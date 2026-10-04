@@ -21,6 +21,17 @@ After KWin, each output turns full side by side into whatever its display, proje
 No program knows about HDMI 3D, anaglyph colours, interleaved lines or shutter timing.
 No driver knows about programs.
 
+```mermaid
+flowchart LR
+  P["Program or engine<br/>two cameras, 2D stays 2D"] -- "edge: pack" --> F["Full side by side<br/>left eye | right eye"]
+  F --> K["KWin<br/>knows stereo"]
+  K -- "edge: convert" --> O["Outputs<br/>HDMI 3D, anaglyph, interleaving,<br/>frame-sequential, pairs, headsets"]
+  O --> D["Driver<br/>switches the display"]
+```
+
+One picture in the middle; formats exist only at the two edges.
+The program owns the camera, a library packs once, KWin composes, each output converts, the driver switches the display.
+
 ## What a program keeps, and the one option it needs
 
 **A program works in 2D, as it always has.**
@@ -38,6 +49,13 @@ No program offers output formats, 3D modes or monitor settings.
 
 **Full side by side, left eye first.**
 Each eye is a complete picture at its full aspect ratio, so the buffer is twice as wide as one eye.
+
+| Left eye, complete | Right eye, complete |
+|:---:|:---:|
+| width W, height H | width W, height H |
+
+The buffer is 2W by H, at any W and H.
+
 It is HDMI 1.4's 3D structure 3, "side by side (full)" (`HDMI_3D_STRUCTURE_SIDE_BY_SIDE_FULL = 3` in the kernel's `include/linux/hdmi.h`), the layout SteamVR writes its stereo screenshots in, and the arrangement of IMAX 3D's two projectors.
 
 **Any resolution.**

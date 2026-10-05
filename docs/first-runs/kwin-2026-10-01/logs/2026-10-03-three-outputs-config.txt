@@ -1,0 +1,93 @@
+# Three outputs, one stereo window: config at 2026-10-03 21:20:50 -0300
+## system
+Linux zionsparkyx64 7.3.0-rc1-stereo3d #2 SMP PREEMPT_DYNAMIC Fri Oct  2 08:12:09 UTC 2026 x86_64 GNU/Linux
+kscreen 4:6.7.4-1+stereo3d4
+kwin-wayland 4:6.7.4-2+stereo3d11
+libgl1-mesa-dri 26.1.6-1
+libgl1-mesa-dri 26.1.6-1
+libkscreen-bin 4:6.7.4-1+stereo3d3
+linux-image-7.3.0-rc1-stereo3d 3
+mesa-vulkan-drivers 26.1.6-1
+mesa-vulkan-drivers 26.1.6-1
+mpv 1:0.41.0-dmo9
+nvidia-kernel-open-dkms-stereo3d 615.71.09-2+stereo3d3
+## GPUs and drivers
+01:00.0 VGA compatible controller [0300]: NVIDIA Corporation GA106 [GeForce RTX 3060 Lite Hash Rate] [10de:2504] (rev a1)
+	Kernel driver in use: nvidia
+0b:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Cezanne [Radeon Vega Series / Radeon Vega Mobile Series] [1002:1638] (rev c9)
+	Kernel driver in use: amdgpu
+/dev/dri/renderD128 -> amdgpu
+/dev/dri/renderD129 -> nvidia
+nvidia module 615.71.09
+## connectors
+card0-DP-1 connected
+card0-HDMI-A-1 connected
+card1-HDMI-A-2 connected
+## KScreen outputs
+Output: 1 HDMI-A-2 779feb79-c80c-4658-93ba-0517e93d11b7
+	enabled
+	Geometry: 3280,0 1920x1080
+	Scale: 1
+	Rotation: 1
+	Overscan: 0
+	RgbRange: Full
+	HDR: incapable
+	Wide Color Gamut: incapable
+	Color profile source: EDID
+	Color power preference: prefer accuracy
+	Color resolution: automatic (16), range: [8; 16] bits per color
+Output: 2 HDMI-A-1 8a513f1f-ec7e-4d8e-9e80-ff0295f40975
+	enabled
+	Geometry: 0,0 1920x1080
+	Scale: 1
+	Rotation: 1
+	Overscan: 0
+	RgbRange: Full
+	HDR: incapable
+	Wide Color Gamut: incapable
+	Color profile source: EDID
+	Color power preference: prefer accuracy
+	Color resolution: automatic (16), range: [8; 16] bits per color
+Output: 3 DP-1 2f874d7e-41e3-4129-b5fe-a7e3cb135f86
+	enabled
+	Geometry: 1920,141 1360x768
+	Scale: 1
+	Rotation: 1
+	Overscan: 0
+	RgbRange: Full
+	HDR: incapable
+	Wide Color Gamut: incapable
+	Color profile source: EDID
+	Color power preference: prefer accuracy
+	Color resolution: automatic (16), range: [8; 16] bits per color
+## current mode per output
+HDMI-A-2 1920x1080@60 60 {'stereo3D': 2}
+HDMI-A-1 1920x1080@30 30 {'stereo3D': 3}
+DP-1 1360x768@60 60.015 {'stereo3D': 0}
+## KWin stereo window rules
+[stereotest]
+Description=Stereo content test: ^mpv$
+stereo3d=sbs-half
+stereo3drule=2
+wmclass=^mpv$
+wmclassmatch=3
+
+--
+position=0,0
+positionrule=2
+stereo3d=sbs-full
+stereo3drule=2
+wmclass=^gamescope$
+wmclassmatch=3
+
+## NVIDIA
+name, driver_version, pstate
+NVIDIA GeForce RTX 3060, 615.71.09, P8
+
+## decoded (libkscreen Mode::Stereo3D: 0 none, 1 side by side half, 2 top and bottom, 3 frame packing)
+HDMI-A-1 (Sony KDL-46HX855, AMD iGPU): frame packing 1080p30
+DP-1 (AOC LE26W154, AMD iGPU): 2D 1360x768@60
+HDMI-A-2 (Sony KDL-46EX725, RTX 3060): top and bottom 1080p60
+
+## the window
+mpv --loop=inf --keepaspect=no --keepaspect-window=no --geometry=5200x600 /K3D/temp/sbs-half-1080p24-sei-60s.mp4 (KWin rule stereotest: stereo3d=sbs-half)

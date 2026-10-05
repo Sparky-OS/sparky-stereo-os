@@ -87,6 +87,7 @@ Look at the one world through two cameras, one per eye, and put the two pictures
 The scene, its simulation and its lights exist once, and everything that does not depend on the viewer (a light's shadow map, for one) is computed once and shared by both eyes.
 Only what a camera sees is rendered per eye: that camera's view of the scene, and the screen-space effects on that view.
 That is what makes the result correct without per-game fixes, and it is not iZ3D's way, which repeats every draw call, shadow passes included, as if there were two worlds.
+The wrappers for programs whose source cannot be patched (wiz3D for Direct3D, our OpenGL layer) follow the same design in our work: they take the camera the program hands the API and render that camera's view for each eye, keeping the other passes once; shifting per draw stays inside them only as the fallback for draws that show no camera.
 
 **2D stays 2D.**
 Your HUD, menus, crosshair, cursor and subtitles are drawn once, identical in both eyes, at the screen's depth.

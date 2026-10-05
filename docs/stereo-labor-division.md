@@ -89,12 +89,14 @@ Only what a camera sees is rendered per eye: that camera's view of the scene, an
 That is what makes the result correct without per-game fixes, and it is not iZ3D's way, which repeats every draw call, shadow passes included, as if there were two worlds.
 The wrappers for programs whose source cannot be patched (wiz3D for Direct3D, our OpenGL layer) follow the same design in our work: they take the camera the program hands the API and render that camera's view for each eye, keeping the other passes once; shifting per draw stays inside them only as the fallback for draws that show no camera.
 No shader needs a fix: the cameras change, and every shader runs unchanged on each camera's view; effects on that view (bloom, ambient occlusion, depth of field) run per eye, and 2D draws stay 2D, drawn once.
+An effect that remembers past frames keeps that memory per eye: Half-Life 2's motion blur kept one previous view for both eyes and wrecked the mouse movement, so it is off in 3D until it keeps one per eye.
 
 **2D stays 2D.**
 Your HUD, menus, crosshair, cursor and subtitles are drawn once, identical in both eyes, at the screen's depth.
 Only the 3D world gets the second camera.
 Repeating the 2D in both eyes is KWin's job wherever the program can separate it: keep the 3D area in its own declared surface (as mpv keeps its video in its own layer) and the interface in ordinary 2D surfaces, and KWin shows every 2D surface in both eyes.
 Only a program that composes its 2D into the same frame as its 3D (a game's HUD, as in Half-Life 2) draws it into each half itself: the same 2D picture at one eye's size, doubled, never stretched across both halves.
+2D never sits over 3D that comes out of the screen: the 2D is at the screen's depth, the object in front of it, and the eyes get two conflicting depths. Move the 2D away from it, never push the 2D into depth: Half-Life 2's ammo row sat over the gun, so it moved to the top of the screen ([how Half-Life 2 reached a 3D display](https://github.com/danielcamposramos/sony-bravia-linux/blob/main/tools/vr-stereo-spectator/FORMULA.md), sections 4 and 6).
 
 **Ways to hand it over:**
 - Draw both eyes into one buffer twice as wide, and declare it through the shared helper (`stereo_declare_x11()` or `stereo_declare_wayland()` with `STEREO_SBS_FULL`).

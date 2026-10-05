@@ -90,8 +90,8 @@ That is what makes the result correct without per-game fixes.
 **2D stays 2D.**
 Your HUD, menus, crosshair, cursor and subtitles are drawn once, identical in both eyes, at the screen's depth.
 Only the 3D world gets the second camera.
-In the double-width buffer that means the interface is drawn into each half: the same 2D picture at one eye's size, doubled, never stretched across both halves.
-A program that keeps its interface in its own 2D window or surface needs nothing at all: KWin shows a 2D surface in both eyes.
+Repeating the 2D in both eyes is KWin's job wherever the program can separate it: keep the 3D area in its own declared surface (as mpv keeps its video in its own layer) and the interface in ordinary 2D surfaces, and KWin shows every 2D surface in both eyes.
+Only a program that composes its 2D into the same frame as its 3D (a game's HUD, as in Half-Life 2) draws it into each half itself: the same 2D picture at one eye's size, doubled, never stretched across both halves.
 
 **Ways to hand it over:**
 - Draw both eyes into one buffer twice as wide, and declare it through the shared helper (`stereo_declare_x11()` or `stereo_declare_wayland()` with `STEREO_SBS_FULL`).

@@ -73,7 +73,7 @@ A stereo window sits on the ordinary desktop, next to 2D windows.
 ## Program developers: applications, games, engines
 
 **Your part is the camera.**
-Render the same world from two cameras, one per eye, and put the two pictures side by side.
+Look at the one world through two cameras, one per eye, and put the two pictures side by side.
 
 **The two cameras:**
 - Start from the camera you already have.
@@ -83,9 +83,10 @@ Render the same world from two cameras, one per eye, and put the two pictures si
 - Do not turn the cameras inward (toe-in): with perspective, it bends the picture differently in each eye.
 - An orthographic view has no perspective, so there the camera move is a small rotation around the point you look at.
 
-**Render the whole frame once per eye.**
-Shadows, lighting, reflections and post effects all run per eye, from that eye's camera.
-That is what makes the result correct without per-game fixes.
+**One world, two cameras.**
+The scene, its simulation and its lights exist once, and everything that does not depend on the viewer (a light's shadow map, for one) is computed once and shared by both eyes.
+Only what a camera sees is rendered per eye: that camera's view of the scene, and the screen-space effects on that view.
+That is what makes the result correct without per-game fixes, and it is not iZ3D's way, which repeats every draw call, shadow passes included, as if there were two worlds.
 
 **2D stays 2D.**
 Your HUD, menus, crosshair, cursor and subtitles are drawn once, identical in both eyes, at the screen's depth.

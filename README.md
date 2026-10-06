@@ -63,6 +63,22 @@ Plasma's Desktop Cube, rebuilt on the standard, shows what follows from one form
 
 **On a 2D screen, too.** A straight 2D screen shows only the left eye, as always, and never renders the second one. But during the cube's animation that one view is still the real 3D scene: live desktops on a turning cube, windows in relief, depth shown by perspective and motion alone. Desktop interfaces have seen little new in years; the cube that is real depth on a 3D screen is something new on a 2D one, before anyone puts on glasses.
 
+## Stereo in the open stack, not in one product
+
+**Elsewhere, stereo is tied to a product.**
+Steam runs on ARM only on Valve's own headset; on every other ARM device, Steam for Linux stays unsupported ([Valve, 4 October 2026](https://github.com/ValveSoftware/steam-for-linux/issues/13689)).
+New glasses-free monitors deliver their 3D through Windows injectors ([ViewX, August 2026](https://www.prnewswire.com/news-releases/viewx-launches-liber-and-immer-glasses-free-ai-3d-displays-on-kickstarter-302857181.html)).
+Cheap ARM boxes switch a television into HDMI 3D only on their vendors' kernels.
+Each works inside its own walls, and stops at them.
+
+**Here, stereo is a property of the open layers, so it reaches the screen you already own.**
+- **KDE carries it.** KWin is the same compositor on the desktop, on ARM boards, on phones with Plasma Mobile and on televisions with Plasma Bigscreen, so one contract covers all of them. China's own desktops have built on KWin too ([UKUI's ukui-kwin](https://github.com/ukui/ukui-kwin), [Deepin's deepin-kwin](https://github.com/linuxdeepin/deepin-kwin)). A new kind of display, glasses-free included, is one more output filter in Stereo KWin, not one more injector per game.
+- **The cheapest hardware already does it.** An Allwinner H616 box and a Rockchip RK3228A box switch a 3D television into HDMI 3D on their Android vendor kernels today, and the Raspberry Pi's mainline driver already allows HDMI stereo modes. Without Steam on ARM, the stereo there comes from the operating system: video, photos, the desktop and native programs.
+- **One kernel fix reaches a whole ecosystem.** In mainline Linux, HDMI stereo modes are allowed by Intel's i915, nouveau and the Raspberry Pi's vc4. The shared HDMI bridge connector that many SoC display drivers build on, Rockchip's and Allwinner's among them, still reads "[TODO: Handle doublescan_allowed and stereo_allowed](https://github.com/torvalds/linux/blob/master/drivers/gpu/drm/display/drm_bridge_connector.c)", and none of the display drivers of China's chipmakers allows stereo modes. Fixing it once, in the DRM core, opens HDMI 3D on every board built on it.
+- **Old hardware comes back.** The Radeon HD 7000 and R9 200 cards, sold alongside the 3D televisions of 2010 to 2013, now run amdgpu's modern display code by default ([Timur Kristóf, XDC 2026](https://indico.freedesktop.org/event/12/contributions/545/)), so HDMI work done there reaches them: an old PC and an old 3D television become a working stereo system again.
+
+KDE carries it, cheap boxes prove it costs little, one kernel fix makes it universal, and old hardware makes it repairable.
+
 ## Documents
 
 - [Stereo labor division](docs/stereo-labor-division.md): who does what to show a stereo picture, from the program to the screen, and what each part never has to care about, tied to the specifications.

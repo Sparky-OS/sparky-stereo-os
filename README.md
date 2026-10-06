@@ -17,6 +17,13 @@ Inside a program, anything goes: a player reads every packing a file can carry, 
 Inside Stereo KWin, only full side by side exists: both eyes at full size, left eye first, at any resolution, declared once.
 The output filters then turn that into whatever the screen needs: a 3D television's own HDMI 3D modes, anaglyph on any monitor, interleaved and frame-sequential displays, a headset.
 
+**A window's 2D part and its 3D area are separate surfaces.**
+The 2D part (menus, toolbars, panels, the document around a picture) is the window's own surface, at its normal size, one eye's size, and declares nothing.
+The 3D area (a stereo video, a 3D viewport, a stereo painting canvas) is a surface of its own that hands Stereo KWin full side by side.
+Stereo KWin shows the 2D part identical in both eyes and gives the 3D area each eye's view, in place inside the window.
+Only a program that is stereo and full screen only, whose whole window is the 3D area, makes its whole window stereo.
+The separation is also what gives the 2D part its depth: its elements declare their planes (sunk, screen, popped), and Stereo KWin draws those for each screen, while the 3D areas carry their own eyes.
+
 **It is how sound already works on Linux.**
 A program hands PipeWire plain PCM, at whatever rate it likes.
 PipeWire resamples, mixes and sends it to HDMI, Bluetooth or a USB DAC, and the program never learns which.

@@ -40,6 +40,16 @@ Here a program learns stereo once: it renders two eyes, declares them to Stereo 
 The converting costs copying rows and columns, work Stereo KWin does every frame anyway; every test runs in software rendering (llvmpipe) as well as on a GPU.
 The design in one page: [STEREO3D.md](https://invent.kde.org/danielcamposramos/kwin/-/blob/stereo3d/STEREO3D.md).
 
+## The Desktop Cube: what one format makes possible
+
+Plasma's Desktop Cube, rebuilt on the standard, shows what follows from one format without inventing anything new.
+- **It is a 3D application, treated like a game:** its scene has its own depth and hands Stereo KWin full side by side, two views of one scene, one camera per eye.
+- **Its faces are your real desktops, each a stereo surface.** The windows on a face sit on the desktop's three planes (sunk, screen and popped, with the pop your own setting), so each face is a relief, and the cube's cameras see the windows standing off its faces from any angle.
+- **When it closes on one desktop, it is the desktop:** the front face lands on the screen plane, identical to the flat desktop.
+- **It is the seed of the VR home:** the same scene, seen through a headset's cameras, is a floating 3D desktop.
+
+**On a 2D screen, too.** A straight 2D screen shows only the left eye, as always, and never renders the second one. But during the cube's animation that one view is still the real 3D scene: live desktops on a turning cube, windows in relief, depth shown by perspective and motion alone. Desktop interfaces have seen little new in years; the cube that is real depth on a 3D screen is something new on a 2D one, before anyone puts on glasses.
+
 ## Documents
 
 - [Stereo labor division](docs/stereo-labor-division.md): who does what to show a stereo picture, from the program to the screen, and what each part never has to care about, tied to the specifications.

@@ -40,6 +40,19 @@ Here a program learns stereo once: it renders two eyes, declares them to Stereo 
 The converting costs copying rows and columns, work Stereo KWin does every frame anyway; every test runs in software rendering (llvmpipe) as well as on a GPU.
 The design in one page: [STEREO3D.md](https://invent.kde.org/danielcamposramos/kwin/-/blob/stereo3d/STEREO3D.md).
 
+## Depth on the desktop
+
+**Three places, declared: sunk, screen and popped.** All subtle, a few pixels, with the limits your own settings (System Settings, "3D Depth"). The active window sits at the screen; its menus, tooltips and notifications pop; the wallpaper and the windows behind sink.
+
+**Everything in between is Stereo KWin's job, by stacking order.** Stacked background windows fan out from sunk towards popped, always behind the active window, in the same order as in 2D. A window caught in the middle of a pile, its edges out of the stack, reads as a sheet floating within it, the way a pile of papers looks in real life. No program declares this; it falls out of the order.
+
+**In the background, each window is 2D.** A window in the pile is a flat sheet at its place in the stack: the desktop's pop effects inside it come to one plane. Its stereo content stays 3D: a movie or a game is full side by side wherever its window is, so a 3D movie plays on one screen while you work on another.
+
+**Pop is real, not faked: a little scale and a little depth, together.** One value per element gives both cues: bigger and nearer when popped, smaller and further when sunk.
+- **Everything follows its element's plane:** its text scales and moves with it, and so does its click area, so a popped element has no dead margin and a sunk one no click area beyond its picture. The plane's geometry lives inside the window itself, the one geometry that drawing and input both read.
+- **Text shares its element's depth.** What tires the eyes is 2D text lying over a picture at another depth, not depth as such.
+- **On a 2D screen, the pop is the same scale plus a move up and to the left,** so depth reads on every screen, with or without glasses.
+
 ## The Desktop Cube: what one format makes possible
 
 Plasma's Desktop Cube, rebuilt on the standard, shows what follows from one format without inventing anything new.

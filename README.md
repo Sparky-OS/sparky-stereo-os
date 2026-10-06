@@ -5,6 +5,13 @@ It is in development.
 
 ## Why one format: full side by side, at any resolution
 
+**The standard in three lines.**
+- **The desktop** (our KWin) speaks full side by side, at any resolution.
+- **Programs** decode or generate stereo in any standard, and deliver full side by side, at any resolution.
+- **Outputs** convert from that to whatever each screen needs.
+
+That is what makes stereo work across GPUs, across monitors (2D ones included) and across every 3D output format.
+
 Every program that shows stereo hands the desktop one thing: both eyes at full size, left eye first, side by side, at any resolution, declared once.
 The desktop turns that into whatever the screen needs: a 3D television's own HDMI 3D modes, anaglyph on any monitor, interleaved and frame-sequential displays, a headset.
 

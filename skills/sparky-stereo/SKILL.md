@@ -57,10 +57,11 @@ A change is done when it is measured, not when it compiles.
 # Part three: working with upstream
 
 - **Patches in upstream style.** The smallest change, in the one place that owns the behaviour, written like the code around it, so maintainers judge what it does.
-- **The project's CI first, locally,** green before anything is pushed; a failure is compared with the unpatched release. Never use a project's own CI as a test bench.
+- **The project's CI first, locally,** green before anything is pushed; a failure is compared with the unpatched release. A release tag's own CI can be red: check whether upstream fixed its CI after the tag, and if so run the CI on a branch based on the current development branch. Never use a project's own CI as a test bench.
 - **Say where the work is used.** An offer names the edition that ships it and the users it serves, and it never makes the edition depend on the merge.
 - **Disclose AI assistance once,** where the project's format asks (for example an `Assisted-by:` trailer), not again in every comment.
-- **Test every mode, not the common one.** The x265 frame packing option passed every test with the SEI in its own unit; a reviewer found that in `--single-sei` mode the units carried stale bytes, a bug older than the option that the option made visible ([x265 #986](https://github.com/Multicorewareinc/x265/pull/986), fixed in [#988](https://github.com/Multicorewareinc/x265/pull/988)). Enumerate a feature's modes and test each.
+- **Test every mode, not the common one.** The x265 frame packing option passed every test with the SEI in its own unit; a reviewer found that in `--single-sei` mode the units carried stale bytes, a bug older than the option that the option made visible ([x265 #986](https://github.com/Multicorewareinc/x265/pull/986); the fix is [#988](https://github.com/Multicorewareinc/x265/pull/988); both in review). Enumerate a feature's modes and test each.
+- **A page behind a bot wall** (a 403, an automated check) is read from the Wayback Machine's copy, one request at a time, with the capture date stated; never with a stealth browser.
 
 Merged so far, for the shape of a good offer: [HandBrake #8100](https://github.com/HandBrake/HandBrake/pull/8100), [Universal Media Server #6330](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6330), [MKVToolNix !6311](https://codeberg.org/mbunkus/mkvtoolnix/pulls/6311), [mpv #18490](https://github.com/mpv-player/mpv/pull/18490).
 

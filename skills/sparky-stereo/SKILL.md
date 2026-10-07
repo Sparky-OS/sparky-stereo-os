@@ -68,20 +68,20 @@ Merged so far, for the shape of a good offer: [HandBrake #8100](https://github.c
 
 # Part four: which skill next
 
-Load the one that matches the work. A skill marked *coming* is not written yet: until it is, the README's program list names what was done in each program and where its fork lives.
+Load the one that matches the work; the README's program list names what was done in each program.
 
 | Skill | For |
 |---|---|
 | [`stereo-window-3d-area`](../stereo-window-3d-area/SKILL.md) | A 3D viewport, canvas or video inside an ordinary window |
 | [`stereo-two-cameras`](../stereo-two-cameras/SKILL.md) | Programs that draw a scene: the cameras, the maths, the proof |
 | [`stereo-video`](../stereo-video/SKILL.md) | Players, encoders, containers and servers |
-| `stereo-pictures` *(coming)* | Stereo photographs: JPS, MPO, viewers, screenshots |
-| `deep-colour` *(coming)* | 10, 12 and 16 bits from the driver to the canvas |
-| `vr-to-3d` *(coming)* | A program's VR path shown on a 3D display |
-| `3d-to-vr` *(coming)* | Stereo content and the desktop in a headset |
-| `drivers` *(coming)* | The kernel and GPU drivers: HDMI 3D modes, deep colour, and carrying patches until mainline takes them |
-| `native-linux` *(coming)* | OpenGL, EGL, Vulkan, Qt and X11 programs on Linux |
-| `proton-wine` *(coming)* | Windows programs through Wine, DXVK and gamescope |
+| [`stereo-pictures`](../stereo-pictures/SKILL.md) | Stereo photographs: JPS, MPO, viewers, screenshots |
+| [`deep-colour`](../deep-colour/SKILL.md) | 10, 12 and 16 bits from the driver to the canvas |
+| [`vr-to-3d`](../vr-to-3d/SKILL.md) | A program's VR path shown on a 3D display |
+| [`3d-to-vr`](../3d-to-vr/SKILL.md) | Stereo content and the desktop in a headset |
+| [`drivers`](../drivers/SKILL.md) | The kernel and GPU drivers: HDMI 3D modes, deep colour, and carrying patches until mainline takes them |
+| [`native-linux`](../native-linux/SKILL.md) | OpenGL, EGL, Vulkan, Qt and X11 programs on Linux |
+| [`proton-wine`](../proton-wine/SKILL.md) | Windows programs through Wine, DXVK and gamescope |
 
 ---
 

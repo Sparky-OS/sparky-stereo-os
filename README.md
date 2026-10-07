@@ -175,7 +175,7 @@ What was proven is said per item, and it was proven on our headless KWin with ca
 
 ## Credit
 
-Sparky Stereo OS, an edition of SparkyLinux, created by Paweł "pavroo" Pijanowski and Daniel Ramos (Capitain Jack).
+Sparky Stereo OS, Daniel Ramos's (Capitain Jack) edition of SparkyLinux (by Paweł "pavroo" Pijanowski).
 
 ## Licence
 

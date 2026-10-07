@@ -5,7 +5,7 @@ description: Operating rules for stereo 3D and deep colour work on Sparky Stereo
 
 # Working on Sparky Stereo OS
 
-Sparky Stereo OS 9 "Mashtabba", based on Debian 14 "Forky", is the stereo 3D edition of SparkyLinux, KDE Plasma only, created by Paweł "pavroo" Pijanowski and Daniel Ramos.
+Sparky Stereo OS 9 "Mashtabba", based on Debian 14 "Forky", is Daniel Ramos's stereo 3D edition of SparkyLinux (by Paweł "pavroo" Pijanowski), KDE Plasma only.
 Its aim is a desktop where stereo 3D and deep colour (10, 12 and 16 bits per channel) are part of the system, not a feature of a few programs.
 This skill holds what every piece of work on it must respect. The other skills in this folder hold the solved patterns for one kind of work each.
 

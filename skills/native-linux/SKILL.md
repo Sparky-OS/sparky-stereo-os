@@ -22,6 +22,7 @@ description: The routes a native Linux program uses to show stereo on Sparky Ste
 
 - **Declare before doubling.** Mesa must declare stereo *before* the window grows to hold both eyes; otherwise KWin takes the resize for a 2D window's.
 - **GLX offers stereo visuals only when KWin announces stereo,** so a program on a plain 2D session sees none, as before.
+- **No `glFinish` is needed, and `GL_BACK` follows the window.** Mesa packs the eyes when the swap flushes, and `GL_BACK` resolves to the drawable's stereo state from any context; a program that drew with a `glFinish` to force the pack can drop it.
 - **Child windows were invisible to the compositor.** gmsh, ParaView, Sweet Home 3D, CloudCompare, GRASS and KiCad declared stereo on a child window, KWin read only top-level windows, and both eyes showed squeezed inside the 2D window; the Xwayland patches answer it.
 - **A program option that does nothing** is common: Netgen had `-stereo` all along; it asked for nothing until patched.
 - **Flatpak:** a Flatpak program loads Mesa from its own runtime, so the edition's stereo Mesa does not reach it; until a Flatpak extension of our Mesa exists, use the distribution's package or the vendor's tarball.

@@ -73,8 +73,8 @@ Load the one that matches the work. A skill marked *coming* is not written yet: 
 | Skill | For |
 |---|---|
 | [`stereo-window-3d-area`](../stereo-window-3d-area/SKILL.md) | A 3D viewport, canvas or video inside an ordinary window |
-| `stereo-two-cameras` *(coming)* | Programs that draw a scene: the cameras, the maths, the proof |
-| `stereo-video` *(coming)* | Players, encoders, containers and servers |
+| [`stereo-two-cameras`](../stereo-two-cameras/SKILL.md) | Programs that draw a scene: the cameras, the maths, the proof |
+| [`stereo-video`](../stereo-video/SKILL.md) | Players, encoders, containers and servers |
 | `stereo-pictures` *(coming)* | Stereo photographs: JPS, MPO, viewers, screenshots |
 | `deep-colour` *(coming)* | 10, 12 and 16 bits from the driver to the canvas |
 | `vr-to-3d` *(coming)* | A program's VR path shown on a 3D display |

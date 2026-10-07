@@ -23,8 +23,8 @@ A side-by-side or top-and-bottom video is an ordinary 2D picture unless somethin
 |---|---|---|
 | x264 (through HandBrake) | `--frame-packing` writes the SEI | [HandBrake #8100](https://github.com/HandBrake/HandBrake/pull/8100), merged |
 | x264 (through VLC) | the input's layout signalled by default | [VLC !10366](https://code.videolan.org/videolan/vlc/-/merge_requests/10366), in review |
-| x265 | `--frame-packing` writes the H.265 SEI | [x265 #986](https://github.com/Multicorewareinc/x265/pull/986), with the single-SEI fix [#988](https://github.com/Multicorewareinc/x265/pull/988) |
-| mkvmerge | `StereoMode` from the H.264 SEI, then from the HEVC SEI | [MKVToolNix !6311](https://codeberg.org/mbunkus/mkvtoolnix/pulls/6311) (merged), [!6312](https://codeberg.org/mbunkus/mkvtoolnix/pulls/6312) |
+| x265 | `--frame-packing` writes the H.265 SEI | [x265 #986](https://github.com/Multicorewareinc/x265/pull/986) and the single-SEI fix [#988](https://github.com/Multicorewareinc/x265/pull/988), both in review |
+| mkvmerge | `StereoMode` from the H.264 SEI, then from the HEVC SEI | [MKVToolNix !6311](https://codeberg.org/mbunkus/mkvtoolnix/pulls/6311) (merged), [!6312](https://codeberg.org/mbunkus/mkvtoolnix/pulls/6312) (in review) |
 | Kdenlive and MLT | a clip knows its packing, the render writes the SEI and `StereoMode` | [Kdenlive `stereo3d-26.08`](https://invent.kde.org/danielcamposramos/kdenlive/-/tree/stereo3d-26.08), [MLT `stereo3d-7.40`](https://github.com/danielcamposramos/mlt/tree/stereo3d-7.40) |
 | Universal Media Server | H.264 transcodes keep the SEI | [#6330](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6330), in 15.9.0 |
 | PeerTube | a container's packing kept through transcoding, right eye first included | [#7816](https://github.com/Chocobozzz/PeerTube/pull/7816), in review |
@@ -34,7 +34,9 @@ A side-by-side or top-and-bottom video is an ordinary 2D picture unless somethin
 
 ## Readers: decoders and players
 
-- **Decoders:** our FFmpeg keeps the SEI's declaration for as long as the standard says, also when it is sent only on keyframes ([FFmpeg #24628](https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/24628)), and prefers the stream's own mark as the side data says ([#24643](https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/24643)). Qt Multimedia names every packing in `QVideoFrameFormat::StereoMode` ([danielcamposramos/qtmultimedia `stereo3d-6.11`](https://github.com/danielcamposramos/qtmultimedia/tree/stereo3d-6.11)).
+- **Decoders:** our FFmpeg keeps the SEI's declaration for as long as the standard says, also when it is sent only on keyframes ([FFmpeg #24628](https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/24628), in review), and prefers the stream's own mark as the side data says ([#24643](https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/24643), in review). Qt Multimedia names every packing in `QVideoFrameFormat::StereoMode` and fills it from the FFmpeg backend ([danielcamposramos/qtmultimedia `stereo3d-6.11`](https://github.com/danielcamposramos/qtmultimedia/tree/stereo3d-6.11)); in the edition's build its video output also takes the views apart itself, so a Qt Quick player keeps only its QML and its 3D menu.
+- **Frame sequences** (temporal interleaving, Table D-8 type 5): pair the frames in stream order on the input side, never from a queue that drops the oldest frame; trust per-frame view marks only when they alternate, and never let a stream-wide Matroska tag flip the eyes.
+- **A side-by-side Matroska file is authored with one eye's display size.** With the pair's full width as the display size, FFmpeg doubles the sample aspect ratio and a player pre-scales the picture before the views are taken apart.
 - **Where a player finds 3D, in this order:** the stream's mark (SEI, `st3d`, `StereoMode`), then tags (`yt3d:` on YouTube), then, last, the frame's shape: a display aspect ratio of at least 2.5 is full side by side.
 - **What a player shows:** every packing unpacked to full side by side, the video in its own layer declared to Stereo KWin, the controls, subtitles and on-screen display in the 2D part, identical in both eyes. A player with output modes of its own loses them in the edition's build.
 - **For video that declares nothing,** a menu with the input format (every packing, both eye orders), Swap Eyes, left or right only, and not 3D. Examples: [Dragon Player `stereo3d-26.04`](https://invent.kde.org/danielcamposramos/dragon/-/tree/stereo3d-26.04), [Haruna `stereo3d`](https://invent.kde.org/danielcamposramos/haruna/-/tree/stereo3d) with [MpvQt](https://invent.kde.org/danielcamposramos/mpvqt/-/tree/stereo3d), [mpv](https://github.com/danielcamposramos/mpv/tree/stereo3d) (its stream detection merged upstream as [#18490](https://github.com/mpv-player/mpv/pull/18490)), [VLC Stereo `3.0.24-3d-stereo`](https://github.com/danielcamposramos/vlc/tree/3.0.24-3d-stereo).
@@ -42,7 +44,7 @@ A side-by-side or top-and-bottom video is an ordinary 2D picture unless somethin
 
 ## Quality
 
-In the edition: decode at the source's depth (10, 12, 16 bits), keep each eye at full resolution (a high-quality filter, not a plain stretch, when a half-width or half-height source is scaled up), pass the colour description on (BT.709 or BT.2020, PQ or HLG, range), and play audio at 24-bit 48 kHz or more wherever the hardware offers it. In a patch offered upstream, keep the project's own defaults and make these paths available.
+In the edition: decode at the source's depth (10, 12, 16 bits), keep each eye at full resolution (a high-quality filter, not a plain stretch, when a half-width or half-height source is scaled up), pass the colour description on (BT.709 or BT.2020, PQ or HLG, range), and play audio at 24-bit 48 kHz or more wherever the hardware offers it, with float output and SoXR for any resampling. In a patch offered upstream, keep the project's own defaults and make these paths available.
 
 ## Proof for this kind of work
 

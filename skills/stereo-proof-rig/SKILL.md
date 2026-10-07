@@ -16,7 +16,7 @@ description: How to prove stereo 3D work on Sparky Stereo OS without a 3D displa
     kwin_wayland --virtual --xwayland --socket=sub --width 1280 --height 800 &
   ```
   wait for the socket in `$XDG_RUNTIME_DIR`, then start the program with `WAYLAND_DISPLAY=sub` and `QT_QPA_PLATFORM=wayland` (or `DISPLAY=:0` and `QT_QPA_PLATFORM=xcb` for the X11 route through Xwayland).
-- **Captures:** KWin's own [ScreenShot2](https://invent.kde.org/plasma/kwin/-/blob/master/src/plugins/screenshot/org.kde.KWin.ScreenShot2.xml) D-Bus interface (`CaptureScreen`, `CaptureActiveWindow`). With stereo content on screen, Stereo KWin's capture holds both eyes side by side, left first, each at the output's full size (a 1280x800 output gives 2560x800), so a script reads each eye as one half.
+- **Captures:** KWin's own [ScreenShot2](https://invent.kde.org/plasma/kwin/-/blob/master/src/plugins/screenshot/org.kde.KWin.ScreenShot2.xml) D-Bus interface (`CaptureScreen`, `CaptureActiveWindow`). With stereo content on screen, Stereo KWin's capture holds both eyes side by side, left eye first, each at the output's full size (a 1280x800 output gives 2560x800), so a script reads each eye as one half.
 - **Declarations:** run the program with `WAYLAND_DEBUG=client` and keep only the lines that matter (`kde_stereo_content`, `set_content`, `get_subsurface`, `place_below`, errors): the log proves which surface declared stereo, and how many times.
 - **Menus and keys:** KWin's [fake input protocol](https://invent.kde.org/libraries/plasma-wayland-protocols/-/blob/master/src/protocols/fake-input.xml) sends key events to the focused window, so a remote-control menu or a 3D menu is driven exactly as a user would, without a desktop.
 
@@ -34,6 +34,7 @@ description: How to prove stereo 3D work on Sparky Stereo OS without a 3D displa
 4. The 2D control: the same container with the distribution's own packages instead of ours, the program with stereo off, 0 differing pixels. When a program animates, freeze it (a deterministic mode and `libfaketime`) and measure the noise between two runs of the same build first.
 5. For drawn scenes: block-match the two eyes (for example 17x17 blocks, sum of absolute differences) along the same row only, and report the vertical profile separately; report the median error, the share within one pixel and the vertical shift.
 6. Rerun everything from the packages installed in a fresh container, not only from the build tree.
+7. For a scaling filter (a half-width or half-height source brought to full size): PSNR against FFmpeg's own output of the same filter, not a judgement by eye. For audio formats: a PipeWire of the container's own, read with `pw-dump`, shows the format and rate the program negotiated.
 
 ## Traps that fooled us
 
@@ -43,3 +44,5 @@ description: How to prove stereo 3D work on Sparky Stereo OS without a 3D displa
 - **Captures are 8 bits per channel:** a deep-colour proof is the surface's configuration and a readback, not the capture.
 - **A test that cannot fail proves nothing:** break the expectation once and see it fail.
 - **Debian source builds in a container:** keep the version's epoch colon out of the build directory's name (CMake's translation targets fail on it).
+- **A background wait with `pgrep -f` or `pkill -f`** on a pattern that also appears in its own command line matches itself and never ends; match the process name, or keep a PID.
+- **The virtual KMS driver (`vkms`) needs a virtual machine:** on a desktop the running compositor takes the virtual device as one more GPU.

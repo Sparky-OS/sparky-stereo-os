@@ -30,6 +30,12 @@ Daniel's rule: "we don't grow so fast, and when grow self prune". A user's disk 
 - **Another system found at installation** (especially on UEFI): other systems listed (`GRUB_DISABLE_OS_PROBER=false`) and the menu shown.
 - **Proposal:** show the menu after a boot that did not finish, so the kept older kernel is reachable. GRUB cannot write its environment block on Btrfs, LVM, RAID or an encrypted `/boot`; use a short visible timeout there.
 
+## Keeping a user's settings
+
+- **An existing home is not overwritten.** Sparky's installer copied `/etc/skel` over a kept `/home`, so a user who kept their home lost their settings. The one-flag fix (`--ignore-existing` on that copy) and a question (keep the settings, the default, or take the edition's with the old files in a dated backup) are offered to Sparky: [sparky-backup-core #3](https://github.com/sparkylinux/sparky-backup-core/pull/3) and [#4](https://github.com/sparkylinux/sparky-backup-core/pull/4), [calamares-sparky #1](https://github.com/sparkylinux/calamares-sparky/pull/1), in review.
+- **KConfig drops comments** when it rewrites a file: an option parked for later goes in a side file, never in a comment.
+- **PipeWire skips a whole configuration file on one syntax error** ("Expected object key"); check a file with `pw-config --name pipewire.conf merge context.properties`. Its node names carry the PCI address and break when the bus renumbers: match cards by name and profile, and rename them.
+
 ## Cleaning a system safely
 
 1. **Diagnose before deleting.** Group crash dumps by where they ran: containers, the user's session, system services. Read the stack traces of the real desktop crashes. On 2026-10-07 this found the VA-API to VDPAU bridge (`vdpau-va-driver`) segfaulting any VA-API probe on a DRM display; the NVDEC-based `nvidia-vaapi-driver` replaced it. Count journal lines per unit and priority to find what fills the log.

@@ -72,6 +72,7 @@ Load the one that matches the work; the README's program list names what was don
 
 | Skill | For |
 |---|---|
+| [`stereo-proof-rig`](../stereo-proof-rig/SKILL.md) | How to produce the proof: a headless Stereo KWin, captures of both eyes, the checks |
 | [`stereo-window-3d-area`](../stereo-window-3d-area/SKILL.md) | A 3D viewport, canvas or video inside an ordinary window |
 | [`stereo-two-cameras`](../stereo-two-cameras/SKILL.md) | Programs that draw a scene: the cameras, the maths, the proof |
 | [`stereo-video`](../stereo-video/SKILL.md) | Players, encoders, containers and servers |

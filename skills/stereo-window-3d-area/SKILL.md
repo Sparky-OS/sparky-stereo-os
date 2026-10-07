@@ -34,6 +34,9 @@ Worked examples:
 
 - A stereo `QWindow` inside `QWidget::createWindowContainer` works on Wayland with our Qt and Mesa.
 - A native stereo `QOpenGLWidget` (`WA_NativeWindow`) does **not**: it comes out with `stereo=false`.
+- A plain `QOpenGLWidget` program with the stereo default format does come out stereo on Wayland today (Kubrick, KAlgebra, Kalzium, measured): but the whole top-level window is declared, menus included. A fix in Qt is being written so that a stereo `QOpenGLWidget` inside a 2D window becomes its own stereo surface, with no change in the program.
+- **Size a stereo top level before its window is created** (`adjustSize()` or a resize when a dialog is built): otherwise its first frame is committed at Qt's default 100x30 and the compositor keeps that size, so the dialog collapses to its title bar (Kalzium's molecule editor; the engine fix is queued).
+- **A GL widget in a dialog turns the parent stereo:** Qt recreates the dialog's parent top level as a GL window when a `QOpenGLWidget` appears, and under the stereo default format the parent is declared too.
 - Setting a stereo *default* surface format makes the whole top level stereo, against the separation rule: set the format on the 3D area's own window only.
 - Qt's client-side decorations once flattened stereo windows; our Qt gives the decorations' content framebuffer a slot per eye ([danielcamposramos/qtbase `stereo3d-csd`](https://github.com/danielcamposramos/qtbase/tree/stereo3d-csd)).
 - A translucent Qt window is forced to an 8-bit alpha, so its 2D part is 8 bits even when the 3D area is deeper; a fix in Qt is being written. Until then, put any deep content in its own layer, as Krita does.

@@ -107,6 +107,7 @@ Each one shows the next project the same problem already fixed elsewhere, and Sp
 - **VLC** ([!10366](https://code.videolan.org/videolan/vlc/-/merge_requests/10366)): the x264 module signals the input's stereo layout by default.
 - **gamescope** ([#2438](https://github.com/ValveSoftware/gamescope/pull/2438)): the present mode of the nested output can be chosen, which ends a frame race seen when stereo games run through it.
 - **NVIDIA's open kernel modules** ([#1386](https://github.com/NVIDIA/open-gpu-kernel-modules/pull/1386)): HDMI deep colour at the depth the display declares in its EDID (DC_30, DC_36, DC_48).
+- **PeerTube** ([#7816](https://github.com/Chocobozzz/PeerTube/pull/7816)): a video that declares its 3D packing in its container keeps it through transcoding, right eye first included.
 - **wiz3D** ([#33](https://github.com/effcol/wiz3D/pull/33)): a Linux build of its DirectX 9 stereo path.
 
 ## Documents

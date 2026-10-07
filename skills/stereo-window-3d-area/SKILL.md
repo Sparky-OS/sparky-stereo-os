@@ -12,7 +12,7 @@ description: How to give an ordinary desktop program a stereo 3D area (a video, 
 A program window has two parts that must not be mixed:
 
 - **the 2D part:** menus, toolbars, panels, the on-screen display, the document around a picture. It stays the window's own surface, at its normal size (one eye's size), declares nothing, and Stereo KWin shows it identical in both eyes;
-- **the 3D area:** a video, a 3D viewport, a canvas. It is a **surface of its own**, handed to Stereo KWin as full side by side (both eyes at full size, left first), declared once.
+- **the 3D area:** a video, a 3D viewport, a canvas. It is a **surface of its own**, handed to Stereo KWin as full side by side (both eyes at full size, left eye first), declared once.
 
 Stereo KWin composes the two in place: the 3D area gets each eye's view inside the window, the 2D part sits over it at screen depth.
 
@@ -28,7 +28,10 @@ Worked examples:
 - **Marble's globe**, a `StereoLayer` class any `QWidget` program can copy: [1df996420832](https://invent.kde.org/danielcamposramos/marble/-/commit/1df996420832) on [`stereo3d`](https://invent.kde.org/danielcamposramos/marble/-/tree/stereo3d).
 - **Krita's canvas**, a child `QWindow` sharing textures with the canvas, also used to keep 16-bit documents deep in a stereo session: [`sparky/stereo-canvas-wayland`](https://invent.kde.org/danielcamposramos/krita/-/tree/sparky/stereo-canvas-wayland).
 - **Video through MpvQt**, shared by Haruna and PlasmaTube, at 10 bits or half float: [danielcamposramos/mpvqt `stereo3d`](https://invent.kde.org/danielcamposramos/mpvqt/-/tree/stereo3d), used by [Haruna `stereo3d`](https://invent.kde.org/danielcamposramos/haruna/-/tree/stereo3d).
-- **Video through Qt Multimedia** (Dragon Player, Plank Player): moving into Qt Multimedia's video output in October 2026, so a Qt Quick player needs no code of its own for declared video.
+- **Video through Qt Multimedia** (Dragon Player, Plank Player): in the edition's Qt Multimedia the video output takes every packing apart itself and draws the video in a declared layer below the window, so a Qt Quick player keeps only its QML and its 3D menu. The public branch carries the `StereoMode` type so far ([danielcamposramos/qtmultimedia `stereo3d-6.11`](https://github.com/danielcamposramos/qtmultimedia/tree/stereo3d-6.11)); the rest follows.
+- **A hole in a Qt Quick window:** an opaque flat-colour node that writes (0,0,0,0) over the area, with an alpha buffer asked for when the window is created; no colour or background of the program changes.
+- **The declaration library's state is per thread:** declare on the thread that initialised it, and let the thread that presents the frames own the layer.
+- **A build option must not change a class layout** that other translation units see: keep the new members always, and hold an optional type through a `shared_ptr` to an incomplete type.
 
 ## Which Qt routes work, measured
 
@@ -38,12 +41,12 @@ Worked examples:
 - **Size a stereo top level before its window is created** (`adjustSize()` or a resize when a dialog is built): otherwise its first frame is committed at Qt's default 100x30 and the compositor keeps that size, so the dialog collapses to its title bar (Kalzium's molecule editor; the engine fix is queued).
 - **A GL widget in a dialog turns the parent stereo:** Qt recreates the dialog's parent top level as a GL window when a `QOpenGLWidget` appears, and under the stereo default format the parent is declared too.
 - Setting a stereo *default* surface format makes the whole top level stereo, against the separation rule: set the format on the 3D area's own window only.
-- Qt's client-side decorations once flattened stereo windows; our Qt gives the decorations' content framebuffer a slot per eye ([danielcamposramos/qtbase `stereo3d-csd`](https://github.com/danielcamposramos/qtbase/tree/stereo3d-csd)).
-- A translucent Qt window is forced to an 8-bit alpha, so its 2D part is 8 bits even when the 3D area is deeper; a fix in Qt is being written. Until then, put any deep content in its own layer, as Krita does.
+- Qt's client-side decorations once flattened stereo windows; our Qt gives the decorations' content framebuffer a slot per eye ([danielcamposramos/qtbase `stereo3d-csd`](https://github.com/danielcamposramos/qtbase/tree/stereo3d-csd)), or KWin decorates the stereo window with server-side decorations.
+- Qt Widgets forced an 8-bit alpha on every translucent window, so a 2D part over a deeper 3D area was 8 bits; our Qt keeps the alpha and depth the window asks for (10/10/10/2 or 16/16/16/16), and a window that asks for nothing stays 8/8/8/8 ([danielcamposramos/qtbase `stereo3d-alpha`](https://github.com/danielcamposramos/qtbase/tree/stereo3d-alpha)). Deep content in its own layer, as Krita does, is still the pattern ([`deep-colour`](../deep-colour/SKILL.md)).
 
 ## X11 programs
 
-Under Xwayland, a 3D area is a child X window. Our Xwayland gives a redirected child window a surface of its own and keeps alpha on 32-bit surfaces, so the same separation works for X11 programs; the declaration goes through the X11 side of the same library. Native Wayland is the route to prefer when the toolkit has it.
+Under Xwayland, a 3D area is a child X window. Our Xwayland gives a redirected child window a surface of its own and keeps alpha on 32-bit surfaces, so the same separation works for X11 programs; the declaration goes through the X11 side of the same library. A window that shows a splash screen first could lose its one-eye size afterwards; our KWin sends it a synthetic ConfigureNotify, so it gets the size back (found on Krita). Native Wayland is the route to prefer when the toolkit has it.
 
 ## Proof for this kind of work
 

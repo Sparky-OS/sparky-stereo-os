@@ -38,6 +38,10 @@ The repository is pinned at 1001. A generated pin file blocks, at priority −1,
 
 A package set waiting for a rebuild is left out of the block until the rebuild lands (see the next section).
 
+## Each build of ours
+
+Each is the distribution's source package plus our patch series, versioned with the suffix `+stereo3dN`, built in a fresh `debian:testing` container, and it keeps its source package, so the repository can offer `deb-src`. A 32-bit twin (Mesa and FFmpeg, for Steam and Wine) comes from the same source build as the 64-bit package: `dpkg` refuses to install the two together when a shared file such as the Debian changelog differs (`Multi-Arch: same`).
+
 ## The media stack sits on deb-multimedia
 
 Players and tools from deb-multimedia (VLC, mpv, OBS, HandBrake) link against its FFmpeg, which has a higher epoch than Debian's. So our stereo patches for FFmpeg and mpv go on deb-multimedia's source packages (`10:…-dmoN+stereo3dM`), with identical sonames, not on Debian's. Offer them to deb-multimedia in the agreed order, and upstream as before.

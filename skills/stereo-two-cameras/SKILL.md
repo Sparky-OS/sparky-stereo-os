@@ -31,7 +31,7 @@ Keep the program's existing separation setting when it has one, and say how its 
 
 ## The OpenGL routes
 
-- **Quad buffer:** draw the left eye into `GL_BACK_LEFT` and the right into `GL_BACK_RIGHT`. The edition's Mesa packs the two at the swap into one full side-by-side picture and declares it to Stereo KWin, so a program that already has quad-buffer stereo works unchanged once it asks for a stereo visual. Netgen had a `-stereo` option that did nothing; it now asks for the quad-buffer window and draws once per eye.
+- **Quad buffer:** draw the left eye into `GL_BACK_LEFT` and the right into `GL_BACK_RIGHT`. The edition's Mesa packs the two at the swap into one full side-by-side picture and declares it to Stereo KWin, so a program that already has quad-buffer stereo works unchanged once it asks for a stereo visual. Netgen had a `-stereo` option that did nothing; it now asks for the quad-buffer window and draws once per eye; OpenSCAD and KiCad take the same route in the edition. Mesa packs the eyes when the swap flushes, so no `glFinish` is needed, and `GL_BACK` follows the drawable's stereo state from any context.
 - **Qt:** a `QOpenGLWidget` with a stereo surface format gets `paintGL()` called once per eye, with `currentTargetBuffer()` saying which (Qt 6.5 and later). KAlgebra, Kubrick and Kalzium were proved this way on X11 and on Wayland (on Wayland the whole window is declared today; see the window skill for the fix in progress).
 - **Vulkan:** a two-layer swapchain image becomes one full side-by-side picture the same way.
 
@@ -40,7 +40,7 @@ Keep the program's existing separation setting when it has one, and say how its 
 As in the general skill, plus the geometry:
 
 1. **The camera maths alone,** in a small test program: project a few thousand visible points with the program's code and with a closed-form prediction (the orbit formula, a pinhole camera, a ray against a sphere), and compare. Expect an error of zero within floating point, zero vertical disparity, and near points crossed.
-2. **The rendered pair** (captured with the [`stereo-proof-rig`](../stereo-proof-rig/SKILL.md)): block-match the two captured eyes along the same row (for example 17×17 blocks, sum of absolute differences; check the vertical profile separately) and compare the measured disparity with the prediction. Report the median error, the median absolute error, the share within one pixel, and the vertical shift. Marble's figures, for scale: median absolute error 0.10 to 0.29 px, about 90 % of points within one pixel, vertical shift 0.
+2. **The rendered pair** (captured with the [`stereo-proof-rig`](../stereo-proof-rig/SKILL.md)): block-match the two captured eyes along the same row (for example 17×17 blocks, sum of absolute differences; check the vertical profile separately) and compare the measured disparity with the prediction. Report the median error, the median absolute error, the share within one pixel, and the vertical shift. Marble's figures, for scale: median absolute error 0.10 to 0.29 px, 81 to 91 % of points within one pixel, vertical shift 0.
 3. **Infinity:** stars or sky shift by the predicted parallax of infinity.
 4. **The 2D parts:** 0 differing pixels between the eyes; the 2D control against the distribution's build, 0 differing pixels.
 5. **Measured limits, written down:** Marble's perspective eyes see a slightly off-centre globe disc that the texture mapper still clips at a circle, about 0.3 px at the default separation; a known limit is stated with its number, not hidden.

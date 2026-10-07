@@ -19,11 +19,11 @@ A Windows game's Direct3D calls become Vulkan through DXVK (Direct3D 9 to 11) or
 
 gamescope is Valve's micro-compositor. Running a game inside it, nested in the desktop, raced frames between the game and the nested output, and stereo made the race visible; letting the nested output's present mode be chosen ends it ([ValveSoftware/gamescope #2438](https://github.com/ValveSoftware/gamescope/pull/2438), in review). SteamVR on a 3D television runs inside gamescope (see [`vr-to-3d`](../vr-to-3d/SKILL.md)). In the edition the desktop draws the final 3D output; a game or gamescope packs the eyes for a screen only on systems without Stereo KWin.
 
-## Planned
+## Done and planned
 
-- **The stereo Lutris build:** a "Stereo 3D" switch, on by default, and a per-game "outputs side by side itself" checkbox; wiz3D as a clean package; the edition's own Wine and DXVK packages.
-- **32-bit builds** of the edition's Mesa and FFmpeg for Steam and Wine.
-- **Proof of each game family** on the capture rig, as below.
+- **Done: 32-bit (i386) builds** of the edition's Mesa and FFmpeg, at the same versions as the 64-bit ones, so the 32-bit programs of Steam and Wine load the same stereo Mesa ([`edition-packaging`](../edition-packaging/SKILL.md)).
+- **Planned: the stereo Lutris build:** a "Stereo 3D" switch, on by default, and a per-game "outputs side by side itself" checkbox; wiz3D as a clean package; the edition's own Wine and DXVK packages.
+- **Planned: proof of each game family** on the capture rig, as below.
 
 ## Traps to check first
 

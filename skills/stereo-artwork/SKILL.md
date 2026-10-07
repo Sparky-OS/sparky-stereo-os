@@ -20,7 +20,7 @@ description: How to make the edition's artwork: copy an existing style exactly (
 ## From 2D art to a stereo pair
 
 - **The background stays identical in both eyes**, at the screen plane (disparity 0). Foreground elements shift by +d/2 in the left eye and −d/2 in the right: crossed disparity, in front of the screen.
-- **Take d from a measured reference**, not a guess. One way: a professionally mastered 3D clip. Block-match a face against its background in a few frames, and use the face's separation from the background as a fraction of the eye width. In a half side-by-side source with a 2:1 sample aspect, one coded pixel is two display pixels. The SparkyOS screen uses 0.473% of the eye width (9.1 px at 1920 per eye).
+- **Take d from a measured reference**, not a guess. One way: a professionally mastered 3D clip. Block-match a face against its background in a few frames, and use the face's separation from the background as a fraction of the eye width. In a half side-by-side source with a 2:1 sample aspect, one coded pixel is two display pixels. The SparkyOS screen uses 0.473% of the eye width (9.08 px at 1920 per eye, each eye shifted by half of it).
 - **Verify on the result:** block-match each element in the pair you made. The foreground must measure d and the background exactly 0.
 - **Preview without a 3D display:** a red/cyan anaglyph (Dubois matrices). The background shows no colour fringes and the foreground floats.
 

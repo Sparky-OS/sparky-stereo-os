@@ -26,7 +26,7 @@ A game with a VR mode already renders two eyes. A 3D display can show them direc
 
 - `sourcevr/`: a replacement VR module for Half-Life 2 that drives a 3D display, and `SPECTATOR.md`, the spectator design (the 2D game with a second camera, so observers and SourceTV get the stereo view too).
 - `steamvr/`: a SteamVR display driver for a 3D television.
-- `gamescope/`: `gamescope-3dtv`, and the nested present-mode patch (upstream as [gamescope #2438](https://github.com/ValveSoftware/gamescope/pull/2438)).
+- `gamescope/`: `gamescope-3dtv`, and the nested present-mode patch (upstream as [gamescope #2438](https://github.com/ValveSoftware/gamescope/pull/2438), in review).
 - `anaglyph/`: an anaglyph shader for gamescope's ReShade, for screens without a 3D mode.
 
 The requests to Valve, with what would make the path clean: [Source-1-Games #8297](https://github.com/ValveSoftware/Source-1-Games/issues/8297) and [SteamVR-for-Linux #961](https://github.com/ValveSoftware/SteamVR-for-Linux/issues/961). Other open routes: [VRto3D](https://github.com/oneup03/VRto3D), an OpenVR driver for 3D displays, and the universal VR mods per engine listed in awesome-stereoscopy.

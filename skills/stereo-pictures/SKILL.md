@@ -28,3 +28,13 @@ description: How stereo photographs and images (MPO, JPS, side-by-side pictures)
 - Test pictures with LEFT in the left view and RIGHT in the right view, in every format and order: MPO, JPS with and without the `_JPSJPS_` block, JPS saved in both orders, plain side by side and top and bottom.
 - For readers and writers: the views read back byte for byte or pixel for pixel by a second program, and the eye order correct.
 - For viewers: both eyes captured, LEFT in the left eye, one declaration on the picture's area, the window's 2D parts identical in both eyes, and the 2D control against the distribution's build.
+
+
+## Writing the marks (2026-10-07)
+
+Many tools lose a stereo mark when they write a file, which silently turns a stereo picture into a plain one.
+
+- **PNG `sTER`:** Pillow 11.3 writes only the public chunks it knows (plus private ones), so it drops `sTER` both when writing and when re-saving. libpng 1.6 has no `sTER` API, and programs built on it (Qt, GIMP, Krita, ImageMagick) keep the chunk only if they opt in to unknown chunks, which they do not. Until those are patched, insert the chunk yourself: right after IHDR, one byte (1 for diverging, the left view on the left), with its CRC. Check the right view starts on a multiple of 8 columns.
+- **Verify with a chunk parser that can fail:** the chunk order `IHDR sTER … IDAT … IEND`, every CRC valid, the mode byte, and the picture still decodes.
+- **Name it `.pns`** (or `.jps` for JPEG with the JPS block). `file` still reports a `.pns` as a plain PNG, so the extension and shared-mime-info carry it until libmagic learns the chunk.
+- **Patches upstream,** engine first: libpng (read and write `sTER`), then Pillow, then the programs that re-save pictures (Krita first, then GIMP), keeping the mark on export.

@@ -1,6 +1,7 @@
 ---
 name: 3d-to-vr
-description: How stereo content and the stereo desktop of Sparky Stereo OS reach a headset or a phone viewer: the headset as one more output of the desktop, 360 and VR180 video, what open software exists today, and what is planned. An early skill; load the general sparky-stereo skill first.
+description: >-
+  How stereo content and the stereo desktop of Sparky Stereo OS reach a headset or a phone viewer: the headset as one more output of the desktop, 360 and VR180 video, what open software exists today, and what is planned. An early skill; load the general sparky-stereo skill first.
 ---
 
 # From 3D content to a headset
@@ -24,6 +25,15 @@ Each a piece, none the whole desktop out of the box; awesome-stereoscopy's [desk
 - KWin's own "VR Mode" draft ([plasma/kwin !8671](https://invent.kde.org/plasma/kwin/-/merge_requests/8671)), closest to KDE itself;
 - [ALVR](https://github.com/alvr-org/ALVR) and [PhoneVR](https://github.com/PhoneVR-Developers/PhoneVR) with the open [Cardboard SDK](https://github.com/googlevr/cardboard), to wear a phone;
 - on the web, the [WebXR Layers API](https://www.w3.org/TR/webxrlayers-1/), whose `stereo-left-right` and `stereo-top-bottom` layouts are the web's only standard stereo vocabulary, inside an immersive session.
+
+## Android XR as a destination (checked 2026-10-07)
+
+[Jetpack XR's spatial-video guide](https://developer.android.com/develop/xr/jetpack-xr-sdk/add-spatial-video) connects Media3 ExoPlayer to a SceneCore `SurfaceEntity` with `StereoMode.SIDE_BY_SIDE`.
+This is a route for a stereo film on a virtual screen in a headset.
+MV-HEVC uses `MULTIVIEW_LEFT_PRIMARY` or `MULTIVIEW_RIGHT_PRIMARY` and requires Media3 1.6.0 or later plus a device with MV-HEVC decoding support.
+Keep this decoder capability separate from displaying a packed side-by-side pair.
+The guide also provides hemisphere and sphere shapes for 180° and 360° content.
+These APIs do not by themselves implement the edition's desktop-to-headset transport; that output remains planned.
 
 ## Planned in the edition
 

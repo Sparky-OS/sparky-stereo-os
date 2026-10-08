@@ -1,6 +1,7 @@
 ---
 name: stereo-pictures
-description: How stereo photographs and images (MPO, JPS, side-by-side pictures) are read, shown, captured and kept on Sparky Stereo OS: the formats, the eye order, what a viewer must offer, screenshots of a stereo desktop, and how to prove it. Load the general sparky-stereo skill first.
+description: >-
+  How stereo photographs and images (MPO, JPS, side-by-side pictures) are read, shown, captured and kept on Sparky Stereo OS: the formats, the eye order, what a viewer must offer, screenshots of a stereo desktop, and how to prove it. Load the general sparky-stereo skill first.
 ---
 
 # Stereo pictures
@@ -13,6 +14,12 @@ description: How stereo photographs and images (MPO, JPS, side-by-side pictures)
 - **JPS:** one JPEG holding both views side by side. Files are commonly saved cross-eyed (the right view on the left); a `_JPSJPS_` block in the file can state the layout and order. Read the block when it is there; when it is not, assume the common order and let the user swap.
 - **PNG with an `sTER` chunk:** the PNG specification already has a stereo mark, the registered chunk `sTER` ([Extensions to the PNG 1.2 Specification, version 1.4.0](http://www.libpng.org/pub/png/spec/register/pngext-1.4.0-pdg.html), section 3.6; in the register since version 1.3.0), placed before the image data: mode 0 is cross-fuse (the right eye's picture on the left), mode 1 diverging (the left eye's picture on the left, which is our full side by side). Read it whatever the file is named, and write it, mode 1, in every stereo PNG you save. A side-by-side PNG named `.pns` is the older convention for the same thing.
 - **A plain side-by-side or top-and-bottom picture** (PNG, JPEG, TIFF): nothing in the file says it is stereo. A viewer offers the input format by hand, and may guess from the shape last (a width of at least twice the height suggests side by side), never before the file's own tags.
+
+## Android camera files (checked 2026-10-07)
+
+- **LG Optimus 3D:** the camera's 3D mode captures with both rear cameras and saves a JPS pair in one JPEG, as documented in this [first-hand camera test](https://www.megatechnews.com/megatech-reviews-lg-optimus-3d-android-smartphone/). Keep both views when importing it; renaming the extension does not convert the pixels.
+- **HTC EVO 3D:** switch the camera to 3D, then choose JPS or MPO in its settings ([HTC user guide, pages 67–73, mirrored by ManualsLib](https://www.manualslib.com/manual/513711/Htc-Evo-3d.html)). Both rear cameras supply the pair. Decode the chosen file format using the rules above; do not infer eye order from the phone model.
+- **Verify with labelled fixtures first.** A camera manual establishes its capture options, not the eye order of every firmware's files. Check the file's stereo metadata and retain Swap Eyes for unmarked pairs.
 
 ## What the pieces do
 

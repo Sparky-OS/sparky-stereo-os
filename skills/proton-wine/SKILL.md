@@ -1,6 +1,7 @@
 ---
 name: proton-wine
-description: How Windows games and programs running through Wine, Proton, DXVK and gamescope reach a 3D display on Sparky Stereo OS: where their stereo comes from (an injector such as wiz3D, a VR mode, or the game's own side-by-side output), how it is handed to the desktop, and what is planned for Lutris. Load the general sparky-stereo skill first.
+description: >-
+  How Windows games and programs running through Wine, Proton, DXVK and gamescope reach a 3D display on Sparky Stereo OS: where their stereo comes from (an injector such as wiz3D, a VR mode, or the game's own side-by-side output), how it is handed to the desktop, and what is planned for Lutris. Load the general sparky-stereo skill first.
 ---
 
 # Windows programs through Wine and Proton

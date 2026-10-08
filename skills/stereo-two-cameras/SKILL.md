@@ -1,6 +1,7 @@
 ---
 name: stereo-two-cameras
-description: How to make a program that draws a scene (a globe, a plot, a molecule, a CAD model, a game view) produce a correct stereo pair on Sparky Stereo OS: one world seen from two cameras, the camera maths for orthographic and perspective views, the OpenGL routes, and how to prove the result against a prediction. Load the general sparky-stereo skill first.
+description: >-
+  How to make a program that draws a scene (a globe, a plot, a molecule, a CAD model, a game view) produce a correct stereo pair on Sparky Stereo OS: one world seen from two cameras, the camera maths for orthographic and perspective views, the OpenGL routes, and how to prove the result against a prediction. Load the general sparky-stereo skill first.
 ---
 
 # One world, two cameras

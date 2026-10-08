@@ -1,6 +1,7 @@
 ---
 name: system-housekeeping
-description: The edition's self-pruning defaults (old kernels removed when a new one installs, minimal capped logs, crash dumps kept small, GRUB menu rules) and how to diagnose and clean a system safely: dry runs, kernel-only removals, reading crash dumps before deleting them. Load the general sparky-stereo skill first.
+description: >-
+  The edition's self-pruning defaults (old kernels removed when a new one installs, minimal capped logs, crash dumps kept small, GRUB menu rules) and how to diagnose and clean a system safely: dry runs, kernel-only removals, reading crash dumps before deleting them. Load the general sparky-stereo skill first.
 ---
 
 # System housekeeping

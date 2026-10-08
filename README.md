@@ -109,6 +109,7 @@ Each one shows the next project the same problem already fixed elsewhere, and Sp
 - **NVIDIA's open kernel modules** ([#1386](https://github.com/NVIDIA/open-gpu-kernel-modules/pull/1386)): HDMI deep colour at the depth the display declares in its EDID (DC_30, DC_36, DC_48).
 - **PeerTube** ([#7816](https://github.com/Chocobozzz/PeerTube/pull/7816)): a video that declares its 3D packing in its container keeps it through transcoding, right eye first included.
 - **wiz3D** ([#33](https://github.com/effcol/wiz3D/pull/33)): a Linux build of its DirectX 9 stereo path.
+- **Qt Multimedia** ([778399](https://codereview.qt-project.org/c/qt/qtmultimedia/+/778399)): the FFmpeg backend reports the mastering display's peak luminance in nits, as `QVideoFrameFormat::maxLuminance()` promises; it reported 10,000 times the value, so HDR video (PQ and HLG) was tone mapped against a peak 10,000 times too high.
 
 ## Programs the edition changes for stereo 3D and deep colour
 

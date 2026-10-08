@@ -92,7 +92,7 @@ By name, the Debian maintainers of the packages we carry with our patches, as th
 **What SparkyLinux provides**:
 - The distribution this edition belongs to: a Debian-based system that follows Debian closely, ready to use out of the box, with its own repositories, keyring and tools.
 - **sparkybackup**, which makes a live ISO from a running system: the way Sparky builds its images, and the way this edition will build its own.
-- The Sparky look: the Plymouth art with the Debian swirl and its orbits and the glass letters, Daniel's own 2015 design for SparkyLinux, from which the edition's SPARKYOS / POWERED BY DEBIAN / STEREO 3D EDITION wordmark is built.
+- The Sparky look: the Plymouth theme `sparky-lines`, Daniel's edit of the theme of Debian 8 "Jessie", with his own background and Sparky logo; the edition's SPARKYOS / POWERED BY DEBIAN / STEREO 3D EDITION wordmark is built from that logo's exact pixels (provenance in section 12).
 
 **Paweł "pavroo" Pijanowski**, the creator and maintainer of SparkyLinux:
 - Built SparkyLinux and has kept it going, year after year, as a free and community-minded Debian derivative.
@@ -398,7 +398,8 @@ Every claim in its documents is tied to a test that could fail or to a public re
 
 ## 12. Art, type and music
 
-- **The Sparky Plymouth art** (the Debian swirl with its orbits and the glass letters), Daniel's own 2015 design for SparkyLinux, from his Sparky artwork of 2015 to 2019: the source of the edition's wordmark, built from its exact pixels.
+- **The Sparky Plymouth theme, `sparky-lines`**: Daniel's edit of the Plymouth theme of **Lines**, the artwork of Debian 8 "Jessie" by **Juliette Taka Belin** (CC BY 3.0 or GPL-2.0-or-later), whose script is by **Alberto Milone** (© 2009 Canonical, GPL-2.0-or-later). Daniel made its background and its Sparky logo, the source of the edition's wordmark, built from that logo's exact pixels. Its spinning orbits come from an earlier Debian Plymouth theme that Debian no longer ships.
+- **The Debian swirl**: Debian's logo, by **Raul Silva** (1999), the Debian Open Use Logo (© 1999 Software in the Public Interest, LGPL-3.0-or-later or CC BY-SA 3.0).
 - **Pirulen**, by **Ray Larabie** (Typodermic Fonts): the typeface the wordmark is rendered in. The font itself is not shipped.
 - **Oxygen**, KDE's classic visual style, by the Oxygen team led by **Nuno Pinheiro**: the model for Stereo Oxygen.
 - **Verdana** (Matthew Carter) and **Trebuchet MS** (Vincent Connare): the typefaces of the edition's web presence.

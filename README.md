@@ -206,6 +206,11 @@ Click a branch to read the code, or its CI result to see every job.
 - [KWin stereo first runs, 2026-10-01](docs/first-runs/kwin-2026-10-01/README.md): the first stereo 3D outputs from KWin on real displays, with photos, logs and the scripts used.
   For KWin and driver developers, and anyone who wants to see what the first runs showed.
 
+## Tools
+
+- [hibernate-bench](tools/hibernate-bench/README.md): boots a Linux kernel in QEMU with UEFI Secure Boot and a software TPM 2.0, hibernates and resumes it, and tampers with the image, the kernel and the TPM in between, with throw-away keys and nothing installed on the host.
+  For kernel developers working on hibernation under Secure Boot and lockdown, and distributions checking their kernels.
+
 ## Credit
 
 Sparky Stereo OS, Daniel Ramos's (Capitain Jack) edition of SparkyLinux (by Paweł "pavroo" Pijanowski).
@@ -216,4 +221,4 @@ Everyone this edition stands on, by name: [ATTRIBUTIONS.md](ATTRIBUTIONS.md).
 
 The documents are licensed under the [Creative Commons Attribution 4.0 International licence](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0): share and adapt them, giving credit to Sparky Stereo OS.
 
-The scripts under `docs/first-runs/` are code and are licensed under the GNU General Public License, version 2 or later (GPL-2.0-or-later); see [LICENSE-GPL-2.0](LICENSE-GPL-2.0).
+The scripts under `docs/first-runs/` and the tools under `tools/` are code and are licensed under the GNU General Public License, version 2 or later (GPL-2.0-or-later); see [LICENSE-GPL-2.0](LICENSE-GPL-2.0).

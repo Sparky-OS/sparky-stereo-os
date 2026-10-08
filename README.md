@@ -168,6 +168,8 @@ What was proven is said per item, and it was proven on our headless KWin with ca
 **Creative programs, not done yet**
 - [**Blender**](https://www.blender.org/): its stereo needs X11 and OpenGL, and its HDR needs Wayland and Vulkan, so today one program cannot have both. Our first run stopped at "OpenGL 4.3 required" because every double-buffered visual had become stereo in an earlier Mesa build; that cause has been fixed in Mesa since, and Blender has not been run again. The planned route is a patch in our own build, so its side by side mode declares its viewport and works on any backend. [planned]
 
+**Beyond stereo, found on the way:** in [**Plasma Add-ons**](https://invent.kde.org/plasma/kdeplasma-addons), the unit converter in Plasma's search downloaded the European Central Bank's currency rates as soon as it loaded, and again every 24 hours, even if nobody converted a currency. In the edition it downloads them only when you convert a currency. KDE knows: [kdeplasma-addons #17](https://invent.kde.org/plasma/kdeplasma-addons/-/work_items/17). [in the edition]
+
 ## Our branches on KDE's GitLab
 
 Every KDE change above is a branch of our fork on [invent.kde.org](https://invent.kde.org/danielcamposramos), built and tested by KDE's own CI before it is proposed upstream.
@@ -195,6 +197,7 @@ Click a branch to read the code, or its CI result to see every job.
 | Kubrick | [`stereo3d`](https://invent.kde.org/danielcamposramos/kubrick/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/kubrick/-/pipelines/1371613) |
 | KInfoCenter | [`stereo3d`](https://invent.kde.org/danielcamposramos/kinfocenter/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/kinfocenter/-/pipelines/1373840) |
 | PlasmaTube | [`stereo3d-26.08`](https://invent.kde.org/danielcamposramos/plasmatube/-/tree/stereo3d-26.08) | [green](https://invent.kde.org/danielcamposramos/plasmatube/-/pipelines/1373822) |
+| Plasma Add-ons | [`sparky-defaults`](https://invent.kde.org/danielcamposramos/kdeplasma-addons/-/tree/sparky-defaults) | [green](https://invent.kde.org/danielcamposramos/kdeplasma-addons/-/pipelines/1374099) |
 | Krita | [`sparky/stereo-canvas-wayland`](https://invent.kde.org/danielcamposramos/krita/-/tree/sparky/stereo-canvas-wayland) | not run on our fork |
 
 ## Documents

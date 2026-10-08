@@ -374,6 +374,9 @@ Their work informs the stereo report Daniel offered the W3C PM-KR Community Grou
 - **TabNews**: **Filipe Deschamps**, its creator, and the TabNews community, where Daniel published his writing.
 - **KDE Discuss**, the **Debian** community and the **SparkyLinux** forums.
 
+**Ideas from the community**, credited to the person who had them:
+- **Karan_Luciano** (Diolinux Plus, 2026-10-08), from IT and 3D printing: **the stereo print preview**, inspecting meshes, parts and layers with real depth before slicing or printing, to save time and catch modelling mistakes. Daniel had not thought of it; it gave the edition its maker role (3D printing, open source first, KDE's AtCore and Atelier first) and puts the slicers' layer preview in depth on the plan. [His reply, in the edition's Diolinux topic](https://plus.diolinux.com.br/t/o-recurso-mais-escondido-do-kde-a-terceira-dimensao-sparky-stereo-os-em-desenvolvimento/84609).
+
 ---
 
 ## 10. AI partners
@@ -453,6 +456,7 @@ We stand on the shoulders of:
 - **Nelson Mandela**.
 - **Sergio Pinheiro**, **Engels Espíritos**, **Eric Joseph Diolé ("Zé Dilone")** and **Ney Milhomem**.
 - **Dionatan Simioni**, **Edson C Silva** and the **Diolinux** community; **Filipe Deschamps** and the **TabNews** community.
+- **Karan_Luciano**, for the stereo print preview, and everyone whose idea becomes part of the edition.
 - The maintainers who reviewed and merged our work.
 - The AI partners who did the legwork.
 - **Áuxia Campos Ramos**, my mother.

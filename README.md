@@ -98,6 +98,7 @@ Each one shows the next project the same problem already fixed elsewhere, and Sp
 - **Universal Media Server** ([#6330](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6330), merged 19 September, released in [15.9.0](https://github.com/UniversalMediaServer/UniversalMediaServer/releases/tag/15.9.0) on 5 October 2026): 3D video keeps its declaration through H.264 transcoding, so televisions and players switch to 3D on their own; the Sony Bravia profiles of 2011 and 2012 are corrected too.
 - **MKVToolNix** ([ebd8445b](https://codeberg.org/mbunkus/mkvtoolnix/commit/ebd8445b1185d35d6bdbb9c1463757fbc9aa7c29), from [!6311](https://codeberg.org/mbunkus/mkvtoolnix/pulls/6311), merged 21 September 2026): mkvmerge sets the Matroska StereoMode ([RFC 9559](https://www.rfc-editor.org/rfc/rfc9559)) from the AVC frame packing SEI.
 - **mpv** ([#18490](https://github.com/mpv-player/mpv/pull/18490), 23 September 2026): the player detects the layout signalled in the stream itself, the frame packing SEI and the MP4 `st3d` box.
+- **Qt Multimedia** ([778399](https://codereview.qt-project.org/c/qt/qtmultimedia/+/778399), merged 8 October 2026): the FFmpeg backend reports the mastering display's peak luminance in nits, as `QVideoFrameFormat::maxLuminance()` promises; it reported 10,000 times the value, so HDR video (PQ and HLG) was tone mapped against a peak 10,000 times too high. Tim Blechmann, the Qt Multimedia maintainer, improved its test and approved it.
 
 **In review:**
 - **FFmpeg** ([#24628](https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/24628)): the H.264 and H.265 decoders honour the SEI's persistence, so the declaration holds for every frame, not only the first; [#24643](https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/24643): the stream's own declaration wins over the container's by default.
@@ -109,7 +110,6 @@ Each one shows the next project the same problem already fixed elsewhere, and Sp
 - **NVIDIA's open kernel modules** ([#1386](https://github.com/NVIDIA/open-gpu-kernel-modules/pull/1386)): HDMI deep colour at the depth the display declares in its EDID (DC_30, DC_36, DC_48).
 - **PeerTube** ([#7816](https://github.com/Chocobozzz/PeerTube/pull/7816)): a video that declares its 3D packing in its container keeps it through transcoding, right eye first included.
 - **wiz3D** ([#33](https://github.com/effcol/wiz3D/pull/33)): a Linux build of its DirectX 9 stereo path.
-- **Qt Multimedia** ([778399](https://codereview.qt-project.org/c/qt/qtmultimedia/+/778399)): the FFmpeg backend reports the mastering display's peak luminance in nits, as `QVideoFrameFormat::maxLuminance()` promises; it reported 10,000 times the value, so HDR video (PQ and HLG) was tone mapped against a peak 10,000 times too high. The Qt Multimedia maintainer approved it (Code-Review +2) and staged it for integration on 8 October 2026.
 
 ## Programs the edition changes for stereo 3D and deep colour
 

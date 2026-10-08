@@ -1,6 +1,7 @@
 ---
 name: stereo-artwork
-description: How to make the edition's artwork: copy an existing style exactly (its own pixels, missing letters built and checked against the typeface, new letters from a calibrated recipe), turn 2D art into a stereo pair with a measured separation, animate in both eyes, and deliver editable files with the right stereo marks. Load the general sparky-stereo skill first.
+description: >-
+  How to make the edition's artwork: copy an existing style exactly (its own pixels, missing letters built and checked against the typeface, new letters from a calibrated recipe), turn 2D art into a stereo pair with a measured separation, animate in both eyes, and deliver editable files with the right stereo marks. Load the general sparky-stereo skill first.
 ---
 
 # Stereo artwork

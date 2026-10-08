@@ -1,6 +1,7 @@
 ---
 name: stereo-proof-rig
-description: How to prove stereo 3D work on Sparky Stereo OS without a 3D display: a headless Stereo KWin in a container, captures of both eyes, the Wayland log of every declaration, key events for menus, the test material (LEFT and RIGHT clips, pictures, scenes), the checks and their numbers, and the traps that fooled us. Load the general sparky-stereo skill first; every other skill's proof section relies on this one.
+description: >-
+  How to prove stereo 3D work on Sparky Stereo OS without a 3D display: a headless Stereo KWin in a container, captures of both eyes, the Wayland log of every declaration, key events for menus, the test material (LEFT and RIGHT clips, pictures, scenes), the checks and their numbers, and the traps that fooled us. Load the general sparky-stereo skill first; every other skill's proof section relies on this one.
 ---
 
 # The proof rig

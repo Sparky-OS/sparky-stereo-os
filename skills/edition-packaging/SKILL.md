@@ -1,6 +1,7 @@
 ---
 name: edition-packaging
-description: How Sparky Stereo OS packages itself the Debian way: role tasks (task-sparky-stereo-<role>), stereo and 2D flavours for science and education, tasksel, blocking Debian's builds of our packages, the media stack on deb-multimedia, and how to prove a package set before it ships. Load the general sparky-stereo skill first.
+description: >-
+  How Sparky Stereo OS packages itself the Debian way: role tasks (task-sparky-stereo-<role>), stereo and 2D flavours for science and education, tasksel, blocking Debian's builds of our packages, the media stack on deb-multimedia, and how to prove a package set before it ships. Load the general sparky-stereo skill first.
 ---
 
 # Packaging the edition

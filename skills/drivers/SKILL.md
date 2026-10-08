@@ -23,6 +23,13 @@ Where mainline stands (October 2026): Intel's i915, nouveau and the Raspberry Pi
 - **nouveau:** deep colour on Turing and newer, the piece it was missing (patches in the same folder).
 - **Probing:** [`stereo-kms-probe`](https://github.com/danielcamposramos/sony-bravia-linux/tree/main/tools/stereo-kms-probe) lists what a connector offers and sets a stereo mode from the command line.
 
+## Android TV-box vendor kernels (checked 2026-10-07)
+
+- **Allwinner's vendor display stack has HDMI 3D paths.** Its [display header](https://github.com/allwinner-zh/linux-3.4-sunxi/blob/6964d467510849e3e262518cb87bff7ef92e01f5/include/video/sunxi_display2.h) defines stereo layer buffers and frame-packing output modes. Its [HDMI timing table](https://github.com/allwinner-zh/linux-3.4-sunxi/blob/6964d467510849e3e262518cb87bff7ef92e01f5/drivers/video/sunxi/hdmi/aw/hdmi_core.c) includes 1080p24 and 720p50/60 frame packing.
+- **Rockchip's vendor HDMI driver has a 3D mode control.** The [mode enum](https://github.com/rockchip-linux/kernel/blob/9ead5f3cbd6e0abd0ac70002205993c953c227ea/drivers/video/rockchip/hdmi/rockchip-hdmi.h) assigns 0 to frame packing, 6 to top and bottom, and 8 to half side by side. The [HDMI implementation](https://github.com/rockchip-linux/kernel/blob/9ead5f3cbd6e0abd0ac70002205993c953c227ea/drivers/video/rockchip/hdmi/rockchip-hdmiv2/rockchip_hdmiv2_hw.c) adjusts frame-packing timing and writes the HDMI vendor InfoFrame's 3D structure.
+- **Proven on the boards tested (2026):** an Allwinner H616 TV box and a Rockchip RK3228A TV box switch a 3D television into HDMI 3D on their vendor Android kernels (frame packing on the H616 box, half side by side on the RK3228A box), and both run the HDMI link at 10-bit RGB.
+- **These are vendor interfaces, not portable Android or mainline DRM APIs.** On another board, identify its kernel and display stack first, then check the modes, the signalling and the return to 2D. Keep physical HDMI packing in the output backend; an Android app still supplies full side by side to the edition's compositor.
+
 ## Carrying patches until mainline takes them
 
 Kernel review is slow and careful, and a subsystem owes nobody a merge. Plan for it:

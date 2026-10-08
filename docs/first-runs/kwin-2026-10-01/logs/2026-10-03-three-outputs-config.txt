@@ -90,4 +90,4 @@ DP-1 (AOC LE26W154, AMD iGPU): 2D 1360x768@60
 HDMI-A-2 (Sony KDL-46EX725, RTX 3060): top and bottom 1080p60
 
 ## the window
-mpv --loop=inf --keepaspect=no --keepaspect-window=no --geometry=5200x600 /K3D/temp/sbs-half-1080p24-sei-60s.mp4 (KWin rule stereotest: stereo3d=sbs-half)
+mpv --loop=inf --keepaspect=no --keepaspect-window=no --geometry=5200x600 /tmp/sbs-half-1080p24-sei-60s.mp4 (KWin rule stereotest: stereo3d=sbs-half; recording path replaced with a generic example)

@@ -1,6 +1,7 @@
 ---
 name: vr-to-3d
-description: How a game or engine with a VR mode is shown on a 3D television, projector or monitor instead of a headset on Sparky Stereo OS, and how a headset player's view is mirrored in stereo for the room (the Stereo Spectator): the formula learned on Half-Life 2, the tools, and the rules. Load the general sparky-stereo skill first.
+description: >-
+  How a game or engine with a VR mode is shown on a 3D television, projector or monitor instead of a headset on Sparky Stereo OS, and how a headset player's view is mirrored in stereo for the room (the Stereo Spectator): the formula learned on Half-Life 2, the tools, and the rules. Load the general sparky-stereo skill first.
 ---
 
 # From a VR engine to a 3D display
@@ -38,6 +39,15 @@ The requests to Valve, with what would make the path clean: [Source-1-Games #829
 - **A headset's cameras, too.** Passthrough headsets carry two cameras about an eye's distance apart, so the room can also watch what the cameras recorded (spatial photos and video) and what they see live (a stereo camera feed streamed to the desktop). Apple Vision Pro and Pico 4 Ultra record stereo natively, Galaxy XR with Samsung's software, Quest 3 and 3S through apps on Meta's Passthrough Camera API, Steam Frame with a colour-camera add-on ([immerNews, 2026-09-03](https://immernews.com/spatial-cameras-in-vr-from-quest-3-to-steam-frame-arcturus-with-project-phoenix-on-the-horizon/)). All of it ends as full side by side in Stereo KWin; only the input formats differ, and each device's real files are tested before the edition claims support ([`stereo-video`](../stereo-video/SKILL.md), [`stereo-pictures`](../stereo-pictures/SKILL.md)).
 - **In the edition** the desktop draws the final output; the game hands over full side by side.
 - **Blur and other effects that keep state between frames** must be per eye, or off: Half-Life 2's motion blur shared its previous view between the eyes and broke.
+
+## Android XR as a source (checked 2026-10-07)
+
+[Android XR supports OpenXR 1.1](https://developer.android.com/develop/xr/openxr).
+Its immersive apps submit [per-view poses, fields of view and images](https://registry.khronos.org/OpenXR/specs/1.1/man/html/XrCompositionLayerProjectionView.html) through that runtime.
+A desktop adapter must preserve the view information before applying the camera rules above.
+For recorded spatial video, [Jetpack XR documents side-by-side and MV-HEVC playback](https://developer.android.com/develop/xr/jetpack-xr-sdk/add-spatial-video).
+Decode the two views, resolve their eye order, and deliver full side by side to Stereo KWin.
+An XR API or a headset's ordinary mirror is not proof that both eyes reach a desktop surface; the Android-to-KWin bridge still needs the capture proof below.
 
 ## Proof
 

@@ -1,6 +1,7 @@
 ---
 name: stereo-video
-description: How stereo 3D video keeps its 3D through every program that touches it on Sparky Stereo OS, from encoder to container, server, decoder and player: the standard marks, the detection order, what a player must offer, 360 and VR180, quality, and how to prove it. Load the general sparky-stereo skill first.
+description: >-
+  How stereo 3D video keeps its 3D through every program that touches it on Sparky Stereo OS, from encoder to container, server, decoder and player: the standard marks, the detection order, what a player must offer, 360 and VR180, quality, and how to prove it. Load the general sparky-stereo skill first.
 ---
 
 # Stereo video, end to end
@@ -41,6 +42,12 @@ A side-by-side or top-and-bottom video is an ordinary 2D picture unless somethin
 - **What a player shows:** every packing unpacked to full side by side, the video in its own layer declared to Stereo KWin, the controls, subtitles and on-screen display in the 2D part, identical in both eyes. A player with output modes of its own loses them in the edition's build.
 - **For video that declares nothing,** a menu with the input format (every packing, both eye orders), Swap Eyes, left or right only, and not 3D. Examples: [Dragon Player `stereo3d-26.04`](https://invent.kde.org/danielcamposramos/dragon/-/tree/stereo3d-26.04), [Haruna `stereo3d`](https://invent.kde.org/danielcamposramos/haruna/-/tree/stereo3d) with [MpvQt](https://invent.kde.org/danielcamposramos/mpvqt/-/tree/stereo3d), [mpv](https://github.com/danielcamposramos/mpv/tree/stereo3d) (its stream detection merged upstream as [#18490](https://github.com/mpv-player/mpv/pull/18490)), [VLC Stereo `3.0.24-3d-stereo`](https://github.com/danielcamposramos/vlc/tree/3.0.24-3d-stereo).
 - **360 and VR180:** the projection comes from the stream (mpv's `demux-projection`, the `sv3d` box); the player shows a flat view the viewer turns with the mouse or keys, the same direction in both eyes; FFmpeg's `v360` filter converts projections.
+
+## Android's media path (checked 2026-10-07)
+
+- **Keep the layout beside the decoded frames.** Media3 carries it in [`Format.stereoMode`](https://github.com/androidx/media/blob/main/libraries/common/src/main/java/androidx/media3/common/Format.java); decoding to a MediaCodec `Surface` is a separate step from presenting each eye.
+- **The MP4 work is still in review.** [Media3 #3439](https://github.com/androidx/media/pull/3439) adds H.264/H.265 frame packing SEI detection in MP4 and fragmented MP4 when the container has no stereo value. It adds right-eye-first modes and writes the four side-by-side/top-and-bottom eye orders in WebM's `StereoMode` ([RFC 9559, Table 5](https://www.rfc-editor.org/rfc/rfc9559.html#section-5.1.4.1.28.3)). A container value wins in this patch; test conflicting marks before treating it as the edition's detection policy.
+- **Do not assume portable MediaCodec stereo side data.** The [Android 16 `MediaFormat` source](https://github.com/aosp-mirror/platform_frameworks_base/blob/android-16.0.0_r1/media/java/android/media/MediaFormat.java) defines no public stereo-layout key. On API 31 and later, [`getSupportedVendorParameters()` and `subscribeToVendorParameters()`](https://developer.android.com/reference/android/media/MediaCodec) can expose a codec's vendor metadata through its output format. Check the named codec and the meaning of each field before using it; keep extractor metadata when no stereo field is available.
 
 ## Quality
 

@@ -196,10 +196,17 @@ The same fight goes on in display standards: in 2024 the HDMI Forum refused an o
 > "If we knew what we were doing, it would not be called research."
 > — attributed to Albert Einstein, an epigraph of Daniel's engineering thesis
 
-### 1.10 Mentors and inspirations
+### 1.10 Nelson Mandela
+
+> "It always seems impossible until it's done."
+> — 👨🏿‍⚖️ Nelson Mandela, the phrase on Daniel's personal website
+
+### 1.11 Mentors, friends and inspirations
 
 - **Sergio Pinheiro**, for mentorship.
 - **Engels Espíritos**, for inspiration.
+- **Eric Joseph Diolé**, "Zé Dilone", Daniel's mentor in web design, who introduced him to [balthaser.com](https://www.balthaser.com/).
+- **Ney Milhomem**, a close friend and visual artist (*artista plástico*), Daniel's partner in design back in the day.
 
 ---
 
@@ -442,7 +449,8 @@ We stand on the shoulders of:
 - **Vadim Asadov** and **iZ3D**, and **Joe Penna**.
 - **Michael Jackson**, **George Lucas**, **James Cameron**, **IMAX** and its engineers.
 - **Nikola Tesla**, **Aaron Swartz** and **Albert Einstein**.
-- **Sergio Pinheiro** and **Engels Espíritos**.
+- **Nelson Mandela**.
+- **Sergio Pinheiro**, **Engels Espíritos**, **Eric Joseph Diolé ("Zé Dilone")** and **Ney Milhomem**.
 - **Dionatan Simioni**, **Edson C Silva** and the **Diolinux** community; **Filipe Deschamps** and the **TabNews** community.
 - The maintainers who reviewed and merged our work.
 - The AI partners who did the legwork.

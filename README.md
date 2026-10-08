@@ -168,6 +168,9 @@ What was proven is said per item, and it was proven on our headless KWin with ca
 **Creative programs, not done yet**
 - [**Blender**](https://www.blender.org/): its stereo needs X11 and OpenGL, and its HDR needs Wayland and Vulkan, so today one program cannot have both. Our first run stopped at "OpenGL 4.3 required" because every double-buffered visual had become stereo in an earlier Mesa build; that cause has been fixed in Mesa since, and Blender has not been run again. The planned route is a patch in our own build, so its side by side mode declares its viewport and works on any backend. [planned]
 
+**Games and emulators, not done yet**
+- [**MAME**](https://www.mamedev.org/) and the emulators of 3D consoles, shipped configured to full side by side; people bring their own game files. First comes [Chris M. Covell's SMS 3-D Demo](https://www.smspower.org/Homebrew/SMS3DDemo-SMS) for the Master System's 3-D Glasses, by his permission (2026-10-08): his own seven pictures, unaltered and looping, with his readme. [planned]
+
 **Beyond stereo, found on the way:** in [**Plasma Add-ons**](https://invent.kde.org/plasma/kdeplasma-addons), the unit converter in Plasma's search downloaded the European Central Bank's currency rates as soon as it loaded, and again every 24 hours, even if nobody converted a currency. In the edition it downloads them only when you convert a currency. KDE knows: [kdeplasma-addons #17](https://invent.kde.org/plasma/kdeplasma-addons/-/work_items/17). [in the edition]
 
 ## Our branches on KDE's GitLab

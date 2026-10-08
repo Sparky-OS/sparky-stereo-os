@@ -178,6 +178,8 @@ What was proven is said per item, and it was proven on our headless KWin with ca
 
 Sparky Stereo OS, Daniel Ramos's (Capitain Jack) edition of SparkyLinux (by Paweł "pavroo" Pijanowski).
 
+Everyone this edition stands on, by name: [ATTRIBUTIONS.md](ATTRIBUTIONS.md).
+
 ## Licence
 
 The documents are licensed under the [Creative Commons Attribution 4.0 International licence](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0): share and adapt them, giving credit to Sparky Stereo OS.

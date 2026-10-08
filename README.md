@@ -193,6 +193,8 @@ Click a branch to read the code, or its CI result to see every job.
 | Analitza | [`stereo3d`](https://invent.kde.org/danielcamposramos/analitza/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/analitza/-/pipelines/1371575) |
 | Kalzium | [`stereo3d`](https://invent.kde.org/danielcamposramos/kalzium/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/kalzium/-/pipelines/1372737) |
 | Kubrick | [`stereo3d`](https://invent.kde.org/danielcamposramos/kubrick/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/kubrick/-/pipelines/1371613) |
+| KInfoCenter | [`stereo3d`](https://invent.kde.org/danielcamposramos/kinfocenter/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/kinfocenter/-/pipelines/1373840) |
+| PlasmaTube | [`stereo3d-26.08`](https://invent.kde.org/danielcamposramos/plasmatube/-/tree/stereo3d-26.08) | [green](https://invent.kde.org/danielcamposramos/plasmatube/-/pipelines/1373822) |
 | Krita | [`sparky/stereo-canvas-wayland`](https://invent.kde.org/danielcamposramos/krita/-/tree/sparky/stereo-canvas-wayland) | not run on our fork |
 
 ## Documents

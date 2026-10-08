@@ -205,7 +205,7 @@ The same fight goes on in display standards: in 2024 the HDMI Forum refused an o
 
 - **Sergio Pinheiro**, for mentorship.
 - **Engels Espíritos**, for inspiration.
-- **Eric Joseph Diolé**, "Zé Dilone", Daniel's mentor in web design, who introduced him to [balthaser.com](https://www.balthaser.com/).
+- **Eric Joseph Diolé**, "Zé Dilone", Daniel's mentor in web design, who introduced him to balthaser.com, a web design landmark known worldwide in its day, kept now only by the Wayback Machine ([its oldest capture, 10 May 2000](https://web.archive.org/web/20000510030857/http://www.balthaser.com/)).
 - **Ney Milhomem**, a close friend and visual artist (*artista plástico*), Daniel's partner in design back in the day.
 
 ---

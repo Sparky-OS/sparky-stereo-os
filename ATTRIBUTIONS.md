@@ -216,8 +216,8 @@ The same fight goes on in display standards: in 2024 the HDMI Forum refused an o
 
 **Source**: [kernel.org](https://www.kernel.org/)
 **License**: GPL-2.0
-**What we changed**: amdgpu lists and signals the HDMI 3D modes a display's EDID declares and times frame packing; full side by side handled in the DRM core, i915, nouveau and amdgpu; nouveau gains 16 bits per colour on Turing and newer; a fix for rumble-less gamepads in hid-betopff.
-**Credit**: Linus Torvalds and the kernel's developers; the DRM maintainers Dave Airlie and Simona Vetter; Damien Lespiau, whose 2013 change let Intel's i915 offer HDMI stereo modes; the nouveau maintainers Lyude Paul and Danilo Krummrich; AMD's display team; Jim Cromie, whose nouveau fix our kernel carries.
+**What we changed**: amdgpu lists and signals the HDMI 3D modes a display's EDID declares and times frame packing; full side by side handled in the DRM core, i915, nouveau and amdgpu; nouveau gains 16 bits per colour on Turing and newer; a fix for rumble-less gamepads in hid-betopff; VKMS, the virtual display driver, sets HDMI 3D modes and composes and writes back the frame of both eyes, on Louis Chauvet's configfs series.
+**Credit**: Linus Torvalds and the kernel's developers; the DRM maintainers Dave Airlie and Simona Vetter; Damien Lespiau, whose 2013 change let Intel's i915 offer HDMI stereo modes; the nouveau maintainers Lyude Paul and Danilo Krummrich; AMD's display team; Jim Cromie, whose nouveau fix our kernel carries; Rodrigo Siqueira and Haneen Mohammed, who created VKMS; Louis Chauvet and José Expósito, whose VKMS configfs work our stereo tests build on; Thomas Wood, for IGT's kms_3d; Adam Jackson and Hans Verkuil, for edid-decode.
 
 ### 2.2 Mesa
 

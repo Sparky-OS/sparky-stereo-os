@@ -1,0 +1,11 @@
+# Memory error and leak detection (KASAN, kmemleak), for runs that look for use-after-free and leaks.
+CONFIG_DEBUG_KERNEL=y
+# KASAN needs the full SLUB, tinyconfig picks the tiny one
+# CONFIG_SLUB_TINY is not set
+CONFIG_KALLSYMS=y
+CONFIG_STACKTRACE=y
+CONFIG_KASAN=y
+CONFIG_KASAN_GENERIC=y
+CONFIG_DEBUG_KMEMLEAK=y
+CONFIG_DEBUG_KMEMLEAK_MEM_POOL_SIZE=16000
+# CONFIG_DEBUG_KMEMLEAK_AUTO_SCAN is not set

@@ -83,6 +83,7 @@ Load the one that matches the work; the README's program list names what was don
 | [`deep-colour`](../deep-colour/SKILL.md) | 10, 12 and 16 bits from the driver to the canvas |
 | [`vr-to-3d`](../vr-to-3d/SKILL.md) | A program's VR path shown on a 3D display |
 | [`3d-to-vr`](../3d-to-vr/SKILL.md) | Stereo content and the desktop in a headset |
+| [`vkms-stereo`](../vkms-stereo/SKILL.md) | Testing stereo without a 3D display: VKMS with a 3D EDID, the writeback bench, IGT and KWin in a VM |
 | [`drivers`](../drivers/SKILL.md) | The kernel and GPU drivers: HDMI 3D modes, deep colour, and carrying patches until mainline takes them |
 | [`native-linux`](../native-linux/SKILL.md) | OpenGL, EGL, Vulkan, Qt and X11 programs on Linux |
 | [`proton-wine`](../proton-wine/SKILL.md) | Windows programs through Wine, DXVK and gamescope |

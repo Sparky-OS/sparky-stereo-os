@@ -212,8 +212,13 @@ Click a branch to read the code, or its CI result to see every job.
 - [KWin stereo first runs, 2026-10-01](docs/first-runs/kwin-2026-10-01/README.md): the first stereo 3D outputs from KWin on real displays, with photos, logs and the scripts used.
   For KWin and driver developers, and anyone who wants to see what the first runs showed.
 
+- [Test stereo without a 3D TV](docs/test-stereo-without-a-3d-tv.md): build a kernel whose VKMS speaks HDMI 3D, give it a 3D EDID, and run the bench, IGT and KWin; what each test proves and how it failed without the patches.
+  For anyone writing stereo code who has no 3D display at hand.
+
 ## Tools
 
+- [vkms-stereo-bench](tools/vkms-stereo-bench/README.md): a kernel's virtual display driver (VKMS) given the EDID of a 3D television, so stereo modes can be set and each eye read back pixel by pixel in a VM, with KUnit, IGT's `kms_3d` and Stereo KWin; no 3D display needed.
+  For driver, compositor and application developers who need to test stereo output.
 - [hibernate-bench](tools/hibernate-bench/README.md): boots a Linux kernel in QEMU with UEFI Secure Boot and a software TPM 2.0, hibernates and resumes it, and tampers with the image, the kernel and the TPM in between, with throw-away keys and nothing installed on the host.
   For kernel developers working on hibernation under Secure Boot and lockdown, and distributions checking their kernels.
 

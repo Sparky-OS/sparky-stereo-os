@@ -1,0 +1,248 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# vkms-stereo-bench: test HDMI 3D (stereo) modes without a 3D display. Boots a kernel whose VKMS lists and
+# composes stereo modes in QEMU, gives VKMS connectors an EDID through configfs, and checks each eye of each
+# mode: VKMS's KUnit tests, a pixel-exact writeback test, IGT's kms_3d, and Stereo KWin. See README.md.
+#
+set -u
+BENCH_DIR=$(cd "$(dirname "$0")" && pwd)
+
+# ---------------------------------------------------------------- options and defaults
+WORK=${BENCH_WORK:-$PWD/bench-work}
+KERNEL=""         # bzImage of the kernel under test (tools/build-test-kernel.sh builds a small one)
+FULL_KERNEL=""    # bzImage built with kconfig/vkms-stereo-full.fragment, for the kwin phase
+IGT_ROOT=""       # root file system with IGT's kms_3d in /usr/local/bin (tools/build-igt-root.sh)
+KWIN_ROOT=""      # root file system with Stereo KWin, kscreen-doctor, D-Bus, gcc and the Wayland/EGL headers
+SBS_FULL=0        # also test an EDID that declares side by side (full)
+MEM=3072
+CPUS=2
+TIMEOUT=900
+ACCEL=auto
+
+usage() {
+    cat <<'USAGE'
+usage: bench [options] COMMAND [PHASE...]
+
+commands:
+  doctor                 check that the tools are there, and KVM
+  run PHASE...           run phases (names below, or "all": the ones whose inputs are given)
+  list                   list the phases
+  clean                  delete the work directory's runs
+
+options:
+  --kernel FILE          bzImage to test, with VKMS, configfs, writeback, KUnit and 9p built in      [required]
+  --full-kernel FILE     bzImage with a desktop-capable configuration, for the kwin phase
+  --igt-root DIR         root file system with /usr/local/bin/kms_3d, for the igt phase
+  --kwin-root DIR        root file system with Stereo KWin and kscreen-doctor, for the kwin phase
+  --sbs-full             the writeback phase also tests an EDID that declares side by side (full), and
+                         the kwin phase uses it; mainline DRM does not list that layout
+  --work DIR             work directory (default ./bench-work, or $BENCH_WORK)
+  --mem MB               guest memory (default 3072; the kwin phase uses at least 4096)
+  --cpus N               guest CPUs (default 2; the kwin phase uses at least 4)
+  --timeout SEC          per boot (default 900)
+  --accel kvm|tcg|auto   (default auto)
+
+phases:
+USAGE
+    list_phases | sed 's/^/  /'
+}
+
+list_phases() {
+    cat <<'LIST'
+kunit       VKMS's KUnit suites, built into the kernel, run at boot (vkms-stereo among them)
+writeback   stereo-wb-test: each listed stereo mode shown with known eyes, read back through writeback, pixel by pixel
+igt         IGT's kms_3d: forces a 3D EDID, lists the 3D modes, sets each one with a stereo framebuffer
+kwin        Stereo KWin: kscreen-doctor sets each 3D mode, the scanned-out frame is checked eye by eye
+LIST
+}
+
+die() { echo "bench: $*" >&2; exit 2; }
+
+ARGS=()
+while [ $# -gt 0 ]; do
+    case "$1" in
+    --kernel) KERNEL=$2; shift 2 ;;
+    --full-kernel) FULL_KERNEL=$2; shift 2 ;;
+    --igt-root) IGT_ROOT=$2; shift 2 ;;
+    --kwin-root) KWIN_ROOT=$2; shift 2 ;;
+    --sbs-full) SBS_FULL=1; shift ;;
+    --work) WORK=$2; shift 2 ;;
+    --mem) MEM=$2; shift 2 ;;
+    --cpus) CPUS=$2; shift 2 ;;
+    --timeout) TIMEOUT=$2; shift 2 ;;
+    --accel) ACCEL=$2; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *) ARGS+=("$1"); shift ;;
+    esac
+done
+set -- "${ARGS[@]:-}"
+COMMAND=${1:-}
+[ $# -gt 0 ] && shift
+
+# ---------------------------------------------------------------- tools
+doctor() {
+    local ok=0 t
+    for t in qemu-system-x86_64 busybox edid-decode gcc python3; do
+        if command -v $t >/dev/null; then echo "ok      $t"; else echo "MISSING $t"; ok=1; fi
+    done
+    if file -L "$(command -v busybox)" 2>/dev/null | grep -q static || ldd "$(command -v busybox)" 2>&1 | grep -q "not a dynamic"; then
+        echo "ok      busybox is static"
+    else
+        echo "MISSING a static busybox (busybox-static)"; ok=1
+    fi
+    if python3 -c 'import PIL' 2>/dev/null; then echo "ok      python3 Pillow"; else echo "MISSING python3 Pillow (python3-pil)"; ok=1; fi
+    if [ -w /dev/kvm ]; then echo "ok      KVM"; else echo "info    no usable /dev/kvm: QEMU uses TCG (slower)"; fi
+    return $ok
+}
+
+build_programs() {
+    mkdir -p "$WORK/bin"
+    local p
+    for p in stereo-wb-test drm-grab; do
+        if [ ! -x "$WORK/bin/$p" ] || [ "$BENCH_DIR/src/$p.c" -nt "$WORK/bin/$p" ]; then
+            gcc -O2 -static -Wall -o "$WORK/bin/$p" "$BENCH_DIR/src/$p.c" || die "could not build $p"
+        fi
+    done
+}
+
+# EDIDs and the stereo formats each should give, read from edid-decode's output (not from the kernel)
+build_data() {
+    mkdir -p "$WORK/data"
+    local e n
+    for e in "$BENCH_DIR"/edid/*.bin; do
+        n=$(basename "$e" .bin)
+        install -m 0644 "$e" "$WORK/data/$n.bin"
+        edid-decode --check "$e" > "$WORK/data/$n.decode.txt" 2>&1
+        python3 "$BENCH_DIR/edid/expect-from-decode.py" "$WORK/data/$n.decode.txt" > "$WORK/data/$n.expect" ||
+            die "could not read the expected formats of $n"
+    done
+}
+
+build_initramfs() {
+    local tree="$WORK/initramfs.tree" a
+    rm -rf "$tree"
+    mkdir -p "$tree"/{bin,sbin,proc,sys,dev,run,tmp,etc,phases,data,src}
+    cp "$(command -v busybox)" "$tree/bin/busybox"
+    for a in $("$tree/bin/busybox" --list); do [ -e "$tree/bin/$a" ] || ln -s busybox "$tree/bin/$a"; done
+    cp "$BENCH_DIR/guest/init" "$tree/init"
+    chmod 755 "$tree/init"
+    cp "$BENCH_DIR"/guest/phases/*.sh "$tree/phases/"
+    cp "$WORK"/data/*.bin "$WORK"/data/*.expect "$tree/data/"
+    cp "$WORK/bin/stereo-wb-test" "$WORK/bin/drm-grab" "$tree/bin/"
+    cp "$BENCH_DIR/src/stereo-subsurface.c" "$BENCH_DIR/src/fullscreen-2d.c" "$tree/src/"
+    python3 "$BENCH_DIR/tools/mkcpio.py" "$tree" "$WORK/initramfs.cpio.gz" || die "could not pack the initramfs"
+    rm -rf "$tree"
+}
+
+# run_vm PHASE KERNEL RUNDIR [QEMU ARGS...] -- [KERNEL COMMAND LINE WORDS...]
+run_vm() {
+    local phase=$1 kernel=$2 dir=$3 accel cpu qemu=() cmdline=()
+    shift 3
+    while [ $# -gt 0 ] && [ "$1" != -- ]; do qemu+=("$1"); shift; done
+    [ "${1:-}" = -- ] && shift
+    cmdline=("$@")
+    accel=tcg; cpu=max
+    if [ "$ACCEL" != tcg ] && [ -w /dev/kvm ]; then accel=kvm; cpu=host; fi
+    [ "$ACCEL" = kvm ] && [ $accel != kvm ] && die "--accel kvm, but /dev/kvm is not usable"
+    timeout "$TIMEOUT" qemu-system-x86_64 -machine q35 -accel $accel -cpu $cpu -smp "$CPUS" -m "$MEM" \
+        -display none -monitor none -serial stdio -no-reboot \
+        -kernel "$kernel" -initrd "$WORK/initramfs.cpio.gz" \
+        -virtfs "local,path=$dir,mount_tag=out,security_model=none,id=out" "${qemu[@]}" \
+        -append "console=ttyS0 panic=-1 loglevel=7 bench.phase=$phase ${cmdline[*]}" > "$dir/console.log" 2>&1
+    local rc=$?
+    [ $rc = 124 ] && echo "STEREO|check|$phase/boot|FAIL|timed out after $TIMEOUT s" >> "$dir/console.log"
+    grep -a "STEREO|" "$dir/console.log" | tr -d '\r' > "$dir/results.txt"
+}
+
+# KUnit: every top-level vkms suite passed, and vkms-stereo ran
+kunit_results() {
+    local dir=$1 s
+    sed 's/^\[[ 0-9.]*\] //' "$dir/console.log" | tr -d '\r' | grep -a -E '^(not )?ok [0-9]+ vkms' > "$dir/suites.txt"
+    while read -r line; do
+        s=${line##* }
+        case "$line" in
+        ok*) echo "STEREO|check|kunit/$s|PASS|" ;;
+        *) echo "STEREO|check|kunit/$s|FAIL|see console.log" ;;
+        esac
+    done < "$dir/suites.txt" >> "$dir/results.txt"
+    grep -q " vkms-stereo$" "$dir/suites.txt" || echo "STEREO|check|kunit/vkms-stereo|FAIL|the suite did not run" >> "$dir/results.txt"
+}
+
+images() { # convert the PPM frames of a run to PNG
+    python3 - "$1" <<'PY'
+import glob, os, sys
+from PIL import Image
+for f in glob.glob(os.path.join(sys.argv[1], "*.ppm")):
+    Image.open(f).save(f[:-4] + ".png", optimize=True)
+    os.remove(f)
+PY
+}
+
+run_phase() {
+    local phase=$1 dir
+    dir="$WORK/runs/$(date +%Y%m%d-%H%M%S)-$phase"
+    mkdir -p "$dir"
+    echo "== $phase ($dir)"
+    case $phase in
+    kunit)
+        run_vm kunit "$KERNEL" "$dir"
+        kunit_results "$dir" ;;
+    writeback)
+        local words=()
+        [ "$SBS_FULL" = 1 ] && words+=(bench.sbs_full=1)
+        run_vm writeback "$KERNEL" "$dir" -- "${words[@]}" ;;
+    igt)
+        [ -n "$IGT_ROOT" ] || die "the igt phase needs --igt-root"
+        run_vm igt "$KERNEL" "$dir" \
+            -virtfs "local,path=$IGT_ROOT,mount_tag=root,security_model=none,readonly=on,id=root" \
+            -- vkms.create_default_dev=0 ;;
+    kwin)
+        [ -n "$KWIN_ROOT" ] && [ -n "$FULL_KERNEL" ] || die "the kwin phase needs --kwin-root and --full-kernel"
+        local mem=$MEM cpus=$CPUS
+        [ "$MEM" -lt 4096 ] && MEM=4096
+        [ "$CPUS" -lt 4 ] && CPUS=4
+        local words=(vkms.create_default_dev=0)
+        [ "$SBS_FULL" = 1 ] && words+=(bench.sbs_full=1)
+        run_vm kwin "$FULL_KERNEL" "$dir" \
+            -virtfs "local,path=$KWIN_ROOT,mount_tag=root,security_model=none,readonly=on,id=root" \
+            -- "${words[@]}"
+        MEM=$mem; CPUS=$cpus
+        python3 "$BENCH_DIR/tools/analyze-kwin.py" "$dir" >> "$dir/results.txt" ||
+            grep -q "^STEREO|summary|kwin|" "$dir/results.txt" ||
+            echo "STEREO|check|kwin/analysis|FAIL|analyze-kwin.py stopped before its summary" >> "$dir/results.txt" ;;
+    *) die "unknown phase $phase (bench list)" ;;
+    esac
+    images "$dir"
+    grep -a -E "STEREO\|(check|skip)\|" "$dir/results.txt" | grep -a -v "|PASS|" || true
+    local pass fail
+    pass=$(grep -c '|PASS|' "$dir/results.txt")
+    fail=$(grep -c '|FAIL|' "$dir/results.txt")
+    echo "$phase: $pass passed, $fail failed"
+    # a phase passes when its checks ran and none failed: no check at all is a failure
+    [ "$pass" -gt 0 ] || echo "$phase: no check ran, see $dir/console.log"
+    [ "$fail" = 0 ] && [ "$pass" -gt 0 ]
+}
+
+case "$COMMAND" in
+doctor) doctor ;;
+list) list_phases ;;
+clean) rm -rf "$WORK/runs" ;;
+run)
+    [ -n "$KERNEL" ] || die "run needs --kernel"
+    [ $# -gt 0 ] || die "run needs phases (bench list), or all"
+    if [ "$1" = all ]; then
+        set -- kunit writeback
+        [ -n "$IGT_ROOT" ] && set -- "$@" igt
+        [ -n "$KWIN_ROOT" ] && [ -n "$FULL_KERNEL" ] && set -- "$@" kwin
+    fi
+    mkdir -p "$WORK"
+    build_programs
+    build_data
+    build_initramfs
+    status=0
+    for p in "$@"; do run_phase "$p" || status=1; done
+    [ $status = 0 ] && echo "all phases passed" || echo "some checks failed"
+    exit $status ;;
+*) usage; exit 2 ;;
+esac

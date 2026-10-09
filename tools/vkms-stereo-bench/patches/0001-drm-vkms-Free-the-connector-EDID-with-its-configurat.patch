@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Daniel Campos Ramos <Capitain_Jack@yahoo.com>
+Date: Thu, 8 Oct 2026 11:49:06 -0300
+Subject: [PATCH 1/5] drm/vkms: Free the connector EDID with its configuration
+
+vkms_config_connector_set_edid() keeps a copy of the EDID in the
+connector configuration, but vkms_config_destroy_connector() never
+frees it, so the copy leaks each time a connector that has an EDID is
+removed from configfs or its device is destroyed. Free it with the rest
+of the connector configuration.
+
+Assisted-by: LLM
+---
+ drivers/gpu/drm/vkms/vkms_config.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/gpu/drm/vkms/vkms_config.c b/drivers/gpu/drm/vkms/vkms_config.c
+index b9d5a2e44f..04a3019317 100644
+--- a/drivers/gpu/drm/vkms/vkms_config.c
++++ b/drivers/gpu/drm/vkms/vkms_config.c
+@@ -1008,6 +1008,7 @@ void vkms_config_destroy_connector(struct vkms_config *config,
+ 
+ 	xa_destroy(&connector_cfg->possible_encoders);
+ 	list_del(&connector_cfg->link);
++	kfree(connector_cfg->edid);
+ 	kfree(connector_cfg);
+ }
+ EXPORT_SYMBOL_IF_KUNIT(vkms_config_destroy_connector);

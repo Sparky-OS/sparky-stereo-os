@@ -1,0 +1,103 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Daniel Campos Ramos <Capitain_Jack@yahoo.com>
+Date: Thu, 8 Oct 2026 09:33:33 -0300
+Subject: [PATCH 2/5] drm/vkms: Compose the frame of both eyes for stereo modes
+
+A frame packing mode describes one eye: hdisplay and vdisplay are the
+size of one view, while the frame holds both views and the vertical
+blanking between them. drm_mode_get_hv_timing() returns the size of
+that frame, vdisplay + vtotal lines for frame packing, and the atomic
+helpers already clip the planes to it. The composer still stops at
+vdisplay, and the writeback connector refuses a buffer taller than one
+eye, so the right eye never reaches the writeback buffer or the CRC.
+
+Use drm_mode_get_hv_timing() for the composed area and for the
+writeback buffer. Modes the helper does not enlarge keep their size,
+top-and-bottom and side by side (half) included: their eyes share the
+frame of the mode.
+
+Assisted-by: LLM
+---
+ drivers/gpu/drm/vkms/vkms_composer.c  |  9 ++++++---
+ drivers/gpu/drm/vkms/vkms_writeback.c | 11 ++++++-----
+ 2 files changed, 12 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/gpu/drm/vkms/vkms_composer.c b/drivers/gpu/drm/vkms/vkms_composer.c
+index 83d217085a..751b7373c0 100644
+--- a/drivers/gpu/drm/vkms/vkms_composer.c
++++ b/drivers/gpu/drm/vkms/vkms_composer.c
+@@ -484,8 +484,9 @@ static void blend(struct vkms_writeback_job *wb,
+ 		.b = DRM_ARGB64_GETB(bgcolor),
+ 	};
+ 
+-	int crtc_y_limit = crtc_state->base.mode.vdisplay;
+-	int crtc_x_limit = crtc_state->base.mode.hdisplay;
++	int crtc_x_limit, crtc_y_limit;
++
++	drm_mode_get_hv_timing(&crtc_state->base.mode, &crtc_x_limit, &crtc_y_limit);
+ 
+ 	/*
+ 	 * The planes are composed line-by-line to avoid heavy memory usage. It is a necessary
+@@ -545,6 +546,7 @@ static int compose_active_planes(struct vkms_writeback_job *active_wb,
+ {
+ 	size_t line_width, pixel_size = sizeof(struct pixel_argb_u16);
+ 	struct line_buffer output_buffer, stage_buffer;
++	int crtc_width, crtc_height;
+ 	int ret = 0;
+ 
+ 	/*
+@@ -561,7 +563,8 @@ static int compose_active_planes(struct vkms_writeback_job *active_wb,
+ 	if (WARN_ON(check_format_funcs(crtc_state, active_wb)))
+ 		return -EINVAL;
+ 
+-	line_width = crtc_state->base.mode.hdisplay;
++	drm_mode_get_hv_timing(&crtc_state->base.mode, &crtc_width, &crtc_height);
++	line_width = crtc_width;
+ 	stage_buffer.n_pixels = line_width;
+ 	output_buffer.n_pixels = line_width;
+ 
+diff --git a/drivers/gpu/drm/vkms/vkms_writeback.c b/drivers/gpu/drm/vkms/vkms_writeback.c
+index ecf29a2c0c..40ee142e0e 100644
+--- a/drivers/gpu/drm/vkms/vkms_writeback.c
++++ b/drivers/gpu/drm/vkms/vkms_writeback.c
+@@ -38,7 +38,7 @@ static int vkms_wb_atomic_check(struct drm_connector *connector,
+ 		drm_atomic_get_new_connector_state(state, connector);
+ 	struct drm_crtc_state *crtc_state;
+ 	struct drm_framebuffer *fb;
+-	const struct drm_display_mode *mode;
++	int width, height;
+ 	int ret;
+ 
+ 	if (!conn_state->writeback_job || !conn_state->writeback_job->fb)
+@@ -48,10 +48,10 @@ static int vkms_wb_atomic_check(struct drm_connector *connector,
+ 		return 0;
+ 
+ 	crtc_state = drm_atomic_get_new_crtc_state(state, conn_state->crtc);
+-	mode = &crtc_state->mode;
++	drm_mode_get_hv_timing(&crtc_state->mode, &width, &height);
+ 
+ 	fb = conn_state->writeback_job->fb;
+-	if (fb->width != mode->hdisplay || fb->height != mode->vdisplay) {
++	if (fb->width != width || fb->height != height) {
+ 		DRM_DEBUG_KMS("Invalid framebuffer size %ux%u\n",
+ 			      fb->width, fb->height);
+ 		return -EINVAL;
+@@ -132,15 +132,16 @@ static void vkms_wb_atomic_commit(struct drm_connector *conn,
+ 	struct drm_connector_state *conn_state = wb_conn->base.state;
+ 	struct vkms_crtc_state *crtc_state = output->composer_state;
+ 	struct drm_framebuffer *fb = connector_state->writeback_job->fb;
+-	u16 crtc_height = crtc_state->base.mode.vdisplay;
+-	u16 crtc_width = crtc_state->base.mode.hdisplay;
+ 	struct vkms_writeback_job *active_wb;
+ 	struct vkms_frame_info *wb_frame_info;
+ 	u32 wb_format = fb->format->format;
++	int crtc_width, crtc_height;
+ 
+ 	if (!conn_state)
+ 		return;
+ 
++	drm_mode_get_hv_timing(&crtc_state->base.mode, &crtc_width, &crtc_height);
++
+ 	vkms_set_composer(output, true);
+ 
+ 	active_wb = conn_state->writeback_job->priv;

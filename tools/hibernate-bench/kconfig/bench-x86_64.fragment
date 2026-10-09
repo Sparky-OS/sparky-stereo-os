@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-2.0-or-later
 # Minimal x86-64 kernel configuration for the hibernate bench (merged on top of `make tinyconfig`).
 # Everything a QEMU q35 + OVMF guest needs to boot to a serial shell from an initramfs, load modules, hibernate to a
 # virtio disk, and run the Secure Boot / lockdown / IMA policy paths. No drivers beyond that.

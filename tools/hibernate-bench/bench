@@ -19,6 +19,9 @@ KERNEL_SIGNED=0      # 1: --kernel and --other-kernel are already signed for Sec
 DB_CERT=""           # an extra certificate (PEM or DER) to enroll in db, for kernels signed with a key of yours
 GUEST_SCRIPT=""      # a shell script the "custom" scenario runs in the guest (it reports with bench_info / bench_check, see guest/lib.sh)
 GUEST_DIR=""         # files copied to /guest in the initramfs for that script (static tools, or a dynamic one with its libraries)
+GUEST_SYSCTL=""      # a sysctl file (key = value lines) the guest applies at boot, as systemd-sysctl would; the kexec scenario applies it half way through
+EXPECT_KEXEC_FILE=refuse  # kexec scenario: what a signed kexec_file_load does after kernel.kexec_load_disabled=1: refuse (documented) | allow
+INITRD=""            # initramfs of the current scenario (default: the common one)
 MEM=1024
 CPUS=1
 TIMEOUT=420
@@ -35,6 +38,7 @@ HMODE=shutdown       # shutdown | reboot | platform | suspend (what /sys/power/d
 COMPRESS=default     # default | none (hibernate=nocompress)
 KEEP=0
 SECURE_BOOT=1
+BIOS=0               # 1: legacy BIOS (QEMU's SeaBIOS) instead of OVMF: no Secure Boot, no EFI variables
 SET_EXPECT_UNSIGNED=0
 
 usage() {
@@ -52,16 +56,19 @@ options:
   --ksrc DIR             build tree of that kernel (the O= directory); used to build benchmod.ko      [required once]
   --other-kernel FILE    a second bzImage, for tamper-kernel-version / tamper-kernel-code
   --modules-dir DIR      modules of a distribution kernel (lib/modules/<release>, or a tree that contains it, e.g. an unpacked linux-image package):
-                         the guest loads them from its initramfs (virtio-blk is a module there). --load-modules "A B" names them (default: virtio_blk)
+                         the guest loads them from its initramfs (virtio-blk is a module there). --load-modules "A B" names them (default: virtio_blk efivarfs)
   --kernel-signed        --kernel (and --other-kernel) are already signed for Secure Boot: the bench does not sign them
   --db-cert FILE         enroll this certificate (PEM or DER) in db too: for a kernel signed with a key of yours; the bench never sees the private key
   --guest-script FILE    for the "custom" scenario: a shell script that runs in the guest after the boot (BusyBox sh) and reports with bench_info / bench_check
   --guest-dir DIR        copied to /guest in the guest's initramfs (tools and libraries for that script)
+  --guest-sysctl FILE    a sysctl file (plain "key = value" lines) that the guest applies at boot, like systemd-sysctl; the file's keys that the kernel does not accept are reported
+  --expect-kexec-file allow|refuse   kexec scenario: does a signed kexec_file_load still load after kernel.kexec_load_disabled=1 (default refuse: the documented behaviour)
   --work DIR             work directory (default ./bench-work, or $BENCH_WORK)
   --mem MB               guest memory (default 1024)       --cpus N   guest CPUs (default 1)
   --timeout SEC          per boot (default 420)            --accel kvm|tcg|auto (default auto)
   --no-tpm               do not attach swtpm
   --no-secure-boot       leave the firmware in setup mode (Secure Boot off): the control that shows what enforces module signatures
+  --bios                 boot with legacy BIOS (SeaBIOS) instead of UEFI: no Secure Boot, no EFI variables; shows that the kernel also boots there
   --module-trust MODE    how the module-signing certificate reaches the kernel: db (OVMF db entry, the default),
                          mok (an emulated shim MokListRT variable) or none (the kernel trusts it by itself)
   --cmdline "WORDS"      extra kernel command line words for every boot (e.g. "lockdown=integrity")
@@ -90,6 +97,7 @@ tamper-flip               hibernate, flip one bit inside the image, try to resum
 tamper-kernel-version     hibernate, resume with --other-kernel (a different build: different uname -v)
 tamper-kernel-code        hibernate, resume with --other-kernel (same uname -v, different code)
 tamper-pcr                hibernate, extend a PCR before resuming, try to resume
+kexec                     one boot: kexec_load and kexec_file_load (signed and unsigned image) before and after kernel.kexec_load_disabled=1
 custom                    one boot that runs --guest-script in the guest; every bench_check line it prints becomes a result
 EOS
 }
@@ -110,6 +118,8 @@ while [ $# -gt 0 ]; do
         --db-cert) DB_CERT=$2; shift 2;;
         --guest-script) GUEST_SCRIPT=$2; shift 2;;
         --guest-dir) GUEST_DIR=$2; shift 2;;
+        --guest-sysctl) GUEST_SYSCTL=$2; shift 2;;
+        --expect-kexec-file) EXPECT_KEXEC_FILE=$2; shift 2;;
         --work) WORK=$2; shift 2;;
         --mem) MEM=$2; shift 2;;
         --cpus) CPUS=$2; shift 2;;
@@ -117,6 +127,7 @@ while [ $# -gt 0 ]; do
         --accel) ACCEL=$2; shift 2;;
         --no-tpm) TPM=0; shift;;
         --no-secure-boot) SECURE_BOOT=0; shift;;
+        --bios) BIOS=1; SECURE_BOOT=0; shift;;
         --module-trust) MODULE_TRUST=$2; shift 2;;
         --cmdline) EXTRA_CMDLINE=$2; shift 2;;
         --expect-hibernate) EXPECT_HIBERNATE=$2; shift 2;;
@@ -210,13 +221,15 @@ build_initramfs() {
     cp "$BENCH_DIR"/guest/lib.sh "$BENCH_DIR"/guest/phase-*.sh "$t/bench/"
     cp "$WORK"/module/benchmod-*.ko "$t/bench/" 2>/dev/null || true
     gcc -static -O2 -o "$t/bench/tpmcli" "$BENCH_DIR/tools/tpmcli.c" || die "cannot build tpmcli"
-    [ -z "$GUEST_SCRIPT" ] || cp "$GUEST_SCRIPT" "$t/bench/phase-custom.sh"
-    [ -z "$GUEST_DIR" ] || { mkdir -p "$t/guest"; cp -a "$GUEST_DIR"/. "$t/guest/"; }
+    gcc -static -O2 -o "$t/bench/kexectest" "$BENCH_DIR/tools/kexectest.c" || die "cannot build kexectest"
+    if [ -n "$GUEST_SYSCTL" ]; then [ -r "$GUEST_SYSCTL" ] || die "cannot read --guest-sysctl $GUEST_SYSCTL"; cp "$GUEST_SYSCTL" "$t/bench/sysctl.conf"; fi
+    if [ -n "$GUEST_SCRIPT" ]; then [ -r "$GUEST_SCRIPT" ] || die "cannot read --guest-script $GUEST_SCRIPT"; cp "$GUEST_SCRIPT" "$t/bench/phase-custom.sh"; fi
+    if [ -n "$GUEST_DIR" ]; then [ -d "$GUEST_DIR" ] || die "no such directory: --guest-dir $GUEST_DIR"; mkdir -p "$t/guest"; cp -a "$GUEST_DIR"/. "$t/guest/"; fi
     if [ -n "$MODDIR" ]; then
         local kd
         if [ -f "$MODDIR/modules.dep" ]; then kd=$MODDIR; else kd=$(ls -d "$MODDIR"/lib/modules/*/ 2>/dev/null | head -n 1); kd=${kd%/}; fi
         [ -f "$kd/modules.dep" ] || die "no modules.dep under --modules-dir $MODDIR"
-        python3 "$BENCH_DIR/tools/modload.py" "$kd" "$t/mods" ${LOAD_MODULES:-virtio_blk} || die "modload failed"
+        python3 "$BENCH_DIR/tools/modload.py" "$kd" "$t/mods" ${LOAD_MODULES:-virtio_blk efivarfs} || die "modload failed"
     fi
     python3 "$BENCH_DIR/tools/mkcpio.py" "$t" "$WORK/initramfs.cpio.gz" || die "cpio failed"
 }
@@ -258,16 +271,16 @@ run_boot() {
         start_swtpm "$run/tpm"
         tpmargs=(-chardev "socket,id=chrtpm,path=$run/tpm/swtpm.sock" -tpmdev emulator,id=tpm0,chardev=chrtpm -device tpm-crb,tpmdev=tpm0)
     fi
+    local fw=(-global driver=cfi.pflash01,property=secure,value=on -drive "if=pflash,format=raw,unit=0,file=$OVMF_CODE,readonly=on" -drive "if=pflash,format=raw,unit=1,file=$run/vars.fd")
+    [ "$BIOS" = 1 ] && fw=()
     # shellcheck disable=SC2046
     timeout --signal=KILL "$TIMEOUT" qemu-system-x86_64 -name "bench-$name" -machine q35,smm=on $(accel_args) -smp "$CPUS" -m "$MEM" \
         -display none -monitor none -serial "file:$log" -no-reboot \
-        -global driver=cfi.pflash01,property=secure,value=on \
-        -drive "if=pflash,format=raw,unit=0,file=$OVMF_CODE,readonly=on" \
-        -drive "if=pflash,format=raw,unit=1,file=$run/vars.fd" \
+        "${fw[@]}" \
         -drive "file=$run/swap.img,format=raw,if=none,id=swap0" -device virtio-blk-pci,drive=swap0,serial=benchswap \
         -drive "file=$run/ctl.img,format=raw,if=none,id=ctl0" -device virtio-blk-pci,drive=ctl0,serial=benchctl \
         "${tpmargs[@]}" \
-        -kernel "$kern" -initrd "$WORK/initramfs.cpio.gz" -append "$cmdline" \
+        -kernel "$kern" -initrd "${INITRD:-$WORK/initramfs.cpio.gz}" -append "$cmdline" \
         >"$run/$name.qemu.out" 2>&1
     local rc=$?
     echo "$rc" > "$run/$name.status"
@@ -311,7 +324,7 @@ new_run() {   # new_run SCENARIO -> sets RUN, prepares vars.fd, swap.img
     if [ "$SECURE_BOOT" = 1 ]; then
         virt-fw-vars "${args[@]}" >"$RUN/vars.log" 2>&1 || { cat "$RUN/vars.log"; die "virt-fw-vars failed"; }
     else
-        cp "$OVMF_VARS" "$RUN/vars.fd"; echo "Secure Boot off: variable store without keys (setup mode)" > "$RUN/vars.log"
+        if [ "$BIOS" = 1 ]; then echo "legacy BIOS (SeaBIOS): no variable store" > "$RUN/vars.log"; else cp "$OVMF_VARS" "$RUN/vars.fd"; echo "Secure Boot off: variable store without keys (setup mode)" > "$RUN/vars.log"; fi
         [ "$SET_EXPECT_UNSIGNED" = 1 ] || EXPECT_UNSIGNED=load; EXPECT_TRUSTED=load
     fi
     if [ "$MODULE_TRUST" = mok ] && [ "$SECURE_BOOT" = 1 ]; then
@@ -420,6 +433,24 @@ sc_tpm() {
     done
 }
 
+sc_kexec() {
+    sc_prepare kexec
+    # the guest needs the kernel as a file: the signed image (the one that boots) and, when there is one, the unsigned image: both go into this scenario's own initramfs
+    local t="$WORK/initrd-tree"
+    cp "$SIGNED" "$t/bench/kernel.signed"
+    [ "$KERNEL_SIGNED" = 1 ] || cp "$KERNEL" "$t/bench/kernel.unsigned"
+    # with --kernel-signed the unsigned twin of the image (same build) can be given in KEXEC_UNSIGNED, for the unsigned kexec_file_load case
+    [ -n "${KEXEC_UNSIGNED:-}" ] && cp "$KEXEC_UNSIGNED" "$t/bench/kernel.unsigned"
+    python3 "$BENCH_DIR/tools/mkcpio.py" "$t" "$WORK/initramfs-kexec.cpio.gz" || die "cpio failed"
+    rm -f "$t/bench/kernel.signed" "$t/bench/kernel.unsigned"
+    set_ctl kexec "bench.expect_kexec_file=$EXPECT_KEXEC_FILE"
+    INITRD="$WORK/initramfs-kexec.cpio.gz" run_boot "$RUN" boot1 "$SIGNED" "$(base_cmdline)"
+    if ! boot_done "$RUN/boot1.log"; then record FAIL boot "the guest did not finish (see $RUN/boot1.log)"; tail -n 20 "$RUN/boot1.log" | sed 's/^/        /'; return; fi
+    dump_guest "$RUN/boot1.log"
+    local n res detail
+    while IFS='|' read -r _ _ n res detail; do record "$res" "$n" "$detail"; done < <(grep -E '^BENCH\|check\|' "$RUN/boot1.log")
+}
+
 sc_custom() {
     sc_prepare custom
     [ -n "$GUEST_SCRIPT" ] || die "the custom scenario needs --guest-script FILE"
@@ -511,7 +542,7 @@ sc_tamper_pcr() {
 run_scenarios() {
     [ -n "$KERNEL" ] || die "--kernel FILE is required"
     [ -r "$KERNEL" ] || die "cannot read $KERNEL"
-    [ -n "$OVMF_CODE" ] && [ -n "$OVMF_VARS" ] || die "OVMF firmware with Secure Boot not found (run: bench doctor)"
+    [ "$BIOS" = 1 ] || { [ -n "$OVMF_CODE" ] && [ -n "$OVMF_VARS" ]; } || die "OVMF firmware with Secure Boot not found (run: bench doctor)"
     make_keys
     build_modules
     build_initramfs
@@ -525,6 +556,7 @@ run_scenarios() {
         case "$s" in
             policy) sc_policy;;
             tpm) sc_tpm;;
+            kexec) sc_kexec;;
             custom) sc_custom;;
             hibernate) sc_hibernate;;
             lockdown-integrity) sc_lockdown integrity;;

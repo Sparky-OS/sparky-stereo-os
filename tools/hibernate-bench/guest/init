@@ -17,11 +17,18 @@ if [ -f /mods/order ]; then
     for m in $(cat /mods/order); do
         if insmod "/mods/$m" 2>/run/insmod.err; then echo "BENCH|info|insmod|$m"; else echo "BENCH|check|insmod_$m|FAIL|$(cat /run/insmod.err)"; fi
     done
+    # file systems that are modules in a distribution kernel (efivarfs) could not be mounted above
+    mount -t efivarfs efivarfs /sys/firmware/efi/efivars 2>/dev/null
 fi
 . /bench/lib.sh
 load_ctl
 PHASE=$(cmdline_opt bench.phase)
 bench_info phase "${PHASE:-none}"
+# --guest-sysctl FILE: apply the distribution's sysctl file, as systemd-sysctl does at boot (the kexec phase applies it itself, half way through)
+if [ -f /bench/sysctl.conf ] && [ "$PHASE" != kexec ]; then
+    apply_sysctl_file /bench/sysctl.conf
+    bench_info sysctl_file "applied $SYSCTL_N lines, $SYSCTL_BAD not accepted by the kernel"
+fi
 if [ -f "/bench/phase-$PHASE.sh" ]; then
     . "/bench/phase-$PHASE.sh"
 else

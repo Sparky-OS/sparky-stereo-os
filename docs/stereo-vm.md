@@ -9,7 +9,7 @@ It also covers rendering the guest on the host's strongest GPU, and passing a wh
 
 **Status (2026-10-09):** the virtual machine is QEMU, and every way of watching it on the edition's desktop shows its 3D modes in stereo: QEMU's own window, virt-viewer and Karton.
 - **It needs Stereo KWin on the host** (the edition's KWin): it is what shows each view to its eye on the screen you have, a 3D television, anaglyph or another stereo output. On any other desktop the window shows the left view only.
-- QEMU: the edition's `qemu` package (1:11.1.2+ds-1+stereo3d2) gives the guest the 3D modes and tells the host which layout each frame uses, in its own window and to SPICE clients.
+- QEMU: the edition's `qemu` package (1:11.1.2+ds-1+stereo3d2) gives the guest the 3D modes and tells the host which layout each frame uses, in its own window and to SPICE clients; the changes are on [Sparky-OS/qemu](https://github.com/Sparky-OS/qemu/tree/stereo3d), branch `stereo3d`.
 - SPICE, which carries the screen to virt-viewer, virt-manager and Karton: the edition's `spice-protocol` (0.14.5-1+stereo3d1), `spice` (0.16.0-3+stereo3d1) and `spice-gtk` (0.42-4+stereo3d1) carry the layout.
 - Karton: the edition's `karton` package (0.1~prealpha+git20260905.08e13cf-1+stereo3d1), branch [`stereo3d`](https://invent.kde.org/danielcamposramos/karton/-/tree/stereo3d).
 - The guest side, two patches to the Linux `virtio-gpu` driver (branch [`vm/virtio-gpu-stereo`](https://github.com/Sparky-OS/linux/tree/vm/virtio-gpu-stereo)), is not yet in the edition's kernel.

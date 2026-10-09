@@ -16,7 +16,11 @@ mkdir -p "$OUT"
 OUT=$(cd "$OUT" && pwd)
 cd "$SRC"
 make O="$OUT" "${BASE:-tinyconfig}" >/dev/null
-KCONFIG_CONFIG="$OUT/.config" scripts/kconfig/merge_config.sh -m -O "$OUT" "$OUT/.config" "$@" >"$OUT/merge.log" 2>&1
+# merge_config.sh makes its temporary file in the current directory: run it from OUT, so SRC can be read-only
+frags=""
+for f in "$@"; do frags="$frags $(cd "$(dirname "$f")" && pwd)/$(basename "$f")"; done
+# shellcheck disable=SC2086
+(cd "$OUT" && KCONFIG_CONFIG="$OUT/.config" "$SRC/scripts/kconfig/merge_config.sh" -m -O "$OUT" "$OUT/.config" $frags) >"$OUT/merge.log" 2>&1
 make O="$OUT" olddefconfig >/dev/null
 for opt in CONFIG_DRM_VKMS CONFIG_CONFIGFS_FS CONFIG_9P_FS; do
     grep -q "^$opt=y" "$OUT/.config" || { echo "build-test-kernel.sh: $opt is not built in, see $OUT/merge.log" >&2; exit 1; }

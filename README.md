@@ -214,6 +214,7 @@ Click a branch to read the code, or its CI result to see every job.
   For KWin and driver developers, and anyone who wants to see what the first runs showed.
 
 - [Test stereo without a 3D TV](docs/test-stereo-without-a-3d-tv.md): build a kernel whose VKMS speaks HDMI 3D, give it a 3D EDID, and run the bench, IGT and KWin; what each test proves and how it failed without the patches.
+- [A virtual machine with a 3D display](docs/stereo-vm.md): a QEMU guest with HDMI 3D modes, shown in stereo on Stereo KWin in QEMU's own window, virt-viewer and Karton; rendering on the strongest GPU, and passing a whole GPU to the guest.
   For anyone writing stereo code who has no 3D display at hand.
 
 ## Tools

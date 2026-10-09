@@ -30,3 +30,21 @@ bench_dmesg() {   # bench_dmesg label egrep-pattern : print matching kernel log 
     dmesg | grep -E "$2" | tail -n 12 | while IFS= read -r l; do echo "BENCH|log|$1|$l"; done
 }
 tpm() { /bench/tpmcli "$@"; }
+apply_sysctl_file() {   # apply_sysctl_file FILE : like systemd-sysctl for plain "key = value" lines (a leading '-' on the key ignores errors); every key the kernel does not accept is reported
+    # sets SYSCTL_N (lines applied) and SYSCTL_BAD (keys missing or rejected)
+    SYSCTL_N=0; SYSCTL_BAD=0
+    while IFS= read -r line; do
+        case "$line" in ''|'#'*|';'*) continue;; esac
+        key=${line%%=*}; val=${line#*=}
+        key=$(echo "$key" | sed 's/[[:space:]]//g'); val=$(echo "$val" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+        ign=0; case "$key" in -*) ign=1; key=${key#-};; esac
+        path=/proc/sys/$(echo "$key" | tr . /)
+        SYSCTL_N=$((SYSCTL_N+1))
+        if [ ! -e "$path" ]; then
+            [ $ign = 1 ] || { SYSCTL_BAD=$((SYSCTL_BAD+1)); echo "BENCH|info|sysctl_missing|$key"; }
+        elif ! echo "$val" > "$path" 2>/run/sysctl.err; then
+            [ $ign = 1 ] || { SYSCTL_BAD=$((SYSCTL_BAD+1)); echo "BENCH|info|sysctl_rejected|$key=$val: $(cat /run/sysctl.err)"; }
+        fi
+    done < "$1"
+}
+efivar_byte() { dd if="$1" bs=1 skip=4 count=1 2>/dev/null | hexdump -v -e '1/1 "%u"'; }   # first payload byte of an EFI variable, after the 4 attribute bytes

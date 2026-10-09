@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-2.0-or-later
 # Extra options for kernels with the "[RFC] power/hibernate: TPM2 image encryption" patch (see README): TPM 2.0 with HMAC sessions, trusted keys,
 # AES-GCM and SHA-256 in the crypto API, and the RFC's own option.
 CONFIG_TCG_TPM2_HMAC=y

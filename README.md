@@ -201,6 +201,7 @@ Click a branch to read the code, or its CI result to see every job.
 | KInfoCenter | [`stereo3d`](https://invent.kde.org/danielcamposramos/kinfocenter/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/kinfocenter/-/pipelines/1373840) |
 | PlasmaTube | [`stereo3d-26.08`](https://invent.kde.org/danielcamposramos/plasmatube/-/tree/stereo3d-26.08) | [green](https://invent.kde.org/danielcamposramos/plasmatube/-/pipelines/1373822) |
 | Plasma Add-ons | [`sparky-defaults`](https://invent.kde.org/danielcamposramos/kdeplasma-addons/-/tree/sparky-defaults) | [green](https://invent.kde.org/danielcamposramos/kdeplasma-addons/-/pipelines/1374099) |
+| Plasma Workspace | [`sparky-defaults`](https://invent.kde.org/danielcamposramos/plasma-workspace/-/tree/sparky-defaults) | [Qt 6.11 and 6.13 pass](https://invent.kde.org/danielcamposramos/plasma-workspace/-/pipelines/1375228); FreeBSD fails the same three tests as KDE's own [Plasma/6.7](https://invent.kde.org/plasma/plasma-workspace/-/pipelines/1373439) |
 | Krita | [`sparky/stereo-canvas-wayland`](https://invent.kde.org/danielcamposramos/krita/-/tree/sparky/stereo-canvas-wayland) | not run on our fork |
 
 ## Documents

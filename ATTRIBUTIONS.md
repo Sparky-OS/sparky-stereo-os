@@ -490,4 +490,27 @@ We stand on the shoulders of:
 
 ---
 
-**Last updated**: 7 October 2026
+## Certificate management and ICP-Brasil interoperability
+
+- **Paweł "pavroo" Pijanowski**, author of Sparky CA (2018), and
+  **Daniel Campos Ramos**, its 2020 and 2026 work, as credited in Sparky CA's
+  original copyright records.
+- **Pedro F. Albanese**, author of [e521](https://github.com/pedroalbanese/e521),
+  as recorded in its ISC license. Our interoperability fixes and public-only
+  OpenSSL prototype follow his reference implementation.
+- **Instituto Nacional de Tecnologia da Informação (ITI)**, for the published
+  ICP-Brasil certificates, bundle hashes and DOC-ICP-01.01 algorithm standard.
+- **The OpenSSL Project**, **Network Security Services (NSS)** and their
+  contributors, for certificate verification, provider APIs and browser stores.
+- **The Python Software Foundation and Python contributors**, for the separate
+  arithmetic/hash oracle used to check the reference implementation.
+- **The RFC Editor and the authors of RFC 8032**, for the EdDSA construction.
+  Ed521's particular parameters come from ITI's standard.
+- **Andreas Hartmetz**, as credited in KIO's certificate-manager sources, and
+  **KDE's KIO contributors**, for KDE certificate and per-host trust handling.
+
+The Ed521 prototype is public-verification-only and unaudited. Trust-store
+membership, cryptographic verification and document-signature policy compliance
+are distinct. Credits do not imply endorsement or upstream acceptance.
+
+**Last updated**: 10 October 2026

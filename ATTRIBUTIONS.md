@@ -508,6 +508,11 @@ We stand on the shoulders of:
   Ed521's particular parameters come from ITI's standard.
 - **Andreas Hartmetz**, as credited in KIO's certificate-manager sources, and
   **KDE's KIO contributors**, for KDE certificate and per-host trust handling.
+- **The Poppler contributors** and **the Okular developers**, for PDF certificate
+  and signature APIs. The upstream projects and Debian copyright records name
+  their contributors.
+- **The Kleopatra developers**, as named in Kleopatra's about data, for the
+  GnuPG certificate and smart-card interface checked alongside this work.
 
 The Ed521 prototype is public-verification-only and unaudited. Trust-store
 membership, cryptographic verification and document-signature policy compliance

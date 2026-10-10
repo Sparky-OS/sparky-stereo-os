@@ -508,6 +508,12 @@ We stand on the shoulders of:
   Ed521's particular parameters come from ITI's standard.
 - **Andreas Hartmetz**, as credited in KIO's certificate-manager sources, and
   **KDE's KIO contributors**, for KDE certificate and per-host trust handling.
+- **George Staikos**, **Marco Martin**, **Nicolas Fella**, and **KDE's KWallet
+  contributors**, as credited in KWallet's backend, service bridge and settings
+  records, for the opt-in certificate password store.
+- **The p11-kit, OpenSC and pcsc-lite contributors**, for PKCS#11 module
+  registration and public token inspection; **the GnuPG contributors**, for the
+  separate S/MIME trust store used by Kleopatra.
 - **The Poppler contributors** and **the Okular developers**, for PDF certificate
   and signature APIs. The upstream projects and Debian copyright records name
   their contributors.

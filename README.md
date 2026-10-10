@@ -101,6 +101,7 @@ Each one shows the next project the same problem already fixed elsewhere, and Sp
 - **MKVToolNix** ([ebd8445b](https://codeberg.org/mbunkus/mkvtoolnix/commit/ebd8445b1185d35d6bdbb9c1463757fbc9aa7c29), from [!6311](https://codeberg.org/mbunkus/mkvtoolnix/pulls/6311), merged 21 September 2026): mkvmerge sets the Matroska StereoMode ([RFC 9559](https://www.rfc-editor.org/rfc/rfc9559)) from the AVC frame packing SEI.
 - **mpv** ([#18490](https://github.com/mpv-player/mpv/pull/18490), 23 September 2026): the player detects the layout signalled in the stream itself, the frame packing SEI and the MP4 `st3d` box.
 - **Qt Multimedia** ([778399](https://codereview.qt-project.org/c/qt/qtmultimedia/+/778399), merged 8 October 2026; in Qt 6.12 too, [778580](https://codereview.qt-project.org/c/qt/qtmultimedia/+/778580), merged 9 October 2026): the FFmpeg backend reports the mastering display's peak luminance in nits, as `QVideoFrameFormat::maxLuminance()` promises; it reported 10,000 times the value, so HDR video (PQ and HLG) was tone mapped against a peak 10,000 times too high. Tim Blechmann, the Qt Multimedia maintainer, improved its test and approved it.
+- **spice-gtk** ([!159](https://gitlab.freedesktop.org/spice/spice-gtk/-/merge_requests/159), merged 10 October 2026): a crash in the display channel whenever a surface is destroyed, which appeared once the project moved to GLib 2.68 (GLib's newer `g_clear_pointer` clears the pointer before its destroy function is read); found while adding stereo display to SPICE for the stereo virtual machine.
 
 **In review:**
 - **FFmpeg** ([#24628](https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/24628)): the H.264 and H.265 decoders honour the SEI's persistence, so the declaration holds for every frame, not only the first; [#24643](https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/24643): the stream's own declaration wins over the container's by default.
@@ -193,6 +194,7 @@ Click a branch to read the code, or its CI result to see every job.
 | KImageFormats | [`stereo3d`](https://invent.kde.org/danielcamposramos/kimageformats/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/kimageformats/-/pipelines/1373209) |
 | KFileMetaData | [`stereo3d`](https://invent.kde.org/danielcamposramos/kfilemetadata/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/kfilemetadata/-/pipelines/1372927) |
 | Gwenview | [`stereo3d`](https://invent.kde.org/danielcamposramos/gwenview/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/gwenview/-/pipelines/1374068) |
+| digiKam | [`stereo3d`](https://invent.kde.org/danielcamposramos/digikam/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/digikam/-/pipelines/1376024) |
 | Spectacle | [`stereo3d`](https://invent.kde.org/danielcamposramos/spectacle/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/spectacle/-/pipelines/1371085) |
 | MpvQt | [`stereo3d`](https://invent.kde.org/danielcamposramos/mpvqt/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/mpvqt/-/pipelines/1371080) |
 | Haruna | [`stereo3d`](https://invent.kde.org/danielcamposramos/haruna/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/haruna/-/pipelines/1371081) |
@@ -213,6 +215,8 @@ Click a branch to read the code, or its CI result to see every job.
 
 ## Documents
 
+- [House formats](docs/house-formats.md): one format inside the system for each medium (stereo pictures, desktop depth, video colour, audio, input devices), converted only where it enters and where it leaves, with the standard behind each and what is in the edition today.
+  For anyone who wants the whole design on one page before reading the details.
 - [Stereo labor division](docs/stereo-labor-division.md): who does what to show a stereo picture, from the program to the screen, and what each part never has to care about, tied to the specifications.
   For application, engine and toolkit developers, driver developers, display and hardware people.
 - [The VR-engine-to-3D-display formula](docs/formula.md): what a VR engine changes to drive a 3D display instead of a headset, worked out on Half-Life 2.

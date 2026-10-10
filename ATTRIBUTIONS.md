@@ -356,9 +356,28 @@ Names and licences below come from the linked source headers and project records
 | [protontricks](https://github.com/Matoking/protontricks) | Proton prefixes | Janne Pulkkinen |
 | [Phoronix Test Suite](https://www.phoronix-test-suite.com/) | Benchmarks | Michael Larabel |
 | [Vibe](https://github.com/thewh1teagle/vibe) | Offline transcription | thewh1teagle |
+| [PowerDevil](https://invent.kde.org/plasma/powerdevil), Plasma Workspace and KScreen | Native KDE power/idle settings, session management, locking and DPMS | The KDE contributors; Dario Freddi and Kai Uwe Broulik in PowerDevil's DPMS source |
+| [power-profiles-daemon](https://gitlab.freedesktop.org/upower/power-profiles-daemon) | Profile holds, restoration and GPU power actions | Its contributors; Bastien Nocera and David Redondo in the daemon's copyright records |
+| [systemd-zram-generator](https://github.com/systemd/zram-generator) | RAM-dependent compressed swap and its native configuration reader | Zbigniew Jędrzejewski-Szmek, Igor Raits and наб; Debian Rust Maintainers, Clay Stan, Ben Westover and Arnaud Ferraris in Debian's packaging records |
+| [CachyOS-Settings](https://github.com/CachyOS/CachyOS-Settings) and the CachyOS kernel contributors | Sources for the edition's user-space tunables and game-performance hold pattern | Peter Jung, Vasiliy Stelmachenok, Vladislav Nepogodin, Jai Kumar, Pete Viri, Matias and phoropter, as recorded in the relevant settings/helper git history |
+| [v4l-utils](https://git.linuxtv.org/v4l-utils.git/) and Linux's CEC framework | cec-ctl and the CEC ioctl interfaces used by the TV controller | The Linux media contributors; Cisco Systems, Inc. and its affiliates in cec-ctl's copyright records |
+| [systemd](https://github.com/systemd/systemd), [procps-ng](https://gitlab.com/procps-ng/procps), GLib/Gio and PolicyKit | Native settings readers, sessions, D-Bus clients and profile authorization | Their contributors and Debian maintainers |
+
 | [Wine](https://www.winehq.org/), Proton, [DXVK](https://github.com/doitsujin/dxvk), [gamescope](https://github.com/ValveSoftware/gamescope) | Windows games on Linux | Alexandre Julliard and the Wine developers, CodeWeavers, Philip Rebohle, Valve |
 | [VRto3D](https://github.com/oneup03/VRto3D) | SteamVR games on 3D displays | oneup03 |
 
+
+Power/idle credits also build on KWin's existing output and workspace code:
+**Xaver Hugl**, **Matthias Ettrich**, **Lubos Lunak**, **Vlad Zahorodnii** and
+**Natalie Clarius**, as named in those files' SPDX records. The DPMS protocol
+is by **Martin Gräßlin**, as `plasma-wayland-protocols/src/protocols/dpms.xml`
+records. Linux's VT and sysctl interfaces remain the Linux contributors' work.
+The unchanged kernel-settings package records **Sultan Alsawaf** and
+**Eric Naim** for the CachyOS kernel topics expressed as settings; those
+credits stay with the values. **Valve** publishes the mapping ceiling in
+[Proton's requirements](https://github.com/ValveSoftware/Proton/wiki/Requirements).
+The helper itself contains no copied CachyOS code. Names above come from
+upstream copyright, Debian copyright or git records; contact details are omitted.
 
 ### Controller input
 

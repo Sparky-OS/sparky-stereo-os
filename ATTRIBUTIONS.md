@@ -271,6 +271,17 @@ Our first Qt change was reviewed within hours by **Tim Blechmann**, with **Artem
 
 ---
 
+### 2.9 The stereo virtual machine
+
+[A virtual machine with a 3D display](docs/stereo-vm.md) builds on these projects. Names come from each project's records: source headers, MAINTAINERS, git history and Debian's control files.
+
+- **[QEMU](https://www.qemu.org/)** (our fork: [Sparky-OS/qemu](https://github.com/Sparky-OS/qemu/tree/stereo3d)): started by Fabrice Bellard and developed by its community. Gerd Hoffmann wrote virtio-gpu, where the stereo scanouts are added; Marc-André Lureau maintains QEMU's graphics. QEMU's policy declines AI-generated code, so our changes stay in the fork.
+- **[SPICE](https://www.spice-space.org/)** (spice, spice-gtk, spice-protocol and spice-common; our forks on [freedesktop.org](https://gitlab.freedesktop.org/danielcamposramos)): the most frequent authors in their histories are Frediano Ziglio, Christophe Fergeau, Marc-André Lureau, Alexander Larsson, Alon Levy and Victor Toso. Frediano Ziglio's symbol-visibility work is what our library builds rely on, and Marc-André Lureau reviewed and merged our crash fix ([spice-gtk !159](https://gitlab.freedesktop.org/spice/spice-gtk/-/merge_requests/159)).
+- **[Karton](https://invent.kde.org/system/karton)** (our fork: [danielcamposramos/karton](https://invent.kde.org/danielcamposramos/karton/-/tree/stereo3d)): Aaron Rainbolt, its initial developer, and Derek Lin.
+- **Debian's packaging** we build on: Michael Tokarev for QEMU, spice and spice-protocol (Debian QEMU Team); Jeremy Bícha, Laurent Bigonville and Lin Qigang for spice-gtk (Debian GNOME team).
+
+---
+
 ## 3. Video
 
 | Program | Licence | What we changed | Credit |
@@ -298,6 +309,7 @@ Names and licences below come from the linked source headers and project records
 | KRdp | [Session source](https://github.com/KDE/krdp/blob/22af703f87b7a14150ade68218274e99f8618650/src/AbstractSession.cpp), KDE LGPL alternatives; [video source](https://github.com/KDE/krdp/blob/22af703f87b7a14150ade68218274e99f8618650/src/VideoStream.cpp), GPL-2.0-or-later | KDE, Aleix Pol Gonzalez and Arjen Hiemstra; Pascal Nowack and GNOME Remote Desktop for the video code KRdp credits. Virtual-output capture and RDP transport. |
 | KPipeWire | [Encoder factory](https://github.com/KDE/kpipewire/blob/46c2d619f26e8f7bf59547a28c64913948665184/src/pipewireproduce.cpp), KDE LGPL alternatives | KDE and Aleix Pol Gonzalez. PipeWire capture and video encoding. |
 | KDE Connect | [Virtual monitor plugin](https://github.com/KDE/kdeconnect-kde/blob/28d93d50d9dfcf49224525ce77ec42df88ee53f9/plugins/virtualmonitor/virtualmonitorplugin.cpp), KDE GPL alternatives | KDE, Aleix Pol i Gonzalez and Fabian Arndt. Paired discovery and virtual-monitor handoff. |
+| KDE Connect remote desktop | [kdeconnect-kde !996](https://invent.kde.org/network/kdeconnect-kde/-/merge_requests/996) and [kdeconnect-android !673](https://invent.kde.org/network/kdeconnect-android/-/merge_requests/673), open merge requests, KDE GPL alternatives | Fabian Druschke: screencast over RDP with remote control on the desktop, and the embedded RDP client on Android. The phone headset's receiver is built on them. Aleix Pol Gonzalez's draft [!543](https://invent.kde.org/network/kdeconnect-android/-/merge_requests/543) explores the phone as an RDP host. |
 | FreeRDP | [Android client](https://github.com/FreeRDP/FreeRDP/blob/87baff6c80e16087c146937bca81d2bdb788e236/client/Android/Studio/freeRDPCore/src/main/cpp/android_freerdp.c), Apache-2.0 | The FreeRDP contributors, Marc-Andre Moreau, Thincast Technologies, Martin Fleisz, Armin Novak and Bernhard Miklautz. Android RDP client and decoder integration. |
 | Cardboard SDK | [Native API](https://github.com/googlevr/cardboard/blob/5969239e7c87f4cd64c8ec170ce1e7f4eb559e37/sdk/include/cardboard.h), Apache-2.0 | Google and the Cardboard contributors. Lens calibration, distortion meshes and eye textures. The repository's Unity plugin files have a separate licence and are outside this native-viewer proposal. |
 | Universal Media Server | [Project record](https://github.com/UniversalMediaServer/UniversalMediaServer/blob/1b1cb16dce26a40da3774bf3bc31202a1049e25d/pom.xml), GPL-2.0 | Universal Media Server contributors, including SubJunk, credited in the upstream-review section below. Renderer profiles and movie delivery. |

@@ -92,6 +92,7 @@ Load the one that matches the work; the README's program list names what was don
 | [`gamecontroller`](../gamecontroller/SKILL.md) | KDE controller models and labels for flight and racing rigs, preserving every raw control and verifying upstream profiles |
 | [`edition-packaging`](../edition-packaging/SKILL.md) | The edition's tasks and metapackages, tasksel, keeping our builds the only candidates, the media stack on deb-multimedia |
 | [`stereo-artwork`](../stereo-artwork/SKILL.md) | Artwork in an existing style, stereo pairs with a measured separation, animation in both eyes, editable deliverables |
+| [`power-idle`](../power-idle/SKILL.md) | KDE idle, lock, laptop lids, power-profile holds, CEC ownership and console isolation proof |
 | [`system-housekeeping`](../system-housekeeping/SKILL.md) | Self-pruning defaults (kernels, logs, crash dumps, GRUB) and cleaning a system safely |
 | [`ai-partners`](../ai-partners/SKILL.md) | AI assistants joining the work: roles, briefs, proof, review, upstream manners, provenance |
 | [`audio`](../audio/SKILL.md) | PipeWire, WirePlumber and KDE's Sound page: the audio house format, routing, formats, passthrough, virtual surround, MIDI |

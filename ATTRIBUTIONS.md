@@ -388,10 +388,11 @@ Their work informs the stereo report Daniel offered the W3C PM-KR Community Grou
 
 This edition is directed and verified by Daniel, and built with AI partners doing the legwork under his direction.
 Every claim in its documents is tied to a test that could fail or to a public record.
+All of their use has been paid by Daniel personally; the full list by lab, model, place and commit count is in [docs/ai-provenance.md](docs/ai-provenance.md).
 
-- **Anthropic, Claude** (Claude Code): orchestration, review and integration; Claude lanes for packaging, proofs, kernels, players and documentation; a quality pass on the public skills.
-- **OpenAI, GPT through Codex**: lanes for KWin and Mesa, KFileMetaData, KIO, the photo viewers and the Android study (GPT-6.1 Sol, GPT-6 Astra and others).
-- **Through Ollama**: **Kimi** (Moonshot AI), **DeepSeek**, **GLM** (Zhipu AI) and **Qwen** (Alibaba), the first stereo partner lanes.
+- **Anthropic, Claude** (Claude Code): Claude Opus 5.5, Opus 5, Opus 4.8, Fable 5.1 and Sonnet 5.5; orchestration, review and integration; lanes for kernels, packaging, proofs, players, the stereo virtual machine and documentation; the public skills.
+- **OpenAI, GPT through Codex**: GPT-6.1 Sol, GPT-6 Astra, GPT-6 Luna, GPT reserve and GPT-5.6 Sol; lanes for KWin and Mesa, KFileMetaData, KIO, the photo viewers, the game controller page, the Android study and certificates for Brazil.
+- **Through Ollama**: **Kimi** (Moonshot AI), **GLM** (Zhipu AI), **DeepSeek** and **Qwen** (Alibaba), the first stereo partner lanes; **Gemma 4** (Google) reading images for sessions without vision.
 
 ---
 

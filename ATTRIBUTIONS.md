@@ -288,6 +288,25 @@ Our first Qt change was reviewed within hours by **Tim Blechmann**, with **Artem
 
 ---
 
+### 3.1 Phone display and movie-renderer study
+
+Checked 10 October 2026. These projects inform the proposed phone display; this list does not claim that the integration has shipped.
+Names and licences below come from the linked source headers and project records. Existing KWin, libkscreen, Qt and FFmpeg credits above also apply.
+
+| Project | Source record and licence | Credit and contribution studied |
+|---|---|---|
+| KRdp | [Session source](https://github.com/KDE/krdp/blob/22af703f87b7a14150ade68218274e99f8618650/src/AbstractSession.cpp), KDE LGPL alternatives; [video source](https://github.com/KDE/krdp/blob/22af703f87b7a14150ade68218274e99f8618650/src/VideoStream.cpp), GPL-2.0-or-later | KDE, Aleix Pol Gonzalez and Arjen Hiemstra; Pascal Nowack and GNOME Remote Desktop for the video code KRdp credits. Virtual-output capture and RDP transport. |
+| KPipeWire | [Encoder factory](https://github.com/KDE/kpipewire/blob/46c2d619f26e8f7bf59547a28c64913948665184/src/pipewireproduce.cpp), KDE LGPL alternatives | KDE and Aleix Pol Gonzalez. PipeWire capture and video encoding. |
+| KDE Connect | [Virtual monitor plugin](https://github.com/KDE/kdeconnect-kde/blob/28d93d50d9dfcf49224525ce77ec42df88ee53f9/plugins/virtualmonitor/virtualmonitorplugin.cpp), KDE GPL alternatives | KDE, Aleix Pol i Gonzalez and Fabian Arndt. Paired discovery and virtual-monitor handoff. |
+| FreeRDP | [Android client](https://github.com/FreeRDP/FreeRDP/blob/87baff6c80e16087c146937bca81d2bdb788e236/client/Android/Studio/freeRDPCore/src/main/cpp/android_freerdp.c), Apache-2.0 | The FreeRDP contributors, Marc-Andre Moreau, Thincast Technologies, Martin Fleisz, Armin Novak and Bernhard Miklautz. Android RDP client and decoder integration. |
+| Cardboard SDK | [Native API](https://github.com/googlevr/cardboard/blob/5969239e7c87f4cd64c8ec170ce1e7f4eb559e37/sdk/include/cardboard.h), Apache-2.0 | Google and the Cardboard contributors. Lens calibration, distortion meshes and eye textures. The repository's Unity plugin files have a separate licence and are outside this native-viewer proposal. |
+| Universal Media Server | [Project record](https://github.com/UniversalMediaServer/UniversalMediaServer/blob/1b1cb16dce26a40da3774bf3bc31202a1049e25d/pom.xml), GPL-2.0 | Universal Media Server contributors, including SubJunk, credited in the upstream-review section below. Renderer profiles and movie delivery. |
+| jUPnP and its Cling origins | [Project record](https://github.com/jupnp/jupnp/blob/dbe0782bcd8e3283ae2f8d177cc4014b19593084/pom.xml), CDDL-1.0; [Android service](https://github.com/jupnp/jupnp/blob/dbe0782bcd8e3283ae2f8d177cc4014b19593084/bundles/org.jupnp.android/src/main/java/org/jupnp/android/AndroidUpnpServiceImpl.java) | Kai Kreuzer, Christian Bauer and the jUPnP/Cling contributors. Java and Android UPnP services. |
+| pupnp / Portable SDK for UPnP Devices | [COPYING](https://github.com/pupnp/pupnp/blob/79fc9f5dbd208888b220dcc0f4d0464bebbfa756/COPYING) and [THANKS](https://github.com/pupnp/pupnp/blob/79fc9f5dbd208888b220dcc0f4d0464bebbfa756/THANKS), BSD three-clause terms | Intel Corporation and the contributors named in THANKS. Native UPnP discovery alternative. |
+| PhoneVR | [Project README](https://github.com/PhoneVR-Developers/PhoneVR/blob/7fdcebee4a662eb8a1c7a8b19774aac71820a772/README.md) and [licence](https://github.com/PhoneVR-Developers/PhoneVR/blob/7fdcebee4a662eb8a1c7a8b19774aac71820a772/LICENSE), GPL-3.0 | PhoneVR Developers and its contributors. The later phone-headset route; current ALVR compatibility remains to be measured. |
+| ALVR | [Licence](https://github.com/alvr-org/ALVR/blob/e0d83b46168449cb0bb514770dd926b0ed85c55a/LICENSE), MIT | polygraphene, alvr-org and the ALVR contributors. The later tracked-headset transport. |
+| UPnP AV and DLNA specifications | [MediaServer:4 and MediaRenderer:3 specifications](https://openconnectivity.org/developer/specifications/upnp-resources/upnp/mediaserver4-and-mediarenderer3/) | UPnP Forum, Open Connectivity Foundation and Digital Living Network Alliance. Discovery, media services and interoperability specifications; citing them does not imply certification. |
+
 ## 4. Science and engineering
 
 | Program | Licence | What we changed | Credit |
@@ -327,6 +346,25 @@ Our first Qt change was reviewed within hours by **Tim Blechmann**, with **Artem
 | [Vibe](https://github.com/thewh1teagle/vibe) | Offline transcription | thewh1teagle |
 | [Wine](https://www.winehq.org/), Proton, [DXVK](https://github.com/doitsujin/dxvk), [gamescope](https://github.com/ValveSoftware/gamescope) | Windows games on Linux | Alexandre Julliard and the Wine developers, CodeWeavers, Philip Rebohle, Valve |
 | [VRto3D](https://github.com/oneup03/VRto3D) | SteamVR games on 3D displays | oneup03 |
+
+
+### Controller input
+
+The Game Controller page keeps every raw button, axis and hat reported by SDL.
+Its database consumer and separately synced data package are part of the edition.
+The profiles add names and provenance; they do not replace the raw controls.
+
+- **KDE Plasma's Game Controller page** ([v6.7.4 source](https://invent.kde.org/plasma/plasma-desktop/-/tree/v6.7.4/kcms/gamecontroller)): Joshua Goins, Jeremy Whiting, Niccolò Venerandi, Arthur Kasimov, Yelsin Sepulveda, Jakob Petsovits and Alexander Wilms, named in the files' SPDX records. The models and QML are GPL-2.0-or-later; the module-data files carry KDE's accepted GPL choices. Daniel Ramos's additions build on their page.
+- **SDL** ([source and licence](https://github.com/libsdl-org/SDL/tree/release-2.32.10)): Sam Lantinga and the SDL contributors, under the zlib licence. SDL provides the raw device API, virtual joystick fixture and game-controller mapping loader.
+- **SDL GameControllerDB** ([pinned source](https://github.com/mdqinc/SDL_GameControllerDB/tree/c1d5289a1f713b30a2c121e9fe6529d39360be0f)): the GameControllerDB contributors; its zlib notice credits Sam Lantinga. The data package syncs their public mapping strings unchanged.
+- **RetroArch joypad autoconfig** ([pinned source](https://github.com/libretro/retroarch-joypad-autoconfig/tree/e889df929e9e4e3c21862c8ae062e60cabf451f5)): the RetroArch team and profile contributors, under the MIT licence. Driver semantics were checked against [RetroArch's SDL2 driver](https://github.com/libretro/RetroArch/blob/01b902b71637cc10502516a71595800a91ef8656/input/drivers_joypad/sdl2_joypad.c), whose GPL-3.0-or-later notice names Hans-Kristian Arntzen, Daniel De Matteis, Higor Euripedes and Carlo Refice.
+- **KDE CI utilities** ([source](https://invent.kde.org/sysadmin/ci-utilities)): the KDE Sysadmin contributors, including Méven Car and Ben Cooksley, the authors recorded for the pinned CI commits used in the controller comparison. The edition's kde-ci-local tool runs those jobs with the same shared cache and build lock.
+
+- **Wheel force-feedback drivers:** [hid-tmff2](https://github.com/Kimplul/hid-tmff2/tree/d890a93105a0aa52028ac49282fa1b579e12566e) by Kimplul (Kim Kuparinen in the initialization code's notice), and its [hid-tminit](https://github.com/Kimplul/hid-tminit/tree/8c4547288a6c182ed4ff131e36f710f11a76c4a9) dependency by Dario Pagani and Kim Kuparinen; [hid-fanatecff](https://github.com/gotzl/hid-fanatecff/tree/bc2601ba230bae3bcc33f1ca51d722569b588d16), whose module names gotzl; and [new-lg4ff](https://github.com/berarma/new-lg4ff/tree/2092db19f7b40854e0427a1b2e39eda9f8d0c3cd), with Bernat Arlandis, Simon Wood and Oleg Makarenko. Their preserved source notices are authoritative for each file's GPL terms.
+- **The Linux HID and Logitech code those drivers build on:** Andreas Gal, Vojtech Pavlik, Michael Haboustak and Concept2, Jiri Kosina, Jiri Slaby, Hendrik Iben, Johann Deneux, Anssi Hannula and Gary Stein, named in the shipped driver source headers.
+- **[OpenTrack](https://github.com/opentrack/opentrack/tree/opentrack-2026.1.0):** Stanisław Halik, Chris Thompson, Donovan Baarda, Xavier Hallade, Michael Welter, Attila Csipa, Wei Shuai and Stéphane Lenclud, from its AUTHORS file. Its README also credits Wim Vriend and FaceTrackNoIR, Patrick Ruoff, furax49, Alexander Orokhovatskiy, Eike “e4z9”, GO63-samara, Davide Mameli, Khoa Nguyen, uglyDwarf and linuxtrack, Andrzej Czarnowski, Ryan Spicer, Ries van Twisk, Mathijs Groothuis and the IL-2 Sturmovik community. Enabled modules also name Tom Brazier. The core and many modules use ISC terms; individual source files and third-party notices retain their own licences.
+- **[PS3EYEDriver](https://github.com/opentrack/PS3EYEDriver/tree/9c03882ce0de4124856d5c1ec08ca947456599b0):** Eugene Zatepyakin and the Linux ov534 work by Antonio Ospite, Jim Paris, Jean-Francois Moine, Mark Ferrell, Richard Kaswy and Max Thrun, as recorded in its licence. New code uses MIT terms, and Linux-derived code retains GPLv2 terms.
+- **Native tracking and package dependencies:** Qt, OpenCV, libusb and libevdev and their contributors, with their notices preserved in the package and distribution libraries. DKMS and Debian's debhelper/dh-dkms provide the module lifecycle; the common DKMS helper credits Flavio Stanchina, Aric Cyr, Mario Limonciello and Alberto Milone. pahole generates the module BTF required by the edition's kernel.
 
 ---
 
@@ -471,4 +509,38 @@ We stand on the shoulders of:
 
 ---
 
-**Last updated**: 7 October 2026
+## Certificate management and ICP-Brasil interoperability
+
+- **Paweł "pavroo" Pijanowski**, author of Sparky CA (2018), and
+  **Daniel Campos Ramos**, its 2020 and 2026 work, as credited in Sparky CA's
+  original copyright records.
+- **Pedro F. Albanese**, author of [e521](https://github.com/pedroalbanese/e521),
+  as recorded in its ISC license. Our interoperability fixes and public-only
+  OpenSSL prototype follow his reference implementation.
+- **Instituto Nacional de Tecnologia da Informação (ITI)**, for the published
+  ICP-Brasil certificates, bundle hashes and DOC-ICP-01.01 algorithm standard.
+- **The OpenSSL Project**, **Network Security Services (NSS)** and their
+  contributors, for certificate verification, provider APIs and browser stores.
+- **The Python Software Foundation and Python contributors**, for the separate
+  arithmetic/hash oracle used to check the reference implementation.
+- **The RFC Editor and the authors of RFC 8032**, for the EdDSA construction.
+  Ed521's particular parameters come from ITI's standard.
+- **Andreas Hartmetz**, as credited in KIO's certificate-manager sources, and
+  **KDE's KIO contributors**, for KDE certificate and per-host trust handling.
+- **George Staikos**, **Marco Martin**, **Nicolas Fella**, and **KDE's KWallet
+  contributors**, as credited in KWallet's backend, service bridge and settings
+  records, for the opt-in certificate password store.
+- **The p11-kit, OpenSC and pcsc-lite contributors**, for PKCS#11 module
+  registration and public token inspection; **the GnuPG contributors**, for the
+  separate S/MIME trust store used by Kleopatra.
+- **The Poppler contributors** and **the Okular developers**, for PDF certificate
+  and signature APIs. The upstream projects and Debian copyright records name
+  their contributors.
+- **The Kleopatra developers**, as named in Kleopatra's about data, for the
+  GnuPG certificate and smart-card interface checked alongside this work.
+
+The Ed521 prototype is public-verification-only and unaudited. Trust-store
+membership, cryptographic verification and document-signature policy compliance
+are distinct. Credits do not imply endorsement or upstream acceptance.
+
+**Last updated**: 10 October 2026

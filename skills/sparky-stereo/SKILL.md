@@ -85,15 +85,18 @@ Load the one that matches the work; the README's program list names what was don
 | [`vr-to-3d`](../vr-to-3d/SKILL.md) | A program's VR path shown on a 3D display |
 | [`3d-to-vr`](../3d-to-vr/SKILL.md) | Stereo content and the desktop in a headset |
 | [`vkms-stereo`](../vkms-stereo/SKILL.md) | Testing stereo without a 3D display: VKMS with a 3D EDID, the writeback bench, IGT and KWin in a VM |
+| [`stereo-vm`](../stereo-vm/SKILL.md) | A virtual machine's stereo display: QEMU's window, virt-viewer, virt-manager and Karton, the pointer in a 3D mode, the controls that must fail |
 | [`drivers`](../drivers/SKILL.md) | The kernel and GPU drivers: HDMI 3D modes, deep colour, and carrying patches until mainline takes them |
 | [`native-linux`](../native-linux/SKILL.md) | OpenGL, EGL, Vulkan, Qt and X11 programs on Linux |
 | [`proton-wine`](../proton-wine/SKILL.md) | Windows programs through Wine, DXVK and gamescope |
+| [`gamecontroller`](../gamecontroller/SKILL.md) | KDE controller models and labels for flight and racing rigs, preserving every raw control and verifying upstream profiles |
 | [`edition-packaging`](../edition-packaging/SKILL.md) | The edition's tasks and metapackages, tasksel, keeping our builds the only candidates, the media stack on deb-multimedia |
 | [`stereo-artwork`](../stereo-artwork/SKILL.md) | Artwork in an existing style, stereo pairs with a measured separation, animation in both eyes, editable deliverables |
 | [`system-housekeeping`](../system-housekeeping/SKILL.md) | Self-pruning defaults (kernels, logs, crash dumps, GRUB) and cleaning a system safely |
 | [`ai-partners`](../ai-partners/SKILL.md) | AI assistants joining the work: roles, briefs, proof, review, upstream manners, provenance |
 | [`audio`](../audio/SKILL.md) | PipeWire, WirePlumber and KDE's Sound page: the audio house format, routing, formats, passthrough, virtual surround, MIDI |
 | [`brazil-certificates`](../brazil-certificates/SKILL.md) | ICP-Brasil certificates, the E-521 root, browsers, tokens and the court signer |
+| [`certificate-manager`](../certificate-manager/SKILL.md) | Sparky CA's verified ICP-Brasil catalogue and Ed521 checks across OpenSSL, NSS, Java and KDE |
 
 
 **Leave a skill behind.** When work in a new area is accepted, write what the next person needs as a skill in this folder, or extend the one it belongs to, and add it to this table.

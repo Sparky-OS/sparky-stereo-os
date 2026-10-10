@@ -347,6 +347,25 @@ Names and licences below come from the linked source headers and project records
 | [Wine](https://www.winehq.org/), Proton, [DXVK](https://github.com/doitsujin/dxvk), [gamescope](https://github.com/ValveSoftware/gamescope) | Windows games on Linux | Alexandre Julliard and the Wine developers, CodeWeavers, Philip Rebohle, Valve |
 | [VRto3D](https://github.com/oneup03/VRto3D) | SteamVR games on 3D displays | oneup03 |
 
+
+### Controller input
+
+The Game Controller page keeps every raw button, axis and hat reported by SDL.
+Its database consumer and separately synced data package are part of the edition.
+The profiles add names and provenance; they do not replace the raw controls.
+
+- **KDE Plasma's Game Controller page** ([v6.7.4 source](https://invent.kde.org/plasma/plasma-desktop/-/tree/v6.7.4/kcms/gamecontroller)): Joshua Goins, Jeremy Whiting, Niccolò Venerandi, Arthur Kasimov, Yelsin Sepulveda, Jakob Petsovits and Alexander Wilms, named in the files' SPDX records. The models and QML are GPL-2.0-or-later; the module-data files carry KDE's accepted GPL choices. Daniel Ramos's additions build on their page.
+- **SDL** ([source and licence](https://github.com/libsdl-org/SDL/tree/release-2.32.10)): Sam Lantinga and the SDL contributors, under the zlib licence. SDL provides the raw device API, virtual joystick fixture and game-controller mapping loader.
+- **SDL GameControllerDB** ([pinned source](https://github.com/mdqinc/SDL_GameControllerDB/tree/c1d5289a1f713b30a2c121e9fe6529d39360be0f)): the GameControllerDB contributors; its zlib notice credits Sam Lantinga. The data package syncs their public mapping strings unchanged.
+- **RetroArch joypad autoconfig** ([pinned source](https://github.com/libretro/retroarch-joypad-autoconfig/tree/e889df929e9e4e3c21862c8ae062e60cabf451f5)): the RetroArch team and profile contributors, under the MIT licence. Driver semantics were checked against [RetroArch's SDL2 driver](https://github.com/libretro/RetroArch/blob/01b902b71637cc10502516a71595800a91ef8656/input/drivers_joypad/sdl2_joypad.c), whose GPL-3.0-or-later notice names Hans-Kristian Arntzen, Daniel De Matteis, Higor Euripedes and Carlo Refice.
+- **KDE CI utilities** ([source](https://invent.kde.org/sysadmin/ci-utilities)): the KDE Sysadmin contributors, including Méven Car and Ben Cooksley, the authors recorded for the pinned CI commits used in the controller comparison. The edition's kde-ci-local tool runs those jobs with the same shared cache and build lock.
+
+- **Wheel force-feedback drivers:** [hid-tmff2](https://github.com/Kimplul/hid-tmff2/tree/d890a93105a0aa52028ac49282fa1b579e12566e) by Kimplul (Kim Kuparinen in the initialization code's notice), and its [hid-tminit](https://github.com/Kimplul/hid-tminit/tree/8c4547288a6c182ed4ff131e36f710f11a76c4a9) dependency by Dario Pagani and Kim Kuparinen; [hid-fanatecff](https://github.com/gotzl/hid-fanatecff/tree/bc2601ba230bae3bcc33f1ca51d722569b588d16), whose module names gotzl; and [new-lg4ff](https://github.com/berarma/new-lg4ff/tree/2092db19f7b40854e0427a1b2e39eda9f8d0c3cd), with Bernat Arlandis, Simon Wood and Oleg Makarenko. Their preserved source notices are authoritative for each file's GPL terms.
+- **The Linux HID and Logitech code those drivers build on:** Andreas Gal, Vojtech Pavlik, Michael Haboustak and Concept2, Jiri Kosina, Jiri Slaby, Hendrik Iben, Johann Deneux, Anssi Hannula and Gary Stein, named in the shipped driver source headers.
+- **[OpenTrack](https://github.com/opentrack/opentrack/tree/opentrack-2026.1.0):** Stanisław Halik, Chris Thompson, Donovan Baarda, Xavier Hallade, Michael Welter, Attila Csipa, Wei Shuai and Stéphane Lenclud, from its AUTHORS file. Its README also credits Wim Vriend and FaceTrackNoIR, Patrick Ruoff, furax49, Alexander Orokhovatskiy, Eike “e4z9”, GO63-samara, Davide Mameli, Khoa Nguyen, uglyDwarf and linuxtrack, Andrzej Czarnowski, Ryan Spicer, Ries van Twisk, Mathijs Groothuis and the IL-2 Sturmovik community. Enabled modules also name Tom Brazier. The core and many modules use ISC terms; individual source files and third-party notices retain their own licences.
+- **[PS3EYEDriver](https://github.com/opentrack/PS3EYEDriver/tree/9c03882ce0de4124856d5c1ec08ca947456599b0):** Eugene Zatepyakin and the Linux ov534 work by Antonio Ospite, Jim Paris, Jean-Francois Moine, Mark Ferrell, Richard Kaswy and Max Thrun, as recorded in its licence. New code uses MIT terms, and Linux-derived code retains GPLv2 terms.
+- **Native tracking and package dependencies:** Qt, OpenCV, libusb and libevdev and their contributors, with their notices preserved in the package and distribution libraries. DKMS and Debian's debhelper/dh-dkms provide the module lifecycle; the common DKMS helper credits Flavio Stanchina, Aric Cyr, Mario Limonciello and Alberto Milone. pahole generates the module BTF required by the edition's kernel.
+
 ---
 
 ## 7. The maintainers who reviewed and merged our work

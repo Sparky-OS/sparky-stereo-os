@@ -358,8 +358,13 @@ Names and licences below come from the linked source headers and project records
 | [Vibe](https://github.com/thewh1teagle/vibe) | Offline transcription | thewh1teagle |
 | [PowerDevil](https://invent.kde.org/plasma/powerdevil), Plasma Workspace and KScreen | Native KDE power/idle settings, session management, locking and DPMS | The KDE contributors; Dario Freddi and Kai Uwe Broulik in PowerDevil's DPMS source |
 | [power-profiles-daemon](https://gitlab.freedesktop.org/upower/power-profiles-daemon) | Profile holds, restoration and GPU power actions | Its contributors; Bastien Nocera and David Redondo in the daemon's copyright records |
-| [systemd-zram-generator](https://github.com/systemd/zram-generator) | RAM-dependent compressed swap and its native configuration reader | Zbigniew Jędrzejewski-Szmek, Igor Raits and наб; Debian Rust Maintainers, Clay Stan, Ben Westover and Arnaud Ferraris in Debian's packaging records |
+| [systemd-zram-generator](https://github.com/systemd/zram-generator) | zram by hardware through its own `set!` directive: no zram unit on capable machines | Zbigniew Jędrzejewski-Szmek, Igor Raits and наб; Debian Rust Maintainers, Clay Stan, Ben Westover and Arnaud Ferraris in Debian's packaging records |
 | [CachyOS-Settings](https://github.com/CachyOS/CachyOS-Settings) and the CachyOS kernel contributors | Sources for the edition's user-space tunables and game-performance hold pattern | Peter Jung, Vasiliy Stelmachenok, Vladislav Nepogodin, Jai Kumar, Pete Viri, Matias and phoropter, as recorded in the relevant settings/helper git history |
+| The Cushion Swap File | The edition's swap: the area off at rest, switched on under memory pressure, switched off when the arithmetic shows it is safe | Daniel Ramos's design, his "Dynamic Swap Parachute" of 2026-08-01, with its rules and test harness |
+| Linux's pressure stall information (PSI) | The kernel wakes the Cushion Swap File when memory stalls | Johannes Weiner; the trigger interface by Suren Baghdasaryan (`kernel/sched/psi.c`) |
+| [swapspace](https://github.com/Tookmund/Swapspace) | Prior art: swap files created and removed on demand | Software Industry Promotion Agency of Thailand, Jeroen T. Vermeulen, Jacob Adams (Debian's copyright records) |
+| [Fedora's SwapOnZRAM change](https://fedoraproject.org/wiki/Changes/SwapOnZRAM) | Prior art for zram swap by default, which the edition keeps only where the hardware needs it | Chris Murphy, the change owner |
+| [KAuth](https://invent.kde.org/frameworks/kauth) and [KCMUtils](https://invent.kde.org/frameworks/kcmutils) | The Memory page in System Settings and its privileged write | The KDE Frameworks contributors |
 | [v4l-utils](https://git.linuxtv.org/v4l-utils.git/) and Linux's CEC framework | cec-ctl and the CEC ioctl interfaces used by the TV controller | The Linux media contributors; Cisco Systems, Inc. and its affiliates in cec-ctl's copyright records |
 | [systemd](https://github.com/systemd/systemd), [procps-ng](https://gitlab.com/procps-ng/procps), GLib/Gio and PolicyKit | Native settings readers, sessions, D-Bus clients and profile authorization | Their contributors and Debian maintainers |
 
@@ -376,7 +381,9 @@ The unchanged kernel-settings package records **Sultan Alsawaf** and
 **Eric Naim** for the CachyOS kernel topics expressed as settings; those
 credits stay with the values. **Valve** publishes the mapping ceiling in
 [Proton's requirements](https://github.com/ValveSoftware/Proton/wiki/Requirements).
-The helper itself contains no copied CachyOS code. Names above come from
+The helper itself contains no copied CachyOS code. /tmp on disk follows
+**Debian's trixie release notes** (5.1.6 and 5.2.1, the Debian Documentation
+Project). Names above come from
 upstream copyright, Debian copyright or git records; contact details are omitted.
 
 ### Controller input

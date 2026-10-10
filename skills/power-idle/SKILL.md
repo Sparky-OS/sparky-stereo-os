@@ -1,14 +1,15 @@
 ---
 name: power-idle
 description: >-
-  Power profiles, idle timelines, locking, laptop lids and HDMI-CEC in Sparky
+  Power profiles, idle timelines, locking, laptop lids, HDMI-CEC, zram by
+  hardware, the Cushion Swap File and hibernate in Sparky
   Stereo OS's KDE session, with native Plasma settings tests and text-console
   isolation proof. Load sparky-stereo first; use edition-packaging for packages.
 ---
 
 # Power and idle in KDE
 
-Written 2026-10-10 from the accepted power/idle work. Check the edition's
+Written 2026-10-10 from the accepted power/idle work, swap and hibernate included. Check the edition's
 current README and decisions before changing a default. Load
 [sparky-stereo](../sparky-stereo/SKILL.md) first, and
 [edition-packaging](../edition-packaging/SKILL.md) when packaging.
@@ -89,16 +90,53 @@ blanking programs and ioctl/writer activity. Plant a real tty2 blank and
 require the same detector to fail. Missing guest prerequisites are not a
 pass. The kernel's blanked-VT query is global, not per-output DPMS.
 
-The person who owns the VM runs this probe and retains its JSON. Preparing
-it or passing its logic tests does not establish the VM result. Keep guest
-credentials with their owner.
+Preparing the probe or passing its logic tests does not establish the VM
+result; run it in the VM and keep its JSON. Keep guest credentials with their
+owner. Three things only the real guest showed: a Wayland client allocates
+its object ids from 3 with no gaps (libwayland's rule; KWin drops a client
+that skips one), PowerDevil's `reparseConfiguration` reloads only the global
+settings (call `refreshStatus`, as the KCM does, to apply short timeouts), and
+DRM's fbdev emulation reads `fb0/blank` as 4 while tty1 is visible, so judge
+the text display by the DRM connector's DPMS state.
+
+A KIdleTime built against an older Qt minor release can get no Wayland
+interface from a newer one (Qt 6.11 raised `QWaylandApplication` to revision
+2): then no idle action fires at all, no dim, no screen off, no lock. Check
+the installed libkf6idletime6 was rebuilt against the running Qt before
+reading a missing dim as a settings problem.
 
 For game performance use PPD's `HoldProfile` through `powerprofilesctl launch`,
 so the daemon owns restoration, concurrent holds and disconnect cleanup.
 Test the child's actual profile, argument boundaries, failure status,
 signals and power-saver hold precedence; an argv-only stub is insufficient.
-Keep zram/sysctl files in their existing owning package. Test native generator
-sizing at either side of the cap and administrator overrides. A generator
-fixture does not prove a live swap device. Retain disk swap for hibernation:
-zram cannot hold the resume image. Read
-[system-housekeeping](../system-housekeeping/SKILL.md) for system policy.
+## Memory and swap
+
+The edition keeps pages in RAM (swappiness 1, with or without zram). zram is
+decided by hardware: zram-generator's own `set!` directive runs a script
+that answers 1 or 0 and multiplies the device size, so a capable machine gets
+no zram unit at all; it is on with 8 GB of RAM or less, or when the swap area
+sits on eMMC, an SD card, a rotating disk or removable storage. lz4, because
+the machines that get zram have the least CPU to spare. The user can switch
+it in System Settings, Memory.
+
+The swap is the Cushion Swap File, Daniel Ramos's design: the area stays off
+at rest, is switched on when available memory runs low or falls fast, and is
+switched off again only when the arithmetic shows that cannot itself run out
+of memory. It wakes through PSI where the kernel has it and polls otherwise.
+Measure before trusting PSI alone: with swap off it fires only at the very
+end, sometimes after the OOM kill, so keep a timed check beside it.
+
+Hibernate with the area off needs two things. logind offers it only with an
+active swap that can hold the image (systemd's `hibernate-util.c`); the
+documented `SYSTEMD_BYPASS_HIBERNATION_MEMORY_CHECK=1` for systemd-logind,
+set by a generator only where an area and `resume=` exist, offers it. And
+systemd-sleep looks for the device before its hooks run, so a unit ordered
+before `systemd-hibernate.service` switches the area on. A virtio-fs share
+blocks hibernation in a VM; test without it. zram cannot hold the resume
+image.
+
+/tmp lives on disk (`tmp.mount` masked, as Debian's trixie release notes
+describe) and is emptied at every boot. Keep zram, sysctl and tmpfiles files
+in their owning package. A generator fixture does not prove a live swap
+device. Read [system-housekeeping](../system-housekeeping/SKILL.md) for
+system policy.

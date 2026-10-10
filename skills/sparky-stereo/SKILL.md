@@ -9,7 +9,7 @@ Sparky Stereo OS 9 "Mashtabba", based on Debian 14 "Forky", is Daniel Ramos's st
 Its aim is a desktop where stereo 3D and deep colour (10, 12 and 16 bits per channel) are part of the system, not a feature of a few programs.
 This skill holds what every piece of work on it must respect. The other skills in this folder hold the solved patterns for one kind of work each.
 
-**Check freshness first.** Written on 2026-10-07. If the [README](../../README.md) says something different, the README wins and this skill is history.
+**Check freshness first.** Written on 2026-10-07, updated on 2026-10-10. If the [README](../../README.md) says something different, the README wins and this skill is history.
 
 ---
 
@@ -37,6 +37,7 @@ Everything below is a rule, and rules are followed when someone is watching. Thi
 - **The whole specification in every API.** A stereo enum or field lists every frame packing the standards define (H.264 and H.265 Table D-8, Matroska `StereoMode` in [RFC 9559](https://www.rfc-editor.org/rfc/rfc9559)), both eye orders, never a subset. Every rule cites its specification; awesome-stereoscopy's [standards page](https://github.com/danielcamposramos/awesome-stereoscopy/blob/main/standards.md) links them.
 - **One world, two cameras.** A stereo pair comes from two camera positions in the same scene, at the projection, never from shifting drawn items one by one.
 - **The engine, not the program.** When two programs need the same stereo code, it belongs in the layer they share (Qt Multimedia, MpvQt, Mesa, KWin), so each program's own change shrinks to its interface.
+- **House formats.** Stereo is one case of a rule for every medium: one format inside, conversions only where it enters and where it leaves, defaults from the hardware ([house formats](../../docs/house-formats.md)).
 - **Quality.** In the edition: video at the source's depth, each eye at full resolution, the colour description kept; audio at 24-bit 48 kHz or more wherever the hardware offers it. In a patch offered upstream: the project's own defaults stay, and the patch makes the higher-quality paths available.
 
 ---
@@ -90,7 +91,12 @@ Load the one that matches the work; the README's program list names what was don
 | [`edition-packaging`](../edition-packaging/SKILL.md) | The edition's tasks and metapackages, tasksel, keeping our builds the only candidates, the media stack on deb-multimedia |
 | [`stereo-artwork`](../stereo-artwork/SKILL.md) | Artwork in an existing style, stereo pairs with a measured separation, animation in both eyes, editable deliverables |
 | [`system-housekeeping`](../system-housekeeping/SKILL.md) | Self-pruning defaults (kernels, logs, crash dumps, GRUB) and cleaning a system safely |
+| [`ai-partners`](../ai-partners/SKILL.md) | AI assistants joining the work: roles, briefs, proof, review, upstream manners, provenance |
+| [`audio`](../audio/SKILL.md) | PipeWire, WirePlumber and KDE's Sound page: the audio house format, routing, formats, passthrough, virtual surround, MIDI |
+| [`brazil-certificates`](../brazil-certificates/SKILL.md) | ICP-Brasil certificates, the E-521 root, browsers, tokens and the court signer |
 
+
+**Leave a skill behind.** When work in a new area is accepted, write what the next person needs as a skill in this folder, or extend the one it belongs to, and add it to this table.
 ---
 
 # Where these came from

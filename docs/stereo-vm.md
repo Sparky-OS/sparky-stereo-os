@@ -7,11 +7,11 @@ It also covers rendering the guest on the host's strongest GPU, and passing a wh
 
 *A Sparky Stereo OS guest in side by side (full), shown by Karton under Stereo KWin: the host's capture holds one view per eye, the red marker in the left eye and the green one in the right, the window around it identical in both.*
 
-**Status (2026-10-09):** the virtual machine is QEMU, and every way of watching it on the edition's desktop shows its 3D modes in stereo: QEMU's own window, virt-viewer and Karton.
+**Status (2026-10-10):** the virtual machine is QEMU, and every way of watching it on the edition's desktop shows its 3D modes in stereo: QEMU's own window, virt-viewer, virt-manager and Karton.
 - **It needs Stereo KWin on the host** (the edition's KWin): it is what shows each view to its eye on the screen you have, a 3D television, anaglyph or another stereo output. On any other desktop the window shows the left view only.
-- QEMU: the edition's `qemu` package (1:11.1.2+ds-1+stereo3d2) gives the guest the 3D modes and tells the host which layout each frame uses, in its own window and to SPICE clients; the changes are on [Sparky-OS/qemu](https://github.com/Sparky-OS/qemu/tree/stereo3d), branch `stereo3d`.
-- SPICE, which carries the screen to virt-viewer, virt-manager and Karton: the edition's `spice-protocol` (0.14.5-1+stereo3d1), `spice` (0.16.0-3+stereo3d1) and `spice-gtk` (0.42-4+stereo3d1) carry the layout.
-- Karton: the edition's `karton` package (0.1~prealpha+git20260905.08e13cf-1+stereo3d1), branch [`stereo3d`](https://invent.kde.org/danielcamposramos/karton/-/tree/stereo3d).
+- QEMU: the edition's `qemu` package (1:11.1.2+ds-1+stereo3d4) gives the guest the 3D modes and tells the host which layout each frame uses, in its own window and to SPICE clients; the changes are on [Sparky-OS/qemu](https://github.com/Sparky-OS/qemu/tree/stereo3d), branch `stereo3d`.
+- SPICE, which carries the screen to virt-viewer, virt-manager and Karton: the edition's `spice-protocol` (0.14.5+git20261010.941d56d-1+stereo3d2), `spice` (0.16.0+git20261010.acb8500-1+stereo3d2) and `spice-gtk` (0.43+git20261010.77a4ac6-1+stereo3d2), built from the `stereo3d` branches of the SPICE projects, carry the layout and the pointer.
+- Karton: the edition's `karton` package (0.1~prealpha+git20260905.08e13cf-1+stereo3d2), branch [`stereo3d`](https://invent.kde.org/danielcamposramos/karton/-/tree/stereo3d).
 - The guest side, two patches to the Linux `virtio-gpu` driver (branch [`vm/virtio-gpu-stereo`](https://github.com/Sparky-OS/linux/tree/vm/virtio-gpu-stereo)), is not yet in the edition's kernel.
 
 QEMU's own contribution policy (`docs/devel/code-provenance.rst`) declines code generated with AI tools, so the QEMU changes stay in Sparky Stereo OS.
@@ -46,8 +46,16 @@ Give the device more host memory than the default 256 MiB for switching between 
 ### In virt-viewer, virt-manager or Karton
 
 These show the guest through SPICE: run the VM with `-device virtio-gpu-pci,stereo=on,max_hostmem=1G` and a SPICE display (with libvirt, the device line through `qemu:commandline`).
-The viewer sizes its window to one view and, on Stereo KWin, shows the two views side by side on a declared surface; without Stereo KWin it shows the left view.
-virt-viewer and Karton were tested; virt-manager uses the same `spice-gtk` widget as virt-viewer.
+The viewer is built the way every stereo program of the edition is:
+- its ordinary window is the guest's display at its own size, one view, and takes the input;
+- the two views go side by side to a surface of their own on top of it, declared once as full side by side (without Stereo KWin the window shows the left view).
+
+The pointer follows from that. The viewer sends its position in the guest's display, and with a stereo layout set the edition's `spice-server` tells QEMU's tablet that the display is one view, so QEMU maps the position as upstream does, and the guest's pointer reaches every corner of its display in every 3D mode.
+Nothing in QEMU remaps the pointer; QEMU's own window scales by one view's size for the same reason.
+A viewer without the stereo code (any other desktop's virt-viewer, Karton or virt-manager) shows the packed frame, which is what its user sees.
+
+virt-viewer, virt-manager and Karton were tested with the pointer at four places of the view in 2D and in each 3D mode, with the window resized, and (virt-manager, Karton and QEMU's own window) with the pointer moving while the guest changed mode. For a stock `spice-gtk` or Karton the same checks fail.
+virt-viewer and virt-manager share the `spice-gtk` widget. virt-viewer opens its window at the size of the guest's whole frame, which in the 3D modes holds both views (twice the width in side by side, twice the height in frame packing): resize it to the view.
 
 ## The strongest GPU renders
 
@@ -113,6 +121,6 @@ While the guest owns it, the host cannot use that GPU or the screens connected t
 
 - With `gl=on`, QEMU reads each stereo frame back from the GPU to show both eyes: one copy per frame.
 - QEMU's GTK display on X11 (`GDK_BACKEND=x11`) shows the packed frame with `gl=on`; use it on Wayland.
-- SPICE sends a frame in tiles, so a viewer can for a moment show the two views from different frames (seen once in six Karton runs); a frame boundary in the protocol would fix it.
+- SPICE sends a frame in tiles, so a viewer can for a moment show the two views from different frames (7 of 100 samples in Karton and 11 of 100 in virt-viewer, measured with frame-numbered views; QEMU's own window, which reads the whole frame at one moment, showed 0 of 200); a frame boundary in the protocol is the proposed fix (not built).
 - Without Stereo KWin (or another compositor that takes the declaration), the window shows the left eye.
 - Interlaced 3D modes (1080i side by side half) are not listed: `virtio-gpu` does not allow interlaced modes.

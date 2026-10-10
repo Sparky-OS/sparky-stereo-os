@@ -53,5 +53,5 @@ Check the actual KDE headers, exported API, certificate store and selected
 Poppler backend; online documentation alone is not a build or runtime test.
 
 Keep evidence small and record commands, exact results and gaps. External
-messages, PR descriptions and contact details belong in the private review
-lane, never in public source or this skill. Publish only after review.
+messages, PR descriptions and contact details stay in private notes, never in
+public source or this skill. Publish only after review.

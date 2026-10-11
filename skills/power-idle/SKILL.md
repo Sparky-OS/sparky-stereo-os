@@ -135,6 +135,25 @@ before `systemd-hibernate.service` switches the area on. A virtio-fs share
 blocks hibernation in a VM; test without it. zram cannot hold the resume
 image.
 
+Find where the image goes the way the installer recorded it:
+`/etc/initramfs-tools/conf.d/resume` (`RESUME=`, `RESUME_OFFSET=` for a swap
+file, `none` for no hibernation). Debian resumes from it with no `resume=` on
+the kernel command line, so a check of `/proc/cmdline` alone misses every
+installed system. initramfs-tools 0.151 has no `RESUME_OFFSET`, though: its
+init takes `resume_offset` only from the command line or a conf.d snippet in
+the image, so a hook must write that snippet. Measure the kernel's offset after
+boot; without the hook it is 0. A swap partition the installer made can sit in
+no fstab line and must still work.
+
+While a hibernation uses the area, nothing may switch it off: hold retraction
+from the unit's switch-on until the sleep hook runs, with a timeout for a
+hibernation that never started. A systemd generator's stderr reaches neither
+dmesg nor the journal (systemd.generator(7)), so write its decisions to
+`/dev/kmsg`. PowerDevil can keep an old CanHibernate answer while logind's has
+changed; ask logind when you prove an offer. Pacing by headroom samples
+fastest on small machines, and so logs the most there: measure the log volume
+on the smallest machine you support, not only on yours.
+
 /tmp lives on disk (`tmp.mount` masked, as Debian's trixie release notes
 describe) and is emptied at every boot. Keep zram, sysctl and tmpfiles files
 in their owning package. A generator fixture does not prove a live swap

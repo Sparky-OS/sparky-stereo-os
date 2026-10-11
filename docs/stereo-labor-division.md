@@ -208,5 +208,6 @@ A new program needs no knowledge of displays, and a new display needs no change 
 - **Wayland**: `wp_viewporter` (wayland-protocols, stable); `kde_stereo_content_v1` (Sparky Stereo OS's addition to plasma-wayland-protocols).
 - **ICCCM** 4.1.5 (configuring the window) and 4.2.3 (window movement, synthetic ConfigureNotify).
 - **Eric Dubois**, "A projection method to generate anaglyph stereo images", ICASSP 2001.
-- **OpenVR** (Valve) and **OpenXR** (Khronos), for headsets.
+- **OpenVR** ([Valve](https://github.com/ValveSoftware/openvr)) and **OpenXR 1.1** ([Khronos](https://registry.khronos.org/OpenXR/specs/1.1/html/xrspec.html)), for headsets.
+- **DisplayXR**, for glasses-free panels: its [window geometry specification](https://github.com/DisplayXR/displayxr-runtime/blob/main/docs/specs/runtime/wayland-window-geometry.md) and [ADR-033](https://github.com/DisplayXR/displayxr-runtime/blob/main/docs/adr/ADR-033-placement-reports-geometry-weaver-owns-phase.md) (geometry crosses to the weaver, phase never leaves it).
 - **AES69-2015** (Audio Engineering Society), the SOFA format for spatial acoustic data such as head-related transfer functions, which PipeWire's [filter chain](https://docs.pipewire.org/page_module_filter_chain.html) takes for binaural headphone sound.

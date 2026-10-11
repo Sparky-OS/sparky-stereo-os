@@ -10,10 +10,11 @@ Broadcast and post-production work this way, and so does PipeWire for sound; thi
 
 | Medium | House format (inside) | Converted where it enters | Converted where it leaves | Status |
 |---|---|---|---|---|
-| **Stereo pictures and video** | Full side by side, left eye first, both eyes complete, at the source's resolution; declared once to the compositor | In the program or its library: every packing in the standards (H.264, H.265 and H.274 frame packing; Matroska StereoMode; MPO; JPS; PNG `sTER`), and anaglyph pictures rebuilt into two eyes | In KWin's outputs only: HDMI 3D (frame packing, side by side, top and bottom), red and cyan on any screen, headsets | In the edition |
+| **Stereo pictures and video** | Full side by side, left eye first, both eyes complete, at the source's resolution; declared once to the compositor | In the program or its library: every packing in the standards (H.264, H.265 and H.274 frame packing; Matroska StereoMode; MPO; JPS; PNG `sTER`), and anaglyph pictures rebuilt into two eyes | In KWin's outputs only: HDMI 3D (frame packing, side by side, top and bottom), red and cyan on any screen, headsets; one conversion per screen, so mirrored screens and screens on different GPUs each get their own 3D output; glasses-free panels through DisplayXR (planned) | In the edition |
 | **Depth of the desktop** | One value per element: sunk, screen or popped | Set by the window manager and the toolkit, from the element's role | Stereo screens: the two eyes' disparity. 2D screens: shadow and a small scale | KWin side done on our KWin branch, coming with the next KWin package; toolkit side being built |
 | **Video colour** | The decoder's own bit depth, never reduced in the middle | In the decoder | At the screen: deep colour at 10, 12 or 16 bits per component when its EDID offers it | Being finished driver by driver |
 | **Audio** | PCM at the source's own rate; the edition's floor is 24 bit at 48 kHz | In the decoder; the sound server follows the source's rate instead of resampling (44.1 to 192 kHz) | Per device: the best format the hardware takes; encoded formats passed through to the TV when its EDID says it accepts them; binaural on headphones for multichannel sound | Being built: rate following, device settings, passthrough and binaural |
+| **Sound in XR** | The program's sound scene: its sources placed in its world, and that world anchored to the room | In the game or engine, which places the sources as it places its two cameras | Speakers: a mix that stays in room coordinates and never turns with the head. Headphones: binaural, following the head. HT mode and the Stereo Spectator keep the sound in the room | Planned: per-speaker setup, the headphone path, and the room-facing listener in our Half-Life 2 module |
 | **Input devices** | Every button, axis and hat raw, as the device reports it | In the kernel driver and SDL, without dropping controls | In the game, Steam Input or the user's mapping | KDE's game controller page with every raw control done on our KDE fork; more than 80 buttons being built |
 
 ## The rules that follow from it
@@ -26,6 +27,8 @@ Broadcast and post-production work this way, and so does PipeWire for sound; thi
 ## Where each medium is explained
 
 - Stereo pictures and video, and who does what between programs, toolkits, KWin and drivers: [stereo-labor-division.md](stereo-labor-division.md).
+- Sound, and who does what between programs and the operating system: the [Sound](stereo-labor-division.md#sound-the-same-division) section of the same page.
+- Developing for 3D and XR without the hardware on the desk: [develop-3d-on-an-ordinary-monitor.md](develop-3d-on-an-ordinary-monitor.md).
 - Testing stereo without a 3D display: [test-stereo-without-a-3d-tv.md](test-stereo-without-a-3d-tv.md) and the stereo virtual machine: [stereo-vm.md](stereo-vm.md).
 - Depth on the desktop: the "Depth on the desktop" section of the [README](../README.md).
 

@@ -1,6 +1,6 @@
 # Our branches on KDE's GitLab
 
-Every KDE change above is a branch of our fork on [invent.kde.org](https://invent.kde.org/danielcamposramos), built and tested by KDE's own CI before it is proposed upstream.
+Every KDE change in the [program list](programs.md) is a branch of our fork on [invent.kde.org](https://invent.kde.org/danielcamposramos), built and tested by KDE's own CI before it is proposed upstream.
 Click a branch to read the code, or its CI result to see every job.
 
 | Project | Our branch | KDE's CI |

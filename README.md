@@ -7,6 +7,13 @@ It is in development.
 
 <a href="https://sourceforge.net/p/sparkyos/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://sourceforge.net/sflogo.php?type=18&amp;group_id=3189517"><img alt="SparkyOS on SourceForge" src="https://sourceforge.net/sflogo.php?type=17&amp;group_id=3189517" width="200"></picture></a>
 
+## The base: three open lists
+
+The research behind this edition is public, in three curated lists anyone can copy (CC0):
+- **[awesome-stereoscopy](https://github.com/danielcamposramos/awesome-stereoscopy)**: stereo 3D formats, standards, tools, players, displays and headsets, and 190 years of history, from Wheatstone's 1838 stereoscope to spatial video.
+- **[awesome-linux-hdr](https://github.com/danielcamposramos/awesome-linux-hdr)**: Linux HDR and deep colour from the specification to the photons: standards, drivers, compositors, applications and measurement.
+- **[awesome-vr](https://github.com/danielcamposramos/awesome-vr)**: virtual reality: headsets, open runtimes, standards, media formats, comfort and accessibility, and sixty years of history.
+
 ## Seen in 3D
 
 Two screenshots taken with the edition's Spectacle, which keeps both eyes. Red-cyan glasses show them in 3D here; the MPO files open in 3D in the edition's photo programs and on a 3D television.

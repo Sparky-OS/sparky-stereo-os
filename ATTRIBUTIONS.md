@@ -63,13 +63,14 @@ By name, the Debian maintainers of the packages we carry with our patches, as th
 |---|---|
 | KWin, KFileMetaData | Debian Qt/KDE Maintainers; Aurélien Couderc, Patrick Franz |
 | Qt (qtbase), Qt Multimedia | Debian Qt/KDE Maintainers; Patrick Franz |
-| Analitza, KAlgebra, Dragon Player | Debian Qt/KDE Maintainers; Aurélien Couderc |
+| Analitza, KAlgebra, Dragon Player, KolourPaint | Debian Qt/KDE Maintainers; Aurélien Couderc |
 | Kalzium | Debian Qt/KDE Maintainers; Aurélien Couderc, Sune Vuorela |
 | Kubrick | Debian Qt/KDE Maintainers; Aurélien Couderc, Daniel Schepler, Lisandro Damián Nicanor Pérez Meyer, Sune Vuorela |
 | Marble | Debian Qt/KDE Maintainers; Aurélien Couderc, Matthias Geiger |
 | Krita | Debian Qt/KDE Maintainers; Pino Toscano |
 | KScreen, libkscreen, Spectacle, KInfoCenter, KImageFormats, plasma-wayland-protocols | Debian Qt/KDE Maintainers |
 | Haruna, MpvQt | Debian KDE Extras Team |
+| digiKam, Showfoto | Debian KDE Extras Team; Steve M. Robbins |
 | Kdenlive, MLT | Patrick Matthäi |
 | Mesa | Debian X Strike Force; Andreas Boll |
 | Xwayland | Debian X Strike Force; Timo Aaltonen |
@@ -342,6 +343,8 @@ Names and licences below come from the linked source headers and project records
 | [KImageFormats](https://invent.kde.org/frameworks/kimageformats) | LGPL-2.0-or-later | JPS and MPO plugins | Albert Astals Cid, Alex Merry, Halla Rempt, Brad Hards, Mirco Miranda, Daniel Novomeský and the other authors |
 | [KFileMetaData](https://invent.kde.org/frameworks/kfilemetadata) | LGPL-2.1-or-later | A `stereo3dLayout` property for every stereo mark the specifications define | Alexander Stippich, Christoph Cullmann, Friedrich W. H. Kossebau, Igor Poboiko, Jos van den Oever, Joshua Goins and the other authors |
 | [KIO](https://invent.kde.org/frameworks/kio), [Gwenview](https://apps.kde.org/gwenview/) | LGPL, GPL | Thumbnails that wait for a finished download; stereo photos in the viewer, in progress | David Faure and the KIO developers; Aurélien Gâteau and the Gwenview developers |
+| [digiKam and Showfoto](https://www.digikam.org/) | GPL-2.0-or-later | Stereo photos in 3D in the album preview, light table, slideshow, image editor and Showfoto; a Showfoto crash at quit fixed | Gilles Caulier, Maik Qualmann, Michael Miller, Marcel Wiesweg, the founder Renchi Raju and the digiKam developers |
+| [KolourPaint](https://apps.kde.org/kolourpaint/) | BSD-2-Clause, LGPL | Stereo pictures in 3D, edited as one side-by-side pair that keeps its stereo mark when saved | Clarence Dang (founder), Thurston Dang, Martin Koller (maintainer) and the KolourPaint authors |
 
 ---
 

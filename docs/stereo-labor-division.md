@@ -28,7 +28,7 @@ A program renders its sound scene; the operating system decides which speakers o
 flowchart LR
   P["Program or engine<br/>two cameras, 2D stays 2D"] -- "edge: pack" --> F["Full side by side<br/>left eye | right eye"]
   F --> K["KWin<br/>knows stereo"]
-  K -- "edge: convert" --> O["Outputs<br/>HDMI 3D, anaglyph, interleaving,<br/>frame-sequential, pairs, headsets"]
+  K -- "edge: convert" --> O["Outputs<br/>HDMI 3D, anaglyph, interleaving,<br/>frame-sequential, pairs,<br/>OpenXR headsets"]
   O --> D["Driver<br/>switches the display"]
 ```
 

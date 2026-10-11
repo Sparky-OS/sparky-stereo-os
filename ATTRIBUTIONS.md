@@ -1,7 +1,7 @@
 # Attributions & Acknowledgments
 
 **Sparky Stereo OS** stands on the shoulders of giants.
-It is Daniel Ramos's (Capitain Jack) edition of SparkyLinux (by Paweł "pavroo" Pijanowski), built on Debian and KDE Plasma, and almost every line of code it ships was written by someone else first.
+It is Daniel Ramos's (Capitain Jack) edition of SparkyLinux (https://sparkylinux.org, by Paweł "pavroo" Pijanowski), built on Debian and KDE Plasma, and almost every line of code it ships was written by someone else first.
 This document names them: the projects, the people inside them, the specifications, the communities, the partners, the inspirations and the family that made this edition possible.
 Our contribution lies in making stereo 3D and deep colour a property of the open desktop stack, and in fixing each program where it breaks on the way to the screen, not in claiming to have invented any of it.
 
@@ -39,7 +39,7 @@ He did not live to see this edition, and it carries what he started: every packa
 - **The separation rule:** a window's 2D part and its 3D area are separate surfaces, so menus and text stay crisp at one eye's size while the 3D area carries both eyes.
 - **The depth rules for the desktop:** sunk, screen and popped planes, text at its element's depth, effects of a few pixels.
 - **A fix in each program where stereo or deep colour broke**, in that program's own style, listed below with the people who wrote the program.
-- **Fixes offered to the projects they belong to**, four of them merged so far (section 7).
+- **Fixes offered to the projects they belong to**, six of them merged so far (section 7).
 - **The edition's packaging:** our patches on Debian's own source packages, role tasks for gamers, designers, creators, musicians, scientists, students and simmers, and a system that keeps itself small.
 
 ---
@@ -68,8 +68,9 @@ By name, the Debian maintainers of the packages we carry with our patches, as th
 | Kubrick | Debian Qt/KDE Maintainers; Aurélien Couderc, Daniel Schepler, Lisandro Damián Nicanor Pérez Meyer, Sune Vuorela |
 | Marble | Debian Qt/KDE Maintainers; Aurélien Couderc, Matthias Geiger |
 | Krita | Debian Qt/KDE Maintainers; Pino Toscano |
-| KScreen, libkscreen, Spectacle, KInfoCenter, KImageFormats, plasma-wayland-protocols | Debian Qt/KDE Maintainers |
-| Haruna, MpvQt | Debian KDE Extras Team |
+| KScreen, libkscreen, Spectacle, KInfoCenter, KImageFormats | Debian Qt/KDE Maintainers; Aurélien Couderc, Patrick Franz; Scarlett Moore (KScreen) |
+| plasma-wayland-protocols | Debian Qt/KDE Maintainers; Aurélien Couderc, Pino Toscano |
+| Haruna, MpvQt | Debian KDE Extras Team; Aurélien Couderc (Haruna), Scarlett Moore (MpvQt) |
 | digiKam, Showfoto | Debian KDE Extras Team; Steve M. Robbins |
 | Kdenlive, MLT | Patrick Matthäi |
 | Mesa | Debian X Strike Force; Andreas Boll |
@@ -77,13 +78,13 @@ By name, the Debian maintainers of the packages we carry with our patches, as th
 | egl-wayland | Timo Aaltonen |
 | FFmpeg | Debian Multimedia Maintainers; Reinhard Tartler, James Cowgill, Sebastian Ramacher |
 | mpv | Debian Multimedia Maintainers; Alessandro Ghedini, Reinhard Tartler, James Cowgill, Sebastian Ramacher |
-| VLC | Debian Multimedia Maintainers |
+| VLC | Debian Multimedia Maintainers; Reinhard Tartler, Benjamin Drung, Mateusz Łukasik, Sebastian Ramacher |
 | Avogadro libraries | Debichem Team; Drew Parsons |
 | Netgen | Debian Science Maintainers; Kurt Kremitzki, Francesco Ballarin |
 | GNU Octave | Debian Octave Group; Sébastien Villemot, Rafael Laboissière |
 | Bino | Debian QA Group, which keeps it alive in Debian |
 | protontricks | Debian Games Team; Stephan Lachnit |
-| libcapi20 (carried unchanged) | Jan-Michael Brummer |
+| libcapi20 (carried unchanged) | Rolf Leggewie; Jan-Michael Brummer |
 
 ### 0.2 SparkyLinux and Paweł "pavroo" Pijanowski
 
@@ -117,7 +118,7 @@ Our KDE changes live in forks on invent.kde.org, offered back to KDE as one patc
 
 ### 0.4 Conectiva and its programmers
 
-**Source**: [Conectiva on Wikipedia](https://en.wikipedia.org/wiki/Conectiva), [APT-RPM](https://en.wikipedia.org/wiki/APT-RPM), [Synaptic](https://en.wikipedia.org/wiki/Synaptic_(software)), [Exame on Conectiva's history](https://exame.com/tecnologia/conectiva-linux-sistema-operacional-do-parana-que-quase-venceu-o-windows-no-brasil-dos-anos-2000/)
+**Source**: [Conectiva on Wikipedia (in Portuguese)](https://pt.wikipedia.org/wiki/Conectiva), [APT-RPM](https://en.wikipedia.org/wiki/APT-RPM), [Synaptic](https://en.wikipedia.org/wiki/Synaptic_(software)), [Exame on Conectiva's history](https://exame.com/tecnologia/conectiva-linux-sistema-operacional-do-parana-que-quase-venceu-o-windows-no-brasil-dos-anos-2000/)
 
 Conectiva was Brazil's own Linux distribution, founded in Curitiba, Paraná, on 28 August 1995 by Arnaldo Carvalho de Melo and a group of friends, to bring Linux to Portuguese and Spanish speakers.
 Its programmers gave the free software world more than a distribution:
@@ -218,11 +219,11 @@ The same fight goes on in display standards: in 2024 the HDMI Forum refused an o
 **Source**: [kernel.org](https://www.kernel.org/)
 **License**: GPL-2.0
 **What we changed**: amdgpu lists and signals the HDMI 3D modes a display's EDID declares and times frame packing; full side by side handled in the DRM core, i915, nouveau and amdgpu; nouveau gains 16 bits per colour on Turing and newer; a fix for rumble-less gamepads in hid-betopff; VKMS, the virtual display driver, sets HDMI 3D modes and composes and writes back the frame of both eyes, on Louis Chauvet's configfs series.
-**Credit**: Linus Torvalds and the kernel's developers; the DRM maintainers Dave Airlie and Simona Vetter; Damien Lespiau, whose 2013 change let Intel's i915 offer HDMI stereo modes; Alastair Bridgewater, whose 2017 series gave nouveau HDMI 3D output ([0f18d2765ab1](https://github.com/torvalds/linux/commit/0f18d2765ab1)), with Ilia Mirkin's review on the list; the nouveau maintainers Lyude Paul and Danilo Krummrich; Mohamed Ahmed, whose nouveau display series (HDMI deep colour, IMP mode validation, GB20x display) our kernel carries; AMD's display team; Jim Cromie, whose nouveau fix our kernel carries; Rodrigo Siqueira and Haneen Mohammed, who created VKMS; Louis Chauvet and José Expósito, whose VKMS configfs work our stereo tests build on; Thomas Wood, for IGT's kms_3d; Adam Jackson and Hans Verkuil, for edid-decode.
+**Credit**: Linus Torvalds and the kernel's developers; the DRM maintainers Dave Airlie and Simona Vetter; Damien Lespiau, whose 2013 change let Intel's i915 offer HDMI stereo modes; Alastair Bridgewater, whose 2017 series gave nouveau HDMI 3D output ([0f18d2765ab1](https://github.com/torvalds/linux/commit/0f18d2765ab1)), with Ilia Mirkin's review on the list; the nouveau maintainers Lyude Paul and Danilo Krummrich; Mohamed Ahmed, whose nouveau display series (HDMI deep colour, IMP mode validation, GB20x display) our kernel carries; AMD's display team; Jim Cromie, whose nouveau fix our kernel carries; Tomasz Pakuła, whose EV_BTN input series ([RFC, January 2026](https://lwn.net/Articles/1052809/)) our next kernel will carry; Rodrigo Siqueira and Haneen Mohammed, who created VKMS; Louis Chauvet and José Expósito, whose VKMS configfs work our stereo tests build on; Thomas Wood, for IGT's kms_3d; Adam Jackson and Hans Verkuil, for edid-decode.
 
 ### 2.2 Mesa
 
-**Source**: [mesa3d.org](https://www.mesa3d.org/)
+**Source**: [mesa3d.org](https://mesa3d.org/)
 **License**: MIT
 **What we changed**: OpenGL quad buffer, EGL multiview windows and two-layer Vulkan swapchains become one full side by side picture, declared to KWin; a Vulkan layer does the same over drivers outside Mesa.
 **Credit**: Brian Paul, who started Mesa in 1993, and the Mesa developers.
@@ -246,21 +247,21 @@ The same fight goes on in display standards: in 2024 the HDMI Forum refused an o
 **Source**: [plasma/kwin](https://invent.kde.org/plasma/kwin)
 **License**: GPL-2.0-or-later
 **What we changed**: per-eye scene passes, stereo windows and subsurfaces, HDMI 3D modes and virtual 3D outputs, and depth on the desktop.
-**Credit**, as KWin names its authors: Matthias Ettrich, Cristian Tibirna, Daniel M. Duley, Luboš Luňák, Martin Flöser, David Edmundson, Roman Gilg, Vlad Zahorodnii and Xaver Hugl, and every KWin contributor.
+**Credit**, as KWin names its authors: Matthias Ettrich, Cristian Tibirna, Daniel M. Duley, Luboš Luňák, Martin Flöser (formerly Martin Gräßlin), David Edmundson, Roman Gilg, Vlad Zahorodnii and Xaver Hugl, and every KWin contributor.
 
 ### 2.6 KScreen and libkscreen
 
 **Source**: [plasma/kscreen](https://invent.kde.org/plasma/kscreen), [plasma/libkscreen](https://invent.kde.org/plasma/libkscreen)
 **License**: GPL-2.0-or-later (KScreen), LGPL-2.1-or-later (libkscreen)
 **What we changed**: the display's 3D modes appear beside its other modes, labelled, never chosen automatically.
-**Credit**: Daniel Vrátil, Sebastian Kügler, Alejandro Fiestas Olivares, Martin Klapetek, Aleix Pol Gonzalez, Kai Uwe Broulik, David Edmundson, David Redondo, Nate Graham, Roman Gilg, Xaver Hugl, Martin Gräßlin, Dario Freddi, Daniel Nicoletti, Frederik Gladhorn, Méven Car and Oliver Beard.
+**Credit**: Daniel Vrátil, Sebastian Kügler, Alejandro Fiestas Olivares, Martin Klapetek, Aleix Pol Gonzalez, Kai Uwe Broulik, David Edmundson, David Redondo, Nate Graham, Roman Gilg, Xaver Hugl, Martin Flöser, Daniel Nicoletti, Frederik Gladhorn, Méven Car and Oliver Beard.
 
 ### 2.7 plasma-wayland-protocols
 
 **Source**: [libraries/plasma-wayland-protocols](https://invent.kde.org/libraries/plasma-wayland-protocols)
 **License**: LGPL-2.1-or-later
 **What we changed**: `kde-stereo-content-v1`, the one declaration a program makes for a window or a subsurface, and `libstereo-declare` beside it.
-**Credit**: Aleix Pol Gonzalez, David Edmundson, Marco Martin, Martin Gräßlin, Oleg Chernovskiy and Pier Luigi Fiorini.
+**Credit**: Aleix Pol Gonzalez, David Edmundson, Marco Martin, Martin Flöser, Oleg Chernovskiy and Pier Luigi Fiorini.
 
 ### 2.8 Qt
 
@@ -270,8 +271,6 @@ The same fight goes on in display standards: in 2024 the HDMI Forum refused an o
 **Credit**: The Qt Company and the Qt Project's contributors; Qt Multimedia's copyright holders also include Research In Motion and Jolla.
 Our first Qt change was reviewed within hours by **Tim Blechmann**, with **Artem Dyomin, Nils Petter Skålerud and Jøger Hansegård** as reviewers.
 
----
-
 ### 2.9 The stereo virtual machine
 
 [A virtual machine with a 3D display](docs/stereo-vm.md) builds on these projects. Names come from each project's records: source headers, MAINTAINERS, git history and Debian's control files.
@@ -280,6 +279,14 @@ Our first Qt change was reviewed within hours by **Tim Blechmann**, with **Artem
 - **[SPICE](https://www.spice-space.org/)** (spice, spice-gtk, spice-protocol and spice-common; our forks on [freedesktop.org](https://gitlab.freedesktop.org/danielcamposramos)): the most frequent authors in their histories are Frediano Ziglio, Christophe Fergeau, Marc-André Lureau, Alexander Larsson, Alon Levy and Victor Toso. Frediano Ziglio's symbol-visibility work is what our library builds rely on, and Marc-André Lureau reviewed and merged our crash fix ([spice-gtk !159](https://gitlab.freedesktop.org/spice/spice-gtk/-/merge_requests/159)).
 - **[Karton](https://invent.kde.org/system/karton)** (our fork: [danielcamposramos/karton](https://invent.kde.org/danielcamposramos/karton/-/tree/stereo3d)): Aaron Rainbolt, its initial developer, and Derek Lin.
 - **Debian's packaging** we build on: Michael Tokarev for QEMU, spice and spice-protocol (Debian QEMU Team); Jeremy Bícha, Laurent Bigonville and Lin Qigang for spice-gtk (Debian GNOME team).
+
+### 2.10 The test benches
+
+The [vkms-stereo-bench](tools/vkms-stereo-bench/README.md) and [hibernate-bench](tools/hibernate-bench/README.md) tools run on these projects, besides QEMU, IGT's `kms_3d` and edid-decode, credited above. Names come from each project's Debian copyright records.
+
+- **[mmdebstrap](https://gitlab.mister-muffin.de/josch/mmdebstrap/)**: Johannes Schauer Marin Rodrigues, its author and its Debian maintainer. It builds the bench's root file system of Debian testing plus the edition's packages, with no root needed.
+- **[BusyBox](https://busybox.net/)**: the BusyBox developers, among them Erik Andersen, its first author in Debian's records. The bench's guest runs a static BusyBox as its init and shell.
+- **[swtpm](https://github.com/stefanberger/swtpm)**: Stefan Berger and IBM Corporation. The software TPM 2.0 of hibernate-bench.
 
 ---
 
@@ -297,8 +304,6 @@ Our first Qt change was reviewed within hours by **Tim Blechmann**, with **Artem
 | [Bino](https://bino3d.org/) | GPL-3.0-or-later | Any input, always full side by side out; a right-eye-first fix | Martin Lambers |
 | [PlasmaTube](https://apps.kde.org/plasmatube/) | GPL-3.0-or-later | 3D from the stream, the `yt3d` tags or the frame's shape | Linus Jahn, Devin Lin, Joshua Goins |
 | [Plank Player](https://invent.kde.org/plasma/plank-player) | GPL-2.0-or-later | The video as its own declared surface, OSD in both eyes | Aditya Mehra |
-
----
 
 ### 3.1 Phone display and movie-renderer study
 
@@ -325,7 +330,8 @@ Names and licences below come from the linked source headers and project records
 | Program | Licence | What we changed | Credit |
 |---|---|---|---|
 | [Marble](https://apps.kde.org/marble/) | LGPL-2.1-or-later | The globe from one world and two cameras | Torsten Rahn, Inge Wallin, Bernhard Beschow, Dennis Nienhüser, Pino Toscano and the many Marble authors |
-| [KAlgebra](https://apps.kde.org/kalgebra/) and [Analitza](https://invent.kde.org/education/analitza) | GPL-2.0-or-later | The 3D plot drawn once per eye | Aleix Pol Gonzalez, Carl Schwan, Swapnil Tripathi; Analitza also Percy Camilo T. Aucahuasi and Pino Toscano |
+| Marble's map themes of the Moon and the planets (`sparky-stereo-marble-planets`) | Public domain | The Moon, Mercury, Venus, Mars and moons of Jupiter and Saturn installed for the stereo globe, as Marble's own map catalogue offers them | NASA, NASA/JPL-Caltech, NASA/SDIO and the Space Science Institute, courtesy of the USGS Astrogeology Research Program, as each theme's record states; the themes as KDE's Marble catalogue packages them |
+| [KAlgebra](https://apps.kde.org/kalgebra/) and [Analitza](https://invent.kde.org/education/analitza) | GPL-2.0-or-later | The 3D plot drawn once per eye | Aleix Pol Gonzalez, Carl Schwan; KAlgebra also Swapnil Tripathi; Analitza also Percy Camilo Triveño Aucahuasi and Pino Toscano |
 | [Kalzium](https://apps.kde.org/kalzium/) and [Avogadro](https://avogadro.cc/) | GPL-2.0-or-later, BSD-3-Clause | Molecules in stereo; why Kalzium drew no molecule with Avogadro 2 (KDE bug 463018) | Kalzium: Carsten Niehaus, Andreas Cord-Landwehr, Marcus D. Hanwell, Inge Wallin and others. Avogadro: Geoff Hutchison, Marcus D. Hanwell and Kitware |
 | [Kubrick](https://apps.kde.org/kubrick/) | GPL-2.0-or-later | The cube once per eye | Ian Wadham |
 | [Netgen](https://ngsolve.org/) | LGPL-2.0-or-later | `-stereo` that does what it says | Joachim Schöberl |
@@ -373,24 +379,20 @@ Names and licences below come from the linked source headers and project records
 | [KAuth](https://invent.kde.org/frameworks/kauth) and [KCMUtils](https://invent.kde.org/frameworks/kcmutils) | The Memory page in System Settings and its privileged write | The KDE Frameworks contributors |
 | [v4l-utils](https://git.linuxtv.org/v4l-utils.git/) and Linux's CEC framework | cec-ctl and the CEC ioctl interfaces used by the TV controller | The Linux media contributors; Cisco Systems, Inc. and its affiliates in cec-ctl's copyright records |
 | [systemd](https://github.com/systemd/systemd), [procps-ng](https://gitlab.com/procps-ng/procps), GLib/Gio and PolicyKit | Native settings readers, sessions, D-Bus clients and profile authorization | Their contributors and Debian maintainers |
-
 | [Wine](https://www.winehq.org/), Proton, [DXVK](https://github.com/doitsujin/dxvk), [gamescope](https://github.com/ValveSoftware/gamescope) | Windows games on Linux | Alexandre Julliard and the Wine developers, CodeWeavers, Philip Rebohle, Valve |
 | [VRto3D](https://github.com/oneup03/VRto3D) | SteamVR games on 3D displays | oneup03 |
+| [Plasma Add-ons](https://invent.kde.org/plasma/kdeplasma-addons) (the unit converter runner) | The currency rates downloaded only when a currency is converted | Alexander Lohnau and Petri Damstén, named in the runner's SPDX records |
+| [SMS 3-D Demo](https://www.smspower.org/Homebrew/SMS3DDemo-SMS) and [Sega Tween](https://www.smspower.org/Homebrew/SegaTween-SMS) | Planned demos for the Master System's 3-D Glasses in the emulators, unaltered and with their readmes | Chris Covell, by his permission of 2026-10-08; Ben Ryves, by his permission of 2026-10-09 |
 
 
-Power/idle credits also build on KWin's existing output and workspace code:
-**Xaver Hugl**, **Matthias Ettrich**, **Lubos Lunak**, **Vlad Zahorodnii** and
-**Natalie Clarius**, as named in those files' SPDX records. The DPMS protocol
-is by **Martin Gräßlin**, as `plasma-wayland-protocols/src/protocols/dpms.xml`
-records. Linux's VT and sysctl interfaces remain the Linux contributors' work.
-The unchanged kernel-settings package records **Sultan Alsawaf** and
-**Eric Naim** for the CachyOS kernel topics expressed as settings; those
-credits stay with the values. **Valve** publishes the mapping ceiling in
-[Proton's requirements](https://github.com/ValveSoftware/Proton/wiki/Requirements).
-The helper itself contains no copied CachyOS code. /tmp on disk follows
-**Debian's trixie release notes** (5.1.6 and 5.2.1, the Debian Documentation
-Project). Names above come from
-upstream copyright, Debian copyright or git records; contact details are omitted.
+Power/idle credits also build on KWin's existing output and workspace code: **Xaver Hugl**, **Matthias Ettrich**, **Luboš Luňák**, **Vlad Zahorodnii** and **Natalie Clarius**, as named in those files' SPDX records.
+The DPMS protocol is by **Martin Flöser**, as `plasma-wayland-protocols/src/protocols/dpms.xml` records.
+Linux's VT and sysctl interfaces remain the Linux contributors' work.
+The unchanged kernel-settings package records **Sultan Alsawaf** and **Eric Naim** for the CachyOS kernel topics expressed as settings; those credits stay with the values.
+**Valve** publishes the mapping ceiling in [Proton's requirements](https://github.com/ValveSoftware/Proton/wiki/Requirements).
+The helper itself contains no copied CachyOS code.
+/tmp on disk follows **Debian's trixie release notes** (5.1.6 and 5.2.1, the Debian Documentation Project).
+Names above come from upstream copyright, Debian copyright or git records; contact details are omitted.
 
 ### Controller input
 
@@ -421,13 +423,15 @@ Every merge below was a maintainer's decision, made on the code.
 - **Universal Media Server** [#6330](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6330): merged by **SubJunk**, 19 September 2026, released in 15.9.0.
 - **MKVToolNix** [ebd8445b](https://codeberg.org/mbunkus/mkvtoolnix/commit/ebd8445b1185d35d6bdbb9c1463757fbc9aa7c29): merged by **Moritz Bunkus**, 21 September 2026.
 - **mpv** [#18490](https://github.com/mpv-player/mpv/pull/18490): merged by **Kacper Michajłow** (kasper93), 23 September 2026, after a careful review by llyyr.
+- **Qt Multimedia** [778399](https://codereview.qt-project.org/c/qt/qtmultimedia/+/778399): approved by **Tim Blechmann** and merged on 8 October 2026; the same fix is in Qt 6.12 too ([778580](https://codereview.qt-project.org/c/qt/qtmultimedia/+/778580), 9 October 2026).
+- **spice-gtk** [!159](https://gitlab.freedesktop.org/spice/spice-gtk/-/merge_requests/159): merged by **Marc-André Lureau**, 10 October 2026.
 
 **In review**, with thanks to everyone reviewing: FFmpeg, x265 (MulticoreWare's collaborators shaped its `--frame-packing` option), MKVToolNix's HEVC change, VLC, gamescope, NVIDIA's open kernel modules, PeerTube, wiz3D, Android's Media3 and Qt.
 
 **Where our work is not welcome yet.** We respect each project's decision. Our changes stay in our own trees, ready to go upstream on the day they are wanted.
 
 - **VLC:** our x264 change, [!10366](https://code.videolan.org/videolan/vlc/-/merge_requests/10366), was labelled "AI::Slop" (the same label now reads "AI::Generated") and then "NotCompliant", and most replies were about the tool that helped write its text rather than about the code. Steve Lhomme reviewed the code itself and found real problems, which we fixed the same day, and Jean-Baptiste Kempf, who leads VideoLAN, answered our email personally and kindly. VLC Stereo, the edition's player, carries the change.
-- **nouveau:** Lyude Paul, a nouveau maintainer, read our two HDMI series on dri-devel and [pointed us](https://lore.kernel.org/all/d5a7e1c598ca3bcaa8cd9eabd1c952a9734033c6.camel@redhat.com/) to Mohamed Ahmed's colour work, the right place for it. Our small fix for that branch, [CD=5 in the GCP at 10 bits per colour](https://gitlab.freedesktop.org/mohamexiety/nouveau/-/merge_requests/1), waited fifteen days without an answer, and I decided to comply and close it right after nouveau approved its LLM statement. When nouveau discussed its [community and LLM statement](https://gitlab.freedesktop.org/nouveau/wiki/-/merge_requests/64), Lyude answered our comments with care. The statement's author asked for a concrete exception for small fixes; we wrote one, and it was never answered. The statement was merged on 9 October 2026 as first written: code must be "the output of your own human brain, not a computer". Our nouveau changes (16 bits per colour on Turing and newer, full side by side, the CD=5 fix) live in the edition's kernel, and [we told the list](https://lore.kernel.org/all/179156201409.1251903.7021297050250233959@yahoo.com/) we will send them upstream the day nouveau welcomes contributors who use AI, including people who use it to write in a different language.
+- **nouveau:** Lyude Paul, a nouveau maintainer, read our two HDMI series on dri-devel and [pointed us](https://lore.kernel.org/all/d5a7e1c598ca3bcaa8cd9eabd1c952a9734033c6.camel@redhat.com/) to Mohamed Ahmed's colour work, the right place for it. Our small fix for that branch, [CD=5 in the GCP at 10 bits per colour](https://gitlab.freedesktop.org/mohamexiety/nouveau/-/merge_requests/1), waited fifteen days without an answer, and I decided to comply and close it right after nouveau approved its LLM statement. When nouveau discussed its [community and LLM statement](https://gitlab.freedesktop.org/nouveau/wiki/-/merge_requests/64), Lyude answered our comments with care. The statement's author, Faith Ekstrand, asked for a concrete exception for small fixes; we wrote one, and it was never answered. The statement was merged on 9 October 2026 as first written: code must be "the output of your own human brain, not a computer". Our nouveau changes (16 bits per colour on Turing and newer, full side by side, the CD=5 fix) live in the edition's kernel, and [we told the list](https://lore.kernel.org/all/179156201409.1251903.7021297050250233959@yahoo.com/) we will send them upstream the day nouveau welcomes contributors who use AI, including people who use it to write in a different language.
 
 ---
 
@@ -514,7 +518,7 @@ Sou autista, **com orgulho**, e esta edição também é sua.
 ```bibtex
 @software{sparkystereo2026,
   author = {Ramos, Daniel Campos},
-  title  = {Sparky Stereo OS: Daniel Ramos's edition of SparkyLinux (by Pawe{\l} "pavroo" Pijanowski)},
+  title  = {Sparky Stereo OS, Daniel Ramos's edition of SparkyLinux (by Pawe{\l} "pavroo" Pijanowski)},
   year   = {2026},
   url    = {https://github.com/Sparky-OS/sparky-stereo-os}
 }
@@ -555,36 +559,20 @@ We stand on the shoulders of:
 
 ## Certificate management and ICP-Brasil interoperability
 
-- **Paweł "pavroo" Pijanowski**, author of Sparky CA (2018), and
-  **Daniel Campos Ramos**, its 2020 and 2026 work, as credited in Sparky CA's
-  original copyright records.
-- **Pedro F. Albanese**, author of [e521](https://github.com/pedroalbanese/e521),
-  as recorded in its ISC license. Our interoperability fixes and public-only
-  OpenSSL prototype follow his reference implementation.
-- **Instituto Nacional de Tecnologia da Informação (ITI)**, for the published
-  ICP-Brasil certificates, bundle hashes and DOC-ICP-01.01 algorithm standard.
-- **The OpenSSL Project**, **Network Security Services (NSS)** and their
-  contributors, for certificate verification, provider APIs and browser stores.
-- **The Python Software Foundation and Python contributors**, for the separate
-  arithmetic/hash oracle used to check the reference implementation.
-- **The RFC Editor and the authors of RFC 8032**, for the EdDSA construction.
-  Ed521's particular parameters come from ITI's standard.
-- **Andreas Hartmetz**, as credited in KIO's certificate-manager sources, and
-  **KDE's KIO contributors**, for KDE certificate and per-host trust handling.
-- **George Staikos**, **Marco Martin**, **Nicolas Fella**, and **KDE's KWallet
-  contributors**, as credited in KWallet's backend, service bridge and settings
-  records, for the opt-in certificate password store.
-- **The p11-kit, OpenSC and pcsc-lite contributors**, for PKCS#11 module
-  registration and public token inspection; **the GnuPG contributors**, for the
-  separate S/MIME trust store used by Kleopatra.
-- **The Poppler contributors** and **the Okular developers**, for PDF certificate
-  and signature APIs. The upstream projects and Debian copyright records name
-  their contributors.
-- **The Kleopatra developers**, as named in Kleopatra's about data, for the
-  GnuPG certificate and smart-card interface checked alongside this work.
+- **Paweł "pavroo" Pijanowski**, author of Sparky CA (2018), and **Daniel Campos Ramos**, its 2020 and 2026 work, as credited in Sparky CA's original copyright records.
+- **Pedro F. Albanese**, author of [e521](https://github.com/pedroalbanese/e521), as recorded in its ISC license. Our interoperability fixes and public-only OpenSSL prototype follow his reference implementation.
+- **Instituto Nacional de Tecnologia da Informação (ITI)**, for the published ICP-Brasil certificates, bundle hashes and DOC-ICP-01.01 algorithm standard.
+- **The OpenSSL Project**, **Network Security Services (NSS)** and their contributors, for certificate verification, provider APIs and browser stores.
+- **The Python Software Foundation and Python contributors**, for the separate arithmetic/hash oracle used to check the reference implementation.
+- **The RFC Editor and the authors of RFC 8032**, for the EdDSA construction. Ed521's particular parameters come from ITI's standard.
+- **Andreas Hartmetz**, as credited in KIO's certificate-manager sources, and **KDE's KIO contributors**, for KDE certificate and per-host trust handling.
+- **George Staikos**, **Marco Martin**, **Nicolas Fella**, and **KDE's KWallet contributors**, as credited in KWallet's backend, service bridge and settings records, for the opt-in certificate password store.
+- **The p11-kit, OpenSC and pcsc-lite contributors**, for PKCS#11 module registration and public token inspection; **the GnuPG contributors**, for the separate S/MIME trust store used by Kleopatra.
+- **The Poppler contributors** and **the Okular developers**, for PDF certificate and signature APIs. The upstream projects and Debian copyright records name their contributors.
+- **The Kleopatra developers**, as named in Kleopatra's about data, for the GnuPG certificate and smart-card interface checked alongside this work.
 
-The Ed521 prototype is public-verification-only and unaudited. Trust-store
-membership, cryptographic verification and document-signature policy compliance
-are distinct. Credits do not imply endorsement or upstream acceptance.
+The Ed521 prototype is public-verification-only and unaudited.
+Trust-store membership, cryptographic verification and document-signature policy compliance are distinct.
+Credits do not imply endorsement or upstream acceptance.
 
-**Last updated**: 10 October 2026
+**Last updated**: 11 October 2026

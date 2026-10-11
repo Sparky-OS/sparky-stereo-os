@@ -21,6 +21,9 @@ After KWin, each output turns full side by side into whatever its display, proje
 No program knows about HDMI 3D, anaglyph colours, interleaved lines or shutter timing.
 No driver knows about programs.
 
+**Sound follows the same division.**
+A program renders its sound scene; the operating system decides which speakers or headphones it reaches ([Sound: the same division](#sound-the-same-division)).
+
 ```mermaid
 flowchart LR
   P["Program or engine<br/>two cameras, 2D stays 2D"] -- "edge: pack" --> F["Full side by side<br/>left eye | right eye"]
@@ -153,6 +156,26 @@ If a display, projector or pair of glasses shows the eyes reversed, flip that ou
 
 **A new kind of display means a new output filter, never a change in any program.**
 
+## Sound: the same division
+
+**A program renders its sound scene, never the speakers.**
+It places its sound sources where its world has them, as it places its two cameras.
+Which speakers or headphones the sound reaches is the operating system's choice, as the screen is KWin's.
+
+**Speakers follow the room; headphones follow the head.**
+Speakers are fixed in the room, and a headset's world is anchored to the room too, so a speaker mix stays in room coordinates and never turns with the head.
+Only headphones follow the head, with binaural rendering.
+When a VR game turns its whole mix with the head, the sound moves from speaker to speaker every time the player looks around.
+
+**Where each part lives:**
+- the game or engine: for speakers its listener faces the room, for headphones it follows the head; a game can offer the choice ("Sound follows: head / room");
+- the operating system: per-speaker setup for multi-channel devices, and headphones with binaural rendering, for which PipeWire's filter chain takes SOFA (HRTF) filters;
+- for a game that keeps turning its mix with the head, a counter-rotation in the operating system is the general fallback.
+
+The per-speaker setup, the headphone path and the game-side listener in our Half-Life 2 module are planned.
+
+**The same holds when a headset is only a screen:** a headset used as a fixed 3D screen (HT mode), and the Stereo Spectator, where someone plays in a headset while the room watches the 3D television, both keep the sound in the room.
+
 ## Driver developers: the smallest part
 
 **Your part is to show the display's 3D modes and switch the display into them.**
@@ -186,3 +209,4 @@ A new program needs no knowledge of displays, and a new display needs no change 
 - **ICCCM** 4.1.5 (configuring the window) and 4.2.3 (window movement, synthetic ConfigureNotify).
 - **Eric Dubois**, "A projection method to generate anaglyph stereo images", ICASSP 2001.
 - **OpenVR** (Valve) and **OpenXR** (Khronos), for headsets.
+- **AES69-2015** (Audio Engineering Society), the SOFA format for spatial acoustic data such as head-related transfer functions, which PipeWire's [filter chain](https://docs.pipewire.org/page_module_filter_chain.html) takes for binaural headphone sound.

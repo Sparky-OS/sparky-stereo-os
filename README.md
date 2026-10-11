@@ -230,6 +230,8 @@ Click a branch to read the code, or its CI result to see every job.
 - [KWin stereo first runs, 2026-10-01](docs/first-runs/kwin-2026-10-01/README.md): the first stereo 3D outputs from KWin on real displays, with photos, logs and the scripts used.
   For KWin and driver developers, and anyone who wants to see what the first runs showed.
 
+- [Develop 3D and XR on an ordinary monitor](docs/develop-3d-on-an-ordinary-monitor.md): hand Stereo KWin two eyes once, see them in anaglyph on any monitor, test the real HDMI 3D path without a 3D television, then glasses-free panels, phones and headsets; the real screen is the last check, of work already right.
+  For XR and 3D developers without the hardware on their desk.
 - [Test stereo without a 3D TV](docs/test-stereo-without-a-3d-tv.md): build a kernel whose VKMS speaks HDMI 3D, give it a 3D EDID, and run the bench, IGT and KWin; what each test proves and how it failed without the patches.
 - [A virtual machine with a 3D display](docs/stereo-vm.md): a QEMU guest with HDMI 3D modes, shown in stereo on Stereo KWin in QEMU's own window, virt-viewer and Karton; rendering on the strongest GPU, and passing a whole GPU to the guest.
   For anyone writing stereo code who has no 3D display at hand.

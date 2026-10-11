@@ -9,9 +9,9 @@ It is in development.
 
 Two screenshots taken with the edition's Spectacle, which keeps both eyes. Red-cyan glasses show them in 3D here; the MPO files open in 3D in the edition's photo programs and on a 3D television.
 
-<a href="docs/screenshots/game-in-a-window.mpo"><img src="docs/screenshots/game-in-a-window-anaglyph.jpg" width="49%" alt="A game in a window, in 3D, with the flat Plasma panel below it (red-cyan anaglyph)"></a> <a href="docs/screenshots/marble-globe.mpo"><img src="docs/screenshots/marble-globe-anaglyph.jpg" width="49%" alt="Marble's globe in front of the stars, in 3D (red-cyan anaglyph)"></a>
+<a href="docs/screenshots/doom-2016-in-a-window.mpo"><img src="docs/screenshots/doom-2016-in-a-window-anaglyph.jpg" width="49%" alt="DOOM (2016) in a window, in 3D, with the flat Plasma panel below it (red-cyan anaglyph)"></a> <a href="docs/screenshots/marble-globe.mpo"><img src="docs/screenshots/marble-globe-anaglyph.jpg" width="49%" alt="Marble's globe in front of the stars, in 3D (red-cyan anaglyph)"></a>
 
-- **A game in an ordinary window** ([MPO](docs/screenshots/game-in-a-window.mpo)): the game has depth while the panel and the window frame stay flat in both eyes. Measured between the eyes: the nearest rock 23 px apart, the far mountains 1 px, the panel 0 px.
+- **DOOM (2016) in an ordinary window** ([MPO](docs/screenshots/doom-2016-in-a-window.mpo)), based on [KHARVOX](https://github.com/CactusVRStudios/KHARVOX), CactusVRStudios' DOOM (2016) VR conversion mod (MIT): the game has depth while the panel and the window frame stay flat in both eyes. Measured between the eyes: the nearest rock 23 px apart, the far mountains 1 px, the panel 0 px.
 - **Marble's globe** ([MPO](docs/screenshots/marble-globe.mpo)): the Earth in front of the screen (+11 px) and the stars behind it (-12 px), the side panel flat. This shot predates fixes made since, which a newer one will show.
 
 ## Why one format: full side by side, at any resolution

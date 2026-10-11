@@ -381,6 +381,7 @@ Names and licences below come from the linked source headers and project records
 | [systemd](https://github.com/systemd/systemd), [procps-ng](https://gitlab.com/procps-ng/procps), GLib/Gio and PolicyKit | Native settings readers, sessions, D-Bus clients and profile authorization | Their contributors and Debian maintainers |
 | [Wine](https://www.winehq.org/), Proton, [DXVK](https://github.com/doitsujin/dxvk), [gamescope](https://github.com/ValveSoftware/gamescope) | Windows games on Linux | Alexandre Julliard and the Wine developers, CodeWeavers, Philip Rebohle, Valve |
 | [VRto3D](https://github.com/oneup03/VRto3D) | SteamVR games on 3D displays | oneup03 |
+| [KHARVOX](https://github.com/CactusVRStudios/KHARVOX) (MIT) | The base of DOOM (2016) in stereo on the desktop, seen on the front page: a DOOM (2016) VR conversion mod | CactusVRStudios, with ODevStudio and vinionsinho (from the repository's contributors) |
 | [Plasma Add-ons](https://invent.kde.org/plasma/kdeplasma-addons) (the unit converter runner) | The currency rates downloaded only when a currency is converted | Alexander Lohnau and Petri Damstén, named in the runner's SPDX records |
 | [SMS 3-D Demo](https://www.smspower.org/Homebrew/SMS3DDemo-SMS) and [Sega Tween](https://www.smspower.org/Homebrew/SegaTween-SMS) | Planned demos for the Master System's 3-D Glasses in the emulators, unaltered and with their readmes | Chris Covell, by his permission of 2026-10-08; Ben Ryves, by his permission of 2026-10-09 |
 

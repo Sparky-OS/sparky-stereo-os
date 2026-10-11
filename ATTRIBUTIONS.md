@@ -10,15 +10,19 @@ Contact details are left out on purpose.
 
 ---
 
-## In memoriam: Luis Carlos de Alencar, "Cau", and Lavinha Campos, "Laví"
+## In memoriam: Luis Carlos de Alencar, "Cau"
 
 **Luis Carlos de Alencar**, "Cau", was Daniel's master on Linux.
 He is the one who introduced Daniel to Linux, back in the 1990s, and he paved the way for Daniel to become what he is today.
 He did not live to see this edition, and it carries what he started: every package built here, every driver fixed and every program taught to show two eyes goes back to the day Cau sat him in front of Linux for the first time.
 
-**Lavinha Campos**, "Laví", Daniel's second first mother, stands alongside him here.
+**Obrigado, Cau.**
 
-**Obrigado, Cau. Obrigado, Laví.**
+## Lavinha Campos, "Laví"
+
+**Lavinha Campos**, "Laví", Daniel's second first mother, stands alongside Cau in this thanks, and she is here to see this edition.
+
+**Obrigado, Laví.**
 
 ---
 

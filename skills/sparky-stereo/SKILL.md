@@ -9,7 +9,7 @@ Sparky Stereo OS 9 "Mashtabba", based on Debian 14 "Forky", is Daniel Ramos's st
 Its aim is a desktop where stereo 3D and deep colour (10, 12 and 16 bits per channel) are part of the system, not a feature of a few programs.
 This skill holds what every piece of work on it must respect. The other skills in this folder hold the solved patterns for one kind of work each.
 
-**Check freshness first.** Written on 2026-10-07, updated on 2026-10-10. If the [README](../../README.md) says something different, the README wins and this skill is history.
+**Check freshness first.** Written on 2026-10-07, updated on 2026-10-10. If the [README](../../README.md) or the pages it links say something different, they win and this skill is history.
 
 ---
 
@@ -30,10 +30,10 @@ Everything below is a rule, and rules are followed when someone is watching. Thi
 
 # Part one: the contract
 
-- **One format inside.** Programs decode or generate stereo in any standard and hand the desktop **full side by side**: both eyes at full size, left eye first, at any resolution, declared once. Stereo KWin's outputs, one per kind of screen, turn that into what each screen needs: a 3D television's HDMI 3D modes, anaglyph on any monitor, interleaved and frame-sequential displays, a headset. The README's [first section](../../README.md#why-one-format-full-side-by-side-at-any-resolution) explains why, and why it is how PipeWire already handles sound.
+- **One format inside.** Programs decode or generate stereo in any standard and hand the desktop **full side by side**: both eyes at full size, left eye first, at any resolution, declared once. Stereo KWin's outputs, one per kind of screen, turn that into what each screen needs: a 3D television's HDMI 3D modes, anaglyph on any monitor, interleaved and frame-sequential displays, a headset. [How it works](../../docs/how-it-works.md) explains why, and why it is how PipeWire already handles sound.
 - **A program that has its own output modes loses them** in the edition's build, so nothing can break the contract; its stereo settings live in a sister folder with "stereo" in the name.
 - **A window's 2D part and its 3D area are separate surfaces.** Menus, toolbars and on-screen displays are the window's own surface at one eye's size, identical in both eyes, and declare nothing. The 3D area (a video, a viewport, a canvas) is a surface of its own, declared as full side by side. Only a program that is stereo and full screen only makes its whole window stereo.
-- **Depth for the 2D parts** is declared, never faked: three planes, sunk, screen and popped, a few pixels each ([Depth on the desktop](../../README.md#depth-on-the-desktop)).
+- **Depth for the 2D parts** is declared, never faked: three planes, sunk, screen and popped, a few pixels each ([Depth on the desktop](../../docs/depth-on-the-desktop.md)).
 - **The whole specification in every API.** A stereo enum or field lists every frame packing the standards define (H.264 and H.265 Table D-8, Matroska `StereoMode` in [RFC 9559](https://www.rfc-editor.org/rfc/rfc9559)), both eye orders, never a subset. Every rule cites its specification; awesome-stereoscopy's [standards page](https://github.com/danielcamposramos/awesome-stereoscopy/blob/main/standards.md) links them.
 - **One world, two cameras.** A stereo pair comes from two camera positions in the same scene, at the projection, never from shifting drawn items one by one.
 - **The engine, not the program.** When two programs need the same stereo code, it belongs in the layer they share (Qt Multimedia, MpvQt, Mesa, KWin), so each program's own change shrinks to its interface.
@@ -72,7 +72,7 @@ Merged so far, for the shape of a good offer: [HandBrake #8100](https://github.c
 
 # Part four: which skill next
 
-Load the one that matches the work; the README's program list names what was done in each program.
+Load the one that matches the work; the [program list](../../docs/programs.md) names what was done in each program.
 
 | Skill | For |
 |---|---|

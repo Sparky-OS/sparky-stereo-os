@@ -30,7 +30,7 @@ Broadcast and post-production work this way, and so does PipeWire for sound; thi
 - Sound, and who does what between programs and the operating system: the [Sound](stereo-labor-division.md#sound-the-same-division) section of the same page.
 - Developing for 3D and XR without the hardware on the desk: [develop-3d-on-an-ordinary-monitor.md](develop-3d-on-an-ordinary-monitor.md).
 - Testing stereo without a 3D display: [test-stereo-without-a-3d-tv.md](test-stereo-without-a-3d-tv.md) and the stereo virtual machine: [stereo-vm.md](stereo-vm.md).
-- Depth on the desktop: the "Depth on the desktop" section of the [README](../README.md).
+- Depth on the desktop: [depth-on-the-desktop.md](depth-on-the-desktop.md); for theme designers and customizers: [for-theme-designers.md](for-theme-designers.md).
 
 ## References
 

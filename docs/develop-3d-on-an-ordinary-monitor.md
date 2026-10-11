@@ -24,6 +24,7 @@ Choose it for that screen in System Settings, Display Configuration, in the scre
 Your program does not change: it still hands over full side by side, and the output decides.
 
 **Several screens:** each screen can run a different 3D output at the same time, for example anaglyph on your monitor and HDMI 3D on a television.
+That holds for a mirrored screen too: tested on two Sony 3D televisions showing one copied screen, one in frame packing at 30 Hz and the other in top and bottom at 60 Hz, both in 3D.
 
 ## 3. Test the real HDMI 3D path without a 3D television
 

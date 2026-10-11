@@ -31,7 +31,7 @@ Why one format, why full side by side, and why it is how Linux already handles s
 
 **Three places, declared: sunk, screen and popped.** All subtle, a few pixels, within the limits you set (System Settings, "3D Depth").
 The active window sits at the screen, its menus and tooltips pop, and the wallpaper and the windows behind sink; everything in between follows the stacking order, so a pile of windows reads as a pile of papers.
-Pop is a little scale and a little depth together, and on a 2D screen it is the same scale plus a small move up and to the left.
+Pop is designed as a little scale and a little depth together, and on a 2D screen as the same scale plus a small move up and to the left.
 The details, and the Desktop Cube built on the same standard: [Depth on the desktop](docs/depth-on-the-desktop.md).
 
 ## For theme designers and customizers

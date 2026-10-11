@@ -27,6 +27,8 @@ Each part is marked **built** or **designed (coming)**.
 
 The edition's own look, Stereo Oxygen, made from KDE's Oxygen, is the first theme being made this way.
 
+**Why pop is not in code yet: Plasma's styling is about to change.** KDE is moving its styling to Union, its new style engine, and where a depth value belongs in Union is still an open question. We asked it in public, on KDE Discuss: [Real depth for Ocean's elevation, a design question for Union](https://discuss.kde.org/t/real-depth-for-oceans-elevation-a-design-question-for-union/50744). Designers who care how depth should be declared in KDE's styles are welcome to join that thread: the answer there decides where every theme's planes will live.
+
 ## The rules every theme keeps
 
 - **A window is never behind anything it covers.** Depth always agrees with what covers what. Stacking and focus keep this today (built); dragging, dropping, dialogs and effects keep it as they arrive (designed). Changes between depths are eased, never a jump.
@@ -67,7 +69,7 @@ This is a design example of what the pieces above allow together, not a theme th
 
 ## How to get involved
 
-- **The themes issue:** ISSUE_LINK. Ideas, sketches, side-by-side mockups and wallpapers in MPO, JPS or side by side are all welcome there.
+- **The themes issue:** [#78](https://github.com/Sparky-OS/sparky-stereo-os/issues/78). Ideas, sketches, side-by-side mockups and wallpapers in MPO, JPS or side by side are all welcome there.
 - **The beta tester calls:** [#26](https://github.com/Sparky-OS/sparky-stereo-os/issues/26) in English, [#25](https://github.com/Sparky-OS/sparky-stereo-os/issues/25) in Portuguese, [#27](https://github.com/Sparky-OS/sparky-stereo-os/issues/27) in Polish. You don't need a 3D TV: red and cyan glasses on any monitor are enough to see depth.
 - **Read more:** [Depth on the desktop](depth-on-the-desktop.md), the [house formats](house-formats.md), and the design in one page, [STEREO3D.md](https://invent.kde.org/danielcamposramos/kwin/-/blob/stereo3d/STEREO3D.md).
 

@@ -39,7 +39,7 @@ The details, and the Desktop Cube built on the same standard: [Depth on the desk
 **On this desktop, depth is a design material.**
 The planes, the limits and the rules every theme keeps are set; effects with their own depth and 3D backgrounds behind the windows are coming.
 What is built, what is designed, and an example theme in words: [For theme designers and customizers](docs/for-theme-designers.md).
-Ideas, sketches and side-by-side mockups are welcome in the [themes issue](ISSUE_LINK).
+Ideas, sketches and side-by-side mockups are welcome in the [themes issue](https://github.com/Sparky-OS/sparky-stereo-os/issues/78).
 
 ## For developers
 

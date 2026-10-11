@@ -6,7 +6,7 @@ description: >-
 
 # From 3D content to a headset
 
-**Check freshness first.** Written on 2026-10-07. This is the youngest part of the work: the principles are settled, the edition's headset output is planned. The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
+**Check freshness first.** Checked on 2026-10-11. The phone display has an emulated integration proof; release packaging and physical-device qualification remain. The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
 
 ## The principle
 
@@ -33,14 +33,68 @@ This is a route for a stereo film on a virtual screen in a headset.
 MV-HEVC uses `MULTIVIEW_LEFT_PRIMARY` or `MULTIVIEW_RIGHT_PRIMARY` and requires Media3 1.6.0 or later plus a device with MV-HEVC decoding support.
 Keep this decoder capability separate from displaying a packed side-by-side pair.
 The guide also provides hemisphere and sphere shapes for 180° and 360° content.
-These APIs do not by themselves implement the edition's desktop-to-headset transport; that output remains planned.
+These APIs do not by themselves implement the edition's desktop-to-headset transport; the phone integration is described below.
 
-## Planned in the edition
+## Phone display implementation (checked 2026-10-11)
 
-- The headset and phone outputs of Stereo KWin, starting when a headset is on the desk.
-- The Cardboard look as a KWin output filter, for phone viewers.
-- The Stereo Spectator's other direction ([`vr-to-3d`](../vr-to-3d/SKILL.md)): the headset player's eyes shown in stereo to the room.
+Build on Fabian Druschke's [desktop receiver handoff](https://invent.kde.org/network/kdeconnect-kde/-/merge_requests/996) and [Android RDP client](https://invent.kde.org/network/kdeconnect-android/-/merge_requests/673).
+KDE Connect is an optional authenticated discovery path.
+Standalone discovery uses pupnp SSDP, a first-use desktop approval, and a TLS channel pinned to the phone certificate identity.
+It authenticates the phone to the desktop; it does not provide mutual certificate authentication.
+A shared KRdp owner deduplicates transport leases and removes the virtual output after the last connection closes.
+USB tethering reuses this IP path; a charging cable alone and Android Open Accessory are not qualified.
 
-## Proof, when it starts
+The native-panel request uses screencast v7 and output-device v25 viewports.
+A 2400×1080 panel has two 1200×1080 eyes at the reported rational refresh.
+KWin sets identity, geometry and stereo mode before output announcement.
+Capture renders each native eye into its own half without compressing a full-width desktop.
+The Android client applies Cardboard lens correction after decode; the desktop sends the unwarped panel.
+Use the SDK default viewer profile until a measured viewer profile is available.
+No-lenses mode permits inspection without a viewer.
+Touch is suppressed, and volume keys change only the foreground window's brightness.
 
-The output filter's two eyes captured and compared with a reference lens model, the content's own left and right views in the right eyes, 360 orientation the same in both eyes, and a person in the headset at the end.
+KPipeWire retains VA-API and software encoding and adds FFmpeg h264_nvenc.
+The NVENC path prepares YUV on the CPU and encodes on the GPU; it is not zero-copy.
+A passing configuration test without libcuda is not GPU performance evidence.
+Hardware encode/decode, radio latency, physical USB, heat and optical comfort require separate device measurements.
+
+## DLNA movie path
+
+Movie mode advertises MediaRenderer:3 with AVTransport, RenderingControl and ConnectionManager through pupnp.
+UMS ContentDirectory supplies media URLs; the phone decodes native resources with Media3 and normalizes them to full SBS before the same lens transform.
+Mono fills both eyes with the same image.
+SOAP play, pause, native-file seek, brightness, volume and mute have independent runtime checks.
+GENA carries initial and changed LastChange events.
+Movie mode creates no desktop virtual output.
+This is an interoperable proof path, not DLNA certification.
+
+ConnectionManager's sink list carries container MIME types.
+Panel dimensions and Android decoder MIME/profile declarations are explicit device-description extensions; do not call them standard SinkProtocolInfo fields.
+The Flat Headset UMS profile requests full SBS and uses a bounded panel declaration from the HTTP identity or device description.
+H.264 compatibility must not bypass required stereo conversion.
+After FFmpeg stereo3d, materialize sample aspect into square pixels before fitting the panel.
+Matroska DisplayWidth/DisplayHeight describe one eye: Media3 must account for horizontal or vertical packing when deriving packed-frame pixel aspect.
+See the [Matroska stereo specification](https://www.matroska.org/technical/notes.html#multi-planar-and-3d-videos).
+
+Native full-SBS MP4, half-SBS Matroska and mono pass every pixel under stated H.264 error bounds, with zero wrong-eye pixels.
+Seeking checks a changing frame marker as well as SOAP state.
+Lens output is compared with an SDK-rendered reference; this does not independently validate Google's optical model.
+Actual audio gain and mute are measured on an isolated sink.
+Transcoded MPEG-TS seeking, multichannel binaural audio and PC/phone synchronization remain separate qualifications.
+[UPnP AV3](https://openconnectivity.org/developer/specifications/upnp-resources/upnp/mediaserver4-and-mediarenderer3/) includes optional CLOCKSYNC and SyncPlay; it is incorrect to say that the specification defines no synchronized playback.
+Support and shared-clock behavior must be measured on both endpoints before promising synchronized PC audio.
+
+## Reproduce safely
+
+Use an immutable private guest base and a disposable overlay for each proof.
+Hash the base before and after; never use a shared development VM as a mutable backing file.
+In the isolated KWin test session, disable the screen locker explicitly so its error screen cannot replace the fixture.
+Check captured images yourself, and use wrong-eye, protocol-version and rate mutants that fail.
+Keep exact raw-pixel checks separate from bounded lossy-codec comparisons.
+Report decoded-frame handoff timing separately from compositor presentation or photon latency.
+
+## Later work
+
+PhoneVR/ALVR head tracking, reprojection and head-tracked multichannel audio follow the flat display.
+360/VR180 projection and the Stereo Spectator's reverse path remain separate integrations.
+No camera tracking or foveated streaming is introduced by the flat display proof.

@@ -14,7 +14,7 @@ Two screenshots taken with the edition's Spectacle, which keeps both eyes. Red-c
 - **DOOM (2016) in an ordinary window** ([MPO](docs/screenshots/doom-2016-in-a-window.mpo)), based on [KHARVOX](https://github.com/CactusVRStudios/KHARVOX), CactusVRStudios' DOOM (2016) VR conversion mod (MIT): the game has depth while the panel and the window frame stay flat in both eyes. Measured between the eyes: the nearest rock 23 px apart, the far mountains 1 px, the panel 0 px.
 - **Marble's globe** ([MPO](docs/screenshots/marble-globe.mpo)): the Earth in front of the screen (+11 px) and the stars behind it (-12 px), the side panel flat. This shot predates fixes made since, which a newer one will show.
 
-## Why one format: full side by side, at any resolution
+## How it works
 
 **The standard in three lines.**
 - **Stereo KWin** (KDE Plasma's compositor, with our stereo changes) speaks full side by side, at any resolution.
@@ -25,237 +25,77 @@ That is what makes stereo work across GPUs, across monitors (2D ones included) a
 
 **One picture, any screens, any GPUs.** One mirrored desktop on two 3D televisions at once, frame packing at 30 Hz from an AMD integrated GPU and top and bottom at 60 Hz from an NVIDIA RTX 3060, both in 3D. The program drew one full side-by-side picture; each output converted it for its own screen. It takes both halves: our driver changes, which give amdgpu and NVIDIA's open kernel modules the HDMI 3D modes, and this one-format contract.
 
-**Two places, two rules.**
-Inside a program, anything goes: a player reads every packing a file can carry, an engine renders its eyes however it likes.
-Inside Stereo KWin, only full side by side exists: both eyes at full size, left eye first, at any resolution, declared once.
-The output filters then turn that into whatever the screen needs: a 3D television's own HDMI 3D modes, anaglyph on any monitor, interleaved and frame-sequential displays, a headset through OpenXR.
-
-**A window's 2D part and its 3D area are separate surfaces.**
-The 2D part (menus, toolbars, panels, the document around a picture) is the window's own surface, at its normal size, one eye's size, and declares nothing.
-The 3D area (a stereo video, a 3D viewport, a stereo painting canvas) is a surface of its own that hands Stereo KWin full side by side.
-Stereo KWin shows the 2D part identical in both eyes and gives the 3D area each eye's view, in place inside the window.
-Only a program that is stereo and full screen only, whose whole window is the 3D area, makes its whole window stereo.
-The separation is also what gives the 2D part its depth: its elements declare their planes (sunk, screen, popped), and Stereo KWin draws those for each screen, while the 3D areas carry their own eyes.
-
-**It is how sound already works on Linux.**
-A program hands PipeWire plain PCM, at whatever rate it likes.
-PipeWire resamples, mixes and sends it to HDMI, Bluetooth or a USB DAC, and the program never learns which.
-Nobody calls that a limitation: it is why every Linux program plays sound on every device.
-Full side by side is the stereo picture's PCM, and Stereo KWin is its PipeWire.
-A new kind of 3D screen needs one new output filter, and every stereo program already written works on it the day the filter lands.
-
-**Why only one format.**
-With several formats, the work is every input format times every output format times every program that wants stereo.
-The formats and the displays are short lists; the programs are an open list, and that is the term that never ends.
-Every earlier attempt put the format question on each program: quad-buffer needed a workstation card, NVIDIA's 3D Vision needed one vendor's driver, and every player grew its own menu of packings.
-Each program had to know the display, and almost none did.
-Here a program learns stereo once: it renders two eyes, declares them to Stereo KWin, and never needs to know what a television or a headset is.
-
-**Why full side by side.**
-- **Programs already produce it.** Games and VR engines render two viewports side by side, most 3D files carry side by side, and our Mesa packs quad-buffer OpenGL and two-layer Vulkan into it at swap.
-- **It loses nothing.** Each eye keeps its full resolution; half formats exist only in the output filters, where a display asks for them.
-- **It survives the path.** One ordinary buffer passes through X11, Xwayland, screenshots, screencasts and remote desktop unchanged.
-- **The eyes stay in sync.** Both eyes travel in one buffer, committed once, so they always show the same instant; that is what lets every output, frame sequential included, be built from the same frame.
-
-The converting costs copying rows and columns, work Stereo KWin does every frame anyway; every test runs in software rendering (llvmpipe) as well as on a GPU.
-The design in one page: [STEREO3D.md](https://invent.kde.org/danielcamposramos/kwin/-/blob/stereo3d/STEREO3D.md).
+Why one format, why full side by side, and why it is how Linux already handles sound: [How it works](docs/how-it-works.md).
 
 ## Depth on the desktop
 
-**Three places, declared: sunk, screen and popped.** All subtle, a few pixels, with the limits your own settings (System Settings, "3D Depth"). The active window sits at the screen; its menus, tooltips and notifications pop; the wallpaper and the windows behind sink.
+**Three places, declared: sunk, screen and popped.** All subtle, a few pixels, within the limits you set (System Settings, "3D Depth").
+The active window sits at the screen, its menus and tooltips pop, and the wallpaper and the windows behind sink; everything in between follows the stacking order, so a pile of windows reads as a pile of papers.
+Pop is a little scale and a little depth together, and on a 2D screen it is the same scale plus a small move up and to the left.
+The details, and the Desktop Cube built on the same standard: [Depth on the desktop](docs/depth-on-the-desktop.md).
 
-**Everything in between is Stereo KWin's job, by stacking order.** Stacked background windows fan out from sunk towards popped, always behind the active window, in the same order as in 2D. A window caught in the middle of a pile, its edges out of the stack, reads as a sheet floating within it, the way a pile of papers looks in real life. No program declares this; it falls out of the order.
+## For theme designers and customizers
 
-**In the background, each window is 2D.** A window in the pile is a flat sheet at its place in the stack: the desktop's pop effects inside it come to one plane. Its stereo content stays 3D: a movie or a game is full side by side wherever its window is, so a 3D movie plays on one screen while you work on another.
+**On this desktop, depth is a design material.**
+The planes, the limits and the rules every theme keeps are set; effects with their own depth and 3D backgrounds behind the windows are coming.
+What is built, what is designed, and an example theme in words: [For theme designers and customizers](docs/for-theme-designers.md).
+Ideas, sketches and side-by-side mockups are welcome in the [themes issue](ISSUE_LINK).
 
-**Pop is real, not faked: a little scale and a little depth, together.** One value per element gives both cues: bigger and nearer when popped, smaller and further when sunk.
-- **Everything follows its element's plane:** its text scales and moves with it, and so does its click area, so a popped element has no dead margin and a sunk one no click area beyond its picture. The plane's geometry lives inside the window itself, the one geometry that drawing and input both read.
-- **Text shares its element's depth.** What tires the eyes is 2D text lying over a picture at another depth, not depth as such.
-- **On a 2D screen, the pop is the same scale plus a move up and to the left,** so depth reads on every screen, with or without glasses.
+## For developers
 
-## The Desktop Cube: what one format makes possible
-
-Plasma's Desktop Cube, rebuilt on the standard, shows what follows from one format without inventing anything new.
-- **It is a 3D application, treated like a game:** its scene has its own depth and hands Stereo KWin full side by side, two views of one scene, one camera per eye.
-- **Its faces are your real desktops, each a stereo surface.** The windows on a face sit on the desktop's three planes (sunk, screen and popped, with the pop your own setting), so each face is a relief, and the cube's cameras see the windows standing off its faces from any angle.
-- **When it closes on one desktop, it is the desktop:** the front face lands on the screen plane, identical to the flat desktop.
-- **It is the seed of the VR home:** the same scene, seen through a headset's cameras, is a floating 3D desktop.
-
-**On a 2D screen, too.** A straight 2D screen shows only the left eye, as always, and never renders the second one. But during the cube's animation that one view is still the real 3D scene: live desktops on a turning cube, windows in relief, depth shown by perspective and motion alone. Desktop interfaces have seen little new in years; the cube that is real depth on a 3D screen is something new on a 2D one, before anyone puts on glasses.
+- [Develop 3D and XR on an ordinary monitor](docs/develop-3d-on-an-ordinary-monitor.md): hand Stereo KWin two eyes once and see them in anaglyph on any monitor; the real screen is the last check.
+- [House formats](docs/house-formats.md): one format inside the system for each medium, converted only where it enters and where it leaves.
+- [Stereo labor division](docs/stereo-labor-division.md): who does what from the program to the screen, tied to the specifications.
+- [Test stereo without a 3D TV](docs/test-stereo-without-a-3d-tv.md): a kernel whose VKMS speaks HDMI 3D, a 3D EDID, and the bench, IGT and KWin.
+- [A virtual machine with a 3D display](docs/stereo-vm.md): a QEMU guest with HDMI 3D modes, shown in stereo on Stereo KWin.
+- [vkms-stereo-bench](tools/vkms-stereo-bench/README.md): each eye read back pixel by pixel in a VM, no 3D display needed; a ready root file system with Stereo KWin is a [release](https://github.com/Sparky-OS/sparky-stereo-os/releases/tag/kwin-root-20261011).
+- [Skills](skills/README.md): instructions for people and AI assistants working on the edition and the programs it changes.
 
 ## Stereo in the open stack, not in one product
 
-**Elsewhere, stereo is tied to a product.**
-Steam runs on ARM only on Valve's own headset; on every other ARM device, Steam for Linux stays unsupported ([Valve, 4 October 2026](https://github.com/ValveSoftware/steam-for-linux/issues/13689)).
-New glasses-free monitors deliver their 3D through Windows injectors ([ViewX, August 2026](https://www.prnewswire.com/news-releases/viewx-launches-liber-and-immer-glasses-free-ai-3d-displays-on-kickstarter-302857181.html)).
-Cheap ARM boxes switch a television into HDMI 3D only on their vendors' kernels.
-A new headset saves its screenshots and spectator view from one eye, the one the user picks ([SteamOS 0.4.1 for Steam Frame](https://store.steampowered.com/news/app/4165890/view/674006995886409325)).
-Each works inside its own walls, and stops at them.
-
-**Here, stereo is a property of the open layers, so it reaches the screen you already own.**
-- **KDE carries it.** KWin is the same compositor on the desktop, on ARM boards, on phones with Plasma Mobile and on televisions with Plasma Bigscreen, so one contract covers all of them. China's own desktops have built on KWin too ([UKUI's ukui-kwin](https://github.com/ukui/ukui-kwin), [Deepin's deepin-kwin](https://github.com/linuxdeepin/deepin-kwin)). A new kind of display, glasses-free included, is one more output filter in Stereo KWin, not one more injector per game. For glasses-free panels, Stereo KWin will publish window geometry to [DisplayXR](https://github.com/DisplayXR/displayxr-runtime), the open runtime for spatial displays, so its apps run on Plasma with each vendor's own weaver; the design is agreed in [displayxr-runtime#1928](https://github.com/DisplayXR/displayxr-runtime/issues/1928).
-- **The cheapest hardware already does it.** An Allwinner H616 box and a Rockchip RK3228A box switch a 3D television into HDMI 3D on their Android vendor kernels today, and the Raspberry Pi's mainline driver already allows HDMI stereo modes. Without Steam on ARM, the stereo there comes from the operating system: video, photos, the desktop and native programs.
-- **One kernel fix reaches a whole ecosystem.** In mainline Linux, HDMI stereo modes are allowed by Intel's i915, nouveau and the Raspberry Pi's vc4. The shared HDMI bridge connector that many SoC display drivers build on, Rockchip's and Allwinner's among them, still reads "[TODO: Handle doublescan_allowed and stereo_allowed](https://github.com/torvalds/linux/blob/master/drivers/gpu/drm/display/drm_bridge_connector.c)", and none of the display drivers of China's chipmakers allows stereo modes. Fixing it once, in the DRM core, opens HDMI 3D on every board built on it.
-- **Nothing rendered is thrown away.** A 3D screenshot keeps both eyes as one stereo picture, JPS or MPO, and any viewer then shows the left eye, the right eye or the picture in 3D. Our Spectacle saves 3D captures this way today. MPO is the format the 3D cameras and the [Nintendo 3DS](https://en.wikipedia.org/wiki/Nintendo_3DS) wrote and showed, and a 3D Sony television shows an MPO from a USB stick in 3D by itself ([measured](https://github.com/danielcamposramos/sony-bravia-linux/blob/main/docs/3d-blocked-in-browser.md)). On Sparky Stereo OS, Gwenview, digiKam, Showfoto and KolourPaint show them in 3D on every output: 3D televisions, anaglyph on any monitor and OpenXR headsets.
-- **Old hardware comes back.** The Radeon HD 7000 and R9 200 cards, sold alongside the 3D televisions of 2010 to 2013, now run amdgpu's modern display code by default ([Timur Kristóf, XDC 2026](https://indico.freedesktop.org/event/12/contributions/545/)), so HDMI work done there reaches them: an old PC and an old 3D television become a working stereo system again.
-
-KDE carries it, cheap boxes prove it costs little, one kernel fix makes it universal, both eyes are always kept, and old hardware makes it repairable.
+Elsewhere, stereo is tied to one product: one headset, one vendor's injector, one vendor's kernel.
+Here it is a property of the open layers (KDE, the kernel, the file formats), so it reaches the screen you already own: [Stereo in the open stack](docs/open-stack.md).
 
 ## Merged outside Sparky Stereo
 
-**Sparky Stereo is also a campaign.**
 Where a program breaks stereo or deep colour on the way to the screen, the fix goes to that program's own project, in its own style.
-Each merge below was reviewed and accepted by that project's maintainers.
-Each one shows the next project the same problem already fixed elsewhere, and Sparky Stereo is the desktop where all of them meet.
+- **HandBrake** ([#8100](https://github.com/HandBrake/HandBrake/pull/8100), 16 September 2026): x264 encodes declare their 3D packing.
+- **Universal Media Server** ([#6330](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6330), 19 September 2026): 3D video stays declared through transcoding.
+- **MKVToolNix** ([ebd8445b](https://codeberg.org/mbunkus/mkvtoolnix/commit/ebd8445b1185d35d6bdbb9c1463757fbc9aa7c29), 21 September 2026): Matroska StereoMode from the H.264 stream.
+- **MKVToolNix, HEVC** ([70889f220e](https://codeberg.org/mbunkus/mkvtoolnix/commit/70889f220e), 11 October 2026): the same from the HEVC stream.
+- **mpv** ([#18490](https://github.com/mpv-player/mpv/pull/18490), 23 September 2026): the 3D layout read from the stream itself.
+- **Teams for Linux** ([#3070](https://github.com/IsmaelMartinez/teams-for-linux/pull/3070) by its maintainer, Ismael Martinez, from our report, 7 October 2026): the app starts on a minimal Debian or Ubuntu.
+- **Qt Multimedia** ([778399](https://codereview.qt-project.org/c/qt/qtmultimedia/+/778399), 8 October 2026): HDR video tone mapped against its real peak.
+- **spice-gtk** ([!159](https://gitlab.freedesktop.org/spice/spice-gtk/-/merge_requests/159), 10 October 2026): a display channel crash fixed.
 
-**Merged:**
-- **HandBrake** ([#8100](https://github.com/HandBrake/HandBrake/pull/8100), 16 September 2026): the x264 encoder writes the H.264 frame packing arrangement SEI (ITU-T H.264, Annex D), so an encoded side by side or top and bottom video declares itself.
-- **Universal Media Server** ([#6330](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6330), merged 19 September, released in [15.9.0](https://github.com/UniversalMediaServer/UniversalMediaServer/releases/tag/15.9.0) on 5 October 2026): 3D video keeps its declaration through H.264 transcoding, so televisions and players switch to 3D on their own; the Sony Bravia profiles of 2011 and 2012 are corrected too.
-- **MKVToolNix** ([ebd8445b](https://codeberg.org/mbunkus/mkvtoolnix/commit/ebd8445b1185d35d6bdbb9c1463757fbc9aa7c29), from [!6311](https://codeberg.org/mbunkus/mkvtoolnix/pulls/6311), merged 21 September 2026): mkvmerge sets the Matroska StereoMode ([RFC 9559](https://www.rfc-editor.org/rfc/rfc9559)) from the AVC frame packing SEI.
-- **MKVToolNix, HEVC** ([70889f220e](https://codeberg.org/mbunkus/mkvtoolnix/commit/70889f220e), from [!6312](https://codeberg.org/mbunkus/mkvtoolnix/pulls/6312), merged 11 October 2026 with Moritz Bunkus's own tests, [db3410509d](https://codeberg.org/mbunkus/mkvtoolnix/commit/db3410509d)): the same StereoMode from the HEVC frame packing SEI.
-- **mpv** ([#18490](https://github.com/mpv-player/mpv/pull/18490), 23 September 2026): the player detects the layout signalled in the stream itself, the frame packing SEI and the MP4 `st3d` box.
-- **Teams for Linux** (our report [#3067](https://github.com/IsmaelMartinez/teams-for-linux/issues/3067), fixed by the maintainer, Ismael Martinez, in [#3070](https://github.com/IsmaelMartinez/teams-for-linux/pull/3070), merged 7 October 2026, released in [2.25.0](https://github.com/IsmaelMartinez/teams-for-linux/releases/tag/v2.25.0), a pre-release for now): the .deb declares ALSA and libgbm among its dependencies, so the app starts on a minimal Debian or Ubuntu system.
-- **Qt Multimedia** ([778399](https://codereview.qt-project.org/c/qt/qtmultimedia/+/778399), merged 8 October 2026; in Qt 6.12 too, [778580](https://codereview.qt-project.org/c/qt/qtmultimedia/+/778580), merged 9 October 2026): the FFmpeg backend reports the mastering display's peak luminance in nits, as `QVideoFrameFormat::maxLuminance()` promises; it reported 10,000 times the value, so HDR video (PQ and HLG) was tone mapped against a peak 10,000 times too high. Tim Blechmann, the Qt Multimedia maintainer, improved its test and approved it.
-- **spice-gtk** ([!159](https://gitlab.freedesktop.org/spice/spice-gtk/-/merge_requests/159), merged 10 October 2026): a crash in the display channel whenever a surface is destroyed, which appeared once the project moved to GLib 2.68 (GLib's newer `g_clear_pointer` clears the pointer before its destroy function is read); found while adding stereo display to SPICE for the stereo virtual machine.
-
-**In review:**
-- **FFmpeg** ([#24628](https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/24628)): the H.264 and H.265 decoders honour the SEI's persistence, so the declaration holds for every frame, not only the first; [#24643](https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/24643): the stream's own declaration wins over the container's by default.
-- **Media3, Android's media framework** ([androidx/media#3439](https://github.com/androidx/media/pull/3439)): the frame packing SEI read in MP4 and fragmented MP4, the right-eye-first modes, StereoMode in the WebM muxer.
-- **x265** ([#986](https://github.com/Multicorewareinc/x265/pull/986)): a `--frame-packing` option that writes the H.265 frame packing arrangement SEI.
-- **VLC** ([!10366](https://code.videolan.org/videolan/vlc/-/merge_requests/10366)): the x264 module signals the input's stereo layout by default.
-- **gamescope** ([#2438](https://github.com/ValveSoftware/gamescope/pull/2438)): the present mode of the nested output can be chosen, which ends a frame race seen when stereo games run through it.
-- **NVIDIA's open kernel modules** ([#1386](https://github.com/NVIDIA/open-gpu-kernel-modules/pull/1386)): HDMI deep colour at the depth the display declares in its EDID (DC_30, DC_36, DC_48).
-- **PeerTube** ([#7816](https://github.com/Chocobozzz/PeerTube/pull/7816)): a video that declares its 3D packing in its container keeps it through transcoding, right eye first included.
-- **wiz3D** ([#33](https://github.com/effcol/wiz3D/pull/33)): a Linux build of its DirectX 9 stereo path.
+Each one in full, and what is in review: [Merged outside Sparky Stereo](docs/upstream-merges.md).
 
 ## Programs the edition changes for stereo 3D and deep colour
 
-**One contract for every program below: programs hand the desktop full side by side, and KWin's outputs decide the screen.**
-Each item names the program, links its own upstream project, says what it gains in the edition and what we found on the way.
-**In the edition** means a package of it is in the Sparky Stereo repository today.
-**In progress** means the work is done and measured, but no package is in the repository yet. **Planned** means not built yet.
-What was proven is said per item, and it was proven on our headless KWin with captures of both eyes unless the item says otherwise; where a real display was used, it says so.
+One contract for every program: it hands the desktop full side by side, and KWin's outputs decide the screen.
+- **The display path** (8): the kernel, Mesa, NVIDIA's open modules, egl-wayland, Xwayland, KWin, KScreen, the Wayland protocols.
+- **Video** (14): FFmpeg, mpv, Haruna, VLC, Kdenlive, PlasmaTube, MKVToolNix and more.
+- **Science and engineering** (12): Marble, KAlgebra, Kalzium, KiCad, OpenSCAD, GNU Octave and more.
+- **Images** (9): Krita, Spectacle, Gwenview, digiKam, KolourPaint, the shared stereo layer and more.
+- **Simulators and their rigs** (2): every raw control of a home cockpit in System Settings, and joysticks past 80 buttons (planned).
+- **System** (2, and one fix beyond stereo): a stereo and deep colour page in KInfoCenter, the Cushion Swap File.
+- **Not done yet** (2): Blender, and MAME with the emulators of 3D consoles.
 
-**The display path**
-- [**Linux kernel**](https://www.kernel.org/): amdgpu lists and signals the HDMI 3D modes a display's EDID declares and times frame packing, full side by side is handled in the DRM core, i915, nouveau and amdgpu, and nouveau gains 16 bits per colour on Turing and newer. Stock amdgpu refuses the 3D modes, and nouveau's missing piece was deep colour; a Sony 3D television switched itself into 3D from System Settings on 2026-10-01. [in the edition]
-- [**Mesa**](https://www.mesa3d.org/): OpenGL quad buffer, EGL multiview windows and two-layer Vulkan swapchains become one full side by side picture and are declared to KWin, and a Vulkan layer does the same over drivers outside Mesa. Mesa has to declare stereo before it doubles the window, or KWin treats the resize as a 2D window's; GLX offers stereo only when KWin announces it. [in the edition]
-- [**NVIDIA open GPU kernel modules**](https://github.com/NVIDIA/open-gpu-kernel-modules): the 3D modes are built from the display's HDMI stereo block, and HDMI deep colour follows the depth the display declares, up to 16 bits. On an RTX 3060 driving a 3D television, KWin listed the television's 3D modes through NVIDIA's driver and the link ran at 12 bits, the display's own maximum; 16 bits is untested on hardware because no 48-bit display is at hand. [in the edition]
-- [**egl-wayland**](https://github.com/NVIDIA/egl-wayland): the EGL external platform for NVIDIA on Wayland learns the two-view window (`EGL_EXT_multiview_window`) as Mesa's EGL has it. It builds and passes a protocol contract test; a real run on NVIDIA's driver is still to do. [in the edition]
-- [**Xwayland**](https://www.x.org/releases/individual/xserver/): four patches give a redirected X11 child window a surface of its own, post its damage and keep alpha on 32-bit root surfaces, so a 3D area inside a toolkit window can be its own stereo layer. The gap they answer was measured: gmsh, ParaView, Sweet Home 3D, CloudCompare, GRASS and KiCad declared stereo on a child window, KWin read only top-level windows, and both eyes showed squeezed inside the 2D window; the proofs of those programs on the patched Xwayland are still open. [in the edition]
-- [**KWin**](https://invent.kde.org/plasma/kwin): per-eye scene passes, stereo windows and subsurfaces, 3D modes and virtual 3D outputs, and depth on the desktop. We found that a window moved for depth lost its blur (`BlurEffect::shouldBlur` skips translated windows unless blur is forced), and that after Krita's splash screen KWin sends no new synthetic configure with the one-eye size, which squeezes the window. KWin now takes one stereo declaration, full side by side at any resolution, and that cleanup passes every job of KDE's CI ([pipeline](https://invent.kde.org/danielcamposramos/kwin/-/pipelines/1373213)). [in the edition]
-- [**KScreen**](https://invent.kde.org/plasma/kscreen): the display's 3D modes appear with its other modes, labelled "(3D …)" with a suggestion for games and for movies, never chosen automatically. A suggestion of frame packing at 30 Hz for games was wrong and is corrected: games only from 60 Hz. [in the edition]
-- [**plasma-wayland-protocols**](https://invent.kde.org/libraries/plasma-wayland-protocols): carries `kde-stereo-content-v1`, the declaration a program makes for a window or a subsurface, and the stereo output settings KScreen uses. Wayland and X11 declarations and the shared library were tested in containers (27 tests). [in the edition]
-
-**Video**
-- [**FFmpeg**](https://ffmpeg.org/): the package carries the seven patches of the review listed above, and the VVC decoder, which did not decode the frame packing message at all, now exports it. Tests (FATE) check the arrangement in output order with four threads, its cancellation and its end at a new coded video sequence. [in the edition]
-- [**mpv**](https://mpv.io/): reads the layout from the stream, unpacks every packing to full side by side, draws the video in a layer below the controls and declares only the video; subtitles and the on-screen display are drawn once per view. Debian's 0.41.0 does not take the patches, so the package is upstream's 2026-09-29 snapshot; stock mpv exposed only the stereo layout of a video, not its projection, which a new track property now gives for 360 and VR180. [in the edition]
-- [**MpvQt**](https://invent.kde.org/libraries/mpvqt): a video layer as a Wayland subsurface placed below the window, declared as full side by side while the video is 3D, at 10 bits, or half float for deeper video. Debian's libmpvqt3 aborts Haruna against Qt 6.11.2 (a Wayland native-interface revision mismatch), and the rebuild cures it. [in the edition]
-- [**Haruna**](https://invent.kde.org/multimedia/haruna): 3D videos play in the layer with controls, subtitles and playlist identical in both eyes, 72 of 72 captures matching, installed from the packages. The unchanged Haruna squeezes both views into one picture and KWin sees a plain 2D window. [in the edition]
-- [**VLC Stereo**](https://www.videolan.org/vlc/): the stereo edition of VLC 3.0 shows both views, reads the layout from the frame packing SEI (right eye first included) and from Matroska's StereoMode, and declares its window. VLC 3.0 parsed Matroska's StereoMode and ignored it, never read the SEI of an MP4 or Matroska file, because the packetizer that reads it does not run for them, and its command-line player shows no video at all on native Wayland, because KWin offers only stable xdg-shell and VLC 3.0 knows only `wl_shell`. [in the edition]
-- [**Dragon Player**](https://apps.kde.org/dragonplayer/): 3D video in both eyes for every packing of H.264 Table D-8, with an input format menu and Swap Eyes for video that declares nothing, proved on builds of the same sources as the package; the menu itself was not driven in the tests. Debian describes it as a Phonon player, but it is QML on QtMultimedia, and a stock install does not start without QML modules its package does not depend on. [in the edition]
-- [**Qt Multimedia**](https://doc.qt.io/qt-6/qtmultimedia-index.html): `QVideoFrameFormat::StereoMode` names every packing of H.264 Table D-8 and RFC 9559, with right eye first and the view of a frame in a sequence, filled from FFmpeg's stereo side data. Qt Multimedia had no stereo notion at all; a unit test of every mode passes (62 checks), and Qt may want another shape for the API. [in the edition]
-- [**Kdenlive**](https://kdenlive.org/) and [**MLT**](https://www.mltframework.org/): a clip knows its packing, the monitors can show the left eye only or both eyes in 3D, and the render writes the frame packing SEI and the Matroska StereoMode. Kdenlive lost both when it rendered (0 SEI in the MP4 and the Matroska file), and Debian's MLT 7.40.0 consumer does not build against FFmpeg 9. [in the edition]
-- [**Bino**](https://bino3d.org/): input in any standard, output always full side by side, with its output menu removed so nothing can break that, and with stereo 360 and VR180 turned by the mouse, the same direction in both eyes. Bino 2.8 reads a right-eye-first Matroska file as left first, because it compares ffprobe's JSON number with the string "1"; the fix of four lines is proved before and after. It runs on X11 through Xwayland, and on Wayland it does not run yet. [in the edition]
-- [**PlasmaTube**](https://apps.kde.org/plasmatube/): packaged from KDE's 26.08.1 release, which is not in Debian, with 3D taken from the stream, then from the `yt3d` tags, then from the shape of the frame, and with 360 and VR180 as a flat view the viewer turns. 48 of 48 captures of declared clips were right in both eyes, and 24 of 24 for the panoramas; YouTube's own streams were not read, because the one public Invidious instance tried answered with its bot wall. [in the edition]
-- [**Plank Player**](https://invent.kde.org/plasma/plank-player): Plasma Bigscreen's own player, driven by a remote control, packaged from KDE's sources because it is not in Debian. The video is a surface of its own declared full side by side, with the packing taken from the stream (the frame packing SEI and Matroska's StereoMode, right eye first included, also when the SEI comes only on keyframes) or from the shape of the frame; the on-screen display and menus stay identical in both eyes (0 differing pixels in 30 captures), and a 3D menu reached with the remote's keys picks the input format, Swap Eyes or one eye. The unchanged player declares nothing, so KWin sees a plain 2D window even for a marked 3D clip. [in the edition]
-- [**MKVToolNix**](https://mkvtoolnix.download/): when you mux a 3D video, mkvmerge writes the Matroska StereoMode ([RFC 9559](https://www.rfc-editor.org/rfc/rfc9559)) from the stream's own frame packing SEI, for H.264 (merged upstream as [ebd8445b](https://codeberg.org/mbunkus/mkvtoolnix/commit/ebd8445b1185d35d6bdbb9c1463757fbc9aa7c29)) and HEVC (merged upstream as [70889f220e](https://codeberg.org/mbunkus/mkvtoolnix/commit/70889f220e)), so every player that reads StereoMode shows the file in 3D. The edition ships MKVToolNix with both until a release carries them, then Debian's own. [in progress]
-- [**HandBrake**](https://handbrake.fr/): its x264 encoder already marks a side by side or top and bottom encode with its frame packing, our change merged upstream ([#8100](https://github.com/HandBrake/HandBrake/pull/8100)). The edition's HandBrake will show a 3D source in 3D in its preview window, as one surface declared full side by side, and will keep the source's 3D in HEVC encodes and in the Matroska and MP4 containers. [planned]
-
-**Science and engineering**
-- [**Marble**](https://apps.kde.org/marble/): the globe in stereo from one world and two cameras orbiting its centre, the stars at the globe's maximum parallax, and the map's controls flat in both eyes, on by default on a stereo desktop (View > Stereo 3D switches it off), with the labels of lines at the same place in both eyes; Marble Maps has its own Stereo 3D button, and the other planets and the Moon come installed. On the way we fixed a crash on the vector map that happens in 2D too: a placemark was freed while the last layout still listed it. Against the exact prediction the median disparity error was 0.16 px at 2 degrees and 0.29 px at 4, with no vertical difference, and with stereo off the window matches Debian's Marble to 0 differing pixels. The perspective view is in progress. [in the edition]
-- [**KAlgebra**](https://apps.kde.org/kalgebra/) and [**Analitza**](https://invent.kde.org/education/analitza): the 3D plot is drawn once per eye by Qt's left and right buffers from one scene with two parallel cameras. The measured disparity of the axes followed the predicted one with a median error of 0.26 to 0.33 px at 2, 5 and 10 percent separation, with 0 differing pixels outside the plot. On a stereo desktop the plot is in stereo by default, in KAlgebra and KAlgebra Mobile, with a Stereo 3D setting to show it flat. [in the edition]
-- [**Kalzium**](https://apps.kde.org/kalzium/) and [**Avogadro**](https://avogadro.cc/): the molecule is drawn in stereo with the same two cameras (9 atoms, median error 0.06 px). On the way we found why Kalzium drew no molecule with Avogadro 2 ([KDE bug 463018](https://bugs.kde.org/show_bug.cgi?id=463018), open since 2022): Kalzium never registered the molecule with Avogadro's layer manager, and a three-file fix is ready for Kalzium on its own. The molecule viewer is in stereo by default on a stereo desktop, and no longer see-through on Wayland: Avogadro's scene background is transparent unless a program sets one, and Kalzium never did. [in the edition]
-- [**Kubrick**](https://apps.kde.org/kubrick/): the cube is drawn once per eye, the background and labels stay flat, and picking uses the left eye. Measured against ray-cast predictions, the median error was 0.13 to 0.24 px on the software and the GPU client. In stereo by default on a stereo desktop, with a setting to play flat. [in the edition]
-- [**Netgen**](https://ngsolve.org/): the `-stereo` option existed and did nothing; it now asks for a quad-buffer window and draws the mesh once per eye (near brick -5.01 px, centre 0, far +3.46 px, vertical 0). Debian's `netgen` also did not start with only that package installed, because the GUI loads `libnggui.so`, which only the development package ships; the edition loads the library by its real name, and the patch is with Debian ([Debian bug 1150173](https://bugs.debian.org/1150173)). [in the edition]
-- [**GNU Octave**](https://octave.org/): a figure takes `stereo` and `stereoeyeseparation` properties. Octave always projects orthographically, so each eye is a shear around the camera target (near -9.5 px, target 0, far +9.5 px), and the legend and 2D axes stay identical in both eyes. Started from the menu, Octave opens with a stereo example, and Welcome > Open empty skips it from then on; it also depends on the font without which no plot can be drawn. [in the edition]
-- [**GRASS GIS**](https://grass.osgeo.org/): the 3D view (NVIZ) draws from two parallel cameras with an off-axis frustum and a setting for the eye separation. In the 8.5.0 build `glDrawBuffer` was compiled out, so everything drew to both eyes; the draw calls now go to the eye's own buffer. [in progress]
-- [**KiCad**](https://www.kicad.org/): the 3D viewer renders each eye from its camera class, perspective and orthographic, with a setting in Preferences. The navigator gizmo differed between the eyes (18 and 332 pixels) because its headlight was placed with the eye's matrix; the cause is fixed and the difference is 0 of 7560 pixels. On the newer Mesa tried, the canvas was not declared as stereo although both eyes were packed, and that is not resolved. [in progress]
-- [**OpenSCAD**](https://openscad.org/): the preview is drawn once per eye by Qt's stereo buffers with a setting for the separation, perspective and orthographic. Vertical disparity was 0 and the editor and console part had 0 differing pixels between the eyes. [in progress]
-- [**F3D**](https://f3d.app/): a `--stereo` option and an eye angle, using VTK's own shear of the projection. F3D draws through render passes that never set the camera's stereo flag, so VTK's own stereo shear was not applied and the two eyes were pixel-identical even at a large eye angle; the change sets the same shear itself. [in progress]
-
-**Images**
-- [**Krita**](https://krita.org/en/): a 16-bit canvas on Wayland and a stereo 3D canvas. Krita forced X11, where under Xwayland it got only 8 bits, and offered only 8 and 10; with the change a ramp that holds 1 level at 8 bits holds 249 at 16. On Wayland the stereo canvas is now a surface of its own below the window, at 16 bits in each eye (249 levels, as in 2D) and with the canvas's colour description, and documents that are not stereo keep their 16 bits in the same session; outside the canvas the eyes differ by 0 pixels. The window around the canvas, which holds the 2D interface, is 8 bits until Qt keeps the depth a translucent window asks for (in progress). On the way we found why Krita's first start can sit on the splash for minutes on a hard disk: it wrote its resource cache with one disk sync per statement (6,908 on a fresh profile; Debian's 5.3.4 does the same). In the edition it takes 504, and the cause is reported to Debian for Krita's developers. [in the edition]
-- [**Spectacle**](https://apps.kde.org/spectacle/): a capture is side by side when a window or an output in it is 3D, and is saved as JPS for the JPG choice and as MPO for the PNG choice. Tested in containers (12 tests); the run on the desktop is still to do. [in the edition]
-- [**KImageFormats**](https://invent.kde.org/frameworks/kimageformats): a plugin for JPS and MPO with the MIME types registered, read back by Pillow and exiftool, and every reader now reports a picture's stereo layout, as the edition's Qt does for PNG's registered `sTER` chunk. 650 JPS photographs from a 3D phone and 2,367 ordinary JPEGs decode with zero mismatches against plain JPEG decoding, and KDE's CI is green on every platform ([pipeline](https://invent.kde.org/danielcamposramos/kimageformats/-/pipelines/1373209)). [in the edition]
-- [**KFileMetaData**](https://invent.kde.org/frameworks/kfilemetadata): one `stereo3dLayout` property for every stereo mark the specifications define: the H.264 and H.265 frame packing SEI, the MV-HEVC eye order, all 15 Matroska `StereoMode` values, PNG's `sTER`, JPS and MPO; files without a usable mark report nothing rather than a guess. KDE's CI is green ([pipeline](https://invent.kde.org/danielcamposramos/kfilemetadata/-/pipelines/1372927)). [in the edition]
-- [**Gwenview**](https://apps.kde.org/gwenview/): MPO, JPS, stereo PNG, side by side and top and bottom pictures shown in 3D, with Swap Eyes; Photo Sphere pictures stay flat; anaglyph pictures are recognised (54 of 79 in our test set, no false positive on 2,428 ordinary photographs) and can be converted, with a note that the colours are approximate. All 650 JPS photographs of a 3D phone show in stereo. Gwenview now takes all of this from the shared stereo layer below and keeps only its view and its 3D menu, and KDE's CI is green ([pipeline](https://invent.kde.org/danielcamposramos/gwenview/-/pipelines/1374068)). [in the edition]
-- [**digiKam**](https://www.digikam.org/) and **Showfoto**: stereo photographs in 3D in the album preview, the light table, the slideshow, the image editor and Showfoto, with flat as a remembered choice; edits and crops made in 3D land on the right view. On the way we fixed Showfoto's crash on quit, a bug in digiKam itself that hit Debian's own build 9 times in 10: its loading cache was freed while thumbnail threads still used it. [in the edition]
-- [**KolourPaint**](https://apps.kde.org/kolourpaint/): stereo pictures shown in 3D, on by default with a switch in the View menu; a stereo file is edited as one side-by-side picture and saved with its stereo mark, for MPO, JPS and PNG. [in the edition]
-- **The shared stereo layer for pictures** (`libstereo-layer1`, ours): one policy and one Wayland layer for every picture viewer, as a C++ library and a QML module. File marks come first, then the user's choice; PNG padding is removed; Photo Sphere pictures stay flat; an anaglyph picture stays as it is on anaglyph and 2D screens and becomes a stereo pair on 3D screens. The picture is a surface of its own below the window, declared once as full side by side, with fit, zoom and pan the same in both eyes: 14 of 14 headless KWin runs passed with captures of both eyes, one declaration per picture and none for ordinary images. Gwenview moves onto it next, then the other viewers and the slideshows. [in the edition]
-
-**Simulators and their rigs**
-- [**KDE Game Controller**](https://invent.kde.org/plasma/plasma-desktop) (System Settings, in Plasma Desktop): every raw control of a joystick, wheel, throttle or button box is shown beside the mapped gamepad view: all its buttons, axes and hats, with the trigger values kept beside the sticks. A home cockpit could not be seen in full in KDE's settings before. Covered by a new test (`kcm-gamecontroller-device`); on our fork KDE's CI passes on Qt 6.11, FreeBSD and the lint jobs, and on Qt 6.13 the one failing test, `kcm_keys_test`, fails on KDE's own Plasma 6.7 branch too. In progress, no package yet.
-- [**Linux kernel input**](https://www.kernel.org/), planned for our next kernel: joysticks stop at 80 buttons (`KEY_MAX`), while flight and racing gear exposes up to 128. On a 128-button, eight-hat, twelve-axis test device we measured 80 buttons and one hat through evdev, 79 buttons in SDL 2 and 3, and fewer again through each of Wine's backends. Our next kernel will carry Tomasz Pakuła's EV_BTN series ([RFC, January 2026](https://lwn.net/Articles/1052809/)), with its SDL and Wine parts in our packages, and it will be proved on that device before it ships. As far as we could find, Sparky Stereo OS will be the first distribution to carry it (checked on 9 October 2026: no trace in CachyOS's or Bazzite's kernel repositories). The other proposals, by Ivan Gorinov (112 buttons) and Ricardo Esteves (110), are credited with it.
-
-**System**
-- [**KInfoCenter**](https://invent.kde.org/plasma/kinfocenter): a page "Stereo 3D and Deep Colour" under Graphics lists, per display, the HDMI 3D modes and the deep colour depths its EDID declares, with the maximum TMDS clock and the HDR it announces. It also says when an HDMI display sits behind a DisplayPort connector, where the adapter decides 3D and deep colour; it was run on the EDIDs of three real displays, and the buttons that open look-ups were checked with stand-in commands. [in the edition]
-- **The Cushion Swap File** (ours, from Daniel Ramos's design): the swap area stays off, is switched on only when memory runs low or falls fast, and is switched off again when the arithmetic shows that cannot itself run out of memory. It wakes through the kernel's pressure stall information where there is one, and Hibernate stays offered with the area off, following the installer's own resume setting. zram is used only where the hardware needs it, with a Memory page in System Settings to choose, and /tmp lives on disk. [in the edition]
-
-**Creative programs, not done yet**
-- [**Blender**](https://www.blender.org/): its stereo needs X11 and OpenGL, and its HDR needs Wayland and Vulkan, so today one program cannot have both. Our first run stopped at "OpenGL 4.3 required" because every double-buffered visual had become stereo in an earlier Mesa build; that cause has been fixed in Mesa since, and Blender has not been run again. The planned route is a patch in our own build, so its side by side mode declares its viewport and works on any backend. [planned]
-
-**Games and emulators, not done yet**
-- [**MAME**](https://www.mamedev.org/) and the emulators of 3D consoles, shipped configured to full side by side; people bring their own game files. First comes [Chris M. Covell's SMS 3-D Demo](https://www.smspower.org/Homebrew/SMS3DDemo-SMS) for the Master System's 3-D Glasses, by his permission (2026-10-08): his own seven pictures, unaltered and looping, with his readme. [planned] Then [Ben Ryves's Sega Tween](https://www.smspower.org/Homebrew/SegaTween-SMS), in its version for the 3-D Glasses, by his permission (2026-10-09): unmodified, with his readme. [planned]
-
-**Beyond stereo, found on the way:** in [**Plasma Add-ons**](https://invent.kde.org/plasma/kdeplasma-addons), the unit converter in Plasma's search downloaded the European Central Bank's currency rates as soon as it loaded, and again every 24 hours, even if nobody converted a currency. In the edition it downloads them only when you convert a currency. KDE knows: [kdeplasma-addons #17](https://invent.kde.org/plasma/kdeplasma-addons/-/work_items/17). [in the edition]
+Each program, what it gains and what we found on the way: [Programs](docs/programs.md).
 
 ## Our branches on KDE's GitLab
 
-Every KDE change above is a branch of our fork on [invent.kde.org](https://invent.kde.org/danielcamposramos), built and tested by KDE's own CI before it is proposed upstream.
-Click a branch to read the code, or its CI result to see every job.
-
-| Project | Our branch | KDE's CI |
-|---|---|---|
-| KWin | [`stereo3d`](https://invent.kde.org/danielcamposramos/kwin/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/kwin/-/pipelines/1373213) |
-| KScreen | [`stereo3d-6.7`](https://invent.kde.org/danielcamposramos/kscreen/-/tree/stereo3d-6.7) | [green](https://invent.kde.org/danielcamposramos/kscreen/-/pipelines/1371083) |
-| libkscreen | [`stereo3d-6.7`](https://invent.kde.org/danielcamposramos/libkscreen/-/tree/stereo3d-6.7) | [green](https://invent.kde.org/danielcamposramos/libkscreen/-/pipelines/1371082) |
-| plasma-wayland-protocols | [`stereo3d-6.7`](https://invent.kde.org/danielcamposramos/plasma-wayland-protocols/-/tree/stereo3d-6.7) | [green](https://invent.kde.org/danielcamposramos/plasma-wayland-protocols/-/pipelines/1371605) |
-| KImageFormats | [`stereo3d`](https://invent.kde.org/danielcamposramos/kimageformats/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/kimageformats/-/pipelines/1373209) |
-| KFileMetaData | [`stereo3d`](https://invent.kde.org/danielcamposramos/kfilemetadata/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/kfilemetadata/-/pipelines/1372927) |
-| Gwenview | [`stereo3d`](https://invent.kde.org/danielcamposramos/gwenview/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/gwenview/-/pipelines/1374068) |
-| digiKam | [`stereo3d`](https://invent.kde.org/danielcamposramos/digikam/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/digikam/-/pipelines/1376024) |
-| KolourPaint | [`stereo3d`](https://invent.kde.org/danielcamposramos/kolourpaint/-/tree/stereo3d) | KDE's CI jobs run locally (Qt 6.11, Qt 6.13, FreeBSD, lint) pass; not yet run on our fork |
-| Spectacle | [`stereo3d`](https://invent.kde.org/danielcamposramos/spectacle/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/spectacle/-/pipelines/1371085) |
-| MpvQt | [`stereo3d`](https://invent.kde.org/danielcamposramos/mpvqt/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/mpvqt/-/pipelines/1371080) |
-| Haruna | [`stereo3d`](https://invent.kde.org/danielcamposramos/haruna/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/haruna/-/pipelines/1371081) |
-| Dragon Player | [`stereo3d-26.04`](https://invent.kde.org/danielcamposramos/dragon/-/tree/stereo3d-26.04) | [green](https://invent.kde.org/danielcamposramos/dragon/-/pipelines/1371597) |
-| Kdenlive | [`stereo3d-26.08`](https://invent.kde.org/danielcamposramos/kdenlive/-/tree/stereo3d-26.08) | [green](https://invent.kde.org/danielcamposramos/kdenlive/-/pipelines/1371602) |
-| Plank Player | [`stereo3d`](https://invent.kde.org/danielcamposramos/plank-player/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/plank-player/-/pipelines/1372766) |
-| Marble | [`stereo3d`](https://invent.kde.org/danielcamposramos/marble/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/marble/-/pipelines/1372607) |
-| KAlgebra | [`stereo3d`](https://invent.kde.org/danielcamposramos/kalgebra/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/kalgebra/-/pipelines/1371619) |
-| Analitza | [`stereo3d`](https://invent.kde.org/danielcamposramos/analitza/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/analitza/-/pipelines/1371575) |
-| Kalzium | [`stereo3d`](https://invent.kde.org/danielcamposramos/kalzium/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/kalzium/-/pipelines/1372737) |
-| Kubrick | [`stereo3d`](https://invent.kde.org/danielcamposramos/kubrick/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/kubrick/-/pipelines/1371613) |
-| KInfoCenter | [`stereo3d`](https://invent.kde.org/danielcamposramos/kinfocenter/-/tree/stereo3d) | [green](https://invent.kde.org/danielcamposramos/kinfocenter/-/pipelines/1373840) |
-| PlasmaTube | [`stereo3d-26.08`](https://invent.kde.org/danielcamposramos/plasmatube/-/tree/stereo3d-26.08) | [green](https://invent.kde.org/danielcamposramos/plasmatube/-/pipelines/1373822) |
-| Plasma Add-ons | [`sparky-defaults`](https://invent.kde.org/danielcamposramos/kdeplasma-addons/-/tree/sparky-defaults) | [green](https://invent.kde.org/danielcamposramos/kdeplasma-addons/-/pipelines/1374099) |
-| Plasma Workspace | [`sparky-defaults`](https://invent.kde.org/danielcamposramos/plasma-workspace/-/tree/sparky-defaults) | [Qt 6.11 and 6.13 pass](https://invent.kde.org/danielcamposramos/plasma-workspace/-/pipelines/1375228); FreeBSD fails the same three tests as KDE's own [Plasma/6.7](https://invent.kde.org/plasma/plasma-workspace/-/pipelines/1373439) |
-| Plasma Desktop | [`sparky/gamecontroller-raw-controls`](https://invent.kde.org/danielcamposramos/plasma-desktop/-/tree/sparky/gamecontroller-raw-controls) | [Qt 6.11, FreeBSD and lint pass](https://invent.kde.org/danielcamposramos/plasma-desktop/-/pipelines/1375866); Qt 6.13 fails only `kcm_keys_test`, as KDE's own Plasma/6.7 pipeline does |
-| Krita | [`sparky/stereo-canvas-wayland`](https://invent.kde.org/danielcamposramos/krita/-/tree/sparky/stereo-canvas-wayland) | not run on our fork |
+Every KDE change is a branch of our fork on [invent.kde.org](https://invent.kde.org/danielcamposramos), tested by KDE's own CI before it is proposed upstream: [the branches and their CI results](docs/kde-branches.md).
 
 ## Documents
 
-- [House formats](docs/house-formats.md): one format inside the system for each medium (stereo pictures, desktop depth, video colour, audio, input devices), converted only where it enters and where it leaves, with the standard behind each and what is in the edition today.
-  For anyone who wants the whole design on one page before reading the details.
-- [Stereo labor division](docs/stereo-labor-division.md): who does what to show a stereo picture, from the program to the screen, and what each part never has to care about, tied to the specifications.
-  For application, engine and toolkit developers, driver developers, display and hardware people.
 - [The VR-engine-to-3D-display formula](docs/formula.md): what a VR engine changes to drive a 3D display instead of a headset, worked out on Half-Life 2.
-  For engine and game developers, and anyone porting a VR title to stereo displays.
 - [KWin stereo first runs, 2026-10-01](docs/first-runs/kwin-2026-10-01/README.md): the first stereo 3D outputs from KWin on real displays, with photos, logs and the scripts used.
-  For KWin and driver developers, and anyone who wants to see what the first runs showed.
-
-- [Develop 3D and XR on an ordinary monitor](docs/develop-3d-on-an-ordinary-monitor.md): hand Stereo KWin two eyes once, see them in anaglyph on any monitor, test the real HDMI 3D path without a 3D television, then glasses-free panels, phones and headsets; the real screen is the last check, of work already right.
-  For XR and 3D developers without the hardware on their desk.
-- [Test stereo without a 3D TV](docs/test-stereo-without-a-3d-tv.md): build a kernel whose VKMS speaks HDMI 3D, give it a 3D EDID, and run the bench, IGT and KWin; what each test proves and how it failed without the patches.
-- [A virtual machine with a 3D display](docs/stereo-vm.md): a QEMU guest with HDMI 3D modes, shown in stereo on Stereo KWin in QEMU's own window, virt-viewer and Karton; rendering on the strongest GPU, and passing a whole GPU to the guest.
-  For anyone writing stereo code who has no 3D display at hand.
 
 ## Tools
 
-- [vkms-stereo-bench](tools/vkms-stereo-bench/README.md): a kernel's virtual display driver (VKMS) given the EDID of a 3D television, so stereo modes can be set and each eye read back pixel by pixel in a VM, with KUnit, IGT's `kms_3d` and Stereo KWin; no 3D display needed. A ready root file system with Stereo KWin for its compositor phase is published as a [release](https://github.com/Sparky-OS/sparky-stereo-os/releases/tag/kwin-root-20261011), with the source packages of everything modified in it.
-  For driver, compositor and application developers who need to test stereo output.
-- [hibernate-bench](tools/hibernate-bench/README.md): boots a Linux kernel in QEMU with UEFI Secure Boot and a software TPM 2.0, hibernates and resumes it, and tampers with the image, the kernel and the TPM in between, with throw-away keys and nothing installed on the host.
-  For kernel developers working on hibernation under Secure Boot and lockdown, and distributions checking their kernels.
+- [vkms-stereo-bench](tools/vkms-stereo-bench/README.md): stereo modes on a virtual display, each eye read back pixel by pixel, for driver, compositor and application developers.
+- [hibernate-bench](tools/hibernate-bench/README.md): hibernation under UEFI Secure Boot and a software TPM 2.0 in QEMU, with throw-away keys and nothing installed on the host.
 
 ## Credit
 

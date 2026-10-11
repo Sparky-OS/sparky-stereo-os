@@ -238,6 +238,7 @@ The same fight goes on in display standards: in 2024 the HDMI Forum refused an o
 **License**: MIT and GPL-2.0 (kernel modules); MIT (egl-wayland)
 **What we changed**: 3D modes built from the display's HDMI stereo block, and HDMI deep colour at the depth the display declares, up to 16 bits; egl-wayland learns the two-view window.
 **Credit**: NVIDIA, for opening its kernel modules.
+**GPU vendors' repositories**: the edition lets NVIDIA's CUDA and AMD's ROCm keep updating while the display driver stays ours, with apt's pinning rules ([apt_preferences(5)](https://manpages.debian.org/testing/apt/apt_preferences.5.en.html), by the APT developers). NVIDIA's container toolkit, published twice as different builds of the same versions, was reported to NVIDIA in [nvidia-container-toolkit#2137](https://github.com/NVIDIA/nvidia-container-toolkit/issues/2137).
 
 ### 2.4 Xwayland
 
@@ -252,6 +253,7 @@ The same fight goes on in display standards: in 2024 the HDMI Forum refused an o
 **License**: GPL-2.0-or-later
 **What we changed**: per-eye scene passes, stereo windows and subsurfaces, HDMI 3D modes and virtual 3D outputs, and depth on the desktop.
 **Credit**, as KWin names its authors: Matthias Ettrich, Cristian Tibirna, Daniel M. Duley, Luboš Luňák, Martin Flöser (formerly Martin Gräßlin), David Edmundson, Roman Gilg, Vlad Zahorodnii and Xaver Hugl, and every KWin contributor.
+**Effects we are bringing back** (studied in KWin's history; their code returns with its headers and these names): the Resize effect's scaled drawing while a window resizes, by **Thomas Lübking** (2010), for headsets; the old Desktop Cube's cylinder and sphere modes and the C++ Flip Switch, by **Martin Flöser** (then Martin Gräßlin, 2008), for curved virtual monitors and stereo switchers; Present Windows' layouts, by **Rivo Laks** (2007) and **Lucas Murray** (2008), whose flexible grid comes from Komposé 0.5.4 by **Hans Oischinger**, for a headset overview; and Snap Helper, by Lucas Murray (2009), the model for a placement debug overlay. Their living successors, which we make stereo: the QML Flip Switch and Cover Switch by **Ismael Asensio**, and the Qt Quick 3D Desktop Cube by **Vlad Zahorodnii**.
 
 ### 2.6 KScreen and libkscreen
 
@@ -356,6 +358,8 @@ Names and licences below come from the linked source headers and project records
 | [digiKam and Showfoto](https://www.digikam.org/) | GPL-2.0-or-later | Stereo photos in 3D in the album preview, light table, slideshow, image editor and Showfoto; a Showfoto crash at quit fixed | Gilles Caulier, Maik Qualmann, Michael Miller, Marcel Wiesweg, the founder Renchi Raju and the digiKam developers |
 | [KolourPaint](https://apps.kde.org/kolourpaint/) | BSD-2-Clause, LGPL | Stereo pictures in 3D, edited as one side-by-side pair that keeps its stereo mark when saved | Clarence Dang (founder), Thurston Dang, Martin Koller (maintainer) and the KolourPaint authors |
 
+**References for pictures**: [StereoPhoto Maker](https://stereo.jpn.org/eng/stphmkr/) by **Masuji Suto**, the stereo photographers' standard editor for more than twenty years, is the reference our MPO and JPS handling answers to, and its author has our offer of a native Linux build. [libheif](https://github.com/strukturag/libheif), by **Dirk Farin**, **Joachim Bauch** and the struktur AG contributors, names HEIF's stereo pair group, the base of the planned reading of phones' spatial photos.
+
 ---
 
 ## 6. System, sound and play
@@ -363,6 +367,7 @@ Names and licences below come from the linked source headers and project records
 | Program | What it brings | Credit |
 |---|---|---|
 | [KInfoCenter](https://invent.kde.org/plasma/kinfocenter) | A page for each display's 3D modes and colour depths | Matthias Hoelzer-Kluepfel, Kai Uwe Broulik, Ismael Asensio, Pino Toscano |
+| [org.kde.video](https://github.com/Sparky-OS/org.kde.video) | Video wallpapers and lock screens; in SparkyLinux since 2018 at Daniel's request, now in Sparky-OS with its author as maintainer, and the base of 3D backgrounds | Jeromy Streets |
 | [PipeWire](https://pipewire.org/) | Sound, the model for this edition's stereo pipeline | Wim Taymans and the PipeWire developers |
 | [OpenRGB](https://openrgb.org/) | Lighting control | Adam Honse and the OpenRGB contributors |
 | [xpadneo](https://github.com/atar-axis/xpadneo) | Xbox wireless controllers | Florian Dollinger and Kai Krakow |
@@ -427,11 +432,14 @@ Every merge below was a maintainer's decision, made on the code.
 - **HandBrake** [#8100](https://github.com/HandBrake/HandBrake/pull/8100): merged by **Damiano Galassi** (galad87), 16 September 2026.
 - **Universal Media Server** [#6330](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6330): merged by **SubJunk**, 19 September 2026, released in 15.9.0.
 - **MKVToolNix** [ebd8445b](https://codeberg.org/mbunkus/mkvtoolnix/commit/ebd8445b1185d35d6bdbb9c1463757fbc9aa7c29): merged by **Moritz Bunkus**, 21 September 2026.
+- **MKVToolNix** [70889f220e](https://codeberg.org/mbunkus/mkvtoolnix/commit/70889f220e), the HEVC half: merged by **Moritz Bunkus** on 11 October 2026, with tests of his own around our test files ([db3410509d](https://codeberg.org/mbunkus/mkvtoolnix/commit/db3410509d)).
 - **mpv** [#18490](https://github.com/mpv-player/mpv/pull/18490): merged by **Kacper Michajłow** (kasper93), 23 September 2026, after a careful review by llyyr.
 - **Qt Multimedia** [778399](https://codereview.qt-project.org/c/qt/qtmultimedia/+/778399): approved by **Tim Blechmann** and merged on 8 October 2026; the same fix is in Qt 6.12 too ([778580](https://codereview.qt-project.org/c/qt/qtmultimedia/+/778580), 9 October 2026).
 - **spice-gtk** [!159](https://gitlab.freedesktop.org/spice/spice-gtk/-/merge_requests/159): merged by **Marc-André Lureau**, 10 October 2026.
+- **Teams for Linux** [#3070](https://github.com/IsmaelMartinez/teams-for-linux/pull/3070): from our report [#3067](https://github.com/IsmaelMartinez/teams-for-linux/issues/3067), fixed by its maintainer, **Ismael Martinez**, 7 October 2026, released in 2.25.0.
+- **DisplayXR** [4c1ad090](https://github.com/DisplayXR/displayxr-runtime/commit/4c1ad090e7d5dc8293f6749d49741ec27c4072c6) (#1929): the per-compositor packaging that lets a KWin window-geometry publisher sit beside GNOME's, written by **David Fattal** on 11 October 2026 after our questions in [#1928](https://github.com/DisplayXR/displayxr-runtime/issues/1928).
 
-**In review**, with thanks to everyone reviewing: FFmpeg, x265 (MulticoreWare's collaborators shaped its `--frame-packing` option), MKVToolNix's HEVC change, VLC, gamescope, NVIDIA's open kernel modules, PeerTube, wiz3D, Android's Media3 and Qt.
+**In review**, with thanks to everyone reviewing: FFmpeg, x265 (MulticoreWare's collaborators shaped its `--frame-packing` option), VLC, gamescope, NVIDIA's open kernel modules, PeerTube, wiz3D, Android's Media3 and Qt.
 
 **Where our work is not welcome yet.** We respect each project's decision. Our changes stay in our own trees, ready to go upstream on the day they are wanted.
 
@@ -481,8 +489,8 @@ This edition is directed and verified by Daniel, and built with AI partners doin
 Every claim in its documents is tied to a test that could fail or to a public record.
 All of their use has been paid by Daniel personally; the full list by lab, model, place and commit count is in [docs/ai-provenance.md](docs/ai-provenance.md).
 
-- **Anthropic, Claude** (Claude Code): Claude Opus 5.5, Opus 5, Opus 4.8, Fable 5.1 and Sonnet 5.5; orchestration, review and integration; lanes for kernels, packaging, proofs, players, the stereo virtual machine and documentation; the public skills.
-- **OpenAI, GPT through Codex**: GPT-6.1 Sol, GPT-6 Astra, GPT-6 Luna, GPT reserve and GPT-5.6 Sol; lanes for KWin and Mesa, KFileMetaData, KIO, the photo viewers, the game controller page, the Android study and certificates for Brazil.
+- **Anthropic, Claude** (Claude Code): Claude Opus 5.5, Opus 5, Opus 4.8, Fable 5.1 and Sonnet 5.5; orchestration, review and integration; lanes for kernels, packaging, proofs, players, the stereo virtual machine and documentation; the GPU vendors' guards and the studies of KWin's effects, live and removed; the public skills.
+- **OpenAI, GPT through Codex**: GPT-6.1 Sol, GPT-6 Astra, GPT-6 Luna, GPT reserve and GPT-5.6 Sol; lanes for KWin and Mesa, KFileMetaData, KIO, the photo viewers, the game controller page, the Android study and certificates for Brazil; the Debian 14 draft for Edson C Silva's post-install guide and SparkyLinux's base-files.
 - **Through Ollama**: **Kimi** (Moonshot AI), **GLM** (Zhipu AI), **DeepSeek** and **Qwen** (Alibaba), the first stereo partner lanes; **Gemma 4** (Google) reading images for sessions without vision.
 
 ---

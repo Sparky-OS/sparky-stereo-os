@@ -19,7 +19,7 @@ That is what makes stereo work across GPUs, across monitors (2D ones included) a
 **Two places, two rules.**
 Inside a program, anything goes: a player reads every packing a file can carry, an engine renders its eyes however it likes.
 Inside Stereo KWin, only full side by side exists: both eyes at full size, left eye first, at any resolution, declared once.
-The output filters then turn that into whatever the screen needs: a 3D television's own HDMI 3D modes, anaglyph on any monitor, interleaved and frame-sequential displays, a headset.
+The output filters then turn that into whatever the screen needs: a 3D television's own HDMI 3D modes, anaglyph on any monitor, interleaved and frame-sequential displays, a headset through OpenXR.
 
 **A window's 2D part and its 3D area are separate surfaces.**
 The 2D part (menus, toolbars, panels, the document around a picture) is the window's own surface, at its normal size, one eye's size, and declares nothing.

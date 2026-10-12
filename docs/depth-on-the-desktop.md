@@ -1,5 +1,8 @@
 # Depth on the desktop
 
+**For everyone who uses the desktop, and for theme and toolkit developers:** how the desktop itself gets a little depth, the same on every screen, and the Desktop Cube built on it.
+**Status:** built in Stereo KWin, coming with the next KWin package.
+
 **Three places, declared: sunk, screen and popped.** All subtle, a few pixels, with the limits your own settings (System Settings, "3D Depth"). The active window sits at the screen; its menus, tooltips and notifications pop; the wallpaper and the windows behind sink.
 
 **Everything in between is Stereo KWin's job, by stacking order.** Stacked background windows fan out from sunk towards popped, always behind the active window, in the same order as in 2D. A window caught in the middle of a pile, its edges out of the stack, reads as a sheet floating within it, the way a pile of papers looks in real life. No program declares this; it falls out of the order.

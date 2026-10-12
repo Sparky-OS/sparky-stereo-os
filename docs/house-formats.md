@@ -1,5 +1,7 @@
 # House formats: one format inside, conversions at the edges
 
+**For developers and packagers:** the one rule the edition applies to stereo pictures, desktop depth, colour and sound: one format inside, converted only where it enters and where it leaves.
+
 Sparky Stereo OS treats every medium the same way.
 Inside the system each medium has one format, the "house format".
 Whatever comes in is converted to it once, where it enters; whatever goes out is converted from it once, where it leaves.

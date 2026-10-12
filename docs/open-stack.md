@@ -1,5 +1,7 @@
 # Stereo in the open stack, not in one product
 
+**For hardware makers, distributions and anyone curious:** why 3D here belongs to the open layers (KDE, the kernel, the file formats), so it reaches the screen you already own.
+
 **Elsewhere, stereo is tied to a product.**
 Steam runs on ARM only on Valve's own headset; on every other ARM device, Steam for Linux stays unsupported ([Valve, 4 October 2026](https://github.com/ValveSoftware/steam-for-linux/issues/13689)).
 New glasses-free monitors deliver their 3D through Windows injectors ([ViewX, August 2026](https://www.prnewswire.com/news-releases/viewx-launches-liber-and-immer-glasses-free-ai-3d-displays-on-kickstarter-302857181.html)).

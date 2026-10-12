@@ -1,5 +1,8 @@
 # Programs the edition changes for stereo 3D and deep colour
 
+**For users, testers and maintainers:** every program the edition changes for 3D and deep colour, what it gains, how it was proven, and whether it is in the edition yet.
+**By area:** the display path, video, science and engineering, images, simulators and their rigs, the system, and the creative programs, games and emulators not done yet.
+
 **One contract for every program below: programs hand the desktop full side by side, and KWin's outputs decide the screen.**
 Each item names the program, links its own upstream project, says what it gains in the edition and what we found on the way.
 **In the edition** means a package of it is in the Sparky Stereo repository today.

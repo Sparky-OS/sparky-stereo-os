@@ -1,5 +1,7 @@
 # Merged outside Sparky Stereo
 
+**For maintainers and distributions:** every fix we sent to another project, merged or in review, with its link and date.
+
 **Sparky Stereo is also a campaign.**
 Where a program breaks stereo or deep colour on the way to the screen, the fix goes to that program's own project, in its own style.
 Each merge below was reviewed and accepted by that project's maintainers.

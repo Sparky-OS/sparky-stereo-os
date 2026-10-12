@@ -1,9 +1,9 @@
 # AI provenance: every model that worked on Sparky Stereo OS
 
+**For anyone who wants to check how AI was used here:** every model that worked on Sparky Stereo OS, by lab, with where it ran and what it did.
 Sparky Stereo OS is directed and verified by Daniel Ramos.
 AI partners from several labs did the legwork under that direction: code, packaging, tests, research and drafts.
 Every one of them was key to the edition existing, and all of their use has been paid by Daniel personally; there is no sponsor so far.
-This page lists them by lab, with where they ran and what they did, so the record is complete and anyone can check it.
 
 ## By lab
 

@@ -1,7 +1,6 @@
 # Stereo labor division in Sparky Stereo OS
 
-Who does what to show a stereo picture, from the program to the screen, and what each part never has to care about.
-Written for people who work on one part of the stack, not the whole OS: application, engine and toolkit developers, driver developers, display and hardware people.
+**For people who work on one part of the stack, not the whole OS** (application, engine and toolkit developers, driver developers, display and hardware people): who does what to show a stereo picture, from the program to the screen, and what each part never has to care about.
 Every rule points to the specification behind it; the references are at the end.
 
 ## In one minute

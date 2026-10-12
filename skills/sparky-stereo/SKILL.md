@@ -98,6 +98,7 @@ Load the one that matches the work; the [program list](../../docs/programs.md) n
 | [`audio`](../audio/SKILL.md) | PipeWire, WirePlumber and KDE's Sound page: the audio house format, routing, formats, passthrough, virtual surround, MIDI |
 | [`brazil-certificates`](../brazil-certificates/SKILL.md) | ICP-Brasil certificates, the E-521 root, browsers, tokens and the court signer |
 | [`certificate-manager`](../certificate-manager/SKILL.md) | Sparky CA's verified ICP-Brasil catalogue and Ed521 checks across OpenSSL, NSS, Java and KDE |
+| [`writing-front-pages`](../writing-front-pages/SKILL.md) | The first text a stranger meets: README tops, profiles, calls for testers, list and page openings, About lines, and the cold-reader test |
 
 
 **Leave a skill behind.** When work in a new area is accepted, write what the next person needs as a skill in this folder, or extend the one it belongs to, and add it to this table.

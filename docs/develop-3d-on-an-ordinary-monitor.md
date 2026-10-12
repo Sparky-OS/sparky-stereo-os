@@ -1,6 +1,6 @@
 # Develop 3D and XR on an ordinary monitor
 
-On Sparky Stereo OS you can write and check stereo 3D work on the screen you already have.
+**For developers of 3D and XR programs:** write and check stereo 3D work on the screen you already have.
 The real 3D television, headset or glasses-free panel is the last check, of work that is already right.
 This page puts the pieces in the order you would use them.
 

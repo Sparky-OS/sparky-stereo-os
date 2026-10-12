@@ -1,5 +1,7 @@
 # From a VR engine to a 3D display: the formula
 
+**For game and engine developers:** what to change so a game's VR mode drives a 3D TV, projector or monitor instead of a headset, learned on Half-Life 2.
+
 A game with a VR mode already renders two eyes. A 3D television, projector or monitor can show those two eyes directly, side by side or top and bottom, with no headset. What stands in the way is everything the VR mode does *for a headset*: head tracking, lens distortion, a floating HUD panel, a cursor in a virtual screen. This file lists what has to change, learned by doing it on Half-Life 2 (2026-09-24, `sourcevr/`), whose own VR interface (`ISourceVirtualReality`) made it a good teacher: the structure below is what most VR games share.
 
 Why games at all: "games and animated films use virtual rather than physical cameras and are therefore much easier to convert to 3D" (Linus Tech Tips, [*Was 3D TV actually poo?*, 2022, 19:02](https://www.youtube.com/watch?v=Dbjb2spwQVg&t=1142s)). An engine holds the scene as geometry, so the second eye is a second camera, not a guess.

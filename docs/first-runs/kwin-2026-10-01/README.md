@@ -1,5 +1,7 @@
 # KWin stereo 3D: the first runs on real TVs, 2026-10-01 to 10-03
 
+**For anyone who wants to see it on real hardware:** photos of the first stereo 3D output from KWin on two 3D TVs, with the logs and the scripts used.
+
 Evidence for the KWin stereo work under review in [plasma/kwin #324](https://invent.kde.org/plasma/kwin/-/work_items/324). The design in one page: [STEREO3D.md](https://invent.kde.org/danielcamposramos/kwin/-/blob/stereo3d/STEREO3D.md). Code: the `stereo3d` branch of [invent.kde.org/danielcamposramos/kwin](https://invent.kde.org/danielcamposramos/kwin/-/tree/stereo3d).
 
 Hardware: a Sony KDL-46HX855 (AMD iGPU, amdgpu) and a Sony KDL-46EX725 (RTX 3060), both 2011-era 3D TVs that declare HDMI 1.4 3D modes and 12-bit deep colour (225 MHz TMDS). Kernel 7.3.0-rc1 with the HDMI 3D patches. Photos taken with a phone by Daniel; the TVs' own information banners are the readout. GPS data was removed from the photos; everything else is as taken.

@@ -1,5 +1,7 @@
 # Why one format: full side by side, at any resolution
 
+**For anyone who wants to know why 3D works on every screen here, and for program and driver developers:** the one picture every program hands the desktop, both eyes side by side at full size, and why.
+
 **The standard in three lines.**
 - **Stereo KWin** (KDE Plasma's compositor, with our stereo changes) speaks full side by side, at any resolution.
 - **Programs** decode or generate stereo in any standard, and deliver full side by side, at any resolution, to Stereo KWin.

@@ -25,7 +25,7 @@ A virtual display driver on a desktop would be taken by the running compositor a
 - Docker, or on Debian: `qemu-system-x86 busybox-static edid-decode build-essential python3 python3-pil` (`./bench doctor` tells what is missing).
 - KVM (`/dev/kvm`) is optional. Without it QEMU uses TCG: slower, but it works.
 - For the optional phases: a root file system with IGT's `kms_3d` (`tools/build-igt-root.sh` builds one), and for the compositor phase a root file system of Sparky Stereo OS (Stereo KWin, `kscreen-doctor`, Qt's Wayland shell integration, Mesa, D-Bus, gcc with the Wayland and EGL development files) with a kernel built from `BASE=x86_64_defconfig` and [kconfig/vkms-stereo-full.fragment](kconfig/vkms-stereo-full.fragment).
-  A ready root file system with Stereo KWin is published as a release: [kwin-root-20261011](https://github.com/Sparky-OS/sparky-stereo-os/releases/tag/kwin-root-20261011) (with the source packages of everything modified in it); [tools/build-kwin-root.sh](tools/build-kwin-root.sh) builds one yourself.
+  A ready root file system with Stereo KWin is on our repository server: [bench/kwin-root](https://repo.sparkyos.org/bench/kwin-root/) (with the source packages of everything modified in it); [tools/build-kwin-root.sh](tools/build-kwin-root.sh) builds one yourself.
 
 ## The kernel
 

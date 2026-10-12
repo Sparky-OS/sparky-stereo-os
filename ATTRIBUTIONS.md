@@ -329,7 +329,7 @@ Names and licences below come from the linked source headers and project records
 | Universal Media Server | [Project record](https://github.com/UniversalMediaServer/UniversalMediaServer/blob/1b1cb16dce26a40da3774bf3bc31202a1049e25d/pom.xml), GPL-2.0 | Universal Media Server contributors, including SubJunk, credited in the upstream-review section below. Renderer profiles and movie delivery. |
 | jUPnP and its Cling origins | [Project record](https://github.com/jupnp/jupnp/blob/dbe0782bcd8e3283ae2f8d177cc4014b19593084/pom.xml), CDDL-1.0; [Android service](https://github.com/jupnp/jupnp/blob/dbe0782bcd8e3283ae2f8d177cc4014b19593084/bundles/org.jupnp.android/src/main/java/org/jupnp/android/AndroidUpnpServiceImpl.java) | Kai Kreuzer, Christian Bauer and the jUPnP/Cling contributors. UPnP services used by UMS; studied as an Android alternative, not the chosen phone stack. |
 | pupnp / Portable SDK for UPnP Devices | [COPYING](https://github.com/pupnp/pupnp/blob/79fc9f5dbd208888b220dcc0f4d0464bebbfa756/COPYING) and [THANKS](https://github.com/pupnp/pupnp/blob/79fc9f5dbd208888b220dcc0f4d0464bebbfa756/THANKS), BSD three-clause terms | Intel Corporation and the contributors named in THANKS. Native UPnP discovery and the Android movie renderer. |
-| PhoneVR | [Project README](https://github.com/PhoneVR-Developers/PhoneVR/blob/7fdcebee4a662eb8a1c7a8b19774aac71820a772/README.md) and [licence](https://github.com/PhoneVR-Developers/PhoneVR/blob/7fdcebee4a662eb8a1c7a8b19774aac71820a772/LICENSE), GPL-3.0 | PhoneVR Developers and its contributors, including Harsha Raghu, whose [migration PR #410](https://github.com/PhoneVR-Developers/PhoneVR/pull/410) is the basis of the current-ALVR port study. The compile and synthetic-pose audit does not yet qualify a tracked-headset runtime. |
+| PhoneVR | [Project README](https://github.com/PhoneVR-Developers/PhoneVR/blob/7fdcebee4a662eb8a1c7a8b19774aac71820a772/README.md) and [licence](https://github.com/PhoneVR-Developers/PhoneVR/blob/7fdcebee4a662eb8a1c7a8b19774aac71820a772/LICENSE), GPL-3.0 | PhoneVR Developers and its contributors, including Harsha Raghu, whose [migration PR #410](https://github.com/PhoneVR-Developers/PhoneVR/pull/410) is the basis of the current-ALVR caller migration and emulated tracking/reprojection proof. Physical-device qualification remains separate. |
 | ALVR | [Licence](https://github.com/alvr-org/ALVR/blob/e0d83b46168449cb0bb514770dd926b0ed85c55a/LICENSE), MIT | polygraphene, alvr-org and the ALVR contributors. The later tracked-headset transport. |
 | UPnP AV and DLNA specifications | [MediaServer:4 and MediaRenderer:3 specifications](https://openconnectivity.org/developer/specifications/upnp-resources/upnp/mediaserver4-and-mediarenderer3/) | UPnP Forum, Open Connectivity Foundation and Digital Living Network Alliance. Discovery, media services and interoperability specifications; citing them does not imply certification. |
 
@@ -635,6 +635,15 @@ Qt Multimedia and androidtestrunner. The Qt and FFmpeg credits above apply.
   Their own distributed notices retain the full contributor credits.
 
 The Linux, QEMU and stereo VM credits above also apply to the shared KVM base.
+
+## PhoneVR audio proposals (checked 2026-10-12)
+
+These proposals follow Harsha Raghu's PhoneVR PR #410 and the PhoneVR and ALVR developers' work.
+They credit the PipeWire contributors for filter-chain and SOFA controls, and libmysofa contributors and the MIT KEMAR dataset for the private control probe.
+Fons Adriaensen's AMB-Plugins (GPL-2.0-or-later) supplies the measured impulse rotator; the LADSPA header credits Richard W. E. Furse and Paul Barton-Davis (LGPL-2.1-or-later).
+IEM/Graz and the IEM Plug-in Suite developers, including SceneRotator author Daniel Rudrich, supply the proposed sufficient-order processor route (GPL-3.0-or-later).
+Names and licences follow the projects' own documentation and Debian copyright records.
+The IEM route is proposed; its processing latency was not measured by the AMB test.
 
 ---
 

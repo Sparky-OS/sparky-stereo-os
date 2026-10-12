@@ -108,8 +108,41 @@ The draft's latest-tracking quaternion is not the decoded frame's source pose: a
 Cardboard's neck-model position is also discarded by the draft's pose function.
 Keep these failures as regression cases; a header compile or synthetic pose test does not qualify streaming, shader pixels, optical comfort or device latency.
 
+## Current caller and emulated reprojection (checked 2026-10-12)
+
+The continuation of Harsha Raghu's PR #410 and the PhoneVR/ALVR developers' work now builds with matching current client/server cores.
+It supplies decoder configuration bytes, preserves the decoded frame's source pose, and retains the neck-model translation.
+Release renderers on the GL thread before releasing their borrowed EGL context.
+Initialize wgpu staging textures before writing them through GLES, so first-use clearing cannot erase the decoded picture.
+Retain the active Android image independently of an overflow queue.
+Choose the transfer correction for the actual target; a Cardboard UNORM target must not receive a second SDR conversion.
+These are local proposed changes, not an upstream acceptance claim.
+
+A clean x86_64 emulated startup and pause/resume each pass all 3,932,160 checked eye pixels.
+The source comparison allows lossy H.264 error; the analytic reprojection checks every pixel, including rasterized boundaries and black disocclusions.
+Keep decoded timestamp/source poses fixed while injecting positive and negative yaw with no new frame.
+A wrong-rotation reference must fail.
+The proof uses actual ALVR transport and Android decoding, but injected poses and pre-lens eye captures.
+It does not qualify physical sensors, ARM APKs, SteamVR games, optics or device latency.
+Respond to ALVR's IDR requests in a synthetic sender and wait for a keyframe before accepting interframes.
+A shell wrapper's zero status is insufficient when the underlying Android command failed; assert explicit counts and output.
+
+## Head-tracked audio proposals (checked 2026-10-12)
+
+Keep the original multichannel bed and source rate until the headphone or speaker edge.
+Record whether the game already rotates or binaurally renders its listener; do not rotate that mix twice.
+For a world-fixed bed, [PipeWire SOFA](https://docs.pipewire.org/page_module_filter_chain.html) exposes runtime Azimuth, Elevation and Radius for each directional channel.
+Recorded ALVR identity and 30-degree poses set a private SOFA node to 0 and 330 degrees, with a wrong-sign control failing.
+This proves parameter plumbing, not a rendered binaural mix or its latency.
+Fons Adriaensen's packaged AMB rotator passes isolated impulse rotations with zero added sample delay after its controls settle.
+Its 256-frame control ramp is separate from device, convolution and scheduling latency.
+First-order ambisonics cannot preserve five or seven independent directional channels; keep LFE separate and test a sufficient-order zero-yaw roundtrip.
+[IEM SceneRotator](https://plugins.iem.at/docs/plugindescriptions/) and its existing [OSC controls](https://plugins.iem.at/docs/osc/) are candidates for a PC-side implementation, not a measured IEM runtime here.
+Reuse the pose already received by ALVR; no new phone transport is needed.
+Coordinate the actual audio graph with the [audio skill](../audio/SKILL.md).
+
 ## Later work
 
-PhoneVR/ALVR head tracking, reprojection and head-tracked multichannel audio follow the flat display.
+Continuously driven multichannel rendering, audio-time pose alignment and physical headset qualification remain separate work.
 360/VR180 projection and the Stereo Spectator's reverse path remain separate integrations.
-No camera tracking or foveated streaming is introduced by the flat display proof.
+No camera tracking or foveated streaming is introduced by these proofs.

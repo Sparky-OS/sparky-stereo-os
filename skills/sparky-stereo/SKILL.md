@@ -99,6 +99,7 @@ Load the one that matches the work; the [program list](../../docs/programs.md) n
 | [`brazil-certificates`](../brazil-certificates/SKILL.md) | ICP-Brasil certificates, the E-521 root, browsers, tokens and the court signer |
 | [`certificate-manager`](../certificate-manager/SKILL.md) | Sparky CA's verified ICP-Brasil catalogue and Ed521 checks across OpenSSL, NSS, Java and KDE |
 | [`writing-front-pages`](../writing-front-pages/SKILL.md) | The first text a stranger meets: README tops, profiles, calls for testers, list and page openings, About lines, and the cold-reader test |
+| [`qt-android-ci`](../qt-android-ci/SKILL.md) | Qt Multimedia's Android tests run locally on a headless emulator, the way Qt's CI runs them: build, compare patch sets, read the results |
 
 
 **Leave a skill behind.** When work in a new area is accepted, write what the next person needs as a skill in this folder, or extend the one it belongs to, and add it to this table.

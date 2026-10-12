@@ -18,8 +18,8 @@ A copy that never goes upstream splits the work, and the people using it never l
 What helps most is people asking their own projects for it.
 
 **Who it is for now.**
-Creators first: photo, video, painting, 3D modelling, and the people who build programs.
-Players and everyone else are welcome as the features land.
+Engineers, scientists and content creators first.
+Then players, video lovers and hi-fi audio listeners, as the features land.
 
 **To try it without installing:** when the edition's image is out, it runs live from a USB stick.
 

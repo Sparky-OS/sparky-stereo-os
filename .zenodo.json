@@ -1,0 +1,32 @@
+{
+  "title": "Sparky Stereo OS 9 \"Mashtabba\": the stereo 3D edition of SparkyLinux",
+  "description": "Sparky Stereo OS 9 \"Mashtabba\" is Daniel Ramos's edition of SparkyLinux (by Paweł \"pavroo\" Pijanowski), based on Debian 14 \"Forky\", with KDE Plasma only: a desktop where stereo 3D is part of the system, from the graphics driver to the display, with the deepest colour the screen accepts. This is a development snapshot. Documents under CC BY 4.0; scripts and tools under GPL-2.0-or-later.",
+  "creators": [
+    {
+      "name": "Ramos, Daniel Campos",
+      "orcid": "0009-0001-4546-8673"
+    }
+  ],
+  "license": "cc-by-4.0",
+  "upload_type": "software",
+  "access_right": "open",
+  "keywords": [
+    "stereoscopic 3D",
+    "stereo desktop",
+    "HDMI 3D",
+    "side by side",
+    "KDE Plasma",
+    "KWin",
+    "Debian",
+    "SparkyLinux",
+    "Linux distribution",
+    "virtual reality"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://sparkylinux.org/",
+      "relation": "isDerivedFrom",
+      "scheme": "url"
+    }
+  ]
+}

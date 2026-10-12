@@ -19,6 +19,13 @@ Sparky Stereo OS, Daniel Ramos's edition of SparkyLinux (by Paweł "pavroo" Pija
 **Next step: tell us about your 3D gear** and hear first when it is ready.
 Sign up in your language: [🇨🇦](https://github.com/Sparky-OS/sparky-stereo-os/issues/26) [🇧🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/25) [🇵🇱](https://github.com/Sparky-OS/sparky-stereo-os/issues/27) [🇫🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/80) [🇯🇵](https://github.com/Sparky-OS/sparky-stereo-os/issues/81) [🇰🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/83) [🇨🇳](https://github.com/Sparky-OS/sparky-stereo-os/issues/84) [🇭🇰](https://github.com/Sparky-OS/sparky-stereo-os/issues/85)
 
+## Who builds it
+
+Daniel, from a favela in Brasília, with one human contributor so far: Jeromy Streets, whose video wallpaper for Plasma ([org.kde.video](https://github.com/Sparky-OS/org.kde.video)) now lives in Sparky-OS, with him as its maintainer.
+Stereo on Linux waited years for volunteers: earlier attempts stalled because reviewers had no 3D display, and the work spans the kernel, Mesa, KWin, FFmpeg, the players and the web standards.
+No other developer came forward to carry it, so the other partners at work here are AI ones, directed and checked by Daniel and named in [AI provenance](docs/ai-provenance.md).
+If you would rather see it built by human hands, you are more than welcome: every fork is public, and every task is open.
+
 ## Create
 
 **Paint, edit photos and edit video in 3D, and paint in deep colour: 16 bits per colour instead of 8.**

@@ -10,6 +10,7 @@ authors:
 license:
   - CC-BY-4.0
   - GPL-2.0-or-later
+doi: "10.5281/zenodo.23309024"
 repository-code: "https://github.com/Sparky-OS/sparky-stereo-os"
 keywords:
   - "stereoscopic 3D"

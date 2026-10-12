@@ -59,7 +59,7 @@ Ideas, sketches and side-by-side mockups are welcome in the [themes issue](https
 - [Stereo labor division](docs/stereo-labor-division.md): who does what from the program to the screen, tied to the specifications.
 - [Test stereo without a 3D TV](docs/test-stereo-without-a-3d-tv.md): a kernel whose VKMS speaks HDMI 3D, a 3D EDID, and the bench, IGT and KWin.
 - [A virtual machine with a 3D display](docs/stereo-vm.md): a QEMU guest with HDMI 3D modes, shown in stereo on Stereo KWin.
-- [vkms-stereo-bench](tools/vkms-stereo-bench/README.md): each eye read back pixel by pixel in a VM, no 3D display needed; a ready root file system with Stereo KWin is a [release](https://github.com/Sparky-OS/sparky-stereo-os/releases/tag/kwin-root-20261011).
+- [vkms-stereo-bench](tools/vkms-stereo-bench/README.md): each eye read back pixel by pixel in a VM, no 3D display needed; a ready root file system with Stereo KWin is on [our repository server](https://repo.sparkyos.org/bench/kwin-root/).
 - [Skills](skills/README.md): instructions for people and AI assistants working on the edition and the programs it changes.
 
 ## Stereo in the open stack, not in one product

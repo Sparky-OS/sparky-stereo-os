@@ -1,7 +1,7 @@
 #!/bin/bash
 # Created by Daniel Ramos (Capitain Jack) 2026/10/11
 # Copyright 2026 under the GNU GPL3 License
-# Last update 2026/10/11
+# Last update 2026/10/12
 #
 # Builds the root file system for the bench's kwin phase: Stereo KWin, kscreen-doctor (with Qt's
 # Wayland shell integration), Mesa, D-Bus, and gcc with wayland-scanner and the Wayland, EGL and GL
@@ -19,7 +19,7 @@ set -euo pipefail
 STEREO_SOURCE=$1
 OUT=$2
 command -v mmdebstrap >/dev/null || { echo "mmdebstrap is needed (apt install mmdebstrap)" >&2; exit 1; }
-PACKAGES=kwin-wayland,libkscreen-bin,qt6-wayland,mesa-libgallium,libgl1-mesa-dri,libegl-mesa0,dbus,dbus-bin,gcc,libc6-dev,pkg-config,libwayland-bin,libwayland-dev,wayland-protocols,libegl-dev,libgl-dev
+PACKAGES=kwin-wayland,displayxr-window-geometry-publisher-kwin,libkscreen-bin,qt6-wayland,mesa-libgallium,libgl1-mesa-dri,libegl-mesa0,dbus,dbus-bin,gcc,libc6-dev,pkg-config,libwayland-bin,libwayland-dev,wayland-protocols,libegl-dev,libgl-dev
 mmdebstrap --mode=unshare --variant=apt --components=main --include="$PACKAGES" \
 	--setup-hook='mkdir -p "$1/etc/apt/preferences.d" && printf "Package: *\nPin: release o=Sparky Stereo OS\nPin-Priority: 1001\n" > "$1/etc/apt/preferences.d/sparky-stereo"' \
 	--customize-hook='chroot "$1" dpkg-query -W -f="\${Package}\t\${Version}\n" > "$1/etc/sparky-stereo-kwin-root.packages"' \

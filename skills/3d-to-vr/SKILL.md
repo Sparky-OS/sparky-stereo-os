@@ -6,7 +6,7 @@ description: >-
 
 # From 3D content to a headset
 
-**Check freshness first.** Written on 2026-10-07. This is the youngest part of the work: the principles are settled, the edition's headset output is planned. The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
+**Check freshness first.** Checked on 2026-10-11. The phone display has an emulated integration proof; release packaging and physical-device qualification remain. The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
 
 ## The principle
 
@@ -33,14 +33,116 @@ This is a route for a stereo film on a virtual screen in a headset.
 MV-HEVC uses `MULTIVIEW_LEFT_PRIMARY` or `MULTIVIEW_RIGHT_PRIMARY` and requires Media3 1.6.0 or later plus a device with MV-HEVC decoding support.
 Keep this decoder capability separate from displaying a packed side-by-side pair.
 The guide also provides hemisphere and sphere shapes for 180° and 360° content.
-These APIs do not by themselves implement the edition's desktop-to-headset transport; that output remains planned.
+These APIs do not by themselves implement the edition's desktop-to-headset transport; the phone integration is described below.
 
-## Planned in the edition
+## Phone display implementation (checked 2026-10-11)
 
-- The headset and phone outputs of Stereo KWin, starting when a headset is on the desk.
-- The Cardboard look as a KWin output filter, for phone viewers.
-- The Stereo Spectator's other direction ([`vr-to-3d`](../vr-to-3d/SKILL.md)): the headset player's eyes shown in stereo to the room.
+Build on Fabian Druschke's [desktop receiver handoff](https://invent.kde.org/network/kdeconnect-kde/-/merge_requests/996) and [Android RDP client](https://invent.kde.org/network/kdeconnect-android/-/merge_requests/673).
+KDE Connect is an optional authenticated discovery path.
+Standalone discovery uses pupnp SSDP, a first-use desktop approval, and a TLS channel pinned to the phone certificate identity.
+It authenticates the phone to the desktop; it does not provide mutual certificate authentication.
+A shared KRdp owner deduplicates transport leases and removes the virtual output after the last connection closes.
+USB tethering reuses this IP path; a charging cable alone and Android Open Accessory are not qualified.
 
-## Proof, when it starts
+The native-panel request uses screencast v7 and output-device v25 viewports.
+A 2400×1080 panel has two 1200×1080 eyes at the reported rational refresh.
+KWin sets identity, geometry and stereo mode before output announcement.
+Capture renders each native eye into its own half without compressing a full-width desktop.
+The Android client applies Cardboard lens correction after decode; the desktop sends the unwarped panel.
+Use the SDK default viewer profile until a measured viewer profile is available.
+No-lenses mode permits inspection without a viewer.
+Touch is suppressed, and volume keys change only the foreground window's brightness.
 
-The output filter's two eyes captured and compared with a reference lens model, the content's own left and right views in the right eyes, 360 orientation the same in both eyes, and a person in the headset at the end.
+KPipeWire retains VA-API and software encoding and adds FFmpeg h264_nvenc.
+The NVENC path prepares YUV on the CPU and encodes on the GPU; it is not zero-copy.
+A passing configuration test without libcuda is not GPU performance evidence.
+Hardware encode/decode, radio latency, physical USB, heat and optical comfort require separate device measurements.
+
+## DLNA movie path
+
+Movie mode advertises MediaRenderer:3 with AVTransport, RenderingControl and ConnectionManager through pupnp.
+UMS ContentDirectory supplies media URLs; the phone decodes native resources with Media3 and normalizes them to full SBS before the same lens transform.
+Mono fills both eyes with the same image.
+SOAP play, pause, native-file seek, brightness, volume and mute have independent runtime checks.
+GENA carries initial and changed LastChange events.
+Movie mode creates no desktop virtual output.
+This is an interoperable proof path, not DLNA certification.
+
+ConnectionManager's sink list carries container MIME types.
+Panel dimensions and Android decoder MIME/profile declarations are explicit device-description extensions; do not call them standard SinkProtocolInfo fields.
+The Flat Headset UMS profile requests full SBS and uses a bounded panel declaration from the HTTP identity or device description.
+H.264 compatibility must not bypass required stereo conversion.
+After FFmpeg stereo3d, materialize sample aspect into square pixels before fitting the panel.
+Matroska DisplayWidth/DisplayHeight describe one eye: Media3 must account for horizontal or vertical packing when deriving packed-frame pixel aspect.
+See the [Matroska stereo specification](https://www.matroska.org/technical/notes.html#multi-planar-and-3d-videos).
+
+Native full-SBS MP4, half-SBS Matroska and mono pass every pixel under stated H.264 error bounds, with zero wrong-eye pixels.
+Seeking checks a changing frame marker as well as SOAP state.
+Lens output is compared with an SDK-rendered reference; this does not independently validate Google's optical model.
+Actual audio gain and mute are measured on an isolated sink.
+Transcoded MPEG-TS seeking, multichannel binaural audio and PC/phone synchronization remain separate qualifications.
+[UPnP AV3](https://openconnectivity.org/developer/specifications/upnp-resources/upnp/mediaserver4-and-mediarenderer3/) includes optional CLOCKSYNC and SyncPlay; it is incorrect to say that the specification defines no synchronized playback.
+Support and shared-clock behavior must be measured on both endpoints before promising synchronized PC audio.
+
+## Reproduce safely
+
+Use an immutable private guest base and a disposable overlay for each proof.
+Hash the base before and after; never use a shared development VM as a mutable backing file.
+In the isolated KWin test session, disable the screen locker explicitly so its error screen cannot replace the fixture.
+Check captured images yourself, and use wrong-eye, protocol-version and rate mutants that fail.
+Keep exact raw-pixel checks separate from bounded lossy-codec comparisons.
+Report decoded-frame handoff timing separately from compositor presentation or photon latency.
+
+## PhoneVR migration checkpoint (checked 2026-10-12)
+
+Continue Harsha Raghu's existing [PhoneVR PR #410](https://github.com/PhoneVR-Developers/PhoneVR/pull/410) before writing another client.
+PhoneVR master uses ALVR 20.8.0; the draft targets a December 2024 core.
+Both JNI callers compile against their pinned headers and fail against current ALVR `ebec107b` (21.0.0-dev14).
+That development revision is distinct from the latest stable release, 20.14.1.
+Use a matching upstream client core and server; changing the protocol identifier cannot make incompatible packets compatible.
+
+The current [C API](https://github.com/alvr-org/ALVR/blob/ebec107b7e5f81677fb9c631d239daf2110bf573/alvr/client_core/src/c_api.rs) separates decoder creation, frame acquisition and frame metadata.
+Check the frame-acquisition result before using its timestamp.
+Match the source eye poses to the decoded frame, then reproject that image to the current pose, including presentations with no new frame.
+The draft's latest-tracking quaternion is not the decoded frame's source pose: an isolated synthetic case applies 15 degrees where 45 are required.
+Cardboard's neck-model position is also discarded by the draft's pose function.
+Keep these failures as regression cases; a header compile or synthetic pose test does not qualify streaming, shader pixels, optical comfort or device latency.
+
+## Current caller and emulated reprojection (checked 2026-10-12)
+
+The continuation of Harsha Raghu's PR #410 and the PhoneVR/ALVR developers' work now builds with matching current client/server cores.
+It supplies decoder configuration bytes, preserves the decoded frame's source pose, and retains the neck-model translation.
+Release renderers on the GL thread before releasing their borrowed EGL context.
+Initialize wgpu staging textures before writing them through GLES, so first-use clearing cannot erase the decoded picture.
+Retain the active Android image independently of an overflow queue.
+Choose the transfer correction for the actual target; a Cardboard UNORM target must not receive a second SDR conversion.
+These are local proposed changes, not an upstream acceptance claim.
+
+A clean x86_64 emulated startup and pause/resume each pass all 3,932,160 checked eye pixels.
+The source comparison allows lossy H.264 error; the analytic reprojection checks every pixel, including rasterized boundaries and black disocclusions.
+Keep decoded timestamp/source poses fixed while injecting positive and negative yaw with no new frame.
+A wrong-rotation reference must fail.
+The proof uses actual ALVR transport and Android decoding, but injected poses and pre-lens eye captures.
+It does not qualify physical sensors, ARM APKs, SteamVR games, optics or device latency.
+Respond to ALVR's IDR requests in a synthetic sender and wait for a keyframe before accepting interframes.
+A shell wrapper's zero status is insufficient when the underlying Android command failed; assert explicit counts and output.
+
+## Head-tracked audio proposals (checked 2026-10-12)
+
+Keep the original multichannel bed and source rate until the headphone or speaker edge.
+Record whether the game already rotates or binaurally renders its listener; do not rotate that mix twice.
+For a world-fixed bed, [PipeWire SOFA](https://docs.pipewire.org/page_module_filter_chain.html) exposes runtime Azimuth, Elevation and Radius for each directional channel.
+Recorded ALVR identity and 30-degree poses set a private SOFA node to 0 and 330 degrees, with a wrong-sign control failing.
+This proves parameter plumbing, not a rendered binaural mix or its latency.
+Fons Adriaensen's packaged AMB rotator passes isolated impulse rotations with zero added sample delay after its controls settle.
+Its 256-frame control ramp is separate from device, convolution and scheduling latency.
+First-order ambisonics cannot preserve five or seven independent directional channels; keep LFE separate and test a sufficient-order zero-yaw roundtrip.
+[IEM SceneRotator](https://plugins.iem.at/docs/plugindescriptions/) and its existing [OSC controls](https://plugins.iem.at/docs/osc/) are candidates for a PC-side implementation, not a measured IEM runtime here.
+Reuse the pose already received by ALVR; no new phone transport is needed.
+Coordinate the actual audio graph with the [audio skill](../audio/SKILL.md).
+
+## Later work
+
+Continuously driven multichannel rendering, audio-time pose alignment and physical headset qualification remain separate work.
+360/VR180 projection and the Stereo Spectator's reverse path remain separate integrations.
+No camera tracking or foveated streaming is introduced by these proofs.

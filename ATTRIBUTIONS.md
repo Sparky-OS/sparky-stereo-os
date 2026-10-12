@@ -311,23 +311,25 @@ The [vkms-stereo-bench](tools/vkms-stereo-bench/README.md) and [hibernate-bench]
 | [PlasmaTube](https://apps.kde.org/plasmatube/) | GPL-3.0-or-later | 3D from the stream, the `yt3d` tags or the frame's shape | Linus Jahn, Devin Lin, Joshua Goins |
 | [Plank Player](https://invent.kde.org/plasma/plank-player) | GPL-2.0-or-later | The video as its own declared surface, OSD in both eyes | Aditya Mehra |
 
-### 3.1 Phone display and movie-renderer study
+### 3.1 Phone display and movie renderer
 
-Checked 10 October 2026. These projects inform the proposed phone display; this list does not claim that the integration has shipped.
+Checked 11 October 2026. These projects support the phone display implementation and its emulated proofs; release packaging is still pending.
 Names and licences below come from the linked source headers and project records. Existing KWin, libkscreen, Qt and FFmpeg credits above also apply.
 
-| Project | Source record and licence | Credit and contribution studied |
+| Project | Source record and licence | Credit and contribution |
 |---|---|---|
 | KRdp | [Session source](https://github.com/KDE/krdp/blob/22af703f87b7a14150ade68218274e99f8618650/src/AbstractSession.cpp), KDE LGPL alternatives; [video source](https://github.com/KDE/krdp/blob/22af703f87b7a14150ade68218274e99f8618650/src/VideoStream.cpp), GPL-2.0-or-later | KDE, Aleix Pol Gonzalez and Arjen Hiemstra; Pascal Nowack and GNOME Remote Desktop for the video code KRdp credits. Virtual-output capture and RDP transport. |
 | KPipeWire | [Encoder factory](https://github.com/KDE/kpipewire/blob/46c2d619f26e8f7bf59547a28c64913948665184/src/pipewireproduce.cpp), KDE LGPL alternatives | KDE and Aleix Pol Gonzalez. PipeWire capture and video encoding. |
 | KDE Connect | [Virtual monitor plugin](https://github.com/KDE/kdeconnect-kde/blob/28d93d50d9dfcf49224525ce77ec42df88ee53f9/plugins/virtualmonitor/virtualmonitorplugin.cpp), KDE GPL alternatives | KDE, Aleix Pol i Gonzalez and Fabian Arndt. Paired discovery and virtual-monitor handoff. |
 | KDE Connect remote desktop | [kdeconnect-kde !996](https://invent.kde.org/network/kdeconnect-kde/-/merge_requests/996) and [kdeconnect-android !673](https://invent.kde.org/network/kdeconnect-android/-/merge_requests/673), open merge requests, KDE GPL alternatives | Fabian Druschke: screencast over RDP with remote control on the desktop, and the embedded RDP client on Android. The phone headset's receiver is built on them. Aleix Pol Gonzalez's draft [!543](https://invent.kde.org/network/kdeconnect-android/-/merge_requests/543) explores the phone as an RDP host. |
+| KDE Connect remote desktop receiver | [Desktop !996](https://invent.kde.org/network/kdeconnect-kde/-/merge_requests/996) and [Android !673](https://invent.kde.org/network/kdeconnect-android/-/merge_requests/673), KDE GPL alternatives | Fabian Druschke and the KDE Connect contributors. The paired handoff and embedded Android receiver extended by this work. |
+| AndroidX Media3 | [Project](https://github.com/androidx/media), Apache-2.0 | Google and the AndroidX Media3 contributors. Local movie playback and stereo metadata extraction, including pull request #3439. |
 | FreeRDP | [Android client](https://github.com/FreeRDP/FreeRDP/blob/87baff6c80e16087c146937bca81d2bdb788e236/client/Android/Studio/freeRDPCore/src/main/cpp/android_freerdp.c), Apache-2.0 | The FreeRDP contributors, Marc-Andre Moreau, Thincast Technologies, Martin Fleisz, Armin Novak and Bernhard Miklautz. Android RDP client and decoder integration. |
-| Cardboard SDK | [Native API](https://github.com/googlevr/cardboard/blob/5969239e7c87f4cd64c8ec170ce1e7f4eb559e37/sdk/include/cardboard.h), Apache-2.0 | Google and the Cardboard contributors. Lens calibration, distortion meshes and eye textures. The repository's Unity plugin files have a separate licence and are outside this native-viewer proposal. |
+| Cardboard SDK | [Native API](https://github.com/googlevr/cardboard/blob/5969239e7c87f4cd64c8ec170ce1e7f4eb559e37/sdk/include/cardboard.h), Apache-2.0 | Google and the Cardboard contributors. Lens calibration, distortion meshes and eye textures. The repository's Unity plugin files have a separate licence and are outside this native viewer. |
 | Universal Media Server | [Project record](https://github.com/UniversalMediaServer/UniversalMediaServer/blob/1b1cb16dce26a40da3774bf3bc31202a1049e25d/pom.xml), GPL-2.0 | Universal Media Server contributors, including SubJunk, credited in the upstream-review section below. Renderer profiles and movie delivery. |
-| jUPnP and its Cling origins | [Project record](https://github.com/jupnp/jupnp/blob/dbe0782bcd8e3283ae2f8d177cc4014b19593084/pom.xml), CDDL-1.0; [Android service](https://github.com/jupnp/jupnp/blob/dbe0782bcd8e3283ae2f8d177cc4014b19593084/bundles/org.jupnp.android/src/main/java/org/jupnp/android/AndroidUpnpServiceImpl.java) | Kai Kreuzer, Christian Bauer and the jUPnP/Cling contributors. Java and Android UPnP services. |
-| pupnp / Portable SDK for UPnP Devices | [COPYING](https://github.com/pupnp/pupnp/blob/79fc9f5dbd208888b220dcc0f4d0464bebbfa756/COPYING) and [THANKS](https://github.com/pupnp/pupnp/blob/79fc9f5dbd208888b220dcc0f4d0464bebbfa756/THANKS), BSD three-clause terms | Intel Corporation and the contributors named in THANKS. Native UPnP discovery alternative. |
-| PhoneVR | [Project README](https://github.com/PhoneVR-Developers/PhoneVR/blob/7fdcebee4a662eb8a1c7a8b19774aac71820a772/README.md) and [licence](https://github.com/PhoneVR-Developers/PhoneVR/blob/7fdcebee4a662eb8a1c7a8b19774aac71820a772/LICENSE), GPL-3.0 | PhoneVR Developers and its contributors. The later phone-headset route; current ALVR compatibility remains to be measured. |
+| jUPnP and its Cling origins | [Project record](https://github.com/jupnp/jupnp/blob/dbe0782bcd8e3283ae2f8d177cc4014b19593084/pom.xml), CDDL-1.0; [Android service](https://github.com/jupnp/jupnp/blob/dbe0782bcd8e3283ae2f8d177cc4014b19593084/bundles/org.jupnp.android/src/main/java/org/jupnp/android/AndroidUpnpServiceImpl.java) | Kai Kreuzer, Christian Bauer and the jUPnP/Cling contributors. UPnP services used by UMS; studied as an Android alternative, not the chosen phone stack. |
+| pupnp / Portable SDK for UPnP Devices | [COPYING](https://github.com/pupnp/pupnp/blob/79fc9f5dbd208888b220dcc0f4d0464bebbfa756/COPYING) and [THANKS](https://github.com/pupnp/pupnp/blob/79fc9f5dbd208888b220dcc0f4d0464bebbfa756/THANKS), BSD three-clause terms | Intel Corporation and the contributors named in THANKS. Native UPnP discovery and the Android movie renderer. |
+| PhoneVR | [Project README](https://github.com/PhoneVR-Developers/PhoneVR/blob/7fdcebee4a662eb8a1c7a8b19774aac71820a772/README.md) and [licence](https://github.com/PhoneVR-Developers/PhoneVR/blob/7fdcebee4a662eb8a1c7a8b19774aac71820a772/LICENSE), GPL-3.0 | PhoneVR Developers and its contributors, including Harsha Raghu, whose [migration PR #410](https://github.com/PhoneVR-Developers/PhoneVR/pull/410) is the basis of the current-ALVR caller migration and emulated tracking/reprojection proof. Physical-device qualification remains separate. |
 | ALVR | [Licence](https://github.com/alvr-org/ALVR/blob/e0d83b46168449cb0bb514770dd926b0ed85c55a/LICENSE), MIT | polygraphene, alvr-org and the ALVR contributors. The later tracked-headset transport. |
 | UPnP AV and DLNA specifications | [MediaServer:4 and MediaRenderer:3 specifications](https://openconnectivity.org/developer/specifications/upnp-resources/upnp/mediaserver4-and-mediarenderer3/) | UPnP Forum, Open Connectivity Foundation and Digital Living Network Alliance. Discovery, media services and interoperability specifications; citing them does not imply certification. |
 
@@ -633,6 +635,15 @@ Qt Multimedia and androidtestrunner. The Qt and FFmpeg credits above apply.
   Their own distributed notices retain the full contributor credits.
 
 The Linux, QEMU and stereo VM credits above also apply to the shared KVM base.
+
+## PhoneVR audio proposals (checked 2026-10-12)
+
+These proposals follow Harsha Raghu's PhoneVR PR #410 and the PhoneVR and ALVR developers' work.
+They credit the PipeWire contributors for filter-chain and SOFA controls, and libmysofa contributors and the MIT KEMAR dataset for the private control probe.
+Fons Adriaensen's AMB-Plugins (GPL-2.0-or-later) supplies the measured impulse rotator; the LADSPA header credits Richard W. E. Furse and Paul Barton-Davis (LGPL-2.1-or-later).
+IEM/Graz and the IEM Plug-in Suite developers, including SceneRotator author Daniel Rudrich, supply the proposed sufficient-order processor route (GPL-3.0-or-later).
+Names and licences follow the projects' own documentation and Debian copyright records.
+The IEM route is proposed; its processing latency was not measured by the AMB test.
 
 ---
 

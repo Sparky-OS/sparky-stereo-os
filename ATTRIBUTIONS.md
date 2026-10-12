@@ -609,6 +609,33 @@ We stand on the shoulders of:
 
 ---
 
+## Local Qt Android CI
+
+The local Android test environment builds on **The Qt Company Ltd.** and the
+**Qt Project** contributors' Coin provisioning scripts, QtBase, QtShaderTools,
+Qt Multimedia and androidtestrunner. The Qt and FFmpeg credits above apply.
+
+- **The Android Open Source Project** and **Google**, for the Android SDK,
+  NDK, emulator and Google APIs system images. The NDK headers identify the
+  Android Open Source Project; the system image identifies Google as its vendor.
+- **KDAB**, for [Android OpenSSL support for Qt](https://github.com/KDAB/android_openssl/tree/b71f1470962019bd89534a2919f5925f93bc5779),
+  including the build script and symbol-version patch cited by Qt's provisioning.
+- **The OpenSSL Project** and the contributors listed in its
+  [AUTHORS.md](https://github.com/openssl/openssl/blob/openssl-3.5.4/AUTHORS.md),
+  including OpenSSL Software Services, Inc., OpenSSL Software Foundation, Inc.
+  and Google LLC, for the Android TLS libraries.
+- **Eelco Dolstra** and the **PatchELF** contributors, named in the project's
+  [README](https://github.com/NixOS/patchelf/blob/0.17.2/README.md), for ELF
+  dependency rewriting used by Qt's FFmpeg provisioning.
+- The **LLVM**, **GCC**, **CMake**, **Ninja**, **Gradle**, **OpenJDK** and
+  **Eclipse Adoptium** projects, for the compilers, build tools and Java runtime;
+  **openSUSE**, **KDE's CI images** and **Docker**, for the build environment.
+  Their own distributed notices retain the full contributor credits.
+
+The Linux, QEMU and stereo VM credits above also apply to the shared KVM base.
+
+---
+
 ## Certificate management and ICP-Brasil interoperability
 
 - **Paweł "pavroo" Pijanowski**, author of Sparky CA (2018), and **Daniel Campos Ramos**, its 2020 and 2026 work, as credited in Sparky CA's original copyright records.
@@ -627,4 +654,4 @@ The Ed521 prototype is public-verification-only and unaudited.
 Trust-store membership, cryptographic verification and document-signature policy compliance are distinct.
 Credits do not imply endorsement or upstream acceptance.
 
-**Last updated**: 11 October 2026
+**Last updated**: 12 October 2026

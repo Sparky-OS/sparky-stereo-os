@@ -93,6 +93,21 @@ Check captured images yourself, and use wrong-eye, protocol-version and rate mut
 Keep exact raw-pixel checks separate from bounded lossy-codec comparisons.
 Report decoded-frame handoff timing separately from compositor presentation or photon latency.
 
+## PhoneVR migration checkpoint (checked 2026-10-12)
+
+Continue Harsha Raghu's existing [PhoneVR PR #410](https://github.com/PhoneVR-Developers/PhoneVR/pull/410) before writing another client.
+PhoneVR master uses ALVR 20.8.0; the draft targets a December 2024 core.
+Both JNI callers compile against their pinned headers and fail against current ALVR `ebec107b` (21.0.0-dev14).
+That development revision is distinct from the latest stable release, 20.14.1.
+Use a matching upstream client core and server; changing the protocol identifier cannot make incompatible packets compatible.
+
+The current [C API](https://github.com/alvr-org/ALVR/blob/ebec107b7e5f81677fb9c631d239daf2110bf573/alvr/client_core/src/c_api.rs) separates decoder creation, frame acquisition and frame metadata.
+Check the frame-acquisition result before using its timestamp.
+Match the source eye poses to the decoded frame, then reproject that image to the current pose, including presentations with no new frame.
+The draft's latest-tracking quaternion is not the decoded frame's source pose: an isolated synthetic case applies 15 degrees where 45 are required.
+Cardboard's neck-model position is also discarded by the draft's pose function.
+Keep these failures as regression cases; a header compile or synthetic pose test does not qualify streaming, shader pixels, optical comfort or device latency.
+
 ## Later work
 
 PhoneVR/ALVR head tracking, reprojection and head-tracked multichannel audio follow the flat display.

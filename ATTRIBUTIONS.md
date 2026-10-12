@@ -382,7 +382,9 @@ Names and licences below come from the linked source headers and project records
 | Linux's pressure stall information (PSI) | The kernel wakes the Cushion Swap File when memory stalls | Johannes Weiner; the trigger interface by Suren Baghdasaryan (`kernel/sched/psi.c`) |
 | [swapspace](https://github.com/Tookmund/Swapspace) | Prior art: swap files created and removed on demand | Software Industry Promotion Agency of Thailand, Jeroen T. Vermeulen, Jacob Adams (Debian's copyright records) |
 | [initramfs-tools](https://salsa.debian.org/kernel-team/initramfs-tools) | Hibernate from the installer's `/etc/initramfs-tools/conf.d/resume`: the Cushion Swap File's hook carries `RESUME_OFFSET` into the image as the snippet its init reads | maximilian attems, Jeff Bailey, David Härdeman, Martin Michlmayr, Michael Prokop, Scott James Remnant, Ben Hutchings and Benjamin Drung (Debian's copyright records) |
-| [logrotate](https://github.com/logrotate/logrotate) | Daily rotation of the Cushion Swap File's per-cycle log | Erik Troan, Preston Brown, Elliot Lee, Miloslav Trmac, Dan Walsh, Peter Vrabec, Jesse Keating, Tomas Smetana, Christian Göttsche and Kamil Dudka (its copyright records) |
+| [logrotate](https://github.com/logrotate/logrotate) | Weekly rotation of the Cushion Swap File's log, one week kept | Erik Troan, Preston Brown, Elliot Lee, Miloslav Trmac, Dan Walsh, Peter Vrabec, Jesse Keating, Tomas Smetana, Christian Göttsche and Kamil Dudka (its copyright records) |
+| [beep](https://github.com/spkr-beep/beep) | The PC-speaker tones of Sparky Beep's service announcements and of Daniel's AutoMountBKP backup | Johnathan Nightingale, its author; Hans Ulrich Niedermann, its maintainer since 2018; Peter Tirsek, Andreas Hochsteger, Rick Franchuk, Serge Winitzki and Ryan Weaver, named in its credits; Gerfried Fuchs, who maintained it in Debian for years |
+| The melodies in [Sparky Beep](https://github.com/Sparky-OS/sparky-beep)'s compositions | Simplified beep arrangements of well-known tunes | "Happy Birthday": Mildred J. Hill and Patty Smith Hill ("Good Morning to All", 1893); "Ode to Joy": Ludwig van Beethoven (Symphony No. 9, 1824); "Twinkle Twinkle Little Star": the French melody "Ah! vous dirai-je, maman" (1761), words by Jane Taylor (1806); the Super Mario Bros. theme: Koji Kondo (Nintendo, 1985); the Star Wars main title: John Williams (1977). Sparky Beep's service tones are Daniel's own, made by hand in 2020, before any AI partner; Claude, Jules and Codex revamped the package in 2025, and Claude added the composer with the scale, alert, startup, shutdown and success tunes |
 | [linux-base](https://salsa.debian.org/kernel-team/linux-base) (linux-sysctl-defaults) | systemd's sysctl defaults in Debian, `vm.max_map_count = 1048576`: the reason the edition's sysctl file is named 70 | Ben Hutchings, Salvatore Bonaccorso and Gioele Barabucci (Debian's copyright records) |
 | [Fedora's SwapOnZRAM change](https://fedoraproject.org/wiki/Changes/SwapOnZRAM) | Prior art for zram swap by default, which the edition keeps only where the hardware needs it | Chris Murphy, the change owner |
 | [KAuth](https://invent.kde.org/frameworks/kauth) and [KCMUtils](https://invent.kde.org/frameworks/kcmutils) | The Memory page in System Settings and its privileged write | The KDE Frameworks contributors |
@@ -485,13 +487,50 @@ Their work informs the stereo report Daniel offered the W3C PM-KR Community Grou
 
 ## 10. AI partners
 
-This edition is directed and verified by Daniel, and built with AI partners doing the legwork under his direction.
+This edition is directed and verified by Daniel, and built with AI partners that do the legwork under that direction.
 Every claim in its documents is tied to a test that could fail or to a public record.
 All of their use has been paid by Daniel personally; the full list by lab, model, place and commit count is in [docs/ai-provenance.md](docs/ai-provenance.md).
 
-- **Anthropic, Claude** (Claude Code): Claude Opus 5.5, Opus 5, Opus 4.8, Fable 5.1 and Sonnet 5.5; orchestration, review and integration; lanes for kernels, packaging, proofs, players, the stereo virtual machine and documentation; the GPU vendors' guards and the studies of KWin's effects, live and removed; the public skills.
+**The method: Multi-Vibe Code In Chain (MVCIC).**
+Daniel built this way of working himself.
+Several AI partners work in sequence, and each reads and extends what the previous ones wrote.
+Daniel is the coordinator, the architect and the one who verifies, carrying the work from partner to partner and deciding.
+In the first chains, one partner at a time had hands on the repository and the others advised through Daniel; today several lanes work at once, each in its own workspace, and one orchestrating partner reviews and integrates.
+The method is written down in the Scaler Wizard repository (`Multi-Vibe_Coding_Chains/Step1.md`, October 2025) and in AI-RLWHF.
+The partners and labs below are the chain, in the order they joined.
+
+**The first AI.**
+- **OpenAI**: **ChatGPT**, in late 2024.
+
+**2025: the first chain (Knowledge3D, Scaler Wizard, AI-RLWHF).**
+
+- **OpenAI**: **GitHub Copilot and Codex** wrote the PTX kernels and the ternary system for Knowledge3D; **GPT** models gave architecture advice and checked research and code.
+- **Anthropic**: **Claude Code** and **Claude** in the browser did repository work, planning, documentation and the W3C specifications. Claude has been in Daniel's commits since 2025-10-04.
+- **xAI**: **Grok** worked on fonts, curves and procedural typography, and opened the first Scaler Wizard chain.
+- **Zhipu AI**: **GLM** (GLM-4.6 in the 2025 trailers) gave multilingual and cognitive-architecture views.
+- **Moonshot AI**: **Kimi** (Kimi K2) worked on the RPN-Graph idea and checked long-context reasoning.
+- **DeepSeek AI**: **DeepSeek** (OCR and R1) gave the OCR design and the thinking tags used to teach honesty in AI-RLWHF.
+- **Alibaba Cloud**: **Qwen** (Max, Coder and VL) worked on vector drawing, CAD ideas and embeddings.
+- **Google**: **Gemini** reviewed and fact-checked; **NotebookLM** holds the research space and made the audio overviews; **Jules** (Google Labs) wrote the ms-swift integration in October 2025.
+- **Perplexity AI**: **Perplexity** did sourced research.
+- **Manus**: **Manus.im** gave a second view on the design.
+
+The first Scaler Wizard chain ran Grok, Codex, Qwen, GLM, Kimi, and then round again, in October 2025.
+Daniel's own count in Knowledge3D is eleven AI partners.
+
+**2026: the chain grows.**
+
+- **Mistral AI**: **Mistral Large 3** joined the model-diversity experiment of July 2026, with GLM 5.2, Kimi K2.6 and Qwen 3.5, run through Ollama's cloud.
+- **NVIDIA**: **Nemotron** joined the chain Daniel's own tooling runs today: Kimi, Qwen, GLM, DeepSeek, Nemotron and Google's **Gemini**, each reading the others' work.
+
+**Today's lanes (this edition).**
+
+- **Anthropic, Claude** (Claude Code): Claude Opus 5.5, Opus 5, Opus 4.8, Fable 5.1 and Sonnet 5.5; orchestration, review and integration; lanes for kernels, packaging, proofs, players, the stereo virtual machine and documentation; the GPU vendors' guards and the studies of KWin's effects, live and removed; the public skills. Earlier Claude models in Daniel's other repositories: Sonnet 4.5, Opus 4.5, 4.6, 4.7 and Sonnet 4.6, Fable 5.
 - **OpenAI, GPT through Codex**: GPT-6.1 Sol, GPT-6 Astra, GPT-6 Luna, GPT reserve and GPT-5.6 Sol; lanes for KWin and Mesa, KFileMetaData, KIO, the photo viewers, the game controller page, the Android study and certificates for Brazil; the Debian 14 draft for Edson C Silva's post-install guide and SparkyLinux's base-files.
 - **Through Ollama**: **Kimi** (Moonshot AI), **GLM** (Zhipu AI), **DeepSeek** and **Qwen** (Alibaba), the first stereo partner lanes; **Gemma 4** (Google) reading images for sessions without vision.
+
+The tools, labs and models above are listed from records: git trailers, lane files and the repositories named here.
+Anything a record could not confirm is left out.
 
 ---
 

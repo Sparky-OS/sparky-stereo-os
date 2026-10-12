@@ -102,6 +102,7 @@ Every KDE change is a branch of our fork on [invent.kde.org](https://invent.kde.
 
 - [The VR-engine-to-3D-display formula](docs/formula.md): what a VR engine changes to drive a 3D display instead of a headset, worked out on Half-Life 2.
 - [KWin stereo first runs, 2026-10-01](docs/first-runs/kwin-2026-10-01/README.md): the first stereo 3D outputs from KWin on real displays, with photos, logs and the scripts used.
+- [Sparky Stereo OS and other distributions](docs/other-distributions.md): why we do not package it for other distributions, and how their maintainers can adopt our fixes.
 - [Stereo 3D: carry the signal to the screen](docs/talks/2026-10-13-w3c-me-ig.md): slides for the W3C Media & Entertainment Interest Group call, 13 October 2026 ([HTML](https://repo.sparkyos.org/talks/2026-10-13-w3c-me-ig/)).
 
 ## Tools

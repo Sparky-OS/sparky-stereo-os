@@ -72,7 +72,7 @@ Merged so far, for the shape of a good offer: [HandBrake #8100](https://github.c
 
 # Part four: which skill next
 
-Load the one that matches the work; the [program list](../../docs/programs.md) names what was done in each program.
+Load the one that matches the work; the [program list](../../docs/programs-in-detail.md) names what was done in each program.
 
 | Skill | For |
 |---|---|

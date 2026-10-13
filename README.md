@@ -115,7 +115,8 @@ Here it is a property of the open layers (KDE, the kernel, the file formats), so
 
 ## Programs the edition changes for stereo 3D and deep colour
 
-Every program the edition changes, by area (the display path, video, science and engineering, images, simulators, the system, and what is not done yet), with what it gains and how it was proven: [Programs](docs/programs.md).
+What 3D brings to each program, from films and photos to globes and molecules: [Programs](docs/programs.md).
+How each one was changed and proven, by area (the display path, video, science and engineering, images, simulators, the system, and what is not done yet): [Programs in detail](docs/programs-in-detail.md).
 
 ## Our branches on KDE's GitLab
 

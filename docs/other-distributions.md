@@ -27,7 +27,7 @@ Then players, video lovers and hi-fi audio listeners, as the features land.
 
 Everything is free software under each project's own licence, and it is public:
 - **The forks:** most projects we change have a fork in the [Sparky-OS organisation](https://github.com/Sparky-OS), with our changes as commits on top of upstream, in its `stereo3d` branch, and a section at the top of its README saying where it comes from and what it adds. KDE's are also on [invent.kde.org](https://invent.kde.org/danielcamposramos).
-- **What each change does:** [Programs](programs.md), one entry per program, with the finding behind it.
+- **What each change does:** [Programs in detail](programs-in-detail.md), one entry per program, with the finding behind it.
 - **KDE changes and their CI results:** [Our branches on KDE's GitLab](kde-branches.md).
 - **Already merged upstream:** [Merged outside Sparky Stereo](upstream-merges.md). These arrive with each project's own releases.
 - **The rule every change follows:** [How it works](how-it-works.md) and [Stereo labor division](stereo-labor-division.md), tied to the specifications.

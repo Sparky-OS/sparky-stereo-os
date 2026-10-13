@@ -29,7 +29,7 @@ A few pixels each, within limits you choose.
 ### VR is also a stereo monitor
 
 Most headsets are a pair of small screens, one for each eye, and the rest split one screen in two, just as a 3D TV does, so this one desktop serves both.
-- **Your phone or tablet as the 3D screen (coming):** in a cardboard viewer, an Android phone shows the desktop in 3D. 3D films already play on it, and the whole desktop is next. That puts a 3D screen in the hands of billions of people who already own an Android phone or tablet ([Google's count, 2021](https://techcrunch.com/2021/05/18/android-now-powers-3b-devices)).
+- **Your phone or tablet as the 3D screen (coming):** in a cardboard viewer, an Android phone shows the desktop in 3D; tablets are too big for a viewer, so their route is the glasses-free (lenticular) 3D tablets of the early 2010s. 3D films already play on it, and the whole desktop is next. That puts a 3D screen in the hands of billions of people who already own an Android phone or tablet ([Google's count, 2021](https://techcrunch.com/2021/05/18/android-now-powers-3b-devices)).
 - **VR films:** Bino plays 360° and 180° films, flat or in 3D, on any 3D screen, and the mouse turns the view.
 - **VR games:** Half-Life 2 and DOOM (2016) reach a 3D screen through their VR modes.
 

@@ -13,7 +13,7 @@ description: >-
 A headset is a stereoscope you wear, so in the edition it is **one more output of Stereo KWin**: programs keep handing over full side by side, exactly as for a 3D television, and the headset's output filter does what only a headset needs (lens correction, head tracking, placing the picture in space). No program has to know a headset exists.
 
 - **Flat stereo content** (a 3D film, a stereo photo, a 3D window) appears on a virtual screen in front of the viewer, each eye seeing its own view.
-- **360 and VR180 video** carries its projection in the stream (`sv3d` in MP4, mpv's `demux-projection`); in a headset the viewer looks around by turning their head, on a television by the mouse, from the same file ([`stereo-video`](../stereo-video/SKILL.md)).
+- **360 and VR180 video** carries its projection in the stream (`sv3d` in MP4, mpv's `demux-projection`); in a headset the viewer looks around by turning their head, on the other registered outputs by the mouse, from the same file ([`stereo-video`](../stereo-video/SKILL.md)).
 - **The phone viewer** (Cardboard-style lenses) is the cheapest headset: the same output filter with the phone's lens correction, the picture streamed from the PC.
 
 ## What open software exists today

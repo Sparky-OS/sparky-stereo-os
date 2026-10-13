@@ -47,7 +47,7 @@ Joining the group is free with a W3C account, and help is welcome: test on your 
 - **Painting:** Krita paints on a 16-bit canvas, and on a 3D canvas with 16 bits in each eye.
 - **Photos:** digiKam and Showfoto show 3D photos in the album, the light table, the slideshow and the editor; KolourPaint edits a 3D picture and saves it with its 3D mark.
 - **Video:** in Kdenlive a clip knows its 3D layout, the monitors can show it in 3D, and the render keeps the 3D mark.
-- **Stories:** [StorySplat](https://storysplat.com) ("Turn your 3D scans into interactive tours") builds tours inside 3D scans of real places, right in the browser, and its 3D View shows them in 3D, tested side by side on a Sony 3D television.
+- **Stories:** [StorySplat](https://storysplat.com) ("Turn your 3D scans into interactive tours") builds tours inside 3D scans of real places, right in the browser, and its 3D View shows them in 3D on any of the registered outputs, first tested side by side on a Sony 3D television.
 
 Each program in full: [Programs](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).
 
@@ -77,7 +77,7 @@ Each program, what it gains and how it was proven: [Programs](#programs-the-edit
 ### Seen in 3D
 
 The two pictures at the top are screenshots taken with the edition's Spectacle, which keeps both eyes.
-Red-cyan glasses show them in 3D here; the MPO files open in 3D in the edition's photo programs and on a 3D television.
+Red-cyan glasses show them in 3D here; the MPO files open in 3D in the edition's photo programs, on any of the registered outputs.
 
 - **DOOM (2016) in an ordinary window** ([MPO](docs/screenshots/doom-2016-in-a-window.mpo)), based on [KHARVOX](https://github.com/CactusVRStudios/KHARVOX), CactusVRStudios' DOOM (2016) VR conversion mod (MIT): the game has depth while the panel and the window frame stay flat in both eyes. Measured between the eyes: the nearest rock 23 px apart, the far mountains 1 px, the panel 0 px.
 - **Marble's globe** ([MPO](docs/screenshots/marble-globe.mpo)): the Earth in front of the screen (+11 px) and the stars behind it (-12 px), the side panel flat. This shot predates fixes made since, which a newer one will show.

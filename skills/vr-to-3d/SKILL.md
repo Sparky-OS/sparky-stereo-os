@@ -1,7 +1,7 @@
 ---
 name: vr-to-3d
 description: >-
-  How a game or engine with a VR mode is shown on a 3D television, projector or monitor instead of a headset on Sparky Stereo OS, and how a headset player's view is mirrored in stereo for the room (the Stereo Spectator): the formula learned on Half-Life 2, the tools, and the rules. Load the general sparky-stereo skill first.
+  How a game or engine with a VR mode is shown on any of the registered outputs (a 3D television, projector or monitor) instead of a headset on Sparky Stereo OS, and how a headset player's view is mirrored in stereo for the room (the Stereo Spectator): the formula learned on Half-Life 2, the tools, and the rules. Load the general sparky-stereo skill first.
 ---
 
 # From a VR engine to a 3D display
@@ -35,7 +35,7 @@ The requests to Valve, with what would make the path clean: [Source-1-Games #829
 ## Rules learned
 
 - **SteamVR on a television runs inside gamescope,** never in a plain desktop window.
-- **The Stereo Spectator:** while someone plays in a headset, the room sees the same two eyes in stereo on the television or projector, instead of a flat mirror. It is the same composition, sent to the desktop instead of only to the headset.
+- **The Stereo Spectator:** while someone plays in a headset, the room sees the same two eyes in stereo on any of the registered outputs, instead of a flat mirror. It is the same composition, sent to the desktop instead of only to the headset.
 - **A headset's cameras, too.** Passthrough headsets carry two cameras about an eye's distance apart, so the room can also watch what the cameras recorded (spatial photos and video) and what they see live (a stereo camera feed streamed to the desktop). Apple Vision Pro and Pico 4 Ultra record stereo natively, Galaxy XR with Samsung's software, Quest 3 and 3S through apps on Meta's Passthrough Camera API, Steam Frame with a colour-camera add-on ([immerNews, 2026-09-03](https://immernews.com/spatial-cameras-in-vr-from-quest-3-to-steam-frame-arcturus-with-project-phoenix-on-the-horizon/)). All of it ends as full side by side in Stereo KWin; only the input formats differ, and each device's real files are tested before the edition claims support ([`stereo-video`](../stereo-video/SKILL.md), [`stereo-pictures`](../stereo-pictures/SKILL.md)).
 - **In the edition** the desktop draws the final output; the game hands over full side by side.
 - **Blur and other effects that keep state between frames** must be per eye, or off: Half-Life 2's motion blur shared its previous view between the eyes and broke.

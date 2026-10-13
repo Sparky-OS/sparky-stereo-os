@@ -12,7 +12,7 @@ description: >-
 
 A Windows game's Direct3D calls become Vulkan through DXVK (Direct3D 9 to 11) or VKD3D-Proton (Direct3D 12), and Vulkan reaches the GPU through Mesa, or through NVIDIA's driver with the edition's Vulkan layer. Stereo can enter at three places:
 
-1. **An injector draws two cameras inside the game.** wiz3D does this for DirectX 9 games, the vendor-neutral way iZ3D did once: the camera moves at the API, one world and two cameras ([`stereo-two-cameras`](../stereo-two-cameras/SKILL.md)). Its Linux build is in review upstream ([effcol/wiz3D #33](https://github.com/effcol/wiz3D/pull/33)); our Proton work is on [danielcamposramos/wiz3D `stereo3d-proton`](https://github.com/danielcamposramos/wiz3D/tree/stereo3d-proton).
+1. **An injector draws two cameras inside the game.** wiz3D does this for DirectX 9 games, the vendor-neutral way iZ3D did once: the camera moves at the API, one world and two cameras ([`stereo-two-cameras`](../stereo-two-cameras/SKILL.md)). Its Linux build is merged upstream ([effcol/wiz3D #33](https://github.com/effcol/wiz3D/pull/33), 13 October 2026); our Proton work is on [Sparky-OS/wiz3D `stereo3d-proton`](https://github.com/Sparky-OS/wiz3D/tree/stereo3d-proton).
 2. **The game has a VR mode.** Its two eyes go to a 3D display instead of a headset: load [`vr-to-3d`](../vr-to-3d/SKILL.md).
 3. **The game draws side by side itself.** Some games and players have a side-by-side option. The window is declared as full side by side, and the game's own output menu is no longer the place where the format is chosen.
 

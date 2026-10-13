@@ -134,7 +134,7 @@ Every KDE change is a branch of our fork on [invent.kde.org](https://invent.kde.
 ## Merged outside Sparky Stereo
 
 Where a program breaks stereo or deep colour on the way to the screen, the fix goes to that program's own project.
-HandBrake, Universal Media Server, MKVToolNix, mpv, Teams for Linux, Qt Multimedia, spice-gtk and PeerTube have merged fixes from our work: each one in full, and what is in review, in [Merged outside Sparky Stereo](docs/upstream-merges.md).
+HandBrake, Universal Media Server, MKVToolNix, mpv, Teams for Linux, Qt Multimedia, Bino, spice-gtk, PeerTube and wiz3D have merged fixes from our work: each one in full, and what is in review, in [Merged outside Sparky Stereo](docs/upstream-merges.md).
 What people who work with stereo said about it, in public and with links: [What people said](docs/what-people-said.md).
 
 ## Documents

@@ -440,10 +440,11 @@ Every merge below was a maintainer's decision, made on the code.
 - **mpv** [#18490](https://github.com/mpv-player/mpv/pull/18490): merged by **Kacper Michajłow** (kasper93), 23 September 2026, after a careful review by llyyr.
 - **Qt Multimedia** [778399](https://codereview.qt-project.org/c/qt/qtmultimedia/+/778399): approved by **Tim Blechmann** and merged on 8 October 2026; the same fix is in Qt 6.12 too ([778580](https://codereview.qt-project.org/c/qt/qtmultimedia/+/778580), 9 October 2026).
 - **spice-gtk** [!159](https://gitlab.freedesktop.org/spice/spice-gtk/-/merge_requests/159): merged by **Marc-André Lureau**, 10 October 2026.
+- **PeerTube** [#7816](https://github.com/Chocobozzz/PeerTube/pull/7816): merged by **Chocobozzz**, 13 October 2026, after he reshaped it into the transcoding profile and handled rotation ([899cb02](https://github.com/Chocobozzz/PeerTube/commit/899cb0208850f2238d551a9bf687fd96460dc3f0)).
 - **Teams for Linux** [#3070](https://github.com/IsmaelMartinez/teams-for-linux/pull/3070): from our report [#3067](https://github.com/IsmaelMartinez/teams-for-linux/issues/3067), fixed by its maintainer, **Ismael Martinez**, 7 October 2026, released in 2.25.0.
 - **DisplayXR** [4c1ad090](https://github.com/DisplayXR/displayxr-runtime/commit/4c1ad090e7d5dc8293f6749d49741ec27c4072c6) (#1929): the per-compositor packaging that lets a KWin window-geometry publisher sit beside GNOME's, written by **David Fattal** on 11 October 2026 after our questions in [#1928](https://github.com/DisplayXR/displayxr-runtime/issues/1928).
 
-**In review**, with thanks to everyone reviewing: FFmpeg, x265 (MulticoreWare's collaborators shaped its `--frame-packing` option), VLC, gamescope, NVIDIA's open kernel modules, PeerTube, wiz3D, Android's Media3 and Qt.
+**In review**, with thanks to everyone reviewing: FFmpeg, x265 (MulticoreWare's collaborators shaped its `--frame-packing` option), VLC, gamescope, NVIDIA's open kernel modules, wiz3D, Android's Media3 and Qt.
 
 **Where our work is not welcome yet.** We respect each project's decision. Our changes stay in our own trees, ready to go upstream on the day they are wanted.
 

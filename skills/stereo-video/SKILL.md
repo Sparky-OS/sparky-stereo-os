@@ -28,7 +28,7 @@ A side-by-side or top-and-bottom video is an ordinary 2D picture unless somethin
 | mkvmerge | `StereoMode` from the H.264 SEI, then from the HEVC SEI | [MKVToolNix !6311](https://codeberg.org/mbunkus/mkvtoolnix/pulls/6311) (merged), [!6312](https://codeberg.org/mbunkus/mkvtoolnix/pulls/6312) (in review) |
 | Kdenlive and MLT | a clip knows its packing, the render writes the SEI and `StereoMode` | [Kdenlive `stereo3d-26.08`](https://invent.kde.org/danielcamposramos/kdenlive/-/tree/stereo3d-26.08), [MLT `stereo3d-7.40`](https://github.com/Sparky-OS/mlt/tree/stereo3d-7.40) |
 | Universal Media Server | H.264 transcodes keep the SEI | [#6330](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6330), in 15.9.0 |
-| PeerTube | a container's packing kept through transcoding, right eye first included | [#7816](https://github.com/Chocobozzz/PeerTube/pull/7816), in review |
+| PeerTube | a container's packing kept through transcoding, right eye first included | [#7816](https://github.com/Chocobozzz/PeerTube/pull/7816), merged |
 | Android's Media3 | the SEI read in MP4 and fragmented MP4, right-eye-first modes, `StereoMode` in the WebM muxer | [androidx/media #3439](https://github.com/androidx/media/pull/3439), in review |
 
 **Test every way the mark can be written.** An encoder option is not done when the common case passes: x265's option was correct with each SEI in its own unit, and a reviewer found stale bytes in `--single-sei` mode, a bug older than the option. Enumerate the modes (single SEI or not, access unit delimiters on and off, repeated headers on and off, every packing type) and check each stream with an independent parser and with FFmpeg's `trace_headers`.

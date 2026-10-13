@@ -19,6 +19,13 @@ Sparky Stereo OS, Daniel Ramos's edition of SparkyLinux (by Paweł "pavroo" Pija
 **Next step: tell us about your 3D gear** and hear first when it is ready.
 Sign up in your language: [🇨🇦](https://github.com/Sparky-OS/sparky-stereo-os/issues/26) [🇧🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/25) [🇵🇱](https://github.com/Sparky-OS/sparky-stereo-os/issues/27) [🇫🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/80) [🇯🇵](https://github.com/Sparky-OS/sparky-stereo-os/issues/81) [🇰🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/83) [🇨🇳](https://github.com/Sparky-OS/sparky-stereo-os/issues/84) [🇭🇰](https://github.com/Sparky-OS/sparky-stereo-os/issues/85)
 
+### VR is also a stereo monitor
+
+Most headsets are a pair of small screens, one for each eye, and the rest split one screen in two, just as a 3D TV does, so this one desktop serves both.
+- **Your phone or tablet as the 3D screen (coming):** in a cardboard viewer, an Android phone shows the desktop in 3D. 3D films already play on it, and the whole desktop is next. That puts a 3D screen in the hands of billions of people who already own an Android phone or tablet ([Google's count, 2021](https://techcrunch.com/2021/05/18/android-now-powers-3b-devices)).
+- **VR films:** Bino plays 360° and 180° films, flat or in 3D, on any 3D screen, and the mouse turns the view.
+- **VR games:** Half-Life 2 and DOOM (2016) reach a 3D screen through their VR modes.
+
 ## Who builds it
 
 Daniel, from a favela in Brasília, with one human contributor so far: Jeromy Streets, whose video wallpaper for Plasma ([org.kde.video](https://github.com/Sparky-OS/org.kde.video)) now lives in Sparky-OS, with him as its maintainer.
@@ -40,6 +47,7 @@ Joining the group is free with a W3C account, and help is welcome: test on your 
 - **Painting:** Krita paints on a 16-bit canvas, and on a 3D canvas with 16 bits in each eye.
 - **Photos:** digiKam and Showfoto show 3D photos in the album, the light table, the slideshow and the editor; KolourPaint edits a 3D picture and saves it with its 3D mark.
 - **Video:** in Kdenlive a clip knows its 3D layout, the monitors can show it in 3D, and the render keeps the 3D mark.
+- **Stories:** [StorySplat](https://storysplat.com) ("Turn your 3D scans into interactive tours") builds tours inside 3D scans of real places, right in the browser, and its 3D View shows them in 3D, tested side by side on a Sony 3D television.
 
 Each program in full: [Programs](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).
 
@@ -59,8 +67,8 @@ Each program in full: [Programs](#programs-the-edition-changes-for-stereo-3d-and
 ## Watch and play
 
 **3D films, photos and games show in 3D in their own window or full screen, and the rest of the desktop stays as it is.**
-- **Screens:** a 3D TV, monitor or projector, the HDMI 3D sets of 2010 to 2013 included, or any ordinary monitor with red-cyan glasses; each screen can show a different kind of 3D at the same time.
-- **Films:** 3D videos play in 3D in Haruna, VLC, mpv, PlasmaTube and more.
+- **Screens:** a 3D TV, monitor or projector, the HDMI 3D sets of 2010 to 2013 included, or any ordinary monitor with red-cyan glasses; each screen can show a different kind of 3D at the same time, and glasses-free 3D monitors are in progress with the DisplayXR team.
+- **Films:** 3D videos play in 3D in Haruna, VLC, mpv, Bino, PlasmaTube and more.
 - **Photos:** Gwenview, digiKam and KolourPaint show 3D photos (MPO, JPS and stereo PNG) in 3D.
 - **Games:** DOOM (2016) in a window and Half-Life 2, both through a VR mode ([the formula](docs/formula.md)).
 

@@ -24,6 +24,10 @@ To re-enable coverage, enumerate the expected data rows. Assert every row
 ran and passed; zero failures with skipped or missing media rows is
 insufficient. Report software/hardware decoding and the tested ABI. Keep
 remaining warnings visible without treating them as failed assertions.
+Before proposing a change, search Gerrit for open changes to the same test
+file and read their CI results. A maintainer's own change may already
+re-enable the coverage, and its failing Coin configuration (for example an
+Android API level with a hardware decoder) is the case to reproduce.
 
 The scripts run as the caller in named containers, force KVM and headless
 SwiftShader, cap CPU use, and check a 15 GiB storage reserve. Supply paths

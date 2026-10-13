@@ -12,7 +12,7 @@
 **Pop is real, not faked: a little scale and a little depth, together.** One value per element gives both cues: bigger and nearer when popped, smaller and further when sunk.
 - **Everything follows its element's plane:** its text scales and moves with it, and so does its click area, so a popped element has no dead margin and a sunk one no click area beyond its picture. The plane's geometry lives inside the window itself, the one geometry that drawing and input both read.
 - **Text shares its element's depth.** What tires the eyes is 2D text lying over a picture at another depth, not depth as such.
-- **On a 2D screen, the pop will be the same scale plus a move up and to the left,** so depth reads on every screen, with or without glasses. Not built yet: today a 2D screen shows the desktop exactly as stock KDE does, while a 3D screen beside it shows the depth.
+- **On a 2D screen, the pop is anaglyph:** the same depth, colour-coded for red-cyan glasses, on any monitor. Without glasses a 2D screen shows the desktop exactly as stock KDE does, while a 3D screen beside it shows the depth.
 
 ## The Desktop Cube: what one format makes possible
 

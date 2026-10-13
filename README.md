@@ -92,7 +92,7 @@ Red-cyan glasses show them in 3D here; the MPO files open in 3D in the edition's
 
 ## Depth on the desktop
 
-**The desktop itself gets a little depth: built, and seen on a 3D TV on 13 October 2026 ([the picture at the top](#seen-in-3d)), with an ordinary monitor beside it looking exactly like stock KDE.**
+**The desktop itself gets a little depth: built, and seen on a 3D TV on 13 October 2026 ([the picture at the top](#seen-in-3d)); on an ordinary monitor it shows as anaglyph, and without glasses that monitor looks exactly like stock KDE.**
 The active window sits at the screen, its menus and tooltips come forward, and the wallpaper and the windows behind sink, a few pixels each, within the limits you set (System Settings, "3D Depth").
 <a href="#seen-in-3d"><img src="docs/screenshots/stereo-desktop-dialogs-anaglyph.jpg" width="99%" alt="Marble's Settings menu and its Panels sub-menu in front of the Marble window, four windows stepping back behind it, and Marble's globe in 3D inside the window (red-cyan anaglyph)"></a>
 

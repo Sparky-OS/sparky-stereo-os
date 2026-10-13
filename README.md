@@ -8,7 +8,7 @@ Sparky Stereo OS, Daniel Ramos's edition of SparkyLinux (by Paweł "pavroo" Pija
 
 *Red-cyan glasses show these in 3D ([more](#seen-in-3d)).*
 
-**In development:** nothing to download yet.
+**In development:** nothing to download yet ([where it is going](#where-it-is-going)).
 
 - **[Create](#create):** paint in 3D and in deep colour (16 bits per colour instead of 8), and edit 3D photos and video.
 - **[Science and engineering](#science-and-engineering):** Marble's globe, KAlgebra's plots and Kalzium's molecules in 3D; 3D models and circuit boards are in progress.
@@ -25,6 +25,14 @@ Daniel, from a favela in Brasília, with one human contributor so far: Jeromy St
 Stereo on Linux waited years for volunteers: earlier attempts stalled because reviewers had no 3D display, and the work spans the kernel, Mesa, KWin, FFmpeg, the players and the web standards.
 No other developer came forward to carry it, so the other partners at work here are AI ones, directed and checked by Daniel and named in [AI provenance](docs/ai-provenance.md).
 If you would rather see it built by human hands, you are more than welcome: every fork is public, and every task is open.
+
+## Where it is going
+
+The edition is the working proof, and what it finds goes back to open standards.
+Daniel chairs the W3C [Procedural Memory Knowledge Representation Community Group (PM-KR)](https://www.w3.org/community/pm-kr/) with Milton Ponson.
+Our report [Stereo 3D on Linux and the Web](https://www.w3.org/publications/spec-generator/?type=respec&url=https://raw.githubusercontent.com/w3c-cg/pm-kr/main/reports/source/stereo-3d-adoption-report.html) is there as an individual proposal, input for the group to discuss: which established specifications already carry 3D, what Linux and the web never adopted, and what a browser would need.
+It is also the subject of our talk at W3C's Media and Entertainment Interest Group on 13 October 2026 ([slides](docs/talks/2026-10-13-w3c-me-ig.md)).
+Joining the group is free with a W3C account, and help is welcome: test on your display, review the report, or bring your use case.
 
 ## Create
 

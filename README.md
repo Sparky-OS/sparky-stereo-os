@@ -4,6 +4,12 @@
 A 3D TV works, and so does any ordinary monitor with cheap red-cyan glasses.
 Sparky Stereo OS, Daniel Ramos's edition of SparkyLinux (by Paweł "pavroo" Pijanowski), is a Linux system with the KDE Plasma desktop.
 
+<a href="#seen-in-3d"><img src="docs/screenshots/stereo-desktop-anaglyph.jpg" width="99%" alt="The Stereo Desktop in 3D: the panel at the screen, a sound pop-up in front of it, and the windows behind stepping back one after another (red-cyan anaglyph)"></a>
+
+**Stereo Desktop:** the desktop itself has depth.
+What you are using sits at the screen or comes forward, like the sound pop-up here, and the windows behind step back one after another, like papers in a pile, with the wallpaper deepest.
+A few pixels each, within limits you choose.
+
 <a href="#seen-in-3d"><img src="docs/screenshots/doom-2016-in-a-window-anaglyph.jpg" width="49%" alt="DOOM (2016) in a window, in 3D, with the flat Plasma panel below it (red-cyan anaglyph)"></a> <a href="#seen-in-3d"><img src="docs/screenshots/marble-globe-anaglyph.jpg" width="49%" alt="Marble's globe in front of the stars, in 3D (red-cyan anaglyph)"></a>
 
 *Red-cyan glasses show these in 3D ([more](#seen-in-3d)).*
@@ -76,15 +82,16 @@ Each program, what it gains and how it was proven: [Programs](#programs-the-edit
 
 ### Seen in 3D
 
-The two pictures at the top are screenshots taken with the edition's Spectacle, which keeps both eyes.
+The pictures at the top are screenshots taken with the edition's Spectacle, which keeps both eyes.
 Red-cyan glasses show them in 3D here; the MPO files open in 3D in the edition's photo programs, on any of the registered outputs.
 
+- **Stereo Desktop** ([MPO](docs/screenshots/stereo-desktop.mpo)), on a 3D TV in frame packing, 13 October 2026. Measured between the eyes: the panel 0 px (at the screen), the sound pop-up +4 px (in front), the three windows behind -3, -7 and -10 px, and the system monitor widget -10 px, at the back with the wallpaper.
 - **DOOM (2016) in an ordinary window** ([MPO](docs/screenshots/doom-2016-in-a-window.mpo)), based on [KHARVOX](https://github.com/CactusVRStudios/KHARVOX), CactusVRStudios' DOOM (2016) VR conversion mod (MIT): the game has depth while the panel and the window frame stay flat in both eyes. Measured between the eyes: the nearest rock 23 px apart, the far mountains 1 px, the panel 0 px.
 - **Marble's globe** ([MPO](docs/screenshots/marble-globe.mpo)): the Earth in front of the screen (+11 px) and the stars behind it (-12 px), the side panel flat. This shot predates fixes made since, which a newer one will show.
 
 ## Depth on the desktop
 
-**The desktop itself gets a little depth, on every screen: built, and coming with the next KWin package.**
+**The desktop itself gets a little depth, on every screen: built, and seen on a 3D TV on 13 October 2026 ([the picture at the top](#seen-in-3d)).**
 The active window sits at the screen, its menus and tooltips come forward, and the wallpaper and the windows behind sink, a few pixels each, within the limits you set (System Settings, "3D Depth").
 <a id="the-desktop-cube-what-one-format-makes-possible"></a>The details, and the Desktop Cube built on the same standard: [Depth on the desktop](docs/depth-on-the-desktop.md).
 

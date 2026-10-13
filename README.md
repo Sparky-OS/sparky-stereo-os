@@ -82,17 +82,22 @@ Each program, what it gains and how it was proven: [Programs](#programs-the-edit
 
 ### Seen in 3D
 
-The pictures at the top are screenshots taken with the edition's Spectacle, which keeps both eyes.
+The pictures on this page are screenshots taken with the edition's Spectacle, which keeps both eyes.
 Red-cyan glasses show them in 3D here; the MPO files open in 3D in the edition's photo programs, on any of the registered outputs.
 
 - **Stereo Desktop** ([MPO](docs/screenshots/stereo-desktop.mpo)), on a 3D TV in frame packing, 13 October 2026. Measured between the eyes: the panel 0 px (at the screen), the sound pop-up +4 px (in front), the three windows behind -3, -7 and -10 px, and the system monitor widget -10 px, at the back with the wallpaper.
+- **A menu over a menu** ([MPO](docs/screenshots/stereo-desktop-dialogs.mpo)), the same day. Measured between the eyes: the focused Marble window 0 px, its Settings menu +2 px and the Panels sub-menu +4 px, the four windows behind -3, -5, -8 and -10 px, the widgets and the wallpaper -10 px; inside the window, Marble's own 3D: the Earth's labels +12 px, the stars' -13 px. The messages in the Diolinux chat behind are blurred.
 - **DOOM (2016) in an ordinary window** ([MPO](docs/screenshots/doom-2016-in-a-window.mpo)), based on [KHARVOX](https://github.com/CactusVRStudios/KHARVOX), CactusVRStudios' DOOM (2016) VR conversion mod (MIT): the game has depth while the panel and the window frame stay flat in both eyes. Measured between the eyes: the nearest rock 23 px apart, the far mountains 1 px, the panel 0 px.
-- **Marble's globe** ([MPO](docs/screenshots/marble-globe.mpo)): the Earth in front of the screen (+11 px) and the stars behind it (-12 px), the side panel flat. This shot predates fixes made since, which a newer one will show.
+- **Marble's globe** ([MPO](docs/screenshots/marble-globe.mpo)): the Earth in front of the screen (+11 px) and the stars behind it (-12 px), the side panel flat. This shot predates fixes made since; the menu-over-menu picture shows Marble today.
 
 ## Depth on the desktop
 
 **The desktop itself gets a little depth, on every screen: built, and seen on a 3D TV on 13 October 2026 ([the picture at the top](#seen-in-3d)).**
 The active window sits at the screen, its menus and tooltips come forward, and the wallpaper and the windows behind sink, a few pixels each, within the limits you set (System Settings, "3D Depth").
+<a href="#seen-in-3d"><img src="docs/screenshots/stereo-desktop-dialogs-anaglyph.jpg" width="99%" alt="Marble's Settings menu and its Panels sub-menu in front of the Marble window, four windows stepping back behind it, and Marble's globe in 3D inside the window (red-cyan anaglyph)"></a>
+
+*A menu over a menu: Marble's Settings menu comes forward from its window and the Panels sub-menu further still, the four windows behind step back one after another, and Marble's own globe keeps its depth inside the window.*
+
 <a id="the-desktop-cube-what-one-format-makes-possible"></a>The details, and the Desktop Cube built on the same standard: [Depth on the desktop](docs/depth-on-the-desktop.md).
 
 ## For developers

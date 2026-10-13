@@ -164,4 +164,7 @@ Everyone this edition stands on, by name: [ATTRIBUTIONS.md](ATTRIBUTIONS.md).
 
 The documents are licensed under the [Creative Commons Attribution 4.0 International licence](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0): share and adapt them, giving credit to Sparky Stereo OS.
 
+> "Information is power. But like all power, there are those who want to keep it for themselves."
+> — Aaron Swartz, [*Guerilla Open Access Manifesto*](https://archive.org/details/GuerillaOpenAccessManifesto) (July 2008)
+
 The scripts under `docs/first-runs/` and the tools under `tools/` are code and are licensed under the GNU General Public License, version 2 or later (GPL-2.0-or-later); see [LICENSE-GPL-2.0](LICENSE-GPL-2.0).

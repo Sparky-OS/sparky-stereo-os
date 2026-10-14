@@ -307,7 +307,7 @@ Most of Number 5's arm movements came from a telemetry suit worn on the puppetee
 
 In Daniel's own words: "I believe in Robonality™."
 The word is Eric's: Robonality™ is Eric Allard's trademark (US trademark application [99047765](https://tsdr.uspto.gov/#caseNumber=99047765&caseType=SERIAL_NO&searchType=statusSearch)).
-And for its song, "Who's Johnny" (1986): **El DeBarge**, who sang it, and **Peter Wolf** and **Ina Wolf**, who wrote it ([Wikipedia](https://en.wikipedia.org/wiki/Who%27s_Johnny)).
+And for its music, which Daniel played many times while building this edition: "Who's Johnny" (Theme from *Short Circuit*, 1986), sung by **El DeBarge** and written by **Peter Wolf** and **Ina Wolf** and produced by Peter Wolf ([Wikipedia](https://en.wikipedia.org/wiki/Who%27s_Johnny)), and the film's score by **David Shire** ([Wikipedia](https://en.wikipedia.org/wiki/Short_Circuit_(1986_film))).
 For Daniel, AI will soon "feel" like Johnny.
 
 ---

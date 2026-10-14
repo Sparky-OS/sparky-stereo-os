@@ -79,6 +79,21 @@ Published root-store inclusion does not prove signature capability.
 Keep chain mathematics separate from ICP-Brasil document-signature policy compliance.
 Check the actual KDE headers, exported API, certificate store and selected Poppler backend; online documentation alone is not a build or runtime test.
 
+## Package it, and test what the package does
+
+- A native Debian source package: `debian/` beside the code.
+  Name the dependency on the patched KIO in `debian/control` and nowhere else, so one edit changes it.
+- Dependencies for the window are listed explicitly, including every QML module; a missing one fails only when the window opens.
+- Let `dh_installsystemd` handle the timer only, so installing never runs the update service.
+  Never write or remove the switch files from a maintainer script.
+- Install in a clean Debian testing container with apt and the recommended packages, then test the installed files, not the build tree: the command name, the desktop entry, the catalogues, the units, a real system store, an A1 import, a token.
+- A language ships only when every message is translated; a test fails otherwise and when the catalogue drifts from the sources.
+  KDE's translation library needs the locale to exist on the machine, so a test that sets only `LANGUAGE` in a minimal container sees English.
+- The privileged helper can be exercised in a container: a system D-Bus, polkit and one rule file written only inside the container.
+  Check the refusal with the rule removed, as well as the success.
+- A stand-in token is SoftHSM behind p11-kit's proxy, with generated keys; never a physical token or a personal certificate.
+- Say what a container cannot show: timers under a running systemd, the package as the main session builds it, the Plasma session, and the owners' review of Brazilian Portuguese and Polish.
+
 Keep evidence small and record commands, exact results and gaps.
 External messages, PR descriptions and contact details stay in private notes, never in public source or this skill.
 Publish only after review.

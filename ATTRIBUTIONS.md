@@ -143,6 +143,35 @@ Daniel's own media programs (VLC, mpv, OBS, HandBrake) come from deb-multimedia,
 
 ---
 
+### 0.6 The Internet, layer by layer, and the Web
+
+Every package, every merge and every message of this project travelled over the Internet, and Daniel is a fan of the model that explains it: the seven layers of Open Systems Interconnection, from the wire up to the application.
+So the thanks are given layer by layer, to some of the many thousands of people who made it possible.
+
+**The model itself**: **Hubert Zimmermann**, who described the seven-layer architecture in "OSI Reference Model: The ISO Model of Architecture for Open Systems Interconnection" (IEEE Transactions on Communications, 1980), and the ISO and IEC committees that published it as [ISO/IEC 7498-1](https://www.iso.org/standard/20269.html).
+
+| Layer | What it does | People we thank | The specification |
+|---|---|---|---|
+| 1. Physical | Bits on a wire, a fibre or the air | **Robert Metcalfe** and **David Boggs** (Ethernet, Xerox PARC, 1973); **Charles K. Kao** (light in optical fibre, Nobel Prize in Physics 2009); **Vic Hayes** (chair of IEEE 802.11, wireless LAN) | IEEE 802.3, IEEE 802.11 |
+| 2. Data link | Frames between neighbours | The same Ethernet and Wi-Fi families; **Radia Perlman** (the spanning tree protocol, which keeps bridged networks free of loops) | IEEE 802.3, IEEE 802.1D |
+| 3. Network | Packets across networks | **Paul Baran** (distributed networks, RAND) and **Donald Davies** (packet switching, who named the packet, NPL); **Leonard Kleinrock** (the theory, and the ARPANET's first message at UCLA in 1969); **Bob Taylor** and **Larry Roberts** (who started and led the ARPANET); **Vint Cerf** and **Bob Kahn** (the Internet Protocol) | [RFC 791](https://www.rfc-editor.org/rfc/rfc791) (IP), [RFC 8200](https://www.rfc-editor.org/rfc/rfc8200) (IPv6) |
+| 4. Transport | Reliable streams and datagrams | **Vint Cerf** and **Bob Kahn** ("A Protocol for Packet Network Intercommunication", 1974); **David P. Reed** (UDP) | [RFC 9293](https://www.rfc-editor.org/rfc/rfc9293) (TCP), [RFC 768](https://www.rfc-editor.org/rfc/rfc768) (UDP) |
+| 5. Session | Trusted conversations | **Taher Elgamal** (SSL at Netscape, the ancestor of TLS) | [RFC 8446](https://www.rfc-editor.org/rfc/rfc8446) (TLS 1.3) |
+| 6. Presentation | Text and data every machine can read | **Joe Becker**, **Lee Collins** and **Mark Davis** (Unicode); **Ken Thompson** and **Rob Pike** (UTF-8, 1992); **Nathaniel Borenstein** and **Ned Freed** (MIME) | [The Unicode Standard](https://www.unicode.org/standard/standard.html), [RFC 3629](https://www.rfc-editor.org/rfc/rfc3629) (UTF-8), [RFC 2045](https://www.rfc-editor.org/rfc/rfc2045) (MIME) |
+| 7. Application | What people use | **Steve Crocker** (RFC 1, 1969, which began the Requests for Comments); **Jon Postel** (the RFC Editor and the keeper of the Internet's numbers for nearly thirty years); **Ray Tomlinson** (network email and its @, 1971); **Elizabeth "Jake" Feinler** (the ARPANET's Network Information Center and its host names); **Paul Mockapetris** (the Domain Name System, 1983); **Tim Berners-Lee** and **Robert Cailliau** (the World Wide Web, at CERN) | [RFC 5321](https://www.rfc-editor.org/rfc/rfc5321) (SMTP), [RFC 1034](https://www.rfc-editor.org/rfc/rfc1034) and [RFC 1035](https://www.rfc-editor.org/rfc/rfc1035) (DNS), [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110) (HTTP) |
+
+And the bodies that keep it open: the [IETF](https://www.ietf.org/), the [RFC Editor](https://www.rfc-editor.org/), [IANA](https://www.iana.org/), the [IEEE 802](https://www.ieee802.org/) committees, the [Unicode Consortium](https://home.unicode.org/) and the W3C.
+
+**The Web and the W3C.**
+**Tim Berners-Lee** invented the Web and gave it to everyone, and in 1994 he founded the [World Wide Web Consortium](https://www.w3.org/about/) "to ensure the long-term growth of the web"; he remains its Emeritus Director.
+Sparky Stereo OS builds on W3C work every day (SVG, WebXR and WebXR Layers, Media Capabilities and WebCodecs), and the W3C's people opened doors for it in October 2026:
+
+- **Chris Needham**, co-chair of the [Media and Entertainment Interest Group](https://www.w3.org/groups/ig/me/), who gave Daniel the floor to present the path for 3D on the web on 13 October 2026 ([minutes](https://www.w3.org/2026/10/13-me-minutes.html)), and **Hyojin Song** of LG Electronics, who introduced him there;
+- **Ian Jacobs** of the W3C team, who answered how a two-person volunteer distribution can take part and pointed it to the right groups;
+- **Milton Ponson**, who chairs the [Procedural Memory Knowledge Representation Community Group](https://www.w3.org/groups/cg/pm-kr/) with Daniel.
+
+**Our gratitude**: the Internet and the Web were given away so that anyone could build on them, and this project is one of the things built.
+
 ## 1. Where it started: the people behind the 3D
 
 ### 1.1 Vadim Asadov and iZ3D (special thanks)

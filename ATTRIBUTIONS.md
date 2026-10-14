@@ -297,6 +297,17 @@ The same fight goes on in display standards: in 2024 the HDMI Forum refused an o
 - **Eric Joseph Diolé**, "Zé Dilone", Daniel's mentor in web design, who introduced him to balthaser.com, a web design landmark known worldwide in its day, kept now only by the Wayback Machine ([its oldest capture, 10 May 2000](https://web.archive.org/web/20000510030857/http://www.balthaser.com/)). It was built in Flash: with a Flash emulator such as [Ruffle](https://ruffle.rs/) in the browser, it still plays.
 - **Ney Milhomem**, a close friend and visual artist (*artista plástico*), Daniel's partner in design back in the day.
 
+### 1.12 *Short Circuit*, its writers, and Eric Allard
+
+**S. S. Wilson** and **Brent Maddock**, who wrote ***Short Circuit*** (1986, directed by John Badham), for the most incredible film about AI, and for Number 5, "Johnny 5", the best robot ever made.
+
+**[Eric Allard](https://www.linkedin.com/in/eric-allard-001802125/)**, Daniel's friend and an engineer like him, was the film's robotics supervisor, credited for "realizing" the robots ([Wikipedia](https://en.wikipedia.org/wiki/Short_Circuit_(1986_film))).
+Syd Mead's design for Number 5 was greatly influenced by Eric's sketches, and John Badham named him the film's "most valuable player".
+Most of Number 5's arm movements came from a telemetry suit worn on the puppeteer's upper body, a sensor in every joint carrying the operator's movements to the machine: an early precursor of today's digital motion capture.
+
+Daniel: "I believe in Robonality", Eric's mark (Robonality™, Eric Allard, US trademark application [99047765](https://tsdr.uspto.gov/#caseNumber=99047765https://trademark.justia.com/990/47/robonality-99047765.htmlcaseType=SERIAL_NOhttps://trademark.justia.com/990/47/robonality-99047765.htmlsearchType=statusSearch)).
+For Daniel, AI will soon "feel" like Johnny.
+
 ---
 
 ## 2. The display path

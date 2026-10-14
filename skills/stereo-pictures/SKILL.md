@@ -42,6 +42,9 @@ The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; a vi
 
 Many tools lose a stereo mark when they write a file, which silently turns a stereo picture into a plain one.
 
+- **Use the format's own mark, and register it.** Wherever a format's specification has a stereo field (PNG `sTER`, MPO's CIPA DC-007 tags, the JPS block), use that one.
+  Only where none exists do we define a mark, specification page first ([SVGStereo](https://github.com/Sparky-OS/svgstereo) for SVG, animated drawings included since 0.2).
+  Every mark is registered in [stereo-layer](https://github.com/Sparky-OS/stereo-layer) and in the shared documents (awesome-stereoscopy's [standards page](https://github.com/danielcamposramos/awesome-stereoscopy/blob/main/standards.md) and the edition's [house formats](../../docs/house-formats.md)) before any program writes it.
 - **PNG `sTER`:** Pillow 11.3 writes only the public chunks it knows (plus private ones), so it drops `sTER` both when writing and when re-saving. libpng 1.6 has no `sTER` API, and programs built on it (Qt, GIMP, Krita, ImageMagick) keep the chunk only if they opt in to unknown chunks, which they do not. Until those are patched, insert the chunk yourself: right after IHDR, one byte (1 for diverging, the left view on the left), with its CRC. The specification pads the left view so that the right view starts on a multiple of 8 columns; check that it does.
 - **Verify with a chunk parser that can fail:** the chunk order `IHDR sTER … IDAT … IEND`, every CRC valid, the mode byte, and the picture still decodes.
 - **Name it `.pns`** (or `.jps` for JPEG with the JPS block). `file` still reports a `.pns` as a plain PNG, so the extension and shared-mime-info carry it until libmagic learns the chunk.

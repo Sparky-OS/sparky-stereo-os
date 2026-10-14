@@ -26,6 +26,10 @@ Broadcast and post-production work this way, and so does PipeWire for sound; thi
 - **Quality is never traded in the middle.** If something must give way on weak hardware, it happens at an edge, it is shown to the user, and the user can change it.
 - **The hardware fills in the defaults.** EDID, ALSA and input descriptors say what a screen, a sound device or a controller can do, and the defaults start from that.
 
+- **Each format's own mark, registered.** A file says it holds two views with its format's own stereo field wherever the specification has one (H.264 and H.265 frame packing SEI, Matroska `StereoMode`, the MP4 `st3d` box, PNG `sTER`, MPO's CIPA DC-007 tags).
+  Where a format has none, the edition defines a mark with its specification page first: [SVGStereo](https://github.com/Sparky-OS/svgstereo) for SVG, animated drawings included.
+  Every mark is registered in the shared library, [stereo-layer](https://github.com/Sparky-OS/stereo-layer), and on awesome-stereoscopy's [standards page](https://github.com/danielcamposramos/awesome-stereoscopy/blob/main/standards.md), so every program reads it the same way.
+
 ## Where each medium is explained
 
 - Stereo pictures and video, and who does what between programs, toolkits, KWin and drivers: [stereo-labor-division.md](stereo-labor-division.md).

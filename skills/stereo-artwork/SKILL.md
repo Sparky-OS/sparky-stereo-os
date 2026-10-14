@@ -36,6 +36,8 @@ When an animated element follows a path drawn on the image (orbits, a progress l
 Both eyes run from one animation clock, so the motion stays in step.
 Everything that can appear (messages, password prompts, progress) is drawn in both eyes, on the screen plane unless it belongs to a floating element.
 Nothing may appear in one eye only.
+Animated artwork keeps its mark on every frame: an animated SVG uses the [SVGStereo](https://github.com/Sparky-OS/svgstereo) mark (0.2, animated drawings: one timeline, nothing crosses the boundary between the views), and animated raster artwork uses its format's own stereo field where its specification has one.
+Every mark is registered in [stereo-layer](https://github.com/Sparky-OS/stereo-layer) and the shared standards documents first.
 
 ## Looks and themes: whose they are, and the glass
 

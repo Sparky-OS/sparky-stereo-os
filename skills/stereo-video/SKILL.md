@@ -19,6 +19,10 @@ The standard marks, each linked from awesome-stereoscopy's [standards page](http
 - **In MP4:** the `st3d` box of Spherical Video V2 (with `sv3d` for 360 and VR180).
 - **In Matroska and WebM:** `StereoMode` ([RFC 9559](https://www.rfc-editor.org/rfc/rfc9559)).
 
+**Use the format's own mark, and register it.** Each container and codec above has its own stereo field; use that one, never a private tag.
+A format without one gets a mark of ours only with its specification page first, like [SVGStereo](https://github.com/Sparky-OS/svgstereo).
+Every mark is registered in [stereo-layer](https://github.com/Sparky-OS/stereo-layer) and on the shared standards page before a program writes it.
+
 **Every program in the chain must carry the mark through, never drop it.**
 Most 3D breakage is a program in the middle silently writing a plain 2D file.
 

@@ -759,4 +759,22 @@ The Ed521 prototype is public-verification-only and unaudited.
 Trust-store membership, cryptographic verification and document-signature policy compliance are distinct.
 Credits do not imply endorsement or upstream acceptance.
 
+## Flat Headset and StereoDroid artwork (2026-10-14)
+
+**Sparky Stereo, by Daniel Ramos and partners.** Daniel Ramos directs the work.
+OpenAI GPT-6 Astra (`gpt-6-astra`), through Codex, drew the original SVGs and wrote their rendering and verification scripts. No image generator was used.
+Anthropic's Claude Sonnet, through Claude Code, integrated the artwork into the apps, the KRdp discovery entry and the packages.
+The artwork is licensed CC-BY-SA-4.0 and its scripts GPL-3.0-or-later (Daniel's decision, 2026-10-14). No KDE Connect badge or Sparky logo is included.
+
+- **David Miller, David Vignoni, Johann Ollivier Lapeyre, Kenneth Wimer, Nuno Pinheiro and Riccardo Iaconelli**, as credited by Debian's Oxygen copyright record, for [Oxygen](https://invent.kde.org/frameworks/oxygen-icons), the edition's icon theme and a glass/material style reference. No Oxygen artwork was copied.
+- **Stepan Roh and the DejaVu contributors**, and **Bitstream Inc.**, as credited in DejaVu's distributed records, for [DejaVu Sans](https://dejavu-fonts.github.io/) and its Vera foundation, used to render promotional lettering.
+- **GNOME's librsvg contributors**, and the **Cairo, Pango, HarfBuzz and Fontconfig contributors**, for SVG and text rendering. **The Python Software Foundation, Python contributors and Pillow contributors**, for the build scripts and image checks.
+- **Google and the Android SDK, AOSP and AndroidX contributors**, for aapt2, Android's resource formats, the SDK/NDK and Media3; the **Gradle, Kotlin, OpenJDK, CMake, Ninja, Git and Docker contributors**, for build and verification tools. Their distributed notices retain their individual credits.
+- **Fabian Druschke and the KDE Connect developers**, the **KRdp and KWin contributors**, **Marc-Andre Moreau, Thincast Technologies, Martin Fleisz, Armin Novak, Bernhard Miklautz and the FreeRDP contributors**, **Google LLC and the Cardboard contributors**, and **Intel Corporation, Rémi Turboult, Michel Pfeiffer and the pupnp contributors**, for the Flat Headset software built to verify the new resources. Names follow the projects' records, collected in [Flat Headset's attributions](https://github.com/Sparky-OS/flat-headset/blob/main/ATTRIBUTIONS.md).
+- **Harsha Raghu, Rohit Panchal, ShootingKing-AM, thezofx, Nick, Riccardo Zaglia, verypurple and the PhoneVR contributors**, and the **ALVR contributors**, for the tracked phone-viewer software behind StereoDroid's identity. [StereoDroid's attributions](https://github.com/Sparky-OS/stereodroid/blob/main/ATTRIBUTIONS.md) retain the full contributor records.
+
+The existing SparkyLinux, Debian and edition credits also apply.
+These credits do not imply upstream endorsement.
+The APK proof is a build/resource check; no artwork was installed on a device or published by this work.
+
 **Last updated**: 14 October 2026

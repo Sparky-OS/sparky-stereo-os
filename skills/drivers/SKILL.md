@@ -5,7 +5,9 @@ description: How the kernel and GPU drivers give Sparky Stereo OS its 3D modes a
 
 # Drivers: 3D modes and deep colour in the kernel
 
-**Check freshness first.** Written on 2026-10-07. The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; for the colour side also load [`deep-colour`](../deep-colour/SKILL.md).
+**Check freshness first.**
+Written on 2026-10-07.
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; for the colour side also load [`deep-colour`](../deep-colour/SKILL.md).
 
 ## What a display driver must do for HDMI 3D
 
@@ -32,7 +34,8 @@ Where mainline stands (October 2026): Intel's i915, nouveau and the Raspberry Pi
 
 ## Carrying patches until mainline takes them
 
-Kernel review is slow and careful, and a subsystem owes nobody a merge. Plan for it:
+Kernel review is slow and careful, and a subsystem owes nobody a merge.
+Plan for it:
 
 - **The edition's kernel carries the patches,** rebased on each release, so users have the feature while review goes on. Nothing in the edition waits for a merge.
 - **Send in kernel style:** the subsystem's mailing list (and Patchwork where it uses one), `scripts/checkpatch.pl` clean, one logical change per patch, a cover letter that states the measured result on real hardware, a `Tested-by:` only from someone who ran it.

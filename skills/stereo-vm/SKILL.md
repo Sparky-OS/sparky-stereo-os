@@ -6,7 +6,9 @@ description: >-
 
 # A virtual machine in stereo
 
-**Check freshness first.** Written on 2026-10-10. The guide [A virtual machine with a 3D display](../../docs/stereo-vm.md) says how the VM works; this skill says how to prove a change to it.
+**Check freshness first.**
+Written on 2026-10-10.
+The guide [A virtual machine with a 3D display](../../docs/stereo-vm.md) says how the VM works; this skill says how to prove a change to it.
 
 ## The design every viewer follows
 

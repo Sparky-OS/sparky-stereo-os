@@ -1,6 +1,7 @@
 # Stereo and HDR in one declaration: `kde-stereo-hdr-content`
 
-Design, 2026-10-13, by Daniel Ramos for Sparky Stereo OS. Status: design; nothing is built yet, and it has not been tried on an HDR screen.
+Design, 2026-10-13, by Daniel Ramos for Sparky Stereo OS.
+Status: design; nothing is built yet, and it has not been tried on an HDR screen.
 
 ## 1. The problem
 
@@ -23,7 +24,8 @@ The same contract as stereo: **programs describe what the content is; KWin's out
 
 ## 3. Who creates the layer: the shared frameworks, never the program
 
-Players and viewers need **no HDR code and no stereo code**. The shared layer reads the stream or file and declares:
+Players and viewers need **no HDR code and no stereo code**.
+The shared layer reads the stream or file and declares:
 
 | Content | Framework that creates and declares the layer | Programs served |
 |---|---|---|

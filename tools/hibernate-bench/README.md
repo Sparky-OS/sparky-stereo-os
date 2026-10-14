@@ -9,7 +9,8 @@ It answers questions such as:
 - Is hibernation **refused under `lockdown=integrity` / `lockdown=confidentiality`**, as the kernel documents?
 - If a kernel claims to allow hibernation under lockdown by **encrypting the image**: is the image really unreadable on disk, and does resume **refuse** an image with a flipped bit, a different kernel, or a changed PCR?
 
-Everything runs with throw-away keys generated on the first run. There is nothing to enrol on your machine, nothing to sign with a key of yours, and nothing is installed on the host when you use the Docker wrapper.
+Everything runs with throw-away keys generated on the first run.
+There is nothing to enrol on your machine, nothing to sign with a key of yours, and nothing is installed on the host when you use the Docker wrapper.
 
 ## What you need
 
@@ -33,7 +34,8 @@ Without Docker: `./bench --kernel ... --ksrc ... run policy hibernate` after ins
 
 ### A distribution kernel (modules, your own signature)
 
-A distribution kernel keeps virtio-blk (and most drivers) in modules, so the guest has to load them from its initramfs. Unpack the kernel's image and headers packages and point the bench at them:
+A distribution kernel keeps virtio-blk (and most drivers) in modules, so the guest has to load them from its initramfs.
+Unpack the kernel's image and headers packages and point the bench at them:
 
 ```sh
 dpkg-deb -x linux-image-REL.deb pkg; dpkg-deb -x linux-headers-REL.deb hdr
@@ -41,9 +43,12 @@ dpkg-deb -x linux-image-REL.deb pkg; dpkg-deb -x linux-headers-REL.deb hdr
     --kernel $PWD/pkg/boot/vmlinuz-REL --ksrc $PWD/hdr/usr/src/linux-headers-REL --modules-dir $PWD/pkg run policy hibernate
 ```
 
-`--modules-dir` takes `lib/modules/REL` or a tree that contains it; `--load-modules "a b"` names the modules to load (default `virtio_blk efivarfs`; dependencies come from `modules.dep`, modules built into the kernel are skipped, compressed modules are decompressed, the module signature survives that). If you signed the kernel yourself, add `--kernel-signed --db-cert your-db-certificate.crt`: the bench enrolls your public certificate next to its own throw-away keys and never needs your private key.
+`--modules-dir` takes `lib/modules/REL` or a tree that contains it; `--load-modules "a b"` names the modules to load (default `virtio_blk efivarfs`; dependencies come from `modules.dep`, modules built into the kernel are skipped, compressed modules are decompressed, the module signature survives that).
+If you signed the kernel yourself, add `--kernel-signed --db-cert your-db-certificate.crt`: the bench enrolls your public certificate next to its own throw-away keys and never needs your private key.
 
-Results are printed as `PASS` / `FAIL` / `INFO` lines per check, followed by a summary. Every run keeps its console logs under `bench-work/runs/<time>-<scenario>/` (`boot1.log`, `boot2.log`, the TPM log, the OVMF variable store). The exit status is 0 when every scenario met its expectation.
+Results are printed as `PASS` / `FAIL` / `INFO` lines per check, followed by a summary.
+Every run keeps its console logs under `bench-work/runs/<time>-<scenario>/` (`boot1.log`, `boot2.log`, the TPM log, the OVMF variable store).
+The exit status is 0 when every scenario met its expectation.
 
 ## Scenarios
 
@@ -62,7 +67,9 @@ Results are printed as `PASS` / `FAIL` / `INFO` lines per check, followed by a s
 
 A hibernation that dies before the image is complete (a kernel oops or panic while writing: the swap header is not marked) is reported as FAIL with the oops lines, never as "image not readable".
 
-`bench list` prints them. What a **stock kernel** does with the tamper scenarios (measured with this bench, Linux 7.3-rc6 with its small test configuration, Secure Boot on, no encryption): `tamper-pcr` is accepted, because nothing in the image or the kernel depends on the TPM; `tamper-flip` is refused only when the flipped bit breaks the compressed stream (`PM: lzo decompression failed`) and is **accepted** with `--compress none`, because an uncompressed image has no check at all; `tamper-kernel-version` and `tamper-kernel-code` are both **accepted**: on x86 the kernel never compares the kernel it booted with the kernel that wrote the image (`check_image_kernel()` with its `uname` comparison is compiled out when the architecture supplies its own image header, as x86 does; that header holds a magic number, the restore addresses and a digest of the memory map), so a boot kernel with a compatible layout resumes the image. The scenarios exist to show whether a proposed design closes those gaps, so they report FAIL on a stock kernel by design (`--expect-tamper accept` records the opposite expectation).
+`bench list` prints them.
+What a **stock kernel** does with the tamper scenarios (measured with this bench, Linux 7.3-rc6 with its small test configuration, Secure Boot on, no encryption): `tamper-pcr` is accepted, because nothing in the image or the kernel depends on the TPM; `tamper-flip` is refused only when the flipped bit breaks the compressed stream (`PM: lzo decompression failed`) and is **accepted** with `--compress none`, because an uncompressed image has no check at all; `tamper-kernel-version` and `tamper-kernel-code` are both **accepted**: on x86 the kernel never compares the kernel it booted with the kernel that wrote the image (`check_image_kernel()` with its `uname` comparison is compiled out when the architecture supplies its own image header, as x86 does; that header holds a magic number, the restore addresses and a digest of the memory map), so a boot kernel with a compatible layout resumes the image.
+The scenarios exist to show whether a proposed design closes those gaps, so they report FAIL on a stock kernel by design (`--expect-tamper accept` records the opposite expectation).
 
 ### What `kexec` measured (Linux 7.3-rc6, distribution-style configuration with `KEXEC_SIG` and IMA's Secure Boot policy, Secure Boot on, no lockdown)
 
@@ -74,7 +81,8 @@ A hibernation that dies before the image is complete (a kernel oops or panic whi
 | `kexec_file_load`, crash (kdump) kernel | refused, `EADDRNOTAVAIL` (this guest reserves no `crashkernel=` memory), not by the toggle | refused, `EPERM` |
 | an image staged before the toggle | | stays staged (`/sys/kernel/kexec_loaded`) |
 
-So the toggle does not keep signed `kexec_file_load` working: `kernel/kexec_core.c:kexec_load_permitted()` serves both system calls (and the documentation says so), and under Secure Boot the old call is refused anyway. `--expect-kexec-file allow` states the opposite expectation (a signed image still loads) and fails on this kernel. The option `--guest-sysctl FILE` also tells you which keys of a distribution's sysctl file the kernel does not have or does not accept.
+So the toggle does not keep signed `kexec_file_load` working: `kernel/kexec_core.c:kexec_load_permitted()` serves both system calls (and the documentation says so), and under Secure Boot the old call is refused anyway. `--expect-kexec-file allow` states the opposite expectation (a signed image still loads) and fails on this kernel.
+The option `--guest-sysctl FILE` also tells you which keys of a distribution's sysctl file the kernel does not have or does not accept.
 
 ## How it works
 
@@ -109,4 +117,5 @@ kconfig/               minimal kernel configuration fragment, and an example wit
 
 ## Licence
 
-GPL-2.0-or-later (SPDX headers in the files), the same family as the Linux kernel the bench is meant to help test. The module in `module/` is GPL-2.0 as it must be.
+GPL-2.0-or-later (SPDX headers in the files), the same family as the Linux kernel the bench is meant to help test.
+The module in `module/` is GPL-2.0 as it must be.

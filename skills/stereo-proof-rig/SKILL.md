@@ -6,7 +6,10 @@ description: >-
 
 # The proof rig
 
-**Check freshness first.** Written on 2026-10-07. The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill says what counts as proof; this one says how to produce it. No 3D display is needed: the rig captures what Stereo KWin hands to an output, both eyes side by side.
+**Check freshness first.**
+Written on 2026-10-07.
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill says what counts as proof; this one says how to produce it.
+No 3D display is needed: the rig captures what Stereo KWin hands to an output, both eyes side by side.
 
 ## The rig, in a throwaway container
 

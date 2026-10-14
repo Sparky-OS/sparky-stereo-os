@@ -5,13 +5,18 @@ description: How to write the first text a stranger meets (a README's top, the o
 
 # Writing front pages
 
-**Check freshness first.** Written on 2026-10-12, from the review of the edition's public texts: the README, the organisation profile, the beta-tester calls, the documents and the three open lists. The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first. If the [README](../../README.md) shows a newer practice, it wins.
+**Check freshness first.**
+Written on 2026-10-12, from the review of the edition's public texts: the README, the organisation profile, the beta-tester calls, the documents and the three open lists.
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
+If the [README](../../README.md) shows a newer practice, it wins.
 
-**The problem it solves.** The work was right and the texts were accurate, but a newcomer could not tell what the project is for.
+**The problem it solves.**
+The work was right and the texts were accurate, but a newcomer could not tell what the project is for.
 The content stays; its order and its words change.
 
 **Where it applies:** every text a stranger meets first.
-**Where it does not:** upstream pull requests and issues. Maintainers want the technical detail there, and [`sparky-stereo`](../sparky-stereo/SKILL.md) Part three applies.
+**Where it does not:** upstream pull requests and issues.
+Maintainers want the technical detail there, and [`sparky-stereo`](../sparky-stereo/SKILL.md) Part three applies.
 
 ## The rules
 

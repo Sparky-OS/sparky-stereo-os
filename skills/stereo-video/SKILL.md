@@ -6,17 +6,21 @@ description: >-
 
 # Stereo video, end to end
 
-**Check freshness first.** Written on 2026-10-07. The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; a player also loads [`stereo-window-3d-area`](../stereo-window-3d-area/SKILL.md) for its video layer.
+**Check freshness first.**
+Written on 2026-10-07.
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; a player also loads [`stereo-window-3d-area`](../stereo-window-3d-area/SKILL.md) for its video layer.
 
 ## The marks a video carries
 
-A side-by-side or top-and-bottom video is an ordinary 2D picture unless something says it holds two views. The standard marks, each linked from awesome-stereoscopy's [standards page](https://github.com/danielcamposramos/awesome-stereoscopy/blob/main/standards.md):
+A side-by-side or top-and-bottom video is an ordinary 2D picture unless something says it holds two views.
+The standard marks, each linked from awesome-stereoscopy's [standards page](https://github.com/danielcamposramos/awesome-stereoscopy/blob/main/standards.md):
 
 - **In the stream:** the H.264 and H.265 **frame packing arrangement SEI** (Table D-8: side by side, top and bottom, temporal interleaving and the older packings; `content_interpretation_type` gives the eye order; persistence says how long it holds). A 3D television reads this one and switches by itself.
 - **In MP4:** the `st3d` box of Spherical Video V2 (with `sv3d` for 360 and VR180).
 - **In Matroska and WebM:** `StereoMode` ([RFC 9559](https://www.rfc-editor.org/rfc/rfc9559)).
 
-**Every program in the chain must carry the mark through, never drop it.** Most 3D breakage is a program in the middle silently writing a plain 2D file.
+**Every program in the chain must carry the mark through, never drop it.**
+Most 3D breakage is a program in the middle silently writing a plain 2D file.
 
 ## Writers: encoders, muxers, editors, servers
 
@@ -31,7 +35,9 @@ A side-by-side or top-and-bottom video is an ordinary 2D picture unless somethin
 | PeerTube | a container's packing kept through transcoding, right eye first included | [#7816](https://github.com/Chocobozzz/PeerTube/pull/7816), merged |
 | Android's Media3 | the SEI read in MP4 and fragmented MP4, right-eye-first modes, `StereoMode` in the WebM muxer | [androidx/media #3439](https://github.com/androidx/media/pull/3439), in review |
 
-**Test every way the mark can be written.** An encoder option is not done when the common case passes: x265's option was correct with each SEI in its own unit, and a reviewer found stale bytes in `--single-sei` mode, a bug older than the option. Enumerate the modes (single SEI or not, access unit delimiters on and off, repeated headers on and off, every packing type) and check each stream with an independent parser and with FFmpeg's `trace_headers`.
+**Test every way the mark can be written.**
+An encoder option is not done when the common case passes: x265's option was correct with each SEI in its own unit, and a reviewer found stale bytes in `--single-sei` mode, a bug older than the option.
+Enumerate the modes (single SEI or not, access unit delimiters on and off, repeated headers on and off, every packing type) and check each stream with an independent parser and with FFmpeg's `trace_headers`.
 
 ## Readers: decoders and players
 
@@ -51,8 +57,11 @@ A side-by-side or top-and-bottom video is an ordinary 2D picture unless somethin
 
 ## Quality
 
-In the edition: decode at the source's depth (10, 12, 16 bits), keep each eye at full resolution (a high-quality filter, not a plain stretch, when a half-width or half-height source is scaled up), pass the colour description on (BT.709 or BT.2020, PQ or HLG, range), and play audio at 24-bit 48 kHz or more wherever the hardware offers it, with float output and SoXR for any resampling. In a patch offered upstream, keep the project's own defaults and make these paths available.
+In the edition: decode at the source's depth (10, 12, 16 bits), keep each eye at full resolution (a high-quality filter, not a plain stretch, when a half-width or half-height source is scaled up), pass the colour description on (BT.709 or BT.2020, PQ or HLG, range), and play audio at 24-bit 48 kHz or more wherever the hardware offers it, with float output and SoXR for any resampling.
+In a patch offered upstream, keep the project's own defaults and make these paths available.
 
 ## Proof for this kind of work
 
-As in the general skill, with a fixed set of clips, each LEFT red and RIGHT blue with a frame number: the SEI side by side and top and bottom, left eye first and right eye first; the same in Matroska; a clip whose SEI comes only on keyframes (ordinary x264 output: many players lose the mark after the first frame); an undeclared 32:9 clip; a plain 2D clip. For each: both eyes captured over time with the same frame number, the right colour in each eye, one declaration per stereo clip, none for the 2D clip, and the player's 2D parts identical in both eyes. For writers: the mark checked byte by byte against an independent writer, in every mode, and read back by a second program.
+As in the general skill, with a fixed set of clips, each LEFT red and RIGHT blue with a frame number: the SEI side by side and top and bottom, left eye first and right eye first; the same in Matroska; a clip whose SEI comes only on keyframes (ordinary x264 output: many players lose the mark after the first frame); an undeclared 32:9 clip; a plain 2D clip.
+For each: both eyes captured over time with the same frame number, the right colour in each eye, one declaration per stereo clip, none for the 2D clip, and the player's 2D parts identical in both eyes.
+For writers: the mark checked byte by byte against an independent writer, in every mode, and read back by a second program.

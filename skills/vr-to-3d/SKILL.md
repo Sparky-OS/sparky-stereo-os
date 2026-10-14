@@ -6,11 +6,16 @@ description: >-
 
 # From a VR engine to a 3D display
 
-**Check freshness first.** Written on 2026-10-07. The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
+**Check freshness first.**
+Written on 2026-10-07.
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
 
 ## The formula
 
-A game with a VR mode already renders two eyes. A 3D display can show them directly. What stands in the way is everything the VR mode does *for a headset*. [The formula](../../docs/formula.md), learned on Half-Life 2's own VR interface, lists what changes, and most VR games share its structure:
+A game with a VR mode already renders two eyes.
+A 3D display can show them directly.
+What stands in the way is everything the VR mode does *for a headset*.
+[The formula](../../docs/formula.md), learned on Half-Life 2's own VR interface, lists what changes, and most VR games share its structure:
 
 1. **The eyes go to a window,** not a headset: no lens distortion, each eye at the display's size.
 2. **The game drives the view,** not a head tracker: mouse and controller turn the camera as in the 2D game.
@@ -30,7 +35,8 @@ A game with a VR mode already renders two eyes. A 3D display can show them direc
 - `gamescope/`: `gamescope-3dtv`, and the nested present-mode patch (upstream as [gamescope #2438](https://github.com/ValveSoftware/gamescope/pull/2438), in review).
 - `anaglyph/`: an anaglyph shader for gamescope's ReShade, for screens without a 3D mode.
 
-The requests to Valve, with what would make the path clean: [Source-1-Games #8297](https://github.com/ValveSoftware/Source-1-Games/issues/8297) and [SteamVR-for-Linux #961](https://github.com/ValveSoftware/SteamVR-for-Linux/issues/961). Other open routes: [VRto3D](https://github.com/oneup03/VRto3D), an OpenVR driver for 3D displays, and the universal VR mods per engine listed in awesome-stereoscopy.
+The requests to Valve, with what would make the path clean: [Source-1-Games #8297](https://github.com/ValveSoftware/Source-1-Games/issues/8297) and [SteamVR-for-Linux #961](https://github.com/ValveSoftware/SteamVR-for-Linux/issues/961).
+Other open routes: [VRto3D](https://github.com/oneup03/VRto3D), an OpenVR driver for 3D displays, and the universal VR mods per engine listed in awesome-stereoscopy.
 
 ## Rules learned
 

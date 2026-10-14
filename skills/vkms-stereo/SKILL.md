@@ -6,7 +6,9 @@ description: >-
 
 # A virtual 3D display: VKMS in stereo
 
-**Check freshness first.** Written on 2026-10-08. The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill says what counts as proof; for driver work also load [`drivers`](../drivers/SKILL.md), and for captures of a compositor's eyes [`stereo-proof-rig`](../stereo-proof-rig/SKILL.md).
+**Check freshness first.**
+Written on 2026-10-08.
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill says what counts as proof; for driver work also load [`drivers`](../drivers/SKILL.md), and for captures of a compositor's eyes [`stereo-proof-rig`](../stereo-proof-rig/SKILL.md).
 The step-by-step guide is [Test stereo without a 3D TV](../../docs/test-stereo-without-a-3d-tv.md); the tool is [vkms-stereo-bench](../../tools/vkms-stereo-bench/README.md).
 
 ## When to use it

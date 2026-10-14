@@ -5,7 +5,9 @@ description: The routes a native Linux program uses to show stereo on Sparky Ste
 
 # Native Linux programs
 
-**Check freshness first.** Written on 2026-10-07. The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; for the drawing itself load [`stereo-two-cameras`](../stereo-two-cameras/SKILL.md), and for a 3D area inside a window [`stereo-window-3d-area`](../stereo-window-3d-area/SKILL.md).
+**Check freshness first.**
+Written on 2026-10-07.
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; for the drawing itself load [`stereo-two-cameras`](../stereo-two-cameras/SKILL.md), and for a 3D area inside a window [`stereo-window-3d-area`](../stereo-window-3d-area/SKILL.md).
 
 ## The routes
 
@@ -30,4 +32,5 @@ description: The routes a native Linux program uses to show stereo on Sparky Ste
 
 ## Proof
 
-As in the general skill: both eyes captured, one declaration, the 2D control. For a route change (Mesa, Xwayland), also the programs that already worked, rerun.
+As in the general skill: both eyes captured, one declaration, the 2D control.
+For a route change (Mesa, Xwayland), also the programs that already worked, rerun.

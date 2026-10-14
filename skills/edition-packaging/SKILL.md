@@ -6,11 +6,14 @@ description: >-
 
 # Packaging the edition
 
-**Check freshness first.** Written on 2026-10-07. The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
+**Check freshness first.**
+Written on 2026-10-07.
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
 
 ## Tasks, the Debian way
 
-People choose what they do, not package names. The edition offers its programs as **tasks**, like Debian's `task-kde-desktop`: one metapackage per role, plus a description file so `tasksel` lists them.
+People choose what they do, not package names.
+The edition offers its programs as **tasks**, like Debian's `task-kde-desktop`: one metapackage per role, plus a description file so `tasksel` lists them.
 
 | Task | For |
 |---|---|
@@ -31,21 +34,29 @@ People choose what they do, not package names. The edition offers its programs a
 
 ## tasksel lists only ours
 
-A small package ships `/usr/share/tasksel/descs/sparky-stereo.desc` (a parent task `sparky-stereo`, then one stanza per task with `Parent`, `Key`, `Section: user`). It diverts Debian's description files to a name that does not end in `.desc` (`dpkg-divert --rename` in `preinst`, removed in `postrm`), because tasksel reads only `*.desc`. Hardware-helper tasks such as isenkram's stay.
+A small package ships `/usr/share/tasksel/descs/sparky-stereo.desc` (a parent task `sparky-stereo`, then one stanza per task with `Parent`, `Key`, `Section: user`).
+It diverts Debian's description files to a name that does not end in `.desc` (`dpkg-divert --rename` in `preinst`, removed in `postrm`), because tasksel reads only `*.desc`.
+Hardware-helper tasks such as isenkram's stay.
 
 ## Only our builds are candidates
 
-The repository is pinned at 1001. A generated pin file blocks, at priority −1, the Debian and deb-multimedia builds of every package the edition's repository ships, plus Debian's `task-*` and the multimedia blend's metapackages. Generate it from the repository index, never by hand, and rebuild the apt-configuration package when the repository gains packages. This is the rule that already kept Bino ours: our build declares full side by side, and other builds would hand the compositor a picture outside the contract.
+The repository is pinned at 1001.
+A generated pin file blocks, at priority −1, the Debian and deb-multimedia builds of every package the edition's repository ships, plus Debian's `task-*` and the multimedia blend's metapackages.
+Generate it from the repository index, never by hand, and rebuild the apt-configuration package when the repository gains packages.
+This is the rule that already kept Bino ours: our build declares full side by side, and other builds would hand the compositor a picture outside the contract.
 
 A package set waiting for a rebuild is left out of the block until the rebuild lands (see the next section).
 
 ## Each build of ours
 
-Each is the distribution's source package plus our patch series, versioned with the suffix `+stereo3dN`, built in a fresh `debian:testing` container, and it keeps its source package, so the repository can offer `deb-src`. A 32-bit twin (Mesa and FFmpeg, for Steam and Wine) comes from the same source build as the 64-bit package: `dpkg` refuses to install the two together when a shared file such as the Debian changelog differs (`Multi-Arch: same`).
+Each is the distribution's source package plus our patch series, versioned with the suffix `+stereo3dN`, built in a fresh `debian:testing` container, and it keeps its source package, so the repository can offer `deb-src`.
+A 32-bit twin (Mesa and FFmpeg, for Steam and Wine) comes from the same source build as the 64-bit package: `dpkg` refuses to install the two together when a shared file such as the Debian changelog differs (`Multi-Arch: same`).
 
 ## The media stack sits on deb-multimedia
 
-Players and tools from deb-multimedia (VLC, mpv, OBS, HandBrake) link against its FFmpeg, which has a higher epoch than Debian's. So our stereo patches for FFmpeg and mpv go on deb-multimedia's source packages (`10:…-dmoN+stereo3dM`), with identical sonames, not on Debian's. Offer them to deb-multimedia in the agreed order, and upstream as before.
+Players and tools from deb-multimedia (VLC, mpv, OBS, HandBrake) link against its FFmpeg, which has a higher epoch than Debian's.
+So our stereo patches for FFmpeg and mpv go on deb-multimedia's source packages (`10:…-dmoN+stereo3dM`), with identical sonames, not on Debian's.
+Offer them to deb-multimedia in the agreed order, and upstream as before.
 
 ## Proof before shipping
 

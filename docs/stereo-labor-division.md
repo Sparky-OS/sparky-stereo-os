@@ -98,7 +98,8 @@ Your HUD, menus, crosshair, cursor and subtitles are drawn once, identical in bo
 Only the 3D world gets the second camera.
 Repeating the 2D in both eyes is KWin's job wherever the program can separate it: keep the 3D area in its own declared surface (as mpv keeps its video in its own layer) and the interface in ordinary 2D surfaces, and KWin shows every 2D surface in both eyes.
 Only a program that composes its 2D into the same frame as its 3D (a game's HUD, as in Half-Life 2) draws it into each half itself: the same 2D picture at one eye's size, doubled, never stretched across both halves.
-2D never sits over 3D that comes out of the screen: the 2D is at the screen's depth, the object in front of it, and the eyes get two conflicting depths. Move the 2D away from it, never push the 2D into depth: Half-Life 2's ammo row sat over the gun, so it moved to the top of the screen ([how Half-Life 2 reached a 3D display](https://github.com/danielcamposramos/sony-bravia-linux/blob/main/tools/vr-stereo-spectator/FORMULA.md), sections 4 and 6).
+2D never sits over 3D that comes out of the screen: the 2D is at the screen's depth, the object in front of it, and the eyes get two conflicting depths.
+Move the 2D away from it, never push the 2D into depth: Half-Life 2's ammo row sat over the gun, so it moved to the top of the screen ([how Half-Life 2 reached a 3D display](https://github.com/danielcamposramos/sony-bravia-linux/blob/main/tools/vr-stereo-spectator/FORMULA.md), sections 4 and 6).
 
 **Ways to hand it over:**
 - Draw both eyes into one buffer twice as wide, and declare it through the shared helper (`stereo_declare_x11()` or `stereo_declare_wayland()` with `STEREO_SBS_FULL`).
@@ -114,8 +115,7 @@ Ask for your window at one eye's size, and read your size from the usual places:
 On Wayland your surface keeps its size and the buffer behind it is scaled onto it (`wp_viewporter`).
 On X11 the real window is twice as wide behind the scenes, and the window manager's synthetic ConfigureNotify gives you your own size (ICCCM 4.1.5 and 4.2.3); a library that asks the X server for the raw window geometry sees the doubled window, and that is the one place a library adapts.
 
-**Eye order:**
-If your engine has its eyes reversed, fix it once, in your camera.
+**Eye order:** If your engine has its eyes reversed, fix it once, in your camera.
 If your stream says right eye first, swap it once, where you read the stream: `content_interpretation_type` 2 in the frame packing SEI (H.264 Annex D, D.2.26 in the 08/2021 edition; H.265 D.3.16; H.274 8.6 for VVC), or Matroska StereoMode 11 instead of 1 (RFC 9559).
 
 **You need no 3D hardware to work on it.**

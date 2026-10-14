@@ -6,11 +6,16 @@ description: >-
 
 # One world, two cameras
 
-**Check freshness first.** Written on 2026-10-07. The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; where the drawing sits inside an ordinary window, also load [`stereo-window-3d-area`](../stereo-window-3d-area/SKILL.md).
+**Check freshness first.**
+Written on 2026-10-07.
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; where the drawing sits inside an ordinary window, also load [`stereo-window-3d-area`](../stereo-window-3d-area/SKILL.md).
 
 ## The rule
 
-A stereo pair is the **same scene seen from two camera positions**, about an eye's distance apart. The program places two cameras at its projection and draws the scene once for each. It never draws once and then shifts items left and right one by one: that breaks lighting, shadows, occlusion and anything computed per view. Wrappers that inject stereo into programs follow the same rule and move the camera at the API.
+A stereo pair is the **same scene seen from two camera positions**, about an eye's distance apart.
+The program places two cameras at its projection and draws the scene once for each.
+It never draws once and then shifts items left and right one by one: that breaks lighting, shadows, occlusion and anything computed per view.
+Wrappers that inject stereo into programs follow the same rule and move the camera at the API.
 
 - **Parallel axes, never toe-in.** Turning the two cameras inward makes keystone distortion and vertical disparity, which the eyes cannot fuse. The cameras stay parallel and the projection is shifted (off-axis) instead.
 - **Choose the zero-parallax plane.** Points on it sit at screen depth in both eyes; nearer points come out of the screen (crossed disparity), farther ones go in. Put it where the scene's centre of interest is.

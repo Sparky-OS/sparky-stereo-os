@@ -1,7 +1,7 @@
 # Sparky Stereo OS
 
 **Create and explore in 3D on the screen you already have: paint, edit photos and video, study molecules and globes, then watch films and play games.**
-A 3D TV works, and so does any ordinary monitor with cheap red-cyan glasses.
+A 3D TV works, so does any ordinary monitor with cheap red-cyan glasses, and soon the phone already in your pocket, in a cardboard viewer.
 Sparky Stereo OS, Daniel Ramos's edition of SparkyLinux (by Paweł "pavroo" Pijanowski), is a Linux system with the KDE Plasma desktop.
 
 <a href="#seen-in-3d"><img src="docs/screenshots/stereo-desktop-dialogs-anaglyph.jpg" width="99%" alt="The Stereo Desktop in 3D: Marble's Settings menu and its Panels sub-menu in front of the Marble window, the windows behind stepping back one after another, and Marble's globe in 3D inside its window (red-cyan anaglyph)"></a>
@@ -29,7 +29,7 @@ A few pixels each, within limits you choose.
 ### VR is also a stereo monitor
 
 Most headsets are a pair of small screens, one for each eye, and the rest split one screen in two, just as a 3D TV does, so this one desktop serves both.
-- **Your phone or tablet as the 3D screen (coming):** in a cardboard viewer, an Android phone shows the desktop in 3D; tablets are too big for a viewer, so their route is the glasses-free (lenticular) 3D tablets of the early 2010s. 3D films already play on it, and the whole desktop is next ([photos of the first test](https://github.com/Sparky-OS/flat-headset#the-first-test-12-october-2026)). That puts a 3D screen in the hands of billions of people who already own an Android phone or tablet ([Google's count, 2021](https://techcrunch.com/2021/05/18/android-now-powers-3b-devices)).
+- **The 3D screen already in your pocket (coming):** in a cardboard viewer, an Android phone shows the desktop in 3D, each eye sharp and in full colour on its own half. The PC does the drawing, so older phones work too, and a phone in a drawer gets a second life instead of becoming e-waste. Tablets are too big for a viewer, so their route is the glasses-free (lenticular) 3D tablets of the early 2010s. 3D films already play on it, and the whole desktop is next ([photos of the first test](https://github.com/Sparky-OS/flat-headset#the-first-test-12-october-2026)). That puts a 3D screen in the hands of billions of people who already own an Android phone or tablet ([Google's count, 2021](https://techcrunch.com/2021/05/18/android-now-powers-3b-devices)).
 - **VR films:** Bino plays 360° and 180° films, flat or in 3D, on any 3D screen, and the mouse turns the view.
 - **VR games:** Half-Life 2 and DOOM (2016) reach a 3D screen through their VR modes.
 
@@ -68,6 +68,7 @@ What is built, what is coming, and an example theme in words: [For theme designe
 **Study and design in 3D: a globe, plots and molecules work in 3D today, and 3D models and circuit boards are in progress.**
 - **Learning and science:** Marble's globe, KAlgebra's plots, Kalzium's molecules and the Kubrick cube, in 3D by default on a 3D desktop.
 - **3D models and circuit boards:** 3D previews in OpenSCAD, KiCad and F3D are in progress.
+- **From the desk to the client, in full colour:** the same model in depth on a glasses-free 3D monitor at the engineer's desk (with [DisplayXR](https://displayxr.org), in progress), on a 3D TV or projector for a team or a training class, and on every worker's and client's own phone in a cardboard viewer ([Flat Headset](https://github.com/Sparky-OS/flat-headset), in development). It is open from end to end, so no one is tied to one display maker.
 
 Each program in full: [Programs](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).
 

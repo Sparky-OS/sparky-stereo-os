@@ -26,6 +26,22 @@ He did not live to see this edition, and it carries what he started: every packa
 
 ---
 
+## Milton Ponson and Christoph Dorn, Daniel's arms, and Ian Jacobs
+
+Daniel calls Milton and Christoph his arms.
+
+**Milton Ponson**, mathematician, chairs the W3C [Procedural Memory Knowledge Representation Community Group](https://www.w3.org/groups/cg/pm-kr/) with Daniel, and he was the first to see the potential in [Knowledge3D](https://github.com/danielcamposramos/Knowledge3D).
+
+**Christoph Dorn**, a main contributor to Knowledge3D and a member of the PM-KR group, who coined "semantic gravity cohered by meaning", is, in Daniel's words, so far the one person who really got it.
+
+**Ian Jacobs**, of the W3C team that looks after the Community Groups, heard Daniel out when PM-KR had to answer for itself, and showed this edition the way into the W3C's working groups.
+
+Milton and Christoph are named among the participants in the [PM-KR repository](https://github.com/w3c-cg/pm-kr).
+
+**Thank you, Milton, Christoph and Ian.**
+
+---
+
 ## Core Philosophy: Adaptation, Not Invention
 
 **What we did NOT invent:**

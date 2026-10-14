@@ -307,6 +307,7 @@ Most of Number 5's arm movements came from a telemetry suit worn on the puppetee
 
 In Daniel's own words: "I believe in Robonality™."
 The word is Eric's: Robonality™ is Eric Allard's trademark (US trademark application [99047765](https://tsdr.uspto.gov/#caseNumber=99047765&caseType=SERIAL_NO&searchType=statusSearch)).
+And for its song, "Who's Johnny" (1986): **El DeBarge**, who sang it, and **Peter Wolf** and **Ina Wolf**, who wrote it ([Wikipedia](https://en.wikipedia.org/wiki/Who%27s_Johnny)).
 For Daniel, AI will soon "feel" like Johnny.
 
 ---

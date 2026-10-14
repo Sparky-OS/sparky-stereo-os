@@ -41,6 +41,8 @@ So every change of ours arrives small, tested and explained.
 
 - **One format inside.** Programs decode or generate stereo in any standard and hand the desktop **full side by side**: both eyes at full size, left eye first, at any resolution, declared once. Stereo KWin's outputs, one per kind of screen, turn that into what each screen needs: a 3D television's HDMI 3D modes, anaglyph on any monitor, interleaved and frame-sequential displays, a headset. [How it works](../../docs/how-it-works.md) explains why, and why it is how PipeWire already handles sound.
 - **A program that has its own output modes loses them** in the edition's build, so nothing can break the contract; its stereo settings live in a sister folder with "stereo" in the name.
+  This is not removing functionality: Stereo KWin gives every program every output, on every screen.
+  There is no direct path to the screen, and a program's own modes would only be more inputs for the desktop to keep working.
 - **A window's 2D part and its 3D area are separate surfaces.** Menus, toolbars and on-screen displays are the window's own surface at one eye's size, identical in both eyes, and declare nothing. The 3D area (a video, a viewport, a canvas) is a surface of its own, declared as full side by side. Only a program that is stereo and full screen only makes its whole window stereo.
 - **Depth for the 2D parts** is declared, never faked: three planes, sunk, screen and popped, a few pixels each ([Depth on the desktop](../../docs/depth-on-the-desktop.md)).
 - **The whole specification in every API.** A stereo enum or field lists every frame packing the standards define (H.264 and H.265 Table D-8, Matroska `StereoMode` in [RFC 9559](https://www.rfc-editor.org/rfc/rfc9559)), both eye orders, never a subset. Every rule cites its specification; awesome-stereoscopy's [standards page](https://github.com/danielcamposramos/awesome-stereoscopy/blob/main/standards.md) links them.
@@ -48,6 +50,8 @@ So every change of ours arrives small, tested and explained.
 - **The engine, not the program.** When two programs need the same stereo code, it belongs in the layer they share (Qt Multimedia, MpvQt, Mesa, KWin), so each program's own change shrinks to its interface.
 - **House formats.** Stereo is one case of a rule for every medium: one format inside, conversions only where it enters and where it leaves, defaults from the hardware ([house formats](../../docs/house-formats.md)).
 - **Quality.** In the edition: video at the source's depth, each eye at full resolution, the colour description kept; audio at 24-bit 48 kHz or more wherever the hardware offers it. In a patch offered upstream: the project's own defaults stay, and the patch makes the higher-quality paths available.
+- **When two ways give the person different results, build them all.** If a design has two or more paths and each gives the person something different, the edition builds every path and offers them as a choice, with one as the default. When paths differ only inside the code, choose one and say why.
+  The contract above is not such a choice: a program's own output modes are not a path to the screen, Stereo KWin is.
 
 ---
 

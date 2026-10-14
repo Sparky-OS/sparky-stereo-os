@@ -314,6 +314,19 @@ For Daniel, AI will soon "feel" like Johnny.
 
 ## 2. The display path
 
+### 2.0 David Fattal and DisplayXR (special thanks)
+
+**Source**: [DisplayXR](https://github.com/DisplayXR/displayxr-runtime), the open OpenXR runtime for 3D displays; our thread with David: [#1928](https://github.com/DisplayXR/displayxr-runtime/issues/1928).
+
+**David Fattal**, co-founder of Leia Inc. and DisplayXR's maintainer, gave this edition his encouragement, his time and his effort, and supported it with the kind of display he builds.
+In October 2026:
+- he agreed that Sparky Stereo OS ships the DisplayXR runtime;
+- he invited us to package it with him;
+- he ran our KWin window-geometry publisher on a real Samsung Odyssey 3D, where the position it published matched the painted pixel in all 269 captures;
+- he found the one bug that run could find, and told us exactly how to reproduce it.
+
+**Thank you, David.**
+
 ### 2.1 The Linux kernel
 
 **Source**: [kernel.org](https://www.kernel.org/) **License**: GPL-2.0 **What we changed**: amdgpu lists and signals the HDMI 3D modes a display's EDID declares and times frame packing; full side by side handled in the DRM core, i915, nouveau and amdgpu; nouveau gains 16 bits per colour on Turing and newer; a fix for rumble-less gamepads in hid-betopff; VKMS, the virtual display driver, sets HDMI 3D modes and composes and writes back the frame of both eyes, on Louis Chauvet's configfs series.

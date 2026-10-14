@@ -40,6 +40,7 @@ So every change of ours arrives small, tested and explained.
 # Part one: the contract
 
 - **One format inside.** Programs decode or generate stereo in any standard and hand the desktop **full side by side**: both eyes at full size, left eye first, at any resolution, declared once. Stereo KWin's outputs, one per kind of screen, turn that into what each screen needs: a 3D television's HDMI 3D modes, anaglyph on any monitor, interleaved and frame-sequential displays, a headset. [How it works](../../docs/how-it-works.md) explains why, and why it is how PipeWire already handles sound.
+- **Per-monitor settings live in one place:** Stereo KWin's outputs (Display Configuration), and beneath them the drivers and the kernel. A program has no per-monitor stereo setting; it hands the same declared pair to every screen.
 - **A program that has its own output modes loses them** in the edition's build, so nothing can break the contract; its stereo settings live in a sister folder with "stereo" in the name.
   This is not removing functionality: Stereo KWin gives every program every output, on every screen.
   There is no direct path to the screen, and a program's own modes would only be more inputs for the desktop to keep working.

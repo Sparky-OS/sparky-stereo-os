@@ -66,7 +66,10 @@ By name, the Debian maintainers of the packages we carry with our patches, as th
 |---|---|
 | KWin, KFileMetaData | Debian Qt/KDE Maintainers; Aurélien Couderc, Patrick Franz |
 | Qt (qtbase), Qt Multimedia | Debian Qt/KDE Maintainers; Patrick Franz |
-| Analitza, KAlgebra, Dragon Player, KolourPaint | Debian Qt/KDE Maintainers; Aurélien Couderc |
+| Analitza, KAlgebra, Dragon Player, KolourPaint, Dolphin | Debian Qt/KDE Maintainers; Aurélien Couderc |
+| KIO, KIconThemes | Debian Qt/KDE Maintainers; Aurélien Couderc, Patrick Franz |
+| kio-extras | Debian Qt/KDE Maintainers; Aurélien Couderc, Pino Toscano |
+| ffmpegthumbs | Debian Qt/KDE Maintainers; Aurélien Couderc, Pino Toscano, Scarlett Moore |
 | Kalzium | Debian Qt/KDE Maintainers; Aurélien Couderc, Sune Vuorela |
 | Kubrick | Debian Qt/KDE Maintainers; Aurélien Couderc, Daniel Schepler, Lisandro Damián Nicanor Pérez Meyer, Sune Vuorela |
 | Marble | Debian Qt/KDE Maintainers; Aurélien Couderc, Matthias Geiger |
@@ -344,6 +347,11 @@ Existing KWin, libkscreen, Qt and FFmpeg credits above also apply.
 | [KImageFormats](https://invent.kde.org/frameworks/kimageformats) | LGPL-2.0-or-later | JPS and MPO plugins | Albert Astals Cid, Alex Merry, Halla Rempt, Brad Hards, Mirco Miranda, Daniel Novomeský and the other authors |
 | [KFileMetaData](https://invent.kde.org/frameworks/kfilemetadata) | LGPL-2.1-or-later | A `stereo3dLayout` property for every stereo mark the specifications define | Alexander Stippich, Christoph Cullmann, Friedrich W. H. Kossebau, Igor Poboiko, Jos van den Oever, Joshua Goins and the other authors |
 | [KIO](https://invent.kde.org/frameworks/kio), [Gwenview](https://apps.kde.org/gwenview/) | LGPL, GPL | Thumbnails that wait for a finished download; stereo photos in the viewer, in progress | David Faure and the KIO developers; Aurélien Gâteau and the Gwenview developers |
+| [KIO](https://invent.kde.org/frameworks/kio) | LGPL-2.0-or-later | Thumbnails that keep a stereo file's two views, marked in the cache as the thumbnail specification allows | David Faure, Carsten Pfeiffer, Malte Starostik, Méven Car, Akseli Lahtinen and the KIO developers |
+| [kio-extras](https://invent.kde.org/network/kio-extras) | LGPL-2.0-or-later | Thumbnails of stereo pictures (MPO, JPS, PNG with `sTER`, marked SVG) with both views | Carsten Pfeiffer, Malte Starostik, Andre Gemünd, Alexander Volkov, Kai Uwe Broulik, Pascal Létourneau and the kio-extras developers |
+| [ffmpegthumbs](https://invent.kde.org/multimedia/ffmpegthumbs) and [FFmpeg](https://ffmpeg.org/) | GPL-2.0-or-later, LGPL-2.1-or-later | Thumbnails of stereo videos, read from the stream's and the container's marks | Dirk Vanden Boer (ffmpegthumbnailer), Heiko Schäfer and the ffmpegthumbs developers; Fabrice Bellard, Michael Niedermayer and the FFmpeg developers |
+| [Dolphin](https://apps.kde.org/dolphin/) | GPL-2.0-or-later | Previews of stereo files in 3D (view, hover tooltip, information panel) and stereo icons, flat on 2D screens | Peter Penz, Frank Reininghaus, Méven Car, Konstantin Heil, Fredrik Höglund, Mark Gaiser and the Dolphin developers |
+| [KIconThemes](https://invent.kde.org/frameworks/kiconthemes) | LGPL-2.0-or-later | A stereo request for icon themes with pictures for both eyes | Geert Jansen, Antonio Larrosa, Michael Pyne and the KIconThemes developers |
 | [digiKam and Showfoto](https://www.digikam.org/) | GPL-2.0-or-later | Stereo photos in 3D in the album preview, light table, slideshow, image editor and Showfoto; a Showfoto crash at quit fixed | Gilles Caulier, Maik Qualmann, Michael Miller, Marcel Wiesweg, the founder Renchi Raju and the digiKam developers |
 | [KolourPaint](https://apps.kde.org/kolourpaint/) | BSD-2-Clause, LGPL | Stereo pictures in 3D, edited as one side-by-side pair that keeps its stereo mark when saved | Clarence Dang (founder), Thurston Dang, Martin Koller (maintainer) and the KolourPaint authors |
 

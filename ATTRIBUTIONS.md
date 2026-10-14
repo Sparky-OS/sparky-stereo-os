@@ -43,7 +43,7 @@ He did not live to see this edition, and it carries what he started: every packa
 - **The separation rule:** a window's 2D part and its 3D area are separate surfaces, so menus and text stay crisp at one eye's size while the 3D area carries both eyes.
 - **The depth rules for the desktop:** sunk, screen and popped planes, text at its element's depth, effects of a few pixels.
 - **A fix in each program where stereo or deep colour broke**, in that program's own style, listed below with the people who wrote the program.
-- **Fixes offered to the projects they belong to**, six of them merged so far (section 7).
+- **Fixes offered to the projects they belong to**, the merged ones listed with their maintainers in [Merged outside Sparky Stereo](docs/upstream-merges.md) (section 7).
 - **The edition's packaging:** our patches on Debian's own source packages, role tasks for gamers, designers, creators, musicians, scientists, students and simmers, and a system that keeps itself small.
 
 ---
@@ -430,20 +430,11 @@ The profiles add names and provenance; they do not replace the raw controls.
 
 ## 7. The maintainers who reviewed and merged our work
 
-Every merge below was a maintainer's decision, made on the code.
+Every merge was a maintainer's decision, made on the code.
 
-**Merged:**
-- **HandBrake** [#8100](https://github.com/HandBrake/HandBrake/pull/8100): merged by **Damiano Galassi** (galad87), 16 September 2026.
-- **Universal Media Server** [#6330](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6330): merged by **SubJunk**, 19 September 2026, released in 15.9.0.
-- **MKVToolNix** [ebd8445b](https://codeberg.org/mbunkus/mkvtoolnix/commit/ebd8445b1185d35d6bdbb9c1463757fbc9aa7c29): merged by **Moritz Bunkus**, 21 September 2026.
-- **MKVToolNix** [70889f220e](https://codeberg.org/mbunkus/mkvtoolnix/commit/70889f220e), the HEVC half: merged by **Moritz Bunkus** on 11 October 2026, with tests of his own around our test files ([db3410509d](https://codeberg.org/mbunkus/mkvtoolnix/commit/db3410509d)).
-- **mpv** [#18490](https://github.com/mpv-player/mpv/pull/18490): merged by **Kacper Michajłow** (kasper93), 23 September 2026, after a careful review by llyyr.
-- **Qt Multimedia** [778399](https://codereview.qt-project.org/c/qt/qtmultimedia/+/778399): approved by **Tim Blechmann** and merged on 8 October 2026; the same fix is in Qt 6.12 too ([778580](https://codereview.qt-project.org/c/qt/qtmultimedia/+/778580), 9 October 2026).
-- **Bino** [e1be2918fe](https://github.com/marlam/bino/commit/e1be2918fe): applied by **Martin Lambers**, 9 October 2026.
-- **spice-gtk** [!159](https://gitlab.freedesktop.org/spice/spice-gtk/-/merge_requests/159): merged by **Marc-André Lureau**, 10 October 2026.
-- **PeerTube** [#7816](https://github.com/Chocobozzz/PeerTube/pull/7816): merged by **Chocobozzz**, 13 October 2026, after he reshaped it into the transcoding profile and handled rotation ([899cb02](https://github.com/Chocobozzz/PeerTube/commit/899cb0208850f2238d551a9bf687fd96460dc3f0)).
-- **wiz3D** [#33](https://github.com/effcol/wiz3D/pull/33): merged by **effcol**, 13 October 2026, after an MSVC rebuild on both architectures.
-- **Teams for Linux** [#3070](https://github.com/IsmaelMartinez/teams-for-linux/pull/3070): from our report [#3067](https://github.com/IsmaelMartinez/teams-for-linux/issues/3067), fixed by its maintainer, **Ismael Martinez**, 7 October 2026, released in 2.25.0.
+**Merged:** every merge, with the maintainer who made it and its date, is in [Merged outside Sparky Stereo](docs/upstream-merges.md), the one list we keep current.
+
+**Also by a maintainer, for our work:**
 - **DisplayXR** [4c1ad090](https://github.com/DisplayXR/displayxr-runtime/commit/4c1ad090e7d5dc8293f6749d49741ec27c4072c6) (#1929): the per-compositor packaging that lets a KWin window-geometry publisher sit beside GNOME's, written by **David Fattal** on 11 October 2026 after our questions in [#1928](https://github.com/DisplayXR/displayxr-runtime/issues/1928).
 
 **In review**, with thanks to everyone reviewing: FFmpeg, x265 (MulticoreWare's collaborators shaped its `--frame-packing` option), VLC, gamescope, NVIDIA's open kernel modules, Android's Media3 and Qt.

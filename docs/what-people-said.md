@@ -31,4 +31,4 @@ skyfishgoo, on the KDE Discuss thread about real depth on the desktop ([KDE Disc
 
 ## Merged
 
-The maintainers who read the change and merged it are listed, with links, in [Merged outside Sparky Stereo](upstream-merges.md): HandBrake, mpv, MKVToolNix, Qt, Bino, spice-gtk, Universal Media Server, PeerTube and wiz3D.
+The maintainers who read the change and merged it are listed, with links, in [Merged outside Sparky Stereo](upstream-merges.md).

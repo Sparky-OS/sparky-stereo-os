@@ -150,3 +150,26 @@ Coordinate the actual audio graph with the [audio skill](../audio/SKILL.md).
 Continuously driven multichannel rendering, audio-time pose alignment and physical headset qualification remain separate work.
 360/VR180 projection and the Stereo Spectator's reverse path remain separate integrations.
 No camera tracking or foveated streaming is introduced by these proofs.
+
+## Headset desktop quality and codec qualification (checked 2026-10-14)
+
+Keep the headset viewport in KWin's output configuration: fitted, full-height with panning, zoomed region, and native standalone with KDE fractional scaling.
+Fitted remains the default; optional active-window centering starts off and must not move windows on the real monitor.
+Match the capture and encode geometry to the panel identity, and adapt bitrate to measured delivery without silently discarding native pixels.
+Treat lost worker wakeups, decoder queues and presentation/readback as separate latency stages.
+An offline decode speed or a selected low-latency encoder flag is not a display-latency measurement.
+The connected, visible Android session owns keep-screen-on and supported sustained-performance mode; bounded wake leases must be released on pause and disconnect.
+Sustained-performance mode does not promise to prevent thermal throttling.
+
+H.264 stays the compatible default.
+[MS-RDPEGFX](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rdpegfx/31c6e2b1-335b-4a75-9454-bb2309958c21) negotiates AVC graphics, not an HEVC codec identifier.
+A locally qualified HEVC transport prototype uses a separately named [dynamic virtual channel](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rdpedyc/3bd53020-9b64-4c9a-97fc-90a79e7e1e06) inside the existing authenticated RDP connection.
+It checks version and capabilities before selecting a codec, waits for decoder acknowledgement, and leaves standard graphics available for older clients or failed negotiation.
+This prototype transfers bounded fixtures; it is not yet a released live HEVC viewer option.
+
+A decoder MIME type is insufficient: check profile, bit depth, colour format, panel size and rate, then decoder initialization.
+The emulated Android HEVC decoder accepts a 2340×1080 fixture but declares that size at 30 Hz, not 60 Hz; its faster offline batch decode must not override the declared rate limit.
+[Android VideoCapabilities](https://developer.android.com/reference/android/media/MediaCodecInfo.VideoCapabilities) owns the size-and-rate check.
+Keep H.264 when HEVC cannot meet the requested panel mode.
+Do not infer HEVC Screen Content Coding support from HEVC Main support; qualify the specific tools at both ends.
+Credits: KDE, Fabian Druschke and KDE Connect, FreeRDP, Google Android and Cardboard, FFmpeg, Mesa and libva developers.

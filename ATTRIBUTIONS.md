@@ -40,6 +40,44 @@ Milton and Christoph are named among the participants in the [PM-KR repository](
 
 **Thank you, Milton, Christoph and Ian.**
 
+**Dave Raggett**, W3C veteran and lead of the Cognitive AI Community Group, whose feedback on declarative and procedural knowledge shaped the direction of PM-KR.
+
+### The W3C PM-KR Community Group, its members and their organisations
+
+Every member of the group, as the W3C lists them on 14 October 2026 ([participants](https://www.w3.org/groups/cg/pm-kr/participants), [former participants](https://www.w3.org/groups/cg/pm-kr/former-participants/)), and the early contributors named in the [PM-KR repository](https://github.com/w3c-cg/pm-kr):
+
+- Chairs: **Milton Ponson** (Rainbow Warriors Core Foundation) and **Daniel Ramos** (EchoSystems AI Studios).
+- **Hanna Abi Akl** (Inria)
+- **Xavier Aimé** (Cogsonomy)
+- **Majid Babaei** (affiliated with the University of the Fraser Valley)
+- **Oserebameh Beckley**
+- **Damir Cavar** (Indiana University)
+- **Aswin Chandrasekaran** (affiliated with Zoho Corporation)
+- **Hsin Yi Chen**
+- **Shaun Conway** (ixo.world)
+- **Matthieu Dionne** (affiliated with the University of Ottawa)
+- **Christoph Dorn**
+- **Aaron Goh** (affiliated with Modern Relay)
+- **Iris Johnson** (affiliated with NHL Stenden)
+- **Thanh Le**
+- **Paul Murdock**
+- **Nitin Pasumarthy** (affiliated with LinkedIn)
+- **Antonio Luigi Pinna**
+- **Dave Richardson** (Spectacular Voyage LLC)
+- **Anisa Rula** (University of Brescia)
+- **Henrique Santos** (Rensselaer Polytechnic Institute)
+- **Saatvika Sathi**
+- **Stewart Smith** (Advanced Projects Group)
+- **Charles Waweru**
+
+The members who have since left the group, with the same thanks:
+
+- **Alex Higuera** (Digital Credentials Consortium)
+- **Heraldo Luciano**
+- **Adam Sobieski** (Phoster, Inc.)
+
+And the early contributors the repository names among the group's first ingressors: **Jonathan DeRouchie**, and the **OpenFn** organisation, which brought real-world validation.
+
 ---
 
 ## Core Philosophy: Adaptation, Not Invention

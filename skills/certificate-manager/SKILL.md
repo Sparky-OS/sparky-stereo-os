@@ -1,7 +1,5 @@
----
-name: certificate-manager
-description: Verified ICP-Brasil catalogue work and Ed521 interoperability for Sparky CA, with boundaries between OpenSSL, NSS, Java and KDE. Load sparky-stereo first.
----
+--- name: certificate-manager description: Verified ICP-Brasil catalogue work and Ed521 interoperability for Sparky CA, with boundaries between OpenSSL, NSS, Java and KDE.
+Load sparky-stereo first. ---
 
 # Certificate manager contributions
 
@@ -12,15 +10,50 @@ The KDE interface follows them; acceptance of the verifier does not establish br
 
 ## Preserve the trust boundary
 
-- Package root fingerprints are reviewed inputs. A refresh cannot authorize a new root. A trust anchor is authenticated by its pin, not its self-signature.
-- Keep expired and revoked certificates visible and excluded from default installation. Preserve historical capabilities and provenance.
-- Verify HTTPS, the published ZIP hash and each supported certificate chain. Never disable TLS checks to compensate for a missing server intermediate.
-- Test system/NSS stores, personal imports and tokens only inside isolated containers. Use generated public fixtures; never a real personal certificate.
+- Package root fingerprints are reviewed inputs.
+  A refresh cannot authorize a new root.
+  A trust anchor is authenticated by its pin, not its self-signature.
+- Keep expired and revoked certificates visible and excluded from default installation.
+  Preserve historical capabilities and provenance.
+- Verify HTTPS, the published ZIP hash and each supported certificate chain.
+  Never disable TLS checks to compensate for a missing server intermediate.
+- Test system/NSS stores, personal imports and tokens only inside isolated containers.
+  Use generated public fixtures; never a real personal certificate.
 - Keep the same core behind the application, command line and automation.
+
+## Keep the user's choice the only way a group is selected
+
+- A group is chosen only by `install` and `remove`, which write the store's ownership list.
+  Automatic updates read that list; they never write it.
+- Automatic updates may add a renewed intermediate of a chosen group and remove an owned certificate that expired or was revoked.
+  They never add a root, never choose a group and never install an Ed521 certificate.
+  A certificate that waits for the user's choice is reported once, not every day.
+- A revocation is permanent.
+  A failed or unverifiable CRL never turns a known revoked certificate good, and an unknown answer never removes anything.
+  A CRL counts only when it names its issuer, verifies against the issuer's key, is complete and has not passed its next update.
+- A failed refresh keeps the last verified catalogue and the stores.
+  The refreshed catalogue replaces the packaged one only from a root-owned file and only if it still holds everything the package ships.
+- The repository job that verifies ITI's bundle holds no write permission.
+  A second job opens the pull request.
+  A new root arrives only as a reviewed commit; the job opens an issue with the fingerprint instead.
+- Test time-dependent steps with libfaketime, never by editing a certificate.
+  The timers and the root helper path need a real systemd and root; a container that runs as an ordinary user checks only the unit files.
+
+## Trust purposes are separate decisions
+
+Roots that browsers trust for web sites (TLS) are not trusted to sign PDFs.
+Okular and Poppler read the NSS store, which keeps separate trust for TLS and for S/MIME and document signing.
+Installing a group gives TLS trust only, so a signed PDF stays untrusted until the user grants the signing purpose on purpose.
+GnuPG's trust list for Kleopatra is a third, separate decision.
+Say this in the user documentation in plain words.
+
+The KIO certificate manager API is published by a small patch to KIO.
+It ships through our kio6 package and our KIO fork after the KDE CI run is green.
 
 ## Ed521 lessons measured against ITI
 
-Pedro F. Albanese is the reference implementation's author.
+Pedro F.
+Albanese is the reference implementation's author.
 Preserve his ISC credit and make contributions with him; do not present the port as independent invention.
 ITI's real v7 uses OID 1.3.6.1.4.1.44588.2.1, absent algorithm parameters, a 66-byte public key, a 132-byte signature and the complete 132-byte SHAKE256 challenge.
 Verify must not modify its caller's signature.

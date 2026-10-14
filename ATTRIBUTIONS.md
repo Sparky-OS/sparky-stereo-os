@@ -750,9 +750,12 @@ The IEM route is proposed; its processing latency was not measured by the AMB te
 - **The p11-kit, OpenSC and pcsc-lite contributors**, for PKCS#11 module registration and public token inspection; **the GnuPG contributors**, for the separate S/MIME trust store used by Kleopatra.
 - **The Poppler contributors** and **the Okular developers**, for PDF certificate and signature APIs. The upstream projects and Debian copyright records name their contributors.
 - **The Kleopatra developers**, as named in Kleopatra's about data, for the GnuPG certificate and smart-card interface checked alongside this work.
+- **D. Cooper, S. Santesson, S. Farrell, S. Boeyen, R. Housley and W. Polk**, authors of RFC 5280, for the certificate revocation list profile the automatic update follows.
+- **Wolfgang Hommel** and **the libfaketime contributors**, as named in its copyright record, for the time control that lets the update tests run months ahead without editing a certificate.
+- **KDE's KNotifications contributors** and **the systemd contributors**, for the notifications and timers that report and schedule the automatic update.
 
 The Ed521 prototype is public-verification-only and unaudited.
 Trust-store membership, cryptographic verification and document-signature policy compliance are distinct.
 Credits do not imply endorsement or upstream acceptance.
 
-**Last updated**: 12 October 2026
+**Last updated**: 14 October 2026

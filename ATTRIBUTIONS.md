@@ -752,6 +752,7 @@ The IEM route is proposed; its processing latency was not measured by the AMB te
 - **The Kleopatra developers**, as named in Kleopatra's about data, for the GnuPG certificate and smart-card interface checked alongside this work.
 - **D. Cooper, S. Santesson, S. Farrell, S. Boeyen, R. Housley and W. Polk**, authors of RFC 5280, for the certificate revocation list profile the automatic update follows.
 - **Wolfgang Hommel** and **the libfaketime contributors**, as named in its copyright record, for the time control that lets the update tests run months ahead without editing a certificate.
+- **.SE (The Internet Infrastructure Foundation)**, **SURFnet bv** and **Ondřej Surý** (Debian packaging), as named in SoftHSM's copyright record, for the stand-in token the A3 path is tested with.
 - **KDE's KNotifications contributors** and **the systemd contributors**, for the notifications and timers that report and schedule the automatic update.
 
 The Ed521 prototype is public-verification-only and unaudited.

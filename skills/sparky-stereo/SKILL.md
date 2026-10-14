@@ -104,6 +104,7 @@ Load the one that matches the work; the [program list](../../docs/programs-in-de
 | [`power-idle`](../power-idle/SKILL.md) | KDE idle, lock, laptop lids, power-profile holds, CEC ownership and console isolation proof |
 | [`system-housekeeping`](../system-housekeeping/SKILL.md) | Self-pruning defaults (kernels, logs, crash dumps, GRUB) and cleaning a system safely |
 | [`ai-partners`](../ai-partners/SKILL.md) | AI assistants joining the work: roles, briefs, proof, review, upstream manners, provenance |
+| [`upstream-outreach`](../upstream-outreach/SKILL.md) | Bringing AI-assisted work to projects and people: a heads-up to the maintainer before any merge request, evidence first, one ask, one knock, the right venue |
 | [`audio`](../audio/SKILL.md) | PipeWire, WirePlumber and KDE's Sound page: the audio house format, routing, formats, passthrough, virtual surround, MIDI |
 | [`brazil-certificates`](../brazil-certificates/SKILL.md) | ICP-Brasil certificates, the E-521 root, browsers, tokens and the court signer |
 | [`certificate-manager`](../certificate-manager/SKILL.md) | Sparky CA's verified ICP-Brasil catalogue and Ed521 checks across OpenSSL, NSS, Java and KDE |

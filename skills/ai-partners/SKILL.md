@@ -43,6 +43,7 @@ Everything below was learned on real work, most of it by getting something wrong
 ## Upstream manners
 
 - **Early contact:** when a project already has the solution, write early: what we use from it, and thanks. When it does not, bring the formula, the links and the patches. Until a project takes our change, keep a stereo fork.
+- **Never cold:** a short heads-up to the maintainer before any merge request, with the evidence and the AI help stated up front ([`upstream-outreach`](../upstream-outreach/SKILL.md)).
 - **Short and human first.** One problem per message, the diff before the story, the cause proved (a minimal reproduction beats a long explanation), AI assistance disclosed once.
 - **Answer the technical points, never the tone.** If a thread turns against the tool rather than the code, stop and let the record speak; take conduct questions to the project's proper channel.
 - **Respect each project's rules on AI.** Some decline AI-assisted code (QEMU, nouveau): keep that work in our forks and packages, report the bugs we find, and do not push.

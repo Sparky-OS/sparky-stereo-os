@@ -6,11 +6,15 @@ description: >-
 
 # From 3D content to a headset
 
-**Check freshness first.** Checked on 2026-10-11. The phone display has an emulated integration proof; release packaging and physical-device qualification remain. The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
+**Check freshness first.**
+Checked on 2026-10-11.
+The phone display has an emulated integration proof; release packaging and physical-device qualification remain.
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
 
 ## The principle
 
-A headset is a stereoscope you wear, so in the edition it is **one more output of Stereo KWin**: programs keep handing over full side by side, exactly as for a 3D television, and the headset's output filter does what only a headset needs (lens correction, head tracking, placing the picture in space). No program has to know a headset exists.
+A headset is a stereoscope you wear, so in the edition it is **one more output of Stereo KWin**: programs keep handing over full side by side, exactly as for a 3D television, and the headset's output filter does what only a headset needs (lens correction, head tracking, placing the picture in space).
+No program has to know a headset exists.
 
 - **Flat stereo content** (a 3D film, a stereo photo, a 3D window) appears on a virtual screen in front of the viewer, each eye seeing its own view.
 - **360 and VR180 video** carries its projection in the stream (`sv3d` in MP4, mpv's `demux-projection`); in a headset the viewer looks around by turning their head, on the other registered outputs by the mouse, from the same file ([`stereo-video`](../stereo-video/SKILL.md)).

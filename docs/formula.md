@@ -2,11 +2,17 @@
 
 **For game and engine developers:** what to change so a game's VR mode drives a 3D TV, projector or monitor instead of a headset, learned on Half-Life 2.
 
-A game with a VR mode already renders two eyes. A 3D television, projector or monitor can show those two eyes directly, side by side or top and bottom, with no headset. What stands in the way is everything the VR mode does *for a headset*: head tracking, lens distortion, a floating HUD panel, a cursor in a virtual screen. This file lists what has to change, learned by doing it on Half-Life 2 (2026-09-24, `sourcevr/`), whose own VR interface (`ISourceVirtualReality`) made it a good teacher: the structure below is what most VR games share.
+A game with a VR mode already renders two eyes.
+A 3D television, projector or monitor can show those two eyes directly, side by side or top and bottom, with no headset.
+What stands in the way is everything the VR mode does *for a headset*: head tracking, lens distortion, a floating HUD panel, a cursor in a virtual screen.
+This file lists what has to change, learned by doing it on Half-Life 2 (2026-09-24, `sourcevr/`), whose own VR interface (`ISourceVirtualReality`) made it a good teacher: the structure below is what most VR games share.
 
-Why games at all: "games and animated films use virtual rather than physical cameras and are therefore much easier to convert to 3D" (Linus Tech Tips, [*Was 3D TV actually poo?*, 2022, 19:02](https://www.youtube.com/watch?v=Dbjb2spwQVg&t=1142s)). An engine holds the scene as geometry, so the second eye is a second camera, not a guess.
+Why games at all: "games and animated films use virtual rather than physical cameras and are therefore much easier to convert to 3D" (Linus Tech Tips, [*Was 3D TV actually poo?*, 2022, 19:02](https://www.youtube.com/watch?v=Dbjb2spwQVg&t=1142s)).
+An engine holds the scene as geometry, so the second eye is a second camera, not a guess.
 
-wiz3D solves a different problem, stereo for games that never had a VR mode (a DirectX proxy; in iZ3D's tradition it renders each draw twice). Our work on it brings it to the same design as this formula: it takes the camera the game hands the API and renders that camera's view for each eye, keeping the per-draw shift inside as the fallback for draws that show no camera. This formula is for games that already have a VR mode.
+wiz3D solves a different problem, stereo for games that never had a VR mode (a DirectX proxy; in iZ3D's tradition it renders each draw twice).
+Our work on it brings it to the same design as this formula: it takes the camera the game hands the API and renders that camera's view for each eye, keeping the per-draw shift inside as the fallback for draws that show no camera.
+This formula is for games that already have a VR mode.
 
 ## 1. The eyes: a window, not a headset
 
@@ -55,4 +61,5 @@ wiz3D solves a different problem, stereo for games that never had a VR mode (a D
 
 ## 9. What stayed the same
 
-Shadows, lighting, level transitions, saves and loads needed nothing: the engine renders each eye itself, so everything it renders is right in both. That is the advantage of a VR engine over a stereo proxy, and why this formula starts from one.
+Shadows, lighting, level transitions, saves and loads needed nothing: the engine renders each eye itself, so everything it renders is right in both.
+That is the advantage of a VR engine over a stereo proxy, and why this formula starts from one.

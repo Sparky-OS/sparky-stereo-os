@@ -6,7 +6,9 @@ description: >-
 
 # Stereo pictures
 
-**Check freshness first.** Written on 2026-10-07. The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; a viewer also loads [`stereo-window-3d-area`](../stereo-window-3d-area/SKILL.md) for its picture area.
+**Check freshness first.**
+Written on 2026-10-07.
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; a viewer also loads [`stereo-window-3d-area`](../stereo-window-3d-area/SKILL.md) for its picture area.
 
 ## The formats
 

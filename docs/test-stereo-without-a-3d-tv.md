@@ -148,6 +148,5 @@ On the kernel without the patches, the bench reported exactly the failures in th
 
 VKMS was written by Rodrigo Siqueira and Haneen Mohammed, and is maintained by Louis Chauvet, with Haneen Mohammed, Simona Vetter and Melissa Wen as reviewers.
 José Expósito wrote VKMS's configfs interface, and Louis Chauvet's v5 series adds the connector type and EDID attributes this bench stands on.
-IGT's `kms_3d` was written by Thomas Wood (Intel) in 2014.
-edid-decode was written by Adam Jackson (Red Hat) and is maintained by Hans Verkuil (Cisco).
+IGT's `kms_3d` was written by Thomas Wood (Intel) in 2014. edid-decode was written by Adam Jackson (Red Hat) and is maintained by Hans Verkuil (Cisco).
 The bench and the stereo patches are by Daniel Ramos, directed and verified, with Claude (Anthropic) as an AI partner.

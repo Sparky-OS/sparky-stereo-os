@@ -9,7 +9,10 @@
 
 That is what makes stereo work across GPUs, across monitors (2D ones included) and across every 3D output format.
 
-**One picture, any screens, any GPUs.** One mirrored desktop on two 3D televisions at once, frame packing at 30 Hz from an AMD integrated GPU and top and bottom at 60 Hz from an NVIDIA RTX 3060, both in 3D. The program drew one full side-by-side picture; each output converted it for its own screen. It takes both halves: our driver changes, which give amdgpu and NVIDIA's open kernel modules the HDMI 3D modes, and this one-format contract.
+**One picture, any screens, any GPUs.**
+One mirrored desktop on two 3D televisions at once, frame packing at 30 Hz from an AMD integrated GPU and top and bottom at 60 Hz from an NVIDIA RTX 3060, both in 3D.
+The program drew one full side-by-side picture; each output converted it for its own screen.
+It takes both halves: our driver changes, which give amdgpu and NVIDIA's open kernel modules the HDMI 3D modes, and this one-format contract.
 
 **Two places, two rules.**
 Inside a program, anything goes: a player reads every packing a file can carry, an engine renders its eyes however it likes.

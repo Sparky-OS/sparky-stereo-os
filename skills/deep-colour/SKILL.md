@@ -5,11 +5,15 @@ description: How 10, 12 and 16 bits per colour reach the screen on Sparky Stereo
 
 # Deep colour, the whole path
 
-**Check freshness first.** Written on 2026-10-07. The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first. HDR facts and measurements are gathered in [awesome-linux-hdr](https://github.com/danielcamposramos/awesome-linux-hdr).
+**Check freshness first.**
+Written on 2026-10-07.
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
+HDR facts and measurements are gathered in [awesome-linux-hdr](https://github.com/danielcamposramos/awesome-linux-hdr).
 
 ## The rule
 
-Deep colour means the **whole standard**: 10, 12 and 16 bits per colour (HDMI's 30, 36 and 48-bit deep colour), never capped at 12 or at the displays at hand. Any one link that drops to 8 bits drops the whole picture to 8 bits, so every layer is checked: the display, the link, the driver, the compositor, the toolkit, the program.
+Deep colour means the **whole standard**: 10, 12 and 16 bits per colour (HDMI's 30, 36 and 48-bit deep colour), never capped at 12 or at the displays at hand.
+Any one link that drops to 8 bits drops the whole picture to 8 bits, so every layer is checked: the display, the link, the driver, the compositor, the toolkit, the program.
 
 ## The layers, and what was found in each
 
@@ -22,7 +26,9 @@ Deep colour means the **whole standard**: 10, 12 and 16 bits per colour (HDMI's 
 | A layer in the compositor's shared memory (`wl_shm`) | A deep buffer format: `XR30` for 10 bits, then `XB48` (16-bit integer) when no half-float format is offered | Qt Multimedia's video layer in the edition |
 | The program | Its canvas or video at the source's depth, not converted to 8-bit RGBA on the way | Krita: a 16-bit canvas on Wayland ([`sparky/deep-colour-canvas`](https://invent.kde.org/danielcamposramos/krita/-/tree/sparky/deep-colour-canvas)), and its main window at 16/16/16/16 in a stereo session with the Qt fix above ([`sparky/stereo-canvas-wayland`](https://invent.kde.org/danielcamposramos/krita/-/tree/sparky/stereo-canvas-wayland)); MpvQt's video layer at 10 bits or half float ([`stereo3d`](https://invent.kde.org/danielcamposramos/mpvqt/-/tree/stereo3d)) |
 
-What Krita taught: it forced X11, where under Xwayland it got only 8 bits, and offered only 8 and 10. On Wayland with a 16-bit format, a ramp that held 1 level at 8 bits holds 249 at 16 in the same band. Each canvas in its own layer, in its own deep format, stays the pattern: the layer's depth does not depend on the window's.
+What Krita taught: it forced X11, where under Xwayland it got only 8 bits, and offered only 8 and 10.
+On Wayland with a 16-bit format, a ramp that held 1 level at 8 bits holds 249 at 16 in the same band.
+Each canvas in its own layer, in its own deep format, stays the pattern: the layer's depth does not depend on the window's.
 
 ## Proof for this kind of work
 

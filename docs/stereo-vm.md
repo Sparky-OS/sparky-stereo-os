@@ -38,8 +38,7 @@ qemu-system-x86_64 -machine q35 -accel kvm -cpu host -m 4G \
 ```
 
 In the guest, the display settings list the 3D modes (labelled 3D-FP, 3D-SBS-full, 3D-TaB, 3D-SBS on Sparky Stereo OS); choose one.
-On the host, the VM window shows the guest's desktop in stereo.
-`zoom-to-fit=off` keeps the guest at one host pixel per guest pixel; with zooming, both eyes are scaled together.
+On the host, the VM window shows the guest's desktop in stereo. `zoom-to-fit=off` keeps the guest at one host pixel per guest pixel; with zooming, both eyes are scaled together.
 
 Give the device more host memory than the default 256 MiB for switching between 3D modes (`max_hostmem=1G`): with the default, the last switch of a long sequence can fail and the display stops.
 
@@ -50,12 +49,13 @@ The viewer is built the way every stereo program of the edition is:
 - its ordinary window is the guest's display at its own size, one view, and takes the input;
 - the two views go side by side to a surface of their own on top of it, declared once as full side by side (without Stereo KWin the window shows the left view).
 
-The pointer follows from that. The viewer sends its position in the guest's display, and with a stereo layout set the edition's `spice-server` tells QEMU's tablet that the display is one view, so QEMU maps the position as upstream does, and the guest's pointer reaches every corner of its display in every 3D mode.
+The pointer follows from that.
+The viewer sends its position in the guest's display, and with a stereo layout set the edition's `spice-server` tells QEMU's tablet that the display is one view, so QEMU maps the position as upstream does, and the guest's pointer reaches every corner of its display in every 3D mode.
 Nothing in QEMU remaps the pointer; QEMU's own window scales by one view's size for the same reason.
 A viewer without the stereo code (any other desktop's virt-viewer, Karton or virt-manager) shows the packed frame, which is what its user sees.
 
-virt-viewer, virt-manager and Karton were tested with the pointer at four places of the view in 2D and in each 3D mode, with the window resized, and (virt-manager, Karton and QEMU's own window) with the pointer moving while the guest changed mode. For a stock `spice-gtk` or Karton the same checks fail.
-virt-viewer and virt-manager share the `spice-gtk` widget. virt-viewer opens its window at the size of the guest's whole frame, which in the 3D modes holds both views (twice the width in side by side, twice the height in frame packing): resize it to the view.
+virt-viewer, virt-manager and Karton were tested with the pointer at four places of the view in 2D and in each 3D mode, with the window resized, and (virt-manager, Karton and QEMU's own window) with the pointer moving while the guest changed mode.
+For a stock `spice-gtk` or Karton the same checks fail. virt-viewer and virt-manager share the `spice-gtk` widget. virt-viewer opens its window at the size of the guest's whole frame, which in the 3D modes holds both views (twice the width in side by side, twice the height in frame packing): resize it to the view.
 
 ## The strongest GPU renders
 
@@ -97,7 +97,8 @@ While the guest owns it, the host cannot use that GPU or the screens connected t
    softdep nvidia pre: vfio-pci
    softdep nouveau pre: vfio-pci
    ```
-   On Debian, add `vfio`, `vfio_iommu_type1` and `vfio_pci` to `/etc/initramfs-tools/modules`, run `update-initramfs -u` and reboot. Check: `lspci -nnk -s 01:00` says `Kernel driver in use: vfio-pci`.
+   On Debian, add `vfio`, `vfio_iommu_type1` and `vfio_pci` to `/etc/initramfs-tools/modules`, run `update-initramfs -u` and reboot.
+   Check: `lspci -nnk -s 01:00` says `Kernel driver in use: vfio-pci`.
    To keep the GPU for the host most of the time, leave this out and let libvirt detach and reattach it when the VM starts and stops (`managed='yes'` below); nothing on the host may be using the GPU then.
 5. **The VM.** Use UEFI firmware (OVMF) and q35:
    ```sh

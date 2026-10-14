@@ -6,11 +6,14 @@ description: >-
 
 # Windows programs through Wine and Proton
 
-**Check freshness first.** Written on 2026-10-07; much of this layer is planned, and each item says whether it is done. The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
+**Check freshness first.**
+Written on 2026-10-07; much of this layer is planned, and each item says whether it is done.
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
 
 ## The chain
 
-A Windows game's Direct3D calls become Vulkan through DXVK (Direct3D 9 to 11) or VKD3D-Proton (Direct3D 12), and Vulkan reaches the GPU through Mesa, or through NVIDIA's driver with the edition's Vulkan layer. Stereo can enter at three places:
+A Windows game's Direct3D calls become Vulkan through DXVK (Direct3D 9 to 11) or VKD3D-Proton (Direct3D 12), and Vulkan reaches the GPU through Mesa, or through NVIDIA's driver with the edition's Vulkan layer.
+Stereo can enter at three places:
 
 1. **An injector draws two cameras inside the game.** wiz3D does this for DirectX 9 games, the vendor-neutral way iZ3D did once: the camera moves at the API, one world and two cameras ([`stereo-two-cameras`](../stereo-two-cameras/SKILL.md)). Its Linux build is merged upstream ([effcol/wiz3D #33](https://github.com/effcol/wiz3D/pull/33), 13 October 2026); our Proton work is on [Sparky-OS/wiz3D `stereo3d-proton`](https://github.com/Sparky-OS/wiz3D/tree/stereo3d-proton).
 2. **The game has a VR mode.** Its two eyes go to a 3D display instead of a headset: load [`vr-to-3d`](../vr-to-3d/SKILL.md).
@@ -18,7 +21,10 @@ A Windows game's Direct3D calls become Vulkan through DXVK (Direct3D 9 to 11) or
 
 ## gamescope
 
-gamescope is Valve's micro-compositor. Running a game inside it, nested in the desktop, raced frames between the game and the nested output, and stereo made the race visible; letting the nested output's present mode be chosen ends it ([ValveSoftware/gamescope #2438](https://github.com/ValveSoftware/gamescope/pull/2438), in review). SteamVR on a 3D television runs inside gamescope (see [`vr-to-3d`](../vr-to-3d/SKILL.md)). In the edition the desktop draws the final 3D output; a game or gamescope packs the eyes for a screen only on systems without Stereo KWin.
+gamescope is Valve's micro-compositor.
+Running a game inside it, nested in the desktop, raced frames between the game and the nested output, and stereo made the race visible; letting the nested output's present mode be chosen ends it ([ValveSoftware/gamescope #2438](https://github.com/ValveSoftware/gamescope/pull/2438), in review).
+SteamVR on a 3D television runs inside gamescope (see [`vr-to-3d`](../vr-to-3d/SKILL.md)).
+In the edition the desktop draws the final 3D output; a game or gamescope packs the eyes for a screen only on systems without Stereo KWin.
 
 ## Done and planned
 

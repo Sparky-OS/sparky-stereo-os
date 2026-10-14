@@ -6,7 +6,8 @@
 **One contract for every program below: programs hand the desktop full side by side, and KWin's outputs decide the screen.**
 Each item names the program, links its own upstream project, says what it gains in the edition and what we found on the way.
 **In the edition** means a package of it is in the Sparky Stereo repository today.
-**In progress** means the work is done and measured, but no package is in the repository yet. **Planned** means not built yet.
+**In progress** means the work is done and measured, but no package is in the repository yet.
+**Planned** means not built yet.
 What was proven is said per item, and it was proven on our headless KWin with captures of both eyes unless the item says otherwise; where a real display was used, it says so.
 
 **The display path**
@@ -70,4 +71,7 @@ What was proven is said per item, and it was proven on our headless KWin with ca
 **Games and emulators, not done yet**
 - [**MAME**](https://www.mamedev.org/) and the emulators of 3D consoles, shipped configured to full side by side; people bring their own game files. First comes [Chris M. Covell's SMS 3-D Demo](https://www.smspower.org/Homebrew/SMS3DDemo-SMS) for the Master System's 3-D Glasses, by his permission (2026-10-08): his own seven pictures, unaltered and looping, with his readme. [planned] Then [Ben Ryves's Sega Tween](https://www.smspower.org/Homebrew/SegaTween-SMS), in its version for the 3-D Glasses, by his permission (2026-10-09): unmodified, with his readme. [planned]
 
-**Beyond stereo, found on the way:** in [**Plasma Add-ons**](https://invent.kde.org/plasma/kdeplasma-addons), the unit converter in Plasma's search downloaded the European Central Bank's currency rates as soon as it loaded, and again every 24 hours, even if nobody converted a currency. In the edition it downloads them only when you convert a currency. KDE knows: [kdeplasma-addons #17](https://invent.kde.org/plasma/kdeplasma-addons/-/work_items/17). [in the edition]
+**Beyond stereo, found on the way:** in [**Plasma Add-ons**](https://invent.kde.org/plasma/kdeplasma-addons), the unit converter in Plasma's search downloaded the European Central Bank's currency rates as soon as it loaded, and again every 24 hours, even if nobody converted a currency.
+In the edition it downloads them only when you convert a currency.
+KDE knows: [kdeplasma-addons #17](https://invent.kde.org/plasma/kdeplasma-addons/-/work_items/17).
+[in the edition]

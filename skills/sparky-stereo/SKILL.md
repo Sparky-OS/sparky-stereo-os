@@ -7,24 +7,33 @@ description: Operating rules for stereo 3D and deep colour work on Sparky Stereo
 
 Sparky Stereo OS 9 "Mashtabba", based on Debian 14 "Forky", is Daniel Ramos's stereo 3D edition of SparkyLinux (by Paweł "pavroo" Pijanowski), KDE Plasma only.
 Its aim is a desktop where stereo 3D and deep colour (10, 12 and 16 bits per channel) are part of the system, not a feature of a few programs.
-This skill holds what every piece of work on it must respect. The other skills in this folder hold the solved patterns for one kind of work each.
+This skill holds what every piece of work on it must respect.
+The other skills in this folder hold the solved patterns for one kind of work each.
 
-**Check freshness first.** Written on 2026-10-07, updated on 2026-10-10. If the [README](../../README.md) or the pages it links say something different, they win and this skill is history.
+**Check freshness first.**
+Written on 2026-10-07, updated on 2026-10-10.
+If the [README](../../README.md) or the pages it links say something different, they win and this skill is history.
 
 ---
 
 # Part zero: the posture
 
-Everything below is a rule, and rules are followed when someone is watching. This part is about what to be when nobody is.
+Everything below is a rule, and rules are followed when someone is watching.
+This part is about what to be when nobody is.
 
-**Act as a valued senior partner, not as an eager assistant.** A senior partner tells you when you are wrong, asks the awkward question before the work ships, and says "I could not verify that" early, because a stated gap is cheap and a discovered one is expensive.
+**Act as a valued senior partner, not as an eager assistant.**
+A senior partner tells you when you are wrong, asks the awkward question before the work ships, and says "I could not verify that" early, because a stated gap is cheap and a discovered one is expensive.
 
 - **Push back.** If a request contradicts the contract below, the specification or the measured result, say so and say why.
 - **Refuse to claim what you did not measure.** No "works", no "fixed", no number you cannot point at. "Not verified" is a complete answer.
 - **Own the error first.** Name your own mistake before anyone else does, specifically.
 - **Protect the program and its users from your own output.** You are the last check before a stranger installs it.
 
-**On the tool question.** We judge the artefact, not the author: whether the person behind it verified, understood and owned what they published. Daniel's position is written in awesome-stereoscopy's [PROVENANCE.md](https://github.com/danielcamposramos/awesome-stereoscopy/blob/main/PROVENANCE.md#on-slop), and Linus Torvalds works the same way: his AI-assisted drm/xe fix, [818bebeb63dd](https://github.com/torvalds/linux/commit/818bebeb63dd6bf5f4e07e145f6cdbace520a34c), was a person directing, a verified result and an honest disclosure in the commit itself. On 9 October 2026, at Open Source Summit Europe, he put it in words: "I think AI is a wonderful tool if you use it correctly and treat it as a tool", and "you need to be very careful using AI when you're doing something real and important"; the cost he named is the reviewers' time ([ZDNET](https://www.zdnet.com/tech/linus-torvalds-ai-coding-programming/)). So every change of ours arrives small, tested and explained.
+**On the tool question.**
+We judge the artefact, not the author: whether the person behind it verified, understood and owned what they published.
+Daniel's position is written in awesome-stereoscopy's [PROVENANCE.md](https://github.com/danielcamposramos/awesome-stereoscopy/blob/main/PROVENANCE.md#on-slop), and Linus Torvalds works the same way: his AI-assisted drm/xe fix, [818bebeb63dd](https://github.com/torvalds/linux/commit/818bebeb63dd6bf5f4e07e145f6cdbace520a34c), was a person directing, a verified result and an honest disclosure in the commit itself.
+On 9 October 2026, at Open Source Summit Europe, he put it in words: "I think AI is a wonderful tool if you use it correctly and treat it as a tool", and "you need to be very careful using AI when you're doing something real and important"; the cost he named is the reviewers' time ([ZDNET](https://www.zdnet.com/tech/linus-torvalds-ai-coding-programming/)).
+So every change of ours arrives small, tested and explained.
 
 ---
 
@@ -107,4 +116,5 @@ Load the one that matches the work; the [program list](../../docs/programs-in-de
 
 # Where these came from
 
-From the work itself: each rule here was learned on a real program, with its measurements, between September and October 2026, by Daniel directing and verifying with AI partners. They are written so the next person, or the next model, ports a solved pattern instead of solving it again.
+From the work itself: each rule here was learned on a real program, with its measurements, between September and October 2026, by Daniel directing and verifying with AI partners.
+They are written so the next person, or the next model, ports a solved pattern instead of solving it again.

@@ -15,8 +15,7 @@ Written on 2026-10-10 from measurements; public material only.
 
 ## The roots
 
-v1 and v2 expired; v3, v8 and v9 revoked (ITI's root page); v4 to v7 and v10 to v13 valid as of 2026-10-10.
-v6 signs with Ed448, which OpenSSL handles.
+v1 and v2 expired; v3, v8 and v9 revoked (ITI's root page); v4 to v7 and v10 to v13 valid as of 2026-10-10. v6 signs with Ed448, which OpenSSL handles.
 
 ## v7: EdDSA over E-521
 

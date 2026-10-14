@@ -6,9 +6,12 @@ description: >-
 
 # System housekeeping
 
-**Check freshness first.** Written on 2026-10-07. The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
+**Check freshness first.**
+Written on 2026-10-07.
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
 
-Daniel's rule: "we don't grow so fast, and when grow self prune". A user's disk must not creep up because Linux keeps everything.
+Daniel's rule: "we don't grow so fast, and when grow self prune".
+A user's disk must not creep up because Linux keeps everything.
 
 ## Old kernels
 

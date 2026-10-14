@@ -6,7 +6,9 @@ description: >-
 
 # Stereo artwork
 
-**Check freshness first.** Written on 2026-10-07, from the SparkyOS boot screen ("SPARKYOS / POWERED BY DEBIAN / STEREO 3D EDITION"). The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; [`stereo-pictures`](../stereo-pictures/SKILL.md) has the file formats.
+**Check freshness first.**
+Written on 2026-10-07, from the SparkyOS boot screen ("SPARKYOS / POWERED BY DEBIAN / STEREO 3D EDITION").
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; [`stereo-pictures`](../stereo-pictures/SKILL.md) has the file formats.
 
 ## Copy a style exactly
 
@@ -16,7 +18,10 @@ description: >-
 4. **New letters come from a recipe calibrated on the original letters:** font size, extra weight, rim width and placement, fill colour and opacity. Search those parameters to minimise the difference from the original letters, then check each letter. Where a letter exists in the original, keep the original.
 5. **Keep the canvas size** when a script scales the image by its width (Plymouth themes do), and centre elements by their measured bounding boxes. "Looks centred" is a measurement.
 
-**Fonts:** most desktop font licences permit rendered images and logos, but never the font file itself. Keep the font out of every repository. Logos ship as images or SVG, never as web fonts. Web text uses CSS stacks of fonts people already have (`Verdana, Geneva, "DejaVu Sans", sans-serif`), so nothing is hosted.
+**Fonts:** most desktop font licences permit rendered images and logos, but never the font file itself.
+Keep the font out of every repository.
+Logos ship as images or SVG, never as web fonts.
+Web text uses CSS stacks of fonts people already have (`Verdana, Geneva, "DejaVu Sans", sans-serif`), so nothing is hosted.
 
 ## From 2D art to a stereo pair
 
@@ -27,7 +32,10 @@ description: >-
 
 ## Animation in both eyes
 
-When an animated element follows a path drawn on the image (orbits, a progress line), each eye computes the path from its own shifted elements. Both eyes run from one animation clock, so the motion stays in step. Everything that can appear (messages, password prompts, progress) is drawn in both eyes, on the screen plane unless it belongs to a floating element. Nothing may appear in one eye only.
+When an animated element follows a path drawn on the image (orbits, a progress line), each eye computes the path from its own shifted elements.
+Both eyes run from one animation clock, so the motion stays in step.
+Everything that can appear (messages, password prompts, progress) is drawn in both eyes, on the screen plane unless it belongs to a floating element.
+Nothing may appear in one eye only.
 
 ## Deliverables
 

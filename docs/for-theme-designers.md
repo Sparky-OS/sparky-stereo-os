@@ -27,7 +27,10 @@ Each part is marked **built** or **designed (coming)**.
 
 The edition's own look, Stereo Oxygen, made from KDE's Oxygen, is the first theme being made this way.
 
-**Why pop is not in code yet: Plasma's styling is about to change.** KDE is moving its styling to Union, its new style engine, and where a depth value belongs in Union is still an open question. We asked it in public, on KDE Discuss: [Real depth for Ocean's elevation, a design question for Union](https://discuss.kde.org/t/real-depth-for-oceans-elevation-a-design-question-for-union/50744). Designers who care how depth should be declared in KDE's styles are welcome to join that thread: the answer there decides where every theme's planes will live.
+**Why pop is not in code yet: Plasma's styling is about to change.**
+KDE is moving its styling to Union, its new style engine, and where a depth value belongs in Union is still an open question.
+We asked it in public, on KDE Discuss: [Real depth for Ocean's elevation, a design question for Union](https://discuss.kde.org/t/real-depth-for-oceans-elevation-a-design-question-for-union/50744).
+Designers who care how depth should be declared in KDE's styles are welcome to join that thread: the answer there decides where every theme's planes will live.
 
 ## The rules every theme keeps
 
@@ -50,10 +53,12 @@ On 2D screens they look exactly as they do today.
 
 ## 3D backgrounds (coming)
 
-**The engine is a video wallpaper.** [org.kde.video](https://github.com/Sparky-OS/org.kde.video), the video wallpaper and lock screen plugin by **Jeromy Streets**, has been in Sparky's repository since 2018 and is offered in APTus, Sparky's app installer.
+**The engine is a video wallpaper.**
+[org.kde.video](https://github.com/Sparky-OS/org.kde.video), the video wallpaper and lock screen plugin by **Jeromy Streets**, has been in Sparky's repository since 2018 and is offered in APTus, Sparky's app installer.
 It now lives in the Sparky-OS organization, with Jeromy Streets as its maintainer, and its Plasma 6 port is the next step, done with him.
 
-**Then stereo, behind the desktop.** Stereo video and stereo stills play on the sunk side, behind every window, with the windows always in front.
+**Then stereo, behind the desktop.**
+Stereo video and stereo stills play on the sunk side, behind every window, with the windows always in front.
 The plugin is QML, so it shows them through the QML item of the shared stereo layer (`libstereo-layer1`), the same layer the edition's picture viewers use: file marks first, full side by side inside, every output converting for its own screen.
 Scenes whose depth seems to go on forever, like facing mirrors, become possible.
 

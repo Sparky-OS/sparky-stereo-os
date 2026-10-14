@@ -35,7 +35,8 @@ Every one of them was key to the edition existing, and all of their use has been
 | **Mistral AI** | Mistral Large 3 (675B cloud) | Ollama's cloud | Model-diversity experiment (blind baseline, cumulative chain) | 2026-07-17 | n/a |
 | **NVIDIA** | Nemotron | Ollama's cloud, in Daniel's own multi-model tooling | A partner in today's chain with Kimi, Qwen, GLM, DeepSeek and Gemini | 2026 | n/a |
 
-Note on Jules: google-labs-jules[bot] authored 12 commits in Knowledge3D, 3 in AI-RLWHF (2025-10-09) and 10 in Scaler Wizard (2025-10-10, 2026-04-01). Counted with `git log --all --author=jules` on 2026-10-12; the Scaler Wizard figure is from the GitHub API.
+Note on Jules: google-labs-jules[bot] authored 12 commits in Knowledge3D, 3 in AI-RLWHF (2025-10-09) and 10 in Scaler Wizard (2025-10-10, 2026-04-01).
+Counted with `git log --all --author=jules` on 2026-10-12; the Scaler Wizard figure is from the GitHub API.
 
 ## How this was counted
 

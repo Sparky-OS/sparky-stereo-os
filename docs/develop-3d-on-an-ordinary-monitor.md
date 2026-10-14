@@ -28,7 +28,8 @@ That holds for a mirrored screen too, even across two GPUs: tested on two Sony 3
 
 ## 3. Test the real HDMI 3D path without a 3D television
 
-**[vkms-stereo-bench](../tools/vkms-stereo-bench/README.md):** a kernel's virtual display driver (VKMS) is given the EDID of a 3D television in a virtual machine, so the 3D modes can be set and each eye read back pixel by pixel. It runs with KUnit, IGT's `kms_3d` and Stereo KWin.
+**[vkms-stereo-bench](../tools/vkms-stereo-bench/README.md):** a kernel's virtual display driver (VKMS) is given the EDID of a 3D television in a virtual machine, so the 3D modes can be set and each eye read back pixel by pixel.
+It runs with KUnit, IGT's `kms_3d` and Stereo KWin.
 **The step-by-step guide:** [Test stereo without a 3D TV](test-stereo-without-a-3d-tv.md).
 **Stereo KWin, ready to use:** the bench's compositor phase needs a root file system with Stereo KWin, published on [our repository server](https://repo.sparkyos.org/bench/kwin-root/) with the source packages of everything modified in it; `tools/build-kwin-root.sh` builds one yourself.
 

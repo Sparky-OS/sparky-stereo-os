@@ -2,13 +2,19 @@
 
 **For anyone who wants to see it on real hardware:** photos of the first stereo 3D output from KWin on two 3D TVs, with the logs and the scripts used.
 
-Evidence for the KWin stereo work, which lives in our KWin fork; our merge request and reports to KWin upstream were withdrawn on 12 October 2026. The design in one page: [STEREO3D.md](https://invent.kde.org/danielcamposramos/kwin/-/blob/stereo3d/STEREO3D.md). Code: the `stereo3d` branch of [invent.kde.org/danielcamposramos/kwin](https://invent.kde.org/danielcamposramos/kwin/-/tree/stereo3d).
+Evidence for the KWin stereo work, which lives in our KWin fork; our merge request and reports to KWin upstream were withdrawn on 12 October 2026.
+The design in one page: [STEREO3D.md](https://invent.kde.org/danielcamposramos/kwin/-/blob/stereo3d/STEREO3D.md).
+Code: the `stereo3d` branch of [invent.kde.org/danielcamposramos/kwin](https://invent.kde.org/danielcamposramos/kwin/-/tree/stereo3d).
 
-Hardware: a Sony KDL-46HX855 (AMD iGPU, amdgpu) and a Sony KDL-46EX725 (RTX 3060), both 2011-era 3D TVs that declare HDMI 1.4 3D modes and 12-bit deep colour (225 MHz TMDS). Kernel 7.3.0-rc1 with the HDMI 3D patches. Photos taken with a phone by Daniel; the TVs' own information banners are the readout. GPS data was removed from the photos; everything else is as taken.
+Hardware: a Sony KDL-46HX855 (AMD iGPU, amdgpu) and a Sony KDL-46EX725 (RTX 3060), both 2011-era 3D TVs that declare HDMI 1.4 3D modes and 12-bit deep colour (225 MHz TMDS).
+Kernel 7.3.0-rc1 with the HDMI 3D patches.
+Photos taken with a phone by Daniel; the TVs' own information banners are the readout.
+GPS data was removed from the photos; everything else is as taken.
 
 ## The display's 3D modes in KDE's display settings (2026-10-01, 03:11 to 03:14)
 
-Both TVs, each in frame packing and in half side by side and top and bottom, every mode chosen in KDE's own display settings: the output mode changer (KScreen) lists the 3D modes beside the 2D ones and KWin switches the TV into 3D (Daniel, the same night). How to read the photos: the mouse pointer rests on the active mode in the list, and the TV's own on-screen display (the banner: resolution, 12bit, 3D, "3D: Sim") shows what the set is receiving, so each photo pairs the mode chosen with the display's readout.
+Both TVs, each in frame packing and in half side by side and top and bottom, every mode chosen in KDE's own display settings: the output mode changer (KScreen) lists the 3D modes beside the 2D ones and KWin switches the TV into 3D (Daniel, the same night).
+How to read the photos: the mouse pointer rests on the active mode in the list, and the TV's own on-screen display (the banner: resolution, 12bit, 3D, "3D: Sim") shows what the set is receiving, so each photo pairs the mode chosen with the display's readout.
 
 KWin branch at [92dfde1](https://invent.kde.org/danielcamposramos/kwin/-/commit/92dfde1) (`drm: side by side (full), and 3D layouts for displays without 3D detection`), with [0672162](https://invent.kde.org/danielcamposramos/kwin/-/commit/0672162) (`drm: list a display's HDMI 3D modes with its other modes`) and [57b02a2](https://invent.kde.org/danielcamposramos/kwin/-/commit/57b02a2) (frame packing modes) below it.
 
@@ -36,14 +42,18 @@ KWin at [4714c8e](https://invent.kde.org/danielcamposramos/kwin/-/commit/4714c8e
 
 ## One window across a 3D TV and a 2D monitor (2026-10-03, 20:51)
 
-KWin package 4:6.7.4-2+stereo3d11, the same LEFT/RIGHT clip in mpv under the same window rule ([scripts/rule.sh](scripts/rule.sh), [scripts/play-clip.sh](scripts/play-clip.sh)). The HX855 (HDMI-A-1) in frame packing 1080p30, "30.00 Hz (3D frame packing)" in the display settings, with the AOC LE26W154 (DP-1), a 2D monitor, to its right; both on the AMD iGPU.
+KWin package 4:6.7.4-2+stereo3d11, the same LEFT/RIGHT clip in mpv under the same window rule ([scripts/rule.sh](scripts/rule.sh), [scripts/play-clip.sh](scripts/play-clip.sh)).
+The HX855 (HDMI-A-1) in frame packing 1080p30, "30.00 Hz (3D frame packing)" in the display settings, with the AOC LE26W154 (DP-1), a 2D monitor, to its right; both on the AMD iGPU.
 
 - [IMG_20261003_205141.jpg](photos/IMG_20261003_205141.jpg): the mpv window on the 2D monitor shows the left view only (LEFT). That is the design: two eyes reach a screen only when a 3D mode is active, and a 2D output takes the left view. The display settings on the HX855 show its frame packing mode.
 - [IMG_20261003_205154.jpg](photos/IMG_20261003_205154.jpg): the same window dragged across both monitors. The part on the HX855 is in 3D (the phone caught the TV's right-eye frame: "RIG"), and the part on the 2D monitor shows the left view ("EFT"). One window, two outputs, each output taking from the same two eyes what it can show: the output is the last step, per monitor.
 
 ## One window across three outputs and two GPUs (2026-10-03, 21:19 to 21:27)
 
-The HX855 (HDMI-A-1, AMD iGPU) in frame packing 1080p30, the AOC LE26W154 (DP-1, AMD iGPU) in 2D in the middle, and the EX725 (HDMI-A-2, RTX 3060) in top and bottom 1080p60, each set in KDE's display settings. One mpv window of 5200x600 across all three, stretched so each half of the window is one eye (`--keepaspect=no --keepaspect-window=no`), with the same clip and window rule. KWin package 4:6.7.4-2+stereo3d11. The configuration and drivers at the time: [logs/2026-10-03-three-outputs-config.txt](logs/2026-10-03-three-outputs-config.txt).
+The HX855 (HDMI-A-1, AMD iGPU) in frame packing 1080p30, the AOC LE26W154 (DP-1, AMD iGPU) in 2D in the middle, and the EX725 (HDMI-A-2, RTX 3060) in top and bottom 1080p60, each set in KDE's display settings.
+One mpv window of 5200x600 across all three, stretched so each half of the window is one eye (`--keepaspect=no --keepaspect-window=no`), with the same clip and window rule.
+KWin package 4:6.7.4-2+stereo3d11.
+The configuration and drivers at the time: [logs/2026-10-03-three-outputs-config.txt](logs/2026-10-03-three-outputs-config.txt).
 
 - [Screenshot_20261003_211911.png](photos/Screenshot_20261003_211911.png), [Screenshot_20261003_211946.png](photos/Screenshot_20261003_211946.png), [Screenshot_20261003_211958.png](photos/Screenshot_20261003_211958.png): the display settings with each output selected in turn: "30.00 Hz (3D frame packing)", "60.01 Hz" (2D) and "60.00 Hz (3D top and bottom, suggested for games)".
 - [IMG_20261003_212607.jpg](photos/IMG_20261003_212607.jpg): all three at once, the window running across them: the HX855 in front, the AOC in the middle, the EX725 at the back.

@@ -52,8 +52,7 @@ He did not live to see this edition, and it carries what he started: every packa
 
 ### 0.1 Debian, the mother distribution
 
-**Source**: [Debian Project](https://www.debian.org/)
-**License**: the Debian Free Software Guidelines; each package under its own licence
+**Source**: [Debian Project](https://www.debian.org/) **License**: the Debian Free Software Guidelines; each package under its own licence
 
 **What Debian provides**:
 - The whole base: Debian 14 "Forky", its packages, its archive and its policy.
@@ -92,8 +91,7 @@ By name, the Debian maintainers of the packages we carry with our patches, as th
 
 ### 0.2 SparkyLinux and Paweł "pavroo" Pijanowski
 
-**Source**: [SparkyLinux](https://sparkylinux.org/)
-**License**: GNU GPL for its own tools; each package under its own licence
+**Source**: [SparkyLinux](https://sparkylinux.org/) **License**: GNU GPL for its own tools; each package under its own licence
 
 **What SparkyLinux provides**:
 - The distribution this edition belongs to: a Debian-based system that follows Debian closely, ready to use out of the box, with its own repositories, keyring and tools.
@@ -111,8 +109,7 @@ The edition is Daniel's; SparkyLinux is Paweł's; the credit line on every packa
 
 ### 0.3 KDE
 
-**Source**: [KDE](https://kde.org/), code at [invent.kde.org](https://invent.kde.org/)
-**License**: GPL, LGPL and others, per project
+**Source**: [KDE](https://kde.org/), code at [invent.kde.org](https://invent.kde.org/) **License**: GPL, LGPL and others, per project
 
 **What KDE provides**: Plasma, KWin, KDE Frameworks and the applications, the desktop this edition is built for and the only one it ships.
 Daniel has loved KDE since his early days with Linux.
@@ -220,66 +217,53 @@ The same fight goes on in display standards: in 2024 the HDMI Forum refused an o
 
 ### 2.1 The Linux kernel
 
-**Source**: [kernel.org](https://www.kernel.org/)
-**License**: GPL-2.0
-**What we changed**: amdgpu lists and signals the HDMI 3D modes a display's EDID declares and times frame packing; full side by side handled in the DRM core, i915, nouveau and amdgpu; nouveau gains 16 bits per colour on Turing and newer; a fix for rumble-less gamepads in hid-betopff; VKMS, the virtual display driver, sets HDMI 3D modes and composes and writes back the frame of both eyes, on Louis Chauvet's configfs series.
+**Source**: [kernel.org](https://www.kernel.org/) **License**: GPL-2.0 **What we changed**: amdgpu lists and signals the HDMI 3D modes a display's EDID declares and times frame packing; full side by side handled in the DRM core, i915, nouveau and amdgpu; nouveau gains 16 bits per colour on Turing and newer; a fix for rumble-less gamepads in hid-betopff; VKMS, the virtual display driver, sets HDMI 3D modes and composes and writes back the frame of both eyes, on Louis Chauvet's configfs series.
 **Credit**: Linus Torvalds and the kernel's developers; the DRM maintainers Dave Airlie and Simona Vetter; Damien Lespiau, whose 2013 change let Intel's i915 offer HDMI stereo modes; Alastair Bridgewater, whose 2017 series gave nouveau HDMI 3D output ([0f18d2765ab1](https://github.com/torvalds/linux/commit/0f18d2765ab1)), with Ilia Mirkin's review on the list; the nouveau maintainers Lyude Paul and Danilo Krummrich; Mohamed Ahmed, whose nouveau display series (HDMI deep colour, IMP mode validation, GB20x display) our kernel carries; AMD's display team; Jim Cromie, whose nouveau fix our kernel carries; Tomasz Pakuła, whose EV_BTN input series ([RFC, January 2026](https://lwn.net/Articles/1052809/)) our next kernel will carry; Rodrigo Siqueira and Haneen Mohammed, who created VKMS; Louis Chauvet and José Expósito, whose VKMS configfs work our stereo tests build on; Thomas Wood, for IGT's kms_3d; Adam Jackson and Hans Verkuil, for edid-decode.
 
 ### 2.2 Mesa
 
-**Source**: [mesa3d.org](https://mesa3d.org/)
-**License**: MIT
-**What we changed**: OpenGL quad buffer, EGL multiview windows and two-layer Vulkan swapchains become one full side by side picture, declared to KWin; a Vulkan layer does the same over drivers outside Mesa.
+**Source**: [mesa3d.org](https://mesa3d.org/) **License**: MIT **What we changed**: OpenGL quad buffer, EGL multiview windows and two-layer Vulkan swapchains become one full side by side picture, declared to KWin; a Vulkan layer does the same over drivers outside Mesa.
 **Credit**: Brian Paul, who started Mesa in 1993, and the Mesa developers.
 
 ### 2.3 NVIDIA's open GPU kernel modules and egl-wayland
 
-**Source**: [open-gpu-kernel-modules](https://github.com/NVIDIA/open-gpu-kernel-modules), [egl-wayland](https://github.com/NVIDIA/egl-wayland)
-**License**: MIT and GPL-2.0 (kernel modules); MIT (egl-wayland)
-**What we changed**: 3D modes built from the display's HDMI stereo block, and HDMI deep colour at the depth the display declares, up to 16 bits; egl-wayland learns the two-view window.
+**Source**: [open-gpu-kernel-modules](https://github.com/NVIDIA/open-gpu-kernel-modules), [egl-wayland](https://github.com/NVIDIA/egl-wayland) **License**: MIT and GPL-2.0 (kernel modules); MIT (egl-wayland) **What we changed**: 3D modes built from the display's HDMI stereo block, and HDMI deep colour at the depth the display declares, up to 16 bits; egl-wayland learns the two-view window.
 **Credit**: NVIDIA, for opening its kernel modules.
-**GPU vendors' repositories**: the edition lets NVIDIA's CUDA and AMD's ROCm keep updating while the display driver stays ours, with apt's pinning rules ([apt_preferences(5)](https://manpages.debian.org/testing/apt/apt_preferences.5.en.html), by the APT developers). NVIDIA's container toolkit, published twice as different builds of the same versions, was reported to NVIDIA in [nvidia-container-toolkit#2137](https://github.com/NVIDIA/nvidia-container-toolkit/issues/2137).
+**GPU vendors' repositories**: the edition lets NVIDIA's CUDA and AMD's ROCm keep updating while the display driver stays ours, with apt's pinning rules ([apt_preferences(5)](https://manpages.debian.org/testing/apt/apt_preferences.5.en.html), by the APT developers).
+NVIDIA's container toolkit, published twice as different builds of the same versions, was reported to NVIDIA in [nvidia-container-toolkit#2137](https://github.com/NVIDIA/nvidia-container-toolkit/issues/2137).
 
 ### 2.4 Xwayland
 
-**Source**: [X.Org](https://www.x.org/)
-**License**: MIT
-**What we changed**: four patches give a redirected X11 child window a surface of its own, so a 3D area inside an X11 program can be its own stereo layer.
+**Source**: [X.Org](https://www.x.org/) **License**: MIT **What we changed**: four patches give a redirected X11 child window a surface of its own, so a 3D area inside an X11 program can be its own stereo layer.
 **Credit**: the X.Org Foundation and the Xwayland developers.
 
 ### 2.5 KWin
 
-**Source**: [plasma/kwin](https://invent.kde.org/plasma/kwin)
-**License**: GPL-2.0-or-later
-**What we changed**: per-eye scene passes, stereo windows and subsurfaces, HDMI 3D modes and virtual 3D outputs, and depth on the desktop.
+**Source**: [plasma/kwin](https://invent.kde.org/plasma/kwin) **License**: GPL-2.0-or-later **What we changed**: per-eye scene passes, stereo windows and subsurfaces, HDMI 3D modes and virtual 3D outputs, and depth on the desktop.
 **Credit**, as KWin names its authors: Matthias Ettrich, Cristian Tibirna, Daniel M. Duley, Luboš Luňák, Martin Flöser (formerly Martin Gräßlin), David Edmundson, Roman Gilg, Vlad Zahorodnii and Xaver Hugl, and every KWin contributor.
-**Effects we are bringing back** (studied in KWin's history; their code returns with its headers and these names): the Resize effect's scaled drawing while a window resizes, by **Thomas Lübking** (2010), for headsets; the old Desktop Cube's cylinder and sphere modes and the C++ Flip Switch, by **Martin Flöser** (then Martin Gräßlin, 2008), for curved virtual monitors and stereo switchers; Present Windows' layouts, by **Rivo Laks** (2007) and **Lucas Murray** (2008), whose flexible grid comes from Komposé 0.5.4 by **Hans Oischinger**, for a headset overview; and Snap Helper, by Lucas Murray (2009), the model for a placement debug overlay. Their living successors, which we make stereo: the QML Flip Switch and Cover Switch by **Ismael Asensio**, and the Qt Quick 3D Desktop Cube by **Vlad Zahorodnii**.
+**Effects we are bringing back** (studied in KWin's history; their code returns with its headers and these names): the Resize effect's scaled drawing while a window resizes, by **Thomas Lübking** (2010), for headsets; the old Desktop Cube's cylinder and sphere modes and the C++ Flip Switch, by **Martin Flöser** (then Martin Gräßlin, 2008), for curved virtual monitors and stereo switchers; Present Windows' layouts, by **Rivo Laks** (2007) and **Lucas Murray** (2008), whose flexible grid comes from Komposé 0.5.4 by **Hans Oischinger**, for a headset overview; and Snap Helper, by Lucas Murray (2009), the model for a placement debug overlay.
+Their living successors, which we make stereo: the QML Flip Switch and Cover Switch by **Ismael Asensio**, and the Qt Quick 3D Desktop Cube by **Vlad Zahorodnii**.
 
 ### 2.6 KScreen and libkscreen
 
-**Source**: [plasma/kscreen](https://invent.kde.org/plasma/kscreen), [plasma/libkscreen](https://invent.kde.org/plasma/libkscreen)
-**License**: GPL-2.0-or-later (KScreen), LGPL-2.1-or-later (libkscreen)
-**What we changed**: the display's 3D modes appear beside its other modes, labelled, never chosen automatically.
+**Source**: [plasma/kscreen](https://invent.kde.org/plasma/kscreen), [plasma/libkscreen](https://invent.kde.org/plasma/libkscreen) **License**: GPL-2.0-or-later (KScreen), LGPL-2.1-or-later (libkscreen) **What we changed**: the display's 3D modes appear beside its other modes, labelled, never chosen automatically.
 **Credit**: Daniel Vrátil, Sebastian Kügler, Alejandro Fiestas Olivares, Martin Klapetek, Aleix Pol Gonzalez, Kai Uwe Broulik, David Edmundson, David Redondo, Nate Graham, Roman Gilg, Xaver Hugl, Martin Flöser, Daniel Nicoletti, Frederik Gladhorn, Méven Car and Oliver Beard.
 
 ### 2.7 plasma-wayland-protocols
 
-**Source**: [libraries/plasma-wayland-protocols](https://invent.kde.org/libraries/plasma-wayland-protocols)
-**License**: LGPL-2.1-or-later
-**What we changed**: `kde-stereo-content-v1`, the one declaration a program makes for a window or a subsurface, and `libstereo-declare` beside it.
+**Source**: [libraries/plasma-wayland-protocols](https://invent.kde.org/libraries/plasma-wayland-protocols) **License**: LGPL-2.1-or-later **What we changed**: `kde-stereo-content-v1`, the one declaration a program makes for a window or a subsurface, and `libstereo-declare` beside it.
 **Credit**: Aleix Pol Gonzalez, David Edmundson, Marco Martin, Martin Flöser, Oleg Chernovskiy and Pier Luigi Fiorini.
 
 ### 2.8 Qt
 
-**Source**: [qt.io](https://www.qt.io/), [codereview.qt-project.org](https://codereview.qt-project.org/)
-**License**: LGPL-3.0 or GPL-2.0
-**What we changed**: stereo EGL window surfaces, a stereo `QOpenGLWidget` as its own surface while the 2D window stays mono, translucent windows keeping their depth; in Qt Multimedia, every stereo packing taken apart in the video output.
+**Source**: [qt.io](https://www.qt.io/), [codereview.qt-project.org](https://codereview.qt-project.org/) **License**: LGPL-3.0 or GPL-2.0 **What we changed**: stereo EGL window surfaces, a stereo `QOpenGLWidget` as its own surface while the 2D window stays mono, translucent windows keeping their depth; in Qt Multimedia, every stereo packing taken apart in the video output.
 **Credit**: The Qt Company and the Qt Project's contributors; Qt Multimedia's copyright holders also include Research In Motion and Jolla.
 Our first Qt change was reviewed within hours by **Tim Blechmann**, with **Artem Dyomin, Nils Petter Skålerud and Jøger Hansegård** as reviewers.
 
 ### 2.9 The stereo virtual machine
 
-[A virtual machine with a 3D display](docs/stereo-vm.md) builds on these projects. Names come from each project's records: source headers, MAINTAINERS, git history and Debian's control files.
+[A virtual machine with a 3D display](docs/stereo-vm.md) builds on these projects.
+Names come from each project's records: source headers, MAINTAINERS, git history and Debian's control files.
 
 - **[QEMU](https://www.qemu.org/)** (our fork: [Sparky-OS/qemu](https://github.com/Sparky-OS/qemu/tree/stereo3d)): started by Fabrice Bellard and developed by its community. Gerd Hoffmann wrote virtio-gpu, where the stereo scanouts are added; Marc-André Lureau maintains QEMU's graphics. QEMU's policy declines AI-generated code, so our changes stay in the fork.
 - **[SPICE](https://www.spice-space.org/)** (spice, spice-gtk, spice-protocol and spice-common; our forks on [freedesktop.org](https://gitlab.freedesktop.org/danielcamposramos)): the most frequent authors in their histories are Frediano Ziglio, Christophe Fergeau, Marc-André Lureau, Alexander Larsson, Alon Levy and Victor Toso. Frediano Ziglio's symbol-visibility work is what our library builds rely on, and Marc-André Lureau reviewed and merged our crash fix ([spice-gtk !159](https://gitlab.freedesktop.org/spice/spice-gtk/-/merge_requests/159)).
@@ -288,7 +272,8 @@ Our first Qt change was reviewed within hours by **Tim Blechmann**, with **Artem
 
 ### 2.10 The test benches
 
-The [vkms-stereo-bench](tools/vkms-stereo-bench/README.md) and [hibernate-bench](tools/hibernate-bench/README.md) tools run on these projects, besides QEMU, IGT's `kms_3d` and edid-decode, credited above. Names come from each project's Debian copyright records.
+The [vkms-stereo-bench](tools/vkms-stereo-bench/README.md) and [hibernate-bench](tools/hibernate-bench/README.md) tools run on these projects, besides QEMU, IGT's `kms_3d` and edid-decode, credited above.
+Names come from each project's Debian copyright records.
 
 - **[mmdebstrap](https://gitlab.mister-muffin.de/josch/mmdebstrap/)**: Johannes Schauer Marin Rodrigues, its author and its Debian maintainer. It builds the bench's root file system of Debian testing plus the edition's packages, with no root needed.
 - **[BusyBox](https://busybox.net/)**: the BusyBox developers, among them Erik Andersen, its first author in Debian's records. The bench's guest runs a static BusyBox as its init and shell.
@@ -313,8 +298,10 @@ The [vkms-stereo-bench](tools/vkms-stereo-bench/README.md) and [hibernate-bench]
 
 ### 3.1 Phone display and movie renderer
 
-Checked 11 October 2026. These projects support the phone display implementation and its emulated proofs; release packaging is still pending.
-Names and licences below come from the linked source headers and project records. Existing KWin, libkscreen, Qt and FFmpeg credits above also apply.
+Checked 11 October 2026.
+These projects support the phone display implementation and its emulated proofs; release packaging is still pending.
+Names and licences below come from the linked source headers and project records.
+Existing KWin, libkscreen, Qt and FFmpeg credits above also apply.
 
 | Project | Source record and licence | Credit and contribution |
 |---|---|---|
@@ -360,7 +347,8 @@ Names and licences below come from the linked source headers and project records
 | [digiKam and Showfoto](https://www.digikam.org/) | GPL-2.0-or-later | Stereo photos in 3D in the album preview, light table, slideshow, image editor and Showfoto; a Showfoto crash at quit fixed | Gilles Caulier, Maik Qualmann, Michael Miller, Marcel Wiesweg, the founder Renchi Raju and the digiKam developers |
 | [KolourPaint](https://apps.kde.org/kolourpaint/) | BSD-2-Clause, LGPL | Stereo pictures in 3D, edited as one side-by-side pair that keeps its stereo mark when saved | Clarence Dang (founder), Thurston Dang, Martin Koller (maintainer) and the KolourPaint authors |
 
-**References for pictures**: [StereoPhoto Maker](https://stereo.jpn.org/eng/stphmkr/) by **Masuji Suto**, the stereo photographers' standard editor for more than twenty years, is the reference our MPO and JPS handling answers to, and its author has our offer of a native Linux build. [libheif](https://github.com/strukturag/libheif), by **Dirk Farin**, **Joachim Bauch** and the struktur AG contributors, names HEIF's stereo pair group, the base of the planned reading of phones' spatial photos.
+**References for pictures**: [StereoPhoto Maker](https://stereo.jpn.org/eng/stphmkr/) by **Masuji Suto**, the stereo photographers' standard editor for more than twenty years, is the reference our MPO and JPS handling answers to, and its author has our offer of a native Linux build.
+[libheif](https://github.com/strukturag/libheif), by **Dirk Farin**, **Joachim Bauch** and the struktur AG contributors, names HEIF's stereo pair group, the base of the planned reading of phones' spatial photos.
 
 ---
 
@@ -404,8 +392,7 @@ The DPMS protocol is by **Martin Flöser**, as `plasma-wayland-protocols/src/pro
 Linux's VT and sysctl interfaces remain the Linux contributors' work.
 The unchanged kernel-settings package records **Sultan Alsawaf** and **Eric Naim** for the CachyOS kernel topics expressed as settings; those credits stay with the values.
 **Valve** publishes the mapping ceiling in [Proton's requirements](https://github.com/ValveSoftware/Proton/wiki/Requirements).
-The helper itself contains no copied CachyOS code.
-/tmp on disk follows **Debian's trixie release notes** (5.1.6 and 5.2.1, the Debian Documentation Project).
+The helper itself contains no copied CachyOS code. /tmp on disk follows **Debian's trixie release notes** (5.1.6 and 5.2.1, the Debian Documentation Project).
 Names above come from upstream copyright, Debian copyright or git records; contact details are omitted.
 
 ### Controller input
@@ -439,7 +426,9 @@ Every merge was a maintainer's decision, made on the code.
 
 **In review**, with thanks to everyone reviewing: FFmpeg, x265 (MulticoreWare's collaborators shaped its `--frame-packing` option), VLC, gamescope, NVIDIA's open kernel modules, Android's Media3 and Qt.
 
-**Where our work is not welcome yet.** We respect each project's decision. Our changes stay in our own trees, ready to go upstream on the day they are wanted.
+**Where our work is not welcome yet.**
+We respect each project's decision.
+Our changes stay in our own trees, ready to go upstream on the day they are wanted.
 
 - **VLC:** our x264 change, [!10366](https://code.videolan.org/videolan/vlc/-/merge_requests/10366), was labelled "AI::Slop" (the same label now reads "AI::Generated") and then "NotCompliant", and most replies were about the tool that helped write its text rather than about the code. Steve Lhomme reviewed the code itself and found real problems, which we fixed the same day, and Jean-Baptiste Kempf, who leads VideoLAN, answered our email personally and kindly. VLC Stereo, the edition's player, carries the change.
 - **nouveau:** Lyude Paul, a nouveau maintainer, read our two HDMI series on dri-devel and [pointed us](https://lore.kernel.org/all/d5a7e1c598ca3bcaa8cd9eabd1c952a9734033c6.camel@redhat.com/) to Mohamed Ahmed's colour work, the right place for it. Our small fix for that branch, [CD=5 in the GCP at 10 bits per colour](https://gitlab.freedesktop.org/mohamexiety/nouveau/-/merge_requests/1), waited fifteen days without an answer, and I decided to comply and close it right after nouveau approved its LLM statement. When nouveau discussed its [community and LLM statement](https://gitlab.freedesktop.org/nouveau/wiki/-/merge_requests/64), Lyude answered our comments with care. The statement's author, Faith Ekstrand, asked for a concrete exception for small fixes; we wrote one, and it was never answered. The statement was merged on 9 October 2026 as first written: code must be "the output of your own human brain, not a computer". Our nouveau changes (16 bits per colour on Turing and newer, full side by side, the CD=5 fix) live in the edition's kernel, and [we told the list](https://lore.kernel.org/all/179156201409.1251903.7021297050250233959@yahoo.com/) we will send them upstream the day nouveau welcomes contributors who use AI, including people who use it to write in a different language.
@@ -554,8 +543,7 @@ Anything a record could not confirm is left out.
 
 *(Em português, para que ela possa ler.)*
 
-**Mãe, Áuxia Campos Ramos:**
-obrigado por acreditar em mim.
+**Mãe, Áuxia Campos Ramos:** obrigado por acreditar em mim.
 Obrigado por manter os parceiros de IA funcionando enquanto eu me recupero do shutdown que vivi depois de perder minha ex-esposa.
 Sou autista, **com orgulho**, e esta edição também é sua.
 
@@ -607,26 +595,14 @@ We stand on the shoulders of:
 
 ## Local Qt Android CI
 
-The local Android test environment builds on **The Qt Company Ltd.** and the
-**Qt Project** contributors' Coin provisioning scripts, QtBase, QtShaderTools,
-Qt Multimedia and androidtestrunner. The Qt and FFmpeg credits above apply.
+The local Android test environment builds on **The Qt Company Ltd.** and the **Qt Project** contributors' Coin provisioning scripts, QtBase, QtShaderTools, Qt Multimedia and androidtestrunner.
+The Qt and FFmpeg credits above apply.
 
-- **The Android Open Source Project** and **Google**, for the Android SDK,
-  NDK, emulator and Google APIs system images. The NDK headers identify the
-  Android Open Source Project; the system image identifies Google as its vendor.
-- **KDAB**, for [Android OpenSSL support for Qt](https://github.com/KDAB/android_openssl/tree/b71f1470962019bd89534a2919f5925f93bc5779),
-  including the build script and symbol-version patch cited by Qt's provisioning.
-- **The OpenSSL Project** and the contributors listed in its
-  [AUTHORS.md](https://github.com/openssl/openssl/blob/openssl-3.5.4/AUTHORS.md),
-  including OpenSSL Software Services, Inc., OpenSSL Software Foundation, Inc.
-  and Google LLC, for the Android TLS libraries.
-- **Eelco Dolstra** and the **PatchELF** contributors, named in the project's
-  [README](https://github.com/NixOS/patchelf/blob/0.17.2/README.md), for ELF
-  dependency rewriting used by Qt's FFmpeg provisioning.
-- The **LLVM**, **GCC**, **CMake**, **Ninja**, **Gradle**, **OpenJDK** and
-  **Eclipse Adoptium** projects, for the compilers, build tools and Java runtime;
-  **openSUSE**, **KDE's CI images** and **Docker**, for the build environment.
-  Their own distributed notices retain the full contributor credits.
+- **The Android Open Source Project** and **Google**, for the Android SDK, NDK, emulator and Google APIs system images. The NDK headers identify the Android Open Source Project; the system image identifies Google as its vendor.
+- **KDAB**, for [Android OpenSSL support for Qt](https://github.com/KDAB/android_openssl/tree/b71f1470962019bd89534a2919f5925f93bc5779), including the build script and symbol-version patch cited by Qt's provisioning.
+- **The OpenSSL Project** and the contributors listed in its [AUTHORS.md](https://github.com/openssl/openssl/blob/openssl-3.5.4/AUTHORS.md), including OpenSSL Software Services, Inc., OpenSSL Software Foundation, Inc. and Google LLC, for the Android TLS libraries.
+- **Eelco Dolstra** and the **PatchELF** contributors, named in the project's [README](https://github.com/NixOS/patchelf/blob/0.17.2/README.md), for ELF dependency rewriting used by Qt's FFmpeg provisioning.
+- The **LLVM**, **GCC**, **CMake**, **Ninja**, **Gradle**, **OpenJDK** and **Eclipse Adoptium** projects, for the compilers, build tools and Java runtime; **openSUSE**, **KDE's CI images** and **Docker**, for the build environment. Their own distributed notices retain the full contributor credits.
 
 The Linux, QEMU and stereo VM credits above also apply to the shared KVM base.
 

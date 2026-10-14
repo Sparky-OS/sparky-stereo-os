@@ -5,7 +5,9 @@ description: How to give an ordinary desktop program a stereo 3D area (a video, 
 
 # A 3D area inside an ordinary window
 
-**Check freshness first.** Written on 2026-10-07 from the forks linked below. The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; this one assumes its contract.
+**Check freshness first.**
+Written on 2026-10-07 from the forks linked below.
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; this one assumes its contract.
 
 ## The shape
 
@@ -46,7 +48,10 @@ Worked examples:
 
 ## X11 programs
 
-Under Xwayland, a 3D area is a child X window. Our Xwayland gives a redirected child window a surface of its own and keeps alpha on 32-bit surfaces, so the same separation works for X11 programs; the declaration goes through the X11 side of the same library. A window that shows a splash screen first could lose its one-eye size afterwards; our KWin sends it a synthetic ConfigureNotify, so it gets the size back (found on Krita). Native Wayland is the route to prefer when the toolkit has it.
+Under Xwayland, a 3D area is a child X window.
+Our Xwayland gives a redirected child window a surface of its own and keeps alpha on 32-bit surfaces, so the same separation works for X11 programs; the declaration goes through the X11 side of the same library.
+A window that shows a splash screen first could lose its one-eye size afterwards; our KWin sends it a synthetic ConfigureNotify, so it gets the size back (found on Krita).
+Native Wayland is the route to prefer when the toolkit has it.
 
 ## Proof for this kind of work
 

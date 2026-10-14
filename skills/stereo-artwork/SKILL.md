@@ -7,7 +7,7 @@ description: >-
 # Stereo artwork
 
 **Check freshness first.**
-Written on 2026-10-07, from the SparkyOS boot screen ("SPARKYOS / POWERED BY DEBIAN / STEREO 3D EDITION").
+Written on 2026-10-07, from the SparkyOS boot screen; looks and themes added on 2026-10-14 ("SPARKYOS / POWERED BY DEBIAN / STEREO 3D EDITION").
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; [`stereo-pictures`](../stereo-pictures/SKILL.md) has the file formats.
 
 ## Copy a style exactly
@@ -36,6 +36,17 @@ When an animated element follows a path drawn on the image (orbits, a progress l
 Both eyes run from one animation clock, so the motion stays in step.
 Everything that can appear (messages, password prompts, progress) is drawn in both eyes, on the screen plane unless it belongs to a floating element.
 Nothing may appear in one eye only.
+
+## Looks and themes: whose they are, and the glass
+
+Written on 2026-10-14, when the edition took two default looks: Oxygen, and a classic look in the spirit of Mac OS 8.
+
+- **Find who made a look in its own files.** A Plasma style keeps it in `metadata.json` or `metadata.desktop` (`X-KDE-PluginInfo-Author`, `-Website`, `-License`); an Aurorae decoration and a Look and Feel package the same way. Follow the website to the author's repository or store page, and credit the person by name.
+- **A missing licence file is a question, not a guess.** When the metadata names a licence but the repository has no licence file, ask the author to add one before a package cites it.
+- **Inspired by a closed design means drawn by us.** A look in the spirit of a commercial system takes its ideas, never its bitmaps, fonts, logos or names. Before reusing a community theme's images, ask its author whether they are their own drawings; if they are not, or nobody can say, redraw them.
+- **Tell the creators.** The people who made a look are the right ones to see what we do with it and to help: one short note each, in their own venue (an issue on their repository, a message on their store page).
+- **The glass is KWin's Translucency effect, plain alpha with no blur.** In KWin 6 its id is `translucency`: `[Plugins] translucencyEnabled=true` and `[Effect-translucency]`. The old `kwin4_effect_translucency` names are ignored without a warning. The edition's values: inactive windows and dialogs at 91 %, full-screen windows opaque so a film on one screen does not fade when the mouse moves to another. Check a running session with `qdbus6 org.kde.KWin /Effects org.kde.kwin.Effects.isEffectLoaded translucency`.
+- **On a stereo desktop the glass meets the depth rules:** sunk inactive windows and floating dialogs are the translucent ones, so the layers read as glass at their depths; on a 2D screen the look renders as it always did.
 
 ## Deliverables
 

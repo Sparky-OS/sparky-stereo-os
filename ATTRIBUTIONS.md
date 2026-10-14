@@ -305,7 +305,7 @@ The same fight goes on in display standards: in 2024 the HDMI Forum refused an o
 Syd Mead's design for Number 5 was greatly influenced by Eric's sketches, and John Badham named him the film's "most valuable player".
 Most of Number 5's arm movements came from a telemetry suit worn on the puppeteer's upper body, a sensor in every joint carrying the operator's movements to the machine: an early precursor of today's digital motion capture.
 
-Daniel: "I believe in Robonality", Eric's mark (Robonality™, Eric Allard, US trademark application [99047765](https://tsdr.uspto.gov/#caseNumber=99047765https://trademark.justia.com/990/47/robonality-99047765.htmlcaseType=SERIAL_NOhttps://trademark.justia.com/990/47/robonality-99047765.htmlsearchType=statusSearch)).
+Daniel: "I believe in Robonality", Eric's mark (Robonality™, Eric Allard, US trademark application [99047765](https://tsdr.uspto.gov/#caseNumber=99047765&caseType=SERIAL_NO&searchType=statusSearch)).
 For Daniel, AI will soon "feel" like Johnny.
 
 ---

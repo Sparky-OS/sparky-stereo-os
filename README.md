@@ -135,6 +135,7 @@ Every KDE change is a branch of our fork on [invent.kde.org](https://invent.kde.
 
 Where a program breaks stereo or deep colour on the way to the screen, the fix goes to that program's own project.
 Projects such as HandBrake, mpv, Qt Multimedia and PeerTube have merged fixes from our work; every one, with the maintainer who merged it, and what is in review, is in [Merged outside Sparky Stereo](docs/upstream-merges.md).
+Each piece is shown working before it is called done, with the numbers and a picture in anaglyph and MPO: [Proofs](docs/proofs/README.md).
 What people who work with stereo said about it, in public and with links: [What people said](docs/what-people-said.md).
 
 ## Documents

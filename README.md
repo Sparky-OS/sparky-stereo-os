@@ -158,6 +158,13 @@ Sparky Stereo OS, Daniel Ramos's (Capitain Jack) edition of SparkyLinux (by Pawe
 
 Everyone this edition stands on, by name: [ATTRIBUTIONS.md](ATTRIBUTIONS.md).
 
+**Special thanks:**
+- **David Fattal**, co-founder of Leia and maintainer of DisplayXR, for his encouragement, his time and his effort, and for testing our desktop on the 3D displays he builds.
+- **Milton Ponson** and **Christoph Dorn**, Daniel's arms in the W3C PM-KR group, every member of that group, and **Dave Raggett**, **Ian Jacobs** and **Chris Needham** of the W3C, who opened its doors to this work.
+- **Tim Berners-Lee** and everyone who built the Internet, layer by layer, and gave it away.
+- The **Foottroller** team, for opening the door to walking in VR with your feet on Linux.
+- **Eric Allard**, the engineer who brought Johnny 5 to life in *Short Circuit*; the film's writers, **S. S. Wilson** and **Brent Maddock**; and its music, by **El DeBarge**, **Peter Wolf**, **Ina Wolf** and **David Shire**, played many times while this edition was built.
+
 **Cite it:** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23309024.svg)](https://doi.org/10.5281/zenodo.23309024)
 
 **Star it:** [![GitHub stars](https://img.shields.io/github/stars/Sparky-OS/sparky-stereo-os?style=flat-square&logo=github&label=Stars)](https://github.com/Sparky-OS/sparky-stereo-os/stargazers) ⭐ If Sparky Stereo OS is useful to you, a star helps other people find it.

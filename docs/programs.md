@@ -51,11 +51,10 @@ The words in quotes are each project's own description of itself; the line after
 
 **GNU Octave**, *"Interactive programming environment for numerical computations"* Any 3D figure in 3D, with two properties.
 
-**Netgen**, the mesh generator Its stereo option, which did nothing, now shows the mesh in 3D.
-
 **Coming:** **OpenSCAD** (*"The Programmers Solid 3D CAD Modeller"*): see your part in 3D before you print it.
 **KiCad**: the circuit board in 3D before it is made.
 **F3D** (*"A fast and minimalist 3D viewer"*) and **GRASS GIS**: models and terrain in 3D.
+**Netgen**, the mesh generator: the mesh in 3D with its own stereo option, once its drawing area, a window inside the window, is shown in 3D too.
 
 ## Play
 

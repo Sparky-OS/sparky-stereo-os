@@ -402,7 +402,7 @@ Names come from each project's Debian copyright records.
 | [MpvQt](https://invent.kde.org/libraries/mpvqt) | LGPL | A stereo video layer below the window | George Florea Bănuș |
 | [Haruna](https://invent.kde.org/multimedia/haruna) | GPL-3.0-or-later | 3D videos in the layer, controls identical in both eyes | George Florea Bănuș, Muhammet Sadık Uğursoy |
 | [VLC](https://www.videolan.org/) | GPL-2.0-or-later | VLC Stereo: the SEI and Matroska's StereoMode read, both views shown | VideoLAN and the VLC team, among them Jean-Baptiste Kempf and Rémi Denis-Courmont |
-| [Dragon Player](https://apps.kde.org/dragonplayer/) | GPL-2.0 or GPL-3.0 | Every packing of H.264 Table D-8, an input menu, Swap Eyes | Eike Hein, Harald Sitter, Marco Martin, Nate Graham |
+| [Dragon Player](https://apps.kde.org/dragonplayer/) | GPL-2.0 or GPL-3.0 | Every packing of H.264 Table D-8 (V15, 08/2024; D-9 in V16, 06/2026), an input menu, Swap Eyes | Eike Hein, Harald Sitter, Marco Martin, Nate Graham |
 | [Kdenlive](https://kdenlive.org/) and [MLT](https://www.mltframework.org/) | GPL-2.0-or-later, LGPL-2.1-or-later | A clip knows its packing; renders write the SEI and StereoMode | Kdenlive: Jean-Baptiste Mardelle, Julius Künzel, Vincent Pinon, Eric Jiang, Simon A. Eugster, Jason Wood. MLT: Charles Yates, Dan Dennedy (Meltytech) |
 | [Bino](https://bino3d.org/) | GPL-3.0-or-later | Any input, always full side by side out; a right-eye-first fix | Martin Lambers |
 | [PlasmaTube](https://apps.kde.org/plasmatube/) | GPL-3.0-or-later | 3D from the stream, the `yt3d` tags or the frame's shape | Linus Jahn, Devin Lin, Joshua Goins |
@@ -559,7 +559,7 @@ Our changes stay in our own trees, ready to go upstream on the day they are want
 
 | Specification | Owner | What it gives this edition |
 |---|---|---|
-| H.264 and H.265, Annex D (frame packing SEI, Table D-8); H.265 Annexes F and G (multiview) | ITU-T and ISO/IEC | The stereo mark inside a video stream |
+| H.264 and H.265, Annex D (frame packing SEI, Table D-8 in H.264 V15, 08/2024, D-9 in V16, 06/2026); H.265 Annexes F and G (multiview) | ITU-T and ISO/IEC | The stereo mark inside a video stream |
 | H.274 | ITU-T | Supplemental enhancement information for video |
 | [RFC 9559](https://www.rfc-editor.org/rfc/rfc9559) | IETF; Steve Lhomme, Moritz Bunkus, Dave Rice | Matroska and its `StereoMode` |
 | HDMI 1.4 3D, CTA-861, E-EDID | HDMI Licensing Administrator, Consumer Technology Association, VESA | 3D modes and deep colour on the wire |

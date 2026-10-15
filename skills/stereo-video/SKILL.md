@@ -15,7 +15,7 @@ The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; a pl
 A side-by-side or top-and-bottom video is an ordinary 2D picture unless something says it holds two views.
 The standard marks, each linked from awesome-stereoscopy's [standards page](https://github.com/danielcamposramos/awesome-stereoscopy/blob/main/standards.md):
 
-- **In the stream:** the H.264 and H.265 **frame packing arrangement SEI** (Table D-8: side by side, top and bottom, temporal interleaving and the older packings; `content_interpretation_type` gives the eye order; persistence says how long it holds). A 3D television reads this one and switches by itself.
+- **In the stream:** the H.264 and H.265 **frame packing arrangement SEI** (Table D-8, which H.264 V15 (08/2024) numbers D-8 and V16 (06/2026) D-9: side by side, top and bottom, temporal interleaving and the older packings; `content_interpretation_type` gives the eye order; persistence says how long it holds). A 3D television reads this one and switches by itself.
 - **In MP4:** the `st3d` box of Spherical Video V2 (with `sv3d` for 360 and VR180).
 - **In Matroska and WebM:** `StereoMode` ([RFC 9559](https://www.rfc-editor.org/rfc/rfc9559)).
 
@@ -46,7 +46,7 @@ Enumerate the modes (single SEI or not, access unit delimiters on and off, repea
 ## Readers: decoders and players
 
 - **Decoders:** our FFmpeg keeps the SEI's declaration for as long as the standard says, also when it is sent only on keyframes ([FFmpeg #24628](https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/24628), in review), and prefers the stream's own mark as the side data says ([#24643](https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/24643), in review). Qt Multimedia names every packing in `QVideoFrameFormat::StereoMode` and fills it from the FFmpeg backend ([Sparky-OS/qtmultimedia `stereo3d-6.11`](https://github.com/Sparky-OS/qtmultimedia/tree/stereo3d-6.11)); in the edition's build its video output also takes the views apart itself, so a Qt Quick player keeps only its QML and its 3D menu.
-- **Frame sequences** (temporal interleaving, Table D-8 type 5): pair the frames in stream order on the input side, never from a queue that drops the oldest frame; trust per-frame view marks only when they alternate, and never let a stream-wide Matroska tag flip the eyes.
+- **Frame sequences** (temporal interleaving, Table D-8 type 5 in H.264 V15, 08/2024, D-9 in V16, 06/2026): pair the frames in stream order on the input side, never from a queue that drops the oldest frame; trust per-frame view marks only when they alternate, and never let a stream-wide Matroska tag flip the eyes.
 - **A side-by-side Matroska file is authored with one eye's display size.** With the pair's full width as the display size, FFmpeg doubles the sample aspect ratio and a player pre-scales the picture before the views are taken apart.
 - **Where a player finds 3D, in this order:** the stream's mark (SEI, `st3d`, `StereoMode`), then tags (`yt3d:` on YouTube), then, last, the frame's shape: a display aspect ratio of at least 2.5 is full side by side.
 - **What a player shows:** every packing unpacked to full side by side, the video in its own layer declared to Stereo KWin, the controls, subtitles and on-screen display in the 2D part, identical in both eyes. A player with output modes of its own loses them in the edition's build.

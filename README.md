@@ -4,7 +4,7 @@
 A 3D TV works, so does any ordinary monitor with cheap red-cyan glasses, and soon the phone already in your pocket, in a cardboard viewer.
 Sparky Stereo OS, Daniel Ramos's edition of SparkyLinux (by Paweł "pavroo" Pijanowski), is a Linux system with a new Stereo KDE Plasma desktop.
 
-<a href="#seen-in-3d"><img src="docs/screenshots/stereo-desktop-dialogs-anaglyph.jpg" width="99%" alt="The Stereo Desktop in 3D: Marble's Settings menu and its Panels sub-menu in front of the Marble window, the windows behind stepping back one after another, and Marble's globe in 3D inside its window (red-cyan anaglyph)"></a>
+<a href="#seen-in-3d"><img src="docs/screenshots/translucent-stereo-desktop-anaglyph.jpg" width="99%" alt="The Stereo Desktop in 3D with translucent windows: Dolphin's Settings menu and its colour-scheme list in front, the glass windows behind stepping back, the system monitor and the wallpaper deepest (red-cyan anaglyph)"></a>
 
 **Stereo Desktop:** the desktop itself has depth.
 What you are using sits at the screen and its menus come forward, like Marble's menu and sub-menu here, while the windows behind step back one after another, like papers in a pile, with the wallpaper deepest.
@@ -84,8 +84,9 @@ Each program, what it gains and how it was proven: [Programs](#programs-the-edit
 ### Seen in 3D
 
 The pictures on this page are screenshots taken with the edition's Spectacle, which keeps both eyes.
-Red-cyan glasses show them in 3D here; the MPO files open in 3D in the edition's photo programs, on any of the registered outputs.
+Red-cyan glasses show them in 3D here; the MPO files open in 3D in the edition's photo programs, on any of the registered outputs. All of them, each with its red-cyan version and a direct MPO download: [the screenshot gallery](docs/screenshots/README.md).
 
+- **Stereo Desktop, translucent** ([MPO](https://raw.githubusercontent.com/Sparky-OS/sparky-stereo-os/main/docs/screenshots/translucent-stereo-desktop.mpo)), on the 3D TV, 15 October 2026. The windows are glass, so the pile shows through. Measured between the eyes: Dolphin, the focused window, 0 px, and its Settings menu +5 px (in front, at the user's popped limit); the long colour-scheme list 0 px, because it touches the top of the screen and a popped thing that touches the edge stays at the screen; Thunderbird behind -3 px; the system monitor widget and the wallpaper -10 px; the panel 0 px. The two email addresses are blurred in both eyes.
 - **Stereo Desktop, a menu over a menu** ([MPO](docs/screenshots/stereo-desktop-dialogs.mpo)), on a 3D TV in frame packing, 13 October 2026. Measured between the eyes: the focused Marble window 0 px, its Settings menu +2 px and the Panels sub-menu +4 px, the four windows behind -3, -5, -8 and -10 px, the widgets and the wallpaper -10 px; inside the window, Marble's own 3D: the Earth's labels +12 px, the stars' -13 px. The messages in the Diolinux chat behind are blurred.
 - **DOOM (2016) in an ordinary window** ([MPO](docs/screenshots/doom-2016-in-a-window.mpo)), based on [KHARVOX](https://github.com/CactusVRStudios/KHARVOX), CactusVRStudios' DOOM (2016) VR conversion mod (MIT): the game has depth while the panel and the window frame stay flat in both eyes. Measured between the eyes: the nearest rock 23 px apart, the far mountains 1 px, the panel 0 px.
 - **Marble's globe** ([MPO](docs/screenshots/marble-globe.mpo)): the Earth in front of the screen (+11 px) and the stars behind it (-12 px), the side panel flat. This shot predates fixes made since; the menu-over-menu picture shows Marble today.

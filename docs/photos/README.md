@@ -2,11 +2,126 @@
 
 Daniel's own 3D photos, taken with an LG Optimus 3D (P720) phone, in Brasília and Pirenópolis.
 Each is shown as a red-cyan anaglyph, so red-cyan glasses show it in 3D on any screen.
-The originals are published exactly as the phone saved them, location data included, on our download server: JPS files, side by side pairs whose left half is the right eye's picture, the JPS convention.
+The originals are published as the phone saved them, location data included, on our download server: JPS files, side by side pairs whose left half is the right eye's picture, the JPS convention.
+For five photos the phone had stored a stale position about 45 km away; Daniel named where they were taken, and their location now holds the buildings' coordinates (the pictures are unchanged).
 They open in 3D in the edition's photo programs on any of the registered outputs.
 
 **The 3D video:** [MOV004.mp4](https://repo.sparkyos.org/photos/lg-optimus-3d/MOV004.mp4) (95 MB), H.264 with the frame packing mark on every frame, so a 3D TV's own player and the edition's players show it in 3D.
 All files with their checksums: [https://repo.sparkyos.org/photos/lg-optimus-3d/](https://repo.sparkyos.org/photos/lg-optimus-3d/).
+
+## IMG001(1), 29 August 2014
+
+<img src="lg-optimus-3d/img0011-anaglyph.jpg" width="99%" alt="IMG001(1), a 3D photo from an LG Optimus 3D, 29 August 2014 (red-cyan anaglyph)">
+
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG001%281%29.jps)
+
+## IMG002(1), 29 August 2014
+
+<img src="lg-optimus-3d/img0021-anaglyph.jpg" width="99%" alt="IMG002(1), a 3D photo from an LG Optimus 3D, 29 August 2014 (red-cyan anaglyph)">
+
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG002%281%29.jps)
+
+## IMG027 (2), 8 September 2014
+
+<img src="lg-optimus-3d/img027-2-anaglyph.jpg" width="99%" alt="IMG027 (2), a 3D photo from an LG Optimus 3D, 8 September 2014 (red-cyan anaglyph)">
+
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG027%20%282%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.17000&mlon=-48.08528#map=17/-16.17000/-48.08528)
+
+## IMG028 (2), 8 September 2014
+
+<img src="lg-optimus-3d/img028-2-anaglyph.jpg" width="99%" alt="IMG028 (2), a 3D photo from an LG Optimus 3D, 8 September 2014 (red-cyan anaglyph)">
+
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG028%20%282%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.18694&mlon=-48.07417#map=17/-16.18694/-48.07417)
+
+## IMG031 (2), 8 September 2014
+
+<img src="lg-optimus-3d/img031-2-anaglyph.jpg" width="99%" alt="IMG031 (2), a 3D photo from an LG Optimus 3D, 8 September 2014 (red-cyan anaglyph)">
+
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG031%20%282%29.jps)
+
+## IMG056, 23 September 2014
+
+<img src="lg-optimus-3d/img056-anaglyph.jpg" width="99%" alt="IMG056, a 3D photo from an LG Optimus 3D, 23 September 2014 (red-cyan anaglyph)">
+
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG056.jps)
+
+## IMG058, 23 September 2014
+
+<img src="lg-optimus-3d/img058-anaglyph.jpg" width="99%" alt="IMG058, a 3D photo from an LG Optimus 3D, 23 September 2014 (red-cyan anaglyph)">
+
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG058.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.19167&mlon=-48.07389#map=17/-16.19167/-48.07389)
+
+## IMG109, Palácio do Itamaraty, 10 October 2014
+
+<img src="lg-optimus-3d/img109-anaglyph.jpg" width="99%" alt="IMG109, a 3D photo from an LG Optimus 3D, at the Palácio do Itamaraty, 10 October 2014 (red-cyan anaglyph)">
+
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG109.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-15.80067&mlon=-47.86726#map=17/-15.80067/-47.86726)
+
+## IMG024, 10 November 2014
+
+<img src="lg-optimus-3d/img024-anaglyph.jpg" width="99%" alt="IMG024, a 3D photo from an LG Optimus 3D, 10 November 2014 (red-cyan anaglyph)">
+
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG024.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.14806&mlon=-48.09806#map=17/-16.14806/-48.09806)
+
+## IMG025(1), 10 November 2014
+
+<img src="lg-optimus-3d/img0251-anaglyph.jpg" width="99%" alt="IMG025(1), a 3D photo from an LG Optimus 3D, 10 November 2014 (red-cyan anaglyph)">
+
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG025%281%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.14806&mlon=-48.09806#map=17/-16.14806/-48.09806)
+
+## IMG031(1), 10 November 2014
+
+<img src="lg-optimus-3d/img0311-anaglyph.jpg" width="99%" alt="IMG031(1), a 3D photo from an LG Optimus 3D, 10 November 2014 (red-cyan anaglyph)">
+
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG031%281%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.14806&mlon=-48.09806#map=17/-16.14806/-48.09806)
+
+## IMG037(1), 10 November 2014
+
+<img src="lg-optimus-3d/img0371-anaglyph.jpg" width="99%" alt="IMG037(1), a 3D photo from an LG Optimus 3D, 10 November 2014 (red-cyan anaglyph)">
+
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG037%281%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.14778&mlon=-48.10167#map=17/-16.14778/-48.10167)
+
+## IMG038(1), 10 November 2014
+
+<img src="lg-optimus-3d/img0381-anaglyph.jpg" width="99%" alt="IMG038(1), a 3D photo from an LG Optimus 3D, 10 November 2014 (red-cyan anaglyph)">
+
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG038%281%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.14778&mlon=-48.10167#map=17/-16.14778/-48.10167)
+
+## IMG039, 10 November 2014
+
+<img src="lg-optimus-3d/img039-anaglyph.jpg" width="99%" alt="IMG039, a 3D photo from an LG Optimus 3D, 10 November 2014 (red-cyan anaglyph)">
+
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG039.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.14778&mlon=-48.10167#map=17/-16.14778/-48.10167)
+
+## IMG044(1), 10 November 2014
+
+<img src="lg-optimus-3d/img0441-anaglyph.jpg" width="99%" alt="IMG044(1), a 3D photo from an LG Optimus 3D, 10 November 2014 (red-cyan anaglyph)">
+
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG044%281%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.14778&mlon=-48.10167#map=17/-16.14778/-48.10167)
+
+## IMG077, Palácio do Planalto, 10 November 2014
+
+<img src="lg-optimus-3d/img077-anaglyph.jpg" width="99%" alt="IMG077, a 3D photo from an LG Optimus 3D, at the Palácio do Planalto, 10 November 2014 (red-cyan anaglyph)">
+
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG077.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-15.79900&mlon=-47.86080#map=17/-15.79900/-47.86080)
+
+## IMG082, Palácio do Planalto, 10 November 2014
+
+<img src="lg-optimus-3d/img082-anaglyph.jpg" width="99%" alt="IMG082, a 3D photo from an LG Optimus 3D, at the Palácio do Planalto, 10 November 2014 (red-cyan anaglyph)">
+
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG082.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-15.79900&mlon=-47.86080#map=17/-15.79900/-47.86080)
+
+## IMG102, Palácio do Planalto, 10 November 2014
+
+<img src="lg-optimus-3d/img102-anaglyph.jpg" width="99%" alt="IMG102, a 3D photo from an LG Optimus 3D, at the Palácio do Planalto, 10 November 2014 (red-cyan anaglyph)">
+
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG102.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-15.79900&mlon=-47.86080#map=17/-15.79900/-47.86080)
+
+## IMG105, Palácio do Planalto, 10 November 2014
+
+<img src="lg-optimus-3d/img105-anaglyph.jpg" width="99%" alt="IMG105, a 3D photo from an LG Optimus 3D, at the Palácio do Planalto, 10 November 2014 (red-cyan anaglyph)">
+
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG105.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-15.79900&mlon=-47.86080#map=17/-15.79900/-47.86080)
 
 ## CAM00004, 3 December 2014
 
@@ -139,119 +254,5 @@ All files with their checksums: [https://repo.sparkyos.org/photos/lg-optimus-3d/
 <img src="lg-optimus-3d/cam01066-anaglyph.jpg" width="99%" alt="CAM01066, a 3D photo from an LG Optimus 3D, 9 February 2016 (red-cyan anaglyph)">
 
 [Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/CAM01066.jps)
-
-## IMG001(1), date not recorded
-
-<img src="lg-optimus-3d/img0011-anaglyph.jpg" width="99%" alt="IMG001(1), a 3D photo from an LG Optimus 3D, date not recorded (red-cyan anaglyph)">
-
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG001%281%29.jps)
-
-## IMG002(1), date not recorded
-
-<img src="lg-optimus-3d/img0021-anaglyph.jpg" width="99%" alt="IMG002(1), a 3D photo from an LG Optimus 3D, date not recorded (red-cyan anaglyph)">
-
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG002%281%29.jps)
-
-## IMG024, date not recorded
-
-<img src="lg-optimus-3d/img024-anaglyph.jpg" width="99%" alt="IMG024, a 3D photo from an LG Optimus 3D, date not recorded (red-cyan anaglyph)">
-
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG024.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.14806&mlon=-48.09806#map=17/-16.14806/-48.09806)
-
-## IMG025(1), date not recorded
-
-<img src="lg-optimus-3d/img0251-anaglyph.jpg" width="99%" alt="IMG025(1), a 3D photo from an LG Optimus 3D, date not recorded (red-cyan anaglyph)">
-
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG025%281%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.14806&mlon=-48.09806#map=17/-16.14806/-48.09806)
-
-## IMG027 (2), date not recorded
-
-<img src="lg-optimus-3d/img027-2-anaglyph.jpg" width="99%" alt="IMG027 (2), a 3D photo from an LG Optimus 3D, date not recorded (red-cyan anaglyph)">
-
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG027%20%282%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.17000&mlon=-48.08528#map=17/-16.17000/-48.08528)
-
-## IMG028 (2), date not recorded
-
-<img src="lg-optimus-3d/img028-2-anaglyph.jpg" width="99%" alt="IMG028 (2), a 3D photo from an LG Optimus 3D, date not recorded (red-cyan anaglyph)">
-
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG028%20%282%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.18694&mlon=-48.07417#map=17/-16.18694/-48.07417)
-
-## IMG031 (2), date not recorded
-
-<img src="lg-optimus-3d/img031-2-anaglyph.jpg" width="99%" alt="IMG031 (2), a 3D photo from an LG Optimus 3D, date not recorded (red-cyan anaglyph)">
-
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG031%20%282%29.jps)
-
-## IMG031(1), date not recorded
-
-<img src="lg-optimus-3d/img0311-anaglyph.jpg" width="99%" alt="IMG031(1), a 3D photo from an LG Optimus 3D, date not recorded (red-cyan anaglyph)">
-
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG031%281%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.14806&mlon=-48.09806#map=17/-16.14806/-48.09806)
-
-## IMG037(1), date not recorded
-
-<img src="lg-optimus-3d/img0371-anaglyph.jpg" width="99%" alt="IMG037(1), a 3D photo from an LG Optimus 3D, date not recorded (red-cyan anaglyph)">
-
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG037%281%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.14778&mlon=-48.10167#map=17/-16.14778/-48.10167)
-
-## IMG038(1), date not recorded
-
-<img src="lg-optimus-3d/img0381-anaglyph.jpg" width="99%" alt="IMG038(1), a 3D photo from an LG Optimus 3D, date not recorded (red-cyan anaglyph)">
-
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG038%281%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.14778&mlon=-48.10167#map=17/-16.14778/-48.10167)
-
-## IMG039, date not recorded
-
-<img src="lg-optimus-3d/img039-anaglyph.jpg" width="99%" alt="IMG039, a 3D photo from an LG Optimus 3D, date not recorded (red-cyan anaglyph)">
-
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG039.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.14778&mlon=-48.10167#map=17/-16.14778/-48.10167)
-
-## IMG044(1), date not recorded
-
-<img src="lg-optimus-3d/img0441-anaglyph.jpg" width="99%" alt="IMG044(1), a 3D photo from an LG Optimus 3D, date not recorded (red-cyan anaglyph)">
-
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG044%281%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.14778&mlon=-48.10167#map=17/-16.14778/-48.10167)
-
-## IMG056, date not recorded
-
-<img src="lg-optimus-3d/img056-anaglyph.jpg" width="99%" alt="IMG056, a 3D photo from an LG Optimus 3D, date not recorded (red-cyan anaglyph)">
-
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG056.jps)
-
-## IMG058, date not recorded
-
-<img src="lg-optimus-3d/img058-anaglyph.jpg" width="99%" alt="IMG058, a 3D photo from an LG Optimus 3D, date not recorded (red-cyan anaglyph)">
-
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG058.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.19167&mlon=-48.07389#map=17/-16.19167/-48.07389)
-
-## IMG077, date not recorded
-
-<img src="lg-optimus-3d/img077-anaglyph.jpg" width="99%" alt="IMG077, a 3D photo from an LG Optimus 3D, date not recorded (red-cyan anaglyph)">
-
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG077.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.19917&mlon=-48.13694#map=17/-16.19917/-48.13694)
-
-## IMG082, date not recorded
-
-<img src="lg-optimus-3d/img082-anaglyph.jpg" width="99%" alt="IMG082, a 3D photo from an LG Optimus 3D, date not recorded (red-cyan anaglyph)">
-
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG082.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.20333&mlon=-48.14278#map=17/-16.20333/-48.14278)
-
-## IMG102, date not recorded
-
-<img src="lg-optimus-3d/img102-anaglyph.jpg" width="99%" alt="IMG102, a 3D photo from an LG Optimus 3D, date not recorded (red-cyan anaglyph)">
-
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG102.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.20333&mlon=-48.14278#map=17/-16.20333/-48.14278)
-
-## IMG105, date not recorded
-
-<img src="lg-optimus-3d/img105-anaglyph.jpg" width="99%" alt="IMG105, a 3D photo from an LG Optimus 3D, date not recorded (red-cyan anaglyph)">
-
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG105.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.20278&mlon=-48.13861#map=17/-16.20278/-48.13861)
-
-## IMG109, date not recorded
-
-<img src="lg-optimus-3d/img109-anaglyph.jpg" width="99%" alt="IMG109, a 3D photo from an LG Optimus 3D, date not recorded (red-cyan anaglyph)">
-
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG109.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.19861&mlon=-48.13250#map=17/-16.19861/-48.13250)
 
 Back to [the front page](../../README.md#seen-in-3d).

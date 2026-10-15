@@ -194,3 +194,32 @@ An acknowledgement means decoded and submitted to GL, not physical scanout.
 A 30 Hz capability negotiation is not a promise of 30 frames per second on an emulated CPU decoder.
 Physical hardware decoder colours, thermal performance and end-to-end latency still require device qualification.
 Credits: Fabian Druschke and KDE Connect, KDE KRdp/KPipeWire, FreeRDP, Google Android/Cardboard, FFmpeg, Mesa/libva and x265 developers.
+
+## Phone link formats and late-frame recovery (checked 2026-10-15)
+
+Keep KWin's internal capture full side by side and recompute it from the current output view after a mode change.
+Test the real viewer through a mode change and back, replication changes and reconnect; a reference decoder alone misses viewer fit errors.
+Recompute the texture fit from each incoming frame while keeping the physical panel and lens profile fixed.
+
+Offer Native, full SBS 720p (2560×720), half TB 720p (1280×720), half SBS 720p (1280×720), and full TB 720p (1280×1440).
+Native remains the default.
+Half TB preserves horizontal detail; half SBS preserves vertical detail; full formats retain both 1280×720 eyes.
+Repack each eye independently at the encoder edge to avoid blending across the eye boundary.
+Use H.264's standard frame-packing SEI, LEFT first, and unpack before applying the lens transform.
+KDE per-output scaling and the reading preset remain separate from transport sampling.
+
+When dropping queued AVC, discard dependent frames until a fresh IDR arrives.
+Request that IDR on the next encoder input without reopening the codec or filter graph.
+Test repeated requests, ordinary intervening P frames, shutdown before the first input, and a no-op request mutant.
+Keep only the newest decoded bitmap awaiting GL and discard expired queued bitmaps; do not discard arbitrary compressed P frames before decoding.
+Measure each queue separately with injected receiver work and renderer stalls.
+Codec-produced bytes include frames dropped before transmission, so compare them with socket byte deltas rather than calling them network traffic.
+
+Show Wi-Fi standard, frequency, Tx/Rx PHY rates and signal without reading network identifiers or requesting location for these fields.
+PHY rate is a hint, not measured available bandwidth.
+An optional Automatic choice can use recent local render delay and frame cadence at connection time; preserve every manual choice and show the reason.
+Acquire [Android's low-latency Wi-Fi lock](https://developer.android.com/reference/android/net/wifi/WifiManager#WIFI_MODE_FULL_LOW_LATENCY) only while the display session is connected and resumed, and release it on pause or disconnect.
+Request AF41 on both RDP sockets where allowed; [RFC 8325](https://www.rfc-editor.org/rfc/rfc8325.html) and [Linux wireless queue mapping](https://wireless.docs.kernel.org/en/latest/en/developers/documentation/mac80211/queues.html) explain its video-priority mapping.
+Verify packet markings against an unmarked control, but reserve radio contention, router policy, power and thermal claims for a physical device.
+An ordinary app cannot force the radio to refuse low rates.
+Credits: Fabian Druschke and KDE Connect, KWin, Arjen Hiemstra and KRdp, Aleix Pol Gonzalez, Marco Martin and KPipeWire, FreeRDP, FFmpeg, Google Android and Cardboard developers.

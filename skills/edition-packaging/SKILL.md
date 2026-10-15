@@ -1,7 +1,7 @@
 ---
 name: edition-packaging
 description: >-
-  How Sparky Stereo OS packages itself the Debian way: role tasks (task-sparky-stereo-<role>), stereo and 2D flavours for science and education, tasksel, blocking Debian's builds of our packages, the media stack on deb-multimedia, and how to prove a package set before it ships. Load the general sparky-stereo skill first.
+  How Sparky Stereo OS packages itself the Debian way: role tasks (task-sparky-stereo-<role>), stereo and 2D flavours for science and education, tasksel, blocking Debian's builds of our packages, the media stack on deb-multimedia, the pins that keep the GPU vendors' display drivers from replacing ours, and how to prove a package set before it ships. Load the general sparky-stereo skill first.
 ---
 
 # Packaging the edition
@@ -46,6 +46,19 @@ Generate it from the repository index, never by hand, and rebuild the apt-config
 This is the rule that already kept Bino ours: our build declares full side by side, and other builds would hand the compositor a picture outside the contract.
 
 A package set waiting for a rebuild is left out of the block until the rebuild lands (see the next section).
+
+## The GPU vendors' repositories: compute updates, the display driver stays ours
+
+NVIDIA and AMD publish their display drivers in the same repositories as CUDA and ROCm, and the hardware setup gives the CUDA repository priority 1002.
+Without a guard, an ordinary upgrade replaces our NVIDIA module and our amdgpu with the vendor's, which have no HDMI 3D.
+`sparky-stereo-nvidia-driver-lock` (its own package, built from the module's source and version, required by `nvidia-kernel-open-dkms-stereo3d`) ships `10sparky-stereo-nvidia-driver-lock`: NVIDIA's and Debian's NVIDIA kernel modules at -1, every driver package at our module's NVIDIA version at 1005, other versions at 100.
+`sparky-stereo-hardware` ships `sparky-stereo-gpu-nvidia` (the container toolkit at 990, its release candidates at 100, our `libnvidia-egl-wayland1` over NVIDIA's) and `sparky-stereo-gpu-amd` (AMD's out-of-tree kernel driver and `*amdgpu*` graphics packages from `repo.radeon.com` at -1; ROCm keeps updating).
+Intel is not guarded.
+`sparky-stereo-hardware` is in `sparky-stereo-hardware-support`, so every install carries the pins; a pin for a repository that is not configured does nothing.
+A pin file whose name starts with `10` is read before `nvidia-driver-pin`, and the first record that names a package wins over any `Package: *` record, whatever the numbers.
+To move the NVIDIA driver, rebuild our module first and publish; the lock follows because it is generated from the module's version, and the first upgrade installs only the new lock.
+Prove a change in a Debian testing container with NVIDIA's and AMD's real repositories at the edition's priorities and a newer driver published beside them, with both of apt's solvers.
+The measurements and the file by file account are in [GPU vendors' repositories](../../docs/gpu-vendor-repositories.md).
 
 ## Each build of ours
 

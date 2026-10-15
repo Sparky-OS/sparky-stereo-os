@@ -2,7 +2,7 @@
 
 **Create and explore in 3D on the screen you already have: paint, edit photos and video, study molecules and globes, then watch films and play games.**
 A 3D TV works, so does any ordinary monitor with cheap red-cyan glasses, and soon the phone already in your pocket, in a cardboard viewer.
-Sparky Stereo OS, Daniel Ramos's edition of SparkyLinux (by Paweł "pavroo" Pijanowski), is a Linux system with the KDE Plasma desktop.
+Sparky Stereo OS, Daniel Ramos's edition of SparkyLinux (by Paweł "pavroo" Pijanowski), is a Linux system with a new Stereo KDE Plasma desktop.
 
 <a href="#seen-in-3d"><img src="docs/screenshots/stereo-desktop-dialogs-anaglyph.jpg" width="99%" alt="The Stereo Desktop in 3D: Marble's Settings menu and its Panels sub-menu in front of the Marble window, the windows behind stepping back one after another, and Marble's globe in 3D inside its window (red-cyan anaglyph)"></a>
 

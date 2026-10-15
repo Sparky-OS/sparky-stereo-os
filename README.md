@@ -60,8 +60,7 @@ Each program in full: [Programs](#programs-the-edition-changes-for-stereo-3d-and
 
 ### For theme designers and customizers
 
-**On this desktop, depth is a design material.**
-What is built, what is coming, and an example theme in words: [For theme designers and customizers](docs/for-theme-designers.md); ideas and mockups are welcome in the [themes issue](https://github.com/Sparky-OS/sparky-stereo-os/issues/78).
+**On this desktop, a theme decides what pops and what dives:** [new frontiers for theme design](#depth-on-the-desktop).
 
 ## Science and engineering
 
@@ -92,11 +91,26 @@ Red-cyan glasses show them in 3D here; the MPO files open in 3D in the edition's
 - **Marble's globe** ([MPO](docs/screenshots/marble-globe.mpo)): the Earth in front of the screen (+11 px) and the stars behind it (-12 px), the side panel flat. This shot predates fixes made since; the menu-over-menu picture shows Marble today.
 - **Stereo Desktop, a pop-up** ([MPO](docs/screenshots/stereo-desktop.mpo)), the same day. Measured between the eyes: the panel 0 px (at the screen), the sound pop-up +4 px (in front), the three windows behind -3, -7 and -10 px, and the system monitor widget -10 px, at the back with the wallpaper.
 
-## Depth on the desktop
+<a id="depth-on-the-desktop"></a>
+## The Stereo Desktop: new frontiers for theme design
 
-**The desktop itself gets a little depth, on every screen: built, and seen on a 3D TV on 13 October 2026 ([the picture at the top](#seen-in-3d)).**
-The active window sits at the screen, its menus and tooltips come forward, and the wallpaper and the windows behind sink, a few pixels each, within the limits you set (System Settings, "3D Depth").
-<a id="the-desktop-cube-what-one-format-makes-possible"></a>The details, and the Desktop Cube built on the same standard: [Depth on the desktop](docs/depth-on-the-desktop.md).
+**For the first time, a theme decides what pops and what dives, not only how things look.**
+For decades, shadows, bevels and raised buttons have only pretended; on the Stereo Desktop it is real, and gentle: a few pixels, within limits you choose (System Settings, "3D Depth").
+
+- **What you use pops:** menus, tooltips, notifications and dialogs come out toward you, and the window you work in sits at the screen. *Built, and seen on a 3D TV on 13 October 2026 ([the picture at the top](#seen-in-3d)).*
+- **The rest sinks:** the windows behind step back one after another, like papers in a pile, and the wallpaper dives deepest. *Built.*
+- **Small things keep their place:** the pointer takes the level of whatever it is over, a shadow lies on what it falls on, and a pinned window, like a webcam over your slides, keeps popping over everything. *Built.*
+- **Wallpapers in 3D:** a 3D photo as your background keeps its own pop and dive, far behind every window. *Built.* 3D video backgrounds come next, with Jeromy Streets' video wallpaper. *Coming.*
+- **Screensavers in 3D:** the classic starfield and the stereo savers, in real 3D. *Built.*
+- **Pictures and icons in 3D:** 3D photos show in 3D in Dolphin's previews and in the picture viewers. *Built.* Icons drawn as a pair, one for each eye, are part of Stereo Oxygen, the edition's own look. *Coming.*
+- **Effects that really pop and dive:** a closing window can fly toward you in pieces, or dive behind the screen and bounce on a floor. *Built on our KWin branch, coming in the next package.* Window switchers that fan out in 3D, and the Desktop Cube in real 3D. *Coming.*
+- **3D from the moment you switch on:** the boot splash and the login screen in 3D on 3D screens. *Coming.*
+
+**And it is still a normal 2D desktop.**
+On an ordinary screen nothing changes: the same theme, the same layout, the same effects, drawn once.
+3D appears only where a screen can show it, or through red-cyan glasses, and a theme made for 3D is also a complete 2D theme.
+
+<a id="the-desktop-cube-what-one-format-makes-possible"></a>The details: [Depth on the desktop](docs/depth-on-the-desktop.md) and [For theme designers and customizers](docs/for-theme-designers.md); ideas, sketches and 3D mockups are welcome in the [themes issue](https://github.com/Sparky-OS/sparky-stereo-os/issues/78).
 
 ## For developers
 

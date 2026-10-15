@@ -1,7 +1,7 @@
 # Depth on the desktop
 
 **For everyone who uses the desktop, and for theme and toolkit developers:** how the desktop itself gets a little depth, the same on every screen, and the Desktop Cube built on it.
-**Status:** built in Stereo KWin, coming with the next KWin package.
+**Status:** built and shipped in the edition's KWin package, and seen on a 3D TV on 13 October 2026.
 
 **Three places, declared: sunk, screen and popped.**
 All subtle, a few pixels, with the limits your own settings (System Settings, "3D Depth").

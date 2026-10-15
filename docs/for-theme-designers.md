@@ -7,7 +7,7 @@ Each part is marked **built** or **designed (coming)**.
 
 ## What you can design with (built)
 
-**Status:** built in Stereo KWin on our KWin branch [`stereo3d-depth`](https://invent.kde.org/danielcamposramos/kwin/-/tree/stereo3d-depth), coming with the next KWin package.
+**Status:** built and shipped in the edition's KWin package (made on our KWin branch [`stereo3d-depth`](https://invent.kde.org/danielcamposramos/kwin/-/tree/stereo3d-depth)), and seen on a 3D TV on 13 October 2026.
 
 - **Three planes: sunk, screen and popped.** The active window sits at the screen; its menus, dialogs and tooltips pop; the wallpaper and the windows behind sink. All subtle, a few pixels of parallax.
 - **Everything in between is Stereo KWin's, by stacking order.** Background windows share the depth behind the active window in the same order as in 2D, so a pile of windows reads as a pile of papers. Any depth between the limits is valid; nothing goes beyond them.
@@ -45,7 +45,7 @@ Today KWin's effects are flat: Glide and Sheet draw a perspective picture once f
 Their stereo versions describe their motion once, in three dimensions, and the renderer's two cameras make each eye; no effect needs to know which eye is being drawn.
 On 2D screens they look exactly as they do today.
 
-- **Fall Apart, Fly and Dive.** With Fly, a closing window's pieces come toward you as they fade. With Dive, they fall into the depth behind the screen, land on a floor and bounce while they fade. A background window being closed makes a short opposite move first, as an anticipation.
+- **Fall Apart, Fly and Dive** (built on our KWin branch, coming in the next package). With Fly, a closing window's pieces come toward you as they fade. With Dive, they fall into the depth behind the screen, land on a floor and bounce while they fade. A background window being closed makes a short opposite move first, as an anticipation.
 - **The floor belongs to the theme.** Where Dive's pieces land, the floor's size and its depth, is part of the theme, so a theme fits it to its own background: the bottom of a well, a table top, the last layer of a 3D wallpaper.
 - **Glide.** An opening window swings in from behind to the screen; a closing one swings away behind it.
 - **Sheet.** A dialog comes down from its parent window at the popped depth. A dialog over a dialog may go one step further, and that is the end: a third stays at the second's depth.
@@ -75,7 +75,7 @@ This is a design example of what the pieces above allow together, not a theme th
 ## How to get involved
 
 - **The themes issue:** [#78](https://github.com/Sparky-OS/sparky-stereo-os/issues/78). Ideas, sketches, side-by-side mockups and wallpapers in MPO, JPS or side by side are all welcome there.
-- **The beta tester calls:** [#26](https://github.com/Sparky-OS/sparky-stereo-os/issues/26) in English, [#25](https://github.com/Sparky-OS/sparky-stereo-os/issues/25) in Portuguese, [#27](https://github.com/Sparky-OS/sparky-stereo-os/issues/27) in Polish. You don't need a 3D TV: red and cyan glasses on any monitor are enough to see depth.
+- **The beta tester calls:** [#26](https://github.com/Sparky-OS/sparky-stereo-os/issues/26) in English, [#25](https://github.com/Sparky-OS/sparky-stereo-os/issues/25) in Portuguese, [#27](https://github.com/Sparky-OS/sparky-stereo-os/issues/27) in Polish, [#80](https://github.com/Sparky-OS/sparky-stereo-os/issues/80) in French, [#153](https://github.com/Sparky-OS/sparky-stereo-os/issues/153) in German, [#81](https://github.com/Sparky-OS/sparky-stereo-os/issues/81) in Japanese, [#83](https://github.com/Sparky-OS/sparky-stereo-os/issues/83) in Korean, [#84](https://github.com/Sparky-OS/sparky-stereo-os/issues/84) and [#85](https://github.com/Sparky-OS/sparky-stereo-os/issues/85) in Chinese. You don't need a 3D TV: red and cyan glasses on any monitor are enough to see it.
 - **Read more:** [Depth on the desktop](depth-on-the-desktop.md), the [house formats](house-formats.md), and the design in one page, [STEREO3D.md](https://invent.kde.org/danielcamposramos/kwin/-/blob/stereo3d/STEREO3D.md).
 
 ## References

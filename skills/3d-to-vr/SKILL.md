@@ -165,7 +165,8 @@ H.264 stays the compatible default.
 [MS-RDPEGFX](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rdpegfx/31c6e2b1-335b-4a75-9454-bb2309958c21) negotiates AVC graphics, not an HEVC codec identifier.
 A locally qualified HEVC transport prototype uses a separately named [dynamic virtual channel](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rdpedyc/3bd53020-9b64-4c9a-97fc-90a79e7e1e06) inside the existing authenticated RDP connection.
 It checks version and capabilities before selecting a codec, waits for decoder acknowledgement, and leaves standard graphics available for older clients or failed negotiation.
-This prototype transfers bounded fixtures; it is not yet a released live HEVC viewer option.
+The initial prototype transferred bounded fixtures; the live integration below supersedes that transport limit.
+It remains a local proposal, not a released viewer option.
 
 A decoder MIME type is insufficient: check profile, bit depth, colour format, panel size and rate, then decoder initialization.
 The emulated Android HEVC decoder accepts a 2340×1080 fixture but declares that size at 30 Hz, not 60 Hz; its faster offline batch decode must not override the declared rate limit.
@@ -173,3 +174,23 @@ The emulated Android HEVC decoder accepts a 2340×1080 fixture but declares that
 Keep H.264 when HEVC cannot meet the requested panel mode.
 Do not infer HEVC Screen Content Coding support from HEVC Main support; qualify the specific tools at both ends.
 Credits: KDE, Fabian Druschke and KDE Connect, FreeRDP, Google Android and Cardboard, FFmpeg, Mesa and libva developers.
+
+## Live HEVC integration (checked 2026-10-15)
+
+Keep codec negotiation and access units on the existing authenticated RDP connection.
+H.264 remains the default and the recovery path.
+Bound queued bytes, queued access units and unacknowledged frames separately; pause capture under pressure rather than discarding dependent HEVC frames.
+The qualified implementation permits two unacknowledged frames and rebuilds the H.264 encoder after a failed optional HEVC session.
+Treat decoder startup separately from steady-state acknowledgement deadlines.
+Reduce VAAPI frame-rate rationals before initializing the encoder; equivalent 30000/1000 and 30/1 inputs did not behave identically on the tested driver.
+Keep the conversion matrix, range and encoded colour metadata consistent.
+
+On the tested Android image, legacy OMX.google software codecs omit the software-only attribute.
+Recognize the platform implementation names as well as that flag before choosing the presentation path.
+Hardware decoders retain their direct surface route; software decoders expose cropped YUV planes for explicit conversion.
+Check row stride, pixel stride, crop bounds and the potentially short final row when packing those planes.
+The actual MediaCodec YUV samples and all 2,527,200 native rendered RGB pixels match an independent HEVC decode exactly; swapped eyes and inverted rows fail.
+An acknowledgement means decoded and submitted to GL, not physical scanout.
+A 30 Hz capability negotiation is not a promise of 30 frames per second on an emulated CPU decoder.
+Physical hardware decoder colours, thermal performance and end-to-end latency still require device qualification.
+Credits: Fabian Druschke and KDE Connect, KDE KRdp/KPipeWire, FreeRDP, Google Android/Cardboard, FFmpeg, Mesa/libva and x265 developers.

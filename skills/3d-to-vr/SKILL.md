@@ -223,3 +223,29 @@ Request AF41 on both RDP sockets where allowed; [RFC 8325](https://www.rfc-edito
 Verify packet markings against an unmarked control, but reserve radio contention, router policy, power and thermal claims for a physical device.
 An ordinary app cannot force the radio to refuse low rates.
 Credits: Fabian Druschke and KDE Connect, KWin, Arjen Hiemstra and KRdp, Aleix Pol Gonzalez, Marco Martin and KPipeWire, FreeRDP, FFmpeg, Google Android and Cardboard developers.
+
+## Throw waiting scenes (checked 2026-10-15)
+
+Keep the network headset distinct from a local output before announcing it, so the desktop can offer Throw without renaming Move to Screen for local monitors.
+Use Throw consistently in approval, settings and phone status, and include all required translations in message extraction.
+Validate the installed catalogs as well as their source strings.
+
+Bundle waiting assets locally, with separate connecting and reconnecting clips and a marked still for reduce motion.
+Choose a different scene for each wait when several exist.
+Use a fixed camera; the reconnect scene drops the ball and throws it again.
+Read the standard stereo mark from the media, never infer it from a filename or catalog entry.
+Require full side by side, left first; use the existing per-eye lens renderer.
+For stills, validate [PNG sTER](http://www.libpng.org/pub/png/spec/register/pngext-1.4.0-pdg.html), mode 1, before image data, including its CRC and eye padding.
+A packed width divisible by 16 avoids that padding for equal-size eyes.
+
+Select hardware video decoders, disable audio and loop only while waiting and resumed.
+Keep legacy software decoder names out of the hardware path even if their capability flag is wrong.
+Missing artwork or unavailable hardware falls back to the marked still, then to identical status text in both eyes.
+Handle unsupported video tracks as well as player errors; an empty hardware decoder selection may report only the former.
+Clear player ownership before release so synchronous callbacks cannot release it twice.
+Release the waiting decoder on the first submitted desktop frame, pause, stop or destruction.
+Drain queued GL cleanup before detaching its surface; a renderer's exit request can precede queued cleanup.
+Do not dismiss waiting because an empty GL surface redrew itself.
+Test connecting, reconnecting, reduce motion, invalid marks, decoder rejection and arrival/pause/close separately.
+A debug-only software-decoder fixture tests the loop and renderer; it does not qualify hardware decoding, power or latency on a phone.
+Credits: KDE and Fabian Druschke's KDE Connect work, FreeRDP, Google Android/Cardboard and AndroidX Media3 developers.

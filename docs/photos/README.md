@@ -57,17 +57,17 @@ All files with their checksums: [https://repo.sparkyos.org/photos/lg-optimus-3d/
 
 [Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG109.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-15.80067&mlon=-47.86726#map=17/-15.80067/-47.86726)
 
-## IMG024, 10 November 2014
+## IMG024, Embassy of Malaysia, Lago Sul, 10 November 2014
 
-<img src="lg-optimus-3d/img024-anaglyph.jpg" width="99%" alt="IMG024, a 3D photo from an LG Optimus 3D, 10 November 2014 (red-cyan anaglyph)">
+<img src="lg-optimus-3d/img024-anaglyph.jpg" width="99%" alt="IMG024, a 3D photo from an LG Optimus 3D, at the Embassy of Malaysia, Lago Sul, 10 November 2014 (red-cyan anaglyph)">
 
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG024.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.14806&mlon=-48.09806#map=17/-16.14806/-48.09806)
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG024.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-15.85202&mlon=-47.90144#map=17/-15.85202/-47.90144)
 
-## IMG025(1), 10 November 2014
+## IMG025(1), Embassy of Malaysia, Lago Sul, 10 November 2014
 
-<img src="lg-optimus-3d/img0251-anaglyph.jpg" width="99%" alt="IMG025(1), a 3D photo from an LG Optimus 3D, 10 November 2014 (red-cyan anaglyph)">
+<img src="lg-optimus-3d/img0251-anaglyph.jpg" width="99%" alt="IMG025(1), a 3D photo from an LG Optimus 3D, at the Embassy of Malaysia, Lago Sul, 10 November 2014 (red-cyan anaglyph)">
 
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG025%281%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.14806&mlon=-48.09806#map=17/-16.14806/-48.09806)
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG025%281%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-15.85202&mlon=-47.90144#map=17/-15.85202/-47.90144)
 
 ## IMG031(1), Embassy of Malaysia, Lago Sul, 10 November 2014
 

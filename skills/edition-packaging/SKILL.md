@@ -65,6 +65,17 @@ The measurements and the file by file account are in [GPU vendors' repositories]
 Each is the distribution's source package plus our patch series, versioned with the suffix `+stereo3dN`, built in a fresh `debian:testing` container, and it keeps its source package, so the repository can offer `deb-src`.
 A 32-bit twin (Mesa and FFmpeg, for Steam and Wine) comes from the same source build as the 64-bit package: `dpkg` refuses to install the two together when a shared file such as the Debian changelog differs (`Multi-Arch: same`).
 
+## Receiver packages must prove their installed interface
+
+Checked 2026-10-16 with KRDC Catch and KRdp.
+When a reviewed change targets development master, backport it to the distribution release and retain the release's existing plugins and behaviour.
+Build the translated catalogs as distribution patches, with test-only capture and mutation hooks disabled in the shipping executable.
+After a full upgrade from the published packages, compare installed payloads with the package archives and run the visible connection action in an isolated session.
+Capture only the synthetic receiver display and check eye identity, per-eye fit, changing source timecodes and reconnect.
+Swap the synthetic source eyes and freeze its animation to prove that the same checker rejects reversed and stale pictures without enabling hooks in the shipped app.
+For certificate rejection, verify that the connection reached TLS and failed pin validation; a server that never listened is not a passing control.
+The owning changes are [KRDC Catch](https://invent.kde.org/danielcamposramos/krdc/-/commit/b3cd02d484) and [KRdp's D-Bus descriptor fix](https://invent.kde.org/danielcamposramos/krdp/-/commit/6d9c6f3dbb).
+
 ## The media stack sits on deb-multimedia
 
 Players and tools from deb-multimedia (VLC, mpv, OBS, HandBrake) link against its FFmpeg, which has a higher epoch than Debian's.

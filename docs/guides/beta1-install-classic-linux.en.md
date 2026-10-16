@@ -28,7 +28,7 @@ The known issues of beta 1 are listed near the end.
 
 ## 1. Download and check the image
 
-Download the image here: `<DOWNLOAD-LINK>`
+The download link goes to beta testers: ask for it in the [beta tester thread](https://github.com/Sparky-OS/sparky-stereo-os/issues/26).
 
 | File | sparky-stereo-os-9-mashtabba-beta1-x86_64.iso |
 |---|---|

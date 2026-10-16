@@ -14,7 +14,7 @@ The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; for 
 | The program uses | What happens in the edition | Its part |
 |---|---|---|
 | OpenGL quad buffer (GLX or EGL) | Mesa packs the two back buffers into one full side-by-side picture at the swap and declares it to Stereo KWin | Ask for a stereo visual or config and draw each eye into its buffer |
-| EGL multiview windows (`EGL_EXT_multiview_window`) | Mesa's EGL; NVIDIA's egl-wayland learns the same two-view window in the edition | Create a two-view window |
+| EGL multiview windows (`EGL_EXT_multiview_window`) | Mesa's EGL, also on NVIDIA's Vulkan driver through zink, the edition's default where NVIDIA's driver runs the desktop; NVIDIA's own EGL has no second view, and the gl-stereo layer gives one over it | Create a two-view window |
 | Vulkan with a two-layer swapchain | Mesa turns the two layers into one full side-by-side picture; a Vulkan layer does the same over drivers outside Mesa | Render each eye into its layer |
 | Qt | A stereo `QOpenGLWidget` (Qt 6.5 and later) or a stereo `QWindow` in a widget container; on Wayland the second | See the window skill |
 | X11 toolkits under Xwayland | Our Xwayland gives a redirected child window a surface of its own, so a 3D area inside an X11 window can be its own stereo layer | Nothing, if the program already asks for stereo on its child window |

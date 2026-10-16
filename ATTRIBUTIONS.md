@@ -339,7 +339,7 @@ In October 2026:
 
 ### 2.3 NVIDIA's open GPU kernel modules and egl-wayland
 
-**Source**: [open-gpu-kernel-modules](https://github.com/NVIDIA/open-gpu-kernel-modules), [egl-wayland](https://github.com/NVIDIA/egl-wayland) **License**: MIT and GPL-2.0 (kernel modules); MIT (egl-wayland) **What we changed**: 3D modes built from the display's HDMI stereo block, and HDMI deep colour at the depth the display declares, up to 16 bits; egl-wayland learns the two-view window.
+**Source**: [open-gpu-kernel-modules](https://github.com/NVIDIA/open-gpu-kernel-modules), [egl-wayland](https://github.com/NVIDIA/egl-wayland) **License**: MIT and GPL-2.0 (kernel modules); MIT (egl-wayland) **What we changed**: 3D modes built from the display's HDMI stereo block, and HDMI deep colour at the depth the display declares, up to 16 bits; egl-wayland learns the two-view window (NVIDIA's own EGL does not take the second view yet, so programs on NVIDIA's driver get their two views from Mesa over NVIDIA's Vulkan driver).
 **Credit**: NVIDIA, for opening its kernel modules.
 **GPU vendors' repositories**: the edition lets NVIDIA's CUDA and AMD's ROCm keep updating while the display driver stays ours, with apt's pinning rules ([apt_preferences(5)](https://manpages.debian.org/testing/apt/apt_preferences.5.en.html), by the APT developers).
 NVIDIA's container toolkit, published twice as different builds of the same versions, was reported to NVIDIA in [nvidia-container-toolkit#2137](https://github.com/NVIDIA/nvidia-container-toolkit/issues/2137).

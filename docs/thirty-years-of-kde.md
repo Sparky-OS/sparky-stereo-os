@@ -1,5 +1,7 @@
 # Thirty years of KDE, in depth
 
+Posted on KDE Discuss on 16 October 2026: https://discuss.kde.org/t/thirty-years-of-kde-in-depth/51031
+
 On 14 October 1996, a student in Tübingen asked the internet for help building a desktop.
 In KDE's new documentary he says he really struggled with English when he wrote that email.
 I know the feeling.

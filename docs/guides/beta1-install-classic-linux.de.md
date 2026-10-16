@@ -364,7 +364,7 @@ Jede dieser Partitionen hatte ihre Gründe, und für jeden Grund gibt es heute e
 | `/boot` weit vorn auf der Platte, wo das BIOS es lesen konnte | UEFI liest die EFI-Systempartition an jeder Stelle einer GPT-Festplatte, und GRUB liest `/boot` aus dem Wurzeldateisystem. |
 | `/usr` schreibgeschützt oder über das Netz geteilt | Debian hat `/bin`, `/sbin` und `/lib` mit `/usr` zusammengelegt; ein eigenes `/usr` muss die Initramfs einhängen und bringt auf einem Desktop nichts. |
 | `/var`, damit Protokolle die Wurzel nicht füllen | Das systemd-Journal begrenzt sich selbst (standardmäßig auf 10 % des Dateisystems, höchstens 4 GB), den Rest erledigt die Protokollrotation. |
-| `/tmp` mit eigener Größengrenze | `/tmp` ist im aktuellen Debian ein Dateisystem im Arbeitsspeicher (tmpfs), auf einen Teil des RAMs begrenzt und bei jedem Start leer. |
+| `/tmp` mit eigener Größengrenze | In Beta 1 ist `/tmp` ein Verzeichnis im Wurzeldateisystem; `sudo systemctl enable tmp.mount` macht es ab dem nächsten Start zu einem Dateisystem im Arbeitsspeicher (tmpfs), auf die Hälfte des RAMs begrenzt und bei jedem Start leer. |
 | `/home` über Neuinstallationen hinweg behalten | Weiterhin sinnvoll; die manuelle Partitionierung des Installationsprogramms legt es an (siehe unten). |
 | Quotas pro Verzeichnis | Projekt-Quotas von ext4 begrenzen einen Verzeichnisbaum ohne eigene Partition. |
 | Swap-Partition | Optional; Sparky Stereo OS richtet komprimierten Swap im Arbeitsspeicher (zram) selbst ein, wo er hilft: bei 8 GB RAM oder weniger oder auf langsamen Datenträgern. |
@@ -434,11 +434,11 @@ Meldet es „Alles erledigt“, starten Sie neu und ziehen den Stick ab.
 
 ### Was das Installationsprogramm für den Doppelstart einrichtet
 
-- Das Startmenü listet zuerst Sparky Stereo OS und darunter den Windows Boot Manager, mit 5 Sekunden Wartezeit.
+- Das Startmenü listet zuerst Sparky Stereo OS, dann dessen erweiterte Optionen und zwei Speichertests, dann den Windows Boot Manager, mit 5 Sekunden Wartezeit.
 - Der Boot-Manager von Windows und sein Rückfall-Lader auf der EFI-Systempartition bleiben unverändert.
 - Die Hardware-Uhr bleibt auf Ortszeit, so wie Windows sie führt, damit beide Systeme die richtige Uhrzeit zeigen.
 
-![Das Startmenü des installierten Systems](images/beta1/grub-menu-installed.png)
+![Das Startmenü des installierten Systems](images/beta1/grub-menu-installed.jpg)
 
 Getestet wurde mit einer Festplatte, die so aufgeteilt ist, wie sich Windows 10 und 11 selbst installieren, mit einem kleinen Platzhalter anstelle des Windows-Boot-Managers.
 Der Windows-Eintrag startete diesen Platzhalter; wie er ein echtes Windows startet, zeigt sich auf Ihrem Rechner.

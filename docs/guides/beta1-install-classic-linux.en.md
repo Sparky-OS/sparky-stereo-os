@@ -357,7 +357,7 @@ Each partition had its reasons, and each reason has a newer answer:
 | `/boot` low on the disk, where the BIOS could read it | UEFI reads the EFI system partition anywhere on a GPT disk, and GRUB reads `/boot` from the root file system. |
 | `/usr` read-only, or shared over the network | Debian has merged `/bin`, `/sbin` and `/lib` into `/usr`; a separate `/usr` must be mounted by the initramfs and gains nothing on a desktop. |
 | `/var` so logs cannot fill the root | The systemd journal limits itself (by default to 10 % of the file system, at most 4 GB), and log rotation does the rest. |
-| `/tmp` with its own size limit | `/tmp` is a memory file system (tmpfs) on current Debian, limited to part of the RAM and emptied at every start. |
+| `/tmp` with its own size limit | In beta 1, `/tmp` is a folder on the root file system; `sudo systemctl enable tmp.mount` makes it a memory file system (tmpfs) from the next start, limited to half the RAM and empty at every start. |
 | `/home` kept across reinstalls | Still a valid choice; the installer's manual partitioning creates it (below). |
 | Quotas per folder | ext4 project quotas limit a folder tree without its own partition. |
 | swap partition | Optional; Sparky Stereo OS sets up compressed swap in memory (zram) by itself where it helps: with 8 GB of RAM or less, or on slow storage. |
@@ -423,13 +423,13 @@ When it says it is done, restart and remove the stick.
 
 ### What the installer sets up for dual boot
 
-- The boot menu lists Sparky Stereo OS first and Windows Boot Manager below it, with a 5 second timeout.
+- The boot menu lists Sparky Stereo OS first, then its advanced options and two memory tests, then Windows Boot Manager, with a 5 second timeout.
 - Windows' own boot manager and its fallback loader on the EFI system partition are left as they are.
 - The hardware clock stays in local time, as Windows keeps it, so both systems show the right time.
 
-![The boot menu of the installed system](images/beta1/grub-menu-installed.png)
+![The boot menu of the installed system](images/beta1/grub-menu-installed.jpg)
 
-The screenshot is from a German installation; an English one reads the same with English words.
+The screenshot is from a German installation, which is why the help text under the menu is German.
 
 The tests used a disk laid out the way Windows 10 and 11 install themselves, with a small stand-in for the Windows boot manager.
 The Windows entry started that stand-in; how it starts a real Windows is something to confirm on your machine.

@@ -330,3 +330,26 @@ Disable all capture and mutation hooks in production builds.
 Keep translation catalogs and translated desktop entries in distribution patches, separate from KDE source commits.
 The amd64 H.264 and uncorrected-view checkpoint does not qualify ARM hardware decoding, optics, sensors or the native compositor output choice.
 Credits: KRDC, Urs Wolfer, Tony Murray, Arjen Hiemstra, the KDE Kirigami, Qt and FreeRDP developers, Fabian Druschke and the KRdp/Flat Headset contributors.
+
+## ARM64 Catch qualification (checked 2026-10-16)
+
+Build ARM64 and amd64 from the same Debian source package, with production capture and mutation hooks disabled.
+If cross-build dependency metadata rejects an Architecture: all provider for the foreign architecture, use a native ARM64 guest build instead of inventing a dependency package.
+Compare every architecture-independent data file and symlink, then verify the installed ARM64 executable against the package hash.
+Keep the ordinary KRDC RDP and VNC plugins in that package.
+
+Boot stock Plasma Mobile on a fresh disposable overlay for each live or negative-control case.
+Use the production Catch button and the existing discovery, TLS approval and owner-lease path.
+When QEMU user networking forwards the descriptor and control listeners, bind them to the private sender interface so the normal subnet policy still applies.
+Do not relax certificate or peer-address checks for an emulator.
+Capture the guest framebuffer through QMP and correlate both eye timecodes with the real source before and after reconnect.
+A swapped-source control must receive changing frames with reversed eye identities; a blank receiver is not a passing negative control.
+A frozen-source control must preserve the eye labels while failing progress on both connections.
+A wrong certificate pin must fail before a Throw output appears.
+
+Give TCG enough startup and handshake time, but keep pixel and liveness gates unchanged.
+State the stimulus and sender encoder for every result.
+A passing functional chart does not clear a failed high-motion stress run; keep both results and their limits visible.
+This qualifies ARM64 software reception and per-eye fitting on stock Plasma Mobile.
+It does not measure a physical phone's decoder, optics, sensors, battery, thermals or latency, and does not qualify the native compositor headset-output choice.
+Credits: the KRDC, KRdp, KDE Plasma Mobile, Kirigami, Qt and FreeRDP developers, the Debian contributors, Fabrice Bellard and the QEMU developers.

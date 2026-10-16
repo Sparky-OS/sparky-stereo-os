@@ -1,5 +1,7 @@
---- name: certificate-manager description: Verified ICP-Brasil catalogue work and Ed521 interoperability for Sparky CA, with boundaries between OpenSSL, NSS, Java and KDE.
-Load sparky-stereo first. ---
+---
+name: certificate-manager
+description: Verified ICP-Brasil catalogue work and Ed521 interoperability for Sparky CA, with boundaries between OpenSSL, NSS, Java and KDE. Load sparky-stereo first.
+---
 
 # Certificate manager contributions
 

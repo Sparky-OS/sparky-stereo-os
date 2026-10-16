@@ -249,3 +249,16 @@ Do not dismiss waiting because an empty GL surface redrew itself.
 Test connecting, reconnecting, reduce motion, invalid marks, decoder rejection and arrival/pause/close separately.
 A debug-only software-decoder fixture tests the loop and renderer; it does not qualify hardware decoding, power or latency on a phone.
 Credits: KDE and Fabian Druschke's KDE Connect work, FreeRDP, Google Android/Cardboard and AndroidX Media3 developers.
+
+## Combined-build regression gate (checked 2026-10-16)
+
+Keep the compositor core, screencast plugin and integration fixture from one coherent build when backend structures change.
+Record loaded library hashes, not only the package names or source branch.
+Run each fitted, full-height, zoom, pointer-following and active-window view in a fresh compositor session, including reconnect.
+Check the decoded cursor at both eyes' edges and corners, then check its disparity against the window underneath.
+A forced wrong fit and a missing-cursor capture must fail their checks.
+
+Correlate encoder and receiver timings with both payload hashes when the transport inserts a stereo SEI before sending.
+Strip only the known inserted marker for the encoder correlation; keep the complete wire hash for the receive correlation.
+Require a complete stage chain for every valid displayed timestamp, including the slowest frame.
+A short instrumentation smoke test does not replace the scheduled five-minute latency gate or a physical-phone measurement.

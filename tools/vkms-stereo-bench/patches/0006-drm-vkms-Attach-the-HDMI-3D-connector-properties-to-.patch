@@ -1,0 +1,43 @@
+From 7c78e57572a9ac9d75b2ae42324e09b8a8aebbd6 Mon Sep 17 00:00:00 2001
+From: Daniel Campos Ramos <Capitain_Jack@yahoo.com>
+Date: Fri, 16 Oct 2026 15:28:55 -0300
+Subject: [PATCH] drm/vkms: Attach the HDMI 3D connector properties to HDMI
+ connectors
+
+The edition's HDMI 3D series gives HDMI connectors two properties, "side
+by side full timing" and "HDMI 3D metadata", which amdgpu and i915 attach
+and a compositor sets. Attach them to VKMS's HDMI-A connectors too, so the
+bench can check that a compositor sets them, and with which values, on a
+kernel instead of only in a mock. VKMS sends no InfoFrame and times no
+link, so the values change nothing in its frames.
+
+Bench tree only.
+
+Assisted-by: Claude Opus 5.5 via Claude Code
+---
+ drivers/gpu/drm/vkms/vkms_connector.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/drivers/gpu/drm/vkms/vkms_connector.c b/drivers/gpu/drm/vkms/vkms_connector.c
+index 5d43201cff..4d34878abf 100644
+--- a/drivers/gpu/drm/vkms/vkms_connector.c
++++ b/drivers/gpu/drm/vkms/vkms_connector.c
+@@ -226,6 +226,15 @@ static int __must_check vkms_connector_init(struct vkms_connector *connector,
+ 		drm_object_attach_property(&connector->base.base,
+ 					   connector->base.dev->mode_config.path_property, 0);
+ 
++	if (connector_cfg->type == DRM_MODE_CONNECTOR_HDMIA) {
++		ret = drm_connector_attach_sbs_full_timing_property(&connector->base);
++		if (ret)
++			return ret;
++		ret = drm_connector_attach_hdmi_3d_metadata_property(&connector->base);
++		if (ret)
++			return ret;
++	}
++
+ 	return 0;
+ }
+ 
+-- 
+2.53.0
+

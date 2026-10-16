@@ -9,7 +9,9 @@
  * The primary plane of the first active CRTC is read through
  * DRM_IOCTL_MODE_GETFB2 and DRM_IOCTL_MODE_MAP_DUMB. RGB formats of 8, 10 and
  * 16 bits per channel; the PPM keeps the high 8 bits. The last line printed is
- * the number of pixels that are not black.
+ * the number of pixels that are not black. With the edition's HDMI 3D series it
+ * also prints the connectors' "side by side full timing" value and the bytes of
+ * their "HDMI 3D metadata" blob.
  */
 #include <errno.h>
 #include <fcntl.h>
@@ -91,6 +93,57 @@ static int xioctl(unsigned long req, void *arg)
 	return r ? -errno : 0;
 }
 
+/* The HDMI 3D properties of every connector (the edition's kernel attaches them to HDMI connectors). */
+static void print_connector_properties(void)
+{
+	struct drm_mode_card_res res = { 0 };
+	uint32_t connectors[16];
+	unsigned int i, k;
+
+	if (xioctl(DRM_IOCTL_MODE_GETRESOURCES, &res) || res.count_connectors > 16)
+		return;
+	res.connector_id_ptr = (uintptr_t)connectors;
+	res.count_crtcs = res.count_encoders = res.count_fbs = 0;
+	if (xioctl(DRM_IOCTL_MODE_GETRESOURCES, &res))
+		return;
+	for (i = 0; i < res.count_connectors; i++) {
+		struct drm_mode_obj_get_properties op = { .obj_id = connectors[i], .obj_type = DRM_MODE_OBJECT_CONNECTOR };
+		uint32_t ids[64];
+		uint64_t values[64];
+
+		if (xioctl(DRM_IOCTL_MODE_OBJ_GETPROPERTIES, &op) || op.count_props > 64)
+			continue;
+		op.props_ptr = (uintptr_t)ids;
+		op.prop_values_ptr = (uintptr_t)values;
+		if (xioctl(DRM_IOCTL_MODE_OBJ_GETPROPERTIES, &op))
+			continue;
+		for (k = 0; k < op.count_props; k++) {
+			struct drm_mode_get_property gp = { .prop_id = ids[k] };
+
+			if (xioctl(DRM_IOCTL_MODE_GETPROPERTY, &gp))
+				continue;
+			if (!strcmp(gp.name, "side by side full timing")) {
+				printf("connector %u sbs-full-timing %llu\n", connectors[i], (unsigned long long)values[k]);
+			} else if (!strcmp(gp.name, "HDMI 3D metadata")) {
+				struct drm_mode_get_blob blob = { .blob_id = values[k] };
+				uint8_t data[64];
+				unsigned int b;
+
+				printf("connector %u 3d-metadata", connectors[i]);
+				if (values[k] && !xioctl(DRM_IOCTL_MODE_GETPROPBLOB, &blob) && blob.length <= sizeof(data)) {
+					blob.data = (uintptr_t)data;
+					if (!xioctl(DRM_IOCTL_MODE_GETPROPBLOB, &blob))
+						for (b = 0; b < blob.length; b++)
+							printf(" %02x", data[b]);
+				} else {
+					printf(" none");
+				}
+				printf("\n");
+			}
+		}
+	}
+}
+
 int main(int argc, char **argv)
 {
 	struct drm_mode_get_plane_res pres = { 0 };
@@ -149,6 +202,7 @@ int main(int argc, char **argv)
 			fb.fb_id = p.fb_id;
 		}
 	}
+	print_connector_properties();
 	printf("mode %s %ux%u total %ux%u clock %u flags 0x%x layout %u\n", crtc.mode.name,
 	       crtc.mode.hdisplay, crtc.mode.vdisplay, crtc.mode.htotal, crtc.mode.vtotal,
 	       crtc.mode.clock, crtc.mode.flags, (crtc.mode.flags & DRM_MODE_FLAG_3D_MASK) >> 14);

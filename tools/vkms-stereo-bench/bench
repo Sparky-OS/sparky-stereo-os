@@ -39,7 +39,8 @@ options:
   --sbs-full             the writeback phase also tests an EDID that declares side by side (full), and
                          the kwin phase uses it; mainline DRM does not list that layout
   --depth                the writeback phase also tests an EDID that declares every HDMI 1.4a 3D
-                         structure (line alternative, L + depth, L + depth + graphics + graphics-depth)
+                         structure (line alternative, L + depth, L + depth + graphics + graphics-depth),
+                         and the kwin phase runs Stereo KWin on it too (guest/phases/kwin-depth-steps.sh)
   --work DIR             work directory (default ./bench-work, or $BENCH_WORK)
   --mem MB               guest memory (default 3072; the kwin phase uses at least 4096)
   --cpus N               guest CPUs (default 2; the kwin phase uses at least 4)
@@ -135,7 +136,7 @@ build_initramfs() {
     cp "$BENCH_DIR"/guest/phases/*.sh "$tree/phases/"
     cp "$WORK"/data/*.bin "$WORK"/data/*.expect "$tree/data/"
     cp "$WORK/bin/stereo-wb-test" "$WORK/bin/drm-grab" "$WORK/bin/depth-cam-test" "$tree/bin/"
-    cp "$BENCH_DIR/src/stereo-subsurface.c" "$BENCH_DIR/src/fullscreen-2d.c" "$tree/src/"
+    cp "$BENCH_DIR/src/stereo-subsurface.c" "$BENCH_DIR/src/fullscreen-2d.c" "$BENCH_DIR/src/depth-client.c" "$tree/src/"
     python3 "$BENCH_DIR/tools/mkcpio.py" "$tree" "$WORK/initramfs.cpio.gz" || die "could not pack the initramfs"
     rm -rf "$tree"
 }
@@ -213,13 +214,19 @@ run_phase() {
         [ "$CPUS" -lt 4 ] && CPUS=4
         local words=(vkms.create_default_dev=0)
         [ "$SBS_FULL" = 1 ] && words+=(bench.sbs_full=1)
+        [ "$DEPTH" = 1 ] && words+=(bench.depth=1)
         run_vm kwin "$FULL_KERNEL" "$dir" \
             -virtfs "local,path=$KWIN_ROOT,mount_tag=root,security_model=none,readonly=on,id=root" \
             -- "${words[@]}"
         MEM=$mem; CPUS=$cpus
         python3 "$BENCH_DIR/tools/analyze-kwin.py" "$dir" >> "$dir/results.txt" ||
             grep -q "^STEREO|summary|kwin|" "$dir/results.txt" ||
-            echo "STEREO|check|kwin/analysis|FAIL|analyze-kwin.py stopped before its summary" >> "$dir/results.txt" ;;
+            echo "STEREO|check|kwin/analysis|FAIL|analyze-kwin.py stopped before its summary" >> "$dir/results.txt"
+        if [ "$DEPTH" = 1 ]; then
+            python3 "$BENCH_DIR/tools/analyze-kwin-depth.py" "$dir" >> "$dir/results.txt" ||
+                grep -q "^STEREO|summary|kwin-depth|" "$dir/results.txt" ||
+                echo "STEREO|check|kwin-depth/analysis|FAIL|analyze-kwin-depth.py stopped before its summary" >> "$dir/results.txt"
+        fi ;;
     *) die "unknown phase $phase (bench list)" ;;
     esac
     images "$dir"

@@ -38,6 +38,7 @@ The [patches/](patches/) folder goes on top of it:
 | 0003 | VKMS connectors allow stereo modes (`stereo_allowed`) |
 | 0004 | KUnit tests: the stereo modes an EDID declares, and the writeback buffer size of each layout |
 | 0005 | Attaches the PATH property only to connectors that have a parent: with v5 as posted every VKMS connector has an empty PATH, and IGT fails in `kmstest_get_path_blob()` on every VKMS device, `kms_3d` and every test built on `igt_display` (`kms_atomic` measured) alike (proposed to the author as a fix for v5 37/38) |
+| 0006 | Attaches the edition's two HDMI 3D connector properties, "side by side full timing" and "HDMI 3D metadata", to VKMS's HDMI-A connectors, so the kwin phase can check that the compositor sets them (needs the edition's HDMI 3D patches; bench tree only) |
 
 ```sh
 # in a clone of the mainline kernel: the base commit is in v7.3-rc1
@@ -76,6 +77,7 @@ Every run keeps its console log, its results and its pictures under `bench-work/
 | `depthcam` | `depth-cam-test` on vivid, the virtual video driver (a kernel built with `kconfig/vivid-depth.fragment` too): the depth formats of a RealSense camera, `Z16`, `INZI` and `CNF4`, are listed, and a frame of each agrees with `Y16` pixel by pixel on one line of the "Gray Ramp" pattern. | Without the vivid change: the three formats are not listed and no frame is read. |
 | `igt` | IGT's `kms_3d`: forces IGT's own 3D EDID through debugfs, requires 3D modes, and sets each one with a stereo framebuffer. | Without 0003: "3D modes not detected". Without 0005: an assertion in `kmstest_get_path_blob()`. |
 | `kwin` | Stereo KWin on the VKMS device: `kscreen-doctor` lists the 3D modes and sets each one; the frame KWin scans out is read back (as root, with `DRM_IOCTL_MODE_GETFB2`) and checked: a fullscreen 2D client identical in both eyes, a stereo client's left view only in the left eye and its right view only in the right eye at the same place, a 2D client the same in both eyes, the frame packing active space black. | Needs a kernel with 0002 and 0003; on a kernel without them KWin lists no 3D mode. |
+| `kwin` with `--depth` | After the checks above, on the EDID with every HDMI 1.4a 3D structure ([guest/phases/kwin-depth-steps.sh](guest/phases/kwin-depth-steps.sh), [tools/analyze-kwin-depth.py](tools/analyze-kwin-depth.py)): the parallax of each window and of a noise patch with 8 pixels of parallax is measured between the eyes of side by side (full) and frame packing, then read from the depth picture of L + depth with the 3D metadata the kernel holds; each depth source; the viewing distance in the metadata; line alternative line by line; side by side (full) with the blanking kept; L + depth + graphics + graphics-depth with a popup in the graphics only, at its parallax; and with no depth levels, the picture of L + depth equal to the 2D frame. Two controls must fail: the patch check with flat depth, and the +8 check with the views exchanged. | A compositor without the depth structures lists none of them and every check fails. |
 
 The test EDID is made by [edid/make-edid.py](edid/make-edid.py) and passes `edid-decode --check`.
 It declares 3D present (the HDMI 1.4b mandatory formats of the 2D formats it lists), side by side (half) for every video format through `3D_Structure_ALL`, top-and-bottom for 1080p60 and frame packing for 1080p30 through `3D_Structure_X`.
@@ -105,13 +107,14 @@ bench                  the command (bash)
 run-in-docker.sh       runs it inside the tool image as your user
 Dockerfile             tool image: QEMU, BusyBox, edid-decode, gcc, Python with Pillow
 guest/                 init and the phase scripts that run in the guest
-src/                   stereo-wb-test.c (writeback checks), drm-grab.c (frame readback), and the two Wayland
-                       test clients for the kwin phase: stereo-subsurface.c and fullscreen-2d.c
+src/                   stereo-wb-test.c (writeback checks), drm-grab.c (frame readback and the HDMI 3D
+                       connector properties), and the Wayland test clients for the kwin phase:
+                       stereo-subsurface.c, fullscreen-2d.c and depth-client.c
 edid/                  the test EDIDs, the generator, and the expectation reader
 kconfig/               kernel configuration fragments: small test kernel, desktop kernel, KASAN and kmemleak
 patches/               the VKMS stereo patches, on top of the v5 configfs series
 tools/                 build-test-kernel.sh, build-igt-root.sh, build-kwin-root.sh, mkcpio.py (initramfs without root),
-                       analyze-kwin.py
+                       analyze-kwin.py, analyze-kwin-depth.py
 igt/                   the image that builds IGT's kms_3d
 ```
 

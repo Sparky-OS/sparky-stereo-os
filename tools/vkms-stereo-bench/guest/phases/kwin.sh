@@ -7,6 +7,8 @@
 . /phases/lib.sh
 edid=stereo-test
 cmdline_has bench.sbs_full=1 && edid=stereo-full
+# bench.depth=1: the EDID with every HDMI 1.4a 3D structure, and the depth steps after the others
+cmdline_has bench.depth=1 && edid=stereo-whole
 mkvkms kwin $edid || echo "STEREO|check|configfs/kwin|FAIL|could not create the device"
 mkdir -p /r
 if ! mount -t 9p -o trans=virtio,version=9p2000.L,ro,cache=loose root /r; then
@@ -23,7 +25,11 @@ for d in /r/tmp /r/run /r/root /r/var/tmp; do mount -t tmpfs tmpfs $d; done
 mkdir -p /r/tmp/out /r/tmp/src
 mount --bind /out /r/tmp/out
 cp /src/* /r/tmp/src/
-cp /bin/drm-grab /phases/kwin-steps.sh /r/tmp/
+cp /bin/drm-grab /phases/kwin-steps.sh /phases/kwin-depth-steps.sh /r/tmp/
 chroot /r /bin/sh /tmp/kwin-steps.sh
 echo "STEREO|exit|kwin|$?"
+if cmdline_has bench.depth=1; then
+    chroot /r /bin/sh /tmp/kwin-depth-steps.sh
+    echo "STEREO|exit|kwin-depth|$?"
+fi
 umount /r/tmp/out 2>/dev/null

@@ -7,3 +7,6 @@ Start with [`sparky-stereo`](sparky-stereo/SKILL.md): the contract, what counts 
 It ends with the list of the skills for each kind of work.
 
 The same approach is used for awesome-stereoscopy's [contribution skill](https://github.com/danielcamposramos/awesome-stereoscopy/blob/main/ai-skill/SKILL.md).
+
+**On Sparky Stereo OS** the package `sparky-stereo-skills` (in both developer tasks) installs them in `/usr/share/sparky-stereo-os/skills`.
+Run `sparky-stereo-skills` as yourself to link them where your AI assistants read skills (Claude Code, Codex, Gemini CLI, OpenCode, GitHub Copilot, Cursor, goose, Cline), or `sparky-stereo-skills export skills.zip` for Open WebUI.

@@ -3,7 +3,7 @@
 Daniel's own 3D photos, taken with an LG Optimus 3D (P720) phone, in Brasília and Pirenópolis.
 Each is shown as a red-cyan anaglyph, so red-cyan glasses show it in 3D on any screen.
 The originals are published as the phone saved them, location data included, on our download server: JPS files, side by side pairs whose left half is the right eye's picture, the JPS convention.
-For five photos the phone had stored a stale position about 45 km away; Daniel named where they were taken, and their location now holds the buildings' coordinates (the pictures are unchanged).
+For some photos the phone had stored a stale position far from where they were taken; Daniel named the places, and their location now holds those places' coordinates (the pictures are unchanged).
 They open in 3D in the edition's photo programs on any of the registered outputs.
 
 **The 3D video:** [MOV004.mp4](https://repo.sparkyos.org/photos/lg-optimus-3d/MOV004.mp4) (95 MB), H.264 with the frame packing mark on every frame, so a 3D TV's own player and the edition's players show it in 3D.
@@ -69,35 +69,35 @@ All files with their checksums: [https://repo.sparkyos.org/photos/lg-optimus-3d/
 
 [Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG025%281%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.14806&mlon=-48.09806#map=17/-16.14806/-48.09806)
 
-## IMG031(1), 10 November 2014
+## IMG031(1), Embassy of Malaysia, Lago Sul, 10 November 2014
 
-<img src="lg-optimus-3d/img0311-anaglyph.jpg" width="99%" alt="IMG031(1), a 3D photo from an LG Optimus 3D, 10 November 2014 (red-cyan anaglyph)">
+<img src="lg-optimus-3d/img0311-anaglyph.jpg" width="99%" alt="IMG031(1), a 3D photo from an LG Optimus 3D, at the Embassy of Malaysia, Lago Sul, 10 November 2014 (red-cyan anaglyph)">
 
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG031%281%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.14806&mlon=-48.09806#map=17/-16.14806/-48.09806)
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG031%281%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-15.85202&mlon=-47.90144#map=17/-15.85202/-47.90144)
 
-## IMG037(1), 10 November 2014
+## IMG037(1), Embassy of Malaysia, Lago Sul, 10 November 2014
 
-<img src="lg-optimus-3d/img0371-anaglyph.jpg" width="99%" alt="IMG037(1), a 3D photo from an LG Optimus 3D, 10 November 2014 (red-cyan anaglyph)">
+<img src="lg-optimus-3d/img0371-anaglyph.jpg" width="99%" alt="IMG037(1), a 3D photo from an LG Optimus 3D, at the Embassy of Malaysia, Lago Sul, 10 November 2014 (red-cyan anaglyph)">
 
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG037%281%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.14778&mlon=-48.10167#map=17/-16.14778/-48.10167)
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG037%281%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-15.85202&mlon=-47.90144#map=17/-15.85202/-47.90144)
 
-## IMG038(1), 10 November 2014
+## IMG038(1), Embassy of Malaysia, Lago Sul, 10 November 2014
 
-<img src="lg-optimus-3d/img0381-anaglyph.jpg" width="99%" alt="IMG038(1), a 3D photo from an LG Optimus 3D, 10 November 2014 (red-cyan anaglyph)">
+<img src="lg-optimus-3d/img0381-anaglyph.jpg" width="99%" alt="IMG038(1), a 3D photo from an LG Optimus 3D, at the Embassy of Malaysia, Lago Sul, 10 November 2014 (red-cyan anaglyph)">
 
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG038%281%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.14778&mlon=-48.10167#map=17/-16.14778/-48.10167)
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG038%281%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-15.85202&mlon=-47.90144#map=17/-15.85202/-47.90144)
 
-## IMG039, 10 November 2014
+## IMG039, Embassy of Malaysia, Lago Sul, 10 November 2014
 
-<img src="lg-optimus-3d/img039-anaglyph.jpg" width="99%" alt="IMG039, a 3D photo from an LG Optimus 3D, 10 November 2014 (red-cyan anaglyph)">
+<img src="lg-optimus-3d/img039-anaglyph.jpg" width="99%" alt="IMG039, a 3D photo from an LG Optimus 3D, at the Embassy of Malaysia, Lago Sul, 10 November 2014 (red-cyan anaglyph)">
 
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG039.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.14778&mlon=-48.10167#map=17/-16.14778/-48.10167)
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG039.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-15.85202&mlon=-47.90144#map=17/-15.85202/-47.90144)
 
-## IMG044(1), 10 November 2014
+## IMG044(1), Embassy of Malaysia, Lago Sul, 10 November 2014
 
-<img src="lg-optimus-3d/img0441-anaglyph.jpg" width="99%" alt="IMG044(1), a 3D photo from an LG Optimus 3D, 10 November 2014 (red-cyan anaglyph)">
+<img src="lg-optimus-3d/img0441-anaglyph.jpg" width="99%" alt="IMG044(1), a 3D photo from an LG Optimus 3D, at the Embassy of Malaysia, Lago Sul, 10 November 2014 (red-cyan anaglyph)">
 
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG044%281%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.14778&mlon=-48.10167#map=17/-16.14778/-48.10167)
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG044%281%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-15.85202&mlon=-47.90144#map=17/-15.85202/-47.90144)
 
 ## IMG077, Palácio do Planalto, 10 November 2014
 

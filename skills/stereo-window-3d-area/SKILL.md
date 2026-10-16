@@ -39,6 +39,7 @@ Worked examples:
 
 - A stereo `QWindow` inside `QWidget::createWindowContainer` works on Wayland with our Qt and Mesa.
 - A native stereo `QOpenGLWidget` (`WA_NativeWindow`) does **not**: it comes out with `stereo=false`.
+- On X11 (xcb), a plain stereo `QOpenGLWidget` in a 2D window works with our Qt, Mesa, Xwayland and KWin: Qt gives it a native child window, Mesa lists it, and KWin shows it per eye with the rest of the window the same in both eyes (measured on the GPU and in software). The window is flushed with a stereo context, because GLX gives a window the configuration of the context made current on it.
 - A plain `QOpenGLWidget` program with the stereo default format does come out stereo on Wayland today (Kubrick, KAlgebra, Kalzium, measured): but the whole top-level window is declared, menus included. A fix in Qt is being written so that a stereo `QOpenGLWidget` inside a 2D window becomes its own stereo surface, with no change in the program.
 - **Size a stereo top level before its window is created** (`adjustSize()` or a resize when a dialog is built): otherwise its first frame is committed at Qt's default 100x30 and the compositor keeps that size, so the dialog collapses to its title bar (Kalzium's molecule editor; the engine fix is queued).
 - **A GL widget in a dialog turns the parent stereo:** Qt recreates the dialog's parent top level as a GL window when a `QOpenGLWidget` appears, and under the stereo default format the parent is declared too.
@@ -49,7 +50,11 @@ Worked examples:
 ## X11 programs
 
 Under Xwayland, a 3D area is a child X window.
-Our Xwayland gives a redirected child window a surface of its own and keeps alpha on 32-bit surfaces, so the same separation works for X11 programs; the declaration goes through the X11 side of the same library.
+The window lists the child in `_KDE_NET_WM_STEREO_CONTENT_CHILDREN` (WINDOW/32) and the child declares itself with its own `_KDE_NET_WM_STEREO_CONTENT`; Mesa's GLX does both for a stereo GLX child (Togl in Netgen, FLTK's GL window in gmsh, ParaView's render view), and keeps the child listed while the window lives.
+KWin, announcing version 5 of `_KDE_NET_WM_STEREO_CONTENT_SUPPORTED`, redirects each listed child; our Xwayland gives it a surface of its own, and KWin shows that surface one view per eye at the child's place, the rest of the window the same in both eyes.
+The child keeps its own size and its buffer is twice as wide, both eyes at full size (declaration version 4); input still goes to the window, and the X server finds the child.
+A program that declares its own child window, with no GLX, writes the same two properties.
+In our Qt on xcb, a stereo `QOpenGLWidget` gets a native child window of its own and is shown the same way, with no change in the program.
 A window that shows a splash screen first could lose its one-eye size afterwards; our KWin sends it a synthetic ConfigureNotify, so it gets the size back (found on Krita).
 Native Wayland is the route to prefer when the toolkit has it.
 

@@ -346,6 +346,7 @@ Capture the guest framebuffer through QMP and correlate both eye timecodes with 
 A swapped-source control must receive changing frames with reversed eye identities; a blank receiver is not a passing negative control.
 A frozen-source control must preserve the eye labels while failing progress on both connections.
 A wrong certificate pin must fail before a Throw output appears.
+Compare the output list before and after that attempt; a headless source compositor already has an ordinary virtual output.
 
 Give TCG enough startup and handshake time, but keep pixel and liveness gates unchanged.
 State the stimulus and sender encoder for every result.

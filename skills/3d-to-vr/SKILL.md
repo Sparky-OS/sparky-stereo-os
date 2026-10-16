@@ -293,3 +293,17 @@ A receiver-only phone does not need a local streaming server; rebuilding Stereo 
 Debian/Mobian packages and Alpine-based postmarketOS packages need separate native builds.
 
 Sources: [Plasma Mobile startup](https://invent.kde.org/plasma/plasma-mobile/-/blob/91971ee78079c699d6970a91bd971ccc42d0759c/bin/startplasmamobile.in), [KDE Connect receiver](https://invent.kde.org/danielcamposramos/kdeconnect-kde/-/blob/e1b0792b5/plugins/virtualmonitor/virtualmonitorplugin.cpp), [KRDC presentation](https://invent.kde.org/network/krdc/-/blob/fc11f278f5e4c15ec3e0c978a60a70494f087072/rdp/rdpview.cpp), [sensor API](https://hadess.pages.freedesktop.org/iio-sensor-proxy/gdbus-net.hadess.SensorProxy.html), [Qt sensor backends](https://code.qt.io/cgit/qt/qtsensors.git/tree/src/plugins/sensors/CMakeLists.txt?id=78f4791c27f0c86b021356f6277f0352abd50583), [current distributions](https://plasma-mobile.org/get/).
+
+### Cardboard QR without Google Play services (checked 2026-10-16)
+
+Cardboard 1.35.0's Android QR scanner depends on Mobile Vision even though its lens math is open source.
+Replace that dependency in the SDK QR package with [ZXing core](https://github.com/zxing/zxing/tree/zxing-3.5.4/core), not a second scanner app.
+Decode the camera's NV21 luminance plane locally and keep Cardboard's profile parser, saved parameters and per-eye distortion meshes.
+Retain a bounded camera worker and release it when the scanning activity pauses.
+A complete `google.com/cardboard/cfg?p=...` QR carries its profile and can be parsed offline; shortened URLs still require their redirect provider.
+Audit every debug and release runtime dependency and the packaged DEX for service references.
+AndroidX, Material, protobuf, Guava and the open Cardboard library are not Google Play services.
+Prove scanning through the camera API on an AOSP emulator image without Play services, with networking disabled.
+Compare both eye captures with independently encoded reference parameters, and reject default-profile and eye-swap controls.
+An emulator proves decoding and profile application, not a physical viewer's optical calibration or GrapheneOS device compatibility.
+Credits: Google and the Cardboard contributors, the ZXing authors, Fabian Druschke and the KDE Connect developers.

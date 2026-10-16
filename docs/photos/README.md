@@ -201,41 +201,41 @@ All files with their checksums: [https://repo.sparkyos.org/photos/lg-optimus-3d/
 
 [Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/CAM00536.jps)
 
-## CAM00790, 7 December 2015
+## CAM00790, Museu Rodas do Tempo, Pirenópolis, 7 December 2015
 
-<img src="lg-optimus-3d/cam00790-anaglyph.jpg" width="99%" alt="CAM00790, a 3D photo from an LG Optimus 3D, 7 December 2015 (red-cyan anaglyph)">
+<img src="lg-optimus-3d/cam00790-anaglyph.jpg" width="99%" alt="CAM00790, a 3D photo from an LG Optimus 3D, at the Museu Rodas do Tempo, Pirenópolis, 7 December 2015 (red-cyan anaglyph)">
 
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/CAM00790.jps)
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/CAM00790.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-15.85198&mlon=-48.94376#map=17/-15.85198/-48.94376)
 
-## CAM00824, 7 December 2015
+## CAM00824, Museu Rodas do Tempo, Pirenópolis, 7 December 2015
 
-<img src="lg-optimus-3d/cam00824-anaglyph.jpg" width="99%" alt="CAM00824, a 3D photo from an LG Optimus 3D, 7 December 2015 (red-cyan anaglyph)">
+<img src="lg-optimus-3d/cam00824-anaglyph.jpg" width="99%" alt="CAM00824, a 3D photo from an LG Optimus 3D, at the Museu Rodas do Tempo, Pirenópolis, 7 December 2015 (red-cyan anaglyph)">
 
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/CAM00824.jps)
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/CAM00824.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-15.85198&mlon=-48.94376#map=17/-15.85198/-48.94376)
 
-## CAM00873, 7 December 2015
+## CAM00873, Museu Rodas do Tempo, Pirenópolis, 7 December 2015
 
-<img src="lg-optimus-3d/cam00873-anaglyph.jpg" width="99%" alt="CAM00873, a 3D photo from an LG Optimus 3D, 7 December 2015 (red-cyan anaglyph)">
+<img src="lg-optimus-3d/cam00873-anaglyph.jpg" width="99%" alt="CAM00873, a 3D photo from an LG Optimus 3D, at the Museu Rodas do Tempo, Pirenópolis, 7 December 2015 (red-cyan anaglyph)">
 
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/CAM00873.jps)
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/CAM00873.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-15.85198&mlon=-48.94376#map=17/-15.85198/-48.94376)
 
-## CAM00874, 7 December 2015
+## CAM00874, Museu Rodas do Tempo, Pirenópolis, 7 December 2015
 
-<img src="lg-optimus-3d/cam00874-anaglyph.jpg" width="99%" alt="CAM00874, a 3D photo from an LG Optimus 3D, 7 December 2015 (red-cyan anaglyph)">
+<img src="lg-optimus-3d/cam00874-anaglyph.jpg" width="99%" alt="CAM00874, a 3D photo from an LG Optimus 3D, at the Museu Rodas do Tempo, Pirenópolis, 7 December 2015 (red-cyan anaglyph)">
 
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/CAM00874.jps)
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/CAM00874.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-15.85198&mlon=-48.94376#map=17/-15.85198/-48.94376)
 
-## CAM00905, 7 December 2015
+## CAM00905, Museu Rodas do Tempo, Pirenópolis, 7 December 2015
 
-<img src="lg-optimus-3d/cam00905-anaglyph.jpg" width="99%" alt="CAM00905, a 3D photo from an LG Optimus 3D, 7 December 2015 (red-cyan anaglyph)">
+<img src="lg-optimus-3d/cam00905-anaglyph.jpg" width="99%" alt="CAM00905, a 3D photo from an LG Optimus 3D, at the Museu Rodas do Tempo, Pirenópolis, 7 December 2015 (red-cyan anaglyph)">
 
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/CAM00905.jps)
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/CAM00905.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-15.85198&mlon=-48.94376#map=17/-15.85198/-48.94376)
 
-## CAM00907, 7 December 2015
+## CAM00907, Museu Rodas do Tempo, Pirenópolis, 7 December 2015
 
-<img src="lg-optimus-3d/cam00907-anaglyph.jpg" width="99%" alt="CAM00907, a 3D photo from an LG Optimus 3D, 7 December 2015 (red-cyan anaglyph)">
+<img src="lg-optimus-3d/cam00907-anaglyph.jpg" width="99%" alt="CAM00907, a 3D photo from an LG Optimus 3D, at the Museu Rodas do Tempo, Pirenópolis, 7 December 2015 (red-cyan anaglyph)">
 
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/CAM00907.jps)
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/CAM00907.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-15.85198&mlon=-48.94376#map=17/-15.85198/-48.94376)
 
 ## CAM00926, 8 December 2015
 

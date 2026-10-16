@@ -39,6 +39,7 @@ Daniel, from a favela in Brasília, with one human contributor so far: Jeromy St
 Stereo on Linux waited years for volunteers: earlier attempts stalled because reviewers had no 3D display, and the work spans the kernel, Mesa, KWin, FFmpeg, the players and the web standards.
 No other developer came forward to carry it, so the other partners at work here are AI ones, directed and checked by Daniel and named in [AI provenance](docs/ai-provenance.md).
 If you would rather see it built by human hands, you are more than welcome: every fork is public, and every task is open.
+It is all built and tested on two ordinary machines, a home PC and a 2016 laptop: [the hardware](docs/hardware.md).
 
 ## Where it is going
 

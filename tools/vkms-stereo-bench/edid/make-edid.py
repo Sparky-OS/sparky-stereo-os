@@ -3,6 +3,9 @@
 """make-edid.py [--sbs-full] OUT.bin [C-ARRAY-NAME]: writes the stereo test EDID (base block + CTA-861
 extension with an HDMI 1.4b Vendor-Specific Data Block declaring 3D) and prints it as a C array.
 --sbs-full adds a side-by-side (full) entry for VIC 16, a layout mainline DRM does not list.
+--whole-spec also adds the other structures of HDMI 1.4a, Appendix H (Table H-2) on progressive
+formats: line alternative for VIC 16, L + depth for VICs 19 and 31, L + depth + graphics +
+graphics-depth for VIC 4, side by side (full) for VIC 16.
 
 HDMI VSDB layout (HDMI 1.4b, 8.3.2): OUI 00-0C-03, physical address, flags, Max_TMDS_Clock,
 HDMI_Video_present; then 3D_present / 3D_Multi_present, HDMI_VIC_LEN / HDMI_3D_LEN,
@@ -39,14 +42,19 @@ def base_block():
     checksum(b)
     return b
 
-def cta_block(sbs_full):
+def cta_block(sbs_full, whole_spec=False):
     vics = [16, 4, 32, 19, 31, 34]          # 1080p60 720p60 1080p24 720p50 1080p50 1080p30
     vdb = bytes([(2 << 5) | len(vics)] + vics)
     structure_all = 1 << 8                  # side-by-side (half) for every VIC
     x_entries = [(0 << 4) | 6,              # VIC 16: top-and-bottom
                  (5 << 4) | 0]              # VIC 34: frame packing
-    if sbs_full:
+    if sbs_full or whole_spec:
         x_entries.append((0 << 4) | 3)      # VIC 16: side-by-side (full)
+    if whole_spec:
+        x_entries += [(0 << 4) | 2,         # VIC 16: line alternative
+                      (3 << 4) | 4,         # VIC 19: L + depth
+                      (4 << 4) | 4,         # VIC 31: L + depth
+                      (1 << 4) | 5]         # VIC 4: L + depth + graphics + graphics-depth
     payload = bytes([0x03, 0x0c, 0x00,      # IEEE OUI 00-0C-03, LSB first
                      0x10, 0x00,            # physical address 1.0.0.0
                      0x00,                  # no deep colour
@@ -66,8 +74,9 @@ def cta_block(sbs_full):
 
 args = sys.argv[1:]
 sbs_full = "--sbs-full" in args
-args = [a for a in args if a != "--sbs-full"]
-edid = base_block() + cta_block(sbs_full)
+whole_spec = "--whole-spec" in args
+args = [a for a in args if a not in ("--sbs-full", "--whole-spec")]
+edid = base_block() + cta_block(sbs_full, whole_spec)
 open(args[0], "wb").write(edid)
 name = args[1] if len(args) > 1 else "edid"
 print("static const u8 %s[] = {" % name)

@@ -15,6 +15,7 @@ FULL_KERNEL=""    # bzImage built with kconfig/vkms-stereo-full.fragment, for th
 IGT_ROOT=""       # root file system with IGT's kms_3d in /usr/local/bin (tools/build-igt-root.sh)
 KWIN_ROOT=""      # root file system with Stereo KWin, kscreen-doctor, D-Bus, gcc and the Wayland/EGL headers
 SBS_FULL=0        # also test an EDID that declares side by side (full)
+DEPTH=0           # also test an EDID that declares every HDMI 1.4a 3D structure
 MEM=3072
 CPUS=2
 TIMEOUT=900
@@ -37,6 +38,8 @@ options:
   --kwin-root DIR        root file system with Stereo KWin and kscreen-doctor, for the kwin phase
   --sbs-full             the writeback phase also tests an EDID that declares side by side (full), and
                          the kwin phase uses it; mainline DRM does not list that layout
+  --depth                the writeback phase also tests an EDID that declares every HDMI 1.4a 3D
+                         structure (line alternative, L + depth, L + depth + graphics + graphics-depth)
   --work DIR             work directory (default ./bench-work, or $BENCH_WORK)
   --mem MB               guest memory (default 3072; the kwin phase uses at least 4096)
   --cpus N               guest CPUs (default 2; the kwin phase uses at least 4)
@@ -54,6 +57,7 @@ kunit       VKMS's KUnit suites, built into the kernel, run at boot (vkms-stereo
 writeback   stereo-wb-test: each listed stereo mode shown with known eyes, read back through writeback, pixel by pixel
 igt         IGT's kms_3d: forces a 3D EDID, lists the 3D modes, sets each one with a stereo framebuffer
 kwin        Stereo KWin: kscreen-doctor sets each 3D mode, the scanned-out frame is checked eye by eye
+depthcam    depth-cam-test: vivid lists Z16, INZI and CNF4 and their frames agree (a kernel with vivid)
 LIST
 }
 
@@ -67,6 +71,7 @@ while [ $# -gt 0 ]; do
     --igt-root) IGT_ROOT=$2; shift 2 ;;
     --kwin-root) KWIN_ROOT=$2; shift 2 ;;
     --sbs-full) SBS_FULL=1; shift ;;
+    --depth) DEPTH=1; shift ;;
     --work) WORK=$2; shift 2 ;;
     --mem) MEM=$2; shift 2 ;;
     --cpus) CPUS=$2; shift 2 ;;
@@ -99,7 +104,7 @@ doctor() {
 build_programs() {
     mkdir -p "$WORK/bin"
     local p
-    for p in stereo-wb-test drm-grab; do
+    for p in stereo-wb-test drm-grab depth-cam-test; do
         if [ ! -x "$WORK/bin/$p" ] || [ "$BENCH_DIR/src/$p.c" -nt "$WORK/bin/$p" ]; then
             gcc -O2 -static -Wall -o "$WORK/bin/$p" "$BENCH_DIR/src/$p.c" || die "could not build $p"
         fi
@@ -129,7 +134,7 @@ build_initramfs() {
     chmod 755 "$tree/init"
     cp "$BENCH_DIR"/guest/phases/*.sh "$tree/phases/"
     cp "$WORK"/data/*.bin "$WORK"/data/*.expect "$tree/data/"
-    cp "$WORK/bin/stereo-wb-test" "$WORK/bin/drm-grab" "$tree/bin/"
+    cp "$WORK/bin/stereo-wb-test" "$WORK/bin/drm-grab" "$WORK/bin/depth-cam-test" "$tree/bin/"
     cp "$BENCH_DIR/src/stereo-subsurface.c" "$BENCH_DIR/src/fullscreen-2d.c" "$tree/src/"
     python3 "$BENCH_DIR/tools/mkcpio.py" "$tree" "$WORK/initramfs.cpio.gz" || die "could not pack the initramfs"
     rm -rf "$tree"
@@ -191,7 +196,11 @@ run_phase() {
     writeback)
         local words=()
         [ "$SBS_FULL" = 1 ] && words+=(bench.sbs_full=1)
+        [ "$DEPTH" = 1 ] && words+=(bench.depth=1)
         run_vm writeback "$KERNEL" "$dir" -- "${words[@]}" ;;
+    depthcam)
+        # no KUnit at boot: its lines would interleave with the checks on the console
+        run_vm depthcam "$KERNEL" "$dir" -- kunit.enable=0 ;;
     igt)
         [ -n "$IGT_ROOT" ] || die "the igt phase needs --igt-root"
         run_vm igt "$KERNEL" "$dir" \

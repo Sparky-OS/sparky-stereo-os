@@ -7,15 +7,23 @@
  *
  * 1. Lists the connector's modes with DRM_CLIENT_CAP_STEREO_3D set and
  *    compares the stereo formats ("WxH@R layout") with FILE.
- * 2. For every listed mode, shows a frame holding a known left and right eye
- *    in the packing of the mode's layout (HDMI 1.4b 3D structures):
+ * 2. For every listed mode, shows a frame holding known pictures in the
+ *    packing of the mode's layout (HDMI 1.4a 3D structures, Appendix H):
  *      frame packing      left eye, active space (vtotal - vdisplay lines),
  *                         right eye: vdisplay + vtotal lines
+ *      line alternative   left and right eye on alternate lines, left first:
+ *                         2 x vdisplay lines
  *      side by side full  left eye, right eye: 2 x hdisplay columns
+ *      L + depth          the 2D picture, active space, its depth:
+ *                         vdisplay + vtotal lines
+ *      L + depth + graphics + graphics-depth
+ *                         picture, depth, graphics, graphics depth, one
+ *                         vtotal apart: vdisplay + 3 x vtotal lines
  *      side by side half  left half, right half of the mode
  *      top and bottom     top half, bottom half of the mode
  *    reads the writeback buffer back and checks every pixel.
- * 3. Per layout, the same with one plane per eye at its place in the frame.
+ * 3. Per layout with two rectangles, the same with one plane per picture at
+ *    its place in the frame.
  * 4. Refuses: a writeback buffer of one eye in a frame packing mode, a
  *    buffer of a frame packing frame in a 2D mode (TEST_ONLY commits).
  * 5. The vblank period of a frame packing mode equals that of its 2D mode.
@@ -42,7 +50,10 @@
 
 #define LAYOUT(m) (((m)->flags & DRM_MODE_FLAG_3D_MASK) >> 14)
 #define FP 1
+#define LINE_ALT 3
 #define SBS_FULL 4
+#define L_DEPTH 5
+#define L_DEPTH_GFX 6
 #define TAB 7
 #define SBS_HALF 8
 
@@ -284,11 +295,16 @@ static uint32_t *px(struct buf *b, int x, int y)
 
 /*
  * The test picture of one eye: red holds the eye (0xa_ left, 0x5_ right,
- * 0xf_ 2D) and the high bits of x and y, green and blue the low bits.
+ * 0xf_ 2D; in the picture plus depth structures 0xa_ the 2D picture, 0x5_
+ * its depth, 0xc_ the graphics, 0x3_ their depth) and the high bits of x
+ * and y, green and blue the low bits.
  */
+#define PIC_GFX 3
+#define PIC_GFX_DEPTH 4
+
 static uint32_t eye_pixel(int eye, int x, int y)
 {
-	static const uint32_t marker[] = { 0xa, 0x5, 0xf };
+	static const uint32_t marker[] = { 0xa, 0x5, 0xf, 0xc, 0x3 };
 	uint32_t r = marker[eye] << 4 | (((x >> 8) ^ (y >> 8)) & 0xf);
 
 	return 0xff000000 | r << 16 | (x & 0xff) << 8 | (y & 0xff);
@@ -298,43 +314,85 @@ struct region {
 	int x, y, w, h;
 };
 
-/* The frame of a mode and where each eye sits in it (HDMI 1.4b). */
-static void frame_layout(const struct drm_mode_modeinfo *m, int *fw, int *fh,
-			 struct region *l, struct region *r)
-{
-	int h = m->hdisplay, v = m->vdisplay;
+/*
+ * The frame of a mode and where each picture sits in it (HDMI 1.4a, section
+ * 8.2.3.2 and Appendix H): rectangles, or for line alternative the eyes on
+ * alternate lines.
+ */
+struct frame {
+	int w, h, n;
+	struct region reg[4];
+	bool rows;
+};
 
-	*fw = h;
-	*fh = v;
-	*l = (struct region){ 0, 0, h, v };
-	*r = (struct region){ 0, 0, 0, 0 };
+static void frame_of(const struct drm_mode_modeinfo *m, struct frame *f)
+{
+	int h = m->hdisplay, v = m->vdisplay, t = m->vtotal;
+
+	*f = (struct frame){ .w = h, .h = v, .n = 1, .reg = { { 0, 0, h, v } } };
 	switch (LAYOUT(m)) {
 	case FP:
-		*fh = v + m->vtotal;
-		*r = (struct region){ 0, m->vtotal, h, v };
+	case L_DEPTH:
+		f->h = v + t;
+		f->reg[1] = (struct region){ 0, t, h, v };
+		f->n = 2;
+		break;
+	case L_DEPTH_GFX:
+		f->h = v + 3 * t;
+		f->reg[1] = (struct region){ 0, t, h, v };
+		f->reg[2] = (struct region){ 0, 2 * t, h, v };
+		f->reg[3] = (struct region){ 0, 3 * t, h, v };
+		f->n = 4;
+		break;
+	case LINE_ALT:
+		f->h = 2 * v;
+		f->rows = true;
+		f->n = 2;
 		break;
 	case SBS_FULL:
-		*fw = 2 * h;
-		*r = (struct region){ h, 0, h, v };
+		f->w = 2 * h;
+		f->reg[1] = (struct region){ h, 0, h, v };
+		f->n = 2;
 		break;
 	case SBS_HALF:
-		*l = (struct region){ 0, 0, h / 2, v };
-		*r = (struct region){ h / 2, 0, h / 2, v };
+		f->reg[0] = (struct region){ 0, 0, h / 2, v };
+		f->reg[1] = (struct region){ h / 2, 0, h / 2, v };
+		f->n = 2;
 		break;
 	case TAB:
-		*l = (struct region){ 0, 0, h, v / 2 };
-		*r = (struct region){ 0, v / 2, h, v / 2 };
+		f->reg[0] = (struct region){ 0, 0, h, v / 2 };
+		f->reg[1] = (struct region){ 0, v / 2, h, v / 2 };
+		f->n = 2;
 		break;
 	}
 }
 
-static uint32_t expected_pixel(int x, int y, const struct region *l, const struct region *r,
-			       bool stereo)
+/* The frame and its first two rectangles, for the tests that use them. */
+static void frame_layout(const struct drm_mode_modeinfo *m, int *fw, int *fh,
+			 struct region *l, struct region *r)
 {
-	if (x >= l->x && x < l->x + l->w && y >= l->y && y < l->y + l->h)
-		return eye_pixel(stereo ? 0 : 2, x - l->x, y - l->y);
-	if (x >= r->x && x < r->x + r->w && y >= r->y && y < r->y + r->h)
-		return eye_pixel(1, x - r->x, y - r->y);
+	struct frame f;
+
+	frame_of(m, &f);
+	*fw = f.w;
+	*fh = f.h;
+	*l = f.reg[0];
+	*r = f.n > 1 && !f.rows ? f.reg[1] : (struct region){ 0, 0, 0, 0 };
+}
+
+static uint32_t expected_pixel(int x, int y, const struct frame *f, bool stereo)
+{
+	static const int marker[] = { 0, 1, PIC_GFX, PIC_GFX_DEPTH };
+	int i;
+
+	if (f->rows)
+		return eye_pixel(y & 1, x, y >> 1);
+	for (i = 0; i < f->n; i++) {
+		const struct region *g = &f->reg[i];
+
+		if (x >= g->x && x < g->x + g->w && y >= g->y && y < g->y + g->h)
+			return eye_pixel(stereo ? marker[i] : 2, x - g->x, y - g->y);
+	}
 	return 0;	/* active space, and the CRTC's black background */
 }
 
@@ -461,8 +519,8 @@ static void save_ppm(struct buf *b, const char *tag)
 }
 
 /* Compares the writeback frame with the expected picture; returns mismatches. */
-static long compare(struct buf *wb, const struct region *l, const struct region *r,
-		    bool stereo, char *first, size_t n)
+static long compare(struct buf *wb, const struct frame *f, bool stereo, char *first,
+		    size_t n)
 {
 	long bad = 0;
 	int x, y;
@@ -470,7 +528,7 @@ static long compare(struct buf *wb, const struct region *l, const struct region 
 	for (y = 0; y < wb->h; y++)
 		for (x = 0; x < wb->w; x++) {
 			uint32_t got = *px(wb, x, y) & 0xffffff;
-			uint32_t want = expected_pixel(x, y, l, r, stereo) & 0xffffff;
+			uint32_t want = expected_pixel(x, y, f, stereo) & 0xffffff;
 
 			if (got != want && !bad++)
 				snprintf(first, n, "first at %d,%d: 0x%06x, want 0x%06x",
@@ -482,22 +540,29 @@ static long compare(struct buf *wb, const struct region *l, const struct region 
 /* One plane holding the whole packed frame, as a compositor presents it. */
 static void test_packed(const struct drm_mode_modeinfo *m, bool save)
 {
-	struct region l, r;
+	struct frame f;
 	struct buf src, wb;
-	char name[64], tag[64], first[96] = "";
-	int fw, fh, fence, x, y, ret;
+	char name[64], tag[64], first[96] = "", where[160] = "";
+	int fence, x, y, ret, i;
 	bool stereo = LAYOUT(m) != 0;
 	long bad;
 
 	format_name(m, name, sizeof(name));
-	frame_layout(m, &fw, &fh, &l, &r);
-	if (buf_create(&src, fw, fh) || buf_create(&wb, fw, fh)) {
-		check(name, false, "buffers %dx%d: %s", fw, fh, strerror(errno));
+	frame_of(m, &f);
+	if (buf_create(&src, f.w, f.h) || buf_create(&wb, f.w, f.h)) {
+		check(name, false, "buffers %dx%d: %s", f.w, f.h, strerror(errno));
 		return;
 	}
-	for (y = 0; y < fh; y++)
-		for (x = 0; x < fw; x++)
-			*px(&src, x, y) = expected_pixel(x, y, &l, &r, stereo);
+	if (f.rows)
+		snprintf(where, sizeof(where), ", left eye on even lines, right eye on odd lines");
+	else
+		for (i = 0; i < f.n; i++)
+			snprintf(where + strlen(where), sizeof(where) - strlen(where),
+				 ", picture %d %dx%d at %d,%d", i, f.reg[i].w, f.reg[i].h,
+				 f.reg[i].x, f.reg[i].y);
+	for (y = 0; y < f.h; y++)
+		for (x = 0; x < f.w; x++)
+			*px(&src, x, y) = expected_pixel(x, y, &f, stereo);
 	memset(wb.map, 0x55, wb.size);
 
 	ret = commit(m, &(struct show){ plane_of_type(PLANE_PRIMARY), &src, 0, 0 }, 1,
@@ -505,13 +570,12 @@ static void test_packed(const struct drm_mode_modeinfo *m, bool save)
 	if (!ret)
 		ret = wait_fence(fence);
 	if (ret) {
-		check(name, false, "packed frame %dx%d: commit or writeback: %s", fw, fh,
+		check(name, false, "packed frame %dx%d: commit or writeback: %s", f.w, f.h,
 		      strerror(-ret));
 	} else {
-		bad = compare(&wb, &l, &r, stereo, first, sizeof(first));
-		check(name, !bad,
-		      "packed frame %dx%d, left eye %dx%d at %d,%d, right eye %dx%d at %d,%d: %ld wrong pixels %s",
-		      fw, fh, l.w, l.h, l.x, l.y, r.w, r.h, r.x, r.y, bad, first);
+		bad = compare(&wb, &f, stereo, first, sizeof(first));
+		check(name, !bad, "packed frame %dx%d%s: %ld wrong pixels %s",
+		      f.w, f.h, where, bad, first);
 		if (save) {
 			snprintf(tag, sizeof(tag), "%dx%d-%d-%s-packed", m->hdisplay, m->vdisplay,
 				 m->vrefresh, layout_name(LAYOUT(m)));
@@ -528,6 +592,7 @@ static void test_planes(const struct drm_mode_modeinfo *m)
 	struct plane *overlay = plane_of_type(PLANE_OVERLAY);
 	struct buf left, right, wb;
 	struct region l, r;
+	struct frame f;
 	char name[96], first[96] = "";
 	int fw, fh, fence, ret;
 	long bad;
@@ -556,7 +621,8 @@ static void test_planes(const struct drm_mode_modeinfo *m)
 	if (ret) {
 		check(name, false, "commit or writeback: %s", strerror(-ret));
 	} else {
-		bad = compare(&wb, &l, &r, true, first, sizeof(first));
+		frame_of(m, &f);
+		bad = compare(&wb, &f, true, first, sizeof(first));
 		check(name, !bad, "left plane at %d,%d, right plane at %d,%d in a %dx%d frame: %ld wrong pixels %s",
 		      l.x, l.y, r.x, r.y, fw, fh, bad, first);
 	}
@@ -732,7 +798,8 @@ int main(int argc, char **argv)
 		if (!layout && !(modes[i].hdisplay == 1920 && modes[i].vdisplay == 1080))
 			continue;
 		test_packed(&modes[i], !(layouts_done & 1 << layout));
-		if (layout && !(layouts_done & 1 << layout))
+		if (layout && layout != LINE_ALT && layout != L_DEPTH_GFX &&
+		    !(layouts_done & 1 << layout))
 			test_planes(&modes[i]);
 		layouts_done |= 1 << layout;
 	}
@@ -753,6 +820,26 @@ int main(int argc, char **argv)
 		check("vblank-period", t_fp > 0 && t_2d > 0 && t_fp > want * 0.99 && t_fp < want * 1.01 &&
 		      t_2d > want * 0.99 && t_2d < want * 1.01,
 		      "1920x1080@24 frame packing %.1f us, 2D %.1f us, timing %.1f us", t_fp, t_2d, want);
+	}
+
+	/* the picture plus depth frames: a one-picture buffer is refused, the refresh stays */
+	for (i = 0; i < n_modes; i++) {
+		const struct drm_mode_modeinfo *d = &modes[i];
+		struct frame f;
+		double want, t;
+
+		if (LAYOUT(d) != L_DEPTH && LAYOUT(d) != L_DEPTH_GFX)
+			continue;
+		if (layouts_done & 1 << (8 + LAYOUT(d)))
+			continue;
+		layouts_done |= 1 << (8 + LAYOUT(d));
+		frame_of(d, &f);
+		test_refused(d, d->hdisplay, d->vdisplay, "one picture");
+		want = (double)d->htotal * d->vtotal * 1000 / d->clock;
+		t = vblank_period(d, 24);
+		check("vblank-period", t > want * 0.99 && t < want * 1.01,
+		      "%dx%d@%d %s %.1f us, 2D timing %.1f us (frame %dx%d)", d->hdisplay,
+		      d->vdisplay, d->vrefresh, layout_name(LAYOUT(d)), t, want, f.w, f.h);
 	}
 
 	printf("STEREO|summary|%s|%d checks, %d failed\n", dev_name, n_checks, n_failures);

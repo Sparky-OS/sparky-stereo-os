@@ -9,12 +9,17 @@ from edid-decode's text (not from the kernel's parser), as "WxH@R layout" lines.
 - 3D_Structure_ALL ("3D: ..." lines) for the VICs it applies to ("All advertised VICs" means the
   first 16, or the "3D VIC indices that support these capabilities" list).
 - "3D VIC indices with specific capabilities" entries.
-Kept: progressive formats (the connector does not allow interlace) in the four layouts DRM's EDID
-parser lists: frame packing, top-and-bottom, side by side (half, horizontal), side by side (full)."""
+Kept: progressive formats (the connector does not allow interlace) in the layouts DRM's EDID parser
+lists: frame packing, top-and-bottom, side by side (half, horizontal), side by side (full), line
+alternative, L + depth and L + depth + graphics + graphics-depth (HDMI 1.4a, Table H-2); the last
+three on progressive formats only (Figures H-3, H-5, H-6)."""
 import re, sys
 
 names = {"frame packing": "fp", "frame-packing": "fp", "top-and-bottom": "tab",
-         "side-by-side (half, horizontal)": "sbs-half", "side-by-side (full)": "sbs-full"}
+         "side-by-side (half, horizontal)": "sbs-half", "side-by-side (full)": "sbs-full",
+         "line alternative": "line-alt", "line-alternative": "line-alt",
+         "field alternative": "field-alt", "field-alternative": "field-alt",
+         "l + depth": "l-depth", "l + depth + gfx + gfx-depth": "l-depth-gfx"}
 vic_re = re.compile(r"VIC\s+(\d+):\s+(\d+)x(\d+)(i?)\s+([\d.]+) Hz")
 mandatory = {(32, "fp"), (32, "tab"), (19, "fp"), (19, "tab"), (4, "fp"), (4, "tab"),
              (20, "sbs-half"), (5, "sbs-half")}
@@ -63,7 +68,7 @@ for line in text:
             mask_vics.append(v)
         else:
             rest = s[s.index("MHz") + 3:].strip()
-            specific.append((v, rest[1:-1] if rest.startswith("(") else ""))
+            specific.append((v, rest[1:-1].lower() if rest.startswith("(") else ""))
         continue
 
 out = set()

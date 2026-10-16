@@ -1,9 +1,11 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # stereo-wb-test on configfs devices whose HDMI-A connector reads an EDID, and on the module's default device
-# (no EDID) as the 2D control. bench.sbs_full=1 adds a device whose EDID also declares side by side (full).
+# (no EDID) as the 2D control. bench.sbs_full=1 adds a device whose EDID also declares side by side (full),
+# bench.depth=1 one whose EDID declares every HDMI 1.4a 3D structure (stereo-whole).
 . /phases/lib.sh
 devices="stereo-test kdl-46hx855"
 cmdline_has bench.sbs_full=1 && devices="$devices stereo-full"
+cmdline_has bench.depth=1 && devices="$devices stereo-whole"
 for dev in $devices; do
     mkvkms $dev $dev overlay writeback || echo "STEREO|check|configfs/$dev|FAIL|could not create the device"
 done

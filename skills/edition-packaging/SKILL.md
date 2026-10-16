@@ -7,7 +7,7 @@ description: >-
 # Packaging the edition
 
 **Check freshness first.**
-Written on 2026-10-07.
+Written on 2026-10-07; the developer tasks and the skills package on 2026-10-16.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
 
 ## Tasks, the Debian way
@@ -25,12 +25,34 @@ The edition offers its programs as **tasks**, like Debian's `task-kde-desktop`: 
 | `task-sparky-stereo-student` | education programs that show stereo 3D today |
 | `task-sparky-stereo-simmer` | flight and racing simulators and the tools for their rigs |
 | `task-sparky-scientist`, `task-sparky-student` | the programs of those fields with no stereo version yet |
+| `task-sparky-stereo-developer` | code and game engines: KDE's development tools first, the Qt 6 and KDE Frameworks development files, compilers, debuggers and build systems for every language Debian carries, version control, containers and virtual machines, graphics and GPU debugging, game engines and libraries, and the skills for AI assistants |
+| `task-sparky-stereo-os-developer` | building, testing and packaging the edition itself: the development files of the stereo stack at the edition's versions, Debian packaging, the proof rig and the virtual display benches, KDE's CI run locally; it brings the developer task |
 
 - **Stereo and 2D flavours** (science and education, where most programs are still 2D): the stereo task holds only programs whose stereo is proven on the edition. The 2D task holds the rest and never names a program the stereo task has, so installing it never replaces a stereo build. A program moves to the stereo task when its proof lands.
-- **The core** stays in a few metapackages everyone gets (desktop, hardware support, languages, system). The top `sparky-stereo` depends on the core and recommends every task.
+- **The core** stays in a few metapackages everyone gets (desktop, hardware support, languages, system). The top `sparky-stereo` depends on the core and recommends every task except the two developer tasks, which are installed on request (Daniel, 2026-10-16: "just install the meta and start developing").
 - **Policy:** essentials and the stereo stack in `Depends`; programs in `Recommends`, so a user can remove one and keep the task. Never a versioned library name in `Depends`: Debian renames those at every transition.
 - **Renaming:** the old package becomes transitional, depending on the new one, so upgrades keep working.
 - **Every build of ours must be in some task.** A stereo build that no list names is never installed; this was found on 2026-10-07 for seven of our KDE and science builds.
+
+## The skills for AI assistants
+
+`sparky-stereo-skills` installs this repository's skills, with the documents and tools they link to, in `/usr/share/sparky-stereo-os`, taken from one commit of the repository and named in `/usr/share/sparky-stereo-os/SOURCE`.
+Both developer tasks depend on it.
+A package never writes into home folders from its maintainer scripts, so each person runs `sparky-stereo-skills`, or answers the offer it makes once at login when an assistant is found.
+It links every skill into the folders where the assistants read skills, and nothing else:
+
+| Folder | Read by (each tool's documentation) |
+|---|---|
+| `~/.agents/skills` | [Codex](https://learn.chatgpt.com/docs/build-skills), [Gemini CLI](https://geminicli.com/docs/cli/skills/), [OpenCode](https://opencode.ai/docs/skills/), [GitHub Copilot](https://code.visualstudio.com/docs/copilot/customization/agent-skills), [Cursor](https://cursor.com/docs/skills), [goose](https://goose-docs.ai/docs/guides/context-engineering/using-skills) |
+| `~/.claude/skills` | [Claude Code](https://code.claude.com/docs/en/skills), and also OpenCode, GitHub Copilot and goose |
+| `~/.cline/skills` | [Cline](https://docs.cline.bot/customization/skills) |
+| `~/.gemini/skills`, `~/.config/opencode/skills`, `~/.copilot/skills`, `~/.cursor/skills` | the tool named, when a person prefers its own folder |
+
+- **By default** it links into the shared folder and the folders of the assistants it finds; the others are a choice by name.
+- **A skill is linked only when its `SKILL.md` starts with a YAML header** whose `name` is the folder's name and which has a `description`. Cline and goose refuse a skill whose name differs from its folder, and a header joined into one line makes every tool skip the skill silently (certificate-manager's, from 2026-10-14 until 2026-10-16).
+- **It never replaces a person's own skill** of the same name, removes only its own links, and after an upgrade the next login links new skills and drops removed ones.
+- **Local models:** `ollama launch` starts Claude Code, Codex or OpenCode on a local or cloud Ollama model ([Ollama's CLI](https://docs.ollama.com/cli)), and those read the same folders. **Open WebUI** imports skills from a ZIP of skill folders (Workspace, Skills, Import; [its documentation](https://docs.openwebui.com/features/workspace/skills)): `sparky-stereo-skills export skills.zip` makes it.
+- **Proof:** link, then have each tool read the skills back: a command that lists them (`gemini skills list`, `goose skills list`), or the tool's request to its model captured at a local endpoint, where every skill's name must appear.
 
 ## tasksel lists only ours
 

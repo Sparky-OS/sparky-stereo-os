@@ -307,3 +307,26 @@ Prove scanning through the camera API on an AOSP emulator image without Play ser
 Compare both eye captures with independently encoded reference parameters, and reject default-profile and eye-swap controls.
 An emulator proves decoding and profile application, not a physical viewer's optical calibration or GrapheneOS device compatibility.
 Credits: Google and the Cardboard contributors, the ZXing authors, Fabian Druschke and the KDE Connect developers.
+
+## Native Catch frontend checkpoint (checked 2026-10-16)
+
+Share KRDC's FreeRDP session between its widget view and a Kirigami receiver.
+Make an owned frame copy before the FreeRDP worker overwrites its GDI buffer.
+Keep one pending frame and one notification; replace an unconsumed frame instead of queuing images.
+Derive each-eye fitting from the current decoded dimensions at paint time.
+Use KScreen's native mode and scale for the panel descriptor, not Qt's logical window size.
+
+Use the existing KRdp discovery, TLS control and owner-lease path end to end in the proof.
+An owner returning a nested `QJsonObject` inside a D-Bus `QVariantMap` can crash while marshalling its reply.
+Return `toVariantMap()` and explicitly decode the nested `QDBusArgument` before converting the reply to JSON.
+A direct `krdpserver` test bypasses that boundary and cannot qualify discovery.
+Verify the RDP certificate through FreeRDP's external certificate callback; a changed pin must fail before a frame arrives.
+Bind the RDP destination to the TLS control peer and keep credentials out of command arguments and history.
+
+Run the receiving app on an unmodified KWin as well as the edition's stack.
+Capture its own window, decode the source timecode in each eye, and correlate it with the producer's record across reconnect.
+An eye-swap control must fail identity; a frozen frame with correct eye labels must fail progress.
+Disable all capture and mutation hooks in production builds.
+Keep translation catalogs and translated desktop entries in distribution patches, separate from KDE source commits.
+The amd64 H.264 and uncorrected-view checkpoint does not qualify ARM hardware decoding, optics, sensors or the native compositor output choice.
+Credits: KRDC, Urs Wolfer, Tony Murray, Arjen Hiemstra, the KDE Kirigami, Qt and FreeRDP developers, Fabian Druschke and the KRdp/Flat Headset contributors.

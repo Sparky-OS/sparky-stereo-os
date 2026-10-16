@@ -7,7 +7,7 @@ description: >-
 # The proof rig
 
 **Check freshness first.**
-Written on 2026-10-07.
+Written on 2026-10-07, the NVIDIA card added on 2026-10-16.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill says what counts as proof; this one says how to produce it.
 No 3D display is needed: the rig captures what Stereo KWin hands to an output, both eyes side by side.
 
@@ -22,6 +22,9 @@ No 3D display is needed: the rig captures what Stereo KWin hands to an output, b
   wait for the socket in `$XDG_RUNTIME_DIR`, then start the program with `WAYLAND_DISPLAY=sub` and `QT_QPA_PLATFORM=wayland` (or `DISPLAY=:0` and `QT_QPA_PLATFORM=xcb` for the X11 route through Xwayland).
 - **Captures:** KWin's own [ScreenShot2](https://invent.kde.org/plasma/kwin/-/blob/master/src/plugins/screenshot/org.kde.KWin.ScreenShot2.xml) D-Bus interface (`CaptureScreen`, `CaptureActiveWindow`). With stereo content on screen, Stereo KWin's capture holds both eyes side by side, left eye first, each at the output's full size (a 1280x800 output gives 2560x800), so a script reads each eye as one half.
 - **Declarations:** run the program with `WAYLAND_DEBUG=client` and keep only the lines that matter (`kde_stereo_content`, `set_content`, `get_subsurface`, `place_below`, errors): the log proves which surface declared stereo, and how many times.
+- **On the NVIDIA card:** Docker's CDI gives the container the card, its render node and NVIDIA's own libraries from the host (`--device nvidia.com/gpu=0`), so the host's driver version is the one under test. Add `--group-add 125` (the render group, for the node only) and `--cap-add SYS_NICE`, which `kwin_wayland`'s file capability needs to start. Give a library by its absolute path, because CDI mounts the host's copies over the image's, and choose NVIDIA's EGL platform library with `__EGL_EXTERNAL_PLATFORM_CONFIG_DIRS` when two are installed. For Mesa on NVIDIA's Vulkan driver (zink), list Mesa's EGL vendor first and NVIDIA's second (`__EGL_VENDOR_LIBRARY_FILENAMES`): NVIDIA's Vulkan driver does not start without its own EGL vendor. Run every case on the AMD card too: they fail differently.
+- **PipeWire for screencasting:** KWin's screencasting tests need a PipeWire and a WirePlumber of the container's own, with the container's `XDG_RUNTIME_DIR`, never the desktop's; without them every casting test fails at its setup.
+- **Geometry, not only colour:** draw a disc of known size in each eye (0.6 of the window's height, round in the width the program believes it has) and measure its area, diameter, aspect and centre in each half; a squeezed eye still shows the right colour.
 - **Menus and keys:** KWin's [fake input protocol](https://invent.kde.org/libraries/plasma-wayland-protocols/-/blob/master/src/protocols/fake-input.xml) sends key events to the focused window, so a remote-control menu or a 3D menu is driven exactly as a user would, without a desktop.
 
 ## Test material that a script can read
@@ -49,4 +52,6 @@ No 3D display is needed: the rig captures what Stereo KWin hands to an output, b
 - **A test that cannot fail proves nothing:** break the expectation once and see it fail.
 - **Debian source builds in a container:** keep the version's epoch colon out of the build directory's name (CMake's translation targets fail on it).
 - **A background wait with `pgrep -f` or `pkill -f`** on a pattern that also appears in its own command line matches itself and never ends; match the process name, or keep a PID.
+- **A Wayland client must read its socket:** a test program that only calls `wl_display_dispatch_pending()` never answers KWin's ping when the driver reads nothing for it (NVIDIA's Vulkan with explicit sync and `wp_fifo_v1`), and KWin then fades the window as "Not Responding". The window looked empty to a colour check; read the socket every frame (`wl_display_prepare_read`, `poll`, `wl_display_read_events`). A KWin script that lists `workspace.stackingOrder` tells a missing window from a faded one.
+- **A race needs repeated runs and a control:** a race left NVIDIA's second view black in some runs only; 20 runs with the fix (all good) beside 20 with the fix switched off (8 black) showed it gone.
 - **The virtual KMS driver (`vkms`) needs a virtual machine:** on a desktop the running compositor takes the virtual device as one more GPU.

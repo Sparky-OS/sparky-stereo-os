@@ -35,11 +35,11 @@ Daniel's field machine, an entry-level laptop from 2016.
 | Graphics | the processor's Radeon R5, and a small second Radeon (R5 M330 class, 2 GB) |
 | Memory | 12 GB, the most it takes |
 | Storage | two SATA SSDs, one in the old DVD drive's bay |
-| Screens | its own 1366x768 screen, and HDMI out to the KDL-46HX855 3D TV |
+| Screens | its own 1366x768 screen, and HDMI out to the KDL-46HX855 3D TV, on the TV's second input |
 
 It runs the same edition, installed from the same packages as the desktop: our stereo core, desktop and graphics drivers.
 The red-cyan 3D view works on its own screen.
-Its HDMI port already offers the TV's 3D modes; its first picture on the 3D TV comes in the next test session.
+On the KDL-46HX855 it runs the 3D desktop by itself, with its own screen off, in full HD for each eye (the TV's frame packing mode).
 
 ## Your hardware
 

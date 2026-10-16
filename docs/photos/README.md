@@ -21,11 +21,11 @@ All files with their checksums: [https://repo.sparkyos.org/photos/lg-optimus-3d/
 
 [Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG002%281%29.jps)
 
-## IMG027 (2), 8 September 2014
+## IMG027 (2), Sky's Burger, 312 Sul, 8 September 2014
 
-<img src="lg-optimus-3d/img027-2-anaglyph.jpg" width="99%" alt="IMG027 (2), a 3D photo from an LG Optimus 3D, 8 September 2014 (red-cyan anaglyph)">
+<img src="lg-optimus-3d/img027-2-anaglyph.jpg" width="99%" alt="IMG027 (2), a 3D photo from an LG Optimus 3D, at the Sky's Burger, 312 Sul, 8 September 2014 (red-cyan anaglyph)">
 
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG027%20%282%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.17000&mlon=-48.08528#map=17/-16.17000/-48.08528)
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG027%20%282%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-15.82329&mlon=-47.91736#map=17/-15.82329/-47.91736)
 
 ## IMG028 (2), 8 September 2014
 
@@ -33,11 +33,11 @@ All files with their checksums: [https://repo.sparkyos.org/photos/lg-optimus-3d/
 
 [Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG028%20%282%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-16.18694&mlon=-48.07417#map=17/-16.18694/-48.07417)
 
-## IMG031 (2), 8 September 2014
+## IMG031 (2), Fonte da Torre de TV, 8 September 2014
 
-<img src="lg-optimus-3d/img031-2-anaglyph.jpg" width="99%" alt="IMG031 (2), a 3D photo from an LG Optimus 3D, 8 September 2014 (red-cyan anaglyph)">
+<img src="lg-optimus-3d/img031-2-anaglyph.jpg" width="99%" alt="IMG031 (2), a 3D photo from an LG Optimus 3D, at the Fonte da Torre de TV, 8 September 2014 (red-cyan anaglyph)">
 
-[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG031%20%282%29.jps)
+[Download the original JPS (both eyes)](https://repo.sparkyos.org/photos/lg-optimus-3d/IMG031%20%282%29.jps) · [where it was taken](https://www.openstreetmap.org/?mlat=-15.79121&mlon=-47.89114#map=17/-15.79121/-47.89114)
 
 ## IMG056, 23 September 2014
 

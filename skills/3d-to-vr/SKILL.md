@@ -262,3 +262,34 @@ Correlate encoder and receiver timings with both payload hashes when the transpo
 Strip only the known inserted marker for the encoder correlation; keep the complete wire hash for the receive correlation.
 Require a complete stage chain for every valid displayed timestamp, including the slowest frame.
 A short instrumentation smoke test does not replace the scheduled five-minute latency gate or a physical-phone measurement.
+
+## Plasma Mobile receiver study (checked 2026-10-16)
+
+Plasma Mobile uses KWin and Wayland; its mobile startup selects the mobile shell and configuration overlay.
+Offer a Kirigami Catch frontend on stock Plasma Mobile and a Stereo KWin headset output as separate choices.
+Recommend the stock frontend first for deployment reach, without claiming it wins a performance comparison.
+In the Stereo KWin path the receiver supplies declared full side by side; lens correction, scaling and cursor presentation belong to the compositor output.
+Do not warp the image in both places.
+
+The accepted KDE Connect Linux receiver checks for KRDC but opens the default `rdp://` handler.
+Its URL handoff omits the Throw packet's panel descriptor and certificate pin.
+Use an authenticated structured handoff for the Catch frontend, preserving ordinary RDP links.
+Share KRDC's FreeRDP session instead of creating another transport.
+Its current QWidget view scales a complete image; each-eye unpacking, fitting and lens correction still need implementation.
+
+Keep all five link layouts, the same panel identity and approval rules, fitted/QR/uncorrected profiles, stereo waiting scenes and nine locales.
+Measure physical panel pixels through output metadata rather than treating Qt's scaled window dimensions as native resolution.
+Cardboard's profile and distortion math can be reused, but its Android build includes JNI and platform-specific services; a Linux adapter is work to implement.
+
+The `iio-sensor-proxy` API supplies discrete orientation, not a timestamped gyro or head quaternion.
+Qt Sensors' Linux proxy plugin has the same boundary; the audited SensorFW build is disabled.
+A head-fixed screen needs no pose integration.
+For optional world-fixed reprojection, qualify a timestamped sensor backend and frame association separately.
+Release sensor claims and power inhibitors when the connection ends; never promise to disable thermal protection.
+
+Use an emulated arm64 Plasma Mobile session before a physical phone window.
+Separate source audit, guest boot, pixel/transport proof and real-device performance in the report.
+A receiver-only phone does not need a local streaming server; rebuilding Stereo KWin does require matching private-API plugins, including Plasma Mobile's task switcher.
+Debian/Mobian packages and Alpine-based postmarketOS packages need separate native builds.
+
+Sources: [Plasma Mobile startup](https://invent.kde.org/plasma/plasma-mobile/-/blob/91971ee78079c699d6970a91bd971ccc42d0759c/bin/startplasmamobile.in), [KDE Connect receiver](https://invent.kde.org/danielcamposramos/kdeconnect-kde/-/blob/e1b0792b5/plugins/virtualmonitor/virtualmonitorplugin.cpp), [KRDC presentation](https://invent.kde.org/network/krdc/-/blob/fc11f278f5e4c15ec3e0c978a60a70494f087072/rdp/rdpview.cpp), [sensor API](https://hadess.pages.freedesktop.org/iio-sensor-proxy/gdbus-net.hadess.SensorProxy.html), [Qt sensor backends](https://code.qt.io/cgit/qt/qtsensors.git/tree/src/plugins/sensors/CMakeLists.txt?id=78f4791c27f0c86b021356f6277f0352abd50583), [current distributions](https://plasma-mobile.org/get/).

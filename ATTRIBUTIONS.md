@@ -778,3 +778,10 @@ These credits do not imply upstream endorsement.
 The APK proof is a build/resource check; no artwork was installed on a device or published by this work.
 
 **Last updated**: 14 October 2026
+
+## Plasma Mobile Catch study (16 October 2026)
+
+Credit the **KDE Plasma Mobile, KWin, KDE Connect and KRDC developers**, **FreeRDP developers**, **Google Cardboard developers**, **Qt developers**, and **Debian, Mobian and postmarketOS/Nura contributors** for the native receiver foundations.
+The audited source headers credit **Arjen Hiemstra** for KRDC's RDP session; **Arend van Beelen jr., Urs Wolfer and AceLan Kao** for its view; **Aleix Pol, Bhushan Shah and Jonah Brüchert** for Plasma Mobile startup; **Devin Lin and Luis Büchi** for mobile environment settings; and **Xaver Hugl and Vlad Zahorodnii** for KWin's orientation integration.
+Names come from the projects' source records linked in the [receiver study skill](skills/3d-to-vr/SKILL.md#plasma-mobile-receiver-study-checked-2026-10-16).
+This is a source and emulation study, not a claim that those projects ship a finished headset receiver or endorse the edition.

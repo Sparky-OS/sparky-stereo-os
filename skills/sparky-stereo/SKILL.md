@@ -107,6 +107,7 @@ Load the one that matches the work; the [program list](../../docs/programs-in-de
 | [`proton-wine`](../proton-wine/SKILL.md) | Windows programs through Wine, DXVK and gamescope |
 | [`gamecontroller`](../gamecontroller/SKILL.md) | KDE controller models and labels for flight and racing rigs, preserving every raw control and verifying upstream profiles |
 | [`edition-packaging`](../edition-packaging/SKILL.md) | The edition's tasks and metapackages, tasksel, keeping our builds the only candidates, the media stack on deb-multimedia |
+| [`lean-code`](../lean-code/SKILL.md) | Lean Code: text files installed without the comments the machine never reads, how each format is checked, and how to verify, explain or undo a file with dpkg-stereo |
 | [`stereo-artwork`](../stereo-artwork/SKILL.md) | Artwork in an existing style, stereo pairs with a measured separation, animation in both eyes, editable deliverables |
 | [`power-idle`](../power-idle/SKILL.md) | KDE idle, lock, laptop lids, power-profile holds, CEC ownership and console isolation proof |
 | [`system-housekeeping`](../system-housekeeping/SKILL.md) | Self-pruning defaults (kernels, logs, crash dumps, GRUB) and cleaning a system safely |

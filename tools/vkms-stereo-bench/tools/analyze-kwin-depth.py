@@ -112,7 +112,7 @@ def decoder(meta, eye_width):
 
 def samples(im, rect):
     x, y, w, h = rect
-    return list(im.crop((x, y, x + w, y + h)).split()[0].getdata())
+    return list(im.crop((x, y, x + w, y + h)).split()[0].tobytes())
 
 
 def median(values):
@@ -130,10 +130,10 @@ def eroded_bbox_region(m, offset, erode=4):
 def region_values(depth_img, region_mask, origin):
     """Depth samples where region_mask (in picture coordinates) is set."""
     m = region_mask
-    data = list(depth_img.split()[0].getdata())
+    data = list(depth_img.split()[0].tobytes())
     w = depth_img.width
     ret = []
-    md = list(m.getdata())
+    md = list(m.tobytes())
     for i, v in enumerate(md):
         if v:
             ret.append(data[i])

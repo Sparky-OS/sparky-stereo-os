@@ -14,11 +14,12 @@ HERE=$(cd "$(dirname "$0")/.." && pwd)
 [ $# -gt 0 ] || set -- "$HERE/kconfig/vkms-stereo-x86_64.fragment"
 mkdir -p "$OUT"
 OUT=$(cd "$OUT" && pwd)
+# the fragments, relative to the directory the script was started from
+frags=""
+for f in "$@"; do frags="$frags $(cd "$(dirname "$f")" && pwd)/$(basename "$f")"; done
 cd "$SRC"
 make O="$OUT" "${BASE:-tinyconfig}" >/dev/null
 # merge_config.sh makes its temporary file in the current directory: run it from OUT, so SRC can be read-only
-frags=""
-for f in "$@"; do frags="$frags $(cd "$(dirname "$f")" && pwd)/$(basename "$f")"; done
 # shellcheck disable=SC2086
 (cd "$OUT" && KCONFIG_CONFIG="$OUT/.config" "$SRC/scripts/kconfig/merge_config.sh" -m -O "$OUT" "$OUT/.config" $frags) >"$OUT/merge.log" 2>&1
 make O="$OUT" olddefconfig >/dev/null

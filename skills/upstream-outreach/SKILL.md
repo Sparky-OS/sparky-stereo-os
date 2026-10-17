@@ -27,6 +27,7 @@ Why: in October 2026 a merge request reached KWin without warning and was declin
 - **Find the right person in the project's own records:** who wrote and keeps the code (its git history, metadata, maintainers file), not a guess. For a theme, its metadata names the author.
 - **Get every fact about people exact:** names, roles and companies from their own pages. A wrong title in a first note costs more than a missing one.
 - **Check the project's stance on AI** before choosing between a proposal, an issue only, or keeping the work in our fork.
+- **Some projects refuse AI work outright, reports included.** XScreenSaver 6.17 ships an `AGENTS.md` saying it "does not want AI contributions of any kind", and its author's site turns robots away; send nothing there. A bug in the version a distribution carries goes to that distribution's tracker, which for Debian's XScreenSaver is also what its packaging asks.
 
 ## The message
 

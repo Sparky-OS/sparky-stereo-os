@@ -390,6 +390,10 @@ Names come from each project's Debian copyright records.
 - **[mmdebstrap](https://gitlab.mister-muffin.de/josch/mmdebstrap/)**: Johannes Schauer Marin Rodrigues, its author and its Debian maintainer. It builds the bench's root file system of Debian testing plus the edition's packages, with no root needed.
 - **[BusyBox](https://busybox.net/)**: the BusyBox developers, among them Erik Andersen, its first author in Debian's records. The bench's guest runs a static BusyBox as its init and shell.
 - **[swtpm](https://github.com/stefanberger/swtpm)**: Stefan Berger and IBM Corporation. The software TPM 2.0 of hibernate-bench.
+- **[apitrace](https://apitrace.github.io/)**: Jose Fonseca and Zack Rusin, as Debian's records name them. It records a screensaver's OpenGL calls once, so its picture with and without the stereo layer can be compared call for call.
+- **[Valgrind](https://valgrind.org/)**: Julian Seward and the Valgrind developers. Its memcheck found the memory GL Snake's light read without ever setting it.
+- **Docker's default seccomp profile** ([moby/profiles](https://github.com/moby/profiles)): the Moby project. The screensaver audit runs under it with one personality added, so programs can run with address randomisation off.
+- **[OpenStreetMap](https://www.openstreetmap.org/copyright)**: © OpenStreetMap contributors, data under the Open Database License. Mapscroller shows their map; the audit keeps only the coordinates it asks for and draws synthetic tiles there, storing none of OpenStreetMap's.
 
 ---
 
@@ -442,6 +446,7 @@ Existing KWin, libkscreen, Qt and FFmpeg credits above also apply.
 | [Kalzium](https://apps.kde.org/kalzium/) and [Avogadro](https://avogadro.cc/) | GPL-2.0-or-later, BSD-3-Clause | Molecules in stereo; why Kalzium drew no molecule with Avogadro 2 (KDE bug 463018) | Kalzium: Carsten Niehaus, Andreas Cord-Landwehr, Marcus D. Hanwell, Inge Wallin and others. Avogadro: Geoff Hutchison, Marcus D. Hanwell and Kitware |
 | [Kubrick](https://apps.kde.org/kubrick/) | GPL-2.0-or-later | The cube once per eye | Ian Wadham |
 | [Netgen](https://ngsolve.org/) | LGPL-2.0-or-later | `-stereo` that does what it says | Joachim Schöberl |
+| [Blender](https://www.blender.org/) | GPL-2.0-or-later | Every window a quad-buffer (Time Sequential) window, so a scene's stereoscopy shows at once; GHOST's EGL keeps the stereo request with two views on Wayland; a mono context instead of an exit when GLX has no stereo; the right eye follows mono frames after stereo stops | The Blender Foundation and the Blender developers, from Ton Roosendaal's first Blender on; Debian's packaging by the Debian Multimedia Maintainers and Matteo F. Vescovi |
 | [GNU Octave](https://octave.org/) | GPL-3.0-or-later | `stereo` figure properties | John W. Eaton and the Octave developers |
 | [GRASS GIS](https://grass.osgeo.org/), [KiCad](https://www.kicad.org/), [OpenSCAD](https://openscad.org/), [F3D](https://f3d.app/) | GPL family, BSD-3-Clause (F3D) | Stereo views, in progress | The GRASS Development Team; Jean-Pierre Charras and the KiCad developers; Marius Kintel and the OpenSCAD developers; Mathieu Westphal, Michael Migliore and the F3D team |
 
@@ -478,6 +483,7 @@ Existing KWin, libkscreen, Qt and FFmpeg credits above also apply.
 | [PipeWire](https://pipewire.org/) | Sound, the model for this edition's stereo pipeline | Wim Taymans and the PipeWire developers |
 | [OpenRGB](https://openrgb.org/) | Lighting control | Adam Honse and the OpenRGB contributors |
 | [xpadneo](https://github.com/atar-axis/xpadneo) | Xbox wireless controllers | Florian Dollinger and Kai Krakow |
+| [XScreenSaver](https://www.jwz.org/xscreensaver/) | The screensavers of the stereo show, each one qualified in 3D against its own 2D picture; Flurry's camera; GL Snake's second light given a place (it read memory never set), and at the viewer, a lamp or the sun as the user chooses | Jamie Zawinski and the many XScreenSaver authors; GL Snake by Jamie Wilkinson, Andrew Bennetts and Peter Aylett; Flurry by Calum Robinson; Debian's packaging by Tormod Volden |
 | [protontricks](https://github.com/Matoking/protontricks) | Proton prefixes | Janne Pulkkinen |
 | [Phoronix Test Suite](https://www.phoronix-test-suite.com/) | Benchmarks | Michael Larabel |
 | [Vibe](https://github.com/thewh1teagle/vibe) | Offline transcription | thewh1teagle |

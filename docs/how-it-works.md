@@ -1,8 +1,10 @@
-# Why one format: full side by side, at any resolution
+<a id="why-one-format-full-side-by-side-at-any-resolution"></a>
 
-**For anyone who wants to know why 3D works on every screen here, and for program and driver developers:** the one picture every program hands the desktop, both eyes side by side at full size, and why.
+# One presentation contract for stereo and HDR
 
-**The standard in three lines.**
+**For program and driver developers, and anyone following the design:** why stereo uses both eyes side by side at full size, and how preserving each picture's description could extend the same division of work to HDR. The stereo choice has device-test evidence; the HDR extension is a design awaiting implementation and equivalent testing.
+
+**The stereo contract in three lines.**
 - **Stereo KWin** (KDE Plasma's compositor, with our stereo changes) speaks full side by side, at any resolution.
 - **Programs** decode or generate stereo in any standard, and deliver full side by side, at any resolution, to Stereo KWin.
 - **Outputs** (Stereo KWin's filters at the end, one per kind of screen) convert from that to whatever each screen needs.
@@ -27,10 +29,11 @@ Only a program that is stereo and full screen only, whose whole window is the 3D
 The separation is also what gives the 2D part its depth: its elements declare their planes (sunk, screen, popped), and Stereo KWin draws those for each screen, while the 3D areas carry their own eyes.
 
 **It is how sound already works on Linux.**
-A program hands PipeWire plain PCM, at whatever rate it likes.
+A program hands PipeWire PCM samples with their sample rate and channel layout.
 PipeWire resamples, mixes and sends it to HDMI, Bluetooth or a USB DAC, and the program never learns which.
 Nobody calls that a limitation: it is why every Linux program plays sound on every device.
-Full side by side is the stereo picture's PCM, and Stereo KWin is its PipeWire.
+Decoded picture samples, with their stereo layout and colour description, are the visual equivalent. Full side by side keeps both views associated with the same presentation frame; preserving HDR precision, luminance information and any gain map would let the compositor adapt that picture to each display.
+The same principle serves stereo and HDR: **describe each content layer once, preserve its information through the stack, and convert for the screen at the output.**
 A new kind of 3D screen needs one new output filter, and every stereo program already written works on it the day the filter lands.
 
 **Why only one format.**
@@ -44,7 +47,15 @@ Here a program learns stereo once: it renders two eyes, declares them to Stereo 
 - **Programs already produce it.** Games and VR engines render two viewports side by side, most 3D files carry side by side, and our Mesa packs quad-buffer OpenGL and two-layer Vulkan into it at swap.
 - **It loses nothing.** Each eye keeps its full resolution; half formats exist only in the output filters, where a display asks for them.
 - **It survives the path.** One ordinary buffer passes through X11, Xwayland, screenshots, screencasts and remote desktop unchanged.
-- **The eyes stay in sync.** Both eyes travel in one buffer, committed once, so they always show the same instant; that is what lets every output, frame sequential included, be built from the same frame.
+- **The eyes stay in sync.** Both views travel in one buffer and are committed together, keeping them associated with the same presentation frame. Each output, frame sequential included, can be built from that pair.
 
 The converting costs copying rows and columns, work Stereo KWin does every frame anyway; every test runs in software rendering (llvmpipe) as well as on a GPU.
 The design in one page: [STEREO3D.md](https://invent.kde.org/danielcamposramos/kwin/-/blob/stereo3d/STEREO3D.md).
+
+## HDR: the same principle, an engineering choice still to test
+
+Stereo layout and colour are independent properties: a picture can be mono or stereo, SDR or HDR. Full side by side specifies where the two views go; it does not select an HDR encoding, working colour space or precision. The [combined declaration](stereo-hdr-content.md) proposes keeping the colour description and any reconstruction data with each content layer, so an HDR picture can sit inside an SDR window and each output can adapt it separately.
+
+**Engineering limit, clarified 19 October 2026:** Daniel has tested the stereo choice on devices, but has not yet performed equivalent cross-format HDR tests. PQ, HLG and gain-map images have different decoding and reconstruction requirements. The HDR interchange representation, working colour space, precision and metadata handling remain choices to evaluate; floating-point composition is a candidate, not a validated decision.
+
+Reference images and measurements must cover HDR, deep-colour SDR and 8-bit outputs, mixed SDR/HDR content, mirrored screens and consistency between the two eyes. Deep colour alone is not HDR, and the existing stereo and deep-colour results do not establish that the proposed HDR path works.

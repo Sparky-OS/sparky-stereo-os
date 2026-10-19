@@ -3,29 +3,35 @@
 Design, 2026-10-13, by Daniel Ramos for Sparky Stereo OS.
 Status: design; nothing is built yet, and it has not been tried on an HDR screen.
 
+**Engineering limit, clarified 19 October 2026:** Daniel's choice of full side by side rests on stereo device testing. He has not yet done the equivalent cross-format HDR testing needed to make an equally informed choice of HDR interchange representation. This document is a proposal based on specifications and architectural reasoning. PQ, HLG and gain-map images impose different decoding and reconstruction requirements; a shared presentation contract does not make them one encoding. Working colour space, pixel representation, precision and metadata handling remain choices to validate. Existing stereo and deep-colour measurements do not validate this HDR path, and deep colour alone is not HDR.
+
 ## 1. The problem
 
 Upstream colour management (`wp_color_management_v1`, wayland-protocols staging) gives **one image description per `wl_surface`**.
 KWin 6.7 implements it: `wp_color_management_surface_v1_set_image_description` (`src/wayland/colormanagement_v1.cpp:217`), per-surface feedback (`:83`), tone mapping in `src/core/colorpipeline.cpp`.
 
-That model fails the ordinary case:
-- **An ordinary program's window is one SDR surface.** An HDR video or photo inside it has nowhere to be declared. The program would have to turn its whole window, interface included, into HDR, and normal programs never do. So upstream HDR needs "HDR-programmed" programs.
-- **Two pictures in different HDR specs in one window** (an Apple HDR photo beside an Ultra HDR one, an HLG clip beside a PQ one) cannot be described at all; the program must convert both into one description itself, before the compositor sees them.
-- **Gain-map photos have no carrier.** A gain-map photo is two pictures: a base and a map of how much brighter each pixel may go. No Wayland protocol carries the second picture.
+This leaves work for applications or their shared frameworks:
 
-Stereo 3D hit the same wall first, and solved it: the content gets **its own layer** (a subsurface inside the flat window), declared on its own, with no work by the program.
+- **SDR controls and HDR content submitted in one buffer** share one surface description. To describe the HDR picture independently, the application or framework needs to give it a separate surface; otherwise it must compose both into a common colour representation before submission.
+- **Two pictures with different HDR descriptions in one window** likewise need separate surfaces or client-side conversion. The proposed shared layer would make that separation reusable across viewers and players.
+- **Gain-map photos need reconstruction data as well as a base picture.** The proposal adds a carrier for the map and its metadata, letting the compositor reconstruct for each output's headroom.
+
+Stereo 3D uses the same separation: the content gets **its own layer** (a subsurface inside the flat window), declared on its own. The HDR proposal extends that shared-framework approach.
 
 ## 2. The principle
 
 The same contract as stereo: **programs describe what the content is; KWin's outputs decide the screen.**
+
+Decoded picture samples with their stereo layout and colour description play the same role as PCM with its sample rate and channel layout in audio. Full side by side keeps both views associated with one presentation frame; HDR additionally needs the colour and luminance description and any reconstruction data preserved until the output can adapt them. The shared principle is to describe each content layer once, preserve its information through the stack, and convert for the screen at the output.
+
 - The declaration belongs to **each content layer**: a video, a photo, a canvas. Not the window, not the display.
 - The rest of the desktop stays SDR, exactly as it stays flat around a 3D window.
 - One declaration carries both halves: a layer declared for HDR carries its stereo layout in the same object, and a stereo layer can carry HDR.
+- Mono/stereo and SDR/HDR are independent properties; a mono HDR picture does not need stereo packing.
 
 ## 3. Who creates the layer: the shared frameworks, never the program
 
-Players and viewers need **no HDR code and no stereo code**.
-The shared layer reads the stream or file and declares:
+The goal is for players and viewers to need **no display-specific HDR or stereo code**, with shared frameworks taking on decoding, layer creation and declaration. The HDR integrations below are proposed work:
 
 | Content | Framework that creates and declares the layer | Programs served |
 |---|---|---|
@@ -76,7 +82,7 @@ For each output, each frame, each layer:
    - HDR output: PQ up to the output's maximum luminance (EDID HDR static metadata, CTA-861); SDR windows at reference white (ITU-R BT.2408, 203 cd/m²) or the user's brightness.
    - **SDR deep-colour output (the 2010-2013 3D TVs, 12 bits per channel):** HDR content tone-mapped into SDR and encoded at the output's declared depth (HDMI deep colour 30/36/48-bit, DC_30/DC_36/DC_48), so the gradients keep the source's steps instead of banding. This is "HDR to 12-bit": a property of the output, never of the program.
    - 8-bit output: the same, dithered.
-6. **Encode** at the output's bit depth from a composition kept at half float, so no step in the middle loses depth (house formats: one format inside, conversions at the edges).
+6. **Encode** at the output's bit depth from a working representation with measured, adequate precision. Floating-point composition, including half float, is a candidate; it does not by itself prove lossless conversion. Working colour space, precision and handling of luminance and gamut must be evaluated before choosing it.
 7. **Signal the screen**: HDMI General Control Packet colour depth; on HDR outputs the Dynamic Range and Mastering InfoFrame (CTA-861) describing the composited output, not any one layer.
 
 ## 7. Compatibility (nothing removed)
@@ -87,10 +93,10 @@ For each output, each frame, each layer:
 
 ## 8. Does it complete HDR on the desktop?
 
-It completes the path **from any content to any screen** for static HDR:
+It proposes a more complete path for static HDR and gain-map images. These are design goals, not demonstrated coverage of every format or screen:
 - every HDR video and photo is declared by the shared layer, with no HDR code in programs;
 - several contents in different HDR specs share one window;
-- gain-map photos get a carrier for the first time;
+- gain-map photos get an explicit carrier in this proposal;
 - each output converts for its own screen: HDR, deep-colour SDR, 8-bit;
 - 3D and HDR travel together, each eye with its own view and its own map.
 
@@ -101,6 +107,8 @@ Still outside it, to plan next:
 - **Per-output calibration**: KWin's ICC profiles in the same chain.
 
 ## 9. First steps of the round
+
+Before settling the HDR representation, compare PQ, HLG and gain-map reference images on HDR, deep-colour SDR and 8-bit displays, including mixed SDR/HDR content and mirrored outputs. Measure colour, luminance, clipping and banding; check that metadata stays with the correct frame and that both eyes receive consistent processing. Virtual-output captures can test buffer handling, but cannot establish the physical display's luminance or colour accuracy.
 
 1. Measure KWin 6.7 as it is: HDR content on a deep-colour SDR output (vkms with a 12-bit EDID) and on an HDR output; record what is tone-mapped, at what depth.
 2. Write the protocol XML in our plasma-wayland-protocols fork beside `kde-stereo-content-v1`.

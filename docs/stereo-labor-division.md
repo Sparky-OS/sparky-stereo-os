@@ -23,6 +23,8 @@ No driver knows about programs.
 **Sound follows the same division.**
 A program renders its sound scene; the operating system decides which speakers or headphones it reaches ([Sound: the same division](#sound-the-same-division)).
 
+**The HDR proposal extends this division.** Each content layer would preserve its pixels, colour description and applicable reconstruction information until adaptation for each output. Stereo layout and HDR are independent: a mono HDR picture needs one view, and stereo can be SDR or HDR. The [combined declaration](stereo-hdr-content.md) is a design awaiting implementation and cross-format HDR device tests; its working representation remains open. The diagram below describes the stereo path.
+
 ```mermaid
 flowchart LR
   P["Program or engine<br/>two cameras, 2D stays 2D"] -- "edge: pack" --> F["Full side by side<br/>left eye | right eye"]

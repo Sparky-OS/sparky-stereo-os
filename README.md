@@ -125,14 +125,14 @@ You can write and check the work on the screen you already have.
 
 ## How it works
 
-<a id="why-one-format-full-side-by-side-at-any-resolution"></a>**In short: every program hands the desktop both eyes the same way, and the desktop converts them for each screen.**
+<a id="why-one-format-full-side-by-side-at-any-resolution"></a>**Programs describe each picture; the desktop adapts it for each screen.** For stereo, both views travel together in one full side-by-side buffer. The proposed HDR extension preserves the picture's colour description and reconstruction information through that same division of work.
 
-**The standard in three lines.**
+**The stereo contract in three lines.**
 - **Stereo KWin** (KDE Plasma's compositor, with our stereo changes) speaks full side by side, at any resolution.
 - **Programs** decode or generate stereo in any standard, and deliver full side by side, at any resolution, to Stereo KWin.
 - **Outputs** (Stereo KWin's filters at the end, one per kind of screen) convert from that to whatever each screen needs.
 
-Why one format, why full side by side, one desktop on two 3D TVs from two GPUs, and why it is how Linux already handles sound: [How it works](docs/how-it-works.md).
+Why full side by side, one desktop on two 3D TVs from two GPUs, and how the same principle extends to HDR: [How it works](docs/how-it-works.md). The [HDR declaration](docs/stereo-hdr-content.md) is a design awaiting implementation and cross-format device tests; the HDR interchange representation remains an engineering choice to validate. Existing stereo and deep-colour tests do not validate that HDR path.
 
 ## Stereo in the open stack, not in one product
 

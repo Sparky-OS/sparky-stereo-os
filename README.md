@@ -1,7 +1,7 @@
 # Sparky Stereo OS
 
 **Create and explore in 3D on the screen you already have: paint, edit photos and video, study molecules and globes, then watch films and play games.**
-A 3D TV works, so does any ordinary monitor with cheap red-cyan glasses, and soon the phone already in your pocket, in a cardboard viewer.
+A 3D TV works, so does any ordinary monitor with cheap red-cyan glasses, and now a compatible Android phone in an inexpensive viewer: a [usable stereo desktop over USB](https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md), tested on older hardware.
 Sparky Stereo OS, Daniel Ramos's edition of SparkyLinux (by Paweł "pavroo" Pijanowski), is a Linux system with a new Stereo KDE Plasma desktop.
 
 <a href="#seen-in-3d"><img src="docs/screenshots/translucent-stereo-desktop-anaglyph.jpg" width="99%" alt="The Stereo Desktop in 3D with translucent windows: Dolphin's Settings menu and its colour-scheme list in front, the glass windows behind stepping back, the system monitor and the wallpaper deepest (red-cyan anaglyph)"></a>
@@ -29,7 +29,7 @@ A few pixels each, within limits you choose.
 ### VR is also a stereo monitor
 
 Most headsets are a pair of small screens, one for each eye, and the rest split one screen in two, just as a 3D TV does, so this one desktop serves both.
-- **The 3D screen already in your pocket:** in a cardboard viewer, an Android phone shows the desktop in 3D, each eye sharp and in full colour on its own half. The PC does the drawing, so older phones work too, and a phone in a drawer gets a second life instead of becoming e-waste. Tablets are too big for a viewer, so their route is the glasses-free (lenticular) 3D tablets of the early 2010s. 3D films play on it, the whole desktop is thrown to it, and the PC side ships in the beta (photos of [the first test](https://github.com/Sparky-OS/flat-headset#the-first-test-12-october-2026) and of [the desktop on the phone](https://github.com/Sparky-OS/flat-headset#the-desktop-on-the-phone-14-october-2026)). That puts a 3D screen in the hands of billions of people who already own an Android phone or tablet ([Google's count, 2021](https://techcrunch.com/2021/05/18/android-now-powers-3b-devices)).
+- **The 3D screen already in your pocket:** an inexpensive Cardboard-style viewer turns a compatible Android phone into a screen for the stereo desktop, in full colour, with a separate view for each eye. On 19 October, Daniel accepted the USB half top-and-bottom setup on a Redmi Note 7 and a 2016 A10 laptop as usable: the desktop works and the mouse is responsive. Video is much improved but still somewhat choppy; full resolution and current Wi-Fi performance need their own checks ([measurements and limits](https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md)). The PC does the drawing, giving an older phone another use. The Android viewer remains a test build; the PC side ships in the beta. Photos of [the first test](https://github.com/Sparky-OS/flat-headset#the-first-test-12-october-2026) and [the desktop on the phone](https://github.com/Sparky-OS/flat-headset#the-desktop-on-the-phone-14-october-2026).
 - **VR films:** Bino plays 360° and 180° films, flat or in 3D, on any 3D screen, and the mouse turns the view.
 - **VR games:** Half-Life 2 and DOOM (2016) reach a 3D screen through their VR modes.
 

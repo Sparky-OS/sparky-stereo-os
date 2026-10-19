@@ -1,7 +1,7 @@
 # What 3D brings to your programs
 
 **Programs you may already use, now with real depth.**
-Each one shows its 3D on any of the registered outputs: a 3D TV or projector, an ordinary monitor with red-cyan glasses, and soon a VR headset or the phone you already own, in a cardboard viewer.
+Each one shows its 3D on any of the registered outputs: a 3D TV or projector, an ordinary monitor with red-cyan glasses, and a compatible Android phone in an inexpensive viewer, now [tested as a usable stereo desktop over USB](https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md); further headset paths are in development.
 For most people, that phone will be their first 3D screen.
 
 The words in quotes are each project's own description of itself; the line after it is what the edition adds.

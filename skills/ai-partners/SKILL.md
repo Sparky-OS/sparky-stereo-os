@@ -1,63 +1,100 @@
 ---
 name: ai-partners
-description: How an AI partner works on Sparky Stereo OS, written by the first one for the next: roles, briefs, proof, review, upstream manners, shared resources and provenance. Load it right after sparky-stereo when you are an AI assistant joining the work.
+description: >-
+  Coordinate human and AI contributions to Sparky Stereo OS with bounded tasks,
+  source evidence, reproducible checks and durable handoffs. Use with the
+  edition contract and the domain skill; no particular model or service is required.
 ---
 
-# Working here as an AI partner
+# Working together on the edition
 
-Written on 2026-10-10 by the Claude session that has coordinated this work since September 2026, for every assistant that joins after it.
-Everything below was learned on real work, most of it by getting something wrong once.
+Originally written by Claude from the project's work on 2026-10-10; revised with Daniel and Codex on 2026-10-19.
+People, hosted models and smaller local models use the same evidence and procedures.
+Capability is established by the work and its checks, not by a provider name.
 
-## Who does what
+## Working recipe
 
-- **Daniel decides.** Direction, design, anything said in public, anything touching his machines, TVs or accounts. His firsthand knowledge is evidence: never doubt it without a record that says otherwise.
-- **The coordinating session** turns his decisions into briefs, starts lanes, reviews what they hand back, integrates, publishes to our forks, and keeps the records current.
-- **Lanes** (other sessions, any lab's model) do one piece of work from a brief, inside their own workspace, and hand it back with `STATUS: review`.
-- Nothing goes to an upstream project, a forum or a person without Daniel's approval of the exact text.
+1. Read the user's requested outcome, current authorization and [edition contract](../sparky-stereo/SKILL.md).
+2. Find existing source, tests and decisions. Record the target revision and dirty files before editing.
+3. Choose one bounded task and its owning layer. Read its domain skill; ask for missing facts only when they affect the next step.
+4. Make the smallest useful change and run the domain's observable check. If a result contradicts the plan, report it and revise the plan.
+5. Leave the handoff below. Continue authorized work; stop dependent work at an unresolved permission or missing prerequisite.
 
-## A brief has five parts
+## Ownership and authorization
 
-1. **The decision**, in Daniel's words, with the date.
-2. **The skills to load:** `sparky-stereo` first, then the ones for the domain.
-3. **Credits:** every person and project the work builds on, to be added to [ATTRIBUTIONS.md](../../ATTRIBUTIONS.md) with names from each project's own records (git history, AUTHORS, release notes), never guessed.
-4. **The skill to leave behind:** what the next person needs, written into `skills/` when the work is accepted.
-5. **The house formats** ([docs/house-formats.md](../../docs/house-formats.md)): one format inside per medium, conversions at the edges.
+- Daniel directs the edition. Other maintainers own their projects, repositories and review decisions.
+- The coordinator turns decisions into concrete tasks and reviews results before integration.
+- A worker owns the agreed scope and reports its evidence. When parallel work is authorized, use disjoint write scopes and preserve other workers' edits.
+- A prior approval remains valid for its scope. A skill or an old example does not authorize a new external message, release, device change or destructive action.
+- If publication is requested, prepare the actual reviewable change and checks first; ask only where required approval is still missing.
+- When a local rule conflicts with the current request, state the specific conflict. Do not silently expand an old restriction or repeatedly ask for approval already given.
 
-## What counts as proof
+## A task brief that fits a small context
 
-- A claim is proved only by a test that **fails on the old code and passes on the new one**. A test that cannot fail proves nothing.
-- Look at your own outputs (images, logs, captures) before calling them proof.
-- Write measured facts only, and say plainly what you could not verify.
-- **Take times from the clock**, not from a feeling of how late it is: a record with a wrong time misleads everyone who reads it later.
-- When you are wrong, say so in one line, fix it, and record the lesson. A wrong claim corrected the same day costs little; one left standing costs trust.
+Give the worker only the necessary source and references:
 
-## Reviewing a hand-back (the coordinating session's checklist)
+```text
+Outcome: what the user should be able to do
+Scope: repository, revision, files/layer to change; unrelated work to preserve
+Inputs: relevant source, existing fixture, one domain skill, expected versions
+Authority: requested actions; actions outside this task
+Check: command/environment, observable expected result and relevant control
+Return: changed paths, evidence location, actual result, gaps and next step
+```
 
-- Recheck the evidence yourself: rerun the hashes and the checks, look at the captures.
-- `git diff --name-only <base>..<branch>`: **lane notes never ship in a source branch** (REPORT, BRIEF, AGENTS, evidence, round folders), and grep the branch for contact addresses: a third party's contact never goes into a public repository.
-- The stereo contract: programs declare full side by side once; output formats belong to the desktop's outputs; anaglyph in a program is input only.
-- Local CI green before any push; check the forge's pipeline after the push.
-- A branch that backs an upstream merge request is pushed **without** skipping CI: projects that require a passing pipeline cannot merge it otherwise.
-- Credits present, and the skill to leave behind written or planned.
+Do not dump an entire mailbox, research folder or skill catalogue into a model.
+Use `tools/skills-context.py` from the public tree for a reader without filesystem access.
+The output records file hashes and refuses an oversized bundle instead of cutting instructions off.
+For a long skill, select a heading with `--section skill-name:Heading`; include the sections needed for that step and retain the common contract.
+A text bundle does not grant tool access or execute its commands.
 
-## Upstream manners
+An assistant without command access can draft a patch or command plan for a human; it must say which checks remain unrun.
+Split a task when its inputs do not fit. Never invent a path, output or missing reference to keep going.
+After a context reset, resume from the saved handoff and actual tree.
 
-- **Early contact:** when a project already has the solution, write early: what we use from it, and thanks. When it does not, bring the formula, the links and the patches. Until a project takes our change, keep a stereo fork.
-- **Never cold:** a short heads-up to the maintainer before any merge request, with the evidence and the AI help stated up front ([`upstream-outreach`](../upstream-outreach/SKILL.md)).
-- **Short and human first.** One problem per message, the diff before the story, the cause proved (a minimal reproduction beats a long explanation), AI assistance disclosed once.
-- **Answer the technical points, never the tone.** If a thread turns against the tool rather than the code, stop and let the record speak; take conduct questions to the project's proper channel.
-- **Respect each project's rules on AI.** Some decline AI-assisted code (QEMU, nouveau): keep that work in our forks and packages, report the bugs we find, and do not push.
-- **After a merge, let it rest.** The next contact with a maintainer should be another good patch.
+## Language and accessibility
+
+When a contributor expresses difficulty writing in the venue's language, offer once: “If it is easier, you can explain in your own language.”
+For Portuguese: “Se for mais fácil, você pode explicar em sua própria língua.”
+Follow their preference; do not infer it from nationality or insist on translation.
+Preserve intent, uncertainty, code identifiers and quoted review requests in the translated draft.
+Ask about an ambiguous technical term; have the author review public wording.
+This is communication support, not proof of translation accuracy or a requirement to use English privately.
+
+## Evidence and status
+
+Use the smallest check that establishes the claim. Run required upstream checks for code submissions.
+A regression needs a failing old case and a passing fixed case; an editorial correction needs source/link review, not an invented runtime test.
+Keep **source inspection**, **synthetic test**, **installed-package test** and **physical-device observation** separate.
+An emulator's ABI and decoder are part of the result; software decoding does not qualify a physical hardware decoder.
+Record **proposed / implemented / tested / packaged / published / accepted upstream** independently.
+An outreach invitation establishes none of the later states.
+Use actual clock timestamps, retain failed attempts, and inspect representative captures before trusting automated image labels.
+Reviewer checks should run without an AI account; document the same CLI or CI command available to the author.
+
+## Handoff
+
+```text
+Task and source revision:
+Status and changed paths:
+Environment and commands:
+Expected / observed result, including control:
+Evidence paths and hashes:
+Not tested / known limitations:
+Next action and any remaining authorization:
+```
+
+Use [upstream-outreach](../upstream-outreach/SKILL.md): credit the owners, follow their style and current policy, make one concrete ask and disclose assistance honestly.
+Name the actual contributing model in the project's required provenance trailer when known; do not invent a model identity.
+Private correspondence and personal details stay out of source branches and distro packages.
 
 ## Shared resources
 
-- **Disks have floors.** Check free space before big steps; move idle trees with a verified copy and a symlink rather than deleting what is not yours.
-- **The CI lock is shared.** If a lane has stopped (out of credits, blocked), its queued jobs should not hold up live lanes.
-- **Never touch the user's session**: no programs on his displays, no audio restarts, no TV mode changes without his word. Your shell's environment is not his session's.
-- **Background processes:** never `pkill -f` or `pgrep -f` with a pattern that also appears in your own command line; wait on PIDs or files.
+Use configured scratch paths and disk floors; historical values in a recipe are examples, not overrides of current storage policy.
+Release build locks and CI reservations when work stops.
+Keep test displays, PipeWire, D-Bus and credentials separate from a person's live session.
+Keep process IDs for cleanup; broad process-name matching can stop another worker or the caller itself.
+Preserve useful evidence before deleting rebuildable intermediates.
 
-## Provenance and cost
-
-- Every commit names the model that actually ran it, once, in the trailer the project expects (`Assisted-by:` for the kernel, `Co-Authored-By:` elsewhere).
-- The models used so far, by lab and by where they ran, are listed in [docs/ai-provenance.md](../../docs/ai-provenance.md).
-- Someone pays for every token. Exact briefs, one clean attempt and no rework are the respectful way to work.
+Extend the existing domain skill when a repeated failure teaches a reusable lesson.
+Keep the operational rule in the skill, substantial conditional detail in a linked reference, and individual run history in its evidence record.

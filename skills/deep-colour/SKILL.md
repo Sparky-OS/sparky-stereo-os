@@ -1,9 +1,16 @@
 ---
 name: deep-colour
-description: How 10, 12 and 16 bits per colour reach the screen on Sparky Stereo OS, from the display's EDID and the HDMI link through the kernel drivers, Mesa and Qt to a program's canvas, without being cut to 8 bits on the way; and how to prove the depth. Load the general sparky-stereo skill first.
+description: >-
+  Trace and test colour precision and HDR metadata across applications, Qt, Mesa, KWin and display links.
 ---
 
 # Deep colour, the whole path
+
+## Working recipe
+
+1. Record the source precision, primaries, transfer function, range and mastering metadata, then the requested and actual format at each boundary.
+2. Locate the first loss with a controlled ramp or metadata fixture. Test both eyes with a deep readback; an 8-bit screenshot cannot prove a deep buffer.
+3. Return precision counts and actual formats. Bit depth, HDR interpretation, tone mapping and physical display output need separate evidence.
 
 **Check freshness first.**
 Written on 2026-10-07.
@@ -37,3 +44,12 @@ Each canvas in its own layer, in its own deep format, stays the pattern: the lay
 - **Stereo too:** the same count in each eye when the area is stereo.
 - **The 2D control:** at the same depth, the changed program against the distribution's build, 0 differing pixels.
 - **What was not tested, said:** 48-bit links need a 48-bit display; until one is at hand, say so.
+
+## HDR is more than buffer precision (2026-10-19)
+
+Preserve the source's primaries, transfer function, range and mastering metadata alongside pixels.
+A 16-bit buffer does not identify PQ, HLG or the output tone mapping by itself.
+The merged [Qt Multimedia luminance correction](https://codereview.qt-project.org/c/qt/qtmultimedia/+/778399) is a concrete unit-boundary lesson: FFmpeg mastering luminance was already in nits; multiplying it by 10,000 broke the value.
+Check units at each conversion with known SDR/PQ/HLG metadata and expected numbers.
+That fix is evidence for its particular path, not equivalent physical HDR qualification across the whole stack.
+The [MEIG discussion](https://www.w3.org/2026/10/13-me-minutes.html) motivates preserving descriptions through shared presentation; it does not select one universal HDR representation or certify our implementation.

@@ -1,9 +1,16 @@
 ---
 name: audio
-description: Sound on Sparky Stereo OS: the audio house format, routing every stream in KDE, formats and rates from the hardware, passthrough by EDID, virtual surround, MIDI and emulators. Load it for any work on PipeWire, WirePlumber or KDE's Sound page.
+description: >-
+  Maintain PipeWire, WirePlumber and KDE audio routing, source formats, passthrough and MIDI in the edition.
 ---
 
 # Audio on Sparky Stereo OS
+
+## Working recipe
+
+1. Record source rate/channels, selected sink, negotiated format and the existing graph with pw-dump.
+2. Change the graph or shared routing layer; keep a private PipeWire session for tests. Check reconnect and teardown for duplicate nodes.
+3. Return the before/after graph and negotiated formats. Parameter updates alone do not prove rendered audio, latency or a physical speaker path.
 
 Written on 2026-10-10 from measurements on the development machine; the parts marked **being built** are queued work, not yet in the edition.
 

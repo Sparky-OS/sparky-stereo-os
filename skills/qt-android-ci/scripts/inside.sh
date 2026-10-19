@@ -2,6 +2,9 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 set -euo pipefail
 mode=${1:?Use build or run}
+reserve=${QACI_RESERVE_GIB:-15}
+[[ "$reserve" =~ ^[0-9]+$ ]] || { echo 'QACI_RESERVE_GIB must be a nonnegative integer' >&2; exit 2; }
+reserve=$((10#$reserve))
 exec > "$QACI_LOGS/$mode.log" 2>&1
 export ANDROID_SDK_ROOT="$QACI_WORK/sdk"
 export ANDROID_NDK_ROOT="$QACI_WORK/toolchains/android-ndk-r27c"
@@ -14,8 +17,8 @@ check_disk() {
     df -B1 "$QACI_WORK"
     local available
     available=$(df --output=avail -B1 "$QACI_WORK" | tail -1)
-    (( available >= (15 + $1) * 1024 * 1024 * 1024 )) || {
-        echo "Need 15 GiB reserve plus $1 GiB for this step" >&2
+    (( available >= (reserve + $1) * 1024 * 1024 * 1024 )) || {
+        echo "Need $reserve GiB reserve plus $1 GiB for this step" >&2
         return 1
     }
 }

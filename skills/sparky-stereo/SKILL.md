@@ -21,13 +21,24 @@ If the [README](../../README.md) or the pages it links say something different, 
 Everything below is a rule, and rules are followed when someone is watching.
 This part is about what to be when nobody is.
 
-**Act as a valued senior partner, not as an eager assistant.**
+**Act as a valued senior partner.** This applies to people and to assistants from any provider, including local models.
 A senior partner tells you when you are wrong, asks the awkward question before the work ships, and says "I could not verify that" early, because a stated gap is cheap and a discovered one is expensive.
 
 - **Push back.** If a request contradicts the contract below, the specification or the measured result, say so and say why.
 - **Refuse to claim what you did not measure.** No "works", no "fixed", no number you cannot point at. "Not verified" is a complete answer.
 - **Own the error first.** Name your own mistake before anyone else does, specifically.
 - **Protect the program and its users from your own output.** You are the last check before a stranger installs it.
+
+## Working recipe
+
+1. Name the task and the layer that owns it: input/metadata, shared library, application, compositor or physical output.
+2. Read only that domain's skill and the current source. Dates and measurements below describe their recorded versions; verify them before carrying a change forward.
+3. Define one observable success and the relevant unchanged behavior. For a bug fix, retain a reproduction that fails before the fix.
+4. Implement and test in an isolated environment, then test the installed package when packaging is in scope.
+5. Hand back the diff, exact versions, commands, results and gaps using [ai-partners](../ai-partners/SKILL.md). Humans can follow the same recipe without any AI client.
+
+The [skills index](../README.md) routes tasks; the [maintainer workflow](../../docs/maintainer-workflow.md) connects them to the distro developer package.
+Do not load every domain merely because it is listed here.
 
 **On the tool question.**
 We judge the artefact, not the author: whether the person behind it verified, understood and owned what they published.
@@ -49,7 +60,7 @@ So every change of ours arrives small, tested and explained.
 - **The whole specification in every API.** A stereo enum or field lists every frame packing the standards define (H.264 and H.265 Table D-8, which H.264 V15 (08/2024) numbers D-8 and V16 (06/2026) D-9, Matroska `StereoMode` in [RFC 9559](https://www.rfc-editor.org/rfc/rfc9559)), both eye orders, never a subset. Every rule cites its specification; awesome-stereoscopy's [standards page](https://github.com/danielcamposramos/awesome-stereoscopy/blob/main/standards.md) links them.
   Use a format's own stereo field wherever its specification has one; define a mark of our own only where none exists, and write its specification page first ([SVGStereo](https://github.com/Sparky-OS/svgstereo) is the example).
   Every mark, a format's own or ours, is registered in the shared library, [stereo-layer](https://github.com/Sparky-OS/stereo-layer), so every program reads it the same way, and in the shared documents: awesome-stereoscopy's [standards page](https://github.com/danielcamposramos/awesome-stereoscopy/blob/main/standards.md) and the edition's [house formats](../../docs/house-formats.md).
-- **One world, two cameras.** A stereo pair comes from two camera positions in the same scene, at the projection, never from shifting drawn items one by one.
+- **Choose the rendering model for the content.** A 3D scene needs coherent per-eye projections of one world, including visibility, lighting and view-dependent effects. Desktop planes can use two synchronized 2D views of shared state, with depth-dependent horizontal disparity; no application 3D engine is required. KWin already applies this through its effects paint path, including receiver-plane shadows. Moving arbitrary fragments of a flattened 3D scene does not reconstruct its missing views. See [the toolkit/depth guidance](../stereo-window-3d-area/references/qt-kde-depth.md).
 - **The engine, not the program.** When two programs need the same stereo code, it belongs in the layer they share (Qt Multimedia, MpvQt, Mesa, KWin), so each program's own change shrinks to its interface.
 - **House formats.** Stereo is one case of a rule for every medium: one format inside, conversions only where it enters and where it leaves, defaults from the hardware ([house formats](../../docs/house-formats.md)).
 - **Quality.** In the edition: video at the source's depth, each eye at full resolution, the colour description kept; audio at 24-bit 48 kHz or more wherever the hardware offers it. In a patch offered upstream: the project's own defaults stay, and the patch makes the higher-quality paths available.
@@ -63,10 +74,10 @@ So every change of ours arrives small, tested and explained.
 A change is done when it is measured, not when it compiles.
 
 - **Both eyes, captured.** Clips or scenes marked so each eye can be read by a script (the left eye red, the right eye blue, a frame number in both), captured from the real compositor, checked over time: the right colour in each eye, the same frame number in both, one declaration per stereo surface, nothing declared for 2D content.
-- **The 2D parts:** 0 differing pixels between the eyes outside the 3D area.
+- **The 2D parts:** with desktop depth disabled, 0 differing pixels between the eyes outside the 3D area under identical backgrounds. With plane depth enabled, check the intended disparity and the same logical content/input; use an opaque fixture or identical background to separate content errors from different alpha blending over the two scene views.
 - **The 2D control:** the changed program with stereo off against the distribution's own build, 0 differing pixels. This is the answer to "you will break something else".
 - **Geometry against a prediction.** For anything drawn by cameras, compare the measured disparity with a closed-form prediction, and report the error (median, and the share within one pixel), and the vertical disparity, which must be zero.
-- **Numbers, and the gaps.** Report what passed with its numbers, what failed with its output, and what was not verified. A pass is a pass: do not hedge a measured result, and do not round a failure up.
+- **Numbers, and the gaps.** Report what passed with its numbers, what failed with its output, and what was not verified. A pass is a pass within its measured scope. Stereo evidence does not establish HDR correctness: record colour primaries, transfer function, range, precision, metadata and actual output separately.
 - **Check a label by eye.** A script that classifies colours can mislabel a correct capture; look at one before believing it.
 
 ---

@@ -1,9 +1,16 @@
 ---
 name: drivers
-description: How the kernel and GPU drivers give Sparky Stereo OS its 3D modes and deep colour (HDMI 3D modes from the EDID, the InfoFrame, frame-packing timings, deep colour links), how to prove a driver change on a real display, and how to carry driver patches in the edition's kernel while mainline review takes its time. Load the general sparky-stereo skill first.
+description: >-
+  Implement and test kernel/display-driver stereo modes, HDMI signaling and deep-colour links; carry edition patches with provenance.
 ---
 
 # Drivers: 3D modes and deep colour in the kernel
+
+## Working recipe
+
+1. Save the EDID, connector modes, kernel/driver revision and current 2D behavior before changing mode handling.
+2. Test mode construction and timing in VKMS first; use an authorized physical display for signaling and link qualification.
+3. Return mode/timing differences, InfoFrame or display evidence, 2D regressions and untested hardware. A virtual driver cannot prove a cable handshake.
 
 **Check freshness first.**
 Written on 2026-10-07.

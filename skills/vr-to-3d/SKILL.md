@@ -1,10 +1,16 @@
 ---
 name: vr-to-3d
 description: >-
-  How a game or engine with a VR mode is shown on any of the registered outputs (a 3D television, projector or monitor) instead of a headset on Sparky Stereo OS, and how a headset player's view is mirrored in stereo for the room (the Stereo Spectator): the formula learned on Half-Life 2, the tools, and the rules. Load the general sparky-stereo skill first.
+  Adapt VR eye images for flat stereo displays and spectator viewing while distinguishing play controls from headset camera preservation.
 ---
 
 # From a VR engine to a 3D display
+
+## Working recipe
+
+1. Choose flat-display play or spectator mirroring; identify eye images, poses/FOV, HUD and tracking ownership.
+2. For play, apply the formula below. For spectators, retain the headset view relationship and test both eyes reaching one declared desktop surface.
+3. Return pose/image evidence, input/restoration checks and device limits. A WebXR session-support result alone does not prove or disprove stereo image presentation.
 
 **Check freshness first.**
 Written on 2026-10-07.

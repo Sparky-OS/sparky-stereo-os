@@ -1,7 +1,16 @@
 ---
 name: qt-android-ci
-description: Build and run Qt Multimedia's frame-backend tests locally on a headless Android emulator, compare Gerrit patch sets, and collect source-identified QTest and crash evidence. Use for Qt Android CI reproduction, not stereo display hardware tests.
+description: >-
+  Reproduce Qt Multimedia Android CI in a headless emulator with exact Qt/NDK/ABI inputs and complete QTest row evidence.
 ---
+
+# Qt Android CI reproduction
+
+## Working recipe
+
+1. Read the failing Coin job and record its Qt/FFmpeg revisions, API, ABI, NDK and decoder before choosing a local setup.
+2. Follow the linked recipe, verify every expected data row ran, and retain full runner/QTest logs and source diffs.
+3. Return matched and unmatched environment dimensions. An x86_64 software decode does not qualify ARM or a physical MediaCodec path.
 
 Read [Run Qt's Android tests locally](references/run-local.md) for the test recipe and [Build prerequisites](references/build-environment.md) when the matching host/Android Qt installation is not available.
 
@@ -23,7 +32,7 @@ Keep remaining warnings visible without treating them as failed assertions.
 Before proposing a change, search Gerrit for open changes to the same test file and read their CI results.
 A maintainer's own change may already re-enable the coverage, and its failing Coin configuration (for example an Android API level with a hardware decoder) is the case to reproduce.
 
-The scripts run as the caller in named containers, force KVM and headless SwiftShader, cap CPU use, and check a 15 GiB storage reserve.
+The scripts run as the caller in named containers, force KVM and headless SwiftShader, cap CPU use, and expose a configurable storage reserve. Use the active workspace disk floor; the original recipe used 15 GiB, which must not override a newer explicit storage decision.
 Supply paths and an existing compatible build image; do not install tools on a desktop host as part of this recipe.
 Register rebuildable artifacts if the project has a registry, preserve evidence and local commits, and remove completed build intermediates.
 Follow the user's milestone and publication boundaries.

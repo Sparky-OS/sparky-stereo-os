@@ -1,10 +1,16 @@
 ---
 name: vkms-stereo
 description: >-
-  How to test HDMI 3D (stereo) modes without a 3D display: VKMS, the kernel's virtual display driver, in a virtual machine, with a connector that reads a 3D display's EDID through configfs, its writeback connector reading each eye back, and the bench that runs KUnit, a pixel-exact writeback test, IGT's kms_3d and Stereo KWin on it. For kernel, driver and compositor work on 3D modes. Load the general sparky-stereo skill first.
+  Test DRM stereo mode enumeration, timing and writeback with an EDID-driven VKMS guest and independent expectations.
 ---
 
 # A virtual 3D display: VKMS in stereo
+
+## Working recipe
+
+1. Pin kernel/bench revisions and validate the test EDID. Derive expected modes from the EDID rather than the code under test.
+2. Run the relevant guest phases with labelled eyes, the no-EDID/2D cases and the old-code control; keep VKMS off the active desktop.
+3. Return mode and pixel comparisons with phase logs. Physical HDMI signaling and panel behavior require separate hardware tests.
 
 **Check freshness first.**
 Written on 2026-10-08.

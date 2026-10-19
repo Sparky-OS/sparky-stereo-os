@@ -1,10 +1,16 @@
 ---
 name: system-housekeeping
 description: >-
-  The edition's self-pruning defaults (old kernels removed when a new one installs, minimal capped logs, crash dumps kept small, GRUB menu rules) and how to diagnose and clean a system safely: dry runs, kernel-only removals, reading crash dumps before deleting them. Load the general sparky-stereo skill first.
+  Maintain bounded logs, kernel retention and cleanup policy while preserving user settings, boot recovery and diagnostic evidence.
 ---
 
 # System housekeeping
+
+## Working recipe
+
+1. Identify package ownership, running and fallback kernels, disk consumers and the diagnostic material needed before removal.
+2. Simulate the specific package transaction, inspect dependencies and preserve one useful crash trace; use an isolated fixture for automatic policy.
+3. Return the reviewed removal set and recovery evidence. Never substitute broad autoremove for the kernel-only policy.
 
 **Check freshness first.**
 Written on 2026-10-07.

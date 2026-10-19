@@ -1,6 +1,7 @@
 ---
 name: writing-front-pages
-description: How to write the first text a stranger meets (a README's top, the organisation profile, the repository server's README, beta-tester calls, the openings of lists and documents, repository About lines): person first, a picture, short, plain words, honest status, doors per reader, one next step, and a cold-reader test before it goes out. Load the general sparky-stereo skill first.
+description: >-
+  Write public project introductions, README openings and About text with clear audiences, evidence-backed status and an actionable next step.
 ---
 
 # Writing front pages
@@ -90,3 +91,12 @@ Before moving a heading, find who links to it: talk slides, forum posts, other l
 - Before: "paint in deep colour and in 3D".
 - After: "paint in 3D and in deep colour (16 bits per colour instead of 8)".
 - The reader who had asked "high bit-depth color, wide gamut, or something else?" then called it "clear in principle".
+
+## Human and local-model review (2026-10-19)
+
+The two-model exercise above records the original review method; it is not a requirement to buy access to two providers for every edit.
+Use an independent human or available model when it adds useful evidence, with the same cold-reader questions; name the actual coverage.
+A self-review is not an independent reader test. Do not fabricate reader responses when no reviewer is available.
+Offer native-language drafting when helpful, following [ai-partners](../ai-partners/SKILL.md#language-and-accessibility), then retain meaning and uncertainty in the venue's language.
+A relevant outreach contact can illustrate a use case before replying; it cannot appear as an adopter, collaborator or endorsement without evidence.
+Keep precise implementation/proposal labels for the Theme Editor, toolkit depth, HDR and new device integrations.

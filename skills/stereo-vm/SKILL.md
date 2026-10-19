@@ -1,10 +1,16 @@
 ---
 name: stereo-vm
 description: >-
-  Testing a virtual machine's stereo display on Sparky Stereo OS: the viewers (QEMU's own window, virt-viewer, virt-manager, Karton), the pointer in a 3D mode, resizing, a mode change while the pointer moves, the controls that must fail, and the traps that fooled us. Load the general sparky-stereo skill first, then stereo-proof-rig for the capture rig and vkms-stereo for the virtual 3D display.
+  Verify stereo VM viewers, logical input coordinates, resize and mode transitions with isolated guests and negative controls.
 ---
 
 # A virtual machine in stereo
+
+## Working recipe
+
+1. Record host/guest/viewer versions and the guest logical display size; distinguish it from the packed stereo frame.
+2. Exercise eye identity and pointer mapping before/after resize, mode changes and reconnect, then run the unmodified viewer control.
+3. Return guest evdev readings and synchronized captures. A correct picture does not prove correct pointer coordinates.
 
 **Check freshness first.**
 Written on 2026-10-10.

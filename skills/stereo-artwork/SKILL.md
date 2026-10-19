@@ -1,10 +1,16 @@
 ---
 name: stereo-artwork
 description: >-
-  How to make the edition's artwork: copy an existing style exactly (its own pixels, missing letters built and checked against the typeface, new letters from a calibrated recipe), turn 2D art into a stereo pair with a measured separation, animate in both eyes, and deliver editable files with the right stereo marks. Load the general sparky-stereo skill first.
+  Create and verify editable stereo artwork and themes with measured disparity, synchronized animation and preserved format marks.
 ---
 
 # Stereo artwork
+
+## Working recipe
+
+1. Identify the source artwork, licence, requested style, per-eye dimensions and intended depth; inspect the source before editing.
+2. Keep named layers, one timeline and a rebuild recipe. Measure disparity and check both eyes and ordinary 2D presentation.
+3. Return editable sources, marked pair, flat views, preview and measurements. A reference disparity is a starting point, not a universal comfort limit.
 
 **Check freshness first.**
 Written on 2026-10-07, from the SparkyOS boot screen; looks and themes added on 2026-10-14 ("SPARKYOS / POWERED BY DEBIAN / STEREO 3D EDITION").
@@ -18,10 +24,9 @@ The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; [`st
 4. **New letters come from a recipe calibrated on the original letters:** font size, extra weight, rim width and placement, fill colour and opacity. Search those parameters to minimise the difference from the original letters, then check each letter. Where a letter exists in the original, keep the original.
 5. **Keep the canvas size** when a script scales the image by its width (Plymouth themes do), and centre elements by their measured bounding boxes. "Looks centred" is a measurement.
 
-**Fonts:** most desktop font licences permit rendered images and logos, but never the font file itself.
-Keep the font out of every repository.
-Logos ship as images or SVG, never as web fonts.
-Web text uses CSS stacks of fonts people already have (`Verdana, Geneva, "DejaVu Sans", sans-serif`), so nothing is hosted.
+**Fonts:** inspect the actual font licence and notices before redistributing a font file; do not infer permission from its name or installed availability.
+The edition's logo deliverable is an image or SVG. Keep font binaries out unless redistribution has been checked and is part of the task.
+The current website uses system font stacks (`Verdana, Geneva, "DejaVu Sans", sans-serif`).
 
 ## From 2D art to a stereo pair
 
@@ -40,6 +45,11 @@ Animated artwork keeps its mark on every frame: an animated SVG uses the [SVGSte
 Every mark is registered in [stereo-layer](https://github.com/Sparky-OS/stereo-layer) and the shared standards documents first.
 
 ## Looks and themes: whose they are, and the glass
+
+For a live theme/control, use [the toolkit/depth guidance](../stereo-window-3d-area/references/qt-kde-depth.md).
+Keep appearance, motion and semantic depth separately editable; the proposed Theme Editor is not a shipped feature.
+Preview focus/pressed/disabled states, high contrast, reduced motion and ordinary 2D alongside both eyes.
+Edge-deep and centre-deep desktop designs are possible policies to prototype; stereo does not mandate one depth map.
 
 Written on 2026-10-14, when the edition took two default looks: Oxygen, and a classic look in the spirit of Mac OS 8.
 

@@ -1,9 +1,16 @@
 ---
 name: brazil-certificates
-description: Brazil's digital certificates (ICP-Brasil) on Linux: the roots and how to verify them, the E-521 root (v7), browsers and tokens, and the court signer PJeOffice. Load it for work on sparky-ca, signing tools or the edition for Brazil's legal, financial and government users.
+description: >-
+  Research ICP-Brasil certificate sources and Ed521 compatibility for Linux packaging. Use certificate-manager for trust-store changes.
 ---
 
 # ICP-Brasil certificates on Linux
+
+## Working recipe
+
+1. Identify the dated ITI bundle, published digest, pinned root and intended consumer; use public certificates only.
+2. Verify the download and chain in isolation. Recheck expiry/revocation and implementation support for the current date before changing packages.
+3. Return fingerprints, algorithm support and verification failures. The dated root list below is historical, not a current trust decision.
 
 Written on 2026-10-10 from measurements; public material only.
 

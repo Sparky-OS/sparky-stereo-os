@@ -1,15 +1,26 @@
 ---
 name: native-linux
-description: The routes a native Linux program uses to show stereo on Sparky Stereo OS (OpenGL quad buffer through GLX and EGL, Vulkan, Qt, X11 programs through Xwayland, programs that draw side by side themselves), what each needs, and the traps found on the way. Load the general sparky-stereo skill first.
+description: >-
+  Integrate native GLX, EGL, Vulkan and Qt stereo routes and test capability discovery, eye delivery and ordinary 2D fallback.
 ---
 
 # Native Linux programs
+
+## Working recipe
+
+1. Identify the actual loaded toolkit/driver, window system and stereo surface owner; choose the matching route below.
+2. Check the granted configuration, draw labelled eyes and capture the compositor output. Exercise resize, close/reopen and the ordinary 2D path.
+3. Return loaded versions, surface declarations, geometry and captures. An API flag or source-code capability is not a runtime result.
 
 **Check freshness first.**
 Written on 2026-10-07; the game engines and libraries on 2026-10-16.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; for the drawing itself load [`stereo-two-cameras`](../stereo-two-cameras/SKILL.md), and for a 3D area inside a window [`stereo-window-3d-area`](../stereo-window-3d-area/SKILL.md).
 
 ## The routes
+
+For Qt/StyleKit/Canvas Painter or KWin effects work, first classify the input using [the depth guidance](../stereo-window-3d-area/references/qt-kde-depth.md).
+An imperative 2D API can produce coordinated eye views; shared styling does not make Widget and Quick rendering identical.
+Record exact toolkit/backend versions and loaded libraries before adopting an API from a talk.
 
 | The program uses | What happens in the edition | Its part |
 |---|---|---|

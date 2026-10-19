@@ -9,8 +9,9 @@ Do not mount display or audio sockets.
 This document assumes a prepared Linux build image; creating or installing packages into a new image was not validated by this recipe.
 
 Use `work` below for that absolute storage directory.
-Keep 15 GiB free, check `df -B1 "$work"` before large steps, and allow at least 8 GiB for the host build or 4 GiB per target module above that floor.
+Use the active workspace disk floor, check `df -B1 "$work"` before large steps, and allow at least 8 GiB for the host build or 4 GiB per target module above that floor.
 These are observed working allowances, not reservations against concurrent disk users.
+The test wrapper accepts `QACI_RESERVE_GIB`; its historical default is 15 GiB, not an override of a newer workspace decision.
 Save small configuration/install records and remove completed build trees.
 
 ## Pin the sources

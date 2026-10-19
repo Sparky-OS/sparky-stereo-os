@@ -1,10 +1,16 @@
 ---
 name: stereo-pictures
 description: >-
-  How stereo photographs and images (MPO, JPS, side-by-side pictures) are read, shown, captured and kept on Sparky Stereo OS: the formats, the eye order, what a viewer must offer, screenshots of a stereo desktop, and how to prove it. Load the general sparky-stereo skill first.
+  Preserve stereo image layouts, eye order and metadata through readers, writers, viewers, thumbnails and caches.
 ---
 
 # Stereo pictures
+
+## Working recipe
+
+1. Use labelled fixtures and identify the file specification, metadata and explicit user override before guessing from dimensions.
+2. Round-trip through an independent reader, inspect eye order and format fields, then check viewer/thumbnail behavior and stale-cache invalidation.
+3. Return byte/field and pixel evidence separately. Preserving a chunk does not prove its mode was interpreted or rendered correctly.
 
 **Check freshness first.**
 Written on 2026-10-07, file managers added on 2026-10-13.
@@ -67,3 +73,11 @@ A file manager shows a stereo file as a pair, never squeezed, through the shared
 
 **Proof for a file manager:** captures of both eyes on a stereo output (each stereo thumbnail, video thumbnail, icon, tooltip and panel preview: the left view in the left eye, matched against the source's views), everything else 0 differing pixels; the left eye equal to the flat view; the same window on a 2D output pixel-identical to the unmodified program with the plain theme; a scrolled view still aligned; the declarations counted in each case's Wayland log (none for Flat and on a 2D output).
 On a stereo pair of outputs even the unmodified program's tooltip, which declares nothing, differs between the eyes by a few pixels of position, so compare a Flat tooltip with the unmodified program's, not eye against eye.
+
+## Preserving bytes and interpreting meaning are separate checks (2026-10-19)
+
+The PhotoCraft work exposed a reusable distinction: an exporter can preserve `sTER` while an API still names its modes incorrectly.
+Both PNG `sTER` modes describe side-by-side views; they differ in eye order, not side-by-side versus top-and-bottom.
+Test preservation, enum semantics, pair extraction and actual display separately, against the format specification.
+Carry layout/eye-order information through export and reopen; then exercise stereo-view close/reopen so a correct file does not hide a stale UI state.
+Attribute an upstream implementation to its actual authors; filing a report or contributing a follow-up does not make the original implementation ours.

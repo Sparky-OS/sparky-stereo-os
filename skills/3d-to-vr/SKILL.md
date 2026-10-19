@@ -1,10 +1,16 @@
 ---
 name: 3d-to-vr
 description: >-
-  How stereo content and the stereo desktop of Sparky Stereo OS reach a headset or a phone viewer: the headset as one more output of the desktop, 360 and VR180 video, what open software exists today, and what is planned. An early skill; load the general sparky-stereo skill first.
+  Integrate stereo desktop/media reception on headsets and phone viewers, including transport, decoding, lens output and lifecycle proof.
 ---
 
 # From 3D content to a headset
+
+## Working recipe
+
+1. Identify sender/receiver builds, panel pixels, link layout, codec and active route. Select the matching transport or receiver section below.
+2. Prove eye identity, geometry and progress first; then change one latency variable at a time and measure each queue. Keep cleanup and reconnect checks.
+3. Return functional captures and measured stage timings separately from physical latency, thermal and optical observations. A cable alone is not USB networking.
 
 **Check freshness first.**
 Checked on 2026-10-11.
@@ -354,3 +360,15 @@ A passing functional chart does not clear a failed high-motion stress run; keep 
 This qualifies ARM64 software reception and per-eye fitting on stock Plasma Mobile.
 It does not measure a physical phone's decoder, optics, sensors, battery, thermals or latency, and does not qualify the native compositor headset-output choice.
 Credits: the KRDC, KRdp, KDE Plasma Mobile, Kirigami, Qt and FreeRDP developers, the Debian contributors, Fabrice Bellard and the QEMU developers.
+
+## Physical-stream investigation and route ownership (2026-10-19)
+
+Use the [video skill's transport procedure](../stereo-video/SKILL.md#editing-playback-and-transport-boundaries-2026-10-19) to isolate each queue before tuning the link.
+Record actual client/server builds; state explicitly whether a fix requires a new Android APK, desktop package or both.
+For a reduced-resolution choice, verify negotiated dimensions at sender, encoder, decoder and renderer, then reconnect and change layouts.
+For Direct Wi-Fi, distinguish discovery/control authorization from group creation, address assignment and authenticated media connection.
+Creating a network is not proof the phone joined it; retain the existing route until handoff can complete and report the actual failure stage.
+USB tethering must not unexpectedly replace a working Ethernet default route; test route priorities and automatic display reconnect independently.
+Connection ownership should survive hiding the control window, with an explicit visible disconnect action; closing or minimizing a frontend is a lifecycle test.
+Check Android immersive UI after focus/notification changes and release screen/power leases on disconnect.
+Do not let diagnostics permissions imply permission to install an APK or change phone settings; use the authorization already recorded for the current task.

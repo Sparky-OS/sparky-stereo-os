@@ -1,9 +1,16 @@
 ---
 name: certificate-manager
-description: Verified ICP-Brasil catalogue work and Ed521 interoperability for Sparky CA, with boundaries between OpenSSL, NSS, Java and KDE. Load sparky-stereo first.
+description: >-
+  Change Sparky CA catalogue, trust-store and Ed521 integration with explicit ownership, rollback and isolated tests.
 ---
 
 # Certificate manager contributions
+
+## Working recipe
+
+1. Record catalogue revision, root pins, selected groups, trust purposes and target backend (OpenSSL, NSS or Java).
+2. Use generated fixtures in isolated stores. Test valid refresh, invalid refresh, revocation, permission denial and ownership-preserving removal.
+3. Return store diffs and package tests. A verifier success is separate from browser trust, PDF signing and legal-policy compliance.
 
 Load [sparky-stereo](../sparky-stereo/SKILL.md) first.
 Read the current Sparky CA design and verification documents before changing trust behavior.

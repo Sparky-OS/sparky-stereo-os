@@ -11,6 +11,8 @@ export QACI_BUILD=${QACI_BUILD:-$QACI_WORK/build/frame-test}
 export QACI_LOGS=${QACI_LOGS:-$QACI_WORK/evidence/frame-test}
 export QACI_HOME=${QACI_HOME:-$QACI_WORK/home}
 export QACI_AVD=${QACI_AVD:-qt_api28_x86_64}
+export QACI_RESERVE_GIB=${QACI_RESERVE_GIB:-15}
+[[ "$QACI_RESERVE_GIB" =~ ^[0-9]+$ ]] || { echo 'QACI_RESERVE_GIB must be a nonnegative integer' >&2; exit 2; }
 [[ "$QACI_WORK" == /* && "$QACI_WORK" != / ]]
 [[ "$QACI_SOURCE" == "$QACI_WORK/"* && "$QACI_BUILD" == "$QACI_WORK/"* ]]
 [[ "$QACI_LOGS" == /* && "$QACI_HOME" == /* ]]
@@ -27,7 +29,7 @@ args=(run --rm --name "$container" --user "$(id -u):$(id -g)" --cpus 4
     -v "$QACI_WORK:$QACI_WORK" -v "$QACI_LOGS:$QACI_LOGS" -v "$QACI_HOME:$QACI_HOME"
     -v "$QACI_JDK:$QACI_JDK:ro" -v "$script_dir:/qt-android-ci-recipe:ro"
     -e HOME="$QACI_HOME" -e JAVA_HOME="$QACI_JDK"
-    -e QACI_WORK -e QACI_SOURCE -e QACI_BUILD -e QACI_LOGS -e QACI_AVD
+    -e QACI_WORK -e QACI_SOURCE -e QACI_BUILD -e QACI_LOGS -e QACI_AVD -e QACI_RESERVE_GIB
     -w "$QACI_WORK")
 if [[ -n "${QACI_SDK_SOURCE:-}" ]]; then
     args+=(-v "$QACI_SDK_SOURCE:$QACI_SDK_SOURCE:ro")

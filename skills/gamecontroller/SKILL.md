@@ -1,12 +1,16 @@
 ---
 name: gamecontroller
 description: >-
-  Extend or verify KDE's Game Controller page for flight and racing rigs,
-  preserving every raw SDL control and checking controller database labels.
-  Load sparky-stereo first; use edition-packaging for a data package.
+  Maintain KDE raw controller models, profile labels and accessible navigation without losing axes, buttons or hats.
 ---
 
 # KDE controller input
+
+## Working recipe
+
+1. Identify raw device counts and the mapping owner. Choose raw-device testing or shell/application navigation; they are different tasks.
+2. Use the virtual joystick fixture for raw controls. For navigation, exercise focus, activation, dialogs, text entry, reconnect and exit in 2D first.
+3. Return raw-count/value checks or the interaction trace, then stereo comparison. Moving the pointer alone does not prove usable controller navigation.
 
 Written on 2026-10-10.
 Load [sparky-stereo](../sparky-stereo/SKILL.md) first.
@@ -105,3 +109,17 @@ A native package without that wrapper does not establish Windows-game head track
 Load packaged UDP modules for a known six-component pose test over loopback.
 Use OpenTrack's `with_tracker_teardown` guard when destroying plugin instances, as its runtime does; ordinary deletion can reload already destroyed settings.
 Keep page tests offscreen and inspect their captures before calling them proof.
+
+## A shell usable without a mouse (2026-10-19)
+
+The KDE Goals discussion connects raw device support to a complete navigation path.
+Use [Plasma Bigscreen's contribution guidance](https://plasma-bigscreen.org/contributing/) when evaluating a TV/controller shell; integration with this edition remains proposed.
+Steam is one application: include media playback, photo browsing, presentations and return to the shell.
+Test D-pad/arrow navigation, visible focus, activation/back, modal dialogs, text entry and input methods, reconnect, wake and exit.
+Keep keyboard, remote, touch and assistive input distinct; one successful gamepad mapping does not prove all of them.
+Run the interaction sequence on ordinary 2D first, then stereo with unchanged logical input.
+A flat handheld display should keep ordinary 2D behavior; a headset name is not evidence of an implemented headset backend.
+
+For gesture work, locate the existing recognizer, recorder and configuration path before writing another one.
+A working recorder does not establish that every planned depth/throw action exists or that upstream accepted the code.
+Record recognizer output, configured action and visible result separately.

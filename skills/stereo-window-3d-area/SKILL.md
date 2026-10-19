@@ -1,15 +1,26 @@
 ---
 name: stereo-window-3d-area
-description: How to give an ordinary desktop program a stereo 3D area (a video, a 3D viewport, a painting canvas) inside its normal window on Sparky Stereo OS, with the menus and toolbars staying 2D. Patterns solved in Kdenlive, Marble, Krita, Haruna and PlasmaTube, with links to their code. Load the general sparky-stereo skill first.
+description: >-
+  Integrate stereo content surfaces inside ordinary Qt/KDE windows and develop coherent 2D plane depth with clipping and input tests.
 ---
 
 # A 3D area inside an ordinary window
+
+## Working recipe
+
+1. Classify the task: stereo media/scene surface, whole-window depth, or proposed control-level depth. Choose the appropriate pattern below.
+2. Trace content, declaration, compositing, clipping and logical input separately; test resize, overlap, close/reopen and mode changes.
+3. Return both-eye captures, declaration count, geometry and 2D baseline. Shared styling does not imply shared rendering or an implemented stereo consumer.
 
 **Check freshness first.**
 Written on 2026-10-07 from the forks linked below.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; this one assumes its contract.
 
 ## The shape
+
+This section describes a stereo content area with depth-neutral surrounding UI.
+For whole-window depth and proposed control-level depth, read [Qt, KDE and depth](references/qt-kde-depth.md).
+Run eye-equality checks below with desktop plane depth disabled; when enabled, validate the intended transform and logical input instead of identical screen coordinates.
 
 A program window has two parts that must not be mixed:
 

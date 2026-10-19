@@ -1,10 +1,16 @@
 ---
 name: edition-packaging
 description: >-
-  How Sparky Stereo OS packages itself the Debian way: role tasks (task-sparky-stereo-<role>), stereo and 2D flavours for science and education, tasksel, blocking Debian's builds of our packages, the media stack on deb-multimedia, the pins that keep the GPU vendors' display drivers from replacing ours, and how to prove a package set before it ships. Load the general sparky-stereo skill first.
+  Maintain distro role tasks, dependency policy, native source/binary packages and installed-package validation for Sparky Stereo OS.
 ---
 
 # Packaging the edition
+
+## Working recipe
+
+1. Record source commits, package versions, architecture, repository pins and the task that should install the result.
+2. Build in isolation, inspect package contents and simulate installation/upgrade before the installed-payload checks below.
+3. Return source/binary hashes, dependency resolution and runtime evidence. Separate local candidate, repository publication and ISO inclusion.
 
 **Check freshness first.**
 Written on 2026-10-07; the developer tasks and the skills package on 2026-10-16.
@@ -25,7 +31,7 @@ The edition offers its programs as **tasks**, like Debian's `task-kde-desktop`: 
 | `task-sparky-stereo-student` | education programs that show stereo 3D today |
 | `task-sparky-stereo-simmer` | flight and racing simulators and the tools for their rigs |
 | `task-sparky-scientist`, `task-sparky-student` | the programs of those fields with no stereo version yet |
-| `task-sparky-stereo-developer` | code and game engines: KDE's development tools first, the Qt 6 and KDE Frameworks development files, compilers, debuggers and build systems for every language Debian carries, version control, containers and virtual machines, graphics and GPU debugging, game engines and libraries, and the skills for AI assistants |
+| `task-sparky-stereo-developer` | code and game engines: KDE's development tools first, the Qt 6 and KDE Frameworks development files, compilers, debuggers and build systems for every language Debian carries, version control, containers and virtual machines, graphics and GPU debugging, game engines and libraries |
 | `task-sparky-stereo-os-developer` | building, testing and packaging the edition itself: the development files of the stereo stack at the edition's versions, Debian packaging, the proof rig and the virtual display benches, KDE's CI run locally; it brings the developer task |
 
 - **Stereo and 2D flavours** (science and education, where most programs are still 2D): the stereo task holds only programs whose stereo is proven on the edition. The 2D task holds the rest and never names a program the stereo task has, so installing it never replaces a stereo build. A program moves to the stereo task when its proof lands.
@@ -34,10 +40,14 @@ The edition offers its programs as **tasks**, like Debian's `task-kde-desktop`: 
 - **Renaming:** the old package becomes transitional, depending on the new one, so upgrades keep working.
 - **Every build of ours must be in some task.** A stereo build that no list names is never installed; this was found on 2026-10-07 for seven of our KDE and science builds.
 
-## The skills for AI assistants
+## The skills for distribution maintainers and their partners
 
 `sparky-stereo-skills` installs this repository's skills, with the documents and tools they link to, in `/usr/share/sparky-stereo-os`, taken from one commit of the repository and named in `/usr/share/sparky-stereo-os/SOURCE`.
-Both developer tasks depend on it.
+`task-sparky-stereo-os-developer` depends on it directly. The revised ordinary developer task does not; it remains separately installable.
+Read [the maintainer workflow](../../docs/maintainer-workflow.md) for human/offline use and bounded model context.
+The package includes `AGENTS.md`, validates skill metadata/local links, and offers `context` and complete-tree `bundle` commands alongside the existing skill-import ZIP.
+Source snapshots identify the exact commit or explicitly labelled local candidate; an old pin must never masquerade as the revised content.
+
 A package never writes into home folders from its maintainer scripts, so each person runs `sparky-stereo-skills`, or answers the offer it makes once at login when an assistant is found.
 It links every skill into the folders where the assistants read skills, and nothing else:
 
@@ -86,6 +96,8 @@ The measurements and the file by file account are in [GPU vendors' repositories]
 
 Each is the distribution's source package plus our patch series, versioned with the suffix `+stereo3dN`, built in a fresh `debian:testing` container, and it keeps its source package, so the repository can offer `deb-src`.
 A 32-bit twin (Mesa and FFmpeg, for Steam and Wine) comes from the same source build as the 64-bit package: `dpkg` refuses to install the two together when a shared file such as the Debian changelog differs (`Multi-Arch: same`).
+
+**Lean Code release requirement (Daniel, 2026-10-18):** every package and ISO we publish passes the edition's Lean Code pipeline. Finish provenance and notices before projecting the disposable package tree; calculate checksums from its lean payload, then assemble and sign. The versioned `lc1` control marker binds the coverage manifest and lets clients skip rendering. Publish exact HR documentation companions beside the packages, outside the ISO's default package set. The publisher rejects missing or stale evidence; never add the marker by hand or change a previously published version in place. See the [lc package contract](../../docs/lean-code-packages.md). The 0.1.6 implementation is staged; existing packages still require migration.
 
 ## Receiver packages must prove their installed interface
 

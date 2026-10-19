@@ -1,9 +1,16 @@
 ---
 name: lean-code
-description: How Sparky Stereo OS ships text files in their machine form (Lean Code) - what is removed, what is always kept, how each format is checked, and how to verify, explain or undo a projected file with dpkg-stereo. Load it before changing a package's text payload, before reading an error that points into an installed script, unit or QML file, and before reviewing a Lean Code report.
+description: >-
+  Maintain and verify Lean Code projection, provenance, restore paths and package release markers without editing authored sources by hand.
 ---
 
 # Lean Code on Sparky Stereo OS
+
+## Working recipe
+
+1. Identify the installed dpkg-stereo version, authored source, manifest and whether projection occurred at build or install time.
+2. Use the format-specific equivalence check and a restore/resolve exercise on a disposable package. Preserve comments in source and maintainer documentation.
+3. Return byte savings, check results and measured timing separately. A smaller payload or a subjective improvement does not establish a universal speedup.
 
 **Check freshness first.**
 Written on 2026-10-16, numbers of 2026-10-17 (dpkg-stereo 0.1.4).
@@ -20,7 +27,8 @@ The renderer that makes the MR also gives the map from every MR line back to the
 
 - **Nobody by hand.** Contributors write and package code in its upstream style, comments included. Lean Code is a step of the edition's own pipeline.
 - **The ISO**: the packer's pre-squashfs step projects the image's packages and records them in the image's `/var/lib/dpkg-stereo`.
-- **Installed systems**: `dpkg-stereo`, after every dpkg run, projects what dpkg installed. The `.deb` files stay exactly as their distributions built them.
+- **Installed systems**: `dpkg-stereo`, after every dpkg run, projects what dpkg installed. Third-party `.deb` files stay exactly as their distributions built them.
+- **Our published packages (Daniel, 2026-10-18)**: Lean Code runs before assembly and final checksums; a versioned **lc** mark lets clients skip a completed build-time projection. Every package and release ISO must pass our release gate. The `lc1` implementation is staged for 0.1.6, not yet released. See the [package contract and release order](../../docs/lean-code-packages.md), which supersede the old rule that all packages were projected only after installation.
 
 ## What goes, what always stays
 

@@ -10,7 +10,8 @@ Use a Linux Docker daemon with KVM access.
 Supply an existing container image with a compatible C++ compiler, CMake/Ninja, Python 3, Perl, make, Git, unzip, patch and the emulator's Linux runtime libraries.
 The measured run used openSUSE/GCC 16.2.1, not Coin's RHEL image.
 The scripts do not install packages or build an image.
-Keep at least 18 GiB free before a test build and preserve the 15 GiB reserve.
+Set `QACI_RESERVE_GIB` to the active workspace floor; the original default is 15 GiB.
+Allow another 3 GiB above that floor before a test build. On the designated expendable build disk in the current studio, the floor is 2 GiB (`QACI_RESERVE_GIB=2`).
 Allow roughly 1.2 GiB per test tree.
 
 [Build prerequisites](build-environment.md) lists the audited source pins, SDK layout and Qt/FFmpeg build commands.

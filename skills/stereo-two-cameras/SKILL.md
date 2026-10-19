@@ -1,10 +1,16 @@
 ---
 name: stereo-two-cameras
 description: >-
-  How to make a program that draws a scene (a globe, a plot, a molecule, a CAD model, a game view) produce a correct stereo pair on Sparky Stereo OS: one world seen from two cameras, the camera maths for orthographic and perspective views, the OpenGL routes, and how to prove the result against a prediction. Load the general sparky-stereo skill first.
+  Generate and verify coherent per-eye projections for real 3D scenes, including geometry, state restoration and eye-private effects.
 ---
 
 # One world, two cameras
+
+## Working recipe
+
+1. Identify projection type, coordinate units, zero-parallax plane and per-eye resources. For flat UI plane depth, use the window/depth guidance instead.
+2. Compare camera math to an independent prediction, then capture rendered near/far geometry and verify vertical alignment and state restoration.
+3. Return predicted/measured disparity, tolerance, controls and ordinary 2D comparison. Keep view-dependent history private to each eye.
 
 **Check freshness first.**
 Written on 2026-10-07.
@@ -14,7 +20,9 @@ The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; wher
 
 A stereo pair is the **same scene seen from two camera positions**, about an eye's distance apart.
 The program places two cameras at its projection and draws the scene once for each.
-It never draws once and then shifts items left and right one by one: that breaks lighting, shadows, occlusion and anything computed per view.
+For a 3D scene, shifting fragments of one flattened image cannot reconstruct missing visibility, lighting or other view-dependent results.
+This does not forbid depth for ordinary 2D UI planes: synchronized per-eye composition with declared disparity is the implemented desktop mechanism, without an application 3D engine.
+Use [the toolkit/depth guidance](../stereo-window-3d-area/references/qt-kde-depth.md) for that case.
 Wrappers that inject stereo into programs follow the same rule and move the camera at the API.
 
 - **Parallel axes, never toe-in.** Turning the two cameras inward makes keystone distortion and vertical disparity, which the eyes cannot fuse. The cameras stay parallel and the projection is shifted (off-axis) instead.

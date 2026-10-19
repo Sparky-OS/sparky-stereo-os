@@ -1,13 +1,16 @@
 ---
 name: power-idle
 description: >-
-  Power profiles, idle timelines, locking, laptop lids, HDMI-CEC, zram by
-  hardware, the Cushion Swap File and hibernate in Sparky
-  Stereo OS's KDE session, with native Plasma settings tests and text-console
-  isolation proof. Load sparky-stereo first; use edition-packaging for packages.
+  Maintain KDE power, locking, idle, lid, CEC, swap and hibernate policy while preserving explicit user settings.
 ---
 
 # Power and idle in KDE
+
+## Working recipe
+
+1. Read effective user and system settings and identify the daemon that owns the action; distinguish default, absent and explicit values.
+2. Reproduce on a private session timeline. Test user overrides and restart/reload separately from the shipped defaults.
+3. Return observed action times and the effective settings. Configuration tests do not prove physical suspend, locking or the GL show ran.
 
 Written 2026-10-10 from the accepted power/idle work, swap and hibernate included.
 Check the edition's current README and decisions before changing a default.
@@ -118,3 +121,11 @@ Pacing by headroom samples fastest on small machines, and so logs the most there
 Keep zram, sysctl and tmpfiles files in their owning package.
 A generator fixture does not prove a live swap device.
 Read [system-housekeeping](../system-housekeeping/SKILL.md) for system policy.
+
+## When a user preference appears ignored (2026-10-19)
+
+Record which machine, session and power state were involved, then read the effective user/system values.
+Separate automatic idle locking, lock-before-screen-off, lock-on-resume and the GL-show launch path; “Never” in one control must not be assumed to disable every other mechanism.
+Trace the action's actual initiator and configuration reload before changing defaults.
+Prove explicit user overrides survive restart and migration; keep a timed runtime witness for each suspected action.
+A corrected setting without reproduction of the overnight event is a configuration fix, not proof that the underlying runtime defect is fixed.

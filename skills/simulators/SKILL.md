@@ -1,12 +1,16 @@
 ---
 name: simulators
 description: >-
-  Diagnose and prove Linux stereo in FlightGear, TORCS and Speed Dreams through
-  OpenSceneGraph or plib, including FlightGear OpenXR spectator output,
-  cockpit/UI camera separation, package controls and upstream review boundaries.
+  Diagnose FlightGear, TORCS and Speed Dreams stereo through OSG/plib, including UI, per-eye resources and OpenXR lifecycle.
 ---
 
 # Open flight and racing simulators
+
+## Working recipe
+
+1. Choose one simulator and failing stage: drawable creation, cameras, render resources, UI/input, lifecycle or packaging.
+2. Record versions and use the corresponding section below. Keep desktop stereo and XR as separate test dimensions; start with a labelled control.
+3. Return the failing/fixed witness, installed executable hash and unaffected 2D result. Older diagnostic candidates below are not current release approvals.
 
 Checked 2026-10-16 against FlightGear 2024.1.5, OpenSceneGraph 3.6.5, plib 1.8.5, TORCS 1.3.7 and Speed Dreams 2.4.2.
 Recheck newer engine code and package versions before carrying a patch forward.

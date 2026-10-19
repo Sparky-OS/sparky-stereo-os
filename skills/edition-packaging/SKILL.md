@@ -118,6 +118,9 @@ Offer them to deb-multimedia in the agreed order, and upstream as before.
 
 ## Proof before shipping
 
+Use [the KDE development checks](../native-linux/references/kde-development-practices.md) when packaging changed KDE applications: fresh message extraction, installed translations, relevant QML/static analysis and required CI results.
+Preserve operational comments through their consuming build steps; Lean Code qualification includes generators and extraction, not only compiler token equivalence.
+
 In a fresh `debian:testing` container with the repository as a local source and the edition's pins:
 - `tasksel --list-tasks` shows the edition's tasks;
 - `dpkg-divert --list` shows Debian's descriptions moved aside;

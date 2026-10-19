@@ -6,6 +6,9 @@ description: >-
 
 # Lean Code on Sparky Stereo OS
 
+For source comments, generators and translation extraction, apply [the KDE development guidance](../native-linux/references/kde-development-practices.md#keep-the-reason-in-authored-source-and-history).
+The resolver requires matching authored source and projection evidence; it does not reconstruct discarded intent from arbitrary binaries.
+
 ## Working recipe
 
 1. Identify the installed dpkg-stereo version, authored source, manifest and whether projection occurred at build or install time.

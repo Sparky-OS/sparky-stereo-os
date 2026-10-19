@@ -71,6 +71,8 @@ Record **proposed / implemented / tested / packaged / published / accepted upstr
 An outreach invitation establishes none of the later states.
 Use actual clock timestamps, retain failed attempts, and inspect representative captures before trusting automated image labels.
 Reviewer checks should run without an AI account; document the same CLI or CI command available to the author.
+Read the actual diff before writing its commit message: state the problem, reason and checked result, without inventing intent.
+For KDE changes, apply [the development practices reference](../native-linux/references/kde-development-practices.md); advice from one talk is not a project-wide contribution policy.
 
 ## Handoff
 

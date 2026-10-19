@@ -37,6 +37,8 @@ Supply paths and an existing compatible build image; do not install tools on a d
 Register rebuildable artifacts if the project has a registry, preserve evidence and local commits, and remove completed build intermediates.
 Follow the user's milestone and publication boundaries.
 A successful local run does not authorize a Gerrit push or comment.
+For KDE/QML work adjacent to this lane, use [the KDE development checks](../native-linux/references/kde-development-practices.md).
+Keep required jobs and flaky failures visible; a successful retry or a different local configuration does not erase the original failure.
 
 Documentation follows Sparky Stereo OS's CC BY 4.0 terms; accompanying code uses GPL-2.0-or-later.
 Keep upstream licenses with any redistributed Qt, Android, FFmpeg or OpenSSL material.

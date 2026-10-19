@@ -31,7 +31,7 @@ The renderer that makes the MR also gives the map from every MR line back to the
 - **Nobody by hand.** Contributors write and package code in its upstream style, comments included. Lean Code is a step of the edition's own pipeline.
 - **The ISO**: the packer's pre-squashfs step projects the image's packages and records them in the image's `/var/lib/dpkg-stereo`.
 - **Installed systems**: `dpkg-stereo`, after every dpkg run, projects what dpkg installed. Third-party `.deb` files stay exactly as their distributions built them.
-- **Our published packages (Daniel, 2026-10-18)**: Lean Code runs before assembly and final checksums; a versioned **lc** mark lets clients skip a completed build-time projection. Every package and release ISO must pass our release gate. The `lc1` implementation is staged for 0.1.6, not yet released. See the [package contract and release order](../../docs/lean-code-packages.md), which supersede the old rule that all packages were projected only after installation.
+- **Our published packages (Daniel, 2026-10-18)**: Lean Code runs before assembly and final checksums; a versioned **lc** mark lets clients skip a completed build-time projection. Every package and release ISO must pass our release gate. The development tooling is now 0.1.7; the Android development channel qualifies a selected package set while the remaining repository and final ISO migration continue. See the [package contract and release order](../../docs/lean-code-packages.md), which supersede the old rule that all packages were projected only after installation.
 
 ## What goes, what always stays
 
@@ -59,6 +59,8 @@ A file whose comments are smaller than that line stays as it is.
 | systemd units and its configuration, udev rules, KConfig, desktop entries, tmpfiles, sysctl, kmod | each consumer's documented comment rule (whole lines only; none of these parsers has inline comments) |
 | YAML, TOML | PyYAML composes the same node graph; tomllib reads the same document |
 | Perl | B::Deparse prints the same program |
+| Java | JDK compiler lexer checks tokens, retained notices/directives and boundaries; the qualified Android build uses JDK 17 |
+| Kotlin / Kotlin Gradle scripts | Pinned Kotlin compiler lexer checks tokens, significant whitespace and retained notices/directives; the qualified Android build uses Kotlin 2.4.0 |
 
 A failed check leaves the file as it is, and the manifest says why.
 A file that comes back in bytes already checked (a reinstall, or a file an upgrade did not change) is rendered again and kept only if it gives the recorded lean bytes; anything else gets the full check.

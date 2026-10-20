@@ -94,6 +94,10 @@ Blender's `discover_nodes.py` reads namespace-closing comments in node `.cc` fil
 
 For compiler-input size claims, intersect the projection report with actual build dependency records and verify the final file hashes. A whole source-tree total also includes files that this configuration never compiled or that configure regenerated afterward. Retain versioned registry inputs for such generators, as with Wine's Vulkan bindings. Report unique input bytes separately from repeated parsing, filesystem reads and elapsed time.
 
+The 0.1.15 candidate preserves installed `/usr/include/wine/*` headers: WIDL and WRC also preprocess them, and their parser rejects filename-less `#line` directives accepted by GCC. Preserve the shared native headers too, through the source-consumer plan. A successful C check does not qualify these other preprocessors. Similarly, UniFFI's `BridgingHeaderTemplate.h` contains binding-generator syntax; its extension does not make it a C input. Preserve generator templates until their own consumer is qualified.
+
+For vendored Cargo inputs, retain the original crate identities and checksum manifests in source. A disposable build may update only checksum entries whose original and final hashes match its qualified native projection report; an unrelated edit must fail, and cleanup must restore the exact original manifests. Pin external compilers to specific archives and verify the complete file/mode/link inventory before building. On an interrupted packaging retry, recreate both ordinary and debug-symbol staging trees from the compiled outputs; do not remove an existing lc marker merely to project that staging tree again.
+
 ## dpkg-stereo, the commands
 
 - `dpkg-stereo --status`: what is projected, by format, and why the rest is left alone. Records live per package in `/var/lib/dpkg-stereo/records/`, so a dpkg run reads only what it touched.

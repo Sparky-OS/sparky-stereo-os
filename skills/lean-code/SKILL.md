@@ -6,6 +6,8 @@ description: >-
 
 # Lean Code on Sparky Stereo OS
 
+**Main principle: [prepare ahead of consumption](../../docs/lean-code-packages.md#main-principle-prepare-ahead-of-consumption).** Like pre-processing, pre-staging and pre-rendering, prepare the verified machine form upstream while preserving the complete source for people. Prioritize what the compiler or runtime actually reads, scans and parses; storage totals alone do not answer that question.
+
 For source comments, generators and translation extraction, apply [the KDE development guidance](../native-linux/references/kde-development-practices.md#keep-the-reason-in-authored-source-and-history).
 The resolver requires matching authored source and projection evidence; it does not reconstruct discarded intent from arbitrary binaries.
 
@@ -13,7 +15,7 @@ The resolver requires matching authored source and projection evidence; it does 
 
 1. Identify the installed dpkg-stereo version, authored source, manifest and whether projection occurred at build or install time.
 2. Use the format-specific equivalence check and a restore/resolve exercise on a disposable package. Preserve comments in source and maintainer documentation.
-3. Return byte savings, check results and measured timing separately. A smaller payload or a subjective improvement does not establish a universal speedup.
+3. Identify the actual consumer and operation, including cached or compiled forms. Report bytes consumed, CPU/elapsed time, memory and check results separately from storage totals and transformation costs. Compiler input savings matter even when the executable is unchanged; documentation and records outside the measured path are not runtime reads. A smaller payload or a subjective improvement does not establish a universal speedup.
 4. Before native projection, identify documentation, translation, binding and resource generators that read source text. Compiler equivalence alone does not qualify those consumers; preserve their inputs until their own checks pass.
 
 **Check freshness first.**

@@ -1,5 +1,17 @@
 # Lean Code packages: the lc mark
 
+## Main principle: prepare ahead of consumption
+
+> Lean Code moves preparation upstream. Like pre-rendering or pre-staging, it prepares what the machine needs before consumption, avoiding repeated work while preserving the original material for people.
+
+**Optimize the path of consumption.** Pre-processing transforms inputs in advance; pre-staging puts data where it will be needed; pre-rendering prepares a visual result before it is requested. Lean Code prepares a verified machine form while keeping the complete human-authored source available.
+
+The objective is fewer bytes read and scanned, less parsing work and less working space where the consumer benefits. It applies both to compiler inputs and to runtime scripts, QML and settings. C/C++ comment removal reduces the compiler's input even when the executable is identical. Cached or compiled forms need their own measurements.
+
+Measure actual reads, CPU time, elapsed time and memory for the operation concerned. Documentation and verification records outside that path do not negate avoided reads there; their storage and processing costs belong in separate build, update and footprint accounts. The principle identifies work to avoid; it does not substitute for measured results.
+
+## Release requirement
+
 Daniel's release rule, 18 October 2026: every package and ISO that the edition publishes goes through Lean Code in our pipeline. A package processed before distribution carries an **lc** mark so clients do not repeat the projection.
 
 The first format is **lc1**, implemented in dpkg-stereo 0.1.6 and extended in 0.1.7. Older installed clients and development images need updating. Newly qualified development packages can use this format while migration of the remaining repository and the final ISO continues.

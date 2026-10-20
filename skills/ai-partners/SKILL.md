@@ -15,7 +15,7 @@ Capability is established by the work and its checks, not by a provider name.
 ## Working recipe
 
 1. Read the user's requested outcome, current authorization and [edition contract](../sparky-stereo/SKILL.md).
-2. Find existing source, tests and decisions. Record the target revision and dirty files before editing.
+2. Read the shared project-memory index and relevant decision topics named in the brief, then find existing source and tests. Record the target revision and dirty files before editing.
 3. Choose one bounded task and its owning layer. Read its domain skill; ask for missing facts only when they affect the next step.
 4. Make the smallest useful change and run the domain's observable check. If a result contradicts the plan, report it and revise the plan.
 5. Leave the handoff below. Continue authorized work; stop dependent work at an unresolved permission or missing prerequisite.
@@ -37,6 +37,7 @@ Give the worker only the necessary source and references:
 Outcome: what the user should be able to do
 Scope: repository, revision, files/layer to change; unrelated work to preserve
 Inputs: relevant source, existing fixture, one domain skill, expected versions
+Memory: shared project index and relevant decision topics, with read access
 Authority: requested actions; actions outside this task
 Check: command/environment, observable expected result and relevant control
 Return: changed paths, evidence location, actual result, gaps and next step
@@ -47,6 +48,15 @@ Use `tools/skills-context.py` from the public tree for a reader without filesyst
 The output records file hashes and refuses an oversized bundle instead of cutting instructions off.
 For a long skill, select a heading with `--section skill-name:Heading`; include the sections needed for that step and retain the common contract.
 A text bundle does not grant tool access or execute its commands.
+
+When partners have filesystem access, give them read access to the same task-relevant decision memory used by the coordinator, regardless of model provider.
+Name the index and relevant topics in the brief; a private coordinator summary alone is not enough when the underlying decisions are needed.
+For a partner without file tools, include those selected decisions in its private task context.
+Read them before reopening a settled design question or searching for an implementation already recorded there.
+Memory records intent and prior evidence; check current source and versions before treating historical status as current.
+If evidence conflicts with memory, report the precise conflict and preserve the user's latest decision.
+Workers return corrections in their handoff; the coordinator maintains the shared record and promotes reusable technical rules into the appropriate public skill.
+Access to decision memory does not imply access to credentials, private correspondence or unrelated personal records.
 
 An assistant without command access can draft a patch or command plan for a human; it must say which checks remain unrun.
 Split a task when its inputs do not fit. Never invent a path, output or missing reference to keep going.

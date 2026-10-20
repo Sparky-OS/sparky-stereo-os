@@ -8,12 +8,15 @@ description: >-
 
 ## Working recipe
 
-1. Identify stream/container marks, eye order, sample aspect, colour description and any explicit per-file override.
+1. Read the shared project decisions named in the task brief, then identify stream/container marks, their origin, eye order, sample aspect, colour description and any explicit per-file override.
 2. Trace decode, preview, effects, export and playback as separate boundaries; use labelled moving fixtures and an independent metadata reader.
 3. Return per-eye geometry/timecodes and round-trip metadata. A correct preview does not establish a correct export, HDR path or network receiver.
 
+For detection, conflicting marks or half/full packing, read [metadata precedence and per-eye geometry](references/metadata-and-geometry.md).
+These are settled rules; check the existing shared policy and its callers before designing another detector.
+
 **Check freshness first.**
-Written on 2026-10-07.
+Written on 2026-10-07; metadata precedence and geometry clarified on 2026-10-20.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; a player also loads [`stereo-window-3d-area`](../stereo-window-3d-area/SKILL.md) for its video layer.
 
 ## The marks a video carries
@@ -54,7 +57,7 @@ Enumerate the modes (single SEI or not, access unit delimiters on and off, repea
 - **Decoders:** our FFmpeg keeps the SEI's declaration for as long as the standard says, also when it is sent only on keyframes ([FFmpeg #24628](https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/24628), in review), and prefers the stream's own mark as the side data says ([#24643](https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/24643), in review). Qt Multimedia names every packing in `QVideoFrameFormat::StereoMode` and fills it from the FFmpeg backend ([Sparky-OS/qtmultimedia `stereo3d-6.11`](https://github.com/Sparky-OS/qtmultimedia/tree/stereo3d-6.11)); in the edition's build its video output also takes the views apart itself, so a Qt Quick player keeps only its QML and its 3D menu.
 - **Frame sequences** (temporal interleaving, Table D-8 type 5 in H.264 V15, 08/2024, D-9 in V16, 06/2026): pair the frames in stream order on the input side, never from a queue that drops the oldest frame; trust per-frame view marks only when they alternate, and never let a stream-wide Matroska tag flip the eyes.
 - **A side-by-side Matroska file is authored with one eye's display size.** With the pair's full width as the display size, FFmpeg doubles the sample aspect ratio and a player pre-scales the picture before the views are taken apart.
-- **Where a player finds 3D, in this order:** the stream's mark (SEI, `st3d`, `StereoMode`), then tags (`yt3d:` on YouTube), then, last, the frame's shape: a display aspect ratio of at least 2.5 is full side by side.
+- **Automatic precedence:** applicable codec SEI first, then container metadata (`StereoMode`, `st3d`), then descriptive tags, then detection as a last safety net. An explicit user override is separate. Read declared per-eye geometry before inferring half/full packing; use the shared policy's tested fallback instead of copying historical aspect thresholds into each application. See [the decision and proof recipe](references/metadata-and-geometry.md).
 - **What a player shows:** every packing unpacked to full side by side, the video in its own layer declared to Stereo KWin, the controls, subtitles and on-screen display in the 2D part, identical in both eyes. A player with output modes of its own loses them in the edition's build.
 - **For video that declares nothing,** a menu with the input format (every packing, both eye orders), Swap Eyes, left or right only, and not 3D. Examples: [Dragon Player `stereo3d-26.04`](https://invent.kde.org/danielcamposramos/dragon/-/tree/stereo3d-26.04), [Haruna `stereo3d`](https://invent.kde.org/danielcamposramos/haruna/-/tree/stereo3d) with [MpvQt](https://invent.kde.org/danielcamposramos/mpvqt/-/tree/stereo3d), [mpv](https://github.com/Sparky-OS/mpv/tree/stereo3d) (its stream detection merged upstream as [#18490](https://github.com/mpv-player/mpv/pull/18490)), [VLC Stereo `3.0.24-3d-stereo`](https://github.com/Sparky-OS/vlc/tree/3.0.24-3d-stereo).
 - **360 and VR180:** the projection comes from the stream (mpv's `demux-projection`, the `sv3d` box); the player shows a flat view the viewer turns with the mouse or keys, the same direction in both eyes; FFmpeg's `v360` filter converts projections.

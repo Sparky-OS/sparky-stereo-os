@@ -7,7 +7,7 @@ Treat every partner as a capable colleague: explain evidence, challenge a mistak
 
 1. Read [the edition contract](skills/sparky-stereo/SKILL.md), then [the working method](skills/ai-partners/SKILL.md).
 2. Choose only the relevant domain from [the skills index](skills/README.md). Follow its working recipe; open detailed references when that step needs them.
-3. Check the target repository's status and instructions before editing. Preserve unrelated work and identify the source revision and installed package separately.
+3. Read the task's shared project-memory index and relevant decisions, then check the target repository's status and instructions before editing. Preserve unrelated work and identify the source revision and installed package separately.
 4. State the intended result, affected layer and observable check. Use existing tools and fixtures before making another implementation.
 5. Make the change, run the relevant checks, and leave the result and next action in a small handoff. A missing environment is an explicit gap, not a passing test.
 

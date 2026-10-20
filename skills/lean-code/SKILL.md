@@ -14,6 +14,7 @@ The resolver requires matching authored source and projection evidence; it does 
 1. Identify the installed dpkg-stereo version, authored source, manifest and whether projection occurred at build or install time.
 2. Use the format-specific equivalence check and a restore/resolve exercise on a disposable package. Preserve comments in source and maintainer documentation.
 3. Return byte savings, check results and measured timing separately. A smaller payload or a subjective improvement does not establish a universal speedup.
+4. Before native projection, identify documentation, translation, binding and resource generators that read source text. Compiler equivalence alone does not qualify those consumers; preserve their inputs until their own checks pass.
 
 **Check freshness first.**
 Written on 2026-10-16, numbers of 2026-10-17 (dpkg-stereo 0.1.4).
@@ -65,6 +66,19 @@ A file whose comments are smaller than that line stays as it is.
 A failed check leaves the file as it is, and the manifest says why.
 A file that comes back in bytes already checked (a reinstall, or a file an upgrade did not change) is rendered again and kept only if it gives the recorded lean bytes; anything else gets the full check.
 dpkg-stereo's own files are never projected: the tool that undoes projections stays as it was built.
+
+### Native source consumers: migration findings, 20 October 2026
+
+The 0.1.9 migration candidate conservatively leaves C/C++ files with structured documentation or translator annotations unchanged.
+Keeping only the comment is insufficient: an inserted `#line` between the comment and its declaration can confuse a textual generator.
+CMake and Meson configuration templates also remain inputs to their generators, even when their filenames end in `.h`.
+
+For additional known consumers, `lean.debian_prepare --preserve-source PATTERN REASON` retains a reviewed `debian/sparky-lean-preserve.json` in the source package.
+Patterns are relative to the source root, and the native report records each retained file and its reason.
+A pattern matching no eligible source or a changed plan fails the build.
+This handles XScreenSaver's resource checker, which parses C text; SDL's manual generator separately needs the original header documentation.
+Run the real generators and tests; do not suppress validation or remove manuals to pass a build.
+These are migration safeguards, not a claim that all repository packages have completed migration.
 
 ## dpkg-stereo, the commands
 

@@ -42,6 +42,12 @@ directives and string contents remain intact. Kotlin newline and token-adjacency
 The Flat Headset recipe qualifies JDK 17 with Kotlin 2.4.0 and then runs the actual Gradle build and headset tests.
 Missing compiler tooling is a recorded refusal, never a successful optimization.
 
+Native source checks must also cover generators that read comments or textual layout.
+During the 20 October migration, XScreenSaver's resource validator rejected inserted line directives, and SDL's manual generator needed the original header documentation.
+The 0.1.9 candidate leaves files with structured documentation or translator annotations unchanged and records additional package-specific preservation patterns in the retained source.
+This preserves those consumers while other qualified files still receive the pre-compilation pass.
+The [maintainer skill](../skills/lean-code/SKILL.md#native-source-consumers-migration-findings-20-october-2026) gives the preparation command and failure rules.
+
 The diagnostic resolver (sometimes called our “decompiler”) maps a location in lean code back to
 the matching complete authored source. It checks source identity and hashes before resolving.
 C/C++ builds preserve authored line numbers through `#line`; Java/Kotlin builds retain a separate mapping

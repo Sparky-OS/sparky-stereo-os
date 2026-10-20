@@ -4,6 +4,8 @@
 A 3D TV works, so does any ordinary monitor with cheap red-cyan glasses, and now a compatible Android phone in an inexpensive viewer: a [usable stereo desktop over USB](https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md), tested on older hardware.
 Sparky Stereo OS, Daniel Ramos's edition of SparkyLinux (by Paweł "pavroo" Pijanowski), is a Linux system with a new Stereo KDE Plasma desktop.
 
+**Read the architecture:** [Sparky Stereo OS and its repositories](docs/architectural-synthesis.md)—a source-linked overview of the display pipeline, desktop depth, media, hardware and development status, adapted from Daniel's Gemini / NotebookLM research.
+
 <a href="#seen-in-3d"><img src="docs/screenshots/translucent-stereo-desktop-anaglyph.jpg" width="99%" alt="The Stereo Desktop in 3D with translucent windows: Dolphin's Settings menu and its colour-scheme list in front, the glass windows behind stepping back, the system monitor and the wallpaper deepest (red-cyan anaglyph)"></a>
 
 **Stereo Desktop:** the desktop itself has depth.

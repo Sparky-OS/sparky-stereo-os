@@ -60,6 +60,8 @@ The 0.1.9 candidate leaves files with structured documentation or translator ann
 This preserves those consumers while other qualified files still receive the pre-compilation pass.
 The [maintainer skill](../skills/lean-code/SKILL.md#native-source-consumers-migration-findings-20-october-2026) gives the preparation command and failure rules.
 
+GLSL shaders remain unchanged until a shader-specific checker is qualified. The 0.1.12 migration candidate also repairs earlier install-time shader projections: it restores exact originals, leaves user edits intact and retries when the matching original is unavailable. Updating the checker alone would leave those old projections in packages that were not upgraded. This recovery is part of qualifying an existing installation; it does not mean the full repository migration has finished.
+
 The diagnostic resolver (sometimes called our “decompiler”) maps a location in lean code back to
 the matching complete authored source. It checks source identity and hashes before resolving.
 C/C++ builds preserve authored line numbers through `#line`; Java/Kotlin builds retain a separate mapping

@@ -82,6 +82,14 @@ This handles XScreenSaver's resource checker, which parses C text; SDL's manual 
 Run the real generators and tests; do not suppress validation or remove manuals to pass a build.
 These are migration safeguards, not a claim that all repository packages have completed migration.
 
+The 0.1.12 migration candidate also carries these upgrade and packaging safeguards:
+
+- GLSL is preserved until a shader-specific checker is qualified. A C preprocessor cannot qualify GLSL directives. On upgrade, `dpkg-stereo --repair-consumers` restores earlier local shader projections from exact original bytes, preserves user changes and retries if an original is unavailable. Verify that recovery before declaring an existing installation migrated.
+- Generated Debian control files must agree with their templates. Keep Wine's `check-control` guard and QEMU's control generator enabled; carry dependency changes into the retained template. Comment lines inside `Build-Depends` must not break relation insertion. Debian's own dependency parser is the check.
+- Assembly-bearing kernel headers and inactive architecture-specific headers need their own consumer qualification. Preserve explicitly identified inputs instead of accepting a C-only check for them.
+
+For compiler-input size claims, intersect the projection report with actual build dependency records and verify the final file hashes. A whole source-tree total also includes files that this configuration never compiled. Report unique input bytes separately from repeated parsing, filesystem reads and elapsed time.
+
 ## dpkg-stereo, the commands
 
 - `dpkg-stereo --status`: what is projected, by format, and why the rest is left alone. Records live per package in `/var/lib/dpkg-stereo/records/`, so a dpkg run reads only what it touched.

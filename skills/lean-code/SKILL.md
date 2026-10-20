@@ -65,7 +65,7 @@ A file whose comments are smaller than that line stays as it is.
 | Java | JDK compiler lexer checks tokens, retained notices/directives and boundaries; the qualified Android build uses JDK 17 |
 | Kotlin / Kotlin Gradle scripts | Pinned Kotlin compiler lexer checks tokens, significant whitespace and retained notices/directives; the qualified Android build uses Kotlin 2.4.0 |
 
-A failed check leaves the file as it is, and the manifest says why.
+A failed check leaves the file as it is and records why; package assembly refuses to certify a failed transformation.
 A file that comes back in bytes already checked (a reinstall, or a file an upgrade did not change) is rendered again and kept only if it gives the recorded lean bytes; anything else gets the full check.
 dpkg-stereo's own files are never projected: the tool that undoes projections stays as it was built.
 
@@ -88,7 +88,11 @@ The 0.1.12 migration candidate also carries these upgrade and packaging safeguar
 - Generated Debian control files must agree with their templates. Keep Wine's `check-control` guard and QEMU's control generator enabled; carry dependency changes into the retained template. Comment lines inside `Build-Depends` must not break relation insertion. Debian's own dependency parser is the check.
 - Assembly-bearing kernel headers and inactive architecture-specific headers need their own consumer qualification. Preserve explicitly identified inputs instead of accepting a C-only check for them.
 
-For compiler-input size claims, intersect the projection report with actual build dependency records and verify the final file hashes. A whole source-tree total also includes files that this configuration never compiled. Report unique input bytes separately from repeated parsing, filesystem reads and elapsed time.
+The 0.1.14 migration candidate adds explicit recovery layouts for installed source copies and checks the original shell grammar before transformation. Use [the source-copy recipe](../../docs/lean-code-packages.md#installed-source-copies) when different originals produce identical projected bytes. Preserve an input that its declared interpreter cannot parse; do not silently select another interpreter or call it optimized.
+
+Blender's `discover_nodes.py` reads namespace-closing comments in node `.cc` files to generate registration symbols. Those comments are machine input. Preserve these files in the source-consumer plan and rebuild the generated registrations if that plan changes. Preservation patterns must follow the source walker's exclusions; a `build/*` pattern cannot match a directory already excluded from projection.
+
+For compiler-input size claims, intersect the projection report with actual build dependency records and verify the final file hashes. A whole source-tree total also includes files that this configuration never compiled or that configure regenerated afterward. Retain versioned registry inputs for such generators, as with Wine's Vulkan bindings. Report unique input bytes separately from repeated parsing, filesystem reads and elapsed time.
 
 ## dpkg-stereo, the commands
 
@@ -114,5 +118,5 @@ For compiler-input size claims, intersect the projection report with actual buil
 - Compiled programs keep their machine code, checked byte for byte; compile times stay within the noise (GCC skips comments cheaply).
 - An installed system's package files: 140 MB fewer on an AMD A10 laptop (55,442 files projected; records 24 MB).
 - Program starts with an empty page cache: 1-5.5% faster on the A10 (plasmashell -5.5%, Dolphin -3.1%, Discover -2.3%, System Settings -0.9%; 22 of 32 pairs). Warm starts and boot to desktop move less than their spread.
-- Session memory does not change: comments never reach memory.
+- No measurable session-memory change was established in these tests; input buffers and filesystem caches require separate measurements.
 - The cost: dpkg runs take longer while dpkg-stereo projects and checks what they installed (three big packages reinstalled: +1.8 s with 0.1.4), and the image carries 5.5 MB of records. The first projection of an existing big install takes time once (the A10 with 770,000 package files: about an hour on two cores); systems installed from the ISO start projected.

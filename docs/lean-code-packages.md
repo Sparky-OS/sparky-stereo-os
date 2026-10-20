@@ -62,6 +62,18 @@ The [maintainer skill](../skills/lean-code/SKILL.md#native-source-consumers-migr
 
 GLSL shaders remain unchanged until a shader-specific checker is qualified. The 0.1.12 migration candidate also repairs earlier install-time shader projections: it restores exact originals, leaves user edits intact and retries when the matching original is unavailable. Updating the checker alone would leave those old projections in packages that were not upgraded. This recovery is part of qualifying an existing installation; it does not mean the full repository migration has finished.
 
+### Installed source copies
+
+Recover copied headers after installation staging and before the separate payload projection. Restoring the compilation tree before `make install` can trigger unintended rebuilds. Content hashes alone cannot distinguish different comment-only files that all become empty, or an originally empty generated header.
+
+Toolkit 0.1.14 accepts a retained `debian/sparky-lean-payload-sources.json` mapping an installed directory to its source-relative directory, for example:
+
+```json
+{"/usr/src/linux-headers-example": "."}
+```
+
+Known copies must match their own authored or projected hash. Changed copies fail; generated paths absent from the native report remain unchanged by recovery. The subsequent payload pass still qualifies their actual consumer. This layout records a known installation relationship; it is not permission to guess provenance from matching bytes.
+
 The diagnostic resolver (sometimes called our “decompiler”) maps a location in lean code back to
 the matching complete authored source. It checks source identity and hashes before resolving.
 C/C++ builds preserve authored line numbers through `#line`; Java/Kotlin builds retain a separate mapping

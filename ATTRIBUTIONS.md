@@ -674,6 +674,7 @@ Anything a record could not confirm is left out.
 - **Oxygen**, KDE's classic visual style, by the Oxygen team led by **Nuno Pinheiro**: the model for Stereo Oxygen.
 - **Verdana** (Matthew Carter) and **Trebuchet MS** (Vincent Connare): the typefaces of the edition's web presence.
 - **Michael Jackson**: see 1.3.
+- **Google Gemini / NotebookLM**, for the architecture research and original infographic commissioned by Daniel Ramos. **OpenAI Codex and OpenAI image generation**, for editing and fact-checking the [published infographic and accessible text](docs/architecture-infographic.md), 20 October 2026. The original is retained in the private research archive; the published adaptation corrects the memory-pressure policy and identifies planned integrations.
 
 ---
 

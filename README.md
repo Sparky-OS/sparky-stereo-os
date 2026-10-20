@@ -4,7 +4,7 @@
 A 3D TV works, so does any ordinary monitor with cheap red-cyan glasses, and now a compatible Android phone in an inexpensive viewer: a [usable stereo desktop over USB](https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md), tested on older hardware.
 Sparky Stereo OS, Daniel Ramos's edition of SparkyLinux (by Paweł "pavroo" Pijanowski), is a Linux system with a new Stereo KDE Plasma desktop.
 
-**Read the architecture:** [Sparky Stereo OS and its repositories](docs/architectural-synthesis.md)—a source-linked overview of the display pipeline, desktop depth, media, hardware and development status, adapted from Daniel's Gemini / NotebookLM research.
+**Read the architecture:** [illustrated guide and repository map](docs/architectural-synthesis.md), with a [full-size infographic and text version](docs/architecture-infographic.md), adapted and checked from Daniel's Gemini / NotebookLM research.
 
 <a href="#seen-in-3d"><img src="docs/screenshots/translucent-stereo-desktop-anaglyph.jpg" width="99%" alt="The Stereo Desktop in 3D with translucent windows: Dolphin's Settings menu and its colour-scheme list in front, the glass windows behind stepping back, the system monitor and the wallpaper deepest (red-cyan anaglyph)"></a>
 
@@ -17,7 +17,7 @@ A few pixels each, within limits you choose.
 
 *Red-cyan glasses show these in 3D ([more](#seen-in-3d)).*
 
-**In development:** nothing to download yet ([where it is going](#where-it-is-going)).
+**In development:** the [Flat Headset development APK and matching PC update instructions](https://github.com/Sparky-OS/flat-headset/tree/main/apk) are available; the final stereo edition ISO is still being prepared ([where it is going](#where-it-is-going)).
 
 - **[Create](#create):** paint in 3D and in deep colour (16 bits per colour instead of 8), and edit 3D photos and video.
 - **[Science and engineering](#science-and-engineering):** Marble's globe, KAlgebra's plots and Kalzium's molecules in 3D; 3D models and circuit boards are in progress.

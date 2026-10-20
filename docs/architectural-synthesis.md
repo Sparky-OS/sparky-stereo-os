@@ -4,6 +4,12 @@
 
 Prepared from a Gemini / NotebookLM research report requested by Daniel Ramos; edited and checked against the project's public documentation and repository records with OpenAI Codex on **20 October 2026**. This is a project-maintained synthesis. Implementation status and measurements belong to the linked evidence.
 
+[![Sparky Stereo OS architecture: applications deliver stereo pairs to KWin, which adapts presentation to each display; desktop depth, colour, verification and memory-pressure policy have distinct roles.](images/spatial-computing-architecture.png)](images/spatial-computing-architecture.png)
+
+NotebookLM infographic, editorially corrected with Codex and OpenAI image generation on 20 October 2026.
+[Full-size image and accessible text](architecture-infographic.md).
+The Cushion Swap File is a reserve for system memory pressure; the diagram also distinguishes implemented features from planned integrations.
+
 - [Architecture at a glance](#architecture-at-a-glance)
 - [One stereo representation, outputs for different screens](#one-stereo-representation-outputs-for-different-screens)
 - [Depth for the desktop and its themes](#depth-for-the-desktop-and-its-themes)

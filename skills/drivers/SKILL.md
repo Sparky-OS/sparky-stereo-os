@@ -41,6 +41,12 @@ Where mainline stands (October 2026): Intel's i915, nouveau and the Raspberry Pi
 
 ## Carrying patches until mainline takes them
 
+### Keep kernel flavours aligned
+
+Base, x86-64-v3 and PREEMPT_RT carry the same accepted edition fixes and optimizations, including stereo, HDR/deep-colour, virtual displays, input and hardware support. RT is an optional kernel for latency-sensitive workloads, not a reduced-feature audio edition. Compare the retained patch lists and hashes before building a release; an older flavour build is not an acceptable reason to omit an accepted fix. Keep required scheduling/ISA differences explicit. Where RT makes a driver or optimization incompatible, record the exact restriction, affected hardware and test evidence instead of silently dropping it or promising identical hardware support.
+
+Qualify each flavour's final packages, boot, Secure Boot, hibernation and DKMS independently. Measure latency/jitter and missed deadlines for the actual audio/video, robotics or inference pipeline before claiming an RT benefit; kernel scheduling alone does not qualify GPU execution or application timing. Preserve the user's kernel choice and the working fallback.
+
 Kernel review is slow and careful, and a subsystem owes nobody a merge.
 Plan for it:
 

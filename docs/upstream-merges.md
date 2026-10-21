@@ -7,6 +7,14 @@ Where a program breaks stereo or deep colour on the way to the screen, the fix g
 Each merge below was reviewed and accepted by that project's maintainers.
 Each one shows the next project the same problem already fixed elsewhere, and Sparky Stereo is the desktop where all of them meet.
 
+## Registered identifiers
+
+**IANA registration, 20 October 2026:** [Matroska Track Plane Types](https://www.iana.org/assignments/matroska#matroska-track-plane-types) now assigns **3, 4 and 5** to the depth maps of the left-eye, right-eye and background planes, respectively, with Daniel Ramos as change controller and the [stereo-layer v1.9.0 specification](https://github.com/Sparky-OS/stereo-layer/blob/v1.9.0/docs/depth-marks.md) as reference.
+This gives separate picture and depth tracks shared identifiers through `TrackCombinePlanes`, so readers can preserve their relationship before rendering stereo views.
+The separate request for six packed-frame `StereoMode` values (proposed 15–20) remains under designated-expert review; those values are not assigned.
+
+This registry milestone is separate from the software merges below.
+
 **Merged:**
 - **HandBrake** ([#8100](https://github.com/HandBrake/HandBrake/pull/8100), merged by Damiano Galassi (galad87) on 16 September 2026): the x264 encoder writes the H.264 frame packing arrangement SEI (ITU-T H.264, Annex D), so an encoded side by side or top and bottom video declares itself.
 - **Universal Media Server** ([#6330](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6330), merged by SubJunk on 19 September, released in [15.9.0](https://github.com/UniversalMediaServer/UniversalMediaServer/releases/tag/15.9.0) on 5 October 2026): 3D video keeps its declaration through H.264 transcoding, so televisions and players switch to 3D on their own; the Sony Bravia profiles of 2011 and 2012 are corrected too.

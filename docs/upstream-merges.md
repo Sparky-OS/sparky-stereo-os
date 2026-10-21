@@ -1,6 +1,6 @@
 # Merged outside Sparky Stereo
 
-**For maintainers and distributions:** every fix we sent to another project, merged or in review, with its link and date.
+**For maintainers and distributions:** fixes and collaborative contributions to other projects, merged or in review, with links and dates.
 
 **Sparky Stereo is also a campaign.**
 Where a program breaks stereo or deep colour on the way to the screen, the fix goes to that program's own project, in its own style.
@@ -21,6 +21,8 @@ Each one shows the next project the same problem already fixed elsewhere, and Sp
 - **PeerTube** ([#7816](https://github.com/Chocobozzz/PeerTube/pull/7816), merged by Chocobozzz on 13 October 2026 after he reshaped it into the transcoding profile and handled rotation, [899cb02](https://github.com/Chocobozzz/PeerTube/commit/899cb0208850f2238d551a9bf687fd96460dc3f0)): a video that declares its 3D packing in its container keeps it through transcoding, right eye first included.
 - **wiz3D** ([#33](https://github.com/effcol/wiz3D/pull/33), merged by effcol on 13 October 2026 after an MSVC rebuild on both architectures): a Linux build of its DirectX 9 stereo path, with three portability fixes that are also correct on Windows (CComPtr through varargs, a log format, an SSE store).
 - **x265** ([#988](https://github.com/Multicorewareinc/x265/pull/988), merged by kirithika7 on 15 October 2026): with `--single-sei` and `--no-aud`, the one SEI NAL unit of a picture no longer starts with the previous picture's slice header bytes. vunguyen1989 found it while reviewing #986 and asked for it as its own pull request, since it affects master.
+
+- **x265, field-coding follow-up** ([#999](https://github.com/Multicorewareinc/x265/pull/999), merged by kirithika7 on 21 October 2026): Akilan Sivakumar removed the unnecessary `--b-adapt 0` restriction for `--field` and added regressions and input-layout documentation. Daniel reported the restriction during #986 review; our [48 combined encodes and 24 byte-identical field-input comparisons](https://github.com/Multicorewareinc/x265/pull/999#issuecomment-6278374499) supplied supporting validation. This is a collaborative report/testing contribution; #986’s frame-packing option remains in review.
 
 **In review:**
 - **FFmpeg** ([#24628](https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/24628)): the H.264 and H.265 decoders honour the SEI's persistence, so the declaration holds for every frame, not only the first; [#24643](https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/24643): the stream's own declaration wins over the container's by default.

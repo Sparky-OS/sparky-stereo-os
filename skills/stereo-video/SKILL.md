@@ -70,7 +70,7 @@ Enumerate the modes (single SEI or not, access unit delimiters on and off, repea
 
 ## Quality
 
-In the edition: decode at the source's depth (10, 12, 16 bits), keep each eye at full resolution (a high-quality filter, not a plain stretch, when a half-width or half-height source is scaled up), pass the colour description on (BT.709 or BT.2020, PQ or HLG, range), and play audio at 24-bit 48 kHz or more wherever the hardware offers it, with float output and SoXR for any resampling.
+In the edition: decode at the source's depth (10, 12, 16 bits), hand each eye at the resolution it has (a half-width or half-height eye is rearranged into full side by side, never scaled up in the program; Stereo KWin resizes once, into the window or the screen), pass the colour description on (BT.709 or BT.2020, PQ or HLG, range), and play audio at 24-bit 48 kHz or more wherever the hardware offers it, with float output and SoXR for any resampling.
 In a patch offered upstream, keep the project's own defaults and make these paths available.
 
 ## Proof for this kind of work

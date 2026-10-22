@@ -51,7 +51,7 @@ Reset state for each case. Repeat a live-preview result from a fresh process and
 4. The 2D control: the same container with the distribution's own packages instead of ours, the program with stereo off, 0 differing pixels. When a program animates, freeze it (a deterministic mode and `libfaketime`) and measure the noise between two runs of the same build first.
 5. For drawn scenes: block-match the two eyes (for example 17x17 blocks, sum of absolute differences) along the same row only, and report the vertical profile separately; report the median error, the share within one pixel and the vertical shift.
 6. Rerun everything from the packages installed in a fresh container, not only from the build tree.
-7. For a scaling filter (a half-width or half-height source brought to full size): PSNR against FFmpeg's own output of the same filter, not a judgement by eye. For audio formats: a PipeWire of the container's own, read with `pw-dump`, shows the format and rate the program negotiated.
+7. For unpacking (a half-width or half-height source rearranged into full side by side): each eye must equal its region of the source sample for sample, nothing rescaled. For Stereo KWin's one resize into a window or screen: PSNR against FFmpeg's own output of the same filter, not a judgement by eye. For audio formats: a PipeWire of the container's own, read with `pw-dump`, shows the format and rate the program negotiated.
 
 ## Traps that fooled us
 

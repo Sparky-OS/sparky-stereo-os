@@ -25,7 +25,7 @@ Run eye-equality checks below with desktop plane depth disabled; when enabled, v
 A program window has two parts that must not be mixed:
 
 - **the 2D part:** menus, toolbars, panels, the on-screen display, the document around a picture. It stays the window's own surface, at its normal size (one eye's size), declares nothing, and Stereo KWin shows it identical in both eyes;
-- **the 3D area:** a video, a 3D viewport, a canvas. It is a **surface of its own**, handed to Stereo KWin as full side by side (both eyes at full size, left eye first), declared once.
+- **the 3D area:** a video, a 3D viewport, a canvas. It is a **surface of its own**, handed to Stereo KWin as full side by side (the two eyes side by side, left eye first, each at its own resolution), declared once.
 
 Stereo KWin composes the two in place: the 3D area gets each eye's view inside the window, the 2D part sits over it at screen depth.
 
@@ -63,7 +63,7 @@ Worked examples:
 Under Xwayland, a 3D area is a child X window.
 The window lists the child in `_KDE_NET_WM_STEREO_CONTENT_CHILDREN` (WINDOW/32) and the child declares itself with its own `_KDE_NET_WM_STEREO_CONTENT`; Mesa's GLX does both for a stereo GLX child (Togl in Netgen, FLTK's GL window in gmsh, ParaView's render view), and keeps the child listed while the window lives.
 KWin, announcing version 5 of `_KDE_NET_WM_STEREO_CONTENT_SUPPORTED`, redirects each listed child; our Xwayland gives it a surface of its own, and KWin shows that surface one view per eye at the child's place, the rest of the window the same in both eyes.
-The child keeps its own size and its buffer is twice as wide, both eyes at full size (declaration version 4); input still goes to the window, and the X server finds the child.
+The child keeps its own size and its buffer is twice as wide, one eye at the child's size on each side (declaration version 4); input still goes to the window, and the X server finds the child.
 A program that declares its own child window, with no GLX, writes the same two properties.
 In our Qt on xcb, a stereo `QOpenGLWidget` gets a native child window of its own and is shown the same way, with no change in the program.
 A window that shows a splash screen first could lose its one-eye size afterwards; our KWin sends it a synthetic ConfigureNotify, so it gets the size back (found on Krita).
@@ -74,6 +74,6 @@ Native Wayland is the route to prefer when the toolkit has it.
 As in the general skill, plus:
 - **0 differing pixels between the eyes outside the 3D area** (the menus, the toolbars, the window background);
 - **exactly one declaration**, on the 3D area's surface, and none on the top level;
-- **no squeeze:** with stereo off the window has its normal size, and with stereo on the 3D area holds both eyes at full size;
+- **no squeeze:** with stereo off the window has its normal size, and with stereo on the 3D area holds both eyes, neither squeezed nor stretched;
 - **overlays:** an overlay over the 3D area changes the same pixels in both eyes and none in one eye only;
 - **the 2D control:** stereo off against the distribution's build, 0 differing pixels.

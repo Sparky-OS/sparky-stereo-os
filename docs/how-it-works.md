@@ -2,7 +2,7 @@
 
 # One presentation contract for stereo and HDR
 
-**For program and driver developers, and anyone following the design:** why stereo uses both eyes side by side at full size, and how preserving each picture's description could extend the same division of work to HDR. The stereo choice has device-test evidence; the HDR extension is a design awaiting implementation and equivalent testing.
+**For program and driver developers, and anyone following the design:** why stereo uses both eyes side by side, each at its own resolution, and how preserving each picture's description could extend the same division of work to HDR. The stereo choice has device-test evidence; the HDR extension is a design awaiting implementation and equivalent testing.
 
 **The stereo contract in three lines.**
 - **Stereo KWin** (KDE Plasma's compositor, with our stereo changes) speaks full side by side, at any resolution.
@@ -18,7 +18,9 @@ It takes both halves: our driver changes, which give amdgpu and NVIDIA's open ke
 
 **Two places, two rules.**
 Inside a program, anything goes: a player reads every packing a file can carry, an engine renders its eyes however it likes.
-Inside Stereo KWin, only full side by side exists: both eyes at full size, left eye first, at any resolution, declared once.
+Inside Stereo KWin, only full side by side exists: the two eyes as separate pictures side by side, left eye first, at any resolution, declared once.
+"Full" names that layout, not a size: half-width and half-height eyes stay as they are, so a half top-and-bottom frame of 1920x1080 arrives as one 3840x540 buffer.
+No program resizes an eye; in a window or full screen, Stereo KWin does the one resize.
 The output filters then turn that into whatever the screen needs: a 3D television's own HDMI 3D modes, anaglyph on any monitor, interleaved and frame-sequential displays, a headset through OpenXR.
 
 **A window's 2D part and its 3D area are separate surfaces.**
@@ -45,7 +47,7 @@ Here a program learns stereo once: it renders two eyes, declares them to Stereo 
 
 **Why full side by side.**
 - **Programs already produce it.** Games and VR engines render two viewports side by side, most 3D files carry side by side, and our Mesa packs quad-buffer OpenGL and two-layer Vulkan into it at swap.
-- **It loses nothing.** Each eye keeps its full resolution; half formats exist only in the output filters, where a display asks for them.
+- **It loses nothing.** Each eye keeps the resolution it came with, and nothing is stretched inside to be squeezed again at the screen; Stereo KWin resizes once, into the window or the screen, and half formats exist only in the output filters, where a display asks for them.
 - **It survives the path.** One ordinary buffer passes through X11, Xwayland, screenshots, screencasts and remote desktop unchanged.
 - **The eyes stay in sync.** Both views travel in one buffer and are committed together, keeping them associated with the same presentation frame. Each output, frame sequential included, can be built from that pair.
 

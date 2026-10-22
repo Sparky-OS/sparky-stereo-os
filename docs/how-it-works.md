@@ -48,6 +48,7 @@ Here a program learns stereo once: it renders two eyes, declares them to Stereo 
 **Why full side by side.**
 - **Programs already produce it.** Games and VR engines render two viewports side by side, most 3D files carry side by side, and our Mesa packs quad-buffer OpenGL and two-layer Vulkan into it at swap.
 - **It loses nothing.** Each eye keeps the resolution it came with, and nothing is stretched inside to be squeezed again at the screen; Stereo KWin resizes once, into the window or the screen, and half formats exist only in the output filters, where a display asks for them.
+- **It costs nothing.** Unpacking any packing is reading, copying and placing samples, with no resampling, so a game can render at any resolution per eye and old half-format content plays as it is, on older hardware too. Resizing in the program and again at the screen would pay the resize twice.
 - **It survives the path.** One ordinary buffer passes through X11, Xwayland, screenshots, screencasts and remote desktop unchanged.
 - **The eyes stay in sync.** Both views travel in one buffer and are committed together, keeping them associated with the same presentation frame. Each output, frame sequential included, can be built from that pair.
 

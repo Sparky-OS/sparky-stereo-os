@@ -60,6 +60,8 @@ For a stock `spice-gtk` or Karton the same checks fail. virt-viewer and virt-man
 
 ## The strongest GPU renders
 
+To exercise two matched displays as one stereo output, including a separate-GPU case, use the [paired-output test procedure](paired-output-tests.md). That case gives each connector one eye; it is separate from showing one packed stereo guest display in a viewer.
+
 A guest renders 3D through `virtio-gpu` with virgl (OpenGL) or Venus (Vulkan), on a host GPU's render node.
 That GPU does not have to be the one that drives the host's screens: QEMU renders on the render node it is given, and Stereo KWin shows the window on whichever GPU drives the screen.
 

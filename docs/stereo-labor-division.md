@@ -144,6 +144,11 @@ No anaglyph, no interleaving, no "3D TV mode" settings: those belong to the outp
 It composes the desktop with each stereo window's two eyes in their places, 2D windows in both eyes, and hands one full side-by-side picture to each output.
 It does not know left from right beyond the convention: left eye first.
 
+**Keep the pair together up to the output boundary.**
+Both eyes belong to the same source frame. Composition and output conversion preserve that association: frame packing rearranges the same pair, a paired-monitor output selects one half for each connector, and a frame-sequential output retains the pair while presenting its eyes in sequence.
+An output must not advance one eye to a new source frame while retaining the other from the previous frame.
+The driver and display own physical link timing and presentation after the handoff; applications do not acquire monitor-specific synchronization code.
+
 ## Outputs: where formats live
 
 **Each output converts full side by side into what its device needs:**
@@ -158,6 +163,8 @@ It does not know left from right beyond the convention: left eye first.
 If a display, projector or pair of glasses shows the eyes reversed, flip that output once in Display Settings, and every 3D mode on it is right (in progress: today some modes come as left-first and right-first twins).
 
 **A new kind of display means a new output filter, never a change in any program.**
+
+The [paired-output test cases](paired-output-tests.md) cover matched displays on one GPU and across two GPUs. These checks follow the complete pair to the driver handoff; implementation and test results are recorded separately for each route.
 
 ## Sound: the same division
 

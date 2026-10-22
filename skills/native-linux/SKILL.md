@@ -13,7 +13,7 @@ description: >-
 3. Return loaded versions, surface declarations, geometry and captures. An API flag or source-code capability is not a runtime result.
 
 **Check freshness first.**
-Written on 2026-10-07; the game engines and libraries on 2026-10-16.
+Written on 2026-10-07; the game engines and libraries on 2026-10-16; X11 views at another size than their resolution on 2026-10-22.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; for the drawing itself load [`stereo-two-cameras`](../stereo-two-cameras/SKILL.md), and for a 3D area inside a window [`stereo-window-3d-area`](../stereo-window-3d-area/SKILL.md).
 
 ## The routes
@@ -30,7 +30,7 @@ For KDE application or toolkit changes, use [the development review recipe](refe
 | Vulkan with a two-layer swapchain | Mesa turns the two layers into one full side-by-side picture; a Vulkan layer does the same over drivers outside Mesa | Render each eye into its layer |
 | Qt | A stereo `QOpenGLWidget` (Qt 6.5 and later) or a stereo `QWindow` in a widget container; on Wayland the second | See the window skill |
 | X11 toolkits under Xwayland | Our Xwayland gives a redirected child window a surface of its own, so a 3D area inside an X11 window can be its own stereo layer | Nothing, if the program already asks for stereo on its child window |
-| The program draws side by side itself (some games, some viewers) | It declares the window through the shared declaration library, and its own output modes go | Hand over full side by side and declare it |
+| The program draws side by side itself (some games, some viewers) | It declares the window through the shared declaration library, and its own output modes go | Hand over full side by side and declare it; on X11, also the size one view is shown at when it differs from the view's resolution ([below](#x11-views-at-another-size-than-their-resolution)) |
 
 ## Traps already found
 
@@ -42,6 +42,17 @@ For KDE application or toolkit changes, use [the development review recipe](refe
 - **Flatpak:** a Flatpak program loads Mesa from its own runtime, so the edition's stereo Mesa does not reach it; until a Flatpak extension of our Mesa exists, use the distribution's package or the vendor's tarball.
 - **A Vulkan layer must stay out of the way of programs that do not use stereo.** An implicit layer loads into every Vulkan program. Ours wrapped every swapchain handle and passed its own handle down as `oldSwapchain`, so a GTK 4 program rebuilding its swapchain on a resize got `VK_ERROR_NATIVE_WINDOW_IN_USE_KHR` and crashed (2026-10-10). The rule: never wrap handles; key the layer's own data by the driver's handle; touch only swapchains created with `imageArrayLayers == 2`; pass `oldSwapchain`, unknown surfaces and every other swapchain call through unchanged. Prove it with a non-stereo program resizing (GTK 4 with `GSK_RENDERER=vulkan`, vkcube) as well as with the stereo case.
 - **An OpenGL layer must interpose every drawing command.** Ten of OpenGL 4.6's drawing commands (the instanced draws with a base instance, multi-draw with a base vertex, the indirect draws with a count from a buffer, the transform feedback draws) once reached the driver unwrapped, with the left view's viewport and draw buffer, so a right-eye draw landed in the left view; Blender draws its batches with two of them, and its right eye on NVIDIA's own OpenGL showed only menus and panels. Export every wrapper through `glXGetProcAddress`, `eglGetProcAddress` and `dlsym`, and keep a test that draws one square per command into each view and reads both back: it must fail without the wrapper.
+
+## X11 views at another size than their resolution
+
+On Wayland a declared surface's `wp_viewport` destination is the size one view is shown at, whatever the buffer's resolution.
+An X11 window's buffer is its own pixmap, so an X11 program declares that size apart: `_KDE_NET_WM_STEREO_CONTENT_ONE_VIEW_SIZE` (CARDINAL/32, the width and the height one view is shown at, in display pixels), which Stereo KWin reads from support version 6 (kwin +stereo3d30).
+
+- **When to set it:** the views have another resolution than the size they are shown at. The two 1920x540 views of a half top-and-bottom 1920x1080 video, shown at 1920x1080; the two 960x1080 views of half side by side, shown at 1920x1080; the 720x288 fields of a PAL frame, shown at the picture's display size; a game that renders each eye at the person's render resolution in a window of another size. Not needed when each view is shown at its own resolution, and never on Wayland, where the viewport destination says it.
+- **With libstereo-declare 1.4.0:** create the window at one view's resolution (1920x540), declare it with `stereo_declare_x11(display, window, STEREO_SBS_FULL, class, subclass)`, then call `stereo_declare_x11_one_view_size(display, window, 1920, 1080)` when `stereo_supported_x11(display)` is 6 or more. Draw both views side by side at their own resolution into the X11 window, which KWin makes two views wide (3840x540). `0, 0` removes the size, and `stereo_remove_x11()` removes it with the rest. From Python: `stereo_declare.Declaration(one_view_size=(1920, 1080))`.
+- **By hand:** once `_KDE_NET_WM_STEREO_CONTENT` is 3, and only when the root window's `_KDE_NET_WM_STEREO_CONTENT_SUPPORTED` is 6 or more, set the property on the window with `XChangeProperty(display, window, XInternAtom(display, "_KDE_NET_WM_STEREO_CONTENT_ONE_VIEW_SIZE", False), XA_CARDINAL, 32, PropModeReplace, (const unsigned char *)size, 2)`, `size` being `unsigned long[2]` (Xlib's 32-bit format), and delete it to go back.
+- **What KWin does:** the X11 window keeps the program's own size, so the views keep their resolution; the window's place on screen is one view at the declared size; KWin resizes each view once, to the window's place, also when the person maximizes or resizes it; the pointer reaches the first view at its place. A new size changes the place.
+- **Traps:** the program's own window size is one view's resolution (from support version 3 KWin makes the X11 window hold both), not the doubled size. The property counts only when the program declares the window itself; a window rule's declaration ignores it. A KWin that announces 5 or less ignores it and shows each view at the window's own size, which makes it the negative control.
 
 ## Game engines and libraries
 

@@ -13,7 +13,7 @@ description: >-
 3. Return commands, hashes, counts, control result and limits. A black or stale frame is not a valid successful stereo witness.
 
 **Check freshness first.**
-Written on 2026-10-07, the NVIDIA card added on 2026-10-16.
+Written on 2026-10-07, the NVIDIA card added on 2026-10-16, KWin's shrink and the X11 view size on 2026-10-22.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill says what counts as proof; this one says how to produce it.
 No 3D display is needed: the rig captures what Stereo KWin hands to an output, both eyes side by side.
 
@@ -57,7 +57,7 @@ Reset state for each case. Repeat a live-preview result from a fresh process and
 
 Full side by side is the layout, never a size: a program hands Stereo KWin the two eyes side by side, left eye first, each at the resolution it has, and KWin resizes them once, into the window or the screen.
 A half top-and-bottom 1920x1080 frame becomes one 3840x540 buffer; half side by side goes as it is, two 960x1080 eyes; a row-interleaved frame gives two 1920x540 eyes; a PAL field-sequential DVD two 720x288 eyes.
-The size an eye is shown at is the surface's: a `wp_viewport` destination on Wayland (each eye is a half of the buffer's source box), the window on X11.
+The size an eye is shown at is the surface's: a `wp_viewport` destination on Wayland (each eye is a half of the buffer's source box), and on X11 the window's place, which a program whose views have another resolution declares with `_KDE_NET_WM_STEREO_CONTENT_ONE_VIEW_SIZE` ([native-linux](../native-linux/SKILL.md#x11-views-at-another-size-than-their-resolution)).
 A program that stretches a half eye to full size, for KWin to squeeze it again for a half-format television, resizes twice.
 
 To prove that a path copies:
@@ -72,13 +72,14 @@ Traps:
 
 - **A player's dither** (mpv's `dither-depth`) changes values by one level without moving any sample: run the sample check with it off, and the picture check with the defaults.
 - **An aspect passed as text with six decimals** made mpv's destination a pixel short of its window and added a letterbox row; carry aspects with all their digits.
-- **KWin's filter:** it samples an eye bilinearly down to half its size and integrates areas only below that, so a 1.5x downscale aliases more than FFmpeg's filtered `bilinear` (44 dB where an upscale gives 48 to 63 dB). Report the numbers with the filter compared against.
+- **KWin's filter, the shrink rule:** from kwin +stereo3d30 a view drawn smaller than its resolution, on either axis, is the average of the samples each pixel covers, taken within its own view, and a view drawn at its size or larger is bilinear. Compare a shrink with FFmpeg's `area` (`one_resize.py --flags area`) and a magnification with its `bilinear`. Measured on the rig's AMD card with FFmpeg's `area` as the reference, eyes of 2880x1620 drawn at 1920x1080 (a 1.5x shrink) score 69 dB, where +stereo3d29's bilinear sampling gave 46 dB; the same release clamps a magnified eye's samples to the eye, so its inner edge no longer takes a quarter of the other eye's first column at 2x (half side by side at full screen: 64 dB against FFmpeg's `bilinear`, 51 dB before). Report the numbers with the filter compared against.
 - **A subsurface's position applies with its parent's next commit:** a test window must repaint after placing its stereo surface.
-- **On X11 the buffer is the window's own pixmap**, so an X11 program's eyes have its window's resolution: an X11 window cannot yet tell KWin the size a view is shown at, and half-height eyes cannot reach KWin at their own resolution from it.
+- **On X11 the buffer is the window's own pixmap**, so an X11 program whose views have another resolution than their place declares the size one view is shown at (support version 6). Prove it in four parts: the X11 window's own size (`xcb_get_geometry`: both views at their resolution, 3840x540 for half top and bottom), its contents read back with `XGetImage` equal to the views handed over, sample for sample, each eye's region of the capture against FFmpeg's resize of the view to the declared size, and the same run on a KWin that announces 5 as the control. A half top-and-bottom 1920x1080 picture, a 3840x540 window declaring 1920x1080, scores 63 dB per eye against FFmpeg's resize of its 1920x540 view, and 8 dB on +stereo3d29, which shows each eye at 1920x540.
 
 ## Traps that fooled us
 
 - **Searching vertical offsets** in block matching picks false matches on repeated patterns; match on the same row and check the vertical profile on its own.
+- **`LIBGL_ALWAYS_SOFTWARE=1` does not move KWin's scene to llvmpipe.** With a render node given, KWin's virtual backend draws through EGL on that card (radeonsi's shader statistics appear in `kwin.log` with `QT_LOGGING_RULES='kwin_*.debug=true'`), so the rig's "software" and `--gpu` runs give the same captures. KWin opens the first render node that opens: with Docker's CDI that is the NVIDIA card, without it the AMD one. Name a run by the card you gave it, and check the log.
 - **A window capture on Wayland includes the compositor's title bar:** offset the analysis by it.
 - **A colour classifier mislabels correct captures** whose views carry large white areas; look at one capture before trusting a label.
 - **Captures are 8 bits per channel:** a deep-colour proof is the surface's configuration and a readback, not the capture.

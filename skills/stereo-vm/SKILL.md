@@ -19,12 +19,13 @@ The guide [A virtual machine with a 3D display](../../docs/stereo-vm.md) says ho
 ## The design every viewer follows
 
 - The viewer's ordinary window is the guest's display at its own size (one view) and takes the input.
-- Both views go side by side to a surface of their own on top of it, declared once as full side by side.
+- Both views go side by side to a surface of their own on top of it, each at the resolution the guest scans it out at (a top-and-bottom 1080p frame as one 3840x540 buffer), declared once as full side by side; the viewport gives the size a view is shown at, and Stereo KWin resizes once.
 - The pointer: the viewer sends its position in the guest's display. With a stereo layout set, the server tells the tablet the display is one view, so the host's tablet mapping stays as upstream has it. Nothing remaps the pointer in QEMU.
 
 ## The checks
 
 1. **Colour test:** both views in the right eye, the same frame number in both, one declaration, the window's 2D part identical in both eyes.
+1. **Resolution:** the buffer the viewer hands over holds each view sample for sample, for every 3D structure (the [proof rig's copy check](../stereo-proof-rig/SKILL.md#unpacking-is-a-copy)); a view stretched to the size it is shown at is a failure.
 2. **Pointer:** the host moves the pointer to four fractions of the view in 2D and in every 3D mode; the guest's own kernel prints what its tablet gets (read the evdev node before any compositor maps it); each report must be the fraction of the range, within 4 %.
 3. **Resize:** the same after the window is made smaller and larger.
 4. **A mode change while the pointer moves:** the pointer circles around the view's centre while the guest changes mode; every report must stay at the centre of the range. A report at the instant of the switch can be off (the viewer's layout, the server's tablet size and the surface arrive on their own, as for a plain 2D resolution change): count those, allow at most two per transition in the first half second, and none later.

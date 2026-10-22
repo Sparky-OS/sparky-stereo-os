@@ -23,10 +23,11 @@ The virtual machine does the same, in three places:
 
 1. **The EDID.** QEMU's `virtio-gpu` device, with `stereo=on`, adds an HDMI Vendor-Specific Data Block to the EDID it gives the guest: "3D present" (the mandatory 3D formats of HDMI 1.4b for 1080p24, 720p50 and 720p60) and, for 1080p60, frame packing, side by side (full), top-and-bottom and side by side (half).
 2. **The guest's driver.** The guest's `virtio-gpu` driver lists those modes when the device offers stereo (`VIRTIO_GPU_F_STEREO`), and on every mode set tells the device the layout: which 3D structure, where each eye sits in the frame, and the size of one eye. This is the InfoFrame's job on a cable.
-3. **The host window.** QEMU's GTK display shows the guest at one eye's size. It draws the left eye in its window and, on a Wayland desktop with Stereo KWin, puts both eyes over it, side by side, left eye first, each at full size, and declares that once as stereo. Stereo KWin then sends it to whatever the host's screen does: a 3D television's own 3D mode, anaglyph, or the left eye on a 2D screen.
+3. **The host window.** QEMU's GTK display shows the guest at one eye's size. It draws the left eye in its window and, on a Wayland desktop with Stereo KWin, puts both eyes over it, side by side, left eye first, each at the resolution the guest scans it out at, and declares that once as stereo. Stereo KWin then sends it to whatever the host's screen does: a 3D television's own 3D mode, anaglyph, or the left eye on a 2D screen.
 
-A guest compositor packs its desktop for the 3D mode it set; QEMU unpacks it again.
-Frame packing and side by side (full) keep both eyes at full resolution and are copied as they are; top-and-bottom and side by side (half) carry half an eye each and are stretched back.
+A guest compositor packs its desktop for the 3D mode it set; QEMU unpacks it again, by copying, never by scaling.
+Frame packing and side by side (full) carry two 1920x1080 views at 1080p; top-and-bottom carries two 1920x540 views, which go to Stereo KWin as one 3840x540 buffer, and side by side (half) two 960x1080 views.
+Stereo KWin resizes each view once, to the window or the screen.
 For a virtual machine, side by side (full) is the natural mode: it is already the host's own format.
 
 ## Run it
@@ -47,7 +48,7 @@ Give the device more host memory than the default 256 MiB for switching between 
 These show the guest through SPICE: run the VM with `-device virtio-gpu-pci,stereo=on,max_hostmem=1G` and a SPICE display (with libvirt, the device line through `qemu:commandline`).
 The viewer is built the way every stereo program of the edition is:
 - its ordinary window is the guest's display at its own size, one view, and takes the input;
-- the two views go side by side to a surface of their own on top of it, declared once as full side by side (without Stereo KWin the window shows the left view).
+- the two views go side by side to a surface of their own on top of it, each at the resolution the guest's frame carries it, declared once as full side by side (without Stereo KWin the window shows the left view).
 
 The pointer follows from that.
 The viewer sends its position in the guest's display, and with a stereo layout set the edition's `spice-server` tells QEMU's tablet that the display is one view, so QEMU maps the position as upstream does, and the guest's pointer reaches every corner of its display in every 3D mode.

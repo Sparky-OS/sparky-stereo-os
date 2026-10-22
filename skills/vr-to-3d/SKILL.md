@@ -23,7 +23,7 @@ A 3D display can show them directly.
 What stands in the way is everything the VR mode does *for a headset*.
 [The formula](../../docs/formula.md), learned on Half-Life 2's own VR interface, lists what changes, and most VR games share its structure:
 
-1. **The eyes go to a window,** not a headset: no lens distortion, each eye at the display's size.
+1. **The eyes go to a window,** not a headset: no lens distortion, each eye at the render resolution the person chose (the display's size by default), handed over as it is; Stereo KWin resizes it once.
 2. **The game drives the view,** not a head tracker: mouse and controller turn the camera as in the 2D game.
 3. **Composition:** each eye renders into its target, and the targets are placed into one full side-by-side frame.
 4. **The 2D layer** (HUD and menus) sits on the screen plane, not on a floating panel.

@@ -44,7 +44,7 @@ Only the 3D content gets stereo, and KWin assembles it and puts it on the screen
 
 **The one required option is the render resolution.**
 - **Internal render resolution:** the size each eye is rendered at, higher than the output for sharpness, lower for speed.
-- **Output at one eye's resolution:** the window's size when windowed, the screen's size when fullscreen, which every program already handles.
+- **The window at one eye's size:** the window's size when windowed, the screen's size when fullscreen, which every program already handles; the eyes in the buffer behind it keep their own resolution, and KWin scales them to it.
 
 **The rest is KWin's:** the monitor's resolution and 3D mode, scaling each eye to its place, and assembling the stereo picture for each output.
 No program offers output formats, 3D modes or monitor settings.
@@ -52,18 +52,20 @@ No program offers output formats, 3D modes or monitor settings.
 ## The picture KWin understands
 
 **Full side by side, left eye first.**
-Each eye is a complete picture at its full aspect ratio, so the buffer is twice as wide as one eye.
+Each eye is a complete picture at the resolution it has, so the buffer is twice as wide as one eye.
 
 | Left eye, complete | Right eye, complete |
 |:---:|:---:|
 | width W, height H | width W, height H |
 
 The buffer is 2W by H, at any W and H.
+W and H are the eye's own samples, half packings included: the eyes of a half top-and-bottom 1920x1080 video are 1920x540, so its buffer is 3840x540, and the size an eye is shown at comes from the surface (a `wp_viewport` destination on Wayland, the window on X11).
 
 It is HDMI 1.4's 3D structure 3, "side by side (full)" (`HDMI_3D_STRUCTURE_SIDE_BY_SIDE_FULL = 3` in the kernel's `include/linux/hdmi.h`), the layout SteamVR writes its stereo screenshots in, and the arrangement of IMAX 3D's two projectors.
 
 **Any resolution.**
 The buffer is the render resolution: higher than the window for sharpness, lower for speed.
+For decoded content (a video, a picture, a guest's screen) it is the content's own resolution: unpacking any packing only reads, copies and places samples, and no program resizes an eye.
 KWin scales each eye to the window's place on screen, the way it scales any window.
 
 **One value says it.**
@@ -131,7 +133,7 @@ Every output has an anaglyph mode, so red/cyan paper glasses show your depth on 
 - Mesa packs the eyes from quad-buffer, multiview and two-layer swapchains into full side by side and declares it.
 - Qt gives a declared window a buffer twice as wide, at a render resolution of its own (in progress).
 - Wine gives a declared window's render window the full doubled size (in progress).
-- Players read the stream's own packing and eye order (the frame packing SEI's `frame_packing_arrangement_type`: 3 side by side, 4 top and bottom, 5 temporal; Matroska StereoMode) and unpack it to full side by side before declaring, respecting the message's persistence (H.264 D.2.26, H.274 8.6.2).
+- Players read the stream's own packing and eye order (the frame packing SEI's `frame_packing_arrangement_type`: 3 side by side, 4 top and bottom, 5 temporal; Matroska StereoMode) and unpack it to full side by side by copying samples, each eye at the resolution the stream carries it (a half view stays half), before declaring, respecting the message's persistence (H.264 D.2.26, H.274 8.6.2).
 
 **A library never offers output formats.**
 No anaglyph, no interleaving, no "3D TV mode" settings: those belong to the outputs.

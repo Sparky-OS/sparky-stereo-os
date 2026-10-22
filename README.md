@@ -121,6 +121,7 @@ On an ordinary screen nothing changes: the same theme, the same layout, the same
 **Make a program 3D once: hand the desktop both eyes, and it takes care of every screen.**
 You can write and check the work on the screen you already have.
 - [Develop 3D and XR on an ordinary monitor](docs/develop-3d-on-an-ordinary-monitor.md): start here.
+- [Your 3D scene in stereo, from a web page](docs/web-3d-in-stereo.md): three.js, WebGL and WebXR, from red and cyan glasses in any browser to every 3D screen.
 - [House formats](docs/house-formats.md) and [Stereo labor division](docs/stereo-labor-division.md): the rules, tied to the specifications.
 - [Test stereo without a 3D TV](docs/test-stereo-without-a-3d-tv.md) and [A virtual machine with a 3D display](docs/stereo-vm.md): test 3D output on a virtual display or in a virtual machine; a ready root file system with Stereo KWin is on [our repository server](https://repo.sparkyos.org/bench/kwin-root/).
 - [Skills](skills/README.md): instructions for people and AI assistants working on the edition.

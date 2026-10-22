@@ -14,6 +14,7 @@ The rules, with their specifications: [house formats](house-formats.md); the des
 - **Ask the graphics API for stereo:** OpenGL quad buffer, an EGL multiview window or a two-layer Vulkan swapchain. The edition's Mesa packs the two eyes into one full side-by-side picture and declares it for you.
 - **Draw both eyes yourself:** put them side by side in one surface, a window or a subsurface, and declare it with `kde-stereo-content-v1` ([plasma-wayland-protocols](https://invent.kde.org/libraries/plasma-wayland-protocols)). The shared declaration library does it for Wayland and for X11.
 - **Pictures:** the shared stereo layer (`libstereo-layer1`) shows a stereo photograph in a window, from the file's own mark.
+- **Web pages:** the edition's browser draws a WebGL scene once per eye from the page's own camera, and offers the 3D screen to WebXR: [your 3D scene in stereo, from a web page](web-3d-in-stereo.md).
 
 A 2D interface stays 2D: keep the 3D area in its own surface, and the rest of the window is the same in both eyes.
 

@@ -51,7 +51,30 @@ Reset state for each case. Repeat a live-preview result from a fresh process and
 4. The 2D control: the same container with the distribution's own packages instead of ours, the program with stereo off, 0 differing pixels. When a program animates, freeze it (a deterministic mode and `libfaketime`) and measure the noise between two runs of the same build first.
 5. For drawn scenes: block-match the two eyes (for example 17x17 blocks, sum of absolute differences) along the same row only, and report the vertical profile separately; report the median error, the share within one pixel and the vertical shift.
 6. Rerun everything from the packages installed in a fresh container, not only from the build tree.
-7. For unpacking (a half-width or half-height source rearranged into full side by side): each eye must equal its region of the source sample for sample, nothing rescaled. For Stereo KWin's one resize into a window or screen: PSNR against FFmpeg's own output of the same filter, not a judgement by eye. For audio formats: a PipeWire of the container's own, read with `pw-dump`, shows the format and rate the program negotiated.
+7. For unpacking (a half-width or half-height source rearranged into full side by side): each eye must equal its region of the source sample for sample, nothing rescaled ([Unpacking is a copy](#unpacking-is-a-copy)). For Stereo KWin's one resize into a window or screen: PSNR against FFmpeg's own output of the same filter, not a judgement by eye. For audio formats: a PipeWire of the container's own, read with `pw-dump`, shows the format and rate the program negotiated.
+
+## Unpacking is a copy
+
+Full side by side is the layout, never a size: a program hands Stereo KWin the two eyes side by side, left eye first, each at the resolution it has, and KWin resizes them once, into the window or the screen.
+A half top-and-bottom 1920x1080 frame becomes one 3840x540 buffer; half side by side goes as it is, two 960x1080 eyes; a row-interleaved frame gives two 1920x540 eyes; a PAL field-sequential DVD two 720x288 eyes.
+The size an eye is shown at is the surface's: a `wp_viewport` destination on Wayland (each eye is a half of the buffer's source box), the window on X11.
+A program that stretches a half eye to full size, for KWin to squeeze it again for a half-format television, resizes twice.
+
+To prove that a path copies:
+
+1. **Fixtures with addresses.** `scripts/fsbs_ids.py make PACKING WIDTH HEIGHT out.png` writes every sample's eye, column and row into its 24 bits (R = x & 255, G = y & 255, B = eye << 7 | (x >> 8) << 3 | y >> 8), packed side by side or top and bottom (full or half), row or column interleaved, checkerboard, quincunx or frame packed. Give them to the program as its input: a picture, a lossless RGB video (FFV1 `gbrp` in Matroska with its `StereoMode`), a guest's framebuffer.
+2. **The buffer handed over.** Build `scripts/wlrec.c` as a shared library and preload it into the program with `WLREC_DIR` set. It writes the shared-memory buffer committed on each surface declared full side by side, and reads back an EGL surface's back buffer at `eglSwapBuffers`, with the viewport destination and the position, one JSON line per commit in `log.jsonl`. It changes nothing the program sends.
+3. **Every sample its own.** `scripts/fsbs_ids.py check BUFFER EYE_WIDTH EYE_HEIGHT --raw WxH:STRIDE` (`--rgba-bottom-up` for an EGL read-back, `--in-layer` where the buffer also holds black around each eye, a player's letterbox counted in samples). A resampled buffer fails: its size is wrong, or its samples mix their neighbours.
+4. **One resize, at KWin.** Capture the screen (`scripts/capture.py`, ScreenShot2) and compare each eye's region with FFmpeg's own resize of the eye handed over (`scripts/one_resize.py`); `--twice WxH` also scores the eye first stretched to WxH, and the one resize must win. Use a window whose size differs from the eye's full size: in a full screen 1920x1080 window, one and two resizes of a 1920x540 eye give the same picture.
+5. **The negative control.** The same run with the old build must fail step 3.
+
+Traps:
+
+- **A player's dither** (mpv's `dither-depth`) changes values by one level without moving any sample: run the sample check with it off, and the picture check with the defaults.
+- **An aspect passed as text with six decimals** made mpv's destination a pixel short of its window and added a letterbox row; carry aspects with all their digits.
+- **KWin's filter:** it samples an eye bilinearly down to half its size and integrates areas only below that, so a 1.5x downscale aliases more than FFmpeg's filtered `bilinear` (44 dB where an upscale gives 48 to 63 dB). Report the numbers with the filter compared against.
+- **A subsurface's position applies with its parent's next commit:** a test window must repaint after placing its stereo surface.
+- **On X11 the buffer is the window's own pixmap**, so an X11 program's eyes have its window's resolution: an X11 window cannot yet tell KWin the size a view is shown at, and half-height eyes cannot reach KWin at their own resolution from it.
 
 ## Traps that fooled us
 

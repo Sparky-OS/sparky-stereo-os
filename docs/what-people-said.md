@@ -9,6 +9,10 @@ Public words are quoted with the person's name and a link to where they said the
 
 Song Xu, co-chair of the W3C Media & Entertainment Interest Group, after the talk of 13 October 2026 ([minutes](https://www.w3.org/2026/10/13-me-minutes.html)).
 
+> "Separate depth tracks with registered identifiers, and side-by-side HEVC that declares itself, are exactly what a weaver needs to stop guessing."
+
+David Fattal, DisplayXR, on the Matroska depth-plane assignment and the x265 frame packing SEI ([DisplayXR #1928](https://github.com/DisplayXR/displayxr-runtime/issues/1928#issuecomment-6358015605)).
+
 > "This is a thorough first drop. Zero off-table frames across 45 drags, and checking paint against weave origin entry by entry, is exactly the evidence we wanted."
 
 David Fattal, DisplayXR, on our KWin window-geometry publisher ([DisplayXR #1928](https://github.com/DisplayXR/displayxr-runtime/issues/1928)).

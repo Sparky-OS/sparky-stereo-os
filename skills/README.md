@@ -37,6 +37,7 @@ Historical versions and test results are evidence for their stated setup, not a 
 | Brazilian certificate sources and algorithms | [brazil-certificates](brazil-certificates/SKILL.md) |
 | Sparky CA trust-store implementation | [certificate-manager](certificate-manager/SKILL.md) |
 | A maintainer message, contribution or follow-up | [upstream-outreach](upstream-outreach/SKILL.md) |
+| An FFmpeg pull request: series, trailers, FATE, the review bot (with upstream-outreach) | [contrib-ffmpeg](contrib-ffmpeg/SKILL.md) |
 | A README opening, About line or public introduction | [writing-front-pages](writing-front-pages/SKILL.md) |
 
 ## Installed and offline use

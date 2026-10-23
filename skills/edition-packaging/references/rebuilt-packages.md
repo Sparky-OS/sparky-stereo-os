@@ -33,6 +33,17 @@
 - Keep Debian's copyright file and append our `Files: debian/*` credit; `provenance.sh` does it (see [provenance](../SKILL.md#provenance-daniel-2026-10-02-always)).
 - Prove each build before shipping: compile against our kernel where the package builds modules, compare the package trees with the previous build, and simulate the installation with apt.
 
+## Receiver packages must prove their installed interface
+
+Checked 2026-10-16 with KRDC Catch and KRdp.
+When a reviewed change targets development master, backport it to the distribution release and retain the release's existing plugins and behaviour.
+Build the translated catalogs as distribution patches, with test-only capture and mutation hooks disabled in the shipping executable.
+After a full upgrade from the published packages, compare installed payloads with the package archives and run the visible connection action in an isolated session.
+Capture only the synthetic receiver display and check eye identity, per-eye fit, changing source timecodes and reconnect.
+Swap the synthetic source eyes and freeze its animation to prove that the same checker rejects reversed and stale pictures without enabling hooks in the shipped app.
+For certificate rejection, verify that the connection reached TLS and failed pin validation; a server that never listened is not a passing control.
+The owning changes are [KRDC Catch](https://invent.kde.org/danielcamposramos/krdc/-/commit/b3cd02d484) and [KRdp's D-Bus descriptor fix](https://invent.kde.org/danielcamposramos/krdp/-/commit/6d9c6f3dbb).
+
 ## Mesa acceptance (2026-10-13)
 
 Mesa `+stereo3d9` shipped with no EGL configurations on the surfaceless and device platforms, on every driver: Waterfox's media process could not upload video and KWin's surfaceless tests failed.

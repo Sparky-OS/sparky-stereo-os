@@ -100,16 +100,8 @@ A package set waiting for a rebuild is left out of the block until the rebuild l
 
 ## The GPU vendors' repositories: compute updates, the display driver stays ours
 
-NVIDIA and AMD publish their display drivers in the same repositories as CUDA and ROCm, and the hardware setup gives the CUDA repository priority 1002.
-Without a guard, an ordinary upgrade replaces our NVIDIA module and our amdgpu with the vendor's, which have no HDMI 3D.
-`sparky-stereo-nvidia-driver-lock` (its own package, built from the module's source and version, required by `nvidia-kernel-open-dkms-stereo3d`) ships `10sparky-stereo-nvidia-driver-lock`: NVIDIA's and Debian's NVIDIA kernel modules at -1, every driver package at our module's NVIDIA version at 1005, other versions at 100.
-`sparky-stereo-hardware` ships `sparky-stereo-gpu-nvidia` (the container toolkit at 990, its release candidates at 100, our `libnvidia-egl-wayland1` over NVIDIA's) and `sparky-stereo-gpu-amd` (AMD's out-of-tree kernel driver and `*amdgpu*` graphics packages from `repo.radeon.com` at -1; ROCm keeps updating).
-Intel is not guarded.
-`sparky-stereo-hardware` is in `sparky-stereo-hardware-support`, so every install carries the pins; a pin for a repository that is not configured does nothing.
-A pin file whose name starts with `10` is read before `nvidia-driver-pin`, and the first record that names a package wins over any `Package: *` record, whatever the numbers.
-To move the NVIDIA driver, rebuild our module first and publish; the lock follows because it is generated from the module's version, and the first upgrade installs only the new lock.
-Prove a change in a Debian testing container with NVIDIA's and AMD's real repositories at the edition's priorities and a newer driver published beside them, with both of apt's solvers.
-The measurements and the file by file account are in [GPU vendors' repositories](../../docs/gpu-vendor-repositories.md).
+NVIDIA's and AMD's repositories carry their display drivers beside CUDA and ROCm, so the edition pins them: compute keeps updating, and the display driver stays ours, with HDMI 3D.
+The packages, the pin files and how to prove a change are in [the repository](references/repository.md#the-gpu-vendors-repositories-compute-updates-the-display-driver-stays-ours).
 
 ## Each build of ours
 
@@ -121,14 +113,7 @@ The rest, Mesa's acceptance and the KDE CI run before a push to invent.kde.org i
 
 ## Receiver packages must prove their installed interface
 
-Checked 2026-10-16 with KRDC Catch and KRdp.
-When a reviewed change targets development master, backport it to the distribution release and retain the release's existing plugins and behaviour.
-Build the translated catalogs as distribution patches, with test-only capture and mutation hooks disabled in the shipping executable.
-After a full upgrade from the published packages, compare installed payloads with the package archives and run the visible connection action in an isolated session.
-Capture only the synthetic receiver display and check eye identity, per-eye fit, changing source timecodes and reconnect.
-Swap the synthetic source eyes and freeze its animation to prove that the same checker rejects reversed and stale pictures without enabling hooks in the shipped app.
-For certificate rejection, verify that the connection reached TLS and failed pin validation; a server that never listened is not a passing control.
-The owning changes are [KRDC Catch](https://invent.kde.org/danielcamposramos/krdc/-/commit/b3cd02d484) and [KRdp's D-Bus descriptor fix](https://invent.kde.org/danielcamposramos/krdp/-/commit/6d9c6f3dbb).
+A changed receiver (KRDC Catch, KRdp; checked 2026-10-16) is proved after a full upgrade from the published packages, with eye-swap and frozen-source controls, as [rebuilt packages](references/rebuilt-packages.md#receiver-packages-must-prove-their-installed-interface) says.
 
 ## The media stack sits on deb-multimedia
 

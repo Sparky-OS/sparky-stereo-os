@@ -63,3 +63,16 @@ Its public part is `sparky-os/packages/sparky-stereo-keyring/sparky-stereo-repo.
 6. **Send** with `--go`, after review, by the maintainer who holds the server's access.
    The server, its path and the access key come from the local configuration (`SPARKY_SYNC_HOST`, `SPARKY_SYNC_PATH`, `SPARKY_SYNC_SSH_KEY`), never from a repository.
 7. **Check it online:** `sparky-os/release/verify-online-repository.py` compares the published tree with its signed local copy.
+
+## The GPU vendors' repositories: compute updates, the display driver stays ours
+
+NVIDIA and AMD publish their display drivers in the same repositories as CUDA and ROCm, and the hardware setup gives the CUDA repository priority 1002.
+Without a guard, an ordinary upgrade replaces our NVIDIA module and our amdgpu with the vendor's, which have no HDMI 3D.
+`sparky-stereo-nvidia-driver-lock` (its own package, built from the module's source and version, required by `nvidia-kernel-open-dkms-stereo3d`) ships `10sparky-stereo-nvidia-driver-lock`: NVIDIA's and Debian's NVIDIA kernel modules at -1, every driver package at our module's NVIDIA version at 1005, other versions at 100.
+`sparky-stereo-hardware` ships `sparky-stereo-gpu-nvidia` (the container toolkit at 990, its release candidates at 100, our `libnvidia-egl-wayland1` over NVIDIA's) and `sparky-stereo-gpu-amd` (AMD's out-of-tree kernel driver and `*amdgpu*` graphics packages from `repo.radeon.com` at -1; ROCm keeps updating).
+Intel is not guarded.
+`sparky-stereo-hardware` is in `sparky-stereo-hardware-support`, so every install carries the pins; a pin for a repository that is not configured does nothing.
+A pin file whose name starts with `10` is read before `nvidia-driver-pin`, and the first record that names a package wins over any `Package: *` record, whatever the numbers.
+To move the NVIDIA driver, rebuild our module first and publish; the lock follows because it is generated from the module's version, and the first upgrade installs only the new lock.
+Prove a change in a Debian testing container with NVIDIA's and AMD's real repositories at the edition's priorities and a newer driver published beside them, with both of apt's solvers.
+The measurements and the file by file account are in [GPU vendors' repositories](../../../docs/gpu-vendor-repositories.md).

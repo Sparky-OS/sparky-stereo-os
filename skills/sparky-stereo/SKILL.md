@@ -51,6 +51,14 @@ So every change of ours arrives small, tested and explained.
 # Part one: the contract
 
 - **One format inside.** Programs decode or generate stereo in any standard and hand the desktop **full side by side**: the two eyes as separate pictures side by side, left eye first, each at the resolution it has, declared once. "Full" names the layout, not a size: any resolution is the pact, half-width and half-height eyes included (a half top-and-bottom 1920x1080 frame becomes one 3840x540 buffer), and the program never resizes an eye. In a window or full screen, Stereo KWin does the one resize. Stereo KWin's outputs, one per kind of screen, turn that into what each screen needs: a 3D television's HDMI 3D modes, anaglyph on any monitor, interleaved and frame-sequential displays, a headset. [How it works](../../docs/how-it-works.md) explains why, and why it is how PipeWire already handles sound.
+- **Internal rendering resolution is not output resolution** (Daniel, 2026-10-23). The internal rendering resolution is how many pixels each eye is drawn with: a quality setting the person picks in the program. The output resolution is the screen's mode, which belongs to Stereo KWin's output. A program never matches one to the other, and never resizes an eye to fit a screen.
+- **Every packing is cut into its two native strips and handed over side by side, as it is:**
+  - full top and bottom, 1920x2160: two 1920x1080 eyes, handed over as one 3840x1080 picture;
+  - half top and bottom, 1920x1080: two 1920x540 strips, handed over as one 3840x540 picture;
+  - half side by side, 1920x1080: two 960x1080 strips that are already side by side, handed over as they are;
+  - full side by side: as it is.
+
+  No strip is stretched or squeezed. Stereo KWin's one resize brings each eye to the screen's size.
 - **Per-monitor settings live in one place:** Stereo KWin's outputs (Display Configuration), and beneath them the drivers and the kernel. A program has no per-monitor stereo setting; it hands the same declared pair to every screen.
 - **The definitive eye swap is the output's.** Stereo KWin swaps left and right per output, in Display Configuration. A program offers no swap of its own for everything it shows; it offers only the per-file correction of its input, "Swap left and right eyes", and only for content it shows in 3D.
 - **Never touch the user's file on your own.** A per-file choice (the eye swap, the input packing chosen for an unmarked file) is kept where the program already keeps its per-file state, next to the resume position of "continue playback", and is forgotten with it. The program offers to save the choice to the file, and writes the file only when the person chooses that; once saved, the file carries the correction and the per-file option goes back to unmarked, its stored entry cleared.

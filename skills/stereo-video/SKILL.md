@@ -25,6 +25,7 @@ A side-by-side or top-and-bottom video is an ordinary 2D picture unless somethin
 The standard marks, each linked from awesome-stereoscopy's [standards page](https://github.com/danielcamposramos/awesome-stereoscopy/blob/main/standards.md):
 
 - **In the stream:** the H.264 and H.265 **frame packing arrangement SEI** (Table D-8, which H.264 V15 (08/2024) numbers D-8 and V16 (06/2026) D-9: side by side, top and bottom, temporal interleaving and the older packings; `content_interpretation_type` gives the eye order; persistence says how long it holds). A 3D television reads this one and switches by itself.
+- **In an MPEG-2 stream:** the JP3D user data (`S3D_video_format_signaling`: 0x03 side by side, 0x04 top and bottom, 0x08 2D; no eye-order field), which FFmpeg's MPEG-2 encoder writes and its decoder reads; a Sony KDL-46EX725 switched to 3D on it (2026-10-23). See [stereo-serving](../stereo-serving/SKILL.md).
 - **In MP4:** the `st3d` box of Spherical Video V2 (with `sv3d` for 360 and VR180).
 - **In Matroska and WebM:** `StereoMode` ([RFC 9559](https://www.rfc-editor.org/rfc/rfc9559)).
 

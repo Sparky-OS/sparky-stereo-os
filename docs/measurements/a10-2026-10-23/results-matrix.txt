@@ -1,0 +1,49 @@
+case                               out      frames   fps render med    p95    p99    max late | cpu% gpu% cpu°C
+L-ext-both-2d/idle                 eDP-1         0 (idle output: too few frames)
+L-ext-both-2d/idle                 HDMI-A-1      2 (idle output: too few frames)
+L-ext-both-2d/2dfilm               eDP-1      4330  24.1     10.664 16.148 17.944  27.69  200 |   36   11  74.5
+L-ext-both-2d/2dfilm               HDMI-A-1     20   0.1     14.897 20.069 21.201  20.14    0 |   36   11  74.5
+L-ext-both-2d/3dfilm               eDP-1      4311  23.9     13.733 18.776 21.109  31.48   45 |   59   13  73.9
+L-ext-both-2d/3dfilm               HDMI-A-1   4276  23.8      5.593 11.410 15.966  33.54  917 |   59   13  73.9
+K-ext-edp3d-tv2d/idle              eDP-1        18   0.1     27.046 41.886 42.071  41.87    3 |    5    0  68.5
+K-ext-edp3d-tv2d/idle              HDMI-A-1     20   0.2     15.806 34.243 35.231  34.30    4 |    5    0  68.5
+K-ext-edp3d-tv2d/2dfilm            eDP-1      4328  24.0     23.248 33.203 35.925  54.75   49 |   40   24  73.8
+K-ext-edp3d-tv2d/2dfilm            HDMI-A-1     18   0.1     15.472 37.025 40.923  36.77    3 |   40   24  73.8
+K-ext-edp3d-tv2d/3dfilm            eDP-1      4287  23.8     31.755 38.695 42.408  68.42  427 |   80   32  73.3
+K-ext-edp3d-tv2d/3dfilm            HDMI-A-1   4185  23.2      8.584 20.040 24.546  43.47  529 |   80   32  73.3
+P-lifeofpi-default                 eDP-1      3591  19.9    180.345 210.061 223.819 247.77 3529 |   86   95  72.7
+P-lifeofpi-default                 HDMI-A-1   3415  19.0    156.644 205.890 220.071 243.78 2693 |   86   95  72.7
+P-lifeofpi-prime                   eDP-1      3760  20.9    118.921 209.390 221.771 243.09 3571 |   86   92  72.7
+P-lifeofpi-prime                   HDMI-A-1   3589  19.9    111.211 202.096 215.229 236.42 2284 |   86   92  72.7
+P-coyote-default                   eDP-1      3384  18.8    195.682 212.516 217.501 232.59 3384 |   71   99  72.5
+P-coyote-default                   HDMI-A-1   3265  18.1    179.822 210.530 216.244 222.28 3230 |   71   99  72.5
+P-coyote-prime                     eDP-1      4020  22.3    145.157 210.370 217.202 235.73 4017 |   75   98  71.9
+P-coyote-prime                     HDMI-A-1   3717  20.6    139.348 208.503 216.260 230.09 2426 |   75   98  71.9
+C-edp-alone-2d/idle                eDP-1       104   0.9      2.946  4.539  6.514   6.52    0 |   11    0  69.5
+C-edp-alone-2d/idle                HDMI-A-1      0 (idle output: too few frames)
+C-edp-alone-2d/2dfilm              eDP-1      4332  24.1     11.025 16.331 17.997  22.32   74 |   31   11  74.8
+C-edp-alone-2d/2dfilm              HDMI-A-1      0 (idle output: too few frames)
+C-edp-alone-2d/3dfilm              eDP-1      4323  24.0     12.695 19.185 21.226  26.48   12 |   50   13  73.3
+C-edp-alone-2d/3dfilm              HDMI-A-1      0 (idle output: too few frames)
+D-edp-alone-3d/idle                eDP-1        25   0.2     21.892 29.272 33.718  30.55    0 |   30    0  79.0
+D-edp-alone-3d/idle                HDMI-A-1      0 (idle output: too few frames)
+D-edp-alone-3d/2dfilm              eDP-1      4324  24.0     26.090 33.857 37.487  47.29   91 |   56   26  71.3
+D-edp-alone-3d/2dfilm              HDMI-A-1      0 (idle output: too few frames)
+D-edp-alone-3d/3dfilm              eDP-1      4317  24.0     30.167 37.396 40.359  51.15  321 |   69   30  71.7
+D-edp-alone-3d/3dfilm              HDMI-A-1      0 (idle output: too few frames)
+E-tv-alone-2d/idle                 eDP-1         0 (idle output: too few frames)
+E-tv-alone-2d/idle                 HDMI-A-1     15   0.1     13.775 18.025 19.725  17.49    2 |    6    0  69.0
+E-tv-alone-2d/2dfilm               eDP-1         0 (idle output: too few frames)
+E-tv-alone-2d/2dfilm               HDMI-A-1   4314  24.0     17.040 25.232 28.362  38.93  989 |   28   19  74.2
+E-tv-alone-2d/3dfilm               eDP-1         0 (idle output: too few frames)
+E-tv-alone-2d/3dfilm               HDMI-A-1   4264  23.7     19.763 27.918 31.554  36.27  277 |   68   21  74.2
+F-tv-alone-3d/idle                 eDP-1         0 (idle output: too few frames)
+F-tv-alone-3d/idle                 HDMI-A-1     20   0.2     60.841 102.911 114.029 103.57    0 |   13    0  71.8
+F-tv-alone-3d/2dfilm               eDP-1         0 (idle output: too few frames)
+F-tv-alone-3d/2dfilm               HDMI-A-1   4327  24.0     54.608 76.780 86.394 116.36  333 |   60   61  72.6
+F-tv-alone-3d/3dfilm               eDP-1         0 (idle output: too few frames)
+F-tv-alone-3d/3dfilm               HDMI-A-1   4280  23.8     57.296 75.596 91.937 142.95  409 |   84   61  73.6
+A-dpms-off-2d/idle                 eDP-1         0 (idle output: too few frames)
+A-dpms-off-2d/idle                 HDMI-A-1      0 (idle output: too few frames)
+B-dpms-off-3d/idle                 eDP-1         0 (idle output: too few frames)
+B-dpms-off-3d/idle                 HDMI-A-1      0 (idle output: too few frames)

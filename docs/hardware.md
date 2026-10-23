@@ -41,6 +41,10 @@ It runs the same edition, installed from the same packages as the desktop: our s
 On the KDL-46HX855 it runs the 3D desktop by itself, with its own screen off, in full HD for each eye (the TV's frame packing mode).
 Red-cyan 3D works on it too, tested by Daniel.
 
+## What it costs on the laptop
+
+The laptop holds 24 fps in every desktop case, 2D and 3D; the numbers, the method and the scripts: [what stereo costs KWin on a 2016 laptop](measurements/kwin-stereo-cost-a10-2026-10-23.md).
+
 ## Your hardware
 
 If your machine runs a current Linux desktop, it is the kind of machine this is made for.

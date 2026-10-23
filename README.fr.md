@@ -45,6 +45,7 @@ La stéréo sur Linux a attendu des années des bénévoles : les tentatives pr�
 Aucun autre développeur ne s'est présenté pour la porter, donc les autres partenaires présents ici sont IA, dirigés et vérifiés par Daniel et nommés dans [la traçabilité IA](docs/ai-provenance.md).
 Si vous préférez voir cela construit par des mains humaines, vous êtes plus que bienvenu : chaque fork est public, et chaque tâche est ouverte.
 Tout est construit et testé sur deux machines ordinaires, un PC familial et un ordinateur portable de 2016 : [le matériel](docs/hardware.md).
+Sur ce portable, chaque cas du bureau tient 24 images par seconde en 2D et en 3D : [ce que la stéréo coûte à KWin, mesuré](docs/measurements/kwin-stereo-cost-a10-2026-10-23.md) (en anglais).
 
 <a id="where-it-is-going"></a>
 ## Où cela va

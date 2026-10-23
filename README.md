@@ -44,6 +44,7 @@ Stereo on Linux waited years for volunteers: earlier attempts stalled because re
 No other developer came forward to carry it, so the other partners at work here are AI ones, directed and checked by Daniel and named in [AI provenance](docs/ai-provenance.md).
 If you would rather see it built by human hands, you are more than welcome: every fork is public, and every task is open.
 It is all built and tested on two ordinary machines, a home PC and a 2016 laptop: [the hardware](docs/hardware.md).
+On that laptop, every desktop case holds 24 fps in 2D and 3D: [what stereo costs KWin, measured](docs/measurements/kwin-stereo-cost-a10-2026-10-23.md).
 
 ## Where it is going
 

@@ -1,0 +1,13 @@
+case                               out      frames   fps render med    p95    p99    max late | cpu% gpu% cpu°C
+G2-copy-2d-tv-source/idle          eDP-1        24   0.2      8.299 11.663 12.086  11.77    0 |   11    0  73.3
+G2-copy-2d-tv-source/idle          HDMI-A-1     22   0.2      8.355 13.493 17.214  14.10    2 |   11    0  73.3
+G2-copy-2d-tv-source/2dfilm        eDP-1      4321  24.0     11.236 16.487 18.639  22.88    3 |   39   21  72.6
+G2-copy-2d-tv-source/2dfilm        HDMI-A-1   4323  24.0     12.641 19.322 21.863  27.79   60 |   39   21  72.6
+G2-copy-2d-tv-source/3dfilm        eDP-1      4294  23.9     15.200 19.588 21.876  30.61   27 |   73   25  73.3
+G2-copy-2d-tv-source/3dfilm        HDMI-A-1   4295  23.9     16.785 23.422 26.344  34.47  113 |   73   25  73.3
+H2-copy-3d-tv-source/idle          eDP-1         2 (idle output: too few frames)
+H2-copy-3d-tv-source/idle          HDMI-A-1      2 (idle output: too few frames)
+H2-copy-3d-tv-source/2dfilm        eDP-1      4327  24.0     25.688 33.214 35.996  57.23  176 |   69   51  71.8
+H2-copy-3d-tv-source/2dfilm        HDMI-A-1   4326  24.0     33.397 42.901 47.027  66.55 2583 |   69   51  71.8
+H2-copy-3d-tv-source/3dfilm        eDP-1      3339  18.5    195.261 217.981 227.154 247.29 3306 |   87   96  72.5
+H2-copy-3d-tv-source/3dfilm        HDMI-A-1   3313  18.4    196.097 218.937 228.768 243.45 3310 |   87   96  72.5

@@ -10,7 +10,7 @@ description: >-
 
 1. Find out what the receiving device takes: its profile, its capabilities, its manual. Find out which profile the server actually matched, in the server's own log, before any test.
 2. If the device takes the source's packing, send the source as it is. No conversion is the best conversion.
-3. If a conversion is needed, repack, then scale to the device's raster with square pixels, encode in a codec that can carry the declaration, and declare the result.
+3. If a conversion is needed, repack, then scale to the raster the device declares (never an assumed one), with square pixels; encode in a codec that can carry the declaration, and declare the result.
 4. Prove it on the real device with a labelled fixture: the matched profile, the server's decision line, the exact encoder command, the output's size and aspect, and what the person sees with glasses.
 
 **Check freshness first.**
@@ -32,14 +32,19 @@ Describing a television's frame in the desktop's terms ("two views at their own 
 
 ## The device's formats
 
-- **Half side by side** and **half top and bottom**: the two views squeezed into one frame at the device's raster (for example 1920x1080), each view half the width or half the height. Every 3D television of the HDMI 1.4 era takes these.
+- **Half side by side** and **half top and bottom**: the two views squeezed into one frame at the device's raster, each view half the width or half the height. Every 3D television of the HDMI 1.4 era takes these at 1920x1080, and the 4K 3D televisions of 2015 and 2016 at 3840x2160.
 - **Frame packing**: two full views and an active space in one tall frame (1920x2205 for 1080p24). A television takes it over HDMI and from its own player; over the network, take it only if the device's profile says so.
 - **2D**: one view, for a device or client that shows no stereo. Choose the left view unless the person chose otherwise.
 - **Anaglyph** only when the person or the profile asks for it, never by default.
 
 ## Converting
 
-- **FFmpeg's `stereo3d` never resamples.** Between half formats it only repacks and changes the sample aspect: half top and bottom 1920x1080 to half side by side (`ab2l:sbs2l`) gives 3840x540 with a sample aspect of 1:4, not 1920x1080. Follow it with `scale=<W>:<H>,setsar=1` to the device's raster, and check the result with ffprobe (width, height, sample aspect).
+- **FFmpeg's `stereo3d` never resamples.** Between half formats it only repacks and changes the sample aspect: half top and bottom 1920x1080 to half side by side (`ab2l:sbs2l`) gives 3840x540 with a sample aspect of 1:4, not 1920x1080. Follow it with a scale, and check the result with ffprobe (width, height, sample aspect).
+- **The raster comes from the device, never from an assumption.** Read it from the device's declared parameters, such as its profile's maximum width and height in UMS, or the capabilities it reports. Then:
+  - a half-to-half repack keeps the source frame's raster (half top and bottom 3840x2160 becomes half side by side 3840x2160 on a 4K 3D television);
+  - only then apply the device's limits, as the server already does for 2D;
+  - when the device declares nothing, keep the source's raster. Choosing a size the device never stated is out of the server's scope.
+  - Never hard-code 1920x1080.
 - **Declare what you send.** Use an H.264 or H.265 output with the frame packing SEI (x264's `frame-packing`, or the `h264_metadata` and `hevc_metadata` `frame_packing` option), plus the container's mark where there is one (Matroska StereoMode, MP4 `st3d`). Then the television switches to 3D by itself.
 - **MPEG-2 cannot carry the frame packing SEI.** A 3D conversion sent as MPEG-2 (VOB, MPEG-TS) leaves the television in whatever mode it was in. For 3D, prefer H.264 output whenever the device takes it.
 - **Keep the eye order.** Read it from the stream's mark, the container's mark or the person's choice, as [`stereo-video`](../stereo-video/SKILL.md) says, and write the declaration with the order you actually send.

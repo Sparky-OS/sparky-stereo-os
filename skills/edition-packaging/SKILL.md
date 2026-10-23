@@ -1,7 +1,7 @@
 ---
 name: edition-packaging
 description: >-
-  Maintain distro role tasks, dependency policy, native source/binary packages and installed-package validation for Sparky Stereo OS.
+  Build, sign and ship Sparky Stereo OS packages: provenance and Paweł's formula, rebuilt upstream packages, role tasks and dependency policy, the signed repository and its publication, the ISO, and installed-package validation.
 ---
 
 # Packaging the edition

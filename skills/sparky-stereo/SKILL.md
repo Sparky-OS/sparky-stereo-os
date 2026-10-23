@@ -120,7 +120,7 @@ Load the one that matches the work; the [program list](../../docs/programs-in-de
 | [`native-linux`](../native-linux/SKILL.md) | OpenGL, EGL, Vulkan, Qt and X11 programs on Linux |
 | [`proton-wine`](../proton-wine/SKILL.md) | Windows programs through Wine, DXVK and gamescope |
 | [`gamecontroller`](../gamecontroller/SKILL.md) | KDE controller models and labels for flight and racing rigs, preserving every raw control and verifying upstream profiles |
-| [`edition-packaging`](../edition-packaging/SKILL.md) | The edition's tasks and metapackages, tasksel, keeping our builds the only candidates, the media stack on deb-multimedia |
+| [`edition-packaging`](../edition-packaging/SKILL.md) | Building, signing and shipping: provenance, Paweł's formula, tasks, our builds as the only candidates, the repository, the ISO |
 | [`lean-code`](../lean-code/SKILL.md) | Lean Code: text files installed without the comments the machine never reads, how each format is checked, and how to verify, explain or undo a file with dpkg-stereo |
 | [`stereo-artwork`](../stereo-artwork/SKILL.md) | Artwork in an existing style, stereo pairs with a measured separation, animation in both eyes, editable deliverables |
 | [`power-idle`](../power-idle/SKILL.md) | KDE idle, lock, laptop lids, power-profile holds, CEC ownership and console isolation proof |

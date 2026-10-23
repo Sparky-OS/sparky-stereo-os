@@ -29,7 +29,7 @@ Historical versions and test results are evidence for their stated setup, not a 
 | Sound routing, formats or MIDI | [audio](audio/SKILL.md) |
 | Idle, locking, lid, CEC, swap or hibernate | [power-idle](power-idle/SKILL.md) |
 | Logs, retained kernels and cleanup | [system-housekeeping](system-housekeeping/SKILL.md) |
-| Distro tasks, dependencies and packages | [edition-packaging](edition-packaging/SKILL.md) |
+| Packages and their provenance, Paweł's formula, distro tasks and dependencies, the signed repository, the ISO | [edition-packaging](edition-packaging/SKILL.md) |
 | Lean Code projection or resolving installed source | [lean-code](lean-code/SKILL.md) |
 | Android Qt test reproduction | [qt-android-ci](qt-android-ci/SKILL.md) |
 | Brazilian certificate sources and algorithms | [brazil-certificates](brazil-certificates/SKILL.md) |

@@ -120,7 +120,7 @@ By name, the Debian maintainers of the packages we carry with our patches, as th
 |---|---|
 | KWin, KFileMetaData | Debian Qt/KDE Maintainers; Aurélien Couderc, Patrick Franz |
 | Qt (qtbase), Qt Multimedia | Debian Qt/KDE Maintainers; Patrick Franz |
-| Analitza, KAlgebra, Dragon Player, KolourPaint, Dolphin | Debian Qt/KDE Maintainers; Aurélien Couderc |
+| Analitza, KAlgebra, Dragon Player, KolourPaint, Dolphin, Partition Manager | Debian Qt/KDE Maintainers; Aurélien Couderc |
 | KIO, KIconThemes | Debian Qt/KDE Maintainers; Aurélien Couderc, Patrick Franz |
 | kio-extras | Debian Qt/KDE Maintainers; Aurélien Couderc, Pino Toscano |
 | ffmpegthumbs | Debian Qt/KDE Maintainers; Aurélien Couderc, Pino Toscano, Scarlett Moore |
@@ -173,6 +173,39 @@ Daniel has loved KDE since his early days with Linux.
 Our KDE changes live in forks on invent.kde.org, offered back to KDE as one patch set.
 
 **Credit**: the KDE community; the people of each KDE program are named in the sections below.
+
+### 0.3.1 Desktop search, recovery and file management
+
+The edition's desktop defaults and small patches ([kde-desktop-defaults](skills/kde-desktop-defaults/SKILL.md)) build on these KDE projects.
+Names below come from their application author lists, the copyright records of the code and tests used here, and the upstream build-fix commits.
+They credit the original work; they do not replace each project's full contributor list.
+
+| Project | Work we build on | People named by its records |
+|---|---|---|
+| [plasma-workspace](https://invent.kde.org/plasma/plasma-workspace) | Logout greeter, session management and its tests | Martin Graesslin, David Edmundson, Aleix Pol Gonzalez; Nicolas Fella and Tobias Fella for the upstream build fixes |
+| [Dolphin](https://invent.kde.org/system/dolphin) | File context menus, Places panel, toolbar and tests | Felix Ernst, Méven Car, Elvis Angelaccio, Emmanuel Pescosta, Frank Reininghaus, Peter Penz, Sebastian Trüg, David Faure, Aaron J. Seigo, Rafael Fernández López, Kevin Ottens, Holger Freyther, Max Blazejak, Michael Austin; Stefan Monov, Mathieu Tarral, Cvetoslav Ludmiloff, Kai Uwe Broulik and Sebastian Englbrecht |
+| [Partition Manager](https://invent.kde.org/system/partitionmanager) | Partition selection, operation queue, authentication and progress | Volker Lanz, Andrius Štikonas, Teo Mrnjavac, Chantara Tith, Pali Rohár, Hugo Pereira Da Costa, Caio Jordão Carvalho; Abhijeet Sharma, René J.V. Bertin and Huzaifa Faruqui |
+| [KPMcore](https://invent.kde.org/system/kpmcore) | Filesystem creation, labels and command execution | Volker Lanz, Andrius Štikonas, Teo Mrnjavac, Pali Rohár, Shubham Jangra, Arnaud Ferraris, Gaël PORTAY, Yuri Chornoivan, Chantara Tith, Huzaifa Faruqui, Caio Jordão Carvalho and David Edmundson |
+| [KIO](https://invent.kde.org/frameworks/kio) | Places actions and application and terminal launch jobs | David Faure, Kevin Ottens, Rafael Fernández López, Kai Uwe Broulik, Harald Sitter, and the KIO contributors |
+
+The unit converter's currency change is credited in section 6, with Plasma Add-ons.
+Plasma's search proof also uses [KRunner](https://invent.kde.org/frameworks/krunner), [Milou](https://invent.kde.org/plasma/milou) and [KUnitConversion](https://invent.kde.org/frameworks/kunitconversion).
+Task recovery uses [KGlobalAccel](https://invent.kde.org/frameworks/kglobalaccel), [System Monitor](https://invent.kde.org/plasma/plasma-systemmonitor) and KWin.
+Terminal launch uses [Konsole](https://invent.kde.org/utilities/konsole).
+The KDE Frameworks and application contributors provide those facilities.
+The build and test jobs come from KDE's [CI utilities](https://invent.kde.org/sysadmin/ci-utilities) and [CI images](https://invent.kde.org/sysadmin/ci-images).
+
+Removable-drive formatting uses these filesystem utilities through KPMcore.
+Names come from their source copyright headers and Debian copyright records.
+
+| Project | Work we build on | People named by its records |
+|---|---|---|
+| [dosfstools](https://github.com/dosfstools/dosfstools) | FAT32 creation and volume labels | Linus Torvalds, Remy Card, David Hudson, H. Peter Anvin, Roman Hodek, Werner Almesberger, Daniel Baumann, Andreas Bombe and Pali Rohár; Andreas Bombe maintains it in Debian |
+| [exfatprogs](https://github.com/exfatprogs/exfatprogs) | exFAT creation and volume labels | Namjae Jeon, Hyunchul Lee, David Timber and Gary S. Brown; LG Electronics and the exfatprogs contributors; Sven Hoexter maintains it in Debian |
+| [ntfs-3g](https://github.com/tuxera/ntfs-3g) | NTFS creation and volume labels | Anton Altaparmakov, Richard Russon, Szabolcs Szakacsits, Erik Sornes, Yura Pakhuchiy, Jean-Pierre Andre and Matthew J. Fanto; Tuxera and the ntfs-3g Development Team; Laszlo Boszormenyi (GCS) maintains it in Debian |
+
+The independent filesystem checks use `blkid` from [util-linux](https://github.com/util-linux/util-linux).
+Its command and library copyright records name Andreas Dilger, Andries Brouwer, Theodore Ts'o, Kay Sievers, Karel Zak, Bastian Friedrich, Corentin Chary, Mike Hommey, Andrew Nayenko, Jeroen Oortwijn, Jiro SEKIBA, Philipp Marek, Milan Broz, Alejandro Martinez Ruiz, Eric Sandeen, Rolf Fokkens and Zeeshan Ali (Khattak), alongside Red Hat and the util-linux contributors.
 
 ### 0.4 Conectiva and its programmers
 
@@ -501,6 +534,10 @@ Existing KWin, libkscreen, Qt and FFmpeg credits above also apply.
 | [linux-base](https://salsa.debian.org/kernel-team/linux-base) (linux-sysctl-defaults) | systemd's sysctl defaults in Debian, `vm.max_map_count = 1048576`: the reason the edition's sysctl file is named 70 | Ben Hutchings, Salvatore Bonaccorso and Gioele Barabucci (Debian's copyright records) |
 | [Fedora's SwapOnZRAM change](https://fedoraproject.org/wiki/Changes/SwapOnZRAM) | Prior art for zram swap by default, which the edition keeps only where the hardware needs it | Chris Murphy, the change owner |
 | [KAuth](https://invent.kde.org/frameworks/kauth) and [KCMUtils](https://invent.kde.org/frameworks/kcmutils) | The Memory page in System Settings and its privileged write | The KDE Frameworks contributors |
+| [adduser](https://salsa.debian.org/debian/adduser) | `EXTRA_GROUPS` and `ADD_EXTRA_GROUPS`, which give every new desktop user the edition's groups ([user-groups](skills/user-groups/SKILL.md)) | Guy Maor, Roland Bauerschmidt, Joerg Hoh, Stephen Gran, John Zaitseff, Marc Haber, Jason Franklin and the others in Debian's copyright records, back to Ian Murdock, Sven Rudolph and Ted Hajek |
+| [AccountsService](https://gitlab.freedesktop.org/accountsservice/accountsservice) | System Settings' Users page, whose Debian packaging creates accounts with adduser | Red Hat, Inc., William Jon McCann, James M. Cape and Canonical in its copyright records; Alessio Treglia for Debian's packaging |
+| [base-passwd](https://salsa.debian.org/debian/base-passwd)'s "Users and Groups in the Debian System" | What each system group means | Joey Hess, Colin Watson and David Mandelberg |
+| [Calamares](https://calamares.io/) | The installer's users module and its `defaultGroups` | Teo Mrnjavac and Adriaan de Groot, its maintainers through the years, and the community maintainers Anke Boersma and Evan James (its AUTHORS file); SparkyLinux's `users.conf` by Paweł "pavroo" Pijanowski |
 | [v4l-utils](https://git.linuxtv.org/v4l-utils.git/) and Linux's CEC framework | cec-ctl and the CEC ioctl interfaces used by the TV controller | The Linux media contributors; Cisco Systems, Inc. and its affiliates in cec-ctl's copyright records |
 | [systemd](https://github.com/systemd/systemd), [procps-ng](https://gitlab.com/procps-ng/procps), GLib/Gio and PolicyKit | Native settings readers, sessions, D-Bus clients and profile authorization | Their contributors and Debian maintainers |
 | [Wine](https://www.winehq.org/), Proton, [DXVK](https://github.com/doitsujin/dxvk), [gamescope](https://github.com/ValveSoftware/gamescope) | Windows games on Linux | Alexandre Julliard and the Wine developers, CodeWeavers, Philip Rebohle, Valve |

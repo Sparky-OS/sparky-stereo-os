@@ -17,6 +17,7 @@ Capability is established by the work and its checks, not by a provider name.
 1. Read the user's requested outcome, current authorization and [edition contract](../sparky-stereo/SKILL.md).
 2. Read the shared project-memory index and relevant decision topics named in the brief, then find existing source and tests. Record the target revision and dirty files before editing.
 3. Choose one bounded task and its owning layer. Read its domain skill; ask for missing facts only when they affect the next step.
+   Before a web search, or writing an API, protocol, codec or specification fact from memory, consult the [local reference index](#reference-knowledge-local-first).
 4. Make the smallest useful change and run the domain's observable check. If a result contradicts the plan, report it and revise the plan.
 5. Leave the handoff below. Continue authorized work; stop dependent work at an unresolved permission or missing prerequisite.
 
@@ -84,12 +85,22 @@ Reviewer checks should run without an AI account; document the same CLI or CI co
 Read the actual diff before writing its commit message: state the problem, reason and checked result, without inventing intent.
 For KDE changes, apply [the development practices reference](../native-linux/references/kde-development-practices.md); advice from one talk is not a project-wide contribution policy.
 
+## Reference knowledge, local first
+
+Daniel, 2026-10-23: consulting the local corpora is mandatory for the edition's own partners, and we recommend the same habit to every distro developer.
+- **Keep the references local and searchable.** Index the specifications, manuals and sources the skills cite: CTA-861 and HDMI, H.264 and H.265 annex D, RFC 9559 (Matroska), the Mesa, Qt, Wayland, Vulkan and OpenGL documentation, and the kernel's DRM documents. Use any vector store you like; ours is [Qdrant](https://qdrant.tech/), one collection per domain.
+- **Consult it first,** before a web search and before writing a fact from memory. A model's recall is the least reliable source in the chain.
+- **A hit is a lead, not an authority.** Read its score, open the original and quote the clause: the specification section, the commit or the manual page. Never cite "the corpus".
+- **Record what you consulted** in the handoff: the collections, the queries, and what was used or missing. A miss shows which document the index still needs.
+- The index holds public references only. Private correspondence and credentials never go into it.
+
 ## Handoff
 
 ```text
 Task and source revision:
 Status and changed paths:
 Environment and commands:
+References consulted (collections, queries, used or missing):
 Expected / observed result, including control:
 Evidence paths and hashes:
 Not tested / known limitations:

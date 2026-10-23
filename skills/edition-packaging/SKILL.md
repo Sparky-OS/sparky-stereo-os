@@ -9,12 +9,12 @@ description: >-
 ## Working recipe
 
 1. Record source commits, package versions, architecture, repository pins and the task that should install the result.
-2. Write the control file, copyright file, script headers and changelog in [Paweł's formula](references/sparky-formula.md) with the edition's [provenance](#provenance-daniel-2026-10-02-always).
+2. Write the control file, copyright file, script headers and changelog in [Paweł's formula](references/sparky-formula.md) with the edition's [provenance](#provenance-daniel-2026-10-02-always); rebuild upstream packages as [rebuilt packages](references/rebuilt-packages.md) says.
 3. Build in isolation, inspect package contents and simulate installation/upgrade before the installed-payload checks below.
 4. Return source/binary hashes, dependency resolution and runtime evidence. Separate local candidate, repository publication and ISO inclusion.
 
 **Check freshness first.**
-Written on 2026-10-07; the developer tasks and the skills package on 2026-10-16; provenance and Paweł's formula on 2026-10-23, from rules dated 2026-10-02 to 2026-10-22.
+Written on 2026-10-07; the developer tasks and the skills package on 2026-10-16; provenance, Paweł's formula and rebuilt packages on 2026-10-23, from rules dated 2026-10-02 to 2026-10-22.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
 
 ## Provenance (Daniel, 2026-10-02): always
@@ -115,6 +115,7 @@ The measurements and the file by file account are in [GPU vendors' repositories]
 
 Each is the distribution's source package plus our patch series, versioned with the suffix `+stereo3dN`, built in a fresh `debian:testing` container, and it keeps its source package, so the repository can offer `deb-src`.
 A 32-bit twin (Mesa and FFmpeg, for Steam and Wine) comes from the same source build as the 64-bit package: `dpkg` refuses to install the two together when a shared file such as the Debian changelog differs (`Multi-Arch: same`).
+The rest, Mesa's acceptance and the KDE CI run before a push to invent.kde.org included, is in [rebuilt packages](references/rebuilt-packages.md).
 
 **Lean Code release requirement (Daniel, 2026-10-18):** every package and ISO we publish passes the edition's Lean Code pipeline. Finish provenance and notices before projecting the disposable package tree; calculate checksums from its lean payload, then assemble and sign. The versioned `lc1` control marker binds the coverage manifest and lets clients skip rendering. Publish exact HR documentation companions beside the packages, outside the ISO's default package set. The publisher rejects missing or stale evidence; never add the marker by hand or change a previously published version in place. See the [lc package contract](../../docs/lean-code-packages.md). The 0.1.7 development tooling qualifies the Android companion package set; other existing packages and the final ISO still require migration.
 

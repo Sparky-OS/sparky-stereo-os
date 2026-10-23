@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: passwd
 name: user-groups
 description: >-
   Give every desktop user the Unix groups the edition's hardware and programs need, however the account is made, and add a group when a feature needs one; never a root-equivalent group.

@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: imagemagick
 name: stereo-pictures
 description: >-
   Preserve stereo image layouts, eye order and metadata through readers, writers, viewers, thumbnails and caches.

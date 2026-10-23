@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: libinput-tools
 name: gamecontroller
 description: >-
   Maintain KDE raw controller models, profile labels and accessible navigation without losing axes, buttons or hats.

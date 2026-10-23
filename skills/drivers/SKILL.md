@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: mesa
 name: drivers
 description: >-
   Implement and test kernel/display-driver stereo modes, HDMI signaling and deep-colour links; carry edition patches with provenance.

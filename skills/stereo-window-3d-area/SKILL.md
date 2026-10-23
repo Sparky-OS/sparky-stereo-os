@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: qt6-base-dev
 name: stereo-window-3d-area
 description: >-
   Integrate stereo content surfaces inside ordinary Qt/KDE windows and develop coherent 2D plane depth with clipping and input tests.

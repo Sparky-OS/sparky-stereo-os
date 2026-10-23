@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: v4l-utils
 name: stereo-two-cameras
 description: >-
   Generate and verify coherent per-eye projections for real 3D scenes, including geometry, state restoration and eye-private effects.

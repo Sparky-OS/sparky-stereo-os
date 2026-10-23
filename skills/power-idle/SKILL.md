@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: powertop
 name: power-idle
 description: >-
   Maintain KDE power, locking, idle, lid, CEC, swap and hibernate policy while preserving explicit user settings.

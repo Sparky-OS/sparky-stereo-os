@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: opensc
 name: brazil-certificates
 description: >-
   Research ICP-Brasil certificate sources and Ed521 compatibility for Linux packaging. Use certificate-manager for trust-store changes.

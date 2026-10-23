@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: pipewire
 name: audio
 description: >-
   Maintain PipeWire, WirePlumber and KDE audio routing, source formats, passthrough and MIDI in the edition.

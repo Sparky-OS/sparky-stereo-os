@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: qemu-system-x86
 name: stereo-vm
 description: >-
   Verify stereo VM viewers, logical input coordinates, resize and mode transitions with isolated guests and negative controls.

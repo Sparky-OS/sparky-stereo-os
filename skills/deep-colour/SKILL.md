@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: libdrm-dev
 name: deep-colour
 description: >-
   Trace and test colour precision and HDR metadata across applications, Qt, Mesa, KWin and display links.

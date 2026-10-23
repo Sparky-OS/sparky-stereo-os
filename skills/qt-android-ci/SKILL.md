@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: qt6-base-dev-tools
 name: qt-android-ci
 description: >-
   Reproduce Qt Multimedia Android CI in a headless emulator with exact Qt/NDK/ABI inputs and complete QTest row evidence.

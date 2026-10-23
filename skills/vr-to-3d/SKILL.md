@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: dav1d
 name: vr-to-3d
 description: >-
   Adapt VR eye images for flat stereo displays and spectator viewing while distinguishing play controls from headset camera preservation.

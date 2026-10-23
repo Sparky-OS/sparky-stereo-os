@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: ffmpeg
 name: 3d-to-vr
 description: >-
   Integrate stereo desktop/media reception on headsets and phone viewers, including transport, decoding, lens output and lifecycle proof.

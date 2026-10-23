@@ -14,6 +14,7 @@ Historical versions and test results are evidence for their stated setup, not a 
 | Theme, Canvas Painter, StyleKit or KWin effects depth | [stereo-window-3d-area](stereo-window-3d-area/SKILL.md) and its [Qt/KDE depth reference](stereo-window-3d-area/references/qt-kde-depth.md) |
 | A scene with cameras and view-dependent rendering | [stereo-two-cameras](stereo-two-cameras/SKILL.md) |
 | Video decoding, editing, export or streaming | [stereo-video](stereo-video/SKILL.md) |
+| Serving or casting to a television, player or phone over the network | [stereo-serving](stereo-serving/SKILL.md) |
 | Photos, format marks or thumbnails | [stereo-pictures](stereo-pictures/SKILL.md) |
 | Colour precision or HDR metadata | [deep-colour](deep-colour/SKILL.md) |
 | Artwork, animated pairs or theme assets | [stereo-artwork](stereo-artwork/SKILL.md) |

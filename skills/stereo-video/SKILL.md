@@ -37,6 +37,8 @@ Most 3D breakage is a program in the middle silently writing a plain 2D file.
 
 ## Writers: encoders, muxers, editors, servers
 
+A server or caster that feeds another device (a DLNA television, a cast receiver) sends that device's own frame format at its raster, not the desktop's full side by side: see [stereo-serving](../stereo-serving/SKILL.md).
+
 | Program | What carries the mark | Where |
 |---|---|---|
 | x264 (through HandBrake) | `--frame-packing` writes the SEI | [HandBrake #8100](https://github.com/HandBrake/HandBrake/pull/8100), merged |

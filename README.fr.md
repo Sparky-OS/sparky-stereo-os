@@ -4,7 +4,7 @@
 
 **Créez et explorez en 3D sur l'écran que vous avez déjà : peinture, retouche de photos et de vidéos, étude de molécules et de globes, puis films et jeux.**
 Un téléviseur 3D fonctionne, tout comme n'importe quel écran ordinaire avec de simples lunettes rouge-cyan, et désormais un téléphone Android compatible dans une visionneuse peu coûteuse : un [bureau stéréo utilisable via USB](https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md), testé sur du matériel plus ancien.
-Sparky Stereo OS, l'édition de SparkyLinux par Daniel Ramos (de Paweł "pavroo" Pijanowski), est un système Linux doté d'un nouveau bureau KDE Plasma stéréo.
+Sparky Stereo OS, l'édition de Daniel Ramos de SparkyLinux (par Paweł « pavroo » Pijanowski), est un système Linux doté d'un nouveau bureau KDE Plasma stéréo.
 
 **Lisez l'architecture :** [guide illustré et carte du dépôt](docs/architectural-synthesis.md), avec une [infographie pleine grandeur et sa version texte](docs/architecture-infographic.md), adaptée et vérifiée à partir des recherches Gemini / NotebookLM de Daniel.
 
@@ -179,7 +179,7 @@ Les recherches derrière cette édition sont publiques, dans trois listes sélec
 
 ## Crédits
 
-Sparky Stereo OS, l'édition de SparkyLinux par Daniel Ramos (Capitain Jack), par Paweł "pavroo" Pijanowski.
+Sparky Stereo OS, l'édition de Daniel Ramos (Capitain Jack) de SparkyLinux (par Paweł « pavroo » Pijanowski).
 
 **Mainteneurs de paquets**, chacun avec les pleins droits sur son propre dépôt dans [Sparky-OS](https://github.com/Sparky-OS) :
 

@@ -12,6 +12,9 @@ Stacked background windows fan out from sunk towards popped, always behind the a
 A window caught in the middle of a pile, its edges out of the stack, reads as a sheet floating within it, the way a pile of papers looks in real life.
 No program declares this; it falls out of the order.
 
+**Inside the active window, each element has a depth of its own.**
+Buttons, fields, tabs and rows move by a pixel or less from the window, as the theme's shadows say, and the menus a window draws inside itself pop like any menu: [Depth inside every window](depth-inside-windows.md).
+
 **In the background, each window is 2D.**
 A window in the pile is a flat sheet at its place in the stack: the desktop's pop effects inside it come to one plane.
 Its stereo content stays 3D: a movie or a game is full side by side wherever its window is, so a 3D movie plays on one screen while you work on another.

@@ -1,0 +1,7 @@
+# Android's media path (checked 2026-10-07)
+
+Part of the [`stereo-video`](../SKILL.md) skill.
+
+- **Keep the layout beside the decoded frames.** Media3 carries it in [`Format.stereoMode`](https://github.com/androidx/media/blob/main/libraries/common/src/main/java/androidx/media3/common/Format.java); decoding to a MediaCodec `Surface` is a separate step from presenting each eye.
+- **The MP4 work is still in review.** [Media3 #3439](https://github.com/androidx/media/pull/3439) adds H.264/H.265 frame packing SEI detection in MP4 and fragmented MP4 when the container has no stereo value. It adds right-eye-first modes and writes the four side-by-side/top-and-bottom eye orders in WebM's `StereoMode` ([RFC 9559, Table 5](https://www.rfc-editor.org/rfc/rfc9559.html#section-5.1.4.1.28.3)). A container value wins in this patch; test conflicting marks before treating it as the edition's detection policy.
+- **Do not assume portable MediaCodec stereo side data.** The [Android 16 `MediaFormat` source](https://github.com/aosp-mirror/platform_frameworks_base/blob/android-16.0.0_r1/media/java/android/media/MediaFormat.java) defines no public stereo-layout key. On API 31 and later, [`getSupportedVendorParameters()` and `subscribeToVendorParameters()`](https://developer.android.com/reference/android/media/MediaCodec) can expose a codec's vendor metadata through its output format. Check the named codec and the meaning of each field before using it; keep extractor metadata when no stereo field is available.

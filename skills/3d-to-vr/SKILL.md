@@ -363,7 +363,7 @@ Credits: the KRDC, KRdp, KDE Plasma Mobile, Kirigami, Qt and FreeRDP developers,
 
 ## Physical-stream investigation and route ownership (2026-10-19)
 
-Use the [video skill's transport procedure](../stereo-video/SKILL.md#editing-playback-and-transport-boundaries-2026-10-19) to isolate each queue before tuning the link.
+Use the [video skill's transport procedure](../stereo-video/references/editing-playback-transport.md) to isolate each queue before tuning the link.
 Record actual client/server builds; state explicitly whether a fix requires a new Android APK, desktop package or both.
 For a reduced-resolution choice, verify negotiated dimensions at sender, encoder, decoder and renderer, then reconnect and change layouts.
 For Direct Wi-Fi, distinguish discovery/control authorization from group creation, address assignment and authenticated media connection.

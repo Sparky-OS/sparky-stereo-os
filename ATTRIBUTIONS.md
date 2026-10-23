@@ -93,7 +93,7 @@ And the early contributors the repository names among the group's first ingresso
 - KWin, Plasma, KDE Frameworks, Qt, Debian's packaging, SparkyLinux and its tools.
 
 **What we DID contribute:**
-- **One format inside the desktop:** programs hand KWin full side by side, both eyes at full size, left eye first, declared once (`kde-stereo-content-v1`, `libstereo-declare`), and KWin's outputs convert it for each screen: a 3D television's HDMI 3D modes, anaglyph, or the left eye on a 2D screen.
+- **One format inside the desktop:** programs hand KWin full side by side, two complete pictures with each eye at the resolution it has, left eye first, declared once (`kde-stereo-content-v1`, `libstereo-declare`), and KWin's outputs convert it for each screen: a 3D television's HDMI 3D modes, anaglyph, or the left eye on a 2D screen.
 - **The separation rule:** a window's 2D part and its 3D area are separate surfaces, so menus and text stay crisp at one eye's size while the 3D area carries both eyes.
 - **The depth rules for the desktop:** sunk, screen and popped planes, text at its element's depth, effects of a few pixels.
 - **A fix in each program where stereo or deep colour broke**, in that program's own style, listed below with the people who wrote the program.

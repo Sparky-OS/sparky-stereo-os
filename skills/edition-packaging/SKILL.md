@@ -9,12 +9,31 @@ description: >-
 ## Working recipe
 
 1. Record source commits, package versions, architecture, repository pins and the task that should install the result.
-2. Build in isolation, inspect package contents and simulate installation/upgrade before the installed-payload checks below.
-3. Return source/binary hashes, dependency resolution and runtime evidence. Separate local candidate, repository publication and ISO inclusion.
+2. Write the control file, copyright file, script headers and changelog in [Paweł's formula](references/sparky-formula.md) with the edition's [provenance](#provenance-daniel-2026-10-02-always).
+3. Build in isolation, inspect package contents and simulate installation/upgrade before the installed-payload checks below.
+4. Return source/binary hashes, dependency resolution and runtime evidence. Separate local candidate, repository publication and ISO inclusion.
 
 **Check freshness first.**
-Written on 2026-10-07; the developer tasks and the skills package on 2026-10-16.
+Written on 2026-10-07; the developer tasks and the skills package on 2026-10-16; provenance and Paweł's formula on 2026-10-23, from rules dated 2026-10-02 to 2026-10-22.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
+
+## Provenance (Daniel, 2026-10-02): always
+
+Every package of ours says who made it, the Sparky way, and [`provenance.sh`](https://github.com/Sparky-OS/sparky-stereo-os-build/blob/main/sparky-os/repo/provenance.sh) in the build tree writes it.
+
+- `Maintainer:` is Daniel's packaging identity, `Daniel Ramos (Capitain Jack)` with his project address, as provenance.sh writes it; build scripts set `DEBFULLNAME` and `DEBEMAIL` to it, and git commits carry `Daniel Campos Ramos` with the same address. Never `root@<container>`, and never an address from a build account or an assistant's session (Daniel, 2026-10-22).
+- `Original-Maintainer:` keeps whoever maintained a package we modified (Debian Qt/KDE Maintainers, NVIDIA), the convention of Debian derivatives.
+- `Homepage: https://sparkylinux.org`, with no trailing slash, the form most of Paweł's packages use.
+- `Bugs:` is the edition's [tracker](https://github.com/Sparky-OS/sparky-stereo-os/issues): a problem in our build never goes to the maintainer of the package we modified (Daniel, 2026-10-08).
+- The copyright file keeps its holders and gains our `Files: debian/*` stanza with the credit in Daniel's wording of 2026-10-07: "Sparky Stereo OS, Daniel Ramos's (Capitain Jack) edition of SparkyLinux (https://sparkylinux.org, by Paweł "pavroo" Pijanowski)".
+- Paweł's own packages keep his `Maintainer:` and are never modified in place: ship ours beside them, divert with `dpkg-divert`, or send him a pull request.
+- **Order:** `provenance.sh --tree STAGING` runs before Lean Code and the final checksums. A package sealed with the lc mark is never restamped (wrong provenance there needs a fresh build), and `make-repo.sh` never rewrites archives.
+
+## Paweł's way first
+
+Everything we ship follows Paweł "pavroo" Pijanowski's way first (he created SparkyLinux); our side adds what the stereo stack needs.
+The edition's own tools, themes and metapackages follow [his formula](references/sparky-formula.md), APTus included.
+His review comes after publication, and anything on his side needs his approval first (Daniel, 2026-10-02; [working with Paweł](references/sparky-formula.md#working-with-paweł)).
 
 ## Tasks, the Debian way
 

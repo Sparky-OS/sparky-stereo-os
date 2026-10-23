@@ -8,7 +8,7 @@ description: >-
 
 ## Working recipe
 
-1. Classify the task: stereo media/scene surface, whole-window depth, or proposed control-level depth. Choose the appropriate pattern below.
+1. Classify the task: stereo media/scene surface, whole-window depth, or control-level depth (built for Union-styled Qt Quick and Qt Widgets windows on Wayland). Choose the appropriate pattern below.
 2. Trace content, declaration, compositing, clipping and logical input separately; test resize, overlap, close/reopen and mode changes.
 3. Return both-eye captures, declaration count, geometry and 2D baseline. Shared styling does not imply shared rendering or an implemented stereo consumer.
 
@@ -19,7 +19,7 @@ The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; this
 ## The shape
 
 This section describes a stereo content area with depth-neutral surrounding UI.
-For whole-window depth and proposed control-level depth, read [Qt, KDE and depth](references/qt-kde-depth.md).
+For whole-window depth and control-level depth, read [Qt, KDE and depth](references/qt-kde-depth.md) and [Depth inside every window](../../docs/depth-inside-windows.md).
 Run eye-equality checks below with desktop plane depth disabled; when enabled, validate the intended transform and logical input instead of identical screen coordinates.
 
 A program window has two parts that must not be mixed:

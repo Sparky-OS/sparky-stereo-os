@@ -19,6 +19,7 @@ The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; for 
 ## The routes
 
 For Qt/StyleKit/Canvas Painter or KWin effects work, first classify the input using [the depth guidance](../stereo-window-3d-area/references/qt-kde-depth.md).
+The edition's Qt draws a window whose style shows depth (Union) once per eye on Wayland: Qt Quick on the OpenGL RHI, Qt Widgets on the shared memory backing store; the Vulkan RHI, the software backend, `QQuickWidget`, client-side decorations and X11 still draw it flat ([Depth inside every window](../../docs/depth-inside-windows.md)).
 An imperative 2D API can produce coordinated eye views; shared styling does not make Widget and Quick rendering identical.
 Record exact toolkit/backend versions and loaded libraries before adopting an API from a talk.
 For KDE application or toolkit changes, use [the development review recipe](references/kde-development-practices.md): translation context/extraction, QML tooling, lifetime, CI and privileged-action checks.

@@ -48,6 +48,7 @@ Every mark is registered in [stereo-layer](https://github.com/Sparky-OS/stereo-l
 
 For a live theme/control, use [the toolkit/depth guidance](../stereo-window-3d-area/references/qt-kde-depth.md).
 Keep appearance, motion and semantic depth separately editable; the proposed Theme Editor is not a shipped feature.
+In a Union theme the shadows already set each element's depth (outer raises, inset sinks, the strongest shadow in the window a whole step of `ElementLimit`, 1 px by default), and `depth: sunk | screen | popped | <percentage> | <number>` declares it where the drawing does not say; a declared depth wins ([Depth inside every window](../../docs/depth-inside-windows.md)).
 Preview focus/pressed/disabled states, high contrast, reduced motion and ordinary 2D alongside both eyes.
 Edge-deep and centre-deep desktop designs are possible policies to prototype; stereo does not mandate one depth map.
 

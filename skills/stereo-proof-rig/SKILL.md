@@ -76,6 +76,17 @@ Traps:
 - **A subsurface's position applies with its parent's next commit:** a test window must repaint after placing its stereo surface.
 - **On X11 the buffer is the window's own pixmap**, so an X11 program whose views have another resolution than their place declares the size one view is shown at (support version 6). Prove it in four parts: the X11 window's own size (`xcb_get_geometry`: both views at their resolution, 3840x540 for half top and bottom), its contents read back with `XGetImage` equal to the views handed over, sample for sample, each eye's region of the capture against FFmpeg's resize of the view to the declared size, and the same run on a KWin that announces 5 as the control. A half top-and-bottom 1920x1080 picture, a 3840x540 window declaring 1920x1080, scores 63 dB per eye against FFmpeg's resize of its 1920x540 view, and 8 dB on +stereo3d29, which shows each eye at 1920x540.
 
+## Element depth inside a window
+
+A window whose elements show depth (Union on the edition's Qt, [Depth inside every window](../../docs/depth-inside-windows.md)) is measured element by element.
+
+1. **A 3D mode on the virtual output.** Start KWin with `KWIN_VIRTUAL_STEREO_MODES=1`, which gives `--virtual` outputs the 3D twins a monitor gets, and restore a saved `kwinoutputconfig.json` in one of them (side by side half), so the window is awake from its first frame.
+2. **The user's limits, written as System Settings writes them:** `kwinrc`, `[StereoDepth]`, `SunkLimit`, `PoppedLimit` and `ElementLimit`. Run the shipped values (`SunkLimit` 10, `PoppedLimit` 4, `ElementLimit` 1) and the measuring scale (`ElementLimit=12`): at 1 px, shares of 0.111 or 0.333 px change no pixel and 0.667 px changes one, so only the larger scale makes every share and every cut measurable. Never report 12 as a default.
+3. **The prediction, from the theme, not from the code under test:** each element's parallax worked out by hand from the style's CSS (shadow strengths against the strongest in the window, nesting fitted into the limit, declared depths), compared with the measured disparity and with the parallax the style reports.
+4. **The measurement:** for each element, the horizontal shift that best matches the same window drawn on a 2D output, searched in steps of 0.005 px with linear interpolation, in each eye; the disparity is the left shift minus the right. A deeper element is cut to its rectangle: also count the pixels that differ beside it (0 expected) and inside it (many).
+5. **Controls:** the same case with Debian's Qt Quick (the elements off the screen plane measure 0, so the case must fail), limits 0/0/0 and a 2D output (0 differing pixels against the same window drawn without the depth packages: the edition as published, with the style built without its depth), and both Qt Quick render loops (`QSG_RENDER_LOOP=basic` and the threaded default).
+6. **On the wire:** `WAYLAND_DEBUG=client` shows the style's `get_depth` and `depth_state`, Qt's `set_desktop_depth`, and the pair's one `set_content(3)` on the same commit.
+
 ## Traps that fooled us
 
 - **Searching vertical offsets** in block matching picks false matches on repeated patterns; match on the same row and check the vertical profile on its own.

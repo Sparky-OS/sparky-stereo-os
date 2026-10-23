@@ -28,7 +28,7 @@ Historical versions and test results are evidence for their stated setup, not a 
 | Controllers, labels, focus or shell navigation | [gamecontroller](gamecontroller/SKILL.md) |
 | Sound routing, formats or MIDI | [audio](audio/SKILL.md) |
 | Idle, locking, lid, CEC, swap or hibernate | [power-idle](power-idle/SKILL.md) |
-| Plasma search defaults, task manager and frozen windows | [kde-desktop-defaults](kde-desktop-defaults/SKILL.md) |
+| Plasma search defaults, task manager, frozen windows and drive formatting | [kde-desktop-defaults](kde-desktop-defaults/SKILL.md) |
 | Unix groups for desktop users | [user-groups](user-groups/SKILL.md) |
 | Logs, retained kernels and cleanup | [system-housekeeping](system-housekeeping/SKILL.md) |
 | Packages and their provenance, Paweł's formula, distro tasks and dependencies, the signed repository, the ISO | [edition-packaging](edition-packaging/SKILL.md) |

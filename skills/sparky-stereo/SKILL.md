@@ -124,7 +124,7 @@ Load the one that matches the work; the [program list](../../docs/programs-in-de
 | [`lean-code`](../lean-code/SKILL.md) | Lean Code: text files installed without the comments the machine never reads, how each format is checked, and how to verify, explain or undo a file with dpkg-stereo |
 | [`stereo-artwork`](../stereo-artwork/SKILL.md) | Artwork in an existing style, stereo pairs with a measured separation, animation in both eyes, editable deliverables |
 | [`power-idle`](../power-idle/SKILL.md) | KDE idle, lock, laptop lids, power-profile holds, CEC ownership and console isolation proof |
-| [`kde-desktop-defaults`](../kde-desktop-defaults/SKILL.md) | Plasma search defaults, task management and frozen-window recovery |
+| [`kde-desktop-defaults`](../kde-desktop-defaults/SKILL.md) | Plasma search defaults, task management, frozen windows and drive formatting |
 | [`user-groups`](../user-groups/SKILL.md) | The groups every desktop user gets, never a root-equivalent one |
 | [`system-housekeeping`](../system-housekeeping/SKILL.md) | Self-pruning defaults (kernels, logs, crash dumps, GRUB) and cleaning a system safely |
 | [`ai-partners`](../ai-partners/SKILL.md) | AI assistants joining the work: roles, briefs, proof, review, upstream manners, provenance |

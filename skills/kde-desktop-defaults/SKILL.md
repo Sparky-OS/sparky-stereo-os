@@ -1,7 +1,7 @@
 ---
 name: kde-desktop-defaults
 description: >-
-  Maintain the edition's Plasma defaults and small KDE patches for search, task management and frozen-window recovery, with native and packaged regression proof.
+  Maintain the edition's Plasma defaults and small KDE patches for search, task management, frozen-window recovery, removable-drive formatting and running scripts, with native and packaged regression proof.
 ---
 
 # KDE desktop defaults
@@ -53,6 +53,15 @@ The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; pack
   - Check the actual System Monitor process, the selection, and the victim's exit; Cancel must leave the victim running.
   - Drive the registered global shortcuts, not just a direct call to the greeter's methods.
   - Use a separate client as a control, and keep the test independent of a person's running desktop.
+
+## Removable drives and scripts in Dolphin and Partition Manager
+
+- **Format a removable drive from Dolphin.** The Places panel offers Format… for a removable or hot-pluggable drive when Partition Manager is installed; it runs `partitionmanager --device <node> --format` through KIO's command launcher (the `dolphin` recipe's patch).
+- **Partition Manager opens one focused Format dialog** for that request (the `partitionmanager` recipe's patch): the device, the file system by its plain name (FAT32, exFAT or NTFS, through KPMcore and the dosfstools, exfatprogs and ntfs-3g tools), and the label, kept from the drive.
+  - A label the chosen file system cannot take is refused with a message, before anything happens.
+  - Formatting asks for confirmation ("will erase all its files"), unmounts the partition first, and refuses while other changes are pending.
+- **Shell scripts in Dolphin:** a local, non-executable shell script offers Run in a terminal…, which shows the script read-only before it runs. Dolphin also shows Reload.
+- **Proof:** each patch keeps its tests with the source, with a cancel row and a row per file system; check the result with an independent `blkid` (file system and label), and run KDE's CI and the native comparison against the unpatched release apart from Debian's nocheck package build.
 
 ## The CI and package gates
 

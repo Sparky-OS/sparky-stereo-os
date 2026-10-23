@@ -29,6 +29,7 @@ Historical versions and test results are evidence for their stated setup, not a 
 | Sound routing, formats or MIDI | [audio](audio/SKILL.md) |
 | Idle, locking, lid, CEC, swap or hibernate | [power-idle](power-idle/SKILL.md) |
 | Plasma search defaults, task manager and frozen windows | [kde-desktop-defaults](kde-desktop-defaults/SKILL.md) |
+| Unix groups for desktop users | [user-groups](user-groups/SKILL.md) |
 | Logs, retained kernels and cleanup | [system-housekeeping](system-housekeeping/SKILL.md) |
 | Packages and their provenance, Paweł's formula, distro tasks and dependencies, the signed repository, the ISO | [edition-packaging](edition-packaging/SKILL.md) |
 | Lean Code projection or resolving installed source | [lean-code](lean-code/SKILL.md) |

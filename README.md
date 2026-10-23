@@ -37,7 +37,7 @@ Most headsets are a pair of small screens, one for each eye, and the rest split 
 
 ## Who builds it
 
-Daniel, from a favela in Brasília, with one human contributor so far: Jeromy Streets, whose video wallpaper for Plasma ([org.kde.video](https://github.com/Sparky-OS/org.kde.video)) now lives in Sparky-OS, with him as its maintainer.
+Daniel, from a favela in Brasília, with two human contributors so far: Jeromy Streets, whose video wallpaper for Plasma ([org.kde.video](https://github.com/Sparky-OS/org.kde.video)) now lives in Sparky-OS with him as its maintainer, and Eff (effcol), who keeps iZ3D's code alive as [wiz3D](https://github.com/Sparky-OS/wiz3D) and maintains it here.
 Stereo on Linux waited years for volunteers: earlier attempts stalled because reviewers had no 3D display, and the work spans the kernel, Mesa, KWin, FFmpeg, the players and the web standards.
 No other developer came forward to carry it, so the other partners at work here are AI ones, directed and checked by Daniel and named in [AI provenance](docs/ai-provenance.md).
 If you would rather see it built by human hands, you are more than welcome: every fork is public, and every task is open.
@@ -175,6 +175,13 @@ The research behind this edition is public, in three curated lists anyone can co
 ## Credit
 
 Sparky Stereo OS, Daniel Ramos's (Capitain Jack) edition of SparkyLinux (by Paweł "pavroo" Pijanowski).
+
+**Package maintainers**, each with full rights over their own repository in [Sparky-OS](https://github.com/Sparky-OS):
+
+| | |
+| --- | --- |
+| <a href="https://github.com/effcol"><img src="https://github.com/effcol.png?size=96" width="72" alt="Eff"></a> | **Eff (effcol)**<br>Maintains [wiz3D](https://github.com/Sparky-OS/wiz3D), the universal stereoscopic 3D wrapper for DirectX, OpenGL, AMD HD3D and NVIDIA 3D Vision, based on iZ3D.<br>[![Follow Eff](https://img.shields.io/badge/Follow-effcol-2777AD?style=flat-square&logo=github)](https://github.com/effcol) |
+| <a href="https://github.com/halverneus"><img src="https://github.com/halverneus.png?size=96" width="72" alt="Jeromy Streets"></a> | **Jeromy Streets (halverneus)**<br>Created and maintains [org.kde.video](https://github.com/Sparky-OS/org.kde.video), the video wallpaper and lock screen for KDE Plasma.<br>[![Follow Jeromy](https://img.shields.io/badge/Follow-halverneus-2777AD?style=flat-square&logo=github)](https://github.com/halverneus) |
 
 **Version:** Sparky Stereo OS 9 "Mashtabba", based on Debian 14 "Forky", KDE Plasma only.
 

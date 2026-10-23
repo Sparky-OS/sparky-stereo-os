@@ -11,10 +11,10 @@ description: >-
 1. Record source commits, package versions, architecture, repository pins and the task that should install the result.
 2. Write the control file, copyright file, script headers and changelog in [Paweł's formula](references/sparky-formula.md) with the edition's [provenance](#provenance-daniel-2026-10-02-always); rebuild upstream packages as [rebuilt packages](references/rebuilt-packages.md) says.
 3. Build in isolation, inspect package contents and simulate installation/upgrade before the installed-payload checks below.
-4. Return source/binary hashes, dependency resolution and runtime evidence. Separate local candidate, repository publication and ISO inclusion.
+4. Return source/binary hashes, dependency resolution and runtime evidence. Separate local candidate, [repository publication](references/repository.md) and ISO inclusion.
 
 **Check freshness first.**
-Written on 2026-10-07; the developer tasks and the skills package on 2026-10-16; provenance, Paweł's formula and rebuilt packages on 2026-10-23, from rules dated 2026-10-02 to 2026-10-22.
+Written on 2026-10-07; the developer tasks and the skills package on 2026-10-16; provenance, Paweł's formula, rebuilt packages and the repository on 2026-10-23, from rules dated 2026-10-02 to 2026-10-22.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
 
 ## Provenance (Daniel, 2026-10-02): always
@@ -135,6 +135,11 @@ The owning changes are [KRDC Catch](https://invent.kde.org/danielcamposramos/krd
 Players and tools from deb-multimedia (VLC, mpv, OBS, HandBrake) link against its FFmpeg, which has a higher epoch than Debian's.
 So our stereo patches for FFmpeg and mpv go on deb-multimedia's source packages (`10:…-dmoN+stereo3dM`), with identical sonames, not on Debian's.
 Offer them to deb-multimedia in the agreed order, and upstream as before.
+A test image that installs from our repository needs deb-multimedia's source and our pin, as [the repository](references/repository.md#the-repository-sits-on-deb-multimedia) says.
+
+## The repository
+
+The development and published repositories, the key and a publication's order: [the repository](references/repository.md).
 
 ## Proof before shipping
 

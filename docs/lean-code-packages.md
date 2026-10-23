@@ -58,7 +58,7 @@ Native source checks must also cover generators that read comments or textual la
 During the 20 October migration, XScreenSaver's resource validator rejected inserted line directives, and SDL's manual generator needed the original header documentation.
 The 0.1.9 candidate leaves files with structured documentation or translator annotations unchanged and records additional package-specific preservation patterns in the retained source.
 This preserves those consumers while other qualified files still receive the pre-compilation pass.
-The [maintainer skill](../skills/lean-code/SKILL.md#native-source-consumers-migration-findings-20-october-2026) gives the preparation command and failure rules.
+The [maintainer skill](../skills/lean-code/references/native-source-consumers.md) gives the preparation command and failure rules.
 
 GLSL shaders remain unchanged until a shader-specific checker is qualified. The 0.1.12 migration candidate also repairs earlier install-time shader projections: it restores exact originals, leaves user edits intact and retries when the matching original is unavailable. Updating the checker alone would leave those old projections in packages that were not upgraded. This recovery is part of qualifying an existing installation; it does not mean the full repository migration has finished.
 

@@ -1,41 +1,50 @@
 ---
 name: contrib-ums
 description: >-
-  Contribute to Universal Media Server on GitHub with its contribution and style
-  guides plus device-level proof. Load with upstream-outreach before a UMS pull
-  request.
+  Contribute to Universal Media Server under its three accepted checks, Java
+  style gate and device-level proof. Load with upstream-outreach before a UMS
+  pull request.
 metadata:
   requires-packages: default-jre
 ---
 
 # Contributing to Universal Media Server
 
-Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this is Universal Media Server's own practice.
-Re-read `CONTRIBUTING.md`, the style guide and the active pull request before work.
+Written on 2026-10-24 from Universal Media Server's `CONTRIBUTING.md`, `STYLEGUIDE.md`, pull-request template and public pull requests [#6330](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6330) and [#6389](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6389).
+Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this skill is Universal Media Server's own practice.
+Re-read those files in the current `master` tree before every round.
 
-## Where
-- Pull requests are on the project's public GitHub repository.
-- Public review is the expected conversation surface.
-- One behavior belongs to one pull request.
-- Do not send private review mail.
+## Merge decisions
+- `CONTRIBUTING.md` says the project will merge changes only if they do not break automated tests.
+- It adds a second condition: "code review by one of our developers".
+- It adds a third condition: manual testing.
+- It also says to "please try to use the code conventions we use".
+- Plan the description so a reviewer can perform all three checks.
 
-## The change
-- Rebase on the current default branch before another review.
-- Separate dependency changes, profile work and behavior.
-- Describe the symptom, the media path and the result in the description.
-- Preserve the project's Java naming, logging and formatting habits.
+## The pull request
+- Use the template's three-part checklist: description, every relevant issue linked, and every relevant Knowledge Base article written or modified.
+- The same checklist requires relevant tests to be written or modified.
+- Keep renderer profile and Knowledge Base changes in one pull request only when the profile adds the documented article the template asks for.
+- `STYLEGUIDE.md` says to follow the Google Java Style Guide with block K&R style.
+- When resolving conflicts, `STYLEGUIDE.md` says "We prefer pulling" into the branch.
+- It explains that merge commits make conflict history easier to inspect than strategies that rewrite history.
 
-## Tests
-- Run the project's documented automated tests and build path.
-- Exercise the affected transcoding or rendering path manually.
-- Record the profile, device or client behavior as well as the automated result.
-- Do not claim a device works without checking that device or the exact public profile.
+## Device and media proof
+- Run the automated build and tests on the changed code.
+- Exercise the exact affected renderer profile and media path by hand.
+- Record the profile, client, exact input, command or configuration, old behaviour and new behaviour.
+- Do not claim a device works without testing that device or a demonstrably equivalent public profile.
+
+## AI policy
+- Universal Media Server's `CONTRIBUTING.md`, `STYLEGUIDE.md` and pull-request template state nothing about AI assistance.
+- All three files were checked on 2026-10-24.
 
 ## Public record
-- Merged pull request [#6330](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6330) shows a direct merged behavior fix and later release.
-- Merged pull request [#6389](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6389) shows another focused media declaration fix.
+- Public pull request [#6330](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6330) was a focused renderer and media-fix change.
+- Public pull request [#6389](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6389) was a focused media declaration change.
+- The reviewer asked for 3D test files on [#6389](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6389).
+- Treat that request as evidence that device and file-level proof matter for stereo changes.
 
 ## Replies
-- Disclose AI assistance once in the pull-request description.
-- Answer every review point with the test, log or device check.
-- Thank reviewers for the specific review work.
+- Answer each review point with the automated result, code-review note or manual check that resolves it.
+- Thank the reviewer for the specific review work.

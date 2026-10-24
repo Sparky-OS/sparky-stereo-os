@@ -53,4 +53,3 @@ Re-read `DOCS/contribute.md` in the current tree before every round.
 - The reviewer asked for the persistence fix in FFmpeg rather than a wider mpv backport.
 - The reviewer also asked to trim the description and commit messages.
 - On 2026-09-16, reviewer `llyyr` wrote that a contributor must show the ability to respond to review with human-written responses.
-- The lesson is to put a work-around at the layer that owns the fault, keep the description short and use AI only where mpv permits it.

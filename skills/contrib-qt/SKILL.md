@@ -1,40 +1,48 @@
 ---
 name: contrib-qt
 description: >-
-  Contribute to Qt through Gerrit with coordinated changes, Qt Test regressions
-  and public CI follow-up. Load with upstream-outreach before a Qt change.
+  Contribute a Qt module change through Gerrit with the CLA, verified author email, dev branch push and public review history.
 metadata:
-  requires-packages: qt6-base-dev | qt6-multimedia-dev
+  requires-packages: qt6-base-dev
 ---
 
 # Contributing to Qt
 
-Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this is Qt's own practice.
-Re-read the current Qt contribution guide and Gerrit project rules before uploading.
+Written on 2026-10-24 from Qt's contribution page (`https://contribute.qt-project.org/`, read 2026-10-24), the Qt Wiki Gerrit setup guide (`https://wiki.qt.io/Setting_up_Gerrit`, read 2026-10-24) and public changes 778399 and 778580 (read 2026-10-24).
+Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this skill is Qt's own practice.
+Re-read the Gerrit setup guide and the active change before every round.
 
 ## Where
-- Changes are on https://codereview.qt-project.org.
-- Gerrit's review thread is the public review surface.
-- A cross-module behavior is coordinated through related changes, not one sprawling change.
-- Do not move discussion to private mail.
+- Changes are uploaded through Gerrit at `https://codereview.qt-project.org`, not through a Git hosting pull request.
+- Push a change to the project's `dev` branch with `git push ssh://USER@codereview.qt-project.org:29418/qt/REPO HEAD:refs/for/dev`.
+- The Gerrit setup guide says to register the commit author email and click the confirmation email before contributing.
+- The same guide says the commit email must match a registered email address.
+- Accept the Qt Contribution Agreement in Gerrit before the first push.
+- Install the `commit-msg` hook from `qtrepotools` so Gerrit receives the `Change-Id`; add that footer by hand if the hook is absent.
+- For a release-series copy, upload the resolved cherry-pick to `refs/for/6.x`.
 
 ## The change
-- Rebase on the target branch before uploading or pushing again.
-- Keep the description about the symptom, the API promise and the proof.
-- Separate an unrelated build cleanup from the behavior.
-- Preserve the project's coding and commit conventions.
+- Qt's contribution page says a `dev` push needs a `Pick-to:` footer when cherry-picking to another release branch.
+- It also says the commit needs a `Task-number:` or `Fixes:` footer.
+- The cherry-pick bot opens the backports named by `Pick-to:`.
+- If a bot-opened backport conflicts, resolve it in the source tree, upload it as a new patch set to that backport with its original `Change-Id`, and post `cpbot: retry` on the change.
+- Before amending, fetch every patch set; a reviewer may have uploaded the latest set, and their work must not be pushed over or lost.
+- Update the same Gerrit change with a new patch set and the original `Change-Id`.
 
 ## Tests
-- Add a Qt Test regression before the fix when possible.
-- Make the regression fail on the unpatched code and pass with the fix.
-- Prefer data-driven columns when several inputs share the same path.
-- Commit the test with the fix; do not promise a later test.
+- In public change 778399, the Qt Sanity Bot first reported that omission of `6.12` from cherry-pick targets was probably incorrect.
+- In 778399, the reviewer parameterized the backend test to increase coverage and the author answered the exact line suggestion.
+- In 778399, the reviewer asked for use cases in `https://bugreports.qt.io` when test scope changed.
+- The Qt CI Bot and Qt Sanity Bot participate in the change and verify it before merge.
+- Run the affected module's targeted tests, upload the change, and monitor its bot and manual review results.
 
 ## Public record
-- Change [778399](https://codereview.qt-project.org/c/qt/qtmultimedia/+/778399) shows review by the Qt Multimedia maintainer.
-- Companion change [778580](https://codereview.qt-project.org/c/qt/qtmultimedia/+/778580) shows a coordinated branch backport.
+- Public change 778399, FFmpeg backend display peak reporting, was merged on `dev` on 2026-10-08.
+- Public change 778580, FFmpeg backend display peak reporting copied for `6.12`, was merged on 2026-10-09.
+- In 778399, the reviewer uploaded a later patch set that parameterized the test for broader coverage.
 
-## Replies
-- Disclose AI assistance once in the Gerrit change.
-- Address every reviewer point and mark the resolved state in Gerrit.
-- Thank reviewers by name for specific review work.
+## AI policy
+- Qt's contribution page and Gerrit setup guide state no project-wide rule for AI assistance, AI-generated code or LLM use (checked 2026-10-24).
+- On 2026-10-24, I checked the contribution page and `https://wiki.qt.io/Setting_up_Gerrit`; those public documents are the project's contribution instructions.
+- In public change 778399, review and service accounts did not raise AI assistance or reject the change for it.
+- Declare AI assistance only when the module's current review instructions or assigned reviewers require it.

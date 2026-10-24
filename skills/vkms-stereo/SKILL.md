@@ -1,6 +1,6 @@
 ---
 metadata:
-  requires-packages: igt-gpu-tools
+  requires-packages: qemu-system-x86 | igt-gpu-tools
 name: vkms-stereo
 description: >-
   Test DRM stereo mode enumeration, timing and writeback with an EDID-driven VKMS guest and independent expectations.

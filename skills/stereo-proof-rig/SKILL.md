@@ -1,6 +1,6 @@
 ---
 metadata:
-  requires-packages: kwin-wayland
+  requires-packages: kwin-wayland | docker.io
 name: stereo-proof-rig
 description: >-
   Run isolated compositor captures and negative controls for stereo identity, geometry, timing, UI and installed-package behavior.

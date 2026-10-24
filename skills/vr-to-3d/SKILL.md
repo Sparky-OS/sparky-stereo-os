@@ -1,6 +1,6 @@
 ---
 metadata:
-  requires-packages: gamescope
+  requires-packages: monado-service | steam-installer
 name: vr-to-3d
 description: >-
   Adapt VR eye images for flat stereo displays and spectator viewing while distinguishing play controls from headset camera preservation.

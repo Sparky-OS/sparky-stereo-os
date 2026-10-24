@@ -7,6 +7,7 @@ These are edition-maintenance procedures, not a general application-development 
 Start with [AGENTS.md](../AGENTS.md), the [edition contract](sparky-stereo/SKILL.md) and [working together](ai-partners/SKILL.md).
 Then choose one task below. Each domain starts with a short working recipe; detailed sections retain the measurements and traps that motivated it.
 Historical versions and test results are evidence for their stated setup, not a guarantee about newer software.
+Core skills are `sparky-stereo`, `ai-partners`, `upstream-outreach`, `edition-packaging` and `writing-front-pages`; they always link.
 
 | Your task | Read next |
 | --- | --- |

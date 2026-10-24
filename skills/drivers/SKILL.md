@@ -1,6 +1,6 @@
 ---
 metadata:
-  requires-packages: libgl1-mesa-dri | mesa-vulkan-drivers
+  requires-packages: dkms | edid-decode
 name: drivers
 description: >-
   Implement and test kernel/display-driver stereo modes, HDMI signaling and deep-colour links; carry edition patches with provenance.

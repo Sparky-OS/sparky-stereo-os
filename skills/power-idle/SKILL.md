@@ -1,6 +1,6 @@
 ---
 metadata:
-  requires-packages: powertop
+  requires-packages: powerdevil
 name: power-idle
 description: >-
   Maintain KDE power, locking, idle, lid, CEC, swap and hibernate policy while preserving explicit user settings.

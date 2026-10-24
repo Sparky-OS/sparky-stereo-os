@@ -2,8 +2,8 @@
 
 **For anyone who wants to know how AI was used here:** which partners took part, from which lab, where they ran and what part of the work they carried.
 Sparky Stereo OS is conceived, directed and verified by Daniel Ramos.
-It is collective intelligence work: partners from several labs worked with him and with each other, each one reading, checking and extending what the others did.
-The technique Daniel works with is named the synthetic user; today it is prompt and context engineering, the briefs and skills each partner reads before it works.
+It is collective intelligence work, as Daniel's chain-written manifesto ["Information is Power, Shared"](https://github.com/danielcamposramos/Knowledge3D/blob/main/docs/SCIENTIFIC_MANIFESTO_COLLECTIVE_INTELLIGENCE_CHAIN.md) (Knowledge3D, 2025) sets out: partners from several labs worked with him and with each other, each one reading, checking and extending what the others did.
+In Knowledge3D's terms the partners are Synthetic Users, and the technique carries that name; today it is prompt and context engineering, the briefs and skills each partner reads before it works.
 All of their use has been paid by Daniel personally; there is no sponsor so far.
 
 ## Why there are no counts here
@@ -18,7 +18,7 @@ The roles are the 14 of CRediT, the [Contributor Roles Taxonomy](https://credit.
 
 | Contributor | Roles (CRediT) |
 |---|---|
-| **Daniel Ramos** | Conceptualization, Methodology (the MVCIC chain, the synthetic user technique), Supervision, Project administration, Validation, Resources (the machines, the 3D televisions, the test media), Funding acquisition (he pays every partner himself), Writing (review and editing) |
+| **Daniel Ramos** | Conceptualization, Methodology (the MVCIC chain, the Synthetic User technique), Supervision, Project administration, Validation, Resources (the machines, the 3D televisions, the test media), Funding acquisition (he pays every partner himself), Writing (review and editing) |
 | **Anthropic, Claude** | Software, Investigation, Validation, Formal analysis, Data curation, Project administration (coordinating the lanes under Daniel), Writing (original draft) |
 | **OpenAI, GPT** | Software, Investigation, Validation, Visualization, Writing (original draft) |
 | **Moonshot AI, Kimi** | Software, Investigation |

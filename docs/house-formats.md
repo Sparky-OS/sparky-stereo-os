@@ -50,3 +50,10 @@ Broadcast and post-production work this way, and so does PipeWire for sound; thi
 - **Glasses-free panels:** DisplayXR's [window geometry specification](https://github.com/DisplayXR/displayxr-runtime/blob/main/docs/specs/runtime/wayland-window-geometry.md) and [ADR-033](https://github.com/DisplayXR/displayxr-runtime/blob/main/docs/adr/ADR-033-placement-reports-geometry-weaver-owns-phase.md): the compositor reports where a window is, and only the display vendor's weaver computes the lens phase.
 - **Sound in XR:** AES69-2015 (SOFA) for the head-related transfer functions of binaural headphone sound, which PipeWire's [filter chain](https://docs.pipewire.org/page_module_filter_chain.html) takes; who places the sound and who routes it: the [Sound section](stereo-labor-division.md#sound-the-same-division) of the labor division.
 - **Input devices:** the Linux input event codes (`include/uapi/linux/input-event-codes.h`); the USB HID Usage Tables.
+
+## Native X11 child placement
+
+The proposed support-version-8 `_KDE_NET_WM_STEREO_CONTENT_CHILD_PLACE` separates a listed child's buffer resolution from its destination rectangle and allows it below the ordinary parent surface.
+A player submits source-sized full-SBS video, while the parent paints subtitles and controls at display resolution without a stereo declaration.
+The [registered stereo-layer specification](https://github.com/Sparky-OS/stereo-layer/blob/main/docs/x11-child-place.md) defines the property and its input and fallback requirements.
+Publication requires the matching compositor and declaration-library support.

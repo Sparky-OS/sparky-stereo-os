@@ -18,7 +18,7 @@ The roles are the 14 of CRediT, the [Contributor Roles Taxonomy](https://credit.
 
 | Contributor | Roles (CRediT) |
 |---|---|
-| **Daniel Ramos** | Conceptualization; Software (the software architecture: he designed the OS and specified its stereo contract; his earlier software is reused in it); Methodology (the MVCIC chain, the Synthetic User technique); Investigation; Supervision; Project administration; Validation; Visualization; Resources; Funding acquisition (he pays every partner himself); Writing (review and editing) |
+| **Daniel Ramos** | Conceptualization; Software (the software architecture: he designed the OS and specified its stereo contract; his earlier software is reused in it); Methodology (the MVCIC chain, the Synthetic User technique); Investigation; Supervision; Project administration; Validation; Visualization; Resources; Funding acquisition (he pays for every AI partner himself); Writing (review and editing) |
 | **Anthropic, Claude** | Software, Investigation, Validation, Formal analysis, Data curation, Project administration (coordinating the lanes under Daniel), Writing (original draft) |
 | **OpenAI, GPT** | Software, Investigation, Validation, Visualization, Writing (original draft) |
 | **Moonshot AI, Kimi** | Software, Investigation |

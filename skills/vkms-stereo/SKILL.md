@@ -1,6 +1,6 @@
 ---
 metadata:
-  requires-packages: linux-tools
+  requires-packages: igt-gpu-tools
 name: vkms-stereo
 description: >-
   Test DRM stereo mode enumeration, timing and writeback with an EDID-driven VKMS guest and independent expectations.

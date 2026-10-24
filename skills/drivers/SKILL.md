@@ -1,6 +1,6 @@
 ---
 metadata:
-  requires-packages: mesa
+  requires-packages: libgl1-mesa-dri | mesa-vulkan-drivers
 name: drivers
 description: >-
   Implement and test kernel/display-driver stereo modes, HDMI signaling and deep-colour links; carry edition patches with provenance.

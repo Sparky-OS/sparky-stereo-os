@@ -1,6 +1,6 @@
 ---
 metadata:
-  requires-packages: dlna-renderer
+  requires-packages: kcm-ums
 name: stereo-serving
 description: >-
   Serve or stream stereo media to another device (DLNA and UPnP renderers, media servers, casting, network players) in exactly the frame format that device takes, at its raster, declared; never in the desktop's internal format.

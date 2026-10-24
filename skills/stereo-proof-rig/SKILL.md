@@ -1,6 +1,6 @@
 ---
 metadata:
-  requires-packages: chromium
+  requires-packages: kwin-wayland
 name: stereo-proof-rig
 description: >-
   Run isolated compositor captures and negative controls for stereo identity, geometry, timing, UI and installed-package behavior.

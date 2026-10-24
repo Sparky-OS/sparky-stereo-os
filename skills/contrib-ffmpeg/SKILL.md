@@ -25,12 +25,13 @@ Check freshness: re-read `CONTRIBUTING.md` and `doc/developer.texi` in the curre
 
 ## Commit messages
 - Subject `area/sub: what it does`, imperative (`avcodec/vvc: keep the current picture after an output error`).
-- Body: the problem, the change, the proof. One sentence per line is accepted.
+- Body: the problem, the change, the proof, wrapped at 72 characters per line except code, URLs and trailers. FFmpeg's `doc/git-howto.texi`, "Writing a commit message": "These details should not exceed 60-72 characters per line, except when containing code." Our one-sentence-per-line style is for our own documents, never for an FFmpeg commit (a reviewer asked for the wrap on #25398, 2026-10-24).
 - Trailers in one block at the end, no blank line between them: `Fixes: #NNNNN` first when an issue tracks the bug (master uses this form, for example 5fd305b8f42), then `Signed-off-by:`, then `Assisted-by:` for AI assistance. A trailer separated by a blank line is not parsed as a trailer.
 
 ## Tests (FATE)
 - Expected results live in `tests/ref/fate/...`; the test prints what it observes and FATE compares. Never hard-code expectations in C constants.
 - A new test fails on unpatched master and passes with the change; run the full applicable FATE with GCC and clang and report both totals.
+- The test goes in its own commit, after the fix, so every commit passes FATE and the fix can be backported alone. A maintainer asked for this on #25398 (2026-10-24: "Please do not mix tests and fixes in the same commit"). It is not written in `doc/developer.texi`; the nearest text is "Bug fixes intended for backporting should stay focused".
 - New samples go to the fate-suite through someone with samples access. Attach them to the pull request (small, generated, no outside media, with how they were made) and ask in a comment; until then the new test entries cannot run upstream.
 
 ## The review bot

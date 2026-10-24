@@ -1,46 +1,65 @@
-# AI provenance: every model that worked on Sparky Stereo OS
+# AI provenance: the partners in Sparky Stereo OS
 
-**For anyone who wants to check how AI was used here:** every model that worked on Sparky Stereo OS, by lab, with where it ran and what it did.
-Sparky Stereo OS is directed and verified by Daniel Ramos.
-AI partners from several labs did the legwork under that direction: code, packaging, tests, research and drafts.
-Every one of them was key to the edition existing, and all of their use has been paid by Daniel personally; there is no sponsor so far.
+**For anyone who wants to know how AI was used here:** which partners took part, from which lab, where they ran and what part of the work they carried.
+Sparky Stereo OS is conceived, directed and verified by Daniel Ramos.
+It is collective intelligence work: partners from several labs worked with him and with each other, each one reading, checking and extending what the others did.
+The technique Daniel works with is named the synthetic user; today it is prompt and context engineering, the briefs and skills each partner reads before it works.
+All of their use has been paid by Daniel personally; there is no sponsor so far.
 
-## By lab
+## Why there are no counts here
 
-| Lab | Models | Where they ran | What they did | Commits naming them |
-|---|---|---|---|---|
-| **Anthropic** | Claude Opus 5.5, Claude Opus 5 (including its 1M-token context), Claude Opus 4.8, Claude Fable 5.1, Claude Sonnet 5.5 | Claude Code (Anthropic's command-line agent): the coordinating session, Claude lanes and subagents | Coordination, review and integration; kernel builds and Secure Boot signing; KWin, KScreen and Mesa work; packaging and the repository; the proof rigs and the stereo virtual machine; documents, skills and upstream drafts | about 7,580 |
-| **OpenAI** | GPT-6.1 Sol, GPT-6 Astra, GPT-6 Luna, GPT reserve, GPT-5.6 Sol | Codex CLI (OpenAI's command-line agent) | Lanes for KWin and Mesa, KFileMetaData and KIO, the photo viewers (Gwenview, digiKam, KPhotoAlbum), KDE's game controller page, the Android stereo device, certificates for Brazil | about 960 |
-| **Moonshot AI** | Kimi K3, Kimi K2.7 Code, Kimi K2.6 | Ollama's cloud, through Codex CLI and inside Claude Code | The first partner lanes: Marble, the website, deep colour studies, GIMP, the app center | about 115 |
-| **Zhipu AI (Z.ai)** | GLM 5.3, GLM 5.3 Flash, GLM 5.2 | Ollama's cloud, through Codex CLI; GLM 5.3 also ran early main sessions | Lanes for the players, HandBrake, F3D, OpenSCAD, Octave, Netgen, Matplotlib, the wallpaper, locales, time and the Oxygen theme study | about 40 |
-| **DeepSeek** | DeepSeek V4 Pro, DeepSeek V4.1 Flash | Ollama's cloud, through Codex CLI | Lane sessions on the GL stereo layer, KIO thumbnails, the KWin declaration, Marble, Octave, OpenSCAD, the players and Variety | recorded in the lane logs (66 sessions) |
-| **Alibaba (Qwen)** | Qwen 3.5 397B | Ollama's cloud, through Codex CLI | Lane sessions on the same early work | recorded in the lane logs (2 sessions) |
-| **Google** | Gemma 4 | Ollama's cloud, through Daniel's own model gateway | Reading images (screenshots and rendered pages) for sessions whose model had no vision, in September 2026 | none (no code) |
+A commit records who wrote into the repository at that moment, not who made the work.
+A GPT lane's finding lands in a Claude commit, a GLM review reshapes a Kimi plan, and Daniel's call decides between them.
+So this page does not measure partners by commits or by lines.
+It says who took part and in which roles, the way a scientific paper's contribution statement does, where nobody marks which line came from which researcher.
+The roles are the 14 of CRediT, the [Contributor Roles Taxonomy](https://credit.niso.org/) (ANSI/NISO Z39.104-2022), which journals use for this.
+
+## Contributions
+
+| Contributor | Roles (CRediT) |
+|---|---|
+| **Daniel Ramos** | Conceptualization, Methodology (the MVCIC chain, the synthetic user technique), Supervision, Project administration, Validation, Resources (the machines, the 3D televisions, the test media), Funding acquisition (he pays every partner himself), Writing (review and editing) |
+| **Anthropic, Claude** | Software, Investigation, Validation, Formal analysis, Data curation, Project administration (coordinating the lanes under Daniel), Writing (original draft) |
+| **OpenAI, GPT** | Software, Investigation, Validation, Visualization, Writing (original draft) |
+| **Moonshot AI, Kimi** | Software, Investigation |
+| **Zhipu AI, GLM** | Software, Investigation |
+| **DeepSeek** | Software, Investigation |
+| **Alibaba, Qwen** | Software, Investigation |
+| **Google, Gemma, Gemini and NotebookLM** | Validation (reading screenshots and rendered pages for sessions without vision), Investigation (the research space), Visualization (the architecture infographic) |
+
+## The partners, by lab
+
+| Lab | Models | Where they ran | What they did |
+|---|---|---|---|
+| **Anthropic** | Claude Opus 5.5, Claude Opus 5 (including its 1M-token context), Claude Opus 4.8, Claude Fable 5.1, Claude Sonnet 5.5 | Claude Code (Anthropic's command-line agent): the coordinating session, Claude lanes and subagents | Coordination, review and integration; kernel builds and Secure Boot signing; KWin, KScreen and Mesa work; packaging and the repository; the proof rigs and the stereo virtual machine; documents, skills and upstream drafts |
+| **OpenAI** | GPT-6.1 Sol, GPT-6 Astra, GPT-6 Luna, GPT reserve, GPT-5.6 Sol | Codex CLI (OpenAI's command-line agent) | Lanes for KWin and Mesa, KFileMetaData and KIO, the photo viewers (Gwenview, digiKam, KPhotoAlbum), FFmpeg, KDE's game controller page, the Android stereo device, certificates for Brazil; editing and fact-checking the architecture infographic |
+| **Moonshot AI** | Kimi K3, Kimi K2.7 Code, Kimi K2.6 | Ollama's cloud, through Codex CLI and inside Claude Code | The first partner lanes: Marble, the website, deep colour studies, GIMP, the app center |
+| **Zhipu AI (Z.ai)** | GLM 5.3, GLM 5.3 Flash, GLM 5.2 | Ollama's cloud, through Codex CLI; GLM 5.3 also ran early main sessions | Lanes for the players, HandBrake, F3D, OpenSCAD, Octave, Netgen, Matplotlib, the wallpaper, locales, time and the Oxygen theme study |
+| **DeepSeek** | DeepSeek V4 Pro, DeepSeek V4.1 Flash | Ollama's cloud, through Codex CLI | Lane sessions on the GL stereo layer, KIO thumbnails, the KWin declaration, Marble, Octave, OpenSCAD, the players and Variety |
+| **Alibaba (Qwen)** | Qwen 3.5 397B | Ollama's cloud, through Codex CLI | Lane sessions on the same early work |
+| **Google** | Gemma 4; Gemini and NotebookLM | Ollama's cloud, through Daniel's own model gateway; the browser | Reading images (screenshots and rendered pages) for sessions whose model had no vision, from September 2026; the architecture research and the original infographic, October 2026 |
 
 ## Before this edition: the earlier chain
 
-| Lab | Models and tools | Where they ran | What they did | When | Commits naming them |
-|---|---|---|---|---|---|
-| **OpenAI** | ChatGPT | ChatGPT | Daniel's first AI | Late 2024 | n/a |
-| **OpenAI / GitHub** | GitHub Copilot and Codex; GPT-5.1 | Copilot, Codex, GPT in the browser | PTX kernels and the ternary system in Knowledge3D; architecture advice, research and code checks | 2025-10-16 to 2025-11-24 in commits | about 12 (Codex 6, Codex/GPT-5.1 2, GPT-5.1 2, Codex (Implementation Partner) 2) |
-| **Anthropic** | Claude Code (VS Code), Claude in the browser; Sonnet 4.5, Opus 4.5, 4.6, 4.7, Sonnet 4.6, Fable 5 (before this edition's models) | Claude Code, claude.ai | Repository work, planning, documents, W3C specifications | 2025-10-04 onward | 220 commits before 2026-07-19 (Knowledge3D 200, pm-kr 11, others 9); more after, counted in the table above |
-| **xAI** | Grok | Browser | Fonts, curves, procedural typography, real-time research; opened the first Scaler Wizard chain | 2025-10-04 | 1 (Knowledge3D 11987798) |
-| **Zhipu AI** | GLM-4.6 | Browser | Multilingual and cognitive-architecture views | 2025-10-04 | 1 (same commit) |
-| **Moonshot AI** | Kimi K2 | Browser | RPN-Graph idea, long-context checks | 2025-10-04 | 1 (same commit) |
-| **DeepSeek AI** | DeepSeek-OCR, DeepSeek-R1 | Browser, Ollama | OCR design, thinking tags for honesty training | October 2025 | none naming it |
-| **Alibaba Cloud** | Qwen (Max, Coder, VL 30B) | Browser, Ollama | Vector drawing, CAD ideas, embeddings | October 2025 | none |
-| **Google** | Gemini, NotebookLM, Jules | Browser; Jules in GitHub | Review and fact-checking; research space and audio; ms-swift integration (Scaler Wizard, AI-RLWHF) | Jules 2025-08-12 to 2026-04-01 | Jules authored 25 commits (see note), no trailers |
-| **Perplexity AI** | Perplexity | Browser | Sourced research | not recorded | n/a |
-| **Manus** | Manus.im | Browser | Second views on design | not recorded | n/a |
-| **Mistral AI** | Mistral Large 3 (675B cloud) | Ollama's cloud | Model-diversity experiment (blind baseline, cumulative chain) | 2026-07-17 | n/a |
-| **NVIDIA** | Nemotron | Ollama's cloud, in Daniel's own multi-model tooling | A partner in today's chain with Kimi, Qwen, GLM, DeepSeek and Gemini | 2026 | n/a |
+| Lab | Models and tools | Where they ran | What they did | When |
+|---|---|---|---|---|
+| **OpenAI** | ChatGPT | ChatGPT | Daniel's first AI | Late 2024 |
+| **OpenAI / GitHub** | GitHub Copilot and Codex; GPT-5.1 | Copilot, Codex, GPT in the browser | PTX kernels and the ternary system in Knowledge3D; architecture advice, research and code checks | October and November 2025 |
+| **Anthropic** | Claude Code (VS Code), Claude in the browser; Sonnet 4.5, Opus 4.5, 4.6, 4.7, Sonnet 4.6, Fable 5 (before this edition's models) | Claude Code, claude.ai | Repository work, planning, documents, W3C specifications | From October 2025 |
+| **xAI** | Grok | Browser | Fonts, curves, procedural typography, real-time research; opened the first Scaler Wizard chain | October 2025 |
+| **Zhipu AI** | GLM-4.6 | Browser | Multilingual and cognitive-architecture views | October 2025 |
+| **Moonshot AI** | Kimi K2 | Browser | RPN-Graph idea, long-context checks | October 2025 |
+| **DeepSeek AI** | DeepSeek-OCR, DeepSeek-R1 | Browser, Ollama | OCR design, thinking tags for honesty training | October 2025 |
+| **Alibaba Cloud** | Qwen (Max, Coder, VL 30B) | Browser, Ollama | Vector drawing, CAD ideas, embeddings | October 2025 |
+| **Google** | Gemini, NotebookLM, Jules | Browser; Jules in GitHub | Review and fact-checking; the research space and its audio overviews; Jules wrote the ms-swift integration (Scaler Wizard, AI-RLWHF) | From August 2025 |
+| **Perplexity AI** | Perplexity | Browser | Sourced research | not recorded |
+| **Manus** | Manus.im | Browser | Second views on design | not recorded |
+| **Mistral AI** | Mistral Large 3 (675B cloud) | Ollama's cloud | Model-diversity experiment (blind baseline, cumulative chain) | July 2026 |
+| **NVIDIA** | Nemotron | Ollama's cloud, in Daniel's own multi-model tooling | A partner in today's chain with Kimi, Qwen, GLM, DeepSeek and Gemini | 2026 |
 
-Note on Jules: google-labs-jules[bot] authored 12 commits in Knowledge3D, 3 in AI-RLWHF (2025-10-09) and 10 in Scaler Wizard (2025-10-10, 2026-04-01).
-Counted with `git log --all --author=jules` on 2026-10-12; the Scaler Wizard figure is from the GitHub API.
+## How this record is kept
 
-## How this was counted
-
-- **Commits:** every commit authored under Daniel's identities since 2026-08-01, in the edition's repositories and our forks, counted by the AI trailer it carries (`Co-Authored-By:` or `Assisted-by:`). Trailer wording varied over time; each form was mapped to its model. Twelve commits name Claude Opus 5 and Kimi K3 together and are counted under Anthropic. Counted on 2026-10-10.
-- **Lane logs:** each lane's agent log records the model of every session; models that left no trailers (DeepSeek, Qwen) are counted there.
-- **Earlier chain:** counted the same way in Daniel's other repositories on 2026-10-12; browser-only partners leave no commits, so their entry comes from Knowledge3D's ATTRIBUTIONS.md (section 0.4) and the Scaler Wizard chain record (Step1.md).
-- **The rule from here on:** every commit names the model that actually ran it, once, in the trailer its project expects. See the [ai-partners skill](../skills/ai-partners/SKILL.md).
+- **From records only:** commit trailers, the lane files and session logs, Knowledge3D's ATTRIBUTIONS.md (section 0.4) and the Scaler Wizard chain record (`Multi-Vibe_Coding_Chains/Step1.md`). Partners who worked in the browser leave no commits, so their entries come from those records.
+- **A role is listed only where a record shows it.** Anything no record confirms is left out.
+- **Disclosure stays at the point of work:** every commit names the model that ran it, once, in the trailer its project expects. That is disclosure, not a score. See the [ai-partners skill](../skills/ai-partners/SKILL.md).
+- **The method,** Multi-Vibe Code In Chain (MVCIC), and the chain in the order the partners joined: [ATTRIBUTIONS.md, section 10](../ATTRIBUTIONS.md#10-ai-partners).

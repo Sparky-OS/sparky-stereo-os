@@ -649,7 +649,7 @@ Their work informs the stereo report Daniel offered the W3C PM-KR Community Grou
 
 This edition is directed and verified by Daniel, and built with AI partners that do the legwork under that direction.
 Every claim in its documents is tied to a test that could fail or to a public record.
-All of their use has been paid by Daniel personally; the full list by lab, model, place and commit count is in [docs/ai-provenance.md](docs/ai-provenance.md).
+All of their use has been paid by Daniel personally; the partners by lab, model, place and role (CRediT) are in [docs/ai-provenance.md](docs/ai-provenance.md).
 
 **The method: Multi-Vibe Code In Chain (MVCIC).**
 Daniel built this way of working himself.

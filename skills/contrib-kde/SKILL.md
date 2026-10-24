@@ -41,7 +41,7 @@ This skill uses KDE's own records read on 2026-10-24, not generic commit hygiene
 
 ## Public record
 - Work item [324](https://invent.kde.org/plasma/kwin/-/work_items/324) says KWin requires all communication to be 100% human written and closes clearly LLM-generated merge requests on sight.
-- [`kdeplasma-addons` merge request](https://invent.kde.org/plasma/kdeplasma-addons/-/merge_requests/17) has a maintainer comment from 2026-10-13 that "copy-pasting text from LLMs is strongly discouraged in KDE".
+- [`kdeplasma-addons` issue 17](https://invent.kde.org/plasma/kdeplasma-addons/-/work_items/17) has a maintainer comment from 2026-10-13 that "copy-pasting text from LLMs is strongly discouraged in KDE".
 - Krita's README, checked on 2026-10-24, contains an AI moratorium.
 - This Week in Plasma takes merged changes only and enters through a commit to an open merge request in `websites/blogs-kde-org` carrying the label `This Week in Plasma`, credited as "(Name, repo MR #n)".
 

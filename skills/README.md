@@ -7,6 +7,7 @@ These are edition-maintenance procedures, not a general application-development 
 Start with [AGENTS.md](../AGENTS.md), the [edition contract](sparky-stereo/SKILL.md) and [working together](ai-partners/SKILL.md).
 Then choose one task below. Each domain starts with a short working recipe; detailed sections retain the measurements and traps that motivated it.
 Historical versions and test results are evidence for their stated setup, not a guarantee about newer software.
+Core skills are `sparky-stereo`, `ai-partners`, `upstream-outreach`, `edition-packaging` and `writing-front-pages`; they always link.
 
 | Your task | Read next |
 | --- | --- |
@@ -38,6 +39,16 @@ Historical versions and test results are evidence for their stated setup, not a 
 | Sparky CA trust-store implementation | [certificate-manager](certificate-manager/SKILL.md) |
 | A maintainer message, contribution or follow-up | [upstream-outreach](upstream-outreach/SKILL.md) |
 | An FFmpeg pull request: series, trailers, FATE, the review bot (with upstream-outreach) | [contrib-ffmpeg](contrib-ffmpeg/SKILL.md) |
+| A HandBrake pull request (with upstream-outreach) | [contrib-handbrake](contrib-handbrake/SKILL.md) |
+| A Universal Media Server pull request (with upstream-outreach) | [contrib-ums](contrib-ums/SKILL.md) |
+| An MKVToolNix merge request (with upstream-outreach) | [contrib-mkvtoolnix](contrib-mkvtoolnix/SKILL.md) |
+| An mpv pull request (with upstream-outreach) | [contrib-mpv](contrib-mpv/SKILL.md) |
+| A Qt change through Gerrit (with upstream-outreach) | [contrib-qt](contrib-qt/SKILL.md) |
+| A PeerTube pull request (with upstream-outreach) | [contrib-peertube](contrib-peertube/SKILL.md) |
+| An x265 pull request (with upstream-outreach) | [contrib-x265](contrib-x265/SKILL.md) |
+| A VLC merge request (with upstream-outreach) | [contrib-vlc](contrib-vlc/SKILL.md) |
+| A KDE Invent change or Bugzilla report (with upstream-outreach) | [contrib-kde](contrib-kde/SKILL.md) |
+| An MPlayer patch, prepared but held until release is requested (with upstream-outreach) | [contrib-mplayer](contrib-mplayer/SKILL.md) |
 | A README opening, About line or public introduction | [writing-front-pages](writing-front-pages/SKILL.md) |
 
 ## Installed and offline use

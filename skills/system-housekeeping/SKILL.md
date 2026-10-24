@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: systemd
 name: system-housekeeping
 description: >-
   Maintain bounded logs, kernel retention and cleanup policy while preserving user settings, boot recovery and diagnostic evidence.

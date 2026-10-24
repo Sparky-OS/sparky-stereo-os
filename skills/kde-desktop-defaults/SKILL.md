@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: plasma-desktop
 name: kde-desktop-defaults
 description: >-
   Maintain the edition's Plasma defaults and small KDE patches for search, task management, frozen-window recovery, removable-drive formatting and running scripts, with native and packaged regression proof.

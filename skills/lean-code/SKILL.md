@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: dpkg-dev
 name: lean-code
 description: >-
   Maintain and verify Lean Code projection, provenance, restore paths and package release markers without editing authored sources by hand.

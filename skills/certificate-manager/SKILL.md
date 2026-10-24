@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: gnupg2
 name: certificate-manager
 description: >-
   Change Sparky CA catalogue, trust-store and Ed521 integration with explicit ownership, rollback and isolated tests.

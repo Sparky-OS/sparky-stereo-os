@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: mkvtoolnix
 name: stereo-video
 description: >-
   Preserve and verify stereo layout and colour metadata from codec/container through editor, server, player and transport.

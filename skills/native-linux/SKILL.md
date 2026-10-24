@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: libx11-dev
 name: native-linux
 description: >-
   Integrate native GLX, EGL, Vulkan and Qt stereo routes and test capability discovery, eye delivery and ordinary 2D fallback.

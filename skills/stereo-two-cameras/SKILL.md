@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: libgl-dev | libvulkan-dev | qt6-quick3d-dev
 name: stereo-two-cameras
 description: >-
   Generate and verify coherent per-eye projections for real 3D scenes, including geometry, state restoration and eye-private effects.

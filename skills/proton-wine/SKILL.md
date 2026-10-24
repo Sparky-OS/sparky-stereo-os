@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: wine64 | libwine | dxvk-wine64
 name: proton-wine
 description: >-
   Diagnose stereo through Wine, Proton, DXVK and gamescope with runtime-library identification and game-specific proof.

@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: inkscape
 name: stereo-artwork
 description: >-
   Create and verify editable stereo artwork and themes with measured disparity, synchronized animation and preserved format marks.

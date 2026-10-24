@@ -1,4 +1,5 @@
 ---
+metadata:
 name: writing-front-pages
 description: >-
   Write public project introductions, README openings and About text with clear audiences, evidence-backed status and an actionable next step.

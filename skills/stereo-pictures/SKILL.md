@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: gwenview | digikam | kphotoalbum
 name: stereo-pictures
 description: >-
   Preserve stereo image layouts, eye order and metadata through readers, writers, viewers, thumbnails and caches.

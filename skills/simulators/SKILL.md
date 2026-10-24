@@ -1,4 +1,6 @@
 ---
+metadata:
+  requires-packages: flightgear | torcs
 name: simulators
 description: >-
   Diagnose FlightGear, TORCS and Speed Dreams stereo through OSG/plib, including UI, per-eye resources and OpenXR lifecycle.

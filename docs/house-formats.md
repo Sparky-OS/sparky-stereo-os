@@ -56,4 +56,5 @@ Broadcast and post-production work this way, and so does PipeWire for sound; thi
 The proposed support-version-8 `_KDE_NET_WM_STEREO_CONTENT_CHILD_PLACE` separates a listed child's buffer resolution from its destination rectangle and allows it below the ordinary parent surface.
 A player submits source-sized full-SBS video, while the parent paints subtitles and controls at display resolution without a stereo declaration.
 The [registered stereo-layer specification](https://github.com/Sparky-OS/stereo-layer/blob/main/docs/x11-child-place.md) defines the property and its input and fallback requirements.
+A child that holds both views at full width declares the size of one view in its own `_KDE_NET_WM_STEREO_CONTENT_ONE_VIEW_SIZE` at the same version 8; the declared place wins over it.
 Publication requires the matching compositor and declaration-library support.

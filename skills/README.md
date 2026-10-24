@@ -33,6 +33,7 @@ Core skills are `sparky-stereo`, `ai-partners`, `upstream-outreach`, `edition-pa
 | Unix groups for desktop users | [user-groups](user-groups/SKILL.md) |
 | Logs, retained kernels and cleanup | [system-housekeeping](system-housekeeping/SKILL.md) |
 | Packages and their provenance, Paweł's formula, distro tasks and dependencies, the signed repository, the ISO | [edition-packaging](edition-packaging/SKILL.md) |
+| One more program's stereo integration: the list, the pack format, the missing program, the proof | [stereo-integrations](stereo-integrations/SKILL.md) |
 | Lean Code projection or resolving installed source | [lean-code](lean-code/SKILL.md) |
 | Android Qt test reproduction | [qt-android-ci](qt-android-ci/SKILL.md) |
 | Brazilian certificate sources and algorithms | [brazil-certificates](brazil-certificates/SKILL.md) |

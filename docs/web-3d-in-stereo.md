@@ -134,7 +134,8 @@ renderer.setAnimationLoop(() => renderer.render(scene, camera));
 ```
 
 Today that route hands the page a headset's views, so the depth is too strong for a screen (section 3); the screen mode comes next.
-WebXR follows its own specifications, and we add no attribute of our own: [WebXR Device API](https://www.w3.org/TR/webxr/), [WebXR Layers](https://www.w3.org/TR/webxrlayers-1/).
+A page can also ask for an `inline-stereo` session, which the WebXR Device API gained on 9 June 2026 ([#1436](https://github.com/immersive-web/webxr/pull/1436)): the two views are drawn inside the page itself, and the edition's browser hands them to the 3D screen ([its proof page](proofs/waterfox-stereo-m3.md)).
+WebXR follows its own specifications, and we add no attribute of our own: [WebXR Device API](https://www.w3.org/TR/webxr/) (written at [immersive-web/webxr](https://github.com/immersive-web/webxr)), [WebXR Layers](https://www.w3.org/TR/webxrlayers-1/).
 
 **Then the screen is the person's choice,** in System Settings, Display Configuration, in the screen's Resolution list: anaglyph on an ordinary monitor, HDMI 3D on a television, several screens at once, each with its own output ([develop on an ordinary monitor](develop-3d-on-an-ordinary-monitor.md)).
 Your page does not change.
@@ -201,6 +202,6 @@ For a page, the standard way to hand the system two such pictures is WebXR (its 
 **Theirs:**
 - three.js: [`StereoCamera`](https://github.com/mrdoob/three.js/blob/dev/src/cameras/StereoCamera.js), [`AnaglyphEffect`](https://github.com/mrdoob/three.js/blob/dev/examples/jsm/effects/AnaglyphEffect.js), [`StereoEffect`](https://github.com/mrdoob/three.js/blob/dev/examples/jsm/effects/StereoEffect.js), [WebXR samples](https://threejs.org/examples/?q=webxr).
 - Paul Bourke, [calculating stereo pairs](https://paulbourke.net/stereographics/stereorender/): the off-axis method three.js follows.
-- [WebXR Device API](https://www.w3.org/TR/webxr/), [WebXR Layers](https://www.w3.org/TR/webxrlayers-1/), [WebXR/WebGPU Binding](https://immersive-web.github.io/webxr-webgpu-binding/), and the [Immersive Web samples](https://immersive-web.github.io/webxr-samples/).
+- [WebXR Device API](https://www.w3.org/TR/webxr/) and its repository [immersive-web/webxr](https://github.com/immersive-web/webxr) (the `inline-stereo` mode, [#1436](https://github.com/immersive-web/webxr/pull/1436)), [WebXR Layers](https://www.w3.org/TR/webxrlayers-1/), [WebXR/WebGPU Binding](https://immersive-web.github.io/webxr-webgpu-binding/), and the [Immersive Web samples](https://immersive-web.github.io/webxr-samples/).
 
 Sparky Stereo OS, Daniel Ramos's edition of SparkyLinux (by Paweł "pavroo" Pijanowski).

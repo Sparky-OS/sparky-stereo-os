@@ -19,7 +19,7 @@ Sparky Stereo OS는 Daniel Ramos의 SparkyLinux 에디션(Paweł "pavroo" Pijano
 
 *적청 안경으로 이들을 3D로 볼 수 있습니다 ([더 보기](#seen-in-3d)).*
 
-**개발 중:** [Flat Headset 개발 APK 및 일치하는 PC 업데이트 지침](https://github.com/Sparky-OS/flat-headset/tree/main/apk)이 제공됩니다; 최종 스테레오 에디션 ISO는 아직 준비 중입니다 ([진행 방향](#where-it-is-going)).
+**개발 중:** [Flat Headset 개발 APK 및 일치하는 PC 업데이트 지침](https://github.com/Sparky-OS/flat-headset/tree/main/apk)이 제공되며, 테스터용 개발 ISO는 이제 Secure Boot가 켜진 최신 PC, 오래된 BIOS PC, 32비트 UEFI 기기에서 부팅됩니다; 최종 스테레오 에디션 ISO는 아직 준비 중입니다 ([진행 방향](#where-it-is-going)).
 
 - **[만들기](#create):** 3D로 그리고 딥 컬러(8비트 대신 색상당 16비트)로 그리며, 3D 사진과 비디오를 편집합니다.
 - **[과학 및 공학](#science-and-engineering):** Marble의 지구본, KAlgebra의 그래프, Kalzium의 분자를 3D로; 3D 모델과 회로 기판은 진행 중입니다.
@@ -90,6 +90,7 @@ W3C 계정으로 그룹 가입은 무료이며, 도움을 환영합니다: 여�
 - **영화:** 3D 비디오가 Haruna, VLC, mpv, Bino, PlasmaTube 등에서 3D로 재생됩니다.
 - **사진:** Gwenview, digiKam, KolourPaint가 3D 사진(MPO, JPS, 스테레오 PNG)을 3D로 보여줍니다.
 - **게임:** 창 안의 DOOM (2016)과 Half-Life 2, 둘 다 VR 모드를 통해 ([공식](docs/formula.md)).
+- **게임에 맞춘 커널:** 에디션은 저희 스테레오 패치를 적용한 Linux 7.3을 사용합니다. 새 스케줄러는 작성자 본인의 테스트에서 오래된 CPU로 게임의 최저 프레임 레이트를 4에서 29 fps로 끌어올렸고([수치](https://lore.kernel.org/all/20260511113104.563854162@infradead.org/)), 비디오 메모리가 적은 AMD 그래픽 카드가 게임의 메모리를 카드에 유지할 수 있게 합니다([변경 내용](https://pixelcluster.dev/VRAM-Mgmt-fixed/)).
 
 각 프로그램, 얻는 것과 입증 방법: [프로그램](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).
 
@@ -118,7 +119,7 @@ W3C 계정으로 그룹 가입은 무료이며, 도움을 환영합니다: 여�
 - **3D 화면 보호기:** 기본 별밭 화면 보호기와 스테레오 화면 보호기를 실제 3D로. *구축됨.*
 - **3D 사진과 아이콘:** 3D 사진은 Dolphin의 미리보기와 사진 뷰어에서 3D로 표시됩니다. *구축됨.* 각 눈에 한 개씩 그린 한 쌍의 아이콘은 에디션 고유의 모습인 Stereo Oxygen의 일부입니다. *예정됨.*
 - **실제로 튀어나오고 들어가는 효과:** 닫히는 창은 조각으로 사용자 쪽으로 날아가거나 화면 뒤로 들어가 바닥에 튕길 수 있습니다. *우리 KWin 브랜치에 구축되었으며 다음 패키지에 제공됩니다.* 3D로 부채꼴로 펼쳐지는 창 전환기와 실제 3D의 Desktop Cube도 예정되어 있습니다. *예정됨.*
-- **전원을 켠 순간부터 3D:** 부트 스플래시와 로그인 화면을 3D 화면에서 3D로. *예정됨.*
+- **전원을 켠 순간부터 3D:** 부트 스플래시와 로그인 화면이 주 화면에 저장한 3D 모드를 따릅니다. *구축됨.*
 
 **그리고 이것은 여전히 정상적인 2D 데스크톱입니다.**
 일반 화면에서는 아무것도 바뀌지 않습니다: 같은 테마, 같은 레이아웃, 같은 효과를 한 번만 그립니다.

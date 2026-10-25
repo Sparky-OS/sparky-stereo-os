@@ -19,7 +19,7 @@ A few pixels each, within limits you choose.
 
 *Red-cyan glasses show these in 3D ([more](#seen-in-3d)).*
 
-**In development:** the [Flat Headset development APK and matching PC update instructions](https://github.com/Sparky-OS/flat-headset/tree/main/apk) are available; the final stereo edition ISO is still being prepared ([where it is going](#where-it-is-going)).
+**In development:** the [Flat Headset development APK and matching PC update instructions](https://github.com/Sparky-OS/flat-headset/tree/main/apk) are available, and a developer ISO for testers now starts on new PCs with Secure Boot on, on older BIOS PCs and on 32-bit UEFI machines; the final stereo edition ISO is still being prepared ([where it is going](#where-it-is-going)).
 
 - **[Create](#create):** paint in 3D and in deep colour (16 bits per colour instead of 8), and edit 3D photos and video.
 - **[Science and engineering](#science-and-engineering):** Marble's globe, KAlgebra's plots and Kalzium's molecules in 3D; 3D models and circuit boards are in progress.
@@ -84,6 +84,7 @@ Each program in full: [Programs](#programs-the-edition-changes-for-stereo-3d-and
 - **Films:** 3D videos play in 3D in Haruna, VLC, mpv, Bino, PlasmaTube and more.
 - **Photos:** Gwenview, digiKam and KolourPaint show 3D photos (MPO, JPS and stereo PNG) in 3D.
 - **Games:** DOOM (2016) in a window and Half-Life 2, both through a VR mode ([the formula](docs/formula.md)).
+- **A kernel tuned for play:** the edition runs Linux 7.3 with our stereo patches. Its new scheduler raised a game's lowest frame rate from 4 to 29 fps on an older CPU in its author's own test ([the numbers](https://lore.kernel.org/all/20260511113104.563854162@infradead.org/)), and it lets AMD cards with little video memory keep a game's memory on the card ([the change](https://pixelcluster.dev/VRAM-Mgmt-fixed/)).
 
 Each program, what it gains and how it was proven: [Programs](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).
 
@@ -111,7 +112,7 @@ For decades, shadows, bevels and raised buttons have only pretended; on the Ster
 - **Screensavers in 3D:** the classic starfield and the stereo savers, in real 3D. *Built.*
 - **Pictures and icons in 3D:** 3D photos show in 3D in Dolphin's previews and in the picture viewers. *Built.* Icons drawn as a pair, one for each eye, are part of Stereo Oxygen, the edition's own look. *Coming.*
 - **Effects that really pop and dive:** a closing window can fly toward you in pieces, or dive behind the screen and bounce on a floor. *Built on our KWin branch, coming in the next package.* Window switchers that fan out in 3D, and the Desktop Cube in real 3D. *Coming.*
-- **3D from the moment you switch on:** the boot splash and the login screen in 3D on 3D screens. *Coming.*
+- **3D from the moment you switch on:** the boot splash and the login screen follow the 3D mode you saved for your main screen. *Built.*
 
 **And it is still a normal 2D desktop.**
 On an ordinary screen nothing changes: the same theme, the same layout, the same effects, drawn once.

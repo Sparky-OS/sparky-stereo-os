@@ -19,7 +19,7 @@ Quelques pixels chacun, dans les limites que vous choisissez.
 
 *Des lunettes rouge-cyan les montrent en 3D ([plus](#seen-in-3d)).*
 
-**En cours de développement :** l'[APK de développement de Flat Headset et les instructions de mise à jour du PC correspondantes](https://github.com/Sparky-OS/flat-headset/tree/main/apk) sont disponibles ; l'ISO finale de l'édition stéréo est encore en préparation ([où cela va](#where-it-is-going)).
+**En cours de développement :** l'[APK de développement de Flat Headset et les instructions de mise à jour du PC correspondantes](https://github.com/Sparky-OS/flat-headset/tree/main/apk) sont disponibles, et une ISO de développement pour les testeurs démarre désormais sur les PC récents avec Secure Boot activé, sur les anciens PC à BIOS et sur les machines UEFI 32 bits ; l'ISO finale de l'édition stéréo est encore en préparation ([où cela va](#where-it-is-going)).
 
 <a id="create"></a>
 - **[Créer](#create) :** peindre en 3D et en couleurs profondes (16 bits par couleur au lieu de 8), et retoucher des photos et des vidéos 3D.
@@ -87,6 +87,7 @@ Chaque programme en détail : [Programmes](#programs-the-edition-changes-for-ste
 - **Films :** les vidéos 3D se lisent en 3D dans Haruna, VLC, mpv, Bino, PlasmaTube et d'autres.
 - **Photos :** Gwenview, digiKam et KolourPaint montrent des photos 3D (MPO, JPS et PNG stéréo) en 3D.
 - **Jeux :** DOOM (2016) dans une fenêtre et Half-Life 2, tous deux via un mode VR ([la formule](docs/formula.md)).
+- **Un noyau réglé pour jouer :** l'édition utilise Linux 7.3 avec nos correctifs stéréo. Son nouvel ordonnanceur a fait passer la fréquence d'images la plus basse d'un jeu de 4 à 29 i/s sur un processeur ancien, dans le propre test de son auteur ([les chiffres](https://lore.kernel.org/all/20260511113104.563854162@infradead.org/)), et il permet aux cartes AMD dotées de peu de mémoire vidéo de garder la mémoire d'un jeu sur la carte ([la modification](https://pixelcluster.dev/VRAM-Mgmt-fixed/)).
 
 Chaque programme, ce qu'il gagne et sa preuve : [Programmes](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).
 
@@ -114,7 +115,7 @@ Depuis des décennies, les ombres, les biseaux et les boutons en relief ne faisa
 - **Des écrans de veille en 3D :** le champ d'étoiles classique et les écrans de veille stéréo, en vraie 3D. *Construit.*
 - **Des images et des icônes en 3D :** les photos 3D s'affichent en 3D dans les aperçus de Dolphin et dans les visionneuses d'images. *Construit.* Les icônes dessinées par paire, une pour chaque œil, font partie de Stereo Oxygen, l'apparence propre de l'édition. *À venir.*
 - **Des effets qui ressortent et plongent vraiment :** une fenêtre en fermeture peut voler vers vous en morceaux, ou plonger derrière l'écran et rebondir sur un sol. *Construit sur notre branche de KWin, arrivant dans le prochain paquet.* Des sélecteurs de fenêtres en éventail en 3D, et le bureau cube en vraie 3D. *À venir.*
-- **La 3D dès l'allumage :** l'écran de démarrage et l'écran de connexion en 3D sur les écrans 3D. *À venir.*
+- **La 3D dès l'allumage :** l'écran de démarrage et l'écran de connexion suivent le mode 3D enregistré pour votre écran principal. *Construit.*
 
 **Et c'est toujours un bureau 2D normal.**
 Sur un écran ordinaire, rien ne change : le même thème, la même disposition, les mêmes effets, dessinés une seule fois.

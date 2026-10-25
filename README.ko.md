@@ -1,6 +1,6 @@
 # Sparky Stereo OS
 
-🇨🇦 [English](README.md) · 🇫🇷 [Français](README.fr.md) · 🇰🇷 [한국어](README.ko.md)
+🇨🇦 [English](README.md) · 🇧🇷 [Português](README.pt-BR.md) · 🇫🇷 [Français](README.fr.md) · 🇯🇵 [日本語](README.ja.md) · 🇰🇷 [한국어](README.ko.md) · 🇨🇳 [简体中文](README.zh-CN.md) · 🇭🇰 [繁體中文](README.zh-TW.md)
 
 **이미 가지고 있는 화면에서 3D로 만들고 탐험하세요: 그림을 그리고, 사진과 비디오를 편집하고, 분자와 지구본을 연구한 다음, 영화를 보고 게임을 즐기세요.**
 3D TV가 작동하고, 값싼 적청 안경을 쓴 일반 모니터도 작동하며, 이제 저렴한 뷰어에 넣은 호환 Android 휴대폰도 작동합니다: [USB를 통한 사용 가능한 스테레오 데스크톱](https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md), 구형 하드웨어에서 테스트되었습니다.

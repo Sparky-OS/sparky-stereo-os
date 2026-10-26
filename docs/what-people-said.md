@@ -5,6 +5,11 @@ Public words are quoted with the person's name and a link to where they said the
 
 ## In public
 
+> "Cool, I appreciate the additional tests on all of these PRs too"
+
+SubJunk, Universal Media Server maintainer, on the regression tests accompanying the UMS fixes, 25 October 2026 ([#6420](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6420#issuecomment-6403112283)).
+The three merged changes are listed in [Merged outside Sparky Stereo](upstream-merges.md).
+
 > "I'm impressed by your presentation, Daniel."
 
 Song Xu, co-chair of the W3C Media & Entertainment Interest Group, after the talk of 13 October 2026 ([minutes](https://www.w3.org/2026/10/13-me-minutes.html)).

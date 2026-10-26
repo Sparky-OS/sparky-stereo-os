@@ -1,6 +1,6 @@
 # Sparky Stereo OS
 
-🇨🇦 [English](README.md) · 🇧🇷 [Português](README.pt-BR.md) · 🇫🇷 [Français](README.fr.md) · 🇯🇵 [日本語](README.ja.md) · 🇰🇷 [한국어](README.ko.md) · 🇨🇳 [简体中文](README.zh-CN.md) · 🇭🇰 [繁體中文](README.zh-TW.md)
+🇨🇦 [English](README.md) · 🇧🇷 [Português](README.pt-BR.md) · 🇵🇱 [Polski](README.pl.md) · 🇫🇷 [Français](README.fr.md) · 🇯🇵 [日本語](README.ja.md) · 🇰🇷 [한국어](README.ko.md) · 🇨🇳 [简体中文](README.zh-CN.md) · 🇭🇰 [繁體中文](README.zh-TW.md)
 
 **在你已有的螢幕上以 3D 進行創作與探索：繪畫、編輯照片與影片、研究分子和地球儀，然後看電影、玩遊戲。**
 3D 電視可以用，配上便宜紅青眼鏡的一般螢幕也可以，現在連裝在平價觀看器中的相容 Android 手機也行：[一個透過 USB 可用的立體桌面](https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md)，已在較舊的硬體上測試過。

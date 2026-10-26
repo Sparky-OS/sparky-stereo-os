@@ -59,6 +59,20 @@ The name combines established techniques: procedural textures with frequency lim
 It claims to invent none of them.
 Daniel's [spatial-browser input](https://github.com/w3c-cg/pm-kr/tree/main/talks/2026-10-28-tpac-spatial-browser) and [Web of Worlds input](https://github.com/w3c-cg/pm-kr/tree/main/talks/2026-10-30-tpac-web-of-worlds) put the idea in its discussion context.
 
+## Tiles and two resolutions (26 October 2026)
+
+The procedures do not need to change, not even 2004 code.
+Their evaluation is tiled: each frame evaluates as many tiles as the device's compute allows, each at the resolution it needs.
+The gaze decides which tiles come first and at what resolution, and evaluated tiles stay cached until they need more or less detail.
+So the same procedure scales from a phone to a workstation by the number of tiles per frame, not by rewriting it.
+The high-resolution image's tiles load the same way, as the last layer.
+
+Each eye has two resolutions: the rendering resolution and the output resolution.
+The rendering resolution is where the procedures and the scene are evaluated; the output resolution is the screen's.
+On modern devices an upscaler, often AI-based, brings the rendered views to the output resolution; elsewhere the compositor scales once, at the output.
+For stereo, the upscaler treats both eyes alike, so the two views keep the same detail.
+In Sparky Stereo OS this is the presentation contract: a program offers the rendering resolution per eye, and the views reach Stereo KWin as full side by side at any resolution per view.
+
 ## Sources
 
 - Matt Pharr, Wenzel Jakob and Greg Humphreys, [Physically Based Rendering, chapter 10: Texture](https://pbr-book.org/3ed-2018/Texture), explain how texture functions can adjust their frequency content to the sampling rate to avoid aliasing.
@@ -73,6 +87,11 @@ Daniel's [spatial-browser input](https://github.com/w3c-cg/pm-kr/tree/main/talks
 - Unity's [foveated rendering documentation](https://docs.unity.com/en-us/engine/6000.6/manual/xr/graphics/foveated-rendering/introduction.md) uses "dynamic foveation" for foveation strength that follows the GPU's load; DPFR's "dynamic" includes that, together with the gaze and the device.
 - Khronos' [`KHR_texture_procedurals` draft proposal, glTF #2381](https://github.com/KhronosGroup/glTF/pull/2381), opened on 3 April 2024, remains a draft checked on 25 October 2026.
   It is a related asset-format proposal, not an adopted DPFR standard.
+- Epic Games, [Runtime Virtual Texturing in Unreal Engine](https://dev.epicgames.com/documentation/en-us/unreal-engine/runtime-virtual-texturing-in-unreal-engine): texel data created "on demand using the GPU at runtime", with a limit on the "Runtime Virtual Texture Tiles being updated in a frame".
+  It is a precedent for tiled evaluation on a per-frame budget, not for its gaze-driven order.
+- Darwyn Peachey, [Texture On Demand](https://graphics.pixar.com/library/TOD/), Pixar Technical Memo #217 (January 1990): textures stored as fixed-size tiles, read only when needed and kept in a cache that drops the least recently used.
+  It is a precedent for the tile cache and for loading the image by tiles.
+- AMD, [FidelityFX Super Resolution](https://gpuopen.com/fidelityfx-superresolution/): "producing high resolution frames from lower resolution inputs", open source under the MIT licence, with an ML-based upscaler.
 
 The term is Daniel Campos Ramos's, dated 25 October 2026.
 In Portuguese: Renderização Foveada Procedural Dinâmica.

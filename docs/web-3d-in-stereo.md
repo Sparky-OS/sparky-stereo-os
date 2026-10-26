@@ -191,6 +191,8 @@ For a page, the standard way to hand the system two such pictures is WebXR (its 
 ## 8. Where to read more
 
 **Ours:**
+
+- [Dynamic Procedural Foveated Rendering](dynamic-procedural-foveated-rendering.md): Daniel's proposal for procedural surface detail that adapts to gaze and device, with its scope and sources.
 - [The formula](formula.md): from a VR engine to a 3D display, learned on Half-Life 2.
 - [One world, two cameras](../skills/stereo-two-cameras/SKILL.md): the camera maths by kind of camera, with the programs that use each.
 - [From a VR engine to a 3D display](../skills/vr-to-3d/SKILL.md): play on a screen, the spectator, headset cameras.

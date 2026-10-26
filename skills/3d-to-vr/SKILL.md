@@ -158,6 +158,7 @@ Coordinate the actual audio graph with the [audio skill](../audio/SKILL.md).
 Continuously driven multichannel rendering, audio-time pose alignment and physical headset qualification remain separate work.
 360/VR180 projection and the Stereo Spectator's reverse path remain separate integrations.
 No camera tracking or foveated streaming is introduced by these proofs.
+For procedural surface detail evaluated at the receiving device, see [Dynamic Procedural Foveated Rendering](../../docs/dynamic-procedural-foveated-rendering.md), Daniel's proposal and its scope.
 
 ## Headset desktop quality and codec qualification (checked 2026-10-14)
 

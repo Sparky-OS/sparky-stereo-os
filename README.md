@@ -157,7 +157,9 @@ Every KDE change is a branch of our fork on [invent.kde.org](https://invent.kde.
 
 ## Merged outside Sparky Stereo
 
-**20 October 2026: IANA registered three Matroska depth-plane types**, referencing our stereo-layer specification. Separate depth tracks now have assigned identifiers for the left-eye, right-eye and background planes. The six proposed packed-frame modes remain under expert review. [Registry milestone and upstream merges](docs/upstream-merges.md#registered-identifiers).
+**26 October 2026: IANA assigned Matroska StereoMode 15 through 20** for packed picture-and-depth layouts, following the assignment of Track Plane Types 3 through 5 on 20 October for separate left-eye, right-eye and background depth tracks.
+Both registrations reference our stereo-layer specification.
+[Live registry](https://www.iana.org/assignments/matroska) and [registry milestone and upstream merges](docs/upstream-merges.md#registered-identifiers).
 
 Where a program breaks stereo or deep colour on the way to the screen, the fix goes to that program's own project.
 Projects such as HandBrake, mpv, Qt Multimedia and PeerTube have merged fixes from our work; every one, with the maintainer who merged it, and what is in review, is in [Merged outside Sparky Stereo](docs/upstream-merges.md).

@@ -160,7 +160,9 @@ Chaque modification KDE est une branche de notre fork sur [invent.kde.org](https
 
 ## Contributions fusionnées hors de Sparky Stereo
 
-**20 octobre 2026 : l'IANA a enregistré trois types de plans de profondeur Matroska**, en référence à notre spécification de couche stéréo. Les pistes de profondeur séparées ont maintenant des identifiants attribués pour le plan de l'œil gauche, celui de l'œil droit et celui d'arrière-plan. Les six modes proposés de trames groupées restent en revue d'expert. [Jalon d'enregistrement et fusions amont](docs/upstream-merges.md#registered-identifiers).
+**26 octobre 2026 : l’IANA a attribué les valeurs StereoMode 15 à 20 de Matroska** aux images regroupant une vue et sa profondeur, après l’attribution des types de plans 3 à 5 le 20 octobre aux pistes de profondeur séparées de l’œil gauche, de l’œil droit et de l’arrière-plan.
+Les deux enregistrements citent notre spécification stereo-layer.
+[Registre actuel](https://www.iana.org/assignments/matroska) et [jalon d’enregistrement et fusions amont](docs/upstream-merges.md#registered-identifiers).
 
 Là où un programme casse la stéréo ou les couleurs profondes en chemin vers l'écran, la correction va au projet du programme lui-même.
 Des projets comme HandBrake, mpv, Qt Multimedia et PeerTube ont fusionné des corrections issues de notre travail ; chacune, avec le mainteneur qui l'a fusionnée, et ce qui est en revue, est dans [Contributions fusionnées hors de Sparky Stereo](docs/upstream-merges.md).

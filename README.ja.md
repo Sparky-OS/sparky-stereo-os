@@ -251,11 +251,11 @@ KDEへの変更はすべて、[invent.kde.org](https://invent.kde.org/danielcamp
 <a id="merged-outside-sparky-stereo"></a>
 ## Sparky Stereoの外でマージされた成果
 
-**2026年10月20日：IANAがMatroskaの奥行き平面の3種類の型を登録しました。**
-私たちのstereo-layer仕様を参照しています。
-分離された奥行きトラックには、左目、右目、背景の各平面の識別子が割り当てられました。
-提案した六つのパックフレームモードは、引き続き専門家による審査中です。
-[識別子の登録と上流でのマージ](docs/upstream-merges.md#registered-identifiers)。
+**2026年10月26日：IANAがMatroskaのStereoMode 15から20を割り当てました。**
+これらは画像と奥行きを一つのフレームに収める配置を表します。
+先に10月20日には、左目、右目、背景の独立した奥行きトラックに平面型3から5が割り当てられました。
+どちらの登録も私たちのstereo-layer仕様を参照しています。
+[現在の登録表](https://www.iana.org/assignments/matroska)と[識別子の登録と上流でのマージ](docs/upstream-merges.md#registered-identifiers)。
 
 画面に届くまでの途中でプログラムがステレオやディープカラーを損なう場合は、そのプログラム自身のプロジェクトへ修正を届けます。
 HandBrake、mpv、Qt Multimedia、PeerTubeなどが、私たちの作業から生まれた修正をマージしています。

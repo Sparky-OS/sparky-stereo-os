@@ -170,7 +170,10 @@ W3C 계정으로 그룹 가입은 무료이며, 도움을 환영합니다: 여�
 <a id="merged-outside-sparky-stereo"></a>
 ## Sparky Stereo 외부에서 병합됨
 
-**2026년 10월 20일: IANA가 세 개의 Matroska 깊이 평면 유형을 등록했습니다**, 우리 stereo-layer 규격을 참조하여. 이제 분리된 깊이 트랙에는 왼쪽 눈 평면, 오른쪽 눈 평면, 배경 평면의 식별자가 있습니다. 제안된 여섯 개의 팩 프레임 모드는 전문가 검토 중입니다. [등록 기점과 업스트림 병합](docs/upstream-merges.md#registered-identifiers).
+**2026년 10월 26일, IANA가 Matroska StereoMode 15부터 20까지를 할당했습니다.**
+이 값들은 한 프레임에 영상과 깊이를 함께 배치하는 형식을 나타내며, 10월 20일에 왼쪽 눈, 오른쪽 눈, 배경의 독립된 깊이 트랙에 할당된 평면 유형 3부터 5까지에 이은 등록입니다.
+두 등록 모두 우리의 stereo-layer 규격을 참조합니다.
+[현재 레지스트리](https://www.iana.org/assignments/matroska) 및 [등록 기점과 업스트림 병합](docs/upstream-merges.md#registered-identifiers).
 
 프로그램이 화면으로 가는 길에서 스테레오나 딥 컬러를 망가뜨리면, 수정은 그 프로그램 자체 프로젝트로 갑니다.
 HandBrake, mpv, Qt Multimedia 및 PeerTube 같은 프로젝트는 우리 작업에서 온 수정을 병합했습니다; 병합한 유지 관리자와 검토 중인 항목까지, 전체는 [Sparky Stereo 외부에서 병합됨](docs/upstream-merges.md)에 있습니다.

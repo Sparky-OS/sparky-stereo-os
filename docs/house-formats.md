@@ -43,6 +43,7 @@ Broadcast and post-production work this way, and so does PipeWire for sound; thi
 ## References
 
 - **Stereo:** the specifications listed in [stereo-labor-division.md](stereo-labor-division.md#references) (HDMI 1.4b 3D structures; ITU-T H.264, H.265 and H.274 frame packing; RFC 9559 StereoMode; Vulkan, GLX, EGL and DXGI stereo).
+- **Matroska depth identifiers:** the [live IANA registry](https://www.iana.org/assignments/matroska) assigned Track Plane Types 3 through 5 on 20 October 2026 and StereoMode 15 through 20 on 26 October for separate depth tracks and packed picture-and-depth layouts, respectively. The [registration details](https://github.com/Sparky-OS/stereo-layer/blob/main/docs/depth-marks.md#registrations) distinguish allocation from reader and writer support.
 - **Still stereo pictures:** CIPA DC-007 (Multi-Picture Format, MPO); PNG Extensions 1.4.0, the `sTER` chunk.
 - **Video colour:** HDMI 1.3 and later, deep colour (30, 36 and 48 bits per pixel), signalled in the HDMI Vendor-Specific Data Block of the EDID.
 - **Audio:** AES5 (preferred sampling frequencies for digital audio; 48 kHz for professional use); IEC 60958 and IEC 61937 (PCM and encoded audio over S/PDIF and HDMI); CTA-861, audio data blocks (the formats a display's EDID says it accepts); AES69 (SOFA files for head-related transfer functions).

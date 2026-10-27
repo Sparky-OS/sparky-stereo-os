@@ -172,7 +172,9 @@ Każda zmiana w KDE jest gałęzią naszego forka na [invent.kde.org](https://in
 <a id="merged-outside-sparky-stereo"></a>
 ## Włączone do projektów poza Sparky Stereo
 
-**20 października 2026 roku: IANA zarejestrowała trzy typy płaszczyzn głębi Matroska**, powołując się na naszą specyfikację stereo-layer. Osobne ścieżki głębi mają teraz przypisane identyfikatory płaszczyzn lewego oka, prawego oka i tła. Sześć proponowanych trybów pakowania klatek nadal podlega ocenie ekspertów. [Rejestracja i poprawki przyjęte przez projekty źródłowe](docs/upstream-merges.md#registered-identifiers).
+**26 października 2026 roku IANA przypisała wartości StereoMode 15 do 20 w Matroska** układom łączącym obraz z głębią w jednej klatce, po przypisaniu 20 października typów płaszczyzn 3 do 5 dla osobnych ścieżek głębi lewego oka, prawego oka i tła.
+Obie rejestracje wskazują naszą specyfikację stereo-layer.
+[Aktualny rejestr](https://www.iana.org/assignments/matroska) oraz [rejestracja i poprawki przyjęte przez projekty źródłowe](docs/upstream-merges.md#registered-identifiers).
 
 Gdy program gubi stereoskopię lub większą głębię koloru w drodze do ekranu, poprawka trafia do projektu tego programu.
 Projekty takie jak HandBrake, mpv, Qt Multimedia i PeerTube włączyły poprawki z naszych prac; każda z nich, wraz z opiekunem, który ją przyjął, oraz poprawki w trakcie przeglądu są opisane w [Włączone do projektów poza Sparky Stereo](docs/upstream-merges.md).

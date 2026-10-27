@@ -170,7 +170,10 @@ Daniel 與 Milton Ponson 共同主持 W3C [Procedural Memory Knowledge Represent
 <a id="merged-outside-sparky-stereo"></a>
 ## 在 Sparky Stereo 之外被合併
 
-**2026 年 10 月 20 日：IANA 註冊了三種 Matroska 深度平面類型**，並參照我們的立體圖層規格。左眼、右眼與背景平面如今各有分派的識別碼。另外六種提議的封裝影格模式仍在專家審查中，見[登錄里程碑與上游合併](docs/upstream-merges.md#registered-identifiers)。
+**2026 年 10 月 26 日，IANA 為 Matroska 分派了 StereoMode 15 至 20**，用於在同一影格內封裝影像與深度的配置。
+此前，IANA 已於 10 月 20 日為左眼、右眼與背景的獨立深度軌道分派了平面類型 3 至 5。
+兩項登錄均參照我們的 stereo-layer 規格。
+[即時登錄表](https://www.iana.org/assignments/matroska)及[登錄里程碑與上游合併](docs/upstream-merges.md#registered-identifiers)。
 
 只要某個程式在通往螢幕的路上弄壞了立體或高色深，修正就會送往該程式自己的專案。
 HandBrake、mpv、Qt Multimedia 與 PeerTube 等專案已經合併了我們工作中的修正；每一項、合併它的維護者是誰、以及還在審查中的有哪些，都列在[在 Sparky Stereo 之外被合併](docs/upstream-merges.md)。

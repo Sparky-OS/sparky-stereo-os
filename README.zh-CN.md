@@ -157,7 +157,10 @@ Daniel 和 Milton Ponson 共同主持 W3C [Procedural Memory Knowledge Represent
 
 ## 已合并到 Sparky Stereo 之外
 
-**2026 年 10 月 20 日：IANA 注册了三种 Matroska 深度平面类型**，引用了我们的立体图层规范。左眼、右眼和背景平面现在分别有已分配的独立深度轨道标识符。六个提议的打包帧模式仍在专家评审中。[注册表里程碑和上游合并](docs/upstream-merges.md#registered-identifiers)。
+**2026 年 10 月 26 日，IANA 为 Matroska 分配了 StereoMode 15 至 20**，用于在同一帧中打包图像和深度的布局。
+此前，IANA 已于 10 月 20 日为左眼、右眼和背景的独立深度轨道分配了平面类型 3 至 5。
+两项注册均引用我们的 stereo-layer 规范。
+[实时注册表](https://www.iana.org/assignments/matroska)及[注册表里程碑和上游合并](docs/upstream-merges.md#registered-identifiers)。
 
 如果某个程序在通往屏幕的路上破坏了立体或深度颜色，修复会提交给那个程序自己的项目。
 HandBrake、mpv、Qt Multimedia 和 PeerTube 等项目已经合并了我们工作中的修复；每一个项目，连同合并它的维护者以及正在评审的内容，都在[已合并到 Sparky Stereo 之外](docs/upstream-merges.md)。

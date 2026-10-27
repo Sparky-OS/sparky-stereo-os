@@ -7,11 +7,37 @@ Where a program breaks stereo or deep colour on the way to the screen, the fix g
 Each merge below was reviewed and accepted by that project's maintainers.
 Each one shows the next project the same problem already fixed elsewhere, and Sparky Stereo is the desktop where all of them meet.
 
+## From the cable to the web
+
+The work connects current 2D and 3D devices through the layers below.
+“In the edition” means downstream packages, while a merge, registry assignment or discussion has its own state.
+
+| Layer | Work and public record | State |
+| --- | --- | --- |
+| Signal and display | [HDMI 3D modes and EDID](how-it-works.md), with [10, 12 and 16-bit colour paths](programs-in-detail.md). | In the edition; 16-bit NVIDIA output has no hardware test. |
+| Kernel and drivers | [Linux HDMI 3D](programs-in-detail.md), [VKMS tests](test-stereo-without-a-3d-tv.md), [virtio-gpu stereo patches](https://github.com/Sparky-OS/sparky-stereo-os-build/blob/main/kernel/series/series.txt) and the [NVIDIA fork](https://github.com/danielcamposramos/open-gpu-kernel-modules); [Jim Cromie’s nouveau null fixes tested](https://github.com/danielcamposramos/sony-bravia-linux/tree/main/docs/upstream/nouveau-null-v3-test-2026-10-03). | Edition changes and a separately recorded test of upstream work. |
+| GPU userspace | [Mesa packs OpenGL, EGL and Vulkan views and declares them to KWin](programs-in-detail.md). | In the edition. |
+| Compositor and protocols | [Stereo KWin and `kde_stereo_content_v1`](stereo-labor-division.md); [X11 stereo properties v8](https://github.com/Sparky-OS/stereo-layer/blob/main/docs/x11-child-place.md). | Edition protocol and a published X11 contract; separate from upstream KDE acceptance. |
+| Toolkit and style | [Qt’s stereo widget path](programs-in-detail.md), [Qt Multimedia’s luminance fix](https://codereview.qt-project.org/c/qt/qtmultimedia/+/778399) and [Union depth design](architectural-synthesis.md#themes-union-and-the-proposed-editor). | Qt stereo in the edition; luminance fix merged upstream; Union design in discussion. |
+| Encoders | [HandBrake’s x264 marking](https://github.com/HandBrake/HandBrake/pull/8100) and [x265 frame packing](https://github.com/Multicorewareinc/x265/pull/986). | Merged by their maintainers. |
+| Codec library | [FFmpeg’s persistent stereo declarations](https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/24628). | In the edition; upstream review remains separate. |
+| Containers and registries | [MKVToolNix reads AVC and HEVC packing](programs-in-detail.md); [Matroska depth identifiers](#registered-identifiers). | MKVToolNix changes merged upstream; identifiers assigned by IANA. |
+| Players | [mpv layout detection](https://github.com/mpv-player/mpv/pull/18490), [Bino eye order](https://github.com/marlam/bino/commit/e1be2918fe) and [VLC stereo playback](programs-in-detail.md). | mpv and Bino fixes merged upstream; VLC build in the edition. |
+| Pictures | [PhotoCraft PNG `sTER` fixes](https://github.com/storytold/photocraft/pull/7815), [Gwenview and digiKam stereo photos](../README.md#watch-and-play), [SVGStereo 0.3](https://github.com/Sparky-OS/svgstereo). | PhotoCraft fixes merged upstream; viewers in the edition; SVG mark remains a proposal. |
+| Serving and streaming | [PeerTube preserves packing](https://github.com/Chocobozzz/PeerTube/pull/7816); [Universal Media Server preserves and converts declared layouts](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6420). | Merged by their maintainers. |
+| VMs and remote | [Stereo guest displays, SPICE viewers and pointer tests](stereo-vm.md); [spice-gtk destruction fix](https://gitlab.freedesktop.org/spice/spice-gtk/-/merge_requests/159). | Stereo viewer builds in the edition; destruction fix merged upstream. |
+| Games and VR | [wiz3D’s Linux portability](https://github.com/effcol/wiz3D/pull/33), [Wine and Proton routes](architectural-synthesis.md), [SteamVR spectator request](https://github.com/ValveSoftware/SteamVR-for-Linux/issues/961) and [phone viewer tests](https://github.com/Sparky-OS/flat-headset). | wiz3D fix merged upstream; edition routes documented; SteamVR request open; phone viewer a test build. |
+| Desktop and boot | [Plasma depth and saved-mode splash/login](../README.md#the-stereo-desktop-new-frontiers-for-theme-design); [ISO installation guides](guides/README.md). | Desktop and boot changes built in the edition; installation steps documented. |
+| Web and standards | [WebCodecs #970](https://github.com/w3c/webcodecs/issues/970), [Media Capabilities #249](https://github.com/w3c/media-capabilities/issues/249), [PM-KR report](https://github.com/w3c-cg/pm-kr/blob/main/reports/source/stereo-3d-adoption-report.html), [M&E IG talk](talks/2026-10-13-w3c-me-ig.md), and [DPFR with glTF #2381](dynamic-procedural-foveated-rendering.md). | Public discussion, report and proposals; no claim of W3C or glTF adoption. |
+
 ## Registered identifiers
 
 **IANA registration, 20 October 2026:** [Matroska Track Plane Types](https://www.iana.org/assignments/matroska#matroska-track-plane-types) now assigns **3, 4 and 5** to the depth maps of the left-eye, right-eye and background planes, respectively, with Daniel Ramos as change controller and the [stereo-layer v1.9.0 specification](https://github.com/Sparky-OS/stereo-layer/blob/v1.9.0/docs/depth-marks.md) as reference.
 This gives separate picture and depth tracks shared identifiers through `TrackCombinePlanes`, so readers can preserve their relationship before rendering stereo views.
-The separate request for six packed-frame `StereoMode` values (proposed 15–20) remains under designated-expert review; those values are not assigned.
+**IANA registration, 26 October 2026:** [Matroska Stereo Modes](https://www.iana.org/assignments/matroska#matroska-stereo-modes) now assigns **15 through 20** to packed picture-and-depth layouts, following designated-expert review under the Specification Required procedure.
+The six values cover picture and depth side by side or top and bottom in either order, four rows with graphics and graphics depth, and four quarters with background and background depth.
+Daniel Ramos is the change controller, and the registry cites the same immutable stereo-layer v1.9.0 specification.
+Assignment identifies the layouts; support in a muxer, decoder or player must be checked separately.
 
 This registry milestone is separate from the software merges below.
 

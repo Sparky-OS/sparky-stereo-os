@@ -32,6 +32,10 @@ A few pixels each, within limits you choose.
 
 ### VR is also a stereo monitor
 
+**Is your VR headset gathering dust in a cabinet?**
+Sparky Stereo OS turns it back into a 3D screen: play 3D games, watch 3D films, edit 3D content, write email and code on the whole desktop in 3D, and play PCVR games through SteamVR where your headset works on Linux.
+A compatible Android phone in an inexpensive viewer already works today; standalone headsets such as the Quest are next, not yet tested.
+
 Most headsets are a pair of small screens, one for each eye, and the rest split one screen in two, just as a 3D TV does, so this one desktop serves both.
 - **The 3D screen already in your pocket:** an inexpensive Cardboard-style viewer turns a compatible Android phone into a screen for the stereo desktop, in full colour, with a separate view for each eye. On 19 October, Daniel accepted the USB half top-and-bottom setup on a Redmi Note 7 and a 2016 A10 laptop as usable: the desktop works and the mouse is responsive. Video is much improved but still somewhat choppy; the first home Wi-Fi test feels closer to USB, while Direct Wi-Fi has longer stalls. Full resolution and more devices still need testing ([measurements and limits](https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md)). The PC does the drawing, giving an older phone another use. The [development APK, source and matching PC update instructions](https://github.com/Sparky-OS/flat-headset/tree/main/apk) are available together; update the development live USB or installed PC first. The Android viewer remains a test build. Photos of [the first test](https://github.com/Sparky-OS/flat-headset#the-first-test-12-october-2026) and [the desktop on the phone](https://github.com/Sparky-OS/flat-headset#the-desktop-on-the-phone-14-october-2026).
 - **VR films:** Bino plays 360° and 180° films, flat or in 3D, on any 3D screen, and the mouse turns the view.

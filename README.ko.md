@@ -32,6 +32,10 @@ Sparky Stereo OS는 Daniel Ramos의 SparkyLinux 에디션(Paweł "pavroo" Pijano
 
 ### VR도 스테레오 모니터입니다
 
+**VR 헤드셋이 수납장 안에서 먼지를 쌓고 있나요?**
+Sparky Stereo OS는 헤드셋을 다시 3D 화면으로 바꿔 줍니다: 3D 게임을 하고, 3D 영화를 보고, 3D 콘텐츠를 편집하고, 이메일을 쓰고 데스크톱 전체에서 3D로 코딩하고, Linux에서 헤드셋이 작동하는 곳에서는 SteamVR을 통해 PCVR 게임을 즐길 수 있습니다.
+호환 Android 휴대폰을 저렴한 뷰어에 넣는 방식은 오늘 이미 작동합니다. Quest 같은 독립형 헤드셋은 그 다음 대상으로, 아직 테스트되지 않았습니다.
+
 대부분의 헤드셋은 각 눈에 하나씩, 한 쌍의 작은 화면이고, 나머지는 3D TV처럼 한 화면을 둘로 나눕니다. 그래서 이 하나의 데스크톱이 둘 다 지원합니다.
 - **이미 주머니에 있는 3D 화면:** 저렴한 Cardboard 스타일 뷰어가 호환 Android 휴대폰을 스테레오 데스크톱용 화면으로 바꿉니다. 풀 컬러로, 각 눈에 별도의 뷰를 제공합니다. 10월 19일, Daniel은 Redmi Note 7과 2016년 A10 노트북에서 USB 절반 상하 설정을 사용 가능한 것으로 승인했습니다: 데스크톱이 작동하고 마우스가 반응합니다. 비디오는 많이 개선되었지만 여전히 다소 끊깁니다; 첫 가정 Wi-Fi 테스트는 USB에 더 가깝게 느껴지고, Direct Wi-Fi는 더 긴 멈춤이 있습니다. 전체 해상도와 더 많은 기기는 여전히 테스트가 필요합니다 ([측정 및 한계](https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md)). PC가 그리기를 담당하므로 구형 휴대폰에 또 다른 용도를 제공합니다. [개발 APK, 소스 및 일치하는 PC 업데이트 지침](https://github.com/Sparky-OS/flat-headset/tree/main/apk)이 함께 제공됩니다; 개발 라이브 USB 또는 설치된 PC를 먼저 업데이트하세요. Android 뷰어는 테스트 빌드로 유지됩니다. [첫 테스트](https://github.com/Sparky-OS/flat-headset#the-first-test-12-october-2026)와 [휴대폰의 데스크톱](https://github.com/Sparky-OS/flat-headset#the-desktop-on-the-phone-14-october-2026) 사진.
 - **VR 영화:** Bino가 360° 및 180° 영화를 평면 또는 3D로, 어떤 3D 화면에서든 재생하고, 마우스가 시점을 돌립니다.

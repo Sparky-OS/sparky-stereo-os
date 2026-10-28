@@ -32,6 +32,10 @@ Sparky Stereo OS 是 Daniel Ramos 的 SparkyLinux 版本（SparkyLinux 由 Pawe�
 
 ### VR 也是一種立體螢幕
 
+**你的 VR 頭戴顯示器是不是在櫃子裡吃灰？**
+Sparky Stereo OS 讓它重新變成一個 3D 螢幕：玩 3D 遊戲、看 3D 電影、編輯 3D 內容、在整個桌面上用 3D 寫郵件與寫程式，而且在你的頭戴顯示器能在 Linux 上運作的情況下，還能透過 SteamVR 玩 PCVR 遊戲。
+把相容的 Android 手機放進平價觀看器裡，今天就能用；Quest 這類獨立式頭戴顯示器是下一步的目標，尚未測試。
+
 大多數頭戴顯示器就是一對小螢幕，每隻眼睛一個；其餘則是把一個螢幕切成兩半，跟 3D 電視一樣，所以同一個桌面兩種都能用。
 - **早已在你口袋裡的 3D 螢幕：**一個平價的 Cardboard 式觀看器能把相容的 Android 手機變成立體桌面的螢幕，全彩顯示，每隻眼睛各有獨立畫面。10 月 19 日，Daniel 在 Redmi Note 7 與一台 2016 年的 A10 筆電上，認定 USB 半解析度上下分割的設定已達到可用：桌面能運作，滑鼠反應靈敏。影片大有改善但仍有些跳；第一次家用 Wi-Fi 測試感覺更接近 USB，Direct Wi-Fi 仍會有較長的卡頓。完整解析度與更多裝置仍需測試（[量測與限制](https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md)）。由 PC 負責繪製，讓舊手機再獲新用。[開發用 APK、原始碼與對應的 PC 更新說明](https://github.com/Sparky-OS/flat-headset/tree/main/apk)已一併提供；請先更新開發用 live USB 或已安裝的 PC。Android 觀看器仍是測試版本。這是[第一次測試](https://github.com/Sparky-OS/flat-headset#the-first-test-12-october-2026)和[手機上的桌面](https://github.com/Sparky-OS/flat-headset#the-desktop-on-the-phone-14-october-2026)的照片。
 - **VR 電影：**Bino 能在任何 3D 螢幕上播放 360° 與 180° 電影，平面或 3D 皆可，用滑鼠轉動視角。

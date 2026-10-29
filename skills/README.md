@@ -38,6 +38,7 @@ Core skills are `sparky-stereo`, `ai-partners`, `upstream-outreach`, `edition-pa
 | Android Qt test reproduction | [qt-android-ci](qt-android-ci/SKILL.md) |
 | Brazilian certificate sources and algorithms | [brazil-certificates](brazil-certificates/SKILL.md) |
 | Sparky CA trust-store implementation | [certificate-manager](certificate-manager/SKILL.md) |
+| Forks, pushing, and checking that the work is online | [forks-and-online](forks-and-online/SKILL.md) |
 | A maintainer message, contribution or follow-up | [upstream-outreach](upstream-outreach/SKILL.md) |
 | An FFmpeg pull request: series, trailers, FATE, the review bot (with upstream-outreach) | [contrib-ffmpeg](contrib-ffmpeg/SKILL.md) |
 | A HandBrake pull request (with upstream-outreach) | [contrib-handbrake](contrib-handbrake/SKILL.md) |

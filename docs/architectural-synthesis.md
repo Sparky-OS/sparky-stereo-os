@@ -69,7 +69,7 @@ The project records a mirrored desktop on two televisions: AMD graphics supplyin
 | Ordinary colour monitor | Select one eye for mono output, or combine the eyes using an anaglyph transform. | The edition documents both routes. |
 | Android phone in a passive viewer | Capture, encode and transport the desktop; the receiver presents the eye views for its viewer. | USB desktop usability accepted on the tested Redmi Note 7 / A10 setup. Full-resolution and wider device coverage remain open. |
 | Eye-tracked glasses-free display | Report window placement to the runtime; the display's own integration owns its optical weaving. | DisplayXR collaboration and audit work, with hardware-specific qualification still required. |
-| Tracked headset | Supply stereo content within a runtime that also handles tracking, view poses and presentation timing. | A separate integration path; the untracked phone receiver alone does not establish it. |
+| Tracked headset | Supply stereo content within a runtime that also handles tracking, view poses and presentation timing; a virtual screen inside the experience keeps stereo content in stereo, each eye seeing its own view. | A separate integration path; the untracked phone receiver alone does not establish it. |
 
 See [the output contract](house-formats.md), [phone evidence](https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md) and the [DisplayXR geometry audit](https://github.com/Sparky-OS/displayxr-kwin-audit).
 
@@ -86,6 +86,9 @@ Stereo KWin gives desktop surfaces three reference planes:
 | **screen** | The active window sits at the screen plane. |
 | **popped** | Menus, dialogs, tooltips and notifications can appear in front. |
 | **sunk** | Background windows step back by stacking order; the wallpaper is deepest. |
+
+The screen plane is the physical screen, or a virtual screen placed inside a VR or AR experience.
+A virtual screen keeps stereo: a stereo picture on it keeps its two views, each eye seeing its own, and the popped and sunk planes keep their order around it.
 
 The implemented settings express depth limits in pixels referenced to a 1920-pixel-wide view and scale them for each output. They are not a viewer-calibrated camera model based on measured viewing distance and eye spacing. The user controls the limits and can set depth to zero. Edges, shadows and pointer placement have their own rules. [Theme-design reference](for-theme-designers.md#what-you-can-design-with-built).
 

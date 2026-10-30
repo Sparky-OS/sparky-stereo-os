@@ -10,6 +10,7 @@ Daniel requested the original research and infographic in Gemini / NotebookLM.
 The published image preserves its visual layout, with factual corrections made using Codex and OpenAI's built-in image editor on **20 October 2026**.
 The original remains in the project's private research archive.
 The status labels describe the work on that date.
+On **31 October 2026** one label was changed, on Daniel's correction: "Physical screen" became "Physical or virtual screen", because a virtual screen inside a VR or AR experience keeps stereo too.
 
 ## The diagram in text
 
@@ -23,7 +24,8 @@ Each output needs its appropriate layout, geometry, timing and device signalling
 Preserving source precision and colour metadata is the goal throughout the path; the actual result depends on the application, compositor, driver and display.
 See [colour and verification](architectural-synthesis.md#colour-system-services-and-verification).
 
-**Desktop depth:** the screen plane has zero disparity.
+**Desktop depth:** the screen plane has zero disparity, on a physical screen or on a virtual screen inside a VR or AR experience.
+A virtual screen is a screen like any other: a stereo picture on it keeps its two views, each eye seeing its own, and the planes keep their order around it.
 Sunk planes sit behind it; popped planes sit in front.
 Window depth is implemented, while finer UI transforms and the central Theme Editor remain planned.
 Theme and user choices determine the depth within supported limits.
@@ -43,7 +45,7 @@ See [the driver guidance](../skills/drivers/SKILL.md).
 When available memory becomes low or falls quickly, the service enables the configured swap area as a reserve against memory pressure.
 It disables that area again when the recovery calculation says this is safe, using kernel pressure signals where available.
 This policy helps absorb memory spikes; it does not establish a stereo frame-rate improvement.
-See the [implementation and thresholds](https://github.com/danielcamposramos/driver_stereodisplay/blob/main/sparky-os/packages/sparky-stereo-cushion-swap/README.md).
+See the [implementation and thresholds](https://github.com/Sparky-OS/sparky-stereo-os-build/blob/main/sparky-os/packages/sparky-stereo-cushion-swap/README.md).
 
 ## Display paths and status
 
@@ -53,6 +55,6 @@ See the [implementation and thresholds](https://github.com/danielcamposramos/dri
 | One eye, or red-cyan anaglyph | An ordinary 2D display connection; one eye gives full colour without anaglyph filters. | Regular colour monitor |
 | Stereo pair for spatial displays | DisplayXR integration is in development; optical weaving belongs to the vendor integration. | Autostereoscopic display |
 | Stereo desktop in a passive viewer | Flat Headset uses USB or a network stream; the current tested receiver has no head tracking. Performance varies by device and connection. | Android phone and viewer |
-| Tracked headset presentation | Compositor VR / Big Picture mode is planned. | Tracked VR headset |
+| Tracked headset presentation | Compositor VR / Big Picture mode is planned; a virtual screen inside it keeps stereo content in stereo. | Tracked VR headset |
 
 The [architectural synthesis](architectural-synthesis.md) links the implementation records, device-test results and remaining work behind these labels.

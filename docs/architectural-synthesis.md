@@ -35,6 +35,7 @@ The edition makes stereo a capability of shared Linux layers: applications and m
 | Phones | Flat Headset has a usable USB desktop result on tested older hardware; video cadence and wireless performance remain development work. |
 | Glasses-free displays | Collaboration with DisplayXR includes geometry and packaging work; broad display compatibility remains to be qualified. |
 | Headset interaction | Flat Headset's current desktop receiver does not provide head tracking. Tracked VR and the broader spatial workspace are separate development goals. |
+| Virtual screens in VR and AR | A virtual screen placed inside a VR or AR experience is one more output: stereo content on it keeps its two views, each eye seeing its own. It belongs to the tracked headset path, which is in development. |
 
 The [program status inventory](programs-in-detail.md), [hardware record](hardware.md) and [Flat Headset measurements](https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md) describe what has actually been packaged or tested.
 
@@ -53,6 +54,7 @@ flowchart LR
     B --> C
     C --> D["Output chosen for each screen"]
     D --> E["HDMI stereo / anaglyph / mono"]
+    D --> V["Virtual screen in VR / AR, both eyes kept"]
     C --> F["Stereo desktop capture"]
     F --> G["Flat Headset receiver"]
 ```

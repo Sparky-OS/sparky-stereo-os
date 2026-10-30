@@ -53,7 +53,9 @@ flowchart LR
     U["Ordinary 2D interface"] --> C["Stereo KWin composition"]
     B --> C
     C --> D["Output chosen for each screen"]
-    D --> E["HDMI stereo / anaglyph / mono"]
+    D --> E["The display's own 3D: HDMI 1.4a structures, DisplayPort frame sequential"]
+    D --> H["Virtual 3D modes on any 2D mode: anaglyph, half side by side or top and bottom, rows, columns, checkerboard, frame sequential"]
+    D --> P["Two outputs as one pair: dual projectors, mirror rigs"]
     D --> V["Virtual screen in VR / AR, both eyes kept"]
     C --> F["Stereo desktop capture"]
     F --> G["Flat Headset receiver"]
@@ -61,21 +63,38 @@ flowchart LR
 
 The application window and its stereo content can be separate surfaces. Menus and controls stay at the interface's ordinary logical size; the video or 3D viewport carries the paired views. Shared libraries and toolkit changes make that separation reusable across applications. [Stereo labour division](stereo-labor-division.md), [stereo window and 3D area](../skills/stereo-window-3d-area/SKILL.md).
 
-### Per-screen output and mixed GPUs
+### Every output is a filter at the end
 
-The project records a mirrored desktop on two televisions: AMD graphics supplying frame packing at 30 Hz and an NVIDIA RTX 3060 supplying top and bottom at 60 Hz. Those are measurements of that setup, rather than a compatibility guarantee for every GPU and display. [Mixed-GPU example](how-it-works.md), [first physical runs](first-runs/kwin-2026-10-01/README.md).
+Stereo KWin composes the scene once, as the two eyes, and each output turns that pair into its screen's format. Its own description is [STEREO3D.md](https://github.com/Sparky-OS/kwin/blob/stereo3d38/STEREO3D.md).
 
 | Endpoint | Work at the output boundary | Qualification |
 | --- | --- | --- |
-| HDMI 3D television or projector | Compose the selected eye layout; use the corresponding DRM mode, timing and HDMI signalling. Frame packing involves timing and blanking as well as image placement. | Physical TV tests and virtual-display tests are documented. |
+| HDMI 3D television or projector | The display's own 3D modes, every HDMI 1.4a structure: frame packing, field and line alternative, side by side full and half, top and bottom, and picture and depth. Listed beside the 2D modes, labelled, never chosen automatically; choosing one sends the InfoFrame. | Physical TV tests and virtual-display tests are documented. |
+| DisplayPort monitor or projector with its own 3D | Frame sequential: the kernel sends one eye per frame and signals it, and KWin commits whole pairs, so a pair is never split. | In development: proven on the VKMS virtual display (kernel series 36 to 39, in kernel build 14, and KWin +stereo3d36 to +stereo3d39); the run on a native DisplayPort monitor is pending. |
+| Any screen, on any 2D mode | Virtual 3D modes, twins of every 2D mode with the same timing and link: anaglyph for modern screens and CRTs; half side by side and top and bottom for a 3D display switched by hand; rows for passive polarised panels; columns for parallax-barrier and lenticular panels; checkerboard for 3D-ready DLP televisions; frame sequential at 100 or 120 Hz for gear with its own glasses sync. Off by default, per output. | Implemented in Stereo KWin; each kind of panel still needs testers. |
+| Dual projectors, mirror rigs and dual-panel monitors | Two outputs as one pair, one eye each, also across two GPUs. | Implemented and run in virtual machines; real timing across two GPUs needs a hardware window. |
+| A mirror of another output | A replica copies the composed eyes and applies only its own layout, so a 3D television beside an anaglyph panel costs one scene pass per eye. | Implemented in Stereo KWin. |
 | Ordinary colour monitor | Select one eye for mono output, or combine the eyes using an anaglyph transform. | The edition documents both routes. |
 | Android phone in a passive viewer | Capture, encode and transport the desktop; the receiver presents the eye views for its viewer. | USB desktop usability accepted on the tested Redmi Note 7 / A10 setup. Full-resolution and wider device coverage remain open. |
 | Eye-tracked glasses-free display | Report window placement to the runtime; the display's own integration owns its optical weaving. | DisplayXR collaboration and audit work, with hardware-specific qualification still required. |
-| Tracked headset | Supply stereo content within a runtime that also handles tracking, view poses and presentation timing; a virtual screen inside the experience keeps stereo content in stereo, each eye seeing its own view. | A separate integration path; the untracked phone receiver alone does not establish it. |
+| Tracked headset | VR is one more filter: each eye goes to the headset through OpenXR, within a runtime that also handles tracking, view poses and presentation timing; a virtual screen inside the experience keeps stereo content in stereo, each eye seeing its own view. | A separate integration path in development; the untracked phone receiver alone does not establish it. |
+| A virtual machine's window | The guest's stereo desktop reaches the host through SPICE, each eye encoded on its own, and the host's Stereo KWin presents it. | In development: SPICE, its GTK client and KDE's Karton. |
 
 See [the output contract](house-formats.md), [phone evidence](https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md) and the [DisplayXR geometry audit](https://github.com/Sparky-OS/displayxr-kwin-audit).
 
-The driver changes are similarly specific. The edition documents amdgpu's HDMI stereo enumeration and signalling, NVIDIA open-kernel-module changes, and Mesa paths that turn stereo graphics buffers into the shared representation. NVIDIA's kernel module, user-space OpenGL driver and Wayland platform are distinct parts of that path; a working kernel mode does not establish that every user-space stereo API works. [Display-path implementation and limits](programs-in-detail.md).
+### Defaults per hardware type
+
+The edition ships decided defaults for each kind of hardware, so most people never open a setting, and every default stays a choice in the usual settings.
+- **3D televisions and projectors:** their 3D modes appear with their other modes, labelled, with a suggestion for games and for movies; the person chooses.
+- **2D screens:** the virtual 3D modes stay off until a toggle on that output turns them on.
+- **Graphics processors:** the Graphics page (System Settings, Hardware; package sparky-stereo-graphics) lists every GPU. Automatic draws the desktop on the GPU with the laptop panel, else the one with the most screens; players, games and anything started in 3D go to the GPU measured best on that machine, other programs stay on the desktop's GPU, and browsers follow the power profile.
+- **Video decoding:** the players we ship use the machine's video decoder where it keeps the source's depth, with software decoding as the fallback.
+- **Drivers and devices:** sparky-stereo-hardware detects the hardware and sets it up, including the NVIDIA driver under the edition's version lock and the driver packages of detected racing wheels and flight devices.
+- **Two GPUs, two screens:** an output pair can span two GPUs, each eye on its own output.
+
+A recorded example, from before these defaults: on 1 October a mirrored desktop on two televisions had AMD graphics supplying frame packing at 30 Hz and an NVIDIA RTX 3060 supplying top and bottom at 60 Hz. That is a measurement of that setup, not a guarantee for every pair of GPUs and displays. [Mixed-GPU example](how-it-works.md), [first physical runs](first-runs/kwin-2026-10-01/README.md).
+
+The driver changes are similarly specific. The edition documents amdgpu's HDMI stereo enumeration and signalling, NVIDIA open-kernel-module changes, and Mesa paths that turn stereo graphics buffers into the shared representation. For DisplayPort, kernel build 14 adds the DRM core's frame sequential flag, the stereo modes that EDID and DisplayID declare, the VSC SDP's stereo byte, a VKMS model to test them without hardware, and amdgpu's in-band DisplayPort stereo. NVIDIA's kernel module, user-space OpenGL driver and Wayland platform are distinct parts of that path; a working kernel mode does not establish that every user-space stereo API works. [Display-path implementation and limits](programs-in-detail.md).
 
 ## Depth for the desktop and its themes
 
@@ -265,5 +284,7 @@ The copied NotebookLM report contained six numbered citations. Their source titl
 | 6 | [Stereo virtual machines: surviving forum thread](https://linustechtips.com/topic/1643492-stereo-3d-virtual-machines-on-linux-a-qemu-guest-with-real-hdmi-3d-modes/) | Outreach context; the technical reference is now the project's [virtual-machine guide](stereo-vm.md). |
 
 Editorial corrections include the separation of implemented and planned features; content resolution versus display resolution; deep colour versus HDR; mastering-display metadata versus output-screen capability; KHARVOX's identity; the scope of the Cushion Swap File; and Flat Headset versus tracked phone VR. An unsupported camera-depth formula, illustrative but unimplemented CSS syntax, repository-language percentages and broad competitor comparisons were omitted.
+
+Revised on 31 October 2026, on Daniel's review: the outputs now follow Stereo KWin's own [STEREO3D.md](https://github.com/Sparky-OS/kwin/blob/stereo3d38/STEREO3D.md) (DisplayPort frame sequential, the virtual 3D modes, output pairs, replicas, VR through OpenXR, virtual machines), virtual screens in VR and AR count as screens that keep stereo, and the mixed-GPU section became the defaults the edition ships per hardware type.
 
 For current implementation details, start with [Programs in detail](programs-in-detail.md). For contributing, use the [maintainer workflow](maintainer-workflow.md) and [skills index](../skills/README.md).

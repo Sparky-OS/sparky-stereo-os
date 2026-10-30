@@ -56,6 +56,7 @@ The edition is the working proof, and what it finds goes back to open standards.
 Daniel chairs the W3C [Procedural Memory Knowledge Representation Community Group (PM-KR)](https://www.w3.org/community/pm-kr/) with Milton Ponson.
 Our report [Stereo 3D on Linux and the Web](https://www.w3.org/publications/spec-generator/?type=respec&url=https://raw.githubusercontent.com/w3c-cg/pm-kr/main/reports/source/stereo-3d-adoption-report.html) is there as an individual proposal, input for the group to discuss: which established specifications already carry 3D, what Linux and the web never adopted, and what a browser would need.
 It is also the subject of our talk at W3C's Media and Entertainment Interest Group on 13 October 2026 ([slides](docs/talks/2026-10-13-w3c-me-ig.md)).
+At W3C's TPAC 2026 Daniel brought written input to seven breakouts ([the report](https://github.com/w3c-cg/pm-kr/blob/main/talks/2026-10-30-tpac-2026-report/README.md)); the Web of Worlds session's follow-up listed his [input for that session](https://github.com/w3c-cg/pm-kr/blob/main/talks/2026-10-30-tpac-web-of-worlds/README.md) as an "in-depth analysis", and the session's next step is a workshop of W3C, the Metaverse Standards Forum and Khronos.
 Joining the group is free with a W3C account, and help is welcome: test on your display, review the report, or bring your use case.
 
 ## Create

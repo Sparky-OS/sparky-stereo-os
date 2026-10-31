@@ -60,7 +60,7 @@ A file whose comments are smaller than that line stays as it is.
 | sh, bash | bash parses both as one function body; `declare -f` must print the same program (dash also runs `dash -n`) |
 | Python | the same abstract syntax tree (`ast.dump`, positions excluded) |
 | QML, JavaScript | acorn gives the same tokens with the same line breaks (semicolon insertion depends on them) |
-| C, C++ | GCC: the same tokens and directives (`-fpreprocessed`), and the same full preprocessing where the file preprocesses on its own; `#line` keeps every authored line number, so `__LINE__`, `assert` and debug line tables do not move, and include guards keep GCC's read-once optimisation |
+| C, C++ | GCC: the same tokens and directives (`-fpreprocessed`), and the same full preprocessing where the file preprocesses on its own; every authored line keeps its number with no `#line` (since toolkit 0.1.17, a removed comment leaves its line breaks), so `__LINE__`, `assert` and debug line tables do not move, and include guards keep GCC's read-once optimisation |
 | systemd units and its configuration, udev rules, KConfig, desktop entries, tmpfiles, sysctl, kmod | each consumer's documented comment rule (whole lines only; none of these parsers has inline comments) |
 | YAML, TOML | PyYAML composes the same node graph; tomllib reads the same document |
 | Perl | B::Deparse prints the same program |

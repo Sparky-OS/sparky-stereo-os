@@ -64,7 +64,7 @@ GLSL shaders remain unchanged until a shader-specific checker is qualified. The 
 
 ### Installed source copies
 
-Recover copied headers after installation staging and before the separate payload projection. Restoring the compilation tree before `make install` can trigger unintended rebuilds. Content hashes alone cannot distinguish different comment-only files that all become empty, or an originally empty generated header.
+Recover copied headers after installation staging and before the separate payload projection. Restoring the compilation tree before `make install` can trigger unintended rebuilds. Content hashes alone cannot distinguish different comment-only files that become identical once their comments leave only line breaks, or an originally empty generated header.
 
 Toolkit 0.1.14 accepts a retained `debian/sparky-lean-payload-sources.json` mapping an installed directory to its source-relative directory, for example:
 
@@ -76,7 +76,7 @@ Known copies must match their own authored or projected hash. Changed copies fai
 
 The diagnostic resolver (sometimes called our “decompiler”) maps a location in lean code back to
 the matching complete authored source. It checks source identity and hashes before resolving.
-C/C++ builds preserve authored line numbers through `#line`; Java/Kotlin builds retain a separate mapping
+C/C++ builds keep every authored line number with no `#line`: since toolkit 0.1.17 a removed comment leaves its line breaks, which costs the compiler fewer instructions than the directives did ([measured](proofs/lean-code-compile-cycles.md#result-toolkit-0117)); Java/Kotlin builds retain a separate mapping
 and exact source copies. This is source recovery from recorded originals, not reconstruction of lost comments from a binary.
 
 For installed packages, use `dpkg-stereo --hr /path/to/file` and

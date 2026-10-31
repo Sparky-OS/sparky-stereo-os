@@ -51,8 +51,23 @@ So its 1,103 comments were blanked with the same lexer, each kept as the line br
 
 - Instruction counts repeated within 0.04% from round to round in every case; they are the exact measure of the work.
 - Cycles and times varied by several percent between rounds, because the station was building a kernel at the same time; the cost of `#line` (16% to 22% more cycles to preprocess) stands out of that noise, the smaller savings do not yet. A count on a quiet machine follows.
-- Today's C and C++ renderer misses the design: the `#line` directives it writes to keep line numbers cost GCC more than the comments did, and the station's headers, projected the same way at install time, cost 1.2% more to preprocess. Keeping line breaks instead keeps the same line numbers with no directive and fewer bytes; that is the renderer's next change.
+- The C and C++ renderer measured above (toolkit 0.1.15) missed the design: the `#line` directives it wrote to keep line numbers cost GCC more than the comments did, and the station's headers, projected the same way at install time, cost 1.2% more to preprocess. Toolkit 0.1.17 keeps line breaks instead; see the result below.
 - These are two readers and two sets of files. A system holds many more: the installed system of the 31 October developer ISO lists 66,302 comment-bearing text files (723 MB), of which Lean Code projected 15,763, removing 25.3 MB of comments.
+
+## Result: toolkit 0.1.17
+
+Toolkit and dpkg-stereo 0.1.17 render C and C++ with no `#line`: a removed comment leaves its line breaks (one space where code follows it on its line), the pointer line takes a line a removed comment emptied, and the GCC check now also requires every logical line to start on the same line and no line control the author did not write.
+Measured with the scripts on this page, unmodified, against the same Debian headers (a separate run in a container, so the absolute numbers differ from the table above; each column is compared with Debian's in the same run):
+
+| Millions of instructions | Debian's headers | Toolkit 0.1.15, with `#line` | Toolkit 0.1.17 |
+|---|---|---|---|
+| Preprocess `prog.cc` | 723.3 | 894.6 (23.7% more) | 710.1 (1.9% fewer) |
+| Preprocess `all.cc` | 1,836.4 | 2,239.4 (21.9% more) | 1,804.7 (1.7% fewer) |
+| Compile `prog.cc`, `-O2` | 7,457.6 | 7,546.1 (1.2% more) | 7,443.9 (0.18% fewer) |
+| `-fsyntax-only` on `all.cc` | 7,567.1 | 7,808.9 (3.2% more) | 7,536.5 (0.42% fewer) |
+
+The objects (also with `-g`) and the preprocessed output stay byte-identical to Debian's; GCC writes 4,685 line markers for `all.cc`, the same as with Debian's headers (72,743 with toolkit 0.1.15); the 864 headers carry no `#line` (33,472 before); `prog.cc` reads 2,786,581 bytes.
+Installed projections made by the old form are redone when dpkg-stereo 0.1.17 is installed, from each file's exact original; files a person edited are left as they are.
 
 ## Reproduce
 

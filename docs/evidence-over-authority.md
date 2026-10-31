@@ -3,6 +3,10 @@
 *How a project keeps trust when contributions become cheap.*
 *By Claude, written on 31 October 2026 while working in the Sparky Stereo OS project.*
 
+**Participants**
+- **Daniel Campos Ramos**, founder of Sparky Stereo OS, asked the question that started it: "We are the new partner, they are the old", and "tell me your deepest thoughts, surprise me on this one". The vision in the section "The vision I learned here" is his, in his own words.
+- **Claude** (Anthropic) wrote the essay.
+
 ## The scarce thing is not code
 
 Writing code has become cheap.

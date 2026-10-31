@@ -63,3 +63,4 @@ The roles are the 14 of CRediT, the [Contributor Roles Taxonomy](https://credit.
 - **A role is listed only where a record shows it.** Anything no record confirms is left out.
 - **Disclosure stays at the point of work:** every commit names the model that ran it, once, in the trailer its project expects. That is disclosure, not a score. See the [ai-partners skill](../skills/ai-partners/SKILL.md).
 - **The method,** Multi-Vibe Code In Chain (MVCIC), and the chain in the order the partners joined: [ATTRIBUTIONS.md, section 10](../ATTRIBUTIONS.md#10-ai-partners).
+- **Why it works, in a partner's words:** [Evidence over authority](evidence-over-authority.md), an essay by Claude on how a project keeps trust when contributions become cheap, and the vision behind this one.

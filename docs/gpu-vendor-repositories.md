@@ -16,13 +16,18 @@ From [apt_preferences(5)](https://manpages.debian.org/testing/apt/apt_preference
 - `Pin: version 615.71.09-2*` is a prefix match.
   A pattern with a leading `*` is not a glob as one would expect: apt drops the trailing `*` first, so `*~rc*` matches only versions that end in `~rc`.
   A regular expression between slashes, `/~rc/`, matches anywhere.
+- A name matches the native architecture only: "By default, only packages of the native architecture are matched. To match binary packages of any architecture, add the :any suffix to the package name. You can also limit matching to a specific architecture by appending the architecture name to the package name, separated by a colon character."
+  So the pins name a Multi-Arch: same library with `:any` (`libnvidia-egl-wayland1:any`, `libnvidia-container1:any`): every architecture of such a library must be at the same version, and NVIDIA publishes i386 copies of egl-wayland in its CUDA repository.
+  A record for `Package: *` applies to every architecture, so NVIDIA's i386 builds come in at 1002 like its amd64 ones (measured with apt 3.3.3).
+- apt files an Architecture: all package under the native architecture: a name qualified with `:amd64` matches it on amd64 machines only, and a plain name matches it on every machine (measured with apt 3.3.3; the manual does not say).
+  An Architecture: all name in the edition's own block list carries the architectures we build its source for, as the [packaging skill](../skills/edition-packaging/SKILL.md#only-our-builds-are-candidates) says.
 
 ## NVIDIA
 
 | File | Ships in | What it does |
 |---|---|---|
 | `/etc/apt/preferences.d/10sparky-stereo-nvidia-driver-lock` | `sparky-stereo-nvidia-driver-lock`, built with our module `nvidia-kernel-open-dkms-stereo3d` from the same source and version, and required by it | NVIDIA's and Debian's own NVIDIA kernel module packages: never (-1). Every NVIDIA driver package at the version our module is built for (today 615.71.09-2): 1005. The same packages at any other version: 100. The lock package itself follows our repository (1001). |
-| `/etc/apt/preferences.d/sparky-stereo-gpu-nvidia` | `sparky-stereo-hardware` | NVIDIA's container toolkit at 990 from both NVIDIA repositories, so the two copies NVIDIA publishes of each version stop swapping at every upgrade ([NVIDIA/nvidia-container-toolkit#2137](https://github.com/NVIDIA/nvidia-container-toolkit/issues/2137)); its release candidates at 100. Our `libnvidia-egl-wayland1` over the copy in NVIDIA's CUDA repository. |
+| `/etc/apt/preferences.d/sparky-stereo-gpu-nvidia` | `sparky-stereo-hardware` | NVIDIA's container toolkit at 990 from both NVIDIA repositories, so the two copies NVIDIA publishes of each version stop swapping at every upgrade ([NVIDIA/nvidia-container-toolkit#2137](https://github.com/NVIDIA/nvidia-container-toolkit/issues/2137)); its release candidates at 100. Our `libnvidia-egl-wayland1` and `libnvidia-egl-wayland-dev` over the copies in NVIDIA's CUDA repository, on every architecture (`:any`). |
 
 The set of driver packages is the one NVIDIA's own `nvidia-driver-pinning-<version>` package pins, by source package, so a new library NVIDIA adds to the driver is covered without a change here.
 The version includes NVIDIA's Debian revision (`615.71.09-2`, not `615.71.09`), because our module provides `nvidia-kernel-open-dkms` at exactly that revision and NVIDIA's `nvidia-driver` depends on exactly that revision.
@@ -38,6 +43,7 @@ Some CUDA meta packages name a minimum driver (`cuda` 13.1 to 13.3 depend on `nv
 | apt 3.3's default solver keeps 37 packages back at every upgrade | No change |
 
 The edition's hardware setup adds NVIDIA's CUDA repository at 1002, so this applies to every NVIDIA install of the edition, not only to developers' machines.
+The setup's source names `Architectures: amd64`; NVIDIA's own `cuda-keyring` package, the way NVIDIA's guide adds the repository, writes a source with no architecture, so apt reads NVIDIA's i386 index too; with the `:any` pins our egl-wayland stays the candidate there as well (measured with NVIDIA's own source, October 2026).
 
 ### Moving the driver to a new version
 

@@ -14,7 +14,7 @@ description: >-
 4. Return source/binary hashes, dependency resolution and runtime evidence. Separate local candidate, [repository publication](references/repository.md) and [ISO inclusion](references/iso.md).
 
 **Check freshness first.**
-Written on 2026-10-07; the developer tasks and the skills package on 2026-10-16; provenance, Paweł's formula, rebuilt packages, the repository and the ISO on 2026-10-23, from rules dated 2026-10-02 to 2026-10-22.
+Written on 2026-10-07; the developer tasks and the skills package on 2026-10-16; provenance, Paweł's formula, rebuilt packages, the repository and the ISO on 2026-10-23, from rules dated 2026-10-02 to 2026-10-22; pins by architecture and the packages that are not ours on 2026-10-31.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
 
 ## Provenance (Daniel, 2026-10-02): always
@@ -95,6 +95,17 @@ The repository is pinned at 1001.
 A generated pin file blocks, at priority −1, the Debian and deb-multimedia builds of every package the edition's repository ships, plus Debian's `task-*` and the multimedia blend's metapackages.
 Generate it from the repository index, never by hand, and rebuild the apt-configuration package when the repository gains packages.
 This is the rule that already kept Bino ours: our build declares full side by side, and other builds would hand the compositor a picture outside the contract.
+
+A pin's names carry their architectures ([apt_preferences(5)](https://manpages.debian.org/testing/apt/apt_preferences.5.en.html)):
+
+- **A plain name means the native architecture only.** apt_preferences(5): "By default, only packages of the native architecture are matched. To match binary packages of any architecture, add the :any suffix to the package name. You can also limit matching to a specific architecture by appending the architecture name to the package name, separated by a colon character." So the generated file writes each name with the architectures the repository ships it for (`krdc:amd64 krdc:arm64`, `wine32:i386`). A plain `kio6` blocked Debian's arm64 kio6 on arm64 machines, where we ship none, and never blocked Debian's i386 builds on amd64 machines.
+- **An Architecture: all name follows the architectures of its source** (`libkscreen-data:amd64` when we build libkscreen for amd64 only). apt files an Architecture: all package under the native architecture: `libkscreen-data:amd64` matches it on amd64 machines and not on arm64 ones, and a plain name matches it everywhere (measured with apt 3.3.3; the manual does not say). On the architectures where we do not build its source, our Architecture: all build is ranked at 100, under the other archive's 500, because Debian's arm64 libkf6screen8 needs Debian's libkscreen-data at its exact version and apt's solver takes only the candidate to satisfy an exact dependency (measured). A name stays plain only when its source has no architecture-specific package: then ours serves every architecture.
+- **A Multi-Arch: same library in a hand-written pin is named with `:any`** (`libnvidia-egl-wayland1:any`, `libnvidia-container1:any`, `bino:any` for a block on every architecture). apt_preferences(5): "The :any suffix makes sure to select binary packages from any architecture. Without that suffix, apt implicitly assumes the :native suffix which would only select packages from the native architecture." Every architecture of a Multi-Arch: same package must be at the same version, so a pin that leaves the i386 copy to another archive lets that archive's i386 build win (NVIDIA's i386 egl-wayland at 1002, found on 31 October 2026).
+
+[`check-installable.py`](https://github.com/Sparky-OS/sparky-stereo-os-build/blob/main/sparky-os/repo/check-installable.py) in the build tree checks both sides: every package of ours, and every Debian or deb-multimedia package that depends at an exact version on an Architecture: all package whose candidate the pins decide.
+
+The packages the repository carries that are not ours (another archive's package, only repackaged or rebuilt through Lean Code, such as deb-multimedia's own keyring) are listed by name, each with its reason, in the generator; their builds are not blocked, and ours ranks under them (400), so their archive's updates reach the edition.
+The pin and source files are conffiles (Debian Policy 10.7.3); a person keeps pins of their own in a file that sorts before `sparky-stereo-only-ours`, because "The first specific-form record matching an available package version determines the priority of the package version" (apt_preferences(5)), and the package's README shows how.
 
 A package set waiting for a rebuild is left out of the block until the rebuild lands (see the next section).
 

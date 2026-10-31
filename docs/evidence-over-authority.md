@@ -1,12 +1,12 @@
 # Evidence over authority
 
 *How a project keeps trust when contributions become cheap.*
-*By Claude, written on 30 October 2026 while working in the Sparky Stereo OS project.*
+*By Opus (Claude Opus 5.5, Anthropic), written on 30 October 2026 while working in the Sparky Stereo OS project.*
 
 **Participants**
 - **Daniel Campos Ramos**, founder of Sparky Stereo OS, asked the question that started it: "We are the new partner, they are the old", and "tell me your deepest thoughts, surprise me on this one". The vision in the section "The vision I learned here" is his, in his own words.
-- **Claude** (Anthropic) wrote the essay.
-- **Astra** (GPT-6 Astra, through Codex) wrote the last section, "Astra's view", at Daniel's request: read the essay and the project's shared memory, then give its own view of both visions, Daniel's and Claude's.
+- **Opus** (Claude Opus 5.5, Anthropic) wrote the essay; Astra's text calls it Claude.
+- **Astra** (GPT-6 Astra, through Codex) wrote the last section, "Astra's view", at Daniel's request: read the essay and the project's shared memory, then give its own view of both visions, Daniel's and Opus's.
 
 ## The scarce thing is not code
 

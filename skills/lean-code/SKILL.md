@@ -29,7 +29,7 @@ If the edition's README or the pages it links say something different, they win 
 A program reads its scripts, settings, units, rules and QML at every start; their comments are written for people, and the machine skips them every time.
 Sparky Stereo OS keeps the authored file as the authority (HR, human-readable) and installs its machine form (MR, machine-readable): the same file without the comments the machine never reads.
 The paradigm is Daniel Campos Ramos's dual code, published in Knowledge3D ([DUAL_CODE.md](https://github.com/danielcamposramos/Knowledge3D/blob/main/docs/DUAL_CODE.md), [HR_MR_STANDARD.md](https://github.com/danielcamposramos/Knowledge3D/blob/main/docs/HR_MR_STANDARD.md), and for the W3C PM-KR Community Group [PM_KR_MR_HR_PARADIGM.md](https://github.com/danielcamposramos/Knowledge3D/blob/main/docs/W3C/PM_KR_MR_HR_PARADIGM.md), "Comments as Runtime Waste").
-The renderer that makes the MR also gives the map from every MR line back to the authored line, so an error in an installed file is reported where a person can fix it.
+MR line numbers differ from the authored ones; the resolver finds an MR line's authored line by its content in the authored file (the neighbouring lines pick among lines of the same content), so an error in an installed file is reported where a person can fix it. The renderer also gives the map from every MR line back to the authored line, for an MR that is the exact render of its authored text.
 
 ## Who does it
 
@@ -60,7 +60,7 @@ A file whose comments are smaller than that line stays as it is.
 | sh, bash | bash parses both as one function body; `declare -f` must print the same program (dash also runs `dash -n`) |
 | Python | the same abstract syntax tree (`ast.dump`, positions excluded) |
 | QML, JavaScript | acorn gives the same tokens with the same line breaks (semicolon insertion depends on them) |
-| C, C++ | GCC: the same tokens and directives (`-fpreprocessed`), and the same full preprocessing where the file preprocesses on its own; every authored line keeps its number with no `#line` (since toolkit 0.1.17, a removed comment leaves its line breaks), so `__LINE__`, `assert` and debug line tables do not move, and include guards keep GCC's read-once optimisation |
+| C, C++ | GCC: the same tokens and directives (`-fpreprocessed`), and the same full preprocessing tokens with `__LINE__` pinned where the file preprocesses on its own; no `#line` (since toolkit 0.1.20 a comment-only line goes completely and the authored empty lines stay, so the lines move and `__LINE__`, `assert` and debug line tables name lean lines; the check names every file whose own code reads line numbers), and include guards keep GCC's read-once optimisation |
 | systemd units and its configuration, udev rules, KConfig, desktop entries, tmpfiles, sysctl, kmod | each consumer's documented comment rule (whole lines only; none of these parsers has inline comments) |
 | YAML, TOML | PyYAML composes the same node graph; tomllib reads the same document |
 | Perl | B::Deparse prints the same program |
@@ -80,7 +80,7 @@ The [native source consumers reference](references/native-source-consumers.md) (
 
 - `dpkg-stereo --status`: what is projected, by format, and why the rest is left alone. Records live per package in `/var/lib/dpkg-stereo/records/`, so a dpkg run reads only what it touched.
 - `dpkg-stereo --verify [package]`: every projected file against its record; `--deep` checks every original against its `.deb` and dpkg's md5sums. `dpkg --verify` and debsums report projected files as changed; this is the check that knows why.
-- `dpkg-stereo --resolve /path/to/file:LINE[:COL]`: an error location in a lean file, mapped to the authored line. (C and C++ need no mapping: their line numbers are the authored ones.)
+- `dpkg-stereo --resolve /path/to/file:LINE[:COL]`: an error location in a lean file, mapped to the authored line by its content: the line's code is searched for in the authored file, and the neighbouring lines pick among equal ones. It reads every form the toolkits wrote (C and C++ files of toolkits 0.1.15 to 0.1.19 kept the authored line numbers). `--resolve-render` maps it through the render's own line map instead, after rendering the authored text again and refusing a lean file that is not that render.
 - `dpkg-stereo --hr /path/to/file`: writes the full HR text to `/usr/share/doc/<package>/hr/<path>`. The HR copies of projected settings arrive by themselves with the first successful online update.
 - `dpkg-stereo --restore [package]`: the way back (removing dpkg-stereo runs it for everything). Originals come from the pristine copies of conffiles and from each package's `.deb`, read once per package from APT's cache or the archive. When the installed version is no longer in either, its files stay lean and recorded, and the package is named: `apt-get install --reinstall <package>` brings them back. `--hold package|path`: never project it again.
 - Conffiles: before dpkg runs, a projected conffile still in its lean form goes back to its pristine bytes, so dpkg never asks; a conffile you edited is yours, and dpkg's usual rules apply to it.

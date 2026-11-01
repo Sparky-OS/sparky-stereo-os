@@ -33,7 +33,7 @@ A senior partner tells you when you are wrong, asks the awkward question before 
 
 1. Name the task and the layer that owns it: input/metadata, shared library, application, compositor or physical output.
 2. Read only that domain's skill and the current source. Dates and measurements below describe their recorded versions; verify them before carrying a change forward.
-3. Define one observable success and the relevant unchanged behavior. For a bug fix, retain a reproduction that fails before the fix.
+3. Define one observable success and the relevant unchanged behavior. For a bug fix, retain a reproduction that fails before the fix, and search upstream for the same fix before writing one ([search-upstream-first](../search-upstream-first/SKILL.md)).
 4. Implement and test in an isolated environment, then test the installed package when packaging is in scope.
 5. Hand back the diff, exact versions, commands, results and gaps using [ai-partners](../ai-partners/SKILL.md). Humans can follow the same recipe without any AI client.
 
@@ -97,6 +97,7 @@ A change is done when it is measured, not when it compiles.
 
 # Part three: working with upstream
 
+- **Search upstream before fixing.** Before writing a fix, search upstream's development branch, its merge requests and its issues for it; when upstream has it, carry upstream's commit with its author's credit ([search-upstream-first](../search-upstream-first/SKILL.md)).
 - **Patches in upstream style.** The smallest change, in the one place that owns the behaviour, written like the code around it, so maintainers judge what it does.
 - **The project's CI first, locally,** green before anything is pushed; a failure is compared with the unpatched release. A release tag's own CI can be red: check whether upstream fixed its CI after the tag, and if so run the CI on a branch based on the current development branch. Never use a project's own CI as a test bench.
 - **Build once with clang too.** A project's Windows and FreeBSD jobs cannot run locally, and GCC accepts code that MSVC and FreeBSD's clang reject: KFileMetaData's first pipeline on KDE's CI was green on Linux and red on both, over one test file where `Property::X` was ambiguous after two `using namespace` lines.
@@ -139,6 +140,7 @@ Load the one that matches the work; the [program list](../../docs/programs-in-de
 | [`user-groups`](../user-groups/SKILL.md) | The groups every desktop user gets, never a root-equivalent one |
 | [`system-housekeeping`](../system-housekeeping/SKILL.md) | Self-pruning defaults (kernels, logs, crash dumps, GRUB) and cleaning a system safely |
 | [`ai-partners`](../ai-partners/SKILL.md) | AI assistants joining the work: roles, briefs, proof, review, upstream manners, provenance |
+| [`search-upstream-first`](../search-upstream-first/SKILL.md) | Before fixing a bug in software we did not write: search upstream's branch, merge requests and issues, carry upstream's commit with credit when it exists |
 | [`upstream-outreach`](../upstream-outreach/SKILL.md) | Bringing AI-assisted work to projects and people: a heads-up to the maintainer before any merge request, evidence first, one ask, one knock, the right venue |
 | [`audio`](../audio/SKILL.md) | PipeWire, WirePlumber and KDE's Sound page: the audio house format, routing, formats, passthrough, virtual surround, MIDI |
 | [`brazil-certificates`](../brazil-certificates/SKILL.md) | ICP-Brasil certificates, the E-521 root, browsers, tokens and the court signer |

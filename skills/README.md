@@ -7,7 +7,7 @@ These are edition-maintenance procedures, not a general application-development 
 Start with [AGENTS.md](../AGENTS.md), the [edition contract](sparky-stereo/SKILL.md) and [working together](ai-partners/SKILL.md).
 Then choose one task below. Each domain starts with a short working recipe; detailed sections retain the measurements and traps that motivated it.
 Historical versions and test results are evidence for their stated setup, not a guarantee about newer software.
-Core skills are `sparky-stereo`, `ai-partners`, `upstream-outreach`, `edition-packaging` and `writing-front-pages`; they always link.
+Core skills are `sparky-stereo`, `ai-partners`, `search-upstream-first`, `upstream-outreach`, `edition-packaging` and `writing-front-pages`; they always link.
 
 | Your task | Read next |
 | --- | --- |
@@ -38,6 +38,7 @@ Core skills are `sparky-stereo`, `ai-partners`, `upstream-outreach`, `edition-pa
 | Android Qt test reproduction | [qt-android-ci](qt-android-ci/SKILL.md) |
 | Brazilian certificate sources and algorithms | [brazil-certificates](brazil-certificates/SKILL.md) |
 | Sparky CA trust-store implementation | [certificate-manager](certificate-manager/SKILL.md) |
+| A bug in a program the edition did not write, before writing any fix | [search-upstream-first](search-upstream-first/SKILL.md) |
 | Forks, pushing, and checking that the work is online | [forks-and-online](forks-and-online/SKILL.md) |
 | A maintainer message, contribution or follow-up | [upstream-outreach](upstream-outreach/SKILL.md) |
 | An FFmpeg pull request: series, trailers, FATE, the review bot (with upstream-outreach) | [contrib-ffmpeg](contrib-ffmpeg/SKILL.md) |

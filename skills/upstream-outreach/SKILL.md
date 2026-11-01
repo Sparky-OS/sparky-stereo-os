@@ -8,9 +8,10 @@ description: >-
 
 ## Working recipe
 
-1. Read previous incoming and sent interactions, current project contribution rules and the exact implementation evidence.
-2. Draft for the responsible maintainer: one concrete problem, a small useful offer, honest assistance disclosure and implementation limits.
-3. Return the draft and claim sources. Send only within explicit authorization; verify the sent copy and record follow-up obligations without inventing acceptance.
+1. For a fix, first search upstream for the same fix ([search-upstream-first](../search-upstream-first/SKILL.md)): when upstream has it, there is nothing to offer, only a commit to carry with credit.
+2. Read previous incoming and sent interactions, current project contribution rules and the exact implementation evidence.
+3. Draft for the responsible maintainer: one concrete problem, a small useful offer, honest assistance disclosure and implementation limits.
+4. Return the draft and claim sources. Send only within explicit authorization; verify the sent copy and record follow-up obligations without inventing acceptance.
 
 **Check freshness first.**
 Written on 2026-10-14, after the edition's first proposal to a project that had declined AI-assisted text.

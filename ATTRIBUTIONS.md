@@ -369,6 +369,7 @@ In October 2026:
 
 **Source**: [mesa3d.org](https://mesa3d.org/) **License**: MIT **What we changed**: OpenGL quad buffer, EGL multiview windows and two-layer Vulkan swapchains become one full side by side picture, declared to KWin; a Vulkan layer does the same over drivers outside Mesa.
 **Credit**: Brian Paul, who started Mesa in 1993, and the Mesa developers.
+The Kopper test series also carries Mike Blumenkrantz's [Present event-selection correction](https://gitlab.freedesktop.org/mesa/mesa/-/commit/b258e2a051761868734f09774295ee9cee5f7e8d), dated 6 October 2026; it remains outside the package recipe pending integration review.
 
 ### 2.3 NVIDIA's open GPU kernel modules and egl-wayland
 

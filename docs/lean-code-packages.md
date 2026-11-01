@@ -32,7 +32,7 @@ The build projects a disposable staging tree before final checksums and package 
 
 The full authored text of changed files goes in a separate `<package>-lc-hr` package at the exact version and architecture. It is required alongside the runtime package in the repository, but is not a runtime dependency and does not go into the ISO by default. The first online update fetches the authored settings; `dpkg-stereo --hr /path` can retrieve other originals. Each retrieved file is checked against its recorded authored-text hash. The usual documentation path and the one-line pointer remain available.
 
-`--resolve` reconstructs a lean file from its exact authored text and refuses a mismatch, so an updated renderer cannot silently point an old error at the wrong line. `--verify` checks build-time projections too; `--deep` checks the complete recorded payload. `--restore` reverses local projections to the distribution baseline. For a build-time lean package that baseline is already MR; `--hr` is how to read the full authored text.
+`--resolve` takes the line's content and searches for it in the exact authored text; where the same content occurs more than once, the neighbouring lines pick the right one, and a line whose content is in no authored line is reported unresolved, never guessed. `--resolve-render` reconstructs the lean file from its authored text instead and refuses a mismatch, so an updated renderer cannot silently point an old error at the wrong line. `--verify` checks build-time projections too; `--deep` checks the complete recorded payload. `--restore` reverses local projections to the distribution baseline. For a build-time lean package that baseline is already MR; `--hr` is how to read the full authored text.
 
 ## Build and release order
 
@@ -74,10 +74,11 @@ Toolkit 0.1.14 accepts a retained `debian/sparky-lean-payload-sources.json` mapp
 
 Known copies must match their own authored or projected hash. Changed copies fail; generated paths absent from the native report remain unchanged by recovery. The subsequent payload pass still qualifies their actual consumer. This layout records a known installation relationship; it is not permission to guess provenance from matching bytes.
 
-The diagnostic resolver (sometimes called our “decompiler”) maps a location in lean code back to
-the matching complete authored source. It checks source identity and hashes before resolving.
-C/C++ builds keep every authored line number with no `#line`: since toolkit 0.1.17 a removed comment leaves its line breaks, which costs the compiler fewer instructions than the directives did ([measured](proofs/lean-code-compile-cycles.md#result-toolkit-0117)); Java/Kotlin builds retain a separate mapping
-and exact source copies. This is source recovery from recorded originals, not reconstruction of lost comments from a binary.
+The diagnostic resolver (sometimes called our “decompiler”) maps a location in lean code back to the matching complete authored source.
+It checks source identity and hashes, then finds the lean line's content in the authored source.
+Lean line numbers differ from the authored ones in every language: since toolkit 0.1.20 a C or C++ comment-only line goes completely, with no `#line` and no empty line where the comment was (the authored empty lines stay), so `__LINE__`, `assert` messages, diagnostics and debug line tables name lean lines, and the resolver translates them ([measured](proofs/lean-code-compile-cycles.md#result-toolkit-0120)).
+Java/Kotlin builds retain a separate mapping and exact source copies.
+This is source recovery from recorded originals, not reconstruction of lost comments from a binary.
 
 For installed packages, use `dpkg-stereo --hr /path/to/file` and
 `dpkg-stereo --resolve /path/to/file:LINE[:COLUMN]` with the matching HR package available.

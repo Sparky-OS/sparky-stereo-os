@@ -19,9 +19,9 @@ Core skills are `sparky-stereo`, `ai-partners`, `search-upstream-first`, `upstre
 | Photos, format marks or thumbnails | [stereo-pictures](stereo-pictures/SKILL.md) |
 | Colour precision or HDR metadata | [deep-colour](deep-colour/SKILL.md) |
 | Artwork, animated pairs or theme assets | [stereo-artwork](stereo-artwork/SKILL.md) |
-| Proving compositor/application stereo | [stereo-proof-rig](stereo-proof-rig/SKILL.md) |
+| Proving compositor/application stereo, or why the two eyes differ | [stereo-proof-rig](stereo-proof-rig/SKILL.md) |
 | Kernel/display driver or virtual display modes | [drivers](drivers/SKILL.md), [vkms-stereo](vkms-stereo/SKILL.md) |
-| A VM viewer and its pointer/mode changes | [stereo-vm](stereo-vm/SKILL.md) |
+| A QEMU or SPICE VM viewer and its pointer/mode changes | [stereo-vm](stereo-vm/SKILL.md) |
 | VR content on a TV or stereo spectator | [vr-to-3d](vr-to-3d/SKILL.md) |
 | A desktop or media stream on a phone/headset | [3d-to-vr](3d-to-vr/SKILL.md); select the relevant receiver/transport section |
 | Wine/Proton games | [proton-wine](proton-wine/SKILL.md) |
@@ -32,12 +32,13 @@ Core skills are `sparky-stereo`, `ai-partners`, `search-upstream-first`, `upstre
 | Plasma search defaults, task manager, frozen windows and drive formatting | [kde-desktop-defaults](kde-desktop-defaults/SKILL.md) |
 | Unix groups for desktop users | [user-groups](user-groups/SKILL.md) |
 | Logs, retained kernels and cleanup | [system-housekeeping](system-housekeeping/SKILL.md) |
-| Packages and their provenance, Paweł's formula, distro tasks and dependencies, the signed repository, the ISO | [edition-packaging](edition-packaging/SKILL.md) |
+| Packages and their provenance, Paweł's formula, distro tasks and dependencies, apt pins and conffiles, the signed repository, the ISO | [edition-packaging](edition-packaging/SKILL.md) |
 | One more program's stereo integration: the list, the pack format, the missing program, the proof | [stereo-integrations](stereo-integrations/SKILL.md) |
 | Lean Code projection or resolving installed source | [lean-code](lean-code/SKILL.md) |
 | Android Qt test reproduction | [qt-android-ci](qt-android-ci/SKILL.md) |
 | Brazilian certificate sources and algorithms | [brazil-certificates](brazil-certificates/SKILL.md) |
 | Sparky CA trust-store implementation | [certificate-manager](certificate-manager/SKILL.md) |
+| A task brief, handoff or review for a person or an AI partner; an unattended runner that stops, loops or cannot write | [ai-partners](ai-partners/SKILL.md) |
 | A bug in a program the edition did not write, before writing any fix | [search-upstream-first](search-upstream-first/SKILL.md) |
 | Forks, pushing, and checking that the work is online | [forks-and-online](forks-and-online/SKILL.md) |
 | A maintainer message, contribution or follow-up | [upstream-outreach](upstream-outreach/SKILL.md) |
@@ -62,12 +63,13 @@ Ordinary application developers can install the skills separately when useful.
 See [the maintainer workflow](../docs/maintainer-workflow.md) for package checks and source/publication boundaries.
 
 - Read the files directly, or run `sparky-stereo-skills list`.
+- Use `sparky-stereo-skills find "<task or symptom>"` when you do not know which skill applies: it ranks the skills by name, description and the task table above, offline and the same every time, and prints each path with the `context` command to run next.
 - Use `sparky-stereo-skills context native-linux` for selected text suitable for a model without file tools.
 - Use `sparky-stereo-skills context --list-sections 3d-to-vr`, then `--section '3d-to-vr:Exact heading'`, for a small part of a long skill.
 - `sparky-stereo-skills link` retains the optional assistant-folder integration; it preserves the person's own skills.
 - `sparky-stereo-skills export skills.zip` retains the skill-import format. `sparky-stereo-skills bundle reference.zip` instead preserves the full offline tree and its relative references.
 
-In a checkout use `python3 tools/skills-context.py` in place of `sparky-stereo-skills context`.
+In a checkout use `python3 tools/skills-context.py` in place of `sparky-stereo-skills context`, and `python3 tools/skills-context.py --find "<task or symptom>"` in place of `sparky-stereo-skills find`.
 The context budget is in characters, not tokens; an oversized request fails rather than truncating instructions.
 A selected section is explicitly labelled as an excerpt. Read additional linked references when the task needs them.
 
@@ -77,4 +79,5 @@ Keep its existing name and path so installed integrations keep finding it.
 Write the decision, the minimum inputs, the operation and the observable result; preserve useful evidence and credits.
 Keep substantial conditional detail in a linked reference, and individual run history in its evidence record.
 Use a valid YAML `name` and `description`; run `python3 tools/check-skills.py` and check the actual instructions as a reader.
+The description and the task table are how a reader finds a skill: name the programs, tools and symptoms a person would type, and add the symptom to `tools/tests/test-skills-find.py` when a new kind of work arrives.
 The validator checks discovery metadata and local file targets, not technical truth, external URLs or every Markdown anchor.

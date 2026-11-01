@@ -91,6 +91,8 @@ A change is done when it is measured, not when it compiles.
 - **The 2D control:** the changed program with stereo off against the distribution's own build, 0 differing pixels. This is the answer to "you will break something else".
 - **Geometry against a prediction.** For anything drawn by cameras, compare the measured disparity with a closed-form prediction, and report the error (median, and the share within one pixel), and the vertical disparity, which must be zero.
 - **Numbers, and the gaps.** Report what passed with its numbers, what failed with its output, and what was not verified. A pass is a pass within its measured scope. Stereo evidence does not establish HDR correctness: record colour primaries, transfer function, range, precision, metadata and actual output separately.
+- **Performance is information, not a gate** (Daniel, 2026-10-03: "not performing does not mean it does not run"). Stereo work is judged by running correctly to the specification; measure its cost and report it (for KWin's second eye pass, `KWIN_LOG_PERFORMANCE_DATA=1`), never hold the work on a speed target.
+  The users bring the hardware and choose the render resolution per eye, and a 2D desktop pays nothing for the design: the second eye is drawn only while stereo is visible or the output is in 3D.
 - **Check a label by eye.** A script that classifies colours can mislabel a correct capture; look at one before believing it.
 
 ---

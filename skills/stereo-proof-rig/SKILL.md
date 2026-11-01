@@ -3,7 +3,7 @@ metadata:
   requires-packages: kwin-wayland | docker.io
 name: stereo-proof-rig
 description: >-
-  Run isolated compositor captures and negative controls for stereo identity, geometry, timing, UI and installed-package behavior.
+  Run isolated Stereo KWin captures of both eyes and negative controls for stereo identity, geometry, timing, UI and installed-package behavior, and find why the two eyes differ.
 ---
 
 # The proof rig
@@ -15,7 +15,7 @@ description: >-
 3. Return commands, hashes, counts, control result and limits. A black or stale frame is not a valid successful stereo witness.
 
 **Check freshness first.**
-Written on 2026-10-07, the NVIDIA card added on 2026-10-16, KWin's shrink and the X11 view size on 2026-10-22.
+Written on 2026-10-07, the NVIDIA card added on 2026-10-16, KWin's shrink and the X11 view size on 2026-10-22, eyes that differ under an opaque region on 2026-11-01.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill says what counts as proof; this one says how to produce it.
 No 3D display is needed: the rig captures what Stereo KWin hands to an output, both eyes side by side.
 
@@ -94,6 +94,10 @@ A window whose elements show depth (Union on the edition's Qt, [Depth inside eve
 - **Searching vertical offsets** in block matching picks false matches on repeated patterns; match on the same row and check the vertical profile on its own.
 - **`LIBGL_ALWAYS_SOFTWARE=1` does not move KWin's scene to llvmpipe.** With a render node given, KWin's virtual backend draws through EGL on that card (radeonsi's shader statistics appear in `kwin.log` with `QT_LOGGING_RULES='kwin_*.debug=true'`), so the rig's "software" and `--gpu` runs give the same captures. KWin opens the first render node that opens: with Docker's CDI that is the NVIDIA card, without it the AMD one. Name a run by the card you gave it, and check the log.
 - **A window capture on Wayland includes the compositor's title bar:** offset the analysis by it.
+- **Eyes that differ only where a window has alpha under its own opaque region.** KWin's occlusion culling leaves the target unpainted below a window's opaque region, and a surface with an alpha channel still blends over what is left there (the Wayland protocol allows that artifact when a client declares a wrong opaque region).
+  In 2D the leftover is usually the previous frame of the same picture, so it rarely shows; in stereo the capture draws the right eye over the left eye's finished picture in one target, and a 3D output's per-eye buffers keep their own history, so one eye came out lighter (found on 2026-10-31 with a program that blits with alpha below 1 under its opaque region).
+  Stereo KWin since `+stereo3d40` clears the background below such windows in the eye passes; surfaces without alpha keep the culling, and 2D frames take upstream's path.
+  To tell it from a content error, repeat the capture with a fixture that draws with alpha 1 where it declares itself opaque: a difference that goes away was this one, a difference that stays is the program's.
 - **A colour classifier mislabels correct captures** whose views carry large white areas; look at one capture before trusting a label.
 - **Captures are 8 bits per channel:** a deep-colour proof is the surface's configuration and a readback, not the capture.
 - **A test that cannot fail proves nothing:** break the expectation once and see it fail.

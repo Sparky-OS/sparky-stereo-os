@@ -29,9 +29,9 @@ The generic source tree remains useful to other distributions under its existing
 5. Build source and binary packages, record provenance, and test the installed payload in isolation. Check dependency resolution and upgrade behavior when changed.
 6. Hand back the patch, commands, evidence and limits. Upstream acceptance, repository publication, ISO inclusion and physical-device qualification are separate milestones.
 
-Prefer getting reusable stereo support accepted upstream. When a suitable upstream release includes our changes,
-test that release and retire the corresponding downstream patches. We still own distro integration, packaging,
-Lean Code qualification and user-facing bug triage; upstream acceptance does not replace those checks.
+Prefer getting reusable stereo support accepted upstream.
+When a suitable upstream release includes our changes, test that release and retire the corresponding downstream patches.
+We still own distro integration, packaging, Lean Code qualification and user-facing bug triage; upstream acceptance does not replace those checks.
 
 For Lean Code use [its skill](../skills/lean-code/SKILL.md) and current release contract.
 Documentation and skill instructions remain authored text; the package must not erase the instructions its maintainers need.
@@ -39,15 +39,17 @@ Documentation and skill instructions remain authored text; the package must not 
 ## Small contexts and offline use
 
 Humans can open the Markdown directly. No AI account or service is needed.
-From a checkout, create a selected text bundle:
+When you do not know which skill a task or symptom needs, ask the skills index first; it ranks the skills by name, description and the index's task table, with no model and no network, and prints each skill's path and the context command to run next.
+From a checkout, find the skill, then create a selected text bundle:
 
 ```sh
+python3 tools/skills-context.py --find "a SPICE migration that loses the cache"
 python3 tools/skills-context.py native-linux --output /tmp/native-linux-context.txt
 python3 tools/skills-context.py --section '3d-to-vr:Phone link formats and late-frame recovery (checked 2026-10-15)' --output /tmp/phone-context.txt
 ```
 
-From the updated package, the equivalent entry is `sparky-stereo-skills context native-linux`.
-It includes the entry guidance, contract and working method, selected content, source identity and file hashes.
+From the updated package, the equivalent entries are `sparky-stereo-skills find a SPICE migration that loses the cache` and `sparky-stereo-skills context native-linux`.
+The context includes the entry guidance, contract and working method, selected content, source identity and file hashes.
 Add a needed document explicitly with `--reference docs/house-formats.md`; other references are not silently loaded.
 The size limit counts characters, not model tokens. Choose it for your client; an over-limit request fails without a partial output.
 A local model without tools should return a proposed patch and unrun commands for a human to check.
@@ -63,5 +65,5 @@ Run `python3 tools/check-skills.py` in the public checkout.
 Review changed claims and links, then pin a reviewed source commit in the package build.
 Do not label a package with an old commit while copying uncommitted files into it.
 Local candidate snapshots must say they include working-tree changes and carry a file manifest; release snapshots must name the actual committed source.
-The helper tests exercise linking, user-file preservation and removal; context and bundle checks exercise use without an AI client.
+The helper tests exercise linking, user-file preservation and removal; find, context and bundle checks exercise use without an AI client.
 Avoid installing the large developer task merely to test documentation packaging.

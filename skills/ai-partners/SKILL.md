@@ -2,13 +2,15 @@
 name: ai-partners
 description: >-
   Coordinate human and AI contributions to Sparky Stereo OS with bounded tasks,
-  source evidence, reproducible checks and durable handoffs. Use with the
-  edition contract and the domain skill; no particular model or service is required.
+  source evidence, reproducible checks and durable handoffs, and keep unattended
+  agent runners (Codex, Claude Code, local models) working when one stops without
+  a tool call, loops or cannot write. Use with the edition contract and the domain
+  skill; no particular model or service is required.
 ---
 
 # Working together on the edition
 
-Originally written by Claude from the project's work on 2026-10-10; revised with Daniel and Codex on 2026-10-19.
+Originally written by Claude from the project's work on 2026-10-10; revised with Daniel and Codex on 2026-10-19; unattended runners, reference corpora and `--find` added by Claude Opus 5.5 with Daniel on 2026-11-01.
 People, hosted models and smaller local models use the same evidence and procedures.
 Capability is established by the work and its checks, not by a provider name.
 
@@ -46,6 +48,7 @@ Return: changed paths, evidence location, actual result, gaps and next step
 
 Do not dump an entire mailbox, research folder or skill catalogue into a model.
 Use `tools/skills-context.py` from the public tree for a reader without filesystem access.
+When the brief does not name the skill, `tools/skills-context.py --find "<task or symptom>"` (installed: `sparky-stereo-skills find`) ranks the skills offline by name, description and the index's task table; a small model can run it and then load only the first one's context.
 The output records file hashes and refuses an oversized bundle instead of cutting instructions off.
 For a long skill, select a heading with `--section skill-name:Heading`; include the sections needed for that step and retain the common contract.
 A text bundle does not grant tool access or execute its commands.
@@ -80,6 +83,8 @@ Keep **source inspection**, **synthetic test**, **installed-package test** and *
 An emulator's ABI and decoder are part of the result; software decoding does not qualify a physical hardware decoder.
 Record **proposed / implemented / tested / packaged / published / accepted upstream** independently.
 An outreach invitation establishes none of the later states.
+Work made for a person is delivered when that person can get it and run it alone: one obvious download (a normal release, not a pre-release), a guide in their language for their own system, the prompts they will meet and how to send results back.
+A release nobody has downloaded has not landed.
 Use actual clock timestamps, retain failed attempts, and inspect representative captures before trusting automated image labels.
 Reviewer checks should run without an AI account; document the same CLI or CI command available to the author.
 Read the actual diff before writing its commit message: state the problem, reason and checked result, without inventing intent.
@@ -89,6 +94,7 @@ For KDE changes, apply [the development practices reference](../native-linux/ref
 
 Daniel, 2026-10-23: consulting the local corpora is mandatory for the edition's own partners, and we recommend the same habit to every distro developer.
 - **Keep the references local and searchable.** Index the specifications, manuals and sources the skills cite: CTA-861 and HDMI, H.264 and H.265 annex D, RFC 9559 (Matroska), the Mesa, Qt, Wayland, Vulkan and OpenGL documentation, and the kernel's DRM documents. Use any vector store you like; ours is [Qdrant](https://qdrant.tech/), one collection per domain.
+  [Reference corpora](references/reference-corpora.md) lists the public documents per domain (Debian packaging, the kernel's display stack, video and containers, graphics, Wine and Proton, virtual machines) with publisher, version, licence and URL, one working chunking and embedding setup, and the payload fields that make a hit citable.
 - **Consult it first,** before a web search and before writing a fact from memory. A model's recall is the least reliable source in the chain.
 - **A hit is a lead, not an authority.** Read its score, open the original and quote the clause: the specification section, the commit or the manual page. Never cite "the corpus".
 - **Record what you consulted** in the handoff: the collections, the queries, and what was used or missing. A miss shows which document the index still needs.
@@ -117,6 +123,7 @@ Use configured scratch paths and disk floors; historical values in a recipe are 
 Release build locks and CI reservations when work stops.
 Keep test displays, PipeWire, D-Bus and credentials separate from a person's live session.
 Keep process IDs for cleanup; broad process-name matching can stop another worker or the caller itself.
+[Unattended agent runners](references/agent-runners.md) collects what was measured running partners without a person at the keyboard: a runner that stops after turns without a tool call, cannot write, will not stop or hands back to nobody, and the traps of a machine shared with a person's desktop.
 Preserve useful evidence before deleting rebuildable intermediates.
 
 Extend the existing domain skill when a repeated failure teaches a reusable lesson.

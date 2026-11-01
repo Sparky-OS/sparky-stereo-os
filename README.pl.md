@@ -65,10 +65,17 @@ Dołączenie do grupy jest bezpłatne z kontem W3C, a pomoc jest mile widziana: 
 ## Twórz
 
 **Maluj, edytuj zdjęcia i filmy w 3D, maluj z większą głębią koloru: 16 bitów na kolor zamiast 8.**
+
+**Wkrótce: Plasma Studio w 3D.**
+[Plasma Studio](https://invent.kde.org/niccolove/plasma-studio), aplikacja KDE Niccolò Venerandiego do wideo, dźwięku, zdjęć, grafiki wektorowej i 3D w jednym miejscu, to pakiet twórczy, który przenosimy do 3D.
+Jego sceny 3D dostaną osobny widok dla każdego oka, a grafika wektorowa głębię dzięki [SVGStereo](https://github.com/Sparky-OS/svgstereo), naszemu oznaczeniu 3D dla rysunków SVG; na ekranie 2D zostaje dokładnie takie, jakie jest.
+**W rozwoju:** badamy je w [naszym forku](https://invent.kde.org/danielcamposramos/plasma-studio).
+
 - **Malowanie:** Krita pozwala malować na 16-bitowym płótnie oraz na płótnie 3D z 16 bitami dla każdego oka.
 - **Zdjęcia:** digiKam i Showfoto pokazują zdjęcia 3D w albumie, podświetlarce, pokazie obrazów i edytorze; KolourPaint edytuje obraz 3D i zapisuje go z oznaczeniem 3D.
 - **Wideo:** w Kdenlive klip zna swój układ 3D, monitory mogą go pokazać w 3D, a renderowanie zachowuje oznaczenie 3D.
 - **Opowieści:** [StorySplat](https://storysplat.com) ("Zamień swoje skany 3D w interaktywne wycieczki") tworzy wycieczki wewnątrz skanów 3D rzeczywistych miejsc, bezpośrednio w przeglądarce, a jego 3D View pokazuje je w 3D na dowolnym z zarejestrowanych wyjść; pierwszy test odbył się w układzie obok siebie na telewizorze Sony 3D.
+- **Obsługiwane także:** PhotoCraft i FilmCraft z [ArtCraft](https://github.com/storytold/artcraft), opublikowane z obsługą 3D.
 
 Pełny opis każdego programu: [Programy](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).
 

@@ -61,10 +61,17 @@ Daniel 和 Milton Ponson 共同主持 W3C [Procedural Memory Knowledge Represent
 ## 创作
 
 **在 3D 中绘图、编辑照片和编辑视频，并在深度颜色中绘图：每种颜色 16 位，而不是 8 位。**
+
+**即将到来：3D 版 Plasma Studio。**
+[Plasma Studio](https://invent.kde.org/niccolove/plasma-studio) 是 Niccolò Venerandi 开发的 KDE 应用，把视频、音频、照片、矢量图和 3D 集于一处，也是我们正在带入 3D 的创意套件。
+它的 3D 场景将为每只眼睛各提供一个视图，它的矢量图将通过 [SVGStereo](https://github.com/Sparky-OS/svgstereo)（我们为 SVG 绘图定义的 3D 标记）获得深度；在 2D 屏幕上，它保持原样。
+**开发中：**我们正在[我们的分支](https://invent.kde.org/danielcamposramos/plasma-studio)中研究它。
+
 - **绘画：**Krita 可以在 16 位画布上绘画，也可以在每只眼睛 16 位的 3D 画布上绘画。
 - **照片：**digiKam 和 Showfoto 在相册、光桌、幻灯片和编辑器中显示 3D 照片；KolourPaint 可以编辑 3D 图片，并保存它的 3D 标记。
 - **视频：**在 Kdenlive 中，片段会识别自己的 3D 布局，监视器可以 3D 显示，渲染结果也会保留 3D 标记。
 - **故事：**[StorySplat](https://storysplat.com)（"把你的 3D 扫描变成互动漫游"）可以在浏览器中直接在真实场所的 3D 扫描里构建漫游，它的 3D View 可以在任何已注册的输出上以 3D 显示这些漫游，并首次在 Sony 3D 电视上左右并排测试。
+- **同样支持：**[ArtCraft](https://github.com/storytold/artcraft) 的 PhotoCraft 和 FilmCraft 已带 3D 发布。
 
 每个程序的完整说明：[程序](#programs-the-edition-changes-for-stereo-3d-and-deep-colour)。
 

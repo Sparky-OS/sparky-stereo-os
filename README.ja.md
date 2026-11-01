@@ -91,12 +91,20 @@ W3Cアカウントがあれば無料でグループに参加できます。
 
 **3Dで絵を描き、写真や動画を編集できます。
 各色8ビットではなく16ビットのディープカラーで絵を描くこともできます。**
+
+**今後の予定：3DのPlasma Studio。**
+[Plasma Studio](https://invent.kde.org/niccolove/plasma-studio)は、Niccolò Venerandiによる、動画、音声、写真、ベクターアート、3Dをひとつにまとめた KDE アプリで、私たちが3D対応を進めているクリエイティブスイートです。
+その3Dシーンは左右の目ごとに1つのビューを持つようになり、ベクターアートはSVG図面のための私たちの3D識別情報である[SVGStereo](https://github.com/Sparky-OS/svgstereo)によって奥行きを持つようになります。
+2D画面では、これまでとまったく同じに表示されます。
+**開発中：** [私たちのフォーク](https://invent.kde.org/danielcamposramos/plasma-studio)で検討しています。
+
 - **ペイント：** Kritaでは16ビットのキャンバスで描けるほか、左右の目それぞれ16ビットの3Dキャンバスでも描けます。
 - **写真：** digiKamとShowfotoは、アルバム、ライトテーブル、スライドショー、エディタで3D写真を表示します。
   KolourPaintは3D画像を編集し、3Dの識別情報を付けて保存します。
 - **動画：** Kdenliveではクリップが自身の3Dレイアウトを保持し、モニターで3D表示でき、レンダリング結果にも3Dの識別情報が残ります。
 - **ストーリー：** [StorySplat](https://storysplat.com)（「3Dスキャンをインタラクティブなツアーに」）は、実在する場所の3Dスキャン内を巡るツアーをブラウザー上で作成します。
   その3D Viewは、登録されているどの出力でもツアーを3D表示でき、最初のテストはSonyの3Dテレビでサイドバイサイド表示を使って行いました。
+- **こちらにも対応：** [ArtCraft](https://github.com/storytold/artcraft)のPhotoCraftとFilmCraftは、3D対応で公開済みです。
 
 各プログラムの詳細：[プログラム](#programs-the-edition-changes-for-stereo-3d-and-deep-colour)。
 

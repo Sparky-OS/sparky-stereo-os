@@ -64,10 +64,17 @@ W3C 계정으로 그룹 가입은 무료이며, 도움을 환영합니다: 여�
 ## 만들기
 
 **3D로 그림을 그리고, 사진과 비디오를 편집하고, 딥 컬러로 그리세요: 8비트 대신 색상당 16비트.**
+
+**곧: 3D로 만나는 Plasma Studio.**
+[Plasma Studio](https://invent.kde.org/niccolove/plasma-studio)는 Niccolò Venerandi가 만든, 비디오, 오디오, 사진, 벡터 아트와 3D를 한곳에 담은 KDE 앱으로, 우리가 3D로 가져오고 있는 크리에이티브 스위트입니다.
+3D 장면은 눈마다 하나의 뷰를 갖게 되고, 벡터 아트는 SVG 그림을 위한 우리의 3D 표시인 [SVGStereo](https://github.com/Sparky-OS/svgstereo)로 깊이를 갖게 됩니다; 2D 화면에서는 지금과 똑같이 보입니다.
+**개발 중:** [우리 포크](https://invent.kde.org/danielcamposramos/plasma-studio)에서 연구하고 있습니다.
+
 - **그리기:** Krita가 16비트 캔버스에 그리고, 각 눈에 16비트인 3D 캔버스에도 그립니다.
 - **사진:** digiKam과 Showfoto가 앨범, 라이트 테이블, 슬라이드쇼 및 편집기에서 3D 사진을 보여줍니다; KolourPaint가 3D 사진을 편집하고 3D 표시와 함께 저장합니다.
 - **비디오:** Kdenlive에서 클립이 자신의 3D 레이아웃을 알고, 모니터가 3D로 보여줄 수 있으며, 렌더가 3D 표시를 유지합니다.
 - **스토리:** [StorySplat](https://storysplat.com) ("3D 스캔을 대화형 투어로 바꾸세요")이 실제 장소의 3D 스캔 안에서 브라우저에서 바로 투어를 만들고, 3D View가 등록된 출력에서 3D로 보여줍니다. Sony 3D 텔레비전에서 나란히 처음 테스트되었습니다.
+- **함께 지원:** [ArtCraft](https://github.com/storytold/artcraft)의 PhotoCraft와 FilmCraft가 3D와 함께 게시되어 있습니다.
 
 각 프로그램 전체: [프로그램](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).
 

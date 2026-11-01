@@ -3,7 +3,7 @@ metadata:
   requires-packages: dkms | edid-decode
 name: drivers
 description: >-
-  Implement and test kernel/display-driver stereo modes, HDMI signaling and deep-colour links; carry edition patches with provenance.
+  Implement and test kernel/display-driver stereo modes, from the HDMI 3D modes a display's EDID declares to HDMI signaling and deep-colour links; carry edition patches with provenance.
 ---
 
 # Drivers: 3D modes and deep colour in the kernel

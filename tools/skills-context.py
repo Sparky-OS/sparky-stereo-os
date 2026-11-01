@@ -3,6 +3,7 @@
 """Select public maintainer instructions for humans and models without file tools."""
 import argparse
 import hashlib
+import math
 from pathlib import Path
 import re
 import subprocess
@@ -102,6 +103,87 @@ def render(root, names, sections, references, limit):
     return result
 
 
+STOPWORDS = frozenset('''a about after all also an and any are as at be been before both but by can could did do does each
+every for from had has have how i if in into is it its just may me might more most must my no not of on one only or other
+our out over same should so some such than that the their them then there these they this those three to two under up us
+very was we were what when where which who why will with without would you your'''.split())
+
+
+def stem(word):
+    # A few English endings, enough for "pins", "pinned" and "pin" to meet; deterministic, no dictionary.
+    if len(word) > 4 and word.endswith('ies'):
+        word = word[:-3] + 'y'
+    elif len(word) > 3 and word.endswith('s') and not word.endswith('ss'):
+        word = word[:-1]
+    for suffix in ('ing', 'ed'):
+        if len(word) > len(suffix) + 2 and word.endswith(suffix):
+            word = word[:-len(suffix)]
+            if len(word) > 2 and word[-1] == word[-2] and word[-1] not in 'lsz':
+                word = word[:-1]
+            break
+    if len(word) > 4 and word.endswith('e'):
+        word = word[:-1]
+    return word
+
+
+def terms(text):
+    return {stem(w) for w in re.findall(r'[a-z0-9]+', text.lower()) if w not in STOPWORDS}
+
+
+def description(text):
+    if not text.startswith('---\n') or '\n---\n' not in text[4:]:
+        return ''
+    front = text[4:].split('\n---\n', 1)[0]
+    try:
+        import yaml
+        data = yaml.safe_load(front)
+        return data.get('description', '') if isinstance(data, dict) else ''
+    except ImportError:
+        m = re.search(r'^description:[ \t]*(?:[>|][-+]?[ \t]*\n)?((?:.*\S.*\n?)(?:[ \t]+.*\n?)*)', front + '\n', re.M)
+        return ' '.join(m[1].split()) if m else ''
+
+
+def task_rows(root):
+    # The "Your task | Read next" table of skills/README.md: each row's task text routes to the skills it links.
+    rows = {}
+    readme = root / 'skills/README.md'
+    if readme.is_file():
+        for line in public_file(root, 'skills/README.md').read_text().splitlines():
+            cells = [c.strip() for c in line.strip().strip('|').split('|')]
+            if len(cells) < 2 or set(cells[0]) <= set('-: '):
+                continue
+            for name in re.findall(r'\(([a-z0-9]+(?:-[a-z0-9]+)*)/SKILL\.md\)', cells[1]):
+                rows.setdefault(name, []).append(cells[0])
+    return rows
+
+
+FIELDS = (('name', 3.0), ('readme', 2.0), ('description', 1.0))
+
+
+def find(root, query, limit):
+    wanted = terms(query)
+    if not wanted:
+        raise ValueError('Describe the task or symptom in a few words')
+    rows = task_rows(root)
+    skills = []
+    for path in sorted((root / 'skills').glob('*/SKILL.md')):
+        name = path.parent.name
+        text = skill_path(root, name).read_text()
+        desc = description(text)
+        skills.append((name, desc, {'name': terms(name.replace('-', ' ')),
+                                    'readme': terms(' '.join(rows.get(name, []))),
+                                    'description': terms(desc)}))
+    count = len(skills)
+    frequency = {t: sum(1 for _, _, f in skills if any(t in f[k] for k, _ in FIELDS)) for t in wanted}
+    weight = {t: math.log(1 + (count - n + 0.5) / (n + 0.5)) for t, n in frequency.items()}
+    scored = []
+    for name, desc, fields in skills:
+        score = sum(weight[t] * w for t in wanted for k, w in FIELDS if t in fields[k])
+        if score > 0:
+            scored.append((-round(score, 6), name, desc))
+    return [(name, -score, desc) for score, name, desc in sorted(scored)[:limit]]
+
+
 def bundle(root, destination):
     dest = Path(destination).resolve()
     if dest.is_relative_to(root.resolve()):
@@ -133,11 +215,27 @@ def main():
     parser.add_argument('--list', action='store_true', help='List skill names')
     parser.add_argument('--list-sections', metavar='SKILL', help='List exact headings for section selection')
     parser.add_argument('--bundle', type=Path, help='New ZIP of the complete public reference tree, for ordinary extraction')
+    parser.add_argument('--find', metavar='TEXT', help='Rank the skills for a task or symptom by name, description and the '
+                        'skills index task table, offline and deterministic; prints each path and the context command to run next')
+    parser.add_argument('--limit', type=int, default=3, help='How many skills --find prints (default 3)')
+    parser.add_argument('--context-command', default=f'python3 {ROOT / "tools/skills-context.py"}', help=argparse.SUPPRESS)
     args = parser.parse_args()
     try:
         if args.max_chars <= 0:
             raise ValueError('--max-chars must be positive')
-        if args.bundle:
+        if args.find is not None:
+            if args.skills or args.section or args.reference or args.output or args.list or args.list_sections or args.bundle:
+                raise ValueError('--find is a separate operation')
+            if args.limit <= 0:
+                raise ValueError('--limit must be positive')
+            found = find(ROOT, args.find, args.limit)
+            if not found:
+                print(f'No skill matches those words. Read the task table in {ROOT / "skills/README.md"}.')
+                sys.exit(1)
+            for i, (name, score, desc) in enumerate(found, 1):
+                print(f'{i}. {name} (score {score:.2f})\n   {" ".join(desc.split())}\n'
+                      f'   {ROOT / "skills" / name / "SKILL.md"}\n   Next: {args.context_command} {name}')
+        elif args.bundle:
             if args.skills or args.section or args.reference or args.output or args.list or args.list_sections:
                 raise ValueError('--bundle is a separate operation')
             print(f'Bundled {bundle(ROOT, args.bundle)} public files into {args.bundle}')

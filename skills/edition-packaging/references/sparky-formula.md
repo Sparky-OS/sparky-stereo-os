@@ -19,13 +19,36 @@ His repositories are the reference: when this page and his current practice diff
 ## The binary package
 
 - Assembled by hand with `dpkg-deb --root-owner-group -b`.
-- `DEBIAN/control` and `DEBIAN/md5sums` only. Maintainer scripts only when they are needed, and small.
+- `DEBIAN/control` and `DEBIAN/md5sums`, plus `DEBIAN/conffiles` when the package ships files under `/etc` ([below](#files-under-etc-are-conffiles)). Maintainer scripts only when they are needed, and small.
 - `/usr/share/doc/<package>/copyright`, and no `changelog.Debian`.
 - **Control fields in this order:** `Package`, `Version`, `Architecture`, `Maintainer`, `Installed-Size`, `Depends`, then `Recommends`, `Suggests`, `Conflicts` or `Replaces` when needed, `Section`, `Priority`, `Homepage`, `Description`.
 - `Section:` is a capitalised free word (`System`, `Utilities`). `Priority: optional`. `Architecture: all` for scripts.
 - `Depends` is alphabetical, with versions only when they are needed.
 - `Description` is a short title line, then the body indented by two spaces.
 - The provenance fields (`Maintainer`, `Homepage`, `Bugs`) are the edition's, as [the skill's provenance section](../SKILL.md#provenance-daniel-2026-10-02-always) says.
+
+## Files under /etc are conffiles
+
+Debian Policy 4.7.4.1, section 10.7.3: configuration files' "local changes must be preserved during a package upgrade", and "The easy way to achieve this behavior is to make the configuration file a conffile".
+So every file the package ships under `/etc` is listed in `DEBIAN/conffiles`, and the maintainer scripts never edit it.
+Policy names the other way, files managed only by maintainer scripts, and the two must not be mixed for one file.
+
+**Turning shipped files into conffiles in a later version** needs maintainer scripts, because dpkg has no record of what the old version shipped (measured with Forky's dpkg on 2026-10-31, for `sparky-stereo-apt` 20261031.1~sparky9~0):
+
+- Without them, dpkg treats every file whose bytes differ from the new one as changed by the person, edited or not. At a terminal it asks about each one; under `apt-get -y` with no `--force-conf*` it stops at the question (end of file on standard input, exit 100, the package unpacked but not configured, until `dpkg --configure -a` with the two options finishes it); with `--force-confdef --force-confold` it keeps every old file silently and writes the new one as `.dpkg-dist`, so an unattended upgrade would keep a stale file for good.
+- With them, the pattern `dpkg-maintscript-helper rm_conffile` uses ([dpkg-maintscript-helper(1)](https://manpages.debian.org/testing/dpkg/dpkg-maintscript-helper.1.en.html)): the `preinst`, on `upgrade` from a version before the first one with conffiles, compares each file with the installed version's `md5sums` and moves an unchanged one aside as `FILE.dpkg-remove`, so dpkg installs the new file without a question; the `postinst` deletes the moved-aside copies; the `postrm` puts them back on `abort-install` and `abort-upgrade`. A changed file stays where it is, and dpkg asks, keeping the person's version by default.
+
+What to check before publishing, each in a throwaway container that starts from the published version:
+
+| Case | Expected |
+| --- | --- |
+| Nothing edited, `apt-get -y` | no question; every file is the new package's; no `.dpkg-*` left; `dpkg --verify` clean |
+| One file edited, at a terminal, Enter | one question, for that file only; the edit kept, the new file as `.dpkg-dist` |
+| One file edited, `--force-confdef --force-confold` | the edit kept, the new file as `.dpkg-dist`, exit 0 |
+| The package without its maintainer scripts (the control that must fail) | dpkg asks about, or silently keeps, files nobody edited |
+| A later version changes a file, nothing edited | "Installing new version of config file", no question |
+
+A file the person deleted before the conversion comes back once, since the old version never recorded it as theirs; after the conversion a deleted conffile stays deleted.
 
 ## Versions and the changelog
 

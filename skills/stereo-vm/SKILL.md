@@ -3,7 +3,7 @@ metadata:
   requires-packages: qemu-system-x86
 name: stereo-vm
 description: >-
-  Verify stereo VM viewers, logical input coordinates, resize and mode transitions with isolated guests and negative controls.
+  Verify stereo VM viewers (QEMU's window, and virt-viewer, virt-manager and Karton over SPICE), logical input coordinates, resize and mode transitions with isolated guests and negative controls.
 ---
 
 # A virtual machine in stereo

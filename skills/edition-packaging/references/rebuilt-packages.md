@@ -15,7 +15,22 @@
 - Every architecture comes from the one source package: `sparky-os/repo/build-from-dsc.sh` builds each architecture from the published `.dsc`, as [the skill](../SKILL.md#each-build-of-ours) says.
 - `DEBIAN_FRONTEND=noninteractive apt-get -y` everywhere: the host, containers, the VM and scripts.
 - Build trees go on a persistent disk, never under `/tmp`, which may be wiped at boot; `sync` after a build worth keeping.
+- **A Qt module built with its documentation in one tree races two header generators (found 2026-10-31).**
+  With `ninja docs` first, `Core_sync_all_public_headers` (`syncqt -all`) and `Core_sync_headers` write `include/QtCore/QtCore` unordered (Qt's `QtSyncQtHelpers.cmake` says so), and the installed module header can come out wrong or empty.
+  qt6-base 6.11.2+dfsg-5+stereo3d13 shipped a `QtCore` header that included files no package ships, so nothing including `<QtCore>` compiled (10 wrong and 3 empty in 800 reproduction runs).
+  Our qt6-base runs `dh_auto_build -- sync_headers` before `docs`, and its `test.sh` compiles every public module header alone and together and resolves every include of every installed header, so the build stops on a bad header.
+  Give every Qt module recipe built this way (qt6-3d, qt6-declarative, qt6-multimedia) the same test.
+  Daniel reported the race to Qt as [QTBUG-151944](https://qt-project.atlassian.net/browse/QTBUG-151944).
 - Root commands on a person's machine run only on that person's go. Tests never change a television's mode, and anything that will open on a television is announced first.
+
+## What the repository carries
+
+- **Only what we change** (Daniel, 2026-10-15: "if we have not changed a line and it serves our stereo needs ... we do not need to host the package").
+  A program goes into the repository when we change it for stereo or it needs work to reach a 3D screen; an unchanged program reaches people through its own channel (the app centre, Flatpak, its upstream download).
+- **Upstream alive, Debian failing:** a living KDE or Qt program that Debian dropped or lags on is packaged from its own upstream, KDE's releases and repositories first (Daniel, 2026-10-05: "I would love to leverage KDE original versions and repos, if possible, where debian fails"); OpenRGB 1.0 and protontricks 1.15 are examples.
+- **Upstream dropped it:** a program its developer archived or never ported to the current Plasma is dropped by us too, never kept alive on a library Debian is retiring (Daniel, the same day: "when the dev drops it, we drop it as well"); then find the living tool for the job, a KDE program first, then Qt, then anything alive.
+- Not being in Debian is not a blocker: Karton and PlasmaTube are packaged from upstream.
+  Like every build of ours, such a package hands Stereo KWin full side by side only.
 
 ## Versions and replacements
 

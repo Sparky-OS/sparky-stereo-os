@@ -21,6 +21,7 @@ The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first. [`up
    - With a clone: `git fetch upstream`, then `git log --oneline <base>..upstream/<default> -- <path>`, then `git log -S '<the code you would change>' upstream/<default> -- <path>`.
    - GitHub without a clone: `gh api "repos/<owner>/<repo>/commits?path=<path>&since=<date of the base>"`, then `gh api repos/<owner>/<repo>/commits/<sha>` to read a candidate's diff.
    - GitLab without a clone: `GET /api/v4/projects/<id>/repository/commits?path=<path>&since=<date>`.
+   - A project that reviews on a mailing list (the kernel): search the list's archive through its public git mirror, `git clone --shallow-since=<date of the base> https://lore.kernel.org/<list>/0`, then `git log --grep` for the function or the error; it works where the web pages show an anti-bot wall. Check the subsystem's tree (for DRM, drm-misc's `-fixes` and `-next` branches) before calling a posted patch merged or missing.
 3. **Search the merge requests or pull requests,** open and merged, that touch the path or name the symptom.
 4. **Search the issue tracker** for the symptom, the function name and the error text.
 5. **Record what you searched and what you found,** whatever it is: the forge, the queries, and each candidate with its URL, author and date, or "nothing found". The record goes in the work's report or hand-back.
@@ -56,3 +57,6 @@ Name the author and the commit in the recipe's credits and in the edition's ATTR
 - **The diagnosis.** A partner spent a full milestone on it: 24 installed cases, a DRI3 trace of the stale pixmap, and the cause in `D3D11SwapChain::ChangeProperties`, which passed the old extent to the presenter. It proposed a one-line correction.
 - **Upstream already had it.** The identical line was merged on 2026-09-25: [3dbf33cb](https://github.com/doitsujin/dxvk/commit/3dbf33cb2205dd0d573cbc7a65e3855d97a4800b), "[d3d11] Fix incorrect swapchain resize dimensions", by ficool2. One search of the file's history would have found it.
 - **What the diagnosis still gave us.** Its first-frame fixture became the red and green test for carrying ficool2's commit.
+- **The same search, on a mailing list (nouveau, 2026-10-02).** An RTX 3060 on nouveau without its GSP firmware has no graphics engine, and the `GET_ZCULL_INFO` ioctl dereferenced the missing engine when Mesa's NVK started, so KWin died.
+  The fix was already on the nouveau list, not yet in drm-misc: Jim Cromie's "drm/nouveau: Fix NULL pointer dereference in GET_ZCULL_INFO ioctl" of 2026-08-15.
+  The edition's kernel carried his patch under his authorship, with Zhenhao Wan's fix for `GETPARAM_GRAPH_UNITS`, which the same machine hit next, instead of a duplicate of our own.

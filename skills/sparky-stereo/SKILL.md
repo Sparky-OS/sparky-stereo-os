@@ -119,8 +119,8 @@ Load the one that matches the work; the [program list](../../docs/programs-in-de
 
 | Skill | For |
 |---|---|
-| [`stereo-proof-rig`](../stereo-proof-rig/SKILL.md) | How to produce the proof: a headless Stereo KWin, captures of both eyes, the checks |
-| [`stereo-window-3d-area`](../stereo-window-3d-area/SKILL.md) | A 3D viewport, canvas or video inside an ordinary window |
+| [`stereo-proof-rig`](../stereo-proof-rig/SKILL.md) | How to produce the proof: a headless Stereo KWin, captures of both eyes, the checks, a showcase stereo screenshot |
+| [`stereo-window-3d-area`](../stereo-window-3d-area/SKILL.md) | A 3D viewport, canvas or video inside an ordinary window; KWin's effects with depth of their own |
 | [`stereo-two-cameras`](../stereo-two-cameras/SKILL.md) | Programs that draw a scene: the cameras, the maths, the proof |
 | [`stereo-video`](../stereo-video/SKILL.md) | Players, encoders, containers and servers |
 | [`stereo-pictures`](../stereo-pictures/SKILL.md) | Stereo photographs: JPS, MPO, viewers, screenshots |
@@ -129,16 +129,16 @@ Load the one that matches the work; the [program list](../../docs/programs-in-de
 | [`3d-to-vr`](../3d-to-vr/SKILL.md) | Stereo content and the desktop in a headset |
 | [`vkms-stereo`](../vkms-stereo/SKILL.md) | Testing stereo without a 3D display: VKMS with a 3D EDID, the writeback bench, IGT and KWin in a VM |
 | [`stereo-vm`](../stereo-vm/SKILL.md) | A virtual machine's stereo display: QEMU's window, virt-viewer, virt-manager and Karton, the pointer in a 3D mode, the controls that must fail |
-| [`drivers`](../drivers/SKILL.md) | The kernel and GPU drivers: HDMI 3D modes, deep colour, and carrying patches until mainline takes them |
+| [`drivers`](../drivers/SKILL.md) | The kernel and GPU drivers: HDMI 3D modes, deep colour, the edition kernel's configuration and its traps, and carrying patches until mainline takes them |
 | [`native-linux`](../native-linux/SKILL.md) | OpenGL, EGL, Vulkan, Qt and X11 programs on Linux |
-| [`proton-wine`](../proton-wine/SKILL.md) | Windows programs through Wine, DXVK and gamescope |
+| [`proton-wine`](../proton-wine/SKILL.md) | Windows programs through Wine, DXVK and gamescope; Steam's environment; Easy Anti-Cheat's Linux requirements |
 | [`gamecontroller`](../gamecontroller/SKILL.md) | KDE controller models and labels for flight and racing rigs, preserving every raw control and verifying upstream profiles |
 | [`edition-packaging`](../edition-packaging/SKILL.md) | Building, signing and shipping: provenance, Paweł's formula, tasks, our builds as the only candidates, the repository, the ISO |
 | [`stereo-integrations`](../stereo-integrations/SKILL.md) | One more program integrated: the integrations list, the pack format, Dolphin's right click packs, the missing program (command-not-found), the proof |
 | [`lean-code`](../lean-code/SKILL.md) | Lean Code: text files installed without the comments the machine never reads, how each format is checked, and how to verify, explain or undo a file with dpkg-stereo |
 | [`stereo-artwork`](../stereo-artwork/SKILL.md) | Artwork in an existing style, stereo pairs with a measured separation, animation in both eyes, editable deliverables |
 | [`power-idle`](../power-idle/SKILL.md) | KDE idle, lock, laptop lids, power-profile holds, CEC ownership and console isolation proof |
-| [`kde-desktop-defaults`](../kde-desktop-defaults/SKILL.md) | Plasma search defaults, task management, frozen windows and drive formatting |
+| [`kde-desktop-defaults`](../kde-desktop-defaults/SKILL.md) | Decided defaults out of the box: Plasma search, task management, frozen windows and drive formatting |
 | [`user-groups`](../user-groups/SKILL.md) | The groups every desktop user gets, never a root-equivalent one |
 | [`system-housekeeping`](../system-housekeeping/SKILL.md) | Self-pruning defaults (kernels, logs, crash dumps, GRUB) and cleaning a system safely |
 | [`ai-partners`](../ai-partners/SKILL.md) | AI assistants joining the work: roles, briefs, proof, review, upstream manners, provenance |

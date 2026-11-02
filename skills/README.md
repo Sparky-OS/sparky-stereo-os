@@ -19,7 +19,7 @@ Core skills are `sparky-stereo`, `ai-partners`, `search-upstream-first`, `upstre
 | Photos, format marks or thumbnails | [stereo-pictures](stereo-pictures/SKILL.md) |
 | Colour precision or HDR metadata | [deep-colour](deep-colour/SKILL.md) |
 | Artwork, animated pairs or theme assets | [stereo-artwork](stereo-artwork/SKILL.md) |
-| Proving compositor/application stereo, or why the two eyes differ | [stereo-proof-rig](stereo-proof-rig/SKILL.md) |
+| Proving compositor/application stereo, or why the two eyes differ; a showcase stereo screenshot | [stereo-proof-rig](stereo-proof-rig/SKILL.md) |
 | Kernel/display driver or virtual display modes; the edition kernel's configuration, DKMS modules on a new kernel | [drivers](drivers/SKILL.md), [vkms-stereo](vkms-stereo/SKILL.md) |
 | A QEMU or SPICE VM viewer and its pointer/mode changes | [stereo-vm](stereo-vm/SKILL.md) |
 | VR content on a TV or stereo spectator | [vr-to-3d](vr-to-3d/SKILL.md) |

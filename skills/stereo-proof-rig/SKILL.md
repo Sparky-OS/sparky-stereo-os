@@ -3,7 +3,7 @@ metadata:
   requires-packages: kwin-wayland | docker.io
 name: stereo-proof-rig
 description: >-
-  Run isolated Stereo KWin captures of both eyes and negative controls for stereo identity, geometry, timing, UI and installed-package behavior, and find why the two eyes differ.
+  Run isolated Stereo KWin captures of both eyes and negative controls for stereo identity, geometry, timing, UI and installed-package behavior, find why the two eyes differ, and take a showcase stereo screenshot that shows every depth level.
 ---
 
 # The proof rig
@@ -15,7 +15,7 @@ description: >-
 3. Return commands, hashes, counts, control result and limits. A black or stale frame is not a valid successful stereo witness.
 
 **Check freshness first.**
-Written on 2026-10-07, the NVIDIA card added on 2026-10-16, KWin's shrink and the X11 view size on 2026-10-22, eyes that differ under an opaque region on 2026-11-01.
+Written on 2026-10-07, the NVIDIA card added on 2026-10-16, KWin's shrink and the X11 view size on 2026-10-22, eyes that differ under an opaque region on 2026-11-01, the showcase screenshot on 2026-11-02.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill says what counts as proof; this one says how to produce it.
 No 3D display is needed: the rig captures what Stereo KWin hands to an output, both eyes side by side.
 
@@ -88,6 +88,22 @@ A window whose elements show depth (Union on the edition's Qt, [Depth inside eve
 4. **The measurement:** for each element, the horizontal shift that best matches the same window drawn on a 2D output, searched in steps of 0.005 px with linear interpolation, in each eye; the disparity is the left shift minus the right. A deeper element is cut to its rectangle: also count the pixels that differ beside it (0 expected) and inside it (many).
 5. **Controls:** the same case with Debian's Qt Quick (the elements off the screen plane measure 0, so the case must fail), limits 0/0/0 and a 2D output (0 differing pixels against the same window drawn without the depth packages: the edition as published, with the style built without its depth), and both Qt Quick render loops (`QSG_RENDER_LOOP=basic` and the threaded default).
 6. **On the wire:** `WAYLAND_DEBUG=client` shows the style's `get_depth` and `depth_state`, Qt's `set_desktop_depth`, and the pair's one `set_content(3)` on the same commit.
+
+## A showcase stereo screenshot
+
+A picture for people rather than a check: it has to show every depth level of the desktop at once, or it undersells the work (Daniel, 2026-10-23).
+Take it in a real Stereo KWin session with a 3D output, on a test machine, never on someone's own desktop.
+
+1. **Real 3D content inside the program:** a beautiful, freely licensed stereo picture or scene, credited with its authors' names.
+2. **Open the volume applet's pop-up and pin it** with its pin button: a pinned pop-up keeps its popped level while focus moves.
+3. **Then focus the program's window,** so it sits at the screen and its menus pop. An unfocused program sinks with the windows behind it and reads flat.
+4. **Open a menu several levels deep** (a menu, its sub-menu, the next sub-menu): each level sits one step further out.
+5. **Capture with Spectacle's 3D capture, on a delay** (MPO for its PNG choice, as [stereo-pictures](../stereo-pictures/SKILL.md) says). Then measure each level's disparity in pixels and write it down; on 2026-10-13, Marble's window measured 0, a menu +2, its sub-menu +4 and the windows behind −3 to −10.
+6. **A program under Wine:** first prove that its menus get their popped levels (override-redirect X11 menus under Xwayland). Menus that come out flat are work to fix, not a limit.
+7. **Hand over both files:** the MPO and a side-by-side PNG built from it, left eye first, with the depth seen (which elements step forward or back, by how many pixels).
+   Look at every frame for private details first: names, accounts, mail, places.
+8. **Never attach them to a mailing-list post,** since lists cap a message's size (the X3D public list at 800 KB). Put the files in a public folder on the edition's download server, with a `README.txt` and `SHA256SUMS`, and link the folder.
+9. **Capture with KWin +stereo3d37 or later.** Before [08453fd](https://github.com/Sparky-OS/kwin/commit/08453fd62972), ScreenShot2's `stereoImage()` painted each eye with source-over onto an image it had not filled, so the transparent parts of a stereo capture held leftover memory; it now copies each eye as it is.
 
 ## Traps that fooled us
 

@@ -633,6 +633,8 @@ Our changes stay in our own trees, ready to go upstream on the day they are want
 | [CSS Color 4](https://www.w3.org/TR/css-color-4/) | W3C; editors Tab Atkins Jr., Chris Lilley, Lea Verou (former editor L. David Baron) | Every colour space an SVG names, and the precision each needs |
 | [CSS Color 5](https://www.w3.org/TR/css-color-5/) | W3C; editors Chris Lilley, Una Kravets, Lea Verou (former editor Adam Argyle) | `color-mix()` and relative colours |
 | [CSS Color HDR](https://drafts.csswg.org/css-color-hdr/) | W3C; editor Chris Lilley | HDR colours in SVG and CSS |
+| [CSS Color Adjustment 1](https://www.w3.org/TR/css-color-adjust-1/) | W3C; editors Alison Maher, Elika J. Etemad (fantasai), Rossen Atanassov, Rune Lillesveen, Tab Atkins Jr. | The colour scheme an SVG declares, for `light-dark()` and system colours |
+| Contrasting text colours | Lea Verou, "On automatically generating contrasting text colors with CSS" (2024) | How `contrast-color()` chooses black or white |
 | Oklab | Björn Ottosson | The perceptual space behind `oklab()` and `oklch()` |
 | web-platform-tests css-color | Sam Weinig, Chris Nardi, Eric Willigers, Romain Menke, Aaron Krajeski, Jason Leo, Chris Lilley, CGQAQ | The parsing vectors our colour tests check against |
 | Debian Policy | Debian | How every package is built |

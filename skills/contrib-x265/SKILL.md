@@ -9,8 +9,16 @@ metadata:
 # Contributing to x265
 
 Written on 2026-10-24 from x265's `CONTRIBUTING.md` (`https://raw.githubusercontent.com/Multicorewareinc/x265/master/CONTRIBUTING.md`, read 2026-10-24) and public pull requests #986 and #999 (read 2026-10-24).
+The rules that come first were added on 2026-11-02 from `CONTRIBUTING.md` and the repository's files on master, read that day.
 Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this skill is x265's own practice.
 Re-read `CONTRIBUTING.md`, `.clang-format` and the active pull request before every round.
+
+## The rules that come first
+- **x265 publishes no code of conduct:** no such file in the repository and none named in `CONTRIBUTING.md` (checked 2026-11-02).
+  Its development list runs on VideoLAN's mailing-list server, where VideoLAN's rules for its lists apply ([`contrib-vlc`](../contrib-vlc/SKILL.md#the-rules-that-come-first)). Elsewhere the same manners hold: respectful, concise, in the project's own venue.
+- **The route:** the signed Contributor License Agreement first, then a GitHub pull request against `master` or patches on the development list (below). Bugs reproduce on the tip of `master` first; a memory-safety issue is reported privately, as `SECURITY.md` says, never as a public issue.
+- **AI:** `CONTRIBUTING.md` has no rule on AI assistance, AI-generated or machine-generated code (checked 2026-10-24 and 2026-11-02).
+  The nearest clause is its provenance rule ("Legal / licensing"): contributions must be "your own work (or work you are authorized to submit)", licensable under both the GPL v2 and the commercial licence, and "Do not paste code from GPL-incompatible or unknown-provenance sources."
 
 ## Where
 - Pull requests are on `https://github.com/Multicorewareinc/x265`.
@@ -25,6 +33,7 @@ Re-read `CONTRIBUTING.md`, `.clang-format` and the active pull request before ev
 - A new public API member requires documentation, parameter parsing, parameter-to-string output, CLI handling and help text, ReST documentation, a build-number bump and test coverage.
 - The guide says the style is four-space indentation, Allman braces and a 120-column soft limit, captured in `.clang-format`.
 - Run `git clang-format origin/master` so the Code Quality check sees only the lines you intended to change.
+- Answer review by pushing follow-up commits; `CONTRIBUTING.md`: "the maintainers will squash if needed".
 
 ## Tests
 - The guide says the patch must build in 8-bit, 10-bit, 12-bit and multilib configurations.
@@ -36,7 +45,6 @@ Re-read `CONTRIBUTING.md`, `.clang-format` and the active pull request before ev
 - Pull request #999 supplied independent validation of a separate field-control change: 48 synthetic encodes, 24 top-field and 24 bottom-field indications, byte comparison against an FFmpeg-separated field input, and acceptance by both an independent SEI reader and FFmpeg's decoder.
 
 ## AI policy
-- X265's `CONTRIBUTING.md` contains no AI, AI assistance, LLM, AI-generated or machine-generated rule (checked 2026-10-24).
-- On 2026-10-24, I checked `CONTRIBUTING.md`, `readme.rst`, `COPYING` and `doc/` in the public tree; they contain no such policy.
+- On 2026-10-24, `CONTRIBUTING.md`, `readme.rst`, `COPYING` and `doc/` in the public tree contained no AI policy; the rules above record the 2026-11-02 reading.
 - In pull request #999, the validation scripts were disclosed as "prepared with Codex assistance" while the contributor reported and ran the checks.
 - Do not invent a policy clause; follow the project's absence until it publishes one.

@@ -16,9 +16,11 @@ Check freshness: re-read `CONTRIBUTING.md`, `doc/developer.texi` and `doc/commun
 
 ## The rules that come first
 - **FFmpeg's Code of Conduct** (`doc/community.texi`, chapter "Code of Conduct") opens: "Be friendly and respectful towards others and third parties. Treat others the way you yourself want to be treated."
-  It asks to be considerate of other viewpoints, not to assume malice ("Do not assume malice for things that can be attributed to incompetence"), to stay friendly when someone does not, to take a break before answering in anger, to help and cooperate, and to give someone who struggles "a helping hand instead". It ends: "Be excellent to each other."
+  It asks to be considerate of other viewpoints, not to assume malice ("Do not assume malice for things that can be attributed to incompetence"), to stay friendly when someone does not, to take a break before answering in anger, to help and cooperate, and to give someone who struggles "a helping hand instead".
+  It ends: "Be excellent to each other."
 - **The Community Committee** enforces it (`doc/community.texi`): five members elected by the General Assembly for a year, who arbitrate interpersonal conflicts and can remove commit access or ban someone from the community for a time.
-- **The route:** pull requests on code.ffmpeg.org or patches on the ffmpeg-devel list (below). `CONTRIBUTING.md`: "Github pull requests should be avoided because they are not part of our review process and **will be ignored**."
+- **The route:** pull requests on code.ffmpeg.org or patches on the ffmpeg-devel list (below).
+  `CONTRIBUTING.md`: "Github pull requests should be avoided because they are not part of our review process and **will be ignored**."
 - **AI:** FFmpeg's documents state no rule on AI-assisted contributions (`CONTRIBUTING.md`, `doc/developer.texi` and `doc/community.texi`, checked 2026-11-02).
   Their one mention is the review bot, in `doc/developer.texi`, "Reviews": "If you want an LLM-based review, add Forgejo Fairy as a reviewer to your pull request."
   The edition discloses its assistance once, in the pull request description, and in the `Assisted-by:` trailer (below).
@@ -42,7 +44,8 @@ Check freshness: re-read `CONTRIBUTING.md`, `doc/developer.texi` and `doc/commun
 - Expected results live in `tests/ref/fate/...`; the test prints what it observes and FATE compares. Never hard-code expectations in C constants.
 - A new test fails on unpatched master and passes with the change; run the full applicable FATE with GCC and clang and report both totals.
 - The test goes in its own commit, after the fix, so every commit passes FATE and the fix can be backported alone. A maintainer asked for this on #25398 (2026-10-24: "Please do not mix tests and fixes in the same commit"). It is not written in `doc/developer.texi`; the nearest text is "Bug fixes intended for backporting should stay focused".
-- New samples go to the fate-suite through someone with samples access. Attach them to the pull request (small, generated, no outside media, with how they were made), each named as the sample, list their paths relative to the fate-suite root in the template's `fate-samples` block, and ask in a comment.
+- New samples go to the fate-suite through someone with samples access.
+  Attach them to the pull request (small, generated, no outside media, with how they were made), each named as the sample, list their paths relative to the fate-suite root in the template's `fate-samples` block, and ask in a comment.
   Since 2026-05-27 the pull request's CI copies the listed attachments into its own fate-suite (`.forgejo/inject-pr-samples.py`, run by `test.yml`), so the new tests run there before the samples are uploaded.
 
 ## The review bot

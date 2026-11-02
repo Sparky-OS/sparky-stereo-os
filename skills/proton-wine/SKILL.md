@@ -46,9 +46,11 @@ In the edition the desktop draws the final 3D output; a game or gamescope packs 
 - **Does the game reach the edition's Mesa?** Steam's runtime, Flatpak and some launchers can load their own libraries. Check which Vulkan and OpenGL drivers the game actually loaded before testing stereo.
 - **Never let a game pick its own 3D output format.** The game delivers full side by side; Stereo KWin's outputs decide the screen.
 - **A Steam started from another environment breaks everything it launches.** Steam hands its own environment to every game and tool it starts.
-  An automation shell (a sandbox, a service, a remote login) often has another `XDG_RUNTIME_DIR` than the person's session, which is where `wayland-0` and `pipewire-0` live. A `steam` command from such a shell, when Steam is not running yet, starts Steam with that environment.
+  An automation shell (a sandbox, a service, a remote login) often has another `XDG_RUNTIME_DIR` than the person's session, which is where `wayland-0` and `pipewire-0` live.
+  A `steam` command from such a shell, when Steam is not running yet, starts Steam with that environment.
   Measured on 2026-09-28: SteamVR's compositor "Couldn't create wayland display" (error 497), vrserver "Failed to connect to pipewire", gamescope "Failed to connect to wayland socket".
-  Before any `steam` command, check that Steam already runs (`pgrep -x steam`); if it does not, have the person start it from the desktop, or set `XDG_RUNTIME_DIR=/run/user/$(id -u)` for the command. When a launched program cannot reach Wayland, PipeWire or PulseAudio, compare `/proc/<Steam's pid>/environ` with the session's environment first.
+  Before any `steam` command, check that Steam already runs (`pgrep -x steam`); if it does not, have the person start it from the desktop, or set `XDG_RUNTIME_DIR=/run/user/$(id -u)` for the command.
+  When a launched program cannot reach Wayland, PipeWire or PulseAudio, compare `/proc/<Steam's pid>/environ` with the session's environment first.
 
 ## Easy Anti-Cheat Linux v2
 
@@ -66,7 +68,8 @@ It has no kernel module of its own: an anti-cheat systemd service runs only whil
 
 What it means for the edition, from Epic's FAQ and the edition's kernel:
 
-- The well-known list of 2026-10-14 names Canonical's, Fedora's, Universal Blue's, Debian's, openSUSE's, SUSE's, Rocky Linux's, AlmaLinux's and Microsoft's UEFI CA keys. The edition's own Secure Boot key is not on it.
+- The well-known list of 2026-10-14 names Canonical's, Fedora's, Universal Blue's, Debian's, openSUSE's, SUSE's, Rocky Linux's, AlmaLinux's and Microsoft's UEFI CA keys.
+  The edition's own Secure Boot key is not on it.
 - Because every enrolled MOK is trusted for module signatures, Epic requires every enrolled MOK to be well-known; a person's own keys for other boot entries go into the firmware's db instead.
 - A module that DKMS signs on the person's machine with its own key does not meet the first requirement.
 - The edition's default boot keeps hibernation, so lockdown is a boot option and not automatic under Secure Boot ([`drivers`](../drivers/SKILL.md#the-editions-kernel-configuration)).

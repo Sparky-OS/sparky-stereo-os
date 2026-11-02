@@ -18,7 +18,8 @@ Re-read those files in the current `develop` tree before every round.
 ## The rules that come first
 - **PeerTube's Code of Conduct** (`CODE_OF_CONDUCT.md`, adapted from the Contributor Covenant 1.4) applies "whenever you are representing the project or community", for example in a project space online or in public ("github.com, framacolibri.org, IRC").
   - It asks for welcoming and inclusive language, respect for differing viewpoints, accepting constructive criticism gracefully, focusing on what is best for the community and empathy, and to recognise people who make an extra effort to keep the community welcoming.
-  - Maintainers may remove, edit or reject contributions not aligned with it, and ban for behaviour they deem inappropriate. Reports go to the project team at the address the file gives.
+  - Maintainers may remove, edit or reject contributions not aligned with it, and ban for behaviour they deem inappropriate.
+    Reports go to the project team at the address the file gives.
 - **The route:** an issue first, claimed before coding, then a draft pull request and a full one against `develop`, as below.
 - **AI:** PeerTube's contribution guide, code of conduct and pull-request template state nothing about AI assistance (checked 2026-10-24 and 2026-11-02).
   Its `AGENTS.md` gives guardrails for agents working in the tree (files they must not modify, the checks before pushing, no new dependency without explicit approval) and no AI-authorship policy.

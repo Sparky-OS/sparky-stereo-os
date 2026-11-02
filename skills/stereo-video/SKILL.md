@@ -33,9 +33,13 @@ The standard marks, each linked from awesome-stereoscopy's [standards page](http
 
 **A television has two paths, and they are tested apart** (Daniel, 2026-10-05).
 
-- **The television's own player** (a DLNA server, a USB stick, casting) decodes the file itself, with the codecs of its generation: the Sony KDL-46HX855 and KDL-46EX725 of the edition's tests decode only H.264 there. The SEI or JP3D mark is what switches the television into 3D, and a server that feeds it follows the device's profile ([stereo-serving](../stereo-serving/SKILL.md)).
-- **The stereo desktop:** the PC decodes the file, in any codec. The player reads the stream's mark, declares the video to Stereo KWin, and KWin drives the television in an HDMI 3D mode. An HEVC file's SEI matters here exactly as much as an H.264 file's: it is how the desktop learns the video is stereo.
-- A hardware test of anything the desktop decodes goes through the second path: an HEVC file made with x265's `--frame-packing`, played on the stereo desktop, shown in 3D on the television. A limit of the television's player is never a limit of the desktop path, and is not a reason to test indirectly.
+- **The television's own player** (a DLNA server, a USB stick, casting) decodes the file itself, with the codecs of its generation: the Sony KDL-46HX855 and KDL-46EX725 of the edition's tests decode only H.264 there.
+  The SEI or JP3D mark is what switches the television into 3D, and a server that feeds it follows the device's profile ([stereo-serving](../stereo-serving/SKILL.md)).
+- **The stereo desktop:** the PC decodes the file, in any codec.
+  The player reads the stream's mark, declares the video to Stereo KWin, and KWin drives the television in an HDMI 3D mode.
+  An HEVC file's SEI matters here exactly as much as an H.264 file's: it is how the desktop learns the video is stereo.
+- A hardware test of anything the desktop decodes goes through the second path: an HEVC file made with x265's `--frame-packing`, played on the stereo desktop, shown in 3D on the television.
+  A limit of the television's player is never a limit of the desktop path, and is not a reason to test indirectly.
 
 **Use the format's own mark, and register it.** Each container and codec above has its own stereo field; use that one, never a private tag.
 A format without one gets a mark of ours only with its specification page first, like [SVGStereo](https://github.com/Sparky-OS/svgstereo).

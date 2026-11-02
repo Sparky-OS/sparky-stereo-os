@@ -44,7 +44,8 @@ Daniel, 2026-10-23, on a plan that called the edition's forks "awaiting upstream
 
 - The work in the edition's forks runs in the edition: it ships in its packages, on every image.
   Carrying changes a project is not ready to take is how open source has always worked, and forks first is the edition's own order.
-- Never write "awaiting upstream", "not yet upstream" or "pending acceptance" as a judgement on the work. Those words adopt a measure where work counts only once a gatekeeper accepts it.
+- Never write "awaiting upstream", "not yet upstream" or "pending acceptance" as a judgement on the work.
+  Those words adopt a measure where work counts only once a gatekeeper accepts it.
 - Where projects judged the work on its merits, it merged: those merges are the record of its quality, kept in one list as [`upstream-outreach`](../upstream-outreach/SKILL.md) says.
 
 ## The audit
@@ -111,11 +112,14 @@ Never use the bypass on someone else's pull request or on a repository Daniel do
   - Before a repository's first release, add `.zenodo.json` and `CITATION.cff` (as this repository has), and check the citation file with `cffconvert`.
 - **The Sponsor button is for our own work only** (Daniel, 2026-10-23).
   - Turn it on for a repository that is the edition's or Daniel's own work: GraphQL `updateRepository(input: {repositoryId: ..., hasSponsorshipsEnabled: true})`.
-  - Keep it off on forks, on upstream programs carried with our patches, on partners' projects, and on a program its creator keeps in the organization (org.kde.video is Jeromy Streets's, wiz3D is effcol's). A button on someone else's code reads as taking money for their work.
-  - The `FUNDING.yml` in the organization's and Daniel's `.github` repositories names Daniel's GitHub Sponsors and SparkyLinux's donation page, and every repository without a file of its own shows both. A fork's or port's own `FUNDING.yml` stays as it is.
+  - Keep it off on forks, on upstream programs carried with our patches, on partners' projects, and on a program its creator keeps in the organization (org.kde.video is Jeromy Streets's, wiz3D is effcol's).
+    A button on someone else's code reads as taking money for their work.
+  - The `FUNDING.yml` in the organization's and Daniel's `.github` repositories names Daniel's GitHub Sponsors and SparkyLinux's donation page, and every repository without a file of its own shows both.
+    A fork's or port's own `FUNDING.yml` stays as it is.
 - **Our own library or format gets a public repository** (Daniel, 2026-10-14: "this is a default yes and a must").
   - A library or tool that the edition's packages use gets `Sparky-OS/<name>` at its first accepted release, such as [stereo-layer](https://github.com/Sparky-OS/stereo-layer).
-  - It also gets a mirror on KDE Invent, `danielcamposramos/<name>`, whose description ends "(mirror of github.com/Sparky-OS/<name>)". Invent refuses a branch named `main`, so push `main:master` there.
+  - It also gets a mirror on KDE Invent, `danielcamposramos/<name>`, whose description ends "(mirror of github.com/Sparky-OS/<name>)".
+    Invent refuses a branch named `main`, so push `main:master` there.
   - The Invent mirror carries the same history without `po/` (`git filter-repo --path po --invert-paths`), because Invent refuses translation commits ([`contrib-kde`](../contrib-kde/SKILL.md)); GitHub keeps the whole repository.
   - A format or namespace we define gets its specification page at the URI it names before the format appears anywhere public, as [SVGStereo](https://github.com/Sparky-OS/svgstereo) did.
 - **Large files never go to GitHub** (Daniel, 2026-10-12), neither as release assets nor as committed files: ISOs, builds, root file systems, virtual machine images, package sets and toolchains.

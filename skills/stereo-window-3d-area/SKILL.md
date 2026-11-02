@@ -77,20 +77,26 @@ Native Wayland is the route to prefer when the toolkit has it.
 Daniel's design calls of 2026-10-11, for the effects KWin draws over windows.
 How a theme designer meets them is on [For theme designers](../../docs/for-theme-designers.md#effects-with-their-own-depth-designed-coming).
 
-- **Effects get depth options of their own,** beyond the desktop's gentle limits, kept in the one place where the desktop's depth settings live and editable by users and developers: "One place, one rule, but for everyone". His reason: "without this freedom the creativity will be stuck". A headset output allows more still.
+- **Effects get depth options of their own,** beyond the desktop's gentle limits, kept in the one place where the desktop's depth settings live and editable by users and developers: "One place, one rule, but for everyone".
+  His reason: "without this freedom the creativity will be stuck".
+  A headset output allows more still.
 - **A window's depth is never behind anything it covers.** The depth solver keeps this in stacking, focus, dragging, dropping, dialogs and effects: the highest overlapped level wins, with hysteresis at overlap edges, and every change of level is eased (one easing for the pointer and the windows: fast up, gentle down, at Plasma's animation speed).
-- **An effect describes its motion once, in three dimensions,** on the shared per-eye layer; the renderer's two cameras make each eye, so no effect knows which eye is drawn. Large depths honour KDE's animation speed and the reduced-motion setting, and a 2D output stays pixel-identical to today's.
+- **An effect describes its motion once, in three dimensions,** on the shared per-eye layer; the renderer's two cameras make each eye, so no effect knows which eye is drawn.
+  Large depths honour KDE's animation speed and the reduced-motion setting, and a 2D output stays pixel-identical to today's.
 - **The calls:**
-  - Fall Apart: "Fly" brings the pieces toward the viewer; "Dive" drops them to the sunk limit, where they hit a floor and bounce while they fade. Built first, on the edition's KWin branch ([b0af6ca](https://github.com/Sparky-OS/kwin/commit/b0af6ca82f46)).
+  - Fall Apart: "Fly" brings the pieces toward the viewer; "Dive" drops them to the sunk limit, where they hit a floor and bounce while they fade.
+    Built first, on the edition's KWin branch ([b0af6ca](https://github.com/Sparky-OS/kwin/commit/b0af6ca82f46)).
   - A closing background window first moves the other way, as an anticipation (Dive: pop, then sink; Fly: sink, then pop).
   - Dive's floor belongs to the theme: its size and depth are set in the theme editor, and effects read the theme's depth geometry.
   - Sheet: the dialog starts from its parent's plane at the popped value; a dialog over a dialog is the limit, and a third stays bound to the second.
   - Glide: sunk to the screen on opening, the reverse on closing.
   - Zoom: a magnifier mode whose area comes toward the viewer; plain zoom keeps a constant parallax.
-  - Dragging: one step up by default, with an option from flat to popped, and only ever up. Over a popped window the dragged window rises to its level and comes back down after leaving it; dropped there, it keeps that plane.
+  - Dragging: one step up by default, with an option from flat to popped, and only ever up.
+    Over a popped window the dragged window rises to its level and comes back down after leaving it; dropped there, it keeps that plane.
   - Flip Switch made stereo.
   - A shaded window's title bar reads as a cylinder: its own plane at the edges, popped 1 or 2 px at the crest, an option on the depth settings page (0, 1 or 2 px).
-- **Study KWin's removed effects before designing a new one** (Snap Helper, Resize, the C++ Flip Switch, the old Cube): "the solution might be there and being ditched". Resize's scaled drawing while resizing serves XR, the old Cube's cylinder and sphere mappings serve the 3D cube and a VR home, and Present Windows' layouts a headset overview, credited to Kompose.
+- **Study KWin's removed effects before designing a new one** (Snap Helper, Resize, the C++ Flip Switch, the old Cube): "the solution might be there and being ditched".
+  Resize's scaled drawing while resizing serves XR, the old Cube's cylinder and sphere mappings serve the 3D cube and a VR home, and Present Windows' layouts a headset overview, credited to Kompose.
 
 ## Proof for this kind of work
 

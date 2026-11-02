@@ -96,13 +96,17 @@ Take it in a real Stereo KWin session with a 3D output, on a test machine, never
 
 1. **Real 3D content inside the program:** a beautiful, freely licensed stereo picture or scene, credited with its authors' names.
 2. **Open the volume applet's pop-up and pin it** with its pin button: a pinned pop-up keeps its popped level while focus moves.
-3. **Then focus the program's window,** so it sits at the screen and its menus pop. An unfocused program sinks with the windows behind it and reads flat.
+3. **Then focus the program's window,** so it sits at the screen and its menus pop.
+   An unfocused program sinks with the windows behind it and reads flat.
 4. **Open a menu several levels deep** (a menu, its sub-menu, the next sub-menu): each level sits one step further out.
-5. **Capture with Spectacle's 3D capture, on a delay** (MPO for its PNG choice, as [stereo-pictures](../stereo-pictures/SKILL.md) says). Then measure each level's disparity in pixels and write it down; on 2026-10-13, Marble's window measured 0, a menu +2, its sub-menu +4 and the windows behind −3 to −10.
-6. **A program under Wine:** first prove that its menus get their popped levels (override-redirect X11 menus under Xwayland). Menus that come out flat are work to fix, not a limit.
+5. **Capture with Spectacle's 3D capture, on a delay** (MPO for its PNG choice, as [stereo-pictures](../stereo-pictures/SKILL.md) says).
+   Then measure each level's disparity in pixels and write it down; on 2026-10-13, Marble's window measured 0, a menu +2, its sub-menu +4 and the windows behind −3 to −10.
+6. **A program under Wine:** first prove that its menus get their popped levels (override-redirect X11 menus under Xwayland).
+   Menus that come out flat are work to fix, not a limit.
 7. **Hand over both files:** the MPO and a side-by-side PNG built from it, left eye first, with the depth seen (which elements step forward or back, by how many pixels).
    Look at every frame for private details first: names, accounts, mail, places.
-8. **Never attach them to a mailing-list post,** since lists cap a message's size (the X3D public list at 800 KB). Put the files in a public folder on the edition's download server, with a `README.txt` and `SHA256SUMS`, and link the folder.
+8. **Never attach them to a mailing-list post,** since lists cap a message's size (the X3D public list at 800 KB).
+   Put the files in a public folder on the edition's download server, with a `README.txt` and `SHA256SUMS`, and link the folder.
 9. **Capture with KWin +stereo3d37 or later.** Before [08453fd](https://github.com/Sparky-OS/kwin/commit/08453fd62972), ScreenShot2's `stereoImage()` painted each eye with source-over onto an image it had not filled, so the transparent parts of a stereo capture held leftover memory; it now copies each eye as it is.
 
 ## Traps that fooled us

@@ -19,7 +19,8 @@ Re-read those files in the current tree before every round; its default branch i
 - **Universal Media Server's Code of Conduct** (`Code_Of_Conduct.md`, the Contributor Covenant 2.1) applies "within all community spaces", and when someone officially represents the community in public.
   - Its standards include empathy and kindness, respect for differing opinions, giving and gracefully accepting constructive feedback, and "Accepting responsibility and apologizing to those affected by our mistakes, and learning from the experience".
   - Community leaders enforce it through its four steps (correction, warning, temporary ban, permanent ban); reports go to them on the [UMS forum](https://www.universalmediaserver.com/forum/).
-- **The route:** a pull request on GitHub that a reviewer can check three ways (below). An issue carries the debug information packed from the Logs tab at the Trace level, attached to the issue or to the forum's attachments thread and linked from the issue.
+- **The route:** a pull request on GitHub that a reviewer can check three ways (below).
+  An issue carries the debug information packed from the Logs tab at the Trace level, attached to the issue or to the forum's attachments thread and linked from the issue.
 - **AI:** Universal Media Server's code of conduct, `CONTRIBUTING.md`, `STYLEGUIDE.md`, pull-request template and the knowledge base's development page state nothing about AI assistance (checked 2026-10-24, and on 2026-11-02 with the code of conduct and the development page).
 
 ## Merge decisions

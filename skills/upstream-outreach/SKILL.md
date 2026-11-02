@@ -58,8 +58,10 @@ A `contrib-<project>` skill declares the packages that make it relevant (`metada
 - **Some projects refuse AI work outright, reports included.** XScreenSaver 6.17 ships an `AGENTS.md` saying it "does not want AI contributions of any kind", and its author's site turns robots away; send nothing there. A bug in the version a distribution carries goes to that distribution's tracker, which for Debian's XScreenSaver is also what its packaging asks.
 - **Prove an absence by running the program, never by code search alone.** A claim that a program does not do something, made in public, is the most expensive kind to get wrong.
   On 2026-09-18 the edition's first report to Kodi ([xbmc/xbmc#29337](https://github.com/xbmc/xbmc/issues/29337)) said Kodi never reads the H.264 frame packing SEI, because GitHub's code search found no `AV_FRAME_DATA_STEREO3D`, `AV_PKT_DATA_STEREO3D` or `frame_packing` in its tree.
-  Kodi does read it: `DVDVideoCodecFFmpeg.cpp` takes `stereo_mode` from the decoded frame's metadata, which FFmpeg's H.264 decoder fills from the SEI, and a container test of Kodi 21.2 logged `autodetected stereo mode for movie mode left_right` minutes after the report went out. The report was corrected and replaced the same day.
-  So: read the source files on the code path (code search does not index every file, and a feature can arrive by a path you did not think to search), run the program on a reproducer in a throwaway container, and name the test files neutrally (a file named `sbs_*.mp4` set off Kodi's file-name detector and confused the first run). Measure, then write.
+  Kodi does read it: `DVDVideoCodecFFmpeg.cpp` takes `stereo_mode` from the decoded frame's metadata, which FFmpeg's H.264 decoder fills from the SEI, and a container test of Kodi 21.2 logged `autodetected stereo mode for movie mode left_right` minutes after the report went out.
+  The report was corrected and replaced the same day.
+  So: read the source files on the code path (code search does not index every file, and a feature can arrive by a path you did not think to search), run the program on a reproducer in a throwaway container, and name the test files neutrally (a file named `sbs_*.mp4` set off Kodi's file-name detector and confused the first run).
+  Measure, then write.
   A display's capabilities likewise: quote `edid-decode` of the saved EDID bytes, never a note's summary of them.
 
 ## The message
@@ -71,7 +73,8 @@ A `contrib-<project>` skill declares the packages that make it relevant (`metada
 - Never another person's contact details in a public file.
 - **A first post from a new account on a Discourse forum** (KDE Discuss and others) is held for a moderator when it looks like a bot to Discourse's rules for new users: pasted in seconds, more than about two links, several @mentions.
   Daniel's first KDE Discuss post, on 2026-10-06, was held and then marked "silenced: New user typed too fast" until a staff member released it.
-  Write or edit a first post in the forum's editor for a while instead of pasting it at once, keep it to two links (the rest go in a reply once it is released) and the mentions to the people who must see it, and never post it again while it is held. The limits lift as the account's trust level rises with ordinary reading and posting.
+  Write or edit a first post in the forum's editor for a while instead of pasting it at once, keep it to two links (the rest go in a reply once it is released) and the mentions to the people who must see it, and never post it again while it is held.
+  The limits lift as the account's trust level rises with ordinary reading and posting.
 
 ## After sending
 
@@ -80,7 +83,8 @@ A `contrib-<project>` skill declares the packages that make it relevant (`metada
 - **Keep every promise** made in a note, and answer every reply.
 - **After a merge, let it rest:** the next contact is another good patch.
 - **Record a merge once,** in [Merged outside Sparky Stereo](../../docs/upstream-merges.md): the link, the date, "merged by NAME (handle)" from the project's own records, and what it does.
-  That page is the one list. Every other page (the README, ATTRIBUTIONS, other repositories' provenance notes) links to it with "such as" or "among others" and never copies the names, because copies drift apart.
+  That page is the one list.
+  Every other page (the README, ATTRIBUTIONS, other repositories' provenance notes) links to it with "such as" or "among others" and never copies the names, because copies drift apart.
 
 ## Turn a talk or reply into a reusable contribution (2026-10-19)
 

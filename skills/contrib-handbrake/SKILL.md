@@ -16,10 +16,12 @@ Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this skill is H
 Re-read `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, `.github/PULL_REQUEST_TEMPLATE.md` and the contribution guide before every round.
 
 ## The rules that come first
-- **HandBrake's Code of Conduct** (`CODE_OF_CONDUCT.md`, adapted from the Contributor Covenant 1.4). The guide begins with it: "First and foremost, familiarize yourself with the project's Code of Conduct."
+- **HandBrake's Code of Conduct** (`CODE_OF_CONDUCT.md`, adapted from the Contributor Covenant 1.4).
+  The guide begins with it: "First and foremost, familiarize yourself with the project's Code of Conduct."
   - Its standards: welcoming and inclusive language, respect for differing viewpoints, accepting constructive criticism gracefully, focusing on what is best for the community, empathy.
   - HandBrake adds to the unacceptable conduct: "Posting content which is illegal or of dubious legality. (This includes but is not limited to: illegally obtained copyrighted content, circumventing Digital Rights Management etc)".
-  - It covers the project's spaces and public spaces where someone represents the project. Reports go to the project team through the Report page on handbrake.fr.
+  - It covers the project's spaces and public spaces where someone represents the project.
+    Reports go to the project team through the Report page on handbrake.fr.
   - "This is a volunteer driven project": the team cannot read every post, and an answer is not always quick.
 - **The route: talk first, then code.** The guide: "Please ask the HandBrake Team via one of the Community Support channels before making changes as this will increase the likely hood of a change being accepted", and "Failure to communicate what you are working on may lead to duplicated efforts or rejection of your contributions".
   Then an issue, its acceptance, and a pull request on GitHub, as the template below demands.

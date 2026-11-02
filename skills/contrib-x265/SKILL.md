@@ -15,8 +15,10 @@ Re-read `CONTRIBUTING.md`, `.clang-format` and the active pull request before ev
 
 ## The rules that come first
 - **x265 publishes no code of conduct:** no such file in the repository and none named in `CONTRIBUTING.md` (checked 2026-11-02).
-  Its development list runs on VideoLAN's mailing-list server, where VideoLAN's rules for its lists apply ([`contrib-vlc`](../contrib-vlc/SKILL.md#the-rules-that-come-first)). Elsewhere the same manners hold: respectful, concise, in the project's own venue.
-- **The route:** the signed Contributor License Agreement first, then a GitHub pull request against `master` or patches on the development list (below). Bugs reproduce on the tip of `master` first; a memory-safety issue is reported privately, as `SECURITY.md` says, never as a public issue.
+  Its development list runs on VideoLAN's mailing-list server, where VideoLAN's rules for its lists apply ([`contrib-vlc`](../contrib-vlc/SKILL.md#the-rules-that-come-first)).
+  Elsewhere the same manners hold: respectful, concise, in the project's own venue.
+- **The route:** the signed Contributor License Agreement first, then a GitHub pull request against `master` or patches on the development list (below).
+  Bugs reproduce on the tip of `master` first; a memory-safety issue is reported privately, as `SECURITY.md` says, never as a public issue.
 - **AI:** `CONTRIBUTING.md` has no rule on AI assistance, AI-generated or machine-generated code (checked 2026-10-24 and 2026-11-02).
   The nearest clause is its provenance rule ("Legal / licensing"): contributions must be "your own work (or work you are authorized to submit)", licensable under both the GPL v2 and the commercial licence, and "Do not paste code from GPL-incompatible or unknown-provenance sources."
 

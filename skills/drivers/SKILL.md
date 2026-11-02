@@ -48,13 +48,15 @@ A fast kernel without the modules people need fails them silently, so the config
 
 - **Debian's own configuration of the nearest version first,** so every module Debian ships is there (`debian-7.2.11-amd64.config` for the 7.3 kernels).
 - **Then what the edition's people need beyond Debian's values,** each a commented pin in `sparky-stereo.config`: Binder with binderfs for Waydroid, sim-rig panels, USB displays and projectors, both NTFS drivers, handheld and laptop drivers; Rust, BTF and sched_ext stay on.
-- **Then the proven performance work** of CachyOS and Bazzite, and what XanMod and Liquorix offer, where the licence and the upstream status allow. The patches taken are folders of their own in `kernel/series/` (the BORE scheduler, CachyOS's, the handheld series), beside the stereo series.
+- **Then the proven performance work** of CachyOS and Bazzite, and what XanMod and Liquorix offer, where the licence and the upstream status allow.
+  The patches taken are folders of their own in `kernel/series/` (the BORE scheduler, CachyOS's, the handheld series), beside the stereo series.
 - **Headers that build DKMS modules** (NVIDIA's open modules, xpadneo and the others), in either install order.
 - Performance is measured as information, never as a gate ([`sparky-stereo`](../sparky-stereo/SKILL.md)).
 
 Traps measured on the way:
 
-- **Secure Boot without losing hibernation** (Daniel, 2026-10-08). Debian's patch that locks the kernel down under Secure Boot is not carried, so lockdown comes only from the boot command line (`lockdown=integrity`), and hibernation keeps working.
+- **Secure Boot without losing hibernation** (Daniel, 2026-10-08).
+  Debian's patch that locks the kernel down under Secure Boot is not carried, so lockdown comes only from the boot command line (`lockdown=integrity`), and hibernation keeps working.
   Under Secure Boot, `IMA_ARCH_POLICY` (`security/integrity/ima/ima_efi.c`) still enforces module and kexec signatures without lockdown.
 - **The real-time flavour keeps the EFI runtime services** (build 8, 2026-10-09): `CONFIG_EFI_DISABLE_RUNTIME` stays unset (`flavour-rt.config`).
   With Debian's rt value (`=y`) the platform keyring stays empty under Secure Boot, so modules signed by a key in the firmware's db or in shim's MOK list (NVIDIA's, every DKMS module) are refused.
@@ -81,8 +83,10 @@ Plan for it:
 - **Answer review with measurements,** not opinions: the timing table, the InfoFrame bytes, a capture of the display's own info screen.
 - **A regression fix, carried with its own patch.** Mainline 5cdad13a40ac ("HID: betop: move FF initialization to .input_configured()", 7.3 cycle) turned a failed force-feedback setup into an error from `.input_configured()`, and the HID core then drops the input device.
   A pad without an output report, such as the ShanWan "Frostbite" receiver (20bc:5500, "Shanwan Twin Usb Joystick"), lost every input device, so no program saw a gamepad.
-  The edition's kernel carries [HID: betop: keep the input device when the pad has no force feedback](https://github.com/Sparky-OS/sparky-stereo-os-build/blob/main/kernel/series/02-carry-stereo-ramos/0009-HID-betop-keep-the-input-device-when-the-pad-has-no-.patch): a missing or unusable output report means no rumble and a working pad, while allocation and ff-memless errors still fail. It has a `Fixes:` tag and `Assisted-by`, and no Signed-off-by from the tool ([`contrib-kernel`](../contrib-kernel/SKILL.md)).
-  Mainline's `hid-betopff.c` still returns the error (checked 2026-11-02). The fix stays a patch apart from the stereo work, so it can go to the input subsystem's maintainers on its own.
+  The edition's kernel carries [HID: betop: keep the input device when the pad has no force feedback](https://github.com/Sparky-OS/sparky-stereo-os-build/blob/main/kernel/series/02-carry-stereo-ramos/0009-HID-betop-keep-the-input-device-when-the-pad-has-no-.patch): a missing or unusable output report means no rumble and a working pad, while allocation and ff-memless errors still fail.
+  It has a `Fixes:` tag and `Assisted-by`, and no Signed-off-by from the tool ([`contrib-kernel`](../contrib-kernel/SKILL.md)).
+  Mainline's `hid-betopff.c` still returns the error (checked 2026-11-02).
+  The fix stays a patch apart from the stereo work, so it can go to the input subsystem's maintainers on its own.
 
 ## Proof for this kind of work
 

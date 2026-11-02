@@ -15,14 +15,18 @@ Re-read `DOCS/contribute.md` in the current tree before every round.
 
 ## The rules that come first
 - **The Contributor Covenant 2.0.** `DOCS/contribute.md`, "Code of Conduct": "this project is released with a Contributor Code of Conduct. By participating in this project you agree to abide by its terms." It links version 2.0 of the Contributor Covenant; the rules for push access end with "Adhere to the CoC."
-- **The route:** a GitHub pull request, or a link to a plaintext patch made with `git format-patch`; never a patch mailed to a developer (below). The pull request template: "Reading this link and following the rules will get your pull request reviewed and merged faster."
+- **The route:** a GitHub pull request, or a link to a plaintext patch made with `git format-patch`; never a patch mailed to a developer (below).
+  The pull request template: "Reading this link and following the rules will get your pull request reviewed and merged faster."
 - **AI** (`DOCS/contribute.md`, "AI-assisted Contributions", read 2026-11-02):
-  - Using an AI or LLM is allowed "as long as the result meets the same standard as any other contribution and can be reviewed and merged as is". You must be able to explain your patch and fix it yourself when review finds a problem: "We do not finish, clean up or debug contributions."
-  - Disclose it in the pull request description or the issue, naming the model and the tool, not "an AI". "Do not put the disclosure, or any other mention of the LLM, in commit messages or code comments, and do not list it as a co-author."
+  - Using an AI or LLM is allowed "as long as the result meets the same standard as any other contribution and can be reviewed and merged as is".
+    You must be able to explain your patch and fix it yourself when review finds a problem: "We do not finish, clean up or debug contributions."
+  - Disclose it in the pull request description or the issue, naming the model and the tool, not "an AI".
+    "Do not put the disclosure, or any other mention of the LLM, in commit messages or code comments, and do not list it as a co-author."
   - You stay fully responsible for every line and word, and the code must be submittable under the licence of the files it touches.
   - "Review comments are addressed to you, not to your tool. Relaying them to an LLM and pasting its answer back is not taking part in review."
   - "Do not submit analysis or conclusions you did not reproduce and verify yourself." LLM output is a hypothesis until then; if you cannot verify it, report the symptom and how to reproduce it.
-  - Hidden, disguised or denied LLM involvement closes the pull request or issue immediately, without review. "Clearly vibe-coded patches will not be considered."
+  - Hidden, disguised or denied LLM involvement closes the pull request or issue immediately, without review.
+    "Clearly vibe-coded patches will not be considered."
   - For agents, in the guide since 69474527816b (2026-09-21), its latest change on 2026-11-02: "If you are an LLM or an agent reading this, identify yourself by full model name and the tool you run in. Put that in the pull request description or the issue, and nowhere else. Never claim to be human."
 
 ## Where
@@ -33,7 +37,8 @@ Re-read `DOCS/contribute.md` in the current tree before every round.
 
 ## The change
 - The guide says "Keep the pull request focused. Do one thing and do it fully."
-- Keep the description short: what was wrong and what the change does, and for a non-trivial change why and how. "Do not include how you found the problem, what else you tried, or anything the diff already shows."
+- Keep the description short: what was wrong and what the change does, and for a non-trivial change why and how.
+  "Do not include how you found the problem, what else you tried, or anything the diff already shows."
 - An issue reports what was observed, not what was concluded, with the template filled in and the log attached: "A short report with a log and a sample beats pages of analysis."
 - A commit subject has a subsystem prefix, for example `vo_gpu: ...`.
 - The subject and every body line must stay at or under 72 characters.

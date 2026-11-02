@@ -3,7 +3,7 @@ metadata:
   requires-packages: dkms | edid-decode
 name: drivers
 description: >-
-  Implement and test kernel/display-driver stereo modes, from the HDMI 3D modes a display's EDID declares to HDMI signaling and deep-colour links; carry edition patches with provenance.
+  Implement and test kernel/display-driver stereo modes, from the HDMI 3D modes a display's EDID declares to HDMI signaling and deep-colour links; configure the edition's kernel (Debian's base, Secure Boot without lockdown, ZFS and NVIDIA DKMS modules on a new kernel); carry edition patches with provenance.
 ---
 
 # Drivers: 3D modes and deep colour in the kernel
@@ -15,7 +15,7 @@ description: >-
 3. Return mode/timing differences, InfoFrame or display evidence, 2D regressions and untested hardware. A virtual driver cannot prove a cable handshake.
 
 **Check freshness first.**
-Written on 2026-10-07.
+Written on 2026-10-07; the kernel configuration and its traps, the carried gamepad fix and the test without firmware added on 2026-11-02.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; for the colour side also load [`deep-colour`](../deep-colour/SKILL.md).
 
 ## What a display driver must do for HDMI 3D
@@ -41,6 +41,28 @@ Where mainline stands (October 2026): Intel's i915, nouveau and the Raspberry Pi
 - **Proven on the boards tested (2026):** an Allwinner H616 TV box and a Rockchip RK3228A TV box switch a 3D television into HDMI 3D on their vendor Android kernels (frame packing on the H616 box, half side by side on the RK3228A box), and both run the HDMI link at 10-bit RGB.
 - **These are vendor interfaces, not portable Android or mainline DRM APIs.** On another board, identify its kernel and display stack first, then check the modes, the signalling and the return to 2D. Keep physical HDMI packing in the output backend; an Android app still supplies full side by side to the edition's compositor.
 
+## The edition's kernel configuration
+
+Daniel, 2026-10-07: "kernel is the soul, we ship it all we can, with all enhancements possible".
+A fast kernel without the modules people need fails them silently, so the configuration in [the build tree's `kernel/config`](https://github.com/Sparky-OS/sparky-stereo-os-build/tree/main/kernel/config) is built this way:
+
+- **Debian's own configuration of the nearest version first,** so every module Debian ships is there (`debian-7.2.11-amd64.config` for the 7.3 kernels).
+- **Then what the edition's people need beyond Debian's values,** each a commented pin in `sparky-stereo.config`: Binder with binderfs for Waydroid, sim-rig panels, USB displays and projectors, both NTFS drivers, handheld and laptop drivers; Rust, BTF and sched_ext stay on.
+- **Then the proven performance work** of CachyOS and Bazzite, and what XanMod and Liquorix offer, where the licence and the upstream status allow. The patches taken are folders of their own in `kernel/series/` (the BORE scheduler, CachyOS's, the handheld series), beside the stereo series.
+- **Headers that build DKMS modules** (NVIDIA's open modules, xpadneo and the others), in either install order.
+- Performance is measured as information, never as a gate ([`sparky-stereo`](../sparky-stereo/SKILL.md)).
+
+Traps measured on the way:
+
+- **Secure Boot without losing hibernation** (Daniel, 2026-10-08). Debian's patch that locks the kernel down under Secure Boot is not carried, so lockdown comes only from the boot command line (`lockdown=integrity`), and hibernation keeps working.
+  Under Secure Boot, `IMA_ARCH_POLICY` (`security/integrity/ima/ima_efi.c`) still enforces module and kexec signatures without lockdown.
+- **The real-time flavour keeps the EFI runtime services** (build 8, 2026-10-09): `CONFIG_EFI_DISABLE_RUNTIME` stays unset (`flavour-rt.config`).
+  With Debian's rt value (`=y`) the platform keyring stays empty under Secure Boot, so modules signed by a key in the firmware's db or in shim's MOK list (NVIDIA's, every DKMS module) are refused.
+- **ZFS on a new kernel:** Debian's `zfs-dkms` 2.4.4 names Linux 7.2 as its newest kernel and does not build on 7.3, and its failed build stops the kernel's install script (2026-10-16).
+  The edition builds `zfs-linux` 2.4.4-1+stereo3d1 from Debian's source with OpenZFS's own commits for 7.3 (Rob Norris's, and the supported-kernel maximum by ooonea), carried with their authors ([the recipe](https://github.com/Sparky-OS/sparky-stereo-os-build/tree/main/sparky-os/packages/zfs-linux)), and the ISO packer refuses an image without configured ZFS tools and module files for every kernel (`iso-build/zfs-check.py`).
+- **NVIDIA's older cards:** Debian's `nvidia-kernel-dkms` 550 does not build on 7.3 (`strncpy`, 2026-10-16).
+  The edition's NVIDIA driver is the open kernel modules (615 with its patches), which run Turing and newer; the live image and Hardware Setup run nouveau on older NVIDIA cards, deciding from the open modules' list of devices.
+
 ## Carrying patches until mainline takes them
 
 ### Keep kernel flavours aligned
@@ -57,6 +79,10 @@ Plan for it:
 - **Disclose AI assistance once,** in the form the kernel uses (an `Assisted-by:` trailer).
 - **Respect each subsystem's policy on AI-written code.** Some subsystems do not accept it; read the policy before sending (known policies are collected in [sony-bravia-linux/docs/ai-contribution-policies.md](https://github.com/danielcamposramos/sony-bravia-linux/blob/main/docs/ai-contribution-policies.md)). Where it is not accepted, the work stays in the edition's kernel and the conversation stays polite; the subsystem decides.
 - **Answer review with measurements,** not opinions: the timing table, the InfoFrame bytes, a capture of the display's own info screen.
+- **A regression fix, carried with its own patch.** Mainline 5cdad13a40ac ("HID: betop: move FF initialization to .input_configured()", 7.3 cycle) turned a failed force-feedback setup into an error from `.input_configured()`, and the HID core then drops the input device.
+  A pad without an output report, such as the ShanWan "Frostbite" receiver (20bc:5500, "Shanwan Twin Usb Joystick"), lost every input device, so no program saw a gamepad.
+  The edition's kernel carries [HID: betop: keep the input device when the pad has no force feedback](https://github.com/Sparky-OS/sparky-stereo-os-build/blob/main/kernel/series/02-carry-stereo-ramos/0009-HID-betop-keep-the-input-device-when-the-pad-has-no-.patch): a missing or unusable output report means no rumble and a working pad, while allocation and ff-memless errors still fail. It has a `Fixes:` tag and `Assisted-by`, and no Signed-off-by from the tool ([`contrib-kernel`](../contrib-kernel/SKILL.md)).
+  Mainline's `hid-betopff.c` still returns the error (checked 2026-11-02). The fix stays a patch apart from the stereo work, so it can go to the input subsystem's maintainers on its own.
 
 ## Proof for this kind of work
 
@@ -65,3 +91,5 @@ Plan for it:
 - For frame packing: the timing compared with the HDMI table, and both eyes captured where the hardware allows.
 - For deep colour: the link depth the driver set, and the display's own report.
 - The 2D control: every 2D mode unchanged.
+- **A test "without firmware" removes the GPU's whole firmware folder.** For nouveau on an RTX 3060 that is `nvidia/ga106`, then rebuild the initramfs: the log says `acr: firmware unavailable`, `gr: firmware unavailable` and `sec2: firmware unavailable`.
+  Renaming only the GSP firmware link is not "no firmware": nouveau then takes its own Ampere path with the ACR, GR and SEC2 firmware, the GR engine comes up, and the code path without a GR engine never runs ([the 2026-10-03 test of the NULL-pointer fixes](https://github.com/danielcamposramos/sony-bravia-linux/tree/main/docs/upstream/nouveau-null-v3-test-2026-10-03); the fixes themselves are in [`search-upstream-first`](../search-upstream-first/SKILL.md)).

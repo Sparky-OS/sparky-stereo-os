@@ -20,6 +20,7 @@ SYMPTOMS = (
     ('a DXVK PE debug CRC mismatch', 'proton-wine'),
     ('an HDMI 3D mode missing from the EDID', 'drivers'),
     ('an ISO uploaded as a GitHub release that Zenodo keeps', 'forks-and-online'),
+    ('zfs-dkms does not build on the new kernel', 'drivers'),
 )
 
 

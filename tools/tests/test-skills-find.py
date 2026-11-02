@@ -19,6 +19,7 @@ SYMPTOMS = (
     ('a SPICE migration that loses the cache', 'stereo-vm'),
     ('a DXVK PE debug CRC mismatch', 'proton-wine'),
     ('an HDMI 3D mode missing from the EDID', 'drivers'),
+    ('an ISO uploaded as a GitHub release that Zenodo keeps', 'forks-and-online'),
 )
 
 

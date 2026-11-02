@@ -40,7 +40,7 @@ Core skills are `sparky-stereo`, `ai-partners`, `search-upstream-first`, `upstre
 | Sparky CA trust-store implementation | [certificate-manager](certificate-manager/SKILL.md) |
 | A task brief, handoff or review for a person or an AI partner; an unattended runner that stops, loops or cannot write | [ai-partners](ai-partners/SKILL.md) |
 | A bug in a program the edition did not write, before writing any fix | [search-upstream-first](search-upstream-first/SKILL.md) |
-| Forks, pushing, and checking that the work is online | [forks-and-online](forks-and-online/SKILL.md) |
+| Forks, pushing, and checking that the work is online; releases and DOIs, the Sponsor button, our own libraries' repositories, where large files go | [forks-and-online](forks-and-online/SKILL.md) |
 | A maintainer message, contribution or follow-up | [upstream-outreach](upstream-outreach/SKILL.md) |
 | An FFmpeg pull request: series, trailers, FATE, the review bot (with upstream-outreach) | [contrib-ffmpeg](contrib-ffmpeg/SKILL.md) |
 | A HandBrake pull request (with upstream-outreach) | [contrib-handbrake](contrib-handbrake/SKILL.md) |

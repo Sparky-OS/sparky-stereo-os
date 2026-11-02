@@ -1,7 +1,7 @@
 ---
 name: forks-and-online
 description: >-
-  Push edition work only to the edition's forks, never upstream; keep every branch online the same day; audit clones for work that exists only locally and tell merged, superseded, missing and uncommitted work apart.
+  Push edition work only to the edition's forks, never upstream; keep every branch online the same day; audit clones for work that exists only locally and tell merged, superseded, missing and uncommitted work apart; cut releases that Zenodo keeps for good, set the Sponsor button, give our own libraries public repositories, and keep large files off GitHub.
 ---
 
 # Forks and keeping the work online
@@ -16,6 +16,7 @@ description: >-
 
 **Check freshness first.**
 Written on 2026-10-29, after a full audit of more than a hundred clones found work that had been reported as done but was never pushed, and clones whose `origin` was the upstream project.
+How to speak of the forks, and the conventions for releases, the Sponsor button, our own libraries and large files, added on 2026-11-02.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; [`ai-partners`](../ai-partners/SKILL.md) covers hand-backs and [`upstream-outreach`](../upstream-outreach/SKILL.md) covers sending work to the upstream project.
 
 ## Where the edition's work goes
@@ -36,6 +37,15 @@ The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; [`ai
 - **Push branches, not over the fork's main**, unless the fork's main is the edition's own line.
   Edition branches are named after the work (`stereo3d`, `stereo3d-6.7`, a feature name).
 - **KDE Invent runs CI on every push.** Push a branch you do not want tested yet with `git push -o ci.skip invent <branch>`; never use upstream CI as a test bench.
+
+## A fork ships; it is not a waiting room
+
+Daniel, 2026-10-23, on a plan that called the edition's forks "awaiting upstream".
+
+- The work in the edition's forks runs in the edition: it ships in its packages, on every image.
+  Carrying changes a project is not ready to take is how open source has always worked, and forks first is the edition's own order.
+- Never write "awaiting upstream", "not yet upstream" or "pending acceptance" as a judgement on the work. Those words adopt a measure where work counts only once a gatekeeper accepts it.
+- Where projects judged the work on its merits, it merged: those merges are the record of its quality, kept in one list as [`upstream-outreach`](../upstream-outreach/SKILL.md) says.
 
 ## The audit
 
@@ -92,6 +102,27 @@ For our own reviewed change: open a pull request, wait for its checks, then merg
 A link check that fails on a line the pull request does not touch (a third-party page answering 500 or 503) is the outside site, not the change: re-run the failed job (`gh run rerun <run> --failed`) and merge when it passes.
 Never use the bypass on someone else's pull request or on a repository Daniel does not own.
 
+## Releases, the Sponsor button, our own libraries and large files
+
+- **A GitHub release is permanent where Zenodo archives it.** Since 2026-10-12 Zenodo archives every new release of the repositories Daniel switched on, forks among them, as a snapshot with a DOI that cannot be deleted, listed in his ORCID record.
+  - Cut releases on purpose, as versions people cite: a list after it has really grown, the edition at its ISO.
+  - Never use a release for a temporary download there; use a draft release, the edition's own download server, or a repository that is switched off.
+  - Never cut a release in a switched-on fork: its DOI would name Daniel as the creator of someone else's project.
+  - Before a repository's first release, add `.zenodo.json` and `CITATION.cff` (as this repository has), and check the citation file with `cffconvert`.
+- **The Sponsor button is for our own work only** (Daniel, 2026-10-23).
+  - Turn it on for a repository that is the edition's or Daniel's own work: GraphQL `updateRepository(input: {repositoryId: ..., hasSponsorshipsEnabled: true})`.
+  - Keep it off on forks, on upstream programs carried with our patches, on partners' projects, and on a program its creator keeps in the organization (org.kde.video is Jeromy Streets's, wiz3D is effcol's). A button on someone else's code reads as taking money for their work.
+  - The `FUNDING.yml` in the organization's and Daniel's `.github` repositories names Daniel's GitHub Sponsors and SparkyLinux's donation page, and every repository without a file of its own shows both. A fork's or port's own `FUNDING.yml` stays as it is.
+- **Our own library or format gets a public repository** (Daniel, 2026-10-14: "this is a default yes and a must").
+  - A library or tool that the edition's packages use gets `Sparky-OS/<name>` at its first accepted release, such as [stereo-layer](https://github.com/Sparky-OS/stereo-layer).
+  - It also gets a mirror on KDE Invent, `danielcamposramos/<name>`, whose description ends "(mirror of github.com/Sparky-OS/<name>)". Invent refuses a branch named `main`, so push `main:master` there.
+  - The Invent mirror carries the same history without `po/` (`git filter-repo --path po --invert-paths`), because Invent refuses translation commits ([`contrib-kde`](../contrib-kde/SKILL.md)); GitHub keeps the whole repository.
+  - A format or namespace we define gets its specification page at the URI it names before the format appears anywhere public, as [SVGStereo](https://github.com/Sparky-OS/svgstereo) did.
+- **Large files never go to GitHub** (Daniel, 2026-10-12), neither as release assets nor as committed files: ISOs, builds, root file systems, virtual machine images, package sets and toolchains.
+  - They go to the edition's own download server: a plain folder with a `README.txt` for a public download the documents link to, a folder no page lists for a private one.
+  - Put `SHA256SUMS` beside the files, and check it on the server after the upload.
+  - It keeps the DOIs clean too, since a release in a switched-on repository is archived for good.
+
 ## Partners and hand-backs
 
 - A partner commits in its own clone; whoever integrates the work pushes it to the fork the same day and writes the branch and commit into the report.
@@ -103,4 +134,5 @@ Never use the bypass on someone else's pull request or on a repository Daniel do
 - Push to an upstream project's repository or to SparkyLinux's own repositories.
 - Force-push over a branch someone else may have built on, or delete a remote branch you did not create.
 - Publish a file you have not read, or credentials of any kind.
+- Put a large file on GitHub, or cut a release in a switched-on fork.
 - Report work as online before the audit above says so.

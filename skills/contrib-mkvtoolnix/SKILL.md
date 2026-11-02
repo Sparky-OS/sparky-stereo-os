@@ -28,7 +28,7 @@ Re-read the README, `CODE_OF_CONDUCT.md`, the active merge request and the repos
   Questions go to the MKVToolNix help forum, Doom9's MKVToolNix thread or `#matroska` on Libera, not to the issue tracker (README 3.3).
 - **AI:** MKVToolNix states nothing about AI, AI assistance, LLMs, generated code or policy for either: not in its README (checked 2026-10-24 and 2026-11-02), not in `CODE_OF_CONDUCT.md`, and the tree has no `CONTRIBUTING.md` or `docs/` (2026-10-24, the same on 2026-11-02).
   The platform rule above is Codeberg's.
-  Do not add an AI mention to upstream prose unless a later project document introduces one.
+  Say the AI help once, in the merge request description, as [`upstream-outreach`](../upstream-outreach/SKILL.md) says ("Say it up front, once"); later merge requests to the same maintainer and the replies in a thread leave it out.
   - Its maintainer's own stance is in issue [#6278](https://codeberg.org/mbunkus/mkvtoolnix/issues/6278), "meta: AI Policy" (2026-07-08): Moritz Bunkus is "very skeptical about what LLMs can do" and does not use them, is "not fundamentally against their use", and needs no written policy yet.
   - The policy he would likely write: "you may use LLMs for assisting during coding, but you-the-human must understand all changes, their effect & be able to explain the reasoning behind why they're correct before submitting PRs", likely "no LLMs for documentation", and he "will outright close & ignore overly verbose & meandering issue requests".
   - He speaks of LLMs, not of AI in general: "AIs is an overly broad term that usually includes a lot of technologies that we've been using for decades".

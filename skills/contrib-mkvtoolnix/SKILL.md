@@ -9,8 +9,21 @@ metadata:
 # Contributing to MKVToolNix
 
 Written on 2026-10-24 from MKVToolNix's README (`https://codeberg.org/mbunkus/mkvtoolnix/raw/branch/main/README.md`, read 2026-10-24) and public merge requests !6311 and !6312 (read 2026-10-24).
+The rules that come first were added on 2026-11-02 from the README and `CODE_OF_CONDUCT.md` on `main` and from [Codeberg's Terms of Use](https://codeberg.org/Codeberg/org/src/branch/main/TermsOfUse.md), read that day.
 Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this skill is MKVToolNix's own practice.
-Re-read the README, the active merge request and the repository's test tree before every round.
+Re-read the README, `CODE_OF_CONDUCT.md`, the active merge request and the repository's test tree before every round.
+
+## The rules that come first
+- **MKVToolNix's Code of Conduct** (`CODE_OF_CONDUCT.md`, the Contributor Covenant 1.4, in the tree since 2017-11-18). README section 5: "By participating in this project you agree to abide by its terms."
+  Its standards: welcoming and inclusive language, respect for differing viewpoints, accepting constructive criticism gracefully, focusing on what is best for the community, empathy. Reports go to the project team at the address the file gives.
+- **Codeberg's Terms of Use apply on the platform** (§ 2, "Rules"): no content that expresses hate or encourages violence, no harassment, doxxing or brigading among them (§ 2 (1) 6).
+  § 2 (1) 7: "You must not share projects that mostly consist of code written by "generative AI"-tools (including services such as *Claude*, *OpenAI Codex*)."
+  The edition's fork there carries MKVToolNix's own code with a few assisted changes; a project of the edition's own that mostly consists of assisted code is not hosted on Codeberg.
+  § 2 (6) lets maintainers set stricter rules, "for example by adding an easily discoverable Code of Conduct as a file in the repository root", as MKVToolNix does.
+- **The route:** merge requests on Codeberg (below). Bugs go to Codeberg's issues with the command line, the system and sample files where possible.
+  A security issue goes privately by mail to the author, never as a Codeberg issue, because Codeberg has no private issues (README 3.2). Questions go to the MKVToolNix help forum, Doom9's MKVToolNix thread or `#matroska` on Libera, not to the issue tracker (README 3.3).
+- **AI:** MKVToolNix states nothing about AI, AI assistance, LLMs, generated code or policy for either: not in its README (checked 2026-10-24 and 2026-11-02), not in `CODE_OF_CONDUCT.md`, and the tree has no `CONTRIBUTING.md` or `docs/` (2026-10-24, the same on 2026-11-02). The platform rule above is Codeberg's.
+  Do not add an AI mention to upstream prose unless a later project document introduces one.
 
 ## Where
 - A change is submitted as a merge request on `https://codeberg.org/mbunkus/mkvtoolnix`.
@@ -31,8 +44,3 @@ Re-read the README, the active merge request and the repository's test tree befo
 - The maintainer required upstream regression files before merging the AVC and HEVC work.
 - In !6311, the maintainer accepted the approach but asked for comments describing the bitstream-detection rule for the two possible HEVC layouts, rather than a larger rewrite.
 - !6312 was merged as the HEVC companion after !6311's AVC work, with a maintainer test run and no review objections.
-
-## AI policy
-- MKVToolNix's README states nothing about AI, AI assistance, LLMs, generated code or policy for either (checked 2026-10-24).
-- On 2026-10-24, I checked `README.md`, `CONTRIBUTING.md` and `docs/` in the public tree; those files are absent.
-- Do not add an AI mention to upstream prose unless a later project document introduces one.

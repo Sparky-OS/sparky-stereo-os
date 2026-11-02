@@ -11,8 +11,17 @@ metadata:
 # Contributing to PeerTube
 
 Written on 2026-10-24 from PeerTube's contribution guide, repository `AGENTS.md`, pull-request template and public pull request [#7816](https://github.com/Chocobozzz/PeerTube/pull/7816), read 2026-10-24.
+The rules that come first were added on 2026-11-02 from `CODE_OF_CONDUCT.md`, `.github/CONTRIBUTING.md`, `.github/PULL_REQUEST_TEMPLATE.md` and `AGENTS.md` on `develop`, read that day.
 Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this skill is PeerTube's own practice.
 Re-read those files in the current `develop` tree before every round.
+
+## The rules that come first
+- **PeerTube's Code of Conduct** (`CODE_OF_CONDUCT.md`, adapted from the Contributor Covenant 1.4) applies "whenever you are representing the project or community", for example in a project space online or in public ("github.com, framacolibri.org, IRC").
+  - It asks for welcoming and inclusive language, respect for differing viewpoints, accepting constructive criticism gracefully, focusing on what is best for the community and empathy, and to recognise people who make an extra effort to keep the community welcoming.
+  - Maintainers may remove, edit or reject contributions not aligned with it, and ban for behaviour they deem inappropriate. Reports go to the project team at the address the file gives.
+- **The route:** an issue first, claimed before coding, then a draft pull request and a full one against `develop`, as below.
+- **AI:** PeerTube's contribution guide, code of conduct and pull-request template state nothing about AI assistance (checked 2026-10-24 and 2026-11-02).
+  Its `AGENTS.md` gives guardrails for agents working in the tree (files they must not modify, the checks before pushing, no new dependency without explicit approval) and no AI-authorship policy.
 
 ## Where
 - Work on GitHub against PeerTube's `develop` branch.
@@ -34,11 +43,6 @@ Re-read those files in the current `develop` tree before every round.
 - A schema change requires a new migration and `LAST_MIGRATION_VERSION` in `server/core/initializers/constants.ts` to be incremented.
 - For a transcoder change, record a small generated input, the exact invocation and the resulting stream metadata; verify the declared stereo layout survives PeerTube's FFmpeg path.
 - PeerTube's existing FFmpeg transcoding configuration is the surface for codec or container behavior, not a parallel stereo copy of it.
-
-## AI policy
-- PeerTube's contribution guide and pull-request template state nothing about AI assistance.
-- Its repository `AGENTS.md` contains agent guardrails for dependencies, migrations, locking and CI but no AI-authorship policy.
-- Both files were checked on 2026-10-24.
 
 ## Public record
 - Merged pull request [#7816](https://github.com/Chocobozzz/PeerTube/pull/7816) used the issue-and-draft route.

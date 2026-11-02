@@ -11,8 +11,16 @@ metadata:
 # Contributing to Universal Media Server
 
 Written on 2026-10-24 from Universal Media Server's `CONTRIBUTING.md`, `STYLEGUIDE.md`, pull-request template and public pull requests [#6330](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6330) and [#6389](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6389).
+The rules that come first were added on 2026-11-02 from `Code_Of_Conduct.md`, `CONTRIBUTING.md`, `STYLEGUIDE.md` and `.github/pull_request_template.md` on `main` and from the knowledge base's [development page](https://github.com/UniversalMediaServer/knowledge-base/blob/main/docs/development/development.md), read that day.
 Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this skill is Universal Media Server's own practice.
-Re-read those files in the current `master` tree before every round.
+Re-read those files in the current tree before every round; its default branch is `main`.
+
+## The rules that come first
+- **Universal Media Server's Code of Conduct** (`Code_Of_Conduct.md`, the Contributor Covenant 2.1) applies "within all community spaces", and when someone officially represents the community in public.
+  - Its standards include empathy and kindness, respect for differing opinions, giving and gracefully accepting constructive feedback, and "Accepting responsibility and apologizing to those affected by our mistakes, and learning from the experience".
+  - Community leaders enforce it through its four steps (correction, warning, temporary ban, permanent ban); reports go to them on the [UMS forum](https://www.universalmediaserver.com/forum/).
+- **The route:** a pull request on GitHub that a reviewer can check three ways (below). An issue carries the debug information packed from the Logs tab at the Trace level, attached to the issue or to the forum's attachments thread and linked from the issue.
+- **AI:** Universal Media Server's code of conduct, `CONTRIBUTING.md`, `STYLEGUIDE.md`, pull-request template and the knowledge base's development page state nothing about AI assistance (checked 2026-10-24, and on 2026-11-02 with the code of conduct and the development page).
 
 ## Merge decisions
 - `CONTRIBUTING.md` says the project will merge changes only if they do not break automated tests.
@@ -34,10 +42,6 @@ Re-read those files in the current `master` tree before every round.
 - Exercise the exact affected renderer profile and media path by hand.
 - Record the profile, client, exact input, command or configuration, old behaviour and new behaviour.
 - Do not claim a device works without testing that device or a demonstrably equivalent public profile.
-
-## AI policy
-- Universal Media Server's `CONTRIBUTING.md`, `STYLEGUIDE.md` and pull-request template state nothing about AI assistance.
-- All three files were checked on 2026-10-24.
 
 ## Public record
 - Public pull request [#6330](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6330) was a focused renderer and media-fix change.

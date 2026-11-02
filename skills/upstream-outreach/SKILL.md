@@ -39,8 +39,9 @@ Every contribution follows the receiving project's own rules and its code of con
 ## Which route
 
 - **A package that comes from Debian:** report it to Debian with the fix inline ([`contrib-debian`](../contrib-debian/SKILL.md)); when the program's own upstream has the bug too, report it there as well, in that project's way.
-- **A package our repository hosts and its creator manages:** a merge request straight from the distribution's fork to the creator's own repository, in that creator's rules; the distribution carries the creator's release, not a private fork of it.
-- **Any other upstream:** the project's own `contrib-<project>` skill, or this skill alone when none exists yet.
+- **A program its creator keeps in the edition's organization:** the organization's repository is that program's upstream, so a change is a pull request there, from a branch, reviewed and merged by its creator under the creator's rules.
+  Jeromy Streets moved org.kde.video, his video wallpaper, into Sparky-OS, so that repository is its only home; effcol keeps admin rights on Sparky-OS/wiz3D beside his own effcol/wiz3D.
+- **Any other upstream:** the edition carries its changes in its own forks, because a stereo kernel and stereo drivers make it different from every other Linux distribution; the parts that make sense upstream go there by the project's own route, its `contrib-<project>` skill, or this skill alone when none exists yet.
 
 ## Per-project skills
 

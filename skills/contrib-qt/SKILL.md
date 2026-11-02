@@ -9,11 +9,19 @@ metadata:
 # Contributing to Qt
 
 Written on 2026-10-24 from Qt's contribution page (`https://contribute.qt-project.org/`, read 2026-10-24), the Qt Wiki Gerrit setup guide (`https://wiki.qt.io/Setting_up_Gerrit`, read 2026-10-24) and public changes 778399 and 778580 (read 2026-10-24).
+Updated on 2026-11-02 from qtsvg's `CONTRIBUTING.md`, the Qt Community Code of Conduct ([QUIP 12](https://code.qt.io/cgit/meta/quips.git/tree/quip-0012-Code-of-Conduct.rst)), [QUIP 17](https://code.qt.io/cgit/meta/quips.git/tree/quip-0017-Change-log-creation.rst) and public change [785347](https://codereview.qt-project.org/c/qt/qtsvg/+/785347).
 Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this skill is Qt's own practice.
 Re-read the Gerrit setup guide and the active change before every round.
 
+## The rules that come first
+- **The Qt Community Code of Conduct (QUIP 12, active since 2018-10-24, adapted from KDE's):** consideration, respect, collaboration and pragmatism, in every Qt channel: Gerrit, the mailing lists, the forum, the wiki, meetings and private correspondence about the project.
+  A Code of Conduct committee of at least three members answers reports of unacceptable behaviour.
+- **Gerrit is the only route.** Every module's `CONTRIBUTING.md` says: "we cannot accept pull requests on GitHub". The repositories under github.com/qt are mirrors; qt/qtbase has never had a pull request.
+
 ## Where
 - Changes are uploaded through Gerrit at `https://codereview.qt-project.org`, not through a Git hosting pull request.
+- Name reviewers by their Gerrit username, not the email in their commits (one reviewer's commit address is not his account's, and the push was refused): look them up with REST `/a/accounts/?q=name:SURNAME&o=DETAILS`, then push `HEAD:refs/for/dev%r=USER1,r=USER2`.
+- The `commit-msg` hook is served by Gerrit itself: `https://codereview.qt-project.org/tools/hooks/commit-msg`.
 - Push a change to the project's `dev` branch with `git push ssh://USER@codereview.qt-project.org:29418/qt/REPO HEAD:refs/for/dev`.
 - The Gerrit setup guide says to register the commit author email and click the confirmation email before contributing.
 - The same guide says the commit email must match a registered email address.
@@ -28,6 +36,11 @@ Re-read the Gerrit setup guide and the active change before every round.
 - If a bot-opened backport conflicts, resolve it in the source tree, upload it as a new patch set to that backport with its original `Change-Id`, and post `cpbot: retry` on the change.
 - Before amending, fetch every patch set; a reviewer may have uploaded the latest set, and their work must not be pushed over or lost.
 - Update the same Gerrit change with a new patch set and the original `Change-Id`.
+- **The ChangeLog line (QUIP 17):** `[ChangeLog][module][class/topic] text`, but the module tag only where the repository holds several modules. In qtsvg the sanity bot calls `[ChangeLog][QtSvg]` a "Redundant repository reference"; write `[ChangeLog][QSvgRenderer]`.
+- **Every new file carries the SPDX line `licenseRule.json` gives its path,** data files such as `.inc` included: under `src/` `LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only`, under `tests/` `LicenseRef-Qt-Commercial OR GPL-3.0-only`, build files `BSD-3-Clause`.
+- Commit message lines at most 72 characters, ChangeLog line included.
+- A file that names a generator outside Qt's tree is a question for reviewers: say what the data comes from (for example, the specification's own sample code) instead.
+- QtSecurityBot marks changes to parser files, such as qtsvg's handlers, as "Qt-Security change" and comments "Modifying security sensitive file"; that is a notice, not a rejection.
 
 ## Tests
 - In public change 778399, the Qt Sanity Bot first reported that omission of `6.12` from cherry-pick targets was probably incorrect.
@@ -40,9 +53,10 @@ Re-read the Gerrit setup guide and the active change before every round.
 - Public change 778399, FFmpeg backend display peak reporting, was merged on `dev` on 2026-10-08.
 - Public change 778580, FFmpeg backend display peak reporting copied for `6.12`, was merged on 2026-10-09.
 - In 778399, the reviewer uploaded a later patch set that parameterized the test for broader coverage.
+- Public change 785347, Qt SVG reading every CSS colour and painting it at the target's precision, was uploaded to `dev` on 2026-11-02.
 
 ## AI policy
-- Qt's contribution page and Gerrit setup guide state no project-wide rule for AI assistance, AI-generated code or LLM use (checked 2026-10-24).
+- Qt's contribution page and Gerrit setup guide state no project-wide rule for AI assistance, AI-generated code or LLM use (checked 2026-10-24, and the contribution page again on 2026-11-02).
 - On 2026-10-24, I checked the contribution page and `https://wiki.qt.io/Setting_up_Gerrit`; those public documents are the project's contribution instructions.
 - In public change 778399, review and service accounts did not raise AI assistance or reject the change for it.
 - Declare AI assistance only when the module's current review instructions or assigned reviewers require it.

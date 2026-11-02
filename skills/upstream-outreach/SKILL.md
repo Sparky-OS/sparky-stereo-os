@@ -29,10 +29,23 @@ Daniel, 2026-10-14: the "not cold PR" policy for AI partnership works with or wi
 
 Why: in October 2026 a merge request reached KWin without warning and was declined for its AI-written text, so the edition withdrew. The next proposal, the DisplayXR window-geometry publisher, goes through the area's maintainer first, with DisplayXR's panel results and support (DisplayXR runtime issue #1928).
 
+## Each project's rules and code of conduct come first
+
+Every contribution follows the receiving project's own rules and its code of conduct, in every channel it uses: code review, trackers, forums, chat and mail (Daniel, 2026-11-02).
+- Read both before the first message: the repository's `CONTRIBUTING.md` or contribution page, and the code of conduct it names (KDE's, Qt's QUIP 12, Debian's, VideoLAN's).
+- Each `contrib-<project>` skill opens with "The rules that come first": the code of conduct, the route the project accepts, and its stance on AI, each with its source and the date it was read.
+- A project with no written code of conduct still gets the same manners: respectful, concise, in its own venue.
+
+## Which route
+
+- **A package that comes from Debian:** report it to Debian with the fix inline ([`contrib-debian`](../contrib-debian/SKILL.md)); when the program's own upstream has the bug too, report it there as well, in that project's way.
+- **A package our repository hosts and its creator manages:** a merge request straight from the distribution's fork to the creator's own repository, in that creator's rules; the distribution carries the creator's release, not a private fork of it.
+- **Any other upstream:** the project's own `contrib-<project>` skill, or this skill alone when none exists yet.
+
 ## Per-project skills
 
 Each project has its own practice: where to send, the shape of a series, its tests and its review habits.
-Load the project's `contrib-<project>` skill with this one when it exists: [`contrib-ffmpeg`](../contrib-ffmpeg/SKILL.md).
+Load the project's `contrib-<project>` skill with this one when it exists: [`contrib-ffmpeg`](../contrib-ffmpeg/SKILL.md), [`contrib-kde`](../contrib-kde/SKILL.md), [`contrib-qt`](../contrib-qt/SKILL.md), [`contrib-debian`](../contrib-debian/SKILL.md) and the others listed in the [skills index](../README.md).
 A `contrib-<project>` skill declares the packages that make it relevant (`metadata: requires-packages`), and `sparky-stereo-skills link` links it only where one of them is installed.
 
 ## Before writing

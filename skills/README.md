@@ -52,6 +52,7 @@ Core skills are `sparky-stereo`, `ai-partners`, `search-upstream-first`, `upstre
 | An x265 pull request (with upstream-outreach) | [contrib-x265](contrib-x265/SKILL.md) |
 | A VLC merge request (with upstream-outreach) | [contrib-vlc](contrib-vlc/SKILL.md) |
 | A KDE Invent change or Bugzilla report (with upstream-outreach) | [contrib-kde](contrib-kde/SKILL.md) |
+| A Debian bug report with its fix inline, or a Salsa merge request (with upstream-outreach) | [contrib-debian](contrib-debian/SKILL.md) |
 | An MPlayer patch, prepared but held until release is requested (with upstream-outreach) | [contrib-mplayer](contrib-mplayer/SKILL.md) |
 | A README opening, About line or public introduction | [writing-front-pages](writing-front-pages/SKILL.md) |
 

@@ -12,6 +12,14 @@ metadata:
 Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this is KDE's own practice.
 Re-read the relevant Invent repository's contribution rules and Bugzilla workflow before work.
 This skill uses KDE's own records read on 2026-10-24, not generic commit hygiene.
+The code of conduct section was added on 2026-11-02 from [kde.org/code-of-conduct](https://kde.org/code-of-conduct/) and the repositories' `CONTRIBUTING.md` files.
+
+## The rules that come first
+- **The KDE Community Code of Conduct** applies in every KDE channel: Invent, Bugzilla, Discuss, Matrix, the mailing lists and events.
+  Its six points: be considerate, be respectful, be collaborative, be pragmatic, support others in the community, get support from others in the community.
+- Repositories state it themselves: libkscreen's `CONTRIBUTING.md` says "The KDE Community Code of Conduct is applied" and names the Community Working Group for questions about it or for help with a conflict.
+- Each module's own rules come on top: its `CONTRIBUTING.md`, its maintainers' stated review style and its AI stance (below).
+- One venue per question. A maintainer who asks to take a discussion elsewhere is answered there, once, or not at all.
 
 ## Where
 - Bugs are https://bugs.kde.org; code is https://invent.kde.org.

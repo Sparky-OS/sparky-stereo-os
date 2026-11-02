@@ -402,8 +402,9 @@ Their living successors, which we make stereo: the QML Flip Switch and Cover Swi
 
 ### 2.8 Qt
 
-**Source**: [qt.io](https://www.qt.io/), [codereview.qt-project.org](https://codereview.qt-project.org/) **License**: LGPL-3.0 or GPL-2.0 **What we changed**: stereo EGL window surfaces, a stereo `QOpenGLWidget` as its own surface while the 2D window stays mono, translucent windows keeping their depth; in Qt Multimedia, every stereo packing taken apart in the video output.
+**Source**: [qt.io](https://www.qt.io/), [codereview.qt-project.org](https://codereview.qt-project.org/) **License**: LGPL-3.0 or GPL-2.0 **What we changed**: stereo EGL window surfaces, a stereo `QOpenGLWidget` as its own surface while the 2D window stays mono, translucent windows keeping their depth; in Qt Multimedia, every stereo packing taken apart in the video output; in Qt SVG, every CSS colour painted at the precision CSS sets.
 **Credit**: The Qt Company and the Qt Project's contributors; Qt Multimedia's copyright holders also include Research In Motion and Jolla.
+Qt SVG's colour work builds on its developers' own, most of all **Hatem ElKharashy** and **Robert Löhning**, whose `resolveColor()` test our change extends.
 Our first Qt change was reviewed within hours by **Tim Blechmann**, with **Artem Dyomin, Nils Petter Skålerud and Jøger Hansegård** as reviewers.
 
 ### 2.9 The stereo virtual machine
@@ -629,6 +630,11 @@ Our changes stay in our own trees, ready to go upstream on the day they are want
 | Photo Sphere XMP | Google | Telling a 360° photo from a stereo pair |
 | HEVC Stereo Video Profile, Stereo Video ISOBMFF Extensions | Apple | Spatial video |
 | Anaglyph matrices | Eric Dubois | Least-squares red/cyan anaglyph |
+| [CSS Color 4](https://www.w3.org/TR/css-color-4/) | W3C; editors Tab Atkins Jr., Chris Lilley, Lea Verou (former editor L. David Baron) | Every colour space an SVG names, and the precision each needs |
+| [CSS Color 5](https://www.w3.org/TR/css-color-5/) | W3C; editors Chris Lilley, Una Kravets, Lea Verou (former editor Adam Argyle) | `color-mix()` and relative colours |
+| [CSS Color HDR](https://drafts.csswg.org/css-color-hdr/) | W3C; editor Chris Lilley | HDR colours in SVG and CSS |
+| Oklab | Björn Ottosson | The perceptual space behind `oklab()` and `oklch()` |
+| web-platform-tests css-color | Sam Weinig, Chris Nardi, Eric Willigers, Romain Menke, Aaron Krajeski, Jason Leo, Chris Lilley, CGQAQ | The parsing vectors our colour tests check against |
 | Debian Policy | Debian | How every package is built |
 
 The W3C's earlier stereo work deserves its own line: the 2012 Stereoscopic 3D Web Task Force of the Web and TV Interest Group (LG Electronics, KDDI and W3C staff, moderated by **Dong-Young Lee** of LG Electronics) and the Stereoscopic 3D Web Community Group (closed in 2023).
@@ -826,7 +832,7 @@ The artwork is licensed CC-BY-SA-4.0 and its scripts GPL-3.0-or-later (Daniel's 
 
 - **David Miller, David Vignoni, Johann Ollivier Lapeyre, Kenneth Wimer, Nuno Pinheiro and Riccardo Iaconelli**, as credited by Debian's Oxygen copyright record, for [Oxygen](https://invent.kde.org/frameworks/oxygen-icons), the edition's icon theme and a glass/material style reference. No Oxygen artwork was copied.
 - **Stepan Roh and the DejaVu contributors**, and **Bitstream Inc.**, as credited in DejaVu's distributed records, for [DejaVu Sans](https://dejavu-fonts.github.io/) and its Vera foundation, used to render promotional lettering.
-- **GNOME's librsvg contributors**, and the **Cairo, Pango, HarfBuzz and Fontconfig contributors**, for SVG and text rendering. **The Python Software Foundation, Python contributors and Pillow contributors**, for the build scripts and image checks.
+- **GNOME's librsvg contributors**, and the **Cairo, Pango, HarfBuzz and Fontconfig contributors**, for SVG and text rendering. Our librsvg reads every CSS colour and draws it at more than 8 bits, on the work of **Federico Mena Quintero**, its maintainer, and on **Emilio Cobos Álvarez**'s cssparser. **The Python Software Foundation, Python contributors and Pillow contributors**, for the build scripts and image checks.
 - **Google and the Android SDK, AOSP and AndroidX contributors**, for aapt2, Android's resource formats, the SDK/NDK and Media3; the **Gradle, Kotlin, OpenJDK, CMake, Ninja, Git and Docker contributors**, for build and verification tools. Their distributed notices retain their individual credits.
 - **Fabian Druschke and the KDE Connect developers**, the **KRdp and KWin contributors**, **Marc-Andre Moreau, Thincast Technologies, Martin Fleisz, Armin Novak, Bernhard Miklautz and the FreeRDP contributors**, **Google LLC and the Cardboard contributors**, and **Intel Corporation, Rémi Turboult, Michel Pfeiffer and the pupnp contributors**, for the Flat Headset software built to verify the new resources. Names follow the projects' records, collected in [Flat Headset's attributions](https://github.com/Sparky-OS/flat-headset/blob/main/ATTRIBUTIONS.md).
 - **Harsha Raghu, Rohit Panchal, ShootingKing-AM, thezofx, Nick, Riccardo Zaglia, verypurple and the PhoneVR contributors**, and the **ALVR contributors**, for the tracked phone-viewer software behind StereoDroid's identity. [StereoDroid's attributions](https://github.com/Sparky-OS/stereodroid/blob/main/ATTRIBUTIONS.md) retain the full contributor records.

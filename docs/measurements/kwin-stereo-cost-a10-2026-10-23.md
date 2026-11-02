@@ -7,7 +7,7 @@ Every case Daniel watched passed his visual check; the numbers below say how muc
 
 - Lenovo ideapad 310-15ABR (80ST): AMD A10-9600P from 2016 (Bristol Ridge, 4 CPU cores and 6 GPU compute units), 11 GiB RAM.
 - The integrated Radeon R5 drives every connector; the discrete Radeon R5 M430 has no outputs.
-- Laptop panel 1366x768 at 60 Hz; a Sony 3D TV on HDMI.
+- Laptop panel 1366x768 at 60 Hz; a Sony 3D TV on [HDMI®](https://www.hdmi.org/resource/brand).
 - Sparky Stereo OS: kernel 7.3.0-rc6-stereo3d10, KWin 6.7.4 +stereo3d30, Mesa 26.1.6 +stereo3d14.
 - Films decoded in software (the players' default at the time; hardware decoding is now being made the default) and played without audio.
 - More about both machines: [hardware.md](../hardware.md).
@@ -90,3 +90,5 @@ The branches are public: https://invent.kde.org/danielcamposramos/kwin/-/tree/st
 - [analyse.py](a10-2026-10-23/analyse.py): reads KWin's per-frame logs and the machine log inside each window.
 - [marks-matrix.csv](a10-2026-10-23/marks-matrix.csv) and [marks-inverse.csv](a10-2026-10-23/marks-inverse.csv): the start and end of every window.
 - Raw data (KWin's per-frame logs, the machine log, mpv logs and the screen layouts): https://repo.sparkyos.org/measurements/a10-kwin-cost-2026-10-23-raw.tgz (8.9 MB), SHA-256 17eb0a700fbcda3f066c2a6a2108d890032d57b57ea0e55ac9885e1d21da5544.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

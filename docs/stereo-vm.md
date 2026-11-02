@@ -1,6 +1,6 @@
 # A virtual machine with a 3D display
 
-A guide for users and developers who want a virtual machine whose display has HDMI 3D modes, shown on the host as a stereo window.
+A guide for users and developers who want a virtual machine whose display has [HDMI®](https://www.hdmi.org/resource/brand) 3D modes, shown on the host as a stereo window.
 It also covers rendering the guest on the host's strongest GPU, and passing a whole second GPU to the guest.
 
 ![Karton, KDE's virtual machine manager, showing a guest in a 3D mode: the left eye (red marker) and the right eye (green marker) as Stereo KWin captures them](images/stereo-vm-karton.png)
@@ -18,10 +18,10 @@ QEMU's own contribution policy (`docs/devel/code-provenance.rst`) declines code 
 
 ## How it works
 
-A real 3D television says in its EDID which 3D modes it accepts, and the computer tells it which one it is sending in the HDMI vendor InfoFrame.
+A real 3D television says in its EDID which 3D modes it accepts, and the computer tells it which one it is sending in the HDMI® vendor InfoFrame.
 The virtual machine does the same, in three places:
 
-1. **The EDID.** QEMU's `virtio-gpu` device, with `stereo=on`, adds an HDMI Vendor-Specific Data Block to the EDID it gives the guest: "3D present" (the mandatory 3D formats of HDMI 1.4b for 1080p24, 720p50 and 720p60) and, for 1080p60, frame packing, side by side (full), top-and-bottom and side by side (half).
+1. **The EDID.** QEMU's `virtio-gpu` device, with `stereo=on`, adds an HDMI® Vendor-Specific Data Block to the EDID it gives the guest: "3D present" (the mandatory 3D formats of HDMI® 1.4b for 1080p24, 720p50 and 720p60) and, for 1080p60, frame packing, side by side (full), top-and-bottom and side by side (half).
 2. **The guest's driver.** The guest's `virtio-gpu` driver lists those modes when the device offers stereo (`VIRTIO_GPU_F_STEREO`), and on every mode set tells the device the layout: which 3D structure, where each eye sits in the frame, and the size of one eye. This is the InfoFrame's job on a cable.
 3. **The host window.** QEMU's GTK display shows the guest at one eye's size. It draws the left eye in its window and, on a Wayland desktop with Stereo KWin, puts both eyes over it, side by side, left eye first, each at the resolution the guest scans it out at, and declares that once as stereo. Stereo KWin then sends it to whatever the host's screen does: a 3D television's own 3D mode, anaglyph, or the left eye on a 2D screen.
 
@@ -82,7 +82,7 @@ Stereo works the same way with a GL display: with `-display gtk,gl=on`, QEMU dra
 ## Pass a whole second GPU to the guest (VFIO)
 
 The guest gets the whole GPU and drives its outputs itself, with its own drivers; the host keeps the GPU that drives its screens.
-A 3D television on the passed GPU's HDMI port then works in the guest exactly as on a real computer.
+A 3D television on the passed GPU's HDMI® port then works in the guest exactly as on a real computer.
 While the guest owns it, the host cannot use that GPU or the screens connected to it.
 
 1. **Firmware.** Enable the IOMMU (AMD: "IOMMU" or "AMD-Vi" and SVM; Intel: VT-d and VT-x) and make the GPU that should stay with the host the primary display.
@@ -93,7 +93,7 @@ While the guest owns it, the host cannot use that GPU or the screens connected t
        g=${d#/sys/kernel/iommu_groups/}; echo "group ${g%%/*}: $(lspci -nns "${d##*/}")"
    done
    ```
-   The GPU and its HDMI audio function should be alone in their group, for example `01:00.0 [10de:2504]` and `01:00.1 [10de:228e]` for an RTX 3060.
+   The GPU and its HDMI® audio function should be alone in their group, for example `01:00.0 [10de:2504]` and `01:00.1 [10de:228e]` for an RTX 3060.
 4. **Give the GPU to vfio-pci at boot**, before its own driver takes it. In `/etc/modprobe.d/vfio.conf`:
    ```
    options vfio-pci ids=10de:2504,10de:228e
@@ -128,3 +128,5 @@ While the guest owns it, the host cannot use that GPU or the screens connected t
 - SPICE sends a frame in tiles, so a viewer can for a moment show the two views from different frames (7 of 100 samples in Karton and 11 of 100 in virt-viewer, measured with frame-numbered views; QEMU's own window, which reads the whole frame at one moment, showed 0 of 200); a frame boundary in the protocol is the proposed fix (not built).
 - Without Stereo KWin (or another compositor that takes the declaration), the window shows the left eye.
 - Interlaced 3D modes (1080i side by side half) are not listed: `virtio-gpu` does not allow interlaced modes.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

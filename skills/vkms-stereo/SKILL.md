@@ -12,7 +12,7 @@ description: >-
 
 1. Pin kernel/bench revisions and validate the test EDID. Derive expected modes from the EDID rather than the code under test.
 2. Run the relevant guest phases with labelled eyes, the no-EDID/2D cases and the old-code control; keep VKMS off the active desktop.
-3. Return mode and pixel comparisons with phase logs. Physical HDMI signaling and panel behavior require separate hardware tests.
+3. Return mode and pixel comparisons with phase logs. Physical [HDMI®](https://www.hdmi.org/resource/brand) signaling and panel behavior require separate hardware tests.
 
 **Check freshness first.**
 Written on 2026-10-08.
@@ -25,13 +25,13 @@ The step-by-step guide is [Test stereo without a 3D TV](../../docs/test-stereo-w
 - A change to how a compositor lists, sets or packs 3D modes, down to the frame it hands the display.
 - A program that must react to a 3D mode, tested on a desktop that has one.
 
-It replaces none of the tests on a real television: VKMS has no cable, so the HDMI vendor InfoFrame is not checked here.
+It replaces none of the tests on a real television: VKMS has no cable, so the HDMI® vendor InfoFrame is not checked here.
 
 ## The pieces
 
 - **The kernel:** Louis Chauvet's VKMS configfs series ([v5](https://lore.kernel.org/dri-devel/20260627-vkms-all-config-v5-0-854aa0840926@bootlin.com/)) gives a VKMS connector a `type` and an EDID (`edid`, `edid_enabled`); the bench's five patches on top free that EDID, make the composer and the writeback connector use the whole frame of a stereo mode, allow stereo modes, test both, and attach the PATH property only where IGT expects it.
 - **A virtual machine, always:** QEMU with KVM when available, a small kernel booted with an initramfs. On a desktop, the running compositor would take VKMS as one more screen.
-- **The EDID decides the modes:** HDMI 1.4b's Vendor-Specific Data Block with 3D present brings the mandatory 3D formats of the listed video formats, plus what `3D_Structure_ALL` and `3D_Structure_X` declare. Use an EDID that `edid-decode --check` passes, and a real display's EDID next to it.
+- **The EDID decides the modes:** HDMI® 1.4b's Vendor-Specific Data Block with 3D present brings the mandatory 3D formats of the listed video formats, plus what `3D_Structure_ALL` and `3D_Structure_X` declare. Use an EDID that `edid-decode --check` passes, and a real display's EDID next to it.
 - **Expectations come from the EDID, not from the kernel:** read the declared 3D formats from `edid-decode`'s text and compare them with what the connector lists. Comparing the kernel with itself proves nothing.
 - **The frame of each layout:** frame packing is vdisplay + vtotal lines (1080p: 2205; 720p: 1470) with the right eye from line vtotal and black active space between; side by side (full) is twice the width; top-and-bottom and side by side (half) keep the mode's size. `drm_mode_get_hv_timing()` gives that size; planes, the composer and the writeback buffer all use it.
 
@@ -67,3 +67,5 @@ It replaces none of the tests on a real television: VKMS has no cable, so the HD
 - The same phases on the kernel without the change, failing where expected.
 - Pictures of a few writeback frames and compositor frames, looked at by eye.
 - The real-hardware test (a television switching itself into 3D) stays in the [`drivers`](../drivers/SKILL.md) skill's proof list.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

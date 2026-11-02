@@ -26,7 +26,7 @@ A monitor with built-in mirror correction starts with **Reflection: None**. The 
 
 ## VM configuration
 
-Use an isolated guest with the edition's KWin and KScreen. Two ordinary display connectors are sufficient: each connector shows one eye at its own mode's size, so this test does not require a packed HDMI 3D mode on either connector.
+Use an isolated guest with the edition's KWin and KScreen. Two ordinary display connectors are sufficient: each connector shows one eye at its own mode's size, so this test does not require a packed [HDMI®](https://www.hdmi.org/resource/brand) 3D mode on either connector.
 
 For one virtual GPU with two outputs, replace the VM's video-device arguments with:
 
@@ -59,3 +59,5 @@ Before another physical test, reproduce activation and recovery in a guest. Keep
 Retain an intentional wrong-eye or mismatched-counter control that the checker rejects. A raw stereo screenshot alone does not establish which eye a physical connector received: inspect the output crop and submitted buffer as well.
 
 The software acceptance boundary is the complete stereo pair handed to the drivers. Record physical display observations separately, without moving display-specific responsibilities into the applications.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

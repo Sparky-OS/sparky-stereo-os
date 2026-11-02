@@ -14,7 +14,7 @@ So this is a thank you, and a short account of what thirty years of KDE made pos
 
 Sparky Stereo OS is my edition of SparkyLinux, on KDE Plasma only, with KWin at its heart.
 Programs hand KWin their picture once, as two full views, left eye first.
-KWin gives every screen what it needs: a 3D TV's HDMI 3D modes, red-cyan glasses on an ordinary monitor, two projectors as one stereo pair, and now a compatible phone in an inexpensive viewer, [tested as a usable stereo desktop over USB](https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md).
+KWin gives every screen what it needs: a 3D TV's [HDMI®](https://www.hdmi.org/resource/brand) 3D modes, red-cyan glasses on an ordinary monitor, two projectors as one stereo pair, and now a compatible phone in an inexpensive viewer, [tested as a usable stereo desktop over USB](https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md).
 The panel and the window frames stay at the screen, while a game or a globe gets real depth inside its window.
 Turn 3D off and the desktop is the same 2D one, which our tests check pixel by pixel.
 
@@ -74,3 +74,5 @@ The work is at https://invent.kde.org/danielcamposramos and https://github.com/S
 Happy 30th birthday, KDE, and thank you.
 
 Daniel Campos Ramos
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

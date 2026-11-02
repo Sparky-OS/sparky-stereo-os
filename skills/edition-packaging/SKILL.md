@@ -117,7 +117,7 @@ A package set waiting for a rebuild is left out of the block until the rebuild l
 
 ## The GPU vendors' repositories: compute updates, the display driver stays ours
 
-NVIDIA's and AMD's repositories carry their display drivers beside CUDA and ROCm, so the edition pins them: compute keeps updating, and the display driver stays ours, with HDMI 3D.
+NVIDIA's and AMD's repositories carry their display drivers beside CUDA and ROCm, so the edition pins them: compute keeps updating, and the display driver stays ours, with [HDMI®](https://www.hdmi.org/resource/brand) 3D.
 The packages, the pin files and how to prove a change are in [the repository](references/repository.md#the-gpu-vendors-repositories-compute-updates-the-display-driver-stays-ours).
 
 ## Each build of ours
@@ -156,3 +156,5 @@ In a fresh `debian:testing` container with the repository as a local source and 
 - `apt-get -s install <task>` resolves for every task, with nothing removed.
 
 Check that each task's package list exists (`apt-cache show`) and that no package appears in both flavours of a role.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

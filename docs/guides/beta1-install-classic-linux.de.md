@@ -313,7 +313,7 @@ Zeilen, Spalten und Schachbrett gibt es in beiden Augenreihenfolgen, „left eye
 
 ![Other stereo formats in der Liste Bildwiederholrate](images/beta1/other-formats-under-refresh-rate.jpg)
 
-Eine Anzeige, die eigene HDMI-3D-Modi meldet (Frame Packing, Side by Side, Top and Bottom), bekommt diese ebenfalls in der Liste Bildwiederholrate, beschriftet etwa mit „3D frame packing“.
+Eine Anzeige, die eigene [HDMI®](https://www.hdmi.org/resource/brand)-3D-Modi meldet (Frame Packing, Side by Side, Top and Bottom), bekommt diese ebenfalls in der Liste Bildwiederholrate, beschriftet etwa mit „3D frame packing“.
 Sie werden nie automatisch gewählt; wählt man einen, schaltet die Anzeige selbst auf 3D um.
 Die virtuellen Maschinen des Tests haben keine solche Anzeige, daher fehlen diese Einträge auf den Bildern.
 
@@ -507,3 +507,5 @@ Für alles, was vor dem Desktop geschieht (Firmware, Startmenü des Sticks, MokM
 
 Hinweis zu dieser Übersetzung: Der deutsche Text wurde nicht von einem zweiten Sprachmodell gegengelesen.
 Korrekturen von Muttersprachlern sind willkommen.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

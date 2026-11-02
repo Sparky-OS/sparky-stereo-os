@@ -17,7 +17,7 @@ Before KWin, the program or its library turns whatever it has into full side by 
 After KWin, each output turns full side by side into whatever its display, projector, glasses or headset needs.
 
 **Nothing in the middle knows about formats.**
-No program knows about HDMI 3D, anaglyph colours, interleaved lines or shutter timing.
+No program knows about [HDMI®](https://www.hdmi.org/resource/brand) 3D, anaglyph colours, interleaved lines or shutter timing.
 No driver knows about programs.
 
 **Sound follows the same division.**
@@ -61,7 +61,7 @@ Each eye is a complete picture at the resolution it has, so the buffer is twice 
 The buffer is 2W by H, at any W and H.
 W and H are the eye's own samples, half packings included: the eyes of a half top-and-bottom 1920x1080 video are 1920x540, so its buffer is 3840x540, and the size an eye is shown at comes from the surface (a `wp_viewport` destination on Wayland, the window on X11).
 
-It is HDMI 1.4's 3D structure 3, "side by side (full)" (`HDMI_3D_STRUCTURE_SIDE_BY_SIDE_FULL = 3` in the kernel's `include/linux/hdmi.h`), the layout SteamVR writes its stereo screenshots in, and the arrangement of IMAX 3D's two projectors.
+It is HDMI® 1.4's 3D structure 3, "side by side (full)" (`HDMI_3D_STRUCTURE_SIDE_BY_SIDE_FULL = 3` in the kernel's `include/linux/hdmi.h`), the layout SteamVR writes its stereo screenshots in, and the arrangement of IMAX 3D's two projectors.
 
 **Any resolution.**
 The buffer is the render resolution: higher than the window for sharpness, lower for speed.
@@ -70,7 +70,7 @@ KWin scales each eye to the window's place on screen, the way it scales any wind
 
 **One value says it.**
 A window declares full side by side, and nothing else exists to declare.
-The declared value is 3, the same number as HDMI's 3D structure: `_KDE_NET_WM_STEREO_CONTENT` = 3 on X11, `side_by_side_full` in the `kde_stereo_content_v1` Wayland protocol.
+The declared value is 3, the same number as HDMI®'s 3D structure: `_KDE_NET_WM_STEREO_CONTENT` = 3 on X11, `side_by_side_full` in the `kde_stereo_content_v1` Wayland protocol.
 Half side by side, top and bottom and right-eye-first are not inputs: they are converted at an edge.
 
 **Windowed or fullscreen, it is the same.**
@@ -152,7 +152,7 @@ The driver and display own physical link timing and presentation after the hando
 ## Outputs: where formats live
 
 **Each output converts full side by side into what its device needs:**
-- the display's own HDMI 3D modes: frame packing (3D structure 0), top and bottom (6), side by side half (8), switched by the HDMI Vendor Specific InfoFrame;
+- the display's own HDMI® 3D modes: frame packing (3D structure 0), top and bottom (6), side by side half (8), switched by the HDMI® Vendor Specific InfoFrame;
 - anaglyph (red/cyan, Dubois least-squares matrices, with a set for CRT and one for modern panels) on any 2D screen;
 - row, column and checkerboard interleaving for passive panels;
 - frame-sequential for shutter glasses and DLP projectors;
@@ -189,9 +189,9 @@ The per-speaker setup, the headphone path and the game-side listener in our Half
 ## Driver developers: the smallest part
 
 **Your part is to show the display's 3D modes and switch the display into them.**
-- Expose the 3D modes the display declares in its EDID: the HDMI Vendor-Specific Data Block's `3D_present`, `3D_Multi_present` and 3D structure fields (parsed by `add_3d_struct_modes()` in `drm_edid.c`, carried as `DRM_MODE_FLAG_3D_*` in `drm_mode.h`).
-- Send the HDMI Vendor Specific InfoFrame that tells the display which 3D structure it receives (`drm_hdmi_vendor_infoframe_from_display_mode()`).
-- Time frame packing as HDMI 1.4 defines it: both eyes in one frame twice as tall, with the active space between them.
+- Expose the 3D modes the display declares in its EDID: the HDMI® Vendor-Specific Data Block's `3D_present`, `3D_Multi_present` and 3D structure fields (parsed by `add_3d_struct_modes()` in `drm_edid.c`, carried as `DRM_MODE_FLAG_3D_*` in `drm_mode.h`).
+- Send the HDMI® Vendor Specific InfoFrame that tells the display which 3D structure it receives (`drm_hdmi_vendor_infoframe_from_display_mode()`).
+- Time frame packing as HDMI® 1.4 defines it: both eyes in one frame twice as tall, with the active space between them.
 - Expose deep colour where the display declares it: `DC_30bit`, `DC_36bit` and `DC_48bit` in the same data block (10, 12 and 16 bits per colour, `drm_parse_hdmi_deep_color_info()`), through the connector's "max bpc" property.
 
 **You never need to know about programs, cameras, packing or eye order.**
@@ -206,7 +206,7 @@ A new program needs no knowledge of displays, and a new display needs no change 
 
 ## References
 
-- **HDMI 1.4b** (HDMI Licensing): 3D structures, the HDMI Vendor-Specific Data Block (EDID) and the HDMI Vendor Specific InfoFrame; deep colour flags since HDMI 1.3. The Linux kernel's open implementation: `include/linux/hdmi.h`, `drivers/gpu/drm/drm_edid.c`, `include/uapi/drm/drm_mode.h`.
+- **HDMI® 1.4b** (HDMI Licensing): 3D structures, the HDMI® Vendor-Specific Data Block (EDID) and the HDMI® Vendor Specific InfoFrame; deep colour flags since HDMI® 1.3. The Linux kernel's open implementation: `include/linux/hdmi.h`, `drivers/gpu/drm/drm_edid.c`, `include/uapi/drm/drm_mode.h`.
 - **ITU-T H.264** (08/2021), Annex D, frame packing arrangement SEI, semantics in D.2.26.
 - **ITU-T H.265**, D.3.16, frame packing arrangement SEI.
 - **ITU-T H.274** (VVC SEI), 8.6, frame packing arrangement.
@@ -221,3 +221,5 @@ A new program needs no knowledge of displays, and a new display needs no change 
 - **OpenVR** ([Valve](https://github.com/ValveSoftware/openvr)) and **OpenXR 1.1** ([Khronos](https://registry.khronos.org/OpenXR/specs/1.1/html/xrspec.html)), for headsets.
 - **DisplayXR**, for glasses-free panels: its [window geometry specification](https://github.com/DisplayXR/displayxr-runtime/blob/main/docs/specs/runtime/wayland-window-geometry.md) and [ADR-033](https://github.com/DisplayXR/displayxr-runtime/blob/main/docs/adr/ADR-033-placement-reports-geometry-weaver-owns-phase.md) (geometry crosses to the weaver, phase never leaves it).
 - **AES69-2015** (Audio Engineering Society), the SOFA format for spatial acoustic data such as head-related transfer functions, which PipeWire's [filter chain](https://docs.pipewire.org/page_module_filter_chain.html) takes for binaural headphone sound.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

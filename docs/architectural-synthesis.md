@@ -69,7 +69,7 @@ Stereo KWin composes the scene once, as the two eyes, and each output turns that
 
 | Endpoint | Work at the output boundary | Qualification |
 | --- | --- | --- |
-| HDMI 3D television or projector | The display's own 3D modes, every HDMI 1.4a structure: frame packing, field and line alternative, side by side full and half, top and bottom, and picture and depth. Listed beside the 2D modes, labelled, never chosen automatically; choosing one sends the InfoFrame. | Physical TV tests and virtual-display tests are documented. |
+| [HDMI®](https://www.hdmi.org/resource/brand) 3D television or projector | The display's own 3D modes, every HDMI® 1.4a structure: frame packing, field and line alternative, side by side full and half, top and bottom, and picture and depth. Listed beside the 2D modes, labelled, never chosen automatically; choosing one sends the InfoFrame. | Physical TV tests and virtual-display tests are documented. |
 | DisplayPort monitor or projector with its own 3D | Frame sequential: the kernel sends one eye per frame and signals it, and KWin commits whole pairs, so a pair is never split. | In development: proven on the VKMS virtual display (kernel series 36 to 39, in kernel build 14, and KWin +stereo3d36 to +stereo3d39); the run on a native DisplayPort monitor is pending. |
 | Any screen, on any 2D mode | Virtual 3D modes, twins of every 2D mode with the same timing and link: anaglyph for modern screens and CRTs; half side by side and top and bottom for a 3D display switched by hand; rows for passive polarised panels; columns for parallax-barrier and lenticular panels; checkerboard for 3D-ready DLP televisions; frame sequential at 100 or 120 Hz for gear with its own glasses sync. Off by default, per output. | Implemented in Stereo KWin; each kind of panel still needs testers. |
 | Dual projectors, mirror rigs and dual-panel monitors | Two outputs as one pair, one eye each, also across two GPUs. | Implemented and run in virtual machines; real timing across two GPUs needs a hardware window. |
@@ -94,7 +94,7 @@ The edition ships decided defaults for each kind of hardware, so most people nev
 
 A recorded example, from before these defaults: on 1 October a mirrored desktop on two televisions had AMD graphics supplying frame packing at 30 Hz and an NVIDIA RTX 3060 supplying top and bottom at 60 Hz. That is a measurement of that setup, not a guarantee for every pair of GPUs and displays. [Mixed-GPU example](how-it-works.md), [first physical runs](first-runs/kwin-2026-10-01/README.md).
 
-The driver changes are similarly specific. The edition documents amdgpu's HDMI stereo enumeration and signalling, NVIDIA open-kernel-module changes, and Mesa paths that turn stereo graphics buffers into the shared representation. For DisplayPort, kernel build 14 adds the DRM core's frame sequential flag, the stereo modes that EDID and DisplayID declare, the VSC SDP's stereo byte, a VKMS model to test them without hardware, and amdgpu's in-band DisplayPort stereo. NVIDIA's kernel module, user-space OpenGL driver and Wayland platform are distinct parts of that path; a working kernel mode does not establish that every user-space stereo API works. [Display-path implementation and limits](programs-in-detail.md).
+The driver changes are similarly specific. The edition documents amdgpu's HDMI® stereo enumeration and signalling, NVIDIA open-kernel-module changes, and Mesa paths that turn stereo graphics buffers into the shared representation. For DisplayPort, kernel build 14 adds the DRM core's frame sequential flag, the stereo modes that EDID and DisplayID declare, the VSC SDP's stereo byte, a VKMS model to test them without hardware, and amdgpu's in-band DisplayPort stereo. NVIDIA's kernel module, user-space OpenGL driver and Wayland platform are distinct parts of that path; a working kernel mode does not establish that every user-space stereo API works. [Display-path implementation and limits](programs-in-detail.md).
 
 ## Depth for the desktop and its themes
 
@@ -143,8 +143,8 @@ The **Cushion Swap File** is the edition's memory-pressure policy: enable swap w
 
 | Tool or record | What it establishes |
 | --- | --- |
-| [vkms-stereo-bench](../tools/vkms-stereo-bench/README.md) | Virtual HDMI stereo enumeration, timing, placement and per-eye readback in a QEMU guest, with optional compositor checks. |
-| [Stereo virtual machine](stereo-vm.md) | A guest display with HDMI 3D modes and a stereo presentation path to its host. |
+| [vkms-stereo-bench](../tools/vkms-stereo-bench/README.md) | Virtual HDMI® stereo enumeration, timing, placement and per-eye readback in a QEMU guest, with optional compositor checks. |
+| [Stereo virtual machine](stereo-vm.md) | A guest display with HDMI® 3D modes and a stereo presentation path to its host. |
 | [hibernate-bench](../tools/hibernate-bench/README.md) | Secure Boot, hibernation, resume and tamper scenarios using guest firmware and throwaway keys. Its records include failing expectations; it does not certify every system's hibernation. |
 | [Proof gallery](proofs/README.md) | Individual application and compositor results, with images and measurements. |
 | [KDE branch records](kde-branches.md) | Branches and their recorded CI results, separate from physical-display tests. |
@@ -288,3 +288,5 @@ Editorial corrections include the separation of implemented and planned features
 Revised on 31 October 2026, on Daniel's review: the outputs now follow Stereo KWin's own [STEREO3D.md](https://github.com/Sparky-OS/kwin/blob/stereo3d38/STEREO3D.md) (DisplayPort frame sequential, the virtual 3D modes, output pairs, replicas, VR through OpenXR, virtual machines), virtual screens in VR and AR count as screens that keep stereo, and the mixed-GPU section became the defaults the edition ships per hardware type.
 
 For current implementation details, start with [Programs in detail](programs-in-detail.md). For contributing, use the [maintainer workflow](maintainer-workflow.md) and [skills index](../skills/README.md).
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

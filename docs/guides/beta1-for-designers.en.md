@@ -26,7 +26,7 @@ These desktop depth rules are built and shipped in beta 1.
 ![The desktop shown in red and cyan anaglyph](images/beta1/anaglyph-desktop.jpg)
 
 On a normal monitor, enable “Anaglyph” for that screen and use red and cyan glasses.
-A 3D television can use one of its own HDMI 3D modes, and Stereo KWin converts the same desktop image for each screen.
+A 3D television can use one of its own [HDMI®](https://www.hdmi.org/resource/brand) 3D modes, and Stereo KWin converts the same desktop image for each screen.
 The display settings screenshot shows the per-screen stereo controls.
 
 ![Per-screen stereo output controls](images/beta1/display-settings.jpg)
@@ -68,3 +68,5 @@ A live USB is slower than an installed system.
 
 Use [issue #26 in English](https://github.com/Sparky-OS/sparky-stereo-os/issues/26) to report what worked or what got in your way.
 Include your computer, graphics card and display models, the steps you took, what you expected, what happened, and screenshots when they help.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

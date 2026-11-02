@@ -14,14 +14,14 @@ That is what makes stereo work across GPUs, across monitors (2D ones included) a
 **One picture, any screens, any GPUs.**
 One mirrored desktop on two 3D televisions at once, frame packing at 30 Hz from an AMD integrated GPU and top and bottom at 60 Hz from an NVIDIA RTX 3060, both in 3D.
 The program drew one full side-by-side picture; each output converted it for its own screen.
-It takes both halves: our driver changes, which give amdgpu and NVIDIA's open kernel modules the HDMI 3D modes, and this one-format contract.
+It takes both halves: our driver changes, which give amdgpu and NVIDIA's open kernel modules the [HDMI®](https://www.hdmi.org/resource/brand) 3D modes, and this one-format contract.
 
 **Two places, two rules.**
 Inside a program, anything goes: a player reads every packing a file can carry, an engine renders its eyes however it likes.
 Inside Stereo KWin, only full side by side exists: the two eyes as separate pictures side by side, left eye first, at any resolution, declared once.
 "Full" names that layout, not a size: half-width and half-height eyes stay as they are, so a half top-and-bottom frame of 1920x1080 arrives as one 3840x540 buffer.
 No program resizes an eye; in a window or full screen, Stereo KWin does the one resize.
-The output filters then turn that into whatever the screen needs: a 3D television's own HDMI 3D modes, anaglyph on any monitor, interleaved and frame-sequential displays, a headset through OpenXR.
+The output filters then turn that into whatever the screen needs: a 3D television's own HDMI® 3D modes, anaglyph on any monitor, interleaved and frame-sequential displays, a headset through OpenXR.
 
 **A window's 2D part and its 3D area are separate surfaces.**
 The 2D part (menus, toolbars, panels, the document around a picture) is the window's own surface, at its normal size, one eye's size, and declares nothing.
@@ -32,7 +32,7 @@ The separation is also what gives the 2D part its depth: its elements declare th
 
 **It is how sound already works on Linux.**
 A program hands PipeWire PCM samples with their sample rate and channel layout.
-PipeWire resamples, mixes and sends it to HDMI, Bluetooth or a USB DAC, and the program never learns which.
+PipeWire resamples, mixes and sends it to HDMI®, Bluetooth or a USB DAC, and the program never learns which.
 Nobody calls that a limitation: it is why every Linux program plays sound on every device.
 Decoded picture samples, with their stereo layout and colour description, are the visual equivalent. Full side by side keeps both views associated with the same presentation frame; preserving HDR precision, luminance information and any gain map would let the compositor adapt that picture to each display.
 The same principle serves stereo and HDR: **describe each content layer once, preserve its information through the stack, and convert for the screen at the output.**
@@ -62,3 +62,5 @@ Stereo layout and colour are independent properties: a picture can be mono or st
 **Engineering limit, clarified 19 October 2026:** Daniel has tested the stereo choice on devices, but has not yet performed equivalent cross-format HDR tests. PQ, HLG and gain-map images have different decoding and reconstruction requirements. The HDR interchange representation, working colour space, precision and metadata handling remain choices to evaluate; floating-point composition is a candidate, not a validated decision.
 
 Reference images and measurements must cover HDR, deep-colour SDR and 8-bit outputs, mixed SDR/HDR content, mirrored screens and consistency between the two eyes. Deep colour alone is not HDR, and the existing stereo and deep-colour results do not establish that the proposed HDR path works.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

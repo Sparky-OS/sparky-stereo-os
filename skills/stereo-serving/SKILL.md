@@ -34,8 +34,8 @@ Describing a television's frame in the desktop's terms ("two views at their own 
 
 ## The device's formats
 
-- **Half side by side** and **half top and bottom**: the two views squeezed into one frame at the device's raster, each view half the width or half the height. Every 3D television of the HDMI 1.4 era takes these at 1920x1080, and the 4K 3D televisions of 2015 and 2016 at 3840x2160.
-- **Frame packing**: two full views and an active space in one tall frame (1920x2205 for 1080p24). A television takes it over HDMI and from its own player; over the network, take it only if the device's profile says so.
+- **Half side by side** and **half top and bottom**: the two views squeezed into one frame at the device's raster, each view half the width or half the height. Every 3D television of the [HDMI®](https://www.hdmi.org/resource/brand) 1.4 era takes these at 1920x1080, and the 4K 3D televisions of 2015 and 2016 at 3840x2160.
+- **Frame packing**: two full views and an active space in one tall frame (1920x2205 for 1080p24). A television takes it over HDMI® and from its own player; over the network, take it only if the device's profile says so.
 - **2D**: one view, for a device or client that shows no stereo. Choose the left view unless the person chose otherwise.
 - **Anaglyph** only when the person or the profile asks for it, never by default.
 
@@ -88,3 +88,5 @@ Describing a television's frame in the desktop's terms ("two views at their own 
 - **Change one thing at a time.** Before converting anything, test the device with the source as it is, so a later failure can be placed.
 - Example, 2026-10-23, KDL-46EX725: with its own profile and `Output3DFormat = sbs2l` set for the test, the server decided correctly and ran `stereo3d=ab2l:sbs2l`. The 3840x540 MPEG-2 output reached the television as a thin strip in the middle of the screen, without a 3D declaration. Both faults are in the conversion path, which this skill's Converting section now covers.
 - Second example, the same day and television: the MPEG-2 half side-by-side control pair, with and without JP3D, as the Converting section says. Only the clip with the mark switched the television to 3D.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

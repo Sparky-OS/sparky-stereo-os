@@ -84,7 +84,7 @@ And the early contributors the repository names among the group's first ingresso
 
 **What we did NOT invent:**
 - Stereoscopy itself: Charles Wheatstone described binocular vision and the stereoscope in 1838.
-- The packings of a stereo picture: side by side, top and bottom, frame packing, checkerboard, row and column interleaving, frame sequential (ITU-T H.264 and H.265, Annex D; HDMI 1.4).
+- The packings of a stereo picture: side by side, top and bottom, frame packing, checkerboard, row and column interleaving, frame sequential (ITU-T H.264 and H.265, Annex D; [HDMI®](https://www.hdmi.org/resource/brand) 1.4).
 - Anaglyph, and its colour matrices (Eric Dubois, 2001).
 - Quad-buffer OpenGL, EGL multiview windows and Vulkan multiview (Khronos).
 - Stereo photo files: MPO (CIPA DC-007) and JPS (VRex), and the PNG `sTER` chunk.
@@ -93,7 +93,7 @@ And the early contributors the repository names among the group's first ingresso
 - KWin, Plasma, KDE Frameworks, Qt, Debian's packaging, SparkyLinux and its tools.
 
 **What we DID contribute:**
-- **One format inside the desktop:** programs hand KWin full side by side, two complete pictures with each eye at the resolution it has, left eye first, declared once (`kde-stereo-content-v1`, `libstereo-declare`), and KWin's outputs convert it for each screen: a 3D television's HDMI 3D modes, anaglyph, or the left eye on a 2D screen.
+- **One format inside the desktop:** programs hand KWin full side by side, two complete pictures with each eye at the resolution it has, left eye first, declared once (`kde-stereo-content-v1`, `libstereo-declare`), and KWin's outputs convert it for each screen: a 3D television's HDMI® 3D modes, anaglyph, or the left eye on a 2D screen.
 - **The separation rule:** a window's 2D part and its 3D area are separate surfaces, so menus and text stay crisp at one eye's size while the 3D area carries both eyes.
 - **The depth rules for the desktop:** sunk, screen and popped planes, text at its element's depth, effects of a few pixels.
 - **A fix in each program where stereo or deep colour broke**, in that program's own style, listed below with the people who wrote the program.
@@ -311,7 +311,7 @@ The engineer Daniel set out to follow, as his own profile says: "willing to take
 
 For open information and open standards.
 This edition's documents are licensed under Creative Commons, whose technical work he helped build, and written in Markdown, which he helped shape.
-The same fight goes on in display standards: in 2024 the HDMI Forum refused an open-source HDMI 2.1 implementation for Linux.
+The same fight goes on in display standards: in 2024 the HDMI Forum refused an open-source HDMI® 2.1 implementation for Linux.
 
 ### 1.9 Albert Einstein
 
@@ -362,8 +362,8 @@ In October 2026:
 
 ### 2.1 The Linux kernel
 
-**Source**: [kernel.org](https://www.kernel.org/) **License**: GPL-2.0 **What we changed**: amdgpu lists and signals the HDMI 3D modes a display's EDID declares and times frame packing; full side by side handled in the DRM core, i915, nouveau and amdgpu; nouveau gains 16 bits per colour on Turing and newer; a fix for rumble-less gamepads in hid-betopff; VKMS, the virtual display driver, sets HDMI 3D modes and composes and writes back the frame of both eyes, on Louis Chauvet's configfs series.
-**Credit**: Linus Torvalds and the kernel's developers; the DRM maintainers Dave Airlie and Simona Vetter; Damien Lespiau, whose 2013 change let Intel's i915 offer HDMI stereo modes; Alastair Bridgewater, whose 2017 series gave nouveau HDMI 3D output ([0f18d2765ab1](https://github.com/torvalds/linux/commit/0f18d2765ab1)), with Ilia Mirkin's review on the list; the nouveau maintainers Lyude Paul and Danilo Krummrich; Mohamed Ahmed, whose nouveau display series (HDMI deep colour, IMP mode validation, GB20x display) our kernel carries; AMD's display team; Jim Cromie, whose nouveau fix our kernel carries; Zhenhao Wan, whose nouveau `GETPARAM_GRAPH_UNITS` fix our kernel carried with it in October 2026; Tomasz Pakuła, whose EV_BTN input series ([RFC, January 2026](https://lwn.net/Articles/1052809/)) our next kernel will carry; Rodrigo Siqueira and Haneen Mohammed, who created VKMS; Louis Chauvet and José Expósito, whose VKMS configfs work our stereo tests build on; Thomas Wood, for IGT's kms_3d; Adam Jackson and Hans Verkuil, for edid-decode.
+**Source**: [kernel.org](https://www.kernel.org/) **License**: GPL-2.0 **What we changed**: amdgpu lists and signals the HDMI® 3D modes a display's EDID declares and times frame packing; full side by side handled in the DRM core, i915, nouveau and amdgpu; nouveau gains 16 bits per colour on Turing and newer; a fix for rumble-less gamepads in hid-betopff; VKMS, the virtual display driver, sets HDMI® 3D modes and composes and writes back the frame of both eyes, on Louis Chauvet's configfs series.
+**Credit**: Linus Torvalds and the kernel's developers; the DRM maintainers Dave Airlie and Simona Vetter; Damien Lespiau, whose 2013 change let Intel's i915 offer HDMI® stereo modes; Alastair Bridgewater, whose 2017 series gave nouveau HDMI® 3D output ([0f18d2765ab1](https://github.com/torvalds/linux/commit/0f18d2765ab1)), with Ilia Mirkin's review on the list; the nouveau maintainers Lyude Paul and Danilo Krummrich; Mohamed Ahmed, whose nouveau display series (HDMI® deep colour, IMP mode validation, GB20x display) our kernel carries; AMD's display team; Jim Cromie, whose nouveau fix our kernel carries; Zhenhao Wan, whose nouveau `GETPARAM_GRAPH_UNITS` fix our kernel carried with it in October 2026; Tomasz Pakuła, whose EV_BTN input series ([RFC, January 2026](https://lwn.net/Articles/1052809/)) our next kernel will carry; Rodrigo Siqueira and Haneen Mohammed, who created VKMS; Louis Chauvet and José Expósito, whose VKMS configfs work our stereo tests build on; Thomas Wood, for IGT's kms_3d; Adam Jackson and Hans Verkuil, for edid-decode.
 
 ### 2.2 Mesa
 
@@ -373,7 +373,7 @@ The Kopper test series also carries Mike Blumenkrantz's [Present event-selection
 
 ### 2.3 NVIDIA's open GPU kernel modules and egl-wayland
 
-**Source**: [open-gpu-kernel-modules](https://github.com/NVIDIA/open-gpu-kernel-modules), [egl-wayland](https://github.com/NVIDIA/egl-wayland) **License**: MIT and GPL-2.0 (kernel modules); MIT (egl-wayland) **What we changed**: 3D modes built from the display's HDMI stereo block, and HDMI deep colour at the depth the display declares, up to 16 bits; egl-wayland learns the two-view window (NVIDIA's own EGL does not take the second view yet, so programs on NVIDIA's driver get their two views from Mesa over NVIDIA's Vulkan driver).
+**Source**: [open-gpu-kernel-modules](https://github.com/NVIDIA/open-gpu-kernel-modules), [egl-wayland](https://github.com/NVIDIA/egl-wayland) **License**: MIT and GPL-2.0 (kernel modules); MIT (egl-wayland) **What we changed**: 3D modes built from the display's HDMI® stereo block, and HDMI® deep colour at the depth the display declares, up to 16 bits; egl-wayland learns the two-view window (NVIDIA's own EGL does not take the second view yet, so programs on NVIDIA's driver get their two views from Mesa over NVIDIA's Vulkan driver).
 **Credit**: NVIDIA, for opening its kernel modules.
 **GPU vendors' repositories**: the edition lets NVIDIA's CUDA and AMD's ROCm keep updating while the display driver stays ours, with apt's pinning rules ([apt_preferences(5)](https://manpages.debian.org/testing/apt/apt_preferences.5.en.html), by the APT developers).
 NVIDIA's container toolkit, published twice as different builds of the same versions, was reported to NVIDIA in [nvidia-container-toolkit#2137](https://github.com/NVIDIA/nvidia-container-toolkit/issues/2137).
@@ -385,7 +385,7 @@ NVIDIA's container toolkit, published twice as different builds of the same vers
 
 ### 2.5 KWin
 
-**Source**: [plasma/kwin](https://invent.kde.org/plasma/kwin) **License**: GPL-2.0-or-later **What we changed**: per-eye scene passes, stereo windows and subsurfaces, HDMI 3D modes and virtual 3D outputs, and depth on the desktop.
+**Source**: [plasma/kwin](https://invent.kde.org/plasma/kwin) **License**: GPL-2.0-or-later **What we changed**: per-eye scene passes, stereo windows and subsurfaces, HDMI® 3D modes and virtual 3D outputs, and depth on the desktop.
 **Credit**, as KWin names its authors: Matthias Ettrich, Cristian Tibirna, Daniel M. Duley, Luboš Luňák, Martin Flöser (formerly Martin Gräßlin), David Edmundson, Roman Gilg, Vlad Zahorodnii and Xaver Hugl, and every KWin contributor.
 **Effects we are bringing back** (studied in KWin's history; their code returns with its headers and these names): the Resize effect's scaled drawing while a window resizes, by **Thomas Lübking** (2010), for headsets; the old Desktop Cube's cylinder and sphere modes and the C++ Flip Switch, by **Martin Flöser** (then Martin Gräßlin, 2008), for curved virtual monitors and stereo switchers; Present Windows' layouts, by **Rivo Laks** (2007) and **Lucas Murray** (2008), whose flexible grid comes from Komposé 0.5.4 by **Hans Oischinger**, for a headset overview; and Snap Helper, by Lucas Murray (2009), the model for a placement debug overlay.
 Their living successors, which we make stereo: the QML Flip Switch and Cover Switch by **Ismael Asensio**, and the Qt Quick 3D Desktop Cube by **Vlad Zahorodnii**.
@@ -609,7 +609,7 @@ We respect each project's decision.
 Our changes stay in our own trees, ready to go upstream on the day they are wanted.
 
 - **VLC:** our x264 change, [!10366](https://code.videolan.org/videolan/vlc/-/merge_requests/10366), was labelled "AI::Slop" (the same label now reads "AI::Generated") and then "NotCompliant", and most replies were about the tool that helped write its text rather than about the code. Steve Lhomme reviewed the code itself and found real problems, which we fixed the same day, and Jean-Baptiste Kempf, who leads VideoLAN, answered our email personally and kindly. VLC Stereo, the edition's player, carries the change.
-- **nouveau:** Lyude Paul, a nouveau maintainer, read our two HDMI series on dri-devel and [pointed us](https://lore.kernel.org/all/d5a7e1c598ca3bcaa8cd9eabd1c952a9734033c6.camel@redhat.com/) to Mohamed Ahmed's colour work, the right place for it. Our small fix for that branch, [CD=5 in the GCP at 10 bits per colour](https://gitlab.freedesktop.org/mohamexiety/nouveau/-/merge_requests/1), waited fifteen days without an answer, and I decided to comply and close it right after nouveau approved its LLM statement. When nouveau discussed its [community and LLM statement](https://gitlab.freedesktop.org/nouveau/wiki/-/merge_requests/64), Lyude answered our comments with care. The statement's author, Faith Ekstrand, asked for a concrete exception for small fixes; we wrote one, and it was never answered. The statement was merged on 9 October 2026 as first written: code must be "the output of your own human brain, not a computer". Our nouveau changes (16 bits per colour on Turing and newer, full side by side, the CD=5 fix) live in the edition's kernel, and [we told the list](https://lore.kernel.org/all/179156201409.1251903.7021297050250233959@yahoo.com/) we will send them upstream the day nouveau welcomes contributors who use AI, including people who use it to write in a different language.
+- **nouveau:** Lyude Paul, a nouveau maintainer, read our two HDMI® series on dri-devel and [pointed us](https://lore.kernel.org/all/d5a7e1c598ca3bcaa8cd9eabd1c952a9734033c6.camel@redhat.com/) to Mohamed Ahmed's colour work, the right place for it. Our small fix for that branch, [CD=5 in the GCP at 10 bits per colour](https://gitlab.freedesktop.org/mohamexiety/nouveau/-/merge_requests/1), waited fifteen days without an answer, and I decided to comply and close it right after nouveau approved its LLM statement. When nouveau discussed its [community and LLM statement](https://gitlab.freedesktop.org/nouveau/wiki/-/merge_requests/64), Lyude answered our comments with care. The statement's author, Faith Ekstrand, asked for a concrete exception for small fixes; we wrote one, and it was never answered. The statement was merged on 9 October 2026 as first written: code must be "the output of your own human brain, not a computer". Our nouveau changes (16 bits per colour on Turing and newer, full side by side, the CD=5 fix) live in the edition's kernel, and [we told the list](https://lore.kernel.org/all/179156201409.1251903.7021297050250233959@yahoo.com/) we will send them upstream the day nouveau welcomes contributors who use AI, including people who use it to write in a different language.
 
 ---
 
@@ -620,7 +620,7 @@ Our changes stay in our own trees, ready to go upstream on the day they are want
 | H.264 and H.265, Annex D (frame packing SEI, Table D-8 in H.264 V15, 08/2024, D-9 in V16, 06/2026); H.265 Annexes F and G (multiview) | ITU-T and ISO/IEC | The stereo mark inside a video stream |
 | H.274 | ITU-T | Supplemental enhancement information for video |
 | [RFC 9559](https://www.rfc-editor.org/rfc/rfc9559) | IETF; Steve Lhomme, Moritz Bunkus, Dave Rice | Matroska and its `StereoMode` |
-| HDMI 1.4 3D, CTA-861, E-EDID | HDMI Licensing Administrator, Consumer Technology Association, VESA | 3D modes and deep colour on the wire |
+| HDMI® 1.4 3D, CTA-861, E-EDID | HDMI Licensing Administrator, Consumer Technology Association, VESA | 3D modes and deep colour on the wire |
 | OpenGL, EGL, Vulkan | Khronos Group | Quad buffer, multiview windows, multiview rendering |
 | Wayland protocols (subsurfaces, `wp_viewporter`, content type) | freedesktop.org | Surfaces, scaling and content hints |
 | shared-mime-info, the thumbnail specification | freedesktop.org | File types and thumbnails |
@@ -708,7 +708,7 @@ Anything a record could not confirm is left out.
 
 - **Displays**: Sony KDL-46HX855 and KDL-46EX725 (3D televisions from 2011), AOC LE26W154.
 - **Computer**: NVIDIA GeForce RTX 3060 (GALAX), AMD Ryzen 5 5500G with its Vega graphics, ASUS TUF GAMING X570-PLUS/BR.
-- **TV boxes**: a T10 (Allwinner H313/H616) and an MXQ PRO 4K (Rockchip RK3228A), both proven in HDMI 3D on their vendor kernels.
+- **TV boxes**: a T10 (Allwinner H313/H616) and an MXQ PRO 4K (Rockchip RK3228A), both proven in HDMI® 3D on their vendor kernels.
 - **Cameras**: an LG Optimus 3D phone, whose 3D camera's JPS photos are the real-world test set for the photo viewers.
 
 ---
@@ -752,7 +752,7 @@ Sou autista, **com orgulho**, e esta edição também é sua.
 
 This repository's documents are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), and its scripts under GPL-2.0-or-later (see [LICENSE](LICENSE) and [LICENSE-GPL-2.0](LICENSE-GPL-2.0)).
 Every package in the edition keeps its upstream licence, as listed above and in each package's copyright file.
-Names of products and companies (HDMI, IMAX, NVIDIA, Sony and others) belong to their owners and are used only to say what is credited.
+Names of products and companies (HDMI®, IMAX, NVIDIA, Sony and others) belong to their owners and are used only to say what is credited.
 
 ---
 
@@ -858,3 +858,5 @@ This is a source and emulation study, not a claim that those projects ship a fin
 
 The **ZXing authors** provide the bundled QR decoder under Apache-2.0, as recorded in [ZXing core's source](https://github.com/zxing/zxing/blob/zxing-3.5.4/core/src/main/java/com/google/zxing/qrcode/QRCodeReader.java).
 The camera integration and lens-profile pipeline build on **Google LLC and the Cardboard contributors**, and on **Fabian Druschke and the KDE Connect developers** for the Android receiver.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

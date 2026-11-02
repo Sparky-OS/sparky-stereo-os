@@ -88,7 +88,7 @@ Use óculos de lentes vermelha e ciano para ver o desktop em 3D no monitor comum
 ![Desktop em 3D anaglífico vermelho e ciano](images/beta1/anaglyph-desktop.jpg)
 
 Com “Other stereo formats” ligado, a lista “Taxa de atualização” mostra formatos como lado a lado, cima e baixo, linhas, colunas, checkerboard e frame sequential.
-Se a sua TV 3D anunciar modos HDMI 3D, eles também aparecem nessa lista.
+Se a sua TV 3D anunciar modos [HDMI®](https://www.hdmi.org/resource/brand) 3D, eles também aparecem nessa lista.
 Esses modos nunca são escolhidos automaticamente; ao selecionar um, a própria TV muda para 3D.
 Depois de cada alteração, aparece “Manter a configuração da tela?” e a configuração volta sozinha em 10 segundos se você não a confirmar.
 
@@ -120,3 +120,5 @@ Os menus do GRUB ainda mostram a imagem azul do átomo do SparkyLinux.
 As Configurações Rápidas ainda oferecem Breeze e Breeze Dark, e a Central de Boas-vindas do KDE abre junto com o Sparky Welcome no primeiro acesso.
 O repositório próprio da edição ainda não está online, então o apt avisa que essa fonte está inacessível, enquanto as atualizações do Debian, do SparkyLinux e do deb-multimedia funcionam.
 O pendrive ao vivo é mais lento do que o sistema instalado.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

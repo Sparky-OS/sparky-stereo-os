@@ -94,7 +94,7 @@ Chaque programme en détail : [Programmes](#programs-the-edition-changes-for-ste
 ## Regarder et jouer
 
 **Des films, des photos et des jeux 3D s'affichent en 3D dans leur propre fenêtre ou plein écran, et le reste du bureau reste tel quel.**
-- **Écrans :** un téléviseur 3D, un moniteur ou un projecteur, y compris les ensembles HDMI 3D de 2010 à 2013, ou n'importe quel écran ordinaire avec des lunettes rouge-cyan ; chaque écran peut afficher un genre de 3D différent en même temps, et les écrans 3D sans lunettes sont en cours avec l'équipe DisplayXR.
+- **Écrans :** un téléviseur 3D, un moniteur ou un projecteur, y compris les ensembles [HDMI®](https://www.hdmi.org/resource/brand) 3D de 2010 à 2013, ou n'importe quel écran ordinaire avec des lunettes rouge-cyan ; chaque écran peut afficher un genre de 3D différent en même temps, et les écrans 3D sans lunettes sont en cours avec l'équipe DisplayXR.
 - **Films :** les vidéos 3D se lisent en 3D dans Haruna, VLC, mpv, Bino, PlasmaTube et d'autres.
 - **Photos :** Gwenview, digiKam et KolourPaint montrent des photos 3D (MPO, JPS et PNG stéréo) en 3D.
 - **Jeux :** DOOM (2016) dans une fenêtre et Half-Life 2, tous deux via un mode VR ([la formule](docs/formula.md)).
@@ -231,3 +231,5 @@ Les documents sont sous licence [Creative Commons Attribution 4.0 International]
 > — Aaron Swartz, [*Guerilla Open Access Manifesto*](https://archive.org/details/GuerillaOpenAccessManifesto) (juillet 2008)
 
 Les scripts sous `docs/first-runs/` et les outils sous `tools/` sont du code et sont sous licence GNU General Public License, version 2 ou suivante (GPL-2.0-or-later) ; voir [LICENSE-GPL-2.0](LICENSE-GPL-2.0).
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

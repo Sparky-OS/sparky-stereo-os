@@ -98,7 +98,7 @@ Cada programa em detalhe: [Programas](#programs-the-edition-changes-for-stereo-3
 ## Assistir e jogar
 
 **Filmes, fotos e jogos 3D aparecem em 3D na própria janela ou em tela cheia, e o restante da área de trabalho fica como está.**
-- **Telas:** uma TV, monitor ou projetor 3D, incluindo os aparelhos HDMI 3D de 2010 a 2013, ou qualquer monitor comum com óculos vermelho e ciano; cada tela pode mostrar um tipo diferente de 3D ao mesmo tempo, e monitores 3D sem óculos estão em desenvolvimento com a equipe DisplayXR.
+- **Telas:** uma TV, monitor ou projetor 3D, incluindo os aparelhos [HDMI®](https://www.hdmi.org/resource/brand) 3D de 2010 a 2013, ou qualquer monitor comum com óculos vermelho e ciano; cada tela pode mostrar um tipo diferente de 3D ao mesmo tempo, e monitores 3D sem óculos estão em desenvolvimento com a equipe DisplayXR.
 - **Filmes:** vídeos 3D são reproduzidos em 3D no Haruna, VLC, mpv, Bino, PlasmaTube e outros.
 - **Fotos:** Gwenview, digiKam e KolourPaint mostram fotos 3D (MPO, JPS e PNG estéreo) em 3D.
 - **Jogos:** DOOM (2016) numa janela e Half-Life 2, ambos por um modo VR ([a fórmula](docs/formula.md)).
@@ -247,3 +247,5 @@ Os documentos estão sob a [licença Creative Commons Atribuição 4.0 Internaci
 > — Aaron Swartz, [*Guerilla Open Access Manifesto*](https://archive.org/details/GuerillaOpenAccessManifesto) (julho de 2008)
 
 Os scripts em `docs/first-runs/` e as ferramentas em `tools/` são código e estão sob a GNU General Public License, versão 2 ou posterior (GPL-2.0-or-later); veja [LICENSE-GPL-2.0](LICENSE-GPL-2.0).
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

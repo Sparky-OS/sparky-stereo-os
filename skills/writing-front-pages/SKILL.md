@@ -84,8 +84,8 @@ Before moving a heading, find who links to it: talk slides, forum posts, other l
 - A cold reader went from "download the ISO and test it in a virtual machine" to "Since there is nothing to download, I would click the sign-up link for my language".
 
 **Jargon one click down** (a developer link):
-- Before: "a kernel whose VKMS speaks HDMI 3D, a 3D EDID, and the bench, IGT and KWin".
-- After: "a virtual display that speaks HDMI 3D, step by step, for driver, compositor and program developers".
+- Before: "a kernel whose VKMS speaks [HDMI®](https://www.hdmi.org/resource/brand) 3D, a 3D EDID, and the bench, IGT and KWin".
+- After: "a virtual display that speaks HDMI® 3D, step by step, for driver, compositor and program developers".
 - VKMS, EDID and IGT stay on the guide's page, where developers meet them in order.
 
 **Name the number** (the Create door):
@@ -101,3 +101,5 @@ A self-review is not an independent reader test. Do not fabricate reader respons
 Offer native-language drafting when helpful, following [ai-partners](../ai-partners/SKILL.md#language-and-accessibility), then retain meaning and uncertainty in the venue's language.
 A relevant outreach contact can illustrate a use case before replying; it cannot appear as an adopter, collaborator or endorsement without evidence.
 Keep precise implementation/proposal labels for the Theme Editor, toolkit depth, HDR and new device integrations.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

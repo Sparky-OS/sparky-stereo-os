@@ -36,7 +36,7 @@ The standard marks, each linked from awesome-stereoscopy's [standards page](http
 - **The television's own player** (a DLNA server, a USB stick, casting) decodes the file itself, with the codecs of its generation: the Sony KDL-46HX855 and KDL-46EX725 of the edition's tests decode only H.264 there.
   The SEI or JP3D mark is what switches the television into 3D, and a server that feeds it follows the device's profile ([stereo-serving](../stereo-serving/SKILL.md)).
 - **The stereo desktop:** the PC decodes the file, in any codec.
-  The player reads the stream's mark, declares the video to Stereo KWin, and KWin drives the television in an HDMI 3D mode.
+  The player reads the stream's mark, declares the video to Stereo KWin, and KWin drives the television in an [HDMI®](https://www.hdmi.org/resource/brand) 3D mode.
   An HEVC file's SEI matters here exactly as much as an H.264 file's: it is how the desktop learns the video is stereo.
 - A hardware test of anything the desktop decodes goes through the second path: an HEVC file made with x265's `--frame-packing`, played on the stereo desktop, shown in 3D on the television.
   A limit of the television's player is never a limit of the desktop path, and is not a reason to test indirectly.
@@ -111,3 +111,5 @@ These narrower topics have their own references:
 - [Android's media path](references/android-media-path.md) (checked 2026-10-07): Media3's `Format.stereoMode`, the MP4 frame packing SEI work in review, and no portable MediaCodec stereo side data.
 - [Screen-content codec comparisons](references/screen-content-codecs.md) (checked 2026-10-14): matched text quality, the controls, and x265 SCC that silently falls back to Main profile.
 - [Editing, playback and transport boundaries](references/editing-playback-transport.md) (2026-10-19): a reusable editing regression project, the per-file eye swap, and a slow phone stream measured stage by stage.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

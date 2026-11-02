@@ -1,16 +1,16 @@
 # Test stereo without a 3D TV
 
 A step-by-step guide for driver, compositor and program developers.
-It shows how to test HDMI 3D modes, from the kernel's mode list to the frame a compositor sends to the display, on any Linux computer, without a 3D display.
+It shows how to test [HDMI®](https://www.hdmi.org/resource/brand) 3D modes, from the kernel's mode list to the frame a compositor sends to the display, on any Linux computer, without a 3D display.
 The tool is [vkms-stereo-bench](../tools/vkms-stereo-bench/README.md); this guide walks through it and says what each test proves and how it fails when support is missing.
 
 ## The idea
 
 A 3D television says what it accepts in its EDID.
-Its HDMI Vendor-Specific Data Block (HDMI 1.4b) says "3D present" and lists the 3D structures, such as frame packing, top-and-bottom and side by side, for the video formats of CTA-861.
+Its HDMI® Vendor-Specific Data Block (HDMI® 1.4b) says "3D present" and lists the 3D structures, such as frame packing, top-and-bottom and side by side, for the video formats of CTA-861.
 The kernel turns that into 3D modes; a compositor sets one and sends the display one frame that holds both eyes.
-How the eyes sit in that frame is fixed by HDMI 1.4b: in frame packing, the left eye, then as many lines as the vertical blanking (the "active space"), then the right eye; in top-and-bottom and side by side (half), each eye in one half of an ordinary frame; in side by side (full), the two eyes next to each other at full width.
-The timings are laid out in awesome-stereoscopy's [frame packing and HDMI timings](https://github.com/danielcamposramos/awesome-stereoscopy/blob/main/docs/frame-packing-and-hdmi-timings.md).
+How the eyes sit in that frame is fixed by HDMI® 1.4b: in frame packing, the left eye, then as many lines as the vertical blanking (the "active space"), then the right eye; in top-and-bottom and side by side (half), each eye in one half of an ordinary frame; in side by side (full), the two eyes next to each other at full width.
+The timings are laid out in awesome-stereoscopy's [frame packing and HDMI® timings](https://github.com/danielcamposramos/awesome-stereoscopy/blob/main/docs/frame-packing-and-hdmi-timings.md).
 
 VKMS, the kernel's virtual display driver ([Documentation/gpu/vkms.rst](https://docs.kernel.org/gpu/vkms.html)), does what a display driver does except drive a cable, and its writeback connector returns the frame it composed.
 Give a VKMS connector the EDID of a 3D display, and the whole path runs in a virtual machine: the kernel lists the 3D modes, a test or a compositor sets one, and the writeback frame shows where each eye landed.
@@ -23,7 +23,7 @@ On a desktop, the running compositor takes a virtual display as one more screen.
 | Test | What it proves | How it fails without the support |
 |---|---|---|
 | KUnit `vkms-stereo` | The connector lists exactly the 3D modes the EDID declares, and the writeback connector takes a buffer of the frame that holds both eyes, for a 2D mode, frame packing, top-and-bottom and side by side (half). | Without `stereo_allowed`, all 14 stereo formats of the test EDID are "not listed". Without the composer change, frame packing fails both size checks: the frame-sized buffer is refused, the one-eye buffer is accepted. |
-| `writeback` phase | For every stereo mode a synthetic EDID and a real television's EDID give: the left eye, the right eye and the frame packing active space land where HDMI 1.4b puts them, pixel by pixel, also with one plane per eye; a 2D mode stays 2D; frame packing keeps the 2D refresh rate. | Without `stereo_allowed`, the mode lists are empty. Without the composer change, every frame packing commit is refused. |
+| `writeback` phase | For every stereo mode a synthetic EDID and a real television's EDID give: the left eye, the right eye and the frame packing active space land where HDMI® 1.4b puts them, pixel by pixel, also with one plane per eye; a 2D mode stays 2D; frame packing keeps the 2D refresh rate. | Without `stereo_allowed`, the mode lists are empty. Without the composer change, every frame packing commit is refused. |
 | IGT `kms_3d` | The driver lists the 3D modes of IGT's own 3D EDID and sets each one with a stereo framebuffer. | "3D modes not detected". On v5 as posted, without the PATH fix, an assertion in `kmstest_get_path_blob()`. |
 | `kwin` phase | Stereo KWin lists the 3D modes, sets each one, and draws a 2D window the same in both eyes and a stereo window's left view only in the left eye and its right view only in the right eye. | No 3D mode is listed. |
 
@@ -75,7 +75,7 @@ A program sees the 3D modes only after it sets the `DRM_CLIENT_CAP_STEREO_3D` cl
 Write the EDID and set `edid_enabled` before enabling the device, and leave both alone afterwards.
 With v5, an EDID rewritten while the connector is probed is read while it changes (KASAN reports an out-of-bounds read in `vkms_connector_read_block()`); `edid_enabled` turned on later gives a Virtual connector no EDID modes, and turned off later it leaves the old EDID on the connector.
 
-The bench's test EDID ([edid/make-edid.py](../tools/vkms-stereo-bench/edid/make-edid.py), `edid-decode --check` passes) declares 3D present, which brings HDMI 1.4b's mandatory 3D formats of the video formats it lists (1080p24, 720p60 and 720p50 in frame packing and top-and-bottom), side by side (half) for its six video formats, top-and-bottom for 1080p60 and frame packing for 1080p30.
+The bench's test EDID ([edid/make-edid.py](../tools/vkms-stereo-bench/edid/make-edid.py), `edid-decode --check` passes) declares 3D present, which brings HDMI® 1.4b's mandatory 3D formats of the video formats it lists (1080p24, 720p60 and 720p50 in frame packing and top-and-bottom), side by side (half) for its six video formats, top-and-bottom for 1080p60 and frame packing for 1080p30.
 The second EDID is a Sony KDL-46HX855's, a 3D television of 2012, which brings 17 stereo formats on a connector without interlace.
 
 ## Step 3: run the bench
@@ -132,16 +132,16 @@ On the kernel without the patches, the bench reported exactly the failures in th
 
 ## Limits
 
-- VKMS has no cable, so the HDMI vendor InfoFrame that tells a television which 3D structure it receives is not checked; that stays a test on real hardware.
+- VKMS has no cable, so the HDMI® vendor InfoFrame that tells a television which 3D structure it receives is not checked; that stays a test on real hardware.
 - VKMS does not allow interlaced modes, so the mandatory 1080i side by side (half) formats are not listed.
-- The DRM core lists four of the 3D structures of HDMI 1.4b from an EDID: frame packing, top-and-bottom, side by side (half), and side by side (full) only with a core change that mainline does not have yet (`--sbs-full` tests it). Field alternative, line alternative and the two L + depth structures are listed by no driver.
+- The DRM core lists four of the 3D structures of HDMI® 1.4b from an EDID: frame packing, top-and-bottom, side by side (half), and side by side (full) only with a core change that mainline does not have yet (`--sbs-full` tests it). Field alternative, line alternative and the two L + depth structures are listed by no driver.
 - The compositor phase reads KWin's frame, not VKMS's writeback, because KWin owns the display; with KWin's cursor plane off in 3D modes, the two hold the same pixels.
 - A real 3D television is still the last test.
 
 ## Sources
 
-- HDMI Specification 1.4b: the HDMI Vendor-Specific Data Block and the 3D video format structures. CTA-861: the video formats (VICs).
-- Kernel: [VKMS](https://docs.kernel.org/gpu/vkms.html), [KUnit](https://docs.kernel.org/dev-tools/kunit/index.html), and in the source, `drm_mode_set_crtcinfo()` and `drm_mode_get_hv_timing()` in `drivers/gpu/drm/drm_modes.c`, the HDMI block parser in `drivers/gpu/drm/drm_edid.c`, the stereo filter in `drivers/gpu/drm/drm_probe_helper.c`.
+- HDMI Specification 1.4b: the HDMI® Vendor-Specific Data Block and the 3D video format structures. CTA-861: the video formats (VICs).
+- Kernel: [VKMS](https://docs.kernel.org/gpu/vkms.html), [KUnit](https://docs.kernel.org/dev-tools/kunit/index.html), and in the source, `drm_mode_set_crtcinfo()` and `drm_mode_get_hv_timing()` in `drivers/gpu/drm/drm_modes.c`, the HDMI® block parser in `drivers/gpu/drm/drm_edid.c`, the stereo filter in `drivers/gpu/drm/drm_probe_helper.c`.
 - [IGT GPU Tools](https://gitlab.freedesktop.org/drm/igt-gpu-tools) (`tests/kms_3d.c`), [edid-decode](https://git.linuxtv.org/v4l-utils.git/tree/utils/edid-decode) (in v4l-utils), [QEMU](https://www.qemu.org/).
 
 ## Credit
@@ -150,3 +150,5 @@ VKMS was written by Rodrigo Siqueira and Haneen Mohammed, and is maintained by L
 José Expósito wrote VKMS's configfs interface, and Louis Chauvet's v5 series adds the connector type and EDID attributes this bench stands on.
 IGT's `kms_3d` was written by Thomas Wood (Intel) in 2014. edid-decode was written by Adam Jackson (Red Hat) and is maintained by Hans Verkuil (Cisco).
 The bench and the stereo patches are by Daniel Ramos, directed and verified, with Claude (Anthropic) as an AI partner.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

@@ -80,10 +80,10 @@ For each output, each frame, each layer:
 4. **Gamut map** to the output's primaries (EDID colorimetry; BT.2020 or BT.709).
 5. **Tone map** to the output's range:
    - HDR output: PQ up to the output's maximum luminance (EDID HDR static metadata, CTA-861); SDR windows at reference white (ITU-R BT.2408, 203 cd/m²) or the user's brightness.
-   - **SDR deep-colour output (the 2010-2013 3D TVs, 12 bits per channel):** HDR content tone-mapped into SDR and encoded at the output's declared depth (HDMI deep colour 30/36/48-bit, DC_30/DC_36/DC_48), so the gradients keep the source's steps instead of banding. This is "HDR to 12-bit": a property of the output, never of the program.
+   - **SDR deep-colour output (the 2010-2013 3D TVs, 12 bits per channel):** HDR content tone-mapped into SDR and encoded at the output's declared depth ([HDMI®](https://www.hdmi.org/resource/brand) deep colour 30/36/48-bit, DC_30/DC_36/DC_48), so the gradients keep the source's steps instead of banding. This is "HDR to 12-bit": a property of the output, never of the program.
    - 8-bit output: the same, dithered.
 6. **Encode** at the output's bit depth from a working representation with measured, adequate precision. Floating-point composition, including half float, is a candidate; it does not by itself prove lossless conversion. Working colour space, precision and handling of luminance and gamut must be evaluated before choosing it.
-7. **Signal the screen**: HDMI General Control Packet colour depth; on HDR outputs the Dynamic Range and Mastering InfoFrame (CTA-861) describing the composited output, not any one layer.
+7. **Signal the screen**: HDMI® General Control Packet colour depth; on HDR outputs the Dynamic Range and Mastering InfoFrame (CTA-861) describing the composited output, not any one layer.
 
 ## 7. Compatibility (nothing removed)
 
@@ -115,3 +115,5 @@ Before settling the HDR representation, compare PQ, HLG and gain-map reference i
 3. KWin: the layer state and the per-output gain-map weight in the colour pipeline.
 4. libstereo-layer and the frameworks (Qt Multimedia, MpvQt) declare from the stream and file.
 5. Proof: LEFT and RIGHT captures per output, with known test patterns (a PQ ramp, a gain-map pair with different maps per eye) and their measured values on the HDR and the 12-bit outputs.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

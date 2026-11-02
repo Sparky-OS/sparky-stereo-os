@@ -91,7 +91,7 @@ Daniel 和 Milton Ponson 共同主持 W3C [Procedural Memory Knowledge Represent
 ## 观看和游玩
 
 **3D 电影、照片和游戏可以在自己的窗口或全屏中显示，桌面的其余部分保持不变。**
-- **屏幕：**3D 电视、显示器或投影仪，包括 2010 到 2013 年的 HDMI 3D 套件，或者任何普通显示器配红青眼镜；每块屏幕可以同时显示不同类型的 3D，裸眼 3D 显示器正在与 DisplayXR 团队一起推进。
+- **屏幕：**3D 电视、显示器或投影仪，包括 2010 到 2013 年的 [HDMI®](https://www.hdmi.org/resource/brand) 3D 套件，或者任何普通显示器配红青眼镜；每块屏幕可以同时显示不同类型的 3D，裸眼 3D 显示器正在与 DisplayXR 团队一起推进。
 - **电影：**3D 视频可以在 Haruna、VLC、mpv、Bino、PlasmaTube 等播放器中以 3D 播放。
 - **照片：**Gwenview、digiKam 和 KolourPaint 以 3D 显示 3D 照片（MPO、JPS 和立体 PNG）。
 - **游戏：**窗口中的 DOOM (2016) 和 Half-Life 2，都通过 VR 模式（[公式](docs/formula.md)）。
@@ -228,3 +228,5 @@ Sparky Stereo OS，Daniel Ramos（Capitain Jack）的 SparkyLinux 发行版（Sp
 > — Aaron Swartz，[*Guerilla Open Access Manifesto*](https://archive.org/details/GuerillaOpenAccessManifesto)（2008 年 7 月）
 
 `docs/first-runs/` 下的脚本和 `tools/` 下的工具是代码，采用 GNU General Public License, version 2 or later（GPL-2.0-or-later）许可；见[LICENSE-GPL-2.0](LICENSE-GPL-2.0)。
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

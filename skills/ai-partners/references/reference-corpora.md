@@ -25,9 +25,9 @@ The versions are the ones indexed for the edition on 2026-11-01; take the curren
 | Document | Publisher | Version | Licence | URL |
 | --- | --- | --- | --- | --- |
 | `Documentation/gpu` and the DRM parts of `Documentation/userspace-api` | Linux kernel developers | 7.3 | per file (GPL-2.0-only, MIT or dual) | https://docs.kernel.org/gpu/ |
-| `include/uapi/drm`, `include/linux/hdmi.h`, and the kernel-doc of `drivers/gpu/drm` (`drm_edid.c` parses the EDID's HDMI and CTA blocks) | Linux kernel developers | 7.3, from the kernel.org tarball with its signature checked | per file (SPDX line) | https://www.kernel.org/ |
+| `include/uapi/drm`, `include/linux/hdmi.h`, and the kernel-doc of `drivers/gpu/drm` (`drm_edid.c` parses the EDID's [HDMI®](https://www.hdmi.org/resource/brand) and CTA blocks) | Linux kernel developers | 7.3, from the kernel.org tarball with its signature checked | per file (SPDX line) | https://www.kernel.org/ |
 
-The HDMI specification, CTA-861 and VESA E-EDID are not in this list: index them only if their publisher offers them without an account.
+The HDMI® specification, CTA-861 and VESA E-EDID are not in this list: index them only if their publisher offers them without an account.
 Until then the kernel's implementation above is the public text to cite, with the specification's own clause named where the code names it.
 
 ### Video, containers and their stereo marks
@@ -111,3 +111,5 @@ A hit without `source_url` can be read but not checked; the edition's older coll
 **Golden queries:** keep ten questions per collection, each with the `source_doc` that must come back in the top three, and run them after every ingest; a rebuild that loses one has lost a document.
 
 **Gaps measured on 2026-11-01:** a query for H.264's frame packing SEI returned the AV1 specification, because the edition's video collection holds neither ITU-T H.264 nor H.265; and its Qt collection holds Qt 6.6.3, five minor versions behind the Qt the edition builds.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

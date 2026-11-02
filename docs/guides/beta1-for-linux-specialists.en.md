@@ -70,7 +70,7 @@ In beta 1 all 49,256 rows say `no`, so no file is projected yet.
 The display path uses the kernel, Mesa, KWin, Xwayland, Qt and FFmpeg as one contract: programs hand the compositor full side by side, left eye first, and KWin converts that image for each output.
 The package versions below are the versions recorded in the beta 1 image package list.
 
-- Kernel: `linux-image-7.3.0-rc6-stereo3d8` (package version `7.3.0~rc6-8`) is the edition's signed kernel, with the edition's patches for HDMI 3D modes.
+- Kernel: `linux-image-7.3.0-rc6-stereo3d8` (package version `7.3.0~rc6-8`) is the edition's signed kernel, with the edition's patches for [HDMI®](https://www.hdmi.org/resource/brand) 3D modes.
 - Mesa: `26.1.6-1+stereo3d13` packs quad-buffer OpenGL and two-layer Vulkan output into full side by side and declares it for the compositor.
 - KWin: `4:6.7.4-2+stereo3d26` consumes full side by side and applies the selected output format per screen.
 - Xwayland: `2:24.1.13-1+stereo3d2` is the edition's build for stereo X11 windows on the Wayland desktop.
@@ -100,3 +100,5 @@ The installer slides are in English even when the installer is set to German or 
 The GRUB menus still show SparkyLinux's blue atom, Quick Settings still offers Breeze and Breeze Dark, and KDE's Welcome Center opens beside Sparky Welcome at first login.
 The edition's own package repository is not online yet, so APT reports that source as unreachable while Debian, SparkyLinux and deb-multimedia updates work.
 A live USB is slower than an installed system.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

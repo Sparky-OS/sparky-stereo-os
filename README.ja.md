@@ -129,7 +129,7 @@ W3Cアカウントがあれば無料でグループに参加できます。
 ## 鑑賞とゲーム
 
 **3Dの映画、写真、ゲームは、それぞれのウィンドウ内や全画面で3D表示され、デスクトップのほかの部分はそのままです。**
-- **画面：** 2010年から2013年のHDMI 3D機器を含む3Dテレビ、モニター、プロジェクターのほか、赤・シアンの眼鏡を使えば普通のモニターにも対応します。
+- **画面：** 2010年から2013年の[HDMI®](https://www.hdmi.org/resource/brand) 3D機器を含む3Dテレビ、モニター、プロジェクターのほか、赤・シアンの眼鏡を使えば普通のモニターにも対応します。
   各画面で同時に異なる方式の3Dを表示でき、DisplayXRチームと裸眼3Dモニターへの対応も進めています。
 - **映画：** Haruna、VLC、mpv、Bino、PlasmaTubeなどで3D動画を3D再生できます。
 - **写真：** Gwenview、digiKam、KolourPaintは、3D写真（MPO、JPS、ステレオPNG）を3D表示します。
@@ -341,3 +341,5 @@ Sparky Stereo OSのクレジットを表示すれば、共有や改変ができ�
 
 `docs/first-runs/`のスクリプトと`tools/`のツールはコードで、GNU General Public License, version 2 or later（GPL-2.0-or-later）で提供します。
 [LICENSE-GPL-2.0](LICENSE-GPL-2.0)をご覧ください。
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

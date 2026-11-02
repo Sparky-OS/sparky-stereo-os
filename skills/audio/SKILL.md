@@ -37,7 +37,7 @@ Conversions happen at the edges only: the decoder on the way in, the device's fo
 
 ## Formats, rates and passthrough
 
-- Each device reports what it takes (ALSA through PipeWire); an HDMI sink's EDID lists the LPCM rates and depths and the encoded formats the TV accepts (CTA-861 audio data blocks).
+- Each device reports what it takes (ALSA through PipeWire); an [HDMI®](https://www.hdmi.org/resource/brand) sink's EDID lists the LPCM rates and depths and the encoded formats the TV accepts (CTA-861 audio data blocks).
 - **Being built:** KDE pages that show these, pre-select "Automatic (best this device supports)", and pre-fill the passthrough codecs (AC-3, E-AC-3, DTS, TrueHD, DTS-HD) from the EDID instead of asking the user.
 - Name features by what they do: "matrix surround, compatible with Dolby Surround and Pro Logic II content", never "Dolby" (a trademark). Ship only openly licensed head-response sets (MIT KEMAR first); users may import their own.
 
@@ -49,4 +49,6 @@ Munt (MT-32), libADLMIDI and libOPNMIDI (FM synthesis) and DOSBox Staging are no
 
 ## Standards
 
-AES5 (preferred sampling frequencies; 48 kHz for professional use); the CD Red Book (44.1 kHz, 16 bit); IEC 60958 and IEC 61937 (PCM and encoded audio over S/PDIF and HDMI); CTA-861 (audio data blocks in the EDID); ITU-R BS.775 (multichannel speaker layouts); AES69 (SOFA files for head-related transfer functions).
+AES5 (preferred sampling frequencies; 48 kHz for professional use); the CD Red Book (44.1 kHz, 16 bit); IEC 60958 and IEC 61937 (PCM and encoded audio over S/PDIF and HDMI®); CTA-861 (audio data blocks in the EDID); ITU-R BS.775 (multichannel speaker layouts); AES69 (SOFA files for head-related transfer functions).
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

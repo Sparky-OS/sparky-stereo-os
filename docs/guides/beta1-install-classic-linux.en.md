@@ -306,7 +306,7 @@ Rows, columns and checkerboard come in both eye orders, "left eye first" and "ri
 
 ![Other stereo formats in the Refresh rate list](images/beta1/other-formats-under-refresh-rate.jpg)
 
-A display that announces its own HDMI 3D modes (frame packing, side by side, top and bottom) gets them in the Refresh rate list too, labelled "3D frame packing" and so on.
+A display that announces its own [HDMI®](https://www.hdmi.org/resource/brand) 3D modes (frame packing, side by side, top and bottom) gets them in the Refresh rate list too, labelled "3D frame packing" and so on.
 They are never chosen automatically; choosing one switches the display to 3D by itself.
 The virtual machines of the tests have no such display, so these entries are not in the screenshots.
 
@@ -495,3 +495,5 @@ sudo cp /root/.cache/calamares/session.log ~/installer.log
 and save it to another stick.
 
 A photo of the screen helps for anything that happens before the desktop: the firmware, the stick's menu, MokManager.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

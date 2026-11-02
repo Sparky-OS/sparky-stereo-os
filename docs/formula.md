@@ -19,7 +19,7 @@ This formula is for games that already have a VR mode.
 - **Projection.** Each eye gets an off-axis frustum: the two frustums share one window at the convergence distance (zero parallax, the screen plane), and each eye sits half the separation to its side. A headset's projection is symmetric per eye and centred on its lens; a display needs the shared window, or everything floats in front of the screen.
 - **Field of view** comes from the game (its 2D setting), widened to the displayed aspect the way the game does it for widescreen, not from a lens.
 - **Defaults that looked right on a 46-inch set:** separation 2.5 game units (about 64 mm in Source), screen plane at 120 units.
-- **Packing:** each eye into its half of the frame (left eye first, as HDMI 1.4 packs it), the display told by its own 3D mode or by the signal.
+- **Packing:** each eye into its half of the frame (left eye first, as [HDMI®](https://www.hdmi.org/resource/brand) 1.4 packs it), the display told by its own 3D mode or by the signal.
 
 ## 2. The view: the game drives it, not a head
 
@@ -63,3 +63,5 @@ This formula is for games that already have a VR mode.
 
 Shadows, lighting, level transitions, saves and loads needed nothing: the engine renders each eye itself, so everything it renders is right in both.
 That is the advantage of a VR engine over a stereo proxy, and why this formula starts from one.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

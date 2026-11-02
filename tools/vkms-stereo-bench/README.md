@@ -1,6 +1,6 @@
 # vkms-stereo-bench
 
-A test bench for HDMI 3D (stereo) modes that needs no 3D display.
+A test bench for [HDMI®](https://www.hdmi.org/resource/brand) 3D (stereo) modes that needs no 3D display.
 It boots a Linux kernel in QEMU whose VKMS, the kernel's virtual display driver, lists and composes stereo modes.
 VKMS connectors get an EDID through configfs, so their 3D modes come through the kernel's normal EDID path, exactly as a 3D television's would.
 The bench then checks each eye of each mode, from the kernel's unit tests up to a desktop compositor.
@@ -10,7 +10,7 @@ The step-by-step guide is [Test stereo without a 3D TV](../../docs/test-stereo-w
 It answers questions such as:
 
 - Does this kernel list the 3D modes an EDID declares, and only those?
-- In each 3D mode, does each eye land where the HDMI 1.4b frame packing, top-and-bottom or side by side layout puts it?
+- In each 3D mode, does each eye land where the HDMI® 1.4b frame packing, top-and-bottom or side by side layout puts it?
 - Does a 2D mode stay 2D?
 - Does IGT's `kms_3d` pass?
 - Does a compositor (Stereo KWin) list the 3D modes, set them, and draw a stereo window's left view only in the left eye and its right view only in the right eye?
@@ -38,7 +38,7 @@ The [patches/](patches/) folder goes on top of it:
 | 0003 | VKMS connectors allow stereo modes (`stereo_allowed`) |
 | 0004 | KUnit tests: the stereo modes an EDID declares, and the writeback buffer size of each layout |
 | 0005 | Attaches the PATH property only to connectors that have a parent: with v5 as posted every VKMS connector has an empty PATH, and IGT fails in `kmstest_get_path_blob()` on every VKMS device, `kms_3d` and every test built on `igt_display` (`kms_atomic` measured) alike (proposed to the author as a fix for v5 37/38) |
-| 0006 | Attaches the edition's two HDMI 3D connector properties, "side by side full timing" and "HDMI 3D metadata", to VKMS's HDMI-A connectors, so the kwin phase can check that the compositor sets them (needs the edition's HDMI 3D patches; bench tree only) |
+| 0006 | Attaches the edition's two HDMI® 3D connector properties, "side by side full timing" and "HDMI 3D metadata", to VKMS's HDMI-A connectors, so the kwin phase can check that the compositor sets them (needs the edition's HDMI® 3D patches; bench tree only) |
 
 ```sh
 # in a clone of the mainline kernel: the base commit is in v7.3-rc1
@@ -48,7 +48,7 @@ git am /path/to/vkms-stereo-bench/patches/*.patch
 ```
 
 Side by side (full) is timed by the DRM core only with a core change that mainline does not have; `--sbs-full` adds a device whose EDID declares it, for kernels that carry that change.
-Line alternative, L + depth and L + depth + graphics + graphics-depth are listed and timed only by kernels with the edition's HDMI 3D patches ([Sparky-OS/linux](https://github.com/Sparky-OS/linux)); `--depth` adds a device whose EDID declares every HDMI 1.4a 3D structure (`edid/stereo-whole.bin`, made by `edid/make-edid.py --whole-spec`), for kernels that carry it.
+Line alternative, L + depth and L + depth + graphics + graphics-depth are listed and timed only by kernels with the edition's HDMI® 3D patches ([Sparky-OS/linux](https://github.com/Sparky-OS/linux)); `--depth` adds a device whose EDID declares every HDMI® 1.4a 3D structure (`edid/stereo-whole.bin`, made by `edid/make-edid.py --whole-spec`), for kernels that carry it.
 
 ## Quick start
 
@@ -77,10 +77,10 @@ Every run keeps its console log, its results and its pictures under `bench-work/
 | `depthcam` | `depth-cam-test` on vivid, the virtual video driver (a kernel built with `kconfig/vivid-depth.fragment` too): the depth formats of a RealSense camera, `Z16`, `INZI` and `CNF4`, are listed, and a frame of each agrees with `Y16` pixel by pixel on one line of the "Gray Ramp" pattern. | Without the vivid change: the three formats are not listed and no frame is read. |
 | `igt` | IGT's `kms_3d`: forces IGT's own 3D EDID through debugfs, requires 3D modes, and sets each one with a stereo framebuffer. | Without 0003: "3D modes not detected". Without 0005: an assertion in `kmstest_get_path_blob()`. |
 | `kwin` | Stereo KWin on the VKMS device: `kscreen-doctor` lists the 3D modes and sets each one; the frame KWin scans out is read back (as root, with `DRM_IOCTL_MODE_GETFB2`) and checked: a fullscreen 2D client identical in both eyes, a stereo client's left view only in the left eye and its right view only in the right eye at the same place, a 2D client the same in both eyes, the frame packing active space black. | Needs a kernel with 0002 and 0003; on a kernel without them KWin lists no 3D mode. |
-| `kwin` with `--depth` | After the checks above, on the EDID with every HDMI 1.4a 3D structure ([guest/phases/kwin-depth-steps.sh](guest/phases/kwin-depth-steps.sh), [tools/analyze-kwin-depth.py](tools/analyze-kwin-depth.py)): the parallax of each window and of a noise patch with 8 pixels of parallax is measured between the eyes of side by side (full) and frame packing, then read from the depth picture of L + depth with the 3D metadata the kernel holds; each depth source; the viewing distance in the metadata; line alternative line by line; side by side (full) with the blanking kept; L + depth + graphics + graphics-depth with a popup in the graphics only, at its parallax; and with no depth levels, the picture of L + depth equal to the 2D frame. Two controls must fail: the patch check with flat depth, and the +8 check with the views exchanged. | A compositor without the depth structures lists none of them and every check fails. |
+| `kwin` with `--depth` | After the checks above, on the EDID with every HDMI® 1.4a 3D structure ([guest/phases/kwin-depth-steps.sh](guest/phases/kwin-depth-steps.sh), [tools/analyze-kwin-depth.py](tools/analyze-kwin-depth.py)): the parallax of each window and of a noise patch with 8 pixels of parallax is measured between the eyes of side by side (full) and frame packing, then read from the depth picture of L + depth with the 3D metadata the kernel holds; each depth source; the viewing distance in the metadata; line alternative line by line; side by side (full) with the blanking kept; L + depth + graphics + graphics-depth with a popup in the graphics only, at its parallax; and with no depth levels, the picture of L + depth equal to the 2D frame. Two controls must fail: the patch check with flat depth, and the +8 check with the views exchanged. | A compositor without the depth structures lists none of them and every check fails. |
 
 The test EDID is made by [edid/make-edid.py](edid/make-edid.py) and passes `edid-decode --check`.
-It declares 3D present (the HDMI 1.4b mandatory formats of the 2D formats it lists), side by side (half) for every video format through `3D_Structure_ALL`, top-and-bottom for 1080p60 and frame packing for 1080p30 through `3D_Structure_X`.
+It declares 3D present (the HDMI® 1.4b mandatory formats of the 2D formats it lists), side by side (half) for every video format through `3D_Structure_ALL`, top-and-bottom for 1080p60 and frame packing for 1080p30 through `3D_Structure_X`.
 
 ## How it works
 
@@ -92,10 +92,10 @@ It declares 3D present (the HDMI 1.4b mandatory formats of the 2D formats it lis
 
 ## Limits
 
-- VKMS has no link, so the HDMI vendor InfoFrame that a real driver sends with a 3D mode is not checked here.
+- VKMS has no link, so the HDMI® vendor InfoFrame that a real driver sends with a 3D mode is not checked here.
 - VKMS does not allow interlaced modes, so the mandatory 1080i side by side (half) formats are not listed.
-- Mainline's DRM core lists four of the HDMI 1.4a 3D structures from an EDID (frame packing, top-and-bottom, side by side half, and side by side full with the core change mentioned above); the edition's HDMI 3D series lists the other four as well.
-- VKMS does not allow interlaced modes, so field alternative (interlaced formats only, HDMI 1.4a Figure H-2) is not listed here.
+- Mainline's DRM core lists four of the HDMI® 1.4a 3D structures from an EDID (frame packing, top-and-bottom, side by side half, and side by side full with the core change mentioned above); the edition's HDMI® 3D series lists the other four as well.
+- VKMS does not allow interlaced modes, so field alternative (interlaced formats only, HDMI® 1.4a Figure H-2) is not listed here.
 - IGT's `kms_3d` sets the structures of IGT's own 3D EDID; with IGT's two stereo patches (every structure in the EDID and in the stereo framebuffer layout) it sets line alternative, side by side (full) and both picture plus depth structures too.
 - The kwin phase reads the frame KWin hands to the display, not VKMS's writeback (KWin is the DRM master); with the cursor plane off, as in KWin's 3D modes, they hold the same pixels.
 - A real 3D television is still the last test: this bench proves the kernel and compositor side, not a display's behaviour.
@@ -122,3 +122,5 @@ igt/                   the image that builds IGT's kms_3d
 
 GPL-2.0-or-later (SPDX headers in the files), the same family as the Linux kernel the bench is meant to help test.
 The EDID of the KDL-46HX855 is the one published in [sony-bravia-linux](https://github.com/danielcamposramos/sony-bravia-linux/tree/main/docs/research/liverecon), read from the television itself.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

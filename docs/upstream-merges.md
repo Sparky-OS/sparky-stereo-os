@@ -14,8 +14,8 @@ The work connects current 2D and 3D devices through the layers below.
 
 | Layer | Work and public record | State |
 | --- | --- | --- |
-| Signal and display | [HDMI 3D modes and EDID](how-it-works.md), with [10, 12 and 16-bit colour paths](programs-in-detail.md). | In the edition; 16-bit NVIDIA output has no hardware test. |
-| Kernel and drivers | [Linux HDMI 3D](programs-in-detail.md), [VKMS tests](test-stereo-without-a-3d-tv.md), [virtio-gpu stereo patches](https://github.com/Sparky-OS/sparky-stereo-os-build/blob/main/kernel/series/series.txt) and the [NVIDIA fork](https://github.com/danielcamposramos/open-gpu-kernel-modules); [Jim Cromie’s nouveau null fixes tested](https://github.com/danielcamposramos/sony-bravia-linux/tree/main/docs/upstream/nouveau-null-v3-test-2026-10-03). | Edition changes and a separately recorded test of upstream work. |
+| Signal and display | [HDMI® 3D modes and EDID](how-it-works.md), with [10, 12 and 16-bit colour paths](programs-in-detail.md). | In the edition; 16-bit NVIDIA output has no hardware test. |
+| Kernel and drivers | [Linux HDMI® 3D](programs-in-detail.md), [VKMS tests](test-stereo-without-a-3d-tv.md), [virtio-gpu stereo patches](https://github.com/Sparky-OS/sparky-stereo-os-build/blob/main/kernel/series/series.txt) and the [NVIDIA fork](https://github.com/danielcamposramos/open-gpu-kernel-modules); [Jim Cromie’s nouveau null fixes tested](https://github.com/danielcamposramos/sony-bravia-linux/tree/main/docs/upstream/nouveau-null-v3-test-2026-10-03). | Edition changes and a separately recorded test of upstream work. |
 | GPU userspace | [Mesa packs OpenGL, EGL and Vulkan views and declares them to KWin](programs-in-detail.md). | In the edition. |
 | Compositor and protocols | [Stereo KWin and `kde_stereo_content_v1`](stereo-labor-division.md); [X11 stereo properties v8](https://github.com/Sparky-OS/stereo-layer/blob/main/docs/x11-child-place.md). | Edition protocol and a published X11 contract; separate from upstream KDE acceptance. |
 | Toolkit and style | [Qt’s stereo widget path](programs-in-detail.md), [Qt Multimedia’s luminance fix](https://codereview.qt-project.org/c/qt/qtmultimedia/+/778399) and [Union depth design](architectural-synthesis.md#themes-union-and-the-proposed-editor). | Qt stereo in the edition; luminance fix merged upstream; Union design in discussion. |
@@ -70,4 +70,6 @@ This registry milestone is separate from the software merges below.
 - **Media3, Android's media framework** ([androidx/media#3439](https://github.com/androidx/media/pull/3439)): the frame packing SEI read in MP4 and fragmented MP4, the right-eye-first modes, StereoMode in the WebM muxer.
 - **VLC** ([!10366](https://code.videolan.org/videolan/vlc/-/merge_requests/10366)): the x264 module signals the input's stereo layout by default.
 - **gamescope** ([#2438](https://github.com/ValveSoftware/gamescope/pull/2438)): the present mode of the nested output can be chosen, which ends a frame race seen when stereo games run through it.
-- **NVIDIA's open kernel modules** ([#1386](https://github.com/NVIDIA/open-gpu-kernel-modules/pull/1386)): HDMI deep colour at the depth the display declares in its EDID (DC_30, DC_36, DC_48).
+- **NVIDIA's open kernel modules** ([#1386](https://github.com/NVIDIA/open-gpu-kernel-modules/pull/1386)): [HDMI®](https://www.hdmi.org/resource/brand) deep colour at the depth the display declares in its EDID (DC_30, DC_36, DC_48).
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

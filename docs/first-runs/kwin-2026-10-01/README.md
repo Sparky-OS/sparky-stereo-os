@@ -6,8 +6,8 @@ Evidence for the KWin stereo work, which lives in our KWin fork; our merge reque
 The design in one page: [STEREO3D.md](https://invent.kde.org/danielcamposramos/kwin/-/blob/stereo3d/STEREO3D.md).
 Code: the `stereo3d` branch of [invent.kde.org/danielcamposramos/kwin](https://invent.kde.org/danielcamposramos/kwin/-/tree/stereo3d).
 
-Hardware: a Sony KDL-46HX855 (AMD iGPU, amdgpu) and a Sony KDL-46EX725 (RTX 3060), both 2011-era 3D TVs that declare HDMI 1.4 3D modes and 12-bit deep colour (225 MHz TMDS).
-Kernel 7.3.0-rc1 with the HDMI 3D patches.
+Hardware: a Sony KDL-46HX855 (AMD iGPU, amdgpu) and a Sony KDL-46EX725 (RTX 3060), both 2011-era 3D TVs that declare [HDMI®](https://www.hdmi.org/resource/brand) 1.4 3D modes and 12-bit deep colour (225 MHz TMDS).
+Kernel 7.3.0-rc1 with the HDMI® 3D patches.
 Photos taken with a phone by Daniel; the TVs' own information banners are the readout.
 GPS data was removed from the photos; everything else is as taken.
 
@@ -20,7 +20,7 @@ KWin branch at [92dfde1](https://invent.kde.org/danielcamposramos/kwin/-/commit/
 
 - [IMG_20261001_031131.jpg](photos/IMG_20261001_031131.jpg): the HX855 in a 3D mode chosen in the display settings. Its banner: **16:9, 1080p HD, 12bit, 3D**, and "3D: Sim" (on). The flat desktop is in both eyes.
 - [IMG_20261001_031147.jpg](photos/IMG_20261001_031147.jpg), [IMG_20261001_031255.jpg](photos/IMG_20261001_031255.jpg), [IMG_20261001_031403.jpg](photos/IMG_20261001_031403.jpg): the refresh-rate list on the display settings page, with the 3D modes listed beside the 2D ones and labelled, for example "60.00 Hz (3D top and bottom)" and "(3D frame packing, suggested for games)" / "(… suggested for movies)". Both TVs and the 2D monitor are on the page.
-- [IMG_20261001_031238.jpg](photos/IMG_20261001_031238.jpg): the EX725 (HDMI 4) in 3D from the 3060: **16:9, 1080p HD, 12bit, 3D**, "3D: Sim".
+- [IMG_20261001_031238.jpg](photos/IMG_20261001_031238.jpg): the EX725 (HDMI® 4) in 3D from the 3060: **16:9, 1080p HD, 12bit, 3D**, "3D: Sim".
 - [IMG_20261001_031354.jpg](photos/IMG_20261001_031354.jpg): the HX855 again, 12bit 3D, with the mode list open.
 
 ## A stereo window on an ordinary desktop (2026-10-01, 20:20)
@@ -65,3 +65,5 @@ The configuration and drivers at the time: [logs/2026-10-03-three-outputs-config
 One window, three outputs, three formats at the end (frame packing, 2D, top and bottom), on two GPUs at the same time: KWin holds the two eyes, and each output takes what it can show.
 
 Done by Daniel Ramos, with an AI assistant doing the legwork under his direction; the TV readings are his.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

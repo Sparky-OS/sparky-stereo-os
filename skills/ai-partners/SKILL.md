@@ -93,7 +93,7 @@ For KDE changes, apply [the development practices reference](../native-linux/ref
 ## Reference knowledge, local first
 
 Daniel, 2026-10-23: consulting the local corpora is mandatory for the edition's own partners, and we recommend the same habit to every distro developer.
-- **Keep the references local and searchable.** Index the specifications, manuals and sources the skills cite: CTA-861 and HDMI, H.264 and H.265 annex D, RFC 9559 (Matroska), the Mesa, Qt, Wayland, Vulkan and OpenGL documentation, and the kernel's DRM documents. Use any vector store you like; ours is [Qdrant](https://qdrant.tech/), one collection per domain.
+- **Keep the references local and searchable.** Index the specifications, manuals and sources the skills cite: CTA-861 and [HDMI®](https://www.hdmi.org/resource/brand), H.264 and H.265 annex D, RFC 9559 (Matroska), the Mesa, Qt, Wayland, Vulkan and OpenGL documentation, and the kernel's DRM documents. Use any vector store you like; ours is [Qdrant](https://qdrant.tech/), one collection per domain.
   [Reference corpora](references/reference-corpora.md) lists the public documents per domain (Debian packaging, the kernel's display stack, video and containers, graphics, Wine and Proton, virtual machines) with publisher, version, licence and URL, one working chunking and embedding setup, and the payload fields that make a hit citable.
 - **Consult it first,** before a web search and before writing a fact from memory. A model's recall is the least reliable source in the chain.
 - **A hit is a lead, not an authority.** Read its score, open the original and quote the clause: the specification section, the commit or the manual page. Never cite "the corpus".
@@ -128,3 +128,5 @@ Preserve useful evidence before deleting rebuildable intermediates.
 
 Extend the existing domain skill when a repeated failure teaches a reusable lesson.
 Keep the operational rule in the skill, substantial conditional detail in a linked reference, and individual run history in its evidence record.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

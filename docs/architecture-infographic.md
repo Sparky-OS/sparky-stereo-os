@@ -36,7 +36,7 @@ Virtual display tests support automated checks; physical-device qualification re
 Hibernation and resume checks concern system reliability and the configured swap target.
 See [the program inventory](programs-in-detail.md) and [virtual display testing](../skills/vkms-stereo/SKILL.md).
 
-**Display drivers:** HDMI stereo presentation combines the pixel layout with appropriate timing and signalling.
+**Display drivers:** [HDMI®](https://www.hdmi.org/resource/brand) stereo presentation combines the pixel layout with appropriate timing and signalling.
 Available modes depend on both driver and display.
 Colour description, range and output timing need validation on the actual hardware path.
 See [the driver guidance](../skills/drivers/SKILL.md).
@@ -51,10 +51,12 @@ See the [implementation and thresholds](https://github.com/Sparky-OS/sparky-ster
 
 | Presentation | Transport and qualification | Display |
 | --- | --- | --- |
-| HDMI stereo layout | HDMI 3D timing and signalling; driver and display dependent. | 3D TV or projector |
+| HDMI® stereo layout | HDMI® 3D timing and signalling; driver and display dependent. | 3D TV or projector |
 | One eye, or red-cyan anaglyph | An ordinary 2D display connection; one eye gives full colour without anaglyph filters. | Regular colour monitor |
 | Stereo pair for spatial displays | DisplayXR integration is in development; optical weaving belongs to the vendor integration. | Autostereoscopic display |
 | Stereo desktop in a passive viewer | Flat Headset uses USB or a network stream; the current tested receiver has no head tracking. Performance varies by device and connection. | Android phone and viewer |
 | Tracked headset presentation | Compositor VR / Big Picture mode is planned; a virtual screen inside it keeps stereo content in stereo. | Tracked VR headset |
 
 The [architectural synthesis](architectural-synthesis.md) links the implementation records, device-test results and remaining work behind these labels.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

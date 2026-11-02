@@ -97,7 +97,7 @@ W3C 계정으로 그룹 가입은 무료이며, 도움을 환영합니다: 여�
 ## 보기 및 플레이
 
 **3D 영화, 사진, 게임이 자체 창이나 전체 화면에서 3D로 표시되고, 데스크톱의 나머지는 그대로 유지됩니다.**
-- **화면:** 3D TV, 모니터 또는 프로젝터, 2010년부터 2013년까지의 HDMI 3D 세트 포함, 또는 적청 안경을 쓴 일반 모니터; 각 화면이 동시에 다른 종류의 3D를 보여줄 수 있으며, 무안경 3D 모니터는 DisplayXR 팀과 함께 진행 중입니다.
+- **화면:** 3D TV, 모니터 또는 프로젝터, 2010년부터 2013년까지의 [HDMI®](https://www.hdmi.org/resource/brand) 3D 세트 포함, 또는 적청 안경을 쓴 일반 모니터; 각 화면이 동시에 다른 종류의 3D를 보여줄 수 있으며, 무안경 3D 모니터는 DisplayXR 팀과 함께 진행 중입니다.
 - **영화:** 3D 비디오가 Haruna, VLC, mpv, Bino, PlasmaTube 등에서 3D로 재생됩니다.
 - **사진:** Gwenview, digiKam, KolourPaint가 3D 사진(MPO, JPS, 스테레오 PNG)을 3D로 보여줍니다.
 - **게임:** 창 안의 DOOM (2016)과 Half-Life 2, 둘 다 VR 모드를 통해 ([공식](docs/formula.md)).
@@ -246,3 +246,5 @@ Sparky Stereo OS, Daniel Ramos (Capitain Jack)의 SparkyLinux 에디션 (Paweł 
 > — Aaron Swartz, [*Guerilla Open Access Manifesto*](https://archive.org/details/GuerillaOpenAccessManifesto) (2008년 7월)
 
 `docs/first-runs/` 아래의 스크립트와 `tools/` 아래의 도구는 코드이며 GNU General Public License, version 2 or later (GPL-2.0-or-later)로 제공됩니다; [LICENSE-GPL-2.0](LICENSE-GPL-2.0)을 보십시오.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

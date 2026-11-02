@@ -21,7 +21,7 @@ HDR facts and measurements are gathered in [awesome-linux-hdr](https://github.co
 
 ## The rule
 
-Deep colour means the **whole standard**: 10, 12 and 16 bits per colour (HDMI's 30, 36 and 48-bit deep colour), never capped at 12 or at the displays at hand.
+Deep colour means the **whole standard**: 10, 12 and 16 bits per colour ([HDMI®](https://www.hdmi.org/resource/brand)'s 30, 36 and 48-bit deep colour), never capped at 12 or at the displays at hand.
 Any one link that drops to 8 bits drops the whole picture to 8 bits, so every layer is checked: the display, the link, the driver, the compositor, the toolkit, the program.
 
 ## The layers, and what was found in each
@@ -29,7 +29,7 @@ Any one link that drops to 8 bits drops the whole picture to 8 bits, so every la
 | Layer | What it needs | Where |
 |---|---|---|
 | The display | What its EDID declares (deep colour flags, maximum TMDS clock); read it before choosing anything | KInfoCenter's "Stereo 3D and Deep Colour" page (in the edition) |
-| The kernel drivers | The link at the depth the display declares, not a fixed 8 | NVIDIA's open kernel modules: HDMI deep colour at the declared depth ([#1386](https://github.com/NVIDIA/open-gpu-kernel-modules/pull/1386), in review); nouveau: deep colour on Turing and newer (patches in [sony-bravia-linux/docs/upstream](https://github.com/danielcamposramos/sony-bravia-linux/tree/main/docs/upstream)) |
+| The kernel drivers | The link at the depth the display declares, not a fixed 8 | NVIDIA's open kernel modules: HDMI® deep colour at the declared depth ([#1386](https://github.com/NVIDIA/open-gpu-kernel-modules/pull/1386), in review); nouveau: deep colour on Turing and newer (patches in [sony-bravia-linux/docs/upstream](https://github.com/danielcamposramos/sony-bravia-linux/tree/main/docs/upstream)) |
 | Mesa | Window configs with 10/10/10/2 and 16/16/16/16 (unorm and half float), with alpha | 177 window-capable EGL configs on Wayland with our Mesa |
 | Qt | The program's requested `QSurfaceFormat` kept, alpha included. Qt Widgets forced an 8-bit alpha on every translucent window; our Qt keeps the alpha and depth the window asks for (10/10/10/2 or 16/16/16/16), and a window that asks for nothing stays 8/8/8/8 | [`stereo3d-alpha`](https://github.com/Sparky-OS/qtbase/tree/stereo3d-alpha); see [`stereo-window-3d-area`](../stereo-window-3d-area/SKILL.md) |
 | A layer in the compositor's shared memory (`wl_shm`) | A deep buffer format: `XR30` for 10 bits, then `XB48` (16-bit integer) when no half-float format is offered | Qt Multimedia's video layer in the edition |
@@ -55,3 +55,5 @@ The merged [Qt Multimedia luminance correction](https://codereview.qt-project.or
 Check units at each conversion with known SDR/PQ/HLG metadata and expected numbers.
 That fix is evidence for its particular path, not equivalent physical HDR qualification across the whole stack.
 The [MEIG discussion](https://www.w3.org/2026/10/13-me-minutes.html) motivates preserving descriptions through shared presentation; it does not select one universal HDR representation or certify our implementation.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

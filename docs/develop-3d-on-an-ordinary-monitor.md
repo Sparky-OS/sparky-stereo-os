@@ -24,10 +24,10 @@ A 2D interface stays 2D: keep the 3D area in its own surface, and the rest of th
 Choose it for that screen in System Settings, Display Configuration, in the screen's Resolution list.
 Your program does not change: it still hands over full side by side, and the output decides.
 
-**Several screens:** each screen can run a different 3D output at the same time, for example anaglyph on your monitor and HDMI 3D on a television.
+**Several screens:** each screen can run a different 3D output at the same time, for example anaglyph on your monitor and [HDMI®](https://www.hdmi.org/resource/brand) 3D on a television.
 That holds for a mirrored screen too, even across two GPUs: tested on two Sony 3D televisions showing one copied screen, one on an AMD integrated GPU in frame packing at 30 Hz and the other on an NVIDIA RTX 3060 in top and bottom at 60 Hz, both in 3D.
 
-## 3. Test the real HDMI 3D path without a 3D television
+## 3. Test the real HDMI® 3D path without a 3D television
 
 **[vkms-stereo-bench](../tools/vkms-stereo-bench/README.md):** a kernel's virtual display driver (VKMS) is given the EDID of a 3D television in a virtual machine, so the 3D modes can be set and each eye read back pixel by pixel.
 It runs with KUnit, IGT's `kms_3d` and Stereo KWin.
@@ -36,7 +36,7 @@ It runs with KUnit, IGT's `kms_3d` and Stereo KWin.
 
 ## 4. A 3D display inside a virtual machine
 
-**[A virtual machine with a 3D display](stereo-vm.md):** a QEMU guest with HDMI 3D modes, shown in stereo on Stereo KWin in QEMU's own window, virt-viewer and Karton.
+**[A virtual machine with a 3D display](stereo-vm.md):** a QEMU guest with HDMI® 3D modes, shown in stereo on Stereo KWin in QEMU's own window, virt-viewer and Karton.
 Use it when you are writing an operating system's or a driver's stereo code and have no 3D display.
 
 ## 5. Glasses-free panels
@@ -65,3 +65,5 @@ Check the finished work on the real 3D television, headset or panel.
 By then it is right on the bench and right in anaglyph, so the real screen confirms; it does not debug.
 
 Sparky Stereo OS, Daniel Ramos's edition of SparkyLinux (by Paweł "pavroo" Pijanowski).
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

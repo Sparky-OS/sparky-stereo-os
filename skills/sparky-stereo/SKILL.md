@@ -50,7 +50,7 @@ So every change of ours arrives small, tested and explained.
 
 # Part one: the contract
 
-- **One format inside.** Programs decode or generate stereo in any standard and hand the desktop **full side by side**: the two eyes as separate pictures side by side, left eye first, each at the resolution it has, declared once. "Full" names the layout, not a size: any resolution is the pact, half-width and half-height eyes included (a half top-and-bottom 1920x1080 frame becomes one 3840x540 buffer), and the program never resizes an eye. In a window or full screen, Stereo KWin does the one resize. Stereo KWin's outputs, one per kind of screen, turn that into what each screen needs: a 3D television's HDMI 3D modes, anaglyph on any monitor, interleaved and frame-sequential displays, a headset. [How it works](../../docs/how-it-works.md) explains why, and why it is how PipeWire already handles sound.
+- **One format inside.** Programs decode or generate stereo in any standard and hand the desktop **full side by side**: the two eyes as separate pictures side by side, left eye first, each at the resolution it has, declared once. "Full" names the layout, not a size: any resolution is the pact, half-width and half-height eyes included (a half top-and-bottom 1920x1080 frame becomes one 3840x540 buffer), and the program never resizes an eye. In a window or full screen, Stereo KWin does the one resize. Stereo KWin's outputs, one per kind of screen, turn that into what each screen needs: a 3D television's [HDMI®](https://www.hdmi.org/resource/brand) 3D modes, anaglyph on any monitor, interleaved and frame-sequential displays, a headset. [How it works](../../docs/how-it-works.md) explains why, and why it is how PipeWire already handles sound.
 - **Internal rendering resolution is not output resolution** (Daniel, 2026-10-23). The internal rendering resolution is how many pixels each eye is drawn with: a quality setting the person picks in the program. The output resolution is the screen's mode, which belongs to Stereo KWin's output. A program never matches one to the other, and never resizes an eye to fit a screen.
 - **Every packing is cut into its two native strips and handed over side by side, as it is:**
   - full top and bottom, 1920x2160: two 1920x1080 eyes, handed over as one 3840x1080 picture;
@@ -129,7 +129,7 @@ Load the one that matches the work; the [program list](../../docs/programs-in-de
 | [`3d-to-vr`](../3d-to-vr/SKILL.md) | Stereo content and the desktop in a headset |
 | [`vkms-stereo`](../vkms-stereo/SKILL.md) | Testing stereo without a 3D display: VKMS with a 3D EDID, the writeback bench, IGT and KWin in a VM |
 | [`stereo-vm`](../stereo-vm/SKILL.md) | A virtual machine's stereo display: QEMU's window, virt-viewer, virt-manager and Karton, the pointer in a 3D mode, the controls that must fail |
-| [`drivers`](../drivers/SKILL.md) | The kernel and GPU drivers: HDMI 3D modes, deep colour, the edition kernel's configuration and its traps, and carrying patches until mainline takes them |
+| [`drivers`](../drivers/SKILL.md) | The kernel and GPU drivers: HDMI® 3D modes, deep colour, the edition kernel's configuration and its traps, and carrying patches until mainline takes them |
 | [`native-linux`](../native-linux/SKILL.md) | OpenGL, EGL, Vulkan, Qt and X11 programs on Linux |
 | [`proton-wine`](../proton-wine/SKILL.md) | Windows programs through Wine, DXVK and gamescope; Steam's environment; Easy Anti-Cheat's Linux requirements |
 | [`gamecontroller`](../gamecontroller/SKILL.md) | KDE controller models and labels for flight and racing rigs, preserving every raw control and verifying upstream profiles |
@@ -158,3 +158,5 @@ Load the one that matches the work; the [program list](../../docs/programs-in-de
 
 From the work itself: each rule here was learned on a real program, with its measurements, between September and October 2026, by Daniel directing and verifying with AI partners.
 They are written so the next person, or the next model, ports a solved pattern instead of solving it again.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

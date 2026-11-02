@@ -3,7 +3,7 @@ metadata:
   requires-packages: dkms | edid-decode
 name: drivers
 description: >-
-  Implement and test kernel/display-driver stereo modes, from the HDMI 3D modes a display's EDID declares to HDMI signaling and deep-colour links; configure the edition's kernel (Debian's base, Secure Boot without lockdown, ZFS and NVIDIA DKMS modules on a new kernel); carry edition patches with provenance.
+  Implement and test kernel/display-driver stereo modes, from the HDMI® 3D modes a display's EDID declares to HDMI® signaling and deep-colour links; configure the edition's kernel (Debian's base, Secure Boot without lockdown, ZFS and NVIDIA DKMS modules on a new kernel); carry edition patches with provenance.
 ---
 
 # Drivers: 3D modes and deep colour in the kernel
@@ -18,28 +18,28 @@ description: >-
 Written on 2026-10-07; the kernel configuration and its traps, the carried gamepad fix and the test without firmware added on 2026-11-02.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; for the colour side also load [`deep-colour`](../deep-colour/SKILL.md).
 
-## What a display driver must do for HDMI 3D
+## What a display driver must do for [HDMI®](https://www.hdmi.org/resource/brand) 3D
 
-1. **List the 3D modes the display declares:** the HDMI vendor-specific block of its EDID says whether it accepts 3D and which structures (frame packing, side by side, top and bottom) for which video formats, and HDMI 1.4 makes some of them mandatory for every 3D display. The structures and timings are laid out in awesome-stereoscopy's [frame packing and HDMI timings](https://github.com/danielcamposramos/awesome-stereoscopy/blob/main/docs/frame-packing-and-hdmi-timings.md) and [standards page](https://github.com/danielcamposramos/awesome-stereoscopy/blob/main/standards.md).
+1. **List the 3D modes the display declares:** the HDMI® vendor-specific block of its EDID says whether it accepts 3D and which structures (frame packing, side by side, top and bottom) for which video formats, and HDMI® 1.4 makes some of them mandatory for every 3D display. The structures and timings are laid out in awesome-stereoscopy's [frame packing and HDMI® timings](https://github.com/danielcamposramos/awesome-stereoscopy/blob/main/docs/frame-packing-and-hdmi-timings.md) and [standards page](https://github.com/danielcamposramos/awesome-stereoscopy/blob/main/standards.md).
 2. **Allow stereo modes** on the connector (`stereo_allowed` in DRM), so they reach user space.
-3. **Signal the mode:** the HDMI vendor-specific InfoFrame carries the 3D structure, so the television switches itself.
+3. **Signal the mode:** the HDMI® vendor-specific InfoFrame carries the 3D structure, so the television switches itself.
 4. **Time it:** frame packing doubles the vertical total with an active space between the eyes; side by side and top and bottom keep the 2D timing. Full side by side is handled in the DRM core.
 
-Where mainline stands (October 2026): Intel's i915, nouveau and the Raspberry Pi's vc4 allow HDMI stereo modes; stock amdgpu refuses them; the shared HDMI bridge connector that many SoC display drivers build on still reads "[TODO: Handle doublescan_allowed and stereo_allowed](https://github.com/torvalds/linux/blob/master/drivers/gpu/drm/display/drm_bridge_connector.c)", so one fix there would open HDMI 3D on every board built on it.
+Where mainline stands (October 2026): Intel's i915, nouveau and the Raspberry Pi's vc4 allow HDMI® stereo modes; stock amdgpu refuses them; the shared HDMI® bridge connector that many SoC display drivers build on still reads "[TODO: Handle doublescan_allowed and stereo_allowed](https://github.com/torvalds/linux/blob/master/drivers/gpu/drm/display/drm_bridge_connector.c)", so one fix there would open HDMI® 3D on every board built on it.
 
 ## The work so far, public
 
-- **amdgpu:** expose the HDMI stereo modes and emit the InfoFrame; extend the display core's stream timing for frame packing. Patches in [sony-bravia-linux/docs/upstream](https://github.com/danielcamposramos/sony-bravia-linux/tree/main/docs/upstream). A Sony 3D television switched itself into 3D from System Settings on 2026-10-01.
-- **NVIDIA's open kernel modules:** the 3D modes built from the display's HDMI stereo block, and HDMI deep colour at the declared depth ([#1386](https://github.com/NVIDIA/open-gpu-kernel-modules/pull/1386), in review); on an RTX 3060 KWin listed the television's 3D modes and the link ran at 12 bits, the display's own maximum.
+- **amdgpu:** expose the HDMI® stereo modes and emit the InfoFrame; extend the display core's stream timing for frame packing. Patches in [sony-bravia-linux/docs/upstream](https://github.com/danielcamposramos/sony-bravia-linux/tree/main/docs/upstream). A Sony 3D television switched itself into 3D from System Settings on 2026-10-01.
+- **NVIDIA's open kernel modules:** the 3D modes built from the display's HDMI® stereo block, and HDMI® deep colour at the declared depth ([#1386](https://github.com/NVIDIA/open-gpu-kernel-modules/pull/1386), in review); on an RTX 3060 KWin listed the television's 3D modes and the link ran at 12 bits, the display's own maximum.
 - **nouveau:** deep colour on Turing and newer, the piece it was missing (patches in the same folder).
 - **Probing:** [`stereo-kms-probe`](https://github.com/danielcamposramos/sony-bravia-linux/tree/main/tools/stereo-kms-probe) lists what a connector offers and sets a stereo mode from the command line.
 
 ## Android TV-box vendor kernels (checked 2026-10-07)
 
-- **Allwinner's vendor display stack has HDMI 3D paths.** Its [display header](https://github.com/allwinner-zh/linux-3.4-sunxi/blob/6964d467510849e3e262518cb87bff7ef92e01f5/include/video/sunxi_display2.h) defines stereo layer buffers and frame-packing output modes. Its [HDMI timing table](https://github.com/allwinner-zh/linux-3.4-sunxi/blob/6964d467510849e3e262518cb87bff7ef92e01f5/drivers/video/sunxi/hdmi/aw/hdmi_core.c) includes 1080p24 and 720p50/60 frame packing.
-- **Rockchip's vendor HDMI driver has a 3D mode control.** The [mode enum](https://github.com/rockchip-linux/kernel/blob/9ead5f3cbd6e0abd0ac70002205993c953c227ea/drivers/video/rockchip/hdmi/rockchip-hdmi.h) assigns 0 to frame packing, 6 to top and bottom, and 8 to half side by side. The [HDMI implementation](https://github.com/rockchip-linux/kernel/blob/9ead5f3cbd6e0abd0ac70002205993c953c227ea/drivers/video/rockchip/hdmi/rockchip-hdmiv2/rockchip_hdmiv2_hw.c) adjusts frame-packing timing and writes the HDMI vendor InfoFrame's 3D structure.
-- **Proven on the boards tested (2026):** an Allwinner H616 TV box and a Rockchip RK3228A TV box switch a 3D television into HDMI 3D on their vendor Android kernels (frame packing on the H616 box, half side by side on the RK3228A box), and both run the HDMI link at 10-bit RGB.
-- **These are vendor interfaces, not portable Android or mainline DRM APIs.** On another board, identify its kernel and display stack first, then check the modes, the signalling and the return to 2D. Keep physical HDMI packing in the output backend; an Android app still supplies full side by side to the edition's compositor.
+- **Allwinner's vendor display stack has HDMI® 3D paths.** Its [display header](https://github.com/allwinner-zh/linux-3.4-sunxi/blob/6964d467510849e3e262518cb87bff7ef92e01f5/include/video/sunxi_display2.h) defines stereo layer buffers and frame-packing output modes. Its [HDMI® timing table](https://github.com/allwinner-zh/linux-3.4-sunxi/blob/6964d467510849e3e262518cb87bff7ef92e01f5/drivers/video/sunxi/hdmi/aw/hdmi_core.c) includes 1080p24 and 720p50/60 frame packing.
+- **Rockchip's vendor HDMI® driver has a 3D mode control.** The [mode enum](https://github.com/rockchip-linux/kernel/blob/9ead5f3cbd6e0abd0ac70002205993c953c227ea/drivers/video/rockchip/hdmi/rockchip-hdmi.h) assigns 0 to frame packing, 6 to top and bottom, and 8 to half side by side. The [HDMI® implementation](https://github.com/rockchip-linux/kernel/blob/9ead5f3cbd6e0abd0ac70002205993c953c227ea/drivers/video/rockchip/hdmi/rockchip-hdmiv2/rockchip_hdmiv2_hw.c) adjusts frame-packing timing and writes the HDMI® vendor InfoFrame's 3D structure.
+- **Proven on the boards tested (2026):** an Allwinner H616 TV box and a Rockchip RK3228A TV box switch a 3D television into HDMI® 3D on their vendor Android kernels (frame packing on the H616 box, half side by side on the RK3228A box), and both run the HDMI® link at 10-bit RGB.
+- **These are vendor interfaces, not portable Android or mainline DRM APIs.** On another board, identify its kernel and display stack first, then check the modes, the signalling and the return to 2D. Keep physical HDMI® packing in the output backend; an Android app still supplies full side by side to the edition's compositor.
 
 ## The edition's kernel configuration
 
@@ -92,8 +92,10 @@ Plan for it:
 
 - The connector's mode list before and after, from `stereo-kms-probe` or the compositor (KScreen labels 3D modes "(3D …)").
 - The display switching itself into 3D, shown by its own info screen, on real hardware.
-- For frame packing: the timing compared with the HDMI table, and both eyes captured where the hardware allows.
+- For frame packing: the timing compared with the HDMI® table, and both eyes captured where the hardware allows.
 - For deep colour: the link depth the driver set, and the display's own report.
 - The 2D control: every 2D mode unchanged.
 - **A test "without firmware" removes the GPU's whole firmware folder.** For nouveau on an RTX 3060 that is `nvidia/ga106`, then rebuild the initramfs: the log says `acr: firmware unavailable`, `gr: firmware unavailable` and `sec2: firmware unavailable`.
   Renaming only the GSP firmware link is not "no firmware": nouveau then takes its own Ampere path with the ACR, GR and SEC2 firmware, the GR engine comes up, and the code path without a GR engine never runs ([the 2026-10-03 test of the NULL-pointer fixes](https://github.com/danielcamposramos/sony-bravia-linux/tree/main/docs/upstream/nouveau-null-v3-test-2026-10-03); the fixes themselves are in [`search-upstream-first`](../search-upstream-first/SKILL.md)).
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

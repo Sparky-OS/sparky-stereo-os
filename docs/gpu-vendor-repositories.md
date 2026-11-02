@@ -1,8 +1,8 @@
 # GPU vendors' repositories on Sparky Stereo OS: compute updates, the display driver stays ours
 
-Sparky Stereo OS drives the screen with its own display drivers, because they carry HDMI 3D and deep colour: our build of NVIDIA's open kernel modules, and the amdgpu driver in our kernel.
+Sparky Stereo OS drives the screen with its own display drivers, because they carry [HDMI®](https://www.hdmi.org/resource/brand) 3D and deep colour: our build of NVIDIA's open kernel modules, and the amdgpu driver in our kernel.
 NVIDIA and AMD publish their own display drivers in the same repositories as CUDA and ROCm.
-If one of those repositories is given a high priority, an ordinary upgrade replaces our driver with the vendor's, which has no HDMI 3D.
+If one of those repositories is given a high priority, an ordinary upgrade replaces our driver with the vendor's, which has no HDMI® 3D.
 The files below let CUDA and ROCm update as usual and keep the display driver ours.
 A pin for a repository that is not configured does nothing, so every install carries them.
 
@@ -68,7 +68,7 @@ Removing without purging keeps the configuration file, and with it the lock.
 What AMD publishes, from AMD's own pages and package indexes:
 
 - **The kernel driver.** AMD's [Debian installation page](https://instinct.docs.amd.com/projects/amdgpu-docs/en/docs-31.60.0/install/detailed-install/package-manager/package-manager-debian.html) adds `https://repo.radeon.com/amdgpu/31.60/ubuntu noble` and installs `amdgpu-dkms`, which depends on `amdgpu-dkms-firmware`; both replace the former `rock-dkms` and `rock-dkms-firmware`.
-  Our kernel's amdgpu carries the HDMI 3D changes, so these never install, and the `amdgpu` meta package, which depends on `amdgpu-dkms`, cannot pull them in.
+  Our kernel's amdgpu carries the HDMI® 3D changes, so these never install, and the `amdgpu` meta package, which depends on `amdgpu-dkms`, cannot pull them in.
 - **Graphics.** `repo.radeon.com/graphics` (the `graphics` use case of [amdgpu-install](https://rocm.docs.amd.com/en/latest/install/rocm.html)) publishes AMD's own Mesa, libdrm, Wayland and LLVM builds as `*-amdgpu` packages under `/opt/amdgpu`: `amdgpu-lib`, `libgbm1-amdgpu`, `libegl1-amdgpu-mesa`, `libgl1-amdgpu-mesa-glx`, `libdrm2-amdgpu`, `libdrm-amdgpu-amdgpu1`, `mesa-amdgpu-vulkan-drivers` and the rest.
   Every one of them depends on `amdgpu-core`, whose install script writes `/etc/ld.so.conf.d/20-amdgpu.conf` and puts `/opt/amdgpu/lib` ahead of the system's libraries for every program.
   **Measured:** with three of them installed, our own Mesa loads AMD's `libgbm`, `libdrm` and `libdrm_amdgpu`.
@@ -82,4 +82,6 @@ What AMD publishes, from AMD's own pages and package indexes:
 ## Intel
 
 Not guarded.
-i915 has allowed HDMI stereo modes upstream since 2013 (`connector->stereo_allowed = true` in [`intel_hdmi.c`](https://github.com/torvalds/linux/blob/master/drivers/gpu/drm/i915/display/intel_hdmi.c)), so the edition has no Intel display driver of its own to protect.
+i915 has allowed HDMI® stereo modes upstream since 2013 (`connector->stereo_allowed = true` in [`intel_hdmi.c`](https://github.com/torvalds/linux/blob/master/drivers/gpu/drm/i915/display/intel_hdmi.c)), so the edition has no Intel display driver of its own to protect.
+
+HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

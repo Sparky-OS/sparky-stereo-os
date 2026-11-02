@@ -11,7 +11,7 @@ metadata:
 # Contributing to HandBrake
 
 Written on 2026-10-24 from HandBrake's own documents, read from the current tree and web.
-The rules that come first were added on 2026-11-02 from `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md` and `.github/PULL_REQUEST_TEMPLATE.md` on master and from the [contribution guide](https://handbrake.fr/docs/en/latest/contributing/contribute.html), read that day.
+The rules that come first were added on 2026-11-02 from `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, `TRANSLATION.markdown` and `.github/PULL_REQUEST_TEMPLATE.md` on master and from the [contribution guide](https://handbrake.fr/docs/en/latest/contributing/contribute.html), read that day.
 Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this skill is HandBrake's own practice.
 Re-read `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, `.github/PULL_REQUEST_TEMPLATE.md` and the contribution guide before every round.
 
@@ -28,7 +28,8 @@ Re-read `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, `.github/PULL_REQUEST_TEMPLATE.
 - **AI** (the guide's "Code" and "Translation" sections):
   - "If AI is used in the process of making a change, it must be disclosed in the Pull Request."
   - "Pull Requests may be rejected without further information if the change is not suitable for the project. For example, issues with: Code Quality / Style, Design, Security Issues, Inappropriate use of AI, Licenses / Copyright etc."
-  - "Use of AI services to translate HandBrake is not permitted." Interface translations go through HandBrake on Transifex.
+  - "Use of AI services to translate HandBrake is not permitted."
+    Interface translations go through HandBrake on Transifex, and the tree's `TRANSLATION.markdown` (since 2025-07-28, #7064) says the same to translators: "You must not use a translation service or an AI translator to aid translation. If anything is unclear, please ask!"
   - `CONTRIBUTING.md` itself: "contributions not meeting the project's goals or standards may be rejected".
 
 ## Where

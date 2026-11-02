@@ -15,7 +15,7 @@ description: >-
 3. Return pose/image evidence, input/restoration checks and device limits. A WebXR session-support result alone does not prove or disprove stereo image presentation.
 
 **Check freshness first.**
-Written on 2026-10-07.
+Written on 2026-10-07; the established solutions linked on 2026-11-02.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
 
 ## The formula
@@ -39,6 +39,7 @@ What stands in the way is everything the VR mode does *for a headset*.
 [sony-bravia-linux/tools/vr-stereo-spectator](https://github.com/danielcamposramos/sony-bravia-linux/tree/main/tools/vr-stereo-spectator):
 
 - `sourcevr/`: a replacement VR module for Half-Life 2 that drives a 3D display, and `SPECTATOR.md`, the spectator design (the 2D game with a second camera, so observers and SourceTV get the stereo view too).
+  **Before any change to the module, read its [established solutions](https://github.com/danielcamposramos/sony-bravia-linux/blob/main/tools/vr-stereo-spectator/sourcevr/README.md#established-solutions-check-before-every-change)** (Daniel, 2026-09-26): each was found by testing on the television and kept on purpose, from the interface laid out at the 2D size to nothing resized for a format. A change that touches one says so and keeps its purpose; one "simplified" away brought its old bug back.
 - `steamvr/`: a SteamVR display driver for a 3D television.
 - `gamescope/`: `gamescope-3dtv`, and the nested present-mode patch (upstream as [gamescope #2438](https://github.com/ValveSoftware/gamescope/pull/2438), in review).
 - `anaglyph/`: an anaglyph shader for gamescope's ReShade, for screens without a 3D mode.

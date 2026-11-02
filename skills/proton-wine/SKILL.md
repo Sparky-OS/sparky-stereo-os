@@ -3,7 +3,7 @@ metadata:
   requires-packages: wine64 | libwine | dxvk-wine64
 name: proton-wine
 description: >-
-  Diagnose stereo through Wine, Proton, DXVK and gamescope with runtime-library identification and game-specific proof.
+  Diagnose stereo through Wine, Proton, DXVK and gamescope with runtime-library identification and game-specific proof; start Steam in the person's session environment; check a system against Easy Anti-Cheat's Linux requirements.
 ---
 
 # Windows programs through Wine and Proton
@@ -16,6 +16,7 @@ description: >-
 
 **Check freshness first.**
 Written on 2026-10-07; much of this layer is planned, and each item says whether it is done.
+Steam started from another environment, and Easy Anti-Cheat's Linux requirements, added on 2026-11-02.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
 
 ## The chain
@@ -44,6 +45,34 @@ In the edition the desktop draws the final 3D output; a game or gamescope packs 
 
 - **Does the game reach the edition's Mesa?** Steam's runtime, Flatpak and some launchers can load their own libraries. Check which Vulkan and OpenGL drivers the game actually loaded before testing stereo.
 - **Never let a game pick its own 3D output format.** The game delivers full side by side; Stereo KWin's outputs decide the screen.
+- **A Steam started from another environment breaks everything it launches.** Steam hands its own environment to every game and tool it starts.
+  An automation shell (a sandbox, a service, a remote login) often has another `XDG_RUNTIME_DIR` than the person's session, which is where `wayland-0` and `pipewire-0` live. A `steam` command from such a shell, when Steam is not running yet, starts Steam with that environment.
+  Measured on 2026-09-28: SteamVR's compositor "Couldn't create wayland display" (error 497), vrserver "Failed to connect to pipewire", gamescope "Failed to connect to wayland socket".
+  Before any `steam` command, check that Steam already runs (`pgrep -x steam`); if it does not, have the person start it from the desktop, or set `XDG_RUNTIME_DIR=/run/user/$(id -u)` for the command. When a launched program cannot reach Wayland, PipeWire or PulseAudio, compare `/proc/<Steam's pid>/environ` with the session's environment first.
+
+## Easy Anti-Cheat Linux v2
+
+Epic's announcement of 2026-10-14, [Awesome Gaming on Linux Without Cheating](https://onlineservices.epicgames.com/news/introducing-easy-anti-cheat-linux-v2) (read on 2026-11-02), lists what a system needs for the games that will use it.
+It has no kernel module of its own: an anti-cheat systemd service runs only while a protected game runs, with eBPF programs.
+
+1. **A signed kernel and signed modules,** "signed with a well-known key"; an out-of-tree module, such as NVIDIA's, must be "built by an organization and signed with a well-known key".
+2. **TPM 2.0,** enabled in the firmware.
+3. **Secure Boot,** booted only with well-known keys.
+4. **Measured boot:** the boot manager's measurements must be present.
+5. **IOMMU** enabled in the firmware and in the kernel, with passthrough off (not required on handhelds).
+6. **Kernel lockdown in integrity mode,** "explicitly enabled at boot time".
+7. **kexec disabled** at boot time.
+8. **The BPF LSM** loaded and active.
+
+What it means for the edition, from Epic's FAQ and the edition's kernel:
+
+- The well-known list of 2026-10-14 names Canonical's, Fedora's, Universal Blue's, Debian's, openSUSE's, SUSE's, Rocky Linux's, AlmaLinux's and Microsoft's UEFI CA keys. The edition's own Secure Boot key is not on it.
+- Because every enrolled MOK is trusted for module signatures, Epic requires every enrolled MOK to be well-known; a person's own keys for other boot entries go into the firmware's db instead.
+- A module that DKMS signs on the person's machine with its own key does not meet the first requirement.
+- The edition's default boot keeps hibernation, so lockdown is a boot option and not automatic under Secure Boot ([`drivers`](../drivers/SKILL.md#the-editions-kernel-configuration)).
+  Epic's FAQ allows exactly that: "You can maintain a separate boot entry with the required kernel and command line, and select that entry when you want to play a protected game."
+- A game started without the requirements shows an error; Epic says the account is not banned for it.
+- The Steam Deck does not meet the requirements yet, by Epic's FAQ.
 
 ## Proof
 

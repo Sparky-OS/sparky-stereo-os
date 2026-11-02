@@ -24,7 +24,7 @@ Core skills are `sparky-stereo`, `ai-partners`, `search-upstream-first`, `upstre
 | A QEMU or SPICE VM viewer and its pointer/mode changes | [stereo-vm](stereo-vm/SKILL.md) |
 | VR content on a TV or stereo spectator | [vr-to-3d](vr-to-3d/SKILL.md) |
 | A desktop or media stream on a phone/headset | [3d-to-vr](3d-to-vr/SKILL.md); select the relevant receiver/transport section |
-| Wine/Proton games | [proton-wine](proton-wine/SKILL.md) |
+| Wine/Proton games; Steam started from a script; Easy Anti-Cheat on Linux | [proton-wine](proton-wine/SKILL.md) |
 | Flight and racing simulators | [simulators](simulators/SKILL.md); select the engine and failing stage |
 | Controllers, labels, focus or shell navigation | [gamecontroller](gamecontroller/SKILL.md) |
 | Sound routing, formats or MIDI | [audio](audio/SKILL.md) |

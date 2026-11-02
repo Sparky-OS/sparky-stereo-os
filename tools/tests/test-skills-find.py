@@ -21,6 +21,7 @@ SYMPTOMS = (
     ('an HDMI 3D mode missing from the EDID', 'drivers'),
     ('an ISO uploaded as a GitHub release that Zenodo keeps', 'forks-and-online'),
     ('zfs-dkms does not build on the new kernel', 'drivers'),
+    ('Steam games cannot connect to the wayland socket or pipewire', 'proton-wine'),
 )
 
 

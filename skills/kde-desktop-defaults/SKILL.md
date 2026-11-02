@@ -15,9 +15,18 @@ description: >-
 3. Prove a patch with a test that fails on the unpatched release, then repeat the native checks on the installed packages.
 
 **Check freshness first.**
-Written on 2026-10-10 from the accepted Plasma 6.7.4 work; published on 2026-10-23.
+Written on 2026-10-10 from the accepted Plasma 6.7.4 work; published on 2026-10-23; the principle behind the defaults added on 2026-11-02.
 Check the edition's current package versions and KDE release before carrying these changes.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; packages follow [`edition-packaging`](../edition-packaging/SKILL.md), and build storage [`system-housekeeping`](../system-housekeeping/SKILL.md).
+
+## Decided defaults, out of the box
+
+The edition sets good defaults itself instead of leaving each choice to the person, as stock Debian and KDE do (Daniel, 2026-10-08: "Having the freedom is perfect, but, for a newcommer ... is a pain, not a feature").
+Newcomers in Linus Tech Tips' Linux challenge and in Diolinux's videos struggled with choices a distribution could have made for them.
+
+- Decide each default, with its reason and its source, rather than leave it to a first-run question or to the stock value. Where a recorded decision sets it, cite that decision beside the file that ships it.
+- Personalisation stays: every default remains a setting the person can change in the ordinary settings, and nothing is removed to make a default work.
+- KConfig reads the system's files before the person's own, so a value in the person's configuration wins over one under `/etc/xdg` ([KConfig's entry options](https://invent.kde.org/frameworks/kconfig/-/blob/master/docs/options.md): "Typically, the system administrator might set global defaults, and a user might override them in their local configuration files"). The tests below check both cases.
 
 ## Defaults before code
 

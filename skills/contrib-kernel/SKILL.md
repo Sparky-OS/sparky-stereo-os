@@ -1,7 +1,7 @@
 ---
 name: contrib-kernel
 description: >-
-  Send a Linux kernel patch or bug report in the kernel's own way: its code of conduct, the human Signed-off-by, the AI coding assistants and tool-generated content rules, the security list's AI rules, a tested fix with every report, and the human sending it.
+  Send a Linux kernel patch or bug report in the kernel's own way: its code of conduct, the human Signed-off-by, the AI coding assistants and tool-generated content rules, the security list's AI rules, a tested fix with every report, and the human's review before anything is sent.
 metadata:
   requires-packages: linux-headers-sparky-stereo | git-email
 ---
@@ -29,8 +29,8 @@ Check freshness: re-read those documents in the current tree before every series
   The 2026 Maintainers Summit agreed to stop requiring the tag; the edition keeps it anyway (Daniel, 2026-10-16: "we'll change nothing - it's just not compulsory anymore - but we respect devs").
 - **Understand and defend every line.** `generated-content.rst`: "You are expected to understand and to be able to defend everything you submit."
   Linus on LKML, 2026-10-13, on tool rules: understanding "has very little to do with what tools they use".
-- **The human sends.** `coding-assistants.rst` step 9: the assistant leaves the result to the reporter for review and "must never send anything itself".
-  For the kernel, Daniel runs `git send-email` himself; the assistant prepares the series, the evidence and the command.
+- **Nothing goes out without the human's review.** `coding-assistants.rst` step 9: the assistant leaves the result to the reporter for review and "must never send anything itself": an agent never sends on its own.
+  The edition's practice already is that: the assistant prepares the series and the evidence, Daniel reviews and approves, and only then is it sent, from his account, by him or at his word.
 - **Subsystems add their own rules.** nouveau's community statement asks for code that is "the output of your own human brain"; the edition carries its nouveau work in its own fork and does not push AI-assisted features there.
   Read the subsystem's documents and MAINTAINERS entry first.
 

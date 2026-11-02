@@ -9,14 +9,26 @@ metadata:
 # Contributing to VLC
 
 Written on 2026-10-24 from VideoLAN's AI policy (`https://code.videolan.org/videolan/vlc/-/raw/master/doc/VideoLAN_AI_Policy.md`, read 2026-10-24), the VideoLAN Code of Conduct page (`https://code.videolan.org/videolan/CODE_OF_CONDUCT/-/blob/main/CODE_OF_CONDUCT.md`, read 2026-10-24) and merge request !10366 (read 2026-10-24).
+The rules that come first were checked again on 2026-11-02: the AI policy on master (added in 8a097e63 on 2026-10-21) and the Code of Conduct on the [VideoLAN wiki](https://wiki.videolan.org/Code_of_Conduct/) (last edited 2019-02-11), because the code.videolan.org page sat behind a bot check that day.
 Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this skill is VLC's own practice.
 Re-read the active policy document and merge-request rules before every round.
+
+## The rules that come first
+- **The VideoLAN Code of Conduct** applies "to all means of communication, online and in real life", across VideoLAN's projects and channels.
+  - No foul language, and "absolutely NO insults will be tolerated"; no ad hominem attacks, flaming or trolling; no spam; no abuse of administrative powers.
+  - Criticism with care: focus on the possible improvements, do not make it personal, and "criticize in private, and praise publicly" where possible.
+  - Do not undo someone else's contribution (wiki edits, code reverts) without asking first.
+  - Communication in English; some lists, wiki pages and forum topics allow other languages when clearly flagged.
+  - On the mailing lists: the proper list for the question, no quoting of private mail without agreement, no copy to the original poster unless asked, lines wrapped at 80 characters, no top-posting, no HTML-only mail, no attachments over 65 kB without moderation.
+  - In the code repositories: no revert wars, no force-push that deletes another developer's commit, no insults in commits, and the project's commit log style.
+  - A first violation brings a warning unless it is grave or deliberate; repeated ones may be escalated to the VideoLAN board and the general assembly.
+- **The route:** a merge request on code.videolan.org (below), with public discussion and review kept there.
+- **AI:** the VideoLAN AI Policy (`doc/VideoLAN_AI_Policy.md` in VLC's tree), which applies to every VideoLAN project that has not set a different, explicit rule; the clauses follow.
 
 ## Where
 - Submit a change as a merge request on `https://code.videolan.org/videolan/vlc`.
 - A new code.videolan.org account may stay gated until an administrator approves it.
 - If registration is blocked, ask on the project's public `vlc-devel` channel; that path unblocked our account in September 2026.
-- The VideoLAN Code of Conduct applies to every project channel.
 
 ## The change
 - Keep the change focused on one VLC behavior or format path.
@@ -31,6 +43,7 @@ Re-read the active policy document and merge-request rules before every round.
 - Public merge request !10366 carries a video-player stereo metadata change in addition to its policy evidence.
 
 ## AI policy
+- The policy's scope: "In this policy, AI means large language models (LLMs) and the tools built on them, such as chatbots, coding assistants, and agents."
 - VideoLAN's policy says the contributor is responsible for all submitted code, commit messages, descriptions, comments and reports.
 - It says "Read it. Test it. Understand it. Be ready to explain it."
 - It says "Do not let an AI agent submit anything to VideoLAN for you, even with your approval."
@@ -39,6 +52,10 @@ Re-read the active policy document and merge-request rules before every round.
 - It says not to put this information in a commit message or credit an AI tool as a co-author.
 - It says AI help with writing or translation is fine, provided descriptions, reports and comments stay precise and concise.
 - It says project rules may differ from the VideoLAN policy, so re-check the policy before every merge request.
+- It says "Bug reports and security reports must be investigated and verified by the person submitting them. Unverified AI-generated reports will be rejected."
+- It says repeated violations "are handled by the board under our Code of Conduct and can lead to a ban".
+- It explains the commit-message rule: "We do not want to advertise for any AI company."
+- In the edition, Daniel submits to VideoLAN himself; no agent submits anything there, approved or not.
 
 ## Public record
 - Public merge request !10366 has both `AI::Generated` and `AI::NotCompliant`.

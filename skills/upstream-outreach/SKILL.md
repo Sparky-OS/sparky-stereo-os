@@ -46,7 +46,7 @@ Every contribution follows the receiving project's own rules and its code of con
 ## Per-project skills
 
 Each project has its own practice: where to send, the shape of a series, its tests and its review habits.
-Load the project's `contrib-<project>` skill with this one when it exists: [`contrib-ffmpeg`](../contrib-ffmpeg/SKILL.md), [`contrib-kde`](../contrib-kde/SKILL.md), [`contrib-qt`](../contrib-qt/SKILL.md), [`contrib-debian`](../contrib-debian/SKILL.md) and the others listed in the [skills index](../README.md).
+Load the project's `contrib-<project>` skill with this one when it exists: [`contrib-ffmpeg`](../contrib-ffmpeg/SKILL.md), [`contrib-kde`](../contrib-kde/SKILL.md), [`contrib-qt`](../contrib-qt/SKILL.md), [`contrib-debian`](../contrib-debian/SKILL.md), [`contrib-kernel`](../contrib-kernel/SKILL.md) and the others listed in the [skills index](../README.md).
 A `contrib-<project>` skill declares the packages that make it relevant (`metadata: requires-packages`), and `sparky-stereo-skills link` links it only where one of them is installed.
 
 ## Before writing

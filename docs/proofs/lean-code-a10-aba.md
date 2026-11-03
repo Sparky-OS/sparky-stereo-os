@@ -40,20 +40,22 @@ Every build is faster lean: 6 to 9 % when warm, 1 to 6 % when cold.
 Both lean runs built byte-identical modules.
 With the original files, acpi-call is identical and evdi and v4l2loopback differ, which is expected: lean headers have fewer lines, and kernel macros carry header line numbers into the module ([line numbers](../lean-code-packages.md)); that this is the only difference was not checked byte by byte here.
 
-## Programs: smaller, except Discover
+## Programs: smaller, and Discover follows its catalog cache
 
 | Program (memory, PSS, median of all launches) | Lean | Original files | Lean again | Change | Window opens (median) |
 |---|---|---|---|---|---|
 | plasmashell | 220 MiB | 226 MiB | 218 MiB | -2.9 % | 2.83 / 2.82 / 2.82 s |
 | systemsettings | 164 MiB | 172 MiB | 164 MiB | -4.2 % | 4.57 / 4.67 / 4.62 s |
 | dolphin | 57 MiB | 58 MiB | 51 MiB | -6.4 % | 2.23 / 2.20 / 2.29 s |
-| plasma-discover | 968 MiB | 640 MiB | 968 MiB | +51.4 % | 4.58 / 4.40 / 4.94 s |
+| plasma-discover (catalog caches not held fixed, see below) | 968 MiB | 640 MiB | 968 MiB | +51.4 % | 4.58 / 4.40 / 4.94 s |
 
 Plasma's shell, System Settings and Dolphin use 3 to 6 % less memory lean, and their windows open in the same time.
 
-**Discover is the exception, and it is a problem we are fixing.**
-Its first launch uses about the same memory in every state; from the second launch on it stays near 968 MiB lean, against about 620 MiB with the original files, in both lean runs.
-Lean files should make it smaller, not bigger, so we are tracing which of the files it reads causes this; this page will be updated with the cause and the fix.
+**Discover's difference is its catalog cache, not Lean Code** (traced on 3 November 2026, on the same laptop).
+This run did not hold Discover's software catalogs fixed: AppStream's caches were rebuilt and Discover refreshed the Flathub catalog between the three states.
+Its memory follows the state of those caches: with stale caches the same lean files measure 945 to 977 MiB from the second launch on; with freshly rebuilt caches, 238 to 250 MiB.
+With the caches held equal, Discover uses 554 to 606 MiB with the original files and 555 to 605 MiB lean: the same.
+Of the files Discover reads, only 28 are projected (Kirigami's QML).
 
 ## Boot: the same
 
@@ -97,7 +99,7 @@ A projection, not a measurement: these assumptions are ours, and each line scale
 | A heavy desktop user who never compiles | **About even**: the rebuilds at kernel updates save about 2 minutes; the checks after each package operation cost 6 to 14 minutes with dpkg-stereo 0.1.24 as measured, or about 1 to 2.5 minutes with 0.1.29's check, plus 2 to 2.5 minutes of monthly verification and about 1 minute of Hardware Setup |
 
 What does not grow with time: memory.
-It is a level, set by how many programs are open: each program measured here, except Discover, is 3 to 6 % smaller lean.
+It is a level, set by how many programs are open: each program measured here is 3 to 6 % smaller lean, and Discover the same once its catalog cache is equal.
 What grows with time: every build against the headers, and every package operation's check.
 
 Measured earlier, and permanent: the ISO is 10.09 MiB smaller after paying for dpkg-stereo and its records, and this laptop's installed package files take 140 MB less (55,442 files projected, 24 MB of records), as the [lean-code skill](../../skills/lean-code/SKILL.md) records.

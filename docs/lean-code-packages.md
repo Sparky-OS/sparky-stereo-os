@@ -10,6 +10,8 @@ The objective is fewer bytes read and scanned, less parsing work and less workin
 
 Measure actual reads, CPU time, elapsed time and memory for the operation concerned. Documentation and verification records outside that path do not negate avoided reads there; their storage and processing costs belong in separate build, update and footprint accounts. The principle identifies work to avoid; it does not substitute for measured results.
 
+**Measured on a whole system:** [Lean Code on a 2016 laptop](proofs/lean-code-a10-aba.md) compares the same installation lean, with its original files, and lean again.
+
 ## Release requirement
 
 Daniel's release rule, 18 October 2026: every package and ISO that the edition publishes goes through Lean Code in our pipeline. A package processed before distribution carries an **lc** mark so clients do not repeat the projection.

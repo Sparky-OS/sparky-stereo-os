@@ -98,7 +98,7 @@ For game performance use PPD's `HoldProfile` through `powerprofilesctl launch`, 
 Test the child's actual profile, argument boundaries, failure status, signals and power-saver hold precedence; an argv-only stub is insufficient.
 ## Memory and swap
 
-The edition keeps pages in RAM (swappiness 1, with or without zram). zram is decided by hardware: zram-generator's own `set!` directive runs a script that answers 1 or 0 and multiplies the device size, so a capable machine gets no zram unit at all; it is on with 8 GB of RAM or less, or when the swap area sits on eMMC, an SD card, a rotating disk or removable storage. lz4, because the machines that get zram have the least CPU to spare.
+The edition keeps pages in RAM (swappiness 1) and swaps to the Cushion Swap File on disk. zram and zswap are never set up by the edition and never on by default, on any machine: nothing for them is installed or configured, and there is no rule that turns them on by hardware. A person who wants zram opts in from Stereo APTus (or the Memory page's shortcut to the same action), which installs Debian's systemd-zram-generator; no edition package Conflicts with or Breaks a zram package, so that choice stays theirs. The publication and image gate (iso-build/zram-check.py in the build repository) refuses any package or image of ours that sets zram or zswap up.
 The user can switch it in System Settings, Memory.
 
 The swap is the Cushion Swap File, Daniel Ramos's design: the area stays off at rest, is switched on when available memory runs low or falls fast, and is switched off again only when the arithmetic shows that cannot itself run out of memory.
@@ -120,7 +120,7 @@ PowerDevil can keep an old CanHibernate answer while logind's has changed; ask l
 Pacing by headroom samples fastest on small machines, and so logs the most there: measure the log volume on the smallest machine you support, not only on yours.
 
 /tmp lives on disk (`tmp.mount` masked, as Debian's trixie release notes describe) and is emptied at every boot.
-Keep zram, sysctl and tmpfiles files in their owning package.
+Keep sysctl and tmpfiles files in their owning package.
 A generator fixture does not prove a live swap device.
 Read [system-housekeeping](../system-housekeeping/SKILL.md) for system policy.
 

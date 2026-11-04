@@ -67,5 +67,6 @@ It replaces none of the tests on a real television: VKMS has no cable, so the HD
 - The same phases on the kernel without the change, failing where expected.
 - Pictures of a few writeback frames and compositor frames, looked at by eye.
 - The real-hardware test (a television switching itself into 3D) stays in the [`drivers`](../drivers/SKILL.md) skill's proof list.
+- How to run that real-hardware test with a person at the bench and the partner remote, without risking the machine or the television: [`test-bench`](../test-bench/SKILL.md).
 
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

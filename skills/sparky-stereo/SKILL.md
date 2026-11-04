@@ -127,6 +127,7 @@ Load the one that matches the work; the [program list](../../docs/programs-in-de
 | [`deep-colour`](../deep-colour/SKILL.md) | 10, 12 and 16 bits from the driver to the canvas |
 | [`vr-to-3d`](../vr-to-3d/SKILL.md) | A program's VR path shown on a 3D display |
 | [`3d-to-vr`](../3d-to-vr/SKILL.md) | Stereo content and the desktop in a headset |
+| [`test-bench`](../test-bench/SKILL.md) | Real machines and 3D televisions: the person at the bench and the partner remote, baselines, recoverable changes, power and UPS, unattended labs |
 | [`vkms-stereo`](../vkms-stereo/SKILL.md) | Testing stereo without a 3D display: VKMS with a 3D EDID, the writeback bench, IGT and KWin in a VM |
 | [`stereo-vm`](../stereo-vm/SKILL.md) | A virtual machine's stereo display: QEMU's window, virt-viewer, virt-manager and Karton, the pointer in a 3D mode, the controls that must fail |
 | [`drivers`](../drivers/SKILL.md) | The kernel and GPU drivers: HDMI® 3D modes, deep colour, the edition kernel's configuration and its traps, and carrying patches until mainline takes them |

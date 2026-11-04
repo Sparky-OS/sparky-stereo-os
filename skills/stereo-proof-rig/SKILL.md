@@ -35,6 +35,8 @@ No 3D display is needed: the rig captures what Stereo KWin hands to an output, b
 - **Geometry, not only colour:** draw a disc of known size in each eye (0.6 of the window's height, round in the width the program believes it has) and measure its area, diameter, aspect and centre in each half; a squeezed eye still shows the right colour.
 - **Menus and keys:** KWin's [fake input protocol](https://invent.kde.org/libraries/plasma-wayland-protocols/-/blob/master/src/protocols/fake-input.xml) sends key events to the focused window, so a remote-control menu or a 3D menu is driven exactly as a user would, without a desktop.
 
+When the question needs a real machine, a cable or a 3D television, the rig is the first step and [`test-bench`](../test-bench/SKILL.md) is the next: baselines, recoverable changes and the television rules.
+
 ## Test material that a script can read
 
 - **Video:** two coloured sources, the left view red with "LEFT" and the right view blue with "RIGHT", both stamped with the same frame number, packed side by side or top and bottom, either eye first; marked with the frame packing SEI (x264's `--frame-packing`, also a clip whose SEI comes only on keyframes) or Matroska's `StereoMode`; plus a plain 2D clip and an undeclared 32:9 clip.

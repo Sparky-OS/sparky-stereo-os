@@ -32,7 +32,7 @@ Recovery that needs hands is the person's part of the job, not a gap in the lab.
 A lab is reliable here when the partner can detect a failure, isolate it to one machine and one change, and leave the person able to recover in minutes.
 
 The unattended model of BayLibre, where nobody is nearby, is a different case with different hardware.
-It is described at the end, for contributors and companies who run labs that way.
+It is described near the end, for contributors and companies who run labs that way, after a section for the middle case: a few people sharing a few benches.
 
 ## Who does what
 
@@ -140,6 +140,17 @@ Label every machine, cable and adapter, and keep a sheet with one line each:
 
 A text file does for a few machines. Snipe-IT is a free asset manager if the list grows.
 The sheet with real addresses and names stays private; a public page names models only.
+
+## A few people sharing a few benches
+
+Between one person's bench and an unattended lab sits the common middle: a small team, a handful of machines, people nearby most of the time.
+What changes is that the machines are shared, so the rules between partner and person also hold between people.
+- **One bench, one holder at a time.** Before using a machine, say so where the team looks (a shared note, a channel, or labgrid's places, which make it explicit). Release it when done. A partner never starts on a machine someone else holds.
+- **Each machine has a named responsible person** who answers when it needs hands, and a second who knows how to recover it.
+- **Announce before load or reboot, to whoever is at that machine.** A test that reboots a machine in the middle of someone's session looks like a crash to them.
+- **One inventory for the team,** with who holds what and since when, and the recovery steps written so that the second person can follow them.
+- **Shared displays get a calendar.** A television or a 3D monitor serves one test window at a time; collect the tests that need it and run them together.
+- **Partners reach shared benches through one coordinator,** never each on their own. One place decides which partner may load which machine, and the people know whom to ask.
 
 ## The unattended lab: BayLibre's model
 

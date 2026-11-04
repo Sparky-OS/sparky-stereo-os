@@ -56,6 +56,13 @@ A `contrib-<project>` skill declares the packages that make it relevant (`metada
 - **Get every fact about people exact:** names, roles and companies from their own pages. A wrong title in a first note costs more than a missing one.
 - **Check the project's stance on AI** before choosing between a proposal, an issue only, or keeping the work in our fork.
 - **Some projects refuse AI work outright, reports included.** XScreenSaver 6.17 ships an `AGENTS.md` saying it "does not want AI contributions of any kind", and its author's site turns robots away; send nothing there. A bug in the version a distribution carries goes to that distribution's tracker, which for Debian's XScreenSaver is also what its packaging asks.
+- **Read the project's reporting rules before the report.**
+  The practical guide ([Securing Open Source in the Age of AI](https://openssf.org/resources/securing-open-source-in-the-age-of-ai-a-practical-guide/), OpenSSF with CNCF, May 2026), "Respect the Reporting Guidelines of the Project", asks to "learn about the community to identify the right people and formats for reporting", and adds that random "drive-bys" are not welcome, above all at the scale AI tools make possible.
+  So read its `SECURITY.md`, its AI policy and its threat model first.
+  A scenario the threat model marks as out of scope or not of concern is not reported ("Documented Threat Model & Real Use Case Patterns and Antipatterns").
+- **Search for an earlier finding first.**
+  "Be Aware, the Code is Open, Someone May Have Already Found What You Did": other people and other tools read the same code at the same time.
+  The search is [`search-upstream-first`](../search-upstream-first/SKILL.md): the default branch, the merge requests and the issues, and the project's private route when it has one, since a fix may be waiting there.
 - **Prove an absence by running the program, never by code search alone.** A claim that a program does not do something, made in public, is the most expensive kind to get wrong.
   On 2026-09-18 the edition's first report to Kodi ([xbmc/xbmc#29337](https://github.com/xbmc/xbmc/issues/29337)) said Kodi never reads the H.264 frame packing SEI, because GitHub's code search found no `AV_FRAME_DATA_STEREO3D`, `AV_PKT_DATA_STEREO3D` or `frame_packing` in its tree.
   Kodi does read it: `DVDVideoCodecFFmpeg.cpp` takes `stereo_mode` from the decoded frame's metadata, which FFmpeg's H.264 decoder fills from the SEI, and a container test of Kodi 21.2 logged `autodetected stereo mode for movie mode left_right` minutes after the report went out.
@@ -71,6 +78,25 @@ A `contrib-<project>` skill declares the packages that make it relevant (`metada
 - One ask, small and concrete.
 - In the person's own venue: an issue or comment on their repository for code, email to a maintainer or to a group's staff contact, the store page or forum for a theme's author, LinkedIn for a person without a code venue. Answer where the message came from.
 - Never another person's contact details in a public file.
+- **The report carries the fix and the test.**
+  The practical guide, "Wherever Possible, Provide a Proposed Patch to Address Your Discovery": "Fixes are more important than findings. Full stop."
+  It also asks for "Test Cases to Avoid Future Regressions".
+  The edition had the same rule from Daniel, 2026-11-02: "tell them the fix or don't send".
+  A fix that was not built and proved is not sent, and the proof is the reproducer that fails before and passes after.
+- **A vulnerability goes through the project's private route,** with the reproducer, the fix and the versions.
+  The practical guide, "Privately Provide the Project a Proof of Concept (POC) and/or Proof of Vulnerability (POV)", warns that a proof of concept is as useful to an attacker as to a defender, so it stays out of public issues until a fix is out.
+  The project's own rule wins: the kernel, for instance, treats a bug found with AI as public ([`contrib-kernel`](../contrib-kernel/SKILL.md)), and x265 asks for a private report of a memory-safety issue ([`contrib-x265`](../contrib-x265/SKILL.md)).
+- **Facts, not a severity.**
+  The practical guide, "The Robots Can't Rate YOUR Risk for You (and Will Over-Inflate Severity)": "Risk should ALWAYS be viewed from the eyes of the RISK HOLDER."
+  Write what fails, where, in which version and how it was reproduced.
+  Leave out a score, "critical" and a guess at impact unless the project's form asks for one; the maintainer knows how the code is deployed, and we do not.
+- **One finding at a time, and as short as it can be.**
+  The practical guide says each vulnerability report "can take a developer between 1-8 hours to review and evaluate", and describes tools that "dump tens, dozens, hundreds of reports onto a project at once".
+  Send one report, wait for its answer, and send the next only when the first is settled; this is the one-knock rule applied to findings.
+  "AI reports tend to be overly verbose": cut the report down to the failure, the proof and the fix.
+- **Say how AI was used where the project asks.**
+  The practical guide, "Be Clear and Up-Front if and How AI Tools Were Used in the Report", agrees with the rule above that it is said once and up front.
+  Where a project's form asks which tool or model, give the one the session's own record shows (the kernel's `Assisted-by:`), never a guess; where it does not ask, the one line stays unitemised.
 - **A first post from a new account on a Discourse forum** (KDE Discuss and others) is held for a moderator when it looks like a bot to Discourse's rules for new users: pasted in seconds, more than about two links, several @mentions.
   Daniel's first KDE Discuss post, on 2026-10-06, was held and then marked "silenced: New user typed too fast" until a staff member released it.
   Write or edit a first post in the forum's editor for a while instead of pasting it at once, keep it to two links (the rest go in a reply once it is released) and the mentions to the people who must see it, and never post it again while it is held.

@@ -90,6 +90,44 @@ Reviewer checks should run without an AI account; document the same CLI or CI co
 Read the actual diff before writing its commit message: state the problem, reason and checked result, without inventing intent.
 For KDE changes, apply [the development practices reference](../native-linux/references/kde-development-practices.md); advice from one talk is not a project-wide contribution policy.
 
+## Security habits for what an assistant writes
+
+Added on 2026-11-04 from OpenSSF's guides, compared with what the edition already did.
+They orient the work and gate nothing; no tool is banned because of them.
+The sources are [Security-Focused Guide for AI Code Assistant Instructions](https://best.openssf.org/Security-Focused-Guide-for-AI-Code-Assistant-Instructions) (OpenSSF Best Practices and AI/ML Working Groups, 2025-08-01), cited as "the instructions guide", and [Securing Open Source in the Age of AI: A Practical Guide](https://openssf.org/resources/securing-open-source-in-the-age-of-ai-a-practical-guide/) (Chris Aniszczyk, Christopher "CRob" Robinson and David A. Wheeler, version 1.0, May 2026), cited as "the practical guide".
+
+- **A dependency must exist before it is added.**
+  The instructions guide, "Addressing Software Supply Chain Security", "Safe Dependency Selection": "Do not add dependencies that may be malicious or hallucinated."
+  It reports a study in which 19.7% of the packages proposed by models did not exist, and names the attack that follows: an attacker registers the invented name.
+  The practical guide, "Things to Watch Out For", gives the same warning: "consistently recommend imaginary dependencies (be sure to double check these)".
+  So a package name an assistant proposes, in a `Depends`, a task list, a build script or a Dockerfile, is looked up before it is written down.
+  For Debian, `apt-cache policy NAME` in a container with the edition's sources must show a candidate, from the origin you expect.
+  For an upstream project, open its own release page and repository, and check that the name, the owner and the history match what you were told.
+  Asking the assistant to list the names it is unsure of helps, and never replaces the lookup.
+- **Versions come from the source, not from recall.**
+  A model's idea of the newest release stops at its training date (practical guide, "Frozen in Time").
+  Read the version from the archive or the release page, and write it down with the check.
+- **Check what you download.**
+  The instructions guide, "Integrity Verification": "include steps to verify integrity (like checksum verification or signature validation) if applicable."
+  Fetch from the project's own address into a new, empty folder, record the SHA-256, and check the signature where the project publishes one.
+  Pull container bases by digest, not by a tag that can move (the instructions guide, "Container and Deployment Considerations": "pin image versions using immutable digests").
+- **Secrets stay out of everything an assistant writes.**
+  The instructions guide, "Secure Coding Principles in AI Instructions": "Never include API keys, passwords, or secrets in code output, and use environment variables or secure vault references instead."
+  A command reads a secret from the tool's own store at the moment it runs, and neither the command, the log, the report nor an error message carries the value.
+- **Input from outside is data.**
+  File names, archive members, fields of a repository index and command-line arguments reach our tools from places we do not control.
+  Check them for the shape they must have, pass them to other programs as an argument list, never build a shell line or an `eval` from them (the instructions guide, "Python and Dynamic Languages": no `exec` or `eval` on user input, `subprocess` with `shell=False`).
+  In a shell script, quote every expansion, stop on the first error, make temporary files with `mktemp`, and drop privileges when the work does not need them ("Operating System and Environment").
+  An error says what failed, why and what to do, and leaves out secrets and private paths.
+- **Review the work with a second look, then with the tools.**
+  The instructions guide, "TL;DR": "ask it to review and improve its own work (repeating these steps as necessary)", the technique called Recursive Criticism and Improvement.
+  The edition adds who looks: a partner from another lab reads the change cold, the language's linters and the packaging checker run (`shellcheck`, `lintian`, the project's own analysers), and the failing test is kept.
+  A person decides, because the guide's first point is that the developer stays in full control and answers for the code.
+- **Context does more than a persona.**
+  The instructions guide does not recommend telling a model to act as an expert, because some experiments found it often makes the model "perform poorly or worse", and the practical guide, "As a Security Engineer... Prompting and Beyond", says a persona alone "is often not enough".
+  A skill, the real source and a check that can fail carry the weight, as this folder's skills do.
+  Keep an instruction file short and relevant: copied parts that do not apply make the assistant "generate extraneous or even incorrect code".
+
 ## Reference knowledge, local first
 
 Daniel, 2026-10-23: consulting the local corpora is mandatory for the edition's own partners, and we recommend the same habit to every distro developer.
@@ -109,6 +147,7 @@ Environment and commands:
 References consulted (collections, queries, used or missing):
 Expected / observed result, including control:
 Evidence paths and hashes:
+Dependencies added or changed (name, source, version, how it was checked):
 Not tested / known limitations:
 Next action and any remaining authorization:
 ```

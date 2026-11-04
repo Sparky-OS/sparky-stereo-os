@@ -172,7 +172,7 @@ Either use a model with an HDMI loop-out that keeps the television in the chain,
 
 ### Connecting a bench to LAVA or labgrid
 
-Do this when a contributor wants the bench to run tests for others without the owner at the keyboard.
+Do this when a contributor wants the bench to run tests for others without the person at the keyboard.
 The names below are the projects' own; read their current documentation for the exact syntax before you write a configuration.
 
 1. **Make each machine controllable by a command.** Power on and off (a switched outlet, a PDU, Copilot) and a console (a UART adapter, or an IP-KVM's serial channel). A machine with only a screen is a manual machine; say so.

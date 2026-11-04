@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Tool image for vkms-stereo-bench: QEMU, a static BusyBox for the guest, edid-decode, a compiler for the
 # static guest programs and for test kernels, and Python with Pillow for the frame analysis.
-FROM debian:testing
+FROM debian:testing@sha256:cf15c569a84dfda832e421ab27a8049e962ba8e90571612396cd8db799279e4e
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
         qemu-system-x86 busybox-static edid-decode \

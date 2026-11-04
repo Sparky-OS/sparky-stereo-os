@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Tool image for hibernate-bench: QEMU, swtpm, OVMF with Secure Boot, key enrolment, signing, an initramfs toolkit
 # and a compiler for the test module. Nothing in it is specific to any one kernel.
-FROM debian:testing
+FROM debian:testing@sha256:cf15c569a84dfda832e421ab27a8049e962ba8e90571612396cd8db799279e4e
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
         qemu-system-x86 ovmf swtpm swtpm-tools tpm2-tools libtss2-tcti-swtpm0 libtss2-tcti-device0 \

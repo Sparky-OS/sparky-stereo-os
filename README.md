@@ -182,6 +182,7 @@ What people who work with stereo said about it, in public and with links: [What 
 ## Documents
 
 [The VR-engine-to-3D-display formula](docs/formula.md), [the first KWin runs on real TVs](docs/first-runs/kwin-2026-10-01/README.md) and [the W3C talk slides](docs/talks/2026-10-13-w3c-me-ig.md) of 13 October 2026; every page is in [docs](docs/).
+[The glossary](docs/glossary.md): every name the edition carries from the file to the screen, each with what it means here, the page that defines it and its name in every format and interface that also has it.
 
 ## Tools
 

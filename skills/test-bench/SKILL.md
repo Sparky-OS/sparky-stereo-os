@@ -183,6 +183,19 @@ The names below are the projects' own; read their current documentation for the 
 6. **Keep the secrets and addresses private,** in the lab's own configuration, never in the edition's public repository.
 7. **Add the baseline** (above) as the first test of every run.
 
+### A board farm for upstream work: obey the project's CI from the start
+
+This is the edition's own practice, added to the talk's model.
+The best use of a board farm for a contributor is to run the upstream project's own CI on your own bench from the first commit.
+- Run the project's jobs as they are: the same images, the same steps, every job including the lint ones.
+- For hardware jobs (kernel, DRM, display), the bench plays the part of the project's lab: KernelCI, for example, runs kernels on real boards through LAVA.
+- Iterate on your bench, never on the project's runners. Their CI is shared infrastructure the project pays for, and each failure mails its maintainers.
+- Push only what is already green on your bench. The pipeline that runs after the push is the confirmation, not the test loop.
+- When a project requires a passing pipeline before merging, the branch behind a merge request must run its pipeline. Skip CI only for documentation and fork-only branches.
+- When your work needs something the project's CI images lack, change the CI on your fork only, in a commit marked as fork-only, and never put that commit in the upstream request.
+- A failure that also happens on the unpatched tag is not your container's fault until you have checked: see whether the project's own runners fail the same way, and look for the project's later fix to its CI before you push.
+- For KDE, [`kde-ci-local`](https://github.com/Sparky-OS/sparky-stereo-os-build/tree/main/tools/kde-ci-local) reproduces KDE's CI jobs locally.
+
 ## Credits
 
 Patrick Titiano and BayLibre for the talk "Making Your CI Lab More Reliable", and for Copilot and LabRack.

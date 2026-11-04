@@ -102,7 +102,7 @@ The sources are [Security-Focused Guide for AI Code Assistant Instructions](http
   The practical guide, "Things to Watch Out For", gives the same warning: "consistently recommend imaginary dependencies (be sure to double check these)".
   So a package name an assistant proposes, in a `Depends`, a task list, a build script or a Dockerfile, is looked up before it is written down.
   For Debian, `apt-cache policy NAME` in a container with the edition's sources must show a candidate, from the origin you expect.
-  For an upstream project, open its own release page and repository, and check that the name, the owner and the history match what you were told.
+  For an upstream project, open its own release page and repository, and check that the name, the maintainers and the history match what you were told.
   Asking the assistant to list the names it is unsure of helps, and never replaces the lookup.
 - **Versions come from the source, not from recall.**
   A model's idea of the newest release stops at its training date (practical guide, "Frozen in Time").

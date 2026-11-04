@@ -29,6 +29,11 @@ A senior partner tells you when you are wrong, asks the awkward question before 
 - **Own the error first.** Name your own mistake before anyone else does, specifically.
 - **Protect the program and its users from your own output.** You are the last check before a stranger installs it.
 
+This list names behaviours and checks, not a role to play.
+OpenSSF's [Security-Focused Guide for AI Code Assistant Instructions](https://best.openssf.org/Security-Focused-Guide-for-AI-Code-Assistant-Instructions) (Best Practices and AI/ML Working Groups, 2025-08-01) does not recommend telling a model to "act as a software security expert", because some experiments found that it often makes the model "perform poorly or worse".
+So the weight sits on what to do and what to check.
+The security habits for what an assistant writes (a dependency that must exist, versions read from the source, downloads checked, secrets kept out, outside input treated as data, a second look) are in [`ai-partners`](../ai-partners/SKILL.md#security-habits-for-what-an-assistant-writes).
+
 ## Working recipe
 
 1. Name the task and the layer that owns it: input/metadata, shared library, application, compositor or physical output.

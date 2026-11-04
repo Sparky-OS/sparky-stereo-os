@@ -144,6 +144,45 @@ A test image that installs from our repository needs deb-multimedia's source and
 The development and published repositories, the key and a publication's order: [the repository](references/repository.md).
 Packing the image, in containers or from the development VM: [the ISO](references/iso.md).
 
+## Names and sources are checked before they are written down
+
+OpenSSF's [Security-Focused Guide for AI Code Assistant Instructions](https://best.openssf.org/Security-Focused-Guide-for-AI-Code-Assistant-Instructions) (Best Practices and AI/ML Working Groups, 2025-08-01), "Addressing Software Supply Chain Security", asks that an assistant not add "dependencies that may be malicious or hallucinated", and that it show how to verify what it adds.
+The packager's side of that is short and applies to a person as much as to an assistant.
+These are habits that orient the work; no tool is refused because of them.
+
+- **Every package name exists in the archive before it enters a file.**
+  The `Depends`, `Recommends`, `Suggests` and `Build-Depends` fields, a task's list, a pin file and a Dockerfile are checked with `apt-cache policy NAME` in the build container, which must show a candidate from the origin you expect.
+  A name that comes from an assistant's memory, a forum post or an old recipe is checked like any other, and an assistant's list of names it is unsure of is a place to start the lookup, not the lookup.
+- **An upstream tarball is verified, not only downloaded.**
+  Debian Policy 4.11 (`debian/watch`) recommends, when upstream signs releases, the `pgpsigurlmangle` option and the signing keys in `debian/upstream/signing-key.asc`, so that `uscan` checks the signature; Lintian's `debian-watch-does-not-check-openpgp-signature` is the reminder.
+  Where upstream signs nothing, fetch from the project's own release page and record the file's SHA-256 in the recipe's notes.
+- **Container bases are pulled by digest and the digest is recorded.**
+  The guide, "Container and Deployment Considerations": "pin image versions using immutable digests (e.g., SHA256 hashes) instead of mutable tags".
+  A `debian:testing` tag changes under a lane; on 2026-10-13 it became an i386 image and a bench installed i386 packages without saying so.
+- **The task check covers every name,** not only the tasks: the list of what the work added or changed goes in the handoff, with its source and version, as [`ai-partners`](../ai-partners/SKILL.md#handoff) asks.
+
+## Workflows and a repository's own safety, measured with Scorecard
+
+[OpenSSF Scorecard](https://github.com/ossf/scorecard) scores a repository from 0 to 10 on a list of checks, each with its reason, and the instructions guide asks the same of generated pipelines: "ensure secrets are stored securely ... and not hard-coded in the workflow files" and "lock the version to specific SHA" ("Operational Security").
+In a repository of ours that has a GitHub Actions workflow:
+
+- the workflow starts with `permissions: contents: read`, and a job asks for more only for the step that needs it;
+- each `uses:` line names a commit, with the release tag in a comment (`actions/checkout@<40-hex commit> # v5`), and a `.github/dependabot.yml` entry for `github-actions` keeps the commits current;
+- no secret is written in the file; a workflow reads it from the repository's secrets.
+
+The organisation's `SECURITY.md` lives in its `.github` repository and applies to every repository without one of its own; Scorecard's Security-Policy check looks there too.
+To measure a repository, run the pinned container from the documented registry, with the token read inside the command and never printed:
+
+```sh
+GITHUB_AUTH_TOKEN="$(gh auth token)" docker run --rm -e GITHUB_AUTH_TOKEN \
+  ghcr.io/ossf/scorecard@sha256:c0a21a1c33a2d8819937d0a8a62e6f4189c800639abd9f0bfbe61c90c71fae90 \
+  --repo=github.com/OWNER/NAME --format=json --show-details
+```
+
+That digest is v5.6.0 (the registry `gcr.io/openssf/scorecard`, which older instructions name, answered "requires billing" on 2026-11-04).
+A score is a measurement of the repository, not a gate: some checks (required reviews, signed releases, branch protection) change how people work, and those are Daniel's to switch on.
+On a fork, Scorecard mostly measures upstream's code and settings, so a fork's low score is not ours to fix.
+
 ## Proof before shipping
 
 Use [the KDE development checks](../native-linux/references/kde-development-practices.md) when packaging changed KDE applications: fresh message extraction, installed translations, relevant QML/static analysis and required CI results.

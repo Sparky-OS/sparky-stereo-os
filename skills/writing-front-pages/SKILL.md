@@ -114,3 +114,30 @@ Keep precise implementation/proposal labels for the Theme Editor, toolkit depth,
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.
+
+## Explainers for a standards group, with respec-mcp (2026-11-06)
+
+Written from ORDER 431, thirty-three explainers for the W3C PM-KR Community Group, one idea each.
+An explainer is a front page for one idea: the rules above apply, and the group's own form adds three things.
+
+**The recipe.**
+1. Read respec-mcp's guidance first: `python3 respec-call.py resources`, then `read respec-mcp://skills`, `read respec-mcp://authoring-guide` and `read respec-mcp://skill/w3c-explainer`. The explainer skill routes to W3C's [Writing Effective Explainers](https://www.w3.org/TR/explainer-explainer/) and says to use the repository's existing format; in pm-kr that is Markdown in `explainers/`, so no ReSpec scaffold is needed for an explainer. Reports stay ReSpec and go through `respec_preflight` then `respec_validate`.
+2. Plan the set before writing: one file per idea, with the idea, its sources and its reader in a table; an idea already covered by an existing page is linked, not rewritten.
+3. Mark every page as an individual's input, in the same three lines each time: "**Status:** an individual's input to the ... Community Group, by NAME, DATE. It is not a decision or a report of the group. Comments and objections are welcome in this repository's issues." The group's name goes on nothing it did not decide.
+4. One shape per page: the question in the reader's words; the idea, with the names it already has and where they come from (cite the clause); where it exists today, with its status said plainly (built, measured, proposal, not implemented); earlier work; what to try or discuss. Short: about 300 to 600 words, the special one longer.
+5. Reuse names. Before naming anything, look it up in the group's glossary and in the specification; never invent a second name for an idea that has one.
+6. Pictures as SVG with a `<title>` and a `<desc>`, no external references; a stereo pair drawn as side by side and as red and cyan; no personal places, accounts or mail.
+7. Keep a claims table as you write (`claims.tsv`: explainer, sentence, source, where checked), one row per load-bearing claim; it is what the reviewer reads first.
+8. Check links by script before the hand-back: relative links and anchors against GitHub's heading slugs (lowercase, punctuation dropped, spaces to hyphens), external links by HTTP status.
+9. Run the repository's own checks (`respec_list_profiles`, `respec_preflight`, `respec_validate` with `--repo-root` pointing at your clone, never at a shared clone, because validate writes the build folder) and the publish check.
+10. Cold readers on two pages, with nothing but the text, answers recorded word for word.
+
+**Traps.**
+- A posted comment that turns out wrong is never contradicted silently: say "corrected", link the correction where it is posted, and explain the reason in the text (the CSS Spatial z-axis insets are named like `top` and `bottom`, a distance measured from that side, so `inset-back` moves a box toward the viewer; "popped" is `inset-back: 100%`).
+- A size is not a count: a 101 KB glossary is not "101 entries". Count before writing a number.
+- Mailing-list archives: the index page's regular expression needs the real markup; fetch the index and grep its `href="NNNN.html"` entries, then open the message to confirm the words before linking it.
+- A talks page's "Discussed at TPAC 2027" kind of slip in a thread you quote is quoted as said, with the date from the record; do not repeat the slip as a fact.
+- `ask_cloud` can answer 429 from the local Ollama and `ask_chatgpt` can be unavailable; record the refusal word for word and try the other dispatcher or another model rather than inventing a reader's answer.
+- A cold reader run as a subagent must be told the one tool it may call to hand its answers back; told "use no tools", it answers into the void (two runs lost that way on 2026-11-06). A required-reading hook can then refuse that handback until the reader has read files it was told not to read: say it may read them only after its answers are written and must not change them, or take the answers from its transcript's text blocks with a bounded script. Give the reader the page with its links intact, or it reports missing references that the page has.
+
+**Perks.** The individual-input label lets a page be bold and early without the group's name on it, and the glossary makes the names free: every explainer's "The names, and where they come from" section is a lookup, not research.

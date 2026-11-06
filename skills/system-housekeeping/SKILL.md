@@ -67,7 +67,7 @@ Daniel, 2026-10-30: "all kernel purges must locate all that kernel parts and reg
 ## Local system mail
 
 A Debian system mails itself: cron, anacron and sudo notices, netdata and security-check alerts (chkrootkit, rkhunter), the bounce of a message nobody could deliver.
-Daniel, 2026-11-05, after a station's mailbox turned out to be 189 MB of such notices from 2019 and 2020: "that cleaning was due long ago".
+Daniel, 2026-11-05: "that cleaning was due long ago".
 
 - **Where it piles up.** `/var/mail/USER`, one mailbox per account. Debian Policy 11.6: the mail spool is `/var/mail`, `2775 root:mail`, and a mailbox is `600` owned by the user or `660` owned by `user:mail`. A person can therefore empty their mailbox but cannot delete it, and root can do both. `~/dead.letter` and `/root/dead.letter` keep a copy of a message a mail program could not send (a failed security alert is the usual one). `/root/mbox` holds mail root has read. The queue folders of a mail program (`/var/spool/exim4`, `/var/spool/postfix/{active,bounce,corrupt,defer,deferred,flush,hold,incoming,maildrop,saved,trace}`, `/var/spool/nullmailer/{queue,failed,tmp}`, `/var/spool/dma`, a person's `~/.msmtp.queue`) outlive the program when it is removed without a purge. Postfix's other folders under `/var/spool/postfix` are its chroot (libraries, `resolv.conf`), not mail.
 - **What is system mail.** Mail a machine wrote to itself. Look at the senders and subjects before you call a mailbox "his data": count them (`grep -c '^From '`, `grep '^Subject:' | sort | uniq -c | sort -rn`). A person's own mail is not system mail, and the local mailbox can hold some: the cleaner says so in its warning.

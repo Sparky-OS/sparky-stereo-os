@@ -36,3 +36,23 @@ For vendored Cargo inputs, retain the original crate identities and checksum man
 If vendor checksums already disagree with the accepted source, establish that baseline separately: verify each discrepancy against the pinned source commit, retain the original manifest and record the exact accepted hashes or absent paths. Any build-time reconciliation must reject other edits and restore the original metadata on clean. This repairs provenance metadata; it is not a Lean Code transformation or saving.
 
 Check the actual language of shared headers, not only their extension. Mesa's shader includes and BVH headers can feed both C and GLSL; preserve them until both consumers are qualified. Inactive architecture branches can also contain target pragmas that the host compiler rejects during a preprocessing check. Preserve those reviewed inputs with an explicit reason, or use the appropriate target checker; never remove the pragma to make a check pass.
+
+## The preserve plan across routes (ORDER 433)
+
+`debian/sparky-lean-preserve.json` maps source patterns to the reason each is kept authored for a consumer that reads source text.
+`lean.debian_prepare` writes it only from `--preserve-source` arguments and refuses to replace an existing one, so a plan survives a new version only if the route hands it back.
+`repo/plain-from-lc.py` removes it with the rest of what `debian_prepare` added, under every option (the unlink is not conditional), so any route that goes through it must read the plan first.
+
+Recipe, for a route that turns a published +lc1 source back into its plain source:
+
+1. Before `plain-from-lc.py`, read `debian/sparky-lean-preserve.json` of the unpacked published source (JSON object, pattern to reason).
+2. After the plain step, call `lean.debian_prepare ... --preserve-source PATTERN REASON` once per entry, in file order, as `repo/lc-successor.py` does.
+3. Compare the new file with the published one byte for byte (`cmp`); a difference stops the route naming the source (a hand-formatted plan, or a pattern `debian_prepare` refuses), and never writes a source that lost its plan.
+
+Routes: `repo/lc-successor.py` and `packages/transition-rebuilds/prepare-lc-source.sh` carry the plan.
+Other scripts that run `plain-from-lc.py` on a published source (kwin and plasma-workspace prepare scripts, dxvk-stereo, ffmpeg-dmo, the mpv recipe) have no plan to lose today: the newest published source of kwin, plasma-workspace, ffmpeg-dmo, dxvk, libkscreen and plasma-wayland-protocols holds none (checked 6 November 2026 with `tar -tf` of each `.debian.tar.xz`).
+Check that again before a script is used on a source that gains a plan: list the published source's `debian/` first.
+
+How to see the loss: `dpkg-source -x` the published .dsc and the new one and `ls debian/sparky-lean-preserve.json` in both; or `diff -rq` of the two `debian/` trees, where the plan is the only file that should differ by absence.
+The loss is silent because the build still passes: the preserved files are projected by Lean Code and the tests of a package with no consumer for them stay green.
+Test: `sparky-os/tests/reproducible-sources/transition-preserve.sh` runs the route's source half on a fixture with a plan, one without and one with a plan in another form, and a copy without the carrying must fail.

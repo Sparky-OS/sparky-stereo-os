@@ -1,11 +1,10 @@
 ---
 name: contrib-ums
 description: >-
-  Contribute to Universal Media Server under its three accepted checks, Java
-  style gate and device-level proof. Load with upstream-outreach before a UMS
-  pull request.
-metadata:
-  requires-packages: default-jre
+  Contribute to Universal Media Server on GitHub: its three accepted checks, the Java style gate (STYLEGUIDE.md),
+  device-level proof on a real renderer, the pull-request template. Load it with upstream-outreach for a UMS
+  transcoding, renderer profile or 3D bug: the frame packing SEI kept through a transcode, Output3DFormat, a renderer
+  configuration that outranks the generic one.
 ---
 
 # Contributing to Universal Media Server
@@ -53,3 +52,9 @@ Re-read those files in the current tree before every round; its default branch i
 ## Replies
 - Answer each review point with the automated result, code-review note or manual check that resolves it.
 - Thank the reviewer for the specific review work.
+
+## Lessons from the lanes, October to November 2026
+
+From the lanes of 25 October to 6 November 2026; add the next lesson here as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
+
+- Nothing UMS specific in the hand-back: the lane packaged ORDER 223 (hardware decode) for nine source packages (116 archives), with the check-debs marker removal control and check-link unresolved library control; the UMS and MPlayer messages were held, none sent. (lane ums-3d-bugs-178-gpt)

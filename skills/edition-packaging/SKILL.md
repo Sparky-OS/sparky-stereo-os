@@ -147,6 +147,11 @@ So our stereo patches for FFmpeg and mpv go on deb-multimedia's source packages 
 Offer them to deb-multimedia in the agreed order, and upstream as before.
 A test image that installs from our repository needs deb-multimedia's source and our pin, as [the repository](references/repository.md#the-repository-sits-on-deb-multimedia) says.
 
+## A publication round
+
+A round runs from a frozen worktree of the build repository, passes the pre-round checks (the whole lean suite, reproducible sources, wiring; in containers), and proves the upgrade on the edition's own dpkg, judged on apt's `Inst` and `Remv` lines.
+The recipe, what the proof fails on, how to read a failed round and the traps already met: [publication round](references/publication-round.md).
+
 ## The repository and the ISO
 
 The development and published repositories, the key and a publication's order: [the repository](references/repository.md).

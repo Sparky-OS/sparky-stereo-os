@@ -114,3 +114,6 @@ Traps:
 - `dpkg-genchanges` fails when a binary package's `Section` differs between `debian/control`, the `.deb` and `dpkg-distaddfile`; the engine package inherits the source's section unless it sets its own.
 - A source package that copies a recipe folder (`HERE=$W/recipe`) must take other trees from the original folder (`$RECIPE/../..`), not from the copy.
 - `docker run --tmpfs` has no `exec`; the mutation and dpkg tests write helper programs under /tmp and need `,exec`.
+
+Once the new engine matched the old one on recorded rankings, the old Python tool was deleted (plain git deletion, no rewritten history); its last commit is 9c834ddc312e0c92f4923bfe088e67b3cd54d0bc in Sparky-OS/sparky-stereo-os.
+Work that replaces a tool this way: record the old tool's answers as data first (the goldens and the routing set), keep the tests reading that data, then delete the tool, so no test needs it afterwards.

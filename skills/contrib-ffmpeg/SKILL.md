@@ -1,10 +1,12 @@
 ---
 name: contrib-ffmpeg
 description: >-
-  Contribute to FFmpeg on code.ffmpeg.org: series shape, commit messages and trailers, FATE references and samples,
-  the review bot, CI and replies. Load with upstream-outreach when sending or answering an FFmpeg pull request.
-metadata:
-  requires-packages: libavcodec-dev | libavformat-dev | libavfilter-dev | libavutil-dev
+  Contribute to FFmpeg on code.ffmpeg.org (Forgejo): the series shape, commit messages (area/sub: what it does, Fixes:,
+  Signed-off-by, Assisted-by), squashing fixups and force-with-lease, FATE references and samples (tests/ref/fate,
+  fate-samples, inject-pr-samples, THREADS), the review bot's verdicts (minor_issues_approve, moderate_issues), the CI
+  logs, replies to reviewers and rebases after approval. Load it with upstream-outreach when a FATE reference differs
+  after a rebase, fate-cbs-h264-metadata-sei changes, ffprobe shows no Stereo 3D side data, the bot or a reviewer asks
+  for changes, a frame packing SEI or stereo3d patch needs a test, or a pull request waits on master.
 ---
 
 # Contributing to FFmpeg
@@ -59,3 +61,8 @@ Check freshness: re-read `CONTRIBUTING.md`, `doc/developer.texi` and `doc/commun
 ## Replies
 - Disclose AI assistance once, in the pull request description; the replies in the thread do not repeat it.
 - Short, one point per line, every claim with its commit, test or clause; thank reviewers by name for what they actually did.
+
+## Lessons from the lanes, October to November 2026
+
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (9 entries).
+Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

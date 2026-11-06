@@ -51,8 +51,8 @@ Return: changed paths, evidence location, actual result, gaps and next step
 ```
 
 Do not dump an entire mailbox, research folder or skill catalogue into a model.
-Use `tools/skills-context.py` from the public tree for a reader without filesystem access.
-When the brief does not name the skill, `tools/skills-context.py --find "<task or symptom>"` (installed: `sparky-stereo-skills find`) ranks the skills offline by name, description and the index's task table; a small model can run it and then load only the first one's context.
+Use `sparky-stereo-skills context` (from a checkout, `SPARKY_STEREO_REFERENCE=$PWD sparky-stereo-skills context`) for a reader without filesystem access.
+When the brief does not name the skill, `sparky-stereo-skills find "<task or symptom>"` ranks the skills offline by name, description and the index's task table; a small model can run it and then load only the first one's context.
 The output records file hashes and refuses an oversized bundle instead of cutting instructions off.
 For a long skill, select a heading with `--section skill-name:Heading`; include the sections needed for that step and retain the common contract.
 A text bundle does not grant tool access or execute its commands.
@@ -211,7 +211,7 @@ Measure a description's tokens with the same tokenizer before trusting its tail.
 ### Finding a skill locally
 
 The files are the source; every index is derived from them and rebuilt after a merge.
-- In a checkout or on an installed system: `sparky-stereo-skills find "<symptom>"` (or `python3 tools/skills-context.py --find "<symptom>"`) ranks the skills offline by name, description and the task table, the same every time, and prints each path with the `context` command to run next.
+- In a checkout or on an installed system: `sparky-stereo-skills find "<symptom>"` (on a checkout, with `SPARKY_STEREO_REFERENCE=$PWD` in front) ranks the skills offline by name, description and the task table, the same every time, and prints each path with the `context` command to run next.
 - With a local vector index: one point per skill, the name and description embedded, the path in the payload; the search returns the skill's name and path and the reader opens the file, never a copy of its body.
   Any vector store does; the index is rebuilt after every merge that changes a skill, and a skill removed from the folder is removed from the index.
 - With a second local index of the bodies: one chunk per section of every `SKILL.md` and references file, the heading path embedded with the chunk, the file and the first and last line in the payload.

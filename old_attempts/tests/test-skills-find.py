@@ -9,7 +9,7 @@ import tempfile
 import unittest
 
 TREE = Path(__file__).resolve().parents[2]
-SCRIPT = TREE / 'tools/skills-context.py'
+SCRIPT = TREE / 'old_attempts/skills-context.py'
 
 # Symptoms met in the edition's work in October 2026, as a person would type them, and the skill that answers each.
 SYMPTOMS = (

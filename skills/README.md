@@ -72,7 +72,7 @@ See [the maintainer workflow](../docs/maintainer-workflow.md) for package checks
 - `sparky-stereo-skills link` retains the optional assistant-folder integration; it preserves the person's own skills.
 - `sparky-stereo-skills export skills.zip` retains the skill-import format. `sparky-stereo-skills bundle reference.zip` instead preserves the full offline tree and its relative references.
 
-In a checkout use `python3 tools/skills-context.py` in place of `sparky-stereo-skills context`, and `python3 tools/skills-context.py --find "<task or symptom>"` in place of `sparky-stereo-skills find`.
+In a checkout, run the installed `sparky-stereo-skills` on it with `SPARKY_STEREO_REFERENCE=$PWD sparky-stereo-skills context ...` and `SPARKY_STEREO_REFERENCE=$PWD sparky-stereo-skills find "<task or symptom>"`.
 The context budget is in characters, not tokens; an oversized request fails rather than truncating instructions.
 A selected section is explicitly labelled as an excerpt. Read additional linked references when the task needs them.
 

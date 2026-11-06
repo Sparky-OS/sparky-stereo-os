@@ -30,6 +30,6 @@ The installed reference tree is `/usr/share/sparky-stereo-os`; its `SOURCE` iden
 It is documentation, not the writable source checkout. Use a checkout to make changes.
 No model service, account or particular assistant is required to read these files or run the documented checks.
 
-To find the skill for a task or symptom without a model or network, run `python3 tools/skills-context.py --find "<task or symptom>"` (installed: `sparky-stereo-skills find`).
-For a model without file access, use `python3 tools/skills-context.py --help` to assemble a bounded text context from selected skills and references.
+To find the skill for a task or symptom without a model or network, run `sparky-stereo-skills find "<task or symptom>"` (on a checkout, put `SPARKY_STEREO_REFERENCE=$PWD` in front).
+For a model without file access, use `sparky-stereo-skills context --help` to assemble a bounded text context from selected skills and references.
 Commands in skills run in the named test environment; they are not permission to alter a person's active desktop, phone or displays.

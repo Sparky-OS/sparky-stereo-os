@@ -92,3 +92,25 @@ Recipe, in order: build with `zig build test-bins`, run every test binary in the
   - Inline `for` over a registry cannot `continue` out of a runtime loop; look the variant up into a plain struct first.
   - A lint that searches parents for variant ids finds real slips (the hardcoded kind name in `--root`); give the engine a function that picks it from the registry instead of a literal.
   - Disk: a Zig cache grows by hundreds of MB per rebuilt test set; delete it between runs on a small scratch disk.
+
+### The package split and a real client (milestone 2c)
+
+Recipe:
+1. Split the work between a helper and an engine package: the helper (`Architecture: all`) keeps link, unlink, the dialog and export; the engine (`Architecture: amd64`, one static program) is what the helper execs for find, list, context, sections, commands, run, mcp and serve.
+   The helper Depends on the engine at its own version, because the feature needs it.
+   Build both from one source package: `debian/control` lists two binary packages, `debian/rules` has `binary-indep` (the helper) and `binary-arch` (the engine) and `binary: binary-indep binary-arch`; the source carries the engine's tracked files under `engine-src/`.
+   Rebuild from the `.dsc` (`dpkg-source -x`, `dpkg-buildpackage -us -uc -b`) and compare SHA-256 with the first build: both `.deb` files came out byte for byte the same.
+2. Run the Lean Code link gate (`python3 -m lean.release check-link --archive-config FILE --scratch DIR --root-min-free-gib 12 HELPER.deb ENGINE.deb`) in the build image with the network, the three `--security-opt` options bubblewrap needs, and a public archive named in the config file.
+3. Prove it under dpkg in a container as root: the published helper installs; the new helper alone is left unconfigured (its Depends); the pair installs over the published helper; the helper's old verbs still work; a second package that ships `usr/share/agent-skills/user/NAME/SKILL.md` adds a skill and removing it removes the skill; a third package shipping the same path is refused by dpkg ("trying to overwrite ... which is also in package ..."); removal leaves nothing of the engine.
+4. Drive `serve` with the official MCP SDK client (`pip install mcp` into a virtual environment in an image built with the network, then run `--network none`): `Client(StdioServerParameters(command=..., args=["serve"]), mode=M)` with M `legacy`, `auto` (the SDK tries `server/discover`, then `initialize`) and the stateless version string.
+   Record what each does: the negotiated version, the server name, the capabilities, the tools and their annotations, a call, an error, the resources.
+
+Traps:
+- A hand-written `server/discover` reply passed hand-written tests and the SDK still would have refused it: the 2026-07-28 `DiscoverResult` requires `supportedVersions`, `capabilities`, `ttlMs` and `cacheScope` (and `resultType`), and the server's name goes in `_meta` under `io.modelcontextprotocol/serverInfo`, not in a `serverInfo` field. In `auto` mode a reply that does not validate silently falls back to the legacy handshake, so check `protocol_version`, not only that the session worked.
+- A client pinned to a version adopts it without asking the server: it shows no server name and no capabilities. That is the SDK, not a defect.
+- `ping` is removed in 2026-07-28; the SDK warns when it is sent outside legacy mode.
+- An environment variable set to an empty string is not an override: the helper tests `[ -n "$VAR" ]`, the engine must too (the dpkg test caught 2 skills the helper linked and the engine did not list).
+- A log line built from a slice of a stack buffer prints garbage once the buffer's block has ended; copy the text into the log record.
+- `dpkg-genchanges` fails when a binary package's `Section` differs between `debian/control`, the `.deb` and `dpkg-distaddfile`; the engine package inherits the source's section unless it sets its own.
+- A source package that copies a recipe folder (`HERE=$W/recipe`) must take other trees from the original folder (`$RECIPE/../..`), not from the copy.
+- `docker run --tmpfs` has no `exec`; the mutation and dpkg tests write helper programs under /tmp and need `,exec`.

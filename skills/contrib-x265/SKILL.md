@@ -1,9 +1,10 @@
 ---
 name: contrib-x265
 description: >-
-  Contribute to x265 on GitHub with CLA-signed patches, bit-depth builds, TestBench, bitstream bytes and public review evidence.
-metadata:
-  requires-packages: x265
+  Contribute to x265 on GitHub: CLA-signed patches, clang-format, bit-depth builds (8, 10, 12), TestBench, bitstream
+  bytes as evidence, --frame-packing, --single-sei and the other option modes, memory-safety issues reported privately.
+  Load it with upstream-outreach for an x265 encoder option, an SEI written into the HEVC stream, a review comment on a
+  pull request, or stale bytes in single-SEI mode.
 ---
 
 # Contributing to x265

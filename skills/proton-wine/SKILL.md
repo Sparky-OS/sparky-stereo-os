@@ -40,7 +40,7 @@ Stereo can enter at three places:
 gamescope is Valve's micro-compositor.
 Running a game inside it, nested in the desktop, raced frames between the game and the nested output, and stereo made the race visible; letting the nested output's present mode be chosen ends it ([ValveSoftware/gamescope #2438](https://github.com/ValveSoftware/gamescope/pull/2438), in review).
 SteamVR on a 3D television runs inside gamescope (see [`vr-to-3d`](../vr-to-3d/SKILL.md)).
-The variable `GAMESCOPE_NESTED_PRESENT_MODE` takes `mailbox` or `immediate`; unset, empty or unknown values mean FIFO, and a mode the host surface does not offer logs an error and uses FIFO.
+The variable `GAMESCOPE_NESTED_PRESENT_MODE` takes `fifo`, `mailbox` or `immediate`; unset or empty means FIFO; an unknown value, or a mode the host surface does not offer, logs an error and uses FIFO.
 Building and proving it the way gamescope's own CI does is a recipe in [the lessons](references/lessons-2026-11.md#gamescope-build-and-prove-the-nested-present-mode).
 In the edition the desktop draws the final 3D output; a game or gamescope packs the eyes for a screen only on systems without Stereo KWin.
 

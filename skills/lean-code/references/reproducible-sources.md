@@ -49,7 +49,7 @@ To compare with a published or staged source, extract both with `dpkg-source --n
 - **`eval exec python3 $script` breaks on a quoted argument.** Symptom: `syntax error near unexpected token '('` in the log. Fix: build the command with `printf '%q '` and run it without `eval`.
 - **A route's input must be the real one.** `apt-get source --download-only` in a container with `https-only-apt.sh` gives Debian's files; the recipes pin the `.dsc` sha256, so a moved testing fails the pin, which is the right answer. Our own sources are read from the live repository's resolved copy (`/var/tmp/sparky-repo-current`, its InRelease equal to the live one), read only and never hard-linked.
 - **Pick scratch that cannot cross a disk floor.** The runs write 0.3 to 0.6 GB each; `/dev/shm` held them with no disk floor in play. Outputs are small and go into the lane's evidence.
-- **A transition rebuild of a source with a preserve plan needs the plan.** The `transition-rebuilds` route with no `PLAIN_OPTIONS` turned the published qt6-declarative +stereo3d1+lc1 into a +stereo3d2+lc1 without `debian/sparky-lean-preserve.json` (the published one has it). Reproducible, but not the same content: give the option the source's shape needs, or use `lc-successor.py`, which keeps the plan.
+- **A transition rebuild must keep the preserve plan.** ORDER 427 found the `transition-rebuilds` route writing a +stereo3d2+lc1 source without `debian/sparky-lean-preserve.json`. Not an option problem: `plain-from-lc.py` removes the plan under every option, and the route never gave it back (ORDER 433 fixed this; see [native source consumers](native-source-consumers.md), "The preserve plan across routes").
 
 ## Commands
 

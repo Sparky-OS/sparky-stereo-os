@@ -145,6 +145,7 @@ A changed receiver (KRDC Catch, KRdp; checked 2026-10-16) is proved after a full
 Players and tools from deb-multimedia (VLC, mpv, OBS, HandBrake) link against its FFmpeg, which has a higher epoch than Debian's.
 So our stereo patches for FFmpeg and mpv go on deb-multimedia's source packages (`10:…-dmoN+stereo3dM`), with identical sonames, not on Debian's.
 Offer them to deb-multimedia in the agreed order, and upstream as before.
+The recipe for adding a fix to that FFmpeg, with the traps met: [rebuilding deb-multimedia's FFmpeg as ours](references/rebuilt-ffmpeg.md).
 A test image that installs from our repository needs deb-multimedia's source and our pin, as [the repository](references/repository.md#the-repository-sits-on-deb-multimedia) says.
 
 ## A publication round

@@ -3,7 +3,11 @@ metadata:
   requires-packages: libinput-tools
 name: gamecontroller
 description: >-
-  Maintain KDE raw controller models, profile labels and accessible navigation without losing axes, buttons or hats.
+  KDE's game controller stack: raw controller models that keep every axis, button and hat, profile labels, the SDL
+  database consumer, uaccess udev rules, build evidence with pahole, rig packages for flight and racing controllers, and
+  a shell usable without a mouse. Load it when a joystick, wheel or pedal set loses an axis or button in KDE, a
+  controller is not recognised, a profile label is wrong, Plasma cannot be driven from a gamepad, or a gamepad regressed
+  in the kernel's HID driver.
 ---
 
 # KDE controller input

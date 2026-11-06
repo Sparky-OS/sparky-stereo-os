@@ -28,7 +28,7 @@ The resolver requires matching authored source and projection evidence; it does 
 4. Before native projection, identify documentation, translation, binding and resource generators that read source text. Compiler equivalence alone does not qualify those consumers; preserve their inputs until their own checks pass.
 
 **Check freshness first.**
-Written on 2026-10-16, numbers of 2026-10-17 (dpkg-stereo 0.1.4).
+Written on 2026-10-16, numbers of 2026-10-17 (dpkg-stereo 0.1.4); the client was dpkg-stereo 0.1.28 on 2026-11-06, and its restore, conffile and record rules since 0.1.19 are in [the lessons](references/lessons-2026-11.md).
 If the edition's README or the pages it links say something different, they win and this skill is history.
 
 ## The idea in one paragraph
@@ -109,3 +109,8 @@ The [native source consumers reference](references/native-source-consumers.md) (
 - Program starts with an empty page cache: 1-5.5% faster on the A10 (plasmashell -5.5%, Dolphin -3.1%, Discover -2.3%, System Settings -0.9%; 22 of 32 pairs). Warm starts and boot to desktop move less than their spread.
 - No measurable session-memory change was established in these tests; input buffers and filesystem caches require separate measurements.
 - The cost: dpkg runs take longer while dpkg-stereo projects and checks what they installed (three big packages reinstalled: +1.8 s with 0.1.4), and the image carries 5.5 MB of records. The first projection of an existing big install takes time once (the A10 with 770,000 package files: about an hour on two cores); systems installed from the ISO start projected.
+
+## Lessons from the lanes, October to November 2026
+
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (32 entries).
+Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

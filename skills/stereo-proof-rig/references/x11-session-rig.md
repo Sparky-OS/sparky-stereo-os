@@ -24,3 +24,11 @@ The scripts are in `../scripts`: `x11_props.py`, `eyes_share.py`, `kwin_script.p
 - **`No space left on device` from dbus-daemon about inotify** is the host's inotify limit, harmless for the case.
 - **The negative path**: preload `support4-shim.so` (`cc -shared -fPIC`) so that `stereo_supported_x11()` returns 4; the capture must show one view and the program must have said why.
 - **A top-level window listed as child**: in `x11_props.py`'s output the video child has `_KDE_NET_WM_STEREO_CONTENT` = 3 and the top-level `_CHILDREN` = the child's id; both must be gone after the video closes.
+
+## The installed package, not the build tree
+
+Run the case in a container that installs the packages first: as root, add the user to the container's own `/etc/passwd` and `/etc/group` (do not mount a replacement over them: `dpkg` stops on `unknown system group 'messagebus'`), `dpkg -i` the `.deb` files of the candidate, then `setpriv --reuid=UID --regid=GID --groups=RENDERGID` into the case. The published version in the image is the negative control: the same cases, the same clips, no packages added.
+
+## Results to expect
+
+For a 3D clip on the X11 path through Xwayland, the published VLC Stereo +stereo3d16 gives a capture one output wide (`stereo` false) with the left view only, and +stereo3d17 gives two outputs wide with the left half red and the right half blue (86 to 100 percent of each half, depending on how much of it the video covers), the interface identical in both halves, and the same after a resize and in full screen. The Wayland captures of the two versions are equal pixel for pixel, and so are the captures of a 2D clip.

@@ -3,7 +3,12 @@ metadata:
   requires-packages: opensc
 name: brazil-certificates
 description: >-
-  Research ICP-Brasil certificate sources and Ed521 compatibility for Linux packaging. Use certificate-manager for trust-store changes.
+  ICP-Brasil certificates on Linux: where the roots come from (ITI's root page, the ACcompactado zip, the SHA-512
+  lists), which root versions are valid, revoked or expired, the v7 root signed with EdDSA over E-521 (SigEd521) and
+  what OpenSSL, NSS, Java and GnuTLS accept, browsers and NSS databases (certutil, ~/.pki/nssdb), smart-card tokens
+  (pcscd, libccid, opensc) and PJeOffice Pro. Load it for a question about a Brazilian government certificate, an e-CPF
+  or e-CNPJ token, a site shown as untrusted under an ICP-Brasil root, or Ed521 support; trust-store changes go to
+  certificate-manager.
 ---
 
 # ICP-Brasil certificates on Linux

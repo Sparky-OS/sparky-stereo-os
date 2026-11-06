@@ -868,4 +868,14 @@ This is a source and emulation study, not a claim that those projects ship a fin
 The **ZXing authors** provide the bundled QR decoder under Apache-2.0, as recorded in [ZXing core's source](https://github.com/zxing/zxing/blob/zxing-3.5.4/core/src/main/java/com/google/zxing/qrcode/QRCodeReader.java).
 The camera integration and lens-profile pipeline build on **Google LLC and the Cardboard contributors**, and on **Fabian Druschke and the KDE Connect developers** for the Android receiver.
 
+## Joins of the 252 study (ORDER 252c, 2026-11-06)
+
+Names come from each Debian package's own copyright file (Debian forky), the project's source record named there.
+**Dave M** and **Tord Dellsén** made ClamTk, and **Brendan O'Dea** and the debsums contributors made debsums; the Dolphin entry and the debsums front only call them.
+The **Wine project** made Wine; its desktop entry gave the command the "Run with Wine" entry uses.
+The VPN and Tools sections of Stereo APTus offer, and install unchanged, **NetworkManager-openvpn** and **NetworkManager-pptp** (Red Hat, Inc. and Dan Williams), **NetworkManager-openconnect** (Intel Corporation, Red Hat, Inc. and Novell, Inc.), **NetworkManager-l2tp** (Douglas Kosovic), **NetworkManager-strongswan** (Martin Willi) and **NetworkManager-ssh** (Dan Fruehauf).
+The same sections offer **Syncthing** (the Syncthing project) with **syncthingtray** (Marius Kittler), **Vorta** (Manuel Riel and the Vorta contributors) with **BorgBackup** (The Borg Collective, Thomas Waldmann), **KeePassXC** (the KeePassXC team), **Solaar** (Daniel Pavel and the Solaar contributors), **Piper** (the libratbag team), **Yakuake** (KDE), **TestDisk and PhotoRec** (Christophe Grenier), **GNU ddrescue** (Antonio Diaz Diaz) and **Sparky Chrooter** (Paweł "pavroo" Pijanowski).
+KDE Connect's ufw application profile, which the firewall rule uses, is KDE Connect's own file, and ufw is its own project's.
+These projects do not endorse the edition.
+
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

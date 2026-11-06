@@ -214,13 +214,22 @@ The files are the source; every index is derived from them and rebuilt after a m
 - In a checkout or on an installed system: `sparky-stereo-skills find "<symptom>"` (or `python3 tools/skills-context.py --find "<symptom>"`) ranks the skills offline by name, description and the task table, the same every time, and prints each path with the `context` command to run next.
 - With a local vector index: one point per skill, the name and description embedded, the path in the payload; the search returns the skill's name and path and the reader opens the file, never a copy of its body.
   Any vector store does; the index is rebuilt after every merge that changes a skill, and a skill removed from the folder is removed from the index.
+- With a second local index of the bodies: one chunk per section of every `SKILL.md` and references file, the heading path embedded with the chunk, the file and the first and last line in the payload.
+  It exists because a symptom's error string usually lives in a lessons file, which a description cannot hold; the search returns the skill, `file:first-last` and the heading path, and the reader opens those lines.
+  A chunk is a whole section, or, when the section is over the model's 256-token window, whole paragraphs or list items; a numbered list, a table and a fenced code block are never split, because half a procedure (step 4 without steps 1 to 3, a command without the invariant that guards it) still looks actionable.
+  A single item over the window stays whole, is embedded by its first 256 tokens and keeps its full text in the payload, so write the symptom first in every lesson.
+  Measured on 2026-11-06 with the same 157 symptoms: descriptions alone first for 58 % and top three for 82 %; bodies alone 85 % and 95 %; both, a skill scored by the larger of its description score and 0.7 times its best chunk score, 75 % and 97 %.
+  Of the 28 symptoms the descriptions missed, the bodies' chunk found the right skill in the top three for 26, and the chunk shown holds the lesson line for the error string.
+  The symptom list was harvested from the same lane reports as the lessons, so the bodies' share is the best case; a symptom nobody wrote down is found only if a body says it.
+  The indexing script also lists every skill whose name plus description is over the 256-token window and exits non-zero, so a description cannot silently lose its tail.
+  Searching the bodies needs no new tool: the generic knowledge search includes the collection, and the finder prints both lists and the merged ranking.
 - An MCP that serves the skills gives every partner (hosted, local, or a person's own tool) the same one call, "which skill answers this symptom", and the file to read.
   The Markdown files stay what people read; an MCP only routes to them.
   [Serving skills over MCP](references/skills-over-mcp.md) has the protocol eras a server must speak, the Skills extension, how each assistant registers a local server and where it reads skills, and what Debian ships.
 
 ## Lessons from the lanes, October to November 2026
 
-[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (9 entries).
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (13 entries).
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

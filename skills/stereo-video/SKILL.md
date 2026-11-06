@@ -119,4 +119,9 @@ These narrower topics have their own references:
 - [Screen-content codec comparisons](references/screen-content-codecs.md) (checked 2026-10-14): matched text quality, the controls, and x265 SCC that silently falls back to Main profile.
 - [Editing, playback and transport boundaries](references/editing-playback-transport.md) (2026-10-19): a reusable editing regression project, the per-file eye swap, and a slow phone stream measured stage by stage.
 
+## Lessons from the lanes, October to November 2026
+
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (21 entries).
+Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
+
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

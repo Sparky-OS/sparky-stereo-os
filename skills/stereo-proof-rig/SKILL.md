@@ -3,7 +3,14 @@ metadata:
   requires-packages: kwin-wayland | docker.io
 name: stereo-proof-rig
 description: >-
-  Run isolated Stereo KWin captures of both eyes and negative controls for stereo identity, geometry, timing, UI and installed-package behavior, find why the two eyes differ, and take a showcase stereo screenshot that shows every depth level.
+  Run isolated Stereo KWin captures of both eyes and negative controls in a throwaway container (kwin_wayland --virtual,
+  ScreenShot2, WAYLAND_DEBUG, fake input, a real plasmashell session) for stereo identity, geometry, timing, UI, element
+  depth and installed packages; find why the two eyes differ; the unpacking checks (one resize at KWin); the showcase
+  screenshot. Load it when a capture is black, transparent, stale or cancelled, the right eye is brighter than the left,
+  Show Screen Contents says the process is not authorized to take a screenshot, testTabBoxStereo or another KWin
+  autotest fails, kf.package reports invalid metadata, timeout as PID 1 exits 125, the Wayland socket path is too long,
+  runuser drops the render group, LIBGL_ALWAYS_SOFTWARE changes nothing, a proof exits 127 under LD_BIND_NOW or a PNS
+  fixture does not decode, translated text does not appear, or a popup or lock-screen depth must be measured.
 ---
 
 # The proof rig

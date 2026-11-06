@@ -1,6 +1,13 @@
 ---
 name: sparky-stereo
-description: Operating rules for stereo 3D and deep colour work on Sparky Stereo OS and on the programs it changes, with or without AI assistance. Load it first, before any other skill in this folder; it ends by saying which one to load next.
+description: >-
+  Operating rules for stereo 3D and deep colour work on Sparky Stereo OS and the programs it changes, with or without
+  AI: the contract (one format inside, full side by side at any resolution, outputs are Stereo KWin's filters, the eye
+  swap belongs to the output, never touch the user's file, the whole specification in every API, sunk, screen and popped
+  depth), what counts as proof (both eyes captured, the 2D control, geometry against a prediction), working with
+  upstream (patches in upstream style, the project's CI first, a specification page behind a 403 or a bot wall read from
+  the Wayback Machine or a mirror, never bought and never fetched with a spoofed agent), and which skill to load next.
+  Load it first, before any other skill in this folder; it ends by saying which one to load next.
 ---
 
 # Working on Sparky Stereo OS
@@ -11,7 +18,7 @@ This skill holds what every piece of work on it must respect.
 The other skills in this folder hold the solved patterns for one kind of work each.
 
 **Check freshness first.**
-Written on 2026-10-07, updated on 2026-10-10.
+Written on 2026-10-07, updated through 2026-11-06 (the dated rules inside say when each was settled).
 If the [README](../../README.md) or the pages it links say something different, they win and this skill is history.
 
 ---
@@ -164,5 +171,12 @@ Load the one that matches the work; the [program list](../../docs/programs-in-de
 
 From the work itself: each rule here was learned on a real program, with its measurements, between September and October 2026, by Daniel directing and verifying with AI partners.
 They are written so the next person, or the next model, ports a solved pattern instead of solving it again.
+
+## Lessons from the lanes, October to November 2026
+
+From the lanes of 25 October to 6 November 2026; add the next lesson here as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
+
+- Symptom: uefi.org and a vendor support site answer 403 to the fetch tool and to curl with a browser agent. Fix: `curl https://web.archive.org/web/2025id_/URL` returns the capture (gzip, decompress before parsing); the capture date is in the final URL; cite it. WebFetch cannot reach web.archive.org. Skill line: "A page behind a bot wall is read from the Wayback Machine's copy". (lane lutz-crash-course-231)
+- Audit of 3,309 default rows sorted by origin: 175 rows are edition-owned (32 behaviour groups); the rest are Debian, upstream, theme values, or recorded decisions. Only edition-owned rows are questions for the person; theme files collapse to 16 records covering 840 value rows (lane design-audit-355)
 
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

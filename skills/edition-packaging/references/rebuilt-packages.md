@@ -48,6 +48,11 @@
 - Keep Debian's copyright file and append our `Files: debian/*` credit; `provenance.sh` does it (see [provenance](../SKILL.md#provenance-daniel-2026-10-02-always)).
 - Prove each build before shipping: compile against our kernel where the package builds modules, compare the package trees with the previous build, and simulate the installation with apt.
 
+## A recipe writes its source from its own date
+
+Every script that writes a changelog entry or packs a source takes the date from the recipe (`sparky_provenance_init`, `SOURCE_DATE_RFC2822`, `dch --date`) and normalizes `debian/` before `dpkg-source -b`; a recipe never reads the clock.
+Prove a new recipe the way the [Lean Code reproducible sources reference](../../lean-code/references/reproducible-sources.md) says: the real `dpkg-buildpackage -S`, three runs under three clocks, zones, umasks and checkout times, the sums equal, and the tree compared with the published source (only the trailer dates and the bundled toolkit may differ).
+
 ## Receiver packages must prove their installed interface
 
 Checked 2026-10-16 with KRDC Catch and KRdp.

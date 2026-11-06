@@ -3,7 +3,14 @@ metadata:
   requires-packages: qt6-base-dev
 name: stereo-window-3d-area
 description: >-
-  Integrate stereo content surfaces inside ordinary Qt/KDE windows and develop coherent 2D plane depth with clipping and input tests; give KWin's effects (Fall Apart, Sheet, Glide, Zoom, dragging) depth of their own.
+  Stereo content inside an ordinary Qt or KDE window, and depth of the desktop's own elements: a declared subsurface
+  below the window with a hole over it (a Wayland subsurface, an X11 child window), the Qt routes measured, Union's
+  depth values, the three levels sunk, screen and popped within the user's limits, menus, popups, tooltips, select
+  lists, notifications and dialogs at depth (xdg_popup, never a subsurface), the 10 px popup border from the output's
+  edges, KWin's effects with depth of their own (Fall Apart, Sheet, Glide, Zoom, dragging). Load it when a popup menu at
+  the screen edge looks cut or flat in 3D, a sub-menu sits behind its parent, a tooltip or select list is not popped, a
+  dialog collapses to its title bar, a hidden top level kills the native child, a whole window is declared instead of
+  its 3D area, two windows draw each other's depth, or an element's parallax must be clipped to its rectangle.
 ---
 
 # A 3D area inside an ordinary window
@@ -106,3 +113,8 @@ As in the general skill, plus:
 - **no squeeze:** with stereo off the window has its normal size, and with stereo on the 3D area holds both eyes, neither squeezed nor stretched;
 - **overlays:** an overlay over the 3D area changes the same pixels in both eyes and none in one eye only;
 - **the 2D control:** stereo off against the distribution's build, 0 differing pixels.
+
+## Lessons from the lanes, October to November 2026
+
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (13 entries).
+Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

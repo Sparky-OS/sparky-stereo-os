@@ -3,7 +3,13 @@ metadata:
   requires-packages: qemu-system-x86 | igt-gpu-tools
 name: vkms-stereo
 description: >-
-  Test DRM stereo mode enumeration, timing and writeback with an EDID-driven VKMS guest and independent expectations.
+  Test DRM stereo mode enumeration, timing and writeback without a 3D display: the virtual KMS driver with an EDID that
+  declares HDMI 3D modes (configfs, edid and edid_enabled, the status attribute for hotplug and detect), IGT kms_3d and
+  its VKMS exceptions, KUnit and its exit status, KWin in the guest (udevd for hotplug, LIBGL_ALWAYS_SOFTWARE,
+  kscreen-doctor), expectations computed from the EDID, a virtual machine always, VC4 and DisplayPort timing checked
+  without the board. Load it when a 3D mode is missing from the list, interlaced or duplicated formats appear, a probe
+  needs the DRM master, IGT leaves VKMS out, the compositor never sees a hotplug, kunit.py exits 0 with failed tests, or
+  a kernel stereo patch needs a bench.
 ---
 
 # A virtual 3D display: VKMS in stereo
@@ -68,5 +74,13 @@ It replaces none of the tests on a real television: VKMS has no cable, so the HD
 - Pictures of a few writeback frames and compositor frames, looked at by eye.
 - The real-hardware test (a television switching itself into 3D) stays in the [`drivers`](../drivers/SKILL.md) skill's proof list.
 - How to run that real-hardware test with a person at the bench and the partner remote, without risking the machine or the television: [`test-bench`](../test-bench/SKILL.md).
+
+## Lessons from the lanes, October to November 2026
+
+From the lanes of 25 October to 6 November 2026; add the next lesson here as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
+
+- Test vc4's HDMI stereo timing without a Pi: KUnit on the real encoder callback in ARM64 QEMU with fixed CEA expectations. Baseline 22 rows: 4 pass, 18 fail; after the patch 77 pass, zero failures (44 stereo cases plus 33 existing vc4 cases); cases cover both SBS-full choices, repeated checks, original VIC and flags, RGB8/RGB12 clock agreement, generation limits, overflow, DBLCLK and 2D controls. Targeted ARM GCC 16.2.0 compile and ARM64 Clang 21.1.8 KUnit kernel build pass; strict checkpatch has zero errors. Tools: GCC 16.2.0, Clang 21.1.8, QEMU 11.1.2. (lane vc4-stereo-timing-155-gpt)
+- Hotplug test on VKMS: build one VKMS device with two DisplayPort connectors by configfs (dp0 connected, dp1 disconnected, each its own CRTC); the connector `status` attribute (1 connected, 2 disconnected) hotplugs; an EDID rewrite while enabled then `echo detect > /sys/class/drm/cardN-DP-N/status` re-announces on the same connector (lane lutz-xreal-driver-233)
+- Symptom: KWin in the guest never sees the hotplug. Cause: KWin binds udevd's netlink group ("udev"), not the kernel's, and the guest root had no udevd. Fix: overlayfs over the read-only 9p root adds udev (systemd 262) and the new kscreen-doctor without touching the shared root (lane lutz-xreal-driver-233)
 
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

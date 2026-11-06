@@ -3,7 +3,15 @@ metadata:
   requires-packages: systemd
 name: system-housekeeping
 description: >-
-  Maintain bounded logs, kernel retention and cleanup policy while preserving user settings, boot recovery and diagnostic evidence.
+  Bounded logs, kernel retention and cleanup policy while keeping user settings, boot recovery and diagnostic evidence:
+  old kernels per flavour (APT::NeverAutoRemove::KernelCount, never a general apt autoremove), update-initramfs for
+  every image, GRUB and grub-editenv or update-grub tested in a container, the journal as the one log, crash dumps
+  capped, /etc/skel and existing homes, local system mail in /var/mail, BleachBit, which scratch folders are safe to
+  delete, services that fail on hardware the machine lacks, PipeWire's one-error configuration files, KConfig dropping
+  comments. Load it when a disk fills with kernels or logs, a removal would take the running kernel, a cleaner would
+  delete the evidence of a crash or shows Access denied on a mailbox, a tool exits 0 with no message on an unreadable
+  HOME, system mail piles up, nvidia-persistenced fails on a machine without the card, or a GRUB test in a container
+  shows English and an empty menu.
 ---
 
 # System housekeeping
@@ -82,3 +90,8 @@ Daniel, 2026-11-05: "that cleaning was due long ago".
 2. **Dry-run every removal** (`apt-get -s`). Read what else it would install, upgrade or remove. A per-version companion package that installed tools still depend on must stay, or apt upgrades those tools behind your back.
 3. **Look at each folder before removing it:** owner (`dpkg -S`; on merged-usr, check both `/lib` and `/usr/lib` paths), whether a matching package is installed, what is inside.
 4. **Keep what explains a crash** you may report (one dump, its trace) before cleaning the rest.
+
+## Lessons from the lanes, October to November 2026
+
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (10 entries).
+Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

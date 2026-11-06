@@ -83,4 +83,7 @@ Write the decision, the minimum inputs, the operation and the observable result;
 Keep substantial conditional detail in a linked reference, and individual run history in its evidence record.
 Use a valid YAML `name` and `description`; run `python3 tools/check-skills.py` and check the actual instructions as a reader.
 The description and the task table are how a reader finds a skill: name the programs, tools and symptoms a person would type, and add the symptom to `tools/tests/test-skills-find.py` when a new kind of work arrives.
+Write the description as a trigger clause: what the skill is for, then the symptoms, error strings, programs and components that should bring a reader to it, then what it is not for and which skill is, within 1024 characters ([ai-partners, the description routes](ai-partners/SKILL.md#the-description-routes-the-body-executes)).
+Write the skill as you go, while the work happens: the recipe first, each trap with its symptom, cause, fix and how the cause was found, the part's perks; longer harvests go to `references/lessons-<date>.md` ([ai-partners, skills as you go](ai-partners/SKILL.md#skills-as-you-go)).
+A local vector index or an MCP over these files finds a skill by the same description; the files stay the source and the index is rebuilt after every merge ([finding a skill locally](ai-partners/SKILL.md#finding-a-skill-locally)).
 The validator checks discovery metadata and local file targets, not technical truth, external URLs or every Markdown anchor.

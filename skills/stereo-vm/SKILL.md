@@ -3,7 +3,11 @@ metadata:
   requires-packages: qemu-system-x86
 name: stereo-vm
 description: >-
-  Verify stereo VM viewers (QEMU's window, and virt-viewer, virt-manager and Karton over SPICE), logical input coordinates, resize and mode transitions with isolated guests and negative controls.
+  Virtual machines in stereo: QEMU's own window, virt-viewer, virt-manager and Karton over SPICE, the edition's
+  spice-gtk, logical input coordinates in a 3D mode, resize and mode transitions, the controls that must fail, isolated
+  guests and negative controls. Load it when a guest's 3D desktop is squeezed or stretched in the viewer, the pointer
+  lands off by half, a resize leaves the window wrong, a libvirt monitor socket path is too long, or Debian's spice-gtk
+  wins over ours.
 ---
 
 # A virtual machine in stereo
@@ -42,3 +46,10 @@ The guide [A virtual machine with a 3D display](../../docs/stereo-vm.md) says ho
 - **WAYLAND_DEBUG prints `wl_pointer#12.enter`, not `@12`:** filters written for the old format match nothing.
 - **A resize test must put the window back:** the next steps are measured at its size.
 - **`pgrep -f` or `pkill -f` on a pattern in your own command line** matches itself.
+
+## Lessons from the lanes, October to November 2026
+
+From the lanes of 25 October to 6 November 2026; add the next lesson here as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
+
+- Secure Boot enrolment rig in QEMU/OVMF: shim 16.1, GRUB 2.14, kernel signed with the edition key; unsigned and machine-signed modules are rejected until the GRUB entry and MokManager enrol the key, then they load. Rig facts: `mkfs.vfat -F 32 -s 1` for a 256 MiB ESP; /run is noexec; a boot probe must not wait on is-system-running; `virt-fw-vars --add-mok` pre-seeds MokList; `grub-reboot <entry id>` reaches an enrolment entry; send MokManager's key at "Booting in 2-3 seconds", an earlier key reopens OVMF's boot menu; `-cpu max` under TCG for engine binaries. (lane dkms-firstboot-enrol-374)
+- Symptom: first KVM check exits 1. Cause: the user lacked the kvm group. Fix: add the kvm group (host gid 105) to the container user. Also Docker's attached output stream dropped later output in some runs: capture to a file and read that. (lane vram-boost-default-263a)

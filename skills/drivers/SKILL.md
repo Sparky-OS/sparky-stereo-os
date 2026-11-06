@@ -3,7 +3,14 @@ metadata:
   requires-packages: dkms | edid-decode
 name: drivers
 description: >-
-  Implement and test kernel/display-driver stereo modes, from the HDMI® 3D modes a display's EDID declares to HDMI® signaling and deep-colour links; configure the edition's kernel (Debian's base, Secure Boot without lockdown, ZFS and NVIDIA DKMS modules on a new kernel); carry edition patches with provenance.
+  Kernel and display-driver work for stereo and deep colour: the HDMI 3D modes an EDID declares and the kernel lists
+  (amdgpu, NVIDIA, nouveau, VC4), USB-C 3D glasses, the edition's kernel configuration (Secure Boot without lockdown,
+  the real-time flavour), DKMS modules on a new kernel (NVIDIA, ZFS, openssl for signing, first-boot MOK enrolment,
+  linux-headers without gcc), udev rules for wheels tested without hardware (umockdev), HDMI-CEC, VRAM protection,
+  patches carried with provenance. Load it when a 3D mode is missing, the TV never switches to 3D, a DKMS build fails on
+  a new kernel, dkms says openssl not found and the module is unsigned, modprobe says Key was rejected by service,
+  ConditionFirstBoot never fires, nouveau reports firmware unavailable, amdgpu hangs with a page fault, ring timeout and
+  a device coredump, virtio-gpu oopses with stereo on, or a udev chmod hides its failure behind || true.
 ---
 
 # Drivers: 3D modes and deep colour in the kernel
@@ -97,5 +104,10 @@ Plan for it:
 - The 2D control: every 2D mode unchanged.
 - **A test "without firmware" removes the GPU's whole firmware folder.** For nouveau on an RTX 3060 that is `nvidia/ga106`, then rebuild the initramfs: the log says `acr: firmware unavailable`, `gr: firmware unavailable` and `sec2: firmware unavailable`.
   Renaming only the GSP firmware link is not "no firmware": nouveau then takes its own Ampere path with the ACR, GR and SEC2 firmware, the GR engine comes up, and the code path without a GR engine never runs ([the 2026-10-03 test of the NULL-pointer fixes](https://github.com/danielcamposramos/sony-bravia-linux/tree/main/docs/upstream/nouveau-null-v3-test-2026-10-03); the fixes themselves are in [`search-upstream-first`](../search-upstream-first/SKILL.md)).
+
+## Lessons from the lanes, October to November 2026
+
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (45 entries).
+Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

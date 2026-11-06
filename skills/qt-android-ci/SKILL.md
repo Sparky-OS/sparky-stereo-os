@@ -3,7 +3,10 @@ metadata:
   requires-packages: qt6-base-dev-tools
 name: qt-android-ci
 description: >-
-  Reproduce Qt Multimedia Android CI in a headless emulator with exact Qt/NDK/ABI inputs and complete QTest row evidence.
+  Reproduce Qt Multimedia's Android CI locally: a headless emulator with the exact Qt, NDK and ABI inputs, the build
+  environment, the run-local scripts, and complete QTest row evidence. Load it when an Android Qt test passes locally
+  but fails on Qt's CI, an emulator's ABI or decoder differs from a device, or a patch set must be compared with the
+  previous one.
 ---
 
 # Qt Android CI reproduction

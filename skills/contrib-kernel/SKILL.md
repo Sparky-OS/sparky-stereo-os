@@ -1,9 +1,12 @@
 ---
 name: contrib-kernel
 description: >-
-  Send a Linux kernel patch or bug report in the kernel's own way: its code of conduct, the human Signed-off-by, the AI coding assistants and tool-generated content rules, the security list's AI rules, a tested fix with every report, and the human's review before anything is sent.
-metadata:
-  requires-packages: linux-headers-sparky-stereo | git-email
+  Send a Linux kernel patch or bug report the kernel's way: its code of conduct, a human Signed-off-by, the Assisted-by:
+  LLM trailer and the coding-assistants and generated-content rules, the security list's rules for a bug found with AI,
+  checkpatch.pl, get_maintainer.pl, git format-patch, Fixes: tags, lore.kernel.org searched first, a tested fix with
+  every report, and the human's review before anything is sent. Load it with upstream-outreach and drivers for a DRM,
+  HDMI 3D, EDID, amdgpu, nouveau, VC4, virtio-gpu or HID patch, a devcoredump or deadlock report, or a question on
+  whether a subsystem accepts AI-assisted work.
 ---
 
 # Contributing to the Linux kernel

@@ -3,7 +3,12 @@ metadata:
   requires-packages: powerdevil
 name: power-idle
 description: >-
-  Maintain KDE power, locking, idle, lid, CEC, swap and hibernate policy while preserving explicit user settings.
+  KDE power, locking, idle, lid, CEC, swap and hibernate policy in the edition: powerdevilrc and kscreenlockerrc
+  defaults, HoldProfile and powerprofilesctl, CEC ownership, text consoles and system power, the Cushion Swap file on
+  disk (zram and zswap never ours, the person's opt-in from the Memory page), resume= and RESUME_OFFSET for hibernation,
+  a user preference that appears ignored. Load it when the screen locks or sleeps against the person's setting, the lid
+  closes and the TV goes dark, hibernate fails to resume, a zram package removes another package or an upgrade proposes
+  removing it, the Memory page needs a swap indicator, or a power profile is held by a program.
 ---
 
 # Power and idle in KDE
@@ -131,3 +136,10 @@ Separate automatic idle locking, lock-before-screen-off, lock-on-resume and the 
 Trace the action's actual initiator and configuration reload before changing defaults.
 Prove explicit user overrides survive restart and migration; keep a timed runtime witness for each suspected action.
 A corrected setting without reproduction of the overnight event is a configuration fix, not proof that the underlying runtime defect is fixed.
+
+## Lessons from the lanes, October to November 2026
+
+From the lanes of 25 October to 6 November 2026; add the next lesson here as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
+
+- Memory page opt-in for zram: the Memory package Depends on Cushion Swap (not Recommends) so an install with `--no-install-recommends` still gets the service; verify with a red/green pair (0.1.7 lacks Cushion in Depends, exit 1; 0.1.8 requires it, exit 0) and an isolated apt solve without Recommends. Cushion zram accounting: 0.3.3 wrongly needed 29 GiB instead of 21 GiB for the same disk swap; 0.3.4 passes the 58-case suite. (lane zram-on-at-opt-in-360b)
+- Symptom: installing a zram package removes `kernel-settings` or a plain upgrade proposes `Remv systemd-zram-generator` with apt exit 0. Cause: package relations (Conflicts) and an auto-installed generator that apt considers unneeded; a dpkg-installed generator does not mean the person selected it. Fix: no Conflicts or Breaks against any zram package; installing through Stereo APTus marks the generator manual, which releases the guard and keeps it across autoremove; a leftover generator with an empty zram node (disksize 0) is not active swap. Proven with real zram activation only inside a nested QEMU guest (`-cpu max` for TCG). The skill covers the opt-in and "no Conflicts"; add the manual-mark and inherited-generator facts. (lane no-zram-kcm-360)

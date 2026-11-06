@@ -1,7 +1,13 @@
 ---
 name: forks-and-online
 description: >-
-  Push edition work only to the edition's forks, never upstream; keep every branch online the same day; audit clones for work that exists only locally and tell merged, superseded, missing and uncommitted work apart; cut releases that Zenodo keeps for good, set the Sponsor button, give our own libraries public repositories, and keep large files off GitHub.
+  Push edition work only to the edition's forks (Sparky-OS, danielcamposramos), never to the upstream project; keep
+  every branch online the same day; audit clones for work that exists only locally ([gone] branches, ahead and behind,
+  commits in no branch, worktrees, partial clones, uncommitted files, git rev-list --not --remotes with patch-id) and
+  tell merged, superseded, missing and uncommitted work apart; cut releases that Zenodo keeps for good, the Sponsor
+  button, our own libraries' repositories, where large files go. Load it when a report says done but nothing is online,
+  origin points at upstream, a push is refused by branch protection or a public-surface rule, KDE Invent runs CI on a
+  push, a release or DOI is needed, or an audit of many clones is due.
 ---
 
 # Forks and keeping the work online
@@ -140,3 +146,8 @@ Never use the bypass on someone else's pull request or on a repository Daniel do
 - Publish a file you have not read, or credentials of any kind.
 - Put a large file on GitHub, or cut a release in a switched-on fork.
 - Report work as online before the audit above says so.
+
+## Lessons from the lanes, October to November 2026
+
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (5 entries).
+Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

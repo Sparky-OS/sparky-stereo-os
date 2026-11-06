@@ -1,7 +1,12 @@
 ---
 name: stereo-integrations
 description: >-
-  How to add the stereo integration of one more program to Sparky Stereo OS so that it is installed whenever the program is selected, switches itself on when the program is present, offers the program when it is missing, can be hidden or switched off without losing its options, leaves 2D exactly as it was, and hands Stereo KWin full side by side declared once. Load the general sparky-stereo skill first.
+  Add the stereo integration of one more program to the edition: the one list (integrations.tsv), the pack format (data
+  pack, native pack, inside our rebuild, settings only), Dolphin right-click packs with their menus and URL rules, the
+  runner and the missing program through command-not-found, HideMissing, the proof in a fresh container, the upstream
+  offer. Load it when a program should gain a stereo action, an integration must switch itself on when the program is
+  present and hide when it is missing without losing its options, stereo-display-info says not announced when the probe
+  failed, or a pack's Enhances or Depends is in question.
 ---
 
 # One more program, integrated
@@ -145,3 +150,10 @@ Then the stereo proof of the general skill for anything that changes what a pers
 
 Check the project's stance on AI before anything (OBS discourages it, Krita has a moratorium, Blender has a published policy, KDE had none adopted in October 2026); find who owns the code in its own records; draft the heads-up as [`upstream-outreach`](../upstream-outreach/SKILL.md) says; the main session and Daniel send it.
 A pack that only calls a program's command line, as these two do, needs no message to its authors.
+
+## Lessons from the lanes, October to November 2026
+
+From the lanes of 25 October to 6 November 2026; add the next lesson here as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
+
+- Symptom: a `bash -c '...'` script breaks at parse. Cause: an apostrophe inside a comment in a single-quoted script; the same with an apostrophe inside `"${var:-word}"` in a function. Fix: no apostrophes in such comments; use a plain variable. (lane nvidia-legacy-354)
+- Symptom: stereo-display-info says "not announced" when the probe itself failed or timed out. Fix: separate "could not be checked (timeout / exit status / not installed)" from "not announced"; catalogue unreadable is told and kept as a person problem, not treated as nothing installed (lane no-fallbacks-system-346f3)

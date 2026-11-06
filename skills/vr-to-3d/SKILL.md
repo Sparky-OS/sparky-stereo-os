@@ -3,7 +3,11 @@ metadata:
   requires-packages: monado-service | steam-installer
 name: vr-to-3d
 description: >-
-  Adapt VR eye images for flat stereo displays and spectator viewing while distinguishing play controls from headset camera preservation.
+  Adapt a VR engine's eye images for a flat stereo display and spectator viewing: the formula (eyes to a window, the
+  game drives the view, composition, the 2D layer, the crosshair, the weapon and its effects), SteamVR on a television
+  inside gamescope, the Stereo Spectator, a headset's cameras kept, blur and effects that keep state between frames,
+  Android XR as a source. Load it when a VR game should play on a 3D TV, the HUD or crosshair doubles, effects smear
+  across the eyes, or a spectator view must keep the headset's camera.
 ---
 
 # From a VR engine to a 3D display

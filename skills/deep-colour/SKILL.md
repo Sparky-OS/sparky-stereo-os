@@ -3,7 +3,11 @@ metadata:
   requires-packages: libdrm-dev
 name: deep-colour
 description: >-
-  Trace and test colour precision and HDR metadata across applications, Qt, Mesa, KWin and display links.
+  Trace and test colour precision beyond 8 bits (10, 12 and 16 bits per channel) and HDR metadata from the application
+  to the display: Qt surface formats (QSurfaceFormat, 10/10/10/2, 16/16/16/16 with alpha), Mesa and wl_shm formats
+  (XR30, XB48), KWin's scanout, Krita's deep canvas, the display link. Load it when a 16-bit document shows 8-bit
+  banding, a translucent window forces 8-bit alpha, a ramp is quantised, HDR primaries, transfer function or range (PQ,
+  HLG, BT.2020) are lost on the way, or an HDR claim needs its own proof apart from the stereo one.
 ---
 
 # Deep colour, the whole path

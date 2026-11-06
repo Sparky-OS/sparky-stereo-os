@@ -1,9 +1,10 @@
 ---
 name: contrib-vlc
 description: >-
-  Contribute a VLC change on code.videolan.org under VideoLAN's AI policy and public moderation.
-metadata:
-  requires-packages: vlc
+  Contribute a VLC change on code.videolan.org under VideoLAN's AI policy (the AI::Assisted, AI::Generated,
+  AI::NotCompliant and AI::Slop labels) and code of conduct, through a merge request and vlc-devel. Load it with
+  upstream-outreach for a VLC stereo, frame packing or video output change, a reply on a VideoLAN merge request, or a
+  moderation question.
 ---
 
 # Contributing to VLC

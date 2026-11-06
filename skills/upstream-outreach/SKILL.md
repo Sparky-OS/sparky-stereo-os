@@ -1,7 +1,14 @@
 ---
 name: upstream-outreach
 description: >-
-  Prepare evidence-based upstream contact, follow current project policy and track reviewed messages and commitments without duplicate outreach.
+  Evidence-based contact with another project before and after a merge request: the heads-up to the maintainer, AI
+  assistance said once up front, one small ask, the project's rules and code of conduct first, which route (Debian, the
+  edition's organization, any other upstream), the right person from the project's own records, prove an absence by
+  running the program, the report carries the fix and the test, one finding at a time, a vulnerability through the
+  private route, facts without a severity, Discourse first-post holds, one knock, the one list of merges. Load it when a
+  maintainer answered with questions, a thread turned to the tool instead of the code, a pull request was closed with
+  the change landed as the maintainer's own commit, a company has not answered, a report or a heads-up must be drafted,
+  names from a transcript must be verified, or a sent copy must be checked.
 ---
 
 # Upstream outreach: never cold
@@ -134,3 +141,8 @@ Keep stereo validation and the limits of HDR validation explicit.
 After an authorized send, preserve the exact reviewed text, recipients and message identifier privately.
 Verify the sent copy before reporting success. If delivery is uncertain, search by that identifier before retrying to avoid duplicate mail.
 Record any promised next action and wait for a response; do not schedule reminders merely because no answer has arrived.
+
+## Lessons from the lanes, October to November 2026
+
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (10 entries).
+Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

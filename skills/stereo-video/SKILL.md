@@ -3,7 +3,14 @@ metadata:
   requires-packages: mkvtoolnix
 name: stereo-video
 description: >-
-  Preserve and verify stereo layout and colour metadata from codec/container through editor, server, player and transport.
+  Stereo video end to end: the marks (H.264 and H.265 frame packing SEI, MPEG-2 JP3D, MP4 st3d and sv3d, Matroska
+  StereoMode 0 to 14), writers (x264, x265, mkvmerge, Kdenlive, UMS, PeerTube), readers (FFmpeg, Qt Multimedia, mpv,
+  VLC, Haruna, Dragon), metadata precedence, unpacking rows, columns, checkerboard and frame sequences by copying, 360
+  and VR180, depth video, the per-file eye swap saved to the file only with consent, the television's two paths. Load it
+  when a 3D film plays flat, the mark is lost after the first frame or a transcode, the eyes are swapped, a half
+  side-by-side file is pre-scaled, mpv shows only the left view, a depth map does not rotate with the picture, a
+  StereoMode must be written back, an FFmpeg hwaccel assertion fails in pthread_frame.c, VLC hangs after a minimize or
+  drops out of full screen on Wayland, or a player's output modes must go.
 ---
 
 # Stereo video, end to end
@@ -111,5 +118,10 @@ These narrower topics have their own references:
 - [Android's media path](references/android-media-path.md) (checked 2026-10-07): Media3's `Format.stereoMode`, the MP4 frame packing SEI work in review, and no portable MediaCodec stereo side data.
 - [Screen-content codec comparisons](references/screen-content-codecs.md) (checked 2026-10-14): matched text quality, the controls, and x265 SCC that silently falls back to Main profile.
 - [Editing, playback and transport boundaries](references/editing-playback-transport.md) (2026-10-19): a reusable editing regression project, the per-file eye swap, and a slow phone stream measured stage by stage.
+
+## Lessons from the lanes, October to November 2026
+
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (21 entries).
+Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

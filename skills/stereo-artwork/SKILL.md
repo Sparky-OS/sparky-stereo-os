@@ -3,7 +3,12 @@ metadata:
   requires-packages: inkscape
 name: stereo-artwork
 description: >-
-  Create and verify editable stereo artwork and themes with measured disparity, synchronized animation and preserved format marks.
+  Create and verify stereo artwork and themes: copy a style exactly, identify a typeface by measurement, build a stereo
+  pair from 2D art with a measured disparity, animate both eyes in step, keep format marks (.pns with sTER, .ora), the
+  edition's looks (Oxygen, the classic glass look, KWin's Translucency), wallpaper and lock-screen plugins and their QML
+  tests, a missing licence as a question. Load it for a boot screen, wallpaper, icon theme, Plasma theme or
+  look-and-feel, when a wallpaper silently falls back to the default, a theme script claims an effect KWin refused, a
+  missing style plugin falls back to Qt's default, or a glass effect must meet the depth rules.
 ---
 
 # Stereo artwork
@@ -69,3 +74,11 @@ Written on 2026-10-14, when the edition took two default looks: Oxygen, and a cl
 - **The pair:** full side by side, left eye first, saved as `.pns` with the PNG `sTER` chunk, mode 1. See [`stereo-pictures`](../stereo-pictures/SKILL.md): many tools drop that chunk.
 - **The recipe:** a small JSON with the measurements and shifts, so the pair can be rebuilt or retuned.
 - Each eye's flat image and the anaglyph preview.
+
+## Lessons from the lanes, October to November 2026
+
+From the lanes of 25 October to 6 November 2026; add the next lesson here as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
+
+- Wallpaper QML test: qmltestrunner with QT_QPA_PLATFORM=offscreen; red 6 of 8 fail (exit 6) on the published ImageStackView.qml extracted from the .deb, green 8 of 8. Plain QML effect id in KWin 6 is `translucency` (lane no-fallbacks-look-346f5)
+- Symptom: choosing a missing or unloadable wallpaper silently shows the default; the Kubabbar Glass minimise-effect script prints "Minimise effect set to X" although KWin refused (7 of 13 cases fail on the old script); a missing Qt style plugin falls back to Qt's default without a word. Fix: keep the selection and show a problem item (unknown-provider, load-error) while releasing the splash (loading=false or ksplash waits); minimise writes both keys, asks org.kde.kwin.Effects (unloadEffect other, loadEffect wanted, isEffectLoaded wanted true and other false) and prints success only after KWin confirms; style script checks the plugin first (Oxygen, Kvantum, Breeze; Fusion is Qt's own) and reads the value back with kreadconfig6 (lane no-fallbacks-look-346f5)
+- Measured in captures: 91 % glass menu bar reads RGB (208.1, 211.0, 206.0) against expected (207.9, 210.4, 205.9); dock centre 0.0 px from the screen centre; GTK 3 view background at 91 % equals the scheme View colour blended 232/255; inactive windows and desktop widgets +8 px right-minus-left disparity, inactive dialogs +4, active 0, popped panel popups -3 (lane classic-look)

@@ -3,7 +3,12 @@ metadata:
   requires-packages: monado-service | ffmpeg
 name: 3d-to-vr
 description: >-
-  Integrate stereo desktop/media reception on headsets and phone viewers, including transport, decoding, lens output and lifecycle proof.
+  Show the stereo desktop or stereo media in a VR headset or a phone viewer (Cardboard, Android XR, a Plasma Mobile
+  receiver, the Catch frontend, KRdp and RDP, DLNA to a phone): the transport, the decoding (HEVC, late frames), the
+  lens output and the lifecycle proof. Load it when a headset or phone shows one eye, a swapped eye, a black frame, a
+  stalled or late stream, a Cardboard QR profile that does not load, iio-sensor-proxy head tracking, head-tracked audio,
+  or when a phone or headset becomes one more output of Stereo KWin. Not for VR games on a 3D TV (vr-to-3d) or USB-C 3D
+  glasses (drivers).
 ---
 
 # From 3D content to a headset

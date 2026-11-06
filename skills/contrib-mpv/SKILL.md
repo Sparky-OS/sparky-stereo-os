@@ -1,9 +1,11 @@
 ---
 name: contrib-mpv
 description: >-
-  Contribute to mpv on GitHub with its 72-character commit rule, in-band stereo evidence and explicit AI disclosure policy.
-metadata:
-  requires-packages: mpv
+  Contribute to mpv on GitHub: the 72-character commit rule, DOCS/contribute.md, interface changes recorded in
+  DOCS/interface-changes, in-band stereo evidence (AV_FRAME_DATA_STEREO3D, the frame packing SEI through
+  ff_h2645_sei_to_frame), the rule that an agent identifies itself, reviewers by handle. Load it with upstream-outreach
+  for an mpv pull request, a vo_gpu or vo_gpu_next stereo change, autostereo and stereo detection from the stream, or a
+  reply to a reviewer.
 ---
 
 # Contributing to mpv

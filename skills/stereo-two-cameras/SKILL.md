@@ -3,7 +3,11 @@ metadata:
   requires-packages: libgl-dev | libvulkan-dev | qt6-quick3d-dev
 name: stereo-two-cameras
 description: >-
-  Generate and verify coherent per-eye projections for real 3D scenes, including geometry, state restoration and eye-private effects.
+  Generate and verify coherent per-eye projections of one world for real 3D scenes: parallel axes never toe-in, the
+  zero-parallax plane, the maths for orthographic and perspective cameras, VTK programs, quad buffer and Vulkan routes,
+  state restoration, eye-private effects, infinity, 2D items over the scene, and the closed-form prediction a capture is
+  measured against. Load it when a globe, plot, molecule, CAD model or game scene shows vertical disparity, the wrong
+  sign, a flat second eye, a swapped eye, or when the disparity must be predicted and measured.
 ---
 
 # One world, two cameras

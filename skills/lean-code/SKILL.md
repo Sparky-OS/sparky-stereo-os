@@ -3,7 +3,14 @@ metadata:
   requires-packages: dpkg-dev
 name: lean-code
 description: >-
-  Maintain and verify Lean Code projection, provenance, restore paths and package release markers without editing authored sources by hand.
+  Lean Code on the edition: dpkg-stereo installs scripts, units, rules, QML and C headers without the comments the
+  machine never reads, keeps the authored file as the authority, checks every format for equivalence (bash, Python,
+  JavaScript, C, YAML, Perl, Java, Kotlin), the lc1 marker, the HR companions, the link and start gate (bubblewrap in
+  Docker, apt-cache show traps, strict pinning, foreign ELF files, the frozen universe), restore and resolve, conffiles
+  on a lean system. Load it when dpkg --verify or debsums report changed files, dpkg-stereo --verify --deep exits 1 with
+  OLDFORM rows, restore says original-mismatch, a fresh install shows a conffile such as gprofng.rc as changed by the
+  person, an edited conffile was replaced without a prompt, a projected script breaks, a package lacks its lc mark, the
+  gate says supplied input changed after its universe was frozen, bwrap cannot mount proc, or a test baseline changes.
 ---
 
 # Lean Code on Sparky Stereo OS
@@ -21,7 +28,7 @@ The resolver requires matching authored source and projection evidence; it does 
 4. Before native projection, identify documentation, translation, binding and resource generators that read source text. Compiler equivalence alone does not qualify those consumers; preserve their inputs until their own checks pass.
 
 **Check freshness first.**
-Written on 2026-10-16, numbers of 2026-10-17 (dpkg-stereo 0.1.4).
+Written on 2026-10-16, numbers of 2026-10-17 (dpkg-stereo 0.1.4); the client was dpkg-stereo 0.1.28 on 2026-11-06, and its restore, conffile and record rules since 0.1.19 are in [the lessons](references/lessons-2026-11.md).
 If the edition's README or the pages it links say something different, they win and this skill is history.
 
 ## The idea in one paragraph
@@ -76,6 +83,11 @@ dpkg-stereo's own files are never projected: the tool that undoes projections st
 Generators, documentation tools and other preprocessors also read native sources and headers; a compiler check alone does not qualify them.
 The [native source consumers reference](references/native-source-consumers.md) (findings of 20 October 2026, toolkit 0.1.9 to 0.1.15) lists the known cases and the safeguards: `lean.debian_prepare --preserve-source`, GLSL, generated control files, kernel generator inputs, Wine's preprocessors, vendored Cargo checksums, and how to measure compiler-input savings.
 
+### Reproducible sources
+
+A source package we make is the same bytes whatever the clock, zone, umask and checkout time: its date is its recipe's (`SOURCE_DATE_EPOCH`, else the last commit touching the recipe's folder), `dch` always takes `--date`, and `debian/` is normalized before `dpkg-source -b`.
+The [reproducible sources reference](references/reproducible-sources.md) has the working recipe, what the real `dpkg-buildpackage -S` (clean included) changes, how to run and compare three runs, and the traps met on real Debian and published inputs.
+
 ## dpkg-stereo, the commands
 
 - `dpkg-stereo --status`: what is projected, by format, and why the rest is left alone. Records live per package in `/var/lib/dpkg-stereo/records/`, so a dpkg run reads only what it touched.
@@ -102,3 +114,8 @@ The [native source consumers reference](references/native-source-consumers.md) (
 - Program starts with an empty page cache: 1-5.5% faster on the A10 (plasmashell -5.5%, Dolphin -3.1%, Discover -2.3%, System Settings -0.9%; 22 of 32 pairs). Warm starts and boot to desktop move less than their spread.
 - No measurable session-memory change was established in these tests; input buffers and filesystem caches require separate measurements.
 - The cost: dpkg runs take longer while dpkg-stereo projects and checks what they installed (three big packages reinstalled: +1.8 s with 0.1.4), and the image carries 5.5 MB of records. The first projection of an existing big install takes time once (the A10 with 770,000 package files: about an hour on two cores); systems installed from the ISO start projected.
+
+## Lessons from the lanes, October to November 2026
+
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (32 entries).
+Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

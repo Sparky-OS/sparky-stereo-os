@@ -2,7 +2,13 @@
 metadata:
 name: writing-front-pages
 description: >-
-  Write public project introductions, README openings and About text with clear audiences, evidence-backed status and an actionable next step.
+  Write the first text a stranger meets: README openings, profiles, calls for testers, list and page openings, About
+  lines within 350 characters, a document's bold lead, README translations, a glossary entry, a new term checked against
+  other projects' names before it is used: person first, show before telling, short, no jargon up front, honest status,
+  one next step, doors per reader, Daniel's voice, move never drop, keep every link and anchor that points in,
+  registered marks that must not split a link, the cold-reader test with two models and a person. Load it when a
+  newcomer cannot tell what the project is for, a term needs its number or a name may already be another project's, a
+  status line confuses, a translated heading's anchor no longer resolves, or a check says a link was split.
 ---
 
 # Writing front pages
@@ -101,5 +107,10 @@ A self-review is not an independent reader test. Do not fabricate reader respons
 Offer native-language drafting when helpful, following [ai-partners](../ai-partners/SKILL.md#language-and-accessibility), then retain meaning and uncertainty in the venue's language.
 A relevant outreach contact can illustrate a use case before replying; it cannot appear as an adopter, collaborator or endorsement without evidence.
 Keep precise implementation/proposal labels for the Theme Editor, toolkit depth, HDR and new device integrations.
+
+## Lessons from the lanes, October to November 2026
+
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (11 entries).
+Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

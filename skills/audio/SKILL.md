@@ -3,7 +3,11 @@ metadata:
   requires-packages: pipewire
 name: audio
 description: >-
-  Maintain PipeWire, WirePlumber and KDE audio routing, source formats, passthrough and MIDI in the edition.
+  PipeWire, WirePlumber and KDE's Sound page in the edition: the audio house format (24-bit 48 kHz or more, float,
+  SoXR), routing the streams KDE hides (node.virtual, node.linger, pw-loopback), sample rates and allowed-rates,
+  passthrough (AC-3, DTS, bitstream over HDMI), virtual surround filter chains, RNNoise, MIDI and emulators. Load it
+  when a stream is missing from the Sound page, a loopback or virtual sink disappears, the rate is stuck, passthrough
+  fails, VLC's PipeWire output plays silence until a seek, a game or emulator has no MIDI, or a player resamples.
 ---
 
 # Audio on Sparky Stereo OS
@@ -50,5 +54,11 @@ Munt (MT-32), libADLMIDI and libOPNMIDI (FM synthesis) and DOSBox Staging are no
 ## Standards
 
 AES5 (preferred sampling frequencies; 48 kHz for professional use); the CD Red Book (44.1 kHz, 16 bit); IEC 60958 and IEC 61937 (PCM and encoded audio over S/PDIF and HDMI®); CTA-861 (audio data blocks in the EDID); ITU-R BS.775 (multichannel speaker layouts); AES69 (SOFA files for head-related transfer functions).
+
+## Lessons from the lanes, October to November 2026
+
+From the lanes of 25 October to 6 November 2026; add the next lesson here as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
+
+- Result of the VLC PipeWire fix: MOV004.mp4 20 s three times, +stereo3d8 no sound and 44 to 50 flushes, +stereo3d9 sound at the track's first sound (1.08 s) with 0 flushes and 0 silences; after four seeks sound at every target; drift view +0.6 ms (MOV004) and +3.3 ms (48 kHz stereo). With 24 kHz audio resampled to 96 kHz VLC's own drift view reads -21 ms (old) and -27 ms (fixed) because the SoX resampler latency is not counted; VLC corrects only above 40 ms. (lane players-shared-layer)
 
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

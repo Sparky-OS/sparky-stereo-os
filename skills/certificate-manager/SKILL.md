@@ -3,7 +3,11 @@ metadata:
   requires-packages: gnupg2
 name: certificate-manager
 description: >-
-  Change Sparky CA catalogue, trust-store and Ed521 integration with explicit ownership, rollback and isolated tests.
+  Change Sparky CA, the edition's certificate manager: its verified ICP-Brasil catalogue, the trust-store writes
+  (update-ca-certificates, NSS databases, Java keystores, KDE), the Ed521 checks, install and remove, rollback, and
+  tests in an isolated container. Load it when a certificate group gets selected without the person's choice, a trust
+  purpose is mixed with another, a root fails verification against ITI, the package's maintainer scripts or systemd
+  units change, or the catalogue needs a new root.
 ---
 
 # Certificate manager contributions

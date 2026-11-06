@@ -1,7 +1,15 @@
 ---
 name: edition-packaging
 description: >-
-  Build, sign and ship Sparky Stereo OS packages: provenance and Paweł's formula, rebuilt upstream packages, role tasks and dependency policy, apt pins and the architectures they match, conffiles, the signed repository and its publication, the ISO, and installed-package validation.
+  Build, sign and ship the edition's packages: provenance and Paweł's formula, rebuilt upstream packages (+stereo3dN,
+  i386 twins, include-binaries), tasks and dependency policy, apt pins and architectures (:any, Signed-By), conffiles
+  and rm_conffile, the signed repository and a publication round, DEP-11 icons and Contents, the ISO, reproducible
+  source packages (SOURCE_DATE_EPOCH, never dch's clock), the build record and the Lean Code gate, installed-package
+  proof, nine languages. Load it when a package will not install (Breaks, Multi-Arch: same, cross toolchains, dpkg
+  --auto-deconfigure), apt picks Debian's build or swaps a package for a dummy at dist-upgrade, two builds of one source
+  differ, apt-get update exits 0 on a failed fetch, lc1 says the build record is not complete, a Qt header is missing
+  after a qt6-base update, a preinst prompt stops a non-interactive install, a language probe shows English, or a pin or
+  index must be regenerated.
 ---
 
 # Packaging the edition
@@ -126,7 +134,7 @@ Each is the distribution's source package plus our patch series, versioned with 
 A 32-bit twin (Mesa and FFmpeg, for Steam and Wine) comes from the same source build as the 64-bit package: `dpkg` refuses to install the two together when a shared file such as the Debian changelog differs (`Multi-Arch: same`).
 The rest, Mesa's acceptance and the KDE CI run before a push to invent.kde.org included, is in [rebuilt packages](references/rebuilt-packages.md).
 
-**Lean Code release requirement (Daniel, 2026-10-18):** every package and ISO we publish passes the edition's Lean Code pipeline. Finish provenance and notices before projecting the disposable package tree; calculate checksums from its lean payload, then assemble and sign. The versioned `lc1` control marker binds the coverage manifest and lets clients skip rendering. Publish exact HR documentation companions beside the packages, outside the ISO's default package set. The publisher rejects missing or stale evidence; never add the marker by hand or change a previously published version in place. See the [lc package contract](../../docs/lean-code-packages.md). On 2026-10-23 every package in the published repository carries the lc1 mark (690 amd64, 122 i386, 2 arm64 and 181 architecture-independent entries, 141 of them HR companions), and the client is dpkg-stereo 0.1.16. Since 2026-10-22 the publisher also runs the link and start gate (`lean.release check-link`) on every new package. Release ISOs are packed with `LEAN=1` and sealed with an lc1 attestation; the final ISO's boot, installation and hardware tests remain separate.
+**Lean Code release requirement (Daniel, 2026-10-18):** every package and ISO we publish passes the edition's Lean Code pipeline. Finish provenance and notices before projecting the disposable package tree; calculate checksums from its lean payload, then assemble and sign. The versioned `lc1` control marker binds the coverage manifest and lets clients skip rendering. Publish exact HR documentation companions beside the packages, outside the ISO's default package set. The publisher rejects missing or stale evidence; never add the marker by hand or change a previously published version in place. See the [lc package contract](../../docs/lean-code-packages.md). On 2026-10-23 every package in the published repository carries the lc1 mark (690 amd64, 122 i386, 2 arm64 and 181 architecture-independent entries, 141 of them HR companions), and the client was dpkg-stereo 0.1.16 (0.1.28 on 2026-11-06). Since 2026-10-22 the publisher also runs the link and start gate (`lean.release check-link`) on every new package. Release ISOs are packed with `LEAN=1` and sealed with an lc1 attestation; the final ISO's boot, installation and hardware tests remain separate.
 
 ## Receiver packages must prove their installed interface
 
@@ -195,5 +203,10 @@ In a fresh `debian:testing` container with the repository as a local source and 
 - `apt-get -s install <task>` resolves for every task, with nothing removed.
 
 Check that each task's package list exists (`apt-cache show`) and that no package appears in both flavours of a role.
+
+## Lessons from the lanes, October to November 2026
+
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (114 entries).
+Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

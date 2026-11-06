@@ -1,10 +1,9 @@
 ---
 name: contrib-mplayer
 description: >-
-  Prepare an MPlayer patch on SVN and hold every public post until Daniel says
-  to send it. Load with upstream-outreach for the eventual public process.
-metadata:
-  requires-packages: mplayer
+  Prepare an MPlayer patch for SVN and the mplayer-dev-eng list (DOCS/tech/patches.txt, svn diff, a [PATCH] subject,
+  mp_msg) and hold every public post until Daniel says to send it. Load it with upstream-outreach for an MPlayer or
+  MEncoder change, its stereo3d filter, or a frame packing SEI read.
 ---
 
 # Contributing to MPlayer

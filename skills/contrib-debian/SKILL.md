@@ -1,9 +1,12 @@
 ---
 name: contrib-debian
 description: >-
-  Report a Debian packaging bug the way a maintainer can act on it the same day: reproduced in a clean container, the fix inline as a patch against Debian's own source, composed with reportbug, under Debian's Code of Conduct and its generative AI resolution.
-metadata:
-  requires-packages: reportbug
+  Report a Debian packaging bug the way a maintainer can act on it the same day: reproduced in a clean testing
+  container, the fix inline as a patch against Debian's own source (apt-get source, Tags: patch), composed with
+  reportbug as a non-root user, the bug queried over the BTS SOAP interface, under Debian's Code of Conduct, Diversity
+  Statement and its generative AI resolution; also a Salsa merge request. Load it when a Debian package fails to
+  install, a dependency is missing from Debian's package, a maintainer script breaks, reportbug exits 1 as root, a tag
+  the BTS drops, or the edition carries a fix Debian should have.
 ---
 
 # Contributing to Debian
@@ -58,3 +61,9 @@ Daniel, on the first drafts, which linked to our own build scripts: "tell them t
 
 - Many packaging teams take merge requests on [Salsa](https://salsa.debian.org), Debian's GitLab; the source's `Vcs-Git` names the repository, and Salsa CI runs the archive's tests on it.
 - A report with the patch is still the route every maintainer reads; use a merge request where the package's team works that way.
+
+## Lessons from the lanes, October to November 2026
+
+From the lanes of 25 October to 6 November 2026; add the next lesson here as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
+
+- contrib-debian already says "compose with reportbug as a non-root user in a clean container"; this lane adds a worked example: reproduce on Debian testing (dkms 3.2.2-1), add `openssl` to Depends in the source, rebuild, show the CMS signature plus both negative controls in the same container, then compose the patch-bearing report (reportbug 13.2.0+nmu1 as uid 1000). Installing the dependency does not repair modules already built unsigned; they need a rebuild. (lane debian-dkms-report-371)

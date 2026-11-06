@@ -1,9 +1,10 @@
 ---
 name: contrib-mkvtoolnix
 description: >-
-  Contribute to MKVToolNix on Codeberg through behavior tests, Matroska field evidence and maintainer-led review.
-metadata:
-  requires-packages: mkvtoolnix
+  Contribute to MKVToolNix on Codeberg: the maintainer's AI stance, behaviour tests (rake tests:run_unit, the tests/
+  suite), Matroska field evidence (StereoMode, mkvmerge --identify and -J, mkvpropedit), and maintainer-led review. Load
+  it with upstream-outreach for a mkvmerge or mkvpropedit change, a StereoMode read from an H.264 or HEVC frame packing
+  SEI, a WebM subset question, or a Matroska 3D field.
 ---
 
 # Contributing to MKVToolNix

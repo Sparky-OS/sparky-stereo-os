@@ -3,7 +3,11 @@ metadata:
   requires-packages: flightgear | torcs
 name: simulators
 description: >-
-  Diagnose FlightGear, TORCS and Speed Dreams stereo through OSG/plib, including UI, per-eye resources and OpenXR lifecycle.
+  FlightGear, TORCS and Speed Dreams in stereo through OpenSceneGraph and plib: the GUI camera, per-eye resources and
+  offscreen textures, OSG DisplaySettings, cockpit and chase convergence defaults, the OpenXR spectator route, canvas
+  texture pitfalls, the FlightGear data downloader package, the edition's gates. Load it when a simulator's menu or HUD
+  shows in one eye, the cockpit sits behind the screen, a canvas or texture is missing in one eye, OpenXR fails to start
+  or mirror, or flightgear-data is missing from the archive and must be fetched at install.
 ---
 
 # Open flight and racing simulators
@@ -298,3 +302,9 @@ An auxiliary-view renderer witness can additionally verify the final four CSM ma
 The +21 stock-OSG comparison reproduced exactly the earlier pristine four-pixel variant, including the whole-image byte values.
 A fresh stock/pristine pair and their repeats match the later pristine reference at zero pixels.
 Retain both pristine variants and report the unresolved low-level cause; comparing only one historical reference can misattribute that existing launch variation to a new engine change.
+
+## Lessons from the lanes, October to November 2026
+
+From the lanes of 25 October to 6 November 2026; add the next lesson here as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
+
+- When Debian's flightgear-data is not in testing (Debian #1146394 serious font licences, flightgear out of testing #1149949): a small downloader package `flightgear-data-installer 2024.1.5-1` fetches FlightGear-2024.1.5-data.txz (1,883,333,376 bytes, 2,797,352,960 unpacked) from SourceForge release-2024.1, checks a recorded SHA-256 (SourceForge publishes MD5 only; the whole file MD5 matches), unpacks to /usr/share/games/flightgear, Provides flightgear-data-all, -base, -ai, -models (= 1:2024.1.5), Conflicts the same four; flightgear Depends the installer only. Room check before any fetch, https only curl with resume, progress every 15 s without a tty, one message on failure (what, why, what to do) and everything placed removed, `--file FILE` offline, MIRROR_URL setting. Proof: `apt-get -s install flightgear` red exit 100 before, green exit 0 from a pre placed archive, `fgfs --version` reports FGData 2024.1.5, 21,644 files, `dpkg -V` clean, purge leaves nothing; 55 tests pass, 5 fail with the cleanup trap removed. (lane flightgear-data-downloader-399)

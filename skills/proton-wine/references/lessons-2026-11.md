@@ -22,3 +22,18 @@ A trap gives its symptom, its cause, its fix and how the cause was found; a reci
 
 - Wine and DXVK build facts: Debian's wine and dxvk are in sid not forky; the patches (3 Wine, 4 DXVK) apply to the pristine Debian tarballs; the build needs trixie unicode data, trixie vk.xml and -Wno-error on sid; libwine built against sid depends on `libavcodec63 (>= 7:9.0.2)`; the fork's `frames` suite takes about 6 minutes and is worth running for every wiz3D upload. (lane wiz3d-lutris)
 
+
+## gamescope: build and prove the nested present mode
+
+Recipe (ORDER 274, 6 November 2026; gamescope master 309eee74 plus ValveSoftware/gamescope#2438):
+
+- Read `.github/workflows/main.yml` of master and copy its steps. At that date: container `archlinux:base-devel`, `pacman -Syu`, the package list in the workflow, `submodules: true`, then three meson setups (gcc with `-Dinput_emulation=disabled --werror --auto-features=enabled`; the same with `-Denable_openvr_support=false`; the same with `-Db_coverage=true`) and `meson test -C build-coverage --suite gamescope -v`. Run it as root in a container with `--ulimit core=0 --cpus 4`, the source mounted. Result to expect: both builds link `src/gamescope`, 17 tests Ok, 0 Fail (about 20 minutes on 4 CPUs, 0.9 GB image).
+- No unit test touches `vulkan_make_swapchain`, so the change is shown by running a nested gamescope. Red and green use the same tree: `git checkout origin/master -- src/rendervulkan.cpp`, `ninja -C build-gcc`, copy the binary, restore the file, rebuild.
+- To see the mode the driver was given, not only what gamescope logs, preload a 30-line shim that interposes `vkGetDeviceProcAddr` and `vkCreateSwapchainKHR` and prints `presentMode`; gamescope loads its device functions through `vkGetDeviceProcAddr`, so interposing the plain symbol alone misses it.
+- Run `gamescope --backend sdl -W 640 -H 360 -- sleep 5` with `DISPLAY` on Xvfb and `SDL_VIDEODRIVER=x11`, one fresh start per value of the variable. Result: master gives mode 2 (FIFO) for every value; the change gives 2 for unset, `fifo` and an unknown word, 0 for `immediate`, and 2 plus the error line for `mailbox` on NVIDIA, whose X11 surface does not offer MAILBOX.
+
+Traps:
+
+- Symptom: nested gamescope on lavapipe (`vulkan-swrast`) under a headless weston prints `Missing required extension: VK_KHR_present_id` and `VK_KHR_present_wait`, then `Failed to create backend`. Cause: the nested backend requires both and lavapipe lacks them. Fix: use a real driver through CDI (`--device nvidia.com/gpu=0`) and Xvfb. Found by: reading the stderr of the run, not only grepping it (a grep for the expected lines hid it, every case just printed nothing).
+- Symptom: pull requests from a fork show "no checks" on Valve's repository. Cause: the workflow runs for outside contributors are created with conclusion `action_required` until a maintainer approves them (`gh api repos/ValveSoftware/gamescope/actions/runs`). The workflow runs on pushes to `master` and by hand (`gh workflow run main.yml --ref BRANCH`), but only where Actions are on: GitHub keeps them off on a new fork until its owner turns them on in the Actions tab, and on our fork `gh api repos/danielcamposramos/gamescope/actions/workflows` listed none (checked 6 November 2026), so run the recipe above locally.
+- Symptom: a gamescope child process survives the run and holds the display. Cause: `timeout` kills gamescope but not its Xwayland. Fix: kill them by PID from `ps -eo pid,comm`, never `pkill -f`.

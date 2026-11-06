@@ -58,3 +58,13 @@ Re-read those files in the current tree before every round; its default branch i
 From the lanes of 25 October to 6 November 2026; add the next lesson here as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 
 - Nothing UMS specific in the hand-back: the lane packaged ORDER 223 (hardware decode) for nine source packages (116 archives), with the check-debs marker removal control and check-link unresolved library control; the UMS and MPlayer messages were held, none sent. (lane ums-3d-bugs-178-gpt)
+
+## Tests that must pass on Windows (ORDER 272b, November 2026)
+
+UMS's CI runs the Java tests on Windows, macOS and Linux, and a test that denies writing with POSIX permissions fails only on Windows.
+
+- **Trap:** `File.setWritable(false, false)` on a folder returns `false` on Windows, so `assertTrue(folder.setWritable(false, false))` fails in the setup, and Windows has no read-only folder to test against. Linux and macOS pass, which is why only the `Windows` job is red (`SubtitleCacheOwnershipTest`, PR 6423: `expected: <true> but was: <false>` at the `setWritable` line).
+- **Technique:** put a regular file where the cache folder should be (`new File(tempDir, "cache").createNewFile()`). Everything written below it fails with `IOException` on every platform, root included, and needs no cleanup.
+- **How it was found:** the failed job's log is `gh api repos/UniversalMediaServer/UniversalMediaServer/actions/jobs/<job id>/logs` (job ids are in `gh pr view <n> --json statusCheckRollup`); `gh run view --log` printed nothing here. Reading a log starts no CI.
+- **Local run without Docker:** Maven 3.9.x from archive.apache.org (verify the `.sha512`), then `mvn -B -q -Dtest=<Class> -Dsurefire.failIfNoSpecifiedTests=false test` with `-Dmaven.repo.local` in scratch; a JDK 17 or newer is enough (the build targets release 17). The first run downloads dependencies and takes several minutes. For red, delete the production line under test, rerun, restore it.
+- **What only Windows CI confirms:** that the regular-file technique also fails the write on Windows. Java's `FileOutputStream` opening `<file>\name` fails there too (the parent is not a directory), but no Windows JVM was run locally.

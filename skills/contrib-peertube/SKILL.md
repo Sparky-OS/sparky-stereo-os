@@ -1,11 +1,10 @@
 ---
 name: contrib-peertube
 description: >-
-  Contribute to PeerTube on GitHub with its issue-first workflow, exact test
-  gates and public transcoding review record. Load with upstream-outreach
-  before a pull request.
-metadata:
-  requires-packages: nodejs | npm
+  Contribute to PeerTube on GitHub: the issue-first workflow, pnpm and the exact test gates (lint, build:server,
+  migrations and LAST_MIGRATION_VERSION), the repository's AGENTS.md, and the public transcoding review record. Load it
+  with upstream-outreach before a PeerTube pull request on transcoding, a container's stereo packing kept through a
+  transcode, or a player change.
 ---
 
 # Contributing to PeerTube

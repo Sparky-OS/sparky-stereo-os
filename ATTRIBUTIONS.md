@@ -563,6 +563,7 @@ Existing KWin, libkscreen, Qt and FFmpeg credits above also apply.
 | [git](https://git-scm.com/)'s "racy git" rule | A file changed in the same second its record was written is looked at again | Junio C Hamano ("Racy GIT", 2005-12-20; Documentation/technical/racy-git.txt, 2006-08-15) |
 | systemd's syntax pages and [KConfig](https://invent.kde.org/frameworks/kconfig) | The settings formats each Lean Code adapter follows (systemd.syntax(7), tmpfiles.d(5), sysctl.d(5) and the others) | The systemd and KDE Frameworks contributors |
 | [Sparky Backup Core](https://github.com/sparkylinux/sparky-backup-core) | The packer whose pre-squashfs hook, in the edition's fork, runs Lean Code's step for the image | Paweł "pavroo" Pijanowski |
+| [BleachBit](https://www.bleachbit.org/) and its [CleanerML](https://github.com/bleachbit/cleanerml) cleaners | The cleaner format and the engine of the "System mail" cleaner (local mailboxes, dead letters and the queues of removed mail programs), written in CleanerML's style and meant to be offered back; its translations join BleachBit's own gettext catalogs | Andrew Ziem, the author, and BleachBit's contributors, among them nodiscc (named in the cleaners' copyright headers), XhmikosR and Tobias-B-Besemer (from the repository's contributor list); Debian's bleachbit maintainers for the package |
 
 
 Power/idle credits also build on KWin's existing output and workspace code: **Xaver Hugl**, **Matthias Ettrich**, **Luboš Luňák**, **Vlad Zahorodnii** and **Natalie Clarius**, as named in those files' SPDX records.

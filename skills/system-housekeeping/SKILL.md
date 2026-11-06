@@ -15,7 +15,7 @@ description: >-
 3. Return the reviewed removal set and recovery evidence. Never substitute broad autoremove for the kernel-only policy.
 
 **Check freshness first.**
-Written on 2026-10-07; old kernels and the boot chain revised on 2026-10-30.
+Written on 2026-10-07; old kernels and the boot chain revised on 2026-10-30; local system mail added on 2026-11-06.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
 
 Daniel's rule: "we don't grow so fast, and when grow self prune".
@@ -63,6 +63,18 @@ Daniel, 2026-10-30: "all kernel purges must locate all that kernel parts and reg
 - **An existing home is not overwritten.** Sparky's installer copied `/etc/skel` over a kept `/home`, so a user who kept their home lost their settings. The one-flag fix (`--ignore-existing` on that copy) and a question (keep the settings, the default, or take the edition's with the old files in a dated backup) are offered to Sparky: [sparky-backup-core #3](https://github.com/sparkylinux/sparky-backup-core/pull/3) and [#4](https://github.com/sparkylinux/sparky-backup-core/pull/4), [calamares-sparky #1](https://github.com/sparkylinux/calamares-sparky/pull/1), in review.
 - **KConfig drops comments** when it rewrites a file: an option parked for later goes in a side file, never in a comment.
 - **PipeWire skips a whole configuration file on one syntax error** ("Expected object key"); check a file with `pw-config --name pipewire.conf merge context.properties`. Its node names carry the PCI address and break when the bus renumbers: match cards by name and profile, and rename them.
+
+## Local system mail
+
+A Debian system mails itself: cron, anacron and sudo notices, netdata and security-check alerts (chkrootkit, rkhunter), the bounce of a message nobody could deliver.
+Daniel, 2026-11-05, after a station's mailbox turned out to be 189 MB of such notices from 2019 and 2020: "that cleaning was due long ago".
+
+- **Where it piles up.** `/var/mail/USER`, one mailbox per account. Debian Policy 11.6: the mail spool is `/var/mail`, `2775 root:mail`, and a mailbox is `600` owned by the user or `660` owned by `user:mail`. A person can therefore empty their mailbox but cannot delete it, and root can do both. `~/dead.letter` and `/root/dead.letter` keep a copy of a message a mail program could not send (a failed security alert is the usual one). `/root/mbox` holds mail root has read. The queue folders of a mail program (`/var/spool/exim4`, `/var/spool/postfix/{active,bounce,corrupt,defer,deferred,flush,hold,incoming,maildrop,saved,trace}`, `/var/spool/nullmailer/{queue,failed,tmp}`, `/var/spool/dma`, a person's `~/.msmtp.queue`) outlive the program when it is removed without a purge. Postfix's other folders under `/var/spool/postfix` are its chroot (libraries, `resolv.conf`), not mail.
+- **What is system mail.** Mail a machine wrote to itself. Look at the senders and subjects before you call a mailbox "his data": count them (`grep -c '^From '`, `grep '^Subject:' | sort | uniq -c | sort -rn`). A person's own mail is not system mail, and the local mailbox can hold some: the cleaner says so in its warning.
+- **How the cleaner treats it.** `sparky-stereo-housekeeping` adds BleachBit's cleaner `system_mail`, never ticked: `mailbox` (the running account's mailbox, emptied in place, so owner and mode stay), `mailboxes` (every mailbox and `/root/mbox`, administrator), `dead_letter`, and `queues`. A queue is offered only when dpkg says every package of its mail program is gone (`dpkg-query -W -f='${db:Status-Status}'` is `not-installed` or `config-files`) and the program is not on the system; CleanerML has no such condition, so dpkg's trigger writes the offer again whenever a mail program is installed or removed. The queue of an installed mail program is never touched. Preview first (`bleachbit --preview system_mail.mailbox`); a file it cannot clear is named in the output (`Access denied: ...`).
+- **After clearing,** check that the spool still works: `/var/mail` `2775 root:mail`, the mailbox `user:mail 0660`, `/var/spool/dma` `2775 root:mail` (dma's Makefile). On the station `/var/spool/dma` had been `root:root 755` since 2020, so chkrootkit's mail failed every night until it was put right.
+- **BleachBit does not take the mailbox lock** that Policy 11.6 asks every mail program to take (`fcntl()` plus dot locking). Empty a mailbox when nothing is delivering to it.
+- **Translations.** BleachBit translates a cleaner's text with its own gettext domain `bleachbit`, which Debian's package owns. The package diverts the eight catalogs (`de fr ja ko pl pt_BR zh_CN zh_TW`), writes Debian's with its strings added, and gives Debian's back when it is removed. A translation test needs a real locale (`localedef`), because gettext translates nothing in `C`.
 
 ## Cleaning a system safely
 

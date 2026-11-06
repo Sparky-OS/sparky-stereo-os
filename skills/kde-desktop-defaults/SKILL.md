@@ -84,6 +84,24 @@ Newcomers in Linus Tech Tips' Linux challenge and in Diolinux's videos struggled
 - **Shell scripts in Dolphin:** a local, non-executable shell script offers Run in a terminal…, which shows the script read-only before it runs. Dolphin also shows Reload.
 - **Proof:** each patch keeps its tests with the source, with a cancel row and a row per file system; check the result with an independent `blkid` (file system and label), and run KDE's CI and the native comparison against the unpatched release apart from Debian's nocheck package build.
 
+## The joins of the 252 study (ORDER 252c, 2026-11-06)
+
+Programs the edition ships that stand apart, joined so the person reaches them without knowing (study items J8, J16, J19 to J21, J25 to J27).
+Each row: what it is, how a person reaches it, how it was tested. The packages are in [the build tree](https://github.com/Sparky-OS/sparky-stereo-os-build) (`sparky-os/packages`).
+
+| Join | How a person reaches it | Test |
+|---|---|---|
+| `sparky-stereo-clamav` (data pack) | Dolphin right click on one file or folder, "Scan for viruses", opens ClamTk | `tests/run.sh`: the generated entry, the worker against a recording stand-in, the runner with and without `clamtk` |
+| `sparky-stereo-wine` (data pack) | Dolphin right click on `.exe` and `.msi`, "Run with Wine"; no default handler | same shape; Wine's own command (`wine start /unix FILE`) from `/usr/share/doc/wine/examples/wine.desktop` |
+| `dpkg-stereo --debsums` | terminal; `debsums` alone calls every Lean Code projection changed; debsums is a Depends of dpkg-stereo from 0.1.39 | `test/debsums-front-test.sh`: control, green, four reds |
+| `sparky-stereo-firewall-apps` | turn the firewall (ufw) on in System Settings, Firewall: KDE Connect answers the phone from the local network | `tests/run.sh` against a profile that arrives by trigger |
+| `sparky-stereo-locales --add` and the Calamares step `languagepacks` | the new system gets the chosen language's packages; nothing is removed | `tests/add.sh` (stand-in packages), `tests/failures.py` (stand-ins for chroot and the engine); the real install waits for the ISO |
+| developer task rows | `ripgrep fd-find bat fzf tealdeer ncdu btop tmux debsums` | `lists/tests/joins-252c-test.py` |
+| Stereo APTus sections VPN and Tools | the plain NetworkManager plugins; Syncthing with its Plasma widget, Vorta with Borg, KeePassXC, Solaar, Piper, Yakuake, the rescue set GPart, Partclone, FSArchiver, nwipe and Chrooter (TestDisk and ddrescue are on the image), HPLIP when Debian has a candidate; no Cisco VPNC row, the package has left forky | the fork's `stereo/tests/entries.py` |
+
+Recipe for a new Dolphin pack: copy the nearest pack, write `gen.py` (nine languages), add the row to `lists/integrations.tsv`, run the pack's `tests/run.sh` in a container, run `lists/tests/integrations-test.py`.
+Details and traps: [lessons from the lanes](references/lessons-2026-11.md) (the 252c entries).
+
 ## The CI and package gates
 
 - Run the owning project's KDE CI jobs locally, the clang FreeBSD proxy included, as [rebuilt packages](../edition-packaging/references/rebuilt-packages.md#before-any-push-to-an-inventkdeorg-fork) says.
@@ -99,5 +117,5 @@ Newcomers in Linus Tech Tips' Linux challenge and in Diolinux's videos struggled
 
 ## Lessons from the lanes, October to November 2026
 
-[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (16 entries).
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (32 entries).
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

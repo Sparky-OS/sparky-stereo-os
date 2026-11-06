@@ -1,10 +1,12 @@
 ---
 name: contrib-kde
 description: >-
-  Contribute KDE fixes on Invent and bugs.kde.org with linked bug reports, module
-  ownership and KDE tests. Load with upstream-outreach before a change.
-metadata:
-  requires-packages: kde-cli-tools | plasma-desktop
+  Contribute KDE fixes on invent.kde.org and bugs.kde.org: a linked bug report, module ownership, the commit message
+  shape (component: Do a thing), branches main, master or a stable branch, git push -o ci.skip, no po/ changes in a
+  commit for invent, KDE's tests and CI, the KDE Community Code of Conduct and Community Working Group, This Week in
+  Plasma. Load it with upstream-outreach before a KWin, Plasma, Frameworks or KDE application change, when invent
+  refuses a push that touches po/, when a .desktop or .notifyrc file needs translated keys, or when a merge request was
+  closed while the maintainer landed a fix of his own.
 ---
 
 # Contributing to KDE

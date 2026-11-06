@@ -1,11 +1,10 @@
 ---
 name: contrib-handbrake
 description: >-
-  Contribute to HandBrake on GitHub with its issue-first template, AI disclosure
-  rules and tested-platform declarations. Load with upstream-outreach before a
-  HandBrake pull request.
-metadata:
-  requires-packages: handbrake-cli
+  Contribute to HandBrake on GitHub: talk first in an issue, then the pull-request template, its AI disclosure rules,
+  tested-platform declarations, translations through TRANSLATION.markdown. Load it with upstream-outreach before a
+  HandBrake pull request: an encoder option (x264 or x265 frame packing through HandBrake), a preset, a stereo preview
+  or a filter change.
 ---
 
 # Contributing to HandBrake

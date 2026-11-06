@@ -3,7 +3,14 @@ metadata:
   requires-packages: wine64 | libwine | dxvk-wine64
 name: proton-wine
 description: >-
-  Diagnose stereo through Wine, Proton, DXVK and gamescope with runtime-library identification and game-specific proof; start Steam in the person's session environment; check a system against Easy Anti-Cheat's Linux requirements.
+  Windows programs through Wine, Proton, DXVK and gamescope on the stereo desktop: identify the runtime libraries in use
+  (a DXVK DLL's PE debug CRC), the chain from Direct3D to Vulkan to Stereo KWin, the stereo DXVK fork, wiz3D and the
+  stereo Lutris build, StereoPhoto Maker under Wine, a WoW64 prefix and 16-bit programs, start Steam in the person's
+  session environment (XDG_RUNTIME_DIR, wayland-0, pipewire-0), game-specific proof, Easy Anti-Cheat Linux v2
+  requirements (Secure Boot, TPM 2.0, measured boot, IOMMU, lockdown). Load it when a game shows one eye or picks its
+  own 3D output format, Wine prints Present returned status 1000001003, krnl386.exe16 failed to initialize, wineserver
+  is not found, Wine menus come out flat, a wiz3D game quits after a second, Steam started from a script sees no
+  display, DXVK resizes wrongly on the first frame, or an anti-cheat refuses the system.
 ---
 
 # Windows programs through Wine and Proton
@@ -80,3 +87,8 @@ What it means for the edition, from Epic's FAQ and the edition's kernel:
 ## Proof
 
 As in the general skill: a known scene, both eyes captured, the left eye's view correct, one declaration, the game's interface (menus, HUD) where it belongs (see the formula's 2D layer rules), and the game with stereo off unchanged.
+
+## Lessons from the lanes, October to November 2026
+
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (10 entries).
+Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

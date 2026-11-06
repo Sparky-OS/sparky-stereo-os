@@ -3,7 +3,14 @@ metadata:
   requires-packages: libx11-dev
 name: native-linux
 description: >-
-  Integrate native GLX, EGL, Vulkan and Qt stereo routes and test capability discovery, eye delivery and ordinary 2D fallback.
+  Native Linux stereo routes: GLX quad buffer (GL_BACK_LEFT, GL_BACK_RIGHT), EGL multiview, Vulkan (imageArrayLayers 2,
+  the implicit layer), Qt (QOpenGLWidget, QWindow), X11 declarations (one view size, child windows through Xwayland),
+  libstereo-declare, game engines and libraries (SDL, GLFW, GLUT, FLTK, Ogre, raylib, plib), KWin's buffer formats,
+  capability discovery, eye delivery and the ordinary 2D fallback. Load it when GLX offers no stereo visual, a program's
+  stereo option does nothing, a child window is invisible to the compositor, an X11 child gets no WL_SURFACE_SERIAL in
+  CI, wp_viewporter says the surface already has a viewport, a mono EGL window draws at half its width, a browser's
+  video crashes KWin when its buffers switch between ARGB and NV12, a Vulkan swapchain errors with NATIVE_WINDOW_IN_USE,
+  or a toolkit lacks stereo.
 ---
 
 # Native Linux programs
@@ -108,3 +115,8 @@ Zig, RenderDoc, GFXReconstruct, Hotspot, GitHub's CLI, Tiled and KDE's Kommit ar
 
 As in the general skill: both eyes captured, one declaration, the 2D control.
 For a route change (Mesa, Xwayland), also the programs that already worked, rerun.
+
+## Lessons from the lanes, October to November 2026
+
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (10 entries).
+Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

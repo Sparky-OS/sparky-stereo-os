@@ -3,7 +3,14 @@ metadata:
   requires-packages: dpkg-dev
 name: lean-code
 description: >-
-  Maintain and verify Lean Code projection, provenance, restore paths and package release markers without editing authored sources by hand.
+  Lean Code on the edition: dpkg-stereo installs scripts, units, rules, QML and C headers without the comments the
+  machine never reads, keeps the authored file as the authority, checks every format for equivalence (bash, Python,
+  JavaScript, C, YAML, Perl, Java, Kotlin), the lc1 marker, the HR companions, the link and start gate (bubblewrap in
+  Docker, apt-cache show traps, strict pinning, foreign ELF files, the frozen universe), restore and resolve, conffiles
+  on a lean system. Load it when dpkg --verify or debsums report changed files, dpkg-stereo --verify --deep exits 1 with
+  OLDFORM rows, restore says original-mismatch, a fresh install shows a conffile such as gprofng.rc as changed by the
+  person, an edited conffile was replaced without a prompt, a projected script breaks, a package lacks its lc mark, the
+  gate says supplied input changed after its universe was frozen, bwrap cannot mount proc, or a test baseline changes.
 ---
 
 # Lean Code on Sparky Stereo OS

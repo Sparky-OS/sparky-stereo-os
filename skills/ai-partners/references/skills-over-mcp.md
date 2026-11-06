@@ -58,3 +58,24 @@ The conventions to follow for a data directory are FHS 3.0 through Debian Policy
 - The offline finder and `context` ignore a skill's `requires-packages` header; only `link` honours it, so `find` can point to a skill whose package is not installed.
   Check eligibility in one place for every door.
 - `context` reads the commit from `SOURCE` or from git; in a container without git and without `SOURCE` it prints an error and exits 2.
+
+## Building the server in cgm-zig, hyper-modular (ORDER 430 milestone 2)
+
+The server is Zig built with the station's cgm-zig, laid out so that a path tells its concern, its level and its owner.
+The layout lives next to the code (`docs/TREE.md` of the product); the short recipe:
+
+1. Put authored Zig under `compiled/L<n>_<name>/`, one folder per level; a level imports only lower levels (primitive, atomic, executable, organization, context, domain).
+   Give each module only the imports its level may use in `build.zig`, so a wrong import fails to compile, and add a test that reads the sources and fails on an upward import.
+2. Make every variant a file in a `_kinds/<registry>/` folder (protocol era, assistant, skill kind, language, tool).
+   Zig cannot discover files at run time, so `build.zig` lists the folder and writes one registry module; adding a variant is adding a file.
+   Test it by adding and removing a file in a scratch folder and by searching the parents for the variant's id as a string (the id of a variant must not appear outside `_kinds/`).
+3. Write contracts and failing tests first: atoms that return `error.NotImplemented`, tests that state the expected value from an outside source (the extension's own digests, a golden recorded from the Python engine).
+   A stub that refuses everything passes the "must refuse" tests vacuously; trust only the tests whose positive twin fails, and show each lint test going red on a copy that breaks its rule.
+4. Run the test binaries in a container, never on the host: build them static (`-target x86_64-linux-musl`) with the station's compiler, then `docker run --network none --ulimit core=0 --tmpfs /tmp` with the product tree mounted read only.
+
+Traps:
+- cgm-zig is dynamically linked against LLVM; compile on the station, run the static result in the container.
+- A directory iterated in `build.zig` is `b.build_root.handle` with `b.graph.io` (Zig 0.16 `std.Io`); `b.addTest` rejects a name that looks like a path, so name tests `<folder>_<file>`.
+- `std.testing.tmpDir` writes `.zig-cache` in the working directory; with a read only mount, make the scratch folder under `/tmp` instead.
+- A comment that names a variant trips the "no hardcoded variant" lint; the lint skips comment lines.
+- The extension page's example skill (`pdf-processing`: 151, 29 and 35 bytes) is the fixture; re-compute its digests with `sha256sum` from the fixture files before trusting a number in notes.

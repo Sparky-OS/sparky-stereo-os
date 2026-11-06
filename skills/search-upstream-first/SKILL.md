@@ -1,7 +1,12 @@
 ---
 name: search-upstream-first
 description: >-
-  Before fixing a bug in software the edition did not write, search upstream's current branch, its merge requests and its issues for the same fix; carry upstream's commit with its author's credit when it exists, and write our own fix only when nothing does.
+  Before fixing a bug in software the edition did not write: search upstream's default branch for commits on the file or
+  function since our base, then its merge requests or pull requests, then its issues and mailing lists (lore.kernel.org
+  for the kernel), then our own published debian/patches; carry upstream's commit with its author's credit (DEP-3
+  Origin: upstream, Applied-Upstream) when it exists, write our own fix only when nothing does. Load it at the first
+  step of any fix in a pinned upstream release, when a diagnosis is already done, when a brief says the published
+  package lacks a fix, before writing our own lock or workaround, or before reporting a bug upstream.
 ---
 
 # Search upstream before fixing
@@ -60,3 +65,8 @@ Name the author and the commit in the recipe's credits and in the edition's ATTR
 - **The same search, on a mailing list (nouveau, 2026-10-02).** An RTX 3060 on nouveau without its GSP firmware has no graphics engine, and the `GET_ZCULL_INFO` ioctl dereferenced the missing engine when Mesa's NVK started, so KWin died.
   The fix was already on the nouveau list, not yet in drm-misc: Jim Cromie's "drm/nouveau: Fix NULL pointer dereference in GET_ZCULL_INFO ioctl" of 2026-08-15.
   The edition's kernel carried his patch under his authorship, with Zhenhao Wan's fix for `GETPARAM_GRAPH_UNITS`, which the same machine hit next, instead of a duplicate of our own.
+
+## Lessons from the lanes, October to November 2026
+
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (6 entries).
+Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

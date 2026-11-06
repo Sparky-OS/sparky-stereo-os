@@ -3,7 +3,13 @@ metadata:
   requires-packages: gwenview | digikam | kphotoalbum
 name: stereo-pictures
 description: >-
-  Preserve stereo image layouts, eye order and metadata through readers, writers, viewers, thumbnails and caches.
+  Stereo pictures through readers, writers, viewers, thumbnails and caches: JPS (_JPSJPS_), MPO, PNG with the sTER chunk
+  (.pns), plain side by side and top and bottom, Android camera files, the MIME types, KImageFormats and KFileMetaData,
+  Gwenview, digiKam, Showfoto, KolourPaint, sView, Spectacle's 3D capture, Dolphin thumbnails (ffmpegthumbnailer before
+  KIO's plugins), tooltips and stereo icon themes, stereo SVG, the sparky-stereo-align and mark command-line tools. Load
+  it when a stereo photo shows as a flat pair, the eye order is wrong, a 3D video's thumbnail is flat or one-eyed, the
+  grid is 3D but the tooltip flat, a writer drops the mark or cannot save sTER or st3d, mark or align prints nothing and
+  exits 0 on a missing input, or a file manager must show pairs only on a 3D screen.
 ---
 
 # Stereo pictures
@@ -83,3 +89,8 @@ Both PNG `sTER` modes describe side-by-side views; they differ in eye order, not
 Test preservation, enum semantics, pair extraction and actual display separately, against the format specification.
 Carry layout/eye-order information through export and reopen; then exercise stereo-view close/reopen so a correct file does not hide a stale UI state.
 Attribute an upstream implementation to its actual authors; filing a report or contributing a follow-up does not make the original implementation ours.
+
+## Lessons from the lanes, October to November 2026
+
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (13 entries).
+Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

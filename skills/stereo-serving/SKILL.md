@@ -3,7 +3,12 @@ metadata:
   requires-packages: minidlna | gerbera | rygel
 name: stereo-serving
 description: >-
-  Serve or stream stereo media to another device (DLNA and UPnP renderers, media servers, casting, network players) in exactly the frame format that device takes, at its raster, declared; never in the desktop's internal format.
+  Serve or stream stereo media to another device (DLNA and UPnP renderers, Universal Media Server, Jellyfin, VLC's sout,
+  PeerTube, casting, a 3D television's own player) in exactly the frame format that device takes, at its raster,
+  declared (half side by side, half top and bottom, frame packing, the H.264 SEI, MPEG-2 JP3D), never in the desktop's
+  internal format; renderer profiles, FFmpeg's stereo3d filter and metadata filters, eye order and subtitles. Load it
+  when a TV fed over the network shows two squeezed pictures, never switches to 3D, swaps the eyes, loses the mark in a
+  transcode, or a device profile is outranked by the generic one.
 ---
 
 # Serving stereo to another device

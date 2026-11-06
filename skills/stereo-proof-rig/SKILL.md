@@ -44,6 +44,10 @@ No 3D display is needed: the rig captures what Stereo KWin hands to an output, b
 
 When the question needs a real machine, a cable or a 3D television, the rig is the first step and [`test-bench`](../test-bench/SKILL.md) is the next: baselines, recoverable changes and the television rules.
 
+## An X11 player (the X11 path through Xwayland)
+
+One fresh session per case, a passwd entry for the user, a render node for KWin, the declarations read from the X window tree, and the stereo capture read per eye: [x11-session-rig.md](references/x11-session-rig.md), with its scripts (`x11_props.py`, `eyes_share.py`, `kwin_script.py`, `vlc_mpris.py`, `support4-shim.c`).
+
 ## Test material that a script can read
 
 - **Video:** two coloured sources, the left view red with "LEFT" and the right view blue with "RIGHT", both stamped with the same frame number, packed side by side or top and bottom, either eye first; marked with the frame packing SEI (x264's `--frame-packing`, also a clip whose SEI comes only on keyframes) or Matroska's `StereoMode`; plus a plain 2D clip and an undeclared 32:9 clip.

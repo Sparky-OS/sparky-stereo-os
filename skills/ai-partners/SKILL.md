@@ -216,6 +216,7 @@ The files are the source; every index is derived from them and rebuilt after a m
   Any vector store does; the index is rebuilt after every merge that changes a skill, and a skill removed from the folder is removed from the index.
 - An MCP that serves the skills gives every partner (hosted, local, or a person's own tool) the same one call, "which skill answers this symptom", and the file to read.
   The Markdown files stay what people read; an MCP only routes to them.
+  [Serving skills over MCP](references/skills-over-mcp.md) has the protocol eras a server must speak, the Skills extension, how each assistant registers a local server and where it reads skills, and what Debian ships.
 
 ## Lessons from the lanes, October to November 2026
 

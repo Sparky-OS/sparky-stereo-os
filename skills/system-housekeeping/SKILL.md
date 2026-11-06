@@ -29,6 +29,28 @@ The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
 Daniel's rule: "we don't grow so fast, and when grow self prune".
 A user's disk must not creep up because Linux keeps everything.
 
+## /tmp on disk, and kept
+
+Daniel's design: /tmp is a plain folder on the disk (tmp.mount masked), and it keeps its files: no wipe at boot and no age cleanup. "make sure the tmp cleaner is really off - we do not want to keep the ram tmp behaviour, and was one of the reasons to move it to the disk" (2026-11-06).
+
+- **Debian's own rule still cleans.** `/usr/lib/tmpfiles.d/tmp.conf` says `q /tmp 1777 root root 10d`: no boot wipe (`q`, not `D`), but the daily `systemd-tmpfiles-clean` timer deletes what is untouched for 10 days. Moving /tmp to the disk does not remove that.
+- **The fix is a conffile of the same name in /etc.** `sparky-stereo-kernel-settings` ships `/etc/tmpfiles.d/tmp.conf` with `q /tmp 1777 root root -` and Debian's `q /var/tmp 1777 root root 30d`. A file in `/etc/tmpfiles.d` masks the one of the same name in `/usr/lib/tmpfiles.d` (tmpfiles.d(5)); an age of `-` means no cleanup. Debian's file holds only those two rules, so nothing else is lost.
+- **A conffile, not a /usr/lib file:** a person who wants an age edits it and dpkg keeps the edit on upgrade.
+- **Never ship a wipe or an age of ours.** The edition once shipped `D /tmp ... 10d` (boot wipe) under Daniel's name; he never asked for it.
+
+### Testing it (container, root)
+
+1. `systemd-tmpfiles --cat-config`: the `/tmp` line must be `q /tmp 1777 root root -`, and the 10d line must be gone.
+2. Build a fixture root (`--root=DIR` with `usr/lib/tmpfiles.d/tmp.conf` copied from Debian, plus the package's `etc/tmpfiles.d/tmp.conf`), put a file in `DIR/tmp` and `DIR/var/tmp`, and run `datefudge '11 days' systemd-tmpfiles --root=DIR --clean`. Debian's file alone removes the /tmp file (the red control); the package keeps it. `datefudge '31 days'` still removes from /var/tmp.
+3. `--clean --dry-run` prints "Would remove" only at `SYSTEMD_LOG_LEVEL=debug`; at the default level it shows nothing and proves nothing, so run a control that must list a file.
+4. Upgrade: install the published package, then the new one with plain `dpkg -i` and stdin from /dev/null. An existing identical file is adopted without a prompt; a person's edit is kept.
+
+### Traps
+
+- **libfaketime cannot age files:** it shifts the `stat()` times too, so a file always looks as old as it was created and `--clean` removes nothing. Use `datefudge`, which moves only the clock. A file's change and birth times cannot be set back with `touch`, and systemd ages by all of them, so the clock has to move.
+- **Lean Code strips comments from a shipped conffile** (the explanation, with Daniel's quote, lives in the authored source and the `-lc-hr` companion). A hand-made file with comments on a machine then differs from the package's file: dpkg asks, and either answer gives the same rules.
+- **A conffile that `--root` fixtures need is found by name:** copy Debian's file into the fixture root first, or the control proves nothing.
+
 ## Old kernels
 
 Daniel, 2026-10-30: "cap to 2 - current and one previous as I said (this is a must to the final user!)".

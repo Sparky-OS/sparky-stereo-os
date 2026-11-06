@@ -37,22 +37,29 @@ If vendor checksums already disagree with the accepted source, establish that ba
 
 Check the actual language of shared headers, not only their extension. Mesa's shader includes and BVH headers can feed both C and GLSL; preserve them until both consumers are qualified. Inactive architecture branches can also contain target pragmas that the host compiler rejects during a preprocessing check. Preserve those reviewed inputs with an explicit reason, or use the appropriate target checker; never remove the pragma to make a check pass.
 
-## The preserve plan across routes (ORDER 433)
+## The preserve plan across routes (ORDER 433, 435)
 
 `debian/sparky-lean-preserve.json` maps source patterns to the reason each is kept authored for a consumer that reads source text.
-`lean.debian_prepare` writes it only from `--preserve-source` arguments and refuses to replace an existing one, so a plan survives a new version only if the route hands it back.
-`repo/plain-from-lc.py` removes it with the rest of what `debian_prepare` added, under every option (the unlink is not conditional), so any route that goes through it must read the plan first.
+`lean.debian_prepare` writes it only from `--preserve-source` (or `--preserve-plan`) and refuses to replace an existing one, so a plan survives a new version only if the route hands it back.
+`repo/plain-from-lc.py` removes it with the rest of what `debian_prepare` added, under every option, so ORDER 433 (transition-rebuilds) and ORDER 435 (every route) fixed it in the shared tools, once:
 
-Recipe, for a route that turns a published +lc1 source back into its plain source:
+1. `plain-from-lc.py` stops, before it touches anything, on a source with a plan unless the caller chose: `--save-plan FILE` (copy the plan to FILE, a path outside the tree that must not exist) or `--drop-plan` (the caller carries the plan itself).
+   A source without a plan needs neither (`--save-plan` then writes no file).
+2. `lean.debian_prepare ... --preserve-plan FILE` gives the next source the published patterns first, then any `--preserve-source` after them, and with no other pattern requires the written plan to equal FILE byte for byte.
+   A plan it cannot write unchanged (a hand-formatted one, a pattern it refuses) stops it, naming the source and the way on (`repo/lc-successor.py`, or fix the plan in its recipe), before the tree is touched. A missing FILE is a source without a plan.
+3. `repo/lc-successor.py` and every route use these two options. A recipe that builds the plain `debian/` for `lc-successor.py --recipe` (the mpv recipe) calls `plain-from-lc.py --drop-plan` on its scratch copy, because `lc-successor.py` reads the plan from its own unpack.
+4. `tests/reproducible-sources/check_producers.py` (run by test-wiring.sh) names a script that calls `plain-from-lc.py` with neither option, or saves a plan and never passes `--preserve-plan` (or `carried_plan=`). A new route that forgets is red before it is run.
 
-1. Before `plain-from-lc.py`, read `debian/sparky-lean-preserve.json` of the unpacked published source (JSON object, pattern to reason).
-2. After the plain step, call `lean.debian_prepare ... --preserve-source PATTERN REASON` once per entry, in file order, as `repo/lc-successor.py` does.
-3. Compare the new file with the published one byte for byte (`cmp`); a difference stops the route naming the source (a hand-formatted plan, or a pattern `debian_prepare` refuses), and never writes a source that lost its plan.
+Recipe for a new route that turns a published +lc1 source into a plain one and prepares the next +lc1 source:
+`plain-from-lc.py OPTIONS --save-plan "$WORK/published-preserve.json" TREE`, then the plain steps, then `python3 -m lean.debian_prepare TREE NEXT+lc1 --toolkit TOOLKIT --preserve-plan "$WORK/published-preserve.json"`.
+A script that only needs the plain tree (a scratch copy for a debian/ directory) says `--drop-plan` and why.
 
-Routes: `repo/lc-successor.py` and `packages/transition-rebuilds/prepare-lc-source.sh` carry the plan.
-Other scripts that run `plain-from-lc.py` on a published source (kwin and plasma-workspace prepare scripts, dxvk-stereo, ffmpeg-dmo, the mpv recipe) have no plan to lose today: the newest published source of kwin, plasma-workspace, ffmpeg-dmo, dxvk, libkscreen and plasma-wayland-protocols holds none (checked 6 November 2026 with `tar -tf` of each `.debian.tar.xz`).
-Check that again before a script is used on a source that gains a plan: list the published source's `debian/` first.
+`plain-from-lc.py` is atomic: every check and every new text come first, and the tree is written only when all passed; an option that does not fit the tree (`--edition-entry` on a source whose first entry is not the combined one) leaves it as it was, so a caller can try the next option on the same tree.
+A caller that passes `--save-plan` and then retries must delete FILE first (an existing file is refused, so a plan from an earlier source is never taken for this one).
+
+Scripts that only mention it (qt6-base, kscreen, libkscreen, plasma-wayland-protocols build-in-container.sh) start from a plain source package somebody made with `plain-from-lc.py`; with a plan in the published source that manual step now stops and says what to pass, and the plan has to be handed to that script's own `debian_prepare` call.
 
 How to see the loss: `dpkg-source -x` the published .dsc and the new one and `ls debian/sparky-lean-preserve.json` in both; or `diff -rq` of the two `debian/` trees, where the plan is the only file that should differ by absence.
 The loss is silent because the build still passes: the preserved files are projected by Lean Code and the tests of a package with no consumer for them stay green.
-Test: `sparky-os/tests/reproducible-sources/transition-preserve.sh` runs the route's source half on a fixture with a plan, one without and one with a plan in another form, and a copy without the carrying must fail.
+Tests: `sparky-os/tests/reproducible-sources/transition-preserve.sh` runs the transition route's source half on a fixture with a plan, one without and one with a plan in another form (a copy with `--drop-plan` must fail); `plain-preserve.sh` covers the shared options, the atomic stops, `lc-successor.py` and the producers check, with ORDER 433's tool as the red copy.
+Trap found while testing: a changelog check that fails late (the Lean Code entry) is the proof of atomicity; compare a hash of every file in the tree before and after, not only the plan.

@@ -83,6 +83,11 @@ dpkg-stereo's own files are never projected: the tool that undoes projections st
 Generators, documentation tools and other preprocessors also read native sources and headers; a compiler check alone does not qualify them.
 The [native source consumers reference](references/native-source-consumers.md) (findings of 20 October 2026, toolkit 0.1.9 to 0.1.15) lists the known cases and the safeguards: `lean.debian_prepare --preserve-source`, GLSL, generated control files, kernel generator inputs, Wine's preprocessors, vendored Cargo checksums, and how to measure compiler-input savings.
 
+### Reproducible sources
+
+A source package we make is the same bytes whatever the clock, zone, umask and checkout time: its date is its recipe's (`SOURCE_DATE_EPOCH`, else the last commit touching the recipe's folder), `dch` always takes `--date`, and `debian/` is normalized before `dpkg-source -b`.
+The [reproducible sources reference](references/reproducible-sources.md) has the working recipe, what the real `dpkg-buildpackage -S` (clean included) changes, how to run and compare three runs, and the traps met on real Debian and published inputs.
+
 ## dpkg-stereo, the commands
 
 - `dpkg-stereo --status`: what is projected, by format, and why the rest is left alone. Records live per package in `/var/lib/dpkg-stereo/records/`, so a dpkg run reads only what it touched.

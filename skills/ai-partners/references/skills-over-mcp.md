@@ -79,3 +79,16 @@ Traps:
 - `std.testing.tmpDir` writes `.zig-cache` in the working directory; with a read only mount, make the scratch folder under `/tmp` instead.
 - A comment that names a variant trips the "no hardcoded variant" lint; the lint skips comment lines.
 - The extension page's example skill (`pdf-processing`: 151, 29 and 35 bytes) is the fixture; re-compute its digests with `sha256sum` from the fixture files before trusting a number in notes.
+
+### What running it taught (milestone 2b)
+
+Recipe, in order: build with `zig build test-bins`, run every test binary in the container (`scripts/run-tests.sh`), then drive the program itself end to end (`scripts/e2e.sh`: command line against goldens recorded from the old engine, both MCP eras over pipes, stub assistants in a throwaway HOME that record their argv, the command gate both ways), then show each rule going red when removed (`scripts/mutation-controls.sh`; a mutation that fails to compile proves nothing, so the script requires the test binary to exist).
+- The commands a skill may run are data (`commands.json`: id, argv with whole-argument `{slot}` tokens, slot classes `word`, `int`, `enum:a,b`, `expect.exit`, `expect.stdout_contains`, `run`: assistant or person). Zig has no regular expressions; classes cannot be made to run for ever.
+- Policy `auto`: an AI assistant found (its program on PATH or its folder in the home) means the assistant's approval applies, none found means the person is asked; `mcp commands auto|assistant|ask` switches it and is saved in the same state file as the other choices, which `statefile` rewrites without touching other lines.
+- Traps:
+  - `docker run --tmpfs /tmp` is `noexec` by default: a stub assistant written under /tmp fails with AccessDenied; add `,exec`.
+  - `set -o pipefail` with `grep -q` on the right makes a pipeline fail when the writer is cut short by the early exit: capture the output first, then grep it.
+  - A test with a stub program on PATH makes "no AI tool found" false; clear PATH for that case.
+  - Inline `for` over a registry cannot `continue` out of a runtime loop; look the variant up into a plain struct first.
+  - A lint that searches parents for variant ids finds real slips (the hardcoded kind name in `--root`); give the engine a function that picks it from the registry instead of a literal.
+  - Disk: a Zig cache grows by hundreds of MB per rebuilt test set; delete it between runs on a small scratch disk.

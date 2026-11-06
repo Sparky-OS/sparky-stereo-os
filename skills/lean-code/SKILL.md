@@ -82,7 +82,7 @@ dpkg-stereo's own files are never projected: the tool that undoes projections st
 
 Generators, documentation tools and other preprocessors also read native sources and headers; a compiler check alone does not qualify them.
 The [native source consumers reference](references/native-source-consumers.md) (findings of 20 October 2026, toolkit 0.1.9 to 0.1.15) lists the known cases and the safeguards: `lean.debian_prepare --preserve-source`, GLSL, generated control files, kernel generator inputs, Wine's preprocessors, vendored Cargo checksums, and how to measure compiler-input savings.
-A route that rebuilds a published source must carry its `debian/sparky-lean-preserve.json` (`plain-from-lc.py` removes it): see "The preserve plan across routes" in that reference.
+A route that rebuilds a published source must carry its `debian/sparky-lean-preserve.json`: `plain-from-lc.py --save-plan FILE` and `lean.debian_prepare --preserve-plan FILE` (it stops without one of the two choices); see "The preserve plan across routes" in that reference.
 
 ### Reproducible sources
 

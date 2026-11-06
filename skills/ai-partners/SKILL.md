@@ -203,7 +203,7 @@ So the description is written as a trigger clause, within 1024 characters:
 
 Measured on 2026-11-06 with 157 real symptoms from the lane reports (one skill expected for each): the old one-line labels found the right skill first for 23 % of them and in the top three for 41 %; the trigger clauses found it first for 58 % and in the top three for 82 %, with the same index and embedding (sentence-transformers/all-MiniLM-L6-v2 through FastEmbed, 384 dimensions).
 The misses that remain are symptoms whose words belong to a neighbouring skill (a Debian error routed to `contrib-debian` instead of `edition-packaging`), which is why the third clause names the neighbour.
-Keep the test: `tools/tests/test-skills-find.py` for the offline finder, and a symptom list for the embedded index, and add the symptom of every new lesson to it.
+Keep the test: `old_attempts/tests/test-skills-find.py (the Python finder the engine is checked against; the engine tests are in the build tree's skills-mcp)` for the offline finder, and a symptom list for the embedded index, and add the symptom of every new lesson to it.
 The embedding model reads only the first 256 tokens of name plus description (FastEmbed's tokenizer truncates there), which is about 170 words of plain text and fewer when the words are technical names, each cut into several tokens.
 On 2026-11-06 the seven longest descriptions had grown past that window and lost their closing symptoms until they were cut, so the words that route go early, and a description stays within the window, not only within 1024 characters.
 Measure a description's tokens with the same tokenizer before trusting its tail.

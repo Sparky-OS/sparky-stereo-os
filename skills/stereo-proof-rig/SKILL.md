@@ -140,3 +140,8 @@ Take it in a real Stereo KWin session with a 3D output, on a test machine, never
 - **Freeze a window only after the compositor has sized it.** KWin doubles a declared X11 window when it reads the declaration; a KWin busy writing its own configuration read it 5 to 16 seconds late, and a program frozen before that showed one eye. Wait until the X server reports the doubled width before the first frame, and keep a test that holds KWin still (`SIGSTOP`) after it maps the window to prove the wait.
 - **No OpenStreetMap tiles in a test.** The OpenStreetMap Foundation's Tile Usage Policy does not permit offline use or tile archives: draw synthetic tiles at the coordinates the program asks for, run with the network off (`--network none`), and fail on any download the program attempts.
 - **A per-scene tolerance hides one eye moved for all scenes.** A depth check that accepts a pixel of bias per scene passed 88 of 92 scenes with the right eye a pixel to the right; also bound the mean bias over all scenes (a quarter pixel caught a pixel either way and half a pixel).
+
+## Lessons from the lanes, October to November 2026
+
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (29 entries).
+Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

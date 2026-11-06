@@ -3,7 +3,11 @@ metadata:
   requires-packages: passwd
 name: user-groups
 description: >-
-  Give every desktop user the Unix groups the edition's hardware and programs need, however the account is made, and add a group when a feature needs one; never a root-equivalent group.
+  The Unix groups every desktop user of the edition gets (audio, video, render, plugdev, input, dialout and the rest a
+  feature needs), however the account is made (adduser EXTRA_GROUPS, useradd, Calamares users.conf, the first user),
+  adding a group when a feature needs one, never a root-equivalent group, sparky-stereo-user-groups apply, check and
+  propose. Load it when a device needs plugdev or uaccess, a serial port or a USB device is refused, a new user misses a
+  group the first user has, a games group is missing in a container, or a package wants to add a group.
 ---
 
 # User groups for desktop users

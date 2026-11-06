@@ -1,9 +1,12 @@
 ---
 name: contrib-qt
 description: >-
-  Contribute a Qt module change through Gerrit with the CLA, verified author email, dev branch push and public review history.
-metadata:
-  requires-packages: qt6-base-dev
+  Contribute a Qt module change through Gerrit: the CLA and the verified author email, the commit-msg hook and
+  Change-Id, git push HEAD:refs/for/dev with reviewers, Pick-to and Task-number, the ChangeLog line (QUIP 17), licence
+  headers and licenseRule.json, the Sanity Bot, a reviewer's own patch set, searching Gerrit for a file's changes and a
+  QTBUG. Load it with upstream-outreach for a qtbase, qtdeclarative, qtmultimedia or qtwayland change, a plugin that
+  cannot load its library (libMyStyle.so, RUNPATH, RPATH_SET could not write new RPATH), a style plugin fix, or a reply
+  on codereview.qt-project.org.
 ---
 
 # Contributing to Qt
@@ -60,3 +63,8 @@ Re-read the Gerrit setup guide and the active change before every round.
 - On 2026-10-24, I checked the contribution page and `https://wiki.qt.io/Setting_up_Gerrit`; those public documents are the project's contribution instructions.
 - In public change 778399, review and service accounts did not raise AI assistance or reject the change for it.
 - Declare AI assistance only when the module's current review instructions or assigned reviewers require it.
+
+## Lessons from the lanes, October to November 2026
+
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (4 entries).
+Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

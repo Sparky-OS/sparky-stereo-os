@@ -3,7 +3,15 @@ metadata:
   requires-packages: plasma-desktop
 name: kde-desktop-defaults
 description: >-
-  Maintain the edition's Plasma defaults and small KDE patches for search, task management, frozen-window recovery, removable-drive formatting and running scripts, with native and packaged regression proof.
+  The edition's Plasma defaults and small KDE patches, with native and packaged proof: KRunner search order, the unit
+  converter's currency rates, task management, Ctrl+Alt+Del to System Monitor and Ctrl+Alt+Esc to log out, frozen-window
+  recovery, formatting a removable drive and running scripts from Dolphin, the look package (cursor theme names,
+  wallpaper, lock screen, the video wallpaper plugin), Discover and its AppStream cache and memory, sparky-stereo-look
+  and /etc/xdg files, the KScreen KCM, widgets that must say when a service is unreachable. Load it when a default
+  should be decided instead of left to the person, a shortcut clashes, a lock screen shows only its wallpaper, a cursor
+  theme name does not exist, a KCM page is out of order in another language, a widget shows zero instead of an error, a
+  video wallpaper keeps the old clip, Discover's memory must be measured fairly, or a KDE patch needs its CI and package
+  gate.
 ---
 
 # KDE desktop defaults
@@ -78,7 +86,7 @@ Newcomers in Linus Tech Tips' Linux challenge and in Diolinux's videos struggled
 
 ## The CI and package gates
 
-- Run the owning project's KDE CI jobs locally, the clang FreeBSD proxy included, as [rebuilt packages](../edition-packaging/references/rebuilt-packages.md#before-any-push-to-an-invent-kde-org-fork) says.
+- Run the owning project's KDE CI jobs locally, the clang FreeBSD proxy included, as [rebuilt packages](../edition-packaging/references/rebuilt-packages.md#before-any-push-to-an-inventkdeorg-fork) says.
 - Compare a failure with the same unpatched release, wrapper, image and dependencies.
   A matching test name is not enough: read the assertion or exception and the diagnostic artifacts.
   Count repeated environment failures separately from new ones.
@@ -88,3 +96,8 @@ Newcomers in Linus Tech Tips' Linux challenge and in Diolinux's videos struggled
   The Plasma 6.7.4 workspace recipe carries two: Nicolas Fella's Qt QML linkage fix from Plasma/6.7 (aa326ad917) and Tobias Fella's QFileInfo include (08383f4b1d, bug 526210).
 - Package from the distribution's source package with the edition's patch series. Check that dependencies resolve with nothing removed, compare the installed payloads with the built archives, and repeat the native behaviour checks on the installed packages.
 - Report the tested revisions, the results, the control failures, the hardware gaps and the commits a later release must carry. Public credit comes from each project's own author records.
+
+## Lessons from the lanes, October to November 2026
+
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (16 entries).
+Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

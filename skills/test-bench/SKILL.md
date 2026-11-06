@@ -1,7 +1,13 @@
 ---
 name: test-bench
 description: >-
-  Run stereo, display and kernel tests on real machines and 3D televisions: a person at the bench and an AI partner working remotely, baselines before and after, recoverable changes, clean power, and the unattended lab model for those who need it.
+  Tests on real machines and 3D televisions with a person at the bench and a partner working remotely: baselines before
+  and after, every change recoverable, clean power (UPS, NUT, the pull-the-plug test), failure domains, the television
+  rules, inventory and reservations, the unattended lab model (BayLibre, LAVA, labgrid), KDE's CI run locally
+  (kde-ci-local), container test harnesses (setpriv for an unprivileged uid, proot and exit status, dpkg --unpack for a
+  real postrm, a read-copy of the repository for a gate). Load it when a test needs a cable, a TV or a laptop, a bench
+  machine must be reserved or recovered, tests pass as root but fail for the person, a CI image lacks the edition's
+  Xwayland, QSignalSpy::wait loses a signal, a KWin autotest flakes, or a kernel test could brick a board.
 ---
 
 # Testing on real machines and televisions
@@ -213,3 +219,8 @@ Patrick Titiano and BayLibre for the talk "Making Your CI Lab More Reliable", an
 Sipeed for NanoKVM, Linaro and the LAVA contributors for LAVA, the labgrid project, and the Snipe-IT authors.
 Network UPS Tools and its contributors.
 Each is quoted from its own pages and licences, checked on 2026-11-04.
+
+## Lessons from the lanes, October to November 2026
+
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (13 entries).
+Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

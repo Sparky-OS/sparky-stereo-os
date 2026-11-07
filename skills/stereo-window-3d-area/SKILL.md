@@ -7,7 +7,8 @@ description: >-
   below the window with a hole over it (a Wayland subsurface, an X11 child window), the Qt routes measured, Union's
   depth values, the three levels sunk, screen and popped within the user's limits, menus, popups, tooltips, select
   lists, notifications and dialogs at depth (xdg_popup, never a subsurface), the 10 px popup border from the output's
-  edges, KWin's effects with depth of their own (Fall Apart, Sheet, Glide, Zoom, dragging). Load it when a popup menu at
+  edges, KWin's effects with depth of their own (Fall Apart, Sheet, Glide, Zoom, dragging), and a GTK 4 GtkGLArea as a
+  declared stereo subsurface inside a 2D window. Load it when a popup menu at
   the screen edge looks cut or flat in 3D, a sub-menu sits behind its parent, a tooltip or select list is not popped, a
   dialog collapses to its title bar, a hidden top level kills the native child, a whole window is declared instead of
   its 3D area, two windows draw each other's depth, or an element's parallax must be clipped to its rectangle.
@@ -67,6 +68,13 @@ Worked examples:
 - Setting a stereo *default* surface format makes the whole top level stereo, against the separation rule: set the format on the 3D area's own window only.
 - Qt's client-side decorations once flattened stereo windows; our Qt gives the decorations' content framebuffer a slot per eye ([Sparky-OS/qtbase `stereo3d-csd`](https://github.com/Sparky-OS/qtbase/tree/stereo3d-csd)), or KWin decorates the stereo window with server-side decorations.
 - Qt Widgets forced an 8-bit alpha on every translucent window, so a 2D part over a deeper 3D area was 8 bits; our Qt keeps the alpha and depth the window asks for (10/10/10/2 or 16/16/16/16), and a window that asks for nothing stays 8/8/8/8 ([Sparky-OS/qtbase `stereo3d-alpha`](https://github.com/Sparky-OS/qtbase/tree/stereo3d-alpha)). Deep content in its own layer, as Krita does, is still the pattern ([`deep-colour`](../deep-colour/SKILL.md)).
+
+## GTK 4 (GtkGLArea, Wayland)
+
+GtkGLArea draws into a framebuffer of its own and appends one texture to the scene graph, so a stereo GtkGLArea is the same pattern with GTK's own subsurface: each eye is rendered by the program's unchanged render handler (the signal is emitted once per eye, `gtk_gl_area_get_current_eye()` says which), the two views are copied side by side into one opaque texture, and that texture goes on a `GdkSubsurface` (the path `GtkGraphicsOffload` takes) declared with `kde_stereo_content_v1` version 2, so the area keeps its size.
+GTK composites an offloaded picture itself whenever the subsurface cannot be used; for a stereo area that would show both eyes flat, so the area draws a clip of the left view as its fallback and tells the program (`stereo-shown`, `stereo-error`) and the log, once.
+The recipe, the proof cases and the traps (no dma-buf from llvmpipe, a blit that obeys the scissor, the decision that comes a frame late, zink on NVIDIA) are in [GTK 4 and GtkGLArea](references/gtk-glarea.md).
+GTK 3, a real GL program, X11 and the deep colour canvas are the next milestones of the same item.
 
 ## X11 programs
 

@@ -151,5 +151,16 @@ they are absent from the packaged 6.7.4 API used in the failed build. Build the
 matching upstream dependency into an isolated prefix and pass that prefix and
 its `KPipeWire_DIR` to CMake. Do not remove the caller's backpressure to make an
 older SDK compile. The recorded dependency source is KDE/kpipewire
-`bb838b0371012b99b5c199b7aaf662be319ae5b6`; the subsequent KRdp build still needs
-its own result.
+`bb838b0371012b99b5c199b7aaf662be319ae5b6`; KRdp subsequently built against that prefix and its two registered tests
+passed. This establishes a build/test baseline, not display or pose delivery.
+
+## TLS fixture stalls before a channel can negotiate
+
+Read the client log as well as the server log. In the recorded failed attempt,
+the Android client invoked `OnAuthenticate` after selecting TLS, then waited
+in the stock credential dialog. The server's later `BIO_do_handshake failed`
+was not a camera-channel rejection. A TLS-only, unauthenticated test server
+can still need explicit public dummy credentials in this client. The proposed
+fixture-URI password addition was not rerun before the resource stop; it is
+not a verified fix. Require RDP connection and DVC readiness before calling
+a camera-disabled timeout the endpoint red control.

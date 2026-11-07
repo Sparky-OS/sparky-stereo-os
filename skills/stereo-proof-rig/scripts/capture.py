@@ -33,7 +33,7 @@ def capture(method="CaptureActiveScreen", args=()):
                     break
                 data.extend(chunk)
 
-    reader = threading.Thread(target=drain)
+    reader = threading.Thread(target=drain, daemon=True)
     reader.start()  # KWin writes the picture before it replies
     result, _ = bus.call_with_unix_fd_list_sync("org.kde.KWin", "/org/kde/KWin/ScreenShot2", "org.kde.KWin.ScreenShot2",
                                                 method, params, GLib.VariantType("(a{sv})"), Gio.DBusCallFlags.NONE,

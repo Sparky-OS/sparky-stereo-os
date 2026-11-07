@@ -119,7 +119,7 @@ def main():
             same = np.all(halves[0][oy0:oy1, ox0:ox1] == halves[1][oy0:oy1, ox0:ox1])
             report('the overlay rectangle, with its text, is the same in both eyes', bool(same))
             skip[oy0 - y0 : oy1 - y0, ox0 - x0 : ox1 - x0] = True
-        for i, (name, tag, bg) in enumerate((('left', 'LEFT', red), ('right', 'RIGHT', blue))):
+        for i, (name, tag, bg) in enumerate((('left', 'LEFT', left_colour), ('right', 'RIGHT', right_colour))):
             want = picture(w, h, tag, bg, frame)
             got = halves[i][y0:y1, x0:x1]
             bad = int(np.count_nonzero(np.any(np.abs(got.astype(int) - want) > TOL, axis=2) & ~skip)) if got.shape == want.shape else -1

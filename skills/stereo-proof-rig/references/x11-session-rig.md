@@ -18,12 +18,12 @@ The scripts are in `../scripts`: `x11_props.py`, `x11_propagation.py`, `eyes_sha
 
 ## Traps
 
-- **Full screen through key presses or clicks of the fake input client did not reach the player on X11** even for the distribution's own VLC, in this rig, while the pointer, the tooltips and the window all worked. Start the player with `--fullscreen` for the full-screen case, and use `kwin_script.py` for window size changes.
+- **Keys and clicks do reach the player on X11 and on Wayland** (ORDER 441 corrected ORDER 265, whose script joined its steps with commas, so only the first step ran). Send them with a connected `fakeinput` and read the player's state back: [input-delivery.md](input-delivery.md). Use `--fullscreen` or `kwin_script.py` only when the case is not about the input.
 - **`Fullscreen state changed` in VLC's log is not a full screen**: it is printed when the video output starts.
 - **The window manager's full screen is not the player's**: `workspace.activeWindow.fullScreen = true` sets KWin's flag but VLC keeps its menu bar and controls; only the player's own full screen resizes the video child.
 - **`No space left on device` from dbus-daemon about inotify** is the host's inotify limit, harmless for the case.
 - **The negative paths**: preload `support-shim.so` (`cc -shared -fPIC`) so that `stereo_supported_x11()` returns `$STEREO_SHIM_SUPPORT` (4: no child windows; 7: no places of views); set the variable in the same `LD_PRELOAD=... STEREO_SHIM_SUPPORT=N` word list you give the player, the container does not pass it on. `STEREO_SHIM_WAYLAND` is not needed: the shim also refuses `stereo_declare_wayland()`, which tests the Wayland notice. The program must have said why each time.
-- **Pointer events through a window that selected none**: `x11_propagation.py` selects pointer motion on the video window's parent, moves the pointer over the child with xdotool and prints the events the parent received; button events are not selectable there because Qt holds ButtonPress on its window (one client only, a silent `BadAccess`). xdotool's clicks did not toggle pause or full screen in this rig even for an unmodified player, so a click is not a test here.
+- **Pointer events through a window that selected none**: `x11_propagation.py` selects pointer motion on the video window's parent, moves the pointer over the child with xdotool and prints the events the parent received; button events are not selectable there because Qt holds ButtonPress on its window (one client only, a silent `BadAccess`). xdotool's clicks and keys reach the player only after `XwaylandEisNoPrompt=true` is set in the rig's `kwinrc` (see [input-delivery.md](input-delivery.md)).
 - **A top-level window listed as child**: in `x11_props.py`'s output the video child has `_KDE_NET_WM_STEREO_CONTENT` = 3 and the top-level `_CHILDREN` = the child's id; both must be gone after the video closes.
 
 ## The installed package, not the build tree

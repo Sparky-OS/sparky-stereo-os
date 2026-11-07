@@ -72,7 +72,7 @@ See [the maintainer workflow](../docs/maintainer-workflow.md) for package checks
 - `sparky-stereo-skills link` retains the optional assistant-folder integration; it preserves the person's own skills.
 - `sparky-stereo-skills export skills.zip` retains the skill-import format. `sparky-stereo-skills bundle reference.zip` instead preserves the full offline tree and its relative references.
 
-In a checkout use `python3 tools/skills-context.py` in place of `sparky-stereo-skills context`, and `python3 tools/skills-context.py --find "<task or symptom>"` in place of `sparky-stereo-skills find`.
+In a checkout, run the installed `sparky-stereo-skills` on it with `SPARKY_STEREO_REFERENCE=$PWD sparky-stereo-skills context ...` and `SPARKY_STEREO_REFERENCE=$PWD sparky-stereo-skills find "<task or symptom>"`.
 The context budget is in characters, not tokens; an oversized request fails rather than truncating instructions.
 A selected section is explicitly labelled as an excerpt. Read additional linked references when the task needs them.
 
@@ -82,7 +82,7 @@ Keep its existing name and path so installed integrations keep finding it.
 Write the decision, the minimum inputs, the operation and the observable result; preserve useful evidence and credits.
 Keep substantial conditional detail in a linked reference, and individual run history in its evidence record.
 Use a valid YAML `name` and `description`; run `python3 tools/check-skills.py` and check the actual instructions as a reader.
-The description and the task table are how a reader finds a skill: name the programs, tools and symptoms a person would type, and add the symptom to `tools/tests/test-skills-find.py` when a new kind of work arrives.
+The description and the task table are how a reader finds a skill: name the programs, tools and symptoms a person would type, and add the symptom to `data/routing/symptoms-157.tsv` of the skills engine (sparky-os/skills-mcp in the build tree), which every change to the engine or to the descriptions is checked against when a new kind of work arrives.
 Write the description as a trigger clause: what the skill is for, then the symptoms, error strings, programs and components that should bring a reader to it, then what it is not for and which skill is, within 1024 characters ([ai-partners, the description routes](ai-partners/SKILL.md#the-description-routes-the-body-executes)).
 Write the skill as you go, while the work happens: the recipe first, each trap with its symptom, cause, fix and how the cause was found, the part's perks; longer harvests go to `references/lessons-<date>.md` ([ai-partners, skills as you go](ai-partners/SKILL.md#skills-as-you-go)).
 A local vector index or an MCP over these files finds a skill by the same description; the files stay the source and the index is rebuilt after every merge ([finding a skill locally](ai-partners/SKILL.md#finding-a-skill-locally)).

@@ -51,8 +51,8 @@ Return: changed paths, evidence location, actual result, gaps and next step
 ```
 
 Do not dump an entire mailbox, research folder or skill catalogue into a model.
-Use `tools/skills-context.py` from the public tree for a reader without filesystem access.
-When the brief does not name the skill, `tools/skills-context.py --find "<task or symptom>"` (installed: `sparky-stereo-skills find`) ranks the skills offline by name, description and the index's task table; a small model can run it and then load only the first one's context.
+Use `sparky-stereo-skills context` (from a checkout, `SPARKY_STEREO_REFERENCE=$PWD sparky-stereo-skills context`) for a reader without filesystem access.
+When the brief does not name the skill, `sparky-stereo-skills find "<task or symptom>"` ranks the skills offline by name, description and the index's task table; a small model can run it and then load only the first one's context.
 The output records file hashes and refuses an oversized bundle instead of cutting instructions off.
 For a long skill, select a heading with `--section skill-name:Heading`; include the sections needed for that step and retain the common contract.
 A text bundle does not grant tool access or execute its commands.
@@ -203,7 +203,7 @@ So the description is written as a trigger clause, within 1024 characters:
 
 Measured on 2026-11-06 with 157 real symptoms from the lane reports (one skill expected for each): the old one-line labels found the right skill first for 23 % of them and in the top three for 41 %; the trigger clauses found it first for 58 % and in the top three for 82 %, with the same index and embedding (sentence-transformers/all-MiniLM-L6-v2 through FastEmbed, 384 dimensions).
 The misses that remain are symptoms whose words belong to a neighbouring skill (a Debian error routed to `contrib-debian` instead of `edition-packaging`), which is why the third clause names the neighbour.
-Keep the test: `tools/tests/test-skills-find.py` for the offline finder, and a symptom list for the embedded index, and add the symptom of every new lesson to it.
+Keep the test: `data/routing/symptoms-157.tsv` of the skills engine (sparky-os/skills-mcp in the build tree), which every change to the engine or to the descriptions is checked against for the offline finder, and a symptom list for the embedded index, and add the symptom of every new lesson to it.
 The embedding model reads only the first 256 tokens of name plus description (FastEmbed's tokenizer truncates there), which is about 170 words of plain text and fewer when the words are technical names, each cut into several tokens.
 On 2026-11-06 the seven longest descriptions had grown past that window and lost their closing symptoms until they were cut, so the words that route go early, and a description stays within the window, not only within 1024 characters.
 Measure a description's tokens with the same tokenizer before trusting its tail.
@@ -211,7 +211,7 @@ Measure a description's tokens with the same tokenizer before trusting its tail.
 ### Finding a skill locally
 
 The files are the source; every index is derived from them and rebuilt after a merge.
-- In a checkout or on an installed system: `sparky-stereo-skills find "<symptom>"` (or `python3 tools/skills-context.py --find "<symptom>"`) ranks the skills offline by name, description and the task table, the same every time, and prints each path with the `context` command to run next.
+- In a checkout or on an installed system: `sparky-stereo-skills find "<symptom>"` (on a checkout, with `SPARKY_STEREO_REFERENCE=$PWD` in front) ranks the skills offline by name, description and the task table, the same every time, and prints each path with the `context` command to run next.
 - With a local vector index: one point per skill, the name and description embedded, the path in the payload; the search returns the skill's name and path and the reader opens the file, never a copy of its body.
   Any vector store does; the index is rebuilt after every merge that changes a skill, and a skill removed from the folder is removed from the index.
 - With a second local index of the bodies: one chunk per section of every `SKILL.md` and references file, the heading path embedded with the chunk, the file and the first and last line in the payload.

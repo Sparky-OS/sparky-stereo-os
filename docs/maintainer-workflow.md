@@ -43,9 +43,9 @@ When you do not know which skill a task or symptom needs, ask the skills index f
 From a checkout, find the skill, then create a selected text bundle:
 
 ```sh
-python3 tools/skills-context.py --find "a SPICE migration that loses the cache"
-python3 tools/skills-context.py native-linux --output /tmp/native-linux-context.txt
-python3 tools/skills-context.py --section '3d-to-vr:Phone link formats and late-frame recovery (checked 2026-10-15)' --output /tmp/phone-context.txt
+sparky-stereo-skills find "a SPICE migration that loses the cache"
+sparky-stereo-skills context native-linux --output /tmp/native-linux-context.txt
+sparky-stereo-skills context --section '3d-to-vr:Phone link formats and late-frame recovery (checked 2026-10-15)' --output /tmp/phone-context.txt
 ```
 
 From the updated package, the equivalent entries are `sparky-stereo-skills find a SPICE migration that loses the cache` and `sparky-stereo-skills context native-linux`.

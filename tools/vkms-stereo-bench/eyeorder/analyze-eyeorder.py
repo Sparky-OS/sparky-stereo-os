@@ -102,7 +102,17 @@ MODELS = {
     "hdmi-fp": packed_fp,
 }
 frames = {}
+listed = {}
+mp = os.path.join(RUN, "modes.txt")
+if os.path.exists(mp):
+    for line in open(mp):
+        parts = line.split()
+        listed[parts[0]] = len(parts) > 1
+for tag in [t for t in MODELS if t.endswith("-right") and not listed.get(t, True)]:
+    check("%s is not listed" % tag, True, "no right eye first twin in the mode list")
 for tag, model in MODELS.items():
+    if not listed.get(tag, True):
+        continue
     for sw in (0, 1):
         A = load("%s-s%d" % (tag, sw))
         frames[(tag, sw)] = A
@@ -131,6 +141,8 @@ for sw, eye, name in ((0, L, "left"), (1, R, "right")):
         check("plain 2D swap %s shows the %s view" % ("on" if sw else "off", name), n == 0, "%d pixels differ" % n)
 # a right-first twin equals the left-first twin with the swap flipped
 for kind in ("rows", "columns", "checkerboard"):
+    if not listed.get(kind + "-right", True):
+        continue
     for sw in (0, 1):
         a, b = frames.get((kind + "-right", sw)), frames.get((kind + "-left", 1 - sw))
         if a is None or b is None or a.shape != b.shape:

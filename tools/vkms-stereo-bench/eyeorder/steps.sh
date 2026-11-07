@@ -97,12 +97,44 @@ setmode() { # setmode TAG SWAP(enable|disable)
     log "$1 swap $2: mode id $id, kscreen-doctor exit $?"
     sleep 3
 }
+if [ "$scenario" = migrate ]; then
+    stopkwin
+    # a right eye first twin saved by an earlier KWin: KWin must come up in the left eye first mode with the swap on
+    for case in rows-right:135168:60000 fs-right:655360:120000; do
+        name=${case%%:*}; rest=${case#*:}; flags=${rest%%:*}; rate=${rest#*:}
+        MODE_FLAGS=$flags MODE_RATE=$rate python3 - <<'PY2'
+import json, os
+p = "/root/.config/kwinoutputconfig.json"
+cfg = json.load(open(p))
+for entry in cfg:
+    if entry.get("name") == "outputs":
+        for o in entry["data"]:
+            o["anaglyph"] = True
+            o["otherStereoFormats"] = True
+            o["stereoSwapEyes"] = False
+            o["mode"] = {"width": 1920, "height": 1080, "refreshRate": int(os.environ["MODE_RATE"]), "flags": int(os.environ["MODE_FLAGS"])}
+json.dump(cfg, open(p, "w"), indent=1)
+PY2
+        startkwin migrate-$name
+        LIBGL_ALWAYS_SOFTWARE=1 STILL=1 HOLD_SECONDS=3000 /tmp/egl-stereo-subsurface > /mnt/client-migrate-$name.log 2>&1 &
+        cp2=$!
+        sleep 6
+        doctor migrate-$name
+        grab migrate-$name
+        grep -E "Swap left and right" /mnt/doctor-migrate-$name.txt | sed "s/^/STEREO|eyeorder|$name: /"
+        kill $cp2
+        stopkwin
+        grep -o '"stereoSwapEyes": [a-z]*\|"flags": [0-9]*' /root/.config/kwinoutputconfig.json | tr '\n' ' ' | sed "s/^/STEREO|eyeorder|$name saved after: /"; echo
+    done
+    exit 0
+fi
 if [ "$scenario" = fsphase ]; then
     setmode plain disable && grab ref
     for rep in 1 2 3; do
         for tag in fs-left fs-right; do
             for sw in disable enable; do
                 n=$tag-$sw-$rep
+                [ -n "$(sed -n "s/^$tag //p" /mnt/modes.txt)" ] || continue
                 setmode plain disable
                 sleep 2
                 /tmp/drm-planelog /dev/dri/card0 HDMI-A-1 6000 > /mnt/planelog-$n.txt 2>&1 &

@@ -51,6 +51,12 @@ FluidSynth and the FluidR3 and TimGM6mb soundfonts are in Debian; the MuseScore 
 Munt (MT-32), libADLMIDI and libOPNMIDI (FM synthesis) and DOSBox Staging are not, so the edition packages them from upstream; MT-32 ROMs are the user's own.
 **Being built:** a soundfont synthesizer running as a user service so emulators and games play MIDI out of the box.
 
+## Bluetooth voice (HFP) and dongles
+
+A headset microphone needs a SCO link, which is separate from A2DP.
+When voice fails, find the refusing layer before changing a codec or a profile: the controller's buffers, the kernel's decision, the connect, the USB alternate settings, then the profile.
+The commands, the two-machine test (a disposable gateway VM with the adapter, a real headset-side machine, a known tone as its microphone) and the traps are in [references/bluetooth-voice-dongles.md](references/bluetooth-voice-dongles.md); `bench/tone-check.py` and `bench/pwctl.py` are the checker and the card helper.
+
 ## Standards
 
 AES5 (preferred sampling frequencies; 48 kHz for professional use); the CD Red Book (44.1 kHz, 16 bit); IEC 60958 and IEC 61937 (PCM and encoded audio over S/PDIF and HDMI®); CTA-861 (audio data blocks in the EDID); ITU-R BS.775 (multichannel speaker layouts); AES69 (SOFA files for head-related transfer functions).

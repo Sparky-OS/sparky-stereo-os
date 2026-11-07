@@ -36,9 +36,12 @@ The [patches/](patches/) folder goes on top of it:
 | 0001 | Frees the connector's EDID copy with its configuration (a leak in v5 32/38, proposed to the author as a fixup) |
 | 0002 | The composer and the writeback connector use the whole frame of a stereo mode (`drm_mode_get_hv_timing()`): for frame packing, vdisplay + vtotal lines |
 | 0003 | VKMS connectors allow stereo modes (`stereo_allowed`) |
+
 | 0004 | KUnit tests: the stereo modes an EDID declares, and the writeback buffer size of each layout |
 | 0005 | Attaches the PATH property only to connectors that have a parent: with v5 as posted every VKMS connector has an empty PATH, and IGT fails in `kmstest_get_path_blob()` on every VKMS device, `kms_3d` and every test built on `igt_display` (`kms_atomic` measured) alike (proposed to the author as a fix for v5 37/38) |
 | 0006 | Attaches the edition's two HDMI® 3D connector properties, "side by side full timing" and "HDMI 3D metadata", to VKMS's HDMI-A connectors, so the kwin phase can check that the compositor sets them (needs the edition's HDMI® 3D patches; bench tree only) |
+
+The edition's kernel carries 0002 and 0003 (as `vkms_frame_size()` and `stereo_allowed`) in its patch series from the build after build 16; on builds 14 and 16 a configfs connector read its EDID and listed no 3D mode (`src/lsmodes.c` shows it, `drm.debug=0x4` names the reason: see the `vkms-stereo` skill).
 
 ```sh
 # in a clone of the mainline kernel: the base commit is in v7.3-rc1

@@ -75,6 +75,12 @@ It replaces none of the tests on a real television: VKMS has no cable, so the HD
 - The real-hardware test (a television switching itself into 3D) stays in the [`drivers`](../drivers/SKILL.md) skill's proof list.
 - How to run that real-hardware test with a person at the bench and the partner remote, without risking the machine or the television: [`test-bench`](../test-bench/SKILL.md).
 
+## A 3D mode of the EDID is missing from the connector's list
+
+Walk the EDID to the mode list one step at a time, each with a check that can fail: the EDID decodes with 3D, the expectation is made from `edid-decode` (never from the kernel), the connector's modes read with the stereo capability set, and, if they are missing, `drm.debug=0x4` names the status of every mode the probe helper drops (`NO_STEREO` means the connector lacks `stereo_allowed`).
+Then the frame of each layout, and the same guest on the kernel without the change.
+The steps, the guest for a published kernel, and the traps are in [references/edid-to-mode-list.md](references/edid-to-mode-list.md); the bench's `src/lsmodes.c` lists a connector's modes against an expectation and `edid/make-2d-edid.py` makes the 2D-only twin of an EDID.
+
 ## Lessons from the lanes, October to November 2026
 
 From the lanes of 25 October to 6 November 2026; add the next lesson here as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
@@ -82,5 +88,7 @@ From the lanes of 25 October to 6 November 2026; add the next lesson here as you
 - Test vc4's HDMI stereo timing without a Pi: KUnit on the real encoder callback in ARM64 QEMU with fixed CEA expectations. Baseline 22 rows: 4 pass, 18 fail; after the patch 77 pass, zero failures (44 stereo cases plus 33 existing vc4 cases); cases cover both SBS-full choices, repeated checks, original VIC and flags, RGB8/RGB12 clock agreement, generation limits, overflow, DBLCLK and 2D controls. Targeted ARM GCC 16.2.0 compile and ARM64 Clang 21.1.8 KUnit kernel build pass; strict checkpatch has zero errors. Tools: GCC 16.2.0, Clang 21.1.8, QEMU 11.1.2. (lane vc4-stereo-timing-155-gpt)
 - Hotplug test on VKMS: build one VKMS device with two DisplayPort connectors by configfs (dp0 connected, dp1 disconnected, each its own CRTC); the connector `status` attribute (1 connected, 2 disconnected) hotplugs; an EDID rewrite while enabled then `echo detect > /sys/class/drm/cardN-DP-N/status` re-announces on the same connector (lane lutz-xreal-driver-233)
 - Symptom: KWin in the guest never sees the hotplug. Cause: KWin binds udevd's netlink group ("udev"), not the kernel's, and the guest root had no udevd. Fix: overlayfs over the read-only 9p root adds udev (systemd 262) and the new kscreen-doctor without touching the shared root (lane lutz-xreal-driver-233)
+- A VKMS connector made through configfs read its EDID but listed no 3D mode (builds 14 and 16 of the edition's kernel): `drm_mode_validate_stereo()` dropped each stereo mode with `NO_STEREO` because VKMS never set `stereo_allowed`; found with `drm.debug=0x4` ("Rejected mode"), fixed with the connector flag plus a composer and writeback frame that hold both eyes. Steps and traps: [references/edid-to-mode-list.md](references/edid-to-mode-list.md).
+- `python3 edid/make-edid.py --help` writes an EDID called `--help` (the first argument is the output path): run the bench's tools from a scratch folder and never ask them for help.
 
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

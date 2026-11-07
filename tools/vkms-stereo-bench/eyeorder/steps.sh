@@ -97,6 +97,29 @@ setmode() { # setmode TAG SWAP(enable|disable)
     log "$1 swap $2: mode id $id, kscreen-doctor exit $?"
     sleep 3
 }
+if [ "$scenario" = fsphase ]; then
+    setmode plain disable && grab ref
+    for rep in 1 2 3; do
+        for tag in fs-left fs-right; do
+            for sw in disable enable; do
+                n=$tag-$sw-$rep
+                setmode plain disable
+                sleep 2
+                /tmp/drm-planelog /dev/dri/card0 HDMI-A-1 6000 > /mnt/planelog-$n.txt 2>&1 &
+                pl=$!
+                sleep 0.5
+                id=$(sed -n "s/^$tag //p" /mnt/modes.txt)
+                kscreen-doctor output.HDMI-A-1.mode.$id output.HDMI-A-1.swapEyes.$sw > /mnt/set-$n.txt 2>&1
+                wait $pl
+                log "$n: $(grep -c . /mnt/planelog-$n.txt) lines"
+                [ $rep = 1 ] && grab $n
+            done
+        done
+    done
+    setmode plain disable
+    stopkwin
+    exit 0
+fi
 setmode plain disable && grab ref
 for tag in plain anaglyph-modern anaglyph-crt twin-sbs-half twin-tab rows-left rows-right columns-left columns-right \
            checkerboard-left checkerboard-right fs-left fs-right hdmi-sbs-half hdmi-tab hdmi-sbs-full hdmi-fp; do

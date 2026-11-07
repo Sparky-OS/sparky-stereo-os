@@ -32,7 +32,7 @@ mount -t tmpfs tmpfs /k/dev/shm
 for x in /k/tmp /k/run /k/root /k/var/tmp /k/home/tester; do mount -t tmpfs tmpfs $x; done
 mount -t 9p -o trans=virtio,version=9p2000.L out /k/mnt || echo "STEREO|info|out|no evidence share"
 cp /eyeorder/*.sh /k/tmp/
-cp /bin/drm-grab /bin/drm-flipwatch /bin/fullscreen-2d /bin/egl-stereo-subsurface /k/tmp/
+cp /bin/drm-grab /bin/drm-flipwatch /bin/drm-planelog /bin/fullscreen-2d /bin/egl-stereo-subsurface /k/tmp/
 echo "$scenario" > /k/tmp/scenario
 chroot /k /bin/sh /tmp/session.sh
 echo "STEREO|exit|eyeorder|$?"

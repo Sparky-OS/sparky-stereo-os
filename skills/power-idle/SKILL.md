@@ -131,9 +131,9 @@ Read [system-housekeeping](../system-housekeeping/SKILL.md) for system policy.
 
 ## Testing hibernate in a VM (2026-11-07)
 
-Use a disposable overlay of the development image, a real swap disk named in `conf.d/resume`, a serial console and QEMU `-no-reboot` with a QMP event log; hibernate at least ten times per kernel and repeat with Debian's stock kernel to tell the kernel from QEMU, OVMF and the guest set-up.
-A "resume" counts only when the boot id is unchanged and the log has "Image successfully loaded"; a hibernation that returns in place ("hibernation exit" with no image saved) is a failed hibernation, not a resume.
-The recipe, the QMP event meanings and the traps are in [references/hibernate-in-a-vm.md](references/hibernate-in-a-vm.md).
+Use a disposable overlay of the development image, a real swap area named in `conf.d/resume`, a serial console and QEMU `-no-reboot` with a QMP event log; hibernate at least ten times per kernel and repeat with Debian's stock kernel to tell the kernel from QEMU, OVMF and the guest set-up.
+A "resume" counts only when the boot id is unchanged and a witness process survived; the journal of the resumed machine looks like an in-place return (`Waking up from system sleep state S4`, `hibernation exit`, no image-writing lines) because the writing lines exist only on the console of the machine that went down.
+The recipe, the edition's own path (partition, swap file with `RESUME_OFFSET`, PowerDevil, suspend-then-hibernate), the Secure Boot bench run and the traps are in [references/hibernate-in-a-vm.md](references/hibernate-in-a-vm.md).
 
 ## When a user preference appears ignored (2026-10-19)
 

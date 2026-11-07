@@ -10,7 +10,8 @@ description: >-
   Show Screen Contents says the process is not authorized to take a screenshot, testTabBoxStereo or another KWin
   autotest fails, kf.package reports invalid metadata, timeout as PID 1 exits 125, the Wayland socket path is too long,
   runuser drops the render group, keys or clicks sent through fake input or xdotool do nothing, LIBGL_ALWAYS_SOFTWARE changes nothing, a proof exits 127 under LD_BIND_NOW or a PNS
-  fixture does not decode, translated text does not appear, or a popup or lock-screen depth must be measured.
+  fixture does not decode, translated text does not appear, a popup or lock-screen depth must be measured, or a
+  declared window shows flat only after many relaunches.
 ---
 
 # The proof rig
@@ -22,7 +23,7 @@ description: >-
 3. Return commands, hashes, counts, control result and limits. A black or stale frame is not a valid successful stereo witness.
 
 **Check freshness first.**
-Written on 2026-10-07, the NVIDIA card added on 2026-10-16, KWin's shrink and the X11 view size on 2026-10-22, eyes that differ under an opaque region on 2026-11-01, the showcase screenshot on 2026-11-02.
+Written on 2026-10-07, the NVIDIA card added on 2026-10-16, KWin's shrink and the X11 view size on 2026-10-22, eyes that differ under an opaque region on 2026-11-01, the showcase screenshot on 2026-11-02, the relaunch soak on 2026-11-07.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill says what counts as proof; this one says how to produce it.
 No 3D display is needed: the rig captures what Stereo KWin hands to an output, both eyes side by side.
 
@@ -47,6 +48,12 @@ When the question needs a real machine, a cable or a 3D television, the rig is t
 ## An X11 player (the X11 path through Xwayland)
 
 One fresh session per case, a passwd entry for the user, a render node for KWin, the declarations read from the X window tree, and the stereo capture read per eye: [x11-session-rig.md](references/x11-session-rig.md), with its scripts (`x11_props.py`, `x11_propagation.py`, `eyes_share.py`, `kwin_script.py`, `vlc_mpris.py`, `support-shim.c`, `make-barcode-fixtures.sh`, `columns.py`).
+
+## A relaunch soak (a client killed and started, or its 3D area remade, many times)
+
+For a defect that shows only after many runs in one session: one compositor session, a player and a plain Wayland client of the same shape, each killed (SIGKILL and SIGTERM in turn) and started hundreds of times with a capture after each start, the 3D area also torn down and made again inside one client, and a `--no-declare` control that must come out flat.
+ScreenShot2 draws each eye itself, and the `--virtual` backend draws its own output once, never per eye: to see the compositor's own choice to draw the scene per eye, run KWin on a DRM output (VKMS in a virtual machine) and read the scanned-out frame.
+The recipe, the vocabulary of the results, the VM and the traps: [relaunch-soak.md](references/relaunch-soak.md).
 
 ## Test material that a script can read
 
@@ -154,6 +161,8 @@ Traps met in this rig:
 - **Searching vertical offsets** in block matching picks false matches on repeated patterns; match on the same row and check the vertical profile on its own.
 - **`LIBGL_ALWAYS_SOFTWARE=1` does not move KWin's scene to llvmpipe.** With a render node given, KWin's virtual backend draws through EGL on that card (radeonsi's shader statistics appear in `kwin.log` with `QT_LOGGING_RULES='kwin_*.debug=true'`), so the rig's "software" and `--gpu` runs give the same captures. KWin opens the first render node that opens: with Docker's CDI that is the NVIDIA card, without it the AMD one. Name a run by the card you gave it, and check the log.
 - **A window capture on Wayland includes the compositor's title bar:** offset the analysis by it.
+- **A ScreenShot2 pair is not the output's picture.** ScreenShot2 renders each eye itself, and the `--virtual` backend's output layer has no eyes, so its own frames are drawn once; a capture proves the declaration and the eye quads, never KWin's choice to draw the output per eye. Read the scanout of a DRM output for that ([relaunch-soak.md](references/relaunch-soak.md)).
+- **Never edit a script while it runs.** `dash` reads a script as it goes: a soak whose script was changed under it read on from its old offset and stopped with `Syntax error: "}" unexpected`. Run a copy; replace a client binary by renaming a new file over it.
 - **Eyes that differ only where a window has alpha under its own opaque region.** KWin's occlusion culling leaves the target unpainted below a window's opaque region, and a surface with an alpha channel still blends over what is left there (the Wayland protocol allows that artifact when a client declares a wrong opaque region).
   In 2D the leftover is usually the previous frame of the same picture, so it rarely shows; in stereo the capture draws the right eye over the left eye's finished picture in one target, and a 3D output's per-eye buffers keep their own history, so one eye came out lighter (found on 2026-10-31 with a program that blits with alpha below 1 under its opaque region).
   Stereo KWin since `+stereo3d40` clears the background below such windows in the eye passes; surfaces without alpha keep the culling, and 2D frames take upstream's path.

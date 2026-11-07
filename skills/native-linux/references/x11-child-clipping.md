@@ -28,15 +28,35 @@ Results on r1107a (each FAIL is a missing part, each PASS a control):
 - GLX `plain`: PASS in every row (stereo capture 2048x640, 100 percent of the place in each eye, listed).
 - GLX `overflow`: FAIL, 45000 child pixels per eye outside the window.
 - GLX `sibling`: FAIL, green 0.000 over the child in both eyes, while `mono-sibling` shows green 1.000.
-- EGL `egl-plain`, Vulkan `vk-plain` and `gls`: declared (`_KDE_NET_WM_STEREO_CONTENT` 3 on the child) but not listed in the window, capture one output wide (`stereo` false), the packed buffer squeezed into the child.
+- EGL `egl-plain`, Vulkan `vk-plain` and `gls` on Mesa +17: declared (`_KDE_NET_WM_STEREO_CONTENT` 3 on the child) but not listed in the window, capture one output wide (`stereo` false), the packed buffer squeezed into the child.
   Only Mesa's GLX lists a child (`src/glx`, patches 0017 to 0019); the EGL X11 platform and the Vulkan WSI declare the window and never write `_KDE_NET_WM_STEREO_CONTENT_CHILDREN`; gl-stereo calls `stereo_declare_x11_format()` on the window it finds.
+
+## Mesa +stereo3d19: EGL and Vulkan list their child
+
+One header, `src/util/u_x11_stereo_child.h`, holds the X side: the owning window (the window below the root on the way up, as GLX takes it), a server grab around the read and write of `_KDE_NET_WM_STEREO_CONTENT_CHILDREN`, windows that are gone dropped when a child is added, the child kept while its window lives, and `_KDE_NET_WM_STEREO_CONTENT_VERSION`.
+EGL's X11 platform writes VERSION 4 before the declaration (compositor version 4 or later), keeps the window one eye wide (`dri_drawable->stereo_window_one_eye`; the software path puts the packed image into a pixmap and presents it) and lists the child (version 5 or later).
+The Vulkan stereo layer and the window system integration's stereo swapchain list the child; the layer writes VERSION 4 first and halves the surface width only for version 3.
+EGL takes zink through DRI3 while the compositor announces stereo (kopper has no second view; GLX has done so since patch 0029).
+Rows from the packages: see the hand-back of ORDER 160 milestone 2; the commands are `scripts/x11-child/run.sh egl-plain|vk-plain|plain` and `remap-inner.sh` with `KIND=egl`.
+
+### A dev build of Mesa for the rows (minutes, not an hour)
+
+`meson setup /b/o --prefix=/b/inst -Dgallium-drivers=llvmpipe,softpipe,zink -Dvulkan-drivers=swrast -Dvulkan-layers=stereo -Dllvm=enabled -Dplatforms=x11,wayland -Dglx=dri -Dglvnd=enabled ...` then `ninja -C /b/o install` in the Mesa build image; run a client with `LD_LIBRARY_PATH=/b/inst/lib/x86_64-linux-gnu LIBGL_DRIVERS_PATH=.../dri __EGL_VENDOR_LIBRARY_FILENAMES=/b/inst/share/glvnd/egl_vendor.d/50_mesa.json` (Vulkan: `VK_ADD_IMPLICIT_LAYER_PATH=/b/inst/share/vulkan/implicit_layer.d`, `MESA_VK_STEREO_LAYER=1`) while KWin stays the installed one.
+Configure once with `-Dbuild-tests=true` before the recipe build: the layer's passthrough test compiles `stereo_layer.c` with its own include list.
+
+### More traps
+
+- **A recipe build fails an hour in with `util/u_x11_stereo_child.h: No such file or directory` in `stereo-layer-passthrough-test`.** Cause: the dev build had tests off, and the test target in `src/vulkan/stereo-layer/meson.build` has its own `include_directories`. Fix: add `inc_src` there too. Found in the build log (`grep -n FAILED`).
+- **The Vulkan rows show red in both eyes on a capture one output wide.** Cause: the client's command pool lacked `RESET_COMMAND_BUFFER_BIT` while it recorded the same buffer every frame (fix the client), and with the child not listed the compositor shows the packed buffer as one picture. With the child listed (Mesa +19) lavapipe and NVIDIA's Vulkan driver both give red and blue.
+- **A zink EGL stereo window shows the left view in both eyes on the RTX 3060.** Cause: kopper. Fix: `LIBGL_KOPPER_DISABLE=1`, or Mesa +19, which chooses DRI3 itself.
+- **A Qt test binary built from a tree stops at `Could not find the Qt platform plugin "xcb"`.** Cause: `cmake --build --target tst_...` builds no plugin. Fix: build `QXcbIntegrationPlugin` and `QXcbGlxIntegrationPlugin` and set `QT_PLUGIN_PATH`.
 
 ## The raw GLX unmap/remap growth
 
 `remap-inner.sh` runs `glx-remap-metrics.c` (from the open-sims lane): a 640x480 GLX stereo window, unmapped and mapped once.
 With KWin announcing declaration version 4 or later the widths stay (GLX 640, native 640 on both sides of the remap): the window is one eye wide and the buffer holds both eyes.
 Negative control, `CTRL_SUPPORT=3` (the root's `_KDE_NET_WM_STEREO_CONTENT_SUPPORTED` set to 3, the doubling route): native 640 then 1280 before, GLX 1280 and native 2560 after, the growth the lane saw on KWin +stereo3d22.
-A program that doubles its own window (the gl-stereo layer, the EGL X11 platform's `xcb_configure_window`) still takes the doubling route; try the remap on them before calling the growth closed.
+The EGL reproducer (`egl-remap-metrics.c`, `KIND=egl`) failed the same way on Mesa +17 (surface 640, native 1280 before, 1280 and 2560 after) and holds 640 and 640 with +19. A program that doubles its own window (the gl-stereo layer) still takes the doubling route; try the remap on it before calling the growth closed.
 
 ## Traps (symptom, cause, fix, how it was found)
 

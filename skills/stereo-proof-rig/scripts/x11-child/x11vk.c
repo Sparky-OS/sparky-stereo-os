@@ -200,6 +200,7 @@ main(void)
 
    VkCommandPoolCreateInfo pool_info = {
       .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+      .flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
       .queueFamilyIndex = queue_family,
    };
    VkCommandPool pool;
@@ -248,8 +249,8 @@ main(void)
                         1, &barrier);
    bool swap_eyes = getenv("VULKAN_STEREO_SWAP_EYES") != NULL;
    VkClearColorValue colors[2] = {
-      swap_eyes ? (VkClearColorValue){{0, 1, 0, 1}} : (VkClearColorValue){{1, 0, 0, 1}},
       swap_eyes ? (VkClearColorValue){{0, 0, 0.78f, 1}} : (VkClearColorValue){{0.78f, 0, 0, 1}},
+      swap_eyes ? (VkClearColorValue){{0.78f, 0, 0, 1}} : (VkClearColorValue){{0, 0, 0.78f, 1}},
    };
    for (uint32_t layer = 0; layer < 2; layer++)
       vkCmdClearColorImage(command, images[image_index],

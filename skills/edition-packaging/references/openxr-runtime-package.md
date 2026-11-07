@@ -62,6 +62,15 @@ Vendor display processors (a glasses-free panel's weaving) are display drivers b
 - **Symptom:** the recipe's check that the runtime still fetches the tag it carries failed on a tree that does.
   **Cause:** the pin line was `GIT_TAG v0.5.6)` with the closing parenthesis. **Fix:** match `^[[:space:]]*GIT_TAG TAG\)?$`, and test the check with a wrong tag once.
 
+- **Symptom:** the installed `displayxr-dashboard` exits 1 at once, prints nothing and writes no log, while `displayxr-dashboard --version` works.
+  **Cause:** not determined; it happened only with `DOTNET_BUNDLE_EXTRACT_BASE_DIR` pointed at the session's runtime directory (a tmpfs). **Fix:** leave it unset (the bundle extracts to `~/.net`); the window then opens on Xwayland ("DisplayXR Dashboard", 1280x820) and shows the active runtime the alternatives link resolves to. **How found:** `strace -f -e trace=mkdir,exit_group` in a container without the variable got further and logged to `/tmp/DisplayXR/`.
+- **Symptom:** `apt-get install` of the runtime with its Recommends installs no KWin window-geometry publisher in a rig image.
+  **Cause:** the publisher depends on its exact KWin version; on an image whose KWin is a staged build (not the published one) apt cannot satisfy it and drops the Recommends. On the published edition (`apt-get -s`) apt picks `displayxr-window-geometry-publisher-kwin`.
+- **Symptom:** a capture of Debian's own KWin (no stereo announcement) passed the LEFT/RIGHT colour rule.
+  **Cause:** that KWin answers ScreenShot2 with one picture (`stereo 0`), and the rule split it in two halves, which hold the two squeezed views in red and blue. **Fix:** check such a control with `--expect flat-single` and read the capture's `stereo` flag and the geometry check, which fails (the views are half as wide).
+- **Symptom:** a rig image named in a brief is gone (`pull access denied for openxr-target-34-rig`).
+  **Cause:** the lane cleaner removes an accepted lane's images. **Fix:** build lane images on an image that is still there and say which KWin it carries.
+
 ## Perks
 
 - DisplayXR's packaging script refuses a build that lost a feature silently (no hybrid runtime, no qwerty, no Wayland present path, a soname outside its list), so reusing it brings those checks into the Debian build for free.

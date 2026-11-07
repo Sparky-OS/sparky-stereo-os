@@ -152,3 +152,23 @@ The server's later `BIO_do_handshake failed` was not a camera-channel rejection.
 A TLS-only, unauthenticated test server can still need explicit public dummy credentials in this client.
 The proposed fixture-URI password addition was not rerun before the resource stop; it is not a verified fix.
 Require RDP connection and DVC readiness before calling a camera-disabled timeout the endpoint red control.
+
+## Relocating the SDK, build cache and stopped emulator
+
+Move bulky SDK, Gradle, source/build and AVD directories to the authorized build filesystem rather than reducing a reserve.
+Check the destination reserve before each copy, including logical image size as a conservative bound.
+Preserve Unix symlinks and sparse image extents (`cp --archive --sparse=always`), compare file/link metadata and hashes of ordinary files, then remove the old copy.
+Do not inspect private key or token contents as part of that verification.
+A recorded migration verified five directory trees; this establishes their relocation, not that their tools start afterward.
+
+Set `ANDROID_HOME`/`ANDROID_SDK_ROOT`, `GRADLE_USER_HOME` and `ANDROID_AVD_HOME` to the new locations.
+Update the AVD registration's `path` and its `image.sysdir.1` setting.
+Repair a moved Git worktree with `git worktree repair "$new_worktree"` from its owning repository.
+Invalidate generated `.cxx` directories that cache absolute source/compiler paths; retain authored sources and dependency pins.
+Check QCOW2 backing filenames as metadata before booting a moved AVD; relative userdata/cache backings remained valid in the recorded move.
+Do not change guest key images while investigating storage paths.
+
+Check the configured Docker socket before interpreting a launch failure as an SDK regression.
+A socket node can remain on disk while connection attempts return `ECONNREFUSED`.
+The recorded relocation could be checked statically, but neither the emulator nor Gradle could be restarted through that unavailable lane proxy.
+Restore the authorized proxy and repeat actual startup checks before claiming the relocated environment works.

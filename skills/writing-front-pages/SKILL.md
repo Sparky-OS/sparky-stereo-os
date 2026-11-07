@@ -131,6 +131,7 @@ An explainer is a front page for one idea: the rules above apply, and the group'
 7. Keep a claims table as you write (`claims.tsv`: explainer, sentence, source, where checked), one row per load-bearing claim; it is what the reviewer reads first.
 8. Check links by script before the hand-back: relative links and anchors against GitHub's heading slugs (lowercase, punctuation dropped, spaces to hyphens), external links by HTTP status.
 9. Run the repository's own checks (`respec_list_profiles`, `respec_preflight`, `respec_validate` with `--repo-root` pointing at your clone, never at a shared clone, because validate writes the build folder) and the publish check.
+   Check every report against the profile the repository's reports page names for it, not each profile's default source: a page can claim a profile a report never satisfied and CI never notices when it only runs defaults. In pm-kr, `node scripts/check-reports.mjs` reads the README's table and `--list` feeds the CI matrix; show the check red on the old claim and green on the fix, and give each report its own profile with its real sections rather than bending a report to another's profile.
 10. Cold readers on two pages, with nothing but the text, answers recorded word for word.
 
 **Traps.**

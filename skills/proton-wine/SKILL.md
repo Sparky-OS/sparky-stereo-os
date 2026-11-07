@@ -3,7 +3,7 @@ metadata:
   requires-packages: wine64 | libwine | dxvk-wine64
 name: proton-wine
 description: >-
-  Windows programs through Wine, Proton, DXVK and gamescope on the stereo desktop: identify the runtime libraries in use
+  Windows programs through Wine, Proton, DXVK and gamescope: identify the runtime libraries in use
   (a DXVK DLL's PE debug CRC), the chain from Direct3D to Vulkan to Stereo KWin, the stereo DXVK fork, wiz3D and the
   stereo Lutris build, StereoPhoto Maker under Wine, a WoW64 prefix and 16-bit programs, start Steam in the person's
   session environment (XDG_RUNTIME_DIR, wayland-0, pipewire-0), game-specific proof, Easy Anti-Cheat Linux v2

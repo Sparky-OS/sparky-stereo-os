@@ -1,6 +1,6 @@
 # RDP sensors and emulator preflight
 
-Checked 2026-11-06 during integration preparation.
+Checked 2026-11-07 during integration preparation.
 This recipe covers source and environment checks; it does not establish a working camera or pose channel.
 Use the current source and preserve the later endpoint results separately.
 
@@ -150,7 +150,9 @@ Read the client log as well as the server log.
 In the recorded failed attempt, the Android client invoked `OnAuthenticate` after selecting TLS, then waited in the stock credential dialog.
 The server's later `BIO_do_handshake failed` was not a camera-channel rejection.
 A TLS-only, unauthenticated test server can still need explicit public dummy credentials in this client.
-The proposed fixture-URI password addition was not rerun before the resource stop; it is not a verified fix.
+An independent instrumentation APK subsequently supplied the public dummy password and the pinned test-certificate fingerprint to the unchanged control APK.
+The control then connected successfully.
+Keep the same driver for both builds so a credential-dialog fix does not require rebuilding the preserved negative control.
 Require RDP connection and DVC readiness before calling a camera-disabled timeout the endpoint red control.
 
 ## Relocating the SDK, build cache and stopped emulator
@@ -172,3 +174,24 @@ Check the configured Docker socket before interpreting a launch failure as an SD
 A socket node can remain on disk while connection attempts return `ECONNREFUSED`.
 The recorded relocation could be checked statically, but neither the emulator nor Gradle could be restarted through that unavailable lane proxy.
 Restore the authorized proxy and repeat actual startup checks before claiming the relocated environment works.
+
+
+## RDP connects but the server never reaches DVC readiness
+
+Do not let `WTSVirtualChannelManagerCheckFileDescriptor` auto-open the manager during the pre-activation handshake.
+The inspected FreeRDP implementation records `DRDYNVC_STATE_INITIALIZED` on its first open attempt, even if the static channel is not yet usable.
+Follow KRdp's lifecycle: require an activated peer and joined `drdynvc`, open once, and use `WTSVirtualChannelManagerCheckFileDescriptorEx(manager, FALSE)` in the event loop.
+With this correction the preserved camera-disabled client reached `RDP_CONNECTED`, `RDP_ACTIVE` and `DVC_READY`.
+That proves the fixture's transport setup, not camera enumeration or sample delivery.
+
+## APK builds but dlopen reports liburiparser.so missing
+
+A successful native link and camera-only symbol check do not establish the APK's runtime dependency closure.
+Inspect `DT_NEEDED` in every packaged library and compare each dependency with the same ABI's APK entries and the selected NDK platform stub directory.
+The camera-enabled candidate passed the focused eager-Camera2 check but failed to start because `libwinpr3.so` needed an omitted `liburiparser.so`.
+A closure check detected the omission independently of the emulator crash.
+
+When adding an imported CMake library, inspect AGP's `android_gradle_build.json` runtime-files list as well as CMake's current file-api reply.
+In the recorded incremental build, the new URI-library link appeared in CMake's reply and the JNI ELF, but the older AGP runtime-files list still omitted it; the rebuilt APK remained broken.
+Regenerate and verify the packaging model before treating an imported-target addition as a fix.
+No working regeneration recipe or camera-frame delivery was established in this run.

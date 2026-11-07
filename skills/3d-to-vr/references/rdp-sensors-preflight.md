@@ -106,3 +106,17 @@ For camera red/green proof, require a real channel-open result and changing rece
 For pose proof, require the selected fused source, captured timestamps and independently expected axes on both endpoints.
 Retain permission-denied, unavailable-camera and absent-channel cases as distinct failures.
 The host's real phone and its ADB server are outside an emulator-only test.
+
+## Native compiler reports “no input files” after manual SDK extraction
+
+Inspect the compiler entry with `ls -l` before changing compiler flags. In a ZIP,
+a Unix symbolic link is marked by the file type in `external_attr`; its stored
+bytes are the link target, not a shell wrapper. Extracting those bytes as a
+regular executable makes `clang++` try to execute `clang` without forwarding
+arguments, and makes the target compiler wrapper fail to locate `clang-20`.
+Restore links from the same checksum-verified archive. Preserve symlinks when
+extracting all SDK archives, validate that their targets remain inside the
+package, and retry a compiler probe before the application build. In the
+recorded NDK r29 beta1 package, 37 links needed restoration; Cardboard then
+compiled and freeRDPCore reached its native build. This is a toolchain result,
+not a camera-channel test.

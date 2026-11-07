@@ -109,58 +109,46 @@ The host's real phone and its ADB server are outside an emulator-only test.
 
 ## Native compiler reports “no input files” after manual SDK extraction
 
-Inspect the compiler entry with `ls -l` before changing compiler flags. In a ZIP,
-a Unix symbolic link is marked by the file type in `external_attr`; its stored
-bytes are the link target, not a shell wrapper. Extracting those bytes as a
-regular executable makes `clang++` try to execute `clang` without forwarding
-arguments, and makes the target compiler wrapper fail to locate `clang-20`.
-Restore links from the same checksum-verified archive. Preserve symlinks when
-extracting all SDK archives, validate that their targets remain inside the
-package, and retry a compiler probe before the application build. In the
-recorded NDK r29 beta1 package, 37 links needed restoration; Cardboard then
-compiled and freeRDPCore reached its native build. This is a toolchain result,
-not a camera-channel test.
+Inspect the compiler entry with `ls -l` before changing compiler flags.
+In a ZIP, a Unix symbolic link is marked by the file type in `external_attr`; its stored bytes are the link target, not a shell wrapper.
+Extracting those bytes as a regular executable makes `clang++` try to execute `clang` without forwarding arguments, and makes the target compiler wrapper fail to locate `clang-20`.
+Restore links from the same checksum-verified archive.
+Preserve symlinks when extracting all SDK archives, validate that their targets remain inside the package, and retry a compiler probe before the application build.
+In the recorded NDK r29 beta1 package, 37 links needed restoration; Cardboard then compiled and freeRDPCore reached its native build.
+This is a toolchain result, not a camera-channel test.
 
 ## Removing a camera OFF argument still leaves the channel absent
 
 Read both the generic channel options and the Android external-build wrapper.
-FreeRDP's `channels/rdpecam/ChannelOptions.cmake` defaults the client to OFF,
-while its Android `ExternalFreeRDP.cmake` explicitly selects ON. An embedding
-that replaces that wrapper must retain the Android ON setting. Check the
-actual native CMake cache; absence of an OFF argument does not prove enablement.
+FreeRDP's `channels/rdpecam/ChannelOptions.cmake` defaults the client to OFF, while its Android `ExternalFreeRDP.cmake` explicitly selects ON.
+An embedding that replaces that wrapper must retain the Android ON setting.
+Check the actual native CMake cache; absence of an OFF argument does not prove enablement.
 Keep a camera-disabled APK as the endpoint control.
 
 ## A supported channel appears absent before the first connection
 
-The Android Java class queries camera support while it initializes, before a
-session registers its addin provider. `freerdp_load_channel_addin_entry` depends
-on that provider. The compiled-table query
-`freerdp_channels_load_static_addin_entry` can inspect built-in support at this
-point. A native check with the known built-in display-control channel returned
-indirect=0, static=1 before a session; an invented channel returned 0. This
-checks lookup semantics, not Android camera delivery. Also keep channel
-presence separate from optional pixel conversion: raw NV12 passthrough does
-not require an NV12-to-I420 converter.
+The Android Java class queries camera support while it initializes, before a session registers its addin provider.
+`freerdp_load_channel_addin_entry` depends on that provider.
+The compiled-table query `freerdp_channels_load_static_addin_entry` can inspect built-in support at this point.
+A native check with the known built-in display-control channel returned indirect=0, static=1 before a session; an invented channel returned 0.
+This checks lookup semantics, not Android camera delivery.
+Also keep channel presence separate from optional pixel conversion: raw NV12 passthrough does not require an NV12-to-I420 converter.
 
 ## KRdp cannot find encoderPaused or setEncoderPaused
 
 An otherwise matching Qt/KF SDK can still contain an older KPipeWire API.
-Inspect the KRdp commit that introduced backpressure and the KPipeWire public
-header. Upstream KPipeWire's `PipeWireBaseEncodedStream` supplies these methods;
-they are absent from the packaged 6.7.4 API used in the failed build. Build the
-matching upstream dependency into an isolated prefix and pass that prefix and
-its `KPipeWire_DIR` to CMake. Do not remove the caller's backpressure to make an
-older SDK compile. The recorded dependency source is KDE/kpipewire
-`bb838b0371012b99b5c199b7aaf662be319ae5b6`; KRdp subsequently built against that prefix and its two registered tests
-passed. This establishes a build/test baseline, not display or pose delivery.
+Inspect the KRdp commit that introduced backpressure and the KPipeWire public header.
+Upstream KPipeWire's `PipeWireBaseEncodedStream` supplies these methods; they are absent from the packaged 6.7.4 API used in the failed build.
+Build the matching upstream dependency into an isolated prefix and pass that prefix and its `KPipeWire_DIR` to CMake.
+Do not remove the caller's backpressure to make an older SDK compile.
+The recorded dependency source is KDE/kpipewire `bb838b0371012b99b5c199b7aaf662be319ae5b6`; KRdp subsequently built against that prefix and its two registered tests passed.
+This establishes a build/test baseline, not display or pose delivery.
 
 ## TLS fixture stalls before a channel can negotiate
 
-Read the client log as well as the server log. In the recorded failed attempt,
-the Android client invoked `OnAuthenticate` after selecting TLS, then waited
-in the stock credential dialog. The server's later `BIO_do_handshake failed`
-was not a camera-channel rejection. A TLS-only, unauthenticated test server
-can still need explicit public dummy credentials in this client. The proposed
-fixture-URI password addition was not rerun before the resource stop; it is
-not a verified fix. Require RDP connection and DVC readiness before calling
-a camera-disabled timeout the endpoint red control.
+Read the client log as well as the server log.
+In the recorded failed attempt, the Android client invoked `OnAuthenticate` after selecting TLS, then waited in the stock credential dialog.
+The server's later `BIO_do_handshake failed` was not a camera-channel rejection.
+A TLS-only, unauthenticated test server can still need explicit public dummy credentials in this client.
+The proposed fixture-URI password addition was not rerun before the resource stop; it is not a verified fix.
+Require RDP connection and DVC readiness before calling a camera-disabled timeout the endpoint red control.

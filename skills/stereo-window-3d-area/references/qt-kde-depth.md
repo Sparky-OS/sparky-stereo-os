@@ -49,6 +49,27 @@ Test focus/keyboard/controller activation, ordinary 2D fallback, reduced motion,
 The planned Theme Editor would author intent, shared toolkit code would consume it, and KWin would adapt the pair to each output.
 Designer freedom does not remove the user's depth and accessibility limits.
 
+## How Stereo KWin picks a surface's depth level
+
+The whole rule is in KWin's `src/scene/stereodepth.{h,cpp}`; read `roleOf()` and `level()` before changing a level.
+
+1. `roleOf(window)` gives one role: `Fixed` (full screen, lock screen, panels, the pointer's drag icon), `Desktop`, `Active`, `Popped`, `Sunk`, `Above` or `Below` (the two pinned ones).
+   Anything `isPopup()` (menus, tooltips, notifications, on-screen displays, applet popups) is `Popped`, and so is whatever is transient for a window that is not sunk.
+2. `level(window)` turns the role into a number from -1 to 1: `Fixed` and `Active` 0, `Desktop` and `Below` -1, `Above` 1, `Sunk` shared out over the sunk range, `Popped` shared out over the popped range.
+3. `levelDepth()` multiplies it by the output's own limit (`SunkLimit` or `PoppedLimit` of kwinrc `[StereoDepth]`, built on the display), and `parallax()` is `round(depth * viewWidth / 1920)` device pixels: 10 or 4 px at 1920 wide by default, 3 px at 1280.
+4. A popped surface that touches the output's edge is flattened to level 0 (the edge rule), because something in front of the screen cut by the screen's edge breaks the picture.
+   Stereo KWin keeps popups 10 logical pixels inside every edge of a 3D output (`PopupBorder`) so the rule never fires for them; it still fires for panels and window content.
+5. `Popped` surfaces share the range: the topmost is at the limit and each one below it is `rank / count` of it.
+   Notifications and on-screen displays (`isNotification()`, `isCriticalNotification()`, `isOnScreenDisplay()`) are not part of that share and always sit at the limit, the nearest thing on the output; before it, a stack of three notifications had 1, 2 and 3 px, though they never overlap.
+   The limit is a hard bound, so over a window pinned above (also at the limit) a notification ties with it and wins by stacking order; nothing is ever drawn beyond `PoppedLimit`.
+
+To change a level: add the case to `level()`, give `StereoDepth` no new state, and write the test in `autotests/integration/stereo_depth_notifications_test.cpp` style: a 320x240 output with `SunkLimit` 96 and `PoppedLimit` 60 (10 px at 320 wide), surfaces from `Test::createXdgToplevelSurface` plus a `PlasmaShellSurface` with the role and a position, a solid colour each, and the parallax read from ScreenShot2 as the left eye's first x of the colour minus the right eye's.
+Cover one surface alone (a control that passes before the change), several surfaces together (the case that shares), the pinned window, the person's own `PoppedLimit`, and a 2D output (nothing moves).
+
+Plasma's own notifications and on-screen displays are `plasmashell` windows with the panel-shell roles Notification, CriticalNotification and OnScreenDisplay at a position it asks for (36 px from the edges for notifications; the OSD low and centred).
+A real plasmashell sees more than a unit test does: several notifications at once (they stack), an on-screen display over a notification, a menu open beside one.
+Test those in the proof rig (`stereo-proof-rig`, "Plasma in the rig"), not only one surface at a time.
+
 ## Effects API changes
 
 Xaver Hugl's Vulkan talk motivates keeping semantic state separate from backend-specific drawing.

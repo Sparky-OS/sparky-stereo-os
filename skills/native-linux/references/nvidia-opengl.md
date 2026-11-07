@@ -1,0 +1,38 @@
+# OpenGL stereo on NVIDIA's own driver
+
+NVIDIA's closed EGL cannot give a window a second view: its window surfaces take only `GL_FRONT` and `GL_BACK`, and it lists no `EGL_EXT_multiview_window`.
+OpenGL stereo on a desktop run by NVIDIA's driver therefore goes through one of two paths of the edition, and the person (or the program's launcher) picks per program.
+
+## The two paths
+
+| Path | What draws | What it needs | Default |
+|---|---|---|---|
+| zink | Mesa's OpenGL on NVIDIA's Vulkan driver; the two views are Mesa's own (EGL on Wayland, GLX over DRI3 on X11) | Mesa's EGL vendor file listed before NVIDIA's (`__EGL_VENDOR_LIBRARY_FILENAMES`, NVIDIA's Vulkan driver does not start without its own vendor file), `__GLX_VENDOR_LIBRARY_NAME=mesa`, `MESA_LOADER_DRIVER_OVERRIDE=zink`; on X11 a Mesa that takes DRI3 and not kopper (below) | yes, where NVIDIA's driver runs the desktop |
+| shim | NVIDIA's own OpenGL; the gl-stereo layer (`LD_PRELOAD`) turns the left and right back buffers into one full side by side buffer and declares it | the layer, `GL_STEREO=1`; on Wayland the layer offers `EGL_EXT_multiview_window` itself when the compositor's stereo declaration is at version 2 | per program: `gl-stereo-run --nvidia-opengl nvidia -- PROGRAM` |
+
+`gl-stereo-run` sets the zink environment itself (`zink_environment` in the launcher), so a launched program needs nothing else.
+When the vendor files are missing it says so on stderr and runs on NVIDIA's own OpenGL: never let a program look stereo when it is flat.
+
+## Recipe (headless, the card through CDI)
+
+The rig's scripts are the gl-stereo source's `tests/nvidia-rig` (session script, client programs, capture check, loops); the numbered steps say what they do.
+
+1. A container with the edition's Stereo KWin, Mesa, SDL, the layer and `libvulkan-dev`, started with `--device nvidia.com/gpu=0 --group-add RENDER_GID --cap-add SYS_NICE --ulimit core=0` and no other GPU; `python3-gi` for the capture script of `stereo-proof-rig`.
+2. One fresh `kwin_wayland --virtual --xwayland --socket=w` inside `dbus-run-session` per probe, KWin's environment holding `KWIN_SCREENSHOT_NO_PERMISSION_CHECKS=1`; the client started from the session script, not from the container's shell (see the second trap below).
+3. A client that draws red into `GL_BACK_LEFT` and blue into `GL_BACK_RIGHT` (`SDL_GL_STEREO`, `glDrawBuffer`), captured with `CaptureActiveScreen`: a stereo screen is twice the output's width, the left half must hold the red, the right half the blue. Keep a client with the colours swapped: it must read as swapped, or the check proves nothing.
+4. The paths: `gl-stereo-run --nvidia-opengl nvidia` for the shim, `--nvidia-opengl zink` for zink, and for zink without the launcher the three variables above.
+5. A race needs many fresh clients and a control with the fix switched off (`GL_STEREO_NO_DOUBLING_WAIT=1` for the X11 doubling wait): without it the numbers say nothing.
+
+## Traps (symptom, cause, fix, how it was found)
+
+- Symptom: the right eye is black in about three of four runs of an SDL 2 or SDL 3 stereo window on NVIDIA's own OpenGL on X11. Cause: the window is created at one eye's width and Stereo KWin doubles it a moment later; if the driver sized its buffers before the doubling, the second view is lost. Fix: gl-stereo 0.4.0 waits (up to one second) for the doubled size before the driver sizes the buffers; `GL_STEREO_NO_DOUBLING_WAIT=1` switches that off for a control. Found by: fresh clients one after the other in one session, 16 of 20 black with the wait off, none of 50 with it on; on native Wayland 10 of 10 right for SDL 2 (through sdl2-compat) and 10 of 10 for SDL 3 (no doubling there). The layer now also says on stderr when the wait ran out, so a missing second view is never silent.
+- Symptom: every environment variable starting with `LD_` is gone from the test client under KWin in a container. Cause: `kwin_wayland` carries a file capability (`--cap-add SYS_NICE`), the loader runs it in secure-execution mode and its children inherit the cleaned environment. Fix: pass the library path under another name and export it in the session script that starts the client. Found by: `/proc/PID/maps` of the client showed the installed `libGLX_mesa.so.0` while `LD_LIBRARY_PATH` named a build; the maps of a client is the check that a build under test is the one loaded.
+- Symptom: a Qt stereo window under Qt's own frame (no server-side decoration offered) is black on NVIDIA's own OpenGL on Wayland, with `Failed to create the decorations EGLContext` on stderr; with `QT_WAYLAND_DISABLE_WINDOWDECORATION=1` it is right. Cause: Qt picks an OpenGL ES config on NVIDIA's EGL (`QEglConfigChooser::chooseConfig`: "NVIDIA EGL only provides desktop GL for development purposes"), while the stereo window's decorations context is a desktop OpenGL context made from the same config, which has no `EGL_OPENGL_BIT`. Fix: for a stereo format on a display that offers `EGL_EXT_multiview_window`, choose the desktop OpenGL config, in the config chooser and also in `q_glFormatFromConfig`, which carries the same NVIDIA exception and kept the window's `renderableType` at OpenGL ES until the second place was changed too (a first patch to the chooser alone changed nothing visible). Found by: the same window with `QSurfaceFormat::setRenderableType(OpenGL)` came out right, a one-line `qWarning` in the chooser printed `stereo=1 twoViews=1 vendor=NVIDIA` (so the chooser was reached and the read-back was the second place), and `Could not locate decoration plugin "org.kde.breeze"` in KWin's log explained why the headless KWin gave a client-side frame at all.
+- Symptom: zink on X11 shows a stereo visual (`SDL_GL_STEREO` reads 1) and the right eye is black, only with the variable `LIBGL_KOPPER_DISABLE=1` right. Cause: kopper, zink's own window system path, has no second view of a window; zink through DRI3 has. Fix: Mesa's GLX takes the DRI3 route by itself while the compositor announces stereo content, says so under `LIBGL_DEBUG=verbose`, and `LIBGL_KOPPER_DISABLE=0` or `1` still decides when set. Found by: the same client with and without the variable, then `LIBGL_DEBUG=verbose` naming the route.
+- Symptom: a one-frame Vulkan Wayland test on NVIDIA's driver shows a wrong flat colour in both eyes. Cause: the test never read its Wayland socket after the present; NVIDIA's Vulkan WSI needs the client to dispatch events (`wl_display_prepare_read`, `poll`, `wl_display_read_events`), with or without explicit sync (`__NV_DISABLE_EXPLICIT_SYNC=1` changed nothing). Fix: the client reads its socket. Found by: the same client with and without the read loop, and `DISABLE_LAYER_MESA_STEREO=1` as the control (the layer is what gives the swapchain its two layers).
+- A test that binds `org_kde_plasma_window_management` without every listener aborts with `listener function for opcode 5 ... is NULL`: bind it only when the test uses it.
+
+## Perks of the part
+
+- The layer's debug log: `GL_STEREO_DEBUG=1` prints each two-view surface it makes (`wayland two-view surface ... window WxH buffer 2WxH`), and `GL_STEREO_LOG` the swaps.
+- `LIBGL_DEBUG=verbose` names the GLX route of a screen (DRI3 or kopper) and why.

@@ -117,3 +117,9 @@ Traps:
 
 Once the new engine matched the old one on recorded rankings, the old Python tool was deleted (plain git deletion, no rewritten history); its last commit is 9c834ddc312e0c92f4923bfe088e67b3cd54d0bc in Sparky-OS/sparky-stereo-os.
 Work that replaces a tool this way: record the old tool's answers as data first (the goldens and the routing set), keep the tests reading that data, then delete the tool, so no test needs it afterwards.
+
+### Rebuilding the pair (milestone 2d)
+
+- The engine's `DEBIAN/control` is written by hand, so it must say `Source: <source package>`: without it the build record is split by binary name and the engine's record lacks the `.buildinfo`. With it, `check-debs` writes ONE record named after the source (`sparky-stereo-skills_VERSION_amd64.sparky-build.json`) that lists every `.deb` (helper, engine, HR companion), the `.buildinfo`, the `.changes` and the `.dsc`. Check with `dpkg-deb -f ENGINE.deb Source` and by reading the record's `debs`, `files` and `unrecorded` (empty).
+- Date a native package's changelog entry in the past of the build. The Lean Code step clamps the files it writes to SOURCE_DATE_EPOCH only when they are newer than it; with an entry dated hours ahead of the clock their modification times are the build's own minute, and a rebuild from the `.dsc` differs from the first build in those times alone.
+- A second-model review of changed strings can be blocked outside the work ("Your workspace is out of credits."): keep the packet and the exact error, leave the strings marked for native review, and use no stand-in model.

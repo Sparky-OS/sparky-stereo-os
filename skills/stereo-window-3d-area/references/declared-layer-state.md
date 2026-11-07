@@ -48,3 +48,26 @@ The rule is the edition's no-silent-fallbacks design (nothing silently fails or 
   Fix: look the real function up in the library asked for by name: `dlopen("libstereo-declare.so.1", RTLD_LAZY | RTLD_NOLOAD)` and `dlsym` on that handle (`../../stereo-proof-rig/scripts/refuse-shim.c`).
   Found by: printing the pointer the shim got ("the real stereo_declare_wayland is not found"), after a control run with the shim in pass-through mode failed where the run without the shim passed.
 - Trap of the proof: `kde_stereo_content_manager_v1` appears in KWin's log at every client connection (`wl_registry.global` and `bind`), so count the `.create` request and `set_content(` on `kde_stereo_content_v1`, not the word `set_content`: `wp_content_type_v1.set_content_type` matches it too (a count of 2 for one declaration).
+
+## The other ways a layer is not made (ORDER 448b)
+
+A compositor that announces the stereo global and a layer that still cannot be made is the same silent flat picture, and the same rule settles it: say it once, keep it, do not ask again.
+- Qt Multimedia's `QQuickVideoStereoLayer::create(window, &why)` returns the reason for: no `wl_surface` for the window, `stereo_declare_wayland_init` failing (`-EBUSY` when another component of the process already holds `libstereo-declare`'s per-thread state), `stereo_supported_wayland()` false although the global is announced, and the window without an alpha buffer.
+  Each goes to `stereoLayerFailure` and one log line, and no presenter is made again for it while the same 3D video plays.
+  Before, `ensureStereoPresenter()` returned silently and made a new presenter thread at every timer tick: with `STEREO_REFUSE_INIT=1` the shim counted 104 `init` calls in 8 s on +stereo3d14 and 1 on +stereo3d15 (107 and 1 with `STEREO_NO_SUPPORT=1`), and the message in `stereoLayerFailure`.
+- stereo-layer's `Stereo::Surface` (Gwenview, digiKam and the other viewers; `WidgetLayer::failure()` and `failureChanged()`, `StereoPicture.stereoFailure`) keeps the same kinds of failure, logs them once (category `org.sparky.stereo.layer`) and does not ask again until the surface is let go (the layer asked for the declaration at every update before).
+  Measured with the demo (`STEREO_DEMO_FORCE_STEREO=1`, one refused declaration, same rig): 1.17.1 asked 268 times in 8 s and showed the packed pair in both eyes, with nothing said; 1.17.2 asks once, shows the left view in both eyes (the widget layer drew the whole file, both views side by side, when the pair was not in its surface: fixed in the same version) and says it.
+  One message for every player: "the compositor's stereo content declaration failed (why): the picture is shown flat, one eye, not in 3D".
+- A compositor that announces no stereo global at all is a 2D desktop: no layer, no failure, no message.
+- Dragon Player and Plank Player do not use stereo-layer's surface: each patch carries its own `StereoLayer` class with its own declaration code, and that copy still logs a warning and attaches the two views anyway (ORDER 448 fixed Qt Multimedia's layer only).
+  Moving both onto `Stereo::Surface` fixes it for them and removes two copies.
+
+### Proof rig traps (ORDER 448b)
+
+- Symptom: the stereo-layer demo draws the pair as plain side by side and declares nothing, even on a good rig.
+  Cause: the picture is loaded for the output mode that `Stereo::ScreenMode` reads through libkscreen, and in a headless rig the Wayland backend never completes the configuration (`kscreen.kwayland: adding output ... Name: " "` and nothing more), so the mode stays Unknown and the picture is not a stereo pair.
+  Fix: the demo takes `STEREO_DEMO_FORCE_STEREO=1` and gives the layer the stereo picture itself; the refusal path under test is the declaration, not the screen reader.
+  Found by: `QT_LOGGING_RULES='kscreen*=true'` on the demo.
+- Symptom: `rm` cannot remove a build work folder after a build container was removed mid-build ("Permissão negada").
+  Cause: the build ran as root in the container and its cleanup (`chown`) never ran.
+  Fix: let the build finish or remove the folder with a throwaway root container (`docker run --user 0 -v DIR:DIR image rm -rf DIR`); never stop a lane's build container just to restart it.

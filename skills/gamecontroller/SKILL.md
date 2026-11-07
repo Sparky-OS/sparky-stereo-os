@@ -91,6 +91,13 @@ A local test deb is not evidence of repository publication or installation on ph
 Credit the authors from the touched upstream files and the projects providing the profiles and CI machinery in [ATTRIBUTIONS](../../ATTRIBUTIONS.md).
 Keep contact addresses out of the public contributor documentation.
 
+## More than 80 buttons
+
+A joystick tops out at 80 buttons because `hid-input` gives each button a key code below `KEY_MAX`.
+Tomasz Pakuła's `EV_BTN` series lifts it with a numbered button event (kernel series group 44; SDL pull request 14758 and Wine merge request 9853 are its consumers).
+Check the kernel part with the 128-button fixture before blaming SDL or Wine: `evtest` must print `EV_BTN` with button numbers above 80.
+The recipe to find the newest posted version, carry it in `kernel/series`, prove strict application on every flavour's tree and compile only `drivers/input` and `drivers/hid` is in [references/ev-btn.md](references/ev-btn.md), with the traps met.
+
 ## Rig packages
 
 Use exact VID/PID rules and active-seat `uaccess` for hidraw.

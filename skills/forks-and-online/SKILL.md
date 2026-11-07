@@ -147,6 +147,10 @@ Never use the bypass on someone else's pull request or on a repository Daniel do
 - Put a large file on GitHub, or cut a release in a switched-on fork.
 - Report work as online before the audit above says so.
 
+## Bringing a fork up to a packaged recipe
+
+[Fork to recipe patch stack](references/fork-to-recipe-patch-stack.md) holds the recipe: patches to commits with their authors, the tree check against the packaged source, the baseline of fork-only files, reference branches on Invent, and the traps (ORDER 445, KWin +stereo3d42 to +stereo3d46).
+
 ## Lessons from the lanes, October to November 2026
 
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (5 entries).

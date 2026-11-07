@@ -9,7 +9,7 @@ description: >-
   screenshot. Load it when a capture is black, transparent, stale or cancelled, the right eye is brighter than the left,
   Show Screen Contents says the process is not authorized to take a screenshot, testTabBoxStereo or another KWin
   autotest fails, kf.package reports invalid metadata, timeout as PID 1 exits 125, the Wayland socket path is too long,
-  runuser drops the render group, LIBGL_ALWAYS_SOFTWARE changes nothing, a proof exits 127 under LD_BIND_NOW or a PNS
+  runuser drops the render group, keys or clicks sent through fake input or xdotool do nothing, LIBGL_ALWAYS_SOFTWARE changes nothing, a proof exits 127 under LD_BIND_NOW or a PNS
   fixture does not decode, translated text does not appear, or a popup or lock-screen depth must be measured.
 ---
 
@@ -40,7 +40,7 @@ No 3D display is needed: the rig captures what Stereo KWin hands to an output, b
 - **On the NVIDIA card:** Docker's CDI gives the container the card, its render node and NVIDIA's own libraries from the host (`--device nvidia.com/gpu=0`), so the host's driver version is the one under test. Query the selected render node’s group ID and add it with `--group-add` (125 was this rig’s ID, not a portable default) and `--cap-add SYS_NICE`, which `kwin_wayland`'s file capability needs to start. Give a library by its absolute path, because CDI mounts the host's copies over the image's (dpkg cannot replace a mounted file, so prove an egl-wayland upgrade in a container without the card), and choose NVIDIA's EGL platform library with `__EGL_EXTERNAL_PLATFORM_CONFIG_DIRS` when two are installed. For Mesa on NVIDIA's Vulkan driver (zink), list Mesa's EGL vendor first and NVIDIA's second (`__EGL_VENDOR_LIBRARY_FILENAMES`): NVIDIA's Vulkan driver does not start without its own EGL vendor. Run every case on the AMD card too: they fail differently.
 - **PipeWire for screencasting:** KWin's screencasting tests need a PipeWire and a WirePlumber of the container's own, with the container's `XDG_RUNTIME_DIR`, never the desktop's; without them every casting test fails at its setup.
 - **Geometry, not only colour:** draw a disc of known size in each eye (0.6 of the window's height, round in the width the program believes it has) and measure its area, diameter, aspect and centre in each half; a squeezed eye still shows the right colour.
-- **Menus and keys:** KWin's [fake input protocol](https://invent.kde.org/libraries/plasma-wayland-protocols/-/blob/master/src/protocols/fake-input.xml) sends key events to the focused window, so a remote-control menu or a 3D menu is driven exactly as a user would, without a desktop.
+- **Menus and keys:** KWin's [fake input protocol](https://invent.kde.org/libraries/plasma-wayland-protocols/-/blob/master/src/protocols/fake-input.xml) sends key events to the focused window, so a remote-control menu or a 3D menu is driven exactly as a user would, without a desktop. Keep one client connected, read the program's own state before and after, and fail when it did not change: [input-delivery.md](references/input-delivery.md) (it also says why ORDER 265 thought keys did not arrive).
 
 When the question needs a real machine, a cable or a 3D television, the rig is the first step and [`test-bench`](../test-bench/SKILL.md) is the next: baselines, recoverable changes and the television rules.
 

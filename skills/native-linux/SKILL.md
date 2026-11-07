@@ -54,6 +54,11 @@ Qt's own window frame around a stereo window (both routes, the recipe, the traps
 - **A Vulkan layer must stay out of the way of programs that do not use stereo.** An implicit layer loads into every Vulkan program. Ours wrapped every swapchain handle and passed its own handle down as `oldSwapchain`, so a GTK 4 program rebuilding its swapchain on a resize got `VK_ERROR_NATIVE_WINDOW_IN_USE_KHR` and crashed (2026-10-10). The rule: never wrap handles; key the layer's own data by the driver's handle; touch only swapchains created with `imageArrayLayers == 2`; pass `oldSwapchain`, unknown surfaces and every other swapchain call through unchanged. Prove it with a non-stereo program resizing (GTK 4 with `GSK_RENDERER=vulkan`, vkcube) as well as with the stereo case.
 - **An OpenGL layer must interpose every drawing command.** Ten of OpenGL 4.6's drawing commands (the instanced draws with a base instance, multi-draw with a base vertex, the indirect draws with a count from a buffer, the transform feedback draws) once reached the driver unwrapped, with the left view's viewport and draw buffer, so a right-eye draw landed in the left view; Blender draws its batches with two of them, and its right eye on NVIDIA's own OpenGL showed only menus and panels. Export every wrapper through `glXGetProcAddress`, `eglGetProcAddress` and `dlsym`, and keep a test that draws one square per command into each view and reads both back: it must fail without the wrapper.
 
+## OpenGL on NVIDIA's own driver
+
+Two paths, a per-program choice with zink the default: Mesa's OpenGL on NVIDIA's Vulkan driver, or NVIDIA's own OpenGL with the gl-stereo layer in front of it (`gl-stereo-run --nvidia-opengl zink|nvidia`).
+What each needs, the proof rig and the traps met (a race that left the right eye black, Qt's frame on NVIDIA's EGL, kopper without a second view, a Vulkan client that never read its socket): [nvidia-opengl.md](references/nvidia-opengl.md).
+
 ## X11 views at another size than their resolution
 
 On Wayland a declared surface's `wp_viewport` destination is the size one view is shown at, whatever the buffer's resolution.

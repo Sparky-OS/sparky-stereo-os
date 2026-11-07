@@ -360,6 +360,12 @@ In October 2026:
 
 **Thank you, David.**
 
+The edition's DisplayXR package (ORDER 58, [Sparky-OS/displayxr-packaging](https://github.com/Sparky-OS/displayxr-packaging)) is built from DisplayXR's release tag with the work of the people in its records:
+- DisplayXR is a fork of [Monado](https://monado.freedesktop.org/), by Collabora, Ltd. and the Monado contributors (DisplayXR's NOTICE);
+- its build carries displayxr-mcp and displayxr-common, by The DisplayXR Project and its contributors;
+- programs reach it through the OpenXR loader of the Khronos Group, as Debian packages it;
+- it joins the `openxr1-active-runtime` alternatives group of Debian's Monado packaging, maintained by Rylie Pavlik, so both runtimes stay selectable.
+
 ### 2.1 The Linux kernel
 
 **Source**: [kernel.org](https://www.kernel.org/) **License**: GPL-2.0 **What we changed**: amdgpu lists and signals the HDMI® 3D modes a display's EDID declares and times frame packing; full side by side handled in the DRM core, i915, nouveau and amdgpu; nouveau gains 16 bits per colour on Turing and newer; a fix for rumble-less gamepads in hid-betopff; VKMS, the virtual display driver, sets HDMI® 3D modes and composes and writes back the frame of both eyes, on Louis Chauvet's configfs series.

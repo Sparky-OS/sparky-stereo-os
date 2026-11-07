@@ -211,6 +211,13 @@ In a fresh `debian:testing` container with the repository as a local source and 
 
 Check that each task's package list exists (`apt-cache show`) and that no package appears in both flavours of a role.
 
+## An upstream program from its release tag
+
+A program with no Debian package (DisplayXR's OpenXR runtime, ORDER 58) is built from its release tag, with every source its build would download carried as a source component and its own packaging script reused where it can stage a finished build.
+A part Debian cannot build (a .NET program) is carried from upstream's release, checked by SHA-256, in a package of its own; `debian/copyright` comes from the tree's SPDX tags (`reuse lint --json`, [`scripts/reuse2dep5.py`](scripts/reuse2dep5.py)) plus the files REUSE cannot see.
+An OpenXR runtime joins the `openxr1-active-runtime` alternatives group Debian's Monado uses, never writing the loader's link itself; the edition builds its simulated display with one output, full side by side.
+The recipe, the coexistence rules with their specification clauses, the proof and the traps: [packaging an OpenXR runtime](references/openxr-runtime-package.md).
+
 ## Lessons from the lanes, October to November 2026
 
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (114 entries).

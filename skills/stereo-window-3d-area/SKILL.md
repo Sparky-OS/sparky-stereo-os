@@ -114,6 +114,11 @@ As in the general skill, plus:
 - **overlays:** an overlay over the 3D area changes the same pixels in both eyes and none in one eye only;
 - **the 2D control:** stereo off against the distribution's build, 0 differing pixels.
 
+## A declared layer's state follows its declaration
+
+Never commit a buffer of two views to a surface the compositor has not taken as stereo content, and never report a layer active before its declaration was taken: a refused declaration is logged once, shown by a property the player reads, and the video is drawn the ordinary way.
+[The rule, the recipe to force and capture a refusal, and the traps](references/declared-layer-state.md) (ORDER 448, after ORDER 49's packed frame in both eyes).
+
 ## Lessons from the lanes, October to November 2026
 
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (13 entries).

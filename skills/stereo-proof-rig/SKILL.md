@@ -48,6 +48,7 @@ When the question needs a real machine, a cable or a 3D television, the rig is t
 ## An X11 player (the X11 path through Xwayland)
 
 One fresh session per case, a passwd entry for the user, a render node for KWin, the declarations read from the X window tree, and the stereo capture read per eye: [x11-session-rig.md](references/x11-session-rig.md), with its scripts (`x11_props.py`, `x11_propagation.py`, `eyes_share.py`, `kwin_script.py`, `vlc_mpris.py`, `support-shim.c`, `make-barcode-fixtures.sh`, `columns.py`).
+To prove what a player does when the compositor refuses its Wayland declaration, preload `scripts/refuse-shim.c` ([recipe](../stereo-window-3d-area/references/declared-layer-state.md)).
 
 ## A relaunch soak (a client killed and started, or its 3D area remade, many times)
 

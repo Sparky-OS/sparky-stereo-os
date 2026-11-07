@@ -45,8 +45,29 @@
   GitHub forks live in the [Sparky-OS organisation](https://github.com/Sparky-OS), with the distribution branch as the default branch (Daniel, 2026-10-09); KDE forks live on [invent.kde.org](https://invent.kde.org/danielcamposramos), listed with their CI in [our KDE branches](../../../docs/kde-branches.md).
 - AI assistance goes in each commit as an `Assisted-by:` trailer.
   An assistant never adds Daniel's `Signed-off-by`: he signs what he sends.
-- Keep Debian's copyright file and append our `Files: debian/*` credit; `provenance.sh` does it (see [provenance](../SKILL.md#provenance-daniel-2026-10-02-always)).
+- Keep Debian's copyright file and append our credit; `provenance.sh` does it (see [provenance](../SKILL.md#provenance-daniel-2026-10-02-always) and [crediting our additions](#crediting-our-additions-without-overriding-the-packagers)).
 - Prove each build before shipping: compile against our kernel where the package builds modules, compare the package trees with the previous build, and simulate the installation with apt.
+
+## Crediting our additions without overriding the packagers
+
+DEP-5 gives a file the last `Files` paragraph that matches it (Debian copyright format 1.0; Lintian's `global-files-wildcard-not-first-paragraph-in-dep5-copyright` says "last match wins"). Our paragraph is appended last, so a `Files: debian/*` of ours after Debian's own credited every Debian packager's work to us.
+
+Recipe, what `provenance.sh --tree STAGING [--source SOURCE_ROOT]` does with the copyright file:
+
+1. A native package of ours (no earlier `Files` paragraph names `debian/`, no `Original-Maintainer`, no changelog entry signed by anyone but us): ours is `Files: debian/*`, the whole packaging.
+2. A rebuild, told by any of three signals of the package itself: an earlier paragraph names `debian/`; its control has an `Original-Maintainer` (the stamp sets it when the package came with another maintainer and keeps it on a restamp); its changelog has an entry signed by anyone but us (a source rebuilt along our chain already has our Maintainer and no Original-Maintainer, kwin is one, but keeps the packagers' entries; `root@container` trailers do not count). Debian's paragraph stays untouched and ours follows it naming only our files: what Lean Code writes (`debian/sparky-lean-toolkit/*`, `debian/sparky-lean-preserve.json`, `debian/sparky-lean-payload-generated.json`, those that exist) and what the recipe lists in `debian/sparky-provenance-files`. `lean.debhelper` passes `--source`; without it (re-staged from a .deb) only the Lean files and an earlier narrowed list are named.
+3. The file is not in Debian's format: no `Files` or `License` field is added (it could override what the file says); a plain sentence carries the credit wording.
+
+Credit goes to whoever wrote the work, so a recipe never globs its patches into the manifest. It calls `python3 "$toolkit/repo/provenance-files.py" . 'GLOB'` after appending its patches: a patch is named only when its header has a `From:` or `Author:` with Daniel's address and no `Origin:` of upstream, backport or vendor; a patch with none of From, Author, Origin stops the run and is named; nothing is guessed. Never list `debian/changelog` (it holds Debian's entries too, DEP-5 cannot name one entry).
+Test: `sparky-os/lean/tests/test_provenance_debian_paragraph.py` resolves files with the last-match rule and has the header fixtures (one patch of ours, one carried): red on main in 9 of 13 tests, green on the branch. Check a recipe against the real source before relying on it: unpack the published `.debian.tar.xz` (Python `tarfile`, no package program) and run the helper; for kwin +46 it names s30 to s46 except s41-0001, which is Vlad Zahorodnii's commit carried as `Origin: backport`.
+
+Traps met:
+- Symptom: `/usr/share/doc/kwin-wayland/copyright` credits `debian/control` to Paweł and Daniel. Cause: our `Files: debian/*` came after Debian's. Fix: case 2. Found by reading the installed file in the published kwin-wayland and resolving `debian/control` by the last-match rule.
+- Symptom: the stanza grew by one on every re-stamp of a non-DEP-5 file. Cause: the earlier plain credit was not removed. Fix: the credit sentence is removed before it is written again; the test reruns and compares bytes.
+- Symptom: a carried upstream commit listed as ours. Cause: the recipe's glob `s??-????-*.patch` took s41-0001. Fix: `provenance-files.py` reads each patch's header. Found by a reviewer reading the manifest against the patch's `From:`.
+- Symptom: kwin's copyright would still say `Files: debian/*` is ours if only Original-Maintainer decided. Cause: the chain's source already carries our Maintainer, so the stamp sets no Original-Maintainer. Fix: the changelog signal. Found by reading the published kwin-wayland control: no Original-Maintainer.
+- Not covered: the `-lc-hr` companions of a rebuild copy the base package's copyright but carry neither signal, so they still get the whole paragraph (14 binaries of 9 sources in the published pool).
+- A manifest entry copied from an old recipe silently matched nothing; the build now stops, which is why the check exists.
 
 ## A recipe writes its source from its own date
 

@@ -34,7 +34,7 @@ Every package of ours says who made it, the Sparky way, and [`provenance.sh`](ht
 - `Original-Maintainer:` keeps whoever maintained a package we modified (Debian Qt/KDE Maintainers, NVIDIA), the convention of Debian derivatives.
 - `Homepage: https://sparkylinux.org`, with no trailing slash, the form most of Paweł's packages use.
 - `Bugs:` is the edition's [tracker](https://github.com/Sparky-OS/sparky-stereo-os/issues): a problem in our build never goes to the maintainer of the package we modified (Daniel, 2026-10-08).
-- The copyright file keeps its holders and gains our `Files: debian/*` stanza with the credit in Daniel's wording of 2026-10-07: "Sparky Stereo OS, Daniel Ramos's (Capitain Jack) edition of SparkyLinux (https://sparkylinux.org, by Paweł "pavroo" Pijanowski)".
+- The copyright file keeps its holders and gains our credit (the whole `Files: debian/*` in our own packages; in a rebuilt Debian package only our own files, after Debian's paragraph: [crediting our additions](references/rebuilt-packages.md#crediting-our-additions-without-overriding-the-packagers)), with the credit in Daniel's wording of 2026-10-07: "Sparky Stereo OS, Daniel Ramos's (Capitain Jack) edition of SparkyLinux (https://sparkylinux.org, by Paweł "pavroo" Pijanowski)".
 - Paweł's own packages keep his `Maintainer:` and are never modified in place: ship ours beside them, divert with `dpkg-divert`, or send him a pull request.
 - **Order:** `provenance.sh --tree STAGING` runs before Lean Code and the final checksums. A package sealed with the lc mark is never restamped (wrong provenance there needs a fresh build), and `make-repo.sh` never rewrites archives.
 

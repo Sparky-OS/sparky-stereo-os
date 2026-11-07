@@ -95,6 +95,21 @@ Traps:
 - Symptom: a reviewer's corrected string reads wrongly in its language (for example a translated placeholder followed by a word that turns it into a noun phrase). Cause: the model fixed the flagged spot without rereading the sentence. Fix: accept the finding, restate the sentence so the command comes after a colon, and keep the metavariable out of the grammar.
 - Symptom: a packet's regex finds fewer strings than the language file holds. Cause: multi-line values (a `--help` block) end on a line that is not the closing quote. Fix: match from `LOCALn="` to the first `"` at a line end, with the dot matching newlines, and count items against the English file.
 
+### From a reviewer's answer to a shipped correction
+
+Recipe, after the coordinator has accepted the findings:
+1. Apply exactly the accepted strings, in the recipe's source of truth (the generator table or the language file the build reads), never in a built file. Change nothing else in the strings; the reviewer's "no errors" languages stay byte for byte.
+2. Make each corrected line testable: a check that fails on the old string and passes on the new one (a word that must appear in both labels of one setting, the clause the Korean line lacked, the verb pair of a help line). Run it against the previous build's packages first: the red run is the proof that the check can fail.
+3. Bump each package's version and write its CHANGELOG entry (reviewer, date, which lines, "every other language reviewed with no errors", "still a first draft with AI assistance, pending native speakers"). Packages built from one source package share the new version; give an in-place correction the next revision of the same stamp (`0.3.0~dev20261107.1` sorts after `0.3.0~dev20261107`). One commit per package.
+4. Build from the committed recipe (record: `recipeDirty` false), rebuild from the `.dsc` and compare the `.deb` files with `cmp`, run `check-debs`, the packages' own tests in containers against the new files, and the link gate.
+5. Stage beside the old stage, move the superseded files to the lane's `superseded/` folder with their sums, write `SHA256SUMS`, and replace the version in the cohort list line by line, then check that every listed file exists.
+
+Traps:
+- Symptom: a new "must contain the word" check fails on the corrected Polish line. Cause: the same word is inflected in the other label (zatwierdzenie, zatwierdzenia). Fix: test the stem. Found by: the red/green run on the new files.
+- Symptom: one dpkg check fails in one of three runs of the same files, the next check passes. Cause: `set -o pipefail` with `program | grep -q`: grep exits at the first match and the program dies of SIGPIPE. Fix: no pipefail in a test where grep decides, or capture the output first. Found by: rerunning the identical files twice.
+- Symptom: the engine's layer lint fails on a fresh clone with "missing mirror folder". Cause: the lint wants empty folders that git does not track. Fix: create them in the clone (they stay untracked) or track them with a placeholder file; report it, do not loosen the lint.
+- Symptom: the rebuilt packages differ from the first build only in file times. Cause: a changelog date later than the build clock. Fix: date the entry before the build.
+
 ## Evidence and status
 
 Use the smallest check that establishes the claim. Run required upstream checks for code submissions.

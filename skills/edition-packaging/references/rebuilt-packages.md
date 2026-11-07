@@ -45,8 +45,26 @@
   GitHub forks live in the [Sparky-OS organisation](https://github.com/Sparky-OS), with the distribution branch as the default branch (Daniel, 2026-10-09); KDE forks live on [invent.kde.org](https://invent.kde.org/danielcamposramos), listed with their CI in [our KDE branches](../../../docs/kde-branches.md).
 - AI assistance goes in each commit as an `Assisted-by:` trailer.
   An assistant never adds Daniel's `Signed-off-by`: he signs what he sends.
-- Keep Debian's copyright file and append our `Files: debian/*` credit; `provenance.sh` does it (see [provenance](../SKILL.md#provenance-daniel-2026-10-02-always)).
+- Keep Debian's copyright file and append our credit; `provenance.sh` does it (see [provenance](../SKILL.md#provenance-daniel-2026-10-02-always) and [crediting our additions](#crediting-our-additions-without-overriding-the-packagers)).
 - Prove each build before shipping: compile against our kernel where the package builds modules, compare the package trees with the previous build, and simulate the installation with apt.
+
+## Crediting our additions without overriding the packagers
+
+DEP-5 gives a file the last `Files` paragraph that matches it (Debian copyright format 1.0; Lintian's `global-files-wildcard-not-first-paragraph-in-dep5-copyright` says "last match wins"). Our paragraph is appended last, so a `Files: debian/*` of ours after Debian's own credited every Debian packager's work to us.
+
+Recipe, what `provenance.sh --tree STAGING [--source SOURCE_ROOT]` does with the copyright file:
+
+1. No `Files` paragraph names `debian/` (our own native package): ours is `Files: debian/*`, the whole packaging.
+2. Debian's paragraph is there (a rebuilt package): Debian's stays untouched and ours follows it naming only our files: what Lean Code writes (`debian/sparky-lean-toolkit/*`, `debian/sparky-lean-preserve.json`, `debian/sparky-lean-payload-generated.json`, those that exist) and the files the recipe lists in `debian/sparky-provenance-files` (one path or DEP-5 glob per line, `#` comments; a line that matches no file stops the build). `lean.debhelper` passes `--source`; without it (a rebuilt package re-staged from a .deb) only the Lean files and an earlier narrowed list are named.
+3. The file is not in Debian's format: no `Files` or `License` field is added (it could override what the file says); a plain sentence carries the credit wording.
+
+A rebuilding recipe writes the manifest where it appends its patches (kwin's `prepare-source-46.sh`: `debian/patches/s??-????-*.patch`), list only what it added, never `debian/changelog` (it holds Debian's entries too, DEP-5 cannot name one entry).
+Test: `sparky-os/lean/tests/test_provenance_debian_paragraph.py` resolves files with the last-match rule: red on main in 4 of 7 cases, green on the branch.
+
+Traps met:
+- Symptom: `/usr/share/doc/kwin-wayland/copyright` credits `debian/control` to Paweł and Daniel. Cause: our `Files: debian/*` came after Debian's. Fix: case 2. Found by reading the installed file in the published kwin-wayland and resolving `debian/control` by the last-match rule.
+- Symptom: the stanza grew by one on every re-stamp of a non-DEP-5 file. Cause: the earlier plain credit was not removed. Fix: the credit sentence is removed before it is written again; the test reruns and compares bytes.
+- A manifest entry copied from an old recipe silently matched nothing; the build now stops, which is why the check exists.
 
 ## A recipe writes its source from its own date
 

@@ -76,6 +76,12 @@ An X11 window's buffer is its own pixmap, so an X11 program declares that size a
 A software-drawn X11 window is declared like any other (`stereo_declare_x11_format()` at support version 1 or more) and Stereo KWin shows each half to its eye; the program draws its picture at the X window's size, which KWin makes twice the created width, and takes that size from the X server's events, never from the synthetic one-view `ConfigureNotify`.
 The recipe, the per-eye proof with its negative controls and the traps are in [x11-software-drawn.md](references/x11-software-drawn.md).
 
+## A GL child that is larger than its window, or under a sibling
+
+X clips a child to its window and a sibling stacked over it hides it; the redirected child's buffer is whole, so the scene must cut it the same way (ORDER 160).
+Mesa's GLX lists its stereo children; the EGL X11 platform, the Vulkan stereo layer and the gl-stereo layer declare the child but do not list it, and then the capture is one picture squeezed into the child.
+The rows, scripts and traps: [x11-child-clipping.md](references/x11-child-clipping.md), scripts in `../stereo-proof-rig/scripts/x11-child`.
+
 ## A video or GL child window of an X11 window
 
 A program whose interface is a toolkit window and whose 3D area is a native child (a player's video, a GL widget) declares the child with `stereo_declare_x11_child()` on its top-level window, not with `stereo_declare_x11()` on the child, and takes the declaration back when the area closes: the top-level must list the child, or Stereo KWin shows one view in both eyes.

@@ -1,6 +1,6 @@
 # An OpenXR runtime that hands its eyes to Stereo KWin
 
-Learned on DisplayXR (ORDER 34, November 2026): an OpenXR runtime presents the two views of any OpenXR app as one window declared full side by side, so Stereo KWin's outputs show it on a 3D television, in anaglyph on any monitor, or as the left view on a plain 2D output.
+Learned on DisplayXR (ORDER 34 and 34b, November 2026): an OpenXR runtime presents the two views of any OpenXR app as one window declared full side by side, so Stereo KWin's outputs show it on a 3D television, in anaglyph on any monitor, or as the left view on a plain 2D output.
 The runtime keeps no knowledge of the screen.
 
 ## The shape
@@ -11,7 +11,13 @@ The runtime keeps no knowledge of the screen.
    The window, and the canvas the views are rendered for, keep the window's size; only the swapchain and the canvas the display processor writes into are two views wide.
 3. **The window is declared once.** On native Wayland, `kde_stereo_content_v1` value 3 on the app's surface, bound at version 2: from version 2 a declared surface without a viewport destination is one view wide, so the window keeps its size on screen.
    The request takes effect with the next commit, which the Vulkan WSI makes inside `vkQueuePresentKHR`: send it before the present that carries the first buffer of the new width.
-4. **Nothing is pretended.** Where the declaration cannot be made (no global, protocol version 1, an X11 window not yet handled, a build without `wayland-scanner`, a switch that turns it off), the buffer stays the window's size and one log line says why; the window shows the two views side by side, flat.
+4. **The runtime's own X11 window is declared too** (plain OpenXR apps run in it, under Xwayland on Plasma). When the root window's `_KDE_NET_WM_STEREO_CONTENT_SUPPORTED` is 3 or more, set `_KDE_NET_WM_STEREO_CONTENT` = 3 (CARDINAL/32) on the window; no `_KDE_NET_WM_STEREO_CONTENT_ONE_VIEW_SIZE`, because each view is rendered at the window's own size.
+   Stereo KWin keeps the window's place and makes the X window twice as wide when it reads the property, which can be seconds later.
+   Vulkan creates an X11 swapchain only at the window's current size (Vulkan 1.3, VK_KHR_xlib_surface: "it is only possible to create a new swapchain on this platform with imageExtent being equal to the current size of the window"), so the runtime presents both views only after the X window has doubled, and until then the window's own size.
+   While doubled, everything but the swapchain sees one view: the window follow, the window metrics (the projection's canvas) and a legacy app's tiles.
+   A fullscreen window doubles too: KWin keeps the program's own frame for a fullscreen stereo window and makes the X window twice that.
+5. **Nothing is pretended.** Where the declaration cannot be made (no global, protocol version 1, a window manager without the announcement, an app's own X11 window, a build without `wayland-scanner`, a switch that turns it off), the buffer stays the window's size and one log line says why; the window shows the two views side by side, flat.
+6. **The rendering mode counts, not only the display processor.** A 2D rendering mode hands the display processor one view, so the declaration is withdrawn there even when the display processor's own output setting still says "full side by side", and made again when a stereo mode returns.
 
 ## Recipe: the proof on a headless Stereo KWin
 
@@ -27,7 +33,20 @@ The runtime keeps no knowledge of the screen.
 6. **Expect in the captures:** ScreenShot2 `CaptureScreen` answers `stereo 1`, 3840x1080; inside the window's rectangle the left eye is about 91 % red and the right eye about 91 % blue (the rest is the cube and the floor grid), 0 pixels with the eyes swapped, 0 pixels differing between the eyes outside the window.
    On the plain 2D mode, one frame of the output's own screencast (`zkde_screencast` output stream through PipeWire) shows the window red, 0 % blue: the left view only.
 7. **Controls that must fail the LEFT/RIGHT rule:** the same run with the declaration switched off (`DXR_STEREO_DECLARE=0`) and with an output mode that does not set the flag (`SIM_DISPLAY_OUTPUT=squeezed`) show both views side by side in both eyes, identical, and KWin receives no `create`; a display-processor build with the tiles placed the other way round shows blue in the left eye (325,316 and 324,831 swapped pixels in the 800x450 window on two captures).
-   A plain OpenXR app on the runtime's own X11 window (DisplayXR's `cube_hosted_legacy_vk_linux`, session with `--xwayland`) logs that its window is not declared and shows both views side by side, flat, with 0 pixels differing between the eyes.
+
+## Recipe: a plain OpenXR app on the runtime's own X11 window
+
+1. **Session:** the same compositor started with `--xwayland`; the X programs (`xwininfo`, `xprop`) talk to `DISPLAY=:0` inside the container.
+2. **The app:** DisplayXR's `cube_hosted_legacy_vk_linux` (no DisplayXR extension, so the runtime makes the window), `SIM_DISPLAY_OUTPUT=sbs_full`, `SIM_DISPLAY_PIXEL_W/H` the output's size, `DXR_CUBE_TEST_EYE_COLORS=1`.
+   The window opens fullscreen on the panel's RandR monitor (`DXR_WINDOW_FULLSCREEN=0` makes it a plain window).
+3. **Wait for the doubling, then capture.** Poll until the runtime's log says `FULL_SBS: the window manager holds the declared X11 window at both views' width` and `xwininfo -name DisplayXR` says `Width: 3840`; capture only then, because KWin may double a declared X11 window seconds after the client wrote the property.
+4. **Expect in the runtime's log:** `the window manager announces version 9` (Stereo KWin +stereo3d43 and +stereo3d46), the declaration, the X server's 3840x1080 and one view 1920x1080, `presenting 3840x1080 px, the two views at the window's 1920x1080 each`.
+5. **Expect from the X server and KWin:** `xwininfo` gives 3840x1080 for the X window, `xprop` gives `_KDE_NET_WM_STEREO_CONTENT(CARDINAL) = 3`, and a KWin script gives the window's frame 1920x1080, fullscreen.
+6. **Expect in the captures:** view 0 in the left eye and view 1 in the right eye over about 95 % of the screen, 0 pixels swapped, on two captures a second apart; on the plain 2D mode the output's own screencast frame is view 0 only.
+   Colour alone does not show a squeezed view: also measure the crate's bounding box in each eye (its width over its height stays between about 0.95 and 1.45 as it turns, and halves when a view is squeezed), and the boxes' vertical centres and heights must be equal between the eyes.
+7. **A mode change in the session:** press V (Linux key code 47; qwerty's 2D/3D toggle in the runtime's window) through KWin's fake input.
+   The property goes away, the X window returns to 1920x1080 and both eyes show the same 2D picture; V again declares it, the X window is 3840x1080 again and the eyes are right.
+8. **Controls that must fail the LEFT/RIGHT rule:** `DXR_STEREO_DECLARE=0` and `SIM_DISPLAY_OUTPUT=squeezed` (nothing declared, the X window stays 1920x1080, both views squeezed side by side in both eyes, the crate about half as wide as tall); a display-processor build with the views swapped (blue in the left eye); and Debian's own KWin, which announces nothing (`FULL_SBS: ... the window manager announces no stereo declaration`, a single 1920x1080 picture with both views squeezed side by side).
 
 ## Traps
 
@@ -62,17 +81,42 @@ The runtime keeps no knowledge of the screen.
   **Cause:** the container, not the change: the same three fail on the unpatched base built the same way.
   **How found:** a worktree of the base commit, the three test targets built and run.
 
+- **Symptom (what it would look like; found by reading first):** once a declared X11 window has doubled, the runtime's idea of the window's size flips between the X window's width and one view on every configure, and the views come out half as wide as they are shown.
+  **Cause:** while a window is declared, Stereo KWin follows every configure with a synthetic ConfigureNotify (ICCCM 4.1.5) in the program's own units, one view; the X server's own ConfigureNotify carries the X window's size, and the synthetic one arrives after it.
+  **Fix:** while declared, take the X window's size only from the server's events (response type without the 0x80 bit); know the doubling from the server's width becoming twice the width at the declaration, or from the synthetic size being half the X window's (the place can change in the same configure).
+  **How found:** KWin's `X11Window::sendSyntheticConfigureNotify` (`width = client width x program scale / stereo window scale`); a unit test that takes the synthetic size instead fails 3 of its 7 cases.
+- **Symptom:** after V (2D) the X window stays 3840 wide and both eyes show red, each a half of the single 2D view.
+  **Cause:** qwerty's V switches the head's rendering mode to 2D, but sim_display's own output setting stays `sbs_full`, so `get_scanout_caps` still sets the flag, and the runtime asked only the display processor.
+  **Fix:** count the flag only in a rendering mode with two or more views on a 3D display state (`hardware_display_3d`); a 2D mode withdraws the declaration.
+  **How found:** the mode-change case's third capture and the X window's width after the key.
+- **Symptom:** the planted eye-swap control passed the LEFT/RIGHT rule.
+  **Cause:** the plug-in manifest copied beside the planted binary (`200-sim-display.json`) names its binary by absolute path (`binary_path`), so the planted folder loaded the ordinary build.
+  **Fix:** point `binary_path` at the planted copy, and read the runtime's `loading plug-in binary PATH` line in every control.
+  **How found:** a control that must fail passed; the app's log named the build's path.
+- **Symptom:** an image with Debian's own KWin, for the control without the announcement, does not install: `libegl-mesa0 ... Breaks kwin-wayland (< 4:6.7.4-2+stereo3d24~)`.
+  **Cause:** the edition's Mesa breaks KWin builds older than +stereo3d24.
+  **Fix:** install Debian's Mesa with it (each installed package of the `mesa` source with `+stereo3d` in its version, at Debian's version); apt then also removes the edition's `libkscreen-bin`, so that image has no `kscreen-doctor`, and its ScreenShot2 answers one picture (`stereo 0`). Debian testing's architecture packages are a binNMU (`4:6.7.4-2+b1`) while `kwin-data` is `4:6.7.4-2`: read each version from `apt-cache madison`.
+- **Symptom:** `invalid version for org_kde_kwin_fake_input#4.destroy (4, need at least 5)`.
+  **Cause:** the destructor came in version 5 of the interface.
+  **Fix:** bind version 5 where it is offered, or never call `destroy` on 4. Reuse the stereo-proof-rig skill's `scripts/fakeinput.c` rather than writing another client (ORDER 34b wrote a second one before finding it).
+- **Symptom:** after the cube's `DXR_CUBE_TEST_RESIZE=640x360` the window's decoration is 640 wide and its content still 800x450.
+  **Cause:** the test hook declares the new size to the runtime but leaves the app's own `wp_viewport` destination at the old size, and KWin shows each view at the destination; the runtime's buffers are 1280x360, two 640x360 views.
+  **How found:** KWin's protocol log (`set_window_geometry(0, -58, 640, 418)` and the decoration's new destination, no new `set_destination` on the main surface); the undeclared control shows its 640x360 buffer at 800x450 the same way, so it is the hook, not the declaration.
+
 ## Not done yet, and where it goes
 
-- **X11 windows.** The runtime's own window for plain OpenXR apps (DisplayXR's `cube_hosted_legacy_vk_linux`, or Monado's xrgears) is an X11 window under Xwayland, which the change logs and leaves flat.
-  The route: `_KDE_NET_WM_STEREO_CONTENT` = 3 on the window when the root's `_KDE_NET_WM_STEREO_CONTENT_SUPPORTED` is 3 or more; Stereo KWin then makes the X11 window two views wide while placing it one view wide, so the runtime's window follow, its window metrics (the Kooima canvas) and its X11 1:1 gate divide the X window's width by two.
-  The Vulkan 1.3 specification sets the difference: on Wayland "the surface size is defined by the images presented to it", while on X11 "it is only possible to create a new swapchain on this platform with imageExtent being equal to the current size of the window" (unless present scaling is used); so the X11 swapchain follows the X window only after KWin has doubled it, and KWin may double it seconds late under load.
-- **A mode change in the middle of a session** (withdrawing the declaration and shrinking the buffer) is in the code and not yet driven in the rig: it needs a key sent through KWin's fake input.
+- **An app's own X11 window** (`XR_DXR_xlib_window_binding`) and **adopt-own-window's child** (DisplayXR #2322) are not declared; the log says so.
+  The app's window belongs to the app, which would see the doubling in its own events; the child would go through the X11 child declaration (`_KDE_NET_WM_STEREO_CONTENT_CHILDREN`, the place negotiation of support 8, libstereo-declare's child calls).
+- **A legacy app's window smaller than the size its views are rendered at:** the runtime scales each view into its tile (DisplayXR's legacy behaviour, with or without the declaration); the route that keeps each view at its resolution is `_KDE_NET_WM_STEREO_CONTENT_ONE_VIEW_SIZE` with the X window two rendered views wide (native-linux, "X11 views at another size than their resolution").
+- **Monado's xrgears** as a second plain client: not run yet. It builds with meson against the OpenXR loader DisplayXR's build makes (`_openxr-*/lib/pkgconfig/openxr.pc`) and needs glm, GLib's GIO and xxd; it runs in the runtime's own X11 window like `cube_hosted_legacy_vk_linux`, with no eye-colour hook, so its check is the declaration, the doubling and the geometry.
+- **A real screen and a scanout:** the captures are the eyes KWin draws; an output filter's own pixels need a VKMS scanout or a real display.
 
 ## Perks
 
 - DisplayXR's display processors already answer `get_scanout_caps` per mode, so a new output kind is one bit and one helper, and every vendor plug-in can set it.
 - KWin's protocol log is the cheapest proof of "declared once" for any program: it needs no client changes.
-- A test hook that clears each view to its eye's colour turns any capture into a LEFT/RIGHT check; the cube's `DXR_CUBE_TEST_EYE_COLORS=1` is the DisplayXR one.
+- A test hook that clears each view to its eye's colour turns any capture into a LEFT/RIGHT check; the cubes' `DXR_CUBE_TEST_EYE_COLORS=1` (`cube_handle_vk_linux` and `cube_hosted_legacy_vk_linux`) is the DisplayXR one.
+- On X11 there is no protocol log, but the X server tells the same story for free: `xprop` shows the declaration on the window, `xwininfo` the X window's doubled width, and a KWin script the place on screen.
+- One rig image serves every KWin build: replace only KWin (dpkg the staged packages, no network) and start the session with that image.
 
 Credits: DisplayXR by David Fattal and its contributors; Monado by Collabora and its contributors, which DisplayXR derives from; KWin by the KDE developers; the stereo declaration and libstereo-declare by Daniel Campos Ramos.

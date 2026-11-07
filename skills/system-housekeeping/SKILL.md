@@ -10,7 +10,8 @@ description: >-
   delete, services that fail on hardware the machine lacks, PipeWire's one-error configuration files, KConfig dropping
   comments. Load it when a disk fills with kernels or logs, a removal would take the running kernel, a cleaner would
   delete the evidence of a crash or shows Access denied on a mailbox, a tool exits 0 with no message on an unreadable
-  HOME, system mail piles up, nvidia-persistenced fails on a machine without the card, or a GRUB test in a container
+  HOME, system mail piles up, nvidia-persistenced fails on a machine without the card, thermald fails at every boot on an
+  AMD CPU, a metapackage pulls a service that only one vendor's hardware can run, or a GRUB test in a container
   shows English and an empty menu.
 ---
 
@@ -105,6 +106,17 @@ Daniel, 2026-11-05: "that cleaning was due long ago".
 - **After clearing,** check that the spool still works: `/var/mail` `2775 root:mail`, the mailbox `user:mail 0660`, `/var/spool/dma` `2775 root:mail` (dma's Makefile). On the station `/var/spool/dma` had been `root:root 755` since 2020, so chkrootkit's mail failed every night until it was put right.
 - **BleachBit does not take the mailbox lock** that Policy 11.6 asks every mail program to take (`fcntl()` plus dot locking). Empty a mailbox when nothing is delivering to it.
 - **Translations.** BleachBit translates a cleaner's text with its own gettext domain `bleachbit`, which Debian's package owns. The package diverts the eight catalogs (`de fr ja ko pl pt_BR zh_CN zh_TW`), writes Debian's with its strings added, and gives Debian's back when it is removed. A translation test needs a real locale (`localedef`), because gettext translates nothing in `C`.
+
+## Services that only one vendor's hardware can run
+
+Symptom: `systemctl --failed` lists a unit at every boot on one kind of machine and not on another (thermald on an AMD CPU: it prints "Unsupported cpu model or platform", leaves without taking its D-Bus name and its `Type=dbus` unit fails; nvidia-persistenced on a machine without the card; NVIDIA's IMEX daemon, which needs a multi-node NVLink domain).
+Debian's postinst enables such a unit wherever the package is installed, so the fix is to decide **who gets the package**, not to mask the unit.
+
+1. **Find them.** Simulate the image's closure (`apt-get -s install sparky-stereo | grep '^Inst'`) and look for services that name one vendor, one card or one fabric. Then run the daemon's own command line once on each side in a container and read its message. A container can show a CPU vendor: `-v FIXTURE:/proc/cpuinfo:ro` bind-mounts over the file, but a daemon that reads CPUID (thermald does) still sees the host's CPU, so the fixture proves the detection and the gate, not the daemon.
+2. **Decide in the detection, never in a list.** The hardware tool picks packages from the captured facts (`vendor_id` in `/proc/cpuinfo`, `lspci`): `GenuineIntel` adds thermald, laptop or desktop; a metapackage's list never names it, because a Depends installs it everywhere. A machine that already has the package keeps it (an upgrade removes nothing), so a package list change alone leaves AMD machines that got thermald from an earlier image still failing.
+3. **Gate the unit where it may already be installed.** A drop-in in the hardware package (`NAME.service.d/sparky-stereo-hardware.conf`) skips it at every boot instead of failing it: a hardware test goes in `[Unit]` as `ConditionPathExists=` (NVIDIA's units check `/sys/module/nvidia`), and a CPU vendor, which no `Condition...=` names, goes in `[Service]` as `ExecCondition=/usr/bin/grep -qs '^vendor_id[[:space:]]*:[[:space:]]*GenuineIntel' /proc/cpuinfo`. systemd.service(5): "when an ExecCondition= command exits with exit code 1 through 254 (inclusive), the remaining commands are skipped and the unit is not marked as failed"; 255 or a signal fails it, which `grep` never gives. The postinst runs `systemctl reset-failed UNIT` where the unit cannot run, so the failure left from before goes too.
+4. **Prove it with fixtures on both sides.** Detection: one fixture folder per case (Intel and AMD, laptop and desktop) through `sparky-stereo-hardware --auto --dry-run --fixture DIR`, red on the published package and green on the new one. Gate: `systemd-analyze condition --unit=NAME.service` for `Condition...=` lines (it does not evaluate `ExecCondition=`; run that command line with `sh -c` under each cpuinfo fixture and expect 0 on the vendor and 1 elsewhere). Upgrade: published packages first, then the new ones, judged on apt's `Inst` and `Remv` lines.
+5. **After the change, the package stops being required.** The new metapackage no longer depends on thermald, so an upgrade does not remove it (no `Remv` line), but apt marks it automatically installed and `apt autoremove` would list it on an Intel machine; Hardware Setup installs it by hand there. The edition never runs a general autoremove.
 
 ## Cleaning a system safely
 

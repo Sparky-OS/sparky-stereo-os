@@ -194,4 +194,34 @@ A closure check detected the omission independently of the emulator crash.
 When adding an imported CMake library, inspect AGP's `android_gradle_build.json` runtime-files list as well as CMake's current file-api reply.
 In the recorded incremental build, the new URI-library link appeared in CMake's reply and the JNI ELF, but the older AGP runtime-files list still omitted it; the rebuilt APK remained broken.
 Regenerate and verify the packaging model before treating an imported-target addition as a fix.
-No working regeneration recipe or camera-frame delivery was established in this run.
+The verified fix is a module-local `CMakeLists.txt` used as Gradle's native entry point, with the prepared upstream CMake project added as a subdirectory.
+AGP then records the embedding's `.cmake` overrides in `buildFiles` and `build_file_index.txt`.
+Its file-api parser retains `.cmake` inputs inside the native source root; the previous generated upstream entry point left the overrides outside that root.
+The inspected build had Gradle's configuration cache disabled, so clearing that cache was unrelated.
+The filter is visible in [AGP's CmakeFileApiV1.kt](https://android.googlesource.com/platform/tools/base/+/refs/heads/mirror-goog-studio-main/build-system/gradle-core/src/main/java/com/android/build/gradle/internal/cxx/cmake/CmakeFileApiV1.kt).
+The local AGP 9.2.1 bytecode confirmed the same rule.
+
+Declare an external shared library in `ExternalProject_Add(BUILD_BYPRODUCTS ...)` as well as in its imported target.
+A clean Ninja graph otherwise reports that the library is missing with no known rule to make it; an existing dependency prefix can hide this error.
+The URI library now participates in the normal native build and packaging graph.
+
+Prove incremental tracking by removing the imported target from the scratch build's override and rebuilding without a clean: the model must drop the runtime library and the closure check must fail.
+Restore the target and rebuild: the model must include it and closure must pass.
+The recorded test passed in both directions while `prepareFreeRdp` stayed up to date; no `.so` was copied by hand and no cache was manually deleted.
+The resulting APK also loaded its native core and connected in the API-28 emulator.
+Camera enumeration and frame delivery are separate gates.
+
+
+## RDPECAM negotiates but Android announces no camera without an H.264 encoder
+
+Check the HAL log after the version exchange, not only the channel-open result.
+The recorded client loaded the Android HAL and negotiated version 2, then logged `no conversion of NV12 frames to H.264` and announced no device.
+The existing video converter supports same-format raw NV12 passthrough without that encoder.
+The enumeration-only H.264 gate therefore hid a usable path before the normal supported-format selection ran.
+A local patch removes that gate and leaves format selection to `GetMediaTypeDescriptions`; frame delivery with that patch remains unproven until the endpoint test passes.
+Current upstream source, recent file commits, related issues and merged encoder changes were checked before writing the patch.
+
+For the camera-disabled control, require a connected, activated RDP peer, DVC readiness and an explicit negative camera-enumerator creation status, with zero frames and no version exchange.
+A fixture now reports `ABSENT_CHANNEL_CONTROL PASS` only when all those conditions hold.
+Keep the enabled build's version negotiation with zero frames as a distinct backend failure.
+Set `CAM_SELECT_VERSION_RESPONSE.Header.MessageId` to `CAM_MSG_ID_SelectVersionResponse`; zero-initializing that caller-owned structure does not set its message type.

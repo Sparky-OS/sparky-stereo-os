@@ -240,3 +240,36 @@ Build the matching server libraries into an isolated prefix and compile the fixt
 Verify `pkg-config --modversion` and `ldd` so the loader actually uses the new FreeRDP and WinPR libraries.
 The matched 3.33.1 server accepted the raw mode and received changing samples; the same fixture binary passed the original camera-disabled negative control.
 Do not bypass the server parser or change valid client flags to satisfy an older validator.
+
+## Pose appears fresh after transport delay, or held input survives loss
+
+Test capture time separately from receive time.
+A receipt-time mutant that replaces the mapped sensor time with `now` must fail the unchanged stale-input test.
+The recorded core uses eight startup clock exchanges, the lowest residual delay and an explicit drift margin; a nominal clock sync does not qualify a physical latency claim.
+The prototype refreshes every 250 ms after startup so the eight-sample window does not retain an estimate past the declared uncertainty budget.
+Reject a discontinuity or excessive uncertainty rather than substituting receipt time.
+
+Bind source registration to one authenticated RDP peer, active input approval, session, lease, seat and owned output before delivering any pose.
+Release held actions on stale input and on revoked permission, then unregister on disconnect.
+Exercise wrong peer, absent lease, missing approval, revocation, replay and changed epochs with a consumer that can observe invalidation.
+Drop an old captured sample before interpreting its source-epoch metadata; otherwise a delayed old source can spuriously request recentering.
+The recorded core has a regression for this ordering.
+
+Test mounting with independent literal device-axis rotations and expected forward/up rays for both landscape directions.
+A wrong-mount and w-first quaternion control must fail.
+Keep source confidence unknown when Android supplies only an accuracy enum; do not invent measured translation from a neck model.
+The common stereo-pointer contract remains proposed until its permission and output adapter exists.
+A synthetic-grant test client demonstrates the consumer seam without granting compositor input authority.
+
+## Pose freezes only after another packet arrives
+
+An RDP worker blocked indefinitely on socket events cannot enforce a 100 ms freshness deadline for an idle peer.
+When tracking is explicitly configured, use a bounded wait and poll freshness even if no event arrives.
+The prototype polls at 10 ms, freezes at 100 ms and exposes lost tracking at 250 ms.
+An ordinary untracked RDP connection retains its existing wait behavior.
+Read the peer's WTS session id with `WTSQuerySessionInformationA(manager, WTS_CURRENT_SESSION, WTSSessionId, ...)` before opening a DVC.
+The OS console session id is not the peer's FreeRDP virtual-channel manager id.
+
+The integrated KRdp build passed its existing module smoke and panel tests plus five pose core suites.
+The pre-pose APK connected to the actual receiver, activated RDP, explicitly rejected the pose DVC and delivered zero poses.
+The Android fused-sensor endpoint still requires its own positive qualification; core tests and a negative endpoint control do not establish it.

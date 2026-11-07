@@ -16,6 +16,7 @@
  *   --frame N      the frame number drawn (fixed, so two runs draw the same picture)
  *   --offload      puts the area in a GtkGraphicsOffload (GTK 4.14 and later), the control for the offload path itself
  *   --grow-after S the area asks for 600x340 after S seconds (resize while shown)
+ *   --two          a second stereo area, 240x135, under the first
  *   --overlay      a yellow label drawn over the lower right of the area (2D drawn over the 3D area)
  *   --hide-after S    the area is hidden after S seconds and shown again S seconds later
  *   --toggle-after S  the property "stereo" goes off after S seconds and on again S seconds later
@@ -32,7 +33,7 @@ typedef int (*EyeFunc) (GtkGLArea *);
 
 static gboolean opt_stereo, opt_swap;
 static double opt_opacity = 1.0;
-static int opt_grow, opt_toggle, opt_offload, opt_hide, opt_overlay;
+static int opt_grow, opt_toggle, opt_offload, opt_hide, opt_overlay, opt_two;
 static int opt_frame = 7, opt_w = 480, opt_h = 270, opt_quit = 0;
 static const char *opt_report;
 static EyeFunc get_eye;
@@ -186,7 +187,7 @@ activate (GApplication *app, gpointer data)
   GtkWidget *label = gtk_label_new ("GtkGLArea in an ordinary window");
 
   gtk_window_set_title (GTK_WINDOW (window), "GtkGLArea stereo test");
-  gtk_window_set_default_size (GTK_WINDOW (window), 640, 460);
+  gtk_window_set_default_size (GTK_WINDOW (window), 640, opt_two ? 620 : 460);
   gtk_widget_set_margin_top (box, 12);
   gtk_widget_set_margin_bottom (box, 12);
   gtk_widget_set_margin_start (box, 12);
@@ -227,6 +228,17 @@ activate (GApplication *app, gpointer data)
   else
     gtk_box_append (GTK_BOX (area_row), area);
   gtk_box_append (GTK_BOX (box), area_row);
+  if (opt_two)
+    {
+      GtkWidget *second = gtk_gl_area_new ();
+
+      gtk_widget_set_size_request (second, 240, 135);
+      gtk_widget_set_halign (second, GTK_ALIGN_CENTER);
+      g_signal_connect (second, "render", G_CALLBACK (render), NULL);
+      if (opt_stereo && g_object_class_find_property (G_OBJECT_GET_CLASS (second), "stereo"))
+        g_object_set (second, "stereo", TRUE, NULL);
+      gtk_box_append (GTK_BOX (box), second);
+    }
   gtk_box_append (GTK_BOX (box), gtk_label_new ("Text under the area, the same in both eyes"));
   gtk_window_set_child (GTK_WINDOW (window), box);
   gtk_window_present (GTK_WINDOW (window));
@@ -253,6 +265,7 @@ main (int argc, char **argv)
       else if (!strcmp (argv[i], "--opacity") && i + 1 < argc) opt_opacity = atof (argv[++i]);
       else if (!strcmp (argv[i], "--frame") && i + 1 < argc) opt_frame = atoi (argv[++i]);
       else if (!strcmp (argv[i], "--size") && i + 1 < argc) sscanf (argv[++i], "%dx%d", &opt_w, &opt_h);
+      else if (!strcmp (argv[i], "--two")) opt_two = TRUE;
       else if (!strcmp (argv[i], "--overlay")) opt_overlay = TRUE;
       else if (!strcmp (argv[i], "--offload")) opt_offload = TRUE;
       else if (!strcmp (argv[i], "--grow-after") && i + 1 < argc) opt_grow = atoi (argv[++i]);

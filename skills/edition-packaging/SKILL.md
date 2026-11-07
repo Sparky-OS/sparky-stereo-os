@@ -4,7 +4,7 @@ description: >-
   Build, sign and ship the edition's packages: provenance and Paweł's formula, rebuilt upstream packages (+stereo3dN,
   i386 twins, include-binaries), tasks and dependency policy, apt pins and architectures (:any, Signed-By), conffiles
   and rm_conffile, the signed repository and a publication round, DEP-11 icons and Contents, the ISO, reproducible
-  source packages (SOURCE_DATE_EPOCH, never dch's clock), the build record and the Lean Code gate, installed-package
+  source packages (SOURCE_DATE_EPOCH), the build record and the Lean Code gate, installed-package
   proof, nine languages. Load it when a package will not install (Breaks, Multi-Arch: same, cross toolchains, dpkg
   --auto-deconfigure), apt picks Debian's build or swaps a package for a dummy at dist-upgrade, two builds of one source
   differ, apt-get update exits 0 on a failed fetch, lc1 says the build record is not complete, a Qt header is missing

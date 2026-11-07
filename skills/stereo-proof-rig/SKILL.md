@@ -46,7 +46,7 @@ When the question needs a real machine, a cable or a 3D television, the rig is t
 
 ## An X11 player (the X11 path through Xwayland)
 
-One fresh session per case, a passwd entry for the user, a render node for KWin, the declarations read from the X window tree, and the stereo capture read per eye: [x11-session-rig.md](references/x11-session-rig.md), with its scripts (`x11_props.py`, `eyes_share.py`, `kwin_script.py`, `vlc_mpris.py`, `support4-shim.c`).
+One fresh session per case, a passwd entry for the user, a render node for KWin, the declarations read from the X window tree, and the stereo capture read per eye: [x11-session-rig.md](references/x11-session-rig.md), with its scripts (`x11_props.py`, `x11_propagation.py`, `eyes_share.py`, `kwin_script.py`, `vlc_mpris.py`, `support-shim.c`, `make-barcode-fixtures.sh`, `columns.py`).
 
 ## Test material that a script can read
 

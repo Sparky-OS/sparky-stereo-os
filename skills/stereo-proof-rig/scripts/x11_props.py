@@ -25,7 +25,14 @@ def walk(w, parent):
             g = w.get_geometry()
             a = w.get_attributes()
             nm = w.get_wm_name()
-            out["windows"].append({"id": w.id, "parent": parent, "geom": [g.x, g.y, g.width, g.height], "mapped": a.map_state == X.IsViewable, "name": nm, "props": found})
+            t = root.translate_coords(w, 0, 0)
+            pg = None
+            try:
+                pgm = d.create_resource_object("window", parent).get_geometry() if parent else None
+                pg = [pgm.x, pgm.y, pgm.width, pgm.height] if pgm else None
+            except Exception:
+                pass
+            out["windows"].append({"id": w.id, "parent": parent, "geom": [g.x, g.y, g.width, g.height], "abs": [t.x, t.y], "parent_geom": pg, "mapped": a.map_state == X.IsViewable, "name": nm, "props": found})
         for c in w.query_tree().children:
             walk(c, w.id)
     except Exception as e:

@@ -67,8 +67,8 @@ An X11 window's buffer is its own pixmap, so an X11 program declares that size a
 ## A video or GL child window of an X11 window
 
 A program whose interface is a toolkit window and whose 3D area is a native child (a player's video, a GL widget) declares the child with `stereo_declare_x11_child()` on its top-level window, not with `stereo_declare_x11()` on the child, and takes the declaration back when the area closes: the top-level must list the child, or Stereo KWin shows one view in both eyes.
-The child's buffer holds both views, one in each half.
-The recipe, the checks and the traps (the version of the library, the toolkit that reads the window's real size, the error handler, the notice when the desktop does not take it) are in [x11-video-child.md](references/x11-video-child.md).
+Each view keeps its resolution: the program draws on a window of its own inside the toolkit's child, twice a view wide, and declares that window with the size one view is shown at (support version 8), so Stereo KWin resizes once; where the desktop announces less, each view is drawn in half of the child and the program says so.
+The recipe, the proof (a column-coded clip), and the traps (the toolkit that reads its child's real size, the library version, the link gate, the error handler, the notices) are in [x11-video-child.md](references/x11-video-child.md).
 
 ## Game engines and libraries
 

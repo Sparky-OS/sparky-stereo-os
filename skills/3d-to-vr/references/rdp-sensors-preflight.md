@@ -218,10 +218,25 @@ Check the HAL log after the version exchange, not only the channel-open result.
 The recorded client loaded the Android HAL and negotiated version 2, then logged `no conversion of NV12 frames to H.264` and announced no device.
 The existing video converter supports same-format raw NV12 passthrough without that encoder.
 The enumeration-only H.264 gate therefore hid a usable path before the normal supported-format selection ran.
-A local patch removes that gate and leaves format selection to `GetMediaTypeDescriptions`; frame delivery with that patch remains unproven until the endpoint test passes.
+A local patch removes that gate and leaves format selection to `GetMediaTypeDescriptions`.
+With that patch and a matching source-built server, the API-28 emulator delivered twelve raw NV12 frames at 640×480, each 460,800 bytes, with ten distinct frame hashes.
+After disconnect both virtual cameras reported closed with no client instance.
+This establishes raw-frame transport and session teardown in the emulator, not compressed-camera encoding or physical-device behavior.
 Current upstream source, recent file commits, related issues and merged encoder changes were checked before writing the patch.
 
 For the camera-disabled control, require a connected, activated RDP peer, DVC readiness and an explicit negative camera-enumerator creation status, with zero frames and no version exchange.
 A fixture now reports `ABSENT_CHANNEL_CONTROL PASS` only when all those conditions hold.
 Keep the enabled build's version negotiation with zero frames as a distinct backend failure.
 Set `CAM_SELECT_VERSION_RESPONSE.Header.MessageId` to `CAM_MSG_ID_SelectVersionResponse`; zero-initializing that caller-owned structure does not set its message type.
+
+
+## Server rejects CAM_MEDIA_TYPE_DESCRIPTION_FLAGS 0
+
+Check both endpoints' FreeRDP revisions.
+The packaged 3.32.1 server rejected flags zero before its media-type callback ran, although the newer client correctly advertised raw NV12 without decoding or bottom-up flags.
+[MS-RDPECAM 2.2.3.8.1](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rdpecam/) permits zero or more defined flags.
+Upstream [faeeb6ae6f84](https://github.com/FreeRDP/FreeRDP/commit/faeeb6ae6f84d9815af96e8b1967f3f295c648d6) corrects the shared validator.
+Build the matching server libraries into an isolated prefix and compile the fixture against that prefix.
+Verify `pkg-config --modversion` and `ldd` so the loader actually uses the new FreeRDP and WinPR libraries.
+The matched 3.33.1 server accepted the raw mode and received changing samples; the same fixture binary passed the original camera-disabled negative control.
+Do not bypass the server parser or change valid client flags to satisfy an older validator.

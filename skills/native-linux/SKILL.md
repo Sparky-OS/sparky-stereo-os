@@ -65,6 +65,11 @@ An X11 window's buffer is its own pixmap, so an X11 program declares that size a
 - **Traps:** the program's own window size is one view's resolution (from support version 3 KWin makes the X11 window hold both), not the doubled size. The property counts only when the program declares the window itself; a window rule's declaration ignores it. A KWin that announces 5 or less ignores it and shows each view at the window's own size, which makes it the negative control.
 - **Two sizes in the events of a declared window** (ORDER 34b, a Vulkan program on its own X11 window): after each configure Stereo KWin sends a synthetic ConfigureNotify in the program's own units, one view, after the X server's own ConfigureNotify with the X window's size. A Vulkan X11 swapchain must be the X window's size, so a program that sizes its swapchain from events takes the size from the server's events only (response type without the 0x80 bit) while it is declared, and knows the doubling when the server's width is twice its own or the synthetic width is half the server's; see vr-to-3d's [openxr-runtime-full-sbs.md](../vr-to-3d/references/openxr-runtime-full-sbs.md).
 
+## A window drawn without OpenGL (XPutImage, XShm)
+
+A software-drawn X11 window is declared like any other (`stereo_declare_x11_format()` at support version 1 or more) and Stereo KWin shows each half to its eye; the program draws its picture at the X window's size, which KWin makes twice the created width, and takes that size from the X server's events, never from the synthetic one-view `ConfigureNotify`.
+The recipe, the per-eye proof with its negative controls and the traps are in [x11-software-drawn.md](references/x11-software-drawn.md).
+
 ## A video or GL child window of an X11 window
 
 A program whose interface is a toolkit window and whose 3D area is a native child (a player's video, a GL widget) declares the child with `stereo_declare_x11_child()` on its top-level window, not with `stereo_declare_x11()` on the child, and takes the declaration back when the area closes: the top-level must list the child, or Stereo KWin shows one view in both eyes.

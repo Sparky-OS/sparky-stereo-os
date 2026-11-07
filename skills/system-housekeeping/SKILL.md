@@ -3,7 +3,7 @@ metadata:
   requires-packages: systemd
 name: system-housekeeping
 description: >-
-  Bounded logs, kernel retention and cleanup policy while keeping user settings, boot recovery and diagnostic evidence:
+  Bounded logs, kernel retention and cleanup that keep user settings, boot recovery and diagnostic evidence:
   old kernels per flavour (APT::NeverAutoRemove::KernelCount, never a general apt autoremove), update-initramfs for
   every image, GRUB and grub-editenv or update-grub tested in a container, the journal as the one log, crash dumps
   capped, /etc/skel and existing homes, local system mail in /var/mail, BleachBit, which scratch folders are safe to
@@ -11,8 +11,7 @@ description: >-
   comments. Load it when a disk fills with kernels or logs, a removal would take the running kernel, a cleaner would
   delete the evidence of a crash or shows Access denied on a mailbox, a tool exits 0 with no message on an unreadable
   HOME, system mail piles up, nvidia-persistenced fails on a machine without the card, thermald fails at every boot on an
-  AMD CPU, a metapackage pulls a service that only one vendor's hardware can run, a person's hand-installed service, or a GRUB test in a container
-  shows English and an empty menu.
+  AMD CPU, or a GRUB test in a container shows English and an empty menu.
 ---
 
 # System housekeeping

@@ -249,3 +249,5 @@ The files are the source; every index is derived from them and rebuilt after a m
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.
+
+[Reconciling a long work queue](references/queue-reconciliation.md) gives the recipe for checking every queue id against merges, packages, forks, sent messages and lane reports, and the traps met (stale status words, duplicate items, unsaved first reconciliations).

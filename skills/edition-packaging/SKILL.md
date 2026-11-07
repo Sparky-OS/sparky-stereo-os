@@ -20,6 +20,7 @@ description: >-
 2. Write the control file, copyright file, script headers and changelog in [Paweł's formula](references/sparky-formula.md) with the edition's [provenance](#provenance-daniel-2026-10-02-always); rebuild upstream packages as [rebuilt packages](references/rebuilt-packages.md) says.
 3. Build in isolation, inspect package contents and simulate installation/upgrade before the installed-payload checks below.
 4. Return source/binary hashes, dependency resolution and runtime evidence. Separate local candidate, [repository publication](references/repository.md) and [ISO inclusion](references/iso.md).
+5. A staged recipe that waited while a shared tool moved is redone on the new main as [rebasing a staged recipe](references/rebasing-a-staged-recipe.md) says.
 
 **Check freshness first.**
 Written on 2026-10-07; the developer tasks and the skills package on 2026-10-16; provenance, Paweł's formula, rebuilt packages, the repository and the ISO on 2026-10-23, from rules dated 2026-10-02 to 2026-10-22; pins by architecture and the packages that are not ours on 2026-10-31; the i386 blocks, the order of pin files and the conversion to conffiles on 2026-11-01.

@@ -32,6 +32,7 @@ The edition's Qt draws a window whose style shows depth (Union) once per eye on 
 An imperative 2D API can produce coordinated eye views; shared styling does not make Widget and Quick rendering identical.
 Record exact toolkit/backend versions and loaded libraries before adopting an API from a talk.
 For KDE application or toolkit changes, use [the development review recipe](references/kde-development-practices.md): translation context/extraction, QML tooling, lifetime, CI and privileged-action checks.
+Qt's own window frame around a stereo window (both routes, the recipe, the traps): [qt-client-decorations.md](references/qt-client-decorations.md).
 
 | The program uses | What happens in the edition | Its part |
 |---|---|---|

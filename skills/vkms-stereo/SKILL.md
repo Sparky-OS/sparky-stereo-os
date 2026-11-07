@@ -81,6 +81,10 @@ Walk the EDID to the mode list one step at a time, each with a check that can fa
 Then the frame of each layout, and the same guest on the kernel without the change.
 The steps, the guest for a published kernel, and the traps are in [references/edid-to-mode-list.md](references/edid-to-mode-list.md); the bench's `src/lsmodes.c` lists a connector's modes against an expectation and `edid/make-2d-edid.py` makes the 2D-only twin of an EDID.
 
+## The output's eye flip on every 3D mode, and an old lane's open points
+
+Every 3D mode of one output (anaglyph, rows, columns, checkerboard, half side by side, top and bottom, side by side full, frame packing, frame sequential) with the eye swap off and on, each against a model that the other swap must fail, in one guest run of about four minutes: [references/eye-order-matrix.md](references/eye-order-matrix.md) has the recipe, the traps and how to reconcile an old report's open points against what ships; the scripts are in `tools/vkms-stereo-bench/eyeorder`.
+
 ## Lessons from the lanes, October to November 2026
 
 From the lanes of 25 October to 6 November 2026; add the next lesson here as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
@@ -90,6 +94,9 @@ From the lanes of 25 October to 6 November 2026; add the next lesson here as you
 - Symptom: KWin in the guest never sees the hotplug. Cause: KWin binds udevd's netlink group ("udev"), not the kernel's, and the guest root had no udevd. Fix: overlayfs over the read-only 9p root adds udev (systemd 262) and the new kscreen-doctor without touching the shared root (lane lutz-xreal-driver-233)
 - A VKMS connector made through configfs read its EDID but listed no 3D mode (builds 14 and 16 of the edition's kernel): `drm_mode_validate_stereo()` dropped each stereo mode with `NO_STEREO` because VKMS never set `stereo_allowed`; found with `drm.debug=0x4` ("Rejected mode"), fixed with the connector flag plus a composer and writeback frame that hold both eyes. Steps and traps: [references/edid-to-mode-list.md](references/edid-to-mode-list.md).
 - A writeback fence that times out on a configfs-made VKMS device (builds 14 and 16) while the default device passes: the job took its vblank reference before the CRTC was on, `drm_crtc_vblank_get()` failed with `-EINVAL` unnoticed, so the vblank timer, and with it the composer, never ran; the default device only passed because its fbdev client had already enabled the CRTC. Run the same device with the CRTC off and on at the first commit. Steps and traps: [references/edid-to-mode-list.md](references/edid-to-mode-list.md).
+- Symptom: a right eye first frame-sequential frame fails the model of the left eye first one with the halves exchanged. Cause: the order of frame sequential is in time (the scheduler starts on the right half of the same packed frame), so the swap exchanges the eyes inside the packed frame and the twin does not. Fix: model one packed frame for both orders and compare the eye streams from the first frame after the mode set (drm-planelog): they are the same. Found by: 12800 failing pixels, the two 6400-pixel eye areas (lane mesa-stereo-followups-116)
+- Symptom: a saved frame-sequential mode comes back as 2D after a restart. Cause: the store's restore check knew no sequential layout. Fix: accept them; test by saving the mode in the JSON and asking the store (lane mesa-stereo-followups-116)
+- Symptom: SRC_X changes 17 to 25 times in 240 vblanks and KWin reports 1644 missed refreshes. Cause: software GL in the guest, about one frame in five refreshes; both halves are shown, not strictly alternately. Fix: judge pacing on the DisplayPort bench, content in the guest (lane mesa-stereo-followups-116)
 - `python3 edid/make-edid.py --help` writes an EDID called `--help` (the first argument is the output path): run the bench's tools from a scratch folder and never ask them for help.
 
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

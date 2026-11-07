@@ -53,3 +53,39 @@ From the lanes of 25 October to 6 November 2026; add the next lesson here as you
 
 - Secure Boot enrolment rig in QEMU/OVMF: shim 16.1, GRUB 2.14, kernel signed with the edition key; unsigned and machine-signed modules are rejected until the GRUB entry and MokManager enrol the key, then they load. Rig facts: `mkfs.vfat -F 32 -s 1` for a 256 MiB ESP; /run is noexec; a boot probe must not wait on is-system-running; `virt-fw-vars --add-mok` pre-seeds MokList; `grub-reboot <entry id>` reaches an enrolment entry; send MokManager's key at "Booting in 2-3 seconds", an earlier key reopens OVMF's boot menu; `-cpu max` under TCG for engine binaries. (lane dkms-firstboot-enrol-374)
 - Symptom: first KVM check exits 1. Cause: the user lacked the kvm group. Fix: add the kvm group (host gid 105) to the container user. Also Docker's attached output stream dropped later output in some runs: capture to a file and read that. (lane vram-boost-default-263a)
+
+## How the guest's stereo layout reaches SPICE, route by route
+
+The guest tells QEMU its layout (virtio-gpu `SET_SCANOUT_STEREO`, stored on the console by `qemu_console_set_stereo()`); the SPICE display in `ui/spice-display.c` reads it with `qemu_spice_update_stereo()` and hands it to the server with `spice_qxl_set_stereo()`.
+That reader is called from the display callbacks, never from a timer, so a route that does not call it never publishes the layout.
+
+| QEMU display route | Callback | Reads the layout |
+| --- | --- | --- |
+| CPU surface | `qemu_spice_display_switch()` | first thing, before the surface is swapped |
+| GL surface (CPU framebuffer exported as a DMA-BUF) | `spice_gl_switch()` | before `spice_server_gl_scanout()`, and when the console has no surface |
+| GL texture | `qemu_spice_gl_scanout_texture()` | before the scanout is handed over |
+| GL DMA-BUF (virgl, direct guest buffers) | `qemu_spice_gl_scanout_dmabuf()` | on the callback |
+| GL scanout disabled | `qemu_spice_gl_scanout_disable()` | after the disable |
+
+The rule: the layout leads the scanout it describes.
+The server's worker queue is first in, first out, so layout, scanout, monitor configuration and the draws that follow reach the client in that order.
+The virtio-gpu driver sends the stereo command before the scanout command, so the console already holds the new layout when the callback runs.
+A layout change with no scanout or surface change publishes nothing on any route; the guests measured here never send one.
+
+### Proving a route with the actual owner
+
+1. Preload a tiny shim that wraps `spice_qxl_set_stereo`, `spice_qxl_gl_scanout2` and `spice_qxl_gl_draw_async` and prints one line per call to stderr (`dlsym(RTLD_NEXT, ...)`, forward the call).
+2. Boot the guest with the QEMU under test and a viewer on the same SPICE socket, with QEMU's `-trace enable=qemu_spice_gl*` and `-trace enable=virtio_gpu_cmd_set_scanout_stereo`.
+3. Old red: the unmodified QEMU prints no `PRODUCER` line while the trace shows the guest's layout command and `qemu_spice_gl_surface`, and the viewer's stereo property stays 0.
+4. New green: one `PRODUCER` line per layout change, each before the `GLSCANOUT` line of its surface; a dark phase between modes prints a layout 0 line; the viewer reports the layout.
+5. Keep the CPU route as a control with the same binary (no `gl=on`): it must stay green.
+6. Keep the unmodified binary under another name and run the control against it; never rebuild over it.
+
+### Traps met on this route
+
+- **Symptom:** the viewer shows the guest flat on the GL route, layout never arrives, while the CPU route is stereo. **Cause:** `spice_gl_switch()` published the GL surface and monitor configuration without calling `qemu_spice_update_stereo()`. **Fix:** call it before `spice_server_gl_scanout()` and in the no-surface branch. **Found by:** the call-logging shim printed nothing, and `grep qemu_spice_update_stereo ui/spice-display.c` listed four callers but not the GL surface switch.
+- **Symptom:** after the correction the viewer has the layout but no acquisition record (the viewer's acquisition count stays 0, the process exits 42). **Cause:** the layout is only the first condition; the server queues an acquisition record only for a current snapshot, and the GL draw path is separate from the CPU draw path. **Fix:** none in this change; it is the next gate, so a green layout is not a green receipt. **Found by:** the viewer's tick lines show `layout=8` with `acquisition=0`.
+- **Symptom:** `ninja` stops with `spice/qxl_dev.h: No such file or directory`. **Cause:** the configure step baked an include path that goes through a symlinked parent of the workspace, and the build container only mounted the real path. **Fix:** mount the workspace a second time at the baked path. **Found by:** the `-I` list in the failing command line.
+- **Symptom:** a rebuild compiles all 1,600 objects. **Cause:** the objects were retired after the last build. **Fix:** plan for the full compile (about 50 MB of objects, 4 CPUs) and a disk guard; hash, then retire the objects after the run.
+- **Symptom:** QEMU with `gl=on` and an NVIDIA render node (CDI) exits with `eglGetDisplay failed: EGL_SUCCESS`, or boots but prints `Cannot retain GL scanout plane` and the guest never reaches its prompt. **Cause:** Mesa's `libgbm` in the test image looks for the vendor backend in `/usr/lib64/gbm`, while CDI mounts it under `/usr/lib/x86_64-linux-gnu/gbm`. **Fix:** `GBM_BACKEND=nvidia-drm` and `GBM_BACKENDS_PATH=/usr/lib/x86_64-linux-gnu/gbm`, plus the render node's group; do not point `__EGL_VENDOR_LIBRARY_FILENAMES` at `/etc/glvnd` (the file is under `/usr/share/glvnd/egl_vendor.d`). **Found by:** the `MESA-LOADER: failed to open nvidia-drm` line at the top of QEMU's stderr.
+- **Symptom:** the same trace shows two `qemu_spice_gl_surface` lines per mode. **Cause:** a disable and a new scanout both reach the callback, the console substitutes a placeholder surface for the missing one; it is not a duplicate. The layout 0 line between modes is that placeholder.

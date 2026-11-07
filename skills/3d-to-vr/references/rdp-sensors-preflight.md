@@ -120,3 +120,36 @@ package, and retry a compiler probe before the application build. In the
 recorded NDK r29 beta1 package, 37 links needed restoration; Cardboard then
 compiled and freeRDPCore reached its native build. This is a toolchain result,
 not a camera-channel test.
+
+## Removing a camera OFF argument still leaves the channel absent
+
+Read both the generic channel options and the Android external-build wrapper.
+FreeRDP's `channels/rdpecam/ChannelOptions.cmake` defaults the client to OFF,
+while its Android `ExternalFreeRDP.cmake` explicitly selects ON. An embedding
+that replaces that wrapper must retain the Android ON setting. Check the
+actual native CMake cache; absence of an OFF argument does not prove enablement.
+Keep a camera-disabled APK as the endpoint control.
+
+## A supported channel appears absent before the first connection
+
+The Android Java class queries camera support while it initializes, before a
+session registers its addin provider. `freerdp_load_channel_addin_entry` depends
+on that provider. The compiled-table query
+`freerdp_channels_load_static_addin_entry` can inspect built-in support at this
+point. A native check with the known built-in display-control channel returned
+indirect=0, static=1 before a session; an invented channel returned 0. This
+checks lookup semantics, not Android camera delivery. Also keep channel
+presence separate from optional pixel conversion: raw NV12 passthrough does
+not require an NV12-to-I420 converter.
+
+## KRdp cannot find encoderPaused or setEncoderPaused
+
+An otherwise matching Qt/KF SDK can still contain an older KPipeWire API.
+Inspect the KRdp commit that introduced backpressure and the KPipeWire public
+header. Upstream KPipeWire's `PipeWireBaseEncodedStream` supplies these methods;
+they are absent from the packaged 6.7.4 API used in the failed build. Build the
+matching upstream dependency into an isolated prefix and pass that prefix and
+its `KPipeWire_DIR` to CMake. Do not remove the caller's backpressure to make an
+older SDK compile. The recorded dependency source is KDE/kpipewire
+`bb838b0371012b99b5c199b7aaf662be319ae5b6`; the subsequent KRdp build still needs
+its own result.

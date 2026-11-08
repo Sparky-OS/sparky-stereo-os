@@ -27,6 +27,12 @@ Written on 2026-10-10 from the accepted Plasma 6.7.4 work; published on 2026-10-
 Check the edition's current package versions and KDE release before carrying these changes.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; packages follow [`edition-packaging`](../edition-packaging/SKILL.md), and build storage [`system-housekeeping`](../system-housekeeping/SKILL.md).
 
+## A program sent to a GPU that dies at start
+
+A browser or player routed to another GPU can die in its first seconds with nothing on screen.
+systemd already knows how every program KIO started ended; the Graphics page keeps a death in the problems engine through a drop-in on the `app-` units, with "Use NAME" for the GPU the program's desktop entry can name, and never starts the program again.
+[The recipe, why this place and not the launcher or a wrapper, the window and the traps](references/program-died-at-start.md).
+
 ## Decided defaults, out of the box
 
 The edition sets good defaults itself instead of leaving each choice to the person, as stock Debian and KDE do (Daniel, 2026-10-08: "Having the freedom is perfect, but, for a newcommer ... is a pain, not a feature").

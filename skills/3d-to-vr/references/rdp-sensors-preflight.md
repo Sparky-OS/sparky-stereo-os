@@ -272,7 +272,8 @@ The OS console session id is not the peer's FreeRDP virtual-channel manager id.
 
 The integrated KRdp build passed its existing module smoke and panel tests plus five pose core suites.
 The pre-pose APK connected to the actual receiver, activated RDP, explicitly rejected the pose DVC and delivered zero poses.
-The Android fused-sensor endpoint still requires its own positive qualification; core tests and a negative endpoint control do not establish it.
+Qualify the Android fused-sensor endpoint separately; core tests and a negative endpoint control do not establish it.
+The additional positive Android and adapter gates are recorded below.
 
 ## Core tests pass but the Android pose path is still unqualified
 

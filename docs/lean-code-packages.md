@@ -12,6 +12,27 @@ Measure actual reads, CPU time, elapsed time and memory for the operation concer
 
 **Measured on a whole system:** [Lean Code on a 2016 laptop](proofs/lean-code-a10-aba.md) compares the same installation lean, with its original files, and lean again.
 
+## Why it matters
+
+Every file a program reads is smaller, so the same machine does the same work with less processing, less energy and less wear, for every person using it, every day.
+The saving compounds where the same files are read again and again: builds, package checks, and AI agents that read the same headers, settings and scripts at every step.
+Nothing is lost: the complete human-authored source stays available beside the machine form.
+
+**Measured** on the 2016 A10 laptop (AMD A10-9600P, GCC 16.2.0-3, five interleaved rounds, medians against Debian's own libstdc++ headers, 864 files):
+
+| Task | Lean Code headers (comment-only lines removed) |
+|---|---|
+| Preprocessing a program with 156 headers | wall time -2.2%, instructions -3.0%, cycles -3.9% |
+| Preprocessing `bits/stdc++.h` | wall time -3.4%, instructions -2.7%, cycles -4.3% |
+| Compiling with `-O2` | wall time +0.3% (inside its 2.9% spread), instructions -0.3% |
+| Syntax check of `bits/stdc++.h` | wall time -0.3%, instructions -0.5% |
+
+The compiled objects are byte-identical to the ones built with Debian's headers.
+An earlier form that replaced removed lines with `#line` references cost about a fifth more preprocessing (+21%); the design finds a location by its content in the source, not by its line number.
+The same shape on a faster machine, counted in instructions: [Lean Code compile cycles](proofs/lean-code-compile-cycles.md).
+
+**Next:** an energy measurement of a whole day's work on one PC, Lean Code against Debian's files, read from the processor's own energy counter, so the saving can be stated in watt-hours per year.
+
 ## Release requirement
 
 Daniel's release rule, 18 October 2026: every package and ISO that the edition publishes goes through Lean Code in our pipeline. A package processed before distribution carries an **lc** mark so clients do not repeat the projection.

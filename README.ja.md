@@ -8,6 +8,9 @@
 [USB接続で実用になるステレオデスクトップ](https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md)を、古い機器でテストしています。
 Sparky Stereo OSは、Paweł "pavroo" PijanowskiによるSparkyLinuxを基にDaniel Ramosが制作するエディションで、新しいStereo KDE Plasmaデスクトップを備えたLinuxシステムです。
 
+**マシンにも地球にも軽く：** すべてのパッケージは、プログラムが読むことのないコメントや注記を除いて提供されるため、同じ作業でも処理、電力、機器の消耗が少なくて済みます。
+[測定結果](docs/lean-code-packages.md#why-it-matters)：C++ヘッダーの読み込みはDebianより2〜4%少ない作業で済み、失われるものはありません。
+
 **アーキテクチャを読む：** [図解ガイドとリポジトリの構成図](docs/architectural-synthesis.md)、[原寸大のインフォグラフィックとテキスト版](docs/architecture-infographic.md)があります。
 DanielのGemini / NotebookLMによる調査を基に、内容を整理して検証しています。
 

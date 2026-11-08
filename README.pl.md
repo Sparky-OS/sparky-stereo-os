@@ -6,6 +6,9 @@
 Sprawdzi się telewizor 3D, zwykły monitor z tanimi okularami czerwono-cyjanowymi, a teraz także zgodny telefon z systemem Android w niedrogich goglach: [pulpit stereoskopowy, z którego można korzystać przez USB](https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md), przetestowany na starszym sprzęcie.
 Sparky Stereo OS, edycja SparkyLinux autorstwa Daniela Ramosa (twórcą SparkyLinux jest Paweł "pavroo" Pijanowski), to system Linux z nowym pulpitem Stereo KDE Plasma.
 
+**Lżejszy dla Twojego komputera i dla planety:** każdy pakiet trafia do Ciebie bez komentarzy i notatek, których programy nigdy nie czytają, więc ta sama praca wymaga mniej obliczeń, mniej energii i mniej zużycia sprzętu.
+[Zmierzone](docs/lean-code-packages.md#why-it-matters): odczyt nagłówków C++ wymaga o 2 do 4% mniej pracy niż w Debianie, bez żadnej straty.
+
 **Poznaj architekturę:** [ilustrowany przewodnik i mapa repozytorium](docs/architectural-synthesis.md), z [infografiką w pełnym rozmiarze i wersją tekstową](docs/architecture-infographic.md), opracowane i sprawdzone na podstawie badań Daniela z Gemini / NotebookLM.
 
 <a href="#seen-in-3d"><img src="docs/screenshots/translucent-stereo-desktop-anaglyph.jpg" width="99%" alt="Pulpit stereoskopowy w 3D z półprzezroczystymi oknami: menu Ustawienia programu Dolphin i lista zestawów barw z przodu, szklane okna za nimi cofające się kolejno, monitor systemu i tapeta najgłębiej (anaglif czerwono-cyjanowy)"></a>

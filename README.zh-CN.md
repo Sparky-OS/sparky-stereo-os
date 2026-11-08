@@ -6,6 +6,9 @@
 3D 电视可以使用，任何普通显示器配上便宜的红青眼镜也可以，现在一台兼容的 Android 手机放进便宜的观片盒也能使用：这是一套[可通过 USB 使用的立体桌面](https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md)，已在旧硬件上测试。
 Sparky Stereo OS 是 Daniel Ramos 的 SparkyLinux 发行版（SparkyLinux 由 Paweł "pavroo" Pijanowski 制作），是一个带有全新 Stereo KDE Plasma 桌面的 Linux 系统。
 
+**对你的电脑和地球都更轻：**每个软件包都去掉了程序从不读取的注释和说明，因此同样的工作需要更少的处理、更少的能耗和更少的磨损。
+[实测](docs/lean-code-packages.md#why-it-matters)：读取 C++ 头文件的工作量比 Debian 少 2% 到 4%，且没有任何损失。
+
 **阅读架构介绍：**[带插图的指南和仓库地图](docs/architectural-synthesis.md)，附带[完整尺寸信息图和文本版](docs/architecture-infographic.md)，改编并核对了 Daniel 的 Gemini / NotebookLM 研究。
 
 <a href="#seen-in-3d"><img src="docs/screenshots/translucent-stereo-desktop-anaglyph.jpg" width="99%" alt="3D 立体桌面，带半透明窗口：Dolphin 的设置菜单和配色方案列表在前面，后面的玻璃窗口一层层退开，系统监视器和壁纸最深（红青立体图）"></a>

@@ -6,6 +6,9 @@
 Un téléviseur 3D fonctionne, tout comme n'importe quel écran ordinaire avec de simples lunettes rouge-cyan, et désormais un téléphone Android compatible dans une visionneuse peu coûteuse : un [bureau stéréo utilisable via USB](https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md), testé sur du matériel plus ancien.
 Sparky Stereo OS, l'édition de Daniel Ramos de SparkyLinux (par Paweł « pavroo » Pijanowski), est un système Linux doté d'un nouveau bureau KDE Plasma stéréo.
 
+**Plus léger pour votre machine et pour la planète :** chaque paquet est livré sans les commentaires et les notes que les programmes ne lisent jamais, donc le même travail demande moins de calcul, moins d'énergie et moins d'usure.
+[Mesuré](docs/lean-code-packages.md#why-it-matters) : lire les en-têtes C++ demande 2 à 4 % de travail en moins que sous Debian, sans rien perdre.
+
 **Lisez l'architecture :** [guide illustré et carte du dépôt](docs/architectural-synthesis.md), avec une [infographie pleine grandeur et sa version texte](docs/architecture-infographic.md), adaptée et vérifiée à partir des recherches Gemini / NotebookLM de Daniel.
 
 <a href="#seen-in-3d"><img src="docs/screenshots/translucent-stereo-desktop-anaglyph.jpg" width="99%" alt="Le bureau stéréo en 3D avec des fenêtres translucides : le menu Réglages de Dolphin et sa liste de jeux de couleurs en avant, les fenêtres vitrines derrière en gradation, le moniteur système et le fond d'écran au plus profond (anaglyphe rouge-cyan)"></a>

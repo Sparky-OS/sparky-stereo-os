@@ -124,6 +124,11 @@ Debian's postinst enables such a unit wherever the package is installed, so the 
 3. **Look at each folder before removing it:** owner (`dpkg -S`; on merged-usr, check both `/lib` and `/usr/lib` paths), whether a matching package is installed, what is inside.
 4. **Keep what explains a crash** you may report (one dump, its trace) before cleaning the rest.
 
+## Kept problems: dismiss and bring back
+
+The engine that keeps what failed lets the person dismiss a problem, and the Problems page of System Settings lists the current and the dismissed ones.
+[Dismiss, Bring back and the page](references/problems-dismiss.md) says what each scope does (a failed service of this boot stays dismissed when it fails the same way after a reboot), the one store the notifier and the page share, and the traps met.
+
 ## Lessons from the lanes, October to November 2026
 
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (10 entries).

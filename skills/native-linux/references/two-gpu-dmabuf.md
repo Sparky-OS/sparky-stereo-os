@@ -23,9 +23,13 @@ The client never compared the compositor's `main_device` with its render device 
 
 ## Fix
 
-Compare the compositor's `main_device` with the client's render node (`drmGetDeviceFromDevId` for both, `drmDevicesEqual`).
-When they differ, allocate with GBM from the modifiers the compositor advertises (the client's GPU then makes LINEAR buffers, which is how PRIME hands frames to the display GPU) and do not export the driver's own tiling.
-Say it in the client's graphics information: failure id `FEATURE_FAILURE_DMABUF_COMPOSITOR_OTHER_GPU`.
+Compare the compositor's `main_device` with the client's render node (both device numbers mapped to their PCI device through `/sys/dev/char/MAJOR:MINOR/device`, so a card node and a render node of one GPU compare equal; libdrm is not linked into Gecko).
+When they differ, the client keeps drawing into its own buffers and gives the compositor a `wl_shm` copy of each committed frame (Gecko `NativeLayerWaylandRender::CopyToSharedMemoryLocked`, `gfxVars::DMABufCompositorOnOtherGPU`).
+Measured on an RTX 3060 against KWin on the AMD iGPU: a WebGL2 canvas and a 1080p video stay at 60 fps, the marked video still declares its stereo content.
+
+What does not work, measured with `gbm_bo_create*` and an EGLImage on the NVIDIA node: `GBM_BO_USE_RENDERING` together with a modifier list fails; a LINEAR buffer is made with `GBM_BO_USE_LINEAR` alone or with the modifier list `[0]` and no flags; but an imported linear dmabuf is not a renderable target (framebuffer status `GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT`, 0x8cd6).
+So "allocate with the compositor's modifiers through GBM" cannot work on NVIDIA; the GPU has to draw into its own tiling and a copy goes to the compositor.
+Without native layers (`gfx.webrender.compositor` false) the driver's own EGL Wayland platform does the cross-GPU copy and the window works, but no layer is declared, so a 3D video is shown flat.
 
 ## Traps
 

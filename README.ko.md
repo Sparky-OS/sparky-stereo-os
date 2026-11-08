@@ -6,6 +6,9 @@
 3D TV가 작동하고, 값싼 적청 안경을 쓴 일반 모니터도 작동하며, 이제 저렴한 뷰어에 넣은 호환 Android 휴대폰도 작동합니다: [USB를 통한 사용 가능한 스테레오 데스크톱](https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md), 구형 하드웨어에서 테스트되었습니다.
 Sparky Stereo OS는 Daniel Ramos의 SparkyLinux 에디션(Paweł "pavroo" Pijanowski 제작)으로, 새로운 Stereo KDE Plasma 데스크톱을 갖춘 Linux 시스템입니다.
 
+**컴퓨터에도 지구에도 가볍게:** 모든 패키지는 프로그램이 읽지 않는 주석과 메모를 빼고 제공되므로, 같은 작업에 처리, 전력, 기기 마모가 더 적게 듭니다.
+[측정 결과](docs/lean-code-packages.md#why-it-matters): C++ 헤더를 읽는 작업이 Debian보다 2~4% 적으며, 잃는 것은 없습니다.
+
 **아키텍처 읽기:** [그림 가이드 및 저장소 지도](docs/architectural-synthesis.md), [전체 크기 인포그래픽 및 텍스트 버전](docs/architecture-infographic.md) 포함, Daniel의 Gemini / NotebookLM 연구에서 각색 및 검증되었습니다.
 
 <a href="#seen-in-3d"><img src="docs/screenshots/translucent-stereo-desktop-anaglyph.jpg" width="99%" alt="반투명 창이 있는 3D 스테레오 데스크톱: Dolphin의 설정 메뉴와 색 구성표 목록이 앞에 있고, 유리 창들이 뒤로 한 단계씩 물러서며, 시스템 모니터와 배경화면이 가장 깊은 곳에 있습니다 (적청 애너글리프)"></a>

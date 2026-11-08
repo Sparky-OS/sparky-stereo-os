@@ -6,6 +6,9 @@
 Funciona em uma TV 3D, em qualquer monitor comum com óculos vermelho e ciano baratos e, agora, em um celular Android compatível num visor de baixo custo: uma [área de trabalho estéreo utilizável por USB](https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md), testada em hardware mais antigo.
 Sparky Stereo OS, a edição de Daniel Ramos do SparkyLinux (de Paweł "pavroo" Pijanowski), é um sistema Linux com uma nova área de trabalho Stereo KDE Plasma.
 
+**Mais leve para a sua máquina e para o planeta:** todo pacote vem sem os comentários e anotações que os programas nunca leem, então o mesmo trabalho exige menos processamento, menos energia e menos desgaste.
+[Medido](docs/lean-code-packages.md#why-it-matters): ler os cabeçalhos C++ dá de 2 a 4% menos trabalho do que no Debian, sem perder nada.
+
 **Conheça a arquitetura:** [guia ilustrado e mapa do repositório](docs/architectural-synthesis.md), com um [infográfico em tamanho completo e sua versão em texto](docs/architecture-infographic.md), adaptados e verificados a partir da pesquisa de Daniel com Gemini / NotebookLM.
 
 <a href="#seen-in-3d"><img src="docs/screenshots/translucent-stereo-desktop-anaglyph.jpg" width="99%" alt="A área de trabalho estéreo em 3D com janelas translúcidas: o menu Configurações do Dolphin e sua lista de esquemas de cores à frente, as janelas de vidro atrás recuando em sequência, o monitor do sistema e o papel de parede ao fundo (anáglifo vermelho e ciano)"></a>

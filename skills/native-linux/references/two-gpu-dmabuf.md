@@ -40,6 +40,13 @@ A `ctypes` `vaInitialize` on `/dev/dri/renderD129` proves the driver loads ("VA-
 The browser log then says `Using preferred hardware codec h264` and `VAAPI locking dmabuf surface`; `IsHardwareAccelerated=false` means the driver did not load.
 Without the per-pair test the package dies at the first decoded frame with the same error 7 (also with the compositor on a software renderer).
 
+## Trap: the fix for the crash took the WebGL canvas out of its layer (360 video doubled, VR crashed)
+
+Symptom: with the per-pair test in place, on the discrete GPU route a 360 video on YouTube draws twice in one view (the stereo canvas shown whole, undeclared: no `kde_stereo_content_v1.set_content(3)`, eyes identical) and a WebXR "Enter VR" ends the browser with `importing the supplied dmabufs failed`; the same pages work on the compositor's GPU.
+Cause, two parts: (1) a WebGL canvas reaches the compositor as an external dmabuf layer that carries the stereo mark; not promoting it (the rule that is right for a decoded YUV picture) drops the layer and the declaration; (2) `NativeLayerRootWayland::BorrowExternalBuffer` makes the `wl_buffer` (the `create_immed` import request) as soon as the picture is attached, so a copy at commit comes too late.
+Fix: promote RGB pictures always; when the pair is not importable keep the layer, do not borrow the buffer, copy to `wl_shm` at commit (`NativeLayerWaylandExternal::CopyToSharedMemoryLocked`). Look the pair up only in the tranches whose `tranche_target_device` is the `main_device`: a scanout tranche for another device lists what that device can scan out, not what the compositor imports.
+How it was found: live YouTube in the two-container rig with a stereo-capable virtual output (`KWIN_VIRTUAL_STEREO_MODES=1` and the capable-anaglyph output config; without it the GPU route's canvas is not a dmabuf layer and the symptom differs), `WAYLAND_DEBUG=client` (no `set_content(3)` on the discrete route, 4 on the other) and `xr465.py` (the session crashed with error 7 after the first 2560x1024 canvas buffer). A WebXR "Enter VR" needs a trusted click (`WebDriver:ElementClick`, not `element.click()`) and `permissions.default.xr` 1. Parallax of the sample page between the routes: cross-correlation of the two eye captures, 8 px on both.
+
 ## Trap: a solid green video with NVDEC (hardware decoding forced on NVIDIA)
 
 Symptom: with `media.hardware-video-decoding.force-enabled` and nvidia-vaapi-driver 0.0.18 (`NVD_BACKEND=direct`), the video area is a flat dark green (0, 77, 0 on the screenshot: both planes read as zero) and both eyes are identical; the log says `Using preferred hardware codec` and `VAAPI locking dmabuf surface`, no protocol error.

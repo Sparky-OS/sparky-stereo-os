@@ -1,7 +1,7 @@
 ---
 name: forks-and-online
 description: >-
-  Push edition work only to the edition's forks (Sparky-OS, danielcamposramos), never to the upstream project; keep
+  Record failures that cannot be filed upstream; push edition work only to the edition's forks (Sparky-OS, danielcamposramos), never to the upstream project; keep
   every branch online the same day; audit clones for work that exists only locally ([gone] branches, ahead and behind,
   commits in no branch, worktrees, partial clones, uncommitted files, git rev-list --not --remotes with patch-id) and
   tell merged, superseded, missing and uncommitted work apart; cut releases that Zenodo keeps for good, the Sponsor
@@ -43,6 +43,13 @@ The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; [`ai
 - **Push branches, not over the fork's main**, unless the fork's main is the edition's own line.
   Edition branches are named after the work (`stereo3d`, `stereo3d-6.7`, a feature name).
 - **KDE Invent runs CI on every push.** Push a branch you do not want tested yet with `git push -o ci.skip invent <branch>`; never use upstream CI as a test bench.
+
+## Failures that cannot be filed upstream
+
+Keep a failure with its evidence even when its report cannot go upstream.
+Use the [unfiled failures recipe](references/unfiled-failures.md) for the inventory, the issue template, duplicate counting and checking whether upstream has fixed it since.
+The destination is the repository Daniel approved in his own namespace; the current KDE list uses one repository on Invent for issues alone.
+An inventory or draft does not authorize creating that repository, posting issues or sending mail.
 
 ## A fork ships; it is not a waiting room
 

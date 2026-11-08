@@ -73,7 +73,7 @@ An XR API or a headset's ordinary mirror is not proof that both eyes reach a des
 ## An OpenXR runtime as a stereo source (checked 2026-11-07)
 
 Any OpenXR app reaches Stereo KWin's outputs when the runtime presents its two views as one window declared full side by side.
-On DisplayXR: the display processor says its output is a stereo pair (`XRT_DP_SCANOUT_FLAG_FULL_SIDE_BY_SIDE`, sim_display's `SIM_DISPLAY_OUTPUT=sbs_full`); the runtime then presents a buffer twice the window's width, each view at the window's resolution, and declares the app's native Wayland surface once (`kde_stereo_content_v1` value 3, bound at version 2 so the window stays one view wide).
+On DisplayXR: the display processor says its output is a stereo pair (`xrt_dp_scanout_caps::stereo_layout` = 3, HDMI 1.4b's Side-by-Side (Full), sim_display's `SIM_DISPLAY_OUTPUT=sbs_full`); the runtime then presents a buffer twice the window's width, each view at the window's resolution, and declares the app's native Wayland surface once (`kde_stereo_content_v1` value 3, bound at version 2 so the window stays one view wide).
 A plain OpenXR app runs in the runtime's own X11 window: the runtime sets `_KDE_NET_WM_STEREO_CONTENT` = 3 on it when the root announces version 3 or later, Stereo KWin makes the X window twice as wide while keeping its place, possibly seconds later, and the swapchain follows the X window only once it is twice as wide (checked 2026-11-07, ORDER 34b).
 Where it cannot declare, it says so and the window shows the two views side by side, flat; a 2D rendering mode withdraws the declaration.
 The proof recipe on a headless Stereo KWin, the controls and the traps are in [openxr-runtime-full-sbs.md](references/openxr-runtime-full-sbs.md).

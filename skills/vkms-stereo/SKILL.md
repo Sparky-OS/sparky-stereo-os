@@ -7,9 +7,10 @@ description: >-
   declares HDMI 3D modes (configfs, edid and edid_enabled, the status attribute for hotplug and detect), IGT kms_3d and
   its VKMS exceptions, KUnit and its exit status, KWin in the guest (udevd for hotplug, LIBGL_ALWAYS_SOFTWARE,
   kscreen-doctor), expectations computed from the EDID, a virtual machine always, VC4 and DisplayPort timing checked
-  without the board. Load it when a 3D mode is missing from the list, interlaced or duplicated formats appear, a probe
-  needs the DRM master, IGT leaves VKMS out, the compositor never sees a hotplug, kunit.py exits 0 with failed tests, or
-  a kernel stereo patch needs a bench.
+  without the board, a claim's EDID read on any kernel through the debugfs edid_override of a QEMU bochs display. Load
+  it when a 3D mode is missing from the list, interlaced or duplicated formats appear, a probe needs the DRM master, IGT
+  leaves VKMS out, the compositor never sees a hotplug, kunit.py exits 0 with failed tests, drm.debug on the command
+  line prints nothing after insmod, or a kernel stereo patch needs a bench.
 ---
 
 # A virtual 3D display: VKMS in stereo
@@ -81,6 +82,11 @@ Walk the EDID to the mode list one step at a time, each with a check that can fa
 Then the frame of each layout, and the same guest on the kernel without the change.
 The steps, the guest for a published kernel, and the traps are in [references/edid-to-mode-list.md](references/edid-to-mode-list.md); the bench's `src/lsmodes.c` lists a connector's modes against an expectation and `edid/make-2d-edid.py` makes the 2D-only twin of an EDID.
 
+## An EDID for a claim, read on any kernel
+
+What a kernel's EDID parser makes of one declaration (a sink that sets 3D_present with no mandatory timing, one 3D format on one VIC, a reserved bit, a shipped device's EDID from linuxhw/EDID) needs no VKMS patch: build the EDID from HDMI® 1.4a Table 8-16, pass `edid-decode --check`, boot the kernel package's own `bochs` driver in QEMU with `-device bochs-display,edid=on`, write the file to the connector's debugfs `edid_override`, `echo detect` to its sysfs `status`, and read the parser's stereo modes from the `Rejected mode ... (NO_STEREO)` lines of `drm.debug=0x4`, which that connector drops for want of `stereo_allowed`.
+The recipe, the edid-decode failures and their fixes, the Debian 14 kernel package split, and the facts measured on two kernels are in [references/edid-for-a-claim.md](references/edid-for-a-claim.md).
+
 ## The output's eye flip on every 3D mode, and an old lane's open points
 
 Every 3D mode of one output (anaglyph, rows, columns, checkerboard, half side by side, top and bottom, side by side full, frame packing, frame sequential) with the eye swap off and on, each against a model that the other swap must fail, in one guest run of about four minutes: [references/eye-order-matrix.md](references/eye-order-matrix.md) has the recipe, the traps and how to reconcile an old report's open points against what ships; the scripts are in `tools/vkms-stereo-bench/eyeorder`.
@@ -98,5 +104,8 @@ From the lanes of 25 October to 6 November 2026; add the next lesson here as you
 - Symptom: a saved frame-sequential mode comes back as 2D after a restart. Cause: the store's restore check knew no sequential layout. Fix: accept them; test by saving the mode in the JSON and asking the store (lane mesa-stereo-followups-116)
 - Symptom: SRC_X changes 17 to 25 times in 240 vblanks and KWin reports 1644 missed refreshes. Cause: software GL in the guest, about one frame in five refreshes; both halves are shown, not strictly alternately. Fix: judge pacing on the DisplayPort bench, content in the guest (lane mesa-stereo-followups-116)
 - `python3 edid/make-edid.py --help` writes an EDID called `--help` (the first argument is the output path): run the bench's tools from a scratch folder and never ask them for help.
+- Symptom: a 3D television's EDID lists only 2D modes in the guest and `dmesg` has no `Rejected mode` line, with `drm.debug=0x4` on the kernel command line. Cause: a module parameter on the command line is applied by modprobe, and BusyBox insmod ignores it. Fix: `echo 0x4 > /sys/module/drm/parameters/debug` after loading the modules, and print it back. Found by: the mode count alone, every layer showing the same short list (lane hdmi-technical-note-475)
+- Symptom: `edid-decode --check` fails a generated EDID with "The HDMI Specification requires EDID 1.3 instead of 1.4", "EDID 1.3 does not support week 0xff", "'Bare Limits' is not allowed for EDID < 1.4", "sRGB is not signaled" or "Missing VCDB". Cause: E-EDID 1.4 habits in the 1.3 structure HDMI asks for. Fix: version `01 03`, a real week, range limits with default GTF, the sRGB feature bit, a VCDB `e2 00 4a`; the parser's answer to each file is then about the field under test only (lane hdmi-technical-note-475)
+- Measured 2026-11-08 on Debian 7.3.3 and 7.3.1-stereo3d16: `add_hdmi_mandatory_stereo_modes()` adds a mandatory 3D format only to a 2D timing the sink lists, so a 1080p60 panel with 3D_present set gets no stereo mode; the 2D_VIC_order_X entries are read with 3D_present clear, so one entry gives exactly 1920x1080p60 side by side (half). Steps and traps: [references/edid-for-a-claim.md](references/edid-for-a-claim.md) (lane hdmi-technical-note-475)
 
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

@@ -320,3 +320,11 @@ Inspect the packaged dex as well as the source API level.
 `Long.compareUnsigned` is API 26 in the SDK metadata, but the recorded minSdk-23 build enables core-library desugaring and its packaged pose-adapter dex contains no reference to that platform method.
 This bounded inspection avoids inventing an API compatibility failure from source spelling alone.
 It does not replace running the supported older Android images.
+
+## A correct transport proof hides overlapping headset status
+
+Capture the production headset activity, not only a debug session activity, before accepting new visible controls.
+The first two-eye capture showed the new pose status overlapping the existing link readout.
+Moving pose status to the bottom separates the readouts; leave the centre alignment margin uncovered.
+Repeat the labels identically in both eyes and inspect the resulting full side-by-side capture.
+A receiver that sends no desktop picture still leaves the original waiting scene visible behind the status; do not describe that capture as streamed-video proof.

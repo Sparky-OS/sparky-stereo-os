@@ -10,7 +10,8 @@ description: >-
   stereo option does nothing, a child window is invisible to the compositor, an X11 child gets no WL_SURFACE_SERIAL in
   CI, wp_viewporter says the surface already has a viewport, a mono EGL window draws at half its width, a browser's
   video crashes KWin when its buffers switch between ARGB and NV12, a Vulkan swapchain errors with NATIVE_WINDOW_IN_USE,
-  or a toolkit lacks stereo.
+  a toolkit lacks stereo, or a gl-stereo layer change needs the 130 saver receipts again ("untested layer binary",
+  "untested saver binary").
 ---
 
 # Native Linux programs
@@ -87,6 +88,11 @@ The rows, scripts and traps: [x11-child-clipping.md](references/x11-child-clippi
 A program whose interface is a toolkit window and whose 3D area is a native child (a player's video, a GL widget) declares the child with `stereo_declare_x11_child()` on its top-level window, not with `stereo_declare_x11()` on the child, and takes the declaration back when the area closes: the top-level must list the child, or Stereo KWin shows one view in both eyes.
 Each view keeps its resolution: the program draws on a window of its own inside the toolkit's child, twice a view wide, and declares that window with the size one view is shown at (support version 8), so Stereo KWin resizes once; where the desktop announces less, each view is drawn in half of the child and the program says so.
 The recipe, the proof (a column-coded clip), and the traps (the toolkit that reads its child's real size, the library version, the link gate, the error handler, the notices) are in [x11-video-child.md](references/x11-video-child.md).
+
+## Requalifying the gl-stereo savers
+
+The 130 saver receipts bind the stripped layer's SHA-256 and each saver's executable, so any layer change (even a message on stderr) and any rebuild of XScreenSaver's savers needs all 130 again, or the package build stops with "untested layer binary".
+The recipe on a device other than the AMD render node (the NVIDIA card through CDI, with Xwayland's glamor off), how the device is proved with the published layer, the run times and every trap met: [requalifying-gl-stereo-savers.md](references/requalifying-gl-stereo-savers.md).
 
 ## Game engines and libraries
 

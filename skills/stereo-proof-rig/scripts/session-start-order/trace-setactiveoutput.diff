@@ -1,0 +1,25 @@
+diff --git a/src/workspace.cpp b/src/workspace.cpp
+index 875623c549..c2e0151b74 100644
+--- a/src/workspace.cpp
++++ b/src/workspace.cpp
+@@ -11,6 +11,7 @@
+ */
+ // own
+ #include "workspace.h"
++#include <execinfo.h>
+ // kwin libs
+ #include "opengl/glplatform.h"
+ // kwin
+@@ -2766,6 +2767,12 @@ void Workspace::setActiveOutput(LogicalOutput *output)
+     if (m_activeOutput == output) {
+         return;
+     }
++    if (qEnvironmentVariableIsSet("KWIN_TRACE_ACTIVE_OUTPUT")) {
++        fprintf(stderr, "TRACE466 %lld active output %s -> %s, active window %s\n", (long long)QDateTime::currentMSecsSinceEpoch(), m_activeOutput ? qPrintable(m_activeOutput->name()) : "none", output ? qPrintable(output->name()) : "none", m_activeWindow ? qPrintable(m_activeWindow->resourceClass()) : "none");
++        void *frames[14];
++        const int n = backtrace(frames, 14);
++        backtrace_symbols_fd(frames, n, 2);
++    }
+     m_activeOutput = output;
+     Q_EMIT activeOutputChanged(output);
+ }

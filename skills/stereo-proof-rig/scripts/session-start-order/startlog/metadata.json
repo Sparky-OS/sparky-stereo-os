@@ -1,0 +1,9 @@
+{
+    "KPackageStructure": "KWin/Script",
+    "KPlugin": {
+        "Id": "startlog",
+        "Name": "Session start logger",
+        "Description": "Logs every activation, every added window and the active screen, with the time"
+    },
+    "X-Plasma-API": "javascript"
+}

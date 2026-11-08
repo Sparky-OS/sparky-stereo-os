@@ -14,6 +14,21 @@ So a stereo GtkGLArea is a GtkGLArea that
 2. appends that texture inside a subsurface node, in a clip of the area's size, with the node's rectangle twice the area's width, and declares the `GdkSubsurface` with `kde_stereo_content_v1.set_content(3)` (the protocol's version 2: a declared surface is one view wide, and `wp_viewport` destination is one view, so the area keeps its size on the screen and the source is the whole texture);
 3. tells the program when it cannot do this (`stereo-shown`, `stereo-error`, one log message) and then renders the left view alone.
 
+## The X11 route (GDK 4 on Xwayland, milestone 2)
+
+GDK 4 has no subsurface on X11, so the area is a child X window, the pattern of [Declaring an X11 child window](../../native-linux/references/x11-video-child.md):
+
+1. a frame window the size of one view, a child of the toplevel's X window at the area's place (`gtk_widget_compute_bounds()` into the native plus `gtk_native_get_surface_transform()`, times the scale factor), and inside it a window twice as wide that holds the two views side by side; no events selected on either, so the pointer and the keys go to the toplevel;
+2. the inner window is declared with `stereo_declare_x11_child(display, toplevel, inner, STEREO_SBS_FULL, class, subclass, view_width, view_height)`, the shown size being the frame's; GDK loads `libstereo-declare.so.1` with `g_module_open` when the first stereo area asks (loaded when needed; `libgtk-4-1` depends on `libstereo-declare1 (>= 1.7.0)`, because X11 stereo areas are a designed feature) and needs `_KDE_NET_WM_STEREO_CONTENT_SUPPORTED` 8 or more;
+3. the views are read back from the stereo texture (`glReadPixels`, rows turned over, red and blue swapped) and put into the inner window with `XPutImage`: one copy through the CPU, each view at the resolution it was drawn at. The readback route stays for now (it works and is measured); a GL route (an EGL surface on the inner window) is the next step and the speed-up, the picture is the same.
+4. an area that cannot do it says so as on Wayland (`stereo-error`: no library, a window manager below version 8, no stereo window manager) and draws its left view alone.
+
+Measured on Stereo KWin +46's Xwayland (client on llvmpipe): 9 of 9 checks (every sample of each eye), resize, another size, off and on, hide and show, two areas in one window; the child is listed in the toplevel's `_KDE_NET_WM_STEREO_CONTENT_CHILDREN`, declared 3, with the one view size 480x270.
+
+What GDK needs from KWin and Mesa (both are lane 160's, nothing was changed here):
+- KWin: an acknowledgement that the declared child is redirected (a property or an event) so the first frames need not be repeated (see the trap); the child cut to its window and under its siblings (the clipping draft); and the child's place with "below the parent's own surface" (`stereo_declare_x11_child_place()`, support 7) together with a transparent hole in the toplevel, so that a 2D widget drawn over the area shows over it as on Wayland. Without it a `GtkOverlay` label over an X11 stereo area is hidden (0 samples of it in either eye, measured).
+- Mesa: nothing; the GLX and EGL child listing is not used (GDK lists the child itself with the library).
+
 ## Recipe
 
 - Check the source first: `GtkGLArea` renders in `gtk_gl_area_snapshot` (gtk/gtkglarea.c); `GskOffload` (gsk/gskoffload.c, `find_texture_to_attach`) decides what can be attached; `gdk_wayland_subsurface_attach` (gdk/wayland/gdksubsurface-wayland.c) does the Wayland side; `GDK_DEBUG=offload` prints each refusal with its reason.
@@ -40,5 +55,19 @@ So a stereo GtkGLArea is a GtkGLArea that
 - **A passwd entry for uid 1000.** GTK's tests start `dbus-daemon`, which fails with `Could not get password database information for UID` in a container without one (the rig mounts a passwd file).
 - **Build dependencies against the edition's pins.** `apt-get build-dep gtk4` in an image with the edition's repository at pin 1001 stops on librsvg (it wants libdav1d 1:1.5.4) and on the media libraries. Lower the edition pin to 100 and pin the Mesa and Wayland packages back to the edition at 1001.
 - **An image committed from a container started with `--entrypoint sh` keeps that entrypoint**: `docker run IMAGE sh script` then fails with `sh: 0: cannot open sh`. Start with `--entrypoint sh IMAGE script`.
+- **The right eye is black on X11 (the left is right).** Symptom: the first captures of the X11 area show the left picture and a black right half. Cause: the inner window is twice as wide as its frame, X clips drawing to the frame until the window manager redirects the declared child, and what was drawn before is lost (a later `XPutImage` is not clipped: a resize fixed it). Fix: the first ten frames are drawn again, 100 ms apart. Found by growing the area after three seconds: the capture then had both eyes.
+- **A 2D widget over an X11 stereo area is hidden.** Cause: the child window is above the toplevel's own pixels. Fix: not in GDK (see what GDK needs from KWin). Measured with `glarea-stereo-test --overlay`.
 - **A capture that never returns.** Symptom: a proof case stays at its capture step for minutes after KWin's ScreenShot2 call timed out (a software-rendered KWin on a loaded machine). Cause: `capture.py`'s reader thread was not a daemon thread and waited for the pipe's end for ever after the exception. Fix: `daemon=True` on the thread (done in `stereo-proof-rig/scripts/capture.py`); rerun the case when the machine is idle. Found with `ps --forest`: the case script's only child was the `docker exec` of the capture.
 - **Reproducing the program's picture in the checker.** GL's y goes up and the capture's goes down: the first checker put the white square one row off (134 samples per eye). Redraw the expected picture with the same flip, and compare every sample.
+
+## Limits (milestone 2)
+
+| Case | Result |
+|---|---|
+| two stereo areas in one window | works on Wayland (two subsurfaces) and X11 (two child windows): each band red in the left eye and blue in the right, same places in both eyes, nothing in the wrong eye |
+| an area under a rounded clip, an opacity below 1, partly scrolled out | GSK cannot offload it: the honest failure for good until `stereo` is set again; kept as is, it is the safe answer |
+| a `GtkWidgetPaintable` or other snapshot of the area | the frame check can read another window's state; not lifted (rare) |
+| fractional output scale (1.5) | the area is drawn at the integer scale (2) and Stereo KWin resamples: works, not sample-exact |
+| a popover or menu over the area | a separate surface: works |
+| a `GtkOverlay` child over the area | Wayland: works (the area lies below the window with a hole); X11: hidden |
+| the GTK demo (`gtk4-demo --run glarea`, `GTK_DEMO_GLAREA_STEREO=1` or the check button) | shown in 3D on NVIDIA's EGL and on Mesa +stereo3d18's zink over the RTX 3060: the triangle's two views 22 samples apart, the rest of the window identical in both eyes |

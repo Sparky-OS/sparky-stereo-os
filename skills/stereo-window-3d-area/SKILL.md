@@ -74,7 +74,7 @@ Worked examples:
 GtkGLArea draws into a framebuffer of its own and appends one texture to the scene graph, so a stereo GtkGLArea is the same pattern with GTK's own subsurface: each eye is rendered by the program's unchanged render handler (the signal is emitted once per eye, `gtk_gl_area_get_current_eye()` says which), the two views are copied side by side into one opaque texture, and that texture goes on a `GdkSubsurface` (the path `GtkGraphicsOffload` takes) declared with `kde_stereo_content_v1` version 2, so the area keeps its size.
 GTK composites an offloaded picture itself whenever the subsurface cannot be used; for a stereo area that would show both eyes flat, so the area draws a clip of the left view as its fallback and tells the program (`stereo-shown`, `stereo-error`) and the log, once.
 The recipe, the proof cases and the traps (no dma-buf from llvmpipe, a blit that obeys the scissor, the decision that comes a frame late, a dma-buf export that writes no descriptor with zink on NVIDIA) are in [GTK 4 and GtkGLArea](references/gtk-glarea.md).
-GTK 3, a real GL program, X11 and the deep colour canvas are the next milestones of the same item.
+X11 is the same area as a child window declared with libstereo-declare (milestone 2). GIMP 3.2's canvas is cairo, not GL; a GL player (Celluloid) and deep colour are plans in [GTK pieces still to build](references/gtk-glarea-plans.md).
 
 ## X11 programs
 

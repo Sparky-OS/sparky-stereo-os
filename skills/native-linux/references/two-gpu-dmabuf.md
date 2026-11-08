@@ -40,6 +40,14 @@ A `ctypes` `vaInitialize` on `/dev/dri/renderD129` proves the driver loads ("VA-
 The browser log then says `Using preferred hardware codec h264` and `VAAPI locking dmabuf surface`; `IsHardwareAccelerated=false` means the driver did not load.
 Without the per-pair test the package dies at the first decoded frame with the same error 7 (also with the compositor on a software renderer).
 
+## Trap: a solid green video with NVDEC (hardware decoding forced on NVIDIA)
+
+Symptom: with `media.hardware-video-decoding.force-enabled` and nvidia-vaapi-driver 0.0.18 (`NVD_BACKEND=direct`), the video area is a flat dark green (0, 77, 0 on the screenshot: both planes read as zero) and both eyes are identical; the log says `Using preferred hardware codec` and `VAAPI locking dmabuf surface`, no protocol error.
+Not the copy: the same green with a second compositor, with `NVD_SINGLE_BUFFER=1`, and with `media.ffmpeg.vaapi.force-surface-zero-copy` 0; the unmodified package cannot be compared because KWin refuses NVDEC's NV12 (error 7) with the compositor on NVIDIA as well.
+The decode itself is right: `ffmpeg -hwaccel vaapi -hwaccel_device /dev/dri/renderD129 -hwaccel_output_format vaapi ... -vf hwdownload,format=nv12` gives the software frame within 2 grey levels. So the zeros come between the driver's exported dmabuf and WebRender's sampler.
+Default: Gecko blocklists hardware decoding on every NVIDIA GPU on Linux (`FEATURE_HARDWARE_VIDEO_DECODING_NO_LINUX_NVIDIA`, GfxInfo.cpp), so the package decodes in software on the RTX and the picture is right (eyes differ against each other, no crash) even with the driver installed; the green appears only after the person forces hardware decoding.
+Upstream context read, not a fix: nvidia-vaapi-driver issues 474 and 481 (0.0.18's per plane modifiers), 486 (black video, direct backend), Mozilla bug 2076178 (a different cause).
+
 ## Traps
 
 - `eglinfo -p gbm` picks the NVIDIA node whatever the vendor file says; judge the compositor's GPU from its log or `gbm_create_device` on each node, not from `eglinfo`.

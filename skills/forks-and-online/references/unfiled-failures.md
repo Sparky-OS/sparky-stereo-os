@@ -24,7 +24,7 @@ One module's position does not establish a KDE policy or another module's rules.
 5. After the authorized publication step, use one issue per failure in Daniel's approved repository.
    For the KDE non-stereo list, Daniel chose one repository in his own Invent namespace, with issues alone.
    Preserve multiple historical records as references in the same failure's issue.
-   If Daniel withdrew them, say they were withdrawn, with the date and the recorded reason, rather than calling them rejected.
+   If Daniel withdrew them, say they were withdrawn, with the date and the recorded reason.
    No report, comment or proposal goes to a KDE project's own tracker under the current hold.
 6. Keep the record current when it is next reviewed.
    Recheck the default branch and related reports before saying a failure remains.

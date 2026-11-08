@@ -49,6 +49,29 @@ A Java or C++ mirror can contain the right formula while its caller supplies pla
 Trace actual values from the file reader through the policy call to the filter arguments and output pixels.
 Record separately what is decided, implemented, exercised and shipped.
 
+## A site's mark: YouTube's yt3d keywords
+
+A video site can say how its videos hold their views outside the file: YouTube took the layout of a 3D upload from the video's keywords (tags) before 2011, and such tags remain on videos from then (verified 2026-11-05 with the watch pages of "Kate in 3D!", XTt_HGmTxf4, and "3D Maestro", uMTvaNomlWY, whose `<meta name="keywords">` carries them; Invidious and Piped hand the keywords on).
+It is a convention of one site, never a web standard (the web has no mark for a video's layout outside WebXR), so it ranks as a **site mark**: the user's choice first, then the stream's and the container's marks, then the site's mark, then the file name's tag and the shape rule.
+A video with no mark at all stays flat when the shape does not say two views, and the person's menu covers it.
+
+**One reader, no copies.** `stereo_policy_site_mark()` and `stereo_policy_site_mark_list()` in libstereo-policy (stereo-layer 1.13, `docs/yt3d.md`) read every form, for the browser and for PlasmaTube alike; a program that shows YouTube videos calls it and keeps no table of the tags.
+Every form, as the reader takes it (case, spaces and quotes do not matter; a malformed number is read as far as it can be, as in "Kate in 3D!", `yt3d:left=0_0._0.5_1`):
+
+| Tag | Meaning |
+| --- | --- |
+| `yt3d:enable=LR`, `RL` | side by side, the left eye's view on the left (YouTube's recommended format) or the right eye's |
+| `yt3d:enable=LonR`, `RonL` | top and bottom, the left eye on top or the right eye on top |
+| `yt3d:enable=true` (1, yes, on) | the first form: what `yt3d:left` and `yt3d:right` place, else side by side with the **right eye first**: YouTube's player took such a video for cross-eyed |
+| `yt3d:enable=false` (0, no, off) | the site says the video is not 3D |
+| `yt3d:swap=true` (1, yes, on, or the bare tag) | the eyes the other way round, whatever else decided; with `enable=true` the left eye is first (parallel). "The yt3d:swap tag was still necessary to get the player to recognize the left eye frame was on the left" (stereo3dchannel.blogspot.com, 2011-02-21); Tim Dashwood, dvinfo.net: "if your video is in parallel format just add the tag yt3d:swap=true" |
+| `yt3d:left=l_t_r_b`, `yt3d:right=l_t_r_b` | the rectangle of each eye as the left, top, right and bottom fractions of the frame; the two halves, side by side or one above the other, either way round, are the arrangements of the policy, any other rectangle gives no mark and the program says so (return value 2) |
+| `yt3d:aspect=W:H` (W/H, a number such as 1.78) | the shape of one view as the site shows it: the plane size of the full or half rule above (a frame of that shape holds half views, one twice as wide or as tall full views) |
+
+An explicit `enable=LR|RL|LonR|RonL` wins over rectangles, rectangles over the first form's side by side; `swap`, `aspect` or an unknown `enable` value alone carry no arrangement.
+The order of the first form is measured, not only quoted: on "3D Maestro" (`enable=true`, `swap=true`) and "Kate in 3D!" (rectangles) the left half of the frame holds the left eye's view (a ground-plane and near-object disparity test, `eye-order.py` of the waterfox-stereo lane); PlasmaTube's first patch had the first form left eye first and `swap` right eye first, the reverse of this, and the shared reader corrects it.
+Test it with a page that carries the keywords around an unmarked stream (`<meta name="keywords">` in the page, nothing in the stream or the container), one case per form, the marked-stream control with conflicting keywords (the stream's mark wins), the user's choice over the keywords, and a 2D video with ordinary keywords that stays flat; LEFT and RIGHT captures show the left eye's half in the left eye.
+
 ## Detection is the fallback
 
 For missing metadata, comparing corresponding regions of the two candidate halves can help distinguish SBS from TAB.

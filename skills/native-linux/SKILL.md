@@ -146,6 +146,8 @@ Zig, RenderDoc, GFXReconstruct, Hotspot, GitHub's CLI, Tiled and KDE's Kommit ar
 As in the general skill: both eyes captured, one declaration, the 2D control.
 For a route change (Mesa, Xwayland), also the programs that already worked, rerun.
 
+A client drawing on a GPU other than the compositor's (a dmabuf import failure, "importing the supplied dmabufs failed"): [references/two-gpu-dmabuf.md](references/two-gpu-dmabuf.md).
+
 ## Lessons from the lanes, October to November 2026
 
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (10 entries).

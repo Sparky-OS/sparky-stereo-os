@@ -23,13 +23,22 @@ The client never compared the compositor's `main_device` with its render device 
 
 ## Fix
 
-Compare the compositor's `main_device` with the client's render node (both device numbers mapped to their PCI device through `/sys/dev/char/MAJOR:MINOR/device`, so a card node and a render node of one GPU compare equal; libdrm is not linked into Gecko).
-When they differ, the client keeps drawing into its own buffers and gives the compositor a `wl_shm` copy of each committed frame (Gecko `NativeLayerWaylandRender::CopyToSharedMemoryLocked`, `gfxVars::DMABufCompositorOnOtherGPU`).
-Measured on an RTX 3060 against KWin on the AMD iGPU: a WebGL2 canvas and a 1080p video stay at 60 fps, the marked video still declares its stereo content.
+Test each buffer's own (fourcc, modifier) against what the compositor advertised, never the GPUs against each other: a Mesa hybrid advertises the discrete GPU's tiling too and must stay zero-copy.
+Gecko `DMABufCompositorCanImport` reads the formats and modifiers of the default feedback (an implicit INVALID modifier is left as it was).
+A render layer whose buffer fails the test is copied to a `wl_shm` buffer before it is attached (`NativeLayerWaylandRender::CopyToSharedMemoryLocked`); a hardware decoded picture that fails it (NVDEC's NV12 modifier 0x300000000606014) is not promoted to a layer of its own, the compositor-side renderer draws it into a render layer.
+Proof of no copy on Mesa: count `wl_shm_pool.create_buffer` in `WAYLAND_DEBUG=client` (3 at start with the compositor on the same GPU, 2022 in 25 s when every frame is copied) and `MOZ_LOG=Dmabuf:5` prints `DMABufCompositorCanImport(): format ... modifier ... -> 0 or 1`.
+Cost measured: `glReadPixels` BGRA of a 4K frame takes 4.5 ms median on an RTX 3060 (1080p 1.2 ms), about 7 GB/s.
 
 What does not work, measured with `gbm_bo_create*` and an EGLImage on the NVIDIA node: `GBM_BO_USE_RENDERING` together with a modifier list fails; a LINEAR buffer is made with `GBM_BO_USE_LINEAR` alone or with the modifier list `[0]` and no flags; but an imported linear dmabuf is not a renderable target (framebuffer status `GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT`, 0x8cd6).
 So "allocate with the compositor's modifiers through GBM" cannot work on NVIDIA; the GPU has to draw into its own tiling and a copy goes to the compositor.
 Without native layers (`gfx.webrender.compositor` false) the driver's own EGL Wayland platform does the cross-GPU copy and the window works, but no layer is declared, so a 3D video is shown flat.
+
+## Hardware decoding on the NVIDIA GPU in a container
+
+`nvidia-vaapi-driver` (Debian) is not in the bench image and `apt-get install` fails on unmet dependencies there: `apt-get download nvidia-vaapi-driver libgstreamer-plugins-bad1.0-0 libgstreamer1.0-0 libgstreamer-gl1.0-0 libgstreamer-plugins-base1.0-0`, `dpkg -x` into a folder, mount it at `/opt/nvd` and set `LD_LIBRARY_PATH=/opt/nvd LIBVA_DRIVERS_PATH=/opt/nvd/dri LIBVA_DRIVER_NAME=nvidia NVD_BACKEND=direct MOZ_DISABLE_RDD_SANDBOX=1` plus the prefs `media.ffmpeg.vaapi.enabled`, `media.hardware-video-decoding.force-enabled`, `media.rdd-ffmpeg.enabled`.
+A `ctypes` `vaInitialize` on `/dev/dri/renderD129` proves the driver loads ("VA-API NVDEC driver [direct backend]", profiles 0 to 28) before the browser is blamed.
+The browser log then says `Using preferred hardware codec h264` and `VAAPI locking dmabuf surface`; `IsHardwareAccelerated=false` means the driver did not load.
+Without the per-pair test the package dies at the first decoded frame with the same error 7 (also with the compositor on a software renderer).
 
 ## Traps
 

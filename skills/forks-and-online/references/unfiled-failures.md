@@ -23,7 +23,8 @@ One module's position does not establish a KDE policy or another module's rules.
    Leave the future issue link unset until the issue exists.
 5. After the authorized publication step, use one issue per failure in Daniel's approved repository.
    For the KDE non-stereo list, Daniel chose one repository in his own Invent namespace, with issues alone.
-   Preserve multiple rejected records as references in the same failure's issue.
+   Preserve multiple historical records as references in the same failure's issue.
+   If Daniel withdrew them, say they were withdrawn, with the date and the recorded reason, rather than calling them rejected.
    No report, comment or proposal goes to a KDE project's own tracker under the current hold.
 6. Keep the record current when it is next reviewed.
    Recheck the default branch and related reports before saying a failure remains.
@@ -56,23 +57,55 @@ Fix and test:
 Related upstream reports:
 [All related open reports with links; label historical closed reports separately.]
 
+Upstream status:
+[Check date, pinned default-branch commit, result and whether it comes from source inspection or a new runtime test.]
+
 Status:
-[Use the approved status line below only where its module-specific premise is established.]
+[Use the applicable approved status line below verbatim.]
 ```
 
-The status line Daniel approved on 2026-11-08 is:
+Daniel approved two status lines on 2026-11-08.
+Use the first only where the module's position is recorded:
 
 > Not filed upstream: the developers of this module currently accept only fully human-written reports. That is their position, not an official KDE policy. Why: https://github.com/Sparky-OS/sparky-stereo-os/blob/main/docs/not-filed-upstream.md
 
-Only this line and link go into an issue.
+For a module with no stated position on AI-assisted reports, when Daniel’s hold on KDE contributions is the reason, use:
+
+> Not filed upstream: I am not contributing to KDE projects for now. The developers of this module have not stated a position on AI-assisted reports. Why: https://github.com/Sparky-OS/sparky-stereo-os/blob/main/docs/not-filed-upstream.md
+
+Use only the applicable status line and its link for the reason.
 The statement itself stays on the linked page, without copying or rewording it.
 No personal reason, third-party contact address or severity rating goes into these issues.
-If the module-specific premise is unverified, record that gap for review before using the line; a hold on all KDE contributions is not proof that each module has the same policy.
+A hold on all KDE contributions is not proof that each module has the same policy.
+The recorded positions currently cover KWin and Krita; the second line applies to Marble, Plasma Workspace and Karton.
+Recheck the module’s own record before changing its status line.
 Credit project authors from their own records and related reporters by their public names.
+
+## Writing public issues from private records
+
+1. Read the private evidence, but write the public explanation from its measured facts.
+   Keep the affected version, minimal reproduction, expected and observed result, fix and failing-before/passing-after counts.
+   Do not paste internal reports, machine paths, task numbers, worker names or personal reasons.
+2. Give the cause a public permalink to the file and line at an exact source commit.
+   Link public fix and test commits where they exist.
+   If a current-master fix exists only locally, say so and name its incomplete checks; do not invent a public link or imply that an older published patch applies unchanged.
+3. Preserve the limits of the evidence.
+   Source inspection is not a runtime reproduction.
+   A test-only failure does not establish a production crash, a focused renderer test does not establish the complete application, and a simulated slow disk is not a hard-disk measurement.
+4. List related open upstream reports and label closed historical records as closed.
+   Keep one issue per failure even when the historical record contains both a patch and a report.
+   Write the title and plain-language list entry from what fails, with one sentence per line and no hard wraps or mid-sentence dash.
+5. Validate every public draft, the list and its manifest.
+   The checker must reject private paths, internal task references, email addresses, missing headings, a status block that differs from its approved line, and a public link that an anonymous reader cannot resolve.
+   Check the final URL as well as the HTTP status: a redirect to sign-in followed by HTTP 200 is not a resolved public issue.
+   When the brief requests future issue numbers in a review draft, retain those exact proposed targets, mark the anonymous link check as blocked until the issues exist, and do not create or post them merely to pass the check.
+6. Hand back the reviewed files and manifest for the authorized publisher.
+   A planned issue number is not proof that an issue exists or that its final number will match.
+   The publisher checks the actual numbers after creation and updates the list before it goes live.
 
 ## Traps found while making the inventory
 
-- Symptom: three rejected tracker records appear to be three failures.
+- Symptom: three closed tracker records appear to be three failures.
   Cause: a merge request and its linked issue describe the same test failure.
   Fix: retain the requested historical records, but give them one failure identity and one future issue.
   Found by reading the merge request's linked issue and matching its cause and reproducer.

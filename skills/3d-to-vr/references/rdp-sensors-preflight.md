@@ -273,3 +273,50 @@ The OS console session id is not the peer's FreeRDP virtual-channel manager id.
 The integrated KRdp build passed its existing module smoke and panel tests plus five pose core suites.
 The pre-pose APK connected to the actual receiver, activated RDP, explicitly rejected the pose DVC and delivered zero poses.
 The Android fused-sensor endpoint still requires its own positive qualification; core tests and a negative endpoint control do not establish it.
+
+## Core tests pass but the Android pose path is still unqualified
+
+Run the receiver's standalone core tests inside its SDK container:
+
+```sh
+cmake -S autotests/stereotracking -B build/pose-core -G Ninja
+cmake --build build/pose-core -j4
+ctest --test-dir build/pose-core --output-on-failure
+```
+
+Then run an actual phone-side fused sensor through the DVC to the integrated KRdp receiver.
+The recorded API-28 AOSP emulator advertises game and compass rotation vectors, with a 100 Hz minimum-period limit.
+It delivered 338 framework-fused game samples at 56.07 Hz for a 60 Hz selection, with increasing source and mapped timestamps and 0.55–2.56 ms estimated clock uncertainty.
+Separate 30 Hz, 90 Hz and compass selections delivered real virtual-sensor samples; a requested 120 Hz was explicitly unavailable, without substitution.
+Those measurements establish emulator delivery, not physical sensor accuracy or end-to-end display latency.
+
+Keep deterministic Android adapter proof separate from virtual sensor-fusion proof.
+Inject literal rotation vectors through the same `SensorManager.getQuaternionFromVector` conversion used by live callbacks, reorder its wxyz result to wire xyzw, and join the PC's original source timestamp to the injected fixture.
+The recorded two landscape runs compare all six signed physical-axis rotations, identity and sign continuity against independent forward/up expectations.
+Pause/resume increments the sensor source epoch and requires recentering before delivery resumes.
+A simulated 500 ms writer stall delivered no old in-flight pose; recovery required fresh input and retained the origin.
+This models blocked transport; it does not qualify concurrent camera saturation on physical hardware.
+
+## A blocked pose writer accumulates old sensor samples
+
+Use one latest-sample mailbox and one network writer, rather than posting a runnable for every sensor callback.
+A blocked-writer test offered 10,000 readings and required the next unsent reading to be the newest, followed by an empty mailbox.
+Replacing the mailbox with an unlimited FIFO made that unchanged test fail.
+Keep the compiled mutant outside authored sources and verify their bytes remain unchanged.
+The phone's controller uses that tested mailbox; its control queue is separately bounded and rejects overflow.
+
+## Phone shows disconnected instead of the actual pose error
+
+Inspect both endpoints before accepting a named error gate.
+The receiver originally queued an error STATUS and immediately called `WTSVirtualChannelClose`; that discarded the unsent status, so Android saw only peer disconnect.
+Invalidate and unregister input immediately, then allow a bounded manager-drain period before closing the optional DVC.
+The recorded 100 ms drain delivered the explicit unavailable-rate and revoked-permission errors to Android, while sources were already invalidated and unregistered.
+Start test revocation and measurement timers at peer activation, not at process creation; slow app startup otherwise revokes the synthetic grant before the test even connects.
+A connection/activation timeout remains separately bounded.
+
+## New Android source uses a Java method newer than minSdk
+
+Inspect the packaged dex as well as the source API level.
+`Long.compareUnsigned` is API 26 in the SDK metadata, but the recorded minSdk-23 build enables core-library desugaring and its packaged pose-adapter dex contains no reference to that platform method.
+This bounded inspection avoids inventing an API compatibility failure from source spelling alone.
+It does not replace running the supported older Android images.

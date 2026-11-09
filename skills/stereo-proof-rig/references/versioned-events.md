@@ -32,6 +32,8 @@ Run the same rows before and after the server change:
 
 In the configured KWin integration-test container, build `testStereoDepthExchange` and run `bin/testStereoDepthExchange testResourceVersion` under the test session bus. Keep the failing old-server log. The full depth exchange suite checks the window, output and inert-surface behavior alongside this version test.
 
+If the explicit registry binding uses a separate event queue, dispatch that queue after the display sync before checking its event counters. A sync dispatched on the framework's default queue does not drain the other queue. In the regression, v3 and v4 each reproduced the unknown event on the old server; v5 passed alone. With the server guard, all three rows and the complete depth exchange suite passed.
+
 Connection survival is protocol proof. The real greeter's lock, idle CPU, unlock and wallpaper depth are separate checks; run them with depth enabled and disabled when fixing a greeter incident.
 
 ## Greeter proof

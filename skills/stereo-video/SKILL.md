@@ -57,6 +57,8 @@ Most 3D breakage is a program in the middle silently writing a plain 2D file.
 
 ## Writers: encoders, muxers, editors, servers
 
+For a GPU recording that loses its mark, [trace the client and driver boundary](references/gpu-encoder-marks.md) before changing either: a raw SEI that survives proves a different cause from one the driver drops.
+
 A server or caster that feeds another device (a DLNA television, a cast receiver) sends that device's own frame format at its raster, not the desktop's full side by side: see [stereo-serving](../stereo-serving/SKILL.md).
 
 | Program | What carries the mark | Where |

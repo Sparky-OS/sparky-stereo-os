@@ -7,7 +7,7 @@ description: >-
   game drives the view, the 2D layer, crosshair, weapon effects), SteamVR on a television inside gamescope, the Stereo
   Spectator, Android XR as a source, an OpenXR runtime (DisplayXR) declaring its window full side by side. Load it when
   a VR game should play on a 3D TV, the HUD or crosshair doubles, effects smear across the eyes, a spectator view must
-  keep the headset's camera, any OpenXR app should show in 3D on Stereo KWin, Sneeze must show its scene in two eyes, an
+  keep the headset's camera, OpenXR or Waydroid needs gralloc/dma-buf transport, Sneeze needs two eyes, an
   OpenVR program must run with no SteamVR (xrizer, openvrpaths.vrpath, VR_Init Installation Not Found, both eyes show
   the left view), an OpenVR or OpenXR program on a 3D screen has no head or wrong depth (depth limits, tv or headset,
   DXR_VIEW_SUNK_PX), or a Linux gamepad gives no pose (evdev).
@@ -100,6 +100,9 @@ The closed forms, the files, the finding, the proof, the gamepad's mapping and t
 
 Every route reaches OpenXR's `xrEndFrame`, so one runtime that declares full side by side serves them all.
 The routes, where the two eyes cross each boundary, and how to read a project's real licence and AI position (history, `AGENTS.md`, open merge requests) are in [who-runs-whose-vr-software.md](references/who-runs-whose-vr-software.md).
+
+Before joining an Android container to the host runtime, verify the selected allocator with real buffer handles.
+The [Android container transport preflight](references/android-container-transport.md) explains the dma-buf gate, the platform probe, the kernel boundary and the evidence still needed for a completed bridge.
 
 ## A metaverse browser's engine (Sneeze), checked 2026-11-08
 

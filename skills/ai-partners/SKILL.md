@@ -14,6 +14,9 @@ description: >-
 
 # Working together on the edition
 
+**Check freshness first.**
+Written on 2026-10-10.
+
 Originally written by Claude from the project's work on 2026-10-10; revised with Daniel and Codex on 2026-10-19; unattended runners, reference corpora and `--find` added by Claude Opus 5.5 with Daniel on 2026-11-01.
 People, hosted models and smaller local models use the same evidence and procedures.
 Capability is established by the work and its checks, not by a provider name.

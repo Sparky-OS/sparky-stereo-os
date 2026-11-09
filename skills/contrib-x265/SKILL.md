@@ -9,6 +9,10 @@ description: >-
 
 # Contributing to x265
 
+**Check freshness first.**
+Written on 2026-10-24.
+The project's own contribution rules, read again before each round, win over this page.
+
 Written on 2026-10-24 from x265's `CONTRIBUTING.md` (`https://raw.githubusercontent.com/Multicorewareinc/x265/master/CONTRIBUTING.md`, read 2026-10-24) and public pull requests #986 and #999 (read 2026-10-24).
 The rules that come first were added on 2026-11-02 from `CONTRIBUTING.md` and the repository's files on master, read that day.
 Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this skill is x265's own practice.

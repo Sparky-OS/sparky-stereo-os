@@ -77,11 +77,34 @@ The method used on the README (3,720 words down to about 500) and the organisati
 1. **List who links in.** Search the repository, the talks, the other READMEs, the organisation profile and the sister repositories for `README.md#` and `sparky-stereo-os#`; write the anchors down. Each one must still resolve at the end.
 2. **Cut the page into blocks** at its headings, and give every block a destination: stays on the front page, moves to an existing page under `docs/`, or moves to a new page under `docs/`.
    A block that moves goes whole, with its pictures, links, credits and footnotes; rewrite nothing on the way.
+   The form that loses nothing by construction, and the one used here: the whole former page becomes one detail page (`docs/edition-in-detail.md`, with its links rewritten for the new folder), and the front page keeps, for every section, one sentence of the section's own and a link to the same anchor on the detail page.
 3. **Keep the claims table** as you go (`claims.tsv`: the front page's sentence, the old line it came from, where the full text now lives). A sentence on the new front page without an old line is a new claim: remove it or source it.
 4. **Leave the anchors.** Where a linked heading left the front page, keep a short section of the same name that says one line and links to the new page, or leave `<a id="old-anchor"></a>` at the line that now points there.
 5. **Prove nothing was lost.** Compare the sets of link targets and of pictures before and after across the front page plus the pages that received its blocks; then compare the words: every sentence of the old page must be found, whole, in the new page or in one of the receiving pages. A script does both; keep its output as evidence.
 6. **Run the link and anchor check** over the whole repository, not only the changed files: a moved heading breaks links in files you did not touch.
 7. **Translations follow the English** in structure and anchors. Give every translated heading that other pages link an explicit `<a id="english-slug"></a>`, because a translated heading makes a different slug.
+   Build each translated front page from that translation's own sentences (the first sentence, the credit, the door lines, the first line under each heading), found by position because every translation keeps the headings in the English order; then only the few new lines need translating. A generator script with one strings file per language keeps the nine pages identical in structure.
 8. **The cold-reader test,** before and after, on the first screen only.
+
+## Traps met while shrinking
+
+- **Symptom:** the first screen stays near 190 words when the rule says about 120.
+  **Cause:** three things may not leave it: the credit sentence, the Lean Code lines with their measurement, and the line that names every kind of screen.
+  **Fix:** cut everywhere else first (the status to one sentence, the next step to one link), say the measured count in the hand-back, and let the cold readers judge the result.
+- **Symptom:** a scope line reads as a claim that everything works ("it drives VR headsets and glasses-free displays").
+  **Cause:** the design's scope and the tested devices were written as one sentence.
+  **Fix:** two lines: "It is made for ..." names the families, and the status line says what was tested and what is in progress.
+- **Symptom:** a cold reader calls a door "a rhetorical question that does not clearly tell me what to do".
+  **Cause:** the door reused a section's opening question.
+  **Fix:** a door states what the reader gets; the question stays in its section.
+- **Symptom:** a cold reader of a quick start lists Secure Boot, the hash check and the writing tool as the confusing words.
+  **Cause:** the step named the thing and not what it is.
+  **Fix:** one clause in the same breath: "Secure Boot is the PC's own check that only signed systems may start".
+- **Symptom:** the second reader cannot be reached (`ask_chatgpt`: "ACIG bootstrap pending").
+  **Fix:** `ask_cloud` with a `model` from another lab than the default; give the text as a file, and record which model answered. Never count one lab twice as two readers.
+- **Symptom:** a request to check nine languages of strings in one call returns an empty answer, three models in a row.
+  **Fix:** not found; say in the hand-back which languages no second model read.
+- **Symptom:** a link from a skill to a page that exists only on the texts branch fails the skills check.
+  **Fix:** link the page by its full address on the main branch until both branches are merged.
 
 **Perks.** The claims table is also the reviewer's reading list, and the receiving pages become the "doors" of the front page for free.

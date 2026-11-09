@@ -1,5 +1,7 @@
 # Sparky Stereo OS 9 Mashtabba beta 1: a technical field guide
 
+**Short version:** for a first look from a USB stick on a Windows PC, [Try it on your Windows PC](try-on-windows.en.md) is one page; step 1 saves the BitLocker recovery key.
+
 You can inspect the tested boot path, install layout, package sources and stereo display contract in a beta 1 image built on Debian 14 Forky and KDE Plasma 6.7.
 This guide records the image's current behavior and the limits that matter when you evaluate it.
 

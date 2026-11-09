@@ -37,6 +37,45 @@ For NVIDIA, the lowest open layer that knows the intended layout is the encoder 
 The [NVENC interface](https://github.com/FFmpeg/nv-codec-headers/blob/master/include/ffnvcodec/nvEncodeAPI.h) accepts `NV_ENC_SEI_PAYLOAD` arrays in the H.264 and HEVC per-picture parameters before `nvEncEncodePicture`.
 The encoder runtime remains closed; open kernel modules are not where this codec SEI is authored.
 
+## Reconcile FFmpeg's encoder paths before adding a writer
+
+Source audit on 9 November 2026, FFmpeg master [b2b543c07924](https://git.ffmpeg.org/gitweb/ffmpeg.git/commit/b2b543c079241a63692245c26c743328385dfff6).
+This identifies existing routes and prerequisites; it does not claim a production writer has been implemented.
+
+| Encoder | Existing insertion route | Stereo handling in that snapshot |
+|---|---|---|
+| H.264 / HEVC VA-API | `init_picture_params` selects messages; `write_extra_header` serializes CBS SEI into `VAEncPackedHeaderRawData`; existing `sei` flags | No FPA writer; HEVC's shared `hw_base_encode_h265.c` sets the non-packed constraint to 1 |
+| H.264 / HEVC NVENC | `prepare_sei_data_array` creates `NV_ENC_SEI_PAYLOAD`; `nvenc_codec_specific_pic_params` supplies the array before `nvEncEncodePicture`; existing `extra_sei` master switch and per-message booleans | No FPA writer; the HEVC use of `AVStereo3D` configures multiview encoding, which is a different representation |
+| H.264 / HEVC Vulkan Video | `init_pic_params` selects messages; `write_extra_header` serializes CBS into the encoder's header buffer; existing `units` flags | No FPA writer; HEVC copies the shared non-packed constraint into its Vulkan parameter structures |
+| H.264 / HEVC QSV | Shared `mfxEncodeCtrl.Payload` array; H.264's callback already builds an A/53 `mfxPayload`; HEVC's callback currently supplies HDR extension buffers | No FPA writer; the shared caller ignores the callback's return value, so a new validation error must also be propagated |
+| H.264 / HEVC AMF | FFmpeg sets AUD/header and HDR metadata properties; the inspected public `VideoEncoderVCE.h` and `VideoEncoderHEVC.h` expose no arbitrary-SEI payload property | No FPA writer; do not claim a general injection API from the presence of HDR or header insertion alone |
+| libx264 | Frame side data reconfigures `i_frame_packing` | Maps types 0 through 6, warns and disables the mark for inverted input, and has no mapping for quincunx SBS or tiled input |
+| libx265 | `x265_picture.userSEI` carries caption/unregistered data; explicit `x265-params` pass to the library | No automatic `AVStereo3D` mapping; a library's `frame-packing` option does not establish wrapper support |
+
+The encoder files and their history credit Mark Thompson for the VA-API encoders, Timo Rothenpieler and Luca Barbato for the NVENC implementations, and Lynne for the Vulkan encoders.
+These routes already own metadata during encoding; use them instead of adding a file-repair stage.
+
+**An upstream predecessor exists.**
+Mark Thompson posted [15/18, the AVStereo3D-to-SEI helper](https://ffmpeg.org/pipermail/ffmpeg-devel/2019-October/250967.html) and [16/18, H.264 VA-API integration](https://ffmpeg.org/pipermail/ffmpeg-devel/2019-October/250966.html).
+The latter adds a default-on `frame_packing` member to `sei`.
+The current source lacks both changes, but a new implementation should adapt and credit them.
+Their original CBS interfaces have changed, the writer requests a message even without side data, and the temporal helper exchanges frame identity for inverted content.
+The current decoder derives `AVStereo3D.view` directly from `current_frame_is_frame0_flag`, independently of `INVERT`; preserve that distinction when adapting the helper.
+
+The edition's metadata-filter series also has `ff_cbs_sei_frame_packing_params`.
+Inspect it before sharing it: its automatic unsupported-type path returns `ENOENT`, and its temporal mapping applies eye inversion.
+Neither behavior meets a writer that must fail on unsupported marked input and preserve frame identity.
+Keep independent tests for the writer's contract instead of assuming the filter helper has it.
+
+**Whole-spec prerequisite:** this FFmpeg snapshot has no tiled `AVStereo3DType` for H.264 type 7, and its dedicated quincunx type describes SBS only.
+Represent every required packing and quincunx variant in side data before claiming full coverage from that side data.
+Check the decoder's export mapping too; parsing payload type 45 is not proof that the frame retains its layout.
+
+**Cadence reference measured with FFmpeg 9.0.2 and libx264:** 100 frames at 25 fps, `keyint=12:min-keyint=12:scenecut=0:threads=1`, ultrafast preset.
+Plain 2D produced zero FPA messages; `frame-packing=3` produced nine messages and nine keyframes, repetition period 1; `frame-packing=5` produced 100 messages, repetition period 0, with alternating frame-0 flags starting at 1.
+The independent Annex-B reader counted payload type 45, `trace_headers` read the periods/flags, and `ffprobe -show_entries frame=key_frame` counted keyframes.
+Use this as a cadence reference, not as proof that x264 covers both eye orders or every packing.
+
 ## Check the entire specification for the production writer
 
 Read the edition of each standard, not an enum remembered from the other codec.
@@ -49,6 +88,18 @@ Segmented rectangular frame packing is a separate H.265 SEI (§D.2.29 and §D.3.
 The [ITU H.264](https://www.itu.int/rec/T-REC-H.264-202606-I/en) and [ITU H.265](https://www.itu.int/rec/T-REC-H.265-202601-I/en) editions are the references; do not distribute their PDFs with a patch.
 
 ## Traps found by the boundary test
+
+**Symptom: NVIDIA Vulkan returns `VK_ERROR_INCOMPATIBLE_DRIVER` although CDI supplies the ICD.**
+First read the ICD path inside the container; CDI can place it under `/etc/vulkan/icd.d`.
+In a minimal VA-API probe image, `VK_LOADER_DEBUG=all` found the manifest and `libGLX_nvidia.so.0` but could not obtain `vkCreateInstance`.
+`LD_DEBUG=libs` then showed unsuccessful lookups for `libEGL.so.1`.
+Installing the archive's verified `libegl1` package inside the disposable image allowed H.264 and HEVC Vulkan encoding to run.
+An ICD file and successfully loaded vendor library alone do not establish a complete runtime.
+
+**Symptom: unmarked HEVC has non-packed constraint 0, despite having no frame packing SEI.**
+This was observed with FFmpeg 9.0.2's NVENC path; the Vulkan baseline set it to 1.
+H.265 V11 §7.4.4, p.90 allows a zero constraint whether or not such SEI is present.
+Read each backend's parameter sets before defining the 2D byte-identity control; forcing this bit to 1 changes an otherwise valid baseline.
 
 **Symptom: FFmpeg's output banner says Stereo 3D, but decoding the encoded file reports none.**
 The banner can describe carried side data even when the VA-API encoder never writes payload type 45.

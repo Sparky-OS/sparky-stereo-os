@@ -122,6 +122,11 @@ These narrower topics have their own references:
 - [Screen-content codec comparisons](references/screen-content-codecs.md) (checked 2026-10-14): matched text quality, the controls, and x265 SCC that silently falls back to Main profile.
 - [Editing, playback and transport boundaries](references/editing-playback-transport.md) (2026-10-19): a reusable editing regression project, the per-file eye swap, and a slow phone stream measured stage by stage.
 
+## A player on the engine's video layer
+
+A Qt Quick player (Dragon Player, Plank Player) keeps only its menu, its per-file store and its message: the drawing, the declaration and a refused declaration (`stereoLayerFailure`) are Qt Multimedia's.
+[What the player keeps, the refused declaration shown, the red and green recipe and its traps](references/a-player-on-the-video-layer.md) (ORDER 453 and 453b), among them the superseded recipe folders that sit beside the shipped ones.
+
 ## Lessons from the lanes, October to November 2026
 
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (22 entries).

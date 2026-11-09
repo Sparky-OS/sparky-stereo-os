@@ -108,6 +108,10 @@ The final proof is an Android `hello_xr` red view 0 and blue view 1 captured at 
   **Cause:** the Android property-service compatibility rewrite runs after loading Waydroid's properties.
   **Fix:** use the existing `gralloc.gbm.legacy=true` opt-in when the test specifically requires the legacy module, and assert the live selection.
   **How found:** live `getprop`, loaded mapper libraries and `system/core/init/property_service.cpp`.
+- **Symptom:** the guest completes filesystem sync and powers off, but its accelerated QEMU container exits 139.
+  **Cause:** an additional teardown crash remains unisolated; guest shutdown is not proof that QEMU exited cleanly.
+  **Next gate:** retain the serial shutdown and container exit state; investigate teardown separately if this rig is reused.
+  **How found:** the final container-state check caught the nonzero exit, despite the guest's recorded power-off; core dumps stayed disabled.
 - **Symptom:** a real dma-buf passes the ioctl probe but the Vulkan consumer aborts before importing memory.
   **Cause established so far:** Venus's resource-properties query cannot find the transferred virtual resource; the precise renderer/kernel defect remains unisolated.
   **Next gate:** repair or qualify the virtual graphics import path, or qualify a compatible native graphics device shared by Android and its runtime under one kernel.

@@ -129,6 +129,7 @@ Debian's postinst enables such a unit wherever the package is installed, so the 
 
 The engine that keeps what failed lets the person dismiss a problem, and the Problems page of System Settings lists the current and the dismissed ones.
 [Dismiss, Bring back and the page](references/problems-dismiss.md) says what each scope does (a failed service of this boot stays dismissed when it fails the same way after a reboot), the one store the notifier and the page share, and the traps met.
+[A problem that says its cause](references/problems-cause-not-retry.md) is the recipe for a failure whose cause stays: its own message, no blind "Repair starts it again", an `ExecStopPost=` for a unit that ends well, and fixtures from real journals.
 
 ## Lessons from the lanes, October to November 2026
 

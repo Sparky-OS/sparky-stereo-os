@@ -6,9 +6,9 @@ description: >-
   KDE power, locking, idle, lid, CEC, swap and hibernate policy in the edition: powerdevilrc and kscreenlockerrc
   defaults, HoldProfile and powerprofilesctl, CEC ownership, text consoles and system power, the Cushion Swap file on
   disk (zram and zswap never ours, the person's opt-in from the Memory page), resume= and RESUME_OFFSET for hibernation,
-  a user preference that appears ignored. Load it when the screen locks or sleeps against the person's setting, the lid
+  a user preference that appears ignored, a failed hibernation read from that attempt (the notice names the device, the share or the cause). Load it when the screen locks or sleeps against the person's setting, the lid
   closes and the TV goes dark, hibernate fails to resume, a zram package removes another package or an upgrade proposes
-  removing it, the Memory page needs a swap indicator, or a power profile is held by a program.
+  removing it, the Memory page needs a swap indicator, or a power profile is held by a program, or Hibernate fails and the Problems page only says the service failed.
 ---
 
 # Power and idle in KDE
@@ -138,6 +138,11 @@ Read [system-housekeeping](../system-housekeeping/SKILL.md) for system policy.
 Use a disposable overlay of the development image, a real swap area named in `conf.d/resume`, a serial console and QEMU `-no-reboot` with a QMP event log; hibernate at least ten times per kernel and repeat with Debian's stock kernel to tell the kernel from QEMU, OVMF and the guest set-up.
 A "resume" counts only when the boot id is unchanged and a witness process survived; the journal of the resumed machine looks like an in-place return (`Waking up from system sleep state S4`, `hibernation exit`, no image-writing lines) because the writing lines exist only on the console of the machine that went down.
 The recipe, the edition's own path (partition, swap file with `RESUME_OFFSET`, PowerDevil, suspend-then-hibernate), the Secure Boot bench run and the traps are in [references/hibernate-in-a-vm.md](references/hibernate-in-a-vm.md).
+
+## A failed hibernation says why (2026-11-09)
+
+The engine reads a failed `systemd-hibernate`, `systemd-suspend-then-hibernate` or `systemd-hybrid-sleep` from that attempt's journal (systemd-sleep's `SLEEP_STOP` line with `ERRNO=`, the kernel's `PM: failed to freeze async: error -95` with its `_KERNEL_DEVICE`) and names the device and what to do; a virtio-fs share, a locked-down kernel and a missing swap area get no retry, because the cause stays.
+The kinds with their source lines, the fixture method (`systemd-journal-remote`), the real virtio-fs run and the traps are in [references/failed-hibernation.md](references/failed-hibernation.md); how any package says a cause instead of "Repair starts it again" is in [system-housekeeping](../system-housekeeping/references/problems-cause-not-retry.md).
 
 ## When a user preference appears ignored (2026-10-19)
 

@@ -62,6 +62,15 @@ Environment for a small rehearsal: `E_PACKAGES` (default the user meta and both 
 - **A rebuilt `+lc1` package cannot just get a new version in its control file.** The lc1 manifest (`usr/share/dpkg-stereo/lc/<package>/<arch>.json`) holds the version, and the control field `Sparky-Lean-Code: lc1 <sha256 of the manifest>` binds it; the gate says `lc identity or scope mismatch`. Change the version in the manifest, recompute the sha256, update the field and the manifest's line in `md5sums`.
 - **`apt-get dist-upgrade` keeps a conflicting upgrade back instead of removing the installed package it conflicts with** (even with `Replaces` and `Provides`), so a planted removal shows as "kept back" in the proof, not as `Remv`; both are failures. The `Remv` check itself is exercised on planted logs by `test-checks.sh`.
 
+## A package whose proofs bind another package's files (the saver catalogue gate, ORDER 146e)
+
+gl-stereo-savers carries 132 receipts, each the SHA-256 of a saver executable and settings file of XScreenSaver and of gl-stereo's layer. They are true against one XScreenSaver build only: published 0.4.2 against the round's +stereo3d4+lc1 offered 1 of 132 savers and nothing said so.
+
+- **Pin it:** the dependency on every package that owns a bound file is `(= version)`, generated at build time from the files the build just proved equal (`dpkg-query -S` then the installed version into a substvar; gl-stereo `savers/pin.py`), never typed and never `>=`. Both packages are ours and publish in the same round, so the pin costs nothing.
+- **Gate it:** `official-part1.sh` runs `gl-stereo/packaging/check-round-savers.py --index $DEST` after publish-tree: it unpacks the tree's own packages in Python and refuses the round when the catalogue would offer fewer savers than it ships against that tree's XScreenSaver, or when Depends is not the exact pin. A round that rebuilds XScreenSaver without requalifying gl-stereo stops here with each saver, file and both hashes named. Exit 2 (no gl-stereo-savers, no xscreensaver, unreadable archive) refuses too: a gate that cannot look is not a pass.
+- **Say it:** what a package cannot offer is named where the person looks (gl-stereo's saver list: "Not offered" and the reason), never dropped from a list.
+- The same shape fits any package whose qualification binds files of another (check what its catalogue code does with a mismatch before trusting a `>=`).
+
 ## Rehearse before the real round
 
 A dry round runs `official-part1.sh` with `ROUND_DRY=1`: the base need not equal the live tree (said loudly), the official key and `build.conf` are never read, and `ROUND_KEY_HOME`/`ROUND_KEY` name a throwaway key.

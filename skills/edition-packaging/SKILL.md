@@ -153,7 +153,7 @@ A test image that installs from our repository needs deb-multimedia's source and
 ## A publication round
 
 A round runs from a frozen worktree of the build repository, passes the pre-round checks (the whole lean suite, reproducible sources, wiring; in containers), and proves the upgrade on the edition's own dpkg, judged on apt's `Inst` and `Remv` lines.
-The recipe, what the proof fails on, how to read a failed round and the traps already met: [publication round](references/publication-round.md).
+The recipe, what the proof fails on, how to read a failed round, a package whose receipts bind another package's files (pin it exactly, gate the round) and the traps already met: [publication round](references/publication-round.md).
 
 ## The repository and the ISO
 

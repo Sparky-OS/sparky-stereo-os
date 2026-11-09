@@ -64,5 +64,5 @@ Check freshness: re-read `CONTRIBUTING.md`, `doc/developer.texi` and `doc/commun
 
 ## Lessons from the lanes, October to November 2026
 
-[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (9 entries).
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (9 entries, and a section on multilayer HEVC and the 3D reference displays SEI).
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

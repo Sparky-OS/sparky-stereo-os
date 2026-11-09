@@ -12,6 +12,10 @@ description: >-
 
 # Open flight and racing simulators
 
+**Check freshness first.**
+Written on 2026-10-16.
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
+
 ## Working recipe
 
 1. Choose one simulator and failing stage: drawable creation, cameras, render resources, UI/input, lifecycle or packaging.

@@ -12,6 +12,10 @@ description: >-
 
 # Audio on Sparky Stereo OS
 
+**Check freshness first.**
+Written on 2026-10-10.
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
+
 ## Working recipe
 
 1. Record source rate/channels, selected sink, negotiated format and the existing graph with pw-dump.

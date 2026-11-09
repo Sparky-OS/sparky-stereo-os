@@ -10,6 +10,10 @@ description: >-
 
 # Contributing to mpv
 
+**Check freshness first.**
+Written on 2026-10-24.
+The project's own contribution rules, read again before each round, win over this page.
+
 Written on 2026-10-24 from `DOCS/contribute.md` (https://raw.githubusercontent.com/mpv-player/mpv/master/DOCS/contribute.md, read 2026-10-24) and public pull request #18490 (https://github.com/mpv-player/mpv/pull/18490, read 2026-10-24).
 The rules that come first were added on 2026-11-02 from `DOCS/contribute.md` and `.github/PULL_REQUEST_TEMPLATE` on master, read that day.
 Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this skill is mpv's own practice.

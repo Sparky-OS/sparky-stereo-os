@@ -13,6 +13,10 @@ description: >-
 
 # Power and idle in KDE
 
+**Check freshness first.**
+Written on 2026-10-10.
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
+
 ## Working recipe
 
 1. Read effective user and system settings and identify the daemon that owns the action; distinguish default, absent and explicit values.

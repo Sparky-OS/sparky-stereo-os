@@ -13,6 +13,10 @@ description: >-
 
 # ICP-Brasil certificates on Linux
 
+**Check freshness first.**
+Written on 2026-10-10.
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
+
 ## Working recipe
 
 1. Identify the dated ITI bundle, published digest, pinned root and intended consumer; use public certificates only.

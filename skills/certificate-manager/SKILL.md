@@ -12,6 +12,10 @@ description: >-
 
 # Certificate manager contributions
 
+**Check freshness first.**
+Written on 2026-10-10.
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
+
 ## Working recipe
 
 1. Record catalogue revision, root pins, selected groups, trust purposes and target backend (OpenSSL, NSS or Java).

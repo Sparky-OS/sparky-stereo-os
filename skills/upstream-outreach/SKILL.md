@@ -85,6 +85,27 @@ A `contrib-<project>` skill declares the packages that make it relevant (`metada
 - One ask, small and concrete.
 - In the person's own venue: an issue or comment on their repository for code, email to a maintainer or to a group's staff contact, the store page or forum for a theme's author, LinkedIn for a person without a code venue. Answer where the message came from.
 - Never another person's contact details in a public file.
+- **Offer, never ask.**
+  A note to a maker, a studio, a lab or a developer says what they get: one desktop where a program hands over its two eye pictures once and every kind of 3D screen shows them, so their developers and their users meet on the same base as everyone else's.
+  What we ask for is people: an introduction to their developers, a pointer to who should see it, "who else should see this?".
+  Never ask for hardware, a loan, a discount or money; when a quotation is offered, the answer is "no quotation for now", then the offer.
+  Other makers on the same base are part of the offer, not a threat to it: a larger ecosystem serves every maker on it.
+  Daniel's reason, used as a reason and never as a slogan aimed at the reader's company: "the internet is a success because is free", and "the same must go for 3D content".
+  Never offer to host or organise a call, and never promise work, a demonstration or a date.
+- **The value first, with its evidence, then the caveat.**
+  When a later result changes a patch's framing, read the first rationale again and keep every piece of evidence that is still true.
+  A fix whose failure was measured on real hardware is never "for compliance" or "changes nothing": write the measured failure it prevents, the log behind it, and only then the limit.
+  Offer the edition as a reference only in its own subject, stereo 3D and the display path that carries it; in any other subject state our experience, never the edition as a reference.
+- **Describe every stereo display, never the oldest ones.**
+  The scope is 3D TVs and projectors, VR headsets, glasses-free 3D displays, any monitor with red-cyan glasses, and a plain 2D monitor without any change.
+  "Works on 3D TVs and with red-cyan glasses" makes the work read as old technology in front of the people it is for.
+  A measurement keeps its real device.
+- **To an engineering reader, colour and quality.**
+  For engineering vendors and their users leave red-cyan glasses out: full colour and full sharpness per eye, the screens that give it, and the 3D screen every engineer, worker and client already carries, the phone in a viewer.
+- **Summary first, details linked.**
+  Open with the subject, what the reader needs and at most three priorities; link each detail to the exact section instead of pasting it.
+  A dense, verified, linked text is right for a reader who knows the field and asked; it is one click down for everyone else ([writing-front-pages](../writing-front-pages/references/selling-to-a-newcomer.md)).
+- **Never "the first" or "the only"** without the source beside it, and never a status better than the evidence.
 - **The report carries the fix and the test.**
   The practical guide, "Wherever Possible, Provide a Proposed Patch to Address Your Discovery": "Fixes are more important than findings. Full stop."
   It also asks for "Test Cases to Avoid Future Regressions".

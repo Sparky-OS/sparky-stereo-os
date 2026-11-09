@@ -12,6 +12,10 @@ description: >-
 
 # KDE controller input
 
+**Check freshness first.**
+Written on 2026-10-10.
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
+
 ## Working recipe
 
 1. Identify raw device counts and the mapping owner. Choose raw-device testing or shell/application navigation; they are different tasks.

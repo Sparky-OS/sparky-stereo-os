@@ -3,12 +3,14 @@ metadata:
 name: writing-front-pages
 description: >-
   Write the first text a stranger meets: README openings, profiles, calls for testers, list and page openings, About
-  lines within 350 characters, a document's bold lead, README translations, a glossary entry, a new term checked against
-  other projects' names before it is used: person first, show before telling, short, no jargon up front, honest status,
-  one next step, doors per reader, Daniel's voice, move never drop, keep every link and anchor that points in,
-  registered marks that must not split a link, the cold-reader test with two models and a person. Load it when a
-  newcomer cannot tell what the project is for, a term needs its number or a name may already be another project's, a
-  status line confuses, a translated heading's anchor no longer resolves, or a check says a link was split.
+  lines within 350 characters, a document's bold lead, README translations, a one-page quick start for a reader coming
+  from Windows, a glossary entry, a new term checked against other projects' names before it is used: person first,
+  show before telling, short, no jargon up front, honest status, one next step, doors per reader, offer and never ask,
+  value with evidence, every stereo display, move never drop, keep every link and anchor that points in, the
+  cold-reader test. Load it when a newcomer cannot tell what the project is for, a long README must shrink without
+  losing a fact, a tester lost Windows to a BitLocker recovery prompt, a term needs its number or a name may already
+  be another project's, a status line confuses, a translated heading's anchor no longer resolves, or a check says a
+  link was split.
 ---
 
 # Writing front pages
@@ -42,7 +44,7 @@ Maintainers want the technical detail there, and [`sparky-stereo`](../sparky-ste
 ## The first screen, in order
 
 1. **What a person can do.** For example: "Create and explore in 3D on the screen you already have".
-2. **What they need,** and what it costs ("cheap red-cyan glasses").
+2. **What they need,** and what it costs: the screen they already have. Name the kinds of screen it drives (3D TVs and projectors, VR headsets, glasses-free 3D displays, any monitor with red-cyan glasses, a plain 2D monitor without any change), never only the oldest ones.
 3. **Who makes it:** the credit line.
 4. **The picture,** linked to the section that explains it. Never link it to a file type the reader does not know.
 5. **The status,** for example "In development: nothing to download yet". Without this line, cold readers go looking for an ISO.
@@ -66,12 +68,29 @@ Maintainers want the technical detail there, and [`sparky-stereo`](../sparky-ste
   - A fork says where it comes from: "The stereo version of <Project> by Sparky Stereo OS, forked from <upstream>", or "Sparky Stereo OS's <kind> work on <Project>" where the name's rules ask for it.
   - Something planned starts with "Planned:".
 
+## Selling the work to a newcomer
+
+[Selling the work to a newcomer](references/selling-to-a-newcomer.md) holds the recipe, the traps and the method for shrinking a long front page.
+The short form:
+
+1. **Offer, never ask.** We offer one common base for 3D programs and 3D screens; what we ask for is people, never hardware, loans or money.
+2. **Value first, with its evidence,** then the caveat. Never undersell a measured result, and claim reference standing only for stereo 3D.
+3. **Every stereo display:** 3D TVs and projectors, VR headsets, glasses-free 3D displays, any monitor with red-cyan glasses, and a plain 2D monitor without any change. A measurement keeps its real device.
+4. **Engineering readers** get full colour and full sharpness per eye, and the 3D screen already in their pocket; no red-cyan glasses in that pitch.
+5. **The reader comes from Windows** and tries before reading: safety first, then the benefit, then one page of at most ten steps, with the long guide one link away.
+6. **Summary first, details linked** to the exact section; one step after another.
+7. **Never "the first" or "the only"** without a source, and never a status better than the evidence.
+
+The trap that cost a tester their Windows installation: the guide did not say, before anything else, to save the BitLocker recovery key and to leave Secure Boot on.
+Step 1 of every page that leads to a USB start says both.
+
 ## Keep every link that points in
 
 Before moving a heading, find who links to it: talk slides, forum posts, other lists, the issues.
 - Keep each linked heading, or leave `<a id="old-anchor"></a>` where its content now starts.
 - Check every relative link and anchor in the changed files before handing back.
 - Keep a claims table (draft line, source file and line, and where each moved fact now lives), so a reviewer can check that nothing new was claimed and nothing was lost.
+- To shrink a long page, follow [the eight steps](references/selling-to-a-newcomer.md#shrinking-a-long-front-page-without-losing-a-fact): blocks move whole, anchors stay, and a script proves every old sentence still exists.
 
 ## The newcomer test
 

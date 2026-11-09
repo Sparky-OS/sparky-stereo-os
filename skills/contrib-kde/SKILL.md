@@ -11,6 +11,10 @@ description: >-
 
 # Contributing to KDE
 
+**Check freshness first.**
+Written on 2026-10-24.
+The project's own contribution rules, read again before each round, win over this page.
+
 Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this is KDE's own practice.
 Re-read the relevant Invent repository's contribution rules and Bugzilla workflow before work.
 This skill uses KDE's own records read on 2026-10-24, not generic commit hygiene.

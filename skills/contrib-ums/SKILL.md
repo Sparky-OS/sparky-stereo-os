@@ -9,6 +9,10 @@ description: >-
 
 # Contributing to Universal Media Server
 
+**Check freshness first.**
+Written on 2026-10-24.
+The project's own contribution rules, read again before each round, win over this page.
+
 Written on 2026-10-24 from Universal Media Server's `CONTRIBUTING.md`, `STYLEGUIDE.md`, pull-request template and public pull requests [#6330](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6330) and [#6389](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6389).
 The rules that come first were added on 2026-11-02 from `Code_Of_Conduct.md`, `CONTRIBUTING.md`, `STYLEGUIDE.md` and `.github/pull_request_template.md` on `main` and from the knowledge base's [development page](https://github.com/UniversalMediaServer/knowledge-base/blob/main/docs/development/development.md), read that day.
 Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this skill is Universal Media Server's own practice.

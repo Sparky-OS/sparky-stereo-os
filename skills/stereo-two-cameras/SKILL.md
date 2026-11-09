@@ -68,3 +68,7 @@ As in the general skill, plus the geometry:
 ## An X3D scene in the browser
 
 X_ITE and X3DOM scenes are real 3D scenes, so they take cameras, not a flat UI's depth: flat WebXR (the page's own views) or the browser's camera hack. The recipe to measure both eyes of either, the numbers found and the traps (float preferences are strings, a shadow-root button needs a real click, model/x3d types open nothing) are in [references/x3d-in-the-browser.md](references/x3d-in-the-browser.md).
+
+## Reading a web 3D project before it goes on a list
+
+Which licence, which AI position, whether it can be built from source, which stereo field it has (or none) and whether a native program can sit inside the browser are read from the project's own repository, not from its web page: the recipe, the read-only commands and the traps (NOASSERTION, a bulk licence folder, source-available viewers, code search that lags) are in [references/reading-a-web-3d-project.md](references/reading-a-web-3d-project.md).

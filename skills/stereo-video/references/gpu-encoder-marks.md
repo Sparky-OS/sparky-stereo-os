@@ -1,5 +1,55 @@
 # A GPU recording loses its stereo mark
 
+## Writer and verification recipe
+
+The encoder-client implementation prepared in November 2026 converts `AVStereo3D` during encoding.
+Its shared `frame_packing.c` adapts Mark Thompson's 2019 conversion proposal; it does not use the metadata-filter helper's inverted temporal mapping.
+For a library caller, attach `AV_FRAME_DATA_STEREO3D` to each input frame and supply the initial layout in `AVCodecContext.decoded_side_data` before opening the encoder.
+The initial side data matters for HEVC parameter sets; frame metadata can then select the packing and temporal frame identity.
+`AV_STEREO3D_VIEW_LEFT` means frame 0 even with `AV_STEREO3D_FLAG_INVERT`.
+
+| Encoder | Marking option, enabled by default | Writer or refusal |
+|---|---|---|
+| H.264 / HEVC VA-API | `-sei +frame_packing`; disable with `-sei -frame_packing` | CBS payload 45 through the existing raw packed-header path; a driver without packed SEI support produces an error |
+| H.264 / HEVC NVENC | `-frame_packing 1`; disable with `-frame_packing 0` | `NV_ENC_SEI_PAYLOAD` first in the existing array; the existing `extra_sei` master switch also controls it |
+| H.264 / HEVC Vulkan Video | `-units +frame_packing`; disable with `-units -frame_packing` | CBS payload 45 in the encoder's extra headers |
+| H.264 / HEVC QSV | `-frame_packing 1`; disable with `-frame_packing 0` | `mfxEncodeCtrl.Payload`; callback errors propagate. HEVC requires the SDK's returned VPS and SPS to establish clear non-packed constraints |
+| H.264 / HEVC AMF | `-frame_packing 1`; disable with `-frame_packing 0` | A marked source is refused with its packing name and the opt-out, because the inspected API has no general SEI route |
+
+H.264 supports standard types 0–7 and their permitted quincunx variants, in both eye orders.
+The new side-data names are `AV_STEREO3D_TILED`, `AV_STEREO3D_TOPBOTTOM_QUINCUNX`, `AV_STEREO3D_LINES_QUINCUNX` and `AV_STEREO3D_COLUMNS_QUINCUNX`; the decoder exports these too.
+H.265 accepts types 3–5 and their permitted quincunx variants; other marked layouts fail explicitly.
+Ordinary 2D has no mark. Explicit H.264 type-6 side data produces the standard 2D arrangement with content interpretation 0; explicit HEVC 2D produces no arrangement.
+Spatial packing is written at keyframes and layout changes; H.264 repetition period is 1.
+Temporal packing is written on every frame, with H.264 repetition period 0 and HEVC persistence 0.
+
+To verify an encoder change:
+
+1. Use a public-API harness to supply every layout, both orders and explicit temporal views. Include initial-only metadata, per-frame metadata and B-frames.
+2. Independently parse Annex-B payload 45 and compare each syntax field; also run `trace_headers` and a software decode with `showinfo`.
+3. Read back HEVC's general and every applicable sublayer non-packed constraint. A marked stream requires 0; an unmarked stream retains the encoder's original value.
+4. Decode every successful stream in mpv with `--no-config --vo=null --ao=null --hwdec=no --audio=no`; count decoded frames and require normal EOF.
+5. Compare unpatched and patched elementary streams byte for byte for plain 2D and for a marked source with marking disabled.
+6. Require the marker check to fail on unpatched output. Check named refusals, invalid tiled dimensions, late HEVC metadata, forced keyframes and the NVENC payload budget.
+
+The implementation was run on AMD VA-API and NVIDIA NVENC/Vulkan Video for H.264 and HEVC: 156 layout/order cases, 108 successful streams, 48 expected refusals, and 1,728 frames decoded by both FFmpeg and mpv.
+Twelve plain/disabled comparisons were byte-identical, and all 102 applicable unpatched marker controls failed as expected.
+Additional controls passed temporal identity with B-frames, initial-only metadata, forced NVENC IDRs and oversized unregistered SEI.
+QSV and AMF compiled and their early refusal paths were exercised; that does not qualify their hardware runtimes.
+The tested HEVC streams had no additional temporal sublayers; the code clears applicable sublayer flags, but this run does not claim extra-sublayer hardware coverage.
+
+## Writer traps
+
+| Symptom | Cause | Fix and how the cause was found |
+|---|---|---|
+| Right-first temporal input changes frame identity after conversion | An older helper XORs frame-0 identity with eye order | Follow the decoder: `frame0 = (view == LEFT)`. Compare parsed frame-0 bits with decoded views in display order, including B-frames; eye order remains a separate content field |
+| HEVC metadata first appears after encoding starts | VA-API/Vulkan already emitted parameter sets with non-packed constraint 1 | Supply initial decoded side data before encoder open; otherwise fail with the packing and marking opt-out. `trace_headers` identifies the contradiction |
+| A large optional NVENC payload consumes the HEVC SEI allowance | The runtime path has a 512-byte total budget | Put the mandatory arrangement first and keep it below the budget. Test with a 600-byte unregistered payload and explicitly enable `udu_sei`; without that option the control never exercises the budget |
+| Tiled output is syntactically marked but has an invalid cropped size | H.264 type 7 requires both cropped dimensions divisible by three | Reject the size before writing; test an invalid width and its explicit marking opt-out |
+| A QSV callback reports an error but encoding continues | The shared caller discarded `set_encode_ctrl_cb`'s return value | Propagate the negative result through encoder cleanup; validate HEVC's returned constraints before adding a payload |
+| New decoder tests appear to retain the old mapping | A reused build's baseline object is newer than edited source | Check object/source times and force rebuilding changed inputs; keep the original failure and do not alter the expected reference |
+| A reused build image cannot update apt | Its sources refer to build-only archive mounts absent in the new container | Read apt's exact missing path; provide those read-only inputs or use a verified HTTPS archive configuration appropriate to the disposable runtime image. Never bypass signature verification |
+
 ## Find the boundary before changing the driver
 
 1. Record the render node, PCI identity, `vainfo` driver string, Mesa/libva/client versions and negotiated packed-header attributes.

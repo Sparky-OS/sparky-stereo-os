@@ -11,6 +11,10 @@ description: >-
 
 # Contributing to Qt
 
+**Check freshness first.**
+Written on 2026-10-24.
+The project's own contribution rules, read again before each round, win over this page.
+
 Written on 2026-10-24 from Qt's contribution page (`https://contribute.qt-project.org/`, read 2026-10-24), the Qt Wiki Gerrit setup guide (`https://wiki.qt.io/Setting_up_Gerrit`, read 2026-10-24) and public changes 778399 and 778580 (read 2026-10-24).
 Updated on 2026-11-02 from qtsvg's `CONTRIBUTING.md`, the Qt Community Code of Conduct ([QUIP 12](https://code.qt.io/cgit/meta/quips.git/tree/quip-0012-Code-of-Conduct.rst)), [QUIP 17](https://code.qt.io/cgit/meta/quips.git/tree/quip-0017-Change-log-creation.rst) and public change [785347](https://codereview.qt-project.org/c/qt/qtsvg/+/785347).
 Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this skill is Qt's own practice.

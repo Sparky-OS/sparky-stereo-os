@@ -73,9 +73,9 @@ The ISO attestation verifies the build's evidence and artifact hashes. It does n
 
 ## Java, Kotlin and native build inputs
 
-The development tooling adds compiler-backed Java and Kotlin adapters: Java uses the JDK lexer,
-and Kotlin uses the pinned Kotlin compiler lexer. Documentation comments, licences, operational
-directives and string contents remain intact. Kotlin newline and token-adjacency semantics are checked.
+The development tooling adds compiler-backed Java and Kotlin adapters: Java uses the JDK lexer, and Kotlin uses the pinned Kotlin compiler lexer.
+Documentation comments, licences, operational directives and string contents remain intact.
+Kotlin newline and token-adjacency semantics are checked.
 The Flat Headset recipe qualifies JDK 17 with Kotlin 2.4.0 and then runs the actual Gradle build and headset tests.
 Missing compiler tooling is a recorded refusal, never a successful optimization.
 

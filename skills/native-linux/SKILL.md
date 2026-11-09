@@ -8,7 +8,7 @@ description: >-
   eye delivery and the 2D fallback. Load it when GLX offers no stereo visual, a program's
   stereo option does nothing, a child window is invisible to the compositor, an X11 child gets no WL_SURFACE_SERIAL in
   CI, wp_viewporter says the surface already has a viewport, a mono EGL window draws at half its width, a video crashes KWin switching between ARGB and NV12, a Vulkan swapchain errors with NATIVE_WINDOW_IN_USE,
-  a toolkit lacks stereo, or a gl-stereo layer change needs the 130 saver receipts again ("untested layer binary",
+  a toolkit lacks stereo, a browser canvas with image-rendering: pixelated shows black, or a gl-stereo layer change needs the 130 saver receipts again ("untested layer binary",
   "untested saver binary").
 ---
 
@@ -145,6 +145,8 @@ As in the general skill: both eyes captured, one declaration, the 2D control.
 For a route change (Mesa, Xwayland), also the programs that already worked, rerun.
 
 A client drawing on a GPU other than the compositor's (a dmabuf import failure, "importing the supplied dmabufs failed"): [references/two-gpu-dmabuf.md](references/two-gpu-dmabuf.md).
+
+A browser canvas (WebGL, three.js, CesiumJS), video or image with `image-rendering: pixelated` that shows black, solid green or blurry on Stereo KWin: [references/browser-pixelated-canvas.md](references/browser-pixelated-canvas.md).
 
 ## Lessons from the lanes, October to November 2026
 

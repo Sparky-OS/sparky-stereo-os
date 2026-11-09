@@ -11,6 +11,10 @@ description: >-
 
 # Qt Android CI reproduction
 
+**Check freshness first.**
+Written on 2026-10-12.
+The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
+
 ## Working recipe
 
 1. Read the failing Coin job and record its Qt/FFmpeg revisions, API, ABI, NDK and decoder before choosing a local setup.

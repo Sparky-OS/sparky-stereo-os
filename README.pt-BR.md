@@ -8,7 +8,7 @@ Num monitor 2D comum, a mesma área de trabalho funciona sem nenhuma mudança.
 Sparky Stereo OS, a edição de Daniel Ramos do SparkyLinux (de Paweł "pavroo" Pijanowski), é um sistema Linux com uma nova área de trabalho Stereo KDE Plasma.
 
 **Mais leve para a sua máquina e para o planeta:** todo pacote vem sem os comentários e anotações que os programas nunca leem, então o mesmo trabalho exige menos processamento, menos energia e menos desgaste.
-[Medido](docs/lean-code-packages.md#why-it-matters): ler os cabeçalhos C++ dá de 2 a 4% menos trabalho do que no Debian, sem perder nada.
+[Medido](docs/lean-code-packages.md#why-it-matters) em um laptop de 2016: preparar um programa para o compilador dá 2 a 4% menos trabalho do que com os mesmos arquivos sem os comentários removidos, e nada se perde.
 
 <a href="docs/edition-in-detail.pt-BR.md#seen-in-3d"><img src="docs/screenshots/translucent-stereo-desktop-anaglyph.jpg" width="99%" alt="A área de trabalho estéreo em 3D com janelas translúcidas: o menu Configurações do Dolphin e sua lista de esquemas de cores à frente, as janelas de vidro atrás recuando em sequência, o monitor do sistema e o papel de parede ao fundo (anáglifo vermelho e ciano)"></a>
 

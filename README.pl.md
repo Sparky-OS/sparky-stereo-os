@@ -8,7 +8,7 @@ Na zwykłym monitorze 2D ten sam pulpit działa bez żadnych zmian.
 Sparky Stereo OS, edycja SparkyLinux autorstwa Daniela Ramosa (twórcą SparkyLinux jest Paweł "pavroo" Pijanowski), to system Linux z nowym pulpitem Stereo KDE Plasma.
 
 **Lżejszy dla Twojego komputera i dla planety:** każdy pakiet trafia do Ciebie bez komentarzy i notatek, których programy nigdy nie czytają, więc ta sama praca wymaga mniej obliczeń, mniej energii i mniej zużycia sprzętu.
-[Zmierzone](docs/lean-code-packages.md#why-it-matters): odczyt nagłówków C++ wymaga o 2 do 4% mniej pracy niż w Debianie, bez żadnej straty.
+[Zmierzone](docs/lean-code-packages.md#why-it-matters) na laptopie z 2016 roku: przygotowanie programu dla kompilatora wymaga o 2 do 4% mniej pracy niż przy tych samych plikach bez usuniętych komentarzy, i nic się nie traci.
 
 <a href="docs/edition-in-detail.pl.md#seen-in-3d"><img src="docs/screenshots/translucent-stereo-desktop-anaglyph.jpg" width="99%" alt="Pulpit stereoskopowy w 3D z półprzezroczystymi oknami: menu Ustawienia programu Dolphin i lista zestawów barw z przodu, szklane okna za nimi cofające się kolejno, monitor systemu i tapeta najgłębiej (anaglif czerwono-cyjanowy)"></a>
 

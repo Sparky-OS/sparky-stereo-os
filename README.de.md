@@ -8,7 +8,7 @@ Auf einem gewöhnlichen 2D-Monitor funktioniert derselbe Desktop ohne jede Ände
 Sparky Stereo OS, Daniel Ramos' Edition von SparkyLinux (von Paweł "pavroo" Pijanowski), ist ein Linux-System mit einem neuen Stereo-KDE-Plasma-Desktop.
 
 **Leichter für Ihren Rechner und für den Planeten:** Jedes Paket kommt ohne die Kommentare und Notizen, die Programme nie lesen; dieselbe Arbeit braucht so weniger Rechenleistung, weniger Energie und weniger Verschleiß.
-[Gemessen](docs/lean-code-packages.md#why-it-matters): Das Einlesen der C++-Header kostet 2 bis 4 % weniger Arbeit als unter Debian, ohne dass etwas verloren geht.
+[Gemessen](docs/lean-code-packages.md#why-it-matters) auf einem Laptop von 2016: Das Vorbereiten eines Programms für den Compiler kostet 2 bis 4 % weniger Arbeit als mit denselben Dateien ohne entfernte Kommentare, und es geht nichts verloren.
 
 <a href="docs/edition-in-detail.md#seen-in-3d"><img src="docs/screenshots/translucent-stereo-desktop-anaglyph.jpg" width="99%" alt="Der Stereo-Desktop in 3D mit durchscheinenden Fenstern: vorn das Einstellungsmenü von Dolphin mit der Liste der Farbschemata, dahinter treten die Glasfenster stufenweise zurück, am tiefsten liegen die Systemüberwachung und das Hintergrundbild (Rot-Cyan-Anaglyphe)"></a>
 

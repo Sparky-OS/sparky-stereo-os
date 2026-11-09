@@ -8,9 +8,9 @@ Sur un écran 2D ordinaire, le même bureau fonctionne sans aucun changement.
 Sparky Stereo OS, l'édition de Daniel Ramos de SparkyLinux (par Paweł « pavroo » Pijanowski), est un système Linux doté d'un nouveau bureau KDE Plasma stéréo.
 
 **Plus léger pour votre machine et pour la planète :** chaque paquet est livré sans les commentaires et les notes que les programmes ne lisent jamais, donc le même travail demande moins de calcul, moins d'énergie et moins d'usure.
-[Mesuré](docs/lean-code-packages.md#why-it-matters) : lire les en-têtes C++ demande 2 à 4 % de travail en moins que sous Debian, sans rien perdre.
+[Mesuré](docs/lean-code-packages.md#why-it-matters) sur un portable de 2016 : préparer un programme pour le compilateur demande 2 à 4 % de travail en moins qu’avec les mêmes fichiers dont les commentaires n’ont pas été retirés, et rien n’est perdu.
 
-<a href="docs/edition-in-detail.fr.md#seen-in-3d"><img src="docs/screenshots/translucent-stereo-desktop-anaglyph.jpg" width="99%" alt="Le bureau stéréo en 3D avec des fenêtres translucides : le menu Réglages de Dolphin et sa liste de jeux de couleurs en avant, les fenêtres vitrines derrière en gradation, le moniteur système et le fond d'écran au plus profond (anaglyphe rouge-cyan)"></a>
+<a href="docs/edition-in-detail.fr.md#seen-in-3d"><img src="docs/screenshots/translucent-stereo-desktop-anaglyph.jpg" width="99%" alt="Le bureau stéréo en 3D avec des fenêtres translucides : le menu Réglages de Dolphin et sa liste de jeux de couleurs en avant, les fenêtres en verre derrière, qui reculent, le moniteur système et le fond d'écran au plus profond (anaglyphe rouge-cyan)"></a>
 
 <a href="docs/edition-in-detail.fr.md#seen-in-3d"><img src="docs/screenshots/doom-2016-in-a-window-anaglyph.jpg" width="32%" alt="DOOM (2016) dans une fenêtre, en 3D, avec le panneau Plasma plat en dessous (anaglyphe rouge-cyan)"></a> <a href="docs/edition-in-detail.fr.md#seen-in-3d"><img src="docs/screenshots/marble-globe-anaglyph.jpg" width="32%" alt="Le globe de Marble devant les étoiles, en 3D (anaglyphe rouge-cyan)"></a> <a href="docs/edition-in-detail.fr.md#seen-in-3d"><img src="docs/screenshots/stereo-desktop-anaglyph.jpg" width="32%" alt="Le bureau stéréo en 3D : le panneau à l'écran, un pop-up du son en avant, et les fenêtres derrière en gradation (anaglyphe rouge-cyan)"></a>
 
@@ -59,7 +59,7 @@ Sparky Stereo OS, l'édition de Daniel Ramos de SparkyLinux (par Paweł « pavro
 Sparky Stereo OS, l'édition de Daniel Ramos (Capitain Jack) de SparkyLinux (par Paweł « pavroo » Pijanowski).
 Tout ce sur quoi s'appuie cette édition, par nom : [ATTRIBUTIONS.md](ATTRIBUTIONS.md).
 
-**Citez le :** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23309024.svg)](https://doi.org/10.5281/zenodo.23309024)
+**Citez-le :** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23309024.svg)](https://doi.org/10.5281/zenodo.23309024)
 
 **Sponsor Daniel :** [![Sponsor Daniel](https://img.shields.io/badge/Sponsor-danielcamposramos-EA4AAA?style=flat-square&logo=githubsponsors)](https://github.com/sponsors/danielcamposramos) [![Donnez à SparkyLinux](https://img.shields.io/badge/Donate-SparkyLinux-2777AD?style=flat-square)](https://sparkylinux.org/donate/) Sponsoriser Daniel finance cette édition, et un don à SparkyLinux soutient la distribution de Paweł, la base sur laquelle elle est construite.
 

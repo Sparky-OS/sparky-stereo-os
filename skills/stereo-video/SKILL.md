@@ -6,11 +6,11 @@ description: >-
   Stereo video: the marks (H.264 and H.265 frame packing SEI, MPEG-2 JP3D, MP4 st3d and sv3d, Matroska
   StereoMode 0 to 14), writers (x264, x265, mkvmerge, Kdenlive, UMS, PeerTube), readers (FFmpeg, Qt Multimedia, mpv,
   VLC, Haruna, Dragon), metadata precedence, unpacking rows, columns, checkerboard and frame sequences by copying, 360
-  and VR180, depth video, the per-file eye swap saved to the file only with consent. Load it
+  and VR180, depth video, the per-file eye swap. Load it
   when a 3D film plays flat, the mark is lost after the first frame or a transcode, the eyes are swapped, a half
-  side-by-side file is pre-scaled, mpv shows only the left view, a depth map does not rotate with the picture, a
-  StereoMode must be written back, an FFmpeg hwaccel assertion fails in pthread_frame.c, VLC hangs after a minimize or
-  drops out of full screen on Wayland, or a player's output modes must go.
+  side-by-side file is pre-scaled, mpv shows one view, a depth map does not rotate with the picture, a
+  StereoMode must be written back, a GPU encoder writes no frame packing SEI, an FFmpeg hwaccel assertion fails in pthread_frame.c, VLC hangs after a minimize or
+  leaves full screen on Wayland, or a player's output modes must go.
 ---
 
 # Stereo video, end to end

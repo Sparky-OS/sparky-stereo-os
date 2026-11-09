@@ -3,13 +3,11 @@ metadata:
   requires-packages: libx11-dev
 name: native-linux
 description: >-
-  Native Linux stereo routes: GLX quad buffer (GL_BACK_LEFT, GL_BACK_RIGHT), EGL multiview, Vulkan (imageArrayLayers 2,
-  the implicit layer), Qt (QOpenGLWidget, QWindow), X11 declarations (one view size, child windows through Xwayland),
-  libstereo-declare, game engines and libraries (SDL, GLFW, GLUT, FLTK, Ogre, raylib, plib), KWin's buffer formats,
-  capability discovery, eye delivery and the ordinary 2D fallback. Load it when GLX offers no stereo visual, a program's
+  Native Linux stereo routes: GLX quad buffer, EGL multiview, Vulkan (imageArrayLayers 2), Qt (QOpenGLWidget, QWindow), X11 declarations (one view size, child windows through Xwayland),
+  libstereo-declare, SDL, GLFW, GLUT, FLTK, Ogre, raylib, plib, KWin's buffer formats,
+  eye delivery and the 2D fallback. Load it when GLX offers no stereo visual, a program's
   stereo option does nothing, a child window is invisible to the compositor, an X11 child gets no WL_SURFACE_SERIAL in
-  CI, wp_viewporter says the surface already has a viewport, a mono EGL window draws at half its width, a browser's
-  video crashes KWin when its buffers switch between ARGB and NV12, a Vulkan swapchain errors with NATIVE_WINDOW_IN_USE,
+  CI, wp_viewporter says the surface already has a viewport, a mono EGL window draws at half its width, a video crashes KWin switching between ARGB and NV12, a Vulkan swapchain errors with NATIVE_WINDOW_IN_USE,
   a toolkit lacks stereo, or a gl-stereo layer change needs the 130 saver receipts again ("untested layer binary",
   "untested saver binary").
 ---

@@ -5,7 +5,7 @@ name: stereo-proof-rig
 description: >-
   Run isolated Stereo KWin captures of both eyes and negative controls in a throwaway container (kwin_wayland --virtual,
   ScreenShot2, WAYLAND_DEBUG, fake input, a real plasmashell session) for stereo identity, geometry, timing, UI, element
-  depth and installed packages; find why the two eyes differ; the unpacking checks (one resize at KWin); the showcase
+  depth and installed packages; find why the two eyes differ; the unpacking checks; the showcase
   screenshot. Load it when a capture is black, transparent, stale or cancelled, the right eye is brighter than the left,
   Show Screen Contents says the process is not authorized to take a screenshot, testTabBoxStereo or another KWin
   autotest fails, kf.package reports invalid metadata, timeout as PID 1 exits 125, the Wayland socket path is too long,

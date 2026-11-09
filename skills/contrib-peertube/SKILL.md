@@ -9,6 +9,10 @@ description: >-
 
 # Contributing to PeerTube
 
+**Check freshness first.**
+Written on 2026-10-24.
+The project's own contribution rules, read again before each round, win over this page.
+
 Written on 2026-10-24 from PeerTube's contribution guide, repository `AGENTS.md`, pull-request template and public pull request [#7816](https://github.com/Chocobozzz/PeerTube/pull/7816), read 2026-10-24.
 The rules that come first were added on 2026-11-02 from `CODE_OF_CONDUCT.md`, `.github/CONTRIBUTING.md`, `.github/PULL_REQUEST_TEMPLATE.md` and `AGENTS.md` on `develop`, read that day.
 Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this skill is PeerTube's own practice.

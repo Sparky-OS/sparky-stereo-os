@@ -33,6 +33,12 @@ A browser or player routed to another GPU can die in its first seconds with noth
 systemd already knows how every program KIO started ended; the Graphics page keeps a death in the problems engine through a drop-in on the `app-` units, with "Use NAME" for the GPU the program's desktop entry can name, and never starts the program again.
 [The recipe, why this place and not the launcher or a wrapper, the window and the traps](references/program-died-at-start.md).
 
+## The KDE splash
+
+KSplash takes `Breeze` when no `ksplashrc` names a theme (plasma-workspace `startkde/startplasma.cpp`, `readEntry("Theme", "Breeze")`), and a global theme's `defaults` file is only applied when the person applies that theme, so a fresh user of the edition saw KDE's splash although `org.sparkystereo.desktop` has its own.
+`sparky-stereo-look` ships `/etc/xdg/ksplashrc` with `[KSplash] Engine=KSplashQML` and `Theme=org.sparkystereo.desktop`; KConfig reads it below the person's `~/.config/ksplashrc`, key by key, so a new user, an empty file and a file with no `Theme` key get ours and a `Theme` the person chose (another global theme, `None`) stays.
+Proof, in a container with `libkf6config-bin`: `tests/ksplashrc.sh` in the look package runs `kreadconfig6 --file ksplashrc --group KSplash --key Theme --default Breeze` for six states of the person's file (4 failing without the file, 0 with it).
+
 ## Decided defaults, out of the box
 
 The edition sets good defaults itself instead of leaving each choice to the person, as stock Debian and KDE do (Daniel, 2026-10-08: "Having the freedom is perfect, but, for a newcommer ... is a pain, not a feature").

@@ -86,6 +86,7 @@ Daniel, 2026-10-30: "all kernel purges must locate all that kernel parts and reg
 
 - **One system:** hidden menu, with Esc or Shift to open it.
 - **Another system found at installation** (especially on UEFI): other systems listed (`GRUB_DISABLE_OS_PROBER=false`) and the menu shown.
+- **An error on the image or the menu:** [every message the edition's configuration can make GRUB print](references/grub-errors.md), booted in QEMU, with the recipe that reads them from the serial port.
 - **Proposal:** show the menu after a boot that did not finish, so the kept older kernel is reachable. GRUB cannot write its environment block on Btrfs, LVM, RAID or an encrypted `/boot`; use a short visible timeout there.
 
 ## Keeping a user's settings

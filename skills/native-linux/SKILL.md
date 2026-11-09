@@ -3,13 +3,14 @@ metadata:
   requires-packages: libx11-dev
 name: native-linux
 description: >-
-  Native Linux stereo routes: GLX quad buffer, EGL multiview, Vulkan (imageArrayLayers 2), Qt (QOpenGLWidget, QWindow), X11 declarations (one view size, child windows through Xwayland),
-  libstereo-declare, SDL, GLFW, GLUT, FLTK, Ogre, raylib, plib, KWin's buffer formats,
-  eye delivery and the 2D fallback. Load it when GLX offers no stereo visual, a program's
-  stereo option does nothing, a child window is invisible to the compositor, an X11 child gets no WL_SURFACE_SERIAL in
-  CI, wp_viewporter says the surface already has a viewport, a mono EGL window draws at half its width, a video crashes KWin switching between ARGB and NV12, a Vulkan swapchain errors with NATIVE_WINDOW_IN_USE,
-  a toolkit lacks stereo, a browser canvas with image-rendering: pixelated shows black, or a gl-stereo layer change needs the 130 saver receipts again ("untested layer binary",
-  "untested saver binary").
+  Native Linux stereo routes: GLX quad buffer, EGL multiview, Vulkan, Qt,
+  X11 declarations (one view size, child windows through Xwayland), libstereo-declare, SDL, GLFW, GLUT, FLTK, Ogre,
+  raylib, plib, KWin's buffer formats, eye delivery and the 2D fallback. Load it when GLX offers no stereo visual, a
+  program's stereo option does nothing, a child window is invisible to the compositor, an X11 child gets no
+  WL_SURFACE_SERIAL in CI, wp_viewporter says the surface already has a viewport, a mono EGL window draws at half its
+  width, a video crashes KWin switching between ARGB and NV12, a Vulkan swapchain errors with NATIVE_WINDOW_IN_USE, a
+  toolkit lacks stereo, a canvas or video looks pixelated or black in the stereo browser, the browser's video is
+  green on NVIDIA, or a gl-stereo layer change needs the saver receipts again.
 ---
 
 # Native Linux programs

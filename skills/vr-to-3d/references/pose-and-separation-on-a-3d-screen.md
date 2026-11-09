@@ -1,11 +1,11 @@
-# No head on a 3D screen: the view from the mouse, the separation from the kind of display
+# No head on a 3D screen: the view from the mouse or a pad, the separation from the desktop's depth limits
 
-Learned on DisplayXR, xrizer and an OpenVR program with a scene of known depth (ORDER 478 milestone 2, November 2026).
+Learned on DisplayXR, xrizer and an OpenVR program with a scene of known depth (ORDER 478 milestones 2 and 2b, November 2026).
 A 3D screen has no head.
-An OpenVR or OpenXR program that expects one gets its view from the runtime's keyboard and mouse driver (qwerty), and the eye separation and screen plane come from a choice the person makes, with one default for each kind of display.
+An OpenVR or OpenXR program that expects one gets its view from the runtime's keyboard and mouse driver (qwerty) or from a gamepad, and the eye separation and screen plane come from the desktop's depth limits and the person's choices on top, not from numbers of the runtime's own.
 Both live in the runtime, so every program gets them with no setting of its own, and nothing in KWin changes ([openvr-on-the-openxr-runtime.md](openvr-on-the-openxr-runtime.md) has the chain).
 
-## Where the numbers come from
+## Where the view comes from
 
 A legacy application (no `XR_DXR_display_info`) never chooses its own camera.
 `xrLocateViews` returns, for each eye, a pose and a field of view that are complete for rendering (DisplayXR: `docs/architecture/extension-vs-legacy.md`, "The View Path").
@@ -13,50 +13,84 @@ xrizer turns them into OpenVR's head pose (`WaitGetPoses`, device 0), `GetEyeToH
 
 | What | Where it comes from |
 | --- | --- |
-| Head pose | the qwerty head device: W A S D Q E move, a right-button drag with the pointer turns, arrow keys turn, Space goes back to the start. No tracker runs. With no input the pose stays exactly where it is |
+| Head pose | the qwerty head device: W A S D Q E move, a right-button drag with the pointer turns, arrow keys turn, Space goes back to the start; or the gamepad provider (left stick moves, right stick looks, triggers go up and down). No tracker runs. With no input the pose stays exactly where it is |
 | Eye offsets | the display's reported eye separation (sim_display: a fixed 60 mm; a tracked display: the viewer's eyes) times the camera rig's `ipdFactor`, half to each side |
 | Field of view | the rig's vertical field of view with each eye's frustum shifted toward the shared window at `convergenceDiopters` (the zero parallax plane, 1/diopters metres) |
-| The rig's starting numbers | the legacy camera profile: `DXR_LEGACY_CAMERA_RIG` (inline JSON or a path), else `app-profiles/<executable>.json` in the runtime's configuration directory, else the view class below |
+| The rig's numbers | a per-title record wins (`DXR_LEGACY_CAMERA_RIG` inline JSON or a path, else `app-profiles/<executable>.json`); otherwise they follow the depth limits below |
 
-The closed form for a point at distance Z, as a fraction of the canvas width (positive behind the screen plane):
+## The depth limits, and the rig that keeps to them
+
+Stereo KWin announces, for the output a window mainly sits on, how far behind and in front of the screen anything may go: `kde_stereo_depth_v1.depth_limits` (`kde-stereo-content-v1`, since version 5), `sunk` and `popped` in pixels of a view 1920 wide, "the user's limits built on the output's display: a headset gets more separation, a framed 3D screen less".
+A program reads them and draws inside them, so its nearest thing and the desktop's popped menu agree on one screen.
+The runtime does the same for the camera; the order of importance is the browser's and the desktop's: the person's choice, built on the display.
+
+The closed form, for a point at distance Z, as a fraction of the canvas width and positive behind the plane (DisplayXR `legacy-camera-profile.md`, "Disparity does not depend on the display"):
 
 ```
-p(Z)/W = ipd * m2v * (convergence - 1/Z) * eyeSeparation / (2 * tan(vFov/2) * aspect)
+p(Z) = k (c - 1/Z)      k = ipd * m2v * eyeSeparation / (2 * tan(vFov/2) * aspect)      c = convergence in diopters
 ```
 
-Because `eyeSeparation` and the canvas aspect are the only display inputs (DisplayXR #2451, fixed in #2452), the same numbers give the same fraction of the canvas on any display.
+With the sunk limit s (pixels / 1920) at infinity, the plane at D metres and the popped limit q:
 
-## The selector and its defaults
+```
+ipdFactor = s * D * (2 * tan(vFov/2) * aspect) / (m2v * eyeSeparation)       convergence = 1 / (D * m2v)
+p(Z) = s * (1 - D / Z)                      the popped limit is met at Z = D * s / (s + q)
+```
 
-The view class is the person's choice of display kind, never read from the output (a desktop can drive a 3D television and a viewer at once).
-`DXR_VIEW_CLASS` in the process environment, else the first line of the file `view-class` in the runtime's configuration directory, else the display's default, `screen`.
-A value that is neither `screen` nor `headset` is refused and said: one error line names the source, the value and the accepted names, and the default applies.
-Anaglyph shares the screen's default (the brief's two kinds); libstereo-policy keeps anaglyph at 0.7 of a framed screen if it ever gets its own value.
+That is the browser's form (its far parallax and `dom.vr.flat.screen-plane-mm`, default 1 m).
+The eye separation is divided out, so the limits hold on any display; the metres-to-world scale cancels in the separation and moves the convergence.
+A scene nearer than D s / (s + q) pops past the popped limit: the camera does what the geometry says and a finished picture is never shifted; the person who wants a scene to reach nearer moves the plane (D = Znear (s + q) / s).
+The runtime logs one `Depth limits:` line with the values in force, that distance included, whenever they change.
+The runtime's comfort rule (the plane no nearer than the viewer) still holds, and the line says when it binds.
 
-| Class | `ipdFactor` | `convergenceDiopters` | Eye offsets | Infinity | 2 m | 0.8 m |
-| --- | --- | --- | --- | --- | --- | --- |
-| `screen` | 0.43 | 0.89 | 25.8 mm apart | 2.0 % behind | 0.9 % behind | 0.8 % in front |
-| `headset` | 1.075 | 0.89 | 64.5 mm apart | 5.0 % behind | 2.2 % behind | 2.0 % in front |
+The person's choices on top, with the browser's names (`dom.vr.flat.mode`, `depth-strength`, `screen-plane-mm`):
 
-Where each number comes from: the headset takes 2.5 times the separation of a framed screen (libstereo-policy's factor, the edition's one depth source); infinity at 2.0 % on a screen is the edition's browser, measured; the pop at the nearest working distance (0.8 m, a proposal) is 0.4 of the sunk side, the ratio of libstereo-policy's popped limit (0.079 degrees) to its sunk limit (0.198 degrees).
-The 2.0 %, the 0.8 m and the plane they give (0.89 diopters) have no recorded design: they are proposals, Daniel's call.
+| Choice | Environment | File in the configuration directory |
+| --- | --- | --- |
+| class `tv` or `headset` | `DXR_VIEW_CLASS` | `view-class`, first line |
+| strength, percent | `DXR_VIEW_DEPTH_STRENGTH` | `view-depth`: `depth-strength=` |
+| screen plane, mm | `DXR_VIEW_SCREEN_PLANE_MM` | `view-depth`: `screen-plane-mm=` |
+| absolute sunk, popped | `DXR_VIEW_SUNK_PX`, `DXR_VIEW_POPPED_PX` | `view-depth`: `sunk-px=`, `popped-px=` |
 
-## The proof, at two settings
+`tv` leaves the announced limits as they are; `headset` takes libstereo-policy's headset factor (2.5) over them; unset is as announced; the class is the person's, never read from the output (a desktop can drive a 3D television and a viewer at once).
+Absolute values replace the limit they name.
+The environment wins over the file key by key, the files are read again twice a second so a change reaches the next frame, and a wrong value (not a number, out of range, an unknown class or key) is refused and said once, never dropped quietly and never read past to the next source.
 
-1. A client of your own that draws squares of known size and depth from the values OpenVR returns (head pose, eye-to-head, raw projection tangents), by ray casting each pixel through exactly those, so nothing is shifted after the drawing.
-   Anchor the scene to the first head pose it sees, so a head that moves afterwards moves the view of a world that stays put.
-   Print every frame's returned values next to the scene.
-2. Run it through xrizer into DisplayXR on a headless Stereo KWin ([openvr-on-the-openxr-runtime.md](openvr-on-the-openxr-runtime.md)), once per class, and capture the output (3840x1080 for a 1920x1080 view: the eyes side by side).
-3. Predict each square's picture in each eye from the returned values: a pinhole camera per eye, the returned tangents as the off-axis frustum, 8x8 samples per pixel.
-   Measure the centroid of each square's colour in the capture by the fraction of the pixel it covers.
-   Disparity is the left centroid minus the right.
-4. Measured, per class (4 squares at 0.8, 2, 6 and 30 m, both eyes): centroid error 0.077 px rms for the screen class and 0.070 px for the headset class, horizontal disparity error 0.085 and 0.042 px rms, vertical disparity error 0.000 px, 0 swapped pixels, and the capture equals the client's own eye images pixel for pixel.
-   The disparity of the 0.8 m square is 15.5 px at the screen class and 38.7 px at the headset class, the ratio of the separations.
-5. Controls that must fail: each class's capture against the other class's returned values (horizontal disparity error 25 px rms), and a selector value that is not a class (refused, the error line, the default applies).
-6. The pose: real events through KWin's fake input, phases with a capture after each.
-   No input: the head pose is exactly the same over 90 frames.
-   W held: the head moves along its own forward axis and nothing else; D: along +x; S: backward along the turned view; a right-button drag of 100 px turns the view to the right and leaves the position alone.
-7. The picture of each eye changes as a camera moved, not as a shifted copy: after D the squares' sideways shifts follow 1/Z (fitted slope -467.1 px per metre against -467.2 predicted, intercept 0.03 px, residual 0.07 px); after W each square's area changes as the returned views predict (within 1 %), the square the picture does not cut grew by (Z/Z')^2 (2.885 against 2.885).
+## Which window can be told its limits (a finding of milestone 2b)
+
+`depth_limits` is an event on a Wayland surface (`kde_stereo_content_manager_v1.get_depth`).
+A hosted legacy session's window is an X11 client of Xwayland, which cannot ask: KWin sends the limits only to windows whose surface tree has a depth object, and it publishes no X11 property or D-Bus value for them.
+An app-provided Wayland surface (`XR_DXR_wayland_surface_binding`) could ask, but those sessions do not use the qwerty camera rig.
+So today the hosted rig has no source of the compositor's limits: with none and no absolute sunk value the runtime logs `Depth limits: none` with the reason and keeps DisplayXR's own rig (ipdFactor 1, convergence 0.5 diopters); the class, strength and plane have nothing to scale.
+The smallest change that would close it, in KWin: write the same two numbers it already sends to Wayland clients, as 24.8 fixed point in one `CARDINAL/32[2]` property `_KDE_NET_WM_STEREO_DEPTH_LIMITS` on an X11 window that declares stereo content, from `StereoDepthStates::update()`, and raise `_KDE_NET_WM_STEREO_CONTENT_SUPPORTED` to 10.
+The other way is a native Wayland window for the hosted session in the runtime.
+
+## The proof
+
+1. What KWin announces: a small Wayland window that follows its desktop depth (`kde_stereo_depth_v1`) prints each `depth_limits` event; run it on the headless Stereo KWin with the person's `[StereoDepth]` `SunkLimit` and `PoppedLimit` in `kwinrc` (10 and 4, the shipped values), rewrite the file while it runs and ask KWin to reconfigure (`org.kde.KWin.reconfigure`): the events follow, 10/4, then 24/9.5, then 3/1.25, and KWin's own side of the Wayland log (`WAYLAND_DEBUG=server`) shows the same numbers.
+   The virtual output has no physical size, so KWin's display factor is 1 and the announced values equal the person's.
+2. The runtime: an OpenVR client of your own that draws squares of known size and depth from the values OpenVR returns (head pose, eye-to-head, raw projection tangents), by ray casting each pixel through exactly those, so nothing is shifted after the drawing.
+   Anchor the scene to the first head pose it sees.
+   Run it through xrizer into DisplayXR on the headless Stereo KWin, once per set of limits, and capture the output (3840x1080 for a 1920x1080 view: the eyes side by side).
+3. Predict from the limits alone, d(Z) = -S (1 - D/Z) in pixels of a view 1920 wide (left centroid minus right, positive in front), and from the returned views (a pinhole camera per eye, 8x8 samples per pixel).
+   Measured at 4 squares (0.8, 2, 6, 30 m): against the limits 0.0024 px rms at 10/4 and 0.066 px at 24/9.5, against the returned views 0.04 px horizontal and 0.000 px vertical, 0 swapped pixels, no square past a limit.
+4. Live: rewrite `view-depth` while the runtime runs; the next logged line is the new limits and the capture after it follows them.
+5. Controls that must fail: a capture against the other set's limits (9.8 px rms), a value that is not a number (refused once, no limits then), no limits at all (said, DisplayXR's own rig).
+6. The keys' proof of milestone 2 stands: the pictures change as a camera moved, not as a shifted copy (the shifts follow 1/Z).
+
+## The gamepad on Linux
+
+The gamepad provider reads the pad through a per-platform backend; desktop Linux had the stub (`available = 0`, "evdev TODO") until `gamepad_backend_evdev.c`.
+It is three layers so each can be tested alone: `gamepad_evdev_decode.c` (pure: `struct input_event` arrays in, `gamepad_state` out), `gamepad_evdev_core.c` (which pads exist, which one speaks, what happens when one goes, with the system calls behind a small table so a test runs on pipes) and the backend (open, ioctl, inotify).
+The mapping is the kernel's gamepad protocol (`Documentation/input/gamepad.rst`): `BTN_SOUTH`, `BTN_EAST`, `BTN_NORTH`, `BTN_WEST` are A, B, X, Y by position; the d-pad is `BTN_DPAD_*` or `ABS_HAT0X/Y`; the sticks are `ABS_X/Y` and `ABS_RX/RY` with "negative is left/up", so Y is negated to the +Y up of `gamepad_state`; the lower triggers are `ABS_HAT2*` by the protocol and `ABS_Z`/`ABS_RZ` in the legacy drivers (xpad, hid-microsoft, hid-sony), or 0 and 1 from `BTN_TL2`/`BTN_TR2`; a pad with no `ABS_RX` has its right stick on `ABS_Z`/`ABS_RZ`.
+A batch counts only at `SYN_REPORT`; `SYN_DROPPED` discards the torn batch and the device layer reads the real state (`EVIOCGKEY`, `EVIOCGABS`).
+A node is a pad when it has `BTN_SOUTH`, a left stick and no relative axis.
+Several pads are all read and the one touched last speaks; a pad that fails to read (`ENODEV`, end of file) is closed and the next takes over; inotify on `/dev/input` finds a pad plugged in later, with a rescan every second while none is open.
+It tells the person when `/dev/input` cannot be opened (the provider declines), when no node can be read by this user (a pad's node belongs to the seat's session or the group `input`) and that rumble is not sent.
+
+The tests: `tests_gamepad_evdev` on synthetic event arrays and on pipes (104 assertions); six mutations of the source each turn it red (the stick's Y not negated, `SYN_DROPPED` not asking for a resync, North and West swapped, the first pad speaking instead of the last touched, end of file not dropping a pad, a hat's sign), and the unmutated tree is green.
+The real kernel device is `tests/gamepad_evdev_uinput.py` with the `gamepad_evdev_probe` binary; it creates virtual pads through `/dev/uinput` and its header says what it must print.
+Never run it on a machine whose session or games should not see a new pad.
 
 ## Traps
 
@@ -75,11 +109,19 @@ The 2.0 %, the 0.8 m and the plane they give (0.89 diopters) have no recorded de
 - **Fix:** one program for the whole gesture, with a wait after the first move: `pa 960 540 w 800 bd 273 w 300 pm 100 0 w 300 bu 273` (absolute move, wait for Xwayland to take the pointer, button down, motion in steps of at most 8 px, button up).
 - **How found:** KWin's server-side Wayland log (`WAYLAND_DEBUG=server`) showed `wl_seat.capabilities(2)` then `(3)`, `(7)`, `(6)`, `(2)` within 30 ms of each call, and the button press arriving before `get_pointer`.
 
+### A 100 px drag turns the view 11.345 degrees, not 10
+
+- **Symptom:** the turn is 13 % more than "0.1 degrees per pixel" predicts.
+- **Cause:** two things, both in the qwerty driver. `SENSITIVITY 0.1` (`qwerty_xcb.c:41`) is multiplied by the head's look speed `0.02` (`QWERTY_HMD_INITIAL_LOOK_SPEED`, `qwerty_device.c:57`) in `qwerty_add_look_delta` (`yaw_delta += yaw * look_speed`, line 1028) and the sum is an angle in radians (`math_quat_from_angle_vector`, lines 544-558): 0.002 rad, 0.1146 degrees, per pixel, not 0.1. And the X server hands the driver integer pointer positions (Xwayland truncates `wl_pointer.motion`'s fixed point): the pointer travelled 960.0 to 1059.988, X reported 960 to 1059, and the driver's per-event differences (`root_x - last_x`, line 547, with `last_x` taken at the button press, line 515) add up to 99.
+- **Check:** 99 px * 0.002 rad = 0.198 rad = 11.3446 degrees; measured 11.345.
+- **How found:** the compositor's own log of the motion events (`wl_pointer.motion` with fractional positions) against the integer positions the driver sees; the arithmetic matched to three decimals.
+
 ### A capture does not match the pose in the log
 
 - **Symptom:** one capture of a series is off by tens of pixels, the others by 0.1 px.
 - **Cause:** the runtime reads input between frames, so a key held for a commanded second keeps moving the view after the script's `ku`, and the capture shows a frame older than the log's last line.
   The CPU ray caster runs at about 2 frames per second, which makes the gap a few frames.
+  The same happens when the limits change: a capture taken before the change must be read against the views of its own frame, not the last logged ones (`--frame` of `check_limits.py`, from the frame number logged just before the capture).
 - **Fix:** capture only after the last six logged poses are identical, and again check they still are after the capture; take the pose from the frame number logged just before the capture.
   Do not infer a speed from the hold time: distance depends on frames, not seconds.
 
@@ -95,24 +137,39 @@ The 2.0 %, the 0.8 m and the plane they give (0.89 diopters) have no recorded de
 The client averages 3x3 samples per pixel, so an edge is placed to a third of a pixel and a centroid to about 0.1 px.
 That is why the horizontal disparity error is 0.04 to 0.09 px and not zero; the limit asked for is 0.5 px.
 
-### A per-title profile makes the class look ignored
+### A per-title profile makes the limits look ignored
 
-- **Symptom:** `DXR_VIEW_CLASS=headset` and the eye separation does not change.
-- **Cause:** `DXR_LEGACY_CAMERA_RIG` or `app-profiles/<executable>.json` exists; the class is only the default of the profile and the person's more specific record wins.
-- **How found:** the log has a `Legacy camera profile:` line with the profile's numbers and no `View class:` line.
+- **Symptom:** `DXR_VIEW_SUNK_PX` is set and the eye separation does not change.
+- **Cause:** `DXR_LEGACY_CAMERA_RIG` or `app-profiles/<executable>.json` exists; a per-title record is the person's more specific choice and the rig does not follow the limits then.
+- **How found:** the log has a `Legacy camera profile:` line with the profile's numbers and no `Depth limits:` line.
 
-### The gamepad cannot give the pose on desktop Linux
+### The same wrong value is logged every half second
 
-- **Symptom:** a pad is attached; the runtime's input plugin loader says `no registered provider claimed the system (2 declined)`; the head is still moved by WASD and the mouse.
-- **Cause:** the gamepad provider (it drives the rig through the navigation role) reads pads with XInput, a Windows HID backend or GameController; `gamepad_backend_stub.c` is what desktop Linux compiles: `available = 0`, "no pad reader on this platform; evdev TODO(linux)".
-  No open DisplayXR issue or pull request covers a Linux reader (searched 2026-11-09).
-- **What would fix it:** a `gamepad_backend_evdev.c` that reads `/dev/input/event*` for devices with `BTN_GAMEPAD` and absolute axes, maps them onto `gamepad_state` (the hub, devices and mapping table need no change), plus a pure decoder with a test on synthetic `input_event` arrays.
-  A test through a real device node needs `/dev/uinput`, which a container without the device cannot have; say so instead of faking it.
+- **Symptom:** the log fills with the same `depth: DXR_VIEW_SUNK_PX holds "abc"` line.
+- **Cause:** the settings are read again twice a second so that an edited file takes effect; each read refused the same value again.
+- **Fix:** the refusal is kept and logged only when its text changes.
+- **How found:** 17 identical lines in a 40 second case.
+
+### A mutation test stays green after the source was put back
+
+- **Symptom:** after a script that breaks a source line, builds, runs the test and restores the file, the next build says `ninja: no work to do` and the test is red on an unmutated tree.
+- **Cause:** `cp file file.orig; mutate; ...; mv file.orig file` gives the file the copy's modification time, older than the mutated object, so the build keeps the mutated object.
+- **Fix:** `touch` the file after restoring it. A run of several mutations on one tree also needs this between them, or a later red can be an earlier mutation's.
+
+### Two pads: the wrong one speaks after both report at once
+- **Symptom:** every synthetic test passes, and on a real kernel device pad A pressed right after pad B was released shows no button: B still speaks, with nothing held.
+- **Cause:** "touched last" was the time of the read, and the reader goes through the pads in slot order, so within one poll the pad read last wins.
+- **Fix:** take the time from the kernel's stamp on the batch's last `SYN_REPORT`, and set the node's clock with `EVIOCSCLOCKID` to `CLOCK_MONOTONIC`, the clock the reader compares with. A report with no stamp takes the time of the read.
+- **Found by:** the real-device script on the A10, the one step a pipe-driven test could not show, because the fake delivered one pad per poll. A real uinput device gives both in the same poll.
+
+### The gamepad cannot give the pose on a machine with no readable pad
+
+- **Symptom:** a pad is attached; the log says `no registered provider claimed the system` or the head still moves only with WASD.
+- **Cause:** the reader declines where `/dev/input` cannot be opened; where it can, it needs a readable node: a pad's node belongs to the seat's active session (udev's `uaccess`) or the group `input`; a user with neither sees no pad, and the first scan says "no input node can be read by this user".
+- **How found:** run `gamepad_evdev_probe` as that user: it prints `DECLINED`, or `STATE connected=0` with the reason before it.
 
 ## Where the kind of display could come from
 
-KWin tells a program, per output: the name, the description and the physical size through `wl_output` (zero or unknown for a virtual output or a projector); the modes with stereo flags (HDMI side by side, top and bottom, frame packing, anaglyph, rows, columns, checkerboard) through `kde_output_device_v2`, the current one marked; `stereo_glasses` (USB-C glasses known by EDID), `stereo_pair`, `stereo_swap_eyes`, `stereo_depth` (the depth source and a viewing distance in centimetres, 0 when it derives it); and per surface, `depth_state` (awake, the edges on the output's edge) from `kde_stereo_content_manager_v1`.
-No event names a device class (monitor, television, projector, glasses, headset), and an X11 program on Xwayland sees only RandR (millimetres, a fixed 96 dpi guess) and the stereo content support version.
-The one thing that says "headset" is KWin's own D-Bus answer, `org.kde.KWin /KWin headsetViews`, which lists the outputs that are split-eye displays; the runtime already links libdbus, and the answer is an empty array for a plain 2D output.
-So the selector starts on `screen` everywhere, which is right for a framed screen and for anaglyph (both are announced as stereo modes); starting on `headset` for a headset output would take one small thing, a per-output device class set in Display Settings with the EDID's guess as its default, announced as one more `kde_output_device_v2` event.
-The selector stays the person's either way.
+KWin tells a program, per output: the name, the description and the physical size through `wl_output` (zero or unknown for a virtual output or a projector); the modes with stereo flags through `kde_output_device_v2`, the current one marked; `stereo_glasses`, `stereo_pair`, `stereo_swap_eyes`, `stereo_depth`; and per surface, `depth_state` and `depth_limits` from `kde_stereo_content_manager_v1`.
+No event names a device class (monitor, television, projector, glasses, headset), which is why the limits are what a program reads: KWin has already built them on the output's kind and size.
+Because the output's kind is not announced, the class `headset` takes the 2.5 over the limits as announced; on an output KWin already knows as a headset the limits are already larger and the class is left unset.

@@ -4,13 +4,13 @@ metadata:
 name: vr-to-3d
 description: >-
   Adapt a VR engine's eye images for a flat stereo display and spectator viewing: the formula (eyes to a window, the
-  game drives the view, composition, the 2D layer, the crosshair, the weapon and its effects), SteamVR on a television
+  game drives the view, the 2D layer, crosshair, weapon effects), SteamVR on a television
   inside gamescope, the Stereo Spectator, a headset's cameras kept, blur and effects that keep state between frames,
   Android XR as a source, an OpenXR runtime (DisplayXR) declaring its window full side by side. Load it when a VR game
   should play on a 3D TV, the HUD or crosshair doubles, effects smear across the eyes, a spectator view must keep the
   headset's camera, or any OpenXR app should show in 3D on Stereo KWin, or Sneeze (a metaverse browser engine) must show its scene in two eyes,
   or an OpenVR program must run with no SteamVR (xrizer, openvrpaths.vrpath, VR_Init Installation Not Found, both eyes show the left view),
-  or an OpenVR or OpenXR program on a 3D screen needs a view without a head and a separation per kind of display (DXR_VIEW_CLASS).
+  or an OpenVR or OpenXR program on a 3D screen has no head or too much or too little depth (depth limits, tv or headset, DXR_VIEW_SUNK_PX), or a Linux gamepad gives no pose (evdev).
 ---
 
 # From a VR engine to a 3D display
@@ -90,10 +90,11 @@ The recipe, the controls, the numbers and the traps (SDL on Wayland crashes the 
 
 ## No head on a 3D screen (checked 2026-11-09)
 
-On a 3D screen the program drives the view and no tracker runs: the runtime's keyboard and mouse driver gives the head pose (the gamepad provider has no reader on desktop Linux), and the eye separation and screen plane come from the runtime, not from the program.
-The person chooses the kind of display (`DXR_VIEW_CLASS` or a `view-class` file: `screen`, the default, or `headset`), never read from the output, and a value that is not a kind is refused and said.
-The measured disparity follows the off-axis prediction from the returned views to 0.09 px at both classes, and the pictures change as a camera moved.
-The numbers, where each comes from, the proof at two settings, the traps (a pointer gesture split over two tool calls, a capture older than the log, a window that truncates the prediction) and what KWin tells a program about its output are in [pose-and-separation-on-a-3d-screen.md](references/pose-and-separation-on-a-3d-screen.md).
+On a 3D screen the program drives the view and no tracker runs: the runtime's keyboard and mouse driver or a gamepad (the Linux evdev reader, three layers, each tested alone) gives the head pose, and the eye separation and screen plane come from the runtime, not from the program.
+They follow the depth limits Stereo KWin announces for the output (`kde_stereo_depth_v1.depth_limits`: the person's limits built on the display), with the person's choices on top under the browser's names: class `tv` or `headset` (`DXR_VIEW_CLASS`, never read from the output), strength, screen plane, absolute sunk and popped (`DXR_VIEW_SUNK_PX`, the file `view-depth`).
+A hosted session's window is an X11 client, to which KWin tells nothing about limits: the runtime says `Depth limits: none` and keeps its own rig until one is set, and the smallest KWin change that closes it is in the reference.
+Measured against the limits alone the disparity is within 0.07 px rms at two sets, the pictures change as a camera moved, and every wrong value is refused and said once.
+The closed forms, the files, the finding, the proof, the gamepad's mapping and tests, and the traps (a pointer gesture split over two tool calls, why 100 px turn 11.345 degrees, a capture older than the log, a mutation test that stays green) are in [pose-and-separation-on-a-3d-screen.md](references/pose-and-separation-on-a-3d-screen.md).
 
 ## Who runs whose VR software
 

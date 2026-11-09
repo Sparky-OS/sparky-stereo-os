@@ -56,14 +56,29 @@ The person's choices on top, with the browser's names (`dom.vr.flat.mode`, `dept
 Absolute values replace the limit they name.
 The environment wins over the file key by key, the files are read again twice a second so a change reaches the next frame, and a wrong value (not a number, out of range, an unknown class or key) is refused and said once, never dropped quietly and never read past to the next source.
 
-## Which window can be told its limits (a finding of milestone 2b)
+## How an X11 window is told its limits (Stereo KWin +stereo3d52, ORDER 485)
 
 `depth_limits` is an event on a Wayland surface (`kde_stereo_content_manager_v1.get_depth`).
-A hosted legacy session's window is an X11 client of Xwayland, which cannot ask: KWin sends the limits only to windows whose surface tree has a depth object, and it publishes no X11 property or D-Bus value for them.
-An app-provided Wayland surface (`XR_DXR_wayland_surface_binding`) could ask, but those sessions do not use the qwerty camera rig.
-So today the hosted rig has no source of the compositor's limits: with none and no absolute sunk value the runtime logs `Depth limits: none` with the reason and keeps DisplayXR's own rig (ipdFactor 1, convergence 0.5 diopters); the class, strength and plane have nothing to scale.
-The smallest change that would close it, in KWin: write the same two numbers it already sends to Wayland clients, as 24.8 fixed point in one `CARDINAL/32[2]` property `_KDE_NET_WM_STEREO_DEPTH_LIMITS` on an X11 window that declares stereo content, from `StereoDepthStates::update()`, and raise `_KDE_NET_WM_STEREO_CONTENT_SUPPORTED` to 10.
-The other way is a native Wayland window for the hosted session in the runtime.
+A hosted legacy session's window is an X11 client of Xwayland, which cannot make that object, so before +52 KWin told it nothing and the runtime logged `Depth limits: none`.
+From version 10 of `_KDE_NET_WM_STEREO_CONTENT_SUPPORTED` (on the root window), KWin writes the same two numbers on every X11 window that declares stereo content:
+
+- `_KDE_NET_WM_STEREO_DEPTH_LIMITS`, `CARDINAL/32`, exactly two values, sunk then popped, each a `wl_fixed_t` (24.8 fixed point, so 10 px is 2560 and 9.5 px is 2432), in pixels of a view 1920 wide, for the output the window mainly sits on: the person's `[StereoDepth]` limits built on that display, the same as the Wayland event.
+- It is written from `StereoDepthStates::update()` (`src/scene/stereodepthstates.cpp`) through `X11Window::updateStereoDepthLimits()`, so it follows the settings, the output's mode and kind, and the window's move to another output; it is removed when the window stops declaring.
+- A client reads it with `xcb_get_property` (length 3 units, so excess is seen) and selects `PropertyChange` on its window.
+  `xprop -name WINDOW _KDE_NET_WM_STEREO_DEPTH_LIMITS` shows it.
+  Anything other than two non-negative `CARDINAL/32` values is wrong: say so and use no limits.
+- DisplayXR's own window (`comp_vk_native_window_xcb.c`, decoding in `comp_vk_native_xcb_depth_limits.h`) reads it on every PropertyNotify and calls `u_depth_limits_publish()`; it says when the limits first arrive, when they change, when they go, when the property is malformed, and (once declared) that the window manager's declaration is older than 10.
+
+## Traps met on the way (ORDER 485)
+
+- **The Wayland probe covers the picture.** A small Wayland window that prints `depth_limits` sits at the centre of the output and moved a square's centroid by 0.83 px (-12.834 against -12.000). Measure by capture in a session without it, and compare the event with the property in another.
+- **A capture is judged against its own frame.** `check_limits.py` without `--frame` compared a capture with the returned views of another frame: horizontal rms 9.3 px against 0.18 px with it. Always pass the `.frame` the case wrote.
+- **A live case's first eye dump is gone.** The client rewrites its dump every 30 frames, so after a live change the dump holds the new eyes and the first capture reads 16068 swapped pixels. Skip the dump comparison for that capture only.
+- **The test source must be writable.** KDE's `KDEGitCommitHooks` writes `.git/hooks/pre-commit` while configuring; a read-only source mount makes cmake stop with "Read-only file system", and ninja then says only "loading build.ninja: No such file".
+- **`setpriv --regid` needs a group option.** `--clear-groups` (or `--groups`) with `--reuid/--regid`, or it exits 1 with the usage line and the autotest never runs.
+- **A header without `<stddef.h>` fails only where `NULL` is used** (the new decoder in the compositor's C file, not in its C++ test).
+- **A recipe that names its container `kwinNNN-pkg`** is missed by `docker ps --filter name=kwin-NNN`; name it with the dash.
+- **How the cause was found:** the red autotest (`testStereoDepthLimits` fails with the call removed, passes with it), `xprop` on the runtime's window, and the runtime's own `Depth limits:` lines in `app.log`.
 
 ## The proof
 

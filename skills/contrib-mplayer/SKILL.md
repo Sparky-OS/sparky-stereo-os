@@ -8,6 +8,10 @@ description: >-
 
 # Contributing to MPlayer
 
+**Check freshness first.**
+Written on 2026-10-24.
+The project's own contribution rules, read again before each round, win over this page.
+
 Written from MPlayer's public patch guide, `https://www.mplayerhq.hu/MPlayer/DOCS/tech/patches.txt`, which served a bot challenge on 2026-10-24.
 On 2026-11-02 it was plain text again (last changed 2010-11-07); the rules that come first were added that day from it and from the [mailing lists page](https://mplayerhq.hu/design7/mailing_lists.html).
 Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this skill is MPlayer's eventual public practice.

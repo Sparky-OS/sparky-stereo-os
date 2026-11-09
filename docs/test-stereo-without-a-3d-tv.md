@@ -1,6 +1,6 @@
 # Test stereo without a 3D TV
 
-A step-by-step guide for driver, compositor and program developers.
+**For** driver, compositor and program developers: a step-by-step guide.
 It shows how to test [HDMI®](https://www.hdmi.org/resource/brand) 3D modes, from the kernel's mode list to the frame a compositor sends to the display, on any Linux computer, without a 3D display.
 The tool is [vkms-stereo-bench](../tools/vkms-stereo-bench/README.md); this guide walks through it and says what each test proves and how it fails when support is missing.
 

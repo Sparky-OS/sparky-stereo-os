@@ -1,5 +1,7 @@
 # Stereo and HDR in one declaration: `kde-stereo-hdr-content`
 
+**For** compositor and toolkit developers: a design for declaring stereo and HDR content together; nothing is built yet.
+
 Design, 2026-10-13, by Daniel Ramos for Sparky Stereo OS.
 Status: design; nothing is built yet, and it has not been tried on an HDR screen.
 

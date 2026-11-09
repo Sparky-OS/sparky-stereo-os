@@ -1,5 +1,7 @@
 # Lean Code packages: the lc mark
 
+**For** users, packagers and anyone who counts energy: what the lc mark on a package means, what was measured, and how the original files stay available to people.
+
 ## Main principle: prepare ahead of consumption
 
 > Lean Code moves preparation upstream. Like pre-rendering or pre-staging, it prepares what the machine needs before consumption, avoiding repeated work while preserving the original material for people.
@@ -71,9 +73,9 @@ The ISO attestation verifies the build's evidence and artifact hashes. It does n
 
 ## Java, Kotlin and native build inputs
 
-The development tooling adds compiler-backed Java and Kotlin adapters: Java uses the JDK lexer,
-and Kotlin uses the pinned Kotlin compiler lexer. Documentation comments, licences, operational
-directives and string contents remain intact. Kotlin newline and token-adjacency semantics are checked.
+The development tooling adds compiler-backed Java and Kotlin adapters: Java uses the JDK lexer, and Kotlin uses the pinned Kotlin compiler lexer.
+Documentation comments, licences, operational directives and string contents remain intact.
+Kotlin newline and token-adjacency semantics are checked.
 The Flat Headset recipe qualifies JDK 17 with Kotlin 2.4.0 and then runs the actual Gradle build and headset tests.
 Missing compiler tooling is a recorded refusal, never a successful optimization.
 

@@ -1,5 +1,7 @@
 # Sparky Stereo OS beta 1: experimente e desenvolva em 3D
 
+**Versão curta:** quer só ver o desktop 3D no seu PC com Windows, sem instalar? [Experimente no seu PC com Windows](try-on-windows.pt-BR.md), uma página, dez passos; o passo 1 guarda a chave de recuperação do BitLocker.
+
 Com esta beta, você tem o desktop inteiro em 3D na tela que já usa e programas com imagem 3D estéreo para experimentar.
 Você pode testar tudo pelo pendrive e depois instalar ao lado do Windows.
 

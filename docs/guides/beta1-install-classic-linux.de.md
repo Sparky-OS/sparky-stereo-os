@@ -1,5 +1,7 @@
 # Sparky Stereo OS 9 Beta 1: ausprobieren und neben Windows installieren
 
+**Kurzfassung:** Sie möchten den 3D-Desktop nur auf Ihrem Windows-PC sehen, ohne zu installieren? [Auf dem eigenen Windows-PC ausprobieren](try-on-windows.de.md), eine Seite, zehn Schritte; Schritt 1 sichert Ihren BitLocker-Wiederherstellungsschlüssel.
+
 Diese Anleitung führt vom Download bis zum 3D-Desktop, zuerst vom USB-Stick und dann fest installiert neben Windows auf derselben Festplatte.
 Sie richtet sich an alle, die Linux noch klassisch kennen, mit einer eigenen Partition für jedes Systemverzeichnis, und sie fängt genau dort an.
 

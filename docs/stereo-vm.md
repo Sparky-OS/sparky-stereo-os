@@ -1,6 +1,6 @@
 # A virtual machine with a 3D display
 
-A guide for users and developers who want a virtual machine whose display has [HDMI®](https://www.hdmi.org/resource/brand) 3D modes, shown on the host as a stereo window.
+**For** users and developers: a guide to a virtual machine whose display has [HDMI®](https://www.hdmi.org/resource/brand) 3D modes, shown on the host as a stereo window.
 It also covers rendering the guest on the host's strongest GPU, and passing a whole second GPU to the guest.
 
 ![Karton, KDE's virtual machine manager, showing a guest in a 3D mode: the left eye (red marker) and the right eye (green marker) as Stereo KWin captures them](images/stereo-vm-karton.png)

@@ -1,5 +1,7 @@
 # For theme designers and customizers: depth is a design material
 
+**For** theme designers and people who customize their desktop: what depth you can design with, the rules every theme keeps, and what is built or coming.
+
 On Sparky Stereo OS the desktop has real depth, and a theme decides how it looks.
 Shadows, bevels and raised or sunken frames have drawn depth in 2D for decades; here the same meanings become a distance your eyes can see.
 This page says what you can design with, the rules every theme keeps, and what is designed and coming.

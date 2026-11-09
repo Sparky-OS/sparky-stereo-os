@@ -1,5 +1,7 @@
 # Sparky Stereo OS 9 beta 1: try it, then install it beside Windows
 
+**Short version:** only want to see the 3D desktop on your Windows PC, without installing? [Try it on your Windows PC](try-on-windows.en.md), one page, ten steps; step 1 saves your BitLocker recovery key.
+
 This guide takes you from the download to a 3D desktop, first from a USB stick and then installed next to Windows on the same disk.
 It is written for a reader who knows Linux the classic way, with one partition for each system folder, and it starts from there.
 

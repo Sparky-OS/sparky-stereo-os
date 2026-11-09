@@ -1,5 +1,7 @@
 # What people said
 
+**For** readers who want to know how the work is received: what people who know stereo said about it, in public, with links.
+
 Sparky Stereo OS is checked by people who know stereo, in public, and this page keeps what they said.
 Public words are quoted with the person's name and a link to where they said them.
 

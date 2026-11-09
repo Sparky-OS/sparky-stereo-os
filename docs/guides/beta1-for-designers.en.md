@@ -1,5 +1,7 @@
 # Sparky Stereo OS beta 1 for designers and 3D artists
 
+**Short version:** to see the 3D desktop on a Windows PC without installing, start with [Try it on your Windows PC](try-on-windows.en.md), one page, ten steps; step 1 saves your BitLocker recovery key.
+
 You can see the whole desktop in 3D on the screen you already own, explore stereo photos and video, and judge how depth changes the way a desktop feels.
 This beta is a working desktop for creative people, with clear limits on which creative applications and theme features are ready today.
 

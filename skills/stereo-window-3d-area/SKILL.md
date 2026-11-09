@@ -4,7 +4,7 @@ metadata:
 name: stereo-window-3d-area
 description: >-
   Stereo content inside an ordinary Qt or KDE window, and depth of the desktop's own elements: a declared subsurface
-  below the window with a hole over it (a Wayland subsurface, an X11 child window), the Qt routes measured, Union's
+  below the window with a hole over it , Union's
   depth values, the three levels sunk, screen and popped within the user's limits, menus, popups, tooltips, select
   lists, notifications and dialogs at depth (xdg_popup, never a subsurface), the 10 px popup border from the output's
   edges, KWin's effects with depth of their own (Fall Apart, Sheet, Glide, Zoom, dragging), and a GTK 4 GtkGLArea as a

@@ -159,6 +159,7 @@ Traps met in this rig:
 
 ## Traps that fooled us
 
+- **`interface 'kde_stereo_depth_v1' has no event 1`**, followed by a fatal Wayland connection error: check the event's `since` against the receiving resource's version. [Versioned events and legacy clients](references/versioned-events.md) gives the diagnosis and the regression-test pattern.
 - **Searching vertical offsets** in block matching picks false matches on repeated patterns; match on the same row and check the vertical profile on its own.
 - **`LIBGL_ALWAYS_SOFTWARE=1` does not move KWin's scene to llvmpipe.** With a render node given, KWin's virtual backend draws through EGL on that card (radeonsi's shader statistics appear in `kwin.log` with `QT_LOGGING_RULES='kwin_*.debug=true'`), so the rig's "software" and `--gpu` runs give the same captures. KWin opens the first render node that opens: with Docker's CDI that is the NVIDIA card, without it the AMD one. Name a run by the card you gave it, and check the log.
 - **A window capture on Wayland includes the compositor's title bar:** offset the analysis by it.

@@ -37,6 +37,8 @@ Twelve plain/disabled comparisons were byte-identical, and all 102 applicable un
 Additional controls passed temporal identity with B-frames, initial-only metadata, forced NVENC IDRs and oversized unregistered SEI.
 QSV and AMF compiled and their early refusal paths were exercised; that does not qualify their hardware runtimes.
 The tested HEVC streams had no additional temporal sublayers; the code clears applicable sublayer flags, but this run does not claim extra-sublayer hardware coverage.
+The installed amd64 candidate repeated these stream checks with its shared libraries: all 108 streams and 1,728 frames passed FFmpeg and mpv decoding, and plain/disabled outputs matched the preceding package byte for byte.
+The master-based GCC build passed 6,158 standard FATE tests. A separate hardware suite passed 32 of 35; the three CUDA scaling checksum mismatches produced identical output with the unpatched binary, so they are not evidence against the writer or a reason to change its references.
 
 ## Writer traps
 
@@ -49,6 +51,10 @@ The tested HEVC streams had no additional temporal sublayers; the code clears ap
 | A QSV callback reports an error but encoding continues | The shared caller discarded `set_encode_ctrl_cb`'s return value | Propagate the negative result through encoder cleanup; validate HEVC's returned constraints before adding a payload |
 | New decoder tests appear to retain the old mapping | A reused build's baseline object is newer than edited source | Check object/source times and force rebuilding changed inputs; keep the original failure and do not alter the expected reference |
 | A reused build image cannot update apt | Its sources refer to build-only archive mounts absent in the new container | Read apt's exact missing path; provide those read-only inputs or use a verified HTTPS archive configuration appropriate to the disposable runtime image. Never bypass signature verification |
+| A backport appears to need a second copy of an upstream fix | The package already carries the same change in a broader downstream patch | Compare the resulting source, preserve the broader validation and record the already-carried commit; retain the upstream regression test |
+| A new side-data member is correct on master but changes the package's existing ABI | The package already appended its own public members | Append the new members after the package's existing fields and bump its minor version; compare the old and new header layouts before porting |
+| A mantissa test passes on master but the packaged decoder exports zero in the new fields | The package uses a split common SEI-export helper instead of master's function | Trace the package's actual decoder call path and populate both its existing exact-value representation and the added syntax fields; do not replace the existing representation |
+| A carried FATE test cannot open its input | Its external sample was never included in the available suite | Record the exact missing name and check the official sample location; obtain the original fixture before qualifying the test. Do not invent a substitute and bless its checksum |
 
 ## Find the boundary before changing the driver
 

@@ -87,9 +87,9 @@ The routes, where the two eyes cross each boundary, and how to read a project's 
 
 ## A metaverse browser's engine (Sneeze), checked 2026-11-08
 
-Sneeze detects an OpenXR runtime and never opens a session; one camera per viewport; Halogen's ANARI camera has no `imageRegion` and no stereo.
+Sneeze detects an OpenXR runtime and never opens a session; one camera per viewport; Halogen's ANARI camera had no `imageRegion` and no stereo until the milestone 2 patches (Halogen reads `imageRegion`, Sneeze renders a side by side pair).
 A host gets two eyes today with no engine change by moving the one camera to two poses and cropping each eye by the off-axis shift, then declares the result full side by side.
-How to build it on Debian, the recipe, the measured disparities and the traps (the optional jsoncpp package breaks the link, the device library path, the shutdown abort) are in [sneeze-engine-eyes.md](references/sneeze-engine-eyes.md).
+How to build it on Debian, the recipe, the measured disparities and the traps (the optional jsoncpp package breaks the link, the device library path, the shutdown abort, the CRLF files, measuring with a flat square, the RTX's Vulkan file) are in [sneeze-engine-eyes.md](references/sneeze-engine-eyes.md).
 
 ## Proof
 

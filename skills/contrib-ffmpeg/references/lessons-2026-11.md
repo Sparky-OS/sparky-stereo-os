@@ -45,6 +45,7 @@ Recipe, from master at 16a345b022: (1) enum value after the last one in `libavut
 
 ## Multilayer HEVC and the 3D reference displays SEI (ORDER 174, 2026-11-09)
 
+- **Loosening a probe keeps its guard.** Symptom: none in FATE; the review saw it. `hevc_probe()` returned 0 on any layer above the base, and that return was also what kept random bytes from being called HEVC. Cause: once layers above 0 are allowed, a NAL unit of any layer could count towards the VPS, SPS, PPS and IRAP the score needs. Fix: count only NAL units of the base layer, and reject only the forbidden zero bit and layer 63. How found: reading the changed line for what it no longer rejected, not from a failing test.
 Four old findings re-run on master 16a345b022 (libavutil 61.20): all four were still real. Each got its own branch from master, the fix first and its test in a second commit.
 Samples for such tests are made by small scripts, kept in [sample-scripts](sample-scripts/): `make-tdrdi-sample.py` (a prefix SEI 176 with long mantissas before the first slice of any single layer stream), `add-hvcc-sei.py` (the same SEI also in the hvcC array of an MP4 made by `ffmpeg -c copy -fflags +bitexact`) and `set-vps-bit.py` (one bit of the VPS RBSP).
 

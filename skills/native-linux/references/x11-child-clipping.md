@@ -31,6 +31,67 @@ Results on r1107a (each FAIL is a missing part, each PASS a control):
 - EGL `egl-plain`, Vulkan `vk-plain` and `gls` on Mesa +17: declared (`_KDE_NET_WM_STEREO_CONTENT` 3 on the child) but not listed in the window, capture one output wide (`stereo` false), the packed buffer squeezed into the child.
   Only Mesa's GLX lists a child (`src/glx`, patches 0017 to 0019); the EGL X11 platform and the Vulkan WSI declare the window and never write `_KDE_NET_WM_STEREO_CONTENT_CHILDREN`; gl-stereo calls `stereo_declare_x11_format()` on the window it finds.
 
+## KWin +stereo3d53: the scene cuts the child as X does (ORDER 160)
+
+The change is `X11StereoChild::visible` and `SurfaceItemXwaylandChild::shape()`, and it is the smaller form of the draft that lane 160 left.
+`visible` is in the X11 window's coordinates: the window's area, cut to the inner area of each window between the child and the window, less the bounding region of every viewable `InputOutput` window stacked above the child in its parent, or above a window between in that window's parent (`xcb_query_tree` lists bottom to top; declared children are skipped, the scene orders those).
+The item's shape is cut to `visible.translated(-position())`, in the item's own coordinates, so one cut serves a child at its own size, scaled by `CHILD_PLACE`, or shown at one view's size (`ONE_VIEW_SIZE`), and a child that fits its window with nothing over it is unchanged.
+
+### Why the cut is made on the item and not in the child's native pixels
+
+A first form put the cut into the child's native shape (`shape` in native X pixels, which `shapeForSourceBox()` maps to the place).
+It breaks the route of ORDER 265b: a program that cannot size the toolkit's child draws on a window of its own that is twice a view wide, so in native pixels the second view lies outside the parent, and a window clip kills the right eye.
+X would clip that window too, but KWin shows a declared child's whole native buffer at the place the program declared; what has to be cut is what the person sees, so the cut is made in display coordinates (the window's own coordinates), where the covering window really is.
+The autotests run in `normal` and `scaled2x` (`testStereoChildWindowClip`) and the shape of the item is compared in its own coordinates.
+
+### What notices a covering window (SubstructureNotify)
+
+A sibling that appears, moves, is restacked or goes away is announced to its parent only if the parent's `SubstructureNotify` is selected.
+`watch()` selects it on each window between the child and the X11 window and adds it, with `|`, to the X11 window's own event mask (read with `xcb_get_window_attributes`: `your_event_mask` is this client's mask); `unwatch()` removes only that bit.
+`Workspace::workspaceEvent()` looks at those events first (`findSubstructureParent()`: the `parent` of a CreateNotify, the `event` of the others when it differs from `window`) and hands them to `X11StereoChildren::handleSubstructureEvent()`; the events a child or a window between sends about itself keep their old route, and the same event arriving through its parent is dropped there, so nothing is computed twice.
+A covering window's shape change is a `ShapeNotify` on that window, selected with `xcb_shape_select_input` and routed by `owns()`, which therefore also accepts the covering windows (`X11StereoChild::coverers`).
+The area follows the X11 window's size through `bufferGeometryChanged`.
+
+### Rows (scripts/x11-child)
+
+| Mode | What it sets up | Row that must pass |
+|---|---|---|
+| `late-sibling` | the sibling is mapped 2 s after the child was listed | the sibling's green shows over the child in both eyes |
+| `shaped-sibling` | the sibling is a frame (SHAPE bounding with a hole) | the frame's bars stay green and the child shows through the hole |
+| `raised` | the sibling is mapped, then the child is raised over it | the child shows whole (control: nothing covers it) |
+| `pointer` | `sibling`, then `fakeinput` moves the pointer over five places | each place reaches the X window under it: the X server decides, so the row guards that the cut changes nothing |
+
+`overflow`, `sibling`, `late-sibling` and `shaped-sibling` FAIL on KWin +stereo3d52 and PASS on +stereo3d53; `plain`, `mono-sibling`, `raised` and `pointer` PASS on both (controls).
+Autotests: `testStereoChildWindowClip` and `testStereoChildWindowClipAncestor` in `testX11Window`; with the call to `updateVisible()` replaced by a `return` they fail with `visible` empty.
+
+### Running and proving the autotests
+
+1. A build image from the published source package: `dpkg-source -x` the .dsc, `apt-get build-dep` it, and add `ninja-build xauth xvfb xwayland dbus libei-dev libeis-dev breeze mesa-utils x11-utils`; commit it as an image.
+2. The source mount must be writable (KDE's git hooks write while cmake configures); configure once with `cmake -G Ninja -DBUILD_TESTING=ON ...`, then `ninja testX11Window` (the CMake `NAME`).
+   About 1165 steps for a first build, an hour under load; after editing one `.cpp` a few minutes; after editing `workspace.h` or another widely included header, hundreds of objects.
+3. Run as uid 1000: `setpriv --reuid=1000 --regid=1000 --clear-groups env QT_QPA_PLATFORM=offscreen EGL_PLATFORM=surfaceless XDG_RUNTIME_DIR=... dbus-run-session -- bin/testX11Window`.
+   The depth tests (`testStereoDepthStack`, `Popups`, `Pinned`, `PinnedStack`, `Notifications`, `Motion`, `Wallpaper`) skip without a GPU: give the container a render node (`--device /dev/dri/renderD128 --group-add GID`) and use `--groups=GID` instead of `--clear-groups`.
+4. Two reds, one per layer: replace the call to `updateVisible()` by a `return` (the `visible` comparisons fail with an empty region), and, separately, make `shapeForSourceBox()` return the uncut shape (the quad coverage of both eyes is the whole child). A test that reads `shape()` alone stays green with the second one, because the painter does not call `shape()`.
+
+### Traps (symptom, cause, fix, how it was found)
+
+- **The autotest is green and the rig rows are still red (child outside its window, sibling hidden).**
+  Cause: the cut was made in `SurfaceItemXwaylandChild::shape()`, which the autotest compared; the eyes' quads are built from `shapeForSourceBox()`, so the painter never saw it.
+  Fix: cut in `shapeForSourceBox()`, and assert the quad coverage of both eyes (`eyeQuads(StereoEye::Left)` and `Right`), as `testStereoChildShape` does.
+  Found by the rows on the installed package, then `grep -n shapeForSourceBox src/scene`: the base class calls it per eye. Run the real rows on the first package, not only the autotests.
+- **A client of the X11 window's own events gets `UnmapNotify` for a child and releases the window.**
+  Cause: once `SubstructureNotify` is selected on the X11 window, `X11Window::windowEvent()` receives the events about its children with `event` equal to its own window, and `unmapNotifyEvent()` assumes `UnmapNotify` is about the client.
+  Fix: take the events whose `event` differs from `window` in `Workspace::workspaceEvent()` before `findClient()`, never in `windowEvent()`.
+  Found by reading `windowEvent()`'s switch before adding the mask.
+- **The cut is correct in the rig and a program's packed child loses its right view.**
+  Cause: the cut was in native pixels (see above). Fix: cut in display coordinates. Found by reading the memory line about ORDER 265b before choosing where to cut, and by the `scaled2x` row of the autotest.
+- **`ninja: error: unknown target 'x11_window_test'`.** Cause: the target is the CMake `NAME` (`testX11Window`), not the source file. Fix: `ninja -t targets all | grep -i x11window`.
+- **`docker run` of the build image says `pull access denied` right after the prep step printed `prep done`.** Cause: the prep script prints before `docker commit` ends. Fix: wait for `docker image inspect` before the first run.
+- **`${GPU:---clear-groups}` runs a command called `1`, every test exits 127.** Cause: `${VAR:-word}` expands to `$VAR` when it is set. Fix: keep the argument in a variable of its own (`GROUPSARG=--clear-groups; [ -n "$GPU" ] && GROUPSARG=--groups=125`).
+- **`ScreenShot2.Error.Cancelled: Screenshot got cancelled (36)` in the rig's capture.** Cause: the container has no render node, so the virtual KWin has no compositor to screenshot (`kwin.log` says `Failed to open drm node` and `Configured compositor not supported by Platform`). Fix: `--device nvidia.com/gpu=0 --group-add 125`, or the AMD node, as for the other rows.
+- **Two rows loops write into one evidence folder.** Cause: `docker kill` of the container does not stop the `for` loop around it (a backgrounded loop started the next row at once); the second loop then ran the same rows beside the first. Fix: stop a loop by its PID, and give every loop its own `TAG`.
+- **The XCB error `BadWindow ... SHAPE, minor code 6` in the autotest log is not new.** Cause: `unwatch()` of a child whose window is already destroyed (`xcb_shape_select_input` unchecked); the +stereo3d52 log of `testX11Window` has five of them. The new calls on covering windows are checked and discarded.
+
 ## Mesa +stereo3d19: EGL and Vulkan list their child
 
 One header, `src/util/u_x11_stereo_child.h`, holds the X side: the owning window (the window below the root on the way up, as GLX takes it), a server grab around the read and write of `_KDE_NET_WM_STEREO_CONTENT_CHILDREN`, windows that are gone dropped when a child is added, the child kept while its window lives, and `_KDE_NET_WM_STEREO_CONTENT_VERSION`.

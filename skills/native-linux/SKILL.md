@@ -77,7 +77,7 @@ The recipe, the per-eye proof with its negative controls and the traps are in [x
 
 ## A GL child that is larger than its window, or under a sibling
 
-X clips a child to its window and a sibling stacked over it hides it; the redirected child's buffer is whole, so the scene must cut it the same way (ORDER 160).
+X clips a child to its window and a sibling stacked over it hides it; the redirected child's buffer is whole, so the scene must cut it the same way: Stereo KWin does from +stereo3d53 (`X11StereoChild::visible`, cut in the item's shapeForSourceBox, windows that appear later noticed through SubstructureNotify; ORDER 160).
 Mesa's GLX lists its stereo children; the EGL X11 platform, the Vulkan stereo layer and the gl-stereo layer declare the child but do not list it, and then the capture is one picture squeezed into the child.
 The rows, scripts and traps: [x11-child-clipping.md](references/x11-child-clipping.md), scripts in `../stereo-proof-rig/scripts/x11-child`.
 

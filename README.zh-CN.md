@@ -2,13 +2,13 @@
 
 🇨🇦 [English](README.md) · 🇧🇷 [Português](README.pt-BR.md) · 🇵🇱 [Polski](README.pl.md) · 🇫🇷 [Français](README.fr.md) · 🇩🇪 [Deutsch](README.de.md) · 🇯🇵 [日本語](README.ja.md) · 🇰🇷 [한국어](README.ko.md) · 🇨🇳 [简体中文](README.zh-CN.md) · 🇭🇰 [繁體中文](README.zh-TW.md)
 
-**在你现有的 2D 和 3D 设备上以 3D 方式创作和探索：绘图，编辑照片和视频，研究分子和地球仪，然后看电影、玩游戏。**
+**在你已有的屏幕上以 3D 方式创作和探索：绘图，编辑照片和视频，研究分子和地球仪，然后看电影、玩游戏。**
 它为各种 3D 屏幕而设计：3D 电视和 3D 投影机、VR 头显、裸眼 3D 显示器，以及配上红青眼镜的任何显示器。
 在普通的 2D 显示器上，同一个桌面无需任何改动即可使用。
 Sparky Stereo OS 是 Daniel Ramos 的 SparkyLinux 发行版（SparkyLinux 由 Paweł "pavroo" Pijanowski 制作），是一个带有全新 Stereo KDE Plasma 桌面的 Linux 系统。
 
 **对你的电脑和地球都更轻：**每个软件包都去掉了程序从不读取的注释和说明，因此同样的工作需要更少的处理、更少的能耗和更少的磨损。
-[实测](docs/lean-code-packages.md#why-it-matters)：读取 C++ 头文件的工作量比 Debian 少 2% 到 4%，且没有任何损失。
+[实测](docs/lean-code-packages.md#why-it-matters)（一台 2016 年的笔记本电脑）：为编译器准备程序的工作量比使用未去除注释的相同文件少 2% 到 4%，且没有任何损失。
 
 <a href="docs/edition-in-detail.zh-CN.md#seen-in-3d"><img src="docs/screenshots/translucent-stereo-desktop-anaglyph.jpg" width="99%" alt="3D 立体桌面，带半透明窗口：Dolphin 的设置菜单和配色方案列表在前面，后面的玻璃窗口一层层退开，系统监视器和壁纸最深（红青立体图）"></a>
 

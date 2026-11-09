@@ -9,7 +9,7 @@
 Sparky Stereo OSは、Paweł "pavroo" PijanowskiによるSparkyLinuxを基にDaniel Ramosが制作するエディションで、新しいStereo KDE Plasmaデスクトップを備えたLinuxシステムです。
 
 **マシンにも地球にも軽く：** すべてのパッケージは、プログラムが読むことのないコメントや注記を除いて提供されるため、同じ作業でも処理、電力、機器の消耗が少なくて済みます。
-[測定結果](docs/lean-code-packages.md#why-it-matters)：C++ヘッダーの読み込みはDebianより2〜4%少ない作業で済み、失われるものはありません。
+[測定結果](docs/lean-code-packages.md#why-it-matters)（2016年のノートPC）：コンパイラに渡すプログラムを準備する作業は、コメントを取り除いていない同じファイルを使う場合より2〜4%少なくて済み、失われるものはありません。
 
 <a href="docs/edition-in-detail.ja.md#seen-in-3d"><img src="docs/screenshots/translucent-stereo-desktop-anaglyph.jpg" width="99%" alt="半透明のウィンドウがある3Dのステレオデスクトップ。手前にDolphinの設定メニューとカラースキームの一覧があり、背後の透明なウィンドウは順に奥へ下がり、システムモニタと壁紙が最も奥にある（赤・シアンのアナグリフ）"></a>
 
@@ -22,7 +22,7 @@ Sparky Stereo OSは、Paweł "pavroo" PijanowskiによるSparkyLinuxを基にDan
 **次のステップ：お使いのWindows PCで、USBメモリから、何もインストールせずに試してみてください：** [1ページ、10ステップ（英語）](docs/guides/try-on-windows.en.md)
 <br>ダウンロードの申し込みと、お持ちの3D機器のご連絡は、あなたの言語でどうぞ： [🇨🇦](https://github.com/Sparky-OS/sparky-stereo-os/issues/26) [🇧🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/25) [🇵🇱](https://github.com/Sparky-OS/sparky-stereo-os/issues/27) [🇫🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/80) [🇩🇪](https://github.com/Sparky-OS/sparky-stereo-os/issues/153) [🇯🇵](https://github.com/Sparky-OS/sparky-stereo-os/issues/81) [🇰🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/83) [🇨🇳](https://github.com/Sparky-OS/sparky-stereo-os/issues/84) [🇭🇰](https://github.com/Sparky-OS/sparky-stereo-os/issues/85)
 
-- <a id="science-and-engineering"></a>**[科学と工学](docs/edition-in-detail.ja.md#science-and-engineering)：** Marbleの地球儀、KAlgebraのグラフ、Kalziumの分子を3Dで表示します。
+- <a id="science-and-engineering"></a>**[科学と工学](docs/edition-in-detail.ja.md#science-and-engineering)：** Marbleの地球儀、KAlgebraのグラフ、Kalziumの分子を3Dで表示します。3Dモデルと回路基板は開発中です。
 - <a id="create"></a>**[制作](docs/edition-in-detail.ja.md#create)：** 3Dとディープカラー（各色8ビットではなく16ビット）で絵を描き、3D写真や動画を編集します。
 - <a id="watch-and-play"></a>**[鑑賞とゲーム](docs/edition-in-detail.ja.md#watch-and-play)：** 3Dの映画、写真、ゲームをウィンドウ内や全画面で楽しめます。
 - <a id="vr-is-also-a-stereo-monitor"></a>**[VRもステレオモニター](docs/edition-in-detail.ja.md#vr-is-also-a-stereo-monitor):** ヘッドセットも、ビューアーに入れたスマートフォンも、このデスクトップの3D画面になります。

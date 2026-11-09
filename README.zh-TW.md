@@ -8,7 +8,7 @@
 Sparky Stereo OS 是 Daniel Ramos 的 SparkyLinux 版本（SparkyLinux 由 Paweł "pavroo" Pijanowski 製作），是一套搭載全新立體 KDE Plasma 桌面的 Linux 系統。
 
 **對你的電腦和地球都更輕：**每個套件都去掉了程式從不讀取的註解和說明，因此同樣的工作需要更少的處理、更少的能源和更少的磨損。
-[實測](docs/lean-code-packages.md#why-it-matters)：讀取 C++ 標頭檔的工作量比 Debian 少 2% 到 4%，且沒有任何損失。
+[實測](docs/lean-code-packages.md#why-it-matters)（一台 2016 年的筆記型電腦）：為編譯器準備程式的工作量比使用未去除註解的相同檔案少 2% 到 4%，且沒有任何損失。
 
 <a href="docs/edition-in-detail.zh-TW.md#seen-in-3d"><img src="docs/screenshots/translucent-stereo-desktop-anaglyph.jpg" width="99%" alt="帶有半透明視窗的 3D 立體桌面：Dolphin 的「設定」選單與配色方案列表在最前面，玻璃視窗在後方層層退後，系統監控程式與桌布在最深處（紅青立體圖）"></a>
 

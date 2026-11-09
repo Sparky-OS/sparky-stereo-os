@@ -1,5 +1,7 @@
 # Not filed upstream
 
+**For** maintainers and readers who find one of our reports in a fork of ours instead of the project's own tracker: why it is there.
+
 Some failures we find in other projects are documented as issues in our own forks, because we cannot report them where they belong.
 Each of those issues names the position that stops the report and links here.
 

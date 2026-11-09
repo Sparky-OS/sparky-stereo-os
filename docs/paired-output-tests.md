@@ -1,5 +1,7 @@
 # Matched displays as one stereo output
 
+**For** testers with two matched panels or projectors, one per eye: the acceptance procedure, step by step.
+
 This is the acceptance procedure for two matched panels or projectors, one per eye.
 It exercises the existing **Dual projection** and **Mirror rig** modes in Display Configuration.
 Applications still supply full side by side; KWin owns eye assignment and output conversion.

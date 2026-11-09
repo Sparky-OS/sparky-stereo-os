@@ -1,5 +1,7 @@
 # GPU vendors' repositories on Sparky Stereo OS: compute updates, the display driver stays ours
 
+**For** people who use CUDA or ROCm on the edition: how to take the vendors' compute updates and keep the edition's display driver, which carries 3D and deep colour.
+
 Sparky Stereo OS drives the screen with its own display drivers, because they carry [HDMI®](https://www.hdmi.org/resource/brand) 3D and deep colour: our build of NVIDIA's open kernel modules, and the amdgpu driver in our kernel.
 NVIDIA and AMD publish their own display drivers in the same repositories as CUDA and ROCm.
 If one of those repositories is given a high priority, an ordinary upgrade replaces our driver with the vendor's, which has no HDMI® 3D.

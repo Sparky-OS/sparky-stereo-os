@@ -1,5 +1,7 @@
 # The hardware behind it
 
+**For** anyone who wonders what it takes: the two ordinary machines and the two 3D TVs that everything here is built and tested on.
+
 Sparky Stereo OS is built and tested on two ordinary machines, the ones Daniel already had: a home PC and a 2016 laptop.
 There is no workstation graphics card and no special 3D monitor.
 The 3D screens are two Sony TVs from 2011 and 2012, and any monitor with red-cyan glasses.

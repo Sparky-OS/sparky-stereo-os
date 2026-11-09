@@ -1,5 +1,7 @@
 # Lean Code packages: the lc mark
 
+**For** users, packagers and anyone who counts energy: what the lc mark on a package means, what was measured, and how the original files stay available to people.
+
 ## Main principle: prepare ahead of consumption
 
 > Lean Code moves preparation upstream. Like pre-rendering or pre-staging, it prepares what the machine needs before consumption, avoiding repeated work while preserving the original material for people.

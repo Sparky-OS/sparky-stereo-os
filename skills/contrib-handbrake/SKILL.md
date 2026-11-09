@@ -9,6 +9,10 @@ description: >-
 
 # Contributing to HandBrake
 
+**Check freshness first.**
+Written on 2026-10-24.
+The project's own contribution rules, read again before each round, win over this page.
+
 Written on 2026-10-24 from HandBrake's own documents, read from the current tree and web.
 The rules that come first were added on 2026-11-02 from `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, `TRANSLATION.markdown` and `.github/PULL_REQUEST_TEMPLATE.md` on master and from the [contribution guide](https://handbrake.fr/docs/en/latest/contributing/contribute.html), read that day.
 Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this skill is HandBrake's own practice.

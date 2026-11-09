@@ -9,6 +9,10 @@ description: >-
 
 # Contributing to VLC
 
+**Check freshness first.**
+Written on 2026-10-24.
+The project's own contribution rules, read again before each round, win over this page.
+
 Written on 2026-10-24 from VideoLAN's AI policy (`https://code.videolan.org/videolan/vlc/-/raw/master/doc/VideoLAN_AI_Policy.md`, read 2026-10-24), the VideoLAN Code of Conduct page (`https://code.videolan.org/videolan/CODE_OF_CONDUCT/-/blob/main/CODE_OF_CONDUCT.md`, read 2026-10-24) and merge request !10366 (read 2026-10-24).
 The rules that come first were checked again on 2026-11-02: the AI policy on master (added in 8a097e63 on 2026-10-21) and the Code of Conduct on the [VideoLAN wiki](https://wiki.videolan.org/Code_of_Conduct/) (last edited 2019-02-11), because the code.videolan.org page sat behind a bot check that day.
 Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this skill is VLC's own practice.

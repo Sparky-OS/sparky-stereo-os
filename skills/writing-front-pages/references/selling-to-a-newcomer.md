@@ -26,7 +26,7 @@ The rules of [the skill](../SKILL.md#the-rules) come first; this page adds what 
    Write for that reader in this order: it is safe, here is what you get, here is the one page of steps.
 7. **Safety first, then the benefit.**
    Before any step that touches the firmware or the disk, the page says what to save and what cannot be undone.
-   The first rule of showing anything to a person is that it must not hurt them: not their files, not their Windows, not their eyes.
+   The first rule of showing anything to a person is that it must not cost them anything: not their files, not their Windows.
 8. **One page before any long guide.**
    At most ten steps, one sentence each, one real screenshot where one exists, what to check after the step, and one link to the long guide at the end.
    The long guide stays, complete and linked by section, for the reader who asks.
@@ -53,7 +53,7 @@ The rules of [the skill](../SKILL.md#the-rules) come first; this page adds what 
 ## Traps
 
 - **Symptom:** a tester's Windows asked for a BitLocker recovery key at the next start; the tester did not have it and had to reinstall Windows.
-  **Cause:** the tester turned Secure Boot off to start the USB stick, and the only warning sat in the installation section, deep in a long guide he had not read.
+  **Cause:** the tester turned Secure Boot off to start the USB stick, and the only warning sat in the installation section, deep in a long guide they had not read.
   The person may never have turned the encryption on or seen the key ("Device Encryption is a Windows feature that enables BitLocker encryption automatically for the Operating System drive and fixed drives", [Device Encryption in Windows](https://support.microsoft.com/en-us/windows/device-encryption-in-windows-cf7e2b6f-3e70-4882-9532-18633605b7df)); BitLocker checks Secure Boot through the TPM ("By default, BitLocker provides integrity protection for Secure Boot by utilizing the TPM PCR[7] measurement", [BitLocker countermeasures](https://learn.microsoft.com/en-us/windows/security/operating-system-security/data-protection/bitlocker/countermeasures)), and Microsoft lists "Changes to the boot manager" and "Modifying the Platform Configuration Registers (PCRs) used by the TPM validation profile" among the events that start recovery ([BitLocker recovery overview](https://learn.microsoft.com/en-us/windows/security/operating-system-security/data-protection/bitlocker/recovery-overview)).
   **Fix:** step 1 of every page that leads to a USB start is "save the BitLocker recovery key" with Microsoft's own page for finding it ([Find your BitLocker recovery key](https://support.microsoft.com/en-us/windows/find-your-bitlocker-recovery-key-6b71ad27-0b89-ea08-f143-056f5ab347d6)), and the page says not to turn Secure Boot off.
   **How the cause was found:** the order of the steps taken, set against where the guide first mentions the key.

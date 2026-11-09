@@ -81,7 +81,7 @@ The short form:
 6. **Summary first, details linked** to the exact section; one step after another.
 7. **Never "the first" or "the only"** without a source, and never a status better than the evidence.
 
-The trap that cost a tester his Windows installation: the guide did not say, before anything else, to save the BitLocker recovery key and to leave Secure Boot on.
+The trap that cost a tester their Windows installation: the guide did not say, before anything else, to save the BitLocker recovery key and to leave Secure Boot on.
 Step 1 of every page that leads to a USB start says both.
 
 ## Keep every link that points in

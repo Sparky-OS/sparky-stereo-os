@@ -33,3 +33,13 @@ Run the same rows before and after the server change:
 In the configured KWin integration-test container, build `testStereoDepthExchange` and run `bin/testStereoDepthExchange testResourceVersion` under the test session bus. Keep the failing old-server log. The full depth exchange suite checks the window, output and inert-surface behavior alongside this version test.
 
 Connection survival is protocol proof. The real greeter's lock, idle CPU, unlock and wallpaper depth are separate checks; run them with depth enabled and disabled when fixing a greeter incident.
+
+## Greeter proof
+
+Use a private KWin virtual session with a render node, the real greeter and an ordinary disposable user whose password is set only inside the container. Keep the normal PAM stack. Lock through `org.freedesktop.ScreenSaver.Lock`, require `GetActive` to become true, allow startup to settle, then measure the same greeter PID for five minutes. Read fields 14 and 15 of `/proc/PID/stat` and `SC_CLK_TCK`; CPU percent of one core is `100 * delta_ticks / ticks_per_second / elapsed_monotonic_seconds`. Keep fractional results: integer division can hide a failed threshold. Check the process start time too, so a restarted greeter cannot count as survival.
+
+After the idle interval, send the fixture user's password through the [fake input client](input-delivery.md). Require both `GetActive == false` and the greeter's exit while KWin remains alive. Killing the greeter is cleanup, not an unlock test. Repeat on the installed packages and with `SunkLimit=0` as well as its default. The protocol trace must show the v3 binding and depth state without an unsupported limits event. With stereo and depth enabled, it must also show the wallpaper subsurface; at zero depth that child must be absent.
+
+**Mode-selection trap:** `kscreen-doctor` can print `Output with name or uuid ... not found` and still exit successfully. A mode number from another virtual backend fixture is not portable either. Enumerate the current fixture's outputs and modes, select its stereo mode, then require the readback to mark that mode as current. This caught a greeter pilot that unlocked successfully but was still in 2D. Checking only the command's exit status would have mislabeled it as depth proof.
+
+**Broken-image trap:** a rig assembled by extracting library files and using `dpkg --force-depends` can have working files but stale package versions and a geometry publisher requiring an older KWin. Install the matching cohort, including that publisher, without forcing dependencies and require `apt-get check` to succeed before recording package versions. Otherwise the reported versions do not identify the code the rig ran.

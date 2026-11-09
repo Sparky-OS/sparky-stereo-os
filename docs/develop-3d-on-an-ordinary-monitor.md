@@ -51,7 +51,7 @@ The panel itself is the last check.
 **A phone as a 3D screen:** [Flat Headset](https://github.com/Sparky-OS/flat-headset) puts a phone in a Cardboard-style viewer as a 3D screen for the desktop, through a KWin output in the headset's mode, KRdp and KDE Connect.
 [StereoDroid](https://github.com/Sparky-OS/stereodroid) makes the same phone a headset for SteamVR on Linux, with head tracking.
 Both are planned.
-**Android apps:** Android's own media framework learns the frame packing marks of 3D video in [androidx/media#3439](https://github.com/androidx/media/pull/3439), in review.
+**Android apps:** Android's own media framework reads the frame packing marks of 3D video in MPEG-TS since [58f396c](https://github.com/androidx/media/commit/58f396c597744112dffd76d08d101de8091a7950), and writing the layout to WebM is in review in [androidx/media#3529](https://github.com/androidx/media/pull/3529).
 The same rule holds there: a program hands over two eyes, and the screen it lands on decides how they are shown.
 
 ## 7. Headsets

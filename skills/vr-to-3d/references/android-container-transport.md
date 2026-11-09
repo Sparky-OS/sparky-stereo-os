@@ -1,6 +1,6 @@
 # An Android container reaching the host OpenXR runtime
 
-This is the allocator preflight for a guest transport, not a completed OpenXR bridge.
+This is the allocator and Vulkan-import preflight for a guest transport, not a completed OpenXR bridge.
 Keep the application's views and poses at the host runtime boundary; the runtime still supplies one declared left-first full side-by-side window to Stereo KWin.
 Depth limits remain the host runtime's existing KWin input.
 
@@ -13,12 +13,15 @@ Depth limits remain the host runtime's existing KWin input.
    An fd count alone cannot distinguish ashmem, memfd and dma-buf.
 4. Run the same check on `/dev/null`; it must be rejected with `ENOTTY`.
    Treat another error as inconclusive, not as a positive dma-buf result.
-5. If the running allocator supplies shared-memory fds, stop the dma-buf transport work at this prerequisite.
+5. Identify each fd's role: pixel storage and allocator metadata need not use the same kind of fd.
+   If the running allocator supplies only shared-memory fds, stop the dma-buf transport work at this prerequisite.
    A source tree containing `gralloc.gbm` does not prove the process selected it.
 
 The [diagnostic probe](../scripts/gralloc-fd-probe.c) tries CPU, GPU render/sample, and combined usages with a 64 by 64 RGBA buffer.
 Exit 0 means every inspected fd accepted the dma-buf sync operation; exit 2 means at least one returned `ENOTTY`; exit 1 means setup or an inconclusive operation failed.
 Its successful ioctl result is only an allocator gate: it does not prove image import, correct modifier/stride handling, fences or OpenXR presentation.
+Its exit 2 is deliberately conservative: a mixed handle needs further inspection, not a conclusion that it has no dma-buf.
+A measured minigbm handle contained a pixel dma-buf and a separate memfd reserved region.
 
 Build inside an isolated development container with a matching Android source tree and NDK mounted read-only:
 
@@ -38,7 +41,45 @@ The probe resolves it from `libnativewindow.so` and reports failure if that symb
 Measured on 2026-11-09 with the edition's Android 13 image in the retained software-configured Waydroid rig: both x86 and x86_64 selected `gralloc.default`, allocated all three usages successfully and returned one memfd per handle.
 All six allocation fds were named `memfd:gralloc-buffer` and rejected the dma-buf sync ioctl with `ENOTTY`; both diagnostic processes exited 2 with zero inconclusive errors.
 The loaded allocator hashes matched the accepted image manifest.
-This establishes the result for that running configuration; the image also contains the separate GBM allocator, whose runtime export/import path was not tested here.
+This establishes the result for that running configuration; the separate GBM configuration below has a different result.
+
+## Qualify GBM explicitly
+
+Keep a saved copy of the existing Waydroid configuration and expose the graphics mode as an explicit choice.
+Test changes belong in an isolated configuration; never rewrite the shared image's graphics default to make a transport probe pass.
+For the measured Android 13 image, these properties select its shipped legacy GBM module with a virtual GPU:
+
+```ini
+[properties]
+ro.hardware.gralloc=gbm
+gralloc.gbm.legacy=true
+gralloc.gbm.device=/dev/dri/renderD128
+ro.hardware.egl=mesa
+ro.hardware.vulkan=virtio
+```
+
+These are a test configuration, not a qualified product preset.
+Recreate the private Android session, then verify the live properties and loaded module in both ABIs.
+Without `gralloc.gbm.legacy=true`, Android's property initialization rewrites `gbm` to `minigbm_gbm_mesa` for vendor API 33 or later.
+
+For an accelerated VM, [QEMU's virtio-gpu documentation](https://www.qemu.org/docs/master/system/devices/virtio/virtio-gpu.html) and [Mesa's Venus requirements](https://docs.mesa3d.org/drivers/venus.html) describe the required host blob support and Venus capability set.
+Use a headless EGL render node, host memory and Venus enabled on the virtual GPU, and a supported host Vulkan driver.
+Check the guest kernel's reported features and run `vulkaninfo` inside the guest with the intended ICD explicitly selected.
+The physical host's `vulkaninfo` is only a virtualization prerequisite.
+
+The measured GBM configuration returned three pixel dma-bufs per ABI, all accepting the sync ioctl.
+Linux in the same VM enumerated a Venus device and advertised dma-buf import and DRM modifiers.
+The next check still failed: send an actual Android buffer fd by `SCM_RIGHTS`, together with its validated format, dimensions, plane count, byte stride and modifier, to a Linux Vulkan receiver in that VM.
+For the tested 64 by 64 RGBA buffer, stride was 256 bytes and the modifier was linear.
+The format query advertised importability and image creation succeeded, but `vkGetMemoryFdPropertiesKHR` aborted in the Venus driver on both ABIs.
+The render server reported an invalid resource ID while querying its properties.
+No Vulkan memory import, pixel readback or OpenXR presentation was proven.
+
+The receiver should proceed to import/bind memory and compare every pixel against a known pattern only after that prerequisite works.
+Wait for Android CPU-unlock completion before transfer, keep the buffer alive until the receiver finishes, and obey Vulkan's fd ownership transfer on successful import.
+This small test does not qualify asynchronous swapchain fences or frame reuse.
+An explicit attempt to select the shipped Zink backend in this image failed graphics allocations and repeatedly crashed SurfaceFlinger; it is not a working alternative.
+Restore the saved configuration and verify the original allocator again before leaving the test.
 
 ## What the next transport gate needs
 
@@ -55,6 +96,27 @@ The final proof is an Android `hello_xr` red view 0 and blue view 1 captured at 
 
 ## Traps
 
+- **Symptom:** `virtio-vga-gl` or `egl-headless` is unavailable, or QEMU cannot open `libEGL.so.1`.
+  **Cause:** a minimal QEMU image lacks its matching OpenGL modules or the EGL loader; the Mesa vendor library alone is insufficient.
+  **Fix:** verify package candidates, install matching QEMU modules and the EGL loader in the disposable image, and check the device/display help before booting.
+  **How found:** QEMU's help and startup log; the corrected image reached guest boot.
+- **Symptom:** Venus advertises its capability set, but guest `vkCreateInstance` returns `ERROR_OUT_OF_HOST_MEMORY`, alongside QEMU commands `0x10c`, `0x208` and `0x209` failing.
+  **Cause in the measured case:** the separately packaged `virgl_render_server` executable was missing.
+  **Fix:** install the matching render-server package in the QEMU container and restart the private VM.
+  **How found:** [QEMU issue 2997](https://gitlab.com/qemu-project/qemu/-/issues/2997), the package file list, then successful guest Venus enumeration after installation.
+- **Symptom:** a configured `gbm` test runs `minigbm_gbm_mesa` instead.
+  **Cause:** the Android property-service compatibility rewrite runs after loading Waydroid's properties.
+  **Fix:** use the existing `gralloc.gbm.legacy=true` opt-in when the test specifically requires the legacy module, and assert the live selection.
+  **How found:** live `getprop`, loaded mapper libraries and `system/core/init/property_service.cpp`.
+- **Symptom:** a real dma-buf passes the ioctl probe but the Vulkan consumer aborts before importing memory.
+  **Cause established so far:** Venus's resource-properties query cannot find the transferred virtual resource; the precise renderer/kernel defect remains unisolated.
+  **Next gate:** repair or qualify the virtual graphics import path, or qualify a compatible native graphics device shared by Android and its runtime under one kernel.
+  Do not call fd allocation a successful swapchain transport.
+  **How found:** both ABI senders, matching metadata, render-server errors and a GDB backtrace at `vkGetMemoryFdPropertiesKHR`; core dumps remained disabled.
+- **Symptom:** binding the diagnostic socket under a host-side Android rootfs directory fails with `ENOENT`.
+  **Cause:** Android's data mount exists in its container mount namespace.
+  **Fix:** for a private diagnostic, resolve the data directory through the live container init process's `/proc/PID/root`; for the feature, bind a dedicated shared socket directory explicitly.
+  **How found:** the failed bind followed by successful fd receipt through the container-visible inode.
 - **Symptom:** a successful Android graphics allocation has a native handle with one fd, yet the dma-buf gate fails.
   **Cause:** the selected `gralloc.default` calls `ashmem_create_region`, and libcutils implements that allocation using memfd on the measured kernel.
   **Next gate:** select and qualify the intended GBM/DRM configuration, with an accessible supported render node and matching graphics drivers.

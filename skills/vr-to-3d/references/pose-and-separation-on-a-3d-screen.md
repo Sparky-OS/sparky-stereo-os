@@ -156,6 +156,12 @@ That is why the horizontal disparity error is 0.04 to 0.09 px and not zero; the 
 - **Cause:** `cp file file.orig; mutate; ...; mv file.orig file` gives the file the copy's modification time, older than the mutated object, so the build keeps the mutated object.
 - **Fix:** `touch` the file after restoring it. A run of several mutations on one tree also needs this between them, or a later red can be an earlier mutation's.
 
+### Two pads: the wrong one speaks after both report at once
+- **Symptom:** every synthetic test passes, and on a real kernel device pad A pressed right after pad B was released shows no button: B still speaks, with nothing held.
+- **Cause:** "touched last" was the time of the read, and the reader goes through the pads in slot order, so within one poll the pad read last wins.
+- **Fix:** take the time from the kernel's stamp on the batch's last `SYN_REPORT`, and set the node's clock with `EVIOCSCLOCKID` to `CLOCK_MONOTONIC`, the clock the reader compares with. A report with no stamp takes the time of the read.
+- **Found by:** the real-device script on the A10, the one step a pipe-driven test could not show, because the fake delivered one pad per poll. A real uinput device gives both in the same poll.
+
 ### The gamepad cannot give the pose on a machine with no readable pad
 
 - **Symptom:** a pad is attached; the log says `no registered provider claimed the system` or the head still moves only with WASD.

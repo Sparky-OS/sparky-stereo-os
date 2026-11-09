@@ -25,7 +25,7 @@ Sparky Stereo OSは、Paweł "pavroo" PijanowskiによるSparkyLinuxを基にDan
 - <a id="science-and-engineering"></a>**[科学と工学](docs/edition-in-detail.ja.md#science-and-engineering)：** Marbleの地球儀、KAlgebraのグラフ、Kalziumの分子を3Dで表示します。
 - <a id="create"></a>**[制作](docs/edition-in-detail.ja.md#create)：** 3Dとディープカラー（各色8ビットではなく16ビット）で絵を描き、3D写真や動画を編集します。
 - <a id="watch-and-play"></a>**[鑑賞とゲーム](docs/edition-in-detail.ja.md#watch-and-play)：** 3Dの映画、写真、ゲームをウィンドウ内や全画面で楽しめます。
-- <a id="vr-is-also-a-stereo-monitor"></a>**[VRもステレオモニター](docs/edition-in-detail.ja.md#vr-is-also-a-stereo-monitor):** お使いのVRヘッドセットが棚の中で埃をかぶっていませんか？
+- <a id="vr-is-also-a-stereo-monitor"></a>**[VRもステレオモニター](docs/edition-in-detail.ja.md#vr-is-also-a-stereo-monitor):** ヘッドセットも、ビューアーに入れたスマートフォンも、このデスクトップの3D画面になります。
 - <a id="for-developers"></a>**[開発](docs/edition-in-detail.ja.md#for-developers)：** プログラムを一度3Dに対応させれば、デスクトップが各画面に合わせます。
 - **[ほかのディストリビューションでは？](docs/other-distributions.md)** 私たちがほかのディストリビューション向けのパッケージを作らない理由と、そのメンテナーが修正を取り入れる方法を説明します。
 

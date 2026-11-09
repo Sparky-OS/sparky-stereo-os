@@ -6,7 +6,7 @@
 
 Sparky Stereo OS startet vom USB-Stick und läuft vom Stick und aus dem Arbeitsspeicher.
 Es ändert nichts an Ihren Festplatten, solange Sie nicht selbst das Installationsprogramm starten, und nichts aus der Sitzung bleibt nach einem Neustart erhalten.
-Dies ist Beta 1 für Tester; jeder Schritt stammt aus [der ausführlichen Anleitung](beta1-install-classic-linux.de.md), in der jeder einzelne mit dem Beta-1-Abbild ausgeführt wurde.
+Dies ist Beta 1: Jeder darf sie ausprobieren, den Download-Link gibt es auf Anfrage (Schritt 3). Jeder Schritt stammt aus [der ausführlichen Anleitung](beta1-install-classic-linux.de.md), in der jeder einzelne mit dem Beta-1-Abbild ausgeführt wurde.
 
 **Zuerst der sichere Weg. Dann das 3D.**
 
@@ -15,16 +15,18 @@ Dies ist Beta 1 für Tester; jeder Schritt stammt aus [der ausführlichen Anleit
    Suchen Sie den Schlüssel jetzt heraus, mit Microsofts eigener Seite: [BitLocker-Wiederherstellungsschlüssel finden](https://support.microsoft.com/de-de/windows/find-your-bitlocker-recovery-key-6b71ad27-0b89-ea08-f143-056f5ab347d6).
    **Prüfen:** Sie können den Schlüssel auf Papier oder auf einem anderen Gerät lesen, nicht nur auf diesem PC.
 2. **Secure Boot eingeschaltet lassen.**
-   Ändern Sie nichts in den Firmware-Einstellungen (dem „BIOS“): Der Stick startet mit eingeschaltetem Secure Boot.
+   Secure Boot ist die Prüfung des PCs, dass nur signierte Systeme starten dürfen.
+   Ändern Sie nichts in den Firmware-Einstellungen (dem „BIOS“): Der Stick ist signiert und startet mit eingeschaltetem Secure Boot.
    Wer Secure Boot ausschaltet, riskiert, dass Windows beim nächsten Start den Wiederherstellungsschlüssel verlangt.
 3. **Nach dem Download fragen.**
    Den Link bekommen Tester: Fragen Sie im [Tester-Thread](https://github.com/Sparky-OS/sparky-stereo-os/issues/153) und schreiben Sie dazu, welchen 3D-Bildschirm oder welche Brille Sie haben, falls vorhanden.
 4. **Die Datei prüfen.**
-   Führen Sie in einer Eingabeaufforderung im Download-Ordner `certutil -hashfile sparky-stereo-os-9-mashtabba-beta1-x86_64.iso SHA256` aus und vergleichen Sie das Ergebnis mit [der Prüfsumme in der ausführlichen Anleitung](beta1-install-classic-linux.de.md#1-abbild-herunterladen-und-prüfen).
+   Das beweist, dass der Download vollständig und unverändert ist.
+   Führen Sie in einer Eingabeaufforderung (`cmd` im Startmenü eingeben) im Download-Ordner `certutil -hashfile sparky-stereo-os-9-mashtabba-beta1-x86_64.iso SHA256` aus und vergleichen Sie das Ergebnis mit [der Prüfsumme in der ausführlichen Anleitung](beta1-install-classic-linux.de.md#1-abbild-herunterladen-und-prüfen).
    **Prüfen:** Jedes Zeichen stimmt überein. Wenn nicht, laden Sie die Datei erneut herunter.
 5. **Auf einen USB-Stick mit mindestens 8 GB schreiben.**
    Alles auf dem Stick wird gelöscht.
-   Wählen Sie in Rufus den Stick und die Datei, klicken Sie auf START und wählen Sie auf Nachfrage „Im DD-Abbild-Modus schreiben“ ([Rufus Schritt für Schritt](beta1-install-classic-linux.de.md#rufus-im-dd-abbild-modus)).
+   Wählen Sie in [Rufus](https://rufus.ie), einem kostenlosen Windows-Programm zum Beschreiben von USB-Sticks, den Stick und die Datei, klicken Sie auf START und wählen Sie auf Nachfrage „Im DD-Abbild-Modus schreiben“ ([Rufus Schritt für Schritt](beta1-install-classic-linux.de.md#rufus-im-dd-abbild-modus)).
    Rufus selbst wurde in unseren Tests nicht ausgeführt; der DD-Abbild-Modus erzeugt dieselbe exakte Kopie wie das getestete Werkzeug.
 6. **Neu starten und den Stick wählen.**
    Drücken Sie beim Einschalten die Taste für das einmalige Startmenü (F12 oder F11 bei vielen PCs, F8 bei ASUS-Boards, manchmal Esc) und wählen Sie den Eintrag des Sticks, der mit „UEFI:“ beginnt.
@@ -32,8 +34,8 @@ Dies ist Beta 1 für Tester; jeder Schritt stammt aus [der ausführlichen Anleit
 
    ![Das Startmenü des Sticks](images/beta1/boot-menu-uefi.jpg)
 
-   Solange der Schlüssel der Edition nicht registriert ist, zeigt der Bildschirm „error: bad shim loader signature.“ und „The Sparky Stereo OS key is not enrolled: starting Debian's signed kernel instead.“
-   Das ist so vorgesehen, und nichts ist kaputt: Warten Sie zehn Sekunden.
+   Der Bildschirm zeigt dann zwei englische Zeilen, „error: bad shim loader signature.“ und „The Sparky Stereo OS key is not enrolled: starting Debian's signed kernel instead.“
+   Beide sind beim ersten Versuch zu erwarten, und nichts ist kaputt: Warten Sie zehn Sekunden, dann startet das System.
 8. **Auf den Desktop warten.**
    Der erste Start dauert einige Minuten, weil alles vom Stick gelesen wird.
 
@@ -42,7 +44,7 @@ Dies ist Beta 1 für Tester; jeder Schritt stammt aus [der ausführlichen Anleit
    **Wenn die Schrift zu klein ist:** Öffnen Sie in den Systemeinstellungen die Seite Anzeige-Einrichtung und erhöhen Sie die Skalierung.
 9. **3D für Ihren Bildschirm einschalten.**
    Öffnen Sie in den Systemeinstellungen die Seite Anzeige-Einrichtung.
-   Mit einer Rot-Cyan-Brille an jedem Monitor: Schalter Anaglyph einschalten, auf Anwenden klicken und die Auflösung mit dem Zusatz „(anaglyph, modern screens)“ wählen.
+   Mit einer Rot-Cyan-Brille an jedem Monitor: Schalter Anaglyph einschalten (so heißt das Rot-Cyan-Verfahren), auf Anwenden klicken und die Auflösung mit dem Zusatz „(anaglyph, modern screens)“ wählen.
    Mit einem 3D-Fernseher, 3D-Projektor oder 3D-Monitor: „Other stereo formats“ einschalten, auf Anwenden klicken und in der Liste Bildwiederholrate das Format Ihres Bildschirms wählen.
    Ohne beides bleibt der Desktop ein gewöhnlicher 2D-Desktop.
 

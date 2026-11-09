@@ -24,7 +24,7 @@ Sparky Stereo OS, Daniel Ramos' Edition von SparkyLinux (von Paweł "pavroo" Pij
 - <a id="science-and-engineering"></a>**[Wissenschaft und Technik](docs/edition-in-detail.md#science-and-engineering):** Marbles Globus, die Graphen von KAlgebra und die Moleküle von Kalzium in 3D; 3D-Modelle und Leiterplatten sind in Arbeit.
 - <a id="create"></a>**[Gestalten](docs/edition-in-detail.md#create):** in 3D und in hoher Farbtiefe malen (16 Bit je Farbe statt 8) und 3D-Fotos und 3D-Videos bearbeiten.
 - <a id="watch-and-play"></a>**[Ansehen und Spielen](docs/edition-in-detail.md#watch-and-play):** 3D-Filme, 3D-Fotos und Spiele, im Fenster oder im Vollbild.
-- <a id="vr-is-also-a-stereo-monitor"></a>**[VR ist auch ein Stereo-Monitor](docs/edition-in-detail.md#vr-is-also-a-stereo-monitor):** Verstaubt Ihr VR-Headset im Schrank?
+- <a id="vr-is-also-a-stereo-monitor"></a>**[VR ist auch ein Stereo-Monitor](docs/edition-in-detail.md#vr-is-also-a-stereo-monitor):** Ein Headset, oder ein Telefon in einem Betrachter, ist für diesen Desktop ebenfalls ein 3D-Bildschirm.
 - <a id="for-developers"></a>**[Entwickeln](docs/edition-in-detail.md#for-developers):** Machen Sie Ihr Programm einmal 3D-fähig; der Desktop passt es an jeden Bildschirm an.
 - **[Eine andere Distribution?](docs/other-distributions.md)** Warum wir nicht für sie paketieren und wie ihre Betreuer unsere Korrekturen übernehmen können.
 

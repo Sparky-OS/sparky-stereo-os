@@ -24,7 +24,7 @@ Sparky Stereo OS, l'édition de Daniel Ramos de SparkyLinux (par Paweł « pavro
 - <a id="science-and-engineering"></a>**[Science et ingénierie](docs/edition-in-detail.fr.md#science-and-engineering) :** le globe de Marble, les tracés de KAlgebra et les molécules de Kalzium en 3D ; les modèles 3D et les circuits imprimés sont en cours.
 - <a id="create"></a>**[Créer](docs/edition-in-detail.fr.md#create) :** peindre en 3D et en couleurs profondes (16 bits par couleur au lieu de 8), et retoucher des photos et des vidéos 3D.
 - <a id="watch-and-play"></a>**[Regarder et jouer](docs/edition-in-detail.fr.md#watch-and-play) :** des films, des photos et des jeux 3D, dans une fenêtre ou en plein écran.
-- <a id="vr-is-also-a-stereo-monitor"></a>**[La VR est aussi un écran stéréo](docs/edition-in-detail.fr.md#vr-is-also-a-stereo-monitor):** Votre casque VR prend-il la poussière dans un placard ?
+- <a id="vr-is-also-a-stereo-monitor"></a>**[La VR est aussi un écran stéréo](docs/edition-in-detail.fr.md#vr-is-also-a-stereo-monitor):** un casque, ou un téléphone dans une visionneuse, est aussi un écran 3D pour ce bureau.
 - <a id="for-developers"></a>**[Développer](docs/edition-in-detail.fr.md#for-developers) :** rendez votre programme 3D une seule fois ; le bureau l'adapte à chaque écran.
 - **[Une autre distribution ?](docs/other-distributions.md)** Pourquoi nous n'empaqueterons pas pour elle, et comment ses mainteneurs peuvent adopter nos corrections.
 

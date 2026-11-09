@@ -24,7 +24,7 @@ Sparky Stereo OS 是 Daniel Ramos 的 SparkyLinux 版本（SparkyLinux 由 Pawe�
 - <a id="science-and-engineering"></a>**[科學與工程](docs/edition-in-detail.zh-TW.md#science-and-engineering)：**Marble 的地球儀、KAlgebra 的函數圖、Kalzium 的分子，都是 3D；3D 模型與電路板正在進行中。
 - <a id="create"></a>**[創作](docs/edition-in-detail.zh-TW.md#create)：**以 3D 與高色深繪畫（每種顏色 16 位元，而不是 8 位元），並編輯 3D 照片與影片。
 - <a id="watch-and-play"></a>**[觀看與遊玩](docs/edition-in-detail.zh-TW.md#watch-and-play)：**3D 電影、照片與遊戲，可在視窗中或全螢幕觀看。
-- <a id="vr-is-also-a-stereo-monitor"></a>**[VR 也是一種立體螢幕](docs/edition-in-detail.zh-TW.md#vr-is-also-a-stereo-monitor):** 你的 VR 頭戴顯示器是不是在櫃子裡吃灰？
+- <a id="vr-is-also-a-stereo-monitor"></a>**[VR 也是一種立體螢幕](docs/edition-in-detail.zh-TW.md#vr-is-also-a-stereo-monitor):** 頭戴顯示器，或裝在觀看器中的手機，同樣是這個桌面的 3D 螢幕。
 - <a id="for-developers"></a>**[開發](docs/edition-in-detail.zh-TW.md#for-developers)：**只要讓程式 3D 化一次，桌面就會為每種螢幕調整它。
 - **[其他發行版？](docs/other-distributions.md)** 我們為何不替它們打包，以及其他發行版的維護者如何採用我們的修正。
 

@@ -6,7 +6,7 @@
 
 Sparky Stereo OS starts from the USB stick and runs from the stick and from memory.
 It changes nothing on your disks unless you start the installer yourself, and nothing you do in it is kept after a restart.
-This is beta 1, for testers; every step below is taken from [the long guide](beta1-install-classic-linux.en.md), where each one was run on the beta 1 image.
+This is beta 1: anyone may try it, and the download link is given on request (step 3). Every step below is taken from [the long guide](beta1-install-classic-linux.en.md), where each one was run on the beta 1 image.
 
 **First, the safe way. Then the 3D.**
 
@@ -15,16 +15,18 @@ This is beta 1, for testers; every step below is taken from [the long guide](bet
    Find the key now, with Microsoft's own page: [Find your BitLocker recovery key](https://support.microsoft.com/en-us/windows/find-your-bitlocker-recovery-key-6b71ad27-0b89-ea08-f143-056f5ab347d6).
    **Check:** you can read the key on paper or on another device, not only on this PC.
 2. **Leave Secure Boot on.**
-   Change nothing in the firmware (the "BIOS") settings: the stick starts with Secure Boot on.
+   Secure Boot is the PC's own check that only signed systems may start.
+   Change nothing in the firmware (the "BIOS") settings: the stick is signed and starts with Secure Boot on.
    Turning Secure Boot off can make Windows ask for the recovery key at its next start.
 3. **Ask for the download.**
    The link goes to testers: ask in the [tester thread](https://github.com/Sparky-OS/sparky-stereo-os/issues/26) and say which 3D screen or glasses you have, if any.
 4. **Check the file.**
-   In a Command Prompt in the download folder, run `certutil -hashfile sparky-stereo-os-9-mashtabba-beta1-x86_64.iso SHA256` and compare the result with [the sum in the long guide](beta1-install-classic-linux.en.md#1-download-and-check-the-image).
+   This proves the download is complete and unchanged.
+   In a Command Prompt (type `cmd` in the Start menu) in the download folder, run `certutil -hashfile sparky-stereo-os-9-mashtabba-beta1-x86_64.iso SHA256` and compare the result with [the sum in the long guide](beta1-install-classic-linux.en.md#1-download-and-check-the-image).
    **Check:** every character is the same. If not, download again.
 5. **Write it to a USB stick of at least 8 GB.**
    Everything on the stick is erased.
-   In Rufus, choose the stick and the file, click START, and choose "Write in DD Image mode" when it asks ([Rufus, step by step](beta1-install-classic-linux.en.md#rufus-in-dd-image-mode)).
+   In [Rufus](https://rufus.ie), a free Windows program that writes USB sticks, choose the stick and the file, click START, and choose "Write in DD Image mode" when it asks ([Rufus, step by step](beta1-install-classic-linux.en.md#rufus-in-dd-image-mode)).
    Rufus itself was not run in our tests; DD Image mode makes the same exact copy as the tool that was tested.
 6. **Restart and choose the stick.**
    Press the one-time boot menu key as the PC switches on (F12 or F11 on many PCs, F8 on ASUS boards, sometimes Esc), and choose the entry for the stick that starts with "UEFI:".
@@ -32,8 +34,8 @@ This is beta 1, for testers; every step below is taken from [the long guide](bet
 
    ![The boot menu of the stick](images/beta1/boot-menu-uefi.jpg)
 
-   Until the edition's key is enrolled, the screen shows "error: bad shim loader signature." and "The Sparky Stereo OS key is not enrolled: starting Debian's signed kernel instead."
-   That is expected, and nothing is broken: wait ten seconds.
+   The screen then shows two lines in English, "error: bad shim loader signature." and "The Sparky Stereo OS key is not enrolled: starting Debian's signed kernel instead."
+   Both are expected on a first try, and nothing is broken: wait ten seconds and the system starts.
 8. **Wait for the desktop.**
    The first start takes a few minutes, because everything is read from the stick.
 
@@ -42,7 +44,7 @@ This is beta 1, for testers; every step below is taken from [the long guide](bet
    **If the text is too small to read:** right-click the desktop, choose Configure Display Settings, and raise Scale.
 9. **Switch on 3D for your screen.**
    Right-click the desktop and choose Configure Display Settings.
-   With red-cyan glasses on any monitor: tick Anaglyph, click Apply, and pick the resolution marked "(anaglyph, modern screens)".
+   With red-cyan glasses on any monitor: tick Anaglyph (the name of the red-cyan kind of 3D), click Apply, and pick the resolution marked "(anaglyph, modern screens)".
    With a 3D TV, projector or monitor: tick "Other stereo formats", click Apply, and pick your screen's format in the Refresh rate list.
    Without either, the desktop stays an ordinary 2D desktop.
 

@@ -24,7 +24,7 @@ Sparky Stereo OS는 Daniel Ramos의 SparkyLinux 에디션(Paweł "pavroo" Pijano
 - <a id="science-and-engineering"></a>**[과학 및 공학](docs/edition-in-detail.ko.md#science-and-engineering):** Marble의 지구본, KAlgebra의 그래프, Kalzium의 분자를 3D로; 3D 모델과 회로 기판은 진행 중입니다.
 - <a id="create"></a>**[만들기](docs/edition-in-detail.ko.md#create):** 3D로 그리고 딥 컬러(8비트 대신 색상당 16비트)로 그리며, 3D 사진과 비디오를 편집합니다.
 - <a id="watch-and-play"></a>**[보기 및 플레이](docs/edition-in-detail.ko.md#watch-and-play):** 3D 영화, 사진, 게임을 창 또는 전체 화면으로.
-- <a id="vr-is-also-a-stereo-monitor"></a>**[VR도 스테레오 모니터입니다](docs/edition-in-detail.ko.md#vr-is-also-a-stereo-monitor):** VR 헤드셋이 수납장 안에서 먼지를 쌓고 있나요?
+- <a id="vr-is-also-a-stereo-monitor"></a>**[VR도 스테레오 모니터입니다](docs/edition-in-detail.ko.md#vr-is-also-a-stereo-monitor):** 헤드셋도, 뷰어에 넣은 휴대폰도 이 데스크톱의 3D 화면이 됩니다.
 - <a id="for-developers"></a>**[개발](docs/edition-in-detail.ko.md#for-developers):** 프로그램을 한 번 3D로 만드세요; 데스크톱이 각 화면에 맞게 조정합니다.
 - **[다른 배포판?](docs/other-distributions.md)** 패키징하지 않는 이유와 유지 관리자가 우리의 수정 사항을 채택하는 방법.
 

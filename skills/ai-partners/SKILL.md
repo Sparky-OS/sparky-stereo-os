@@ -79,6 +79,16 @@ Preserve intent, uncertainty, code identifiers and quoted review requests in the
 Ask about an ambiguous technical term; have the author review public wording.
 This is communication support, not proof of translation accuracy or a requirement to use English privately.
 
+### A reader who comes from somewhere else
+
+Most people who try the edition come from Windows, a few from a Mac, and many know only a phone or a tablet.
+Write and answer for that reader:
+- **Safety first, then the benefit.** Say what to save and what cannot be undone before any step that touches the firmware or a disk.
+- **One page before the long guide,** at most ten steps, with the long guide linked for the reader who asks ([writing-front-pages](../writing-front-pages/references/selling-to-a-newcomer.md)).
+- **Summary first, details linked** to the exact section; one step after another, never several things to weigh at once.
+- **People try before they read.** A warning that sits deep in a guide has not been given; put it in step 1.
+- **A true simplification stays.** Do not correct a sentence that is true at the reader's level; give the precise form when the reader asks.
+
 ### Second-model review of new strings (nine languages)
 
 Recipe, in this order:

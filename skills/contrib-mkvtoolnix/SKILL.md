@@ -9,6 +9,10 @@ description: >-
 
 # Contributing to MKVToolNix
 
+**Check freshness first.**
+Written on 2026-10-24.
+The project's own contribution rules, read again before each round, win over this page.
+
 Written on 2026-10-24 from MKVToolNix's README (`https://codeberg.org/mbunkus/mkvtoolnix/raw/branch/main/README.md`, read 2026-10-24) and public merge requests !6311 and !6312 (read 2026-10-24).
 The rules that come first were added on 2026-11-02 from the README and `CODE_OF_CONDUCT.md` on `main` and from [Codeberg's Terms of Use](https://codeberg.org/Codeberg/org/src/branch/main/TermsOfUse.md), read that day.
 Load [`upstream-outreach`](../upstream-outreach/SKILL.md) first; this skill is MKVToolNix's own practice.

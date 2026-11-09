@@ -11,6 +11,7 @@ KWin sees only the window's surface through Xwayland, so what draws the window d
 3. Map it. Stereo KWin makes the X window two views wide (`xwininfo` says 2W by H) and shows it at W by H.
 4. Draw the picture at the X window's size: left view in the left half, right view in the right half, each at its own resolution. Redraw on every real `ConfigureNotify` and on `Expose`; the doubling can arrive late.
 5. Take the size only from the events the X server sent. After each configure KWin sends a second, synthetic `ConfigureNotify` (`send_event` set) in the program's own units, one view wide. Ignore it, or read the real size with `XGetGeometry`.
+6. At support 10 or more, KWin also writes `_KDE_NET_WM_STEREO_DEPTH_LIMITS` on the declared window (`CARDINAL/32`, two `wl_fixed_t` values: sunk then popped, pixels of a view 1920 wide, for the output the window sits on). Select `PropertyChange`, read it on each notify, and draw inside it; the reference `vr-to-3d/references/pose-and-separation-on-a-3d-screen.md` has the traps.
 
 ## Proof, per eye
 

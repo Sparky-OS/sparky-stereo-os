@@ -4,13 +4,13 @@ metadata:
 name: vr-to-3d
 description: >-
   Adapt a VR engine's eye images for a flat stereo display and spectator viewing: the formula (eyes to a window, the
-  game drives the view, the 2D layer, crosshair, weapon effects), SteamVR on a television
-  inside gamescope, the Stereo Spectator, a headset's cameras kept, blur and effects that keep state between frames,
-  Android XR as a source, an OpenXR runtime (DisplayXR) declaring its window full side by side. Load it when a VR game
-  should play on a 3D TV, the HUD or crosshair doubles, effects smear across the eyes, a spectator view must keep the
-  headset's camera, or any OpenXR app should show in 3D on Stereo KWin, or Sneeze (a metaverse browser engine) must show its scene in two eyes,
-  or an OpenVR program must run with no SteamVR (xrizer, openvrpaths.vrpath, VR_Init Installation Not Found, both eyes show the left view),
-  or an OpenVR or OpenXR program on a 3D screen has no head or too much or too little depth (depth limits, tv or headset, DXR_VIEW_SUNK_PX), or a Linux gamepad gives no pose (evdev).
+  game drives the view, the 2D layer, crosshair, weapon effects), SteamVR on a television inside gamescope, the Stereo
+  Spectator, Android XR as a source, an OpenXR runtime (DisplayXR) declaring its window full side by side. Load it when
+  a VR game should play on a 3D TV, the HUD or crosshair doubles, effects smear across the eyes, a spectator view must
+  keep the headset's camera, any OpenXR app should show in 3D on Stereo KWin, Sneeze must show its scene in two eyes, an
+  OpenVR program must run with no SteamVR (xrizer, openvrpaths.vrpath, VR_Init Installation Not Found, both eyes show
+  the left view), an OpenVR or OpenXR program on a 3D screen has no head or wrong depth (depth limits, tv or headset,
+  DXR_VIEW_SUNK_PX), or a Linux gamepad gives no pose (evdev).
 ---
 
 # From a VR engine to a 3D display

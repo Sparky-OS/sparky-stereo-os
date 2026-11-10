@@ -9,8 +9,8 @@ description: >-
   value with evidence, every stereo display, move never drop, keep every link and anchor that points in, the
   cold-reader test. Load it when a newcomer cannot tell what the project is for, a long README must shrink without
   losing a fact, a tester lost Windows to a BitLocker recovery prompt, a term needs its number or a name may already
-  be another project's, a status line confuses, a translated heading's anchor no longer resolves, or a check says a
-  link was split.
+  be another project's, a status line confuses, a translated heading's anchor no longer resolves, a check says a
+  link was split, or the front pages must name a planned program or capability the edition does not ship yet.
 ---
 
 # Writing front pages
@@ -83,6 +83,12 @@ The short form:
 
 The trap that cost a tester their Windows installation: the guide did not say, before anything else, to save the BitLocker recovery key and to leave Secure Boot on.
 Step 1 of every page that leads to a USB start says both.
+
+## Adding a planned capability
+
+When the front pages must name something the edition does not do yet, sentence one stays as it is and the word goes into the doors it serves, status first: "Scanning is planned: a video of an object or a place becomes a 3D model you can walk around."
+The detail page gets one paragraph under its own anchor, the credits page one row marked "Planned, not shipped yet", and the nine languages change together.
+The recipe, the checks and the traps: [Adding a planned capability to every front page](references/adding-a-planned-capability.md).
 
 ## Keep every link that points in
 

@@ -15,7 +15,7 @@ The scripts are in `sparky-os/iso-build/` and `sparky-os/vm/` of [the build tree
 - `pack` (`pack.sh`): `sparkybackup-stereo dist` in a chroot of that tree, the way SparkyLinux packs its images on the system itself.
   The staged packages go in; the build's own apt sources, policy and module signing key come out.
   The ISO step packs from an overlay, so the root file system is the same for every pack.
-- `check` (`check-iso.sh`): the packed ISO against the recipe, with the ISO mounted read-only: one live kernel, signed with the edition's key; the menus, with no second kernel and with the Secure Boot enrolment in the nine languages; the EFI image's shim, GRUB and MokManager, the same files as the root file system's packages, and the edition's certificate; the image's `/boot`; the boot splash in the image and in the live boot image; command-not-found's index.
+- `check` (`check-iso.sh`): the packed ISO against the recipe, with the ISO mounted read-only: one live kernel, signed with the edition's key; the menus, with no second kernel and with the Secure Boot enrolment in the ten languages; the EFI image's shim, GRUB and MokManager, the same files as the root file system's packages, and the edition's certificate; the image's `/boot`; the boot splash in the image and in the live boot image; command-not-found's index.
 - `EDITION_REPO`: `live` (the default) reads the published repository at https://repo.sparkyos.org/, so the image is what people get; `flat` reads the development repository (`REPO`).
 - `ADD_HOSTS`: `host:address` pairs for the containers (`docker run --add-host`), for a repository host that the containers reach only on the local network.
 - `LEAN=1` is required for release images. `LEAN=0` is accepted only with `ISO_PURPOSE=benchmark` and a `-nolean-` file name.
@@ -45,7 +45,7 @@ Nothing in the menus is written by hand.
 
 The chain under Secure Boot is Debian's Microsoft-signed shim, Debian's signed GRUB, and the edition's kernel signed with the edition's key, which shim accepts once the key is in the firmware's MOK list:
 
-- On the live medium, a kernel shim refuses ("bad shim loader signature") leads to an explanation in the nine required languages and to the menu again with "Secure Boot: enroll the Sparky Stereo OS key" selected; that entry shows the steps in the nine languages and starts MokManager.
+- On the live medium, a kernel shim refuses ("bad shim loader signature") leads to an explanation in the ten required languages and to the menu again with "Secure Boot: enroll the Sparky Stereo OS key" selected; that entry shows the steps in the ten languages and starts MokManager.
 - In MokManager: Enroll key from disk, the disk, EFI, boot, `sparky-stereo-secureboot-2026.der`, Continue, Yes, Reboot. Enrolling from disk asks for a confirmation and no password; the one-time password belongs to `mokutil --import` from a running system.
 - On an installed system, `sparky-stereo-boot` keeps the certificate next to every shim on the EFI system partition and puts the same entry in GRUB's menu, in the system's language; under Secure Boot, when shim refuses the newest kernel, the entry is the menu's default. A new or reset motherboard, or Secure Boot turned on after the installation, ends at the enrolment, never at a dead end.
 

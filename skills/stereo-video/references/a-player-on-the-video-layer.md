@@ -10,7 +10,7 @@ Learned from ORDER 453, 453b and 453c (November 2026): Dragon Player and Plank P
 
 ## The refused declaration shown (the one piece a player adds)
 
-The sentence is one for both players, in the nine languages, with the engine's own reason (English) in the brackets: "This video is shown flat: the desktop refused to show it in 3D (%1)."
+The sentence is one for both players, in the ten languages, with the engine's own reason (English) in the brackets: "This video is shown flat: the desktop refused to show it in 3D (%1)."
 
 - Dragon: a `Kirigami.InlineMessage` of the warning type over the video, `visible: video.stereoLayerFailure.length > 0`.
 - Plank Player: a banner over the video in the theme's own warning colours (`Kirigami.Theme.neutralBackgroundColor`, `neutralTextColor` for its border, `textColor` for the text), never a fixed colour: a fixed orange ignored the person's colour scheme.
@@ -104,7 +104,7 @@ Plank Player `+stereo3d3` reset both corrections for every source and had no res
 
 The file is `$XDG_CONFIG_HOME/PlankPlayer/PlankPlayer.conf`, normally `~/.config/PlankPlayer/PlankPlayer.conf`. The isolated run observed `/run/user/1000/config/PlankPlayer/PlankPlayer.conf`. Its `[StereoVideo]` group uses the same key scheme as Dragon: SHA-256 of `QUrl::toEncoded()` for the eye swap and that hash plus `.input` for the packing. The two applications use their own configuration files. There is no Plank resume position to put beside these keys, and no xattr, sidecar or file beside the media.
 
-On every source change, load that URL's choices. Save a change only for its URL. Returning packing to Automatic removes `.input`; switching swap off removes the unsuffixed key. A failed QSettings read or sync produces an on-screen message naming the settings file, translated into the nine required languages. Making the configuration directory unwritable in the isolated run produced that visible message with the actual path.
+On every source change, load that URL's choices. Save a change only for its URL. Returning packing to Automatic removes `.input`; switching swap off removes the unsuffixed key. A failed QSettings read or sync produces an on-screen message naming the settings file, translated into the ten required languages. Making the configuration directory unwritable in the isolated run produced that visible message with the actual path.
 
 The package proof used actual menu activation, file A / file B / back to A, then a new application process. On the default render loop, an unmarked full-side-by-side A with explicit full-side-by-side packing and eye swap lost both choices in `+stereo3d3` and restored both in `+stereo3d4`. B stayed automatic and unswapped. Clearing both choices left the config file empty. Media SHA-256, size, modification/change times and xattrs were unchanged. The half-side-by-side variant also passed with an explicitly selected basic render loop; its default threaded-loop source transition exposed an additional OpenGL context-affinity failure in both package versions, so that variant is not evidence of a successful threaded transition.
 

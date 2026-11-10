@@ -12,8 +12,8 @@ His repositories are the reference: when this page and his current practice diff
 - One git repository per tool. The folder name is the package name, with the `sparky-` prefix for tools of the Sparky ecosystem.
 - It holds `bin/`, `lang/`, `share/` (the `.desktop` file and the icon), `install.sh` (install and uninstall), `CHANGELOG`, `copyright`, `LICENSE` (GPLv3) and `README.md`.
 - `README.md` follows his template: a title line, a one-sentence description, the copyright line, the GPL paragraph, then the `Dependencies:`, `Install:` and `Uninstall:` blocks, each under a line of `-------------`.
-- `lang/` holds `en` first, `pl` second (Paweł's language, which he reviews), `pt_BR` third, then `fr`, `de`, `ja`, `ko`, `zh_CN` and `zh_TW`.
-  These nine are the required set for every string the edition adds (Daniel, 2026-10-11; German since 2026-10-15); any other language comes after them.
+- `lang/` holds `en` first, `pl` second (Paweł's language, which he reviews), `pt_BR` third, then `fr`, `de`, `es`, `ja`, `ko`, `zh_CN` and `zh_TW`.
+  These ten are the required set for every string the edition adds (Daniel, 2026-10-11; German since 2026-10-15; Spanish since 2026-11-10); any other language comes after them.
 - A commit in a tool's repository has the new version string as its message, followed by the `Assisted-by:` trailer when an assistant helped.
 
 ## The binary package
@@ -75,9 +75,9 @@ A file the person deleted before the conversion comes back once, since the old v
 - Strings live in sourced files, `/usr/share/sparky/<tool>/<code>`, as `LOCAL1` to `LOCALn` (`LOCAL001` and up in AppCenter).
 - The language comes from `/etc/default/locale`.
   Match the whole `LANG=xx_YY` first, never a substring: a plain `grep de` also matches other locales.
-  Then match the bare language, so `fr` serves fr_FR, fr_CA and fr_BE, and `ja` and `ko` work the same way.
+  Then match the bare language, so `fr` serves fr_FR, fr_CA and fr_BE, and `es` serves es_ES, es_MX and es_AR (one Spanish catalogue, no territory variants), and `ja` and `ko` work the same way.
   Chinese keeps its territory, `zh_CN` or `zh_TW`. English comes last.
-- Write the fr, ja, ko and zh strings with care, have a second model check them, and welcome corrections from native speakers.
+- Write the fr, es, ja, ko and zh strings with care, have a second model check them, and welcome corrections from native speakers.
   Paweł reviews pl after publication; Daniel reviews pt_BR.
 - Dialogs use yad (zenity for progress, dialog in text mode), not kdialog.
 - A root check comes first in a tool that needs root, and commands run visibly in `sparky-xterm`.

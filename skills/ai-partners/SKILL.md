@@ -92,7 +92,7 @@ Write and answer for that reader:
 - **People try before they read.** A warning that sits deep in a guide has not been given; put it in step 1.
 - **A true simplification stays.** Do not correct a sentence that is true at the reader's level; give the precise form when the reader asks.
 
-### Second-model review of new strings (nine languages)
+### Second-model review of new strings (ten languages)
 
 Recipe, in this order:
 1. Find the strings in the package's own files (`git log -p` on its `lang/` folder, a JSON catalogue, a generator table) and build the packet with a script, never by hand: one block per string, `### N. [KEY]`, a context line, the English, then every language's current text. Keep one packet per language family (CJK, European) so the reviewer's language list is short.

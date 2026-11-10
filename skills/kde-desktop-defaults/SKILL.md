@@ -111,7 +111,7 @@ Each row: what it is, how a person reaches it, how it was tested. The packages a
 | developer task rows | `ripgrep fd-find bat fzf tealdeer ncdu btop tmux debsums` | `lists/tests/joins-252c-test.py` |
 | Stereo APTus sections VPN and Tools | the plain NetworkManager plugins; Syncthing with its Plasma widget, Vorta with Borg, KeePassXC, Solaar, Piper, Yakuake, the rescue set GPart, Partclone, FSArchiver, nwipe and Chrooter (TestDisk and ddrescue are on the image), HPLIP when Debian has a candidate; no Cisco VPNC row, the package has left forky | the fork's `stereo/tests/entries.py` |
 
-Recipe for a new Dolphin pack: copy the nearest pack, write `gen.py` (nine languages), add the row to `lists/integrations.tsv`, run the pack's `tests/run.sh` in a container, run `lists/tests/integrations-test.py`.
+Recipe for a new Dolphin pack: copy the nearest pack, write `gen.py` (ten languages), add the row to `lists/integrations.tsv`, run the pack's `tests/run.sh` in a container, run `lists/tests/integrations-test.py`.
 Details and traps: [lessons from the lanes](references/lessons-2026-11.md) (the 252c entries).
 
 ## The CI and package gates

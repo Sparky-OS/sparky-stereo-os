@@ -1,15 +1,15 @@
 # Requalifying the gl-stereo savers
 
-Read on 2026-11-08 (gl-stereo 0.4.3, ORDER 146d), from a requalification of the published 0.4.2 layer and of the 0.4.3 layer on an NVIDIA card, with the AMD render node out of reach.
+Read on 2026-11-08 (gl-stereo 0.4.3, ORDER 146d; the pin and the gate added with 0.4.4, ORDER 146e), from a requalification of the published 0.4.2 layer and of the 0.4.3 layer on an NVIDIA card, with the AMD render node out of reach.
 gl-stereo's own recipe is `savers/audit/README.md`, section "Requalifying after a layer change"; this page adds what it leaves out: the audit image when its base is gone, a device other than the AMD render node, the run times and every trap met.
 
 ## When it is needed
 
 The 130 saver receipts in `savers/qualification-6.09.json` bind two things: the SHA-256 of the stripped `libgl-stereo.so` (`library_sha256`) and the SHA-256 of each saver's executable (`executable_sha256`).
-`install-qualified.py`, run by `packaging/qualify-package.sh` in the package build, stops the build with "untested layer binary" or "untested saver binary" when either differs.
+`install-qualified.py`, run by `packaging/qualify-package.sh` in the package build, stops the build when either differs and (0.4.4) names every receipt with the file and both hashes: `FAIL: N of 130 receipts name binaries that are not the ones installed:` then `gears: saver executable /usr/libexec/xscreensaver/gears differs: the receipt names H1, the installed file is H2`. Before 0.4.4 it printed only the first id with "untested layer binary" or "untested saver binary".
 So all 130 are needed again after any change to the layer, even a message on stderr, and after a rebuild of XScreenSaver's savers (a Lean Code rebuild gives other bytes).
 
-Check first which savers the installed package can offer at all:
+Check first which savers the installed package can offer at all (0.4.4 and later name each one that is left out and why: `python3 /usr/lib/gl-stereo/savers/catalogue.py /usr/share/gl-stereo/catalogue.json` exits 1 and prints one `NAME is not offered: executable PATH differs: qualified H1, installed H2` line per saver; before it, count them):
 
 ```sh
 python3 - <<'PY'
@@ -74,10 +74,34 @@ Set `-e XWAYLAND_NO_GLAMOR=1` (see the first trap).
   **Cause:** not determined (the oracle reads the layer's own dump); noted so the next run knows it is not the layer.
 - **The Lean Code layer is not the plain layer.** See step 4: requalify the bootstrap that is built the way the package ships, or the final build stops at the gate.
 - **The repository changed under the receipts.** Receipts made against +stereo3d3 savers do not hold for +stereo3d4+lc1: every executable hash differs.
-  Requalify against the savers of the repository the final build uses, and say so in the changelog; `gl-stereo-savers` depends on `xscreensaver-gl (>= …+stereo3d3)`, which does not pin the build the receipts name.
+  Requalify against the savers of the repository the final build uses, and say so in the changelog. Since 0.4.4 `gl-stereo-savers` pins the exact build (see "The pin and the gate" below), so a later XScreenSaver rebuild makes apt refuse the pair, and the publication gate refuses the round, until the receipts are requalified.
 - **Disk.** The scratch of one run is 0.8 GB, the image 4.4 GB; delete the case directories after copying the logs, statuses, `qualification-6.09.json` and the comparison output.
 
 ## What a good run looks like (0.4.3, Lean Code layer `cab2fc79…`)
 
 `requalify.log` shows every step with status 0; `installed-mono-summary.log`: "exact nonempty 2D controls 130 of 130"; `installed-qualification.log`: "depth residual mean -0.043 px over 92 savers; histogram {-0.5: 13, 0.0: 75, 0.5: 3, 1.0: 1}" and "PASS: 130 complete installed qualifications {'layer': 118, 'flat': 10, 'owning-fix': 2}"; the mutations log: 13 PASS lines (valid accepted, missing, duplicate, unknown, stale-layer, stale-saver, settings, false-proof, false-2d, false-composition, excess-depth, excess-residual, shifted-residuals rejected); `installed-late-compositor.log`: "held equals plain: True".
 The candidate manifest (compiled without the functional gate) and the final one are the same file (`cmp`).
+
+## The pin and the gate (gl-stereo 0.4.4, ORDER 146e)
+
+Receipts are only true against the build they were proved on, so the package says which build that is and the round refuses anything else.
+
+- **The pin is generated, never typed.** `packaging/qualify-package.sh` runs `savers/pin.py` after `install-qualified.py` has proved every hash equal. `pin.py` asks dpkg which installed package owns each file a receipt binds (the saver executable and its settings file under `/usr/share/xscreensaver/config`) and writes `receipts:Pin=xscreensaver-data (= V), xscreensaver-gl (= V), xscreensaver-gl-extra (= V)` into `debian/gl-stereo-savers.substvars`; `debian/control` has `${receipts:Pin}` in gl-stereo-savers' Depends. The Build-Depends keep their `>=` (a substvar cannot be used there; the gate in install-qualified.py is what holds the build to the right files). The bootstrap build, without the manifest, writes the unpinned names and is never shipped.
+- **The gate is a file check, not an install.** `packaging/check-round-savers.py --index REPO` (a finished tree: `dists/` and `pool/`) or `--debs DIR...` unpacks the round's newest gl-stereo, gl-stereo-savers and every xscreensaver package in pure Python (no dpkg on the host), runs `catalogue.dropped(entries, root)`, the code the controller and the saver list run, with the unpacked tree as root, and refuses when fewer savers are offered than `savers.json` ships, when a bound file's owner is not pinned `(= its version)`, or when it cannot look (exit 2). `/K3D/partners/round-next/official-part1.sh` calls it on DEST after publish-tree.
+- **Red and green on real packages.** Published gl-stereo 0.4.2 against the r1107a tree: `catalogue: 1 of 132 savers can be offered`, 131 saver names with both hashes, three unpinned Depends, exit 1. 0.4.4 against the same XScreenSaver: 132 of 132, pinned, exit 0.
+- **What the person sees.** The saver list (`savers/settings.py`) shows "Not offered" for a saver the package has a receipt for and cannot offer, the reason in its last column (file, qualified hash, installed hash, 12 characters each), and a count above the list; a saver with no receipt stays "Pending verification". The controller writes the same reasons to stderr (the user's journal) when it starts and when a saver leaves the rotation. The nine languages are in `savers/strings.json` (German was missing from that file before 0.4.4). Not wired: the problems engine (a notice outside the list), because it needs a catalog in nine languages and a Build-Depends in a debhelper recipe, and with the pin apt cannot install the mismatched pair; only a hand-changed file reaches it.
+
+### Traps
+
+- **Symptom:** the first `sed` of `${receipts:Pin}` into debian/control also changed Build-Depends and the source stanza stopped parsing.
+  **Cause:** the saver dependencies are written identically in both stanzas.
+  **Fix:** edit the binary stanza only; Build-Depends cannot hold a substvar. **Found by:** `git diff debian/control` before building.
+- **Symptom:** a gate that passes while the Depends is `>=`.
+  **Cause:** comparing hashes alone proves the round's files, not what apt will pair on a user's machine, where an older XScreenSaver still satisfies `>=`.
+  **Fix:** the gate also refuses any Depends on an XScreenSaver package that is not `(= the round's version)` and any owner of a bound file that is not named.
+- **Symptom:** an old published gl-stereo-savers and a new XScreenSaver pass `apt` and the list is empty.
+  **Cause:** exactly the missing pin; `catalogue.load` drops the entries silently (before 0.4.4).
+  **Fix:** this section.
+- **Symptom:** a gl-stereo rebuild two days after the receipts were made stops at `install-qualified.py` with `layer ... differs: the receipt names cab2fc79..., the built layer is f83c52ca...` for all 130 receipts, with no source change to the layer.
+  **Cause:** the Lean Code build of the same source gives the same machine code (`objdump -d` equal) but another build ID and debuglink bytes (59 bytes differ) when the toolchain in the build container has moved (the container installs build-essential from Debian testing at build time; gcc was 16.2.0-3). Rebuilding the published 0.4.3 `.dsc` unchanged in the same container (`build-from-lc-dsc.sh`) stops the same way, so the receipts of a published gl-stereo cannot be rebuilt later.
+  **Fix:** none cheap: a gl-stereo version needs its 130 receipts requalified against the layer its own build makes, so do the build-and-requalify in one sitting, and record the toolchain (gcc, binutils) in the report. **Found by:** rebuilding the published .dsc as a control before suspecting the 0.4.4 change.

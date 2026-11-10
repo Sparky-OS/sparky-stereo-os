@@ -10,7 +10,7 @@ description: >-
   WL_SURFACE_SERIAL in CI, wp_viewporter says the surface already has a viewport, a mono EGL window draws at half its
   width, a video crashes KWin switching between ARGB and NV12, a Vulkan swapchain errors with NATIVE_WINDOW_IN_USE, a
   toolkit lacks stereo, a canvas or video looks pixelated or black in the stereo browser, the browser's video is
-  green on NVIDIA, or a gl-stereo layer change needs the saver receipts again.
+  green on NVIDIA, a gl-stereo layer change needs the saver receipts again, or the saver list says "Not offered".
 ---
 
 # Native Linux programs
@@ -91,7 +91,7 @@ The recipe, the proof (a column-coded clip), and the traps (the toolkit that rea
 ## Requalifying the gl-stereo savers
 
 The 130 saver receipts bind the stripped layer's SHA-256 and each saver's executable, so any layer change (even a message on stderr) and any rebuild of XScreenSaver's savers needs all 130 again, or the package build stops with "untested layer binary".
-The recipe on a device other than the AMD render node (the NVIDIA card through CDI, with Xwayland's glamor off), how the device is proved with the published layer, the run times and every trap met: [requalifying-gl-stereo-savers.md](references/requalifying-gl-stereo-savers.md).
+The recipe on a device other than the AMD render node (the NVIDIA card through CDI, with Xwayland's glamor off), how the device is proved with the published layer, the run times, the exact pin of the XScreenSaver build the receipts name and the publication gate that refuses a round whose catalogue would drop savers, and every trap met: [requalifying-gl-stereo-savers.md](references/requalifying-gl-stereo-savers.md).
 
 ## Game engines and libraries
 

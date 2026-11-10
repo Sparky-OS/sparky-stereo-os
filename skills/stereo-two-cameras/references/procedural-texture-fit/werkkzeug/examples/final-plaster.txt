@@ -1,0 +1,12 @@
+# relief round 2: only a few pits, softer lumps, a gentler light
+lu   Perlin - 10 10 3 4 0.6 2 0 1 1 #ffc0c0c0 #ffffffff
+pi   Perlin - 10 10 5 3 0.9 14 0 2.0 9 #ffffffff #ff808080
+to   Perlin - 10 10 7 2 1.0 6 0 1 1 #ffd8d8d8 #ffffffff
+h    Merge lu,pi,to 2
+dep  Blur h 1 0.003 0.003 1
+p    Perlin - 10 10 1 5 0.6 2 0 1 1 #ff000000 #ffffffff
+c    Range p 1 #ff8e8a7c #ffb2aea0
+st   Perlin - 10 10 2 4 0.7 9 0 1.5 2.5 #ffffffff #ffd8d4c8
+cs   Merge c,st 2
+n    Normals h 0.15 0
+res  Bump cs,n 2 0.5 0.5 0.5 0.62 0.1 #ff707070 #ffd0d0d0 0.5 0.5 1 #ffffffff 8 0.0

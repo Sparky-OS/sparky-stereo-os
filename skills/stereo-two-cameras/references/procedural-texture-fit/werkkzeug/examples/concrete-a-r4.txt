@@ -1,0 +1,10 @@
+# round 4: speckle warmer and softer, so it mottles instead of sparkling
+p    Perlin - 9 9 2 7 1.0 1 0 0.9 0.9 #ff000000 #ffffffff
+c    Range p 1 #ff3c3a30 #ff847e6c
+s    Perlin - 9 9 6 3 1.1 8 0 1.6 1.2 #ff000000 #ffffffff
+k    Perlin - 9 9 1 5 0.7 5 0 2.2 0.9 #ff000000 #ffffffff
+sk   Merge s,k 2
+sc   Range sk 1 #ff000000 #ffc8bca0
+m    Merge c,sc 0
+g    Perlin - 9 9 8 1 1.0 3 0 1 1 #ff909090 #ffffffff
+res  Merge m,g 2

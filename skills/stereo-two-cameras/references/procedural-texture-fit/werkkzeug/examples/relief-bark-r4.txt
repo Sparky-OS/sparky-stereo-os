@@ -1,0 +1,27 @@
+# relief round 4: the same relief, lighter and greyer as the trunk is
+pl   Perlin - 9 9 3 4 0.6 2 0 1.2 0.8 #ff000000 #ffffffff
+plt  Transform pl 0 1 5 0.5 0.5 0 0 0
+plr  Range plt 1 #ff909090 #ffffffff
+k    Cell - 9 9 #ff000000 #ffffffff #ff000000 40 3 1 0.5 1 0.1 0 0
+kt   Transform k 0 0.3 4 0.5 0.5 0 0 0
+d    Perlin - 9 9 2 4 0.7 4 0 1 1 #ff000000 #ffffffff
+kd   Distort kt,d 0.04 0
+fu   Range kd 1 #ffffffff #ff000000
+fub  HSCB fu 0 1 1 2.2
+k2   Cell - 9 9 #ff000000 #ffffffff #ff000000 90 8 1 0.5 1 0.06 0 0
+k2t  Transform k2 0 0.35 5 0.25 0.5 0 0 0
+k2d  Distort k2t,d 0.015 0
+f2   Range k2d 1 #ffffffff #ff606060
+f2b  HSCB f2 0 1 1 1.8
+fi   Perlin - 9 9 6 3 0.9 7 0 1 1 #ff989898 #ffffffff
+fit  Transform fi 0 1 2 0.5 0.5 0 0 0
+cr   Perlin - 9 9 5 4 1.0 13 1 1.4 1 #ffffffff #ff8c8c8c
+h    Merge plr,fub,f2b,fit,cr 2
+c0   Perlin - 9 9 2 5 0.8 9 0 1 1 #ff000000 #ffffffff
+c1   Range c0 1 #ffa89c88 #ffe8e4dc
+cp   Perlin - 9 9 1 4 0.6 17 0 1.6 1.2 #ffb09878 #ffffffff
+c    Merge c1,cp 2
+hc   Color h 1 #ffa0a0a0
+cd   Merge c,hc 2
+n    Normals h 0.5 0
+res  Bump cd,n 2 0.5 0.5 0.5 0.25 0.1 #ff909090 #ffc8c8c8 0.5 0.5 1 #ffffffff 8 0.0

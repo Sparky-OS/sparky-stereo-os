@@ -1,0 +1,20 @@
+# relief round 2: far fewer chips, larger and shallower; the rest as before
+b    Bricks - 9 9 #ffffffff #ffe0e0e0 #ff000000 0.2 0.36 2 4 3 80 0 0.25 1
+d    Perlin - 9 9 4 4 0.8 6 0 1 1 #ff000000 #ffffffff
+bd   Distort b,d 0.01 0
+bb   Blur bd 1 0.006 0.006 1
+# chips: a sparse high-contrast noise eats into the brick faces
+ch   Perlin - 9 9 4 3 0.8 11 0 2.2 7 #ffffffff #ff909090
+gr   Perlin - 9 9 7 2 1.0 2 0 1 1 #ffc0c0c0 #ffffffff
+h    Merge bb,ch,gr 2
+# colour: bricks from the Bricks operator, mortar grey, lime specks masked to the mortar (the inverse of the brick shape)
+bc   Bricks - 9 9 #ff7a4a42 #ffa06a56 #ff9c988e 0.2 0.36 2 4 3 80 0 0.25 1
+bcd  Distort bc,d 0.01 0
+mo   Color bd 4 #ff000000
+sp   Perlin - 9 9 6 2 1.0 9 0 5 6 #ff000000 #ffa0a0a0
+sm   Merge sp,mo 2
+cs   Merge bcd,sm 0
+n1   Perlin - 9 9 6 3 1.0 5 0 1 1 #ffa8a8a8 #ffffffff
+cn   Merge cs,n1 2
+n    Normals h 0.5 0
+res  Bump cn,n 2 0.5 0.5 0.5 0.62 0.1 #ff909090 #ffc0c0c0 0.5 0.5 1 #ffffffff 8 0.0

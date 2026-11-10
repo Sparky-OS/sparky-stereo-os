@@ -1,0 +1,27 @@
+# relief round 2: thinner cracks, the ochre only a trace, both slabs lighter
+f    Flat - 9 9 #ffffffff
+j1   GlowRect f 0.5 0.722 0.004 0.004 0.6 0.003 #ff000000 1 0.5 0 1
+j2   GlowRect j1 0.022 0.5 0.004 0.004 0.003 0.6 #ff000000 1 0.5 0 1
+# slate crackle: cell borders, only in the lower slab
+k    Cell - 9 9 #ff000000 #ffffffff #ff000000 30 5 1 0.5 1 0.1 0 0
+d    Perlin - 9 9 3 4 0.8 4 0 1 1 #ff000000 #ffffffff
+kd   Distort k,d 0.04 0
+kr   Range kd 1 #ffffffff #ff000000
+kb   HSCB kr 0 1 1 5.0
+fb   Flat - 9 9 #ff000000
+lo   GlowRect fb 0.5 0.86 0.003 0.003 0.6 0.137 #ffffffff 1 0.5 0 1
+wh   Flat - 9 9 #ffffffff
+kl   Mask lo,kb,wh 0
+sc   Perlin - 9 9 5 3 0.9 21 1 1 0.5 #ffffffff #ffd0d0d0
+h    Merge j2,kl,sc 2
+pl   Perlin - 9 9 1 6 0.7 4 0 1 1 #ff000000 #ffffffff
+cl   Range pl 1 #ffb4aaa0 #ffd4ccc4
+pd   Perlin - 9 9 2 6 0.8 7 0 1 1 #ff000000 #ffffffff
+cd   Range pd 1 #ff4a4648 #ff6c6462
+och  Perlin - 9 9 3 5 0.9 3 0 2 5 #ff000000 #ff382810
+cdo  Merge cd,och 0
+a    Mask lo,cdo,cl 0
+hc   Color h 1 #ffa0a0a0
+ac   Merge a,hc 2
+n    Normals h 0.35 0
+res  Bump ac,n 2 0.5 0.5 0.5 0.62 0.1 #ff808080 #ffe0e0e0 0.5 0.5 1 #ffffffff 8 0.0

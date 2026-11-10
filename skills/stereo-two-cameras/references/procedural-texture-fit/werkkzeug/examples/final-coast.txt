@@ -1,0 +1,23 @@
+# relief round 1: stones as raised blocks with flat tops (cells, the borders sunk), moss as a soft raised cushion, earth low and rough
+k    Cell - 10 10 #ff000000 #ffffffff #ff000000 24 7 1 0.6 1 0.12 0 0
+d    Perlin - 10 10 3 4 0.8 4 0 1 1 #ff000000 #ffffffff
+kd   Distort k,d 0.05 0
+kr   Range kd 1 #ffffffff #ff000000
+st   HSCB kr 0 1 1 3.0
+ms   Perlin - 10 10 2 6 0.8 11 0 3 2.8 #ff000000 #ffffffff
+ea   Perlin - 10 10 4 5 0.9 2 0 1 1 #ff404040 #ff909090
+hs   Mask ms,st,ea 0
+mm   Perlin - 10 10 2 6 0.8 5 0 3 2.4 #ff000000 #ffffffff
+mo   Perlin - 10 10 6 3 1.0 2 0 1 1 #ff808080 #ffc0c0c0
+h    Mask mm,mo,hs 0
+dep  Blur h 1 0.003 0.003 1
+pb   Perlin - 10 10 3 6 0.9 1 0 1 1 #ff000000 #ffffffff
+base Range pb 1 #ff3a2e22 #ff64543f
+pc   Perlin - 10 10 5 3 1.0 7 0 1 1 #ff847464 #ffb8aa98
+a    Mask ms,pc,base 0
+pg   Perlin - 10 10 7 2 1.0 2 0 1 1 #ff26381a #ff566e30
+b    Mask mm,pg,a 0
+hc   Color h 1 #ff707070
+bc   Merge b,hc 2
+n    Normals h 0.5 0
+res  Bump bc,n 2 0.5 0.5 0.5 0.62 0.1 #ff909090 #ffb0b0b0 0.5 0.5 1 #ffffffff 8 0.0

@@ -1,0 +1,8 @@
+# round 3: lighter, pinker-brown bricks and light grey mortar; the bump gentler
+b    Bricks - 9 9 #ff7a4a42 #ff9c6a5a #ff9c988e 0.16 0.3 2 4 3 80 0 0.25 1
+d    Perlin - 9 9 4 4 0.8 6 0 1 1 #ff000000 #ffffffff
+bd   Distort b,d 0.012 0
+n    Perlin - 9 9 6 3 1.0 2 0 1 1 #ffa8a8a8 #ffffffff
+bn   Merge bd,n 2
+hn   Normals bn 0.4 0
+res  Bump bn,hn 2 0.5 0.5 0.5 0.62 0.1 #ff808080 #ffd0d0d0 0.5 0.5 1 #ffffffff 8 0.0

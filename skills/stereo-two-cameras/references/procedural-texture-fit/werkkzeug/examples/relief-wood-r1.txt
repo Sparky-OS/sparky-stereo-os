@@ -1,0 +1,19 @@
+# a panel's wood, the game's wood idiom laid along the bar: stretched two-colour noise for the grain, soft ellipses bending it into knots,
+# and a height of its own: fine grooves along the grain and one joint between planks, all below the surface
+g    Perlin - 9 9 4 5 1.0 0 0 0.8 1.16 #ff40120c #ffbf6f48
+gt   Transform g 0 12 1 0.5 0.5 0 0 0
+f    Flat - 9 9 #ff7f7f7f
+k1   GlowRect f 0.28 0.4 0.16 0.2 0 0 #ffffffff 1 0.02 1 1
+k2   GlowRect k1 0.74 0.7 0.12 0.22 0 0 #ff202020 1 0.04 1 1
+w    Distort gt,k2 -0.2 0
+s    Perlin - 9 9 7 2 1.0 3 0 1 1 #ff000000 #ffffffff
+st   Transform s 0 6 0.4 0.5 0.5 0 0 0
+sd   Distort st,k2 -0.2 0
+gr   Range sd 1 #ff707070 #ffffffff
+j    Flat - 9 9 #ffffffff
+jl   GlowRect j 0.5 0.5 0.003 0.003 0.003 0.6 #ff000000 1 0.5 1 1
+h    Merge gr,jl 2
+hc   Color h 1 #ff909090
+wc   Merge w,hc 2
+n    Normals h 0.3 0
+res  Bump wc,n 2 0.5 0.5 0.5 0.3 0.1 #ff909090 #ffc0c0c0 0.5 0.5 1 #ffffffff 8 0.0

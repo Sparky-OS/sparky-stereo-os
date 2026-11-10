@@ -167,6 +167,8 @@ Record any promised next action and wait for a response; do not schedule reminde
 
 [A meeting abstract for a standards group](references/meeting-abstract-for-a-standards-group.md): the recipe for the short text a chair shares on the group's list before a review (read the list first, credit its open proposals by name, check each relation against the clause, commit only to what was promised), with four traps.
 
+[The first thread on a standards group's list](references/first-thread-on-a-standards-list.md): the recipe for the post that follows when a chair asks for one topic on the public list (one use case, the clauses by number, what implementations do today, open questions that name their possible answers, an experiment described and not built, no names of people), with five traps and the private gap map that orders the threads after it.
+
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (10 entries).
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 

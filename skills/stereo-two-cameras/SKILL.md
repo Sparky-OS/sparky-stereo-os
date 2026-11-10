@@ -71,6 +71,8 @@ X_ITE and X3DOM scenes are real 3D scenes, so they take cameras, not a flat UI's
 
 Motion in such a scene that is computed and not stored (a clock's `reverse`, a second-order follower beside the Followers component, inverse kinematics on HAnim Sites within their joint limits): the recipe for a live X_ITE scene that runs from a folder, what the X3D and HAnim clauses say, the numbers measured and the traps (a canvas shown twice in a WebDriver screenshot, a fetch that fails from disk, an arm that flips at its limit) are in [references/x3d-procedural-motion.md](references/x3d-procedural-motion.md).
 
+A surface's texture as a procedure first and the image last: [a procedure fitted to a bitmap](references/procedural-texture-from-a-bitmap.md) has the method to measure how much of a bitmap a small procedure holds (OpenKTG's noise from Farbrausch's open tools, the controls that must come back exactly, the bytes of the remainder), the first numbers, where it fails, and six traps (an operator undefined at one value, a lossless codec that flatters the remainder, a licence that forbids the obvious library).
+
 ## Any web 3D engine's two eyes
 
 Eight engines (three.js, A-Frame, Babylon.js, PlayCanvas, react-three-fiber, model-viewer, Spark, CesiumJS) through the browser's two routes, one scene, a prediction from the session's own views, controls that must fail, and what each engine needs from the browser: [references/web3d-engines-in-the-browser.md](references/web3d-engines-in-the-browser.md).

@@ -125,7 +125,7 @@ These narrower topics have their own references:
 ## A player on the engine's video layer
 
 A Qt Quick player (Dragon Player, Plank Player) keeps only its menu, its per-file store and its message: the drawing, the declaration and a refused declaration (`stereoLayerFailure`) are Qt Multimedia's.
-[What the player keeps, the refused declaration shown, the red and green recipe and its traps](references/a-player-on-the-video-layer.md) (ORDER 453 and 453b), among them the superseded recipe folders that sit beside the shipped ones.
+[What the player keeps, the refused declaration shown, the red and green recipe and its traps](references/a-player-on-the-video-layer.md) (ORDER 453, 453b and 453c), including the shipped recipes, Plank’s QSettings store, the actual menu-item visibility guard, and the carried and local QML fixes with their control tests.
 
 ## Lessons from the lanes, October to November 2026
 

@@ -19,7 +19,7 @@ An ELF dependency scan does not establish that a QML module will be installed.
    A solver success or a `--version` invocation does not prove the QML root loaded.
 5. Keep the old package as the failing control, with the same missing-module starting state and `--no-install-recommends`.
 
-The missing-module startup failure above is verified; the successor's complete installation-and-window test belongs to its package proof.
+ORDER 453c built Plank `5.27.80+git20261005.f87e775-1+stereo3d4+lc1` against Qt Multimedia `+stereo3d15`. Both the successor generator and the standalone control template now put `qml6-module-org-kde-desktop` in `Depends`; the template also requires Qt Multimedia QML `+stereo3d15~`. In the red installation, `+stereo3d3` left the style absent with recommendations disabled and no window opened. In the green installation, `+stereo3d4` pulled the style in and a non-root Wayland window opened in the isolated rig. The module was removed before each solver run and was never named in the install command. Both packages passed the Lean Code archive-qualified link/start gate and `check-debs`.
 Do not add the module explicitly to the test image and then claim that the player pulled it in.
 
 ## Follow the source-generation route

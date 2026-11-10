@@ -47,3 +47,13 @@ An embedded canvas needs its own subsurface/child-window integration and overlay
   The Craft library test passed with `LANG=C.UTF-8 LC_ALL=C.UTF-8`; preserve that environment in the runner.
   A separate spelling-budget test exceeded its deadline in a parallel workspace run and passed in the complete serial run.
   Keep both logs and the actual thread setting; do not increase the assertion's deadline to hide contention.
+
+- Symptom: private portal tests report `Memory allocation failure in message bus`, preceded by `Looking up user ID 1000: not found`.
+  The SDK has no passwd entry for the unprivileged test UID.
+  Add that account in the disposable build image; raising the memory limit does not address this cause.
+  The same compiled portal tests then pass with no app source change.
+- Symptom: scratch-corruption regressions fail during setup with `scratch disk ... is low on free space`, even above the lane's disk floor.
+  Read the product reserve too: PhotoCraft at de7e1eec keeps max(1 GiB, 5% of the scratch volume), so a nearly full build disk cannot enable spilling.
+  Provide a separate bounded test filesystem with enough room for that unchanged reserve.
+  A 4 GiB private tmpfs under a 16 GiB container memory cap passed the identical portal/scratch binaries; Cargo targets and caches stayed on the build disk.
+  Record the backing filesystem, memory limit and actual free-space measurement with the test result.

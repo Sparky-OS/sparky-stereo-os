@@ -35,6 +35,25 @@ It belongs after the interpolator, on the value. On the clock's fraction it woul
 Two editors' notes in HAnim 2.1 ask how the limits relate to an inverse kinematics engine and ask for an example model; a NOTE says the limits "only affect Joint presentation", which a solver cannot live with: it has to apply them while it solves.
 A planar FABRIK that reads `llimit` and `ulimit` from the nodes: every turn stayed inside the limits over a full turn of the target, the hand reached the target when it could (0 mm) and stopped up to 32 cm short when the target went behind the back; with the limits ignored the hand always arrived (within 4 mm) and the elbow turned to +3.1 rad against an allowed 0.
 
+## From a prototype to a node in X_ITE, and to a model from the example archive
+
+**Building X_ITE with a new node.** Clone create3000/x_ite at its release tag, add the node beside its siblings (`src/x_ite/Components/Followers/`), register it in the component file (`FollowersComponent.js`, `concreteNodes` and `abstractNodes`), then in a Node 24 container: `npm ci` and `npx webpack` (the full `npm run dist` also wants rsync, perl and the network). Constants such as `X3DConstants .MyNode` come from the registration; nothing else needs editing.
+The page then needs `dist/x_ite.min.js`, `x_ite.css` and, when served over http, `assets/lib/mikktspace_bg.wasm` and each external component under `assets/components/`.
+
+**The second-order follower as a node** (`X3DSecondOrderFollowerNode`, `PositionSecondOrderFollower`, `ScalarSecondOrderFollower`, working names; fields `frequency`, `damping`, `response`, `tolerance` beside the usual follower fields). Its text says how a frame is advanced: steps of at most 1/240 s and at most half the stable step, the destination moved evenly across them.
+Measured in the browser against a reference integrated in 0.1 ms steps from the same destinations, on a step, a ramp and a move that turns round: the node stays within 0.007 to 0.017 of a unit jump at 30 ms frames and within 0.005 to 0.011 at frames of 100 ms and more. On those slow frames one plain step per frame grows without bound (1e9 to 1e96) for the same settings, because the frame is longer than the stable step.
+PositionDamper and PositionChaser on the same step peak at 0.997 and 1.000.
+
+**Reverse in Castle Game Engine** (source at commit a368ad74, 4 November 2026, `src/scene/x3d/x3dnodes_standard_time.inc`): `Fraction := ElapsedTimeInCycle / CycleInterval`, then `if not FdFractionIncreasing.Value then Fraction := 1 - Fraction`. Nothing else reads the field while the sensor runs, so a switch at fraction f sends 1 - f on the next frame: a jump of |1 - 2f|. X_ITE's test build continues from f. Two engines, two results for one file, until the text says which.
+
+**Inverse kinematics on an HAnim model** (JinLOA1 from the X3D example archive, by Jin Hoon Lee and Min Joo Lee, converted by Chul Hee Jung and Myeong Won Lee, under the Web3D Consortium's open-source licence named in the file's own `license` meta; it has no Site and no limits, so a Site named `r_carpal_tip` and limits on r_shoulder, r_elbow and r_radiocarpal are added in memory).
+- FABRIK places points, so it says nothing about the turn of a bone about its own length, and a hinge needs that turn from the joint before it. FABRIK with the limits applied in its forward pass missed the target by a median of 9.3 units on a 26.7 unit arm. Adding passes over each allowed angle of each joint, tip to base (one axis at a time, as in cyclic coordinate descent), brought it to a median of 0.002 and a worst of 0.08, every angle inside its limits.
+- Without the limits the hand always arrives and the elbow turns 1.66 rad off its hinge and 1.06 rad the wrong way.
+- `limitOrientation` matters: turning the elbow's limit frame by 0.2 rad changed its pose by up to 0.39 rad, the limits holding in each frame.
+- `stiffness` as written (the turn scaled by 1 - stiffness "at each step of the IK solver") only slows a joint for the steps of one frame: with 24 steps a frame a shoulder at 0.8 still travelled as far, and the hand lagged by a median of 0.24 units. The text does not say what a step is.
+- Choices the text leaves open and a solver has to make: the order of the three limit angles (here X, then Y, then Z), whether equal `llimit` and `ulimit` on one axis mean free or locked (free, by the sentence in clause 6, so a hinge is written as a narrow range), and what a step is for `stiffness`.
+- Check the convention against the browser, not against yourself: draw one marker inside the Site and one at the tip the solver computed, show one at a time, and compare their centroids in a screenshot (0.00 to 0.08 px over six poses).
+
 ## Traps
 
 - **"Couldn't create browser", WebGL creation failed.** Cause: the browser was started headless in a container with no display, and Gecko found no GL. Fix: run it inside the proof rig's private KWin session (software GL is enough to draw). Found in the browser's log: `FEATURE_FAILURE_WEBGL_EXHAUSTED_DRIVERS`.
@@ -46,6 +65,10 @@ A planar FABRIK that reads `llimit` and `ulimit` from the nodes: every turn stay
 - **The limited arm swings to the far side and misses by its whole length.** Cause: an angle outside its limits was clamped by value, which picks the far end when the target passes the back of the joint's range. Fix: stop at the end that is nearer round the circle. Found by the largest miss of a full turn (0.79 m for a 0.75 m arm).
 - **A rotation about X bends a hanging arm backwards.** A positive turn about +X takes -Y toward -Z. With the figure facing +Z, forward flexion is a negative X rotation, so an elbow that only bends forward has `llimit` negative and `ulimit` 0.
 - **A test that scrolls and screenshots shows the top of the page.** Cause: `scroll-behavior: smooth` and a second scroll call cancel the first. Fix: `scrollIntoView ({ behavior: "instant" })`.
+- **A new node is "not found" in the built library.** Symptom: `Named node 'X' not found` although the build holds the class. Cause: the node is registered from X3D 4.1 and the scene said `version='4.0'`, so the parser left the node out without an error. Fix: `version='4.1'` in the scene.
+- **`CompileError: wasm validation error ... failed to match magic number`.** Cause: over http the missing `mikktspace_bg.wasm` comes back as a 404 page. Fix: copy `assets/lib/mikktspace_bg.wasm`.
+- **A page's `const` is invisible to WebDriver's script.** `return names` fails with "names is not defined" in Marionette's sandbox; hang what the test reads on `window`.
+- **A bounded joint still misses a target inside its reach.** Cause: the twist a hinge needs is not something FABRIK produces (above). Found by the median miss, not the worst one.
 - **The sign of parallax.** Stereo books call behind the screen positive; a table of left minus right has behind negative. Say which one a page uses.
 - **Portuguese names:** give one only where it is in common use (paralaxe, sobressinal, cinemática inversa, efetuador final); node names stay as they are.
 

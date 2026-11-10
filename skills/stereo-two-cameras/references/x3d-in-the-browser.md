@@ -27,9 +27,19 @@ With the flat TV mode's recorded values (interaxial 3.47 mm at a 1 m plane, a vi
 The interaxial grows with the plane: the 10 m column (+31.5, +7.87, -1.31, -5.25) comes out only with 34.7 mm, 3.47 mm for each metre of screen distance. A prediction that keeps 3.47 mm at 10 m is ten times too small.
 The camera hack is on by default (`webgl.stereo-camera.enabled`), so an X_ITE canvas in any page, a local file included, reaches KWin with two views; for a 2D control turn it off.
 
+## The camera hack's prediction, and the outline of a box
+
+The hack's formula is in the browser's source (`dom/canvas/WebGLStereoCamera.h`, branch `stereo3d` of Sparky-OS/waterfox): each eye's clip x is `x -/+ s (w - C)`, with s the separation as a share of the view's width (Normal is 2 %), C the zero-parallax distance (`webgl.stereo-camera.convergence` times the camera's near distance) and w the depth. In pixels, left minus right: `s W (C / Z - 1)`.
+Predict what is measured: the measurement is the centroid of a box's pixels, so the prediction is the centroid of its outline (the convex hull of its eight corners projected for each eye), not its front-face centre.
+With that, seven cases on X_ITE and X3DOM (defaults and a 10 m plane, the hack, flat TV and flat headset) agree with the captures within 0.46 px; with the front-face centre the 10 m cases were 2 px off.
+A scene-derived plane for X_ITE under the hack is `convergence = distance / near` ("80.0" for 10 m with X_ITE's near of 0.125 m); under flat WebXR it is `dom.vr.flat.screen-plane-mm`. X3D itself has no field to carry it.
+
 ## Traps
 
 - **A float preference written as a number is ignored.** Symptom: `webgl.stereo-camera.convergence` 80.0 in user.js changed nothing. Cause: Gecko stores float preferences as strings. Fix: `"80.0"`. Found by the identical numbers of two runs.
 - **A model/x3d type is not shown.** Navigating to a `.x3d`, `.x3dv` or `.x3dj` served as `model/x3d+xml`, `model/x3d+vrml` or `model/x3d+json` times out and leaves about:blank (an external handler, nothing drawn); served as `application/xml` it opens the XML tree.
 - **JSON in a shell word:** a preference object passed through an unquoted variable breaks at its space; write it compact.
 - **Measure the whole screen in a flat WebXR session:** the library's canvas is resized to the session's layer, so its page rectangle is not where the views are.
+- **A still scene shows the same picture to both eyes.** Symptom: one canvas of a long page measures 0 px while animated canvases beside it are in stereo. Cause: the canvas was drawn while it was out of view, the scene never drew again, and nothing asks the page for a new frame when it scrolls in. Not the cause, each ruled out by its own page: a scene built with `createX3DFromString`, a still scene as such, a rounded clip on the canvas, a small canvas, four canvases on one page. Reproduce: a spacer above the canvas and `scrollIntoView` after 3 s gives 0 px; one field written after the scroll gives the full parallax. Fix in a page: draw once more from an IntersectionObserver. The lasting fix belongs in the browser.
+- **`gfx.webrender.compositor.force-enabled` false removes the declaration.** No `set_content`, eyes equal, for still and animated canvases alike. The package sets it true; a test profile must not turn it off.
+- **A plain 2D output cannot be proved in the virtual rig.** ScreenShot2 answers with both eyes whenever a window holds stereo content, also on an output in a 2D mode, and the virtual backend has no scanout to read. What can be measured there: the HTML around the canvas is identical with the hack on and off, and the left eye's picture differs from the hack-off picture only inside the canvas (the camera sits half a separation to the left).

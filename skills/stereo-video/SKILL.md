@@ -7,8 +7,8 @@ description: >-
   mkvmerge, Kdenlive, UMS, FFmpeg, Qt Multimedia, mpv, VLC, Dragon), metadata precedence, unpacking by copying, 360
   and VR180, depth video, the per-file eye swap. Load it when a 3D film plays flat, the mark is lost after the first
   frame or a transcode, the eyes are swapped, a half side-by-side file is pre-scaled, mpv shows one view, a depth map
-  does not rotate, a StereoMode must be written back, a GPU encoder writes no SEI, an FFmpeg hwaccel assertion fails
-  in pthread_frame.c, VLC hangs after a minimize or leaves full screen on Wayland, a player's output modes must go, a
+  does not rotate, a GPU encoder writes no SEI, an FFmpeg hwaccel assertion fails
+  in pthread_frame.c, VLC hangs after a minimize, a
   Qt Multimedia player aborts at the next file ("QOpenGLContext current in a different thread"), logs "Handle type:
   NoHandle", or its 3D video copies into wl_shm buffers.
 ---

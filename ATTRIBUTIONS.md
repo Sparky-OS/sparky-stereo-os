@@ -501,6 +501,7 @@ Existing KWin, libkscreen, Qt and FFmpeg credits above also apply.
 | Program | Licence | What we changed | Credit |
 |---|---|---|---|
 | [Krita](https://krita.org/) | GPL-3.0-or-later | A 16-bit canvas on Wayland and a stereo canvas | Halla Rempt, Dmitry Kazakov and the Krita developers |
+| [ArtCraft](https://github.com/storytold/artcraft) and its Craft apps | MIT OR Apache-2.0 | PhotoCraft and FilmCraft published with 3D; that work and LightCraft's are being moved onto their current versions, and the other apps are being planned (in development) | The ArtCraft Team and the ArtCraft contributors |
 | [Spectacle](https://apps.kde.org/spectacle/) | LGPL-2.0-or-later | Captures of 3D windows saved as JPS and MPO | Boudhayan Gupta, Noah Davis, Marco Martin, David Redondo, Vlad Zahorodnii, Ahmad Samir, Aleix Pol Gonzalez, Ambareesh Balaji |
 | [KImageFormats](https://invent.kde.org/frameworks/kimageformats) | LGPL-2.0-or-later | JPS and MPO plugins | Albert Astals Cid, Alex Merry, Halla Rempt, Brad Hards, Mirco Miranda, Daniel Novomeský and the other authors |
 | [KFileMetaData](https://invent.kde.org/frameworks/kfilemetadata) | LGPL-2.1-or-later | A `stereo3dLayout` property for every stereo mark the specifications define | Alexander Stippich, Christoph Cullmann, Friedrich W. H. Kossebau, Igor Poboiko, Jos van den Oever, Joshua Goins and the other authors |

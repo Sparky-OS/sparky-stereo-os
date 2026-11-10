@@ -72,22 +72,22 @@ Daniel 與 Milton Ponson 共同主持 W3C [Procedural Memory Knowledge Represent
 
 **以 3D 繪畫、編輯照片、編輯影片，並以高色深繪畫：每種顏色 16 位元，而不是 8 位元。**
 
-**即將到來：3D 版 Plasma Studio。**
-[Plasma Studio](https://invent.kde.org/niccolove/plasma-studio) 是 Niccolò Venerandi 開發的 KDE 應用程式，把影片、音訊、照片、向量圖與 3D 集於一處，也是我們正在帶入 3D 的創作套件。
-它的 3D 場景將為每隻眼睛各提供一個視圖，它的向量圖將透過 [SVGStereo](https://github.com/Sparky-OS/svgstereo)（我們為 SVG 繪圖定義的 3D 標記）獲得深度；在 2D 螢幕上，它維持原樣。
-**開發中：**我們正在[我們的分支](https://invent.kde.org/danielcamposramos/plasma-studio)中研究它。
+**開發中：3D 版 Craft 應用程式。**
+[ArtCraft](https://github.com/storytold/artcraft)（storytold 出品）旗下的 Craft 應用程式，是我們正在帶入 3D 的創作套件：一個程式家族，從照片與影片編輯到 CAD、2D 動畫、向量圖、紋理繪製與材質，以 Rust 撰寫，採用 MIT 或 Apache-2.0 授權。
+PhotoCraft 與 FilmCraft 已帶 3D 發布；我們正在把這項工作連同 LightCraft 的工作移到它們的目前版本，並為其餘應用程式擬定計畫。
 
 - **繪畫：**Krita 能在 16 位元畫布上作畫，也能在每隻眼睛各 16 位元的 3D 畫布上作畫。
 - **照片：**digiKam 與 Showfoto 在相簿、燈箱、投影片放映與編輯器中顯示 3D 照片；KolourPaint 能編輯 3D 圖片並連同 3D 標記一起儲存。
 - **影片：**在 Kdenlive 裡，片段知道自己的 3D 版面，監看視窗能以 3D 顯示，渲染輸出時也會保留 3D 標記。
-- **故事：**[StorySplat](https://storysplat.com)（"Turn your 3D scans into interactive tours"）能直接在瀏覽器中，以真實地點的 3D 掃描建構成互動導覽，而且它的 3D View 能在已註冊的任何輸出上以 3D 顯示，最先是在 Sony 的 3D 電視上以並排模式測試的。
-- **同樣支援：**[ArtCraft](https://github.com/storytold/artcraft) 的 PhotoCraft 與 FilmCraft 已帶 3D 發布。
+- <a id="stories"></a>**故事：**[StorySplat](https://storysplat.com)（"Turn your 3D scans into interactive tours"）能直接在瀏覽器中，以真實地點的 3D 掃描建構成互動導覽，而且它的 3D View 能在已註冊的任何輸出上以 3D 顯示，最先是在 Sony 的 3D 電視上以並排模式測試的。
+- **計畫中，稍後：**[Plasma Studio](https://invent.kde.org/niccolove/plasma-studio) 是 Niccolò Venerandi 開發的 KDE 應用程式，把影片、音訊、照片、向量圖與 3D 集於一處。依構想，它的 3D 場景將為每隻眼睛各提供一個視圖，它的向量圖將透過 [SVGStereo](https://github.com/Sparky-OS/svgstereo)（我們為 SVG 繪圖定義的 3D 標記）獲得深度；[我們的分支](https://invent.kde.org/danielcamposramos/plasma-studio)為這項研究保留著。
 
 <a id="scan"></a>
 **計畫中：把物體或場所掃描成 3D 模型。**
 你用手機等裝置繞著物體或穿過一個場所拍一段影片，程式就在你自己的電腦上把它變成可以在其中走動的 3D 模型。
 這個程式是 [Spirula Studio](https://github.com/harry7557558/spirula-studio)，作者 Harry (J.X.) C.，採用 GPLv3 授權；它產生的模型叫做 3D Gaussian splat（3D 高斯潑濺），還可以由此產生帶貼圖的網格。
 **計畫中：**本版本還沒有收錄它，它也還不支援每眼一個視圖的 3D 顯示；這項工作將在[我們的分支](https://github.com/Sparky-OS/spirula-studio)中進行。
+有了掃描結果，就可以用 [StorySplat](#stories) 講述它的故事：它用這類 3D 掃描建構導覽，而且今天就能以 3D 顯示；把 Spirula Studio 的掃描放進 StorySplat 還有待試驗。
 
 每個程式的完整說明：[Programs](#programs-the-edition-changes-for-stereo-3d-and-deep-colour)。
 

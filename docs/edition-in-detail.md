@@ -70,22 +70,22 @@ Joining the group is free with a W3C account, and help is welcome: test on your 
 
 **Paint, edit photos and edit video in 3D, and paint in deep colour: 16 bits per colour instead of 8.**
 
-**Coming: Plasma Studio in 3D.**
-[Plasma Studio](https://invent.kde.org/niccolove/plasma-studio), Niccolò Venerandi's KDE app for video, audio, photos, vector art and 3D in one place, is the creative suite we are bringing to 3D.
-Its 3D scenes will get one view per eye, and its vector art depth through [SVGStereo](https://github.com/Sparky-OS/svgstereo), our 3D mark for SVG drawings; on a 2D screen it stays exactly as it is.
-**In development:** we are studying it in [our fork](https://invent.kde.org/danielcamposramos/plasma-studio).
+**In development: the Craft apps in 3D.**
+The Craft apps of storytold's [ArtCraft](https://github.com/storytold/artcraft) are the creative suite we are bringing to 3D: one family of programs, from photo and video editing to CAD, 2D animation, vector art, texture painting and materials, written in Rust under the MIT or Apache-2.0 licence.
+PhotoCraft and FilmCraft are published with 3D; we are moving that work, and LightCraft's, onto their current versions, and planning the other apps.
 
 - **Painting:** Krita paints on a 16-bit canvas, and on a 3D canvas with 16 bits in each eye.
 - **Photos:** digiKam and Showfoto show 3D photos in the album, the light table, the slideshow and the editor; KolourPaint edits a 3D picture and saves it with its 3D mark.
 - **Video:** in Kdenlive a clip knows its 3D layout, the monitors can show it in 3D, and the render keeps the 3D mark.
-- **Stories:** [StorySplat](https://storysplat.com) ("Turn your 3D scans into interactive tours") builds tours inside 3D scans of real places, right in the browser, and its 3D View shows them in 3D on any of the registered outputs, first tested side by side on a Sony 3D television.
-- **Also supported:** [ArtCraft](https://github.com/storytold/artcraft)'s PhotoCraft and FilmCraft, published with 3D.
+- <a id="stories"></a>**Stories:** [StorySplat](https://storysplat.com) ("Turn your 3D scans into interactive tours") builds tours inside 3D scans of real places, right in the browser, and its 3D View shows them in 3D on any of the registered outputs, first tested side by side on a Sony 3D television.
+- **Planned, later:** [Plasma Studio](https://invent.kde.org/niccolove/plasma-studio), Niccolò Venerandi's KDE app for video, audio, photos, vector art and 3D in one place. Its 3D scenes would get one view per eye, and its vector art depth through [SVGStereo](https://github.com/Sparky-OS/svgstereo), our 3D mark for SVG drawings; [our fork](https://invent.kde.org/danielcamposramos/plasma-studio) is kept for that study.
 
 <a id="scan"></a>
 **Planned: scan an object or a place into a 3D model.**
 You record a video around an object or through a place, with a phone for example, and the program turns it into a 3D model you can walk around, on your own computer.
 The program is [Spirula Studio](https://github.com/harry7557558/spirula-studio), by Harry (J.X.) C., under the GPLv3; the model it makes is called a 3D Gaussian splat, and it can also make a textured mesh from it.
 **Planned:** the edition does not ship it yet, and it does not show its models in 3D with one view per eye yet; that work will happen in [our fork](https://github.com/Sparky-OS/spirula-studio).
+With a scan in hand, [StorySplat](#stories) can tell its story: it builds tours from 3D scans of this kind and already shows them in 3D today; a Spirula Studio scan in StorySplat is still to be tried.
 
 Each program in full: [Programs](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).
 

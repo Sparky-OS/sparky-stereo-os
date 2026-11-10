@@ -22,8 +22,8 @@ Sparky Stereo OSは、Paweł "pavroo" PijanowskiによるSparkyLinuxを基にDan
 **次のステップ：お使いのWindows PCで、USBメモリから、何もインストールせずに試してみてください：** [1ページ、10ステップ（英語）](docs/guides/try-on-windows.en.md)
 <br>ダウンロードの申し込みと、お持ちの3D機器のご連絡は、あなたの言語でどうぞ： [🇨🇦](https://github.com/Sparky-OS/sparky-stereo-os/issues/26) [🇧🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/25) [🇵🇱](https://github.com/Sparky-OS/sparky-stereo-os/issues/27) [🇫🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/80) [🇩🇪](https://github.com/Sparky-OS/sparky-stereo-os/issues/153) [🇯🇵](https://github.com/Sparky-OS/sparky-stereo-os/issues/81) [🇰🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/83) [🇨🇳](https://github.com/Sparky-OS/sparky-stereo-os/issues/84) [🇭🇰](https://github.com/Sparky-OS/sparky-stereo-os/issues/85)
 
-- <a id="science-and-engineering"></a>**[科学と工学](docs/edition-in-detail.ja.md#science-and-engineering)：** Marbleの地球儀、KAlgebraのグラフ、Kalziumの分子を3Dで表示します。3Dモデルと回路基板は開発中です。
-- <a id="create"></a>**[制作](docs/edition-in-detail.ja.md#create)：** 3Dとディープカラー（各色8ビットではなく16ビット）で絵を描き、3D写真や動画を編集します。
+- <a id="science-and-engineering"></a>**[科学と工学](docs/edition-in-detail.ja.md#science-and-engineering)：** Marbleの地球儀、KAlgebraのグラフ、Kalziumの分子を3Dで表示します。3Dモデルと回路基板は開発中です。スキャンは計画中です。部品、現場、標本を撮った動画から3Dモデルを作ります。
+- <a id="create"></a>**[制作](docs/edition-in-detail.ja.md#create)：** 3Dとディープカラー（各色8ビットではなく16ビット）で絵を描き、3D写真や動画を編集します。スキャンは計画中です。物や場所を撮った動画から、中を歩き回れる3Dモデルを作ります。
 - <a id="watch-and-play"></a>**[鑑賞とゲーム](docs/edition-in-detail.ja.md#watch-and-play)：** 3Dの映画、写真、ゲームをウィンドウ内や全画面で楽しめます。
 - <a id="vr-is-also-a-stereo-monitor"></a>**[VRもステレオモニター](docs/edition-in-detail.ja.md#vr-is-also-a-stereo-monitor):** ヘッドセットも、ビューアーに入れたスマートフォンも、このデスクトップの3D画面になります。
 - <a id="for-developers"></a>**[開発](docs/edition-in-detail.ja.md#for-developers)：** プログラムを一度3Dに対応させれば、デスクトップが各画面に合わせます。

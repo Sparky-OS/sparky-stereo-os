@@ -492,6 +492,7 @@ Existing KWin, libkscreen, Qt and FFmpeg credits above also apply.
 | [Blender](https://www.blender.org/) | GPL-2.0-or-later | Every window a quad-buffer (Time Sequential) window, so a scene's stereoscopy shows at once; GHOST's EGL keeps the stereo request with two views on Wayland; a mono context instead of an exit when GLX has no stereo; the right eye follows mono frames after stereo stops | The Blender Foundation and the Blender developers, from Ton Roosendaal's first Blender on; Debian's packaging by the Debian Multimedia Maintainers and Matteo F. Vescovi |
 | [GNU Octave](https://octave.org/) | GPL-3.0-or-later | `stereo` figure properties | John W. Eaton and the Octave developers |
 | [GRASS GIS](https://grass.osgeo.org/), [KiCad](https://www.kicad.org/), [OpenSCAD](https://openscad.org/), [F3D](https://f3d.app/) | GPL family, BSD-3-Clause (F3D) | Stereo views, in progress | The GRASS Development Team; Jean-Pierre Charras and the KiCad developers; Marius Kintel and the OpenSCAD developers; Mathieu Westphal, Michael Migliore and the F3D team |
+| [Spirula Studio](https://github.com/harry7557558/spirula-studio) | GPLv3 | Planned, not shipped yet: scanning, a video of an object or a place turned into a 3D model, shown in stereo; the work will happen in [our fork](https://github.com/Sparky-OS/spirula-studio) | Harry (J.X.) C. and the Spirula Studio contributors. The models and code it builds on keep their own licences, as its LICENSES folder names them: BiRefNet (MIT, ZhengPeng), FlexGlue (MIT, Computer Vision and Geometry Lab), RoMaV2 (MIT, Johan Edstedt), GroundingDINO, SAM2 and GoPro Labs (Apache-2.0), DINOv3 and SAM3 (Meta's own licences) |
 
 ---
 
@@ -500,6 +501,7 @@ Existing KWin, libkscreen, Qt and FFmpeg credits above also apply.
 | Program | Licence | What we changed | Credit |
 |---|---|---|---|
 | [Krita](https://krita.org/) | GPL-3.0-or-later | A 16-bit canvas on Wayland and a stereo canvas | Halla Rempt, Dmitry Kazakov and the Krita developers |
+| [ArtCraft](https://github.com/storytold/artcraft) and its Craft apps | MIT OR Apache-2.0 | PhotoCraft and FilmCraft published with 3D; that work and LightCraft's are being moved onto their current versions, and the other apps are being planned (in development) | The ArtCraft Team and the ArtCraft contributors |
 | [Spectacle](https://apps.kde.org/spectacle/) | LGPL-2.0-or-later | Captures of 3D windows saved as JPS and MPO | Boudhayan Gupta, Noah Davis, Marco Martin, David Redondo, Vlad Zahorodnii, Ahmad Samir, Aleix Pol Gonzalez, Ambareesh Balaji |
 | [KImageFormats](https://invent.kde.org/frameworks/kimageformats) | LGPL-2.0-or-later | JPS and MPO plugins | Albert Astals Cid, Alex Merry, Halla Rempt, Brad Hards, Mirco Miranda, Daniel Novomeský and the other authors |
 | [KFileMetaData](https://invent.kde.org/frameworks/kfilemetadata) | LGPL-2.1-or-later | A `stereo3dLayout` property for every stereo mark the specifications define | Alexander Stippich, Christoph Cullmann, Friedrich W. H. Kossebau, Igor Poboiko, Jos van den Oever, Joshua Goins and the other authors |

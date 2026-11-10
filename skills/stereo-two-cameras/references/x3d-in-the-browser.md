@@ -20,6 +20,13 @@ Measured 2026-11-08 on the edition's browser (Waterfox-based, 6.7.5 +stereo3d10)
 - X3D has no zero-parallax plane, so metres 1 to 1 against a 1 m screen plane put a scene that is 2 to 30 m away wholly behind the screen (-4 to -7.5 px at 1280 wide). With the plane at the Viewpoint's distance to its `centerOfRotation` (10 m, `dom.vr.flat.screen-plane-mm` 10000) the same boxes read +29.6, +7.1, -1.5, -5.5 px against +31.5, +7.9, -1.3, -5.2 predicted.
 - The camera hack keeps the author's framing and the HTML around (outside-canvas difference 0.000) but puts the screen plane at 5 times the library's near plane: X_ITE's near is 0.125 m (plane about 0.6 m, all boxes behind the screen, -11 to -15.5 px of 800, so 2 m and 30 m differ by 4.5 px), X3DOM computes its near from the scene (1.4 m, plane about 7 m: +59.6, +9.0, -11.5, -19.5). `webgl.stereo-camera.convergence` is a multiple of the near plane.
 
+## The prediction without a session
+
+Where a point at distance Z shows against a screen plane at distance d, in pixels of a picture `width` wide: `-interaxial * (Z - d) / Z / (2 d tan (hfov / 2)) * width` (left minus right, so behind the screen is negative).
+With the flat TV mode's recorded values (interaxial 3.47 mm at a 1 m plane, a view 31.5 degrees wide, 1280 pixels) this gives -3.94, -6.30, -7.22, -7.61 for 2, 5, 12 and 30 m: the session's predicted column to 0.01 px.
+The interaxial grows with the plane: the 10 m column (+31.5, +7.87, -1.31, -5.25) comes out only with 34.7 mm, 3.47 mm for each metre of screen distance. A prediction that keeps 3.47 mm at 10 m is ten times too small.
+The camera hack is on by default (`webgl.stereo-camera.enabled`), so an X_ITE canvas in any page, a local file included, reaches KWin with two views; for a 2D control turn it off.
+
 ## Traps
 
 - **A float preference written as a number is ignored.** Symptom: `webgl.stereo-camera.convergence` 80.0 in user.js changed nothing. Cause: Gecko stores float preferences as strings. Fix: `"80.0"`. Found by the identical numbers of two runs.

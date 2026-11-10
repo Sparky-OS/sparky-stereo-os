@@ -132,6 +132,18 @@ The runtime keeps no knowledge of the screen.
   **Cause:** the test hook declares the new size to the runtime but leaves the app's own `wp_viewport` destination at the old size, and KWin shows each view at the destination; the runtime's buffers are 1280x360, two 640x360 views.
   **How found:** KWin's protocol log (`set_window_geometry(0, -58, 640, 418)` and the decoration's new destination, no new `set_destination` on the main surface); the undeclared control shows its 640x360 buffer at 800x450 the same way, so it is the hook, not the declaration.
 
+## Display zones and full side by side (ORDER 58b)
+
+**What a zone is** (DisplayXR's `XR_DXR_display_zones` spec, ADR-027, and `XR_DXR_local_3d_zone`): an app's window holds N 3D zones (window-pixel rectangles, each with its own view framing and its own multiview picture), M flat 2D zones, and one "wish" mask, a per-pixel value from 0 (flat) to 1 (3D) in window pixels that says where the panel itself should switch.
+The mask has two readers that must agree: the runtime's own composite (2D laid over the woven 3D wherever the mask is below 1) and, on a display with switchable lens zones, the display processor, which turns the lens cells.
+Displays it matters for are the ones with a lens or barrier that can switch part of the panel; on a display that is 3D everywhere, or flat everywhere, the mask only decides which pixels get the weave.
+
+**What the edition's build does today** (measured in lane 58b with DisplayXR's `cube_zones_vk_linux` on the staged package, Stereo KWin in the rig): sim_display is built with 2D and full side by side only, so there is no output that keeps pixel positions to substitute for the mask, and it logs "zone mask active ... drawn as it is".
+On a native Wayland window (declared, target 3840x1080 for a 1920x1080 window) the zones and the 2D strip are laid in window coordinates, which is the left half of the doubled target: the left eye holds the scene, the right eye is entirely black (0 of 2,073,600 pixels lit; undeclared, with `DXR_STEREO_DECLARE=0`, both eyes hold it). On an app's own X11 window nothing is declared and both eyes hold the flat window.
+**Why it is a decision and not a patch:** flat content in a stereo window is simply the same pixels in both views, so for every output KWin makes (anaglyph, interleaved, HDMI 3D) a 2D zone needs no mask at all; only a switchable-lens output needs to know where the 3D is, and that would be a declaration to KWin that no recorded design covers.
+Options, in the words the person sees: keep today (one eye black in zone apps), present zone apps undeclared (two squeezed pictures side by side, flat, told through the problems engine), lay every zone in both halves (zone apps in true 3D, 2D zones flat at the screen), or the same plus the mask declared to KWin for panels with switchable lens zones.
+The state is in the hand-back of ORDER 58b; the decision is Daniel's.
+
 ## Not done yet, and where it goes
 
 - **An app's own X11 window** (`XR_DXR_xlib_window_binding`) and **adopt-own-window's child** (DisplayXR #2322) are not declared; the log says so.

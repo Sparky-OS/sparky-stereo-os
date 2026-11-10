@@ -10,7 +10,7 @@ description: >-
   when a 3D film plays flat, the mark is lost after the first frame or a transcode, the eyes are swapped, a half
   side-by-side file is pre-scaled, mpv shows one view, a depth map does not rotate with the picture, a
   StereoMode must be written back, a GPU encoder writes no frame packing SEI, an FFmpeg hwaccel assertion fails in pthread_frame.c, VLC hangs after a minimize or
-  leaves full screen on Wayland, or a player's output modes must go.
+  leaves full screen on Wayland, a player's output modes must go, or a player built on Qt Multimedia aborts with "Cannot make QOpenGLContext current in a different thread" (exit 134) when the next file opens.
 ---
 
 # Stereo video, end to end

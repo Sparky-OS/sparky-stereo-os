@@ -48,3 +48,11 @@ Current craft-contrib core rule 15 says a pull request does not say an agent wro
 The edition's policy asks for disclosure once, and a task may explicitly require it in a fresh PR.
 Record the conflict and the responsible person's explicit instruction in the private handoff; do not quietly rewrite either project's rules or misrepresent what they require.
 A local draft is not authorization to send.
+
+## When a rebased gate disagrees with main
+
+Read a successful gate for the same source commit and compare its measured toolchain and inputs before changing untouched code.
+`Cargo.toml`'s `rust-version` is a minimum, not a CI pin.
+PhotoCraft's [passing gate at de7e1eec](https://github.com/storytold/photocraft/actions/runs/42861583249/job/129988830503) used Rust 1.99.1 on 2026-11-10, while the local Debian SDK supplied 1.97.1.
+The older Clippy complained about unchanged PSD callback and cursor-range code.
+Match the actual gate compiler, Clippy, font input and software GPU checks, then repeat the unchanged-source check; do not silence the diagnostic or fold an environment workaround into a media fix.

@@ -1,0 +1,9 @@
+# round 4: masks made in Perlin itself (amplify and gamma), which gives real patches; moss darker and less neon, stone paler
+pb   Perlin - 9 9 3 6 0.9 1 0 1 1 #ff000000 #ffffffff
+base Range pb 1 #ff3a2e22 #ff64543f
+mm   Perlin - 9 9 2 6 0.8 5 0 3 2.4 #ff000000 #ffffffff
+pg   Perlin - 9 9 7 2 1.0 2 0 1 1 #ff26381a #ff5c7a34
+a    Mask mm,pg,base 0
+ms   Perlin - 9 9 2 6 0.8 11 0 3 2.8 #ff000000 #ffffffff
+pc   Perlin - 9 9 5 3 1.0 7 0 1 1 #ff847464 #ffb8aa98
+res  Mask ms,pc,a 0

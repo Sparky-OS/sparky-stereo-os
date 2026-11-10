@@ -62,6 +62,8 @@ Not measured: GPU texture formats with their own chains (KTX2, BCn), AVIF and JP
 
 ## The tiled ladder: procedures informed by the tile's own pixels (ORDER 473w)
 
+These are code metrics of a three-term fitter (gradient, cells, seed-chosen noise). Daniel's reading of them, 10 November 2026: "you have not started this properly. start from the kkrigger game tooling and it's way of doing textures, on the comparison, do not use code for now, it's a visual thing, a vision able model is more correct at this than a code analysis". They stay as that round's record; the artist's way below is the round that answers him.
+
 The direction of werkkzeug3 and .kkrieger run backwards: there operators made the texture; here the texture yields the operators and their parameters, tile by tile.
 
 ### Two fitters
@@ -115,6 +117,85 @@ Seven pictures take about an hour per ladder variant on a busy machine: the 512 
   Fix: fade each tile's terms to zero at the border with `GlowRect`'s falloff and fit with the fade applied; keep the gradient shared at tile corners.
 - Symptom: two ladders and a recogniser run at once, and the timing of the operators doubles from run to run.
   Fix: time the operators (`ktgtool bench`) when nothing else of yours runs, and take the median of five.
+
+## The artist's way: werkkzeug3's own graphs, a vision model as the artist, the eye as the judge (ORDER 473x)
+
+### How .kkrieger made its textures
+
+The project file of the game is in `fr_public` (`werkkzeug3/data/kkrieger.k`, 217 pages, 29,347 operators).
+[`werkkzeug/kdoc.py`](procedural-texture-fit/werkkzeug/kdoc.py) reads it, following `WerkDoc::Read`; [`kgraph.py`](procedural-texture-fit/werkkzeug/kgraph.py) rebuilds each texture's graph the way the editor does (an operator takes the operators in the row right above it that overlap it sideways, left to right; `Load` takes a stored operator by name) and prints it in plain words.
+854 named bitmaps can be drawn; a graph has 16 operators and 396 bytes of class and parameter words at the median, 173 operators and 3,793 bytes at most.
+The operators used most: `HSCB` (hue, saturation, contrast, brightness), `Merge`, `Color`, `Transform`, `Perlin`, `Blur`, `GlowRect`, `Range`, `Flat`, `TransformMul`, `Normals`, `Distort`, `Twirl`, `Bump`, `Cell`, `Mask`, `Gradient`.
+
+The artist's idioms, read from the graphs:
+- **A colour layer:** `Perlin` in black and white, `Range` to map it to two colours of the material, `HSCB` to tune it. Several noises at different frequencies are multiplied or added.
+- **A shape, repeated:** one soft rectangle (`Flat`, then `GlowRect`), repeated with `TransformMul` or by a `Transform` that scales it down so it tiles. .kkrieger's brick walls and tiles are made this way; the `Bricks` operator exists and the game does not use it.
+- **Irregular edges:** `Distort` the shape by a noise.
+- **Relief:** the shape and noises as a height, `Normals`, then `Bump` lights the colour layer with it; a brightened copy of the shape is multiplied in for the joints.
+- **Two materials on one surface:** `Mask` with a noise as the mask (metal and rust, wood and knots).
+- **A mask from a noise:** `Perlin`'s own amplify and gamma (amplify 3, gamma 2 gives patches over about 40 % of the picture).
+
+### Drawing them with Farbrausch's own operator code
+
+werkkzeug3's `genbitmap.cpp` is Visual C++ with x86 MMX assembly and does not compile with g++.
+werkkzeug4 carries Farbrausch's own portable C++ version of the same generator (`altona_wz4/wz4/wz4frlib/wz3_bitmap_code.cpp`, BSD).
+[`build.sh`](procedural-texture-fit/werkkzeug/build.sh) builds [`wzrender`](procedural-texture-fit/werkkzeug/wzrender.cpp) from an unchanged clone: `patch_wz3.py` removes seven whole functions that need fonts, image files or the vector operator, and one line of `Paste` (a test that belongs to the editor's cache); no other line of a texture operator is changed; `shim/` stands in for the few altona types the file uses, with altona's random generators copied so the operators draw what they draw there.
+wzrender's calls follow werkkzeug3's `Bitmap_*` functions parameter for parameter.
+
+```sh
+KTG_IMAGE=your-image-with-g++ sh werkkzeug/build.sh FR_PUBLIC BUILD
+PYTHONPATH=werkkzeug python3 werkkzeug/kgraph.py FR_PUBLIC/werkkzeug3/data/kkrieger.k              # the 854 names
+PYTHONPATH=werkkzeug python3 werkkzeug/kgraph.py FR_PUBLIC/werkkzeug3/data/kkrieger.k t.wall.bricks.01 > g.txt   # a script for wzrender
+```
+
+Expect: `t.wall.bricks.01` (24 operators, 644 bytes), `0.fliesen_01` (36, 772), `0.wood.02` (35, 831), `t.bricks.02` (36, 784), `0.wood.crate01` (69, 1,773) and the others draw as a brick wall, stone tiles, wood, a stone wall and a crate, 512 x 512.
+They are the game's graphs through werkkzeug4's code: the look is the game's; the random details (which cell is where) need not be, because werkkzeug4 uses other random generators than werkkzeug3. `Text` is passed through undrawn (it needs Windows fonts).
+
+### The reverse direction, as an artist would do it
+
+1. Cut a tile of the high-resolution texture (512 x 512 at full size).
+2. A vision-capable model looks at the tile and types a graph in werkkzeug3's operators, in [`wzlang.py`](procedural-texture-fit/werkkzeug/wzlang.py)'s form: one operator per line, name, operator, inputs, values in werkkzeug3's own parameter order. Four typed graphs are in [`werkkzeug/examples/`](procedural-texture-fit/werkkzeug/examples/).
+3. [`look.py`](procedural-texture-fit/werkkzeug/look.py) draws it with wzrender and puts it beside the tile at the same size.
+4. The model looks at the sheet, says in words what matches and what is wrong, and revises the graph. Three to five rounds.
+5. A second, cold vision model that has seen none of this judges the final sheet: what each side is, what matches, what is missing, the same surface at a glance, and close up.
+6. The level of detail is the graph's detail: thinner versions of the final graph (fewer operators, fewer octaves, down to one flat colour) are drawn beside it and judged for the distance at which each still reads.
+7. The next tile of the same picture starts from the same graph; only seeds and a few values change. The tiles are where the graph changes.
+
+No code metric decides anything. The graph's bytes are written beside each sheet as a fact.
+
+### What the first run found (the vision model's and the second judge's words are in the lane's evidence)
+
+- **Known answers.** Two .kkrieger textures written from the picture alone came back in three rounds as the same surface at a glance for both judges: stone tiles in 12 operators and 296 bytes (the artist's own graph: 36 and 772), stained rusty metal in 9 and 237 (the artist's: 48 and 804). The typed tile graph used the artist's own idiom (one soft rectangle scaled to half) without having read it.
+- **Six photographs, one 512 pixel tile each, 3 to 5 rounds:** concrete (9 operators, 221 bytes), plaster (6, 186), floor tiles (13, 337), red brick (7, 227, with werkkzeug3's `Bricks`), coast with moss and stone (8, 248): the same kind of surface at a glance, or nearly, for both judges; none the same surface close up. Tree bark (15, 427): refused by both; it came out as a drawing of bark.
+- **What a typed graph gets:** the material's colours, grain, shares of light and dark, and a regular layout. **What it does not get:** things that are objects or events on the surface (stones, chips, a knot, the one orange brick, a crack) and deep relief with light and shadow.
+- **Level of detail:** concrete still reads from afar at 108 bytes (4 operators), brick at 57 bytes (`Bricks` alone), the coast at 139 bytes; one or two operators below that are placeholders in the right colours.
+- **A second tile** of the same picture needed the same graph with other seeds and one or two changed values.
+
+### Traps of the artist's round
+
+- Symptom: the first compile of werkkzeug3's own texture library stops in `_types.hpp` with `fclex`, `push`, `fldcw` not declared.
+  Cause: inline x86 assembly in Visual C++ syntax, 29 blocks, with no C fallback for the merge, blur and filter cores.
+  Fix: use werkkzeug4's `wz3_bitmap_code.cpp`, which has no assembly, with a small stand-in for altona's types; altona's own base does not compile with a current g++ either (its `new` macros collide with the standard headers).
+  Found by: `grep -c __asm` over both trees.
+- Symptom: `grep` finds nothing in files that plainly hold the text.
+  Cause: the sources are ISO-8859 and grep takes them for binary.
+  Fix: `grep -a`.
+- Symptom: a mask hardened with `HSCB` (contrast 3 to 4) comes out nearly black, three rounds in a row.
+  Cause: the contrast does not turn around mid-grey as assumed.
+  Fix: make masks in `Perlin` itself with amplify and gamma, and look at the mask alone before using it.
+  Found by: drawing five masks side by side.
+- Symptom: a relief turns the picture into black and white hair, or plaster into sandpaper.
+  Cause: `Normals` strength near 1 on a fine noise is ten times too much.
+  Fix: 0.08 to 0.4 for a surface's tooth, and a `Bump` ambient colour close to the diffuse.
+- Symptom: `Mask` puts the two layers the wrong way round.
+  Fix: the first layer shows where the mask is white.
+- Symptom: a speckle meant for the mortar lands on the bricks too.
+  Cause: a layer added to the whole picture has no notion of the shape under it.
+  Fix: mask it with the shape, as the artist's graphs do with a brightened copy of the joints.
+- Symptom: the writer of the graph accepts its own result more easily than a cold reader does.
+  Fix: always a second judge that has not seen the graph or the rounds; record both verdicts and where they differ.
+- Symptom: the local vision model answers 404 and the cloud one 429.
+  Fix: record the refusals word for word and use another independent model that can look at pictures; never invent a second opinion.
 
 ## Where it fails
 

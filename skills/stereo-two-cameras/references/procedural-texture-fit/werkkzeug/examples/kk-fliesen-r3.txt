@@ -1,0 +1,13 @@
+# round 3: lighter and less blue, more contrast between the light and dark clouds, crisper speckle
+p    Perlin - 9 9 2 7 1.0 1 0 0.95 0.8 #ff000000 #ffffffff
+q    Perlin - 9 9 7 2 1.0 5 0 1 1 #ff606060 #ffffffff
+pq   Merge p,q 2
+col  Range pq 1 #ff4c5060 #ffe8ecff
+sh   Sharpen col 1 0.004 0.004 1.5
+f    Flat - 9 9 #ff000000
+r    GlowRect f 0.5 0.5 0.004 0.004 0.492 0.492 #ffffffff 1 0.5 0 1
+t    Transform r 0 0.5 0.5 0.5 0.5 0 0 0
+n    Normals t 0.5 0
+b    Bump sh,n 2 0.5 0.5 0.5 0.62 0.016 #ffffffff #ffbfbfbf 0.5 0.5 1 #ffffffff 8 0.3
+m    Color t 1 #ff909090
+res  Merge b,m 2

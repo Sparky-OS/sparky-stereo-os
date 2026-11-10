@@ -147,6 +147,8 @@ For a route change (Mesa, Xwayland), also the programs that already worked, reru
 
 A client drawing on a GPU other than the compositor's (a dmabuf import failure, "importing the supplied dmabufs failed"): [references/two-gpu-dmabuf.md](references/two-gpu-dmabuf.md).
 
+A compute or sparse-buffer program that draws nothing on the RTX through zink, with no GL error (64-bit atomics in another storage buffer, a sparse buffer's tail reading zero): [references/zink-storage-and-sparse.md](references/zink-storage-and-sparse.md).
+
 A browser canvas (WebGL, three.js, CesiumJS), video or image with `image-rendering: pixelated` that shows black, solid green or blurry on Stereo KWin: [references/browser-pixelated-canvas.md](references/browser-pixelated-canvas.md).
 
 ## Lessons from the lanes, October to November 2026

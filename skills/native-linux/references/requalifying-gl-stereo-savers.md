@@ -102,3 +102,6 @@ Receipts are only true against the build they were proved on, so the package say
 - **Symptom:** an old published gl-stereo-savers and a new XScreenSaver pass `apt` and the list is empty.
   **Cause:** exactly the missing pin; `catalogue.load` drops the entries silently (before 0.4.4).
   **Fix:** this section.
+- **Symptom:** a gl-stereo rebuild two days after the receipts were made stops at `install-qualified.py` with `layer ... differs: the receipt names cab2fc79..., the built layer is f83c52ca...` for all 130 receipts, with no source change to the layer.
+  **Cause:** the Lean Code build of the same source gives the same machine code (`objdump -d` equal) but another build ID and debuglink bytes (59 bytes differ) when the toolchain in the build container has moved (the container installs build-essential from Debian testing at build time; gcc was 16.2.0-3). Rebuilding the published 0.4.3 `.dsc` unchanged in the same container (`build-from-lc-dsc.sh`) stops the same way, so the receipts of a published gl-stereo cannot be rebuilt later.
+  **Fix:** none cheap: a gl-stereo version needs its 130 receipts requalified against the layer its own build makes, so do the build-and-requalify in one sitting, and record the toolchain (gcc, binutils) in the report. **Found by:** rebuilding the published .dsc as a control before suspecting the 0.4.4 change.

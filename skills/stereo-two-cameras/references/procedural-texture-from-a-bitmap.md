@@ -313,12 +313,139 @@ It is a picture to judge by, not a renderer.
   Cause: near the rim one pixel covers many of the bark's.
   Fix: blend to a softened copy of the lit bark as the surface turns away from the eye.
 
+## Procedures from pixels: the artist's order run backwards, by a program (ORDER 508)
+
+Daniel's request, stated plainly: the procedure is made the way .kkrieger's textures were made, in reverse, from the high-resolution texture's own pixels, never from text; no model types a graph.
+The typed graphs of the section above are reference only.
+[`pixels/p2p.zig`](procedural-texture-fit/pixels/p2p.zig) is the fitter: Zig, with Farbrausch's own operator code as its renderer ([`wzbridge.cpp`](procedural-texture-fit/pixels/wzbridge.cpp) over werkkzeug4's `wz3_bitmap_code.cpp`), so what it finds is a real werkkzeug3 procedure that the playback module of the WebAssembly section draws unchanged.
+This first milestone proves the method on known answers: .kkrieger's own textures, drawn from their real graphs, with only the pixels handed to the fitter.
+
+### The method, and why
+
+The published ways to get a procedure from a picture were read first.
+MATch (Shi and colleagues, 2020) picks a finished graph from a library and tunes its values by gradient descent through a differentiable copy of every node; its DiffMat library is for noncommercial research only, so it is cited and not used.
+MatFormer (Guerrero and colleagues, 2022) and "Generating Procedural Materials from Text or Image Prompts" (Hu and colleagues, 2023) generate graphs with trained networks, which needs thousands of graphs to train on and is a model writing the graph.
+Guo, Hašan, Yan and Zhao (2020) sample a fixed procedure's values with Markov chains, discrete ones included.
+"An Inverse Procedural Modeling Pipeline for SVBRDF Maps" (Hu, He, Deschaintre, Dorsey and Rushmeier, 2022) needs no artist's graph: it takes the bitmap apart into parts, models each part as noise in several layers, and tunes everything together against the bitmap.
+That last order is the one that fits the request, and it is the artist's order backwards, so the fitter follows it with werkkzeug3's operators:
+
+1. **Read the picture** (no search, at the picture's own size):
+   - its two colours: the ends of its main colour axis, where 1 % and 99 % of the pixels lie, and the grey picture between them (the reverse of `Perlin`'s two colours, or of `Range`);
+   - whether it repeats: the means of the columns and of the rows, compared with themselves one period away and half a period away (a joint adds up along its length, a noise averages out); when the column means show nothing, the picture against itself moved sideways (rows shifted against each other, a wall's bond);
+   - the one cell under the repeats, the mean of all of them, and the shapes in it (the reverse of "one shape drawn once and repeated"); a larger cell is kept only when it predicts the repeats it was not made from better;
+   - the noise: which octaves and how strong, from the strength of detail per scale of what the cell leaves, against the same strengths measured on `Perlin` itself one octave at a time.
+2. **Build the procedure in the artist's idioms from that reading:** a `Perlin` between the two colours; `Flat`, one `GlowRect` per shape and a `Transform` that repeats it, multiplied in; a `Normals` and a `Bump` taken from .kkrieger's own graphs for the relief, the light starting white; more `Perlin` layers merged over the colour layer.
+   A part is kept only when it brings the drawing closer to the picture by more than its bytes cost.
+3. **Tune every value by direct search**, one value at a time (Hooke and Jeeves, 1961): whole numbers by trying the values .kkrieger's artists used (all 256 seeds for `Perlin`), decimals and colours by steps that halve.
+   No derivative is needed, so the renderer is werkkzeug's own integer code and nothing is re-implemented.
+   Values read from the picture that must stay whole (the repeat count) are locked.
+4. **Coarse to fine:** at 128 pixels, then 256, then the picture's own size; each size adds what only shows there.
+5. **Every kept step is saved as a rung:** the procedure up to there is a thinner version of the final one, with its bytes.
+
+The prior is `prior.py`'s reading of `kkrieger.k`: every operator instance and every generator chain with the operator that consumed it.
+It gives the ranges and the values to try, and the real `Normals` and `Bump` instances.
+The operators of the textures used as known answers are left out of it, so a known answer never meets its own values.
+
+The measure the search steers by is internal and is not the verdict:
+- place: one minus the correlation between drawing and picture per level of a pyramid, counted fully on coarse levels and less on fine ones;
+- texture: for twelve small random filters with no mean on the six finest levels, the distance between the spread of their answers on the drawing and on the picture (Elnekave and Weiss, 2022: patch distributions along random directions, no trained network);
+- spread: the same distance for each colour channel's values.
+The verdict is the eye's: a sheet per texture with the original and the drawing, whole and close up, read by the person, by the model that ran the work and by a second model that saw nothing else.
+
+### Recipe
+
+```sh
+# FR is an unchanged clone of github.com/farbrausch/fr_public; Zig 0.16; python3 with Pillow
+sh pixels/build.sh BUILD FR                                   # BUILD/p2p, native (x86-64, musl, static)
+python3 pixels/prior.py FR/werkkzeug3/data/kkrieger.k WORK NAME...   # the prior without the named textures; WORK/scripts/NAME.script are the artists' graphs
+BUILD/p2p render WORK/scripts/NAME.script NAME.ppm            # the known answer's pixels
+BUILD/p2p fit NAME.ppm WORK/prior.txt OUT/NAME                # OUT/NAME.script, .ppm, .log (the rungs), .rNN.script per rung
+python3 pixels/sheet.py NAME.ppm OUT/NAME.ppm OUT/NAME.jpg "caption"   # original and found, whole and close up
+python3 pixels/script2text.py OUT/NAME.script > NAME.txt      # the typed form the playback module and wzlang.py take
+python3 pixels/table.py OUT WORK/names.txt NAME...            # bytes and time beside the artist's graph
+```
+
+Expect a line `read: colours ... repeats N by M ... noise octaves A to B`, then one line per rung, then `done: N operators, B bytes, T s`.
+The same picture and prior give the same procedure and the same pixels on every run (checked with `cmp`).
+Run every program the build makes in a container; Zig itself only compiles.
+`p2p fit ... readonly=1` prints the reading and stops; `grow=N` adds free moves taken at random from the prior after the reading (off by default: see the traps).
+
+### What the first run found (eleven of .kkrieger's textures, 512 x 512, one CPU thread each)
+
+| texture | artist's graph | found | time | at a glance | close up |
+|---|---|---|---|---|---|
+| concrete wall | 22 operators, 470 B | 7 operators, 211 B | 268 s | yes | nearly |
+| camouflage | 22, 470 B | 3, 111 B | 209 s | yes | no |
+| rust | 33, 721 B | 11, 311 B | 240 s | nearly | no |
+| rusty metal | 48, 804 B | 3, 95 B | 156 s | nearly | no |
+| fibrous wall | 24, 540 B | 7, 211 B | 185 s | no | no |
+| rock | 80, 1,664 B | 9, 261 B | 307 s | nearly | no |
+| stone tiles | 36, 772 B | 11, 307 B | 240 s | nearly | no |
+| brick wall | 24, 644 B | 13, 357 B | 299 s | no | no |
+| stone-block wall | 36, 784 B | 14, 402 B | 308 s | no | no |
+| wood | 35, 831 B | 3, 111 B | 219 s | no | no |
+| carved stone | 33, 789 B | 7, 211 B | 196 s | no | no |
+
+The verdicts in the table are the fitting model's own reading of the sheets; the lane's report holds its words and the second model's.
+- **What it finds:** the material's colours and the kind and scale of its noise (concrete, camouflage, rust, the metal's grey); a regular repeat and where its joints are (the tiles' two by two, the wall's rows).
+- **What it does not find:** hard-edged patches (camouflage's flakes come back as soft clouds); a second material on the surface (the metal's orange rust: no `Mask` is built yet); grain that runs one way or swirls (wood, the fibrous wall: no `Distort`, `Twirl` or stretched noise is built yet); bricks of uneven length and a wall's bond with a bevel on every stone; a drawing (the carved ornament), which is objects, not a material.
+- **The relief is the weakest part:** a `Bump` over a noise often comes back as pits or lumps the original does not have.
+- **Bytes:** the found procedures are 12 to 55 % of the artists' bytes, because they hold less, not because they are better.
+- **Time:** 2.6 to 5.1 minutes per 512 pixel texture on one thread, about 11,000 to 17,000 drawings of the graph; the fitter remembers every operator's result, so a changed value redraws only what lies above it.
+
+### Traps of the reverse
+
+- Symptom: free moves drawn at random from the prior (a real chain, a real operator, joined anywhere) with a measure made of squared pixel differences and the strength of detail give scratches, rotated grids and soft rectangles, never the material.
+  Cause: a weak statistic is easy to satisfy with the wrong thing, and the artists' graphs are mostly lamps and sprites, so random real chains are mostly glows.
+  Fix: read the picture first and build from the reading; keep random moves as an option.
+  Found by: looking at the first three sheets instead of the falling measure.
+- Symptom: a patchy texture comes back as one flat colour.
+  Cause: with squared pixel differences a right texture in the wrong place scores worse than no texture at all.
+  Fix: the place part is one minus the correlation, never below none, so flat and misplaced score the same and the texture part decides.
+  Found by: drawing the reading's own first `Perlin` beside the flat result; the eye preferred the one the measure refused.
+- Symptom: the whole picture is chosen as the repeating cell and "explains 100 %".
+  Cause: a larger cell always fits its own pixels better.
+  Fix: make the cell from every second repeat and judge it on the others.
+- Symptom: tiles with thin joints read as not repeating.
+  Cause: a thin joint is a few per cent of the contrast, less than the noise of a cell made from two repeats; at 128 pixels it is gone.
+  Fix: read at the picture's own size and find joints in the column and row means with the peak test (agree one period away, not half a period away), which a smooth noise does not pass.
+- Symptom: a brick wall reads as rows only.
+  Cause: rows shifted against each other put their upright joints at different columns, so the column means show nothing; bricks of uneven length have no period at all.
+  Fix: for the first, compare the picture with itself moved sideways; the second is not a repeat and stays with the image.
+- Symptom: joints found at the right place come out as ten slanted or crowded lines.
+  Cause: the tuner changed the `Transform`'s scale, a repeat count read from the pixels, by a fraction.
+  Fix: lock what was read as a whole number.
+- Symptom: purple, green and blue patches on a grey material.
+  Cause: .kkrieger's `Bump` instances carry the game's coloured lamps, and colours of added layers were tuned freely.
+  Fix: a light starts white over grey with no shine, and lights and added noises are tuned as greys.
+- Symptom: nothing is written for minutes and one thread is busy.
+  Cause: `var sh: u5 = 0; while (sh <= 24) : (sh += 8)` wraps in a fast build and never ends.
+  Fix: loop over a list of the four shifts.
+  Found by: no rung file after the first tuning.
+- Symptom: a rerun gives the same numbers to the last digit after a change.
+  Cause: the build failed (an unused capture is an error in Zig) behind a pipe that hid the exit status, and the old program ran.
+  Fix: write the build's output to a file, test its exit status, and check the program's date before believing a run.
+- Symptom: leaving the known answers out halves the prior (737 of 1,484 instances).
+  Cause: every graph that shares one stored operator with a known answer was dropped.
+  Fix: drop the shared operators, keep the graphs.
+- Symptom: a run stalls on one candidate.
+  Cause: an operator with a large count (`Cell`, `TransformMul`) takes seconds.
+  Fix: a drawing slower than a bound is refused: the device must draw it too.
+- Symptom: the operator code stops the program on a check.
+  Cause: the fitter tries values no artist typed.
+  Fix: the bridge returns from a failed check with `longjmp` and the candidate is refused; the bitmaps of that one call are lost.
+
+### Where the procedures stop (so far)
+
+On .kkrieger's own textures, which are procedures, the reverse gets the material at a glance for the plain noises and the regular repeats, and nothing close up.
+What it misses is named above by operator; the next steps are a `Mask` for a second material, `Distort` and `Twirl` for grain, the bond's second shape with its bevel, and the same method tile by tile on photographs, where the image stays the last layer.
+
 ## Where it fails
 
 - Photographic and scanned detail: nothing small predicts it.
 - A statistics match is another sample of a similar material, not the picture; no number here says how different it looks.
 - Regular textures are regular only in outline; each brick's own colour and chips stay in the image.
-- A sum of cosines rings at edges and is not what an artist's graph is; fitting shapes (`GlowRect`, `Cells`, werkkzeug3's `Bricks`) is what the published methods do with networks and gradient descent, and was not tried.
+- A sum of cosines rings at edges and is not what an artist's graph is; fitting shapes (`GlowRect`, `Cells`, werkkzeug3's `Bricks`) is what the published methods do with networks and gradient descent; the reverse section above fits `GlowRect` shapes from the picture's repeats by direct search.
 - Not covered: normal, roughness and height maps; AVIF, JPEG XL and GPU texture formats; a perceptual measure or a person's judgement; the cost of evaluating the procedure; magnification beyond the picture's size.
 
 ## Traps
@@ -352,4 +479,4 @@ It is a picture to judge by, not a renderer.
 
 ## Credits
 
-OpenKTG: Fabian "ryg" Giesen. werkkzeug3: Dierk Ohlerich, Fabian Giesen, Thomas Mahlke, Christoph Muetze, Tammo Hinrichs and Bastian Zuehlke, as its licence names them. The pictures of the first run: Poly Haven, CC0. Relief mapping: Fábio Policarpo, Manuel M. Oliveira and João L. D. Comba (2005). Parallax occlusion mapping: Natalya Tatarchuk (2006). The stereo photographs of bark and ground: Robbie Sproule, CC BY 2.0, on Wikimedia Commons. MaterialX: the Academy Software Foundation's project, its standard nodes document by Doug Smythe and Jonathan Stone.
+OpenKTG: Fabian "ryg" Giesen. werkkzeug3: Dierk Ohlerich, Fabian Giesen, Thomas Mahlke, Christoph Muetze, Tammo Hinrichs and Bastian Zuehlke, as its licence names them. The pictures of the first run: Poly Haven, CC0. Relief mapping: Fábio Policarpo, Manuel M. Oliveira and João L. D. Comba (2005). Parallax occlusion mapping: Natalya Tatarchuk (2006). The stereo photographs of bark and ground: Robbie Sproule, CC BY 2.0, on Wikimedia Commons. MaterialX: the Academy Software Foundation's project, its standard nodes document by Doug Smythe and Jonathan Stone. The reverse from pixels: Yiwei Hu, Chengan He, Valentin Deschaintre, Julie Dorsey and Holly Rushmeier (2022) for the order (parts, layered noise, tuning together); Ariel Elnekave and Yair Weiss (2022) for comparing textures by their patches along random directions; Robert Hooke and T. A. Jeeves (1961) for direct search; the bridge to the operators started as lane 503's, from lane 473x's renderer.

@@ -892,4 +892,16 @@ The same sections offer **Syncthing** (the Syncthing project) with **syncthingtr
 KDE Connect's ufw application profile, which the firewall rule uses, is KDE Connect's own file, and ufw is its own project's.
 These projects do not endorse the edition.
 
+## Procedures from pixels (ORDER 508, 2026-11-10)
+
+The fitter that finds a werkkzeug3 procedure from a texture's pixels (skill `stereo-two-cameras`, `references/procedural-texture-from-a-bitmap.md`) builds on:
+
+- **Farbrausch** ([fr_public](https://github.com/farbrausch/fr_public), BSD or public domain): werkkzeug3's texture operators, by Dierk Ohlerich, Fabian Giesen, Thomas Mahlke, Christoph Muetze, Tammo Hinrichs and Bastian Zuehlke as its licence names them; werkkzeug4's portable version of them (`altona_wz4/wz4/wz4frlib/wz3_bitmap_code.cpp`), which the fitter calls unchanged as its renderer; and .kkrieger's own project file (`werkkzeug3/data/kkrieger.k`, .theprodukkt), whose graphs are the fitter's prior and its known answers.
+- **Yiwei Hu, Chengan He, Valentin Deschaintre, Julie Dorsey and Holly Rushmeier**, "An Inverse Procedural Modeling Pipeline for SVBRDF Maps" (ACM Transactions on Graphics 41(2), 2022): a bitmap taken apart into parts, a noise model of several layers per part, then every value tuned together. The fitter follows that order with werkkzeug3's operators.
+- **Ariel Elnekave and Yair Weiss**, "Generating natural images with direct Patch Distributions Matching" (2022): textures compared by the spread of their patches along random directions, with no trained network. The fitter's internal measure uses it.
+- **Robert Hooke and T. A. Jeeves**, "Direct search solution of numerical and statistical problems" (Journal of the ACM 8(2), 1961): values tuned one at a time without derivatives.
+- Read and cited, not used: Liang Shi, Beichen Li, Miloš Hašan, Kalyan Sunkavalli, Tamy Boubekeur, Radomír Měch and Wojciech Matusik, "MATch" (2020), whose DiffMat library is for noncommercial research only and is not shipped; Paul Guerrero and colleagues, "MatFormer" (2022); Yiwei Hu and colleagues, "Generating Procedural Materials from Text or Image Prompts" (2023); Yu Guo, Miloš Hašan, Lingqi Yan and Shuang Zhao, "A Bayesian Inference Framework for Procedural Material Parameter Estimation" (2020).
+
+These projects and authors do not endorse the edition.
+
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

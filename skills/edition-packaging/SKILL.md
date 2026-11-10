@@ -125,6 +125,8 @@ Lifting a block is not enough on its own: our build stays the candidate at 1001,
 
 A package set waiting for a rebuild is left out of the block until the rebuild lands (see the next section).
 
+A package of another archive that ships our files under another name (deb-multimedia's `libmlt7-data` owned our MLT data) is not caught by a block by name: find it from the two Contents files, pin it out and settle the machines that have it, as [a package of another archive that ships our files](references/shadowed-by-another-archive.md) says.
+
 ## The GPU vendors' repositories: compute updates, the display driver stays ours
 
 NVIDIA's and AMD's repositories carry their display drivers beside CUDA and ROCm, so the edition pins them: compute keeps updating, and the display driver stays ours, with [HDMI®](https://www.hdmi.org/resource/brand) 3D.

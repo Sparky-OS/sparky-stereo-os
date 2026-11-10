@@ -35,3 +35,28 @@ It extends [x3d-in-the-browser.md](x3d-in-the-browser.md), which holds the first
 - **A float preference written as a number is ignored** (see the first reference).
 - **Cesium's `PerspectiveFrustum.fov` is the angle of the larger side**, so a 45 degree vertical angle at 16:9 is 72.7 degrees.
 - **A page rectangle is not the canvas in the capture:** find the canvas from a coloured wrap.
+
+## A finished three.js page with a sky and a post stack (ORDER 494, 2026-11-10)
+
+Cosmic Shore's screensaver (three.js 0.181.2, MIT; an EffectComposer with bloom and a Panini pass, an instanced Garland, a baked cube-map sky) run from its own build, unchanged, in the same bench (browser +stereo3d10, Stereo KWin +stereo3d46, Mesa on an AMD render node).
+It has no WebXR code, so only the camera hack applies; the flat modes need a page that asks for an `immersive-vr` session.
+
+### Recipe for a page you did not write
+
+1. Build it from its lockfile in a Node container (`npm ci --ignore-scripts`, then its own build), serve the `dist` folder from disk with the standard library's HTTP server inside the test container (no network).
+2. Freeze the page with its own parameters, not with a patch: a frame cap near zero (`?fps=0.01` here) draws the first frame only, so the capture and the state you read belong to one frame, and the seed makes it repeat.
+3. Read the page's state through whatever it exposes (here `?debug` puts `__camera` and `__crystal` on `window`; the crystal's `object.parent` is the scene, so the camera's matrices and every instance matrix of the instanced mesh come out as plain numbers).
+4. Predict with the hack's formula, which patches the projection matrix: each eye's clip x becomes x -/+ s (w - C), s the separation (0.02 of the width by default), C five times the camera's near plane. Add every later pass that remaps the picture (here Panini, inverted numerically) before comparing.
+5. Measure by block matching: a patch of the left capture around each prediction found in the right capture (normalised cross correlation, parabola for the sub pixel), keeping matches above 0.9 whose next peak is lower by 0.03. Disparity is left x minus right x, negative behind the screen.
+6. Controls: the 2D case (eyes identical, difference 0), the eyes swapped (every sign flips, error 52 px against 0.2), and a dense disparity map of the whole picture, so a layer you did not predict shows up as its own cluster.
+
+Numbers: 60 prisms at 241 to 1336 units, predicted -27.6 to -23.2 px, measured within 0.18 px rms; the vessel at 25 units (-24.96 predicted, -24.93 measured), the crystal at 378 units (-27.51, -27.52); `webgl.stereo-camera.convergence` 50.0 moved the vessel to +0.14 px (-0.33 predicted).
+
+### Traps
+
+- **A `scene.background` cube map stands in front of the screen.** Symptom: the dense map has two clusters, the scene at -25 px and the sky at +60 to +140 px; the nebula and the sun glow come out of the screen while everything in front of them sits behind it. Cause: three.js draws a background as a box of side 1 centred on the camera with `gl_Position.z = gl_Position.w`, so its clip w is 0.5 to 0.87, nearer than the plane (5 x near = 2.5 here), and the hack's x + s (w - C) puts it in front. A box draw's disparity predicted from w alone matched 665 close-up blocks within -0.1 px mean, 3 px std (the cube's own baking pass through the hack did not matter). Raising `convergence` makes it worse: at 200 (plane 100) the sky left the picture altogether (black in both eyes), because the shift grows with C / w. Fix on the page, 23 lines: draw the sky as a box of half side 3000 (inside the far plane), `BackSide`, `depthTest` and `depthWrite` off, `renderOrder` -1000, following the camera. The sky then sits with the far scene (all 1284 blocks in one band), the 2D picture is identical (mean difference 0.0004 of 255), and a plane set to the scene (convergence 1000) spreads the garland over -17 to +30 px. Found by the dense map's second cluster and by a left and right capture that showed the sun 100 px apart.
+- **With the default plane a large scene is a flat wall.** The plane is 5 x near; a scene of units 25 to 1300 away has every part at 1 - C / w of the far parallax: 4.4 px of range in 25 (the whole Garland), so it reads as one sunk plane. The page's near plane or the preference has to follow the scene (ORDER 473t's scene-derived plane is the browser's side).
+- **The window is not the canvas.** The capture of a kiosk window is 1280x1024 while the canvas is 1264x1014 at (11, 5): find the corner from the page's dark background against the border, or every prediction is 11 px off.
+- **Marionette's script world is not the page's.** `window.requestAnimationFrame = ...` set from a script does not reach the page, `exportFunction` is undefined and the page's CSP (`script-src 'self'`) refuses an inline script; reading page properties works. Freeze with the page's own frame cap instead.
+- **Vertical disparity read as 0.7 px** is the integer row step of the matcher, not the picture: use a sub pixel step before calling it a defect.
+- **Large shifts break the simple prediction.** At convergence 1000 the same 60 prisms were predicted -17 to +26 px and measured -17 to +30, but the point by point error was 14 px rms (40 matches, ambiguous patches over a wide range): the range and sign agree, the 0.2 px agreement of the default plane is not shown there.

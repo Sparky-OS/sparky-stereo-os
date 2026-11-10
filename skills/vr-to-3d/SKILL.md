@@ -101,6 +101,8 @@ The closed forms, the files, the finding, the proof, the gamepad's mapping and t
 Every route reaches OpenXR's `xrEndFrame`, so one runtime that declares full side by side serves them all.
 The routes, where the two eyes cross each boundary, and how to read a project's real licence and AI position (history, `AGENTS.md`, open merge requests) are in [who-runs-whose-vr-software.md](references/who-runs-whose-vr-software.md).
 
+A Unity game with no XR path and no Editor on our side (Cosmic Shore): how to read its Unity version, packages, cameras and CI from a partial clone, the first-party non-Unity engine found in the same repository, and where the second eye goes: [references/unity-game-without-the-editor.md](references/unity-game-without-the-editor.md).
+
 Before joining an Android container to the host runtime, verify the selected allocator with real buffer handles.
 The [Android container transport preflight](references/android-container-transport.md) explains the dma-buf gate, the platform probe, the kernel boundary and the evidence still needed for a completed bridge.
 

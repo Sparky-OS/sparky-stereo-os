@@ -69,6 +69,8 @@ As in the general skill, plus the geometry:
 
 X_ITE and X3DOM scenes are real 3D scenes, so they take cameras, not a flat UI's depth: flat WebXR (the page's own views) or the browser's camera hack. The recipe to measure both eyes of either, the numbers found and the traps (float preferences are strings, a shadow-root button needs a real click, model/x3d types open nothing) are in [references/x3d-in-the-browser.md](references/x3d-in-the-browser.md).
 
+Motion in such a scene that is computed and not stored (a clock's `reverse`, a second-order follower beside the Followers component, inverse kinematics on HAnim Sites within their joint limits): the recipe for a live X_ITE scene that runs from a folder, what the X3D and HAnim clauses say, the numbers measured and the traps (a canvas shown twice in a WebDriver screenshot, a fetch that fails from disk, an arm that flips at its limit) are in [references/x3d-procedural-motion.md](references/x3d-procedural-motion.md).
+
 ## Any web 3D engine's two eyes
 
 Eight engines (three.js, A-Frame, Babylon.js, PlayCanvas, react-three-fiber, model-viewer, Spark, CesiumJS) through the browser's two routes, one scene, a prediction from the session's own views, controls that must fail, and what each engine needs from the browser: [references/web3d-engines-in-the-browser.md](references/web3d-engines-in-the-browser.md).

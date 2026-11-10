@@ -165,5 +165,7 @@ Record any promised next action and wait for a response; do not schedule reminde
 
 ## Lessons from the lanes, October to November 2026
 
+[A meeting abstract for a standards group](references/meeting-abstract-for-a-standards-group.md): the recipe for the short text a chair shares on the group's list before a review (read the list first, credit its open proposals by name, check each relation against the clause, commit only to what was promised), with four traps.
+
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (10 entries).
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

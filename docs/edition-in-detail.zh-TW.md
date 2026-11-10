@@ -83,6 +83,12 @@ Daniel 與 Milton Ponson 共同主持 W3C [Procedural Memory Knowledge Represent
 - **故事：**[StorySplat](https://storysplat.com)（"Turn your 3D scans into interactive tours"）能直接在瀏覽器中，以真實地點的 3D 掃描建構成互動導覽，而且它的 3D View 能在已註冊的任何輸出上以 3D 顯示，最先是在 Sony 的 3D 電視上以並排模式測試的。
 - **同樣支援：**[ArtCraft](https://github.com/storytold/artcraft) 的 PhotoCraft 與 FilmCraft 已帶 3D 發布。
 
+<a id="scan"></a>
+**計畫中：把物體或場所掃描成 3D 模型。**
+你用手機等裝置繞著物體或穿過一個場所拍一段影片，程式就在你自己的電腦上把它變成可以在其中走動的 3D 模型。
+這個程式是 [Spirula Studio](https://github.com/harry7557558/spirula-studio)，作者 Harry (J.X.) C.，採用 GPLv3 授權；它產生的模型叫做 3D Gaussian splat（3D 高斯潑濺），還可以由此產生帶貼圖的網格。
+**計畫中：**本版本還沒有收錄它，它也還不支援每眼一個視圖的 3D 顯示；這項工作將在[我們的分支](https://github.com/Sparky-OS/spirula-studio)中進行。
+
 每個程式的完整說明：[Programs](#programs-the-edition-changes-for-stereo-3d-and-deep-colour)。
 
 <a id="for-theme-designers-and-customizers"></a>
@@ -96,6 +102,7 @@ Daniel 與 Milton Ponson 共同主持 W3C [Procedural Memory Knowledge Represent
 **以 3D 學習與設計：地球儀、函數圖與分子今天就能以 3D 呈現，3D 模型與電路板正在進行中。**
 - **學習與科學：**Marble 的地球儀、KAlgebra 的函數圖、Kalzium 的分子，以及 Kubrick 方塊，在 3D 桌面上預設就是 3D。
 - **3D 模型與電路板：**OpenSCAD、KiCad 與 F3D 的 3D 預覽正在進行中。
+- **掃描：**計畫用 Spirula Studio 把拍攝零件、現場或標本的影片變成 3D 模型（[掃描](#scan)）。
 - **從工程師桌面到客戶手中，全程全彩：**同一個模型可以在工程師桌上的裸視 3D 螢幕上以深度呈現（搭配 [DisplayXR](https://displayxr.org)，進行中）、在團隊或訓練課程用的 3D 電視或投影機上呈現，以及在每位工作者與客戶自己手機上的紙板觀看器中呈現（[Flat Headset](https://github.com/Sparky-OS/flat-headset)）。從頭到尾都是開放的，沒有人被綁在單一顯示器廠商上。
 
 每個程式的完整說明：[Programs](#programs-the-edition-changes-for-stereo-3d-and-deep-colour)。

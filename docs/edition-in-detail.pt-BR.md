@@ -83,6 +83,12 @@ Suas cenas 3D terão uma vista por olho, e sua arte vetorial profundidade com o 
 - **Histórias:** [StorySplat](https://storysplat.com) ("Transforme suas digitalizações 3D em passeios interativos") cria passeios dentro de digitalizações 3D de lugares reais, direto no navegador, e seu 3D View os mostra em 3D em qualquer uma das saídas registradas, com o primeiro teste lado a lado numa televisão Sony 3D.
 - **Também com suporte:** PhotoCraft e FilmCraft, do [ArtCraft](https://github.com/storytold/artcraft), publicados com 3D.
 
+<a id="scan"></a>
+**Planejado: escanear um objeto ou um lugar para criar um modelo 3D.**
+Você grava um vídeo em volta de um objeto ou andando por um lugar, com o celular por exemplo, e o programa transforma esse vídeo num modelo 3D para você explorar, no seu próprio computador.
+O programa é o [Spirula Studio](https://github.com/harry7557558/spirula-studio), de Harry (J.X.) C., sob a GPLv3; o modelo que ele cria se chama 3D Gaussian splat, e ele também gera uma malha texturizada a partir dele.
+**Planejado:** a edição ainda não traz o programa, e ele ainda não mostra seus modelos em 3D com uma vista por olho; esse trabalho será feito no [nosso fork](https://github.com/Sparky-OS/spirula-studio).
+
 Cada programa em detalhe: [Programas](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).
 
 <a id="for-theme-designers-and-customizers"></a>
@@ -96,6 +102,7 @@ Cada programa em detalhe: [Programas](#programs-the-edition-changes-for-stereo-3
 **Estude e projete em 3D: um globo, gráficos e moléculas já funcionam em 3D, e modelos 3D e placas de circuito estão em desenvolvimento.**
 - **Aprendizado e ciência:** o globo do Marble, os gráficos do KAlgebra, as moléculas do Kalzium e o cubo do Kubrick, em 3D por padrão numa área de trabalho 3D.
 - **Modelos 3D e placas de circuito:** prévias 3D no OpenSCAD, KiCad e F3D estão em desenvolvimento.
+- **Escanear:** transformar um vídeo de uma peça, de um local ou de um espécime num modelo 3D está planejado, com o Spirula Studio ([Escanear](#scan)).
 - **Da mesa ao cliente, em cores:** o mesmo modelo com profundidade num monitor 3D sem óculos na mesa do engenheiro (com [DisplayXR](https://displayxr.org), em desenvolvimento), numa TV 3D ou num projetor para uma equipe ou uma turma em treinamento, e no próprio celular de cada trabalhador e cliente num visor de papelão ([Flat Headset](https://github.com/Sparky-OS/flat-headset)). É aberto de ponta a ponta, então ninguém fica preso a um fabricante de telas.
 
 Cada programa em detalhe: [Programas](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).

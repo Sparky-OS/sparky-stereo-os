@@ -112,6 +112,16 @@ W3Cアカウントがあれば無料でグループに参加できます。
   その3D Viewは、登録されているどの出力でもツアーを3D表示でき、最初のテストはSonyの3Dテレビでサイドバイサイド表示を使って行いました。
 - **こちらにも対応：** [ArtCraft](https://github.com/storytold/artcraft)のPhotoCraftとFilmCraftは、3D対応で公開済みです。
 
+<a id="scan"></a>
+**計画中：物や場所をスキャンして3Dモデルにします。**
+スマートフォンなどで、物のまわりを回りながら、または場所の中を歩きながら動画を撮ります。
+プログラムがその動画を、中を歩き回れる3Dモデルに変えます。
+処理は自分のコンピューターで行います。
+プログラムは[Spirula Studio](https://github.com/harry7557558/spirula-studio)で、作者はHarry (J.X.) C.で、ライセンスはGPLv3です。
+作られるモデルは「3D Gaussian splat」と呼ばれ、そこからテクスチャ付きメッシュも作れます。
+**計画中：** このエディションにはまだ入っておらず、左右の目それぞれに別の視点でモデルを3D表示する機能もまだありません。
+その作業は[私たちのフォーク](https://github.com/Sparky-OS/spirula-studio)で行います。
+
 各プログラムの詳細：[プログラム](#programs-the-edition-changes-for-stereo-3d-and-deep-colour)。
 
 <a id="for-theme-designers-and-customizers"></a>
@@ -126,6 +136,7 @@ W3Cアカウントがあれば無料でグループに参加できます。
 地球儀、グラフ、分子はすでに3Dで動作し、3Dモデルと回路基板への対応は作業中です。**
 - **学習と科学：** Marbleの地球儀、KAlgebraのグラフ、Kalziumの分子、Kubrickのキューブは、3Dデスクトップ上では標準で3D表示されます。
 - **3Dモデルと回路基板：** OpenSCAD、KiCad、F3Dの3Dプレビューに取り組んでいます。
+- **スキャン：** 部品、現場、標本を撮った動画を3Dモデルにする機能を、Spirula Studioで計画しています（[スキャン](#scan)）。
 - **デスクから顧客まで、フルカラーで：** 同じモデルを、技術者のデスクにある裸眼3Dモニター（[DisplayXR](https://displayxr.org)との連携を作業中）、チームや研修向けの3Dテレビやプロジェクター、Cardboard型ビューアーに入れた従業員や顧客それぞれのスマートフォン（[Flat Headset](https://github.com/Sparky-OS/flat-headset)）で、奥行きを持って表示します。
   端から端までオープンなので、一つのディスプレイメーカーに縛られません。
 

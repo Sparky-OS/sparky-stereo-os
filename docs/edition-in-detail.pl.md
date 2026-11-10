@@ -83,6 +83,12 @@ Jego sceny 3D dostaną osobny widok dla każdego oka, a grafika wektorowa głęb
 - **Opowieści:** [StorySplat](https://storysplat.com) ("Zamień swoje skany 3D w interaktywne wycieczki") tworzy wycieczki wewnątrz skanów 3D rzeczywistych miejsc, bezpośrednio w przeglądarce, a jego 3D View pokazuje je w 3D na dowolnym z zarejestrowanych wyjść; pierwszy test odbył się w układzie obok siebie na telewizorze Sony 3D.
 - **Obsługiwane także:** PhotoCraft i FilmCraft z [ArtCraft](https://github.com/storytold/artcraft), opublikowane z obsługą 3D.
 
+<a id="scan"></a>
+**W planach: skanowanie przedmiotu lub miejsca do modelu 3D.**
+Nagrywasz wideo wokół przedmiotu albo idąc przez jakieś miejsce, na przykład telefonem, a program zamienia je w model 3D, po którym można się poruszać, na twoim własnym komputerze.
+Ten program to [Spirula Studio](https://github.com/harry7557558/spirula-studio), którego autorem jest Harry (J.X.) C., na licencji GPLv3; model, który tworzy, nazywa się 3D Gaussian splat, a program potrafi też zrobić z niego siatkę z teksturami.
+**W planach:** edycja jeszcze go nie zawiera, a on sam nie pokazuje jeszcze swoich modeli w 3D z osobnym widokiem dla każdego oka; te prace będą prowadzone w [naszym forku](https://github.com/Sparky-OS/spirula-studio).
+
 Pełny opis każdego programu: [Programy](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).
 
 <a id="for-theme-designers-and-customizers"></a>
@@ -96,6 +102,7 @@ Pełny opis każdego programu: [Programy](#programs-the-edition-changes-for-ster
 **Badaj i projektuj w 3D: globus, wykresy i cząsteczki już działają w 3D, a prace nad modelami 3D i płytkami drukowanymi trwają.**
 - **Nauka i edukacja:** globus w Marble, wykresy w KAlgebra, cząsteczki w Kalzium i kostka w Kubrick, domyślnie w 3D na pulpicie 3D.
 - **Modele 3D i płytki drukowane:** trwają prace nad podglądami 3D w OpenSCAD, KiCad i F3D.
+- **Skanowanie:** w planach jest zamiana nagrania wideo części, terenu lub okazu w model 3D, w programie Spirula Studio ([Skanowanie](#scan)).
 - **Od biurka do klienta, w pełnym kolorze:** ten sam model z głębią na monitorze 3D bez okularów na biurku inżyniera (z [DisplayXR](https://displayxr.org), prace trwają), na telewizorze 3D lub projektorze dla zespołu czy grupy szkoleniowej oraz na własnym telefonie każdego pracownika i klienta w kartonowych goglach ([Flat Headset](https://github.com/Sparky-OS/flat-headset)). Wszystko jest otwarte od początku do końca, więc nikt nie jest związany z jednym producentem ekranów.
 
 Pełny opis każdego programu: [Programy](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).

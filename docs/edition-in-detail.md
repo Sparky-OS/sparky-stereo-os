@@ -81,6 +81,12 @@ Its 3D scenes will get one view per eye, and its vector art depth through [SVGSt
 - **Stories:** [StorySplat](https://storysplat.com) ("Turn your 3D scans into interactive tours") builds tours inside 3D scans of real places, right in the browser, and its 3D View shows them in 3D on any of the registered outputs, first tested side by side on a Sony 3D television.
 - **Also supported:** [ArtCraft](https://github.com/storytold/artcraft)'s PhotoCraft and FilmCraft, published with 3D.
 
+<a id="scan"></a>
+**Planned: scan an object or a place into a 3D model.**
+You record a video around an object or through a place, with a phone for example, and the program turns it into a 3D model you can walk around, on your own computer.
+The program is [Spirula Studio](https://github.com/harry7557558/spirula-studio), by Harry (J.X.) C., under the GPLv3; the model it makes is called a 3D Gaussian splat, and it can also make a textured mesh from it.
+**Planned:** the edition does not ship it yet, and it does not show its models in 3D with one view per eye yet; that work will happen in [our fork](https://github.com/Sparky-OS/spirula-studio).
+
 Each program in full: [Programs](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).
 
 ### For theme designers and customizers
@@ -92,6 +98,7 @@ Each program in full: [Programs](#programs-the-edition-changes-for-stereo-3d-and
 **Study and design in 3D: a globe, plots and molecules work in 3D today, and 3D models and circuit boards are in progress.**
 - **Learning and science:** Marble's globe, KAlgebra's plots, Kalzium's molecules and the Kubrick cube, in 3D by default on a 3D desktop.
 - **3D models and circuit boards:** 3D previews in OpenSCAD, KiCad and F3D are in progress.
+- **Scanning:** turning a video of a part, a site or a specimen into a 3D model is planned, with Spirula Studio ([Scan](#scan)).
 - **From the desk to the client, in full colour:** the same model in depth on a glasses-free 3D monitor at the engineer's desk (with [DisplayXR](https://displayxr.org), in progress), on a 3D TV or projector for a team or a training class, and on every worker's and client's own phone in a cardboard viewer ([Flat Headset](https://github.com/Sparky-OS/flat-headset)). It is open from end to end, so no one is tied to one display maker.
 
 Each program in full: [Programs](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).

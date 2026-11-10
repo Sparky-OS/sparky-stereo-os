@@ -83,6 +83,12 @@ W3C 계정으로 그룹 가입은 무료이며, 도움을 환영합니다: 여�
 - **스토리:** [StorySplat](https://storysplat.com) ("3D 스캔을 대화형 투어로 바꾸세요")이 실제 장소의 3D 스캔 안에서 브라우저에서 바로 투어를 만들고, 3D View가 등록된 출력에서 3D로 보여줍니다. Sony 3D 텔레비전에서 나란히 처음 테스트되었습니다.
 - **함께 지원:** [ArtCraft](https://github.com/storytold/artcraft)의 PhotoCraft와 FilmCraft가 3D와 함께 게시되어 있습니다.
 
+<a id="scan"></a>
+**계획 중: 물체나 장소를 스캔해 3D 모델로.**
+휴대폰 등으로 물체 주위를 돌면서 또는 장소 안을 걸으면서 비디오를 찍으면, 프로그램이 그 비디오를 둘러볼 수 있는 3D 모델로 바꿉니다. 모두 자신의 컴퓨터에서 처리합니다.
+프로그램은 Harry (J.X.) C.가 만든 [Spirula Studio](https://github.com/harry7557558/spirula-studio)이며 라이선스는 GPLv3입니다. 만들어지는 모델은 3D Gaussian splat이라고 부르고, 여기서 텍스처가 입혀진 메시도 만들 수 있습니다.
+**계획 중:** 이 에디션에는 아직 들어 있지 않고, 눈마다 다른 시점으로 모델을 3D로 보여 주는 기능도 아직 없습니다. 그 작업은 [우리 포크](https://github.com/Sparky-OS/spirula-studio)에서 진행할 예정입니다.
+
 각 프로그램 전체: [프로그램](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).
 
 <a id="for-theme-designers-and-customizers"></a>
@@ -96,6 +102,7 @@ W3C 계정으로 그룹 가입은 무료이며, 도움을 환영합니다: 여�
 **3D로 연구하고 설계하세요: 지구본, 그래프, 분자가 오늘 3D로 작동하고, 3D 모델과 회로 기판은 진행 중입니다.**
 - **학습 및 과학:** Marble의 지구본, KAlgebra의 그래프, Kalzium의 분자와 Kubrick 큐브가 3D 데스크톱에서 기본적으로 3D로.
 - **3D 모델 및 회로 기판:** OpenSCAD, KiCad, F3D의 3D 미리보기가 진행 중입니다.
+- **스캔:** 부품, 현장, 표본을 찍은 비디오를 3D 모델로 바꾸는 기능을 Spirula Studio로 계획하고 있습니다 ([스캔](#scan)).
 - **책상에서 클라이언트까지, 풀 컬러로:** 엔지니어 책상의 무안경 3D 모니터에서 ([DisplayXR](https://displayxr.org)과 함께, 진행 중), 팀이나 교육 수업을 위한 3D TV나 프로젝터에서, 그리고 모든 직원과 클라이언트의 휴대폰에서 Cardboard 뷰어로 ([Flat Headset](https://github.com/Sparky-OS/flat-headset)) 같은 모델을 깊이 있게. 끝에서 끝까지 개방되어 있어 누구도 한 디스플레이 제조사에 묶이지 않습니다.
 
 각 프로그램 전체: [프로그램](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).

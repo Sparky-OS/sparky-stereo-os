@@ -84,6 +84,12 @@ Ses scènes 3D auront une vue par œil, et son dessin vectoriel de la profondeur
 - **Tours interactifs :** [StorySplat](https://storysplat.com) ("Transformez vos scans 3D en visites interactives") construit des visites à l'intérieur de scans 3D de lieux réels, directement dans le navigateur, et sa vue 3D les montre en 3D sur toute sortie enregistrée, d'abord testée côte à côte sur un téléviseur Sony 3D.
 - **Aussi pris en charge :** PhotoCraft et FilmCraft d'[ArtCraft](https://github.com/storytold/artcraft), publiés avec la 3D.
 
+<a id="scan"></a>
+**Prévu : scanner un objet ou un lieu pour en faire un modèle 3D.**
+Vous filmez autour d'un objet ou en traversant un lieu, avec un téléphone par exemple, et le programme transforme cette vidéo en un modèle 3D dans lequel on peut se déplacer, sur votre propre ordinateur.
+Le programme est [Spirula Studio](https://github.com/harry7557558/spirula-studio), de Harry (J.X.) C., sous licence GPLv3 ; le modèle qu'il produit s'appelle un « 3D Gaussian splat », et il peut aussi en tirer un maillage texturé.
+**Prévu :** l'édition ne le fournit pas encore, et il ne montre pas encore ses modèles en 3D avec une vue par œil ; ce travail se fera dans [notre fork](https://github.com/Sparky-OS/spirula-studio).
+
 Chaque programme en détail : [Programmes](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).
 
 <a id="for-theme-designers-and-customizers"></a>
@@ -97,6 +103,7 @@ Chaque programme en détail : [Programmes](#programs-the-edition-changes-for-ste
 **Étudier et concevoir en 3D : un globe, des tracés et des molécules fonctionnent en 3D dès aujourd'hui, et les modèles 3D et les circuits imprimés sont en cours.**
 - **Apprentissage et science :** le globe de Marble, les tracés de KAlgebra, les molécules de Kalzium et le cube de Kubrick, en 3D par défaut sur un bureau 3D.
 - **Modèles 3D et circuits imprimés :** des aperçus 3D dans OpenSCAD, KiCad et F3D sont en cours.
+- **Scan 3D :** transformer une vidéo d'une pièce, d'un site ou d'un spécimen en modèle 3D est prévu, avec Spirula Studio ([Scan](#scan)).
 - **Du bureau au client, en couleurs pleines :** le même modèle en profondeur sur un écran 3D sans lunettes au bureau de l'ingénieur (avec [DisplayXR](https://displayxr.org), en cours), sur un téléviseur 3D ou un projecteur pour une équipe ou une formation, et sur le téléphone de chaque employé et client dans une visionneuse de type Cardboard ([Flat Headset](https://github.com/Sparky-OS/flat-headset)). C'est ouvert de bout en bout, donc personne n'est captif d'un seul fabricant d'écrans.
 
 Chaque programme en détail : [Programmes](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).

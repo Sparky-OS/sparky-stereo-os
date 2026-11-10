@@ -9,9 +9,8 @@ description: >-
   frame or a transcode, the eyes are swapped, a half side-by-side file is pre-scaled, mpv shows one view, a depth map
   does not rotate, a StereoMode must be written back, a GPU encoder writes no SEI, an FFmpeg hwaccel assertion fails
   in pthread_frame.c, VLC hangs after a minimize or leaves full screen on Wayland, a player's output modes must go, a
-  Qt Multimedia player aborts with "Cannot make QOpenGLContext current in a different thread" at the next file, its
-  video logs "Handle type: NoHandle", or its 3D video takes 150 to 280 percent of a core and the presenter says it
-  copies into wl_shm buffers.
+  Qt Multimedia player aborts at the next file ("QOpenGLContext current in a different thread"), logs "Handle type:
+  NoHandle", or its 3D video copies into wl_shm buffers.
 ---
 
 # Stereo video, end to end

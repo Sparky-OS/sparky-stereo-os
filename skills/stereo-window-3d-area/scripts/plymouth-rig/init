@@ -1,0 +1,32 @@
+#!/bin/busybox sh
+# The guest's init: the GPU driver, then Plymouth as the boot starts it, the kernel line decides what it shows.
+/bin/busybox mkdir -p /proc /sys /dev /run /tmp
+/bin/busybox mount -t proc proc /proc
+/bin/busybox mount -t sysfs sys /sys
+/bin/busybox mount -t devtmpfs dev /dev
+/bin/busybox mount -t tmpfs tmpfs /run
+export PATH=/usr/sbin:/usr/bin:/sbin:/bin
+exec >/dev/ttyS0 2>&1
+echo "RIG: kernel line: $(cat /proc/cmdline)"
+modprobe virtio_gpu || echo "RIG: virtio_gpu failed"
+i=0; while [ ! -e /dev/dri/card0 ] && [ $i -lt 50 ]; do sleep 0.2; i=$((i+1)); done
+ls /dev/dri
+# Plymouth only uses devices udev has initialised
+/usr/lib/systemd/systemd-udevd --daemon
+udevadm trigger --action=add
+udevadm settle --timeout=20
+mkdir -p /run/plymouth
+plymouthd --mode=boot --graphical-boot --no-daemon --debug --debug-file=/run/ply.log >/run/ply.out 2>&1 &
+sleep 1.5
+plymouth show-splash
+echo "RIG: SPLASH-UP"
+sleep ${RIG_SECONDS:-14}
+echo "RIG: ---- plymouthd output"
+cat /run/ply.out
+echo "RIG: ---- plymouthd debug log (stereo lines)"
+# plymouth.debug=stream: on the kernel line sends its trace and errors to /run/ply.log: what it said about the stereo outputs
+grep -E "Stereo output|depth limit|no depth|no popped|no sunk|is no depth|stereo head|theme draws" /run/ply.log | sed "s/^[0-9:.]* [^ ]*: *//" | cut -c1-230
+echo "RIG: DONE"
+plymouth quit 2>/dev/null
+echo o > /proc/sysrq-trigger
+sleep 5

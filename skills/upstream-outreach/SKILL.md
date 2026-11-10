@@ -169,3 +169,5 @@ Record any promised next action and wait for a response; do not schedule reminde
 
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (10 entries).
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
+
+[A series of small patches to one maintainer's Go library](references/small-patch-series-to-a-go-library.md): the recipe for sending fixes and tests one subject at a time after a maintainer said yes (fresh upstream first, a straight line of branches, red and green shown, his commit style), and the independent-vector method with its traps (e521, ORDER 493).

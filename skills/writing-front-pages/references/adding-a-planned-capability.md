@@ -47,5 +47,16 @@ The rules of [the skill](../SKILL.md#the-rules) come first.
 - **Symptom:** the visible word count of the first screen grows by two sentences per language.
   **Cause:** the doors are part of the first screen.
   **Fix:** keep each added sentence under twenty words, count before and after with the same script, and say both numbers.
+- **Symptom:** a block that is replaced held the page's only link to another project (the suite's paragraph was the one place that linked SVGStereo).
+  **Cause:** the replacement was written from the new subject, not from the old block's links.
+  **Fix:** before replacing a block, count each of its links in the whole page; a link that appears once moves with a sentence of its own. The before and after link sets show it as "links lost".
+- **Symptom:** a line is asked for that says one program's result "can be used" in another.
+  **Cause:** each program's record says what it reads or writes, and nobody ran the two together.
+  **Fix:** write each half with its own status and say the pair is untried: "it builds tours from 3D scans of this kind and already shows them in 3D today; a Spirula Studio scan in StorySplat is still to be tried."
+- **Symptom:** the publish check reports "hard-wrapped line" on a line that is not wrapped.
+  **Cause:** the line starts with a lowercase project name.
+  **Fix:** start the sentence with another word, or put the name in brackets after the linked one.
+- **Symptom:** a suite that is "coming" loses its place to another.
+  **Fix:** the new one takes the lead paragraph with its status; the old one stays as one "Planned, later" line after the programs that ship, with its links (move, never drop), written in the conditional.
 
 **Perks.** A planned line written this way needs one edit when the program ships: the status word changes, and the anchor, the links and the credits stay.

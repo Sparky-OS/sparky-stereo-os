@@ -3,6 +3,11 @@
 Checked 2026-11-10 against [craft-contrib](https://github.com/storytold/craft-contrib), revision cb0d67e, and the app repositories' current rules.
 Read the receiving repository again before preparing a submission: the suite changes quickly.
 
+Inventory the organisation as well as the launcher: ArtCraft and ArtCraft-X are creative apps too.
+ArtCraft's November main has both its Tauri/Three.js frontend and a new `artcraft-native` egui frontend.
+Select rules by the actual repository and frontend; do not assume every app has the same renderer or gate.
+Craft Status and Craft PR Review are development tools; Spark is a renderer dependency.
+
 ## Working recipe
 
 1. Read the app's `AGENTS.md`, its `CLAUDE.md` if present, the contribution files, `.coderabbit.yaml` and the called shared CI workflow.

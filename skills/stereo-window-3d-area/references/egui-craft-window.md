@@ -42,3 +42,8 @@ An embedded canvas needs its own subsurface/child-window integration and overlay
   Decode suspect streams with HM and check the number and content of reconstructed pictures; exit zero on an empty stream is not success.
 - Symptom: strict shared-crate Clippy fails on protocol imports after a rebase.
   Follow the workspace's new explicit-import policy in the handwritten protocol wrapper; generated code allowances need not weaken workspace rules.
+- Symptom: an unchanged Unicode process-path test fails only in the minimal SDK.
+  Compare the same binary under the C and UTF-8 locales before changing process matching.
+  The Craft library test passed with `LANG=C.UTF-8 LC_ALL=C.UTF-8`; preserve that environment in the runner.
+  A separate spelling-budget test exceeded its deadline in a parallel workspace run and passed in the complete serial run.
+  Keep both logs and the actual thread setting; do not increase the assertion's deadline to hide contention.

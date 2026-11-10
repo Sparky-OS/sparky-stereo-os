@@ -62,7 +62,7 @@ Not measured: GPU texture formats with their own chains (KTX2, BCn), AVIF and JP
 
 ## The tiled ladder: procedures informed by the tile's own pixels (ORDER 473w)
 
-These are code metrics of a three-term fitter (gradient, cells, seed-chosen noise). Daniel's reading of them, 10 November 2026: "you have not started this properly. start from the kkrigger game tooling and it's way of doing textures, on the comparison, do not use code for now, it's a visual thing, a vision able model is more correct at this than a code analysis". They stay as that round's record; the artist's way below is the round that answers him.
+These are code metrics of a three-term fitter (gradient, cells, seed-chosen noise). Daniel's reading of them, 10 November 2026: the work had not started where it should, from .kkrieger's own tooling and its way of making textures, and the comparison is a visual matter, which a vision-capable model judges better than code metrics do. They stay as that round's record; the artist's way below is the round that answers him.
 
 The direction of werkkzeug3 and .kkrieger run backwards: there operators made the texture; here the texture yields the operators and their parameters, tile by tile.
 
@@ -199,7 +199,7 @@ No code metric decides anything. The graph's bytes are written beside each sheet
 
 ## Relief the artist's way, and stereo textures that only sink (ORDER 473y)
 
-Daniel's request: "Building the relief - do it traditionally, but also consider stereo textures here, this is my request, always sunk or screen level, otherwise the POV can render incorrect popping things - meaning that regular rendering shows one side, stereo rendering actually has sunk levels".
+Daniel's request (10 November 2026): build the relief the traditional way, and make it a stereo texture whose depth is always sunk or at the surface's level, never in front of it, because a popped relief renders wrongly from some points of view; regular rendering shows the relief from one side, while stereo rendering gives it real sunk levels.
 
 ### The relief, as werkkzeug3's artists built it
 
@@ -240,7 +240,7 @@ The script tests itself first: a mark on a wide flat floor at the black level, t
 
 ### The size, the mark, the range and the edges (ORDER 473z, after Daniel saw the pictures on his 3D TV)
 
-Daniel: "for sure 3D sunk textures work, even the poped brick worked, so I guess if it's very suttil, like only few pixels, we can have poped textures as well"; the four textures "all can have a little more separation, taking into consideration our cut from the borders rule so it does not have a strip on the corners".
+Daniel, after seeing the pictures on his 3D TV (10 November 2026): sunk stereo textures work, and so did the subtly popped brick, so a texture may also pop by a few pixels; the coast, bark, tiles and plaster can take a little more separation, keeping the edge-cut rule so no strip shows at the edges.
 
 - **The size.** A procedural texture is drawn at the size it is wanted, by setting the size in the graph's generators (`10 10` is 1024 x 1024). The 2D picture and each eye of the 3D picture have that one size. Nothing is resized afterwards: a program never stretches or squeezes an eye, and the compositor scales once at the output. The first pictures had enlarged a 512 tile to 1024 inside a 1920 x 1080 frame, and Daniel asked why the sizes differed.
 - **The mark.** Every stereo picture is written as a `.pns`: full side by side, left eye first, with the PNG `sTER` chunk (mode 1) before the first `IDAT`, and the specification's padding between the views when the width is not a multiple of eight. `pns.py` writes it and reads it back. An unmarked side by side PNG is shown flat by the viewers. No red-cyan picture is made: the person has a 3D screen.

@@ -38,12 +38,19 @@ A catalog listing is not permission to transplant their UI or approve another th
 AniCraft requires crates.io-only dependencies and a cargo-deny gate.
 A shared library existing in craft-libs does not establish that an unpublished git dependency is permitted there.
 TextureCraft and MaterialCraft explicitly put shared code in craft-libs; FigCraft and Craft Anything retain no-code-sharing text.
-Read the actual dependency boundary and resolve it before wiring an adapter, without silently editing policy.
+For an edition task that explicitly requires shared engines, implement the edition library and adapters on its own branch.
+Keep changes needed to meet upstream dependency or sharing policy on a separate upstream-offer branch; do not silently edit their policy or duplicate an engine merely to accommodate it.
+State the boundary in the handoff before preparing an offer.
 DeckCraft excludes some vendor-designed font families even when open; PdfCraft allows OFL releases under its own attribution rules.
 PdfCraft’s hashed `ATTRIBUTION.toml` is authoritative and its Markdown index is generated.
 WordCraft proofing tests need the pinned craft-i18n input as well as the optional font input.
 SoundCraft’s reference-video work stays outside its real-time audio callback.
 Launcher time uses Jiff under its local rule, rather than adding Chrono beside it.
+
+Audit new edition labels against all ten required languages: en, pl, pt_BR, fr, de, es, ja, ko, zh_CN and zh_TW.
+An app advertising a language does not prove a newly added label has a row in its catalog.
+Check the actual lookup and bare-language routing, preserving separate simplified and traditional Chinese catalogs.
+Keep upstream catalog identifiers such as `pt-br` or `zh-hant` where their lookup expects them.
 
 ## The closure that exposed the gap
 

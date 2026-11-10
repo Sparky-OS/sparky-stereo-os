@@ -27,7 +27,7 @@ for line in open(sys.argv[1]):
         elif k == "c":
             vals.append("#%08x" % w)
         elif k == "f":
-            vals.append("%.6g" % struct.unpack("<f", struct.pack("<I", w))[0])
+            vals.append("%.9g" % struct.unpack("<f", struct.pack("<I", w))[0])
         else:
             vals.append(str(struct.unpack("<i", struct.pack("<I", w))[0]))
     print(name, op, ins, " ".join(vals))

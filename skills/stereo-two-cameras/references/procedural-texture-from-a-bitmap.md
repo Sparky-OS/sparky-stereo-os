@@ -435,6 +435,29 @@ The verdicts in the table are the fitting model's own reading of the sheets; the
   Cause: the fitter tries values no artist typed.
   Fix: the bridge returns from a failed check with `longjmp` and the candidate is refused; the bitmaps of that one call are lost.
 
+### The second round: more of the artists' operators, and what the eye said (milestone 1b)
+
+The build step gained steps over the colour layer, each from .kkrieger's real instances: grain (the layer stretched one way, `Distort` by a noise, `Twirl`), a second material (`Mask` through a `Perlin` with amplify and gamma or through a `Cell`), `Cell` merged in, tone (`Range`, `HSCB`, `Blur`), the bond (the shape on every second row moved half a cell), the bevel (`Blur` of the shape before `Normals`), and the joints' colour taken from the dark end of the picture's own colours.
+Which generators the artists started from, counted in the 742 drawable graphs: `Perlin` 1,519 times in 511 graphs, `Flat` 908 in 459, `Cell` 243 in 145, `Gradient` 192 in 104, `Bricks` never.
+- **Better, by eye:** the stone tiles (dark grooves with a lit edge, a whole tile with its border in the close-up); the dark pinpoints are gone; wood has a grain direction.
+- **Worse, by eye:** `Cell` and `Mask` through cells were kept on nine of eleven textures and drew a web of cell edges over rust, metal, rock and both walls; they paid by the inner measure and are wrong to the eye.
+- **The rule this leaves:** "kept if it pays by the measure" is not enough for an operator that adds structure. Grain is now tried only where the reading finds one (detail stronger one way than the other by 1.2 or more: wood 2.13, the fibrous wall 1.38, the others 1.01 to 1.07); cells, a mask and a twirl need a reading of their own before they are tried.
+
+More traps:
+- Symptom: dark pinpoint specks on a smooth surface.
+  Cause: a `Perlin` gamma tuned below zero (the range was the artists' lowest value minus one spread), which turns the noise's zeros into spikes.
+  Fix: a value the artists never took below zero stays at or above zero.
+  Found by: every specked result had a `Perlin` with a negative gamma; setting it to 1 removed the specks on the fibrous wall (317 to 0 counted pinpoints).
+- Symptom: the joints are found, but a close-up shows a cross of lines where the original shows one whole tile.
+  Cause: the tuner moved the shape's centre, which was read from the picture.
+  Fix: lock the centre as well as the repeat count.
+- Symptom: one large swirl on a concrete wall.
+  Cause: a `Twirl` pays by the measure on any noise.
+  Fix: try grain only where the reading finds a direction.
+- Symptom: the playback module draws a found graph with a few hundred pixels different.
+  Cause: the typed text printed decimals with six digits.
+  Fix: nine digits (`%.9g`); then 0 of 262,144 pixels differ on four graphs.
+
 ### Where the procedures stop (so far)
 
 On .kkrieger's own textures, which are procedures, the reverse gets the material at a glance for the plain noises and the regular repeats, and nothing close up.

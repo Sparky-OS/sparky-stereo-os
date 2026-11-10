@@ -124,6 +124,8 @@ const Node = struct {
     nw: u8 = 0,
     w: [NW]u32 = [_]u32{0} ** NW,
     lock: bool = false, // values read from the picture that the tuning must keep (a repeat count)
+    lockw: u16 = 0, // single values the tuning must keep (where a shape's centre was read)
+    shape: bool = false, // the Transform that repeats the read shape: the relief's height
     grey: bool = false, // its colours are tuned as greys: a light or an added noise changes shade, not hue
 };
 
@@ -936,6 +938,7 @@ fn tune(g: *Graph, t: *Target, first: usize, last: usize, budget_in: i64, deep: 
             for (ops[op].kinds, 0..) |kd, p| {
                 if (budget <= 0) break;
                 if (fixedWord(op, p)) continue;
+                if ((g.nodes[i].lockw >> @intCast(p)) & 1 == 1) continue;
                 const st = &stats[op][p];
                 switch (kd) {
                     'i' => {
@@ -965,7 +968,7 @@ fn tune(g: *Graph, t: *Target, first: usize, last: usize, budget_in: i64, deep: 
                     'f' => {
                         if (st.sd <= 0) continue;
                         const step = 0.5 * st.sd * scale;
-                        const lo = st.lo - st.sd;
+                        const lo = if (st.lo >= 0) @max(0.0, st.lo - st.sd) else st.lo - st.sd;
                         const hi = st.hi + st.sd;
                         const dirs = [_]f32{ 1, -1 };
                         for (dirs) |d| {
@@ -1166,6 +1169,8 @@ const Reading = struct {
     nrect: usize = 0,
     rect: [3][4]f32 = undefined, // centre x, y and half sizes, in cells
     dark: f32 = 0, // the joints' brightness against the shapes'
+    aniso: f32 = 1, // how much stronger the detail is one way than the other (1: no grain)
+    joint: u32 = 0xff404040, // the joints' colour as a share of the surface's: the dark end of the picture's own colours
     ox: f32 = 0,
     oy: f32 = 0,
     f0: u32 = 0, // the noise: first octave, how many, the fall per octave, the strength
@@ -1413,10 +1418,32 @@ fn readPicture(t: *Target) Reading {
         ca[c] = @floatCast(mean[c] + p1 * v[c]);
         cb[c] = @floatCast(mean[c] + p99 * v[c]);
     }
+    {
+        // the mortar is the darkest of the same colours: the dark end over the middle, channel by channel
+        var jc: [3]f32 = undefined;
+        inline for (0..3) |c| jc[c] = @min(1.0, @max(0.0, ca[c]) / @max(0.02, 0.5 * (ca[c] + cb[c])));
+        r.joint = 0xff000000 | rgbWord(jc);
+    }
     r.c0 = 0xff000000 | rgbWord(ca);
     r.c1 = 0xff000000 | rgbWord(cb);
     for (r.t) |*s| s.* = @floatCast(@min(1.0, @max(0.0, (s.* - p1) / (p99 - p1))));
 
+    {
+        // grain: the change from a pixel to its neighbour across against the change to the one below
+        var ex: f64 = 0;
+        var ey: f64 = 0;
+        for (0..n) |y| {
+            for (0..n) |x| {
+                const here = r.t[y * n + x];
+                const dx = r.t[y * n + (x + 1) % n] - here;
+                const dy = r.t[((y + 1) % n) * n + x] - here;
+                ex += dx * dx;
+                ey += dy * dy;
+            }
+        }
+        const q = @sqrt(@max(ex, 1e-12) / @max(ey, 1e-12));
+        r.aniso = @floatCast(@max(q, 1.0 / q));
+    }
     // the repeat, and the one cell under it
     var tm: f64 = 0;
     for (r.t) |s| tm += s;
@@ -1678,7 +1705,7 @@ fn readPicture(t: *Target) Reading {
     r.fade = if (last > first) @floatCast(std.math.pow(f64, a1 / a0, 1.0 / @as(f64, @floatFromInt(last - first)))) else 1.0;
     r.fade = @min(2.0, @max(0.25, r.fade));
     r.amp = @floatCast(@min(8.0, @max(0.05, a0)));
-    say("read: colours {x:0>6} to {x:0>6}; repeats {d} by {d} (cell explains {d:.0} % of the contrast, {d} shapes); noise octaves {d} to {d}, fall {d:.2}, strength {d:.2}\n", .{ r.c0 & 0xffffff, r.c1 & 0xffffff, r.nx, r.ny, r.share * 100.0, r.nrect, first, last, r.fade, r.amp });
+    say("read: grain {d:.2}; colours {x:0>6} to {x:0>6}; repeats {d} by {d} (cell explains {d:.0} % of the contrast, {d} shapes); noise octaves {d} to {d}, fall {d:.2}, strength {d:.2}\n", .{ r.aniso, r.c0 & 0xffffff, r.c1 & 0xffffff, r.nx, r.ny, r.share * 100.0, r.nrect, first, last, r.fade, r.amp });
     return r;
 }
 
@@ -1702,10 +1729,28 @@ fn grey(v: f32) u32 {
 
 /// the shape drawn once and repeated, the way .kkrieger's walls and tiles are built:
 /// Flat (the joints), one GlowRect per shape, Transform to repeat. Returns the index of its last operator.
-fn appendShape(g: *Graph, r: *const Reading) usize {
-    _ = append(g, flatNode(grey(r.dark)));
+fn appendShape(g: *Graph, r_in: *const Reading, bond: bool) usize {
+    // bond: the same shape on every second row, moved half a cell sideways, as a wall is laid
+    var rr = r_in.*;
+    if (bond) {
+        if (rr.nrect == 1) {
+            const a = rr.rect[0];
+            rr.rect[0] = .{ a[0], a[1] * 0.5, a[2], a[3] * 0.5 };
+            rr.rect[1] = .{ @mod(a[0] + 0.5, 1.0), 0.5 + a[1] * 0.5, a[2], a[3] * 0.5 };
+            rr.ny = rr.ny / 2;
+            rr.oy = rr.oy * 0.5;
+        } else {
+            rr.rect[0] = .{ 0.5, 0.25, 0.46, 0.21 };
+            rr.rect[1] = .{ 0.0, 0.75, 0.46, 0.21 };
+        }
+        rr.nrect = 2;
+    }
+    const r = &rr;
+    var jf = flatNode(r.joint);
+    jf.grey = true; // its shade is tuned, its hue stays the picture's
+    _ = append(g, jf);
     for (0..r.nrect) |k| {
-        var nd = Node{ .op = OP_GLOWRECT, .nin = 1, .nw = 11 };
+        var nd = Node{ .op = OP_GLOWRECT, .nin = 1, .nw = 11, .grey = true, .lockw = 3 };
         nd.in[0] = @intCast(g.n - 1);
         const edge: f32 = 0.008;
         nd.w[0] = wordOf(r.rect[k][0]);
@@ -1721,7 +1766,7 @@ fn appendShape(g: *Graph, r: *const Reading) usize {
         nd.w[10] = 0;
         _ = append(g, nd);
     }
-    var tr = Node{ .op = OP_TRANSFORM, .nin = 1, .nw = 8, .lock = true };
+    var tr = Node{ .op = OP_TRANSFORM, .nin = 1, .nw = 8, .lock = true, .shape = true };
     tr.in[0] = @intCast(g.n - 1);
     const fx: f32 = @floatFromInt(r.nx);
     const fy: f32 = @floatFromInt(r.ny);
@@ -1732,6 +1777,202 @@ fn appendShape(g: *Graph, r: *const Reading) usize {
     tr.w[4] = wordOf(@mod(0.5 * fy - r.oy, 1.0));
     tr.w[5] = 0;
     return append(g, tr);
+}
+
+// ---------------------------------------------------------------- more of the artists' operators, each a step
+//
+// Every step makes a handful of candidates in one of .kkrieger's idioms over the colour layer (operator
+// `base`), tunes each a little, the best three more, and keeps the best only if it pays for its bytes.
+
+const OP_CELL = 2;
+const OP_RANGE = 6;
+const OP_HSCB = 7;
+const OP_BLUR = 8;
+const OP_TWIRL = 15;
+const OP_DISTORT = 22;
+
+const Cand = struct { g: Graph, first: usize, last: usize, base: usize, s: f32 = BAD };
+
+fn keepBest(g: *Graph, t: *Target, base: *usize, cur: *f32, opt: Options, cands: []Cand) bool {
+    var order: [3]usize = undefined;
+    var nord: usize = 0;
+    for (cands, 0..) |*c, i| {
+        c.s = cost(tune(&c.g, t, c.first, c.last, opt.quick, false, 1), c.g.bytes(), g.bytes(), opt);
+        if (c.s >= BAD) continue;
+        var at: usize = nord;
+        while (at > 0 and cands[order[at - 1]].s > c.s) at -= 1;
+        if (at >= 3) continue;
+        var j: usize = @min(nord, 2);
+        while (j > at) : (j -= 1) order[j] = order[j - 1];
+        order[at] = i;
+        if (nord < 3) nord += 1;
+    }
+    var best_s: f32 = BAD;
+    var best_raw: f32 = BAD;
+    var best_i: usize = 0;
+    for (order[0..nord]) |i| {
+        const c = &cands[i];
+        _ = tune(&c.g, t, c.first, c.last, opt.deep * 2, true, 3);
+        const raw = tune(&c.g, t, 0, c.g.n - 1, opt.deep, false, 1);
+        const s = cost(raw, c.g.bytes(), g.bytes(), opt);
+        if (s < best_s) {
+            best_s = s;
+            best_raw = raw;
+            best_i = i;
+        }
+    }
+    if (nord == 0 or best_s >= cur.* * (1.0 - opt.gain)) return false;
+    g.* = cands[best_i].g;
+    base.* = cands[best_i].base;
+    cur.* = best_raw;
+    return true;
+}
+
+/// put `nd` right after operator k as its only consumer (a one-input operator over the colour layer)
+fn wrapOne(c: *Graph, k: usize, nd_in: Node) void {
+    var nd = nd_in;
+    nd.nin = 1;
+    nd.in[0] = @intCast(k);
+    c.insert(k + 1, nd);
+    c.rewire(k + 1, k, k + 1);
+}
+
+/// grain and fibres: the colour layer stretched one way, bent by a noise (Distort), or twirled
+fn stepGrain(g: *Graph, t: *Target, base: *usize, cur: *f32, opt: Options) bool {
+    const cands = alloc.alloc(Cand, 24) catch die("out of memory", .{});
+    defer alloc.free(cands);
+    var n: usize = 0;
+    const k = base.*;
+    const reps = [_]f32{ 2, 4, 8 };
+    for (reps) |rp| {
+        inline for (.{ 0, 1 }) |ax| {
+            var c = g.*;
+            var tr = Node{ .op = OP_TRANSFORM, .nw = 8, .lock = true };
+            tr.w[0] = wordOf(0.0);
+            tr.w[1] = wordOf(if (ax == 0) 1.0 / rp else 1.0);
+            tr.w[2] = wordOf(if (ax == 1) 1.0 / rp else 1.0);
+            tr.w[3] = wordOf(0.5);
+            tr.w[4] = wordOf(0.5);
+            wrapOne(&c, k, tr);
+            cands[n] = .{ .g = c, .first = 0, .last = k, .base = k + 1 };
+            n += 1;
+        }
+    }
+    var f0: u32 = 0;
+    while (f0 < 4) : (f0 += 1) {
+        for (0..2) |_| {
+            const di = randomInst(OP_DISTORT) orelse break;
+            var c = g.*;
+            var pn = perlinNode(f0, 2, 0.7, @intCast(rndN(256)), 1.0, 0xff000000, 0xffffffff);
+            pn.grey = true;
+            c.insert(k + 1, pn);
+            var ds = nodeOf(di);
+            ds.nin = 2;
+            ds.in[0] = @intCast(k);
+            ds.in[1] = @intCast(k + 1);
+            c.insert(k + 2, ds);
+            c.rewire(k + 2, k, k + 2);
+            cands[n] = .{ .g = c, .first = k + 1, .last = k + 2, .base = k + 2 };
+            n += 1;
+        }
+    }
+    for (0..6) |_| {
+        const ti = randomInst(OP_TWIRL) orelse break;
+        var c = g.*;
+        wrapOne(&c, k, nodeOf(ti));
+        cands[n] = .{ .g = c, .first = k + 1, .last = k + 1, .base = k + 1 };
+        n += 1;
+    }
+    return keepBest(g, t, base, cur, opt, cands[0..n]);
+}
+
+/// a second material through a mask made from a noise (the artists' Perlin with amplify and gamma) or from cells
+fn stepMask(g: *Graph, t: *Target, base: *usize, cur: *f32, opt: Options) bool {
+    const cands = alloc.alloc(Cand, 48) catch die("out of memory", .{});
+    defer alloc.free(cands);
+    var n: usize = 0;
+    const k = base.*;
+    var f0: u32 = 0;
+    while (f0 < 5) : (f0 += 1) {
+        for (0..8) |pi| {
+            if (n >= 44) break;
+            var c = g.*;
+            var mk: Node = undefined;
+            if (pi % 4 == 3) {
+                const ci = randomInst(OP_CELL) orelse continue;
+                mk = nodeOf(ci);
+                mk.nin = 0;
+                mk.w[2] = 0xff000000;
+                mk.w[3] = 0xffffffff;
+            } else {
+                mk = perlinNode(f0, 3, 0.7, @intCast(rndN(256)), 3.0, 0xff000000, 0xffffffff);
+                mk.w[8] = wordOf(2.0);
+            }
+            mk.grey = true;
+            c.insert(k + 1, mk);
+            c.insert(k + 2, flatNode(0xff000000 | palette[pi]));
+            var ms = Node{ .op = OP_MASK, .nin = 3, .nw = 1 };
+            ms.in[0] = @intCast(k + 1);
+            ms.in[1] = @intCast(k + 2);
+            ms.in[2] = @intCast(k);
+            ms.w[0] = 0;
+            c.insert(k + 3, ms);
+            c.rewire(k + 3, k, k + 3);
+            cands[n] = .{ .g = c, .first = k + 1, .last = k + 2, .base = k + 3 };
+            n += 1;
+        }
+    }
+    return keepBest(g, t, base, cur, opt, cands[0..n]);
+}
+
+/// patches and facets: real Cell instances merged over the colour layer
+fn stepCell(g: *Graph, t: *Target, base: *usize, cur: *f32, opt: Options) bool {
+    const cands = alloc.alloc(Cand, 24) catch die("out of memory", .{});
+    defer alloc.free(cands);
+    var n: usize = 0;
+    const k = base.*;
+    const modes = [_]u32{ 2, 0, 1 };
+    for (0..8) |_| {
+        const ci = randomInst(OP_CELL) orelse break;
+        for (modes) |md| {
+            var c = g.*;
+            var ce = nodeOf(ci);
+            ce.nin = 0;
+            ce.grey = true;
+            ce.w[2] = if (md == 2) 0xff909090 else 0xff000000;
+            ce.w[3] = if (md == 2) 0xffffffff else 0xff505050;
+            ce.w[4] = ce.w[2];
+            c.insert(k + 1, ce);
+            var mg = Node{ .op = OP_MERGE, .nin = 2, .nw = 1 };
+            mg.in[0] = @intCast(k);
+            mg.in[1] = @intCast(k + 1);
+            mg.w[0] = md;
+            c.insert(k + 2, mg);
+            c.rewire(k + 2, k, k + 2);
+            cands[n] = .{ .g = c, .first = k + 1, .last = k + 1, .base = k + 2 };
+            n += 1;
+        }
+    }
+    return keepBest(g, t, base, cur, opt, cands[0..n]);
+}
+
+/// hard edges, contrast and softness: real Range, HSCB and Blur instances over the colour layer
+fn stepTone(g: *Graph, t: *Target, base: *usize, cur: *f32, opt: Options) bool {
+    const cands = alloc.alloc(Cand, 24) catch die("out of memory", .{});
+    defer alloc.free(cands);
+    var n: usize = 0;
+    const k = base.*;
+    const which = [_]u8{ OP_RANGE, OP_HSCB, OP_BLUR };
+    for (which) |op| {
+        for (0..7) |_| {
+            const in = randomInst(op) orelse break;
+            var c = g.*;
+            wrapOne(&c, k, nodeOf(in));
+            cands[n] = .{ .g = c, .first = k + 1, .last = k + 1, .base = k + 1 };
+            n += 1;
+        }
+    }
+    return keepBest(g, t, base, cur, opt, cands[0..n]);
 }
 
 // ---------------------------------------------------------------- the search
@@ -1812,16 +2053,25 @@ fn addNoise(g: *Graph, t: *Target, base: *usize, cur: *f32, opt: Options) bool {
 fn tryRelief(g: *Graph, t: *Target, cur: *f32, opt: Options) bool {
     var best: Graph = undefined;
     var best_s: f32 = BAD;
-    for (0..opt.relief) |_| {
+    for (0..opt.relief) |trial| {
         var c = g.*;
         const nmi = randomInst(OP_NORMALS) orelse return false;
         const bui = randomInst(OP_BUMP) orelse return false;
         // the height: the repeated shape when there is one (the artist's usual height), else the picture so far
         var h = c.root;
         for (c.nodes[0..c.n], 0..) |nd, i| {
-            if (nd.op == OP_TRANSFORM and nd.lock) h = i;
+            if (nd.shape) h = i;
         }
         const old = c.root;
+        if (trial % 2 == 1) {
+            // the bevel: the height softened first, as the artists did before Normals
+            if (randomInst(OP_BLUR)) |bi| {
+                var bl = nodeOf(bi);
+                bl.nin = 1;
+                bl.in[0] = @intCast(h);
+                h = append(&c, bl);
+            }
+        }
         var nm = nodeOf(nmi);
         nm.in[0] = @intCast(h);
         const ni = append(&c, nm);
@@ -1836,14 +2086,14 @@ fn tryRelief(g: *Graph, t: *Target, cur: *f32, opt: Options) bool {
         bu.in[0] = @intCast(old);
         bu.in[1] = @intCast(ni);
         _ = append(&c, bu);
-        const s = tune(&c, t, c.n - 2, c.n - 1, opt.quick * 2, false, 2);
+        const s = tune(&c, t, old + 1, c.n - 1, opt.quick * 2, false, 2);
         if (s < best_s) {
             best_s = s;
             best = c;
         }
     }
     if (best_s >= BAD) return false;
-    _ = tune(&best, t, best.n - 2, best.n - 1, opt.deep * 2, true, 3);
+    _ = tune(&best, t, best.n - 3, best.n - 1, opt.deep * 2, true, 3);
     const raw = tune(&best, t, 0, best.n - 1, opt.deep, false, 1);
     if (cost(raw, best.bytes(), g.bytes(), opt) >= cur.* * (1.0 - opt.gain)) return false;
     g.* = best;
@@ -1909,29 +2159,36 @@ fn fit(target_path: [*:0]const u8, prior_path: [*:0]const u8, prefix: []const u8
         }
     }
     if (rd.nrect > 0) {
-        var c = g;
-        const colour = c.root;
-        const sh = appendShape(&c, &rd);
-        var mg = Node{ .op = OP_MERGE, .nin = 2, .nw = 1 };
-        mg.in[0] = @intCast(colour);
-        mg.in[1] = @intCast(sh);
-        mg.w[0] = 2;
-        _ = append(&c, mg);
-        {
-            // the shape as it was read, before any tuning: kept beside the result so it can be looked at
-            var sbuf: [1 << 14]u8 = undefined;
-            var sname: [1024]u8 = undefined;
-            writeFile(std.fmt.bufPrint(&sname, "{s}.shape-as-read.script", .{prefix}) catch unreachable, scriptText(&c, &sbuf));
+        var best: Graph = undefined;
+        var best_s: f32 = BAD;
+        var best_bond = false;
+        inline for (.{ false, true }) |bond| {
+            if (!bond or rd.nrect >= 2 or rd.ny % 2 == 0) {
+                var c = g;
+                const colour = c.root;
+                const sh = appendShape(&c, &rd, bond);
+                var mg = Node{ .op = OP_MERGE, .nin = 2, .nw = 1 };
+                mg.in[0] = @intCast(colour);
+                mg.in[1] = @intCast(sh);
+                mg.w[0] = 2;
+                _ = append(&c, mg);
+                _ = tune(&c, &t, colour + 1, c.n - 1, opt.deep * 3, false, 3);
+                const s = tune(&c, &t, 0, c.n - 1, opt.deep * 2, true, 2);
+                say("  the shape {s}: measure {d:.5}\n", .{ if (bond) "in a bond" else "as read", s });
+                if (cost(s, c.bytes(), g.bytes(), opt) < best_s) {
+                    best_s = cost(s, c.bytes(), g.bytes(), opt);
+                    best = c;
+                    best_bond = bond;
+                }
+            }
         }
-        _ = tune(&c, &t, colour + 1, c.n - 1, opt.deep * 3, false, 3);
-        const s = tune(&c, &t, 0, c.n - 1, opt.deep * 2, true, 2);
-        if (cost(s, c.bytes(), g.bytes(), opt) < cur * (1.0 - opt.gain)) {
-            g = c;
-            cur = s;
+        if (best_s < cur * (1.0 - opt.gain)) {
+            g = best;
+            cur = score(&g, &t);
             rung += 1;
             saveRung(prefix, rung, &g, &t, cur, &log, seconds() - t0);
-            say("rung {d}: the repeated shape, {d} operators, {d} bytes, measure {d:.5}\n", .{ rung, g.n, g.bytes(), cur });
-        } else say("the repeated shape did not pay ({d:.5})\n", .{s});
+            say("rung {d}: the repeated shape{s}, {d} operators, {d} bytes, measure {d:.5}\n", .{ rung, if (best_bond) " in a bond" else "", g.n, g.bytes(), cur });
+        } else say("the repeated shape did not pay ({d:.5})\n", .{best_s});
     }
 
     const TOP = 4;
@@ -1943,6 +2200,17 @@ fn fit(target_path: [*:0]const u8, prior_path: [*:0]const u8, prefix: []const u8
             rung += 1;
             saveRung(prefix, rung, &g, &t, cur, &log, seconds() - t0);
             say("rung {d} at {d} px: a lit relief, {d} operators, {d} bytes, measure {d:.5}\n", .{ rung, @as(usize, 1) << @intCast(size), g.n, g.bytes(), cur });
+        }
+        if (size < full or full == work) {
+            const names = [_][]const u8{ "grain (stretch, Distort or Twirl)", "a second material (Mask)", "cells", "tone (Range, HSCB or Blur)" };
+            inline for (.{ stepGrain, stepMask, stepCell, stepTone }, 0..) |step, si| {
+                // grain is tried only where the picture has one: a swirl pays by the measure on any noise and is wrong to the eye
+                if ((si != 0 or rd.aniso >= opt.grain) and g.n + 4 < opt.max_ops and step(&g, &t, &base, &cur, opt)) {
+                    rung += 1;
+                    saveRung(prefix, rung, &g, &t, cur, &log, seconds() - t0);
+                    say("rung {d} at {d} px: {s}, {d} operators, {d} bytes, measure {d:.5}, {d:.0} s\n", .{ rung, @as(usize, 1) << @intCast(size), names[si], g.n, g.bytes(), cur, seconds() - t0 });
+                }
+            }
         }
         for (0..opt.noises) |_| {
             if (g.n + 2 >= opt.max_ops or !addNoise(&g, &t, &base, &cur, opt)) break;
@@ -2063,6 +2331,7 @@ const Options = struct {
     patience: usize = 3,
     gain: f32 = 0.005,
     read_only: bool = false,
+    grain: f32 = 1.2,
     grow: usize = 0, // free moves from the prior tried per step after the reading (0: none)
     relief: usize = 16,
     noises: usize = 2,

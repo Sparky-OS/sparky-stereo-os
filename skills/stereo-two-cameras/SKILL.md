@@ -77,6 +77,10 @@ Eight engines (three.js, A-Frame, Babylon.js, PlayCanvas, react-three-fiber, mod
 
 A finished page you did not write (a three.js screensaver with a cube-map sky and bloom): freeze it with its own frame cap, read its camera, predict through the hack and the post pass, find a sky that stands in front of the screen with a dense disparity map, and the 23 line fix on the page: [references/web3d-engines-in-the-browser.md](references/web3d-engines-in-the-browser.md), section on a finished page.
 
+## A game engine that draws its own frames (C#, OpenGL, Silk.NET)
+
+An engine with its own camera class, post stack and UI (Froglet's Amoebius: Unity's `Camera` contract in C# over OpenGL 3.3) gets the pair in its camera (`stereoSeparation`, `stereoConvergence`, `GetStereoViewMatrix`, `GetStereoProjectionMatrix` with an off-axis frustum), draws each eye with its own post effects and the UI once per eye into the two halves of one window, declares the window once as full side by side, and takes the separation from the person's depth limits on the window: the recipe, the closed form, a probe scene and checker, the measured errors (0.05 to 0.16 px) and the traps (a newest commit that does not build, GLFW choosing Wayland, the doubled window, the limits property's format) are in [references/csharp-opengl-engine-two-eyes.md](references/csharp-opengl-engine-two-eyes.md).
+
 ## Reading a web 3D project before it goes on a list
 
 Which licence, which AI position, whether it can be built from source, which stereo field it has (or none) and whether a native program can sit inside the browser are read from the project's own repository, not from its web page: the recipe, the read-only commands and the traps (NOASSERTION, a bulk licence folder, source-available viewers, code search that lags) are in [references/reading-a-web-3d-project.md](references/reading-a-web-3d-project.md).

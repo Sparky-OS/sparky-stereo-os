@@ -136,6 +136,7 @@ The developer task (`task-sparky-stereo-developer`) installs all of them.
 | FreeSpace 2 Open 26.0.1 | OpenXR support | XR, through Monado. |
 | OpenMW 0.51.0 | `[Stereo] stereo enabled` splits the window with OpenSceneGraph's horizontal split, each eye at half the width | Missing: OpenSceneGraph's quad buffer, or full side by side declared. |
 | Spring 106, Flare 1.15, Cube 2, FIFE 0.4.3, KDE's libkdegames | No stereo request | Missing. |
+| Amoebius (Froglet's C# engine, Silk.NET and its bundled GLFW 3.4.0, OpenGL 3.3) | No stereo request; a `Camera.stereoEnabled` stub | Proved in the rig on 2026-11-10: the window is declared full side by side through libstereo-declare on its X11 handles, the two eyes are drawn into its halves, the separation comes from the window's depth limits ([the recipe](../stereo-two-cameras/references/csharp-opengl-engine-two-eyes.md)). |
 
 "Missing" is the next piece of work, in the engine's own window or camera code, proved in the rig like any program ([`stereo-two-cameras`](../stereo-two-cameras/SKILL.md) for the cameras).
 Zig, RenderDoc, GFXReconstruct, Hotspot, GitHub's CLI, Tiled and KDE's Kommit are not in Debian testing (2026-10-16), so the developer task cannot carry them yet.

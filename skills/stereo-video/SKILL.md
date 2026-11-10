@@ -3,15 +3,14 @@ metadata:
   requires-packages: mkvtoolnix
 name: stereo-video
 description: >-
-  Stereo video: the marks (frame packing SEI, MPEG-2 JP3D, MP4 st3d and sv3d, Matroska StereoMode), writers and
-  readers (x264, x265, mkvmerge, Kdenlive, UMS, FFmpeg, Qt Multimedia, mpv, VLC, Dragon), metadata precedence,
-  unpacking every packing by copying, 360 and VR180, depth video, the per-file eye swap. Load it when a 3D film plays
-  flat, the mark is lost after the first frame or a transcode, the eyes are swapped, a half side-by-side file is
-  pre-scaled, mpv shows one view, a depth map does not rotate, a StereoMode must be written back, a GPU encoder writes
-  no frame packing SEI, an FFmpeg hwaccel assertion fails in pthread_frame.c, VLC hangs after a minimize or leaves
-  full screen on Wayland, a player's output modes must go, or a Qt Multimedia player aborts with "Cannot make
-  QOpenGLContext current in a different thread" at the next file, or a player's video node logs "Handle type:
-  NoHandle" and copies every decoded frame through memory.
+  Stereo video: the marks (frame packing SEI, JP3D, st3d, sv3d, StereoMode), writers and readers (x264, x265,
+  mkvmerge, Kdenlive, UMS, FFmpeg, Qt Multimedia, mpv, VLC, Dragon), metadata precedence, unpacking by copying, 360
+  and VR180, depth video, the per-file eye swap. Load it when a 3D film plays flat, the mark is lost after the first
+  frame or a transcode, the eyes are swapped, a half side-by-side file is pre-scaled, mpv shows one view, a depth map
+  does not rotate, a StereoMode must be written back, a GPU encoder writes no SEI, an FFmpeg hwaccel assertion fails
+  in pthread_frame.c, VLC hangs after a minimize or leaves full screen on Wayland, a player's output modes must go, a
+  Qt Multimedia player aborts with "Cannot make QOpenGLContext current in a different thread" at the next file, or its
+  video logs "Handle type: NoHandle".
 ---
 
 # Stereo video, end to end

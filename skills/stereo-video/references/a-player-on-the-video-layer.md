@@ -1,6 +1,6 @@
 # A player on the engine's video layer
 
-Learned from ORDER 453 and 453b (November 2026): Dragon Player and Plank Player, both built on Qt Multimedia's `VideoOutput` stereo layer since 7 October 2026, made to say when the desktop refuses to show a video in 3D.
+Learned from ORDER 453, 453b and 453c (November 2026): Dragon Player and Plank Player, both built on Qt Multimedia's `VideoOutput` stereo layer since 7 October 2026, made to say when the desktop refuses to show a video in 3D.
 
 ## What the player keeps, what the engine does
 
@@ -21,7 +21,9 @@ The sentence is one for both players, in the nine languages, with the engine's o
 
 1. **Two rig images.** Take lane 448's `:red` (Qt Multimedia +stereo3d14) and `:green` (+stereo3d15) rig images (Stereo KWin, a QML runtime, the NVIDIA card through CDI), and install the player's debs in a throwaway container as root with apt: the published tree as a file repository (`deb [trusted=yes] file:/repo mashtabba main`, the image's own `sparky-stereo.sources` removed), the round's debs as a flat repository (`dpkg-scanpackages -m . /dev/null > Packages` and a `Release` with `Origin: Sparky Stereo OS`, so apt keeps the +15 build), Debian over https (`https-only-apt.sh`), then `docker commit -c 'CMD ["sh"]'`.
    "Today" is the published players on +14; "yours" is the new players on +15, installed from the debs, so the Depends are proved too.
-   Plank Player needs `qml6-module-org-kde-desktop` (its QML imports `org.kde.desktop`) and the image has to add it.
+   Plank Player needs `qml6-module-org-kde-desktop`: `app/main.cpp` selects that Qt Quick Controls style before loading `main.qml`.
+   The earlier rig added it explicitly because the package only recommended it; that workaround does not prove the package's dependencies.
+   See [required QML modules](../../edition-packaging/references/required-qml-modules.md) for the installation test.
 2. **One fresh Stereo KWin per case,** a fresh `HOME` and `XDG_CONFIG_HOME` (the per-file store of an earlier case must not decide a later one), the player started with a file argument, both eyes captured by ScreenShot2 after the video plays and again a few seconds later.
 3. **The refuse case:** `LD_PRELOAD=refuse-shim.so STEREO_REFUSE=1` (the shim of the proof rig). Today: the packed frame, red left of blue, in both eyes, 0 `kde_stereo_content` requests and a buffer attached to the video's subsurface at every frame (249 and 327 in the two players' runs). Yours: the left view in both eyes, the message in the window, 0 attaches.
    Count the attaches, not the subsurfaces: the layer makes its subsurface before the declaration, so `get_subsurface` is 1 in both (`tools/subsurface_attaches.py` reads KWin's `WAYLAND_DEBUG=server` log: the surfaces made a subsurface and the buffers attached and committed to each).
@@ -46,13 +48,39 @@ The sentence is one for both players, in the nine languages, with the engine's o
   Fix: `ROUND_SOURCES=qt6-multimedia` (the sources built earlier in the round are taken out of the published list). How found: the gate's one line, after `dh_builddeb`.
 - **Symptom:** `plank-player` prints `module "org.kde.desktop" is not installed` and no window opens in the rig image.
   Cause: its `Depends` name the Bigscreen module but not the Qt Quick Controls desktop style (`qml6-module-org-kde-desktop`), which a Plasma desktop always has.
-  Fix in the rig: install it (`apt-cache policy` first: the name is not `qqc2-desktop-style`). The package's `Depends` is a gap to close, reported with the evidence.
+  Fix in Plank `+stereo3d4`: add it to `Depends` in the shipped successor generator and the standalone template. Prove installation with recommendations off and no preinstalled style; see the packaging skill. `apt-cache policy` identifies the module name; it is not `qqc2-desktop-style`.
 - **Symptom:** after adding `breeze-icon-theme` and `plasma-integration` to the rig image to see the icon-only buttons, Dragon's controls bar never appeared again under the same fake pointer moves.
   Cause: the KDE platform theme changed the application's behaviour (and the window decoration), so the rig no longer measured the package. Fix: no icon theme; the buttons are found by position and read from a capture of the menu they open.
 - **Symptom:** Plank Player's 3D menu shows Swap Eyes enabled on a flat 2D clip, while Dragon greys it.
   Cause: the entry was listed with `needsStereo: false` (the Input Format entries are meant to stay open to a video that does not say it is 3D, and the swap was written beside them).
   Fix: `needsStereo: true` for the swap: a video that says nothing becomes 3D when the person picks its Input Format, and the entry is enabled from then on (Plank patch 0004).
   How found: the menu captured on the 2D clip and scrolled to its last entry; the same capture on the fixed build shows it greyed.
-- **Symptom (open):** Dragon's "Save the 3D Correction into the File..." entry is enabled on a 2D clip. It is not a correction for that clip; what it does there was not run.
+- **Symptom:** Dragon's "Save the 3D Correction into the File..." entry is enabled on a 2D clip. It is not a correction for that clip.
+  Investigation of the `+stereo3d10` source found that `ControlsBar.qml::canOfferSave` already checks stereo content, a changed correction, the view and a local file.
+  A minimal test on its Qt Quick Controls runtime reproduced a `Kirigami.Action` with `visible: false` whose generated menu item remained visible and enabled after opening the menu.
+  Check `menu.itemAt(index).visible` with the menu open; a closed menu makes all its children's effective visibility false and gives a misleading pass.
+  Dragon `+stereo3d11` uses an explicit `QQC2.MenuItem` with visibility, enabled state and hidden height bound to the existing `canOfferSave` predicate; both the question function and the save function guard that same predicate. Keep Input Format usable on 2D content so unmarked stereo can be identified. Check the open 2D menu, then the corrected 3D offer and its Cancel path; the offer itself never writes the media.
 - **Symptom:** `STEPS= run case ...` in a POSIX shell function did not reach the case script. Cause: a prefix assignment before a function call is not exported. Fix: `export` the names inside the function.
 - **Symptom:** `docker commit -c 'ENTRYPOINT []'` left `["sh"]` as the entry point and later `docker run IMAGE sh -c ...` failed with "sh: 0: cannot open sh". Cause: the image was built from a container started with `--entrypoint sh`. Fix: start the build container with the image's default entry point and `sh -c` as its command, and commit with `-c 'CMD ["sh"]'`.
+
+## Per-file corrections without a resume store
+
+Plank Player `+stereo3d3` reset both corrections for every source and had no resume-position store. `+stereo3d4` uses QtCore's QSettings with the organisation and application names already set by `app/main.cpp`: `PlankPlayer` and `PlankPlayer`. No framework was added for this key-value store.
+
+The file is `$XDG_CONFIG_HOME/PlankPlayer/PlankPlayer.conf`, normally `~/.config/PlankPlayer/PlankPlayer.conf`. The isolated run observed `/run/user/1000/config/PlankPlayer/PlankPlayer.conf`. Its `[StereoVideo]` group uses the same key scheme as Dragon: SHA-256 of `QUrl::toEncoded()` for the eye swap and that hash plus `.input` for the packing. The two applications use their own configuration files. There is no Plank resume position to put beside these keys, and no xattr, sidecar or file beside the media.
+
+On every source change, load that URL's choices. Save a change only for its URL. Returning packing to Automatic removes `.input`; switching swap off removes the unsuffixed key. A failed QSettings read or sync produces an on-screen message naming the settings file, translated into the nine required languages. Making the configuration directory unwritable in the isolated run produced that visible message with the actual path.
+
+The package proof used actual menu activation, file A / file B / back to A, then a new application process. On the default render loop, an unmarked full-side-by-side A with explicit full-side-by-side packing and eye swap lost both choices in `+stereo3d3` and restored both in `+stereo3d4`. B stayed automatic and unswapped. Clearing both choices left the config file empty. Media SHA-256, size, modification/change times and xattrs were unchanged. The half-side-by-side variant also passed with an explicitly selected basic render loop; its default threaded-loop source transition exposed an additional OpenGL context-affinity failure in both package versions, so that variant is not evidence of a successful threaded transition.
+
+## QML diagnostics: cause and proof
+
+- `PlayerPage.qml: ReferenceError: audioOutput is not defined`: the controls-bar `WheelHandler` refers to `audioOutput` outside the player's object scope. Upstream [merge request 86](https://invent.kde.org/multimedia/dragon/-/merge_requests/86), by Erich Seifert, contains commit `ae56fa67c9d5ff4742136a25b0071d18a4f7f047`. Dragon `+stereo3d11` carries the complete patch, with its author and upstream origin in the DEP-3 header. It binds to `player.audioOutput.volume` and restores the binding when scrolling ends, matching the video area's existing handler. `Applied-Upstream: no` records that the MR was open when checked on 10 November 2026. Test a scroll from a nonzero volume and another after an external volume change; absence of the diagnostic alone is insufficient.
+- `OverlayPopup.qml: ReferenceError: backgroundSource is not defined`: the effect's visibility reads an undeclared name. Bind it to `shaderSource.sourceItem !== null`, the property of its actual ShaderEffectSource. Verify the source and visible background with the popup open.
+- `IconToolButton.qml: Unable to assign [undefined] to QString`: `(action as Kirigami.Action)?.tooltip` yields `undefined` for a button without that action type, while `ToolTip.text` requires a string. Keep the typed action when present; use its tooltip, or the button's own text for a directly labelled button. Exercise action-backed and direct buttons and inspect their tooltip text, not just the log.
+
+The latter two failures had no matching upstream fix in the audited history, merge requests or issue search. They remain unfiled; the edition carries its own patches and sends nothing to KDE.
+
+The installed `+stereo3d11` rig run had zero occurrences of those three diagnostics. Native compositor wheel input over the controls bar changed volume from 0.80 to 0.95 and, after setting 0.40 externally, to 0.55; `+stereo3d10` jumped to 0.15 and then 0.30. Play/pause changed playback state, the direct forward button sought five seconds, the action-backed and directly labelled tooltips were strings, and the opened popup had a non-null source with its effect visible. A corrected 3D clip still opened the Save question; cancelling left the media hash unchanged. On 2D, the actual Save item was hidden, disabled and zero height, both entry functions returned without a dialog or write, Swap stayed disabled, and Input Format remained enabled.
+
+For the proof driver, take the window position from KWin and add Qt's client-side frame margins when translating an item's coordinates on Wayland. A raw `mapToGlobal()` alone does not establish the compositor's global position. Scroll over a tool button on the controls bar when testing its WheelHandler: the seek slider consumes the event. Inspect a ShaderEffectSource through its source and effect properties, not a presumed visual parent; internal effect objects may have no QML context and must not be passed to a QML expression evaluator.

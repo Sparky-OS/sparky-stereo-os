@@ -203,6 +203,9 @@ On a fork, Scorecard mostly measures upstream's code and settings, so a fork's l
 
 ## Proof before shipping
 
+For a QML application that fails before opening its window, check [required QML modules and selected styles](references/required-qml-modules.md).
+Install the player without recommendations in the proof; a required QML module must arrive through `Depends`.
+
 Use [the KDE development checks](../native-linux/references/kde-development-practices.md) when packaging changed KDE applications: fresh message extraction, installed translations, relevant QML/static analysis and required CI results.
 Preserve operational comments through their consuming build steps; Lean Code qualification includes generators and extraction, not only compiler token equivalence.
 

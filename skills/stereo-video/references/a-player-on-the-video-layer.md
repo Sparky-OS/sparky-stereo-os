@@ -21,7 +21,9 @@ The sentence is one for both players, in the nine languages, with the engine's o
 
 1. **Two rig images.** Take lane 448's `:red` (Qt Multimedia +stereo3d14) and `:green` (+stereo3d15) rig images (Stereo KWin, a QML runtime, the NVIDIA card through CDI), and install the player's debs in a throwaway container as root with apt: the published tree as a file repository (`deb [trusted=yes] file:/repo mashtabba main`, the image's own `sparky-stereo.sources` removed), the round's debs as a flat repository (`dpkg-scanpackages -m . /dev/null > Packages` and a `Release` with `Origin: Sparky Stereo OS`, so apt keeps the +15 build), Debian over https (`https-only-apt.sh`), then `docker commit -c 'CMD ["sh"]'`.
    "Today" is the published players on +14; "yours" is the new players on +15, installed from the debs, so the Depends are proved too.
-   Plank Player needs `qml6-module-org-kde-desktop` (its QML imports `org.kde.desktop`) and the image has to add it.
+   Plank Player needs `qml6-module-org-kde-desktop`: `app/main.cpp` selects that Qt Quick Controls style before loading `main.qml`.
+   The earlier rig added it explicitly because the package only recommended it; that workaround does not prove the package's dependencies.
+   See [required QML modules](../../edition-packaging/references/required-qml-modules.md) for the installation test.
 2. **One fresh Stereo KWin per case,** a fresh `HOME` and `XDG_CONFIG_HOME` (the per-file store of an earlier case must not decide a later one), the player started with a file argument, both eyes captured by ScreenShot2 after the video plays and again a few seconds later.
 3. **The refuse case:** `LD_PRELOAD=refuse-shim.so STEREO_REFUSE=1` (the shim of the proof rig). Today: the packed frame, red left of blue, in both eyes, 0 `kde_stereo_content` requests and a buffer attached to the video's subsurface at every frame (249 and 327 in the two players' runs). Yours: the left view in both eyes, the message in the window, 0 attaches.
    Count the attaches, not the subsurfaces: the layer makes its subsurface before the declaration, so `get_subsurface` is 1 in both (`tools/subsurface_attaches.py` reads KWin's `WAYLAND_DEBUG=server` log: the surfaces made a subsurface and the buffers attached and committed to each).
@@ -54,5 +56,34 @@ The sentence is one for both players, in the nine languages, with the engine's o
   Fix: `needsStereo: true` for the swap: a video that says nothing becomes 3D when the person picks its Input Format, and the entry is enabled from then on (Plank patch 0004).
   How found: the menu captured on the 2D clip and scrolled to its last entry; the same capture on the fixed build shows it greyed.
 - **Symptom (open):** Dragon's "Save the 3D Correction into the File..." entry is enabled on a 2D clip. It is not a correction for that clip; what it does there was not run.
+  Investigation of the `+stereo3d10` source found that `ControlsBar.qml::canOfferSave` already checks stereo content, a changed correction, the view and a local file.
+  A minimal test on its Qt Quick Controls runtime reproduced a `Kirigami.Action` with `visible: false` whose generated menu item remained visible and enabled after opening the menu.
+  Check `menu.itemAt(index).visible` with the menu open; a closed menu makes all its children's effective visibility false and gives a misleading pass.
+  Bind the actual menu item's visibility and availability, and test the application's full offer and acceptance paths before calling the package fixed.
 - **Symptom:** `STEPS= run case ...` in a POSIX shell function did not reach the case script. Cause: a prefix assignment before a function call is not exported. Fix: `export` the names inside the function.
 - **Symptom:** `docker commit -c 'ENTRYPOINT []'` left `["sh"]` as the entry point and later `docker run IMAGE sh -c ...` failed with "sh: 0: cannot open sh". Cause: the image was built from a container started with `--entrypoint sh`. Fix: start the build container with the image's default entry point and `sh -c` as its command, and commit with `-c 'CMD ["sh"]'`.
+
+## Follow-up source checks before changing a player
+
+Plank Player `+stereo3d3` resets `stereoInput` to automatic and `stereoSwapEyes` to false in `app/qml/main.qml::onSourceChanged`.
+Its application source has no resume-position or per-file settings store.
+Do not mistake its seek bar's current position for a persisted resume position.
+For a player without a store, put per-file choices in its own configuration location, using its existing application identity; Plank sets both the organisation and application name to `PlankPlayer` in `app/main.cpp`.
+Record the actual settings path when the implementation is tested.
+Keep the media files unchanged, key choices by file URL, and verify file A, file B, back to A and a fresh application process.
+Returning a choice to its default should clear that choice's entry.
+This describes the required follow-up; it does not claim that `+stereo3d3` persists either choice.
+
+The three recurring Dragon QML diagnostics have distinct source sites:
+
+- `PlayerPage.qml: ReferenceError: audioOutput is not defined`: the controls-bar `WheelHandler` refers to `audioOutput` outside the player's object scope.
+  Upstream [merge request 86](https://invent.kde.org/multimedia/dragon/-/merge_requests/86), by Erich Seifert, contains commit `ae56fa67c9d5ff4742136a25b0071d18a4f7f047`.
+  It binds to `player.audioOutput.volume` and restores the binding when scrolling ends, matching the video area's existing handler.
+  The complete patch applies to the `+stereo3d10` source; it was open at the source audit, so recheck its state before carrying it with its author.
+  Test a scroll from a nonzero volume and another after an external volume change, not just the absence of the diagnostic.
+- `OverlayPopup.qml: ReferenceError: backgroundSource is not defined`: the effect's visibility reads an undeclared name although its shader source is a separately declared object.
+  Trace the effect's actual `source` and the `ShaderEffectSource.sourceItem`; do not suppress the warning.
+  Verify the background while the popup is open after fixing the reference.
+- `IconToolButton.qml: Unable to assign [undefined] to QString`: the optional cast `(action as Kirigami.Action)?.tooltip` produces `undefined` for buttons without that action type, while `ToolTip.text` requires a string.
+  Audit both action-backed and directly labelled buttons, and verify their tooltip text and activation.
+  An error-free log alone does not prove those controls work.

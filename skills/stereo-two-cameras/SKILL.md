@@ -75,6 +75,8 @@ Motion in such a scene that is computed and not stored (a clock's `reverse`, a s
 
 Eight engines (three.js, A-Frame, Babylon.js, PlayCanvas, react-three-fiber, model-viewer, Spark, CesiumJS) through the browser's two routes, one scene, a prediction from the session's own views, controls that must fail, and what each engine needs from the browser: [references/web3d-engines-in-the-browser.md](references/web3d-engines-in-the-browser.md).
 
+A finished page you did not write (a three.js screensaver with a cube-map sky and bloom): freeze it with its own frame cap, read its camera, predict through the hack and the post pass, find a sky that stands in front of the screen with a dense disparity map, and the 23 line fix on the page: [references/web3d-engines-in-the-browser.md](references/web3d-engines-in-the-browser.md), section on a finished page.
+
 ## Reading a web 3D project before it goes on a list
 
 Which licence, which AI position, whether it can be built from source, which stereo field it has (or none) and whether a native program can sit inside the browser are read from the project's own repository, not from its web page: the recipe, the read-only commands and the traps (NOASSERTION, a bulk licence folder, source-available viewers, code search that lags) are in [references/reading-a-web-3d-project.md](references/reading-a-web-3d-project.md).

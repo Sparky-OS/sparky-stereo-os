@@ -8,7 +8,7 @@ Daniel's rule (memory no-silent-fallbacks, 2026-11-01): when a step cannot do wh
 
 1. Read the cause from the failed attempt itself: the unit's invocation in the journal (`INVOCATION_ID` / `_SYSTEMD_INVOCATION_ID`), then the kernel's lines between its first and last line.
    `MONITOR_INVOCATION_ID`, `MONITOR_UNIT`, `MONITOR_EXIT_STATUS` and `MONITOR_SERVICE_RESULT` reach the engine's handler from systemd (systemd.service(5)).
-2. Give the problem its own message (LOCALnn in the package's lang/, nine languages) built from nested messages: `args` are `[["LOCALphrase"], ["LOCALreason", device, error]]`, and `more` holds the what-to-do sentence as `["LOCALfix", args]`.
+2. Give the problem its own message (LOCALnn in the package's lang/, ten languages) built from nested messages: `args` are `[["LOCALphrase"], ["LOCALreason", device, error]]`, and `more` holds the what-to-do sentence as `["LOCALfix", args]`.
 3. Classify each cause as one that stays or one that can pass.
    Stays: the record has an empty `repair`, the text says "Repair is not offered", and the problem ends when the unit is no longer `failed` (the next attempt that works).
    Can pass or unknown: keep `["systemctl","restart",UNIT]` and say what Repair does ("starts the operation again, which puts the computer to sleep again").

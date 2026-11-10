@@ -55,7 +55,7 @@ A pack is a Debian package `sparky-stereo-<thing>` in Paweł's formula ([`editio
   {"file": "sparky-stereo-mkv-mark", "icon": "video-x-generic",
    "mime": ["video/x-matroska", "video/webm", "video/x-matroska-3d"],
    "urls": {"min": 1},
-   "submenu": {"en": "Mark as 3D", "pl": "...", "pt_BR": "...", "fr": "...", "de": "...", "ja": "...", "ko": "...", "zh_CN": "...", "zh_TW": "..."},
+   "submenu": {"en": "Mark as 3D", "pl": "...", "pt_BR": "...", "fr": "...", "de": "...", "es": "...", "ja": "...", "ko": "...", "zh_CN": "...", "zh_TW": "..."},
    "actions": [{"id": "Mark1", "args": ["1"], "name": {"en": "Side by side, left eye first", "...": "..."}}]}
  ]
 }
@@ -65,7 +65,7 @@ A pack is a Debian package `sparky-stereo-<thing>` in Paweł's formula ([`editio
 - `worker` is the installed executable that does the work; it receives the action's `args`, then `--`, then the files.
 - Each entry of `menus` becomes one ordinary Dolphin service menu, `/usr/share/kio/servicemenus/<file>.desktop`, with `MimeType`, `Actions`, `X-KDE-Submenu` and the `urls` limits (`required`, `min`, `max`, KIO's `X-KDE-RequiredNumberOfUrls`, `X-KDE-MinNumberOfUrls`, `X-KDE-MaxNumberOfUrls`); every action's `Exec` is `sparky-stereo-integration run <id> <args> -- %F`.
 - The generator also writes `/usr/share/sparky-stereo/integrations.d/<id>.conf` (`program=`, `worker=`, `menus=`), which the runner reads.
-- Every text exists in the nine required languages, en, pl, pt_BR, fr, de, ja, ko, zh_CN and zh_TW, or the generator stops. The worker's own messages live in `/usr/share/sparky/<package>/<code>` as `LOCAL1` to `LOCALn`, chosen as the other Sparky tools choose (the whole `LANG`, then the bare language, then English; Chinese keeps its territory).
+- Every text exists in the ten required languages, en, pl, pt_BR, fr, de, es, ja, ko, zh_CN and zh_TW, or the generator stops. The worker's own messages live in `/usr/share/sparky/<package>/<code>` as `LOCAL1` to `LOCALn`, chosen as the other Sparky tools choose (the whole `LANG`, then the bare language, then English; Chinese keeps its territory).
 - A pack gets its MIME list from the files it can really handle, never `image/*` or `video/*`: stereo actions must not show on plain files. A pair action on two pictures is the exception that the number of files makes (`urls.required: [2]`).
 - Keep one table of words per pack (`gen.py` in the two first packs writes `pack.json` and the language files from it), so the menu and the worker say the same thing.
 
@@ -117,7 +117,7 @@ A dpkg file trigger (`interest-noawait <the program's folder>`) is for state tha
 
 ## Step 3: package it
 
-`sparky-stereo-<thing>`, `Maintainer: Daniel Ramos (Capitain Jack)`, `Homepage: https://sparkylinux.org`, `copyright` with every upstream credit kept, `lang/` in the nine languages, version `0.MINOR.PATCH+lc1`.
+`sparky-stereo-<thing>`, `Maintainer: Daniel Ramos (Capitain Jack)`, `Homepage: https://sparkylinux.org`, `copyright` with every upstream credit kept, `lang/` in the ten languages, version `0.MINOR.PATCH+lc1`.
 Add the row to `lists/integrations.tsv`; `make-meta.py` does the rest.
 Build with the Lean Code toolkit (`lean.standalone`, then `check-debs` and `check-link`), stage with a `SHA256SUMS`; the main session signs and publishes.
 

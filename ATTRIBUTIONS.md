@@ -174,6 +174,8 @@ Our KDE changes live in forks on invent.kde.org, offered back to KDE as one patc
 
 **Credit**: the KDE community; the people of each KDE program are named in the sections below.
 
+**Spanish wording**: the Spanish strings of the edition take the interface terms of KDE's own Spanish catalogues (KScreen, KWin, Dolphin, Gwenview, System Settings) as their glossary; those catalogues are the work of KDE's Spanish translation team, in these files by Eloy Cuadra.
+
 ### 0.3.1 Desktop search, recovery and file management
 
 The edition's desktop defaults and small patches ([kde-desktop-defaults](skills/kde-desktop-defaults/SKILL.md)) build on these KDE projects.

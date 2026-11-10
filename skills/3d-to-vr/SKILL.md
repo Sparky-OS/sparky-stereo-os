@@ -294,7 +294,7 @@ Use an authenticated structured handoff for the Catch frontend, preserving ordin
 Share KRDC's FreeRDP session instead of creating another transport.
 Its current QWidget view scales a complete image; each-eye unpacking, fitting and lens correction still need implementation.
 
-Keep all five link layouts, the same panel identity and approval rules, fitted/QR/uncorrected profiles, stereo waiting scenes and nine locales.
+Keep all five link layouts, the same panel identity and approval rules, fitted/QR/uncorrected profiles, stereo waiting scenes and ten locales.
 Measure physical panel pixels through output metadata rather than treating Qt's scaled window dimensions as native resolution.
 Cardboard's profile and distortion math can be reused, but its Android build includes JNI and platform-specific services; a Linux adapter is work to implement.
 

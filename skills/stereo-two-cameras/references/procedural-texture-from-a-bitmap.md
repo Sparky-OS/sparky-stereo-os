@@ -197,6 +197,94 @@ No code metric decides anything. The graph's bytes are written beside each sheet
 - Symptom: the local vision model answers 404 and the cloud one 429.
   Fix: record the refusals word for word and use another independent model that can look at pictures; never invent a second opinion.
 
+## Relief the artist's way, and stereo textures that only sink (ORDER 473y)
+
+Daniel's request: "Building the relief - do it traditionally, but also consider stereo textures here, this is my request, always sunk or screen level, otherwise the POV can render incorrect popping things - meaning that regular rendering shows one side, stereo rendering actually has sunk levels".
+
+### The relief, as werkkzeug3's artists built it
+
+The relief is one grey picture, the height, made of several shapes and noises multiplied together, and it is used three times.
+`Merge a,b,c 2` multiplies the parts into the height `h`.
+`Color h 1 #ffa0a0a0` lifts it, and a multiply over the colour darkens the hollows.
+`Normals h 0.08 to 0.5` then `Bump colour,normals` lights it.
+The parts that worked, per kind of surface (the graphs are in `procedural-texture-fit/werkkzeug/examples/relief-*.txt`):
+
+- Bark: two `Cell` layers stretched along the trunk and bent by `Distort` for the furrows, a stretched `Perlin` for the plates, a fine `Perlin` for the fibre and a coarse one for the crust.
+- Brick: the `Bricks` joints, a sparse `Perlin` with high gamma for the chips, a fine one for the grain; the lime specks are colour only.
+- Plaster: a soft `Perlin` for the lumps and a very sparse one (gamma 9) for the pits.
+- Stone tiles: the slabs' joints from thin `GlowRect` lines, a `Cell` crackle only inside the slate slabs through `Mask`.
+- Wood for a panel: the game's wood (a stretched `Perlin`), two knots from `GlowRect`, the joint between planks as the only deep line.
+
+```sh
+KTG_IMAGE=image PYTHONPATH=werkkzeug python3 werkkzeug/relief_look.py BUILD TILE.png SHEET.jpg GRAPH.txt
+# writes GRAPH.png (lit), GRAPH-height.png (the operator named h) and a sheet: tile | lit | height
+```
+
+### The height is also the depth, and the depth only sinks
+
+White in the height is the surface and has zero parallax.
+Black is the deepest point and lies behind it.
+Nothing stands in front of the surface, so a tile's outline, a wall's corner and a panel's edge stay where the flat geometry puts them in both eyes.
+A relief that stands in front must show its side past the outline, which a flat tile cannot draw: that is the popping Daniel names.
+Relief mapping already works this way: Policarpo, Oliveira and Comba (2005) store depth from 0.0 at the surface to 1.0, and a ray enters the surface and is searched (linear steps, then a refinement) for the first point it meets; Tatarchuk (2006) does the same search with a height field below the polygon.
+For stereo the search runs once per eye, with each eye's own ray, and the lit colour is the same in both eyes because the light is baked.
+
+```sh
+python3 werkkzeug/stereo_tile.py --setup            # prints the viewing setup the numbers are stated for
+python3 werkkzeug/stereo_tile.py LIT.png HEIGHT.png OUT            # sunk
+python3 werkkzeug/stereo_tile.py LIT.png HEIGHT.png OUT-POPPED --popped   # the wrong case, as a control
+# writes OUT-sbs-3840x1080.png (full side by side, left eye first), OUT-sbs-tile.png and OUT-anaglyph.png
+```
+
+The setup of the first run: 1920 pixels on a screen 1.21 m wide seen from 2.5 m with eyes 65 mm apart; the deepest point has 10 pixels of parallax (the desktop's default limit for sunk elements at 1920), which is 6.3 mm on the screen and about 0.27 m behind it.
+The script tests itself first: a mark on the floor of a wide pit must come out uncrossed by the whole depth, the popped control crossed, the flat control identical.
+
+### A flat element with a stereo texture: the wood panel
+
+`panel.py` draws a desktop bar whose wood is sunk below the bar's plane (4 pixels at the deepest, the lane's choice) while the icons and the clock are the same in both eyes, at the bar's plane.
+A theme can carry this as three things: the graph of the wood, the name of its height operator, and one depth value that may only be "sunk by at most N".
+SVGStereo 0.4 can say one level for an element (`svgstereo:depth="sunk"`), so a filled area sinks as a whole.
+It cannot say a depth that varies inside one fill; today that is drawn as separate elements at a few sunk levels.
+
+### A scene to look at, and real stereo photographs beside the procedure
+
+`scene.py TEXDIR OUTDIR` renders a room corner (tile floor, brick wall, plaster wall, bark post) once in 2D and as stereo pairs: two cameras with parallel axes and off-axis projections, zero parallax at the nearest thing in view, the relief sunk per eye.
+It is a picture to judge by, not a renderer.
+`real_pair.py REAL.jpg cross|parallel PROCEDURAL-sbs-tile.png OUT` puts a real stereo photograph beside a procedural pair, both left eye first at the same size.
+
+### What the first run found
+
+- A relief built from three to five parts reads as relief and as the right kind of surface for bark, brick, plaster and tiles; it stays more regular than the photograph, and the second judge's words are in the lane's evidence.
+- With true sizes the relief's own parallax is small at 1920 pixels and a 50 degree view: about half a pixel for a brick joint 15 mm deep at 2 m and for a tile joint 6 mm deep at 1.3 m, a little over one pixel for bark furrows 25 mm deep at 1.6 m (computed from the cameras, not measured on the pictures). The surfaces' places in the room carry the depth, and the relief shows in the light. The tile pictures at 10 pixels are an exaggeration, said as such.
+- A real stereo photograph of bark has flakes that stand tens of pixels in front of the trunk; the sunk-only tile cannot and should not copy that. Such parts are geometry, or a separate element at its own level.
+- Open stereo photographs of a single flat surface are rare: for bark and ground Wikimedia Commons had usable pairs (Robbie Sproule, CC BY 2.0); for a brick wall, plaster and stone tiles none was found, and none was substituted.
+
+### Traps of the relief and stereo round
+
+- Symptom: the self-test measures 2 pixels where 10 were set.
+  Cause: the test mark sat in a narrow pit, whose walls hide the floor from each eye.
+  Fix: test a mark on the floor of a wide pit.
+  Found by: widening the pit until the number stopped changing.
+- Symptom: a real stereo photograph looks inside out after it is placed left eye first.
+  Cause: it was a cross-eyed pair; its left half is the right eye's view.
+  Fix: read the page's own words ("cross eyed", "parallel") and swap the halves; check with a near thing against a far one.
+- Symptom: chips or pits cover the whole surface like lava.
+  Cause: a `Perlin` used as a mask without amplify and gamma.
+  Fix: amplify 2 to 3 and gamma 2 to 9 make it sparse; `HSCB` is not a threshold.
+- Symptom: the bark looks like pleated cloth.
+  Cause: one `Cell` layer, evenly stretched.
+  Fix: a second layer at another scale, a `Distort`, and a coarse noise multiplied over all.
+- Symptom: the popped control looks the same as the sunk picture on a far wall.
+  Cause: at that distance the relief's parallax is under a pixel either way.
+  Fix: judge the control on the nearest surface, or on the tile pictures.
+- Symptom: a model says an anaglyph "looks deep".
+  Cause: it reads colour fringes, it does not fuse them.
+  Fix: ask it which side the red fringe lies on and where; a person with glasses or a 3D screen gives the judgement.
+- Symptom: a judge reading a red-cyan picture calls a thing popped that the cameras put behind the screen.
+  Cause: the rule "red to the left of cyan is behind" holds for a feature brighter than its surround; for a dark feature on a light ground (a post against a pale floor, a dark furrow) the colours come out the other way round.
+  Fix: say in the judge's brief whether each feature is lighter or darker than what is behind it, or give it the two eyes as separate pictures and ask which way the feature moved.
+  Found by: the second judge read the dark post's cyan left edge as popped while the scene's nearest point is the zero-parallax plane.
+
 ## Where it fails
 
 - Photographic and scanned detail: nothing small predicts it.
@@ -236,4 +324,4 @@ No code metric decides anything. The graph's bytes are written beside each sheet
 
 ## Credits
 
-OpenKTG: Fabian "ryg" Giesen. werkkzeug3: Dierk Ohlerich, Fabian Giesen, Thomas Mahlke, Christoph Muetze, Tammo Hinrichs and Bastian Zuehlke, as its licence names them. The pictures of the first run: Poly Haven, CC0. MaterialX: the Academy Software Foundation's project, its standard nodes document by Doug Smythe and Jonathan Stone.
+OpenKTG: Fabian "ryg" Giesen. werkkzeug3: Dierk Ohlerich, Fabian Giesen, Thomas Mahlke, Christoph Muetze, Tammo Hinrichs and Bastian Zuehlke, as its licence names them. The pictures of the first run: Poly Haven, CC0. Relief mapping: Fábio Policarpo, Manuel M. Oliveira and João L. D. Comba (2005). Parallax occlusion mapping: Natalya Tatarchuk (2006). The stereo photographs of bark and ground: Robbie Sproule, CC BY 2.0, on Wikimedia Commons. MaterialX: the Academy Software Foundation's project, its standard nodes document by Doug Smythe and Jonathan Stone.

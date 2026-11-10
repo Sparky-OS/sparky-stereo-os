@@ -7,6 +7,8 @@ Inventory the organisation as well as the launcher: ArtCraft and ArtCraft-X are 
 ArtCraft's November main has both its Tauri/Three.js frontend and a new `artcraft-native` egui frontend.
 Select rules by the actual repository and frontend; do not assume every app has the same renderer or gate.
 Craft Status and Craft PR Review are development tools; Spark is a renderer dependency.
+The launcher also lists approved community apps, currently SolidCraft and MailCraft, whose independent ownership and contribution rules remain explicit.
+A catalog listing is not permission to transplant their UI or approve another third-party app.
 
 ## Working recipe
 
@@ -30,6 +32,18 @@ Craft Status and Craft PR Review are development tools; Spark is a renderer depe
    A fix, explanation or agreed plan resets the clock; unrelated activity does not.
    Waiting on the maintainer pauses it; unconfirmed bot suggestions do not start it.
    Reuse searches and stop at a rate limit.
+
+## Local policies differ
+
+AniCraft requires crates.io-only dependencies and a cargo-deny gate.
+A shared library existing in craft-libs does not establish that an unpublished git dependency is permitted there.
+TextureCraft and MaterialCraft explicitly put shared code in craft-libs; FigCraft and Craft Anything retain no-code-sharing text.
+Read the actual dependency boundary and resolve it before wiring an adapter, without silently editing policy.
+DeckCraft excludes some vendor-designed font families even when open; PdfCraft allows OFL releases under its own attribution rules.
+PdfCraft’s hashed `ATTRIBUTION.toml` is authoritative and its Markdown index is generated.
+WordCraft proofing tests need the pinned craft-i18n input as well as the optional font input.
+SoundCraft’s reference-video work stays outside its real-time audio callback.
+Launcher time uses Jiff under its local rule, rather than adding Chrono beside it.
 
 ## The closure that exposed the gap
 

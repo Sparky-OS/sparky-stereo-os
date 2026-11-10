@@ -226,6 +226,8 @@ The recipe, the coexistence rules with their specification clauses, the proof an
 
 ## Lessons from the lanes, October to November 2026
 
+[Adding a required language to the whole edition](references/adding-a-required-language.md): the audit, where language lists hide, the generator and test traps.
+
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (114 entries).
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 

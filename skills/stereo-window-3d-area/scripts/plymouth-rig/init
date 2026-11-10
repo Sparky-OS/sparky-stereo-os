@@ -16,7 +16,7 @@ ls /dev/dri
 udevadm trigger --action=add
 udevadm settle --timeout=20
 mkdir -p /run/plymouth
-plymouthd --mode=boot --graphical-boot --no-daemon --debug --debug-file=/run/ply.log --tty=/dev/tty1 >/run/ply.out 2>&1 &
+plymouthd --mode=boot --graphical-boot --no-daemon --debug --debug-file=/run/ply.log >/run/ply.out 2>&1 &
 sleep 1.5
 plymouth show-splash
 echo "RIG: SPLASH-UP"
@@ -24,7 +24,8 @@ sleep ${RIG_SECONDS:-14}
 echo "RIG: ---- plymouthd output"
 cat /run/ply.out
 echo "RIG: ---- plymouthd debug log (stereo lines)"
-grep -E "Stereo output|depth limit|Found mode|No mode|stereo head|theme draws|takes one picture|no depth|is no depth" /run/ply.log
+# plymouth.debug=stream: on the kernel line sends its trace and errors to /run/ply.log: what it said about the stereo outputs
+grep -E "Stereo output|depth limit|no depth|no popped|no sunk|is no depth|stereo head|theme draws" /run/ply.log | sed "s/^[0-9:.]* [^ ]*: *//" | cut -c1-230
 echo "RIG: DONE"
 plymouth quit 2>/dev/null
 echo o > /proc/sysrq-trigger

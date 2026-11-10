@@ -1,5 +1,5 @@
 #!/usr/bin/python3 -I
-# One guest boot of the rig (environment: KVER, the kernel under /boot): QEMU with a virtio-vga that takes stereo modes, the splash's screen read through QMP
+# One guest boot of the rig: QEMU with a virtio-vga that takes stereo modes, the splash's screen read through QMP
 # (screendump), the guest's console in a file. usage: run-case.py OUTDIR TAG INITRD 'KERNEL ARGS' [SHOTS]
 import json, os, socket, subprocess, sys, time
 
@@ -14,7 +14,7 @@ for p in (qmp_path, serial):
         os.unlink(p)
 cmd = ['qemu-system-x86_64', '-name', 'plymouth-rig-' + tag, '-machine', 'q35,accel=kvm', '-cpu', 'host', '-smp', '2', '-m', '3G',
        '-kernel', '/boot/vmlinuz-' + kver, '-initrd', initrd,
-       '-append', 'console=ttyS0 rdinit=/init loglevel=3 ' + args,
+       '-append', 'console=ttyS0 rdinit=/init loglevel=3 plymouth.debug=stream:/run/ply.log ' + args,
        '-device', 'virtio-vga,xres=1920,yres=1080,stereo=on,max_hostmem=1G', '-display', 'none',
        '-qmp', 'unix:%s,server=on,wait=off' % qmp_path, '-serial', 'file:' + serial, '-monitor', 'none', '-nic', 'none']
 vm = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=open(os.path.join(out, tag + '.qemu.log'), 'w'))

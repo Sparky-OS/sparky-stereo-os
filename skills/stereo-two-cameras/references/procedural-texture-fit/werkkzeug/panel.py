@@ -4,25 +4,22 @@
 The panel is a flat element drawn once per eye. Its plane has zero parallax; the wood's grooves and
 the joint between planks lie behind it, each eye's texture shifted by that depth; the icons and the
 clock's text sit on the panel's plane and are the same in both eyes. No 3D scene.
+The wood is used at the size it was drawn (a 256 pixel tile, 48 of its rows), never resized, and
+it repeats along the bar, so the shift uncovers nothing at the screen's edges and no column is lost.
 
-Usage: panel.py WOOD_LIT.png WOOD_HEIGHT.png OUT_PREFIX [--popped]
+Usage: panel.py WOOD_LIT.png WOOD_HEIGHT.png OUT_PREFIX [SUNK_PIXELS]
+Writes OUT_PREFIX-2D.png and OUT_PREFIX-3D.pns (full side by side, left eye first, marked).
 """
+import argparse
 import sys
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-import stereo_tile
+import pns
+import stereo_texture
 
-W, H, BAR = 1920, 1080, 48
-stereo_tile.SUNK_PX = 4.0          # the deepest groove: 4 pixels between the eyes at 1920 wide (the lane's choice)
-
-
-def strip(path, mode):
-    t = Image.open(path).convert(mode).resize((192, 192), Image.LANCZOS)
-    a = np.asarray(t).astype(np.float32)
-    a = np.concatenate([a] * 10, 1)[60:60 + BAR, :W]
-    return a
+W, H, BAR, ROW = 1920, 1080, 48, 60
 
 
 def desktop(bar):
@@ -44,20 +41,15 @@ def desktop(bar):
 
 def main():
     lit, height, prefix = sys.argv[1:4]
-    popped = "--popped" in sys.argv
-    stereo_tile.selftest()
-    c, h = strip(lit, "RGB"), strip(height, "L") / 255.0
-    d = 1 - h
-    left = stereo_tile.march(c, d, -1, popped)
-    right = stereo_tile.march(c, d, +1, popped)
-    L, R = desktop(left), desktop(right)
-    Image.fromarray(desktop(c)).save(prefix + "-2D.png")
-    Image.fromarray(np.concatenate([L, R], 1)).save(prefix + "-sbs-3840x1080.png")
-    a = np.stack([L[..., 0], R[..., 1], R[..., 2]], -1)
-    Image.fromarray(a).save(prefix + "-anaglyph.png")
-    # the panel alone, three times enlarged, for a close look
-    z = Image.fromarray(a[H - BAR - 8:, :640]).resize((1920, (BAR + 8) * 3), Image.NEAREST)
-    z.save(prefix + "-anaglyph-panel-enlarged.png")
+    sunk = float(sys.argv[4]) if len(sys.argv) > 4 else 4.0   # the deepest groove, in pixels between the eyes
+    stereo_texture.selftest()
+    c = np.asarray(Image.open(lit).convert("RGB")).astype(np.float32)[ROW:ROW + BAR]
+    h = np.asarray(Image.open(height).convert("L")).astype(np.float32)[ROW:ROW + BAR]
+    a = argparse.Namespace(sunk=sunk, pop=0.0, black=0.0, surface=255.0, white=255.0)
+    along = lambda s: np.concatenate([s] * (W // s.shape[1] + 1), 1)[:, :W]
+    left, right = (along(e) for e in stereo_texture.pair(c, h, a))
+    Image.fromarray(desktop(along(c))).save(prefix + "-2D.png")
+    print(prefix, pns.write(prefix + "-3D.pns", desktop(left), desktop(right)))
 
 
 if __name__ == "__main__":

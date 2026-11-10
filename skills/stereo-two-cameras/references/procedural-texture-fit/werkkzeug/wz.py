@@ -17,7 +17,7 @@ _n = [0]
 def render(build, script):
     """script: the text for wzrender. Returns an RGB uint8 array, or raises with wzrender's message."""
     _n[0] += 1
-    cmd = ["docker", "run", "--rm", "-i", "--name", "x3d-473x-%d-%d" % (os.getpid(), _n[0]), "--network", "none",
+    cmd = ["docker", "run", "--rm", "-i", "--name", "procedural-texture-%d-%d" % (os.getpid(), _n[0]), "--network", "none",
            "--ulimit", "core=0", "--cpus", "1", "--user", "%d:%d" % (os.getuid(), os.getgid()),
            "-v", build + ":" + build + ":ro", os.environ["KTG_IMAGE"], build + "/wzrender"]
     r = subprocess.run(cmd, input=script.encode(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)

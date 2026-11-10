@@ -220,7 +220,7 @@ KTG_IMAGE=image PYTHONPATH=werkkzeug python3 werkkzeug/relief_look.py BUILD TILE
 # writes GRAPH.png (lit), GRAPH-height.png (the operator named h) and a sheet: tile | lit | height
 ```
 
-### The height is also the depth, and the depth only sinks
+### The height is also the depth: at the surface or behind it
 
 White in the height is the surface and has zero parallax.
 Black is the deepest point and lies behind it.
@@ -230,27 +230,38 @@ Relief mapping already works this way: Policarpo, Oliveira and Comba (2005) stor
 For stereo the search runs once per eye, with each eye's own ray, and the lit colour is the same in both eyes because the light is baked.
 
 ```sh
-python3 werkkzeug/stereo_tile.py --setup            # prints the viewing setup the numbers are stated for
-python3 werkkzeug/stereo_tile.py LIT.png HEIGHT.png OUT            # sunk
-python3 werkkzeug/stereo_tile.py LIT.png HEIGHT.png OUT-POPPED --popped   # the wrong case, as a control
-# writes OUT-sbs-3840x1080.png (full side by side, left eye first), OUT-sbs-tile.png and OUT-anaglyph.png
+KTG_IMAGE=image PYTHONPATH=werkkzeug python3 werkkzeug/draw.py BUILD GRAPH.txt     # GRAPH.png, GRAPH-height.png, GRAPH-depth.png at the graph's own size
+python3 werkkzeug/stereo_texture.py GRAPH.png GRAPH-depth.png OUT.pns --sunk 10 --pop 3 --black 25 --surface 128 --white 165
+python3 werkkzeug/pns.py OUT.pns                     # chunk order, every CRC, the mode, the padding, and that it decodes; exit 1 on a fault
 ```
 
-The setup of the first run: 1920 pixels on a screen 1.21 m wide seen from 2.5 m with eyes 65 mm apart; the deepest point has 10 pixels of parallax (the desktop's default limit for sunk elements at 1920), which is 6.3 mm on the screen and about 0.27 m behind it.
-The script tests itself first: a mark on the floor of a wide pit must come out uncrossed by the whole depth, the popped control crossed, the flat control identical.
+The first run stated its numbers for 1920 pixels on a screen 1.21 m wide seen from 2.5 m with eyes 65 mm apart: 10 pixels of parallax are 6.3 mm on the screen and about 0.27 m behind it.
+The script tests itself first: a mark on a wide flat floor at the black level, the surface level and the white level must come out with exactly the sunk, zero and popped parallax.
+
+### The size, the mark, the range and the edges (ORDER 473z, after Daniel saw the pictures on his 3D TV)
+
+Daniel: "for sure 3D sunk textures work, even the poped brick worked, so I guess if it's very suttil, like only few pixels, we can have poped textures as well"; the four textures "all can have a little more separation, taking into consideration our cut from the borders rule so it does not have a strip on the corners".
+
+- **The size.** A procedural texture is drawn at the size it is wanted, by setting the size in the graph's generators (`10 10` is 1024 x 1024). The 2D picture and each eye of the 3D picture have that one size. Nothing is resized afterwards: a program never stretches or squeezes an eye, and the compositor scales once at the output. The first pictures had enlarged a 512 tile to 1024 inside a 1920 x 1080 frame, and Daniel asked why the sizes differed.
+- **The mark.** Every stereo picture is written as a `.pns`: full side by side, left eye first, with the PNG `sTER` chunk (mode 1) before the first `IDAT`, and the specification's padding between the views when the width is not a multiple of eight. `pns.py` writes it and reads it back. An unmarked side by side PNG is shown flat by the viewers. No red-cyan picture is made: the person has a 3D screen.
+- **The range.** Three levels of the height, set as an artist sets levels: the black level is the deepest point, the surface level has no parallax, the white level is the highest point. Mostly sunk, and a few pixels in front at most, inside the desktop's default limits (10 sunk, 4 popped at 1920). The first proposal: bark 10 and 3, coast ground 10 and 4 (the stones stand up), stone tiles 10 and 2, plaster 8 and 2; the brick stayed at 10 and 0 as approved.
+- **The depth without the finest grain.** The graph names a second operator, `dep  Blur h 1 0.003 0.003 1`. The light keeps the grain (`h`); the depth takes the form (`dep`). With the grain in the depth, a wall four pixels wide carries ten pixels of parallax and the two eyes see different pictures.
+- **The edges.** Each eye is drawn shifted over the tile plus its edge columns, then the same columns are cut from the left and the right of both eyes, half the largest parallax per side, rounded up; top and bottom are untouched; nothing is widened, scaled or filled. A texture that repeats loses nothing by it: the eye comes out at the tile's own size with no strip.
+- **A round thing.** On a post the search runs in the cylinder's own shell: walk the ray from where it enters the shell's outer radius to where it leaves, and stop where the ray's radius falls below the relief's. A ray that passes through a furrow at the rim sees what is behind the post, so the post gets a true rough outline and both eyes see the same trunk. Searching the post as if it were a flat sheet gave streaks, which was the one thing Daniel found wrong in the popped control.
 
 ### A flat element with a stereo texture: the wood panel
 
-`panel.py` draws a desktop bar whose wood is sunk below the bar's plane (4 pixels at the deepest, the lane's choice) while the icons and the clock are the same in both eyes, at the bar's plane.
-A theme can carry this as three things: the graph of the wood, the name of its height operator, and one depth value that may only be "sunk by at most N".
+`panel.py WOOD.png WOOD-height.png OUT` draws a desktop bar whose wood is sunk below the bar's plane (4 pixels at the deepest, the lane's choice, which Daniel saw and found working) while the icons and the clock are the same in both eyes, at the bar's plane.
+The wood is used at the size it was drawn and repeats along the bar, so the shift uncovers nothing at the screen's edges.
+A theme can carry this as three things: the graph of the wood, the name of its depth operator, and its range (sunk by at most N, popped by at most a few).
 SVGStereo 0.4 can say one level for an element (`svgstereo:depth="sunk"`), so a filled area sinks as a whole.
-It cannot say a depth that varies inside one fill; today that is drawn as separate elements at a few sunk levels.
+It cannot say a depth that varies inside one fill; today that is drawn as separate elements at a few levels.
 
-### A scene to look at, and real stereo photographs beside the procedure
+### A scene to look at, and real stereo photographs
 
-`scene.py TEXDIR OUTDIR` renders a room corner (tile floor, brick wall, plaster wall, bark post) once in 2D and as stereo pairs: two cameras with parallel axes and off-axis projections, zero parallax at the nearest thing in view, the relief sunk per eye.
+`scene.py TEXDIR OUTDIR` renders a room corner (tile floor, brick wall, plaster wall, bark post) in 2D and as two marked stereo pictures, the relief sunk only and mostly sunk with a little in front: two cameras with parallel axes and off-axis projections, zero parallax at the nearest thing in view.
 It is a picture to judge by, not a renderer.
-`real_pair.py REAL.jpg cross|parallel PROCEDURAL-sbs-tile.png OUT` puts a real stereo photograph beside a procedural pair, both left eye first at the same size.
+`real_pns.py REAL.jpg cross|parallel OUT.pns` turns a real side by side photograph into a marked `.pns` at its own size, left eye first.
 
 ### What the first run found
 
@@ -277,13 +288,30 @@ It is a picture to judge by, not a renderer.
 - Symptom: the popped control looks the same as the sunk picture on a far wall.
   Cause: at that distance the relief's parallax is under a pixel either way.
   Fix: judge the control on the nearest surface, or on the tile pictures.
-- Symptom: a model says an anaglyph "looks deep".
-  Cause: it reads colour fringes, it does not fuse them.
-  Fix: ask it which side the red fringe lies on and where; a person with glasses or a 3D screen gives the judgement.
-- Symptom: a judge reading a red-cyan picture calls a thing popped that the cameras put behind the screen.
-  Cause: the rule "red to the left of cyan is behind" holds for a feature brighter than its surround; for a dark feature on a light ground (a post against a pale floor, a dark furrow) the colours come out the other way round.
-  Fix: say in the judge's brief whether each feature is lighter or darker than what is behind it, or give it the two eyes as separate pictures and ask which way the feature moved.
-  Found by: the second judge read the dark post's cyan left edge as popped while the scene's nearest point is the zero-parallax plane.
+- Symptom: a model says a stereo picture "looks deep".
+  Cause: it compares two pictures, it does not fuse them.
+  Fix: give it the two eyes as separate pictures and ask which way each feature moved; a person on a 3D screen gives the judgement.
+- Symptom: a judge reading colour fringes calls a thing popped that the cameras put behind the screen.
+  Cause: the usual reading holds for a feature brighter than its surround; for a dark feature on a light ground the colours come out the other way round.
+  Fix: do not make red-cyan pictures for judging; compare the two eyes.
+  Found by: the second judge read the dark post as popped while the scene's nearest point is the zero-parallax plane.
+- Symptom: the viewers show a stereo PNG flat.
+  Cause: the file has no `sTER` chunk; Pillow drops it on every save.
+  Fix: insert the chunk after `IHDR` in the finished file and read the file back (`pns.py`).
+  Found by: Daniel opened the unmarked pictures on his desktop and TV.
+- Symptom: the depth picture is plain noise and the eyes show a grainy surface with no furrows.
+  Cause: the graph already had an operator named `d` (a noise used by `Distort`), and the depth was read from it.
+  Fix: name the depth operator `dep`, and look at the depth picture before using it.
+  Found by: three different textures had the same depth percentiles.
+- Symptom: `IndexError: index 512 is out of bounds` while sampling a repeating texture.
+  Cause: `np.mod` of a tiny negative float32 returns the width itself.
+  Fix: take the floor first, then the modulo of the integer.
+- Symptom: at the steep side of a furrow one eye sees a wide dark floor and the other a bright wall.
+  Cause: a wall a few pixels wide carries the whole range, so one eye sees it stretched and the other hidden.
+  Fix: take the depth from the height without its finest grain, and widen the wall or lower the range if a person finds it restless.
+- Symptom: the round post's rim sparkles.
+  Cause: near the rim one pixel covers many of the bark's.
+  Fix: blend to a softened copy of the lit bark as the surface turns away from the eye.
 
 ## Where it fails
 

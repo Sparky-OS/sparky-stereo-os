@@ -105,3 +105,35 @@ Receipts are only true against the build they were proved on, so the package say
 - **Symptom:** a gl-stereo rebuild two days after the receipts were made stops at `install-qualified.py` with `layer ... differs: the receipt names cab2fc79..., the built layer is f83c52ca...` for all 130 receipts, with no source change to the layer.
   **Cause:** the Lean Code build of the same source gives the same machine code (`objdump -d` equal) but another build ID and debuglink bytes (59 bytes differ) when the toolchain in the build container has moved (the container installs build-essential from Debian testing at build time; gcc was 16.2.0-3). Rebuilding the published 0.4.3 `.dsc` unchanged in the same container (`build-from-lc-dsc.sh`) stops the same way, so the receipts of a published gl-stereo cannot be rebuilt later.
   **Fix:** none cheap: a gl-stereo version needs its 130 receipts requalified against the layer its own build makes, so do the build-and-requalify in one sitting, and record the toolchain (gcc, binutils) in the report. **Found by:** rebuilding the published .dsc as a control before suspecting the 0.4.4 change.
+
+## The one-sitting run, with its timings (gl-stereo 0.4.4, ORDER 146f)
+
+Measured on 10 November 2026, four CPUs, RTX 3060 through CDI, `XWAYLAND_NO_GLAMOR=1`, gcc 16.2.0-4; wall clock from the first command to the staged packages was about 1 hour 50 minutes.
+
+| step | minutes | note |
+|---|---|---|
+| audit base (`docker run` of `setup-auditbase.sh` over the pinned testing base, `docker commit`) | 6 | the repository of the round mounted at `/var/local/sparky-stereo-repo` |
+| audit image (`savers/audit/Dockerfile` with its `FROM` changed and `paraview python3-paraview` added to the apt line, through `tools/https-only-build.sh`) | 2 | one image instead of the two of 0.4.3 |
+| bootstrap build (`build-dh-lean.sh`, work folder with the tree and an orig tarball both without `savers/qualification-6.09.json`) | 8 | prints the layer: install the .deb and `sha256sum usr/lib/gl-stereo/libgl-stereo.so` |
+| requalification (`run-audit.sh`, all steps) | 50 | sweep 16, mono controls 17, references 5 |
+| a step run again (`STEPS="candidate install-candidate functional compile"`) | 5 | a new container installs the bootstrap again, so name `candidate` and `install-candidate` with `functional`, or the catalogue has five receipts and `tests` stops at `len(expected)==132` |
+| final build (`build-dh-lean.sh` with the manifest) then the published form (`build-from-lc-dsc.sh` from the +lc1 .dsc) | 5 + 5 | gate lines "PASS: 132 receipts bind..." and "PASS: gl-stereo-savers depends on the exact build..." |
+| installed proof (`run-cmd.sh` with the staged debs: functional, sizing, late doubling held and unheld, `catalogue.py`, `install-qualified.py` on a copy of the catalogue, `pin.py`) | 5 | |
+
+Result: layer `f83c52ca...` named by all 130 receipts and built twice (bootstrap, final, and from the .dsc) with the same hash; 118 layer, 10 flat, 2 owning-fix; 0 outcome differences from 0.4.3's receipts saver by saver, the 92 depth residuals identical, mean -0.0435 px; the manifest compiled before and after the functional gate was the same file; 13 mutation checks PASS.
+So a requalification with no change to what the layer draws is a copy of the old outcomes with new hashes: compare with `compare-receipts.py OLD NEW` and expect "outcome differences 0".
+
+### The pin's first real run
+
+`savers/pin.py` ran inside `qualify-package.sh` in the real build and wrote `receipts:Pin=xscreensaver-data-extra (= V), xscreensaver-gl (= V), xscreensaver-gl-extra (= V)`, with V the installed XScreenSaver build; the built `gl-stereo-savers` Depends line is `libc6 (>= 2.38), libgl1, libx11-6, gl-stereo (= 0.4.4-1+lc1), python3, xvfb, x11-utils, xscreensaver-data-extra (= V), xscreensaver-gl (= V), xscreensaver-gl-extra (= V)`.
+`xscreensaver-data` is not in it because no saver executable or settings file the receipts bind belongs to it; the pin names exactly the owners.
+Installed from the round's repository with plain `apt-get install`, apt resolved all three exact versions and `pin.py` run again on the installed catalogue wrote the same line.
+The gate on the staged debs and the round's XScreenSaver: `catalogue: 132 of 132 savers can be offered`, `GATE PASSES`, exit 0.
+Red controls: published 0.4.2 against the same XScreenSaver gives `1 of 132` and `GATE REFUSES THE ROUND`; the staged 0.4.4 against XScreenSaver +stereo3d2 gives the same refusal with one `REFUSED ... Depends on xscreensaver-gl (= ...stereo3d4+lc1) but the round carries ...stereo3d2` line per package.
+
+### Trap: the installed functional suite stops at `No module named 'pin'`
+
+**Symptom:** `installed-functional status 1` in the first requalification of 0.4.4; the log ends `File "/build/installed-tests/tests/saver-receipts.py", line 21, in <module> import pin` / `ModuleNotFoundError: No module named 'pin'`, then `compile-qualification.py` asserts on `installed-functional.status`.
+**Cause:** `packaging/test-installed.sh` builds its work folder from installed files only (links into `/usr/lib/gl-stereo`), and 0.4.4's `tests/saver-receipts.py` imports `savers/pin.py` and runs `packaging/check-round-savers.py`, which are build-time files that no package installs.
+**Fix:** the script copies those two files from the source checkout into its work folder.
+**Found by:** the traceback in `installed-functional.log`; the earlier steps' statuses were all 0, so only that step was repeated (3 minutes).

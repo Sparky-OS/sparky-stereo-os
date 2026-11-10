@@ -10,7 +10,8 @@ description: >-
   pre-scaled, mpv shows one view, a depth map does not rotate, a StereoMode must be written back, a GPU encoder writes
   no frame packing SEI, an FFmpeg hwaccel assertion fails in pthread_frame.c, VLC hangs after a minimize or leaves
   full screen on Wayland, a player's output modes must go, or a Qt Multimedia player aborts with "Cannot make
-  QOpenGLContext current in a different thread" at the next file.
+  QOpenGLContext current in a different thread" at the next file, or a player's video node logs "Handle type:
+  NoHandle" and copies every decoded frame through memory.
 ---
 
 # Stereo video, end to end
@@ -125,7 +126,7 @@ These narrower topics have their own references:
 ## A player on the engine's video layer
 
 A Qt Quick player (Dragon Player, Plank Player) keeps only its menu, its per-file store and its message: the drawing, the declaration and a refused declaration (`stereoLayerFailure`) are Qt Multimedia's.
-[What the player keeps, the refused declaration shown, the red and green recipe and its traps](references/a-player-on-the-video-layer.md) (ORDER 453, 453b and 453c), including the shipped recipes, Plank’s QSettings store, the actual menu-item visibility guard, and the carried and local QML fixes with their control tests.
+[What the player keeps, the refused declaration shown, the red and green recipe and its traps](references/a-player-on-the-video-layer.md) (ORDER 453, 453b and 453c), including the shipped recipes, Plank’s QSettings store, the actual menu-item visibility guard, the carried and local QML fixes with their control tests, why a player's video takes the memory route (`Handle type: NoHandle`, `createTexturesFromMemory`: Dragon's AMD texture hack, ORDER 497) and how to read the route from Qt's log.
 
 ## Lessons from the lanes, October to November 2026
 

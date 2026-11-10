@@ -71,5 +71,5 @@ Measured: driver 615.71.09, RTX 3060, `MOZ_GFX_SPOOF_GL_VERSION="4.6.0 NVIDIA 53
 ## A mark a site does not carry
 
 A page can take the right click, so the context menu's 3D Video is out of reach on a site like YouTube.
-The browser puts the same choices in the application menu (3D Video, 3D Display), acting on the page's main playing video (largest playing area, frames included).
+The browser puts the same choices in the application menu (3D Video, Display Settings), acting on the page's main playing video (largest playing area, frames included).
 The site's own VR button appears only for videos the site marks as spherical; the browser does not fake a mark to make it appear.

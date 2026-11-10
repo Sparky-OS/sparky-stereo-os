@@ -8,7 +8,7 @@ description: >-
   proof, nine languages. Load it when a package will not install (Breaks, Multi-Arch: same, cross toolchains, dpkg
   --auto-deconfigure), apt picks Debian's build or swaps a package for a dummy at dist-upgrade, two builds of one source
   differ, apt-get update exits 0 on a failed fetch, lc1 says the build record is not complete, a Qt header is missing
-  after a qt6-base update, a preinst prompt stops a non-interactive install, a language probe shows English, or a pin or
+  after a qt6-base update, a pin leaves a person's package (a binding, a development package) uninstallable, a systemd unit is proven only by hand or journalctl -u shows none of its lines, a preinst prompt stops a non-interactive install, a language probe shows English, or a pin or
   index must be regenerated.
 ---
 
@@ -125,7 +125,7 @@ Lifting a block is not enough on its own: our build stays the candidate at 1001,
 
 A package set waiting for a rebuild is left out of the block until the rebuild lands (see the next section).
 
-A package of another archive that ships our files under another name (deb-multimedia's `libmlt7-data` owned our MLT data) is not caught by a block by name: find it from the two Contents files, pin it out and settle the machines that have it, as [a package of another archive that ships our files](references/shadowed-by-another-archive.md) says.
+A package of another archive that ships our files under another name (deb-multimedia's `libmlt7-data` owned our MLT data) is not caught by a block by name: find it from the two Contents files, pin it out and settle the machines that have it, as [a package of another archive that ships our files](references/shadowed-by-another-archive.md) says. A pin that leaves a person's other package of that archive uninstallable (MLT's Perl and Ruby bindings) is answered by building the function ourselves under names that clash with nobody, the same page's second half.
 
 ## The GPU vendors' repositories: compute updates, the display driver stays ours
 

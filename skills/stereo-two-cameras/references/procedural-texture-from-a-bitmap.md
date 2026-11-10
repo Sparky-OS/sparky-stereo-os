@@ -21,6 +21,7 @@ git clone --depth 1 https://github.com/farbrausch/fr_public.git WORK/fr_public
 # put 2048 x 2048 pictures as WORK/tex/NAME.png (the first run used six CC0 diffuse maps from Poly Haven)
 KTG_IMAGE=your-image-with-g++ sh procedural-texture-fit/run.sh WORK WORK/out
 python3 procedural-texture-fit/tables.py WORK/out WORK/out/sheet.png > WORK/out/tables.md
+python3 procedural-texture-fit/chain_sizes.py WORK/tex/*.png   # the fair baseline: the lower-resolution copies
 ```
 
 Expect: `ktgtool` built from OpenKTG's unchanged `gentexture.cpp` (public domain, Fabian "ryg" Giesen, 2007); three control pictures; one JSON file per picture; and 16 lines starting with PASS from `check_controls.py`, which exits 1 on any FAIL.
@@ -38,12 +39,26 @@ The noise fit, in OpenKTG's own terms (`Noise(grad, freqX, freqY, oct, fadeoff, 
 Six pictures (two noise-like, two regular, two photographic), 2048 x 2048, and three controls.
 
 - A picture that is an OpenKTG procedure came back exactly from 57 bytes (1,614,136 bytes as a PNG), with an empty remainder; best seed correlation 0.990, second best 0.464.
-- On the six real pictures no procedure made the remainder smaller: the total changed by 0.0 to +7.6 % lossless (PNG) and +0.1 to +29.5 % as JPEG at a matched PSNR.
+- On the six real pictures no procedure made a difference image (the remainder) smaller: procedure plus remainder changed the total by 0.0 to +7.6 % lossless (PNG) and +0.1 to +29.5 % as JPEG at a matched PSNR.
+  This compares procedure plus picture with the picture alone, which is not DPFR's comparison; see the next section.
 - OpenKTG's noise (57 bytes) brought the power spectrum within 1.1 to 3.8 dB and the histogram within 1.2 to 7.5 levels of the picture, and was 1.3 to 2.4 dB worse than a flat colour pixel by pixel.
 - 64 waves (835 bytes) showed the checkerboard and the brick courses (28.3 and 21.1 dB against 20.6 and 18.9 for a flat colour) and beat a 32 pixel picture of the same bytes only on the brick.
 - A fitted procedure of a few kilobytes stood for the picture up to about 64 pixels wide (32.6 to 40.0 dB at 32 pixels with 64 waves), and for nothing above that pixel by pixel (23.1 to 33.0 dB at 512 pixels with 1,024 waves).
 
-So, for assets that start as bitmaps: the last layer is the picture itself, not a difference image; the procedure gives the first frame and the material's statistics; and the saving of the picture's lower-resolution copies holds only for content authored as a procedure.
+## The fair baseline: what a traditional asset ships
+
+Daniel's correction of the first reading (2026-11-10): a traditional asset carries the picture in several resolutions, which is where the procedure is meant to act, so procedure plus picture against the picture alone is not a fair comparison.
+A traditional asset ships the picture and its lower-resolution copies (a mip chain, or separate versions per device); DPFR ships a small procedure and the single picture, and the procedure stands where those copies were.
+Measured on the same six pictures with [`chain_sizes.py`](procedural-texture-fit/chain_sizes.py) (box-averaged levels, JPEG quality 90):
+
+- The lower-resolution copies down to 1 pixel added 31.1 to 41.4 % to the picture's bytes (29.1 to 38.6 % for two device copies at 1024 and 512; 31.0 to 38.1 % lossless as PNG).
+- The procedure costs 57 bytes (OpenKTG noise) to 13,315 bytes (1,024 waves), under 1 % of the picture.
+- So the procedure and the one picture were 24 to 29 % smaller than the picture with its full chain.
+
+What the person sees differs in one place: before the picture arrives, a traditional asset shows a blurred copy of the picture, and DPFR shows the procedure, which is the material (its spectrum and colours) and is pixel-exact only up to about 64 pixels for a fitted photo (exact at every size for content authored as a procedure).
+Once the picture arrives, the device makes its lower levels from it.
+The asset is the procedure plus the single picture, never a difference image.
+Not measured: GPU texture formats with their own chains (KTX2, BCn), AVIF and JPEG XL, and how the change from material to picture looks.
 
 ## Where it fails
 

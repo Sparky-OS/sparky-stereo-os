@@ -57,3 +57,23 @@ An embedded canvas needs its own subsurface/child-window integration and overlay
   Provide a separate bounded test filesystem with enough room for that unchanged reserve.
   A 4 GiB private tmpfs under a 16 GiB container memory cap passed the identical portal/scratch binaries; Cargo targets and caches stayed on the build disk.
   Record the backing filesystem, memory limit and actual free-space measurement with the test result.
+
+## A retained SHM pool is a direct native-grid witness
+
+A preload recorder may produce no dump even while a dynamically dispatched client logs valid `wl_shm` requests.
+Geometry in the protocol log alone does not prove that the samples were copied.
+For the tested SCTK native window, the pool retains its original memfd for resizing.
+The FD number printed by marshalling was a transient duplicate; opening that number later failed, while the retained original was still present.
+
+1. Use only the test client's PID inside its isolated container.
+2. Follow the stereo declaration to its surface, the attached buffer, and that buffer's pool, offset, width, height, stride and format.
+3. Select the retained `smithay-client-toolkit` memfd by its public name and the pool capacity from create/resize requests.
+   Require one unique inode before looking at any expected pixels; reject missing or ambiguous candidates.
+4. Read the buffer region twice and require stable bytes.
+   Interpret XRGB8888 as the protocol specifies, then compare every RGB pixel with independently generated left/right references.
+5. Keep a swapped-eye reference as a failing control, and measure the displayed pair against one-resize references plus the independent client rectangle.
+
+On 2026-11-10, PhotoCraft's full, half-width and half-height ID pictures matched 6,635,520 native RGB pixels across Wayland and X11 with zero differences.
+The Wayland swapped-eye references differed at every pixel.
+Displayed sample shape matched its rational pixel aspect, single-resize PSNR was 58.94–69.46 dB, and there were zero eye differences outside the media window.
+This result covers the tested opaque RGB8 path; it is not a deep-colour, stock-main 2D or other-platform proof.

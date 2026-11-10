@@ -116,7 +116,7 @@ flowchart LR
 
 **Route A: a plain WebGL page, unchanged.**
 Draw your scene with one camera, as today, and the browser draws it once per eye from that camera: parallel axes, off-axis frustums, never toe-in ([dom/canvas/WebGLStereoCamera.h](https://github.com/Sparky-OS/waterfox/blob/stereo3d/dom/canvas/WebGLStereoCamera.h)).
-- **On for every site in the edition's browser:** right-click the page, **3D Canvas**: Off or On, kept per site, and **Display Settings…**, where your depth limits are (the browser has no depth setting of its own: the depth is your limit). Choose Off for a site to draw it with one camera again.
+- **On for every site in the edition's browser:** right-click the page, **3D Canvas**: Off or On, kept per site, and **Display Configuration**, KDE's page where your depth limits are (the browser has no depth setting of its own: the depth is your limit). Choose Off for a site to draw it with one camera again.
 - **What it needs from your page:** the camera reaches the GPU as a `mat4` uniform, the projection or the view-projection product, which three.js, Babylon.js and PlayCanvas all do.
 - **Post-processing** (bloom, an effect composer) gets a render target per eye, so effects drawn from the scene are stereo too.
 - **The HTML around the canvas stays 2D**, identical in both eyes.

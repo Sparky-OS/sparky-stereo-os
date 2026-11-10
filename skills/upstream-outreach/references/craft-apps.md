@@ -77,3 +77,8 @@ Read a successful gate for the same source commit and compare its measured toolc
 PhotoCraft's [passing gate at de7e1eec](https://github.com/storytold/photocraft/actions/runs/42861583249/job/129988830503) used Rust 1.99.1 on 2026-11-10, while the local Debian SDK supplied 1.97.1.
 The older Clippy complained about unchanged PSD callback and cursor-range code.
 Match the actual gate compiler, Clippy, font input and software GPU checks, then repeat the unchanged-source check; do not silence the diagnostic or fold an environment workaround into a media fix.
+
+Read the environment on the specific CI job too, not only its shell command.
+PhotoCraft’s corpus job at de7e1eec runs `cargo xtask test-corpus` with `CARGO_PROFILE_RELEASE_LTO=false` and `CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16`.
+The default release profile applies thin LTO separately to many integration-test binaries, which needlessly changed the local build workload.
+Match the job’s explicit overrides while retaining its complete package, feature and test selection; record an interrupted mismatched-profile attempt separately from the resulting gate.

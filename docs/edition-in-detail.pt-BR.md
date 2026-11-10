@@ -72,16 +72,22 @@ Participar do grupo é gratuito com uma conta W3C, e toda ajuda é bem-vinda: te
 
 **Pinte, edite fotos e vídeos em 3D e pinte com maior profundidade de cor: 16 bits por cor em vez de 8.**
 
-**Em breve: Plasma Studio em 3D.**
-O [Plasma Studio](https://invent.kde.org/niccolove/plasma-studio), app do KDE de Niccolò Venerandi para vídeo, áudio, fotos, arte vetorial e 3D num só lugar, é a suíte criativa que estamos levando ao 3D.
-Suas cenas 3D terão uma vista por olho, e sua arte vetorial profundidade com o [SVGStereo](https://github.com/Sparky-OS/svgstereo), nossa marca 3D para desenhos SVG; numa tela 2D, ele fica exatamente como é.
-**Em desenvolvimento:** estamos estudando-o no [nosso fork](https://invent.kde.org/danielcamposramos/plasma-studio).
+**Em desenvolvimento: os apps Craft em 3D.**
+Os apps Craft do [ArtCraft](https://github.com/storytold/artcraft) da storytold são a suíte criativa que estamos levando ao 3D: uma família de programas, da edição de fotos e vídeos ao CAD, à animação 2D, à arte vetorial, à pintura de texturas e aos materiais, escrita em Rust sob a licença MIT ou Apache-2.0.
+PhotoCraft e FilmCraft estão publicados com 3D; estamos passando esse trabalho, e o do LightCraft, para as versões atuais deles, e planejando os outros apps.
 
 - **Pintura:** Krita pinta numa tela de 16 bits e numa tela 3D com 16 bits em cada olho.
 - **Fotos:** digiKam e Showfoto mostram fotos 3D no álbum, na Mesa de Luz, na Apresentação de slides e no editor; KolourPaint edita uma imagem 3D e a salva com sua marca 3D.
 - **Vídeo:** no Kdenlive, um clipe conhece sua disposição 3D, os monitores podem mostrá-lo em 3D e a renderização mantém a marca 3D.
-- **Histórias:** [StorySplat](https://storysplat.com) ("Transforme suas digitalizações 3D em passeios interativos") cria passeios dentro de digitalizações 3D de lugares reais, direto no navegador, e seu 3D View os mostra em 3D em qualquer uma das saídas registradas, com o primeiro teste lado a lado numa televisão Sony 3D.
-- **Também com suporte:** PhotoCraft e FilmCraft, do [ArtCraft](https://github.com/storytold/artcraft), publicados com 3D.
+- <a id="stories"></a>**Histórias:** [StorySplat](https://storysplat.com) ("Transforme suas digitalizações 3D em passeios interativos") cria passeios dentro de digitalizações 3D de lugares reais, direto no navegador, e seu 3D View os mostra em 3D em qualquer uma das saídas registradas, com o primeiro teste lado a lado numa televisão Sony 3D.
+- **Planejado, mais adiante:** [Plasma Studio](https://invent.kde.org/niccolove/plasma-studio), app do KDE de Niccolò Venerandi para vídeo, áudio, fotos, arte vetorial e 3D num só lugar. Suas cenas 3D teriam uma vista por olho, e sua arte vetorial ganharia profundidade com o [SVGStereo](https://github.com/Sparky-OS/svgstereo), nossa marca 3D para desenhos SVG; o [nosso fork](https://invent.kde.org/danielcamposramos/plasma-studio) fica guardado para esse estudo.
+
+<a id="scan"></a>
+**Planejado: escanear um objeto ou um lugar para criar um modelo 3D.**
+Você grava um vídeo em volta de um objeto ou andando por um lugar, com o celular por exemplo, e o programa transforma esse vídeo num modelo 3D para você explorar, no seu próprio computador.
+O programa é o [Spirula Studio](https://github.com/harry7557558/spirula-studio), de Harry (J.X.) C., sob a GPLv3; o modelo que ele cria se chama 3D Gaussian splat, e ele também gera uma malha texturizada a partir dele.
+**Planejado:** a edição ainda não traz o programa, e ele ainda não mostra seus modelos em 3D com uma vista por olho; esse trabalho será feito no [nosso fork](https://github.com/Sparky-OS/spirula-studio).
+Com o modelo escaneado em mãos, o [StorySplat](#stories) conta a história dele: cria passeios a partir de digitalizações 3D desse tipo e já os mostra em 3D hoje; ainda falta testar um modelo do Spirula Studio no StorySplat.
 
 Cada programa em detalhe: [Programas](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).
 
@@ -96,6 +102,7 @@ Cada programa em detalhe: [Programas](#programs-the-edition-changes-for-stereo-3
 **Estude e projete em 3D: um globo, gráficos e moléculas já funcionam em 3D, e modelos 3D e placas de circuito estão em desenvolvimento.**
 - **Aprendizado e ciência:** o globo do Marble, os gráficos do KAlgebra, as moléculas do Kalzium e o cubo do Kubrick, em 3D por padrão numa área de trabalho 3D.
 - **Modelos 3D e placas de circuito:** prévias 3D no OpenSCAD, KiCad e F3D estão em desenvolvimento.
+- **Escanear:** transformar um vídeo de uma peça, de um local ou de um espécime num modelo 3D está planejado, com o Spirula Studio ([Escanear](#scan)).
 - **Da mesa ao cliente, em cores:** o mesmo modelo com profundidade num monitor 3D sem óculos na mesa do engenheiro (com [DisplayXR](https://displayxr.org), em desenvolvimento), numa TV 3D ou num projetor para uma equipe ou uma turma em treinamento, e no próprio celular de cada trabalhador e cliente num visor de papelão ([Flat Headset](https://github.com/Sparky-OS/flat-headset)). É aberto de ponta a ponta, então ninguém fica preso a um fabricante de telas.
 
 Cada programa em detalhe: [Programas](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).

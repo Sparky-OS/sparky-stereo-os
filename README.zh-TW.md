@@ -21,8 +21,8 @@ Sparky Stereo OS 是 Daniel Ramos 的 SparkyLinux 版本（SparkyLinux 由 Pawe�
 **下一步：在你的 Windows 電腦上用 USB 隨身碟試用，無需安裝任何東西：**[一頁，十個步驟（英文）](docs/guides/try-on-windows.en.md)
 <br>索取下載連結，並用你的語言告訴我們你的 3D 裝備： [🇨🇦](https://github.com/Sparky-OS/sparky-stereo-os/issues/26) [🇧🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/25) [🇵🇱](https://github.com/Sparky-OS/sparky-stereo-os/issues/27) [🇫🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/80) [🇩🇪](https://github.com/Sparky-OS/sparky-stereo-os/issues/153) [🇯🇵](https://github.com/Sparky-OS/sparky-stereo-os/issues/81) [🇰🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/83) [🇨🇳](https://github.com/Sparky-OS/sparky-stereo-os/issues/84) [🇭🇰](https://github.com/Sparky-OS/sparky-stereo-os/issues/85)
 
-- <a id="science-and-engineering"></a>**[科學與工程](docs/edition-in-detail.zh-TW.md#science-and-engineering)：**Marble 的地球儀、KAlgebra 的函數圖、Kalzium 的分子，都是 3D；3D 模型與電路板正在進行中。
-- <a id="create"></a>**[創作](docs/edition-in-detail.zh-TW.md#create)：**以 3D 與高色深繪畫（每種顏色 16 位元，而不是 8 位元），並編輯 3D 照片與影片。
+- <a id="science-and-engineering"></a>**[科學與工程](docs/edition-in-detail.zh-TW.md#science-and-engineering)：**Marble 的地球儀、KAlgebra 的函數圖、Kalzium 的分子，都是 3D；3D 模型與電路板正在進行中。掃描已在計畫中：把拍攝零件、現場或標本的影片變成 3D 模型。
+- <a id="create"></a>**[創作](docs/edition-in-detail.zh-TW.md#create)：**以 3D 與高色深繪畫（每種顏色 16 位元，而不是 8 位元），並編輯 3D 照片與影片。掃描已在計畫中：把拍攝物體或場所的影片變成可以在其中走動的 3D 模型。
 - <a id="watch-and-play"></a>**[觀看與遊玩](docs/edition-in-detail.zh-TW.md#watch-and-play)：**3D 電影、照片與遊戲，可在視窗中或全螢幕觀看。
 - <a id="vr-is-also-a-stereo-monitor"></a>**[VR 也是一種立體螢幕](docs/edition-in-detail.zh-TW.md#vr-is-also-a-stereo-monitor):** 頭戴顯示器，或裝在觀看器中的手機，同樣是這個桌面的 3D 螢幕。
 - <a id="for-developers"></a>**[開發](docs/edition-in-detail.zh-TW.md#for-developers)：**只要讓程式 3D 化一次，桌面就會為每種螢幕調整它。

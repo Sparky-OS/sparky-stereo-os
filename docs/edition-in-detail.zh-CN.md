@@ -72,16 +72,22 @@ Daniel 和 Milton Ponson 共同主持 W3C [Procedural Memory Knowledge Represent
 
 **在 3D 中绘图、编辑照片和编辑视频，并在深度颜色中绘图：每种颜色 16 位，而不是 8 位。**
 
-**即将到来：3D 版 Plasma Studio。**
-[Plasma Studio](https://invent.kde.org/niccolove/plasma-studio) 是 Niccolò Venerandi 开发的 KDE 应用，把视频、音频、照片、矢量图和 3D 集于一处，也是我们正在带入 3D 的创意套件。
-它的 3D 场景将为每只眼睛各提供一个视图，它的矢量图将通过 [SVGStereo](https://github.com/Sparky-OS/svgstereo)（我们为 SVG 绘图定义的 3D 标记）获得深度；在 2D 屏幕上，它保持原样。
-**开发中：**我们正在[我们的分支](https://invent.kde.org/danielcamposramos/plasma-studio)中研究它。
+**开发中：3D 版 Craft 应用。**
+[ArtCraft](https://github.com/storytold/artcraft)（storytold 出品）旗下的 Craft 应用，是我们正在带入 3D 的创意套件：一个程序家族，从照片和视频编辑到 CAD、2D 动画、矢量图、纹理绘制和材质，用 Rust 编写，采用 MIT 或 Apache-2.0 许可证。
+PhotoCraft 和 FilmCraft 已带 3D 发布；我们正在把这项工作连同 LightCraft 的工作迁移到它们的当前版本，并为其余应用制定计划。
 
 - **绘画：**Krita 可以在 16 位画布上绘画，也可以在每只眼睛 16 位的 3D 画布上绘画。
 - **照片：**digiKam 和 Showfoto 在相册、光桌、幻灯片和编辑器中显示 3D 照片；KolourPaint 可以编辑 3D 图片，并保存它的 3D 标记。
 - **视频：**在 Kdenlive 中，片段会识别自己的 3D 布局，监视器可以 3D 显示，渲染结果也会保留 3D 标记。
-- **故事：**[StorySplat](https://storysplat.com)（"把你的 3D 扫描变成互动漫游"）可以在浏览器中直接在真实场所的 3D 扫描里构建漫游，它的 3D View 可以在任何已注册的输出上以 3D 显示这些漫游，并首次在 Sony 3D 电视上左右并排测试。
-- **同样支持：**[ArtCraft](https://github.com/storytold/artcraft) 的 PhotoCraft 和 FilmCraft 已带 3D 发布。
+- <a id="stories"></a>**故事：**[StorySplat](https://storysplat.com)（"把你的 3D 扫描变成互动漫游"）可以在浏览器中直接在真实场所的 3D 扫描里构建漫游，它的 3D View 可以在任何已注册的输出上以 3D 显示这些漫游，并首次在 Sony 3D 电视上左右并排测试。
+- **计划中，稍后：**[Plasma Studio](https://invent.kde.org/niccolove/plasma-studio) 是 Niccolò Venerandi 开发的 KDE 应用，把视频、音频、照片、矢量图和 3D 集于一处。按设想，它的 3D 场景将为每只眼睛各提供一个视图，它的矢量图将通过 [SVGStereo](https://github.com/Sparky-OS/svgstereo)（我们为 SVG 绘图定义的 3D 标记）获得深度；[我们的分支](https://invent.kde.org/danielcamposramos/plasma-studio)为这项研究保留着。
+
+<a id="scan"></a>
+**计划中：把物体或场所扫描成 3D 模型。**
+你用手机等设备围着物体或穿过一个场所拍一段视频，程序就在你自己的电脑上把它变成可以在其中漫游的 3D 模型。
+这个程序是 [Spirula Studio](https://github.com/harry7557558/spirula-studio)，作者 Harry (J.X.) C.，采用 GPLv3 许可证；它生成的模型叫做 3D Gaussian splat（3D 高斯泼溅），还可以由此生成带纹理的网格。
+**计划中：**本版还没有收录它，它也还不能以左右眼各一个视图的方式用 3D 显示模型；这项工作将在[我们的分支](https://github.com/Sparky-OS/spirula-studio)中进行。
+有了扫描结果，就可以用 [StorySplat](#stories) 讲述它的故事：它用这类 3D 扫描构建漫游，而且今天就能以 3D 显示；把 Spirula Studio 的扫描放进 StorySplat 还有待试验。
 
 每个程序的完整说明：[程序](#programs-the-edition-changes-for-stereo-3d-and-deep-colour)。
 
@@ -96,6 +102,7 @@ Daniel 和 Milton Ponson 共同主持 W3C [Procedural Memory Knowledge Represent
 **在 3D 中学习和设计：地球仪、曲线图和分子今天就能以 3D 工作，3D 模型和电路板仍在进行中。**
 - **学习和科学：**Marble 的地球仪、KAlgebra 的曲线图、Kalzium 的分子和 Kubrick 立方体，在 3D 桌面上默认以 3D 显示。
 - **3D 模型和电路板：**OpenSCAD、KiCad 和 F3D 的 3D 预览正在进行中。
+- **扫描：**计划用 Spirula Studio 把拍摄零件、现场或标本的视频变成 3D 模型（[扫描](#scan)）。
 - **从工作台到客户，全程全彩：**同一个模型可以显示在工程师桌上的裸眼 3D 显示器（配合 [DisplayXR](https://displayxr.org)，进行中）、团队或培训教室使用的 3D 电视或投影仪，以及每位工人和客户自己手机插入纸板观片盒的画面（[Flat Headset](https://github.com/Sparky-OS/flat-headset)）。它端到端开放，因此没有人被绑定到某一家显示器厂商。
 
 每个程序的完整说明：[程序](#programs-the-edition-changes-for-stereo-3d-and-deep-colour)。

@@ -8,10 +8,12 @@ description: >-
   depth values, the three levels sunk, screen and popped within the user's limits, menus, popups, tooltips, select
   lists, notifications and dialogs at depth (xdg_popup, never a subsurface), the 10 px popup border from the output's
   edges, KWin's effects with depth of their own (Fall Apart, Sheet, Glide, Zoom, dragging), and a GTK 4 GtkGLArea as a
-  declared stereo subsurface inside a 2D window. Load it when a popup menu at
+  declared stereo subsurface inside a 2D window, and the boot splash at the person's depth limits (the kernel line's popped= and
+  sunk=, a Plymouth guest rig). Load it when a popup menu at
   the screen edge looks cut or flat in 3D, a sub-menu sits behind its parent, a tooltip or select list is not popped, a
   dialog collapses to its title bar, a hidden top level kills the native child, a whole window is declared instead of
-  its 3D area, two windows draw each other's depth, or an element's parallax must be clipped to its rectangle.
+  its 3D area, two windows draw each other's depth, an element's parallax must be clipped to its rectangle, or the boot splash
+  shows the default depth after the person lowered their popped limit.
 ---
 
 # A 3D area inside an ordinary window
@@ -126,6 +128,11 @@ As in the general skill, plus:
 
 Never commit a buffer of two views to a surface the compositor has not taken as stereo content, and never report a layer active before its declaration was taken: a refused declaration is logged once, shown by a property the player reads, and the video is drawn the ordinary way.
 [The rule, the recipe to force and capture a refusal, and the traps](references/declared-layer-state.md) (ORDER 448, after ORDER 49's packed frame in both eyes).
+
+## The boot splash at the person's depth
+
+The splash takes the main screen's limits, never numbers of its own: sparky-stereo-boot puts `popped=` and `sunk=` on each stereo output of `plymouth.stereo=` (the person's `kwinrc` `[StereoDepth]` limits times the display's factor, as KWin resolves them), Plymouth hands them to the theme (`Window.GetStereoPoppedLimit ()`, `Window.GetStereoSunkLimit ()`), the theme places its levels inside them, and what the person did not save is the display's default, said.
+[The chain, the guest rig that proves it (`scripts/plymouth-rig/`), the predicted and measured parallax, and the traps](references/boot-splash-depth.md) (ORDER 481).
 
 ## Lessons from the lanes, October to November 2026
 

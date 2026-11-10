@@ -3,17 +3,15 @@ metadata:
   requires-packages: qt6-base-dev
 name: stereo-window-3d-area
 description: >-
-  Stereo content inside an ordinary Qt or KDE window, and depth of the desktop's own elements: a declared subsurface
-  below the window with a hole over it , Union's
-  depth values, the three levels sunk, screen and popped within the user's limits, menus, popups, tooltips, select
-  lists, notifications and dialogs at depth (xdg_popup, never a subsurface), the 10 px popup border from the output's
-  edges, KWin's effects with depth of their own (Fall Apart, Sheet, Glide, Zoom, dragging), and a GTK 4 GtkGLArea as a
-  declared stereo subsurface inside a 2D window, and the boot splash at the person's depth limits (the kernel line's popped= and
-  sunk=, a Plymouth guest rig). Load it when a popup menu at
-  the screen edge looks cut or flat in 3D, a sub-menu sits behind its parent, a tooltip or select list is not popped, a
-  dialog collapses to its title bar, a hidden top level kills the native child, a whole window is declared instead of
-  its 3D area, two windows draw each other's depth, an element's parallax must be clipped to its rectangle, or the boot splash
-  shows the default depth after the person lowered their popped limit.
+  Stereo content in an ordinary Qt, KDE or GTK 4 window, and depth of the desktop's own elements: a declared
+  subsurface under a hole in the window, Union's depth values, the levels sunk, screen and popped within the person's
+  limits, menus, popups, tooltips, select lists, notifications and dialogs at depth (xdg_popup), the 10 px popup
+  border, KWin's effects with their own depth (Fall Apart, Sheet, Glide, Zoom, drag), and the boot splash at the
+  person's limits (popped= and sunk= on the kernel line, a Plymouth guest). Load it when a popup menu at the screen
+  edge looks cut or flat in 3D, a sub-menu sits behind its parent, a tooltip or select list is not popped, a dialog
+  collapses to its title bar, a hidden top level kills the native child, a whole window is declared instead of its 3D
+  area, two windows draw each other's depth, an element's parallax must stay in its rectangle, or the boot splash
+  ignores a lowered popped limit.
 ---
 
 # A 3D area inside an ordinary window
@@ -47,6 +45,7 @@ Stereo KWin composes the two in place: the 3D area gets each eye's view inside t
 2. **A hole in the window.** The window surface must be transparent exactly over the 3D area, so the subsurface shows through. In Qt Widgets: make the top level translucent and paint its background yourself everywhere *except* the 3D area's rectangle, because Qt skips `autoFillBackground` and `PE_Widget` on translucent windows. A small event filter on the top level does it.
 3. **Follow the rectangle.** Move and resize the subsurface when the area moves (Kdenlive uses a 100 ms timer), and only while the area is visible and not covered: a document in another tab must not leave its layer on screen.
 4. **2D on top stays 2D.** Overlays drawn over the 3D area (a popup palette, a compass, subtitles) are drawn by the window, once, so they come out identical in both eyes.
+5. **A popup is an xdg_popup, never a subsurface.** Menus, tooltips, select lists and dialogs get their depth from KWin as popup surfaces of their own; a popup made as a subsurface stays at its parent window's level (the browser's case: [lessons-2026-11.md](references/lessons-2026-11.md)).
 
 Worked examples:
 - **Kdenlive's monitor**, the first one: [danielcamposramos/kdenlive `stereo3d-26.08`](https://invent.kde.org/danielcamposramos/kdenlive/-/tree/stereo3d-26.08).

@@ -49,6 +49,8 @@ Launcher time uses Jiff under its local rule, rather than adding Chrono beside i
 
 Audit new edition labels against all ten required languages: en, pl, pt_BR, fr, de, es, ja, ko, zh_CN and zh_TW.
 An app advertising a language does not prove a newly added label has a row in its catalog.
+Include native file-picker filters, native window titles and dynamic media-layout descriptions in the source-diff audit; a scan of translation macros alone misses those call sites.
+A green gate may still report missing translations without failing, so check the actual new labels through the app’s lookup too.
 Check the actual lookup and bare-language routing, preserving separate simplified and traditional Chinese catalogs.
 Keep upstream catalog identifiers such as `pt-br` or `zh-hant` where their lookup expects them.
 

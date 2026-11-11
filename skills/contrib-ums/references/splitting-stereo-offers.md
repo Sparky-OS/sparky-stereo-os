@@ -42,6 +42,8 @@ Read the current UMS contribution rules before preparing offers.
 7. Save one template-shaped pull-request body per subject, with exact tests and device gaps.
    State dependencies explicitly.
    A Java profile match or an emulated SSDP announcement does not establish playback on a physical phone.
+8. Before filing, squash a repair of the offer's own commit (a style fix to a line the offer added) into that commit, so each pull request carries its subject and nothing that corrects itself.
+   Check that the squashed tree is identical to the tested one (`git diff --stat TESTED HEAD` prints nothing), then file one offer at a time.
 
 ## Traps
 

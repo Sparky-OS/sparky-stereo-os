@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The typed form of a graph (script2text.py's output) back into the fitter's script: text2script.py < TYPED > SCRIPT
 Used for small test graphs that check what an operator does (which way a move goes, which input is subtracted)."""
-import re, struct, sys
+import json, re, struct, sys
 kinds = {}
 import os
 here = os.path.dirname(os.path.abspath(__file__))
@@ -10,7 +10,9 @@ for m in re.finditer(r'\.name = "(\w+)", \.kinds = "(\w*)"', open(src).read()):
     kinds[m.group(1)] = m.group(2)
 last = None
 for line in sys.stdin:
-    t = line.split()
+    # quoted strings (a Text operator's text and font name) are taken out first: they may hold spaces
+    strs = [json.loads(m) for m in re.findall(r'"(?:[^"\\]|\\.)*"', line)]
+    t = re.sub(r'"(?:[^"\\]|\\.)*"', "", line).split()
     if not t or t[0].startswith("#"):
         continue
     name, op, ins, vals = t[0], t[1], t[2], t[3:]
@@ -25,6 +27,6 @@ for line in sys.stdin:
             out.append("%x" % struct.unpack("<I", struct.pack("<f", float(v)))[0])
         else:
             out.append(v.lstrip("#"))
-    print(name, op, ins, " ".join(out))
+    print(name, op, ins, " ".join(out + ["s=" + x.encode("latin-1").hex() for x in strs]))
     last = name
 print("out", last)

@@ -569,11 +569,146 @@ Traps of the third round:
   Cause: a wait loop that started the jobs was thought to have ended without starting them.
   Fix: one launcher; check the container list by name before starting another.
 
+### The fourth round: Text, a font glyph used as a shape (milestone 1d)
+
+.kkrieger's artists used letters as shapes: `kkrieger.k` holds 99 `Text` operators, and 112 of its drawable named textures contain one.
+The title logo is seven of them: each letter of "kkrieger" is one glyph, blurred, twisted by three to thirteen `Twirl`s and lit as a relief (`r.kkrieger.g` is `Flat`, `Text` "g", `Blur`, three `Twirl`s: 6 operators, 170 bytes).
+The others are the title and credits screens, the menu, two font pages, and words on a crate, a sign, a blade and the weapons.
+
+**The font renderer.**
+werkkzeug3 drew text with Windows GDI (`sSystem_::FontBegin`, `FontPrint`, `FontWidth` and `FontCharWidth` in `_start.cpp`); werkkzeug4's portable copy (`GenBitmap::Text`) draws through altona's `sFont2D`.
+`pixels/wzfont.c` gives those calls on FreeType, reading the font's own outlines and nothing else: no bitmap strike, no hinting program, no pre-rendered glyph.
+`shim/font2d.hpp` is the `sFont2D` stand-in over it, so `GenBitmap::Text` itself draws a plain text; a font page (flags 0x10 to 0x70: every letter of a game font, one after the other) exists only in werkkzeug3, and its loop is taken over line by line in `wzbridge.cpp`.
+What the renderer follows, each tied to its source:
+
+| what | the rule | where it is written |
+|---|---|---|
+| the outline | TrueType outlines are quadratic curves, CFF outlines cubic; both are filled by the non-zero winding rule | OpenType 1.9.1, "glyf" and "CFF"; FreeType Glyph Conventions, VI "FreeType Outlines" |
+| character to glyph | the font's `cmap`; a character with no entry gets glyph 0, the missing glyph | OpenType 1.9.1, "cmap" ("mapped to glyph index 0 (missing glyph)") |
+| the size | werkkzeug3 calls `CreateFont(-h, w, ...)`: an em square `h` pixels high, so the scale is `h` over `unitsPerEm` | werkkzeug3 `_start.cpp`; OpenType "head" |
+| the line's top and height | GDI's `tmAscent` and `tmHeight`, from `usWinAscent` and `usWinDescent` | OpenType "OS/2" ("In the Windows GDI implementation, the usWinAscent and usWinDescent values have been used to determine the size of the bitmap surface") |
+| the advance | `advanceWidth`, rounded to whole pixels; no kerning (GDI's `ExtTextOut` adds none) | OpenType "hmtx" |
+| a set character width | `w` is the average character width asked for; the outlines are stretched by `w` over the font's own average | OpenType "OS/2", `xAvgCharWidth`; see the trap below |
+| the text's bytes | Windows code page 1252 | the project file stores 8-bit strings |
+| an empty font name | "arial" | werkkzeug3 `_start.cpp`: `if(name[0]==0) name = "arial";` |
+| the two size values | the operator's third value is the font's height and its fourth the character width, although werkkzeug3's code names them `width` and `height` | `FontBegin(xs,ys,font,xs*height,ys*width,4)` in `genbitmap.cpp` |
+| where a plain text starts | (the space around letters + 2) pixels right and down of its x and y; every plain text of .kkrieger has space 2 | `es = extspace*alias + 2*alias` in `genbitmap.cpp` |
+
+**The fonts, and what stands in for them.**
+`kkrieger.k` names "times new roman" 15 times, "verdana" twice, and no font 82 times (so 82 are Arial).
+Those are Microsoft's fonts and are not in Debian, so a font map says which file draws each name, and nothing is chosen in the code:
+
+```
+# werkkzeug's font name = font file | the sentence said in every caption
+arial = LiberationSans-Regular.ttf | Liberation Sans 2.1.5 stands in for Arial (metric-compatible)
+times new roman = LiberationSerif-Regular.ttf | Liberation Serif 2.1.5 stands in for Times New Roman (metric-compatible)
+verdana = DejaVuSans.ttf | DejaVu Sans 2.37 stands in for Verdana (not metric-compatible: its letters are a different width)
+```
+
+`WZ_FONTMAP` names that file.
+Without it, with a name it does not hold, with a file that is no outline font, or with werkkzeug4's bold and italic flags, `Text` is refused with a sentence that says which; every font used and every character without a glyph is printed as a `text:` line by `p2p render` and `p2p fit`, and the sheets carry those lines.
+Liberation Sans and Liberation Serif are the stand-ins fontconfig's own `30-metric-aliases.conf` binds to Arial and Times New Roman.
+Measured against the Microsoft fonts of 2000 (versions 2.82) over code page 1252: 217 of 218 advances are equal (the middle dot differs), and `usWinAscent` and `usWinDescent` are equal, so the same letters stand at the same places.
+The letter shapes inside those widths differ: 1.35 % of the pixels (the middle value over the 112 textures) differ by more than 24 of 255, 7 to 9 % on the logo's big twirled letters.
+Verdana has no metric-compatible free font: DejaVu Sans has 35 of 218 advances equal, letters 0.65 to 1.06 times as wide and a different line height, and 32 % of the pixels of the one Verdana font page differ.
+A person who has the named fonts points the map at them; the fitter and the renderer do not care which files they are.
+
+**The known answers.**
+All 112 textures with a `Text` draw (14 seconds for all of them at 512 pixels).
+The shipped game's title screen (a capture on Wikimedia Commons) shows the same four texts in the same places at the same sizes as the drawing of `flat.credits.kk01`.
+
+**The reading: what in the pixels says a glyph shape is here.**
+Like every structure of the third round, `Text` is tried only where its own reading allows it, and a letter is found by laying the font's own outlines over the ink, never named by a person or a model.
+
+1. A figure on a ground: at least 0.80 of the picture lies in two flat shades (within a quarter of either end of the picture's colour axis); the smaller shade is the ink.
+   The fourteen pictures of the earlier rounds give 0.16 to 0.51, the text pictures 0.94 to 1.00.
+2. The ink's connected pieces, each stretched to its own box as a 24 by 24 picture.
+   A box or a disc is not a glyph: `GlowRect` draws those.
+3. Each piece against every glyph of the map's fonts (code page 1252), drawn from the outlines and stretched the same way: their common part over their union, where the piece's own proportions are the glyph's.
+   Two pieces one above the other are tried together against the glyphs that have two pieces (i, j, !, ?).
+4. A line: the size and top most pieces agree on, each piece taken with the glyph whose box fits the line best, which also tells o from O and s from S.
+   A line is started only by a piece with enough form to say "glyph" on its own (a line through it crosses ink twice in a quarter of its rows or columns: o, e, a, g, k, not a comma, a dash, an r or a t) that reaches 0.70; pieces that fit a standing line are taken from 0.58.
+5. The letters of a line that follow each other by the font's own advances, with spaces where the gap is whole spaces, become one `Text` operator: its text, font, place and size are all read.
+6. Allowed when the lines hold 0.85 of the ink or more and the pieces lie over their glyphs by 0.70 or more.
+   Why 0.70: the menu's plain texts lie over their glyphs by 0.90 and a twirled glyph given back by 0.99; texts bent by a `Distort` give 0.66 to 0.76, so the threshold cuts through them; the pieces of figures that are no text (two-shade noise, veins, one blob) give 0.27 to 0.34, a box and a disc are no glyph at all, and a square ring gives 0.66, the nearest thing to a letter that is none.
+
+**A twirled glyph: the Twirl run backwards.**
+Where the figure is one to three pieces that are no glyph and the ring reading of the third round finds a swirl, werkkzeug's own `Twirl` is run on the picture at minus its strength.
+`Twirl` turns every point about the centre by an angle that depends only on its distance from the centre, so the same twirl with the opposite strength undoes it exactly.
+The candidates are the fitter's own grid (centres on eighths of the side, radii 0.25, 0.5 and 0.75, gamma 2, 16 and 48, strengths in eighths up to 1.5); the one after which the pieces lie best over a glyph is kept, up to three, and what steers it is the glyph reading, not the inner measure.
+After twirls were taken out the figure must lie over its glyph by 0.90 or more: a true `Twirl` run backwards gives the glyph back (0.99 on the logo's g), while the search can also bend a bar into a tilde or a hook into an e (0.75 to 0.77).
+The found procedure is `Flat`, the `Text`, a `Blur` for the soft edges (the artists' one to three passes and ten widths are drawn, the best is kept if it pays for its 17 bytes), and the twirls forwards, with the strengths as read.
+Each text's place and size are then tried by pixels and less around what was read; nothing else is searched.
+
+```sh
+export WZ_FONTMAP=FONTS/fonts.map                               # name = file | sentence; nothing draws a Text without it
+python3 pixels/textset.py FR/werkkzeug3/data/kkrieger.k WORK/text    # the 112 graphs with Text, their strings as s=HEX
+BUILD/p2p render WORK/text/r.kkrieger.g.script g.ppm            # prints: text: Liberation Sans 2.1.5 stands in for Arial (metric-compatible)
+BUILD/p2p fit g.ppm WORK/prior.txt OUT/x readonly=1             # figure: ... as lines of arial ...: 1.00 of the ink, likeness 0.99 / text "g" at 0.2510, -0.2495, height 1.0000
+BUILD/p2p fit g.ppm WORK/prior.txt OUT/g structure=text         # the found procedure
+python3 pixels/script2text.py OUT/g.script                      # ... Text v0 0.25 -0.25 1 0 #ffffffff 0 2 0 1 "g" ""
+sh pixels/build.sh BUILD FR FREETYPE                            # the build now takes FreeType's unpacked source as its third argument
+```
+
+What the fourth round found (512 pixels, one thread):
+
+| picture | the artists' graph | found from the pixels | time | at a glance | close up |
+|---|---|---|---|---|---|
+| the logo's g | 6 operators, 170 B: `Flat`, `Text` "g", `Blur`, three `Twirl`s | the same six operators, 170 B: the `Text` and the three `Twirl`s value for value, `Blur` 0.0090 for 0.0092 | 19 s | yes | yes |
+| the menu | 5, 201 B: three `Text`s and an `HSCB` | 4, 184 B: the three texts "start", "options", "info" within a pixel, in the picture's grey | 5 s | yes | yes |
+| "chaos" (bent by a `Distort`) | 4, 124 B | 3, 123 B: "chao" and "s", clean | 4 s | yes | no |
+| "kb", "ryg" (bent) | 4, 120 B each | 2 and 3 operators, 66 and 83 B | 2 s | yes | no |
+| "giZMo" (bent) | 4, 124 B | 4, 172 B: "g Z", "Mo" and an inverted exclamation mark where the i is | 4 s | nearly | no |
+| ".hund" (bent, over drips) | 13, 385 B | 4, 144 B: "hu" and "nd" in the font named verdana, where the artists' graph has Arial | 4 s | nearly | no |
+
+- **Wrong, and seen by eye:** the reading allowed seven of the thirty text pictures it was run on; on two of them the letters bent by the `Distort` misled it (another glyph for giZMo's i; the wider font for ".hund", whose dot and drips are also missing).
+- **Read back:** the reading run on the fitter's own seven drawings gives the same texts ("chaos" as one), and "g!ZMo" for the sixth: the mark standing for the i is no i.
+- **Refused, and said so:** the logo's other letters (four to thirteen twirls: the search takes out three at most, one at a time, and does not get the glyph back); eight of the twelve credits' texts tried (bent too far: 0.66 to 0.75, or under 0.85 of the ink read); texts 9 to 20 pixels high; a font page (more than 300 pieces); a text over a material (no flat ground: a crate, a sign, a blade).
+- **The eleven of the third round:** rerun with this fitter, every found procedure and every drawing is byte for byte the third round's.
+
+Traps of the fourth round:
+- Symptom: small captions overlap the names beside them, and every text with a set character width is a quarter too narrow.
+  Cause: GDI stretches a font by the width asked over the font's average width; Arial 2.82 states 904 units (OS/2 version 1: the weighted average of the lower-case letters and the space), Liberation Sans 2.1.5 states 1187 for the same letter widths (version 3 and later: "the arithmetic average of the escapement (width) of all non-zero width glyphs").
+  Fix: for an OS/2 table of version 3 or later, work out the average by the older rule from the font's own advances (904.46 for both fonts).
+  Found by: the two fonts' tables side by side, and the caption row of the intro's credits, which overlapped before and fits after.
+- Symptom: letters would come out about a tenth too small, and shifted.
+  Cause: werkkzeug4's `sFont2D` on Windows hands the size to GDI as a positive height (the whole line's height); werkkzeug3 handed it over negative (the em square's height), and its plain texts start (space + 2) pixels in, which werkkzeug4's copy dropped.
+  Fix: the stand-in takes the size as the em square's height, and the bridge adds the offset to the position.
+  Found by: reading `FontBegin` in werkkzeug3's `_start.cpp` beside `sFont2D::Init` in altona's `windows.cpp`; the game's title screen then showed the texts where the drawing has them.
+- Symptom: every place read from the pixels is two pixels off the artists' value.
+  Cause: the space around letters is 2 in every plain text of .kkrieger, so the text starts four pixels in, not two.
+  Fix: the found `Text` carries space 2 and its place is the pen minus four pixels; the menu's texts then read 0.0006, 0.1746 and 0.3759 where the artists typed 0, 0.175 and 0.375.
+- Symptom: the Twirl run backwards turns a box and a disc into a dash and a comma, and a twirled bar into a tilde, and calls them text.
+  Cause: a single stroke or a blob is easy to reach by bending, and any shape may start a line.
+  Fix: only a shape with form starts a line (see the reading), and after twirls the figure must be the glyph itself (0.90).
+  Found by: seven control figures that are no text (two-shade noise, veins, cells, one blob, a box and a disc, a ring, a twirled bar), read before any text picture was trusted.
+- Symptom: the first twirl taken out shreds the figure into fourteen pieces and the search stops there.
+  Cause: the search was steered by the best glyph over any one piece, and one small piece looked like a letter.
+  Fix: every piece's best glyph is weighted by the piece's ink.
+- Symptom: the fitter's own drawing of the g is refused by the reading that allowed the original (0.89 against 0.99).
+  Cause: the inner measure had moved a twirl's strength off the value that was read (0.390625 for 0.375) and kept a `Blur` of two passes where the artists used three.
+  Fix: a twirl stays as read, and the `Blur` tries one to three passes; the found graph is then the artists' graph and its drawing reads as "g" at 0.99.
+  Found by: running the reading on the fitter's own drawings, which is a test that can fail.
+- Symptom: the fitter's own drawing of "info" reads "infn".
+  Cause: on a line, the glyph whose box fitted best was taken, and n and o have the same box.
+  Fix: the glyph that lies best over the shape is taken; how well its box fits counts for a tenth at most, which still tells o from O.
+- Symptom: with the stand-in, a font page holds one letter more in its first row than with Times New Roman.
+  Cause: a font page wraps where a letter's ink ends, and the stand-in's letters have the same advances but not the same ink.
+  Fix: none in the code; the caption says which font drew, and a person who has the named font points the map at it.
+- Symptom: one list of readings gives two answers for the same kind of picture.
+  Cause: the fitter was rebuilt while a container was still working through the list; each picture starts the program anew, so the list was read half by the old program and half by the new.
+  Fix: never rebuild while jobs run, and keep the program's SHA-256 beside its results.
+- Symptom: a row of 108 boxes in a sign's text.
+  Cause: the artists typed character 0x12, which no font has; Windows draws the font's missing-glyph box, and they used it as a row of boxes.
+  Fix: the missing glyph is drawn, and the `text:` line says so (`no glyph for character 0x12`).
+
 ### Where the procedures stop (so far)
 
 On .kkrieger's own textures, which are procedures, the reverse now gets the material at a glance for the plain noises, the regular repeats and the walls in a bond, and a recognisable drawing for the wood and the carved ornament; nothing is right close up.
 On photographs it gets the colours and the kind of surface, and none of the marks that make the photograph that surface (speckles, drips, stains, cracks): those stay with the image, the last layer.
-Not built yet: a `Distort` for ragged patch edges and for stones of uneven length, the rounded bevel of a stone, text (font glyphs used as shapes), rings (as against spirals), and the same method tile by tile on photographs.
+A glyph used as a shape is found where it stands as a figure on a flat ground: plain, or under up to three twirls that the search can take out one at a time; then the found procedure can be the artists' own.
+It stops at letters bent by a `Distort` (found clean, or refused), at four twirls and more, at letters under about 20 pixels, at a text stretched by more than a third, at a single stroke standing alone (an r, a t), and at a text over a material.
+Not built yet: a `Distort` for ragged patch edges, for bent letters and for stones of uneven length, the rounded bevel of a stone, a text read over a material (its ink is a second colour, which the second-material reading already finds), a font page, rings (as against spirals), and the same method tile by tile on photographs.
 
 ## Where it fails
 
@@ -614,4 +749,4 @@ Not built yet: a `Distort` for ragged patch edges and for stones of uneven lengt
 
 ## Credits
 
-OpenKTG: Fabian "ryg" Giesen. werkkzeug3: Dierk Ohlerich, Fabian Giesen, Thomas Mahlke, Christoph Muetze, Tammo Hinrichs and Bastian Zuehlke, as its licence names them. The pictures of the first run: Poly Haven, CC0. Relief mapping: Fábio Policarpo, Manuel M. Oliveira and João L. D. Comba (2005). Parallax occlusion mapping: Natalya Tatarchuk (2006). The stereo photographs of bark and ground: Robbie Sproule, CC BY 2.0, on Wikimedia Commons. MaterialX: the Academy Software Foundation's project, its standard nodes document by Doug Smythe and Jonathan Stone. The reverse from pixels: Yiwei Hu, Chengan He, Valentin Deschaintre, Julie Dorsey and Holly Rushmeier (2022) for the order (parts, layered noise, tuning together); Ariel Elnekave and Yair Weiss (2022) for comparing textures by their patches along random directions; Robert Hooke and T. A. Jeeves (1961) for direct search; the bridge to the operators started as lane 503's, from lane 473x's renderer.
+OpenKTG: Fabian "ryg" Giesen. werkkzeug3: Dierk Ohlerich, Fabian Giesen, Thomas Mahlke, Christoph Muetze, Tammo Hinrichs and Bastian Zuehlke, as its licence names them. The pictures of the first run: Poly Haven, CC0. Relief mapping: Fábio Policarpo, Manuel M. Oliveira and João L. D. Comba (2005). Parallax occlusion mapping: Natalya Tatarchuk (2006). The stereo photographs of bark and ground: Robbie Sproule, CC BY 2.0, on Wikimedia Commons. MaterialX: the Academy Software Foundation's project, its standard nodes document by Doug Smythe and Jonathan Stone. The reverse from pixels: Yiwei Hu, Chengan He, Valentin Deschaintre, Julie Dorsey and Holly Rushmeier (2022) for the order (parts, layered noise, tuning together); Ariel Elnekave and Yair Weiss (2022) for comparing textures by their patches along random directions; Robert Hooke and T. A. Jeeves (1961) for direct search; the bridge to the operators started as lane 503's, from lane 473x's renderer. Text: the FreeType Project (David Turner, Robert Wilhelm, Werner Lemberg) for the font renderer; Liberation Fonts (SIL Open Font License 1.1) and DejaVu Fonts (Bitstream Vera licence) as the stand-ins named in the font map; .theprodukkt's capture of the title screen on Wikimedia Commons (BSD licence).

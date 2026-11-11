@@ -4,7 +4,7 @@ lane 503's playback module takes: NAME OPERATOR INPUTS VALUES, one operator per 
 
 Usage: script2text.py FOUND.script [SIZE-EXPONENT] > FOUND.txt      (default size 9: 512 pixels)
 """
-import os, struct, sys
+import json, os, struct, sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "werkkzeug"))
 from wzlang import PACK
 size = int(sys.argv[2]) if len(sys.argv) > 2 else 9
@@ -15,7 +15,8 @@ for line in open(sys.argv[1]):
         continue
     if p[0] == "out":
         out = p[1]; continue
-    name, op, ins, words = p[0], p[1], p[2], [int(x, 16) for x in p[3:]]
+    strs = [bytes.fromhex(x[2:]).decode("latin-1") for x in p[3:] if x.startswith("s=")]
+    name, op, ins, words = p[0], p[1], p[2], [int(x, 16) for x in p[3:] if not x.startswith("s=")]
     kinds = PACK[op]
     vals = []
     for i, k in enumerate(kinds):
@@ -30,6 +31,7 @@ for line in open(sys.argv[1]):
             vals.append("%.9g" % struct.unpack("<f", struct.pack("<I", w))[0])
         else:
             vals.append(str(struct.unpack("<i", struct.pack("<I", w))[0]))
-    print(name, op, ins, " ".join(vals))
+    # a Text operator's two strings (the text, the font's name; an empty name is werkkzeug3's "arial") as quoted strings
+    print(name, op, ins, " ".join(vals + [json.dumps(x) for x in strs]))
 if out is None:
     sys.exit("no out line")

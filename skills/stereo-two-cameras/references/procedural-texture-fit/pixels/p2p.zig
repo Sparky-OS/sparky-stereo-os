@@ -32,6 +32,9 @@ const std = @import("std");
 extern "c" fn wzb_init() void;
 extern "c" fn wzb_set_limit(bytes: usize) void;
 extern "c" fn wzb_apply(name: [*:0]const u8, w: [*]const u32, nin: c_int, inp: [*]?*anyopaque, out: *?*anyopaque, err: [*]u8, errlen: c_int) c_int;
+extern "c" fn wzb_strings(text: [*:0]const u8, font: [*:0]const u8) void;
+extern "c" fn wzb_notes() [*:0]const u8;
+extern "c" fn wzb_glyph_mask(font: [*:0]const u8, c: c_int, side: c_int, out: [*]u8, v: [*]f32) c_int;
 extern "c" fn wzb_free(p: ?*anyopaque) void;
 extern "c" fn wzb_width(p: ?*anyopaque) c_int;
 extern "c" fn wzb_height(p: ?*anyopaque) c_int;
@@ -55,6 +58,12 @@ fn say(comptime fmt: []const u8, args: anytype) void {
 fn die(comptime fmt: []const u8, args: anytype) noreturn {
     say(fmt ++ "\n", args);
     exit(1);
+}
+
+/// what the font renderer noted about the texts drawn: the font that stood in, characters without a glyph
+fn sayNotes() void {
+    var it = std.mem.tokenizeScalar(u8, std.mem.span(wzb_notes()), '\n');
+    while (it.next()) |line| say("text: {s}\n", .{line});
 }
 
 fn seconds() f64 {
@@ -98,7 +107,11 @@ const ops = [_]OpInfo{
     .{ .name = "Mask", .kinds = "i", .nin = 3 },
     .{ .name = "Format", .kinds = "", .nin = 1 },
     .{ .name = "Pass", .kinds = "", .nin = 1 },
+    // x, y, the font's height, the character width (0: the font's own), colour, flags, space around a font page's
+    // letters (whole pixels, then parts of the picture), line height; and two strings: the text and the font's name
+    .{ .name = "Text", .kinds = "ffffciiff", .nin = 1 },
 };
+const OP_TEXT = 28;
 const OP_FLAT = 0;
 const OP_NORMALS = 16;
 const OP_TRANSFORM = 13;
@@ -134,7 +147,38 @@ const Node = struct {
     is_base: bool = false, // the top of the surface layer, marked while the cleaning moves operators
     keep: bool = false, // built from a reading: the cleaning by the inner measure does not remove it
     grey: bool = false, // its colours are tuned as greys: a light or an added noise changes shade, not hue
+    s: [2]u16 = .{ 0, 0 }, // Text: its text and its font's name, as places in the string pool (0 is the empty string)
 };
+
+// The strings of Text operators: 8-bit, Windows code page 1252, kept once each.
+var spool: [512][:0]const u8 = undefined;
+var spool_n: usize = 0;
+
+fn intern(bytes: []const u8) u16 {
+    if (spool_n == 0) {
+        spool[0] = "";
+        spool_n = 1;
+    }
+    for (spool[0..spool_n], 0..) |x, i| {
+        if (std.mem.eql(u8, x, bytes)) return @intCast(i);
+    }
+    if (spool_n >= spool.len) die("more than {d} different strings", .{spool.len});
+    const m = alloc.allocSentinel(u8, bytes.len, 0) catch die("out of memory", .{});
+    @memcpy(m, bytes);
+    spool[spool_n] = m;
+    spool_n += 1;
+    return @intCast(spool_n - 1);
+}
+
+fn strOf(i: u16) [:0]const u8 {
+    if (spool_n == 0) return "";
+    return spool[i];
+}
+
+/// a string as werkkzeug3 stores it: a length word, then the bytes and their end mark, filled to whole words
+fn stringBytes(i: u16) usize {
+    return 4 + 4 * ((strOf(i).len + 1 + 3) / 4);
+}
 
 const Graph = struct {
     n: usize = 0,
@@ -144,7 +188,10 @@ const Graph = struct {
     /// werkkzeug3's storage: one class byte and the parameter words of every operator
     fn bytes(g: *const Graph) usize {
         var b: usize = 0;
-        for (g.nodes[0..g.n]) |nd| b += 1 + 4 * @as(usize, ops[nd.op].kinds.len);
+        for (g.nodes[0..g.n]) |nd| {
+            b += 1 + 4 * @as(usize, ops[nd.op].kinds.len);
+            if (nd.op == OP_TEXT) b += stringBytes(nd.s[0]) + stringBytes(nd.s[1]);
+        }
         return b;
     }
 
@@ -291,7 +338,19 @@ fn parseScript(text: []const u8) Graph {
                 if (!found) die("{s}: input {s} is not defined above it", .{ id, nm });
             }
         }
+        var ns: usize = 0;
         while (t.next()) |hx| {
+            if (std.mem.startsWith(u8, hx, "s=")) {
+                // a string: s= and its bytes as hex digits
+                const hd = hx[2..];
+                if (ns >= 2 or hd.len % 2 != 0) die("{s}: bad string {s}", .{ id, hx });
+                var tmp: [600]u8 = undefined;
+                if (hd.len / 2 > tmp.len) die("{s}: a string longer than {d} bytes", .{ id, tmp.len });
+                for (0..hd.len / 2) |k| tmp[k] = std.fmt.parseInt(u8, hd[2 * k .. 2 * k + 2], 16) catch die("{s}: bad string {s}", .{ id, hx });
+                nd.s[ns] = intern(tmp[0 .. hd.len / 2]);
+                ns += 1;
+                continue;
+            }
             if (nd.nw < NW) {
                 nd.w[nd.nw] = std.fmt.parseInt(u32, hx, 16) catch die("{s}: bad word {s}", .{ id, hx });
                 nd.nw += 1;
@@ -320,6 +379,12 @@ fn scriptText(g: *const Graph, buf: []u8) []u8 {
         for (0..ops[nd.op].kinds.len) |p| {
             n += (std.fmt.bufPrint(buf[n..], " {x}", .{nd.w[p]}) catch die("script too long", .{})).len;
         }
+        if (nd.op == OP_TEXT) {
+            for (nd.s) |si| {
+                n += (std.fmt.bufPrint(buf[n..], " s=", .{}) catch die("script too long", .{})).len;
+                for (strOf(si)) |ch| n += (std.fmt.bufPrint(buf[n..], "{x:0>2}", .{ch}) catch die("script too long", .{})).len;
+            }
+        }
         buf[n] = '\n';
         n += 1;
     }
@@ -337,6 +402,7 @@ var cache_cap: usize = 1500;
 var n_draw: u64 = 0; // operators really drawn
 var n_eval: u64 = 0; // graphs asked for
 var n_refused: u64 = 0;
+var say_refusals: bool = false; // render says why an operator refused; the fitter tries values in silence
 
 fn cacheClear() void {
     for (cache) |*s| {
@@ -391,6 +457,12 @@ fn draw(g: *const Graph, size: u32) ?*anyopaque {
         }
         var h: u64 = mix(0x1234567, @as(u64, nd.op) + (@as(u64, size) << 8));
         for (0..nk) |p| h = mix(h, w[p]);
+        if (nd.op == OP_TEXT) {
+            for (nd.s) |si| {
+                h = mix(h, 0x7e87);
+                for (strOf(si)) |ch| h = mix(h, ch);
+            }
+        }
         for (nd.in[0..nd.nin]) |v| h = mix(h, hs[v]);
         hs[i] = h;
         if (cacheFind(h)) |s| {
@@ -401,10 +473,12 @@ fn draw(g: *const Graph, size: u32) ?*anyopaque {
         var inp: [MAXIN]?*anyopaque = undefined;
         for (nd.in[0..nd.nin], 0..) |v, k| inp[k] = bm[v];
         var out: ?*anyopaque = null;
-        var err: [200]u8 = undefined;
-        const r = wzb_apply(ops[nd.op].name.ptr, &w, nd.nin, &inp, &out, &err, 200);
+        var err: [300]u8 = [_]u8{0} ** 300;
+        if (nd.op == OP_TEXT) wzb_strings(strOf(nd.s[0]).ptr, strOf(nd.s[1]).ptr);
+        const r = wzb_apply(ops[nd.op].name.ptr, &w, nd.nin, &inp, &out, &err, 300);
         n_draw += 1;
         if (r != 0) {
+            if (say_refusals) say("refused: v{d} {s}: {s}\n", .{ i, ops[nd.op].name, std.mem.sliceTo(&err, 0) });
             n_refused += 1;
             cachePut(h, null);
             return null;
@@ -1206,6 +1280,7 @@ const Reading = struct {
     row0: f32 = 0, // where the first row starts, as a share of the side
     jmul: u32 = 0xff404040, // the joints' own colour over the shapes' own colour, measured in the joints
     jw: [2]f32 = .{ 0.02, 0.02 }, // the joints' width across and down, as shares of the cell
+    fig: Figure = .{}, // a figure on a ground, and its pieces read as glyphs (the reading behind Text)
 };
 
 /// the picture made smaller by whole steps: the mean of every block
@@ -2185,6 +2260,759 @@ fn readPicture(t: *Target) Reading {
     return r;
 }
 
+// ---------------------------------------------------------------- a glyph shape: the reading behind Text
+//
+// What in the pixels says "a glyph shape is here": the picture is a figure in one flat shade on a ground in
+// another, and its pieces, each stretched to its own box, lie over the same picture of a glyph of one of the
+// fonts, drawn from that font's outlines, and stand on one line at one size. The letter is found by laying
+// the font's own outlines over the ink; nobody names it. A box or a disc is not a glyph: GlowRect draws those.
+
+const GS = 24; // the side of a shape's picture, stretched to its own box
+const NFONT = 3;
+/// the font names .kkrieger's Text operators hold ("" is werkkzeug3's "arial"); the font map says which file draws each
+const font_names = [NFONT][:0]const u8{ "", "times new roman", "verdana" };
+const Templ = struct { font: u8, ch: u8, m: [GS * GS]bool, aspect: f32, inkh: f32, top: f32, adv: f32, lsb: f32, plain: bool, parts: u8, rich: bool };
+var templs: std.ArrayList(Templ) = .empty;
+var font_space = [_]f32{0} ** NFONT;
+var font_avg = [_]f32{0} ** NFONT;
+var font_have = [_]bool{false} ** NFONT;
+var templs_loaded = false;
+
+/// how much of a shape must lie over a glyph, and the glyph over it (their common part over their union).
+/// Measured: the letters of .kkrieger's plain texts give 0.86 to 1.00 against their own font, letters bent by a
+/// Distort 0.74 and more; the best glyph for the pieces of a noise, a patch or a swirl gives 0.35 to 0.66.
+var glyph_t: f32 = 0.70;
+/// a line is started by a shape that reaches glyph_t; once a line stands, a shape that fits the line's size and
+/// top is taken with this much less (a letter bent by a Distort still stands on its line)
+const MEMBER_SLACK: f32 = 0.12;
+/// a figure: at least this share of the picture lies in the two flat shades
+const TWO_T: f32 = 0.80;
+
+/// a box, or a disc stretched to its box: what GlowRect draws
+fn plainShape(m: *const [GS * GS]bool) bool {
+    var ink: usize = 0;
+    var both: usize = 0;
+    var either: usize = 0;
+    for (0..GS) |y| {
+        for (0..GS) |x| {
+            const dx = (@as(f32, @floatFromInt(x)) + 0.5) / GS * 2.0 - 1.0;
+            const dy = (@as(f32, @floatFromInt(y)) + 0.5) / GS * 2.0 - 1.0;
+            const in = dx * dx + dy * dy <= 1.0;
+            const v = m[y * GS + x];
+            if (v) ink += 1;
+            if (v and in) both += 1;
+            if (v or in) either += 1;
+        }
+    }
+    return ink * 100 >= GS * GS * 88 or both * 100 >= either * 85;
+}
+
+/// A shape with enough form to say "glyph" on its own: in a quarter or more of its rows, or of its columns, a
+/// line through it crosses ink twice or more (o, e, a, g, k, h, n, s, c, A, 8). A comma, a dash, a bar, a slash,
+/// an r or a t are single strokes that a blob or a bent box also gives: they are read on a line that such a
+/// shape started, never as the start of one.
+fn richShape(m: *const [GS * GS]bool) bool {
+    var rows: usize = 0;
+    var cols: usize = 0;
+    for (0..GS) |a| {
+        var runs_r: usize = 0;
+        var runs_c: usize = 0;
+        var pr = false;
+        var pc = false;
+        for (0..GS) |b| {
+            const vr = m[a * GS + b];
+            const vc = m[b * GS + a];
+            if (vr and !pr) runs_r += 1;
+            if (vc and !pc) runs_c += 1;
+            pr = vr;
+            pc = vc;
+        }
+        if (runs_r >= 2) rows += 1;
+        if (runs_c >= 2) cols += 1;
+    }
+    return rows * 4 >= GS or cols * 4 >= GS;
+}
+
+/// how many separate pieces of ink a small picture holds
+fn partsOf(m: *const [GS * GS]bool) u8 {
+    var seen = [_]bool{false} ** (GS * GS);
+    var stack: [GS * GS]u16 = undefined;
+    var parts: u8 = 0;
+    for (0..GS * GS) |s| {
+        if (!m[s] or seen[s]) continue;
+        parts += 1;
+        var sp: usize = 0;
+        stack[sp] = @intCast(s);
+        sp += 1;
+        seen[s] = true;
+        while (sp > 0) {
+            sp -= 1;
+            const p: usize = stack[sp];
+            const x = p % GS;
+            const y = p / GS;
+            const nb = [4][2]i32{ .{ -1, 0 }, .{ 1, 0 }, .{ 0, -1 }, .{ 0, 1 } };
+            for (nb) |d| {
+                const xx = @as(i32, @intCast(x)) + d[0];
+                const yy = @as(i32, @intCast(y)) + d[1];
+                if (xx < 0 or yy < 0 or xx >= GS or yy >= GS) continue;
+                const q: usize = @intCast(yy * GS + xx);
+                if (m[q] and !seen[q]) {
+                    seen[q] = true;
+                    stack[sp] = @intCast(q);
+                    sp += 1;
+                }
+            }
+        }
+    }
+    return parts;
+}
+
+fn loadTemplates() void {
+    if (templs_loaded) return;
+    templs_loaded = true;
+    var buf: [GS * GS]u8 = undefined;
+    for (font_names, 0..) |fname, fi| {
+        var v: [6]f32 = undefined;
+        var c: c_int = 32;
+        while (c < 256) : (c += 1) {
+            if (c >= 127 and c < 161) continue;
+            const r = wzb_glyph_mask(fname.ptr, c, GS, &buf, &v);
+            if (r == 1) continue;
+            font_have[fi] = true;
+            font_avg[fi] = v[5];
+            if (c == 32) {
+                font_space[fi] = v[3];
+                continue;
+            }
+            if (r != 0) continue;
+            var tp = Templ{ .font = @intCast(fi), .ch = @intCast(c), .m = undefined, .aspect = v[0], .inkh = v[1], .top = v[2], .adv = v[3], .lsb = v[4], .plain = false, .parts = 1, .rich = false };
+            for (0..GS * GS) |i| tp.m[i] = buf[i] >= 128;
+            tp.plain = plainShape(&tp.m);
+            tp.parts = partsOf(&tp.m);
+            tp.rich = richShape(&tp.m);
+            templs.append(alloc, tp) catch die("out of memory", .{});
+        }
+    }
+}
+
+const MAXSHAPE = 300;
+const MAXC = 12;
+const Shape = struct {
+    x0: usize = 0,
+    y0: usize = 0,
+    x1: usize = 0,
+    y1: usize = 0,
+    area: usize = 0,
+    ids: [2]u32 = .{ 0, 0 },
+    m: [GS * GS]bool = undefined,
+    plain: bool = false,
+    rich: bool = false,
+    nc: usize = 0, // the glyphs of the font in hand that lie over it well enough
+    c: [MAXC]u16 = undefined,
+    ci: [MAXC]f32 = undefined,
+    best: f32 = 0, // the best any non-plain glyph does
+    used: bool = false,
+    dead: bool = false,
+};
+
+fn shapeMask(labels: []const u32, n: usize, sh: *Shape) void {
+    const w = sh.x1 - sh.x0;
+    const h = sh.y1 - sh.y0;
+    for (0..GS) |gy| {
+        const ya = sh.y0 + gy * h / GS;
+        const yb = @max(ya + 1, sh.y0 + (gy + 1) * h / GS);
+        for (0..GS) |gx| {
+            const xa = sh.x0 + gx * w / GS;
+            const xb = @max(xa + 1, sh.x0 + (gx + 1) * w / GS);
+            var cnt: usize = 0;
+            var tot: usize = 0;
+            for (ya..@min(yb, n)) |y| {
+                for (xa..@min(xb, n)) |x| {
+                    tot += 1;
+                    const l = labels[y * n + x];
+                    if (l != 0 and (l == sh.ids[0] or l == sh.ids[1])) cnt += 1;
+                }
+            }
+            sh.m[gy * GS + gx] = tot > 0 and 2 * cnt >= tot;
+        }
+    }
+    sh.plain = plainShape(&sh.m);
+    sh.rich = !sh.plain and richShape(&sh.m);
+}
+
+fn iou(a: *const [GS * GS]bool, b: *const [GS * GS]bool) f32 {
+    var both: usize = 0;
+    var either: usize = 0;
+    for (a, b) |x, y| {
+        if (x and y) both += 1;
+        if (x or y) either += 1;
+    }
+    return if (either == 0) 0 else @as(f32, @floatFromInt(both)) / @as(f32, @floatFromInt(either));
+}
+
+/// the connected pieces of the ink, each with its box; returns how many, or MAXSHAPE + 1 when there are more
+fn pieces(ink: []const bool, n: usize, labels: []u32, out: []Shape) usize {
+    @memset(labels, 0);
+    const stack = alloc.alloc(u32, n * n) catch die("out of memory", .{});
+    defer alloc.free(stack);
+    var count: usize = 0;
+    for (0..n * n) |s| {
+        if (!ink[s] or labels[s] != 0) continue;
+        if (count >= MAXSHAPE) return MAXSHAPE + 1;
+        const id: u32 = @intCast(count + 1);
+        var sh = Shape{ .x0 = n, .y0 = n, .x1 = 0, .y1 = 0, .ids = .{ id, 0 } };
+        var sp: usize = 0;
+        stack[sp] = @intCast(s);
+        sp += 1;
+        labels[s] = id;
+        while (sp > 0) {
+            sp -= 1;
+            const p: usize = stack[sp];
+            const x = p % n;
+            const y = p / n;
+            sh.area += 1;
+            sh.x0 = @min(sh.x0, x);
+            sh.y0 = @min(sh.y0, y);
+            sh.x1 = @max(sh.x1, x + 1);
+            sh.y1 = @max(sh.y1, y + 1);
+            if (x > 0 and ink[p - 1] and labels[p - 1] == 0) {
+                labels[p - 1] = id;
+                stack[sp] = @intCast(p - 1);
+                sp += 1;
+            }
+            if (x + 1 < n and ink[p + 1] and labels[p + 1] == 0) {
+                labels[p + 1] = id;
+                stack[sp] = @intCast(p + 1);
+                sp += 1;
+            }
+            if (y > 0 and ink[p - n] and labels[p - n] == 0) {
+                labels[p - n] = id;
+                stack[sp] = @intCast(p - n);
+                sp += 1;
+            }
+            if (y + 1 < n and ink[p + n] and labels[p + n] == 0) {
+                labels[p + n] = id;
+                stack[sp] = @intCast(p + n);
+                sp += 1;
+            }
+        }
+        out[count] = sh;
+        count += 1;
+    }
+    return count;
+}
+
+const TextRead = struct { font: u8 = 0, x: f32 = 0, y: f32 = 0, size: f32 = 0, wide: f32 = 0, len: usize = 0, str: [200]u8 = undefined };
+const MAXTEXT = 24;
+const Figure = struct {
+    two: f32 = 0, // the share of the picture in the two flat shades
+    ink: f32 = 0, // the smaller shade's share: the ink
+    ink_high: bool = true,
+    nshape: usize = 0,
+    nrich: usize = 0, // pieces with enough form to be a glyph on their own
+    font: u8 = 0,
+    explained: f32 = 0, // the share of the ink that lies in shapes read as glyphs on a line
+    like: f32 = 0, // how well those shapes lie over their glyphs (1: exactly)
+    best_single: f32 = 0, // how well each piece lies over its best glyph, weighted by the pieces' ink, line or no line
+    ntext: usize = 0,
+    texts: [MAXTEXT]TextRead = undefined,
+    nun: usize = 0, // twirls taken out of the picture before the glyphs were read: strength, gamma, radius, centre x, y
+    un: [3][5]f32 = undefined,
+};
+
+/// the glyphs of one font that lie over a shape well enough, the best first
+fn shapeCands(sh: *Shape, font: u8, parts_min: u8) void {
+    sh.nc = 0;
+    sh.best = 0;
+    const asp = @as(f32, @floatFromInt(sh.x1 - sh.x0)) / @as(f32, @floatFromInt(@max(1, sh.y1 - sh.y0)));
+    for (templs.items, 0..) |*tp, ti| {
+        if (tp.font != font or tp.parts < parts_min) continue;
+        if (sh.plain != tp.plain) continue;
+        // the shape's own proportions must be the glyph's (a stretched text keeps them within this)
+        const ra = @abs(@log(asp / tp.aspect));
+        if (ra > @as(f32, if (sh.plain) 0.5 else 0.27)) continue;
+        const v = iou(&sh.m, &tp.m);
+        if (sh.rich and tp.rich) sh.best = @max(sh.best, v);
+        if (v < glyph_t - MEMBER_SLACK) continue;
+        var at = sh.nc;
+        while (at > 0 and sh.ci[at - 1] < v) at -= 1;
+        if (at >= MAXC) continue;
+        var j = @min(sh.nc, MAXC - 1);
+        while (j > at) : (j -= 1) {
+            sh.c[j] = sh.c[j - 1];
+            sh.ci[j] = sh.ci[j - 1];
+        }
+        sh.c[at] = @intCast(ti);
+        sh.ci[at] = v;
+        if (sh.nc < MAXC) sh.nc += 1;
+    }
+}
+
+fn fitsLine(sh: *const Shape, tp: *const Templ, em: f32, top: f32) f32 {
+    const tol = @max(1.6, 0.06 * em);
+    const h: f32 = @floatFromInt(sh.y1 - sh.y0);
+    const e1 = @abs(h - tp.inkh * em);
+    const e2 = @abs(@as(f32, @floatFromInt(sh.y0)) - (top + tp.top * em));
+    if (e1 > tol or e2 > tol) return -1;
+    return e1 + e2;
+}
+
+/// Read the shapes as lines of one font's glyphs. Returns the ink explained (pixels) and adds the texts to fig.
+fn readLines(shapes: []Shape, font: u8, n: usize, fig: *Figure, like_sum: *f64) usize {
+    var explained: usize = 0;
+    for (shapes) |*sh| {
+        sh.used = false;
+        if (!sh.dead) shapeCands(sh, font, 1);
+    }
+    const order = alloc.alloc(usize, shapes.len) catch die("out of memory", .{});
+    defer alloc.free(order);
+    const pick = alloc.alloc(u16, shapes.len) catch die("out of memory", .{});
+    defer alloc.free(pick);
+    var lines: usize = 0;
+    while (lines < MAXTEXT) : (lines += 1) {
+        // the line (size and top) most shapes agree on; a line needs one shape that is no box and no disc
+        var best_n: usize = 0;
+        var best_s: f32 = 0;
+        var best_em: f32 = 0;
+        var best_top: f32 = 0;
+        for (shapes) |*si| {
+            if (si.used or si.dead or !si.rich) continue;
+            for (si.c[0..si.nc], si.ci[0..si.nc]) |ti, vi| {
+                if (vi < glyph_t) continue;
+                const tp = &templs.items[ti];
+                if (!tp.rich) continue;
+                const em = @as(f32, @floatFromInt(si.y1 - si.y0)) / tp.inkh;
+                const top = @as(f32, @floatFromInt(si.y0)) - tp.top * em;
+                var cnt: usize = 0;
+                var sum: f32 = 0;
+                for (shapes) |*sj| {
+                    if (sj.used or sj.dead) continue;
+                    for (sj.c[0..sj.nc], sj.ci[0..sj.nc]) |tj, vj| {
+                        if (fitsLine(sj, &templs.items[tj], em, top) >= 0) {
+                            cnt += 1;
+                            sum += vj;
+                            break;
+                        }
+                    }
+                }
+                if (cnt > best_n or (cnt == best_n and sum > best_s)) {
+                    best_n = cnt;
+                    best_s = sum;
+                    best_em = em;
+                    best_top = top;
+                }
+            }
+        }
+        if (best_n == 0) break;
+        // its members, left to right, each with the glyph whose box fits best
+        var m: usize = 0;
+        for (shapes, 0..) |*sj, j| {
+            if (sj.used or sj.dead) continue;
+            // of the glyphs that fit the line, the one that lies best over the shape; how well its box fits the line
+            // counts for a tenth at most, enough to tell o from O and not enough to take an n for an o
+            var bt: ?u16 = null;
+            var be: f32 = -1e9;
+            const tol2 = 2.0 * @max(1.6, 0.06 * best_em);
+            for (sj.c[0..sj.nc], sj.ci[0..sj.nc]) |tj, vj| {
+                const e = fitsLine(sj, &templs.items[tj], best_em, best_top);
+                if (e < 0) continue;
+                const worth = vj - 0.1 * e / tol2;
+                if (worth > be) {
+                    be = worth;
+                    bt = tj;
+                }
+            }
+            if (bt) |tj| {
+                order[m] = j;
+                pick[j] = tj;
+                m += 1;
+            }
+        }
+        var a: usize = 1;
+        while (a < m) : (a += 1) {
+            const v = order[a];
+            var b = a;
+            while (b > 0 and shapes[order[b - 1]].x0 > shapes[v].x0) : (b -= 1) order[b] = order[b - 1];
+            order[b] = v;
+        }
+        // a text stretched sideways: the middle value of the letters' own stretch
+        var sx: f32 = 1;
+        {
+            var rs: [MAXSHAPE]f32 = undefined;
+            var nr: usize = 0;
+            for (order[0..m]) |j| {
+                const sh = &shapes[j];
+                if (sh.plain) continue;
+                rs[nr] = (@as(f32, @floatFromInt(sh.x1 - sh.x0)) / @as(f32, @floatFromInt(sh.y1 - sh.y0))) / templs.items[pick[j]].aspect;
+                nr += 1;
+            }
+            if (nr > 0) {
+                std.mem.sort(f32, rs[0..nr], {}, std.sort.asc(f32));
+                sx = rs[nr / 2];
+                if (@abs(sx - 1.0) < 0.06) sx = 1;
+            }
+        }
+        const fn_: f32 = @floatFromInt(n);
+        const space = font_space[font] * best_em * sx;
+        var k: usize = 0;
+        while (k < m) {
+            // one Text operator: the letters that follow each other by the font's own advances, spaces between
+            if (fig.ntext >= MAXTEXT) break;
+            var tr = TextRead{ .font = font };
+            const s0 = &shapes[order[k]];
+            const t0 = &templs.items[pick[order[k]]];
+            const pen0 = @as(f32, @floatFromInt(s0.x0)) - t0.lsb * best_em * sx;
+            // werkkzeug3 draws a plain text (space + 2) pixels right and down of where its values say; the space
+            // around letters is 2 in every plain text of .kkrieger (the operator's own default), so 4 pixels
+            tr.x = (pen0 - 4.0) / fn_;
+            tr.y = (best_top - 4.0) / fn_;
+            tr.size = best_em / fn_;
+            tr.wide = if (sx == 1) 0 else sx * font_avg[font] * best_em / fn_;
+            var expect = pen0;
+            while (k < m and tr.len + 42 < tr.str.len) {
+                const sh = &shapes[order[k]];
+                const tp = &templs.items[pick[order[k]]];
+                const pen = @as(f32, @floatFromInt(sh.x0)) - tp.lsb * best_em * sx;
+                const gap = pen - expect;
+                const nsp_f = if (space > 0) @round(gap / space) else 0;
+                const tol = @max(1.6, 0.08 * best_em);
+                if (nsp_f < 0 or nsp_f > 40 or @abs(gap - nsp_f * space) > tol) break;
+                var q: usize = 0;
+                while (q < @as(usize, @intFromFloat(nsp_f))) : (q += 1) {
+                    tr.str[tr.len] = ' ';
+                    tr.len += 1;
+                }
+                tr.str[tr.len] = tp.ch;
+                tr.len += 1;
+                expect += nsp_f * space + @round(tp.adv * best_em * sx);
+                sh.used = true;
+                explained += sh.area;
+                var vv: f32 = 0;
+                for (sh.c[0..sh.nc], sh.ci[0..sh.nc]) |tc, vc| {
+                    if (tc == pick[order[k]]) vv = vc;
+                }
+                like_sum.* += @as(f64, vv) * @as(f64, @floatFromInt(sh.area));
+                k += 1;
+            }
+            if (tr.len == 0) {
+                // a shape that does not follow: it starts a text of its own on the next turn
+                shapes[order[k]].used = true;
+                k += 1;
+                continue;
+            }
+            fig.texts[fig.ntext] = tr;
+            fig.ntext += 1;
+        }
+        // members that were not placed stay out of further lines
+        for (order[0..m]) |j| shapes[j].used = true;
+    }
+    return explained;
+}
+
+/// The figure reading, on the picture along its colour axis (0..1, n by n).
+fn readFigure(t: []const f32, n: usize, fig: *Figure) void {
+    loadTemplates();
+    fig.ntext = 0;
+    fig.explained = 0;
+    fig.like = 0;
+    fig.best_single = 0;
+    var lo: usize = 0;
+    var hi: usize = 0;
+    for (t) |v| {
+        if (v < 0.25) lo += 1;
+        if (v > 0.75) hi += 1;
+    }
+    const tot: f32 = @floatFromInt(n * n);
+    fig.two = @as(f32, @floatFromInt(lo + hi)) / tot;
+    fig.ink_high = hi <= lo;
+    fig.ink = @as(f32, @floatFromInt(@min(lo, hi))) / tot;
+    fig.nshape = 0;
+    if (fig.two < TWO_T or fig.ink < 0.0005) return;
+    const ink = alloc.alloc(bool, n * n) catch die("out of memory", .{});
+    defer alloc.free(ink);
+    var ink_px: usize = 0;
+    for (t, ink) |v, *b| {
+        b.* = if (fig.ink_high) v > 0.5 else v < 0.5;
+        if (b.*) ink_px += 1;
+    }
+    const labels = alloc.alloc(u32, n * n) catch die("out of memory", .{});
+    defer alloc.free(labels);
+    const shapes = alloc.alloc(Shape, MAXSHAPE * 2) catch die("out of memory", .{});
+    defer alloc.free(shapes);
+    const ns = pieces(ink, n, labels, shapes);
+    fig.nshape = ns;
+    if (ns > MAXSHAPE or ns == 0) return;
+    fig.nrich = 0;
+    for (shapes[0..ns]) |*sh| {
+        shapeMask(labels, n, sh);
+        if (sh.rich) fig.nrich += 1;
+    }
+    var best_font: u8 = 0;
+    var best_val: f64 = -1;
+    var best_fig = Figure{};
+    for (0..NFONT) |fi| {
+        if (!font_have[fi]) continue;
+        const font: u8 = @intCast(fi);
+        // two pieces one above the other that together are a glyph of two pieces (i, j, !, ?, :, ;, =)
+        var nn = ns;
+        for (shapes[0..ns]) |*sh| sh.dead = false;
+        for (0..ns) |a| {
+            for (0..ns) |b| {
+                if (a == b or shapes[a].dead or shapes[b].dead or nn >= MAXSHAPE * 2) continue;
+                const sa = &shapes[a];
+                const sb = &shapes[b];
+                if (sa.y1 > sb.y0) continue; // a lies above b
+                const ov = @as(i64, @intCast(@min(sa.x1, sb.x1))) - @as(i64, @intCast(@max(sa.x0, sb.x0)));
+                const wmin: i64 = @intCast(@min(sa.x1 - sa.x0, sb.x1 - sb.x0));
+                if (ov * 2 < wmin) continue;
+                const hmax = @max(sa.y1 - sa.y0, sb.y1 - sb.y0);
+                if (sb.y0 - sa.y1 > hmax + hmax / 4) continue;
+                var mg = Shape{ .x0 = @min(sa.x0, sb.x0), .y0 = sa.y0, .x1 = @max(sa.x1, sb.x1), .y1 = sb.y1, .area = sa.area + sb.area, .ids = .{ sa.ids[0], sb.ids[0] } };
+                if (sa.ids[1] != 0 or sb.ids[1] != 0) continue;
+                shapeMask(labels, n, &mg);
+                mg.plain = false;
+                mg.rich = true; // two pieces that are one glyph (i, j, ?, !): crossed twice by every line through both
+                shapeCands(&mg, font, 2);
+                if (mg.nc > 0 and mg.ci[0] >= glyph_t + 0.08) {
+                    shapes[a].dead = true;
+                    shapes[b].dead = true;
+                    shapes[nn] = mg;
+                    nn += 1;
+                }
+            }
+        }
+        var f2 = Figure{};
+        var like_sum: f64 = 0;
+        const ex = readLines(shapes[0..nn], font, n, &f2, &like_sum);
+        // every piece's best glyph, weighted by the piece's ink: one small piece that happens to look like a
+        // letter does not make a shredded figure a text
+        var single: f32 = 0;
+        for (shapes[0..nn]) |*sh| {
+            if (!sh.dead) single += sh.best * @as(f32, @floatFromInt(sh.area));
+        }
+        single /= @as(f32, @floatFromInt(@max(1, ink_px)));
+        f2.explained = @as(f32, @floatFromInt(ex)) / @as(f32, @floatFromInt(@max(1, ink_px)));
+        f2.like = if (ex > 0) @floatCast(like_sum / @as(f64, @floatFromInt(ex))) else 0;
+        f2.best_single = single;
+        const val = @as(f64, f2.explained) * f2.like;
+        if (val > best_val or (val == best_val and single > best_fig.best_single)) {
+            best_val = val;
+            best_font = font;
+            best_fig = f2;
+        }
+    }
+    fig.font = best_font;
+    fig.explained = best_fig.explained;
+    fig.like = best_fig.like;
+    fig.best_single = best_fig.best_single;
+    fig.ntext = best_fig.ntext;
+    fig.texts = best_fig.texts;
+}
+
+/// after twirls were taken out, the figure must be the glyph itself: a true Twirl run backwards gives the glyph
+/// back (0.99 on .kkrieger's g), while the search can also bend a bar into a tilde or a hook into an e (0.75 to 0.77)
+const UNTWIRL_T: f32 = 0.90;
+
+fn figureIsText(fig: *const Figure) bool {
+    const need: f32 = if (fig.nun > 0) UNTWIRL_T else glyph_t;
+    return fig.two >= TWO_T and fig.ntext > 0 and fig.explained >= 0.85 and fig.like >= need;
+}
+
+/// how far a figure is a text: the share of its ink read as glyphs on lines times how well they lie over their
+/// glyphs; while no line stands, the best one glyph does over one piece, kept below what a line gives
+fn figureWorth(fig: *const Figure) f32 {
+    if (fig.ntext > 0) return @max(fig.explained * fig.like, 0.6 * fig.best_single);
+    return 0.6 * fig.best_single;
+}
+
+fn fontSaid(font: u8) []const u8 {
+    return if (font_names[font].len == 0) "arial (the empty name)" else font_names[font];
+}
+
+fn sayFigure(fig: *const Figure) void {
+    say("figure: {d:.2} of the picture lies in two flat shades, the ink is {d:.3} of it in {d} pieces, {d} with form enough for a glyph; ", .{ fig.two, fig.ink, fig.nshape, fig.nrich });
+    if (fig.two < TWO_T) {
+        say("no figure on a ground\n", .{});
+        return;
+    }
+    if (fig.nshape > MAXSHAPE) {
+        say("more than {d} pieces of ink: not read as glyphs\n", .{MAXSHAPE});
+        return;
+    }
+    say("each piece over its best glyph {d:.2}; as lines of {s}: {d:.2} of the ink, likeness {d:.2}, {d} text(s)\n", .{ fig.best_single, fontSaid(fig.font), fig.explained, fig.like, fig.ntext });
+    for (fig.un[0..fig.nun]) |u| say("  a twirl taken out first: strength {d:.3}, gamma {d:.0}, radius {d:.3}, centre {d:.3}, {d:.3}\n", .{ -u[0], u[1], u[2], u[3], u[4] });
+    for (fig.texts[0..fig.ntext]) |*tr| {
+        var shown: [220]u8 = undefined;
+        var l: usize = 0;
+        for (tr.str[0..tr.len]) |ch| {
+            shown[l] = if (ch >= 32 and ch < 127) ch else '?';
+            l += 1;
+        }
+        say("  text \"{s}\" at {d:.4}, {d:.4}, height {d:.4}, width {d:.4}\n", .{ shown[0..l], tr.x, tr.y, tr.size, tr.wide });
+    }
+}
+
+extern "c" fn wzb_from_rgba(xs: c_int, ys: c_int, rgba: [*]const u8) ?*anyopaque;
+
+/// one Twirl of werkkzeug's own code run on a grey picture (n by n, 0..1)
+fn twirlPicture(src: ?*anyopaque, n: usize, u: [5]f32, out: []f32, rgba: []u8) bool {
+    var w: [32]u32 = [_]u32{0} ** 32;
+    w[0] = wordOf(u[0]);
+    w[1] = wordOf(u[1]);
+    w[2] = wordOf(u[2]);
+    w[3] = wordOf(u[2]);
+    w[4] = wordOf(u[3]);
+    w[5] = wordOf(u[4]);
+    var inp = [1]?*anyopaque{src};
+    var res: ?*anyopaque = null;
+    var err: [200]u8 = undefined;
+    if (wzb_apply("Twirl", &w, 1, &inp, &res, &err, 200) != 0) return false;
+    wzb_rgba(res, rgba.ptr);
+    wzb_free(res);
+    for (0..n * n) |i| out[i] = @as(f32, @floatFromInt(rgba[4 * i])) / 255.0;
+    return true;
+}
+
+fn greyBitmap(t: []const f32, n: usize, rgba: []u8) ?*anyopaque {
+    for (0..n * n) |i| {
+        const b: u8 = @intFromFloat(@min(255.0, @max(0.0, t[i] * 255.0 + 0.5)));
+        rgba[4 * i] = b;
+        rgba[4 * i + 1] = b;
+        rgba[4 * i + 2] = b;
+        rgba[4 * i + 3] = 255;
+    }
+    return wzb_from_rgba(@intCast(n), @intCast(n), rgba.ptr);
+}
+
+/// A figure that is no glyph, in a picture where the ring reading found a swirl: the Twirl run backwards.
+/// Each candidate twirl (centres on eighths of the side, three radii, three gammas, strengths in eighths of a
+/// turn: the fitter's own grid) is taken out of the picture with werkkzeug's own Twirl at minus its strength,
+/// and the figure is read again; the one after which the pieces lie best over a glyph is kept, up to three.
+/// What steers it is the glyph reading, not the inner measure.
+fn untwirl(t_full: []const f32, n_full: usize, fig: *Figure) void {
+    const m: usize = 128;
+    const small = shrink(t_full, n_full, m);
+    defer alloc.free(small);
+    const cur = alloc.alloc(f32, m * m) catch die("out of memory", .{});
+    defer alloc.free(cur);
+    const trial = alloc.alloc(f32, m * m) catch die("out of memory", .{});
+    defer alloc.free(trial);
+    const rgba = alloc.alloc(u8, n_full * n_full * 4) catch die("out of memory", .{});
+    defer alloc.free(rgba);
+    @memcpy(cur, small);
+    var f0 = Figure{};
+    readFigure(cur, m, &f0);
+    var have: f32 = figureWorth(&f0);
+    fig.nun = 0;
+    const radii = [_]f32{ 0.25, 0.5, 0.75 };
+    const gammas = [_]f32{ 2, 16, 48 };
+    while (fig.nun < 3) {
+        const src = greyBitmap(cur, m, rgba);
+        defer wzb_free(src);
+        var best: [5]f32 = undefined;
+        var best_v: f32 = have;
+        for (1..8) |cy| {
+            for (1..8) |cx| {
+                for (radii) |rad| {
+                    for (gammas) |ga| {
+                        var si: i32 = -6;
+                        while (si <= 6) : (si += 1) {
+                            if (si == 0) continue;
+                            const u = [5]f32{ @as(f32, @floatFromInt(si)) * 0.25, ga, rad, @as(f32, @floatFromInt(cx)) / 8.0, @as(f32, @floatFromInt(cy)) / 8.0 };
+                            if (!twirlPicture(src, m, u, trial, rgba)) continue;
+                            var f2 = Figure{};
+                            readFigure(trial, m, &f2);
+                            const v2 = figureWorth(&f2);
+                            if (v2 > best_v + 0.0001) {
+                                best_v = v2;
+                                best = u;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (best_v < have + 0.03) break;
+        // the strength once more, in eighths, around the best quarter
+        for ([_]f32{ -0.125, 0.125 }) |d| {
+            var u = best;
+            u[0] += d;
+            if (u[0] == 0 or !twirlPicture(src, m, u, trial, rgba)) continue;
+            var f2 = Figure{};
+            readFigure(trial, m, &f2);
+            const v2 = figureWorth(&f2);
+            if (v2 > best_v + 0.0001) {
+                best_v = v2;
+                best = u;
+            }
+        }
+        _ = twirlPicture(src, m, best, trial, rgba);
+        @memcpy(cur, trial);
+        have = best_v;
+        fig.un[fig.nun] = best;
+        fig.nun += 1;
+        say("  twirl backwards {d}: strength {d:.3}, gamma {d:.0}, radius {d:.2}, centre {d:.3}, {d:.3}: the figure's worth as text now {d:.2}\n", .{ fig.nun, best[0], best[1], best[2], best[3], best[4], have });
+    }
+    if (fig.nun == 0) return;
+    // the same twirls taken out of the picture at its own size, and the figure read there
+    const a = alloc.alloc(f32, n_full * n_full) catch die("out of memory", .{});
+    defer alloc.free(a);
+    const b = alloc.alloc(f32, n_full * n_full) catch die("out of memory", .{});
+    defer alloc.free(b);
+    @memcpy(a, t_full);
+    for (fig.un[0..fig.nun]) |u| {
+        const src = greyBitmap(a, n_full, rgba);
+        defer wzb_free(src);
+        if (!twirlPicture(src, n_full, u, b, rgba)) return;
+        @memcpy(a, b);
+    }
+    const keep_n = fig.nun;
+    const keep_u = fig.un;
+    readFigure(a, n_full, fig);
+    fig.nun = keep_n;
+    fig.un = keep_u;
+}
+
+fn textNode(tr: *const TextRead, col: u32) Node {
+    var nd = Node{ .op = OP_TEXT, .nw = 9, .keep = true };
+    nd.w[0] = wordOf(tr.x);
+    nd.w[1] = wordOf(tr.y);
+    nd.w[2] = wordOf(tr.size);
+    nd.w[3] = wordOf(tr.wide);
+    nd.w[4] = col;
+    nd.w[5] = 0;
+    nd.w[6] = 2;
+    nd.w[7] = wordOf(0.0);
+    nd.w[8] = wordOf(1.0);
+    nd.s[0] = intern(tr.str[0..tr.len]);
+    nd.s[1] = intern(font_names[tr.font]);
+    return nd;
+}
+
+/// a few values tried around what was read, each by steps that halve: the place and size of a text
+fn nudge(g: *Graph, t: *Target, items: []const [2]usize, steps: []const f32, rounds: usize) f32 {
+    var best = score(g, t);
+    var scale: f32 = 1;
+    for (0..rounds) |_| {
+        var improved = false;
+        for (items, steps) |it, st| {
+            const old = g.nodes[it[0]].w[it[1]];
+            for ([_]f32{ st * scale, -st * scale }) |d| {
+                g.nodes[it[0]].w[it[1]] = wordOf(f32of(old) + d);
+                const s = score(g, t);
+                if (s < best - 1e-6) {
+                    best = s;
+                    improved = true;
+                    break;
+                }
+                g.nodes[it[0]].w[it[1]] = old;
+            }
+        }
+        if (!improved) scale *= 0.5;
+    }
+    return best;
+}
+
 fn flatNode(col: u32) Node {
     var nd = Node{ .op = OP_FLAT, .nw = 3 };
     nd.w[2] = col;
@@ -2764,8 +3592,15 @@ fn fit(target_path: [*:0]const u8, prior_path: [*:0]const u8, prefix: []const u8
     // the picture read backwards: the noise between its two colours, the repeated shape, the relief
     // read at the picture's own size: a thin joint is lost in a smaller copy
     var tread = makeTarget(img, full);
-    const rd = readPicture(&tread);
+    var rd = readPicture(&tread);
     freeTarget(&tread);
+    // a figure on a ground, and whether its pieces are glyphs of a font (the reading behind Text)
+    readFigure(rd.t, rd.n, &rd.fig);
+    if (!figureIsText(&rd.fig) and rd.fig.two >= TWO_T and rd.fig.nshape > 0 and rd.fig.nshape <= 3 and rd.fig.nrich > 0 and rd.fig.ink >= 0.02 and rd.nring > 0) {
+        say("a figure of {d} piece(s) that is no glyph (best {d:.2}), and the ring reading found a swirl: the Twirl is run backwards\n", .{ rd.fig.nshape, rd.fig.best_single });
+        untwirl(rd.t, rd.n, &rd.fig);
+    }
+    sayFigure(&rd.fig);
     {
         var line: [200]u8 = undefined;
         var len: usize = 0;
@@ -2779,6 +3614,101 @@ fn fit(target_path: [*:0]const u8, prior_path: [*:0]const u8, prefix: []const u8
     }
     if (opt.read_only) return;
     if (!allowed(&rd, opt.structure, opt)) die("structure {s} is refused: its reading does not allow it on this picture", .{@tagName(opt.structure)});
+    if (opt.structure == .text) {
+        // The text read from the figure, drawn by werkkzeug's Text operator on a flat ground. Everything here was
+        // read: the ground and the ink are the picture's two colours, each text's letters, font, place and size come
+        // from the glyph reading, the twirls from running Twirl backwards. Only each text's place and size (by pixels
+        // and less, around what was read) and a Blur for soft edges are tried by the inner measure.
+        freeTarget(&t);
+        cacheClear();
+        cache_cap = 500;
+        t = makeTarget(img, full);
+        const ground = if (rd.fig.ink_high) rd.c0 else rd.c1;
+        const inkc = if (rd.fig.ink_high) rd.c1 else rd.c0;
+        g = Graph{};
+        g.nodes[0] = flatNode(ground);
+        g.nodes[0].nw = 3;
+        g.nodes[0].lock = true;
+        g.n = 1;
+        g.root = 0;
+        var items: [MAXTEXT * 3 + 8][2]usize = undefined;
+        var steps: [MAXTEXT * 3 + 8]f32 = undefined;
+        var ni: usize = 0;
+        const px = 1.0 / @as(f32, @floatFromInt(rd.n));
+        for (rd.fig.texts[0..rd.fig.ntext]) |*tr| {
+            var nd = textNode(tr, inkc);
+            nd.nin = 1;
+            nd.in[0] = @intCast(g.n - 1);
+            const k = append(&g, nd);
+            for (0..3) |w| {
+                items[ni] = .{ k, w };
+                steps[ni] = px;
+                ni += 1;
+            }
+        }
+        const last_text = g.n - 1;
+        var iu = rd.fig.nun;
+        while (iu > 0) {
+            iu -= 1;
+            const u = rd.fig.un[iu];
+            var tw = Node{ .op = OP_TWIRL, .nw = 7, .nin = 1, .keep = true };
+            tw.in[0] = @intCast(g.n - 1);
+            tw.w[0] = wordOf(-u[0]);
+            tw.w[1] = wordOf(u[1]);
+            tw.w[2] = wordOf(u[2]);
+            tw.w[3] = wordOf(u[2]);
+            tw.w[4] = wordOf(u[3]);
+            tw.w[5] = wordOf(u[4]);
+            tw.w[6] = 0;
+            // a twirl stays as it was read: only the very strength that was taken out gives the glyph back
+            _ = append(&g, tw);
+        }
+        cur = score(&g, &t);
+        if (cur >= BAD) die("the text read from the picture does not draw: {s}", .{std.mem.span(wzb_notes())});
+        rung += 1;
+        saveRung(prefix, rung, &g, &t, cur, &log, seconds() - t0);
+        say("rung {d}: structure text, as read: {d} text(s), {d} twirl(s), {d} operators, {d} bytes, measure {d:.5}\n", .{ rung, rd.fig.ntext, rd.fig.nun, g.n, g.bytes(), cur });
+        {
+            // soft edges: a Blur right after the texts, as wide as pays (the artists blurred the glyph before twirling it)
+            const widths = [_]f32{ 0.002, 0.003, 0.004, 0.006, 0.008, 0.009, 0.011, 0.013, 0.016, 0.02 };
+            const passes = [_]u32{ 0x11, 0x12, 0x13 }; // one to three passes, as .kkrieger's artists set them (0x12 most often)
+            var best_g = g;
+            var best_s = cur;
+            for (passes) |pc| {
+                for (widths) |bw| {
+                    var c = g;
+                    var bl = Node{ .op = OP_BLUR, .nw = 4, .keep = true };
+                    bl.w[0] = pc;
+                    bl.w[1] = wordOf(bw);
+                    bl.w[2] = wordOf(bw);
+                    bl.w[3] = wordOf(1.0);
+                    wrapOne(&c, last_text, bl);
+                    const sc = score(&c, &t);
+                    // the best of them, if it pays for its 17 bytes
+                    if (sc < cur * (1.0 - opt.byte_cost * 17.0) and sc < best_s) {
+                        best_s = sc;
+                        best_g = c;
+                    }
+                }
+            }
+            if (best_g.n != g.n) {
+                g = best_g;
+                cur = best_s;
+                for (items[0..ni]) |*it| {
+                    if (it[0] > last_text) it[0] += 1;
+                }
+                rung += 1;
+                saveRung(prefix, rung, &g, &t, cur, &log, seconds() - t0);
+                say("rung {d}: soft edges, a Blur of {d:.4} after the text, {d} operators, {d} bytes, measure {d:.5}\n", .{ rung, f32of(g.nodes[last_text + 1].w[1]), g.n, g.bytes(), cur });
+            }
+        }
+        cur = nudge(&g, &t, items[0..ni], steps[0..ni], 6);
+        rung += 1;
+        saveRung(prefix, rung, &g, &t, cur, &log, seconds() - t0);
+        say("cleaned and tuned at {d} px: {d} operators, {d} bytes, measure {d:.5}, {d:.0} s\n", .{ rd.n, g.n, g.bytes(), cur, seconds() - t0 });
+        finish(&g, img, full, prefix, &log, t0);
+        return;
+    }
     var base: usize = 0;
     var has_relief = false;
     {
@@ -2981,16 +3911,22 @@ fn fit(target_path: [*:0]const u8, prior_path: [*:0]const u8, prefix: []const u8
         cur = score(&g, &t);
         if (base >= g.n) base = g.root;
     }
+    finish(&g, img, full, prefix, &log, t0);
+}
+
+/// write the found procedure, its drawing and the rungs' record
+fn finish(g: *const Graph, img: Image, full: u32, prefix: []const u8, log: *std.ArrayList(u8), t0: f64) void {
     var buf: [1 << 16]u8 = undefined;
     var name: [1024]u8 = undefined;
-    writeFile(std.fmt.bufPrint(&name, "{s}.script", .{prefix}) catch unreachable, scriptText(&g, &buf));
-    const bm = draw(&g, full) orelse die("the final procedure does not draw", .{});
+    writeFile(std.fmt.bufPrint(&name, "{s}.script", .{prefix}) catch unreachable, scriptText(g, &buf));
+    const bm = draw(g, full) orelse die("the final procedure does not draw", .{});
     const rgba = alloc.alloc(u8, img.w * img.w * 4) catch die("out of memory", .{});
     wzb_rgba(bm, rgba.ptr);
     writePpm(std.fmt.bufPrint(&name, "{s}.ppm", .{prefix}) catch unreachable, rgba, img.w, img.w);
     const tail = std.fmt.bufPrint(&buf, "# rung operators bytes measure seconds\n# total {d:.1} s, {d} graphs asked, {d} operators drawn, {d} refused, {d} too slow\n", .{ seconds() - t0, n_eval, n_draw, n_refused, n_slow }) catch unreachable;
     log.appendSlice(alloc, tail) catch {};
     writeFile(std.fmt.bufPrint(&name, "{s}.log", .{prefix}) catch unreachable, log.items);
+    sayNotes();
     say("done: {d} operators, {d} bytes, {d:.1} s, {d} graphs asked, {d} operators drawn, {d} refused\n", .{ g.n, g.bytes(), seconds() - t0, n_eval, n_draw, n_refused });
 }
 
@@ -3020,7 +3956,7 @@ const Options = struct {
 
 /// What adds structure. Each needs its own reading; the inner measure accepts any of them on almost any
 /// picture, so none is tried without one, and the choice between the allowed ones is the eye's.
-const Structure = enum { plain, shape, patches, second, grain, rings, mirror };
+const Structure = enum { plain, shape, patches, second, grain, rings, mirror, text };
 
 fn allowed(rd: *const Reading, st: Structure, opt: Options) bool {
     return switch (st) {
@@ -3031,6 +3967,7 @@ fn allowed(rd: *const Reading, st: Structure, opt: Options) bool {
         .grain => rd.nrect == 0 and rd.aniso >= opt.grain,
         .rings => rd.nrect == 0 and rd.nring > 0,
         .mirror => rd.nrect == 0 and rd.nring >= 2 and rd.mirror >= 0.10,
+        .text => figureIsText(&rd.fig),
     };
 }
 
@@ -3049,12 +3986,14 @@ pub export fn main(argc: c_int, argv: [*]const [*:0]const u8) c_int {
         // p2p render SCRIPT OUT.ppm [SIZE-EXPONENT]
         const g = parseScript(readFile(argv[2]));
         const size: u32 = if (n > 4) std.fmt.parseInt(u32, argStr(argv, 4), 10) catch 0 else 0;
+        say_refusals = true;
         const bm = draw(&g, size) orelse die("the procedure does not draw", .{});
         const w: usize = @intCast(wzb_width(bm));
         const h: usize = @intCast(wzb_height(bm));
         const rgba = alloc.alloc(u8, w * h * 4) catch die("out of memory", .{});
         wzb_rgba(bm, rgba.ptr);
         writePpm(argStr(argv, 3), rgba, w, h);
+        sayNotes();
         say("{d} operators, {d} bytes, {d}x{d}\n", .{ g.n, g.bytes(), w, h });
         return 0;
     }
@@ -3101,7 +4040,7 @@ pub export fn main(argc: c_int, argv: [*]const [*:0]const u8) c_int {
             } else if (std.mem.eql(u8, k, "noises")) {
                 opt.noises = std.fmt.parseInt(usize, v, 10) catch die("bad {s}", .{a});
             } else if (std.mem.eql(u8, k, "structure")) {
-                opt.structure = std.meta.stringToEnum(Structure, v) orelse die("structure {s} is not known (plain, shape, patches, second, grain, rings, mirror)", .{v});
+                opt.structure = std.meta.stringToEnum(Structure, v) orelse die("structure {s} is not known (plain, shape, patches, second, grain, rings, mirror, text)", .{v});
             } else if (std.mem.eql(u8, k, "surface2")) {
                 opt.surface2 = v[0] == '1';
             } else if (std.mem.eql(u8, k, "blur")) {
@@ -3110,6 +4049,8 @@ pub export fn main(argc: c_int, argv: [*]const [*:0]const u8) c_int {
                 opt.stretch = std.fmt.parseFloat(f32, v) catch die("bad {s}", .{a});
             } else if (std.mem.eql(u8, k, "jointw")) {
                 opt.jointw = std.fmt.parseFloat(f32, v) catch die("bad {s}", .{a});
+            } else if (std.mem.eql(u8, k, "glyph")) {
+                glyph_t = std.fmt.parseFloat(f32, v) catch die("bad {s}", .{a});
             } else if (std.mem.eql(u8, k, "bytecost")) {
                 opt.byte_cost = std.fmt.parseFloat(f32, v) catch die("bad {s}", .{a});
             } else die("option {s} is not known (seed, work, candidates, quick, deep, final, maxops, patience, gain, placeweight, texture, spread, place, bytecost)", .{k});

@@ -2,7 +2,8 @@
 //
 // The operators are werkkzeug4's wz3_bitmap_code.cpp (fr_public, BSD licence), Farbrausch's portable C++
 // version of werkkzeug3's texture generator, with the small changes of patch_wz3.py (functions that need
-// fonts, image files or the vector operator are left out). The calls below follow werkkzeug3's Bitmap_*
+// image files or the vector operator are left out). Text draws through wzfont.c, a font renderer on
+// FreeType that reads the font's own outlines; which font file stands for a name comes from the font map. The calls below follow werkkzeug3's Bitmap_*
 // functions parameter for parameter; they are lane 473x's wzrender.cpp, turned into a function that takes
 // one operator at a time and says what it refuses.
 //
@@ -38,7 +39,119 @@ extern "C" int wzb_simd(void)
 #endif
 }
 
+#define SETERR(...) do { snprintf(err, errlen, __VA_ARGS__); return 1; } while (0)
+
 struct Bm { GenBitmap *g; };
+
+// The two strings of the next Text operator (the text and the font's name, 8-bit, Windows code page 1252).
+static const unsigned char *g_text = (const unsigned char *) "", *g_font = (const unsigned char *) "";
+extern "C" void wzb_strings(const char *text, const char *font)
+{
+  g_text = (const unsigned char *) (text ? text : "");
+  g_font = (const unsigned char *) (font ? font : "");
+}
+// What the font renderer has to say about the texts drawn so far: one sentence per line (the font that
+// stood in for each name, every character the font had no glyph for).
+extern "C" const char *wzb_notes(void) { return hf_notes(); }
+extern "C" void wzb_notes_clear(void) { hf_notes_clear(); }
+// One glyph's ink stretched to a square and its measures, for the fitter's reading of shapes (see wzfont.c).
+extern "C" int wzb_glyph_mask(const char *font, int c, int side, uint8_t *out, float *v)
+{
+  char err[300];
+  return hf_glyph_mask(font, c, side, out, v, err, sizeof err);
+}
+// A picture handed in as a bitmap, so the fitter can run one operator on the picture it reads (Twirl backwards).
+extern "C" void *wzb_from_rgba(int xs, int ys, const uint8_t *rgba)
+{
+  GenBitmap *o = new GenBitmap;
+  o->Init(xs, ys);
+  for (int i = 0; i < o->Size; i++) {
+    sU16 *q = (sU16 *) &o->Data[i];   // blue, green, red, alpha
+    for (int c = 0; c < 3; c++) { int x = rgba[4 * i + c]; q[2 - c] = (sU16) ((x << 7) | (x >> 1)); }
+    q[3] = 0x7fff;
+  }
+  g_live += (size_t) o->Size * sizeof(sU64);
+  return o;
+}
+
+// werkkzeug3's Bitmap_Text (fr_public/werkkzeug3/genbitmap.cpp), parameter for parameter:
+//   x, y        where the text starts, in parts of the picture
+//   width       the height of the font's em square, in parts of the picture's height (werkkzeug3 hands
+//               ys*width to CreateFont as the height: FontBegin(xs,ys,font,xs*height,ys*width,4))
+//   height      the average character width, in parts of the picture's width; 0 keeps the font's own
+//   flags       1 centre across, 2 centre down, 0x10..0x70 a font page (one letter after the other), 0x80 keep the drawing
+//   extspace, inspace   the space around every letter of a font page; extspace + 2 pixels also moves a plain text
+//   lineskip    the line's height in font heights
+// A plain text is drawn by Farbrausch's own GenBitmap::Text (werkkzeug4's copy of the same code, which
+// lacks only the extspace offset: it is added to the position). A font page is not in werkkzeug4's copy:
+// its loop is werkkzeug3's, taken over line by line.
+static int text_wz3(GenBitmap *bm, sF32 x, sF32 y, sF32 width, sF32 height, sU32 col, sU32 flags, sInt extspace, sF32 inspace, sF32 lineskip,
+                    const unsigned char *text, const unsigned char *font, char *err, int errlen)
+{
+  const sInt alias = 4;
+  sInt xs = bm->XSize * alias, ys = bm->YSize * alias;
+  if (flags & ~0xf3u) SETERR("flags 0x%x hold bits werkkzeug3's Text does not have", flags);
+  if (!(width > 0) || width > 64) SETERR("font height %g of the picture is outside what this module draws", width);
+  if (height < 0 || height > 64) SETERR("character width %g of the picture is outside what this module draws", height);
+  if (extspace < 0 || extspace > 1024) SETERR("space %d around letters is outside 0..1024", extspace);
+  sInt es = extspace * alias + 2 * alias;
+  sInt page = (flags & 0x70) >> 4;
+  size_t tl = strlen((const char *) text), fl = strlen((const char *) font);
+  if (!page) {
+    sChar *wt = new sChar[tl + 1], *wf = new sChar[fl + 1];
+    for (size_t i = 0; i <= tl; i++) wt[i] = text[i];
+    for (size_t i = 0; i <= fl; i++) wf[i] = font[i];
+    bm->Text(x + (sF32) es / xs, y + (sF32) es / ys, height, width, col, flags & 3, lineskip, wt, wf);
+    delete[] wt; delete[] wf;
+    if (g_f2d_err[0]) SETERR("%s", g_f2d_err);
+    return 0;
+  }
+  // font page mode (werkkzeug3 only)
+  char nm[64]; size_t k = 0;
+  for (; font[k] && k < 63; k++) nm[k] = (char) font[k];
+  nm[k] = 0;
+  sInt yf = hf_begin(xs, ys, nm, (sInt) (xs * height), (sInt) (ys * width), err, errlen);
+  if (yf < 0) return 1;
+  sInt is = inspace * xs;
+  sInt xp = x * xs + es, yp = y * ys + es;
+  sInt count = 0, chr = 'a', widths[3];
+  const unsigned char *t = text;
+  while (*t || chr < count) {
+    if (t[0] == '-' && t[1] != '-' && t[1] != 0) { t++; count = (*t++) & 255; }
+    if (t[0] == '-' && t[1] == '-') t++;
+    if (chr < count) chr++;
+    else { count = 0; chr = (*t++) & 255; }
+    hf_abc(chr, widths);
+    sInt w1 = widths[1];
+    if (xp + w1 + es + 2 * is >= xs) {
+      yp = (yp + yf + 2 * is + alias - 1) & ~(alias - 1);
+      yp += es;
+      xp = x * xs + es;
+      if (yp + yf + es + 2 * is >= ys) break;
+    }
+    unsigned char c = (unsigned char) chr;
+    hf_print(xp + is - widths[0], yp + is, &c, 1);
+    xp = (xp + w1 + 2 * is + alias - 1) & ~(alias - 1);
+    xp += es;
+  }
+  // write to bitmap: the same averaging of 4 by 4 page pixels and the same fade as GenBitmap::Text
+  const unsigned char *pg = hf_page();
+  __m128i color = GetColor128(col);
+  sInt i = 0;
+  for (sInt yi = 0; yi < bm->YSize; yi++) {
+    const unsigned char *sp = pg + (size_t) yi * xs * alias;
+    for (sInt xi = 0; xi < bm->XSize; xi++) {
+      sU32 fade = 0;
+      for (sInt a = 0; a < 4; a++) for (sInt b = 0; b < 4; b++) fade += sp[b + a * xs];
+      fade >>= 4;
+      fade = (fade) | (fade << 8);
+      FadeOver(bm->Data[i], color, fade);
+      i++; sp += alias;
+    }
+  }
+  hf_end();
+  return 0;
+}
 
 static GenBitmap *clone(GenBitmap *in)
 {
@@ -71,7 +184,6 @@ extern "C" void wzb_rgba(void *p, uint8_t *dst)
   }
 }
 
-#define SETERR(...) do { snprintf(err, errlen, __VA_ARGS__); return 1; } while (0)
 
 // Draw one operator. w holds its 32 parameter words (as a .k project stores them), in[] its inputs.
 // Returns 0 and the new bitmap in *out, or 1 and a sentence in err.
@@ -171,7 +283,11 @@ static int wzb_apply_inner(const char *name, const uint32_t *w32, int nin, void 
   else if (IS("Bulge")) { NEED(1); o = new GenBitmap; o->InitSize(I[0]); o->Bulge(I[0], F(0)); }
   else if (IS("Paste")) { NEED(2); o = Bitmap_Paste(clone(I[0]), I[1], F(0), F(1), F(2), F(3), F(4), F(5), F(6), N(7)); }
   else if (IS("Format") || IS("Pass")) { NEED(1); o = clone(I[0]); }
-  else if (IS("Text")) SETERR("needs Windows fonts, which this module does not have");
+  else if (IS("Text")) {
+    NEED(1);
+    o = clone(I[0]);
+    if (text_wz3(o, F(0), F(1), F(2), F(3), U(4), U(5), N(6), F(7), F(8), g_text, g_font, err, errlen)) { delete o; return 1; }
+  }
   else SETERR("is not an operator of this module");
   if (!o) SETERR("gave nothing");
   g_live += (size_t) o->Size * sizeof(sU64);

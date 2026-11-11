@@ -908,6 +908,13 @@ int uc_class(unsigned cp)
   return 0;
 }
 
+/* 1: a character that is a drawing rather than a letter (Unicode general category So or Sm, or private use, where
+ * icon fonts put their pictures); the seeds of milestone 2 prefer them */
+int uc_drawing(unsigned cp)
+{
+  return in_ranges(udrawing_ranges, sizeof udrawing_ranges / sizeof udrawing_ranges[0], cp);
+}
+
 /* how many entries the index has, and the key of entry i (for the tools that walk it) */
 int ix_count(void) { if (!g_ix_loaded) ix_load(); return g_nix; }
 const char *ix_key(int i) { return (i >= 0 && i < g_nix) ? g_ix[i].key : ""; }

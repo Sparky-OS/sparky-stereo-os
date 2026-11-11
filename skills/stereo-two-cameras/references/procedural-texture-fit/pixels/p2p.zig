@@ -1296,6 +1296,14 @@ const Reading = struct {
     jmul: u32 = 0xff404040, // the joints' own colour over the shapes' own colour, measured in the joints
     jw: [2]f32 = .{ 0.02, 0.02 }, // the joints' width across and down, as shares of the cell
     fig: Figure = .{}, // a figure on a ground, and its pieces read as glyphs (the reading behind Text)
+    // milestone 2: the mean cell along the colour axis (its first pixel lies at the picture's first), and a tile's
+    // view of the whole picture's repeat
+    cell: []f32 = &.{},
+    cw: usize = 0,
+    ch: usize = 0,
+    win: bool = false,
+    ax: Axis = .{},
+    ay: Axis = .{},
 };
 
 /// the picture made smaller by whole steps: the mean of every block
@@ -2045,6 +2053,9 @@ fn readPicture(t: *Target) Reading {
             }
             r.ox = @as(f32, @floatFromInt(bx)) / @as(f32, @floatFromInt(cw));
             r.oy = @as(f32, @floatFromInt(by)) / @as(f32, @floatFromInt(ch));
+            r.cell = cell;
+            r.cw = cw;
+            r.ch = ch;
             if (r.nx == kx and r.ny == ky) {
                 // one shape per cell: its sides are where the column and row means rise out of the joints
                 const pxs = alloc.alloc(f32, cw) catch die("out of memory", .{});
@@ -4467,6 +4478,816 @@ fn appendOutline(g: *Graph, r: *const Reading, colour: usize, opt: Options) Outl
     return .{ .first = first, .sub = subi, .hscb = hsi, .root = root };
 }
 
+// ---------------------------------------------------------------- milestone 2: tiles, and glyphs as seeds
+//
+// A tile is fitted from its own pixels. The whole picture's repeat (its cell, where the cell starts, its shapes, and a
+// seed: a glyph that lies over the cell's motif) is read once on the whole picture and drawn in every tile at its own
+// place, so the joints and the motifs of neighbouring tiles meet at their borders (the seams).
+
+/// One axis of the whole picture's repeat as a tile sees it: the cell repeats f times across the tile, and the cell
+/// coordinate of a point u of the tile is u * f - o. Periodic when one cell or more lies across the tile: one cell is
+/// drawn in a picture of its own and Transform repeats it. Direct when less than one does: the tile itself is the
+/// picture, and every instance that reaches the tile is drawn at its own place, so nothing is magnified.
+const Axis = struct { f: f32 = 1, o: f32 = 0, direct: bool = false };
+
+fn axisOf(n: f32, o: f32, w0: f32, ws: f32) Axis {
+    const f = ws * n;
+    return .{ .f = f, .o = o - w0 * n, .direct = f < 0.999 };
+}
+
+/// A shape of the cell: its centre and half sizes, in cells.
+const CellItem = struct { cx: f32 = 0.5, cy: f32 = 0.5, hw: f32 = 0.25, hh: f32 = 0.25, seed: ?*const Seed = null };
+
+/// A seed: a glyph of a font that lies over the motif of the cell, called by its key and its character.
+const Seed = struct {
+    have: bool = false,
+    key: [:0]const u8 = "",
+    label: []const u8 = "",
+    cp: u32 = 0,
+    // the glyph's ink in em squares: width over height, height, top below the line's top, advance, left edge after the
+    // pen, and the font's average character width
+    gv: [6]f32 = .{ 1, 1, 0, 1, 0, 0.5 },
+    box: CellItem = .{},
+    nx: f32 = 1,
+    ny: f32 = 1,
+    ox: f32 = 0,
+    oy: f32 = 0,
+    bonded: bool = false,
+    bond_shift: f32 = 0,
+    ink: u32 = 0xffffffff,
+    ground: u32 = 0xff000000,
+    like: f32 = 0,
+    box_like: f32 = 0,
+    drawing: bool = false,
+    bytes: usize = 0,
+};
+/// the seeds of a seed file: one glyph over the whole motif, or one per piece of it (a flower and its leaves); they
+/// share the whole picture's repeat
+const MAXSEED = 12;
+var seeds: [MAXSEED]Seed = undefined;
+var nseeds: usize = 0;
+
+/// The window of the whole picture a tile is: its left, its top and its side, in shares of the whole picture.
+const Win = struct { x: f32 = 0, y: f32 = 0, s: f32 = 1 };
+
+/// The tile's reading takes the repeat from the whole picture's: what repeats is a property of the whole surface, and a
+/// tile holds too few repeats to read it (a 512 pixel tile of a 2048 pixel brick wall holds one and a half bricks).
+fn mapWhole(rd: *Reading, rw: *const Reading, w: Win) void {
+    rd.nx = rw.nx;
+    rd.ny = rw.ny;
+    rd.ox = rw.ox;
+    rd.oy = rw.oy;
+    rd.nrect = rw.nrect;
+    rd.rect = rw.rect;
+    rd.bonded = rw.bonded;
+    rd.bond_shift = rw.bond_shift;
+    rd.bond = rw.bond;
+    rd.rows = rw.rows;
+    rd.bricks = rw.bricks;
+    rd.row0 = rw.row0;
+    rd.jw = rw.jw;
+    rd.jmul = rw.jmul;
+    rd.dark = rw.dark;
+    rd.share = rw.share;
+    rd.win = true;
+    rd.ax = axisOf(@floatFromInt(rw.nx), rw.ox, w.x, w.s);
+    rd.ay = axisOf(@floatFromInt(rw.ny), rw.oy, w.y, w.s);
+    say("the tile's window: {d:.4}, {d:.4}, side {d:.4} of the whole; the whole repeats {d} by {d} ({d} shape(s){s}), so {d:.3} by {d:.3} cells lie across the tile ({s} across, {s} down)\n", .{ w.x, w.y, w.s, rw.nx, rw.ny, rw.nrect, if (rw.bonded) ", in a bond" else "", rd.ax.f, rd.ay.f, if (rd.ax.direct) "each drawn at its place" else "repeated", if (rd.ay.direct) "each drawn at its place" else "repeated" });
+}
+
+/// The edge of a drawn shape: two pixels of the tile, in the units of the picture the shape is drawn in
+fn edgeOf(a: Axis, side: f32) f32 {
+    return if (a.direct) 2.0 / side else 2.0 * a.f / side;
+}
+
+/// The instances of a cell coordinate c (half size h, cells) along an axis, in the units of the picture they are drawn
+/// in: one at c on a periodic axis; on a direct axis every one that reaches the tile, at (c + o + k) / f.
+fn instances(a: Axis, c: f32, h: f32, out: *[8][2]f32) usize {
+    if (!a.direct) {
+        out[0] = .{ c, h };
+        return 1;
+    }
+    var nout: usize = 0;
+    const reach = 0.5 + h / a.f + 0.002;
+    var k: f32 = @floor(-(c + a.o) - 1.0);
+    const k_end = @ceil(a.f - (c + a.o) + 1.0);
+    while (k <= k_end and nout < out.len) : (k += 1) {
+        const u = (c + a.o + k) / a.f;
+        if (@abs(u - 0.5) <= reach) {
+            out[nout] = .{ u, h / a.f };
+            nout += 1;
+        }
+    }
+    return nout;
+}
+
+/// A seed's glyph drawn white into the box (centre and half sizes, in the units of a picture of side pixels); the
+/// glyph's own ink is stretched to the box, so a picture whose two axes have other scales gets the glyph right
+/// once Transform has repeated it. Always Text version 2 (the font's key), in its outline form.
+fn seedText(sd: *const Seed, cx: f32, cy: f32, hw: f32, hh: f32, side: f32) Node {
+    const bw = 2.0 * hw * side;
+    const bh = 2.0 * hh * side;
+    const em = bh / @max(sd.gv[1], 1e-4);
+    var sx = (bw / @max(bh, 1e-4)) / @max(sd.gv[0], 1e-4);
+    if (@abs(sx - 1.0) < 0.01) sx = 1.0;
+    const pen0 = (cx - hw) * side - sd.gv[4] * em * sx;
+    const top = (cy - hh) * side - sd.gv[2] * em;
+    var nd = Node{ .op = OP_TEXT, .nw = TEXT2_WORDS, .lock = true, .keep = true };
+    // the text starts (space + 2) pixels right and down of its x and y; the space around letters is 0 here
+    nd.w[0] = wordOf((pen0 - 2.0) / side);
+    nd.w[1] = wordOf((top - 2.0) / side);
+    nd.w[2] = wordOf(em / side);
+    nd.w[3] = wordOf(if (sx == 1.0) 0.0 else sx * sd.gv[5] * em / side);
+    nd.w[4] = 0xffffffff;
+    nd.w[5] = 0;
+    nd.w[6] = 0;
+    nd.w[7] = wordOf(0.0);
+    nd.w[8] = wordOf(1.0);
+    nd.w[9] = 2;
+    nd.w[10] = 0;
+    nd.w[11] = 1; // the outline form: the seed is a shape, white on black
+    var b: [8]u8 = undefined;
+    const l = std.unicode.utf8Encode(@intCast(sd.cp), &b) catch die("character U+{X} cannot be written as UTF-8", .{sd.cp});
+    nd.s[0] = intern(b[0..l]);
+    nd.s[1] = intern(sd.key);
+    nd.s[2] = 0;
+    return nd;
+}
+
+/// The cell's shapes (GlowRects, or the seed's glyph) white on black in the tile's own frame: drawn once in a cell
+/// picture and repeated by Transform on periodic axes, drawn at each instance's place on direct ones. Rows in a bond
+/// make a cell one brick wide and two rows tall, the second row moved sideways by TransformMul. Returns the last
+/// operator: the shape picture, marked as the relief's height.
+fn appendCellShapes(g: *Graph, ax_in: Axis, ay_in: Axis, items: []const CellItem, bonded_in: bool, bshift: f32, side: f32) usize {
+    var bonded = bonded_in;
+    var ay = ay_in;
+    const ax = ax_in;
+    if (bonded and (ax.direct or ay.f < 2.0)) {
+        say("the bond is not drawn in this tile: {d:.2} bricks and {d:.2} rows lie across it, and the bond's two-row cell needs a brick and two rows; the rows are drawn without it\n", .{ ax.f, ay.f });
+        bonded = false;
+    }
+    if (bonded) ay = .{ .f = ay.f / 2.0, .o = ay.o / 2.0, .direct = false };
+    var fl = flatNode(0xff000000);
+    fl.lock = true;
+    fl.keep = true;
+    _ = append(g, fl);
+    const ex = edgeOf(ax, side);
+    const ey = edgeOf(ay, side);
+    for (items) |it| {
+        const cy = if (bonded) it.cy / 2.0 else it.cy;
+        const hh = if (bonded) it.hh / 2.0 else it.hh;
+        var xs: [8][2]f32 = undefined;
+        var ys: [8][2]f32 = undefined;
+        const nxs = instances(ax, it.cx, it.hw, &xs);
+        const nys = instances(ay, cy, hh, &ys);
+        for (ys[0..nys]) |yi| {
+            for (xs[0..nxs]) |xi| {
+                var nd: Node = undefined;
+                if (it.seed) |s| {
+                    nd = seedText(s, xi[0], yi[0], xi[1], yi[1], side);
+                } else {
+                    nd = Node{ .op = OP_GLOWRECT, .nin = 1, .nw = 11, .lock = true, .keep = true };
+                    nd.w[0] = wordOf(xi[0]);
+                    nd.w[1] = wordOf(yi[0]);
+                    nd.w[2] = wordOf(ex);
+                    nd.w[3] = wordOf(ey);
+                    nd.w[4] = wordOf(@max(0.002, xi[1] - ex));
+                    nd.w[5] = wordOf(@max(0.002, yi[1] - ey));
+                    nd.w[6] = 0xffffffff;
+                    nd.w[7] = wordOf(1.0);
+                    nd.w[8] = wordOf(0.5);
+                    nd.w[9] = if (ax.direct or ay.direct) 0 else 1; // wrapped round the cell only where the cell repeats
+                    nd.w[10] = 0;
+                }
+                nd.nin = 1;
+                nd.in[0] = @intCast(g.n - 1);
+                _ = append(g, nd);
+            }
+        }
+    }
+    if (bonded) {
+        // RotateMul, mode 16, count 1: the picture merged with itself carried by minus (t - 0.5): the second row,
+        // half the cell down and the bond's part of a brick sideways
+        var mul = Node{ .op = OP_TRANSFORMMUL, .nin = 1, .nw = 10, .lock = true, .keep = true };
+        mul.in[0] = @intCast(g.n - 1);
+        mul.w[0] = wordOf(0.0);
+        mul.w[1] = wordOf(1.0);
+        mul.w[2] = wordOf(1.0);
+        mul.w[3] = wordOf(0.5 - bshift);
+        mul.w[4] = wordOf(0.0);
+        mul.w[5] = 0;
+        mul.w[6] = 0xffffffff;
+        mul.w[7] = 16;
+        mul.w[8] = 1;
+        mul.w[9] = 0xffffffff;
+        _ = append(g, mul);
+    }
+    if (!ax.direct or !ay.direct) {
+        // Transform: a point u of the tile reads the cell picture at (u - 0.5) / s + t, so s = 1 / f and
+        // t = 0.5 f - o give u f - o; on a direct axis s = 1 and t = 0.5 leave the picture as it is
+        var tr = Node{ .op = OP_TRANSFORM, .nin = 1, .nw = 8, .lock = true, .keep = true };
+        tr.in[0] = @intCast(g.n - 1);
+        tr.w[0] = wordOf(0.0);
+        tr.w[1] = wordOf(if (ax.direct) 1.0 else 1.0 / ax.f);
+        tr.w[2] = wordOf(if (ay.direct) 1.0 else 1.0 / ay.f);
+        tr.w[3] = wordOf(if (ax.direct) 0.5 else @mod(0.5 * ax.f - ax.o, 1.0));
+        tr.w[4] = wordOf(if (ay.direct) 0.5 else @mod(0.5 * ay.f - ay.o, 1.0));
+        tr.w[5] = 0;
+        _ = append(g, tr);
+    }
+    g.nodes[g.n - 1].shape = true;
+    return g.n - 1;
+}
+
+/// The repeated shape of a tile, its joints by the outline trick (milestone 1c), with the whole picture's repeat
+/// drawn at the tile's place.
+fn appendOutlineWin(g: *Graph, r: *const Reading, colour: usize, opt: Options, side: f32) Outline {
+    const first = g.n;
+    var items: [3]CellItem = undefined;
+    for (0..r.nrect) |i| items[i] = .{ .cx = r.rect[i][0], .cy = r.rect[i][1], .hw = r.rect[i][2], .hh = r.rect[i][3] };
+    // the existing build draws one shape per cell (the first); so does this one
+    const shape = appendCellShapes(g, r.ax, r.ay, items[0..@min(r.nrect, 1)], r.bonded, r.bond_shift, side);
+    g.nodes[shape].shape = false;
+    var bl = Node{ .op = OP_BLUR, .nin = 1, .nw = 4, .lock = true, .shape = true, .keep = true };
+    bl.in[0] = @intCast(shape);
+    bl.w[0] = 1;
+    bl.w[1] = wordOf(@max(0.001, opt.jointw * r.jw[0] / r.ax.f));
+    bl.w[2] = wordOf(@max(0.001, opt.jointw * r.jw[1] / r.ay.f));
+    bl.w[3] = wordOf(1.0);
+    const blurred = append(g, bl);
+    var sub = Node{ .op = OP_MERGE, .nin = 2, .nw = 1, .lock = true };
+    sub.in[0] = @intCast(blurred);
+    sub.in[1] = @intCast(shape);
+    sub.w[0] = 1;
+    const subi = append(g, sub);
+    var hs = Node{ .op = OP_HSCB, .nin = 1, .nw = 4, .lock = true };
+    hs.in[0] = @intCast(g.n - 1);
+    hs.w[0] = wordOf(0.0);
+    hs.w[1] = wordOf(1.0);
+    hs.w[2] = wordOf(1.0);
+    hs.w[3] = wordOf(2.0);
+    const hsi = append(g, hs);
+    var rg = Node{ .op = OP_RANGE, .nin = 1, .nw = 3, .lock = true };
+    rg.in[0] = @intCast(g.n - 1);
+    rg.w[0] = 1;
+    rg.w[1] = 0xffffffff;
+    rg.w[2] = r.jmul;
+    _ = append(g, rg);
+    var mg = Node{ .op = OP_MERGE, .nin = 2, .nw = 1, .lock = true };
+    mg.in[0] = @intCast(colour);
+    mg.in[1] = @intCast(g.n - 1);
+    mg.w[0] = 2;
+    const root = append(g, mg);
+    for (g.nodes[first..g.n]) |*x| x.keep = true;
+    return .{ .first = first, .sub = subi, .hscb = hsi, .root = root };
+}
+
+/// The seed over the surface: its glyph, white on black, at every instance of the motif, is the mask through which
+/// the motif's own colour lies over the surface (Mask: the first layer where the mask is white).
+fn appendSeed(g: *Graph, sds: []const Seed, w: Win, colour: usize, side: f32) usize {
+    const first = g.n;
+    const sd = &sds[0];
+    const ax = axisOf(sd.nx, sd.ox, w.x, w.s);
+    const ay = axisOf(sd.ny, sd.oy, w.y, w.s);
+    var items: [MAXSEED]CellItem = undefined;
+    for (sds, 0..) |*x, i| {
+        say("the seed: U+{X:0>4} of {s}, over {d:.3} by {d:.3} cells of the tile ({s} across, {s} down)\n", .{ x.cp, x.label, ax.f, ay.f, if (ax.direct) "each drawn at its place" else "repeated", if (ay.direct) "each drawn at its place" else "repeated" });
+        items[i] = x.box;
+        // a seed with no character is the box GlowRect draws: the motif is a box, and the box costs the fewest bytes
+        items[i].seed = if (x.cp == 0) null else x;
+    }
+    const shape = appendCellShapes(g, ax, ay, items[0..sds.len], sd.bonded, sd.bond_shift, side);
+    var ink = flatNode(sd.ink);
+    ink.lock = true;
+    ink.keep = true;
+    const inki = append(g, ink);
+    var ms = Node{ .op = OP_MASK, .nin = 3, .nw = 1, .lock = true, .keep = true };
+    ms.in[0] = @intCast(shape);
+    ms.in[1] = @intCast(inki);
+    ms.in[2] = @intCast(colour);
+    ms.w[0] = 0;
+    const root = append(g, ms);
+    for (g.nodes[first..g.n]) |*x| x.keep = true;
+    return root;
+}
+
+fn parseF(tok: ?[]const u8) f32 {
+    return std.fmt.parseFloat(f32, tok orelse die("the seed file is cut short", .{})) catch die("the seed file holds a number that is none", .{});
+}
+
+/// The seed file `p2p seed` writes: one name and its values per line; `cand` lines are the record of the search.
+fn loadSeed(path: [*:0]const u8) void {
+    const text = readFile(path);
+    var lines = std.mem.splitScalar(u8, text, '\n');
+    while (lines.next()) |line| {
+        var it = std.mem.tokenizeScalar(u8, line, ' ');
+        const k = it.next() orelse continue;
+        if (std.mem.eql(u8, k, "seed")) {
+            if (std.mem.eql(u8, it.next() orelse "0", "1")) {
+                if (nseeds >= MAXSEED) die("the seed file holds more than {d} seeds", .{MAXSEED});
+                seeds[nseeds] = .{ .have = true };
+                nseeds += 1;
+            }
+            continue;
+        }
+        if (nseeds == 0) continue;
+        const the_seed = &seeds[nseeds - 1];
+        if (false) {
+        } else if (std.mem.eql(u8, k, "key")) {
+            const rest = std.mem.trim(u8, line[3..], " ");
+            the_seed.key = alloc.dupeZ(u8, rest) catch die("out of memory", .{});
+        } else if (std.mem.eql(u8, k, "label")) {
+            the_seed.label = alloc.dupe(u8, std.mem.trim(u8, line[5..], " ")) catch die("out of memory", .{});
+        } else if (std.mem.eql(u8, k, "cp")) {
+            the_seed.cp = std.fmt.parseInt(u32, it.next() orelse "0", 16) catch die("the seed's character is not a number", .{});
+        } else if (std.mem.eql(u8, k, "gv")) {
+            for (0..6) |i| the_seed.gv[i] = parseF(it.next());
+        } else if (std.mem.eql(u8, k, "box")) {
+            the_seed.box = .{ .cx = parseF(it.next()), .cy = parseF(it.next()), .hw = parseF(it.next()), .hh = parseF(it.next()) };
+        } else if (std.mem.eql(u8, k, "repeat")) {
+            the_seed.nx = parseF(it.next());
+            the_seed.ny = parseF(it.next());
+            the_seed.ox = parseF(it.next());
+            the_seed.oy = parseF(it.next());
+            the_seed.bonded = parseF(it.next()) > 0.5;
+            the_seed.bond_shift = parseF(it.next());
+        } else if (std.mem.eql(u8, k, "colour")) {
+            the_seed.ink = std.fmt.parseInt(u32, it.next() orelse "0", 16) catch die("the seed's colour is not a number", .{});
+            the_seed.ground = std.fmt.parseInt(u32, it.next() orelse "0", 16) catch die("the seed's colour is not a number", .{});
+        } else if (std.mem.eql(u8, k, "like")) {
+            the_seed.like = parseF(it.next());
+            the_seed.box_like = parseF(it.next());
+        }
+    }
+    for (seeds[0..nseeds]) |x| {
+        if (x.key.len == 0) die("the seed file says seed 1 and names no font", .{});
+    }
+}
+
+extern "c" fn uc_drawing(cp: u32) c_int;
+
+/// The motif's picture as 16 by 16 bits and as GS by GS, each stretched to the ink's own box
+const Sil = struct { bits: [4]u64, la: f32, m: [GS * GS]bool, x0: usize, y0: usize, x1: usize, y1: usize, area: usize };
+
+fn silOf(mask: []const bool, w: usize, x0: usize, y0: usize, x1: usize, y1: usize) Sil {
+    var s = Sil{ .bits = .{ 0, 0, 0, 0 }, .la = 0, .m = undefined, .x0 = x0, .y0 = y0, .x1 = x1, .y1 = y1, .area = 0 };
+    const bw = x1 - x0;
+    const bh = y1 - y0;
+    for (y0..y1) |y| {
+        for (x0..x1) |x| {
+            if (mask[y * w + x]) s.area += 1;
+        }
+    }
+    inline for (.{ 16, GS }) |side| {
+        for (0..side) |gy| {
+            const ya = y0 + gy * bh / side;
+            const yb = @max(ya + 1, y0 + (gy + 1) * bh / side);
+            for (0..side) |gx| {
+                const xa = x0 + gx * bw / side;
+                const xb = @max(xa + 1, x0 + (gx + 1) * bw / side);
+                var cnt: usize = 0;
+                var tot: usize = 0;
+                for (ya..@min(yb, y1)) |y| {
+                    for (xa..@min(xb, x1)) |x| {
+                        tot += 1;
+                        if (mask[y * w + x]) cnt += 1;
+                    }
+                }
+                const on = tot > 0 and 2 * cnt >= tot;
+                if (side == 16) {
+                    if (on) {
+                        const i = gy * 16 + gx;
+                        s.bits[i >> 6] |= @as(u64, 1) << @intCast(i & 63);
+                    }
+                } else s.m[gy * GS + gx] = on;
+            }
+        }
+    }
+    s.la = @log(@as(f32, @floatFromInt(bw)) / @as(f32, @floatFromInt(@max(1, bh))));
+    return s;
+}
+
+/// how well a glyph must lie over a motif to be offered as a seed (the eye then decides). The likeness is the soft one
+/// below: a drawing of thin strokes (a snowflake) and its look-alikes lie over each other badly pixel for pixel, while
+/// the eye takes them for the same thing; blurring both first lets strokes that run close count.
+const SEED_T: f32 = 0.70;
+
+/// 16 by 16 bits as one number, bit gy * 16 + gx; grown by one cell in the four directions
+fn bits256(b: *const [4]u64) u256 {
+    return @as(u256, b[0]) | (@as(u256, b[1]) << 64) | (@as(u256, b[2]) << 128) | (@as(u256, b[3]) << 192);
+}
+fn grow256(x: u256) u256 {
+    var col0: u256 = 0;
+    var col15: u256 = 0;
+    for (0..16) |r| {
+        col0 |= @as(u256, 1) << @intCast(16 * r);
+        col15 |= @as(u256, 1) << @intCast(16 * r + 15);
+    }
+    return x | ((x << 1) & ~col0) | ((x >> 1) & ~col15) | (x << 16) | (x >> 16);
+}
+fn iou256(a: u256, b: u256) f32 {
+    const u: u32 = @popCount(a | b);
+    return if (u == 0) 0 else @as(f32, @floatFromInt(@as(u32, @popCount(a & b)))) / @as(f32, @floatFromInt(u));
+}
+/// a GS by GS picture blurred by a box of five cells, twice (close to a Gaussian of 1.6 cells)
+fn softOf(m: *const [GS * GS]bool) [GS * GS]f32 {
+    var a: [GS * GS]f32 = undefined;
+    for (m, 0..) |v, i| a[i] = if (v) 1 else 0;
+    var b: [GS * GS]f32 = undefined;
+    for (0..2) |_| {
+        for (0..GS) |y| {
+            for (0..GS) |x| {
+                var s: f32 = 0;
+                var k: i32 = -2;
+                while (k <= 2) : (k += 1) {
+                    const xx = @as(i32, @intCast(x)) + k;
+                    if (xx >= 0 and xx < GS) s += a[y * GS + @as(usize, @intCast(xx))];
+                }
+                b[y * GS + x] = s / 5.0;
+            }
+        }
+        for (0..GS) |y| {
+            for (0..GS) |x| {
+                var s: f32 = 0;
+                var k: i32 = -2;
+                while (k <= 2) : (k += 1) {
+                    const yy = @as(i32, @intCast(y)) + k;
+                    if (yy >= 0 and yy < GS) s += b[@as(usize, @intCast(yy)) * GS + x];
+                }
+                a[y * GS + x] = s / 5.0;
+            }
+        }
+    }
+    return a;
+}
+fn softLike(a: *const [GS * GS]f32, b: *const [GS * GS]f32) f32 {
+    var mn: f32 = 0;
+    var mx: f32 = 0;
+    for (a, b) |x, y| {
+        mn += @min(x, y);
+        mx += @max(x, y);
+    }
+    return if (mx <= 0) 0 else mn / mx;
+}
+
+const SeedCand = struct { gi: u32, like: f32, score: f32, drawing: bool, bytes: usize, v: [6]f32 };
+
+/// p2p seed WHOLE.ppm OUT.seed: the whole picture's repeat, the mean cell's motif (the minority of its two shades),
+/// and the glyph of every font of the index that lies over it best, the pure drawings and the fewest bytes preferred.
+fn seedRead(path: [*:0]const u8, out_path: []const u8) void {
+    const img = readPpm(path);
+    var full: u32 = 0;
+    while ((@as(usize, 1) << @intCast(full)) < img.w) full += 1;
+    var t = makeTarget(img, full);
+    const rd = readPicture(&t);
+    var rec: std.ArrayList(u8) = .empty;
+    var line: [600]u8 = undefined;
+    const W = struct {
+        fn put(r: *std.ArrayList(u8), buf: []u8, comptime fmt: []const u8, args: anytype) void {
+            const l = std.fmt.bufPrint(buf, fmt, args) catch die("seed record line too long", .{});
+            r.appendSlice(alloc, l) catch die("out of memory", .{});
+        }
+    };
+    if (rd.cw == 0 or rd.nx * rd.ny < 2) {
+        say("no seed: the picture does not repeat, so it has no cell and no motif to lay a glyph over\n", .{});
+        W.put(&rec, &line, "seed 0\nwhy the picture does not repeat\n", .{});
+        writeFile(out_path, rec.items);
+        return;
+    }
+    if (!giLoad()) die("the seed reading needs the glyph index: set WZ_GLYPHINDEX and WZ_FONTINDEX", .{});
+    const cw = rd.cw;
+    const ch = rd.ch;
+    const cell = rd.cell;
+    // two shades by Otsu's threshold over the cell (between-class variance over total); the ink is the smaller shade
+    var lo: f32 = 1e9;
+    var hi: f32 = -1e9;
+    for (cell) |c| {
+        lo = @min(lo, c);
+        hi = @max(hi, c);
+    }
+    var hist = [_]f64{0} ** 64;
+    const span = @max(hi - lo, 1e-6);
+    for (cell) |c| hist[@min(63, @as(usize, @intFromFloat((c - lo) / span * 64.0)))] += 1;
+    const total: f64 = @floatFromInt(cw * ch);
+    var mu: f64 = 0;
+    for (hist, 0..) |hcount, b| mu += hcount * @as(f64, @floatFromInt(b));
+    mu /= total;
+    var vt: f64 = 0;
+    for (hist, 0..) |hcount, b| vt += hcount * (@as(f64, @floatFromInt(b)) - mu) * (@as(f64, @floatFromInt(b)) - mu);
+    vt /= total;
+    var w0: f64 = 0;
+    var m0: f64 = 0;
+    var best_b: usize = 0;
+    var best_v: f64 = -1;
+    for (0..63) |b| {
+        w0 += hist[b] / total;
+        m0 += hist[b] * @as(f64, @floatFromInt(b)) / total;
+        if (w0 <= 0 or w0 >= 1) continue;
+        const mb = (mu * w0 - m0);
+        const vb = mb * mb / (w0 * (1 - w0));
+        if (vb > best_v) {
+            best_v = vb;
+            best_b = b;
+        }
+    }
+    const eta: f32 = @floatCast(if (vt > 0) best_v / vt else 0);
+    const th = lo + span * (@as(f32, @floatFromInt(best_b)) + 1.0) / 64.0;
+    var nhigh: usize = 0;
+    for (cell) |c| {
+        if (c > th) nhigh += 1;
+    }
+    const ink_high = 2 * nhigh < cw * ch;
+    const ink = alloc.alloc(bool, cw * ch) catch die("out of memory", .{});
+    var nink: usize = 0;
+    for (cell, 0..) |c, i| {
+        ink[i] = (c > th) == ink_high;
+        if (ink[i]) nink += 1;
+    }
+    const share = @as(f32, @floatFromInt(nink)) / @as(f32, @floatFromInt(cw * ch));
+    say("seed reading: the whole repeats {d} by {d}{s}; its mean cell is {d} by {d} pixels; two shades by Otsu: separation {d:.2}; the ink is the {s} shade, {d:.3} of the cell\n", .{ rd.nx, rd.ny, if (rd.bonded) " in a bond" else "", cw, ch, eta, if (ink_high) "lighter" else "darker", share });
+    W.put(&rec, &line, "# seed reading: repeats {d} by {d}{s}; mean cell {d} by {d}; Otsu separation {d:.3}; ink the {s} shade, {d:.3} of the cell\n", .{ rd.nx, rd.ny, if (rd.bonded) " in a bond" else "", cw, ch, eta, if (ink_high) "lighter" else "darker", share });
+    if (eta < 0.60 or share < 0.005) {
+        say("no seed: the cell is no figure on a ground (separation {d:.2}, under 0.60, or no ink)\n", .{eta});
+        W.put(&rec, &line, "seed 0\nwhy the cell is no figure on a ground (Otsu separation {d:.3}, ink {d:.3})\n", .{ eta, share });
+        writeFile(out_path, rec.items);
+        return;
+    }
+    // the cell turned round so its first row and column hold the least ink: the motif is not cut by the cell's border
+    var rx: usize = 0;
+    var ry: usize = 0;
+    {
+        var bestc: usize = std.math.maxInt(usize);
+        for (0..cw) |x| {
+            var c: usize = 0;
+            for (0..ch) |y| c += @intFromBool(ink[y * cw + x]);
+            if (c < bestc) {
+                bestc = c;
+                rx = x;
+            }
+        }
+        bestc = std.math.maxInt(usize);
+        for (0..ch) |y| {
+            var c: usize = 0;
+            for (0..cw) |x| c += @intFromBool(ink[y * cw + x]);
+            if (c < bestc) {
+                bestc = c;
+                ry = y;
+            }
+        }
+    }
+    const m = alloc.alloc(bool, cw * ch) catch die("out of memory", .{});
+    for (0..ch) |y| {
+        for (0..cw) |x| m[y * cw + x] = ink[((y + ry) % ch) * cw + (x + rx) % cw];
+    }
+    {
+        // the turned cell and its ink, for the sheet: OUT.cell.pgm, OUT.ink.pgm
+        var nb: [1024]u8 = undefined;
+        const pg = alloc.alloc(u8, cw * ch + 64) catch die("out of memory", .{});
+        inline for (.{ "cell", "ink" }) |what| {
+            const head = std.fmt.bufPrint(pg[0..64], "P5\n{d} {d}\n255\n", .{ cw, ch }) catch unreachable;
+            const hl = head.len;
+            for (0..ch) |y| {
+                for (0..cw) |x| {
+                    const src = ((y + ry) % ch) * cw + (x + rx) % cw;
+                    const v: f32 = if (std.mem.eql(u8, what, "cell")) (cell[src] - lo) / span else if (ink[src]) 1.0 else 0.0;
+                    pg[hl + y * cw + x] = @intFromFloat(@min(255.0, @max(0.0, v * 255.0)));
+                }
+            }
+            writeFile(std.fmt.bufPrint(&nb, "{s}.{s}.pgm", .{ out_path, what }) catch unreachable, pg[0 .. hl + cw * ch]);
+        }
+    }
+    // the motif: all the ink of the turned cell; and each of its larger pieces on its own (a flower and its leaves)
+    var sils: std.ArrayList(Sil) = .empty;
+    {
+        var x0: usize = cw;
+        var y0: usize = ch;
+        var x1: usize = 0;
+        var y1: usize = 0;
+        for (0..ch) |y| {
+            for (0..cw) |x| {
+                if (!m[y * cw + x]) continue;
+                x0 = @min(x0, x);
+                y0 = @min(y0, y);
+                x1 = @max(x1, x + 1);
+                y1 = @max(y1, y + 1);
+            }
+        }
+        sils.append(alloc, silOf(m, cw, x0, y0, x1, y1)) catch die("out of memory", .{});
+        // the pieces (8-connected), each with its box
+        const lab = alloc.alloc(u32, cw * ch) catch die("out of memory", .{});
+        @memset(lab, 0);
+        const stack = alloc.alloc(usize, cw * ch) catch die("out of memory", .{});
+        const Piece = struct { l: u32, area: usize, b: [4]usize };
+        var pcs: std.ArrayList(Piece) = .empty;
+        var nl: u32 = 0;
+        for (0..cw * ch) |s0| {
+            if (!m[s0] or lab[s0] != 0) continue;
+            nl += 1;
+            var sp: usize = 1;
+            stack[0] = s0;
+            lab[s0] = nl;
+            var area: usize = 0;
+            var b = [4]usize{ cw, ch, 0, 0 };
+            while (sp > 0) {
+                sp -= 1;
+                const p = stack[sp];
+                const px = p % cw;
+                const py = p / cw;
+                area += 1;
+                b = .{ @min(b[0], px), @min(b[1], py), @max(b[2], px + 1), @max(b[3], py + 1) };
+                var dy: i32 = -1;
+                while (dy <= 1) : (dy += 1) {
+                    var dx: i32 = -1;
+                    while (dx <= 1) : (dx += 1) {
+                        const qx = @as(i32, @intCast(px)) + dx;
+                        const qy = @as(i32, @intCast(py)) + dy;
+                        if (qx < 0 or qy < 0 or qx >= @as(i32, @intCast(cw)) or qy >= @as(i32, @intCast(ch))) continue;
+                        const q: usize = @intCast(qy * @as(i32, @intCast(cw)) + qx);
+                        if (!m[q] or lab[q] != 0) continue;
+                        lab[q] = nl;
+                        stack[sp] = q;
+                        sp += 1;
+                    }
+                }
+            }
+            pcs.append(alloc, .{ .l = nl, .area = area, .b = b }) catch die("out of memory", .{});
+        }
+        std.mem.sort(Piece, pcs.items, {}, struct {
+            fn lt(_: void, a: Piece, b: Piece) bool {
+                return a.area > b.area;
+            }
+        }.lt);
+        var kept: usize = 0;
+        if (pcs.items.len > 1) {
+            for (pcs.items) |pc| {
+                if (kept >= MAXSEED - 1 or pc.area * 100 < nink * 3) break;
+                const only = alloc.alloc(bool, cw * ch) catch die("out of memory", .{});
+                for (lab, 0..) |l, i| only[i] = l == pc.l;
+                sils.append(alloc, silOf(only, cw, pc.b[0], pc.b[1], pc.b[2], pc.b[3])) catch die("out of memory", .{});
+                kept += 1;
+            }
+        }
+        say("  the cell's ink: {d} piece(s); {d} hold 3 % of the ink or more and are read on their own too\n", .{ nl, kept });
+    }
+    var found: [MAXSEED]SeedCand = undefined;
+    var found_ok: [MAXSEED]bool = undefined;
+    var found_box: [MAXSEED]f32 = undefined;
+    var buf: [GS * GS]u8 = undefined;
+    for (sils.items, 0..) |*sl, si| {
+        // what GlowRect draws: a box, or a disc stretched to its box
+        var boxm: [GS * GS]bool = undefined;
+        var discm: [GS * GS]bool = undefined;
+        for (0..GS) |gy| {
+            for (0..GS) |gx| {
+                boxm[gy * GS + gx] = true;
+                const u = (@as(f32, @floatFromInt(gx)) + 0.5) / GS * 2.0 - 1.0;
+                const v = (@as(f32, @floatFromInt(gy)) + 0.5) / GS * 2.0 - 1.0;
+                discm[gy * GS + gx] = u * u + v * v <= 1.0;
+            }
+        }
+        const ms = softOf(&sl.m);
+        const bs = softOf(&boxm);
+        const ds = softOf(&discm);
+        const bl = @max(softLike(&ms, &bs), softLike(&ms, &ds));
+        // the coarse pass, with both pictures grown by one cell, so strokes that run close count (a thin drawing and
+        // its look-alikes lie far apart bit for bit)
+        const mg = grow256(bits256(&sl.bits));
+        var hcount = [_]u32{0} ** 101;
+        for (gi, gi_la) |*e, la| {
+            if (e.form != 1 or @abs(la - sl.la) > 0.27) continue;
+            hcount[@intFromFloat(@round(100.0 * iou256(mg, grow256(bits256(&e.bits)))))] += 1;
+        }
+        const K: u32 = 4000;
+        var hmin: usize = 100;
+        var acc: u32 = hcount[100];
+        while (hmin > 0 and acc + hcount[hmin - 1] < K) {
+            hmin -= 1;
+            acc += hcount[hmin];
+        }
+        var near: std.ArrayList(u32) = .empty;
+        defer near.deinit(alloc);
+        for (gi, gi_la, 0..) |*e, la, i| {
+            if (e.form != 1 or @abs(la - sl.la) > 0.27) continue;
+            if (@as(usize, @intFromFloat(@round(100.0 * iou256(mg, grow256(bits256(&e.bits)))))) >= hmin) near.append(alloc, @intCast(i)) catch die("out of memory", .{});
+            if (near.items.len >= 6000) break;
+        }
+        say("  motif {d} ({s}, {d} by {d} pixels of the cell): a box or a disc lies over it by {d:.2}; {d} glyphs of the index lie over it by {d} hundredths or more, grown by one cell\n", .{ si, if (si == 0) "all the ink" else "one piece", sl.x1 - sl.x0, sl.y1 - sl.y0, bl, near.items.len, hmin });
+        var cands: std.ArrayList(SeedCand) = .empty;
+        defer cands.deinit(alloc);
+        for (near.items) |ii| {
+            const e = &gi[ii];
+            if (uc_class(e.cp) == 2) continue; // a presentation variant: the plain character draws the same shape
+            var v: [6]f32 = undefined;
+            var form: c_int = 0;
+            const key = fx_key.items[e.font];
+            if (wzb_glyph_mask2(key.ptr, e.cp, GS, &buf, &v, &form, null) != 0) continue;
+            var tm: [GS * GS]bool = undefined;
+            for (0..GS * GS) |q| tm[q] = buf[q] >= 128;
+            const ts = softOf(&tm);
+            const like = softLike(&ms, &ts);
+            const drawing = uc_drawing(e.cp) != 0;
+            var u8b: [8]u8 = undefined;
+            const ul = std.unicode.utf8Encode(@intCast(e.cp), &u8b) catch continue;
+            const bytes: usize = 1 + 4 * @as(usize, TEXT2_WORDS) + (@as(usize, ul) + 1) + (key.len + 1) + 1;
+            // a drawing is preferred by 0.03 of likeness; among glyphs that lie as well, the fewer bytes
+            const sc = like + (if (drawing) @as(f32, 0.03) else 0.0) - 0.0005 * @as(f32, @floatFromInt(bytes));
+            cands.append(alloc, .{ .gi = ii, .like = like, .score = sc, .drawing = drawing, .bytes = bytes, .v = v }) catch die("out of memory", .{});
+        }
+        std.mem.sort(SeedCand, cands.items, {}, struct {
+            fn lt(_: void, a: SeedCand, b: SeedCand) bool {
+                return a.score > b.score;
+            }
+        }.lt);
+        for (cands.items[0..@min(if (si == 0) @as(usize, 12) else 4, cands.items.len)]) |c| {
+            const e = &gi[c.gi];
+            say("    U+{X:0>4} of {s}: lies over it by {d:.3}{s}, {d} bytes\n", .{ e.cp, fx_label.items[e.font], c.like, if (c.drawing) ", a drawing" else "", c.bytes });
+            W.put(&rec, &line, "cand {d} U+{X:0>4} like {d:.3} drawing {d} bytes {d} gv {d:.5} {d:.5} {d:.5} {d:.5} {d:.5} {d:.5} box {d} {d} {d} {d} {d} {d}\t{s}\t{s}\n", .{ si, e.cp, c.like, @intFromBool(c.drawing), c.bytes, c.v[0], c.v[1], c.v[2], c.v[3], c.v[4], c.v[5], cw, ch, sl.x0, sl.y0, sl.x1, sl.y1, fx_key.items[e.font], fx_label.items[e.font] });
+        }
+        found_box[si] = bl;
+        found_ok[si] = cands.items.len > 0 and cands.items[0].like >= SEED_T and cands.items[0].like >= bl + 0.05;
+        if (cands.items.len > 0) found[si] = cands.items[0];
+        if (cands.items.len == 0) found[si] = .{ .gi = 0, .like = 0, .score = -1, .drawing = false, .bytes = 0, .v = undefined };
+    }
+    // the motif's and the ground's colours: the picture's own pixels on each side of the threshold
+    var sums = [2][3]f64{ .{ 0, 0, 0 }, .{ 0, 0, 0 } };
+    var cnts = [2]f64{ 0, 0 };
+    {
+        const n = rd.n;
+        const px = t.pyr.lev[0];
+        for (0..n * n) |i| {
+            const s = (rd.t[i] > th) == ink_high;
+            const k: usize = if (s) 0 else 1;
+            inline for (0..3) |c| sums[k][c] += px[3 * i + c];
+            cnts[k] += 1;
+        }
+    }
+    var cols: [2]u32 = undefined;
+    for (0..2) |k| {
+        const c3 = [3]f32{ @floatCast(sums[k][0] / @max(cnts[k], 1)), @floatCast(sums[k][1] / @max(cnts[k], 1)), @floatCast(sums[k][2] / @max(cnts[k], 1)) };
+        cols[k] = 0xff000000 | rgbWord(c3);
+    }
+    // the phase the seeds are placed with (the cell turned by rx, ry)
+    const fcw: f32 = @floatFromInt(cw);
+    const fch: f32 = @floatFromInt(ch);
+    var ox = @as(f32, @floatFromInt(rx)) / fcw;
+    const oy = @as(f32, @floatFromInt(ry)) / fch;
+    if (rd.bonded) {
+        // the mean cell of a wall in a bond lies in the frame where every row is moved back by its place in the
+        // bond: the seed's first row is the bond's row m, which lies m bond shifts to the right
+        const n = rd.n;
+        const period = @as(f32, @floatFromInt(n)) / @as(f32, @floatFromInt(rd.ny));
+        const ymid = (@as(f32, @floatFromInt(ry)) + 0.5 * fch);
+        const y0 = rd.row0 * @as(f32, @floatFromInt(n));
+        const mrow = @floor(@mod(ymid - y0, @as(f32, @floatFromInt(n))) / period);
+        ox += mrow * rd.bond_shift;
+    }
+    const Put = struct {
+        fn seedBlock(r: *std.ArrayList(u8), lb: []u8, c: *const SeedCand, sl: *const Sil, fw: f32, fh: f32, nx: usize, ny: usize, pox: f32, poy: f32, bonded: bool, bshift: f32, ink_c: u32, ground_c: u32, boxl: f32) void {
+            const e = &gi[c.gi];
+            const bx = CellItem{
+                .cx = 0.5 * @as(f32, @floatFromInt(sl.x0 + sl.x1)) / fw,
+                .cy = 0.5 * @as(f32, @floatFromInt(sl.y0 + sl.y1)) / fh,
+                .hw = 0.5 * @as(f32, @floatFromInt(sl.x1 - sl.x0)) / fw,
+                .hh = 0.5 * @as(f32, @floatFromInt(sl.y1 - sl.y0)) / fh,
+            };
+            W.put(r, lb, "seed 1\nlabel {s}\ncp {X}\ngv {d:.6} {d:.6} {d:.6} {d:.6} {d:.6} {d:.6}\nbox {d:.6} {d:.6} {d:.6} {d:.6}\nrepeat {d} {d} {d:.6} {d:.6} {d} {d:.6}\ncolour {x:0>8} {x:0>8}\nlike {d:.4} {d:.4}\ndrawing {d} bytes {d}\n", .{ fx_label.items[e.font], e.cp, c.v[0], c.v[1], c.v[2], c.v[3], c.v[4], c.v[5], bx.cx, bx.cy, bx.hw, bx.hh, nx, ny, pox, poy, @intFromBool(bonded), bshift, ink_c, ground_c, c.like, boxl, @intFromBool(c.drawing), c.bytes });
+            W.put(r, lb, "key {s}\n", .{fx_key.items[e.font]});
+        }
+    };
+    // OUT: one glyph over the whole motif
+    if (found_ok[0]) {
+        const e = &gi[found[0].gi];
+        say("seed: U+{X:0>4} of {s}, lying over the motif by {d:.3} (a box or a disc {d:.3}){s}; {d} bytes; ink {x:0>6} on {x:0>6}\n", .{ e.cp, fx_label.items[e.font], found[0].like, found_box[0], if (found[0].drawing) ", a drawing" else "", found[0].bytes, cols[0] & 0xffffff, cols[1] & 0xffffff });
+        Put.seedBlock(&rec, &line, &found[0], &sils.items[0], fcw, fch, rd.nx, rd.ny, ox, oy, rd.bonded, rd.bond_shift, cols[0], cols[1], found_box[0]);
+    } else if (found_box[0] >= SEED_T and found[0].score >= 0 and found[0].like < found_box[0] + 0.05) {
+        // the motif is a box: GlowRect draws it in fewer bytes than any glyph, through the same mask
+        say("seed: the box GlowRect draws (it lies over the motif by {d:.3}, the best glyph by {d:.3}); 45 bytes; ink {x:0>6} on {x:0>6}\n", .{ found_box[0], found[0].like, cols[0] & 0xffffff, cols[1] & 0xffffff });
+        const sl = &sils.items[0];
+        W.put(&rec, &line, "seed 1\nlabel GlowRect (a box)\ncp 0\ngv 1 1 0 1 0 0.5\nbox {d:.6} {d:.6} {d:.6} {d:.6}\nrepeat {d} {d} {d:.6} {d:.6} {d} {d:.6}\ncolour {x:0>8} {x:0>8}\nlike {d:.4} {d:.4}\ndrawing 0 bytes 45\nkey -\n", .{ 0.5 * @as(f32, @floatFromInt(sl.x0 + sl.x1)) / fcw, 0.5 * @as(f32, @floatFromInt(sl.y0 + sl.y1)) / fch, 0.5 * @as(f32, @floatFromInt(sl.x1 - sl.x0)) / fcw, 0.5 * @as(f32, @floatFromInt(sl.y1 - sl.y0)) / fch, rd.nx, rd.ny, ox, oy, @intFromBool(rd.bonded), rd.bond_shift, cols[0], cols[1], found_box[0], found_box[0] });
+    } else {
+        const why = if (found[0].score < 0) "no glyph of the index lies over the motif" else "no glyph lies over the motif by 0.70 (soft)";
+        say("no seed: {s} (best {d:.3}, a box or a disc {d:.3})\n", .{ why, if (found[0].score < 0) 0 else found[0].like, found_box[0] });
+        W.put(&rec, &line, "seed 0\nwhy {s} (best {d:.3}, box or disc {d:.3})\n", .{ why, if (found[0].score < 0) 0 else found[0].like, found_box[0] });
+    }
+    writeFile(out_path, rec.items);
+    // OUT.pieces: one glyph per piece, for the pieces a glyph lies over
+    if (sils.items.len > 2) {
+        var pr: std.ArrayList(u8) = .empty;
+        var npc: usize = 0;
+        for (sils.items[1..], 1..) |*sl, si| {
+            if (!found_ok[si]) {
+                W.put(&pr, &line, "# piece {d}: no seed (best {d:.3}, a box or a disc {d:.3}); left out\n", .{ si, found[si].like, found_box[si] });
+                continue;
+            }
+            Put.seedBlock(&pr, &line, &found[si], sl, fcw, fch, rd.nx, rd.ny, ox, oy, rd.bonded, rd.bond_shift, cols[0], cols[1], found_box[si]);
+            npc += 1;
+        }
+        say("seeds per piece: {d} of {d} pieces have a glyph\n", .{ npc, sils.items.len - 1 });
+        var nb: [1024]u8 = undefined;
+        writeFile(std.fmt.bufPrint(&nb, "{s}.pieces", .{out_path}) catch unreachable, pr.items);
+    }
+}
+
 /// hard edges, contrast and softness: real Range, HSCB and Blur instances over the colour layer
 fn stepTone(g: *Graph, t: *Target, base: *usize, cur: *f32, opt: Options) bool {
     const cands = alloc.alloc(Cand, 24) catch die("out of memory", .{});
@@ -4653,6 +5474,17 @@ fn fit(target_path: [*:0]const u8, prior_path: [*:0]const u8, prefix: []const u8
     var tread = makeTarget(img, full);
     var rd = readPicture(&tread);
     freeTarget(&tread);
+    if (opt.whole) |wp| {
+        say("the whole picture, read for the repeat every tile draws at its own place:\n", .{});
+        const wimg = readPpm(wp);
+        var wf: u32 = 0;
+        while ((@as(usize, 1) << @intCast(wf)) < wimg.w) wf += 1;
+        var wt = makeTarget(wimg, wf);
+        const rw = readPicture(&wt);
+        freeTarget(&wt);
+        mapWhole(&rd, &rw, opt.win);
+    }
+    if (opt.seedfile) |sp| loadSeed(sp);
     // a figure on a ground, and whether its pieces are glyphs of a font (the reading behind Text)
     readFigure(rd.t, rd.n, &rd.fig);
     if (!figureIsText(&rd.fig) and giLoad()) {
@@ -4692,6 +5524,45 @@ fn fit(target_path: [*:0]const u8, prior_path: [*:0]const u8, prefix: []const u8
     }
     if (opt.read_only) return;
     if (!allowed(&rd, opt.structure, opt)) die("structure {s} is refused: its reading does not allow it on this picture", .{@tagName(opt.structure)});
+    if (opt.from) |fp| {
+        // The tile keeps the whole picture's procedure (the same operators, so neighbouring tiles are the same kind of
+        // surface) and retunes their values on its own pixels, coarse to fine. What places a shape, repeats it or
+        // draws a glyph stays as found on the whole picture.
+        g = parseScript(readFile(fp));
+        for (g.nodes[0..g.n]) |*x| {
+            x.keep = true;
+            x.lock = x.op == OP_GLOWRECT or x.op == OP_TRANSFORM or x.op == OP_TRANSFORMMUL or x.op == OP_TEXT or x.op == OP_TWIRL;
+            // the kind of surface stays the whole picture's: the whole-number values (a noise's frequency and octaves,
+            // modes, passes) are kept, so neighbouring tiles do not turn into other surfaces; a noise's seed may change,
+            // or every tile would repeat the same field (Daniel's 473x note: "only seeds and a few values change")
+            if (!opt.from_free) {
+                for (ops[x.op].kinds, 0..) |kd, wi| {
+                    if (kd == 'i' and !(x.op == OP_PERLIN and wi == 5)) x.lockw |= @as(u16, 1) << @intCast(wi);
+                }
+            }
+        }
+        if (opt.structure == .seed) {
+            // the seeds at the tile's own place over the retuned surface; they are locked (placed, never tuned)
+            const colour = g.root;
+            _ = appendSeed(&g, seeds[0..nseeds], opt.win, colour, @floatFromInt(@as(usize, 1) << @intCast(full)));
+        }
+        var size = work;
+        while (true) {
+            cur = tune(&g, &t, 0, g.n - 1, if (size >= full) opt.final else opt.deep * 2, true, 2);
+            if (cur >= BAD) die("the whole picture's procedure does not draw on this tile: {s}", .{std.mem.span(wzb_notes())});
+            rung += 1;
+            saveRung(prefix, rung, &g, &t, cur, &log, seconds() - t0);
+            say("the whole picture's procedure, retuned at {d} px: {d} operators, {d} bytes, measure {d:.5}, {d:.0} s\n", .{ @as(usize, 1) << @intCast(size), g.n, g.bytes(), cur, seconds() - t0 });
+            if (size >= full) break;
+            size += 1;
+            cacheClear();
+            cache_cap = if (size >= 9) 500 else 1500;
+            freeTarget(&t);
+            t = makeTarget(img, size);
+        }
+        finish(&g, img, full, prefix, &log, t0);
+        return;
+    }
     if (opt.structure == .text) {
         // The text read from the figure, drawn by werkkzeug's Text operator on a flat ground. Everything here was
         // read: the ground and the ink are the picture's two colours, each text's letters, font, place and size come
@@ -4819,9 +5690,18 @@ fn fit(target_path: [*:0]const u8, prior_path: [*:0]const u8, prefix: []const u8
         saveRung(prefix, rung, &g, &t, cur, &log, seconds() - t0);
         say("rung {d}: the surface repeated 2 by 2, {d} bytes, measure {d:.5}\n", .{ rung, g.bytes(), cur });
     }
+    if (opt.structure == .seed) {
+        const colour = g.root;
+        _ = appendSeed(&g, seeds[0..nseeds], opt.win, colour, @floatFromInt(@as(usize, 1) << @intCast(full)));
+        cur = tune(&g, &t, 0, colour, opt.deep * 2, true, 2);
+        if (cur >= BAD) die("the seed does not draw: {s}", .{std.mem.span(wzb_notes())});
+        rung += 1;
+        saveRung(prefix, rung, &g, &t, cur, &log, seconds() - t0);
+        say("rung {d}: {d} seed(s), {d} operators, {d} bytes, measure {d:.5}\n", .{ rung, nseeds, g.n, g.bytes(), cur });
+    }
     if (opt.structure == .shape) {
         const colour = g.root;
-        const ol = appendOutline(&g, &rd, colour, opt);
+        const ol = if (rd.win) appendOutlineWin(&g, &rd, colour, opt, @floatFromInt(@as(usize, 1) << @intCast(full))) else appendOutline(&g, &rd, colour, opt);
         {
             var gs = g;
             gs.root = ol.sub;
@@ -4839,7 +5719,7 @@ fn fit(target_path: [*:0]const u8, prior_path: [*:0]const u8, prefix: []const u8
         saveRung(prefix, rung, &g, &t, cur, &log, seconds() - t0);
         say("rung {d}: the repeated shape{s}, joints by the outline, {d} operators, {d} bytes, measure {d:.5}\n", .{ rung, if (rd.bonded) " in a bond" else "", g.n, g.bytes(), cur });
     }
-    var structure_done = opt.structure == .shape or opt.structure == .plain;
+    var structure_done = opt.structure == .shape or opt.structure == .plain or opt.structure == .seed;
 
     const TOP = 4;
     var size = work;
@@ -5031,11 +5911,16 @@ const Options = struct {
     blur: f32 = 0.002, // the Blur over patches (the operator's own radius value; 0.006 already smears a patch away)
     stretch: f32 = 0, // the grain's stretch (2, 4, 8 or 16); 0 lets the inner measure pick
     jointw: f32 = 1.0, // the joints' width against the width read from the picture
+    whole: ?[*:0]const u8 = null, // milestone 2: the whole picture (at the tile's size), whose repeat the tile draws
+    win: Win = .{}, // where the tile lies in the whole picture
+    seedfile: ?[*:0]const u8 = null, // the seed `p2p seed` found on the whole picture
+    from: ?[*:0]const u8 = null, // a procedure found on the whole picture: the tile keeps its operators and retunes their values
+    from_free: bool = false, // with from: the whole-number values are retuned too (the first try; the tiles drift apart)
 };
 
 /// What adds structure. Each needs its own reading; the inner measure accepts any of them on almost any
 /// picture, so none is tried without one, and the choice between the allowed ones is the eye's.
-const Structure = enum { plain, shape, patches, second, grain, rings, mirror, text };
+const Structure = enum { plain, shape, patches, second, grain, rings, mirror, text, seed };
 
 fn allowed(rd: *const Reading, st: Structure, opt: Options) bool {
     return switch (st) {
@@ -5047,6 +5932,7 @@ fn allowed(rd: *const Reading, st: Structure, opt: Options) bool {
         .rings => rd.nrect == 0 and rd.nring > 0,
         .mirror => rd.nrect == 0 and rd.nring >= 2 and rd.mirror >= 0.10,
         .text => figureIsText(&rd.fig),
+        .seed => nseeds > 0,
     };
 }
 
@@ -5070,6 +5956,11 @@ pub export fn main(argc: c_int, argv: [*]const [*:0]const u8) c_int {
         const k: c_int = if (n >= 5) std.fmt.parseInt(c_int, argStr(argv, 3), 10) catch die("bad shard", .{}) else 0;
         const m: c_int = if (n >= 5) std.fmt.parseInt(c_int, argStr(argv, 4), 10) catch die("bad shard count", .{}) else 1;
         return gi_build(argv[2], k, m);
+    }
+    if (n >= 4 and std.mem.eql(u8, argStr(argv, 1), "seed")) {
+        // p2p seed WHOLE.ppm OUT.seed   (the glyph index of WZ_GLYPHINDEX and WZ_FONTINDEX)
+        seedRead(argv[2], argStr(argv, 3));
+        return 0;
     }
     if (n >= 4 and std.mem.eql(u8, argStr(argv, 1), "render")) {
         // p2p render SCRIPT OUT.ppm [SIZE-EXPONENT]
@@ -5129,7 +6020,7 @@ pub export fn main(argc: c_int, argv: [*]const [*:0]const u8) c_int {
             } else if (std.mem.eql(u8, k, "noises")) {
                 opt.noises = std.fmt.parseInt(usize, v, 10) catch die("bad {s}", .{a});
             } else if (std.mem.eql(u8, k, "structure")) {
-                opt.structure = std.meta.stringToEnum(Structure, v) orelse die("structure {s} is not known (plain, shape, patches, second, grain, rings, mirror, text)", .{v});
+                opt.structure = std.meta.stringToEnum(Structure, v) orelse die("structure {s} is not known (plain, shape, patches, second, grain, rings, mirror, text, seed)", .{v});
             } else if (std.mem.eql(u8, k, "surface2")) {
                 opt.surface2 = v[0] == '1';
             } else if (std.mem.eql(u8, k, "blur")) {
@@ -5138,6 +6029,19 @@ pub export fn main(argc: c_int, argv: [*]const [*:0]const u8) c_int {
                 opt.stretch = std.fmt.parseFloat(f32, v) catch die("bad {s}", .{a});
             } else if (std.mem.eql(u8, k, "jointw")) {
                 opt.jointw = std.fmt.parseFloat(f32, v) catch die("bad {s}", .{a});
+            } else if (std.mem.eql(u8, k, "whole")) {
+                opt.whole = argv[i] + eq + 1;
+            } else if (std.mem.eql(u8, k, "window")) {
+                var it = std.mem.tokenizeScalar(u8, v, ',');
+                opt.win.x = std.fmt.parseFloat(f32, it.next() orelse die("window=X,Y,SIDE", .{})) catch die("bad {s}", .{a});
+                opt.win.y = std.fmt.parseFloat(f32, it.next() orelse die("window=X,Y,SIDE", .{})) catch die("bad {s}", .{a});
+                opt.win.s = std.fmt.parseFloat(f32, it.next() orelse die("window=X,Y,SIDE", .{})) catch die("bad {s}", .{a});
+            } else if (std.mem.eql(u8, k, "fromfree")) {
+                opt.from_free = v[0] == '1';
+            } else if (std.mem.eql(u8, k, "from")) {
+                opt.from = argv[i] + eq + 1;
+            } else if (std.mem.eql(u8, k, "seeds")) {
+                opt.seedfile = argv[i] + eq + 1;
             } else if (std.mem.eql(u8, k, "glyph")) {
                 glyph_t = std.fmt.parseFloat(f32, v) catch die("bad {s}", .{a});
             } else if (std.mem.eql(u8, k, "bytecost")) {

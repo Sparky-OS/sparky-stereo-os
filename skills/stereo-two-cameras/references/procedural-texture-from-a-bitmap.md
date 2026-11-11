@@ -824,6 +824,181 @@ What the fifth round found (pictures of 512 by 512, one CPU thread each; the gly
 - **Known answers with the real fonts:** the 112 Text textures draw with the machine's Arial 2.82, Times New Roman 2.82 and Verdana 2.35; against the stand-ins, 1.22 % of the pixels differ by more than 24 of 255 at the median, 17 textures not at all, the Verdana font page 32 %; the game's title screen shows the same four texts at the same places.
 - **Nothing of the fourth round moved:** with its font map and no glyph index, the 112 drawings are byte for byte the fourth round's (one texture, filigran_messing_font.tex, draws differently from run to run in both programs: see the traps), the thirty readings and the seven found procedures are byte for byte, and the eleven of the third round too.
 
+### The sixth round: high-resolution pictures, tile by tile, and glyphs as seeds (milestone 2)
+
+Daniel (11 November 2026), on the fifth round: "the objective of leveraging other letters is not to be a copy of kkriger, but instead, expand what's possible - we aim small, but small today is not like the demo scene - we want a modern small, and with plenty of fonts as procedure seeds, we can do a lot ... letters are drawings with meanings, and when fonts are pure drawing, it's even better"; and "extend to reproduce advanced hi res textures, even if multiple tiles are needed".
+The design it follows (his words of 10 November): the procedural part is tiled, each tile's procedure informed by the high-resolution texture's own pixels and its neighbours for the seams; the tiles are also the levels of detail; the image stays the last layer.
+
+#### Tiles
+
+**The tile size, and why.**
+Tiles of 512 pixels at the picture's full size: 16 tiles for a 2048 pixel map.
+- The fitter searches coarse to fine at 128, 256 and 512 pixels, and its readings were set and judged by eye at 512 (the third round, which Daniel passed), so a 512 tile is fitted at its own size and drawn at its own size, never resampled.
+- A 512 pixel tile at full size holds a photograph's grain and pits at the size the person sees them close up.
+- A repeat is often larger than a tile (a brick wall's 512 pixel tile holds one and a half bricks per row), so a tile never reads its own repeat: the repeat is read once on the whole picture and drawn at the tile's place (below).
+
+**Three ways of drawing a photograph's tiles.**
+Each gives the person another texture, so all three are kept as options.
+1. **A procedure per tile**: the fitter of the earlier rounds on each tile on its own. Each tile finds its own operators, and neighbouring tiles become different kinds of surface (a lit relief of scales on one, plain noise on the next, stripes on the third): the eye sees the grid at once, blended seams or not. Four to six minutes per tile on one thread.
+2. **One procedure, every value retuned per tile** (`from=WHOLE.script fromfree=1`): the procedure found on the whole picture (reduced to the tile's size) keeps its operators, and every value is retuned on the tile's own pixels, coarse to fine. Neighbouring tiles are mostly the same surface, but some drift: one tile of the rust lets its noise fall to the lowest frequency and draws one large drop, a tile of the floor turns to stripes.
+3. **One procedure, its kind kept, retuned per tile** (`from=WHOLE.script`, the default proposed): as the second, but the whole-number values stay the whole picture's (a noise's frequency and octaves, the modes, a blur's passes), except a noise's seed, which may change, or every tile would repeat the same noise field. 8 to 20 seconds per tile.
+What places, repeats or draws a shape (`GlowRect`, `Transform`, `TransformMul`, `Text`, `Twirl`) stays as found in the second and the third.
+
+**The whole picture's repeat, drawn at a tile's place.**
+`fit TILE.ppm PRIOR OUT structure=shape whole=WHOLE.ppm window=X,Y,SIDE` reads the tile as usual and takes the repeat (cells across and down, where the cell starts, its shapes, the bond, the joints) from the whole picture's reading; a seed file (`seeds=`) carries its own repeat.
+For an axis where the whole repeats n times, a tile of side SIDE at X sees f = SIDE × n cells, and its point u lies at the cell coordinate u × f − o, with o = o_whole − X × n.
+- **Periodic axis** (f of one or more): one cell is drawn in a picture of its own and `Transform` repeats it, with scale 1 / f and offset 0.5 f − o (werkkzeug's `Rotate` reads its input at (u − 0.5) / scale + offset).
+- **Direct axis** (f under one): less than a cell lies across the tile, so the tile itself is the picture and every instance that reaches the tile is drawn at its own place, at (c + o + k) / f; through `Transform` a cell picture would be magnified (four times for an ornament's cell of 683 by 2048 pixels seen from a 512 pixel tile) and soft.
+- **A bond**: the cell is one brick wide and two rows tall, the second row carried half the cell down and the bond's part of a brick sideways by `TransformMul` (mode 16, count 1); where a tile has less than a brick across or two rows down, the rows are drawn without the bond and the program says so.
+
+**The rungs of a tile (the levels of detail).**
+Each rung of a tile is a thinner version of the same tile's procedure, and each rung of the whole texture is every tile at that rung.
+With one procedure retuned per tile, the rungs are the whole picture's own rungs, each retuned on the tile: one flat colour (13 bytes a tile), the noise between two colours (45), the procedure as found at 128 pixels, the whole procedure.
+With a procedure per tile they are the fitter's own rungs: the flat colour, the noise, the procedure as found at 128 and at 256 pixels, the final one.
+
+**The seams.**
+A werkkzeug picture repeats, so a tile's procedure drawn past the tile's border continues itself, not its neighbour.
+The composition (ours, with one value for the whole texture: the band's width) has two modes, each giving another result:
+- **mixed** (for surfaces of noise): every tile is drawn 32 pixels past each border, and neighbours are mixed across the 64 pixel band with weights that rise and fall linearly and sum to one, keeping the texture's contrast: the weighted sum of each tile's departure from its own mean colour is divided by the root of the sum of the squared weights (the variance-preserving blend of Heitz and Neyret, 2018), where a plain average leaves a softer, greyer band;
+- **colour-matched** (for shapes and seeds drawn at their place, which already meet at the border): every pixel keeps its own tile, and only the tiles' mean colours are mixed across the band; mixed drawings would lay a ghost of each tile's own repeat over its neighbour's shapes.
+The sheets show the corner where four tiles meet, at 1:1, hard and composed.
+
+```sh
+python3 pixels/m2cut.py PICTURE.png TILES                                   # TILES/L0-0-0.ppm (the whole at 512), L1-*, L2-r-c.ppm (512 at full size), tiles.txt
+BUILD/p2p fit TILES/L0-0-0.ppm PRIOR W/plain/L0-0-0                          # the whole picture's procedure and its rungs
+BUILD/p2p fit TILES/L2-1-2.ppm PRIOR W/kc3/L2-1-2 from=W/plain/L0-0-0.script # one tile: the whole's procedure, its kind kept, retuned
+BUILD/p2p fit TILES/L2-1-2.ppm PRIOR W/kc1/L2-1-2 from=W/plain/L0-0-0.r01.script   # the same tile's rung 1
+BUILD/p2p fit TILES/L2-1-2.ppm PRIOR W/shape/L2-1-2 structure=shape whole=TILES/L0-0-0.ppm window=0.5,0.25,0.25
+python3 pixels/m2run.py BUILD/p2p JOBS.txt 8                                 # many jobs, each in its own container; waits for all of them
+sh pixels/m2render.sh BUILD/p2p W/kc3 RENDERS/kc3                            # level 0 at 2048, level 2 at 512, every rung at 512
+python3 pixels/m2compose.py SCRATCH NAME kc FONT OUT 64 full                 # NAME-sheet.jpg, NAME-ladder.jpg, NAME-tiled.jpg, NAME.json
+```
+
+#### Glyphs as seeds
+
+A glyph is a seed: a small, exact drawing a procedure calls by a few bytes (the font's key, the character, a place and a size), then repeats, masks, blurs and lights like any other shape.
+Which font a seed comes from is not the measure: any glyph of any free or installed font that lies over the motif is a good seed, a look-alike as good as the original.
+.kkrieger's own `Text` stays as it was.
+
+**What triggers a seed.**
+A seed is tried where the picture repeats (the repeat reading of the first round, on the whole picture) and the mean cell is a figure on a ground: repeating motifs, ornaments, rosettes, tiles' patterns, rivets, perforations, weave, scales, leaves and stars all arrive as a mean cell with ink.
+- The mean cell, along the picture's colour axis, is split into two shades by Otsu's threshold; the separation (the variance between the two shades over the whole variance) must be 0.60 or more, and the smaller shade is the ink.
+- The cell is turned so its first row and column hold the least ink, so the motif is not cut by the cell's border.
+- The motif is all the ink of the turned cell; each piece holding 3 % of the ink or more is also read on its own (a flower and its leaves).
+
+**The search** (`p2p seed WHOLE.ppm OUT.seed`, with the glyph index of the fifth round).
+1. A coarse pass over every glyph of the index (17,166,578 silhouettes of 12,845 faces, 16 by 16 bits, outline forms): both pictures grown by one cell in the four directions and laid over each other; glyphs of other proportions (more than 0.27 apart in the logarithm of width over height) are left out; the 4,000 closest go on.
+2. Each is drawn from its font at 24 by 24, stretched to its own box, and laid over the motif with the soft likeness: both pictures blurred by a box of five cells, twice, then the sum of the smaller of the two over the sum of the larger.
+3. Drawings are preferred (Unicode general categories So and Sm, and private use, where icon fonts put their pictures): 0.03 of likeness; among glyphs that lie as well, the fewer bytes (0.0005 of likeness a byte).
+4. The box and the disc `GlowRect` draws are laid over the motif the same way; a seed is offered when its glyph lies over the motif by 0.70 or more, and better than the box or the disc by 0.05.
+5. The program's choice and its runners-up go into the seed file and are drawn by the engine, each stretched to the motif's box, on a candidates sheet (`m2seedsheet.py`); the person or the model looking chooses by eye (`m2seedpick.py`), as the visual check of the third round chooses a structure, and both choices are recorded.
+
+**The build.**
+A black `Flat`; the glyph drawn white by `Text` version 2 in its outline form, stretched to the motif's box, once per cell on periodic axes and once per instance on direct ones; the repeat's `Transform`; a `Flat` in the motif's colour; `Mask` lays it over the surface where the glyph is white.
+The motif's and the ground's colours are the means of the picture's pixels on each side of the threshold.
+A seed file may hold several seeds (one per piece); they share the repeat and are drawn into the same shape picture.
+With `from=`, the seeds are laid at the tile's place over the whole picture's surface procedure, retuned on the tile.
+
+**What a seed costs, and what the font's presence means.**
+In the procedure a seed costs its key, not its outline: a version 2 `Text` operator is 12 words and three strings, 64 to 86 bytes with the font's key (`Symbola/Regular`, 15 bytes) and the character (one to four bytes).
+The font must be present where the procedure is drawn: installed on the machine (the font index reads fontconfig's folders in place) or in the free collection the index was built from; a key the index does not hold is refused with a sentence, never replaced.
+If the font had to travel with the procedure, the whole file weighs 27 KB to 5.2 MB; cut to the one glyph the seed calls (fontTools' subsetter: the glyph, its cmap entry and the tables a renderer needs), 300 to 720 bytes as WOFF2 (`m2fontweight.py`).
+
+```sh
+WZ_FONTINDEX=IX/candidates.tsv WZ_GLYPHINDEX=IX/glyphs.bin BUILD/p2p seed TILES/L0-0-0.ppm S/NAME.seed   # NAME.seed, NAME.seed.pieces, the cell and ink as PGM
+python3 pixels/m2seedsheet.py prep S NAME && sh S/cands/render.sh BUILD/p2p && python3 pixels/m2seedsheet.py sheet S cands.jpg FONT NAME
+python3 pixels/m2seedpick.py S/NAME.seed K S/NAME.chosen "why the eye took candidate K"
+BUILD/p2p fit TILES/L2-1-1.ppm PRIOR W/kcs3/L2-1-1 from=W/plain/L0-0-0.script structure=seed seeds=S/NAME.chosen window=0.25,0.25,0.25
+python3 pixels/m2fontweight.py IX/candidates.tsv "Symbola/Regular" 2745   # the font whole, and cut to the one glyph
+```
+
+#### What the sixth round found
+
+Nine photographs at full size (2048 by 2048, CC0 from Poly Haven: the six of the earlier study and the rust, rusted metal and rock of the third round) and six textures with motifs (a patterned terracotta floor and a tread plate from Poly Haven, two ornament prints from ambientCG, and the floor of slabs and the brick wall again, with seeds); every sheet looked at before a word was written about it.
+
+- **Repeats need the whole picture.** The brick wall reads its repeat on the whole picture and on its quarters and on one of its sixteen 512 pixel tiles; the floor of slabs and the two ornaments only on the whole picture (their tiles read patches and rings instead); the terracotta's cell (293 pixels) fits a tile and reads everywhere.
+- **A procedure per tile is a patchwork.** On the first row of tiles of all nine photographs, neighbouring tiles are other surfaces (scales, stripes, lumps, plain noise side by side).
+- **One procedure, its kind kept, retuned per tile, reads as one surface** on the coast, the concrete, the plaster, the rock and the rusted metal, with each tile's own colour; the bark keeps its colours (grey, the green of the moss) and loses its furrows, which the whole picture's procedure never had. Three faults remain and are not fixed: a relief's light stands over every tile at the same place, so a lit procedure (the rust) shows each tile as a cushion; a few tiles drift in hue (a purple and a green tint on the floor and on the concrete), because a noise's two colours are retuned channel by channel; and a tile draws the whole picture's octaves at its own scale, four times finer in the picture than on the whole (the frequencies are kept as numbers; shifting them by the window's scale is not built).
+- **Seams.** A 64 pixel band shows the border at 1:1 as a change of grain; a 256 pixel band (half a tile) hides it at 1:1. At a glance a faint grid of tiles remains on some pictures, from each tile's own colour: the picture's local colour, in steps of a tile.
+- **The ladder, for 16 tiles of a 2048 pixel photograph:** one flat colour per tile 208 bytes, the noise between two colours 720, the whole's procedure at 128 pixels 1.0 to 2.3 KB, the whole procedure 1.8 to 3.6 KB.
+- **Against the fair baseline:** the picture's lower-resolution copies add 31 to 41 % to the photographs' JPEG (60 to 66 % to the flat ornament prints); the tiled procedures with the picture are 23.7 to 29.2 % smaller than the picture with its copies for the photographs, 23.6 to 39.3 % for the textures with seeds.
+- **The second judge** (a model that saw only the four sheets, none of this text): of the three ways of drawing a row of tiles, the per-tile procedures were never the continuous one except on the coarse rust, where it also had the truest grain; every value retuned won on the coast, the concrete and the rock; the kind kept won on the floor, the plaster, the brick and the rusted metal; on the bark none was continuous. So the three stay options, and the kind kept is proposed as the default for the tiles where the eye judged both, with the free retune as the other choice.
+- **Time, one CPU thread:** a tile retuned from the whole picture's procedure 8 to 20 seconds; a tile fitted on its own 4 to 6 minutes; the seed reading of a picture over the whole glyph index 2 to 4 seconds.
+
+What the seeds made possible (the same tile without a seed and with one, on a sheet in the lane's evidence):
+
+| texture | the seed | without a seed | with it |
+|---|---|---|---|
+| snowflakes on red | ❅ U+2745 of Symbola, chosen by eye (the measure put the helm ⎈ U+2388 of STIX Two Math first, 0.88 against 0.86) | white blobs of noise | the three snowflakes at their places, the arms thicker and without the branched tips; one procedure for the whole picture, 277 bytes, draws them |
+| floor of slabs in two shades | ▞ U+259E of Murecho Thin, 1.00 | a cloud: one shape per cell and darker joints cannot draw a checker | the checker of slabs; the light slabs flat, the dark ones noise |
+| brick wall, light mortar | ᆍ U+118D of Gothic A1 (two bars and an upright), chosen by eye over two harpoons | brick-coloured noise: the outline trick only darkens | rows of bricks with light mortar, too wide and too regular; the bond stays with the image |
+| terracotta floor with black inserts | the box `GlowRect` draws (every glyph that lies as well costs more bytes) | joints, no inserts | the black inserts at their places |
+| tread plate | ↘ U+2198 of Inconsolata UltraExpanded Black | dark noise | a patterned plate at a glance; arrows, not raised lozenges |
+| poinsettias | refused by eye: a not-equal sign for the whole flower, a hand, a pig, a seedling and leaves for its pieces | white blobs | no seed |
+
+Traps of the sixth round:
+- Symptom: every 512 pixel tile of a brick wall and of a floor of slabs reads "repeats 1 by 1", plain only.
+  Cause: a tile holds one and a half bricks per row, one slab: too few repeats for the repeat reading.
+  Fix: read the repeat on the whole picture and draw it at the tile's place (`whole=`, `window=`).
+  Found by: the readings of all 21 windows of the nine pictures (`readonly=1`): the brick wall reads its repeat at 2048 and 1024 pixels, never at 512.
+- Symptom: the tiles of one photograph are different surfaces side by side (scales, stripes, lumps), and blended seams do not hide it.
+  Cause: each tile's fit chooses its own operators (a relief kept on one, extra noises on another).
+  Fix: one procedure for the whole picture, retuned per tile (`from=`).
+  Found by: the first row of tiles of the nine pictures drawn side by side.
+- Symptom: retuned per tile, one tile of the rust draws a single large drop, a tile of the floor turns to stripes.
+  Cause: the tuning also moved the whole-number values (a noise's frequency fell to its lowest, a mode changed).
+  Fix: keep the whole-number values as found on the whole picture, except a noise's seed; with the seed kept too, every tile would repeat the same noise field.
+  Found by: the same first row, drawn for the freely retuned tiles.
+- Symptom: a cell larger than the tile (an ornament's cell is 683 by 2048 pixels, a tile 512) would come out magnified and soft.
+  Cause: `Transform` reads a cell picture of the tile's own size; a quarter of a cell across means four times the scale.
+  Fix: on an axis with less than one cell across the tile, draw every instance at its own place.
+  Found by: the arithmetic of the window before the first run (0.75 by 0.25 cells across the tile).
+- Symptom: a blended seam lays a ghost of a snowflake's arm, or a strip of the slabs' joint, across the band.
+  Cause: a tile drawn past its border continues its own repeat, not its neighbour; shapes drawn at their place already meet at the border.
+  Fix: the colour-matched seam for shapes and seeds; the mixed seam only for surfaces of noise.
+  Found by: the close-up at the corner of four tiles, hard and blended side by side.
+- Symptom: the tiled rust looks like quilted panels, each tile brighter in its middle and darker at its border, and a 256 pixel band does not hide it.
+  Cause: the whole picture's procedure lights its relief with `Bump`'s light at a place in the picture; drawn on a tile, the same light stands over every tile, so every tile is lit as a cushion of its own.
+  Fix: not built: a tile's light must stand at the whole picture's place (moved by the window like a repeat) or come from a direction.
+  Found by: the rust's sheet, and the second judge's words for it ("the 4x4 grid is plain, like quilted panels").
+- Symptom: background jobs started with `( ... ) &` by a shell that then exits leave their output files empty, and the containers go on running.
+  Cause: the docker client dies with the shell; the container does not.
+  Fix: a runner that starts every job in its own container and waits for all of them (`m2run.py`); stop leftovers by your own container name prefix only.
+  Found by: `docker ps` after the task said it had finished.
+- Symptom: a sheet shows a black tile.
+  Cause: the sheet was drawn while that tile's fit still ran.
+  Fix: compose only when every tile's script exists; the composer lists what is missing.
+- Symptom: the mortar of a photographed brick wall comes out darker than the bricks, where the photograph's is light.
+  Cause: the outline trick of the third round multiplies, and a multiply only darkens; the bricks are of uneven length, so no bricks per row are read either, only rows.
+  Fix: a seed whose ink is the light mortar (two bed joints and a head joint, a Hangul jamo here), laid by `Mask` in the mortar's own colour; the bond stays with the image.
+
+Traps of the seeds:
+- Symptom: for a snowflake the search offers a sun icon and a starfish, while the snowflake glyphs (❄ ❅ ❆) lie over it by only 0.29 to 0.47.
+  Cause: the overlap pixel for pixel punishes thin strokes that run close but not on top of each other.
+  Fix: the soft likeness (both pictures blurred, twice, by a box of five cells at 24 by 24); the snowflakes then lie over it by 0.79 to 0.89.
+  Found by: laying ❄ ❅ ❆ ✶ of four fonts over the motif outside the program, then drawing the engine's candidates on a sheet.
+- Symptom: the true look-alikes never reach the fine pass.
+  Cause: the coarse pass took the 500 glyphs closest bit for bit; the snowflake glyphs are 65 to 108 of 256 bits away.
+  Fix: grow both 16 by 16 pictures by one cell before laying them over each other, and take 4,000.
+- Symptom: the mean cell of a tread plate is a soft diagonal band, and the seed is an arrow.
+  Cause: the plate's lozenges lie in two directions; the repeat reading takes a cell of one lozenge and averages both directions into it.
+  Fix: not built (a cell of two motifs, or a motif turned per row); the plate's raised lozenges stay with the image.
+- Symptom: a flower with leaves gets a not-equal sign, or, one glyph per piece, a hand, a seedling and an arrow.
+  Cause: no glyph of the index lies over a poinsettia's silhouette, and its leaves alone lie closest over letters and icons.
+  Fix: none: the eye refuses both, and the flower stays with the image.
+- Symptom: the motif is a box (the black squares between octagonal tiles), and a seed would draw it.
+  Cause: a box glyph lies over it as well as `GlowRect` does.
+  Fix: a seed must beat the box or the disc by 0.05; here `GlowRect` keeps it, in fewer bytes.
+- Symptom: `fit ... seed=FILE` stops with "bad seed=".
+  Cause: `seed` is the fitter's random seed already.
+  Fix: the seed file is given as `seeds=`.
+- Symptom: `type 'u3' cannot represent integer value '49'` at a sum of byte counts.
+  Cause: `std.unicode.utf8Encode` returns a `u3`, and the sum takes the type of its first runtime operand.
+  Fix: widen to `usize` before adding.
+- Symptom: `function parameter shadows declaration of 'seed'`, `local constant shadows declaration of 'score'`.
+  Cause: Zig refuses a name that hides a declaration of the file.
+  Fix: give the file's own globals names no function uses (`seeds`, `nseeds`).
+
 ### Where the procedures stop (so far)
 
 On .kkrieger's own textures, which are procedures, the reverse now gets the material at a glance for the plain noises, the regular repeats and the walls in a bond, and a recognisable drawing for the wood and the carved ornament; nothing is right close up.
@@ -831,7 +1006,9 @@ On photographs it gets the colours and the kind of surface, and none of the mark
 A glyph used as a shape is found where it stands as a figure on a flat ground: plain, or under up to three twirls that the search can take out one at a time; then the found procedure can be the artists' own.
 Over every free and open font and the machine's own, any character is found the same way: Latin, Greek, Cyrillic, Hebrew, CJK characters of several pieces, ornaments, icons, bitmap fonts and colour emoji, with the font, the place and the size.
 It stops at letters bent by a `Distort` (found clean, often whole, in another design), at four twirls and more, at letters under about 20 pixels, at a text stretched by more than a third, at a single stroke standing alone (an r, a t), at letters that touch (rt), at a word that is one piece of ink (joined Arabic, a Devanagari word under its headline), at thin line drawings (hieroglyphs), at a text over a material, and at telling clones of one design apart (Times, Helvetica and Arial copies draw the same letters within a pixel).
-Not built yet: a `Distort` for ragged patch edges, for bent letters and for stones of uneven length, the rounded bevel of a stone, a text read over a material (its ink is a second colour, which the second-material reading already finds), a font page, rings (as against spirals), and the same method tile by tile on photographs.
+On photographs at full size, tile by tile, one procedure retuned per tile gives each part of the picture its own colours and grain, and the whole stays one surface where the second judge and the eye agree (coast, concrete, plaster, rock, rusted metal); the bark's furrows and knots, the coast's stones, the rock's pits and cracks, the rust's stains, the rusted metal's drips, a wall's bond and a slab's veins stay with the image, the last layer.
+Where a picture repeats a motif, a glyph found over the whole index draws it at every place in a few bytes (snowflakes, a checker of slabs, a wall's mortar), and the box `GlowRect` draws where the motif is a box; a motif no glyph lies over (a poinsettia), or a cell that averages two motifs (a tread plate's lozenges in two directions), stays with the image.
+Not built yet: a `Distort` for ragged patch edges, for bent letters and for stones of uneven length, the rounded bevel of a stone, a text read over a material (its ink is a second colour, which the second-material reading already finds), a font page, rings (as against spirals), a tile's noise frequencies shifted by its window's scale, a noise's colours retuned as one hue, a cell of two motifs, and a disc as a seed (the box only, so far).
 
 ## Where it fails
 
@@ -872,4 +1049,4 @@ Not built yet: a `Distort` for ragged patch edges, for bent letters and for ston
 
 ## Credits
 
-OpenKTG: Fabian "ryg" Giesen. werkkzeug3: Dierk Ohlerich, Fabian Giesen, Thomas Mahlke, Christoph Muetze, Tammo Hinrichs and Bastian Zuehlke, as its licence names them. The pictures of the first run: Poly Haven, CC0. Relief mapping: Fábio Policarpo, Manuel M. Oliveira and João L. D. Comba (2005). Parallax occlusion mapping: Natalya Tatarchuk (2006). The stereo photographs of bark and ground: Robbie Sproule, CC BY 2.0, on Wikimedia Commons. MaterialX: the Academy Software Foundation's project, its standard nodes document by Doug Smythe and Jonathan Stone. The reverse from pixels: Yiwei Hu, Chengan He, Valentin Deschaintre, Julie Dorsey and Holly Rushmeier (2022) for the order (parts, layered noise, tuning together); Ariel Elnekave and Yair Weiss (2022) for comparing textures by their patches along random directions; Robert Hooke and T. A. Jeeves (1961) for direct search; the bridge to the operators started as lane 503's, from lane 473x's renderer. Text: the FreeType Project (David Turner, Robert Wilhelm, Werner Lemberg) for the font renderer; Liberation Fonts (SIL Open Font License 1.1) and DejaVu Fonts (Bitstream Vera licence) as the stand-ins named in the font map; .theprodukkt's capture of the title screen on Wikimedia Commons (BSD licence). Any font, any character: HarfBuzz (Behdad Esfahbod and the contributors its AUTHORS file names) for shaping and COLR painting; SheenBidi (Muhammad Tayyab Akram) for UAX #9 and the script runs; plutosvg and plutovg (Samuel Ugochukwu) for SVG glyphs; libpng, zlib (Jean-loup Gailly and Mark Adler) and Brotli for colour bitmaps, WOFF and WOFF2; the Unicode Consortium's UAX #9, UAX #24 and Blocks.txt; the Google Fonts repository and Debian's font packages (the Debian Fonts Team and each package's maintainers), every font credited from its own name table in the lane's evidence; Microsoft's core fonts read where the person installed them, never shipped.
+OpenKTG: Fabian "ryg" Giesen. werkkzeug3: Dierk Ohlerich, Fabian Giesen, Thomas Mahlke, Christoph Muetze, Tammo Hinrichs and Bastian Zuehlke, as its licence names them. The pictures of the first run: Poly Haven, CC0. Relief mapping: Fábio Policarpo, Manuel M. Oliveira and João L. D. Comba (2005). Parallax occlusion mapping: Natalya Tatarchuk (2006). The stereo photographs of bark and ground: Robbie Sproule, CC BY 2.0, on Wikimedia Commons. MaterialX: the Academy Software Foundation's project, its standard nodes document by Doug Smythe and Jonathan Stone. The reverse from pixels: Yiwei Hu, Chengan He, Valentin Deschaintre, Julie Dorsey and Holly Rushmeier (2022) for the order (parts, layered noise, tuning together); Ariel Elnekave and Yair Weiss (2022) for comparing textures by their patches along random directions; Robert Hooke and T. A. Jeeves (1961) for direct search; the bridge to the operators started as lane 503's, from lane 473x's renderer. Text: the FreeType Project (David Turner, Robert Wilhelm, Werner Lemberg) for the font renderer; Liberation Fonts (SIL Open Font License 1.1) and DejaVu Fonts (Bitstream Vera licence) as the stand-ins named in the font map; .theprodukkt's capture of the title screen on Wikimedia Commons (BSD licence). Any font, any character: HarfBuzz (Behdad Esfahbod and the contributors its AUTHORS file names) for shaping and COLR painting; SheenBidi (Muhammad Tayyab Akram) for UAX #9 and the script runs; plutosvg and plutovg (Samuel Ugochukwu) for SVG glyphs; libpng, zlib (Jean-loup Gailly and Mark Adler) and Brotli for colour bitmaps, WOFF and WOFF2; the Unicode Consortium's UAX #9, UAX #24 and Blocks.txt; the Google Fonts repository and Debian's font packages (the Debian Fonts Team and each package's maintainers), every font credited from its own name table in the lane's evidence; Microsoft's core fonts read where the person installed them, never shipped. Tiles and seeds: the variance-preserving blend of Eric Heitz and Fabrice Neyret (2018); Otsu's threshold (Nobuyuki Otsu, 1979); fontTools (MIT licence, copyright Just van Rossum, as its LICENSE states) for cutting a font to one glyph; the pictures of the sixth round from Poly Haven (Rob Tuytel; Dimitrios Savva and Rico Cilliers; Amal Kumar) and ambientCG, all CC0; the seeds' fonts as their own name tables credit them: Symbola (George Douros), Murecho (Neil Summerour), Gothic A1 (HanYang I&C), Inconsolata (Raph Levien, Cyreal, Brenton Simpson).

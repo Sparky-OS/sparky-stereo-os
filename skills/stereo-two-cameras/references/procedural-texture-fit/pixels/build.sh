@@ -64,6 +64,21 @@ with open(sys.argv[1], 'w') as f:
     f.write('};\nstatic const unsigned uspecial_ranges[][2] = {\n')
     for a, b in special:
         f.write('  { 0x%X, 0x%X },\n' % (a, b))
+    # characters that are drawings rather than letters (general categories So and Sm, and private use, where icon
+    # fonts put their pictures): the seeds of milestone 2 prefer them
+    draw = []
+    start = None
+    for c in range(0x110000):
+        d = unicodedata.category(chr(c)) in ('So', 'Sm', 'Co')
+        if d and start is None:
+            start = c
+        if not d and start is not None:
+            draw.append((start, c - 1)); start = None
+    if start is not None:
+        draw.append((start, 0x10FFFF))
+    f.write('};\nstatic const unsigned udrawing_ranges[][2] = {\n')
+    for a, b in draw:
+        f.write('  { 0x%X, 0x%X },\n' % (a, b))
     f.write('};\n')
 PY
 # FreeType with every font driver (TrueType, CFF and CFF2, Type 1, CID, Type 42, PFR, Windows FNT, PCF, BDF),

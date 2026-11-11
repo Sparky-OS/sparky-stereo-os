@@ -50,6 +50,24 @@ extern "C" void wzb_strings(const char *text, const char *font)
   g_text = (const unsigned char *) (text ? text : "");
   g_font = (const unsigned char *) (font ? font : "");
 }
+// Version 2 of Text (our extension, wztext2.c): the text is UTF-8, the font an entry of the font index, and a
+// third string holds the variable font's axis values.
+static const char *g_axes = "";
+extern "C" void wzb_strings3(const char *text, const char *font, const char *axes)
+{
+  wzb_strings(text, font);
+  g_axes = axes ? axes : "";
+}
+extern "C" int ht2_draw(int XS, int YS, float x, float y, float emh, float avgw, unsigned flags, int extspace, float lineskip,
+                        const char *text, const char *key, const char *axes, int palette, int form, unsigned col,
+                        uint8_t *out, char *err, int errlen);
+extern "C" int ht2_glyph_mask(const char *key, unsigned cp, int side, unsigned char *outm, float *v, int *formp, unsigned char *rgba_out);
+extern "C" int ht2_font_spacing(const char *key, float *space, float *avg);
+extern "C" int wzb_glyph_mask2(const char *key, unsigned cp, int side, uint8_t *out, float *v, int *form, uint8_t *rgba)
+{
+  return ht2_glyph_mask(key, cp, side, out, v, form, rgba);
+}
+extern "C" int wzb_font_spacing(const char *key, float *space, float *avg) { return ht2_font_spacing(key, space, avg); }
 // What the font renderer has to say about the texts drawn so far: one sentence per line (the font that
 // stood in for each name, every character the font had no glyph for).
 extern "C" const char *wzb_notes(void) { return hf_notes(); }
@@ -150,6 +168,27 @@ static int text_wz3(GenBitmap *bm, sF32 x, sF32 y, sF32 width, sF32 height, sU32
     }
   }
   hf_end();
+  return 0;
+}
+
+// Version 2: wztext2.c draws the text as a premultiplied picture; it lies over the input the way GenBitmap::Text's
+// FadeOver lays the operator's colour (where the text covers fully, the text; where it does not, the input).
+static int text_v2(GenBitmap *bm, sF32 x, sF32 y, sF32 width, sF32 height, sU32 col, sU32 flags, sInt extspace, sF32 lineskip,
+                   sInt palette, sInt form, char *err, int errlen)
+{
+  uint8_t *pic = new uint8_t[(size_t) bm->Size * 4];
+  if (ht2_draw(bm->XSize, bm->YSize, x, y, width, height, flags, extspace, lineskip, (const char *) g_text, (const char *) g_font, g_axes,
+               palette, form, col, pic, err, errlen)) { delete[] pic; return 1; }
+  for (sInt i = 0; i < bm->Size; i++) {
+    sU16 *q = (sU16 *) &bm->Data[i];   // blue, green, red, alpha
+    unsigned a = pic[4 * i + 3];
+    if (!a) continue;
+    for (int c = 0; c < 4; c++) {
+      unsigned s15 = ((unsigned) pic[4 * i + c] << 7) | (pic[4 * i + c] >> 1);
+      q[c] = (sU16) (s15 + ((unsigned) q[c] * (255 - a) + 127) / 255);
+    }
+  }
+  delete[] pic;
   return 0;
 }
 
@@ -286,7 +325,10 @@ static int wzb_apply_inner(const char *name, const uint32_t *w32, int nin, void 
   else if (IS("Text")) {
     NEED(1);
     o = clone(I[0]);
-    if (text_wz3(o, F(0), F(1), F(2), F(3), U(4), U(5), N(6), F(7), F(8), g_text, g_font, err, errlen)) { delete o; return 1; }
+    // version 2 (our extension) says so in its tenth word; werkkzeug3's own Text has nine
+    if (U(9) == 2) { if (text_v2(o, F(0), F(1), F(2), F(3), U(4), U(5), N(6), F(8), N(10), N(11), err, errlen)) { delete o; return 1; } }
+    else if (U(9) != 0) { delete o; SETERR("Text version %u is not known (1: werkkzeug3's, 2: any font, any character)", U(9)); }
+    else if (text_wz3(o, F(0), F(1), F(2), F(3), U(4), U(5), N(6), F(7), F(8), g_text, g_font, err, errlen)) { delete o; return 1; }
   }
   else SETERR("is not an operator of this module");
   if (!o) SETERR("gave nothing");

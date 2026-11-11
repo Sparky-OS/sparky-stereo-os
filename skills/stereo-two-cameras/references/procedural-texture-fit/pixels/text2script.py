@@ -17,6 +17,11 @@ for line in sys.stdin:
         continue
     name, op, ins, vals = t[0], t[1], t[2], t[3:]
     k = kinds[op]
+    # Text version 2 (our extension): three more whole numbers (the version, 2; the palette; the form) and a third
+    # string (the axis values); its strings are UTF-8, werkkzeug3's own are 8-bit
+    v2 = op == "Text" and len(vals) == len(k) + 3
+    if v2:
+        k = k + "iii"
     if len(vals) != len(k):
         sys.exit("%s: %s takes %d values, %d given" % (name, op, len(k), len(vals)))
     out = []
@@ -27,6 +32,8 @@ for line in sys.stdin:
             out.append("%x" % struct.unpack("<I", struct.pack("<f", float(v)))[0])
         else:
             out.append(v.lstrip("#"))
-    print(name, op, ins, " ".join(out + ["s=" + x.encode("latin-1").hex() for x in strs]))
+    if v2 and len(strs) == 2:
+        strs.append("")
+    print(name, op, ins, " ".join(out + ["s=" + x.encode("utf-8" if v2 else "latin-1").hex() for x in strs]))
     last = name
 print("out", last)

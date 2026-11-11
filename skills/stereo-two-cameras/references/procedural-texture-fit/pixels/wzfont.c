@@ -34,12 +34,12 @@
 #include <string.h>
 #include <ctype.h>
 
-#define MAXMAP 16
+#define MAXMAP 64
 #define NOTES 4096
 
-struct entry { char name[64]; char file[512]; char label[200]; FT_Face face; int tried; };
+struct entry { char name[64]; char file[512]; char label[300]; FT_Face face; int tried; int index; };
 static struct entry g_map[MAXMAP];
-static int g_nmap = 0, g_map_loaded = 0;
+static int g_nmap = 0, g_map_loaded = 0, g_map_given = 0;
 static char g_map_err[300];
 static FT_Library g_lib;
 static char g_notes[NOTES];
@@ -81,6 +81,7 @@ static void note(const char *fmt, ...)
 }
 
 const char *hf_notes(void) { return g_notes; }
+void hf_note_line(const char *line) { note("%s", line); }
 void hf_notes_clear(void) { g_notes[0] = 0; }
 
 static char *trim(char *s)
@@ -97,7 +98,8 @@ static void map_load(void)
 {
   g_map_loaded = 1;
   const char *path = getenv("WZ_FONTMAP");
-  if (!path || !path[0]) { snprintf(g_map_err, sizeof g_map_err, "no font map is given: set WZ_FONTMAP to a file of lines  name = font file | sentence for the caption"); return; }
+  if (!path || !path[0]) { g_map_given = 0; return; }
+  g_map_given = 1;
   FILE *f = fopen(path, "r");
   if (!f) { snprintf(g_map_err, sizeof g_map_err, "the font map %.200s cannot be read", path); return; }
   char dir[512];
@@ -125,6 +127,44 @@ static void map_load(void)
   fclose(f);
 }
 
+/* Without a font map, a name resolves the way the person's own system resolves it: the font of that family
+ * installed on this machine (the font index's "machine" entries, read from fontconfig's folders), else the same
+ * family anywhere in the index. Only when the font is not installed does a free font stand in: the ones
+ * fontconfig's own 30-metric-aliases.conf binds to Microsoft's names (metric-compatible), and DejaVu Sans for
+ * Verdana, which has no metric-compatible free font. The caption says which was used. */
+int ix_resolve_family(const char *name, char *file, int filelen, int *face, char *label, int labellen);
+const char *ix_error(void);
+static const struct { const char *name, *standin, *how; } g_standins[] = {
+  { "arial", "Liberation Sans", "metric-compatible" },
+  { "times new roman", "Liberation Serif", "metric-compatible" },
+  { "courier new", "Liberation Mono", "metric-compatible" },
+  { "verdana", "DejaVu Sans", "not metric-compatible: its letters are a different width" },
+};
+static struct entry *resolve_installed(const char *want, char *err, int errlen)
+{
+  if (g_nmap >= MAXMAP) { snprintf(err, errlen, "more than %d font names in one drawing", MAXMAP); return 0; }
+  struct entry *e = &g_map[g_nmap];
+  memset(e, 0, sizeof *e);
+  snprintf(e->name, sizeof e->name, "%s", want);
+  char lb[300];
+  if (ix_resolve_family(want, e->file, sizeof e->file, &e->index, lb, sizeof lb)) {
+    snprintf(e->label, sizeof e->label, "%s", lb);
+    g_nmap++;
+    return e;
+  }
+  for (size_t k = 0; k < sizeof g_standins / sizeof g_standins[0]; k++) {
+    if (strcmp(g_standins[k].name, want)) continue;
+    if (ix_resolve_family(g_standins[k].standin, e->file, sizeof e->file, &e->index, lb, sizeof lb)) {
+      snprintf(e->label, sizeof e->label, "%s stands in for %s (%s): %s is not installed on this machine", lb, want, g_standins[k].how, want);
+      g_nmap++;
+      return e;
+    }
+  }
+  if (ix_error()[0]) snprintf(err, errlen, "no font map is given and %s", ix_error());
+  else snprintf(err, errlen, "the text asks for the font \"%s\": it is not installed on this machine, no font of that family is in the font index, and no free font stands in for it", want);
+  return 0;
+}
+
 /* werkkzeug3's FontBegin: a page of pagex by pagey, the font by its Windows name, the average character
  * width (0: the font's own) and the height of the em square, both in page pixels.
  * Returns the line height (GDI's tmHeight), or -1 and a sentence in err. */
@@ -140,11 +180,12 @@ int hf_begin(int pagex, int pagey, const char *name, int avgw, int emh, char *er
   want[i] = 0;
   struct entry *e = 0;
   for (int k = 0; k < g_nmap; k++) if (strcmp(g_map[k].name, want) == 0) e = &g_map[k];
-  if (!e) { snprintf(err, errlen, "the text asks for the font \"%s\" and the font map has no line for it", want); return -1; }
+  if (!e && g_map_given) { snprintf(err, errlen, "the text asks for the font \"%s\" and the font map has no line for it", want); return -1; }
+  if (!e && !(e = resolve_installed(want, err, errlen))) return -1;
   if (!e->tried) {
     e->tried = 1;
     if (!g_lib && FT_Init_FreeType(&g_lib)) { snprintf(err, errlen, "FreeType did not start"); return -1; }
-    if (FT_New_Face(g_lib, e->file, 0, &e->face)) e->face = 0;
+    if (FT_New_Face(g_lib, e->file, e->index, &e->face)) e->face = 0;
   }
   if (!e->face) { snprintf(err, errlen, "the font file for \"%s\" cannot be read as a font: %.200s", want, e->file); return -1; }
   if (!FT_IS_SCALABLE(e->face)) { snprintf(err, errlen, "the font file for \"%s\" has no outlines (a bitmap font is not drawn): %.200s", want, e->file); return -1; }

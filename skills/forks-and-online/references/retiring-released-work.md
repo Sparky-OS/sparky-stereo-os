@@ -64,34 +64,36 @@ The credit remains in [the one merges list](../../../docs/upstream-merges.md).
 
 ## Bounded API and duplicate-copy recipe
 
-Keep API responses in a scratch file, with a response-size limit and timeout. Print only an explicitly selected
-scalar or count. Do not stringify a list of records to discover its shape: that prints all nested diffs and release assets.
+Keep API responses in a scratch file, with a response-size limit and timeout.
+Print only an explicitly selected scalar or count.
+Do not stringify a list of records to discover its shape: that prints all nested diffs and release assets.
 Follow wrappers to the actual JSON, validate its shape, and keep compact receipts with the original response checksum.
 For large histories, request one comparison commit where supported; some forges still return the complete changed-file list.
 
-An exact duplicate is a different proof from a landed commit. Hash both regular files with SHA-256, record their
-allocated blocks, inode/device and link count, and name the retained copy for every candidate. Do not follow symlinks.
-Exclude protected runner files and reports before making the removal manifest. Count separate allocated inodes once;
-shared hard links and nested candidate directories must not inflate the reclaimable total. An unmatched file keeps its
-own path even if most of its directory is duplicate. Recheck both files immediately before applying removal.
+An exact duplicate is a different proof from a landed commit.
+Hash both regular files with SHA-256, record their allocated blocks, inode/device and link count, and name the retained copy for every candidate.
+Do not follow symlinks.
+Exclude protected runner files and reports before making the removal manifest.
+Count separate allocated inodes once; shared hard links and nested candidate directories must not inflate the reclaimable total.
+An unmatched file keeps its own path even if most of its directory is duplicate.
+Recheck both files immediately before applying removal.
+On one filesystem, the least destructive reclamation keeps every path: link the kept copy to a temporary name beside the duplicate, then rename it over the duplicate, after rechecking both hashes, the device and a link count of one.
+ORDER 513 freed 3.80 GB this way (115,249 links, nothing removed, 2026-11-11).
 
-A lane marked done can still hold the only surviving test evidence for an open review. Query the live review state,
-record its current head, and list bundle heads without extracting them (`git bundle list-heads FILE`). A newer review
-head does not prove that an older bundle or historical experiments are preserved upstream. A broken evidence symlink
-is not a backup: resolve it and verify the target exists before declaring the other copy redundant.
+A lane marked done can still hold the only surviving test evidence for an open review.
+Query the live review state, record its current head, and list bundle heads without extracting them (`git bundle list-heads FILE`).
+A newer review head does not prove that an older bundle or historical experiments are preserved upstream.
+A broken evidence symlink is not a backup: resolve it and verify the target exists before declaring the other copy redundant.
 
 ## Further traps
 
 - **Symptom:** an audit fills its output disk while making read-only API calls.
   **Cause:** a diagnostic prints whole JSON records, including repeated tool envelopes and large diffs.
-  **Fix:** redirect raw data to bounded scratch storage and print only whitelisted fields; check free bytes before
-  each step and stop automatically when the intended write would reach the floor.
+  **Fix:** redirect raw data to bounded scratch storage and print only whitelisted fields; check free bytes before each step and stop automatically when the intended write would reach the floor.
   **Found by:** output sizes and an ENOSPC write failure showed the log copies, rather than Git objects, exhausted storage.
 - **Symptom:** a containing-tag check appears successful after a request failed.
-  **Cause:** a tool returned an error envelope inside a successful outer JSON response, or a saved JSON response was
-  damaged by manual text redaction.
-  **Fix:** unwrap and validate the actual payload, require the expected comparison fields, and retain parse/API failures
-  as failures. Repair through a new bounded request; never interpret a missing field as a zero count.
+  **Cause:** a tool returned an error envelope inside a successful outer JSON response, or a saved JSON response was damaged by manual text redaction.
+  **Fix:** unwrap and validate the actual payload, require the expected comparison fields, and retain parse/API failures as failures. Repair through a new bounded request; never interpret a missing field as a zero count.
   **Found by:** parsing cached responses and inspecting their nested `content` and `structuredContent` fields.
 - **Symptom:** a finished lane's handoff looks entirely disposable.
   **Cause:** it holds duplicate files beside unique evidence, and its old evidence symlink points to a removed target.

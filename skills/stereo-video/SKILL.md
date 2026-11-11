@@ -114,6 +114,7 @@ In a patch offered upstream, keep the project's own defaults and make these path
 As in the general skill, with a fixed set of clips, each LEFT red and RIGHT blue with a frame number: the SEI side by side and top and bottom, left eye first and right eye first; the same in Matroska; a clip whose SEI comes only on keyframes (ordinary x264 output: many players lose the mark after the first frame); an undeclared 32:9 clip; a plain 2D clip.
 For each: both eyes captured over time with the same frame number, the right colour in each eye, one declaration per stereo clip, none for the 2D clip, and the player's 2D parts identical in both eyes.
 For writers: the mark checked byte by byte against an independent writer, in every mode, and read back by a second program.
+For an existing correction writer, audit [temporary replacement, read-back and failed restoration](references/correction-container-audit.md) separately; sView's published container branches illustrate the distinction.
 
 ## Android, screen-content codecs, editing and transport
 

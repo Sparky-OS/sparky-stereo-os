@@ -106,3 +106,4 @@ Check both the bytes and a reader round trip: an unmarked `.jps` can reopen corr
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 
 For an accepted metadata-only correction save, use the shared `Picture::saveCorrection` entry point; see the [JPS/MPO save recipe](references/jps-descriptor.md#save-a-correction-without-recompressing-an-existing-jps-or-mpo).
+Before moving an existing program's writer, use the [correction-writer audit](references/correction-writer-audit.md) to reconcile its published source, recipe pin, encoder callers and actual disk transaction.

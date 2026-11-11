@@ -3,7 +3,8 @@
 Written on 2026-11-10 (ORDER 514, milestone 1), by Claude Fable 5.2 with Daniel Campos Ramos.
 It holds what Farbrausch's open tools are, what builds where, who already works on them, the plan for an editor on KDE Plasma where people and AI partners build procedural textures together, and, since milestone 2 (11 November 2026), the recipe and the traps of the editor's core: Stereo Werkkzeug, the part without a window.
 Since milestone 3 (the same day) it also holds the maths the core carries inside, so that one procedure draws the same bytes with every C library and in WebAssembly, and the partners' server, which an AI partner reaches the open project through.
-The window and the stereo preview are not built yet.
+Since milestone 4 (the same day) it holds the editor's first light: a KDE program over the C interface, its parameter panel made from Farbrausch's table, a live picture drawn in a process of its own, the core's sentences in ten languages, and AI partners working in the open window.
+The stereo preview, new operators and the Text operator are not built yet.
 Later milestones grow this page into the editor's contributor skill.
 
 **Check freshness first.**
@@ -72,8 +73,8 @@ They are where to look for how a modern texture editor behaves; none of them ope
 The core is a folder, `stereo_werkkzeug`, in the edition's fork of `fr_public`: Zig for everything new, Farbrausch's `wz3_bitmap_code.cpp` compiled as it is, one C header for every front end.
 "Stereo" marks the edition's work on a program whose origin is Farbrausch's, as in Stereo KWin; Farbrausch is credited wherever the name appears.
 
-1. Build: `./build.sh OUT` (Zig 0.16). It makes the operator table from Farbrausch's sources, then `OUT/wz` (the command), `OUT/libstereo_werkkzeug.a` with `stereo_werkkzeug.h`, `OUT/capi_test` and `OUT/swz-mcp` (the partners' server). `SWZ_TARGET=x86_64-linux-musl` makes static programs; `SWZ_TARGET=wasm32-wasi` makes `OUT/wz.wasm`, the command only.
-2. Prove: `tests/run-all.sh OUT`. One line per step; expect "62 steps passed, 0 failed" (Python 3 is needed for the step that proves the partners' server). The steps that are controls pass when the check under them fails (a change made behind the journal's back, one flipped bit in one picture).
+1. Build: `./build.sh OUT` (Zig 0.16). It makes the operator table from Farbrausch's sources, then `OUT/wz` (the command), `OUT/libstereo_werkkzeug.a` with `stereo_werkkzeug.h`, `OUT/capi_test`, `OUT/swz-mcp` (the partners' server), `OUT/libswz_front.a` with `stereo_werkkzeug_front.h` and `OUT/front_test` (the front library), and `OUT/swz-draw` (the drawing process of a live preview). `SWZ_TARGET=x86_64-linux-musl` makes static programs; `SWZ_TARGET=wasm32-wasi` makes `OUT/wz.wasm`, the command only.
+2. Prove: `tests/run-all.sh OUT`. One line per step; expect "65 steps passed, 0 failed" (Python 3 is needed for the step that proves the partners' server; with `SWZ_SDK_PYTHON` naming a Python that has the `mcp` package, the server is also run under the official SDK's client, 119 checks; without it that step says it was not run). The steps that are controls pass when the check under them fails (a change made behind the journal's back, one flipped bit in one picture).
 3. Look: `wz textures FILE.k` lists the named textures, `wz draw FILE.k NAME OUT.png --png` draws one, `wz text FILE.k --labels` prints the project for reading, `wz graph FILE.k NAME` prints one texture's operators as typed text.
 
 What to expect on `werkkzeug3/data/kkrieger.k`: version 13, 217 pages, 29,347 operators, 854 named textures; 742 draw, 112 are refused by name because they hold a Text operator (drawn with Text handed on when asked, which the output says).
@@ -142,6 +143,8 @@ One program, `swz-mcp --project FILE.k`, serves one open project to an AI partne
 1. The person chooses once how partners work: `wz partners` shows the three ways and what is kept; `wz partners apply-and-show`, `suggest-only` or `ask-each-time` keeps the choice in `~/.config/stereowerkkzeugrc` (group `[Partners]`, key `Mode`; the editor will share the file); `wz partners forget` takes it back. Nothing is preset, and the server only reads the file.
 2. Register it with the assistant's own command, for example `claude mcp add --scope user stereo-werkkzeug -- /path/swz-mcp --project /path/FILE.k --person-socket "$XDG_RUNTIME_DIR/stereo-werkkzeug.sock"`.
 3. Prove it: `python3 tests/mcp-proof.py OUT`. Expect "123 checks passed, 0 failed". A scripted partner speaks both protocol revisions, a scripted person answers on the socket, and each check compares with something outside the server: the file's own SHA-256, the reference table, what `wz` prints, a PNG decoded in the test.
+4. Prove it under the official client: `python tests/sdk-client.py OUT` with the `mcp` package installed (`pip install mcp` into a virtual environment). Expect "119 checks passed, 0 failed": the SDK's three ways of connecting (`legacy`, `auto`, the 2026-07-28 revision adopted directly), each under the three ways of working and with none chosen. Check the negotiated version in each (`auto` must come out as 2026-07-28: a discover answer the SDK cannot validate falls back to the handshake without a word).
+5. For a project open in the editor, register `swz-mcp --attach "$XDG_RUNTIME_DIR/stereo-werkkzeug.sock"` instead of `--project`.
 
 What it offers, and to whom:
 
@@ -163,6 +166,59 @@ Rules worth copying into any server of this kind:
 - **A partner's tools cannot answer for the person:** no tool saves, chooses the mode, or takes a suggestion; "ask each time" asks on the person's socket and the partner's call waits for the answer (`--ask-seconds`).
 - **A partner can set what a person could type:** a number outside the range of werkkzeug3's own panel is refused with the range.
 - **The specification asks for a rate limit** ("Servers MUST ... rate limit tool invocations"): `--calls-per-10s`, refused with a sentence.
+
+## The editor (first light): working recipe
+
+The editor is `stereo_werkkzeug/editor`: Qt 6 Widgets and KDE Frameworks 6 (KXmlGui, KConfig, KI18n, KIO, KWidgetsAddons, KCoreAddons), built by CMake on what the core's `build.sh` made.
+
+1. Build: `./build.sh CORE`, then `cmake -S editor -B ED -DSWZ_CORE_DIR=CORE && cmake --build ED`. The core's folder gives `libstereo_werkkzeug.a`, `libswz_front.a`, their two headers, `swz-draw`, `swz-mcp` and `wz`.
+2. Check: `ctest --test-dir ED` (the editor's catalogue is the one the built core prints; the nine translated catalogues are whole).
+3. Prove the window: `ED/bin/editor-proof SCENARIO FR_PUBLIC OUT [PARTNER...]` inside a private compositor (see "Proving a window" below). Expect, per scenario: `open-edit` 35 checks, `partner-first` 24, `partner-apply` 17, `partner-suggest` 15, `partner-ask` 15, `refusal` 6, `settings` 6, `socket-kept` 4, `socket-stale` 1, each ending "N checks passed, 0 failed". Run `refusal` once per language (`LANG`, `LC_ALL` and `LANGUAGE` set, the locale generated in the image): the same refusal of the core comes out as another sentence in each.
+
+### Keep the logic on the core's side of the window
+
+A front end draws and asks; it does not decide what a parameter line means or what a partner may do. What every front end needs sits in one more library over the C interface, `libswz_front` (`src/front.zig`, `include/stereo_werkkzeug_front.h`), so a page in a browser can follow the KDE window without copying its logic.
+
+- **The panel as fields.** `swz_panel_lines`, `swz_panel_line`, `swz_panel_field` and `swz_panel_choice` turn werkkzeug3's own panel lines into fields a window can draw: a whole number, a decimal, a colour, a choice among named values in some bits of a word, a toggle, a row of bits, a link, a string. The rules are werkkzeug3's: a label's leading `*` and one digit after it are marks, not text (`WinPara::Label` in `winpara.cpp`); a choice text is groups parted by `:`, each with `*N` for its first bit and its choices parted by `|`, holding as many bits as the choices need (`sControl` in `_gui.cpp`); the same label for the same words is one line.
+- **The partners' tools on a held document.** `swz_partner_call(doc, host, partner, tool, args_json, ...)` runs one tool of `src/partners.zig` on the document a front end holds. The front end gives the person's kept choice and two functions: one that asks the person about a waiting suggestion, one that hears that a suggestion waits.
+- **The window itself** (`editor/src`) wraps the handle (`document.cpp`), paints pages (`pagecanvas.cpp`), makes one widget per field (`parampanel.cpp`), and nothing else knows an operator.
+
+### From Qt: linking two Zig archives into a g++ program
+
+- Build each archive with `-fcompiler-rt`, so Zig's own helper functions travel inside it.
+- The bridge is compiled against LLVM's libc++; a g++ program has no `std::__1::__libcpp_verbose_abort`. Define it once in the program (a C function given that linker name with `__asm__("_ZNSt3__122__libcpp_verbose_abortEPKcz")`), in a source file of the program itself, not of a static library that is read before the core's archive.
+- Link order: the front library, then the core.
+
+### The live picture, in a process of its own
+
+`swz-draw` reads one packed graph on standard input and writes one answer: the picture, or the core's refusal with its number and values. The editor asks the core for the selected operator's packed graph (`swz_graph_pack`, any operator, named or not), starts `swz-draw` with the limits, and replaces a drawing that is still running when a newer picture is wanted. When the time is up it ends the process and says so. A crash of the operator code ends that process only.
+The checksum under the picture is the SHA-256 of the width, the height and every byte, the one `wz manifest` prints, so the window can be checked against the reference table.
+
+### Sentences in ten languages
+
+The core says every refusal as a sentence in English and also as a number with its values (`swz_message_number`, `swz_message_value`; an operator's own refusal inside "operator 3 of 7 (Blur): ..." is an inner sentence with its own number).
+The number is the FNV-1a checksum of the template as the source writes it, the same in every build.
+
+1. Every template is kept in one section of the program (`swz_msgs`): in Zig by `@export` with `.section`, in the C++ bridge by a `static const char[]` with `__attribute__((section("swz_msgs"), used))`.
+2. `wz messages` reads that section out of the running program and prints `number<TAB>template`, the template with `%1`, `%2` for its places: the catalogue is what the program can say, never a list kept by hand.
+3. `editor/po/core-catalogue.tsv` is that output; `editor/tools/gen-coremessages.py` makes `coremessages.inc` from it, each sentence marked with `kli18n`, so `po/update-pot.sh` puts the core's sentences and the window's strings into one template.
+4. At run time the editor looks the number up, substitutes the values (`KLocalizedString::subs`) and shows the result; a number it does not know is shown as the core said it, with a warning in the log.
+5. `ctest` fails when the committed catalogue is not what the built core prints, and `editor/tests/po-check.sh` when a language is not whole or a translation lost one of its places.
+
+Write sentence families so that the changing part stands after a colon in its dictionary form ("out of memory for: the picture"): a noun inside a sentence needs a case in Polish and German, a contraction in Portuguese and French.
+
+### The partners in the window
+
+- The editor holds the socket (`$XDG_RUNTIME_DIR/stereo-werkkzeug.sock`, the person's alone). `swz-mcp --attach SOCKET` passes each tool call there as one line of JSON and gets one line back; the tools run on the document in the window.
+- The server tells the editor its client's name as soon as it knows it (a line with `hello`). On the first one, when no way of working is kept, the editor asks once: three choices, none marked, OK greyed until one is chosen, "Not now" leaves every change refused. The answer goes to `~/.config/stereowerkkzeugrc`, `[Partners]` `Mode`, and the settings page offers it again.
+- "Apply and show" selects the operator the partner changed and says who changed what. "Suggest only" shows the waiting suggestion with Take and Drop. "Ask each time" opens a dialog inside the partner's call; the call waits for the answer.
+- A path that already holds something is never cleared blindly: a socket that answers belongs to another window (said), a socket that does not answer was left by a window ended by force (cleared), anything else is the person's (left, and said).
+
+### Proving a window
+
+The proof program is the editor's own classes with a script instead of a person (`editor/tests/editor-proof.cpp`), run in a private session: a session bus, KWin on a virtual output, one fresh session per scenario ([stereo-proof-rig](../../stereo-proof-rig/SKILL.md)).
+Each check compares with something outside the window: the opened file's SHA-256, the reference table's checksum of the texture, the partner's own answers (the official MCP SDK's client, `editor/tests/sdk-partner.py`), the settings file on disk.
+Pictures are KWin's (`ScreenShot2`); a picture that is one colour all over fails its check.
 
 ## Werkkzeug4 itself on Linux: what a probe found
 
@@ -315,6 +371,65 @@ So Werkkzeug4 does not run on Linux today, with or without the four pull request
   Cause: `... | tee LOG | cut -c1-300` buffers.
   Fix: write the log to a file and read the file.
 
+## Traps found while building the editor
+
+- Symptom: `wz messages` lists only the bridge's sentences; the core's, written in Zig, are missing.
+  Cause: a `const` with `linksection` is laid down with the other constants, not in the section; and a section that nothing reads is dropped when the program is linked.
+  Fix: `@export(&kept, .{ .name = ..., .section = "swz_msgs", .linkage = .weak })` in a `comptime` block of the function's own body (a `comptime` block inside a struct declared in the function did not run), and one function that returns the last template, so that every template is referenced.
+  Found by: `readelf -SW wz | grep swz_msgs` (the size did not grow) and `nm wz | grep -c swz_template`.
+- Symptom: a C check that reads the catalogue with `strstr` fails now and then.
+  Cause: the text came with a length and no zero byte at its end.
+  Fix: end every text handed out through the C interface with a zero byte the length does not count.
+- Symptom: the editor does not link: `undefined reference to __zig_probe_stack`, and `std::__1::__libcpp_verbose_abort(char const*, ...)`.
+  Cause: a static library made by `zig build-lib` leaves Zig's helper functions out; the bridge's C++ was compiled against libc++, the editor against libstdc++.
+  Fix: see "From Qt: linking two Zig archives".
+  Found by: the linker's own lines.
+- Symptom: the window has no View menu and a toolbar with other buttons than the menu file names.
+  Cause: the menu file was not well-formed XML (a `sed` had deleted the line that opened the menu), KXmlGui then uses its defaults, and its one line of complaint is in the `kf.xmlgui` log category, which the test session had switched off.
+  Fix: never switch off `kf.*` in a proof session; check the file with an XML parser; carry it inside the program (`qt_add_resources` under `/kxmlgui5/NAME/`), so the window is whole wherever it is started.
+  Found by: `QT_LOGGING_RULES="kf.xmlgui*=true"` and one start of the program.
+- Symptom: a `<Menu name="view">` without `<text>` does not appear.
+  Fix: give the text, and put it where the translators' template finds it (a line of `i18n("&View")` in a file that is only read by `xgettext`).
+- Symptom: `ScreenShot2` answers "Screenshot got cancelled", or a picture of nothing.
+  Cause: KWin's virtual output found no render node and fell back to drawing without OpenGL.
+  Fix: give the container a GPU, as the proof rig's page says.
+- Symptom: every picture the proof takes of its own window is empty, 0 bytes of 4,096,000 not zero, while a picture taken by another program shows the window.
+  Cause: the proof asked KWin with a blocking call from the thread that draws the window; a window whose program stands still inside a call is not drawn into the capture.
+  Fix: take the picture from a second process and keep the window's event loop running meanwhile (the proof starts itself again with `capture`).
+  Found by: counting the bytes that are not zero, then the same capture from a shell script.
+- Symptom: the capture never returns.
+  Cause: the D-Bus message object still held a copy of the pipe's writing end, so the reading thread never saw the end.
+  Fix: let go of the message (`call = QDBusMessage()`) before joining the reader.
+- Symptom: the proof stands still when the partner asks ("ask each time").
+  Cause: the question is a dialog with its own event loop, opened inside the socket's handler, which the proof's own waiting loop had called: the proof's next line runs only when the dialog closes.
+  Fix: the proof's person answers from a timer that was started before the wait.
+- Symptom: a file of the person's that had the socket's name is gone after the editor started, and the editor listens there.
+  Cause: with access options set (`QLocalServer::UserAccessOption`), Qt makes the socket under another name and puts it in place by a rename, which replaces whatever had the name; `listen()` does not fail.
+  Fix: look before listening (`lstat`): something that is not a socket is left and said; a socket that answers is another window's; only a socket nobody answers on is cleared.
+  Found by: the proof's `socket-kept` scenario, written from the partners' server's own rule ("never remove what is at the path"): red on the first build, green after.
+- Symptom: the named texture shows no picture: "does not make a texture".
+  Cause: a named texture is a `Store` operator, whose class makes "anything"; the editor had judged by the class.
+  Fix: ask the core for the graph and show its sentence when it refuses; never decide from the class in the window.
+- Symptom: a texture's preview is an empty checked ground.
+  Cause: many werkkzeug textures keep nothing in their alpha, and the preview had applied it.
+  Fix: show the colours as they are; the checksum still covers every byte.
+- Symptom: the window looks like no desktop in particular, with no icons.
+  Cause: the private session says nothing about its desktop, so Qt takes its plainest theme.
+  Fix: `XDG_CURRENT_DESKTOP=KDE` and `KDE_SESSION_VERSION=6` in the session; Qt's own KDE theme then reads the icon theme and colours.
+- Symptom: `kkrieger.k` opens on an empty canvas.
+  Cause: its first two pages hold no operator. Not a fault: the canvas says so.
+- Symptom: a rerun of a proof fails at once: the container's name is already in use.
+  Cause: the script that started the first run was ended, and its container ran on.
+  Fix: stop your own container by its name before starting the run again; never a list of all containers.
+- Symptom: a script fed to `docker run IMAGE python3 -` prints nothing.
+  Cause: without `-i` the container has no standard input.
+  Fix: write the script to a file and name it.
+- Symptom: `KLazyLocalizedString` has no member `toKLocalizedString`.
+  Fix: assign it to a `KLocalizedString`; the conversion is implicit.
+- Symptom: a partner's parameter is called `4Color`.
+  Cause: werkkzeug3 marks an animated value with `*` and may add one digit; only the star had been taken off.
+  Fix: take off both, as `WinPara::Label` does.
+
 ## What the parts are good for
 
 - The `.ops` blocks are a table a program can read: generate the parameter panel and the partner's operator list from them, so the editor, the server and the documentation cannot drift apart.
@@ -327,12 +442,17 @@ So Werkkzeug4 does not run on Linux today, with or without the four pull request
 - `wz manifest FILE.k` is a build's fingerprint: one checksum per texture. Two builds draw the same pictures exactly when `cmp` finds their tables equal.
 - Bisecting a graph finds the operator that differs between two builds in minutes: typed text is one operator per line, and its first N lines are a graph too.
 - `tests/mcp-proof.py` is a pattern for proving any MCP server: start it as a client does, check every line it writes, compare each answer with a second source, and play the person from a second channel.
-- The settings file is KConfig's form on purpose: the editor will read and write the same key with KConfig, and the server and `wz` need no library for it.
+- The settings file is KConfig's form on purpose: the editor reads and writes the same key with KConfig, and the server and `wz` need no library for it.
+- `wz messages` is the list a translator needs and a reviewer can count: 332 sentences in milestone 4, each with its number. With the window's 124 strings each of the nine catalogues holds 456 entries.
+- `editor/tests/sdk-partner.py` is a partner of twenty lines: an assistant's whole way into the window, to copy when a new tool needs a proof.
+- The proof program's `capture` scenario takes one picture of a private session's screen from any script.
 
 ## Credits
 
 Farbrausch and .theprodukkt, as the `fr_public` README names them: Fabian "ryg" Giesen, Sebastian "Wayfinder" Grillmaier, Tammo "kb" Hinrichs, Thomas "fiver2" Mahlke, Christoph "giZMo" Muetze, Dierk "Chaos" Ohlerich, Kai "cp" Poethkow, Ronny Pries, Dennis "Exoticorn" Ranke, Leonard "paniq" Ritter and Bastian "Tron" Zuehlke; 49Games GmbH in Altona's licence; Sean Barrett for the stb libraries inside Altona.
 The maths carried inside the core is musl's (release 1.2.6, MIT): Rich Felker and the musl contributors, with Sun Microsystems (SunPro), Ian Lance Taylor and Bruce D. Evans for the single-precision sine, cosine and arc tangent and Arm Limited for `powf`, as the files and musl's `COPYRIGHT` name them.
 The partners' server follows the Model Context Protocol's specification (revisions 2025-11-25 and 2026-07-28), by the Model Context Protocol project and its contributors, and the two-era pattern of the edition's own skills server.
+The partners' server is proved under the official MCP SDK for Python (the `mcp` package, by the Model Context Protocol project, MIT).
+The editor is built on Qt (The Qt Company and the Qt Project) and KDE Frameworks (the KDE community): KXmlGui, KConfig, KI18n, KIO, KWidgetsAddons, KCoreAddons; its pictures are taken with KWin's ScreenShot2.
 WebAssembly builds ran in wasmtime (Bytecode Alliance).
 The people whose work this plan reads or builds on, by the names their own pages give: wxthss82, wzman, Gregor Riepl (onitake), Frantsishak (KkriegerNet), kznsq, Mason Liu (kkrieger-wasm), Alfredo (varrtto), Steven Schronk, Rodz Labs and the Material Maker contributors, Nicolas Brown and the TextureLab contributors, Cedric Guillemet (Imogen).

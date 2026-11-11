@@ -30,6 +30,9 @@ for line in sys.stdin:
         # a Ramp typed with fewer than eight stops: the stored operator holds eight, the unused ones repeat the last
         while len(vals) < len(k):
             vals += ["1", vals[-1]]
+    if len(vals) < len(k) and op in ("Tiles", "Scatter", "Cells") and vals and vals[0] == "1":
+        # a version 1 node of an operator whose version 2 added words (milestone 2c) stores only its own
+        k = k[:len(vals)]
     if len(vals) != len(k):
         sys.exit("%s: %s takes %d values, %d given" % (name, op, len(k), len(vals)))
     out = []

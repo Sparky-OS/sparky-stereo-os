@@ -80,6 +80,10 @@ Describing a television's frame in the desktop's terms ("two views at their own 
   - The phone headset over KRdp (Flat Headset): it is one of Stereo KWin's outputs, see [`3d-to-vr`](../3d-to-vr/SKILL.md).
   - Anything a program hands the desktop: see [`sparky-stereo`](../sparky-stereo/SKILL.md).
 
+## Proof in containers
+
+Universal Media Server, a scripted controller and an emulated renderer on an internal network prove the matched profile, the layout filter and what the renderer receives for full and half side by side, top and bottom, right eye first, 2D and an input that cannot be converted: recipe, expected table and traps in [`references/ums-container-proof.md`](references/ums-container-proof.md).
+
 ## Proof on the real device
 
 - **The fixture:** left view with "LEFT EYE" in red, right view with "RIGHT EYE" in blue, a white square shifted in each view so that it floats in front of the screen. Mark it only in the stream when the test is about detection, or in the container when it is about the mark.

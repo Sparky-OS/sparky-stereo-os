@@ -9,6 +9,11 @@
 //! Sources: Inigo Quilez, "2D distance functions" (iquilezles.org): the rounded box and the rhombus, written from
 //! the formulas; the hexagons are the cells of a lattice, their edge where the nearest centre and the second
 //! nearest are equally far (Worley 1996's F2 - F1 on a regular lattice). No code copied.
+//! Version 2 (milestone 2c, close up): edges chipped by a noise that eats into the pieces (chip, chip cells), and
+//! each piece's face its own fine grain and its own coarse stain (grain, grain cells, grain octaves, stain, stain
+//! cells): the noise is read at the piece's own place in the noise (an offset drawn from the piece), so neighbouring
+//! bricks or slabs never share a pattern across a joint, as cut stone and fired brick never do. The grain also
+//! roughens the face's height a little. Version 1 graphs draw byte for byte as before.
 //! Output: red, green and blue: 0 in the joints, the piece's shade (between the floor value and 0.85) inside, rising
 //! across the bevel; inserts (octagons and inserts layouts) at 1, above every piece, so a Layer can take them apart. Alpha: the height, 0 in the joint, 1 on
 //! a piece's face.
@@ -18,7 +23,7 @@ pub const name = "Tiles";
 pub const version: u32 = 1;
 pub const inputs: u8 = 0;
 pub const params = [_]c.Param{
-    .{ .kind = .int, .label = "version", .offset = 0, .def = 1, .min = 1, .max = 1 },
+    .{ .kind = .int, .label = "version", .offset = 0, .def = 2, .min = 1, .max = 2 },
     .{ .kind = .cycle, .label = "layout", .offset = 1, .def = 0, .min = 0, .max = 8, .choices = "grid|bond|checker|hexagons|lozenges|studs|octagons|planks|inserts" },
     .{ .kind = .int, .label = "pieces across", .offset = 2, .def = 4, .min = 1, .max = 1024 },
     .{ .kind = .int, .label = "pieces down", .offset = 3, .def = 8, .min = 1, .max = 1024 },
@@ -35,7 +40,20 @@ pub const params = [_]c.Param{
     .{ .kind = .float, .label = "size", .offset = 14, .def = 0.5, .min = 0.01, .max = 2, .step = 0.01 },
     .{ .kind = .float, .label = "phase across", .offset = 15, .def = 0, .min = -4, .max = 4, .step = 0.01 },
     .{ .kind = .float, .label = "phase down", .offset = 16, .def = 0, .min = -4, .max = 4, .step = 0.01 },
+    // version 2
+    .{ .kind = .float, .label = "chip", .offset = 17, .def = 0, .min = 0, .max = 0.6, .step = 0.01 },
+    .{ .kind = .int, .label = "chip cells", .offset = 18, .def = 64, .min = 1, .max = 4096 },
+    .{ .kind = .float, .label = "grain", .offset = 19, .def = 0, .min = 0, .max = 1, .step = 0.01 },
+    .{ .kind = .int, .label = "grain cells", .offset = 20, .def = 256, .min = 1, .max = 4096 },
+    .{ .kind = .int, .label = "grain octaves", .offset = 21, .def = 3, .min = 1, .max = 8 },
+    .{ .kind = .float, .label = "stain", .offset = 22, .def = 0, .min = 0, .max = 1, .step = 0.01 },
+    .{ .kind = .int, .label = "stain cells", .offset = 23, .def = 16, .min = 1, .max = 4096 },
 };
+
+/// the words a version stores: 17 in version 1, 24 in version 2
+pub fn wordCount(ver: u32) usize {
+    return if (ver >= 2) 24 else 17;
+}
 
 pub fn margin(w: []const u32) f32 {
     _ = w;
@@ -66,7 +84,7 @@ fn rhombus(px: f32, py: f32, bx: f32, by: f32) f32 {
 
 pub fn draw(out: c.Pix, ins: []const c.Pix, w: []const u32) error{Refused}!void {
     _ = ins;
-    try c.version(name, w, version);
+    const ver = try c.versionUpTo(name, w, 2);
     const layout = try c.int(&params, w, 1);
     const nx = try c.int(&params, w, 2);
     const ny = try c.int(&params, w, 3);
@@ -83,6 +101,22 @@ pub fn draw(out: c.Pix, ins: []const c.Pix, w: []const u32) error{Refused}!void 
     const size = try c.flt(&params, w, 14);
     const phx = try c.flt(&params, w, 15);
     const phy = try c.flt(&params, w, 16);
+    var chip: f32 = 0;
+    var ccells: i32 = 1;
+    var grain: f32 = 0;
+    var gcells: i32 = 1;
+    var goct: u32 = 1;
+    var stain: f32 = 0;
+    var scells: i32 = 1;
+    if (ver >= 2) {
+        chip = try c.flt(&params, w, 17);
+        ccells = try c.int(&params, w, 18);
+        grain = try c.flt(&params, w, 19);
+        gcells = try c.int(&params, w, 20);
+        goct = @intCast(try c.int(&params, w, 21));
+        stain = try c.flt(&params, w, 22);
+        scells = try c.int(&params, w, 23);
+    }
     const fnx: f32 = @floatFromInt(nx);
     const fny: f32 = @floatFromInt(ny);
     const cw = 1.0 / fnx;
@@ -209,15 +243,33 @@ pub fn draw(out: c.Pix, ins: []const c.Pix, w: []const u32) error{Refused}!void 
                     sd = roundBox((fx - 0.5) * cw * span, (fy - 0.5) * ch, 0.5 * (cw * span - jw) - sh, 0.5 * (ch - jw) - sh, rr);
                 },
             }
+            if (chip > 0 and !insert) {
+                // chipped edges: a noise that is positive on about half the edge eats into the piece there
+                const cn = c.fbm(p[0], p[1], ccells, ccells, 3, 0.5, seed ^ 0xc41b, .fbm);
+                sd += chip * m * c.clamp01(2.0 * cn);
+            }
             const r = c.rnd01(c.hash(cid ^ 0x1b873593));
             const cellv = if (layout == 2)
                 0.25 + 0.5 * parity + 0.25 * vary * (r - 0.5)
             else
                 0.5 + vary * (r - 0.5);
             const h = c.smoothstep(0, bw, -sd);
-            const face = if (insert) 1.0 else floor + (0.85 - floor) * c.clamp01(cellv);
+            var face = if (insert) 1.0 else floor + (0.85 - floor) * c.clamp01(cellv);
+            var rough: f32 = 0;
+            if (!insert and (grain > 0 or stain > 0)) {
+                // the piece's own place in the noise: every piece shows another part of it
+                const ox = c.rnd01(c.hash(cid ^ 0x6a09e667));
+                const oy = c.rnd01(c.hash(cid ^ 0xbb67ae85));
+                if (grain > 0) {
+                    rough = c.fbm(p[0] + ox, p[1] + oy, gcells, gcells, goct, 0.6, seed ^ 0x9a11, .fbm);
+                    face += grain * (0.85 - floor) * rough;
+                }
+                if (stain > 0) face += stain * (0.85 - floor) * c.fbm(p[0] + oy, p[1] + ox, scells, scells, 3, 0.5, seed ^ 0x5a17, .fbm);
+                // the face stays above the floor, so no grain reads as the bevel's darker values
+                face = @min(0.9, @max(floor, face));
+            }
             const g = h * face;
-            const hh = if (insert) 0.6 * h else h;
+            const hh = if (insert) 0.6 * h else if (grain > 0) c.clamp01(h * (1.0 + 0.3 * grain * rough)) else h;
             c.putc(out, j * out.w + i, .{ g, g, g, hh });
         }
     }

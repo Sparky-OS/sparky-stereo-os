@@ -93,6 +93,12 @@ pub fn flt(comptime P: []const Param, w: []const u32, comptime k: usize) error{R
 pub fn version(comptime opname: []const u8, w: []const u32, comptime known: u32) error{Refused}!void {
     if (w[0] != known) return refuse("{s} version {d} is not known (this module draws version {d})", .{ opname, w[0], known });
 }
+/// versions 1 to newest: an operator whose later version adds words (milestone 2c) still draws its earlier ones
+/// byte for byte; a version it does not know is refused with a sentence
+pub fn versionUpTo(comptime opname: []const u8, w: []const u32, comptime newest: u32) error{Refused}!u32 {
+    if (w[0] < 1 or w[0] > newest) return refuse("{s} version {d} is not known (this module draws versions 1 to {d})", .{ opname, w[0], newest });
+    return w[0];
+}
 
 /// a colour word (0xAARRGGBB) as three values 0..1
 pub fn rgb(word: u32) [3]f32 {
@@ -237,6 +243,25 @@ pub fn fbm(u: f32, v: f32, fx: i32, fy: i32, oct: u32, gain: f32, seed: u32, kin
             // the mean a left-out ridged or billowed octave would have added
             sum += amp * (if (kind == .ridged) @as(f32, 0.55) else @as(f32, 0.3));
         }
+        amp *= gain;
+    }
+    return sum / norm;
+}
+
+/// The same fractal sum with every octave drawn, whatever the canvas (milestone 2c): for what decides where things
+/// are (where a scatter's instances cluster, how a crack's width or a seed's edge wanders), so the places are the same
+/// at every size and level of detail; only for coarse noises (a few octaves of a few cells), never for a surface.
+pub fn fbmAll(u: f32, v: f32, fx: i32, fy: i32, oct: u32, gain: f32, seed: u32) f32 {
+    var sum: f32 = 0;
+    var amp: f32 = 1;
+    var norm: f32 = 0;
+    var k: u32 = 0;
+    while (k < oct) : (k += 1) {
+        const m: i32 = @as(i32, 1) << @intCast(@min(k, 20));
+        const cx = fx * m;
+        const cy = fy * m;
+        norm += amp;
+        sum += amp * gnoise(u * @as(f32, @floatFromInt(cx)), v * @as(f32, @floatFromInt(cy)), cx, cy, seed +% k *% 1013);
         amp *= gain;
     }
     return sum / norm;

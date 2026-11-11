@@ -7,13 +7,16 @@
 //! finds the nearest point exactly while the jitter stays inside a cell, and the second nearest in all but rare
 //! places (Worley's own note on the neighbourhood).
 //! Output: a grey field (0 to 1) in red, green and blue, and the same value as the height in alpha.
+//! Version 2 (milestone 2c, close up): a crack's or a gap's width wanders along it by a coarse noise (width
+//! variation, width cells), so furrows in bark and cracks in rock are wide in places and thin in others; version 1
+//! graphs draw byte for byte as before.
 const c = @import("common.zig");
 
 pub const name = "Cells";
 pub const version: u32 = 1;
 pub const inputs: u8 = 0;
 pub const params = [_]c.Param{
-    .{ .kind = .int, .label = "version", .offset = 0, .def = 1, .min = 1, .max = 1 },
+    .{ .kind = .int, .label = "version", .offset = 0, .def = 2, .min = 1, .max = 2 },
     .{ .kind = .cycle, .label = "kind", .offset = 1, .def = 0, .min = 0, .max = 2, .choices = "cracks|stones|patches" },
     .{ .kind = .int, .label = "cells across", .offset = 2, .def = 8, .min = 1, .max = 2048 },
     .{ .kind = .int, .label = "cells down", .offset = 3, .def = 8, .min = 1, .max = 2048 },
@@ -23,7 +26,15 @@ pub const params = [_]c.Param{
     .{ .kind = .int, .label = "warp cells", .offset = 7, .def = 8, .min = 1, .max = 512 },
     .{ .kind = .int, .label = "seed", .offset = 8, .def = 0, .min = 0, .max = 65535 },
     .{ .kind = .float, .label = "variation", .offset = 9, .def = 0.5, .min = 0, .max = 1, .step = 0.05 },
+    // version 2
+    .{ .kind = .float, .label = "width variation", .offset = 10, .def = 0, .min = 0, .max = 2, .step = 0.05 },
+    .{ .kind = .int, .label = "width cells", .offset = 11, .def = 8, .min = 1, .max = 1024 },
 };
+
+/// the words a version stores: 10 in version 1, 12 in version 2
+pub fn wordCount(ver: u32) usize {
+    return if (ver >= 2) 12 else 10;
+}
 
 pub fn margin(w: []const u32) f32 {
     _ = w;
@@ -32,16 +43,22 @@ pub fn margin(w: []const u32) f32 {
 
 pub fn draw(out: c.Pix, ins: []const c.Pix, w: []const u32) error{Refused}!void {
     _ = ins;
-    try c.version(name, w, version);
+    const ver = try c.versionUpTo(name, w, 2);
     const kind = try c.int(&params, w, 1);
     const nx = try c.int(&params, w, 2);
     const ny = try c.int(&params, w, 3);
     const jit = try c.flt(&params, w, 4);
-    const width = try c.flt(&params, w, 5);
+    const width0 = try c.flt(&params, w, 5);
     const warp = try c.flt(&params, w, 6);
     const wf = try c.int(&params, w, 7);
     const seed: u32 = @intCast(try c.int(&params, w, 8));
     const vary = try c.flt(&params, w, 9);
+    var wvar: f32 = 0;
+    var wcl: i32 = 1;
+    if (ver >= 2) {
+        wvar = try c.flt(&params, w, 10);
+        wcl = try c.int(&params, w, 11);
+    }
     const fnx: f32 = @floatFromInt(nx);
     const fny: f32 = @floatFromInt(ny);
     // distances are measured in cells of the mean side, so width means the same across and down
@@ -79,6 +96,7 @@ pub fn draw(out: c.Pix, ins: []const c.Pix, w: []const u32) error{Refused}!void 
             }
             const cellv = c.rnd01(c.hash(id1 ^ 0x1b873593));
             const shade = 1.0 - vary + vary * cellv;
+            const width = if (wvar > 0) width0 * @max(0.05, 1.0 + wvar * c.fbmAll(p[0], p[1], wcl, wcl, 3, 0.5, seed ^ 0x3c3c)) else width0;
             const g: f32 = switch (kind) {
                 0 => c.smoothstep(0, width, d2 - d1),
                 1 => blk: {

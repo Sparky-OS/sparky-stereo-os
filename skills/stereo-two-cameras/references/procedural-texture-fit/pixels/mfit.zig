@@ -20,32 +20,35 @@ const std = @import("std");
 const P = @import("p2p.zig");
 const R = @import("readings.zig");
 const M = @import("modern.zig");
+const CL = @import("close.zig");
 const alloc = std.heap.c_allocator;
 
 extern "c" fn wzb_data(p: ?*anyopaque) [*]u16;
 
-const K_NOISE = 0;
-const K_CELLS = 1;
-const K_TILES = 2;
-const K_RAMP = 3;
-const K_LAYER = 4;
-const K_SHADE = 5;
-const K_SCATTER = 6;
-const K_WEAR = 7;
-const K_TINT = 8;
+pub const K_NOISE = 0;
+pub const K_CELLS = 1;
+pub const K_TILES = 2;
+pub const K_RAMP = 3;
+pub const K_LAYER = 4;
+pub const K_SHADE = 5;
+pub const K_SCATTER = 6;
+pub const K_WEAR = 7;
+pub const K_TINT = 8;
 
 var logbuf: std.ArrayList(u8) = .empty;
-fn note(comptime fmt: []const u8, args: anytype) void {
+pub fn note(comptime fmt: []const u8, args: anytype) void {
     var b: [1024]u8 = undefined;
     const s = std.fmt.bufPrint(&b, fmt, args) catch return;
     P.say("{s}", .{s});
     logbuf.appendSlice(alloc, s) catch {};
 }
 
-fn mk(k: usize, v: []const f64, ins: []const usize) P.Node {
+pub fn mk(k: usize, v: []const f64, ins: []const usize) P.Node {
     var nd = P.Node{ .op = @intCast(P.OP_MODERN + k) };
-    const kinds = P.ops[P.OP_MODERN + k].kinds;
-    if (v.len != kinds.len) P.die("{s}: {d} values given, {d} needed", .{ P.ops[P.OP_MODERN + k].name, v.len, kinds.len });
+    const kinds_all = P.ops[P.OP_MODERN + k].kinds;
+    const nwv = M.wordsFor(k, @intFromFloat(v[0]));
+    if (v.len != nwv) P.die("{s} version {d}: {d} values given, {d} needed", .{ P.ops[P.OP_MODERN + k].name, v[0], v.len, nwv });
+    const kinds = kinds_all[0..nwv];
     for (kinds, 0..) |kd, i| {
         nd.w[i] = switch (kd) {
             'i' => @bitCast(@as(i32, @intFromFloat(v[i]))),
@@ -59,7 +62,7 @@ fn mk(k: usize, v: []const f64, ins: []const usize) P.Node {
     return nd;
 }
 
-fn add(g: *P.Graph, nd: P.Node) usize {
+pub fn add(g: *P.Graph, nd: P.Node) usize {
     if (g.n >= P.MAXN) P.die("graph too large", .{});
     g.nodes[g.n] = nd;
     g.n += 1;
@@ -67,11 +70,11 @@ fn add(g: *P.Graph, nd: P.Node) usize {
     return g.n - 1;
 }
 
-const Drawn = struct {
+pub const Drawn = struct {
     rgb: []f32,
     grey: []f32,
     h: []f32,
-    fn free(d: *Drawn) void {
+    pub fn free(d: *Drawn) void {
         alloc.free(d.rgb);
         alloc.free(d.grey);
         alloc.free(d.h);
@@ -79,10 +82,10 @@ const Drawn = struct {
 };
 
 /// draw node `root` of g over the whole picture at n by n pixels: its colours, grey and height
-fn drawNode(g: *P.Graph, root: usize, n: usize) Drawn {
+pub fn drawNode(g: *P.Graph, root: usize, n: usize) Drawn {
     return drawWin(g, root, n, .{});
 }
-fn drawWin(g: *P.Graph, root: usize, n: usize, win: P.Win) Drawn {
+pub fn drawWin(g: *P.Graph, root: usize, n: usize, win: P.Win) Drawn {
     const keep = g.root;
     g.root = root;
     defer g.root = keep;
@@ -111,7 +114,7 @@ fn drawWin(g: *P.Graph, root: usize, n: usize, win: P.Win) Drawn {
     return o;
 }
 
-fn colourWord(c: [3]f32) f64 {
+pub fn colourWord(c: [3]f32) f64 {
     var w: u32 = 0xff000000;
     inline for (0..3) |k| {
         const v: u32 = @intFromFloat(@min(255.0, @max(0.0, c[k] * 255.0 + 0.5)));
@@ -121,16 +124,16 @@ fn colourWord(c: [3]f32) f64 {
 }
 
 /// the picture: its colours, its values along the main colour axis (rank key) and its luminance
-const Pic = struct { n: usize, rgb: []const f32, t: []const f32, tsort: []f32 };
+pub const Pic = struct { n: usize, rgb: []const f32, t: []const f32, tsort: []f32 };
 
 /// A Ramp's words: the field's values at eight ranks (or seven after the joint's own stop) and the picture's mean
 /// colour at the same ranks of its main colour axis, among the selected pixels of each (a histogram match).
-fn rampWords(F: []const f32, fsel: ?[]const bool, pic: *const Pic, psel: ?[]const bool, reversed: bool, joint: ?[3]f32) [18]f64 {
+pub fn rampWords(F: []const f32, fsel: ?[]const bool, pic: *const Pic, psel: ?[]const bool, reversed: bool, joint: ?[3]f32) [18]f64 {
     return rampWords2(F, fsel, pic, psel, reversed, joint, null, 0);
 }
 
 /// the same with a second stop of its own at place ipos (an insert's colour, measured where the drawing has inserts)
-fn rampWords2(F: []const f32, fsel: ?[]const bool, pic: *const Pic, psel: ?[]const bool, reversed: bool, joint: ?[3]f32, insert: ?[3]f32, ipos: f32) [18]f64 {
+pub fn rampWords2(F: []const f32, fsel: ?[]const bool, pic: *const Pic, psel: ?[]const bool, reversed: bool, joint: ?[3]f32, insert: ?[3]f32, ipos: f32) [18]f64 {
     var fv: std.ArrayList(f32) = .empty;
     defer fv.deinit(alloc);
     for (F, 0..) |v, i| {
@@ -186,11 +189,11 @@ fn rampWords2(F: []const f32, fsel: ?[]const bool, pic: *const Pic, psel: ?[]con
     return w;
 }
 
-fn rgbOfWord(w: u32) [3]f32 {
+pub fn rgbOfWord(w: u32) [3]f32 {
     return .{ @as(f32, @floatFromInt((w >> 16) & 0xff)) / 255.0, @as(f32, @floatFromInt((w >> 8) & 0xff)) / 255.0, @as(f32, @floatFromInt(w & 0xff)) / 255.0 };
 }
 
-fn absDiff(a: f32, b: f32) f32 {
+pub fn absDiff(a: f32, b: f32) f32 {
     return @abs(a - b);
 }
 
@@ -208,9 +211,9 @@ fn ranked(F: []const f32, pic: *const Pic, reversed: bool) []f32 {
     return g;
 }
 
-const Built = struct { field: usize, reversed: bool, fx: i32, fy: i32, oct: i32, gain: f32, kind: u32, warp: f32, wf: i32 };
+pub const Built = struct { field: usize, reversed: bool, fx: i32, fy: i32, oct: i32, gain: f32, kind: u32, warp: f32, wf: i32 };
 
-fn noiseNode(kind: u32, fx: i32, fy: i32, oct: i32, gain: f32, warp: f32, wf: i32, seed: i32) P.Node {
+pub fn noiseNode(kind: u32, fx: i32, fy: i32, oct: i32, gain: f32, warp: f32, wf: i32, seed: i32) P.Node {
     return mk(K_NOISE, &.{ 1, @floatFromInt(kind), @floatFromInt(fx), @floatFromInt(fy), @floatFromInt(oct), gain, warp, @floatFromInt(wf), @floatFromInt(seed), 1 }, &.{});
 }
 
@@ -356,9 +359,9 @@ fn readNoiseCand(g: *P.Graph, pic: *const Pic, kind: u32, rev: bool, fx: i32, fy
     };
 }
 
-const Struct = struct { tiles: usize = 0, layout: u32 = 0, nx: i32 = 1, ny: i32 = 1, floor: f32 = 0.3, ok: bool = false };
+pub const Struct = struct { tiles: usize = 0, layout: u32 = 0, nx: i32 = 1, ny: i32 = 1, floor: f32 = 0.3, ok: bool = false };
 
-fn tilesNode(layout: u32, nx: i32, ny: i32, bond: f32, joint: f32, bevel: f32, round: f32, vary: f32, size: f32, phx: f32, phy: f32) P.Node {
+pub fn tilesNode(layout: u32, nx: i32, ny: i32, bond: f32, joint: f32, bevel: f32, round: f32, vary: f32, size: f32, phx: f32, phy: f32) P.Node {
     return mk(K_TILES, &.{ 1, @floatFromInt(layout), @floatFromInt(nx), @floatFromInt(ny), bond, joint, bevel, round, 0.02, vary, 7, 0.0015, 32, 0.3, size, phx, phy }, &.{});
 }
 
@@ -507,7 +510,7 @@ fn readStructure(g: *P.Graph, pic: *const Pic, rd: *const P.Reading) Struct {
 }
 
 /// the mean of the picture's colours where sel holds
-fn meanColour(pic: *const Pic, sel: []const bool) [3]f32 {
+pub fn meanColour(pic: *const Pic, sel: []const bool) [3]f32 {
     var c = [3]f64{ 0, 0, 0 };
     var k: f64 = 0;
     for (sel, 0..) |s, i| {
@@ -520,7 +523,7 @@ fn meanColour(pic: *const Pic, sel: []const bool) [3]f32 {
 }
 
 /// the picture's colour at a rank of its main axis among the selected pixels
-fn colourAtRankSel(pic: *const Pic, q: f32, sel: []const bool) [3]f32 {
+pub fn colourAtRankSel(pic: *const Pic, q: f32, sel: []const bool) [3]f32 {
     var idx: std.ArrayList(u32) = .empty;
     defer idx.deinit(alloc);
     for (sel, 0..) |s, i| {
@@ -546,7 +549,7 @@ fn colourAtRankSel(pic: *const Pic, q: f32, sel: []const bool) [3]f32 {
 }
 
 /// the picture's colour at a rank of its main axis (the mean of a band of ranks around it)
-fn colourAtRank(pic: *const Pic, q: f32) [3]f32 {
+pub fn colourAtRank(pic: *const Pic, q: f32) [3]f32 {
     const n2 = pic.n * pic.n;
     const idx = alloc.alloc(u32, n2) catch unreachable;
     defer alloc.free(idx);
@@ -568,13 +571,16 @@ fn colourAtRank(pic: *const Pic, q: f32) [3]f32 {
     return c;
 }
 
-const Rung = struct { root: usize, label: []const u8 };
+pub const Rung = struct { root: usize, label: []const u8 };
 
 pub const MOpt = struct {
     full: ?[*:0]const u8 = null, // the picture at full size: tiles of 512 corrected where they differ
     tile: usize = 512,
     seeds: ?[*:0]const u8 = null, // milestone 2's seed, as the eye chose it (a .chosen file): a glyph scattered at the repeat
     light: bool = true, // light=0: the eye left the light off (its sheet shows the procedure with and without it)
+    close: bool = true, // close=0: milestone 2b's procedure, without the close-up layers of milestone 2c
+    grain_in_field: bool = false, // grainat=field: the close-up grain laid into the field before the Ramp
+    off: []const u8 = "", // off=NAME,...: close-up layers the eye refused (grain, chips, mortar, patches, spots, furrows, knots, stones, pits)
 };
 
 pub fn run(path: [*:0]const u8, prefix: []const u8, opt: MOpt) void {
@@ -606,6 +612,8 @@ pub fn run(path: [*:0]const u8, prefix: []const u8, opt: MOpt) void {
     const st = if (motif or opt.seeds != null) Struct{} else readStructure(&g, &pic, &rd);
     if (opt.seeds != null and !motif) note("structure: not read (a figure on a ground: its motif is the seed's)\n", .{});
     var colour: usize = 0;
+    var main_ramp: usize = 0;
+    var face_layer: usize = 0;
     var ground_c = [3]f32{ 0, 0, 0 };
     var ink_c = [3]f32{ 0, 0, 0 };
     if (opt.seeds != null) {
@@ -626,6 +634,7 @@ pub fn run(path: [*:0]const u8, prefix: []const u8, opt: MOpt) void {
         defer dn.free();
         const rw = rampWords(dn.grey, null, &pic, gsel, nb.reversed, null);
         colour = add(&g, mk(K_RAMP, &rw, &.{nb.field}));
+        main_ramp = colour;
         rungs.append(alloc, .{ .root = colour, .label = "ground: Noise, Ramp" }) catch unreachable;
         if (motif) {
             const sd = &P.seeds[0];
@@ -684,6 +693,8 @@ pub fn run(path: [*:0]const u8, prefix: []const u8, opt: MOpt) void {
         note("joint colour {x:0>6} (the picture's mean where the drawing has its joints)\n", .{@as(u32, @intFromFloat(colourWord(jc))) & 0xffffff});
         const rw = rampWords(dl.grey, face, &pic, face, false, jc);
         colour = add(&g, mk(K_RAMP, &rw, &.{lx}));
+        main_ramp = colour;
+        face_layer = lx;
         if (st.layout == 6 or st.layout == 8) {
             // inserts: the structure's value 1 (above every piece); their own colour, measured where the drawing has
             // them, laid by a Layer whose mask is the structure itself
@@ -701,11 +712,13 @@ pub fn run(path: [*:0]const u8, prefix: []const u8, opt: MOpt) void {
         defer dn.free();
         const rw = rampWords(dn.grey, null, &pic, null, nb.reversed, null);
         colour = add(&g, mk(K_RAMP, &rw, &.{nb.field}));
+        main_ramp = colour;
         rungs.append(alloc, .{ .root = colour, .label = "Noise, Ramp" }) catch unreachable;
     }
 
     // 3. a second material (milestone 1's reading: colours off the main axis, as one cluster)
     var second_mask: ?usize = null;
+    var second_layer: usize = 0;
     var second_col = [3]f32{ 0, 0, 0 };
     if (rd.off >= 0.01 and rd.off_coh >= 0.8) {
         second_col = rgbOfWord(rd.off_col);
@@ -751,6 +764,7 @@ pub fn run(path: [*:0]const u8, prefix: []const u8, opt: MOpt) void {
         const rw = rampWords(dn.grey, null, &pic, sel, nb.reversed, null);
         const r2 = add(&g, mk(K_RAMP, &rw, &.{nb.field}));
         colour = add(&g, mk(K_LAYER, &.{ 1, 0, lo, hi, 1, 2, 0.1 }, &.{ colour, r2, mx }));
+        second_layer = colour;
         note("second material laid where its noise is above {d:.3} to {d:.3}\n", .{ lo, hi });
         rungs.append(alloc, .{ .root = colour, .label = "+ second material (Noise, Ramp, Layer)" }) catch unreachable;
         // drips: the second material running down
@@ -873,8 +887,14 @@ pub fn run(path: [*:0]const u8, prefix: []const u8, opt: MOpt) void {
         } else note("light: none read (the sides differ by {d:.3})\n", .{len});
     } else note("light: none read\n", .{});
 
+    // 7. close up (milestone 2c): what the eye misses at 1:1, each layer by its own reading of the full-size picture
+    if (opt.close and opt.full != null) {
+        const fimg0 = P.readPpm(opt.full.?);
+        var cx = CL.Ctx{ .g = &g, .rd = &rd, .st = st, .nb = nb, .root = colour, .main_ramp = main_ramp, .face_layer = face_layer, .second = second_mask != null, .second_layer = second_layer, .motif = opt.seeds != null, .rungs = &rungs, .off = opt.off, .full = fimg0.rgb, .N = fimg0.w, .grain_in_field = opt.grain_in_field };
+        colour = CL.run(&cx);
+    } else if (!opt.close) note("close up: left out (close=0: milestone 2b's procedure)\n", .{});
     const whole_root = colour;
-    // 7. tiles: the whole picture's procedure at each tile's place, and a tile's own correction where it differs
+    // 8. tiles: the whole picture's procedure at each tile's place, and a tile's own correction where it differs
     var ntint: usize = 0;
     var ndiff: usize = 0;
     if (opt.full) |fp| {
@@ -967,7 +987,7 @@ pub fn run(path: [*:0]const u8, prefix: []const u8, opt: MOpt) void {
 
 /// the share of the faces' variation that lies between pieces: the variance of the means of the pieces (pieces told
 /// apart by the drawn structure's own face value) over the variance of the faces
-fn betweenShare(v: []const f32, ids: []const f32, face: []const bool, n: usize) f32 {
+pub fn betweenShare(v: []const f32, ids: []const f32, face: []const bool, n: usize) f32 {
     const NB = 64;
     var s = [_]f64{0} ** NB;
     var c = [_]f64{0} ** NB;
@@ -998,7 +1018,7 @@ fn betweenShare(v: []const f32, ids: []const f32, face: []const bool, n: usize) 
 
 /// the off-axis mask: how far each pixel's colour lies from the line between the picture's two colours, toward the
 /// second material's colour; sel marks the pixels milestone 1's reading counts (further than 0.10)
-fn offMask(pic: *const Pic, rd: *const P.Reading, mask: []f32, sel: []bool) void {
+pub fn offMask(pic: *const Pic, rd: *const P.Reading, mask: []f32, sel: []bool) void {
     const c0 = rgbOfWord(rd.c0);
     const c1 = rgbOfWord(rd.c1);
     var ax = [3]f32{ c1[0] - c0[0], c1[1] - c0[1], c1[2] - c0[2] };
@@ -1014,10 +1034,10 @@ fn offMask(pic: *const Pic, rd: *const P.Reading, mask: []f32, sel: []bool) void
     }
 }
 
-const LitSrc = enum { slopes, stones, pits };
+pub const LitSrc = enum { slopes, stones, pits };
 
 /// the same light reading on a drawing as was made on the picture: slopes of the drawn relief, or the sides of blobs
-fn litReading(src: LitSrc, grey: []const f32, h: []const f32, n: usize) [2]f32 {
+pub fn litReading(src: LitSrc, grey: []const f32, h: []const f32, n: usize) [2]f32 {
     switch (src) {
         .slopes => {
             const r = slopeLight(grey, h, n);
@@ -1036,7 +1056,7 @@ fn litReading(src: LitSrc, grey: []const f32, h: []const f32, n: usize) [2]f32 {
 
 /// regress the picture's values on the drawn relief's slopes (where the relief slopes): how much brighter it is where
 /// the relief rises across and down; and the share of the variation the slopes explain
-fn slopeLight(t: []const f32, h: []const f32, n: usize) [3]f32 {
+pub fn slopeLight(t: []const f32, h: []const f32, n: usize) [3]f32 {
     var sxx: f64 = 0;
     var syy: f64 = 0;
     var sxy: f64 = 0;

@@ -6,13 +6,18 @@
 //! sinks the height by its own amount.
 //! Bounded: a place looks at the cells within reach of the largest instance (at most 7 by 7 cells; a size above
 //! one and a half cells is refused). The turn is a polynomial sine and cosine (no maths library).
+//! Version 2 (milestone 2c, close up): instances gather in clusters (cluster cells, cluster: the density follows a
+//! coarse noise read at the instance's own cell, every octave drawn, so the same instances stand at every size), a
+//! disc's edge breaks up (rough, rough cells: its radius wanders by a noise in the instance's own coordinates, for rust
+//! spots, stones and pits that are not round), and its centre is darker or lighter than its rim (core). Version 1
+//! graphs draw byte for byte as before.
 const c = @import("common.zig");
 
 pub const name = "Scatter";
 pub const version: u32 = 1;
 pub const inputs: u8 = 1; // the base; a second input is the seed's picture
 pub const params = [_]c.Param{
-    .{ .kind = .int, .label = "version", .offset = 0, .def = 1, .min = 1, .max = 1 },
+    .{ .kind = .int, .label = "version", .offset = 0, .def = 2, .min = 1, .max = 2 },
     .{ .kind = .int, .label = "cells across", .offset = 1, .def = 16, .min = 1, .max = 4096 },
     .{ .kind = .int, .label = "cells down", .offset = 2, .def = 16, .min = 1, .max = 4096 },
     .{ .kind = .float, .label = "density", .offset = 3, .def = 0.5, .min = 0, .max = 1, .step = 0.02 },
@@ -29,7 +34,18 @@ pub const params = [_]c.Param{
     .{ .kind = .float, .label = "opacity", .offset = 14, .def = 1, .min = 0, .max = 1, .step = 0.05 },
     .{ .kind = .float, .label = "phase across", .offset = 15, .def = 0, .min = -1, .max = 1, .step = 0.01 },
     .{ .kind = .float, .label = "phase down", .offset = 16, .def = 0, .min = -1, .max = 1, .step = 0.01 },
+    // version 2
+    .{ .kind = .int, .label = "cluster cells", .offset = 17, .def = 8, .min = 1, .max = 256 },
+    .{ .kind = .float, .label = "cluster", .offset = 18, .def = 0, .min = 0, .max = 1, .step = 0.05 },
+    .{ .kind = .float, .label = "rough", .offset = 19, .def = 0, .min = 0, .max = 1, .step = 0.05 },
+    .{ .kind = .int, .label = "rough cells", .offset = 20, .def = 3, .min = 1, .max = 64 },
+    .{ .kind = .float, .label = "core", .offset = 21, .def = 0, .min = -1, .max = 1, .step = 0.05 },
 };
+
+/// the words a version stores: 17 in version 1, 22 in version 2
+pub fn wordCount(ver: u32) usize {
+    return if (ver >= 2) 22 else 17;
+}
 
 pub fn margin(w: []const u32) f32 {
     _ = w;
@@ -37,7 +53,7 @@ pub fn margin(w: []const u32) f32 {
 }
 
 pub fn draw(out: c.Pix, ins: []const c.Pix, w: []const u32) error{Refused}!void {
-    try c.version(name, w, version);
+    const ver = try c.versionUpTo(name, w, 2);
     const nx = try c.int(&params, w, 1);
     const ny = try c.int(&params, w, 2);
     const dens = try c.flt(&params, w, 3);
@@ -54,12 +70,24 @@ pub fn draw(out: c.Pix, ins: []const c.Pix, w: []const u32) error{Refused}!void 
     const opac = try c.flt(&params, w, 14);
     const phx = try c.flt(&params, w, 15);
     const phy = try c.flt(&params, w, 16);
+    var ccl: i32 = 1;
+    var clu: f32 = 0;
+    var rough: f32 = 0;
+    var rcl: f32 = 1;
+    var core: f32 = 0;
+    if (ver >= 2) {
+        ccl = try c.int(&params, w, 17);
+        clu = try c.flt(&params, w, 18);
+        rough = try c.flt(&params, w, 19);
+        rcl = @floatFromInt(try c.int(&params, w, 20));
+        core = try c.flt(&params, w, 21);
+    }
     const fnx: f32 = @floatFromInt(nx);
     const fny: f32 = @floatFromInt(ny);
     const cw = 1.0 / fnx;
     const ch = 1.0 / fny;
     const m = @min(cw, ch);
-    const rmax = size * m * (1.0 + svar) * @max(1.0, aspect);
+    const rmax = size * m * (1.0 + svar) * @max(1.0, aspect) * (1.0 + rough);
     const reach_f = @ceil(rmax / m + jit * 0.5 + @max(@abs(phx), @abs(phy)));
     if (reach_f > 3) return c.refuse("Scatter: an instance reaches {d} cells; at most 3 (size times aspect too large for the grid)", .{reach_f});
     const reach: i32 = @intFromFloat(reach_f);
@@ -80,7 +108,15 @@ pub fn draw(out: c.Pix, ins: []const c.Pix, w: []const u32) error{Refused}!void 
                     const gx = cx + dx;
                     const gy = cy + dy;
                     const h = c.hash3(c.wrap(gx, nx), c.wrap(gy, ny), seed);
-                    if (c.rnd01(h) >= dens) continue;
+                    var dl = dens;
+                    if (clu > 0) {
+                        // the cluster: a coarse noise at the cell's centre (on the repeating picture), all octaves
+                        const cu = (@as(f32, @floatFromInt(c.wrap(gx, nx))) + 0.5) / fnx;
+                        const cvv = (@as(f32, @floatFromInt(c.wrap(gy, ny))) + 0.5) / fny;
+                        const f = c.fbmAll(cu, cvv, ccl, ccl, 3, 0.5, seed ^ 0xc105);
+                        dl = dens * c.lerp(1.0, c.clamp01(0.5 + 2.5 * f), clu);
+                    }
+                    if (c.rnd01(h) >= dl) continue;
                     const h2 = c.hash(h ^ 0x2545f491);
                     const h3 = c.hash(h2 ^ 0x9e3779b9);
                     const h4 = c.hash(h3 ^ 0x85ebca6b);
@@ -94,6 +130,7 @@ pub fn draw(out: c.Pix, ins: []const c.Pix, w: []const u32) error{Refused}!void 
                     const qx = (ex * sc[1] + ey * sc[0]) / r;
                     const qy = (-ex * sc[0] + ey * sc[1]) / (r * aspect);
                     var cov: f32 = 0;
+                    var dd_core: f32 = 0;
                     if (stamp) |st| {
                         const sx = (0.5 + 0.5 * qx) * @as(f32, @floatFromInt(st.w)) - 0.5;
                         const sy = (0.5 + 0.5 * qy) * @as(f32, @floatFromInt(st.h)) - 0.5;
@@ -117,12 +154,22 @@ pub fn draw(out: c.Pix, ins: []const c.Pix, w: []const u32) error{Refused}!void 
                             cov = acc;
                         }
                     } else {
-                        const dd = @sqrt(qx * qx + qy * qy);
+                        var dd = @sqrt(qx * qx + qy * qy);
+                        if (rough > 0 and dd < 1.0 + rough) {
+                            // the edge breaks up: the radius wanders by a noise in the instance's own coordinates
+                            const o1 = 64.0 * c.rnd01(c.hash(h5 ^ 0x3c6ef372));
+                            const o2 = 64.0 * c.rnd01(c.hash(h5 ^ 0xa54ff53a));
+                            const n1 = c.gnoise(qx * rcl + o1, qy * rcl + o2, 4096, 4096, seed ^ 0x51f1);
+                            const n2 = c.gnoise(2.0 * qx * rcl + o2, 2.0 * qy * rcl + o1, 4096, 4096, seed ^ 0x1f83);
+                            dd = dd / @max(0.2, 1.0 + rough * (0.67 * n1 + 0.33 * n2));
+                        }
                         cov = 1.0 - c.smoothstep(1.0 - soft, 1.0, dd);
+                        if (core != 0 and cov > 0) dd_core = c.clamp01(1.0 - dd);
                     }
                     if (cov <= 0) continue;
                     const a = cov * opac;
-                    const shade = 1.0 + cvar * (2.0 * c.rnd01(c.hash(h5 ^ 0x27d4eb2f)) - 1.0);
+                    var shade = 1.0 + cvar * (2.0 * c.rnd01(c.hash(h5 ^ 0x27d4eb2f)) - 1.0);
+                    if (core != 0) shade *= 1.0 + core * dd_core;
                     inline for (0..3) |q| o[q] = c.lerp(o[q], c.clamp01(col[q] * shade), a);
                     o[3] = c.clamp01(o[3] + hgt * cov);
                 }

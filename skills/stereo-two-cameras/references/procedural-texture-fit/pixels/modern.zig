@@ -38,6 +38,18 @@ pub fn paramsOf(k: usize) []const c.Param {
     unreachable;
 }
 
+/// the words operator k stores at a version: its own wordCount where a later version added words (Tiles, Scatter,
+/// Cells, milestone 2c), else its whole table
+pub fn wordsFor(k: usize, ver: u32) usize {
+    inline for (list, 0..) |m, i| {
+        if (i == k) {
+            if (@hasDecl(m, "wordCount")) return m.wordCount(ver);
+            return m.params.len;
+        }
+    }
+    unreachable;
+}
+
 pub fn inputsOf(k: usize) u8 {
     inline for (list, 0..) |m, i| {
         if (i == k) return m.inputs;

@@ -77,7 +77,7 @@ pub fn seconds() f64 {
 
 // ---------------------------------------------------------------- operators
 
-const NW = 20; // werkkzeug3 stores at most 14 words; the modern Ramp 18
+const NW = 28; // werkkzeug3 stores at most 14 words; the modern Ramp 18, Tiles version 2 24
 const MAXIN = 8;
 pub const MAXN = 220;
 
@@ -146,6 +146,7 @@ fn isText2(nd: *const Node) bool {
 }
 /// the words an operator stores: werkkzeug3's count, or version 2 Text's twelve
 fn wordsOf(nd: *const Node) usize {
+    if (isModern(nd.op)) return modern.wordsFor(nd.op - OP_MODERN, nd.w[0]);
     return if (isText2(nd)) TEXT2_WORDS else ops[nd.op].kinds.len;
 }
 
@@ -6132,7 +6133,8 @@ pub fn mainC(argc: c_int, argv: [*]const [*:0]const u8) callconv(.c) c_int {
         return gi_build(argv[2], k, m);
     }
     if (n >= 4 and std.mem.eql(u8, argStr(argv, 1), "mfit")) {
-        // p2p mfit WHOLE.ppm OUT-PREFIX [full=FULL.ppm] [tile=512]   (milestone 2b: the modern operators, the whole first)
+        // p2p mfit WHOLE.ppm OUT-PREFIX [full=FULL.ppm] [tile=512] [close=0] [off=grain,...]   (milestone 2b: the modern operators,
+        // the whole first; milestone 2c: the close-up layers, read on the full-size picture)
         var mo = mfit.MOpt{};
         for (4..n) |i| {
             const a = argStr(argv, i);
@@ -6144,7 +6146,15 @@ pub fn mainC(argc: c_int, argv: [*]const [*:0]const u8) callconv(.c) c_int {
                 mo.seeds = argv[i] + 6;
             } else if (std.mem.startsWith(u8, a, "light=")) {
                 mo.light = a[6] == '1';
-            } else die("mfit: {s} is not known (full=FULL.ppm, tile=SIDE, seeds=CHOSEN, light=0|1)", .{a});
+            } else if (std.mem.startsWith(u8, a, "close=")) {
+                mo.close = a[6] == '1';
+            } else if (std.mem.startsWith(u8, a, "off=")) {
+                mo.off = a[4..];
+            } else if (std.mem.eql(u8, a, "grainat=field")) {
+                mo.grain_in_field = true;
+            } else if (std.mem.eql(u8, a, "grainat=colour")) {
+                mo.grain_in_field = false;
+            } else die("mfit: {s} is not known (full=FULL.ppm, tile=SIDE, seeds=CHOSEN, light=0|1, close=0|1, off=LAYER,..., grainat=colour|field)", .{a});
         }
         mfit.run(argv[2], argStr(argv, 3), mo);
         return 0;

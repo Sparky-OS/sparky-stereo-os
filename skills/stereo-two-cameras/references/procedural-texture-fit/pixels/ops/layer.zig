@@ -5,13 +5,15 @@
 //! werkkzeug graphs (Mask), with the height carried along so the relief stays one with the colour.
 //! The detail mode adds the top's departure from mid grey (signed) to the base: a texture laid into the faces of a
 //! structure before one Ramp colours both (so a brick's own shade and its grain follow the same colours).
+//! Version 2 (milestone 2c): with lo above hi the mask falls (1 below hi, 0 above lo), so a layer can take the
+//! joints of a structure (its darkest values) as its mask without a turned-over copy; version 1 is drawn as before.
 const c = @import("common.zig");
 
 pub const name = "Layer";
 pub const version: u32 = 1;
 pub const inputs: u8 = 3;
 pub const params = [_]c.Param{
-    .{ .kind = .int, .label = "version", .offset = 0, .def = 1, .min = 1, .max = 1 },
+    .{ .kind = .int, .label = "version", .offset = 0, .def = 2, .min = 1, .max = 2 },
     .{ .kind = .cycle, .label = "colour", .offset = 1, .def = 0, .min = 0, .max = 3, .choices = "mix|multiply|add|detail" },
     .{ .kind = .float, .label = "lo", .offset = 2, .def = 0.4, .min = -1, .max = 2, .step = 0.01 },
     .{ .kind = .float, .label = "hi", .offset = 3, .def = 0.6, .min = -1, .max = 2, .step = 0.01 },
@@ -20,13 +22,18 @@ pub const params = [_]c.Param{
     .{ .kind = .float, .label = "height amount", .offset = 6, .def = 0.2, .min = 0, .max = 1, .step = 0.02 },
 };
 
+pub fn wordCount(ver: u32) usize {
+    _ = ver;
+    return 7;
+}
+
 pub fn margin(w: []const u32) f32 {
     _ = w;
     return 0;
 }
 
 pub fn draw(out: c.Pix, ins: []const c.Pix, w: []const u32) error{Refused}!void {
-    try c.version(name, w, version);
+    const ver = try c.versionUpTo(name, w, 2);
     const mode = try c.int(&params, w, 1);
     const lo = try c.flt(&params, w, 2);
     const hi = try c.flt(&params, w, 3);
@@ -36,7 +43,7 @@ pub fn draw(out: c.Pix, ins: []const c.Pix, w: []const u32) error{Refused}!void 
     for (0..out.w * out.h) |i| {
         const b = c.getc(ins[0], i);
         const t = c.getc(ins[1], i);
-        const m = c.smoothstep(lo, hi, c.grey(ins[2], i)) * amt;
+        const m = (if (ver >= 2 and lo > hi) 1.0 - c.smoothstep(hi, lo, c.grey(ins[2], i)) else c.smoothstep(lo, hi, c.grey(ins[2], i))) * amt;
         var o: [4]f32 = undefined;
         inline for (0..3) |q| {
             o[q] = switch (mode) {

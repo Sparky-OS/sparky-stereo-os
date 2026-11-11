@@ -45,6 +45,31 @@ Qt's own documentation still says it: "Antialiasing in the OpenGL paint engine i
 - **GPU use:** `gpu_busy_percent` for amdgpu, `nvidia-smi --query-gpu=utilization.gpu,power.draw` for NVIDIA (inside a container that got the card through CDI); power from the amdgpu hwmon `power1_input` and `nvidia-smi`. Package power (RAPL) is readable by root only.
 - **Text by pixels, then by eye:** capture both paths with ScreenShot2 at scale 1 and at a fractional scale, count differing pixels, and put the same crop of each side by side, enlarged without smoothing.
 
+## What the prototype measured (2026-11-11)
+
+One machine, a Ryzen with a Renoir iGPU (Mesa radeonsi) and an RTX 3060 (NVIDIA 615), nested Stereo KWin on the same GPU as the program, Qt's own window frame, 1920x1080, three rounds, CPU and GPU painting alternating.
+Read the numbers as one machine's, and measure again on a slower CPU before deciding anything.
+
+| Case | CPU painting | OpenGL paint engine |
+|---|---|---|
+| Konsole, a full-screen colour animation (160x48 cells) | 9 ms per paint, the terminal takes 297 frames a second | 18 to 20 ms per paint, 221 to 242 frames a second |
+| Konsole, `cat` of a 20 MB file | 27 MB/s | 27 MB/s (Mesa), 24 MB/s (NVIDIA) |
+| Konsole idle, cursor blinking | 0.1 % of a core | 0.3 % |
+| Dolphin scrolling 5,000 files | 19 to 22 % of a core, KWin 6 to 9 % | 26 to 35 %, KWin 5 to 6 % |
+| Kate scrolling 60,000 lines | 10 to 12 %, KWin 5 to 7 % | 16 to 17 %, KWin 4.5 % |
+| Every widget of a 900x760 window repainted | 4.0 to 4.5 ms | 1.5 ms (Mesa), 2.3 ms (NVIDIA) |
+| The same, once per eye (element depth) | 8.8 to 9.3 ms | 3.2 ms (Mesa), 4.1 ms (NVIDIA, shown flat) |
+| `QT_WIDGETS_RHI=1` (stock: CPU painting, RHI composition) | | Kate: 13 ms per flush and 58 paints a second instead of 82 |
+
+What the numbers say:
+
+- The OpenGL engine's cost follows the number of things drawn, not the pixels: one draw call with its own uniforms for each rectangle, text run and pixmap. A terminal draws thousands of small things a frame and loses; a window of large fills and few items wins.
+- The compositor saves a little (no upload of a shared memory buffer); the program pays more than that back.
+- Painting once per eye is where the GPU path pays: the pair costs about a third of the CPU's time on Mesa.
+- Text at scale 1 uses the same glyphs; some labels sit one pixel higher. At a fractional scale (1.25) the engine places every glyph on a whole pixel, so letters are spaced unevenly where the raster engine places them by parts of a pixel.
+- An element moved by half a pixel is drawn with linear filtering, so its text is soft in the eye that carries the half pixel and sharp in the other.
+- With whole-pixel parallaxes both paths gave the same disparities to the thousandth of a pixel; with fractions the GPU path gave 0.5, -0.5, 1.5, -1.5 and 0.263 (for 0.25, the four samples' grid) where the CPU path rounds to 1, -1, 2, -2 and 0.
+
 ## Traps
 
 - **Symptom:** a terminal painted on the GPU takes a third of the output it took before, and the flush time is 12 ms. **Cause:** `QWaylandGLContext::swapBuffers()` emulates a blocking swap (`waitForFrameSync(100)`) when the context's format has a swap interval above 0, and widgets are painted and flushed on the GUI thread, which also reads the terminal's program. **Fix:** swap interval 0 in the format the window's RHI is made with. **Found by:** `flush_ms` in the repaint manager's statistics, 12.8 ms at 60 paints per second against 0.07 ms on the raster path.
@@ -62,3 +87,6 @@ Qt's own documentation still says it: "Antialiasing in the OpenGL paint engine i
 - **Symptom:** a window with Qt's own frame, painted once per eye on the GPU, shows the left eye only. **Cause:** not found; the decorated EGL window's content framebuffer has a slot per eye only for a window that asked for stereo when it was made. **Fix in the prototype:** such a window is painted once, as on the CPU. **Found by:** captures with identical eyes.
 - **Symptom:** an idle terminal reports about five paints per second on one path and none on the other. **Cause:** the only statistics line of the run was the start-up second, and the cursor never blinked: Konsole reads `BlinkingCursorEnabled` from the profile's `[Terminal Features]` group. **Fix:** the right group, and a summary that reports "no paints" when the run printed nothing after the warm-up. **Found by:** reading the run's log instead of its summary.
 - **Symptom:** numbers measured before a cut-off cannot be tied to the source tree found afterwards. **Cause:** the library was older than the last edits (`ninja -n` only says CMake must run again; `git stash` and `git stash pop` also give every changed file a new time). **Fix:** commit before every measuring round, and write the commit into the round's folder. **Found by:** rebuilding changed the library's size.
+- **Symptom:** "GPU painting" is slower than CPU painting and `GL_RENDERER` says `llvmpipe`. **Cause:** Mesa's EGL follows the compositor's main device; with the compositor on a GPU Mesa has no driver for (NVIDIA's own driver) and Mesa's vendor file named, the context comes up in software unless `DRI_PRIME=pci-...` names a Mesa GPU. **Fix:** name the GPU as well as the vendor, and refuse a software renderer by its name, saying so. **Found by:** printing `GL_RENDERER` in a container that had both GPUs.
+- **Symptom:** captures at `kwin_wayland --virtual --scale 1.25` are identical, pixel for pixel, to the captures at scale 1. **Cause:** the virtual backend's option enlarges the output; the windows stay at 1. **Fix:** set the scale as the display settings do, `kscreen-doctor output.NAME.scale.1.25`, and read it back. **Found by:** the same count of differing pixels in both pairs of captures.
+- **Symptom:** a run on a rig image without a GPU cannot be captured (`Screenshot got cancelled`). **Cause:** Stereo KWin's virtual output needs a render node. **Fix:** give the container a GPU for KWin and switch only the program to software with its own environment.

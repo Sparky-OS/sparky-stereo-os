@@ -893,3 +893,10 @@ KDE Connect's ufw application profile, which the firewall rule uses, is KDE Conn
 These projects do not endorse the edition.
 
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.
+
+## Stereo Werkkzeug, the core (ORDER 514, 11 November 2026)
+
+- **Farbrausch and .theprodukkt** ([fr_public](https://github.com/farbrausch/fr_public), BSD 2-clause): werkkzeug3's project format (`WerkDoc::Write` and `WerkDoc::Read`, the specification the core's reader and writer follow), its operator table (`WerkClasses[]` and the `Edit_*` functions of `werkops.cpp`) and its rules for which operator feeds which (`WerkPage::Connect1` and `Connect2`); Werkkzeug4's operator declarations (`wz3_bitmap_ops.ops`) and its texture operators (`wz3_bitmap_code.cpp`), which the core compiles as published. Copyright 2002-2012 Dierk Ohlerich, Fabian Giesen, Thomas Mahlke, Christoph Muetze, Tammo Hinrichs and Bastian Zuehlke, with 49Games GmbH for Altona; the people of Farbrausch as the repository's README names them: Fabian "ryg" Giesen, Sebastian "Wayfinder" Grillmaier, Tammo "kb" Hinrichs, Thomas "fiver2" Mahlke, Christoph "giZMo" Muetze, Dierk "Chaos" Ohlerich, Kai "cp" Poethkow, Ronny Pries, Dennis "Exoticorn" Ranke, Leonard "paniq" Ritter and Bastian "Tron" Zuehlke. The 23 project files in `werkkzeug3/data` (CC-BY 3.0) are the core's test set.
+- **wxthss82**: the four open pull requests to `fr_public` ([#105](https://github.com/farbrausch/fr_public/pull/105) to [#108](https://github.com/farbrausch/fr_public/pull/108)), read and built in the probe of Werkkzeug4 on Linux.
+- **The GNU C Library** (LGPL 2.1 or later): `sinf32` and `cosf32`, the names of ISO/IEC TS 18661-3 under which the operators reach the library's own sine and cosine.
+- **Zig** (MIT; Andrew Kelley and the Zig contributors): the language and compiler of the core, through Daniel's cgm-zig.

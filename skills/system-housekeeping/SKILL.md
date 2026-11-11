@@ -5,14 +5,11 @@ name: system-housekeeping
 description: >-
   Bounded logs, kernel retention and cleanup that keep user settings, boot recovery and diagnostic evidence:
   old kernels per flavour (APT::NeverAutoRemove::KernelCount, never a general apt autoremove), update-initramfs for
-  every image, GRUB and grub-editenv or update-grub tested in a container, the journal as the one log, crash dumps
-  capped, /etc/skel and existing homes, local system mail in /var/mail, BleachBit, which scratch folders are safe to
-  delete, services that fail on hardware the machine lacks, PipeWire's one-error configuration files, KConfig dropping
-  comments. Load it when a disk fills with kernels or logs, a removal would take the running kernel, a cleaner would
+  every image, GRUB tested in a container, the journal as the one log, crash dumps capped, /etc/skel, system mail,
+  BleachBit, safe scratch folders, cleaning a shared build machine, services failing on absent hardware. Load it when a disk fills with kernels or logs, a removal would take the running kernel, a cleaner would
   delete the evidence of a crash or shows Access denied on a mailbox, a tool exits 0 with no message on an unreadable
-  HOME, system mail piles up, nvidia-persistenced fails on a machine without the card, thermald fails at every boot on an
-  AMD CPU, a GRUB test in a container shows English and an empty menu, or a shared build machine's disks fill with
-  finished lanes' build trees, duplicate files and Docker images.
+  HOME, nvidia-persistenced or thermald fails on a machine without that hardware, a GRUB test in a container shows
+  English and an empty menu, or a build machine's disks fill with finished build trees, duplicates and Docker images.
 ---
 
 # System housekeeping

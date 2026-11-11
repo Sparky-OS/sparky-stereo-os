@@ -1,6 +1,6 @@
-# egui: a native stereo child with one shared owner
+# egui: a native stereo window with one shared owner
 
-The Craft Apps' `craft-stereo-window` work uses a native child toplevel for the picture, beside an ordinary egui editing window.
+The Craft Apps' `craft-stereo-window` work uses a native toplevel for the picture, beside an ordinary egui editing window.
 This is a separate Stereo View/Monitor, not a claim that the image is embedded under the main canvas.
 An embedded canvas needs its own subsurface/child-window integration and overlay/input tests.
 
@@ -20,6 +20,7 @@ An embedded canvas needs its own subsurface/child-window integration and overlay
    PhotoCraft moved save logic into `ui-egui/src/app/files.rs`, services into `services.rs`, canvas display into `canvas/display.rs`, and commands into `engine/src/cmd/`.
    FilmCraft split export types, registries and encoders into `format.rs`, `registry.rs` and `encoders.rs`.
    Port the small hook into those owners; do not restore obsolete monoliths from a conflict.
+   When the receiving host separates logic from drawing, keep native picture delivery and closure in its logic callback so they continue without a UI paint.
 5. Test independent eye/row/column sample IDs before compositor scaling.
    X11 drawable readback can establish every native sample; a Wayland trace establishes buffer geometry, and the captured output still needs both-eye comparisons against independent references.
    Read the client's rectangle from KWin rather than deriving it from the image being tested.
@@ -30,6 +31,11 @@ An embedded canvas needs its own subsurface/child-window integration and overlay
 
 ## Measured traps
 
+- Symptom: Stereo Monitor enablement tests pass, but its host receives zero pictures after a rebase.
+  FilmCraft's old update called `stereo_monitor::tick`; that call was lost when main split logic from drawing.
+  Restore it in `logic_inner` after playback and job updates.
+  A regression that calls only logic, without UI passes, failed with no delivered frame before the fix and then passed frame delivery and closure; all seven monitor tests passed.
+  Keep native compositor proofs as a separate check.
 - Symptom: an ID probe shows a blank stereo image and every sample is wrong.
   Check the decoder first: FilmCraft reported no decoder for FFV1.
   A successful import/sequence command did not prove the frames decoded.

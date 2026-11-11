@@ -65,13 +65,13 @@ Preserve the correction when answering the review.
 The two CodeRabbit findings were truncated MPO entries silently losing damage reporting and Duotone stereo exports bypassing ink rendering.
 Confirm each against the submitted head, then cite the fixing commit and a regression, or explain with measured evidence why it no longer applies.
 
-## Disclosure conflict to resolve before sending
+## Authorship and assistance are different claims
 
-Current craft-contrib core rule 15 says a pull request does not say an agent wrote it.
-The edition's policy asks for disclosure once, and a task may explicitly require it in a fresh PR.
-Record the conflict and the responsible person's explicit instruction in the private handoff; do not quietly rewrite either project's rules or misrepresent what they require.
-Leave conflicting attribution wording unresolved in the draft until that person decides; the private handoff quotes the exact rule and links its pinned source.
-Keep doing authorized local implementation and verification while that public-submission decision is pending.
+Read the exact wording before declaring an attribution-policy conflict.
+Craft core rule 15 says a pull request does not say an agent wrote it; acknowledging assistance does not make the assistant its author.
+Keep the person as author and accountable reviewer, with no agent author/co-author or “Generated with” line.
+Retain the instructed `Assisted-by:` commit trailer and acknowledge AI assistance once in the fresh pull request description; do not repeat it in replies.
+Do not claim a person's review happened before it did: a draft's first-person review assertion must be checked by that person before sending.
 A local draft is not authorization to send.
 
 ## When a rebased gate disagrees with main

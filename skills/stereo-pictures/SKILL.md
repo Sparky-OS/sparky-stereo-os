@@ -104,3 +104,5 @@ Check both the bytes and a reader round trip: an unmarked `.jps` can reopen corr
 
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (13 entries).
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
+
+For an accepted metadata-only correction save, use the shared `Picture::saveCorrection` entry point; see the [JPS/MPO save recipe](references/jps-descriptor.md#save-a-correction-without-recompressing-an-existing-jps-or-mpo).

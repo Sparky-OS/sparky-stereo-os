@@ -43,7 +43,8 @@ Check freshness: re-read `CONTRIBUTING.md`, `doc/developer.texi` and `doc/commun
 - Trailers in one block at the end, no blank line between them: `Fixes: #NNNNN` first when an issue tracks the bug (master uses this form, for example 5fd305b8f42), then `Signed-off-by:`, then `Assisted-by:` for AI assistance. A trailer separated by a blank line is not parsed as a trailer.
 
 ## Tests (FATE)
-- Expected results live in `tests/ref/fate/...`; the test prints what it observes and FATE compares. Never hard-code expectations in C constants.
+- Expected results live in `tests/ref/fate/...`; the test prints what it observes and FATE compares. Never hard-code expectations in C constants, and never let a callback in a test program decide by itself: a `get_format()` that returned `AV_PIX_FMT_NONE` on an unexpected query result hid a failed query in every case that expected `none` anyway (#25398). Print the result (`query_failed=%d`) and go on.
+- A test is as small as the change it proves: run it on the unfixed code, keep the cases whose output changes plus one control, and show each kept case is needed with a mutation only it catches (the bot rates "tests larger than the change they cover" as moderate). Wider coverage of existing behaviour goes in a pull request of its own.
 - A new test fails on unpatched master and passes with the change; run the full applicable FATE with GCC and clang and report both totals.
 - The test goes in its own commit, after the fix, so every commit passes FATE and the fix can be backported alone. A maintainer asked for this on #25398 (2026-10-24: "Please do not mix tests and fixes in the same commit"). It is not written in `doc/developer.texi`; the nearest text is "Bug fixes intended for backporting should stay focused".
 - New samples go to the fate-suite through someone with samples access.
@@ -53,6 +54,7 @@ Check freshness: re-read `CONTRIBUTING.md`, `doc/developer.texi` and `doc/commun
 ## The review bot
 - A review bot (Forgejo_Fairy) reviews pull requests and classifies them (for example `minor_issues_approve`, `moderate_issues`). Mentioning it in a comment asks it to review again.
 - Answer it point by point, like any reviewer: fixed (the commit), shown correct (the evidence: code path, clause, probe), or outside this pull request (a separate patch).
+- Reproduce each finding before changing anything: the review often names the mutation it ran (for example "I forced `frame_params()` to fail"); run the same probe on the old head and keep its output as the red column. When a change to the test makes sentences of the pull request description untrue (what the reference covers, the FATE totals), rewrite them in the same round.
 
 ## CI
 - Infrastructure failures happen (the win64 job's rsync of the fate-suite was refused once); show the log line and ask a maintainer to re-run, since only maintainers can.

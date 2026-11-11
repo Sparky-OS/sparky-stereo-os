@@ -8,6 +8,7 @@ Pass a `QImage` to `QImageWriter` with format `jps`.
 The two suffix variants are complete names, such as `topBottomRightFirst`.
 An absent layout retains the existing writer convention: canonical left-first side-by-side input is exchanged into right-first storage.
 An explicit layout preserves the input pixel arrangement.
+The shared policy’s legacy `anaglyphCyanRed` name is accepted as red-left anaglyph.
 Unsupported layouts fail before writing and log a refusal translated into ten languages.
 
 Additional QImage text fields, also reported by the reader:

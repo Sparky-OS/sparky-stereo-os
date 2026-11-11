@@ -152,3 +152,17 @@ Traps:
 - Symptom: the build ends with `make[1]: *** [debian/rules:299: override_dh_builddeb] Error 1` after the last package, with no message about why. Cause: the link and start gate refuses to run with less than 12 GiB free on `/` (the message `/: free space ... is below root floor` is printed once, far above, after the meson test output); the floors cannot be set lower (`space floors cannot be below 2 GiB scratch and 12 GiB root`). A Mesa amd64 build uses about 13 GiB. Fix: have 25 GiB free on `/` before starting, and watch `df` during the build. Found with `grep -n "free space\|floor" build.log`.
 - Symptom: a "+20" container behaves exactly like +19 (same red result). Cause: the image was committed after an apt step that failed (`The repository 'file:/repo mashtabba' no longer has a Release file`) because the edition repository was not mounted; the packages never changed. Fix: check `dpkg -l | grep mesa` in the committed image for the new version before testing, and mount the repository (`realpath`) in every container that runs apt with the edition source configured.
 - Symptom: a lane-written wrapper `docker()` function exported with `export -f` to rename the containers of a shared script works, but cannot lower a safety floor the script enforces. Use it only for names and `--ulimit core=0`.
+
+## A published lc1 source is not the authored recipe
+
+- **Symptom:** a package works alone, but merging its imported source makes the supply-chain wiring gate fail and publish-check reports bundled toolkit files.
+  **Cause:** the published `+lc1` source already contains release-generated `debian/sparky-lean-toolkit`, six build dependencies, a Lean Code changelog entry and three rules targets added by `lean.debian_prepare`.
+  Importing that archive verbatim puts release machinery into the authored recipe and makes it appear to be another unwired source producer.
+  **Fix:** unpack the published source into a disposable directory, read `repo/plain-from-lc.py`'s docstring and run its checked inverse with the flags matching that source.
+  The native kcm-ums 0.1.1+lc1 source needs `--build-depends-at-end`; its recovered 33 files matched the earlier authored source byte for byte.
+  Preserve a source-consumer plan explicitly with `--save-plan FILE` and return it with `--preserve-plan FILE` when one exists.
+  Commit the plain baseline, then adapt feature commits to plain rules/control/changelog; release tooling alone adds the toolkit to a separate extracted source.
+  Add a normal package driver that sources build-provenance.sh, calls sparky_provenance_init before docker run, and passes SPARKY_PROV_ARGS; normalize the native source before packing.
+  Run test-wiring.sh with inherited grep functions unset, publish-check on every changed file including the baseline, then build through the tree route and rerun the installed proof and its failing control on that artifact.
+  **How found:** the integration review failed test-wiring.sh and publish-check despite passing private-KWin tests; reading debian_prepare and plain-from-lc established the generated delta, and comparison with the earlier authoring tree confirmed the recovered baseline.
+  Keep original copyright names when removing third-party contacts required by the public-text gate.

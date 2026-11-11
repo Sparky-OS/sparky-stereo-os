@@ -137,3 +137,8 @@ One command reruns it, offline, with one line per case: recipe, expected table a
 - Second example, the same day and television: the MPEG-2 half side-by-side control pair, with and without JP3D, as the Converting section says. Only the clip with the mark switched the television to 3D.
 
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.
+
+## KDE renderer controls
+
+For an MPRIS2 bridge, Dolphin and Purpose actions, and isolated runtime proof, use [the KDE renderer-controller recipe](references/kde-renderer-controller.md).
+Keep renderer-specific media selection in UMS and prove the received stream as well as the control calls.

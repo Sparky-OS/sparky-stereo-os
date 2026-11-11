@@ -99,3 +99,11 @@ The compiler diagnostics, current type definitions and existing callers identifi
 Preserve the live path's newer behavior when removing obsolete helpers; reconnecting an old helper can discard changes made on main.
 For several independent compile errors, `cargo clippy --workspace --all-targets --keep-going -- -D warnings` collects the remaining diagnostics together.
 This is a diagnostic step, not a replacement gate: run the receiving project's unchanged complete gate before committing or calling the port green.
+
+## Native tests pass, but a rebased tracker fails parity
+
+LightCraft's November port passed its complete native test stage, then failed parity on duplicate import/export row IDs and an export-test path moved on main.
+The replay had appended the older stereo rows and header after the current tracker instead of merging their new details into its existing rows.
+Keep the current row's content and status, add the feature details and live test references there, remove the appended duplicates, and refresh the generated summary with `cargo xtask parity --write`.
+The focused parity check then passed; the receiving full gate remains required before the port is committed.
+Run a repository's inexpensive tracker/reference check early alongside compile diagnostics after a large rebase, so documentation errors appear before its long native test stage.

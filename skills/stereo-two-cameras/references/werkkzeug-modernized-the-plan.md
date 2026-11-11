@@ -6,7 +6,8 @@ Since milestone 3 (the same day) it also holds the maths the core carries inside
 Since milestone 4 (the same day) it holds the editor's first light: a KDE program over the C interface, its parameter panel made from Farbrausch's table, a live picture drawn in a process of its own, the core's sentences in ten languages, and AI partners working in the open window.
 Since milestone 5 (the same day) it holds building in the window: operators dragged onto the page with the core's connection rules shown while they are dragged, a preview that can be pinned and tiled, the two sides of a step side by side, a partner's change marked on the page, and a proof that sends real pointer and key events through the compositor.
 Since milestone 6 (the same day) it holds the stereo preview: the three kinds of stereo project and where their values live in the file, the two eyes drawn by the core with the stereo texture module's own mapping, the preview's 3D area in a Qt Widgets dock, a stereo photograph as a project's source with its per-file corrections, and the proofs read from the compositor's own picture of both eyes.
-New operators, the Text operator and the fitter as a tool are not built yet.
+Since milestone 7 (the same day) it holds the fitter as a tool in the window: the fitter behind one small program with five kinds of lines, its modern operators as classes of the core, a found procedure laid on a page, one fit for each eye of a stereo photograph, and the corrections to the stereo preview (3D from the start, no limit on a tool's depth, a picture with its depth map, JPS and MPO marks saved, a floated preview in 3D).
+The Text operator and new operators beyond the fitter's nine are not built yet.
 Later milestones grow this page into the editor's contributor skill.
 
 **Check freshness first.**
@@ -319,11 +320,15 @@ A pair is two pictures of one size side by side; eyes of two sizes are refused w
 3. The surface below the window holds **the part of each eye that shows**, copied from the eyes as the core drew them: a crop at the picture's own pixels, wrapped for three by three. Its destination (`wp_viewport`) is the rectangle that part has in the window. The compositor resizes it once; the program fits nothing to the window. Fitted, enlarged, three by three and pinned all fall out of that one rule.
 4. "Render resolution per eye" is a largest eye: the picture's own size first; a wider eye is made smaller by a whole factor, each pixel the mean of its block. Two eyes larger than a surface can hold are said, with the size, never silently made smaller.
 5. A 100 ms timer looks at the place again while two eyes are shown (a dock was moved, the window resized); a key of the eyes' serial number, the crop and the place keeps it from committing the same picture again.
-6. Messages belong to the preview, in a widget of their own: the desktop takes no declaration; the declaration failed (with the system's words); the preview floats in a window of its own (a floated dock is a top level without the alpha buffer); the two eyes do not fit a surface.
+6. Messages belong to the preview, in a widget of their own: the desktop takes no declaration; the declaration failed (with the system's words); the two eyes do not fit a surface. They are said for a stereo project only: a project that is not stereo is shown as it always was and says nothing.
+7. A dock that can be floated is prepared like the main window, before it is created (`StereoArea::prepareWindow(previewDock)` right after the dock is made): floated, it is a top level of its own with the alpha buffer, and the area follows `window()`. Without that a floated preview cannot show 3D (milestone 6 said so in a message; milestone 7 removed the cause).
 
 ### The program's three options, and the project's values
 
-The 3D menu holds Show in 3D (off at the start, kept like every setting), Render Resolution per Eye and Display Settings (`kcmshell6 kcm_kscreen`), and a proof counts its entries.
+The 3D menu holds Show in 3D, Render Resolution per Eye and Display Settings (`kcmshell6 kcm_kscreen`), and a proof counts its entries.
+Show in 3D is marked from the start (Daniel, 10 October 2026: on a stereo desktop stereo content shows in stereo wherever it appears; flat is the person's opt-out, never the default): a stereo project opens in 3D where the desktop takes the declaration, a project that is not stereo is unchanged, and the person's unmarking is kept like every setting.
+Milestone 6 started with it off, which was a brief's mistake; a proof now reads the start, the opt-out and its place in the settings.
+The relief's depth has no upper limit (Daniel, 14 October 2026: a tool's depth is the user's setting, unclamped, with no forced warning); only a number that is no distance is refused.
 Everything else about stereo is the project's and lives in the Stereo panel: it changes by journalled steps and is saved when the person saves.
 The program draws its own pictures, so no action of it swaps eyes; the proof looks through the action collection for one.
 
@@ -331,7 +336,12 @@ The program draws its own pictures, so no action of it swaps eyes; the proof loo
 
 - Read through the edition's shared readers (`Stereo::Picture::load` of stereo-layer, with the edition's KImageFormats for JPS and MPO and the edition's Qt for PNG's `sTER`): never a list of formats of the editor's own.
 - The person's corrections (the input packing and "Swap left and right eyes") are kept for that one file in the program's state file (`KSharedConfig::openStateConfig()`, a group per absolute path), not in the project and not in the photograph. An entry with nothing set is deleted.
-- "Save the Correction to the File" writes the format's own mark (PNG's `sTER`, inserted after the header without touching the picture's bytes), reads the file back with nothing chosen, compares the two eyes, puts the file back when they differ, and forgets the stored entry when they are the same. A format or a correction it cannot write is refused with the reason, the file untouched, the correction kept.
+- "Save the Correction to the File" writes the format's own mark, reads the file back with nothing chosen, compares the two eyes, puts the file back when they differ, and forgets the stored entry when they are the same. Three marks, none of which touches a picture's bytes or compresses anything again:
+  - PNG: the chunk `sTER`, inserted after the header (two eyes side by side, a width divisible by 16).
+  - JPEG: the JPS block, an APP3 segment right after the file's first two bytes: `FF E3 00 12`, `_JPSJPS_`, `00 04`, the descriptor's four bytes with the most significant first (flags, layout, type: `00 04 02 01` is a stereo picture, side by side, the left eye first; layout 3 is one over the other, 1 is rows), `00 00`. An older block is left out. The shared reader takes the descriptor in this order only; and it looks for the block in files named `.jps`.
+  - MPO: the two pictures' MP Individual Numbers (tag `0xB101`) exchanged, found by walking each `MPF` segment's lists in the byte order its header states. Exactly two bytes change. That is the whole correction an MPO can carry: a packing chosen by hand is refused for it with the reason.
+  A correction a format cannot hold (a top and bottom PNG, a depth choice) is refused with the reason, the file untouched, the correction kept.
+- A picture with its depth map is a packing like any other (side by side, top and bottom, with a layer in front, with the background, with the depth in a file beside it): the manual list offers every layout the shared reader has, and the shared library makes the two eyes. Its own settings object and controls (`Stereo::DepthSettings`, `Stereo::DepthControls`) stand in the panel for such a picture; what the person chooses there is kept for that one file as the settings' own text. No file format has a mark for that choice, so saving it into the file is refused with that reason.
 - The project keeps the file's name; the two eyes are the fitter's targets. The preview shows them beside the two procedures: inside each eye the photograph's eye, then the procedure's, each at its own size.
 
 ### Proofs read from the compositor's own picture
@@ -346,6 +356,71 @@ With stereo content on the screen, Stereo KWin's ScreenShot2 holds both eyes sid
 6. **A refused declaration:** an environment switch makes every declaration fail as a compositor's refusal would; the preview says it and the screen shows the left eye's picture once, the same in both eyes.
 7. **A compositor without the protocol:** the same scenario under Weston's headless backend; the message is read from the widget, in each of the ten languages.
 8. **A photograph per packing family:** MPO, JPS with and without its block, PNG with `sTER` in both modes, a plain side by side pair, a plain top and bottom pair (the packing chosen), a plain pair the wrong way round (the swap); in every case the left eye is the red picture.
+
+## The fitter as a tool: working recipe
+
+The fitter is the edition's [procedures from pixels](procedural-texture-from-a-bitmap.md) program: a picture's pixels in, a procedure out, never from text.
+In the window it is a tool the person starts on a picture they chose; its answer is journalled operators on the open project.
+
+### One small program between the window and the fitter
+
+- The fitter's folder is carried as it is, in the layout of its own home (`fitter/pixels`, `fitter/werkkzeug`), every file compared equal: its next version takes its place by replacing the folder.
+- `swz-fit` (`src/fitrun.zig`) is the only program that knows how the fitter is started and what it writes. It prints five kinds of lines and nothing else: `note TEXT` (what the fitter says while it reads), `step P K OPERATORS BYTES FILE LABEL` (kept step K of procedure P, as a script), `procedure P X Y SIDE FILE` (procedure P and the window of the picture it draws, in parts of the picture; `0 0 1` is the whole), `done SECONDS`, `refused SENTENCE`.
+- The window and the partners' server read those lines only. A fitter that answers with four procedures for one picture prints four `procedure` lines; the window already places each on a page of its own (proved with a stand-in that speaks the lines). What joins four quarters into one picture is the core's next operator, not the window's work.
+- The fitter runs as a child with the adapter's own environment (`execv`), asked to die with its parent (`prctl(PR_SET_PDEATHSIG, SIGKILL)`); the adapter answers SIGTERM by ending the child. A proof ends the adapter in the middle and looks for the fitter's process.
+- The fitter writes its notes on standard error and its steps when it ends, so the adapter joins both streams, and steps arrive at the end: while it runs, the person sees the notes and the time.
+
+### The fitter's operators are classes of the core
+
+The fitter builds with nine operators of its own (Noise, Cells, Tiles, Ramp, Layer, Shade, Scatter, Wear, Tint), each with a version word and a parameter table.
+
+- They join the operator table after werkkzeug3's 218 classes, with class ids of their own above every id of werkkzeug3 (0x5300 to 0x5308); their rows are made at compile time from the operators' own tables, so the parameter panel, the text form and the partners' tools have them without one hand-written line.
+- They are compiled as a named module (`--dep modernops -Mmodernops=fitter/pixels/modern.zig`): a Zig file cannot import a file outside its module's folder, and what the module declares for another program (the fitter's own bridge) is not linked while nothing calls it.
+- They have no size of their own. A drawing is asked for at a canvas (512 pixels when nothing is said; `--canvas N`, the limits' `canvas`, View, Draw Procedures Without a Size At), on a margin that the neighbourhood operators read and that is cut away, exactly as the fitter draws them.
+- In a `.k` file they stand on their pages like any operator; an earlier version of an operator holds its whole table's words, the later ones at their starting values. A project without one writes the bytes it always wrote.
+- werkkzeug3 itself: `WerkOp::Init` takes class `0x04`, its error class, for an id `FindWerkClass` does not know, and `WerkDoc::Read` takes the smaller of the file's and the class's counts. So it shows such an operator as an error and loses its values when it saves. Read from its source, not run.
+- **The proof that the core draws them as the fitter does:** one script, drawn by the fitter (`p2p render SCRIPT OUT.ppm 9`) and by the core after `wz place`: the same 786,432 bytes. The checksum of the fitter's drawing is the test's reference.
+
+### A found procedure on a page
+
+`swz_place_procedure` (`src/fit.zig`, `wz place`) reads the fitter's script (`NAME OPERATOR INPUTS WORDS`, the words in hexadecimal, then `out NAME`) and lays it out by werkkzeug3's own rule: an operator takes the operators in the row right above it, from left to right.
+
+- The picture's operator carries the procedure's name. An operator that feeds several others is named `NAME.ITSNAME` and reached through Load operators, which is werkkzeug3's own way to use a picture twice. Stacks stand side by side, in bands when the page's width is used up.
+- A name is a store found from anywhere, so a name that the project already has is refused; so are an unknown operator, a wrong number of inputs, too many words, a missing `out` line and a page that holds operators.
+- Each step the fitter kept is one journalled step: the first adds the page and the procedure so far, each later one replaces the page's operators with the next. Undo walks back to a simpler procedure; every operator is the person's to change.
+
+### The tool in the window
+
+- Its own dock, a second tab in the preview's place: it has pictures of its own (the picture beside the procedure) and needs that room. In the lower tab group its buttons lay below the fold.
+- The picture is read from a file the person chooses. The fitter reads a square whose side is a power of two: the tool takes the largest square from the middle and, when its side is no power of two, makes it smaller to the next one, and says both.
+- The fit is a `QProcess`; Stop is `terminate()`. Nothing is placed by a stopped, refused or crashed fit, and each is said with its reason (the fitter's own sentence in its own words).
+- The comparison draws the procedure at the picture's size (the canvas), so "1:1" is pixel beside pixel; the two views' scroll bars follow each other.
+- Parts that come and go while a fit runs (the bar) keep their room when hidden (`QSizePolicy::setRetainSizeWhenHidden`), and the state sentence has room for five lines from the start: what stands below does not jump under the pointer.
+- A fit belongs to the project it was started for. The tool keeps the document's generation at the start; a fit that ends after another project was opened places nothing and says so, and the tool forgets which operators its last fit placed when the project changes.
+
+### A stereo photograph: one fit for each eye, and nothing between them
+
+The photograph's two eyes are fitted one after the other, each the regular way; the pages are `NAME.L` and `NAME.R`, and one more journalled step names the two results as the project's left and right procedures.
+Nothing is matched or estimated between the eyes.
+What to expect, measured on three real stereo photographs (bark, lichen, sand; each eye 1,024 pixels): the two fits take 21 to 31 seconds together, the two procedures are 9 to 13 operators and 373 to 471 bytes each, and they are not the same procedure: one eye's fit kept furrows where the other kept patches.
+Two separate fits know nothing of each other, so do not promise that the pair reads as depth: hand the pair and the photograph's own pair to a person at a 3D screen.
+Daniel's order for what follows (11 November 2026): only if the pair does not read as stereo, one eye is fitted and the other starts from that procedure with the separation added. The project's form allows it (a pair names any two operators); it is built on his word only.
+
+### A partner starts the same tool
+
+`fit_picture` takes `"picture": "chosen"` (the picture the person chose in the Fit tool) or `"photograph"` (the project's stereo photograph), an optional name and a reason.
+A partner names no file and writes no procedure.
+The tool runs in two halves like `draw_texture`: the first checks the call and the person's way of working; the window runs the fit in its own tool, where the person sees it and can stop it; the second lays the answer on its page as one step under the partner's name, applied, held or asked about as the person chose.
+Where no window holds the project the tool is refused and says where it works.
+`draw_stereo` runs in two halves the same way, so a partner's two eyes are drawn by the drawing process and not in the window's thread.
+
+### Proving it
+
+1. A stand-in fitter (`tests/fake-fitter.sh`) that speaks as the fitter does, takes as long as it is told, refuses, crashes or says nothing on request, and answers with reference scripts: the tool's whole behaviour is proved in seconds. A stand-in adapter (`tests/fake-fit-four.sh`) answers with four procedures.
+2. The window's heartbeat: a 2 ms timer records the longest time between two turns of the event loop while a fit runs (11 to 44 ms with the stand-in, 12 to 35 ms with the real fitter on a machine at rest and up to 59 ms with other builds loading it, while the person's real clicks land).
+3. The real fitter in the window on real photographs, the pairs exported as stereo PNG files and read back with the chunk parser.
+4. A partner under the official SDK's client: refused while the person has chosen no picture (it leaves a marker file at its first refusal, and the proof's person chooses then), applied or held afterwards.
+5. The corrections, each against the compositor's own picture or the file's own bytes: the start in 3D and the opt-out, 80 pixels of parallax at 600 pixels behind (600 * 256 / 1920), a floated dock's two eyes, the JPS block's 20 bytes with the rest of the file unchanged, an MPO's two changed bytes, two eyes from a depth map.
 
 ## Werkkzeug4 itself on Linux: what a probe found
 
@@ -625,6 +700,73 @@ So Werkkzeug4 does not run on Linux today, with or without the four pull request
   Cause: the surface is still declared, with nothing attached. The two eyes are the same picture.
   Fix: none needed; the 2D control compares the two halves and accepts one picture or two equal ones.
 
+## Traps found while building the fitter as a tool
+
+- Symptom: the drawing process ends with "index out of bounds: index 65536, len 65536" in the relief mapping as soon as the depth is large (600 pixels behind on a 256 pixel picture).
+  Cause: the mapping wraps a place into the picture with `x - w * floor(x / w)`; for a place just below zero the sum rounds to `w` itself in single precision (-0.0000005 + 256 is 256), one past the last column. Small depths met it rarely; removing the limit of 64 pixels met it at once.
+  Fix: a wrapped place that is not below `w` is column 0. The same line stands in the stereo texture module the mapping came from.
+  What the fix costs: the comparison with that module's own drawings is no longer 27 identical of 27 but 19, the other eight differing in 1 to 20 of 2,097,152 pixels: the places where the module reads one past the row's end (the next row's first pixel). With the fix taken out the core is identical in all 27 again, which proves the difference is the fix and nothing else; the module needs the same line to bring the comparison back to identical.
+  Found by: the panic's own trace (`sampleF`, `fromRelief`); the process is the drawing process, so the window only showed no 3D.
+- Symptom: the depth controls of the shared library change nothing: the right eye is the same at strength 29, 58 and 200.
+  Cause: `Stereo::Picture::load` with depth options makes the eyes its own way when the depth layout was chosen by hand (stereo-layer 1.17.1): its result equals `fromDepth` with the starting options whatever is handed over.
+  Fix: for the two layouts whose parts are plain (the picture, then its depth map, side by side or one over the other) cut `original` in two and ask the same library's `Picture::fromDepth` with the person's options; for the other depth layouts keep the library's own way, do not offer the controls, and say so.
+  Found by: a 30-line probe that loads one file with three strengths and compares the right eyes, then compares with `fromDepth`.
+- Symptom: a JPS written by the shared writer and read back has its eyes "the wrong way round", and no `_JPSJPS_` is in the file.
+  Cause: the writer takes a left-first pair, writes it the usual way (the right eye's picture on the left) and writes no block. It cannot say "left first" or "one over the other", and it compresses the picture again.
+  Fix: for a correction, write the block yourself into the file as it is; the writer is for new files.
+  Found by: probing the written file for the block and reading it back.
+- Symptom: a JPS block written with the descriptor's least significant byte first is not read at all (the file reads as one picture).
+  Cause: the reader takes the four bytes with the most significant first.
+  Fix: `00 flags layout type`.
+  Found by: four variants of one file through the shared reader.
+- Symptom: a plain side by side JPEG "is not read as a pair" in a test's expectation, and the test fails because it is.
+  Cause: the shared reader reads a picture twice as wide as high by its shape, the left half as the left eye, and says "by its shape".
+  Fix: a cross-eyed pair needs only "Swap left and right eyes"; expect the reader's own sentence.
+- Symptom: the stand-in fitter ignores its settings (how long it takes, whether it refuses).
+  Cause: the adapter started the fitter with a fixed environment (`execve` with three variables).
+  Fix: `setenv` what the fitter must not inherit, then `execv`.
+  Found by: a fit asked to take three seconds ended at once.
+- Symptom: after a real click on a button of the tool, another dock's tab comes forward and the next clicks do nothing.
+  Cause: the tool stood in the lower tab group, about 190 pixels high at 1280 by 800; the button lay below the fold or moved between the scroll and the click (a label appeared above it), and the click landed on the tab bar under the dock.
+  Fix: the tool in the preview's place; room kept for parts that hide; in a proof, scroll to a widget before a real click and wait a moment.
+  Found by: the screen's picture after the click: the Stereo tab was in front.
+- Symptom: an older scenario fails after a tab was added elsewhere: a value typed into the parameter panel "is one step: 2".
+  Cause: the new tab bar made the dock below it lower; the field lay below the fold and the real click landed on a tab.
+  Fix: the proof scrolls to the field first, as a person does.
+- Symptom: `error: evaluation exceeded 1000 backwards branches` in a table lookup.
+  Cause: a function that walks the whole operator table was called at compile time (to make the portable forms' entries for the modern operators).
+  Fix: `@setEvalBranchQuota` in the compile-time block.
+- Symptom: the C tests stop compiling with "missing field 'canvas' initializer".
+  Cause: the limits gained a field, the tests are built with `-Wextra -Werror`, and every `{ 256, 30.0, 0, 0 }` names one field too few.
+  Fix: name the field in each; Zig's own literals take the field's starting value.
+- Symptom: five proofs fail on a count (218 classes, 27 tools).
+  Cause: the counts stand in five files: the C test, the front test, the scripted partner, the SDK client, the window's proof.
+  Fix: `grep -rn '218\|27 tools'` before the first run.
+- Symptom: the partner's proof passes or fails by the second: "refused 0 times before the person chose".
+  Cause: the proof's person chose the picture after a fixed wait, and the partner's first call came later than that.
+  Fix: the partner writes a marker file at its first refusal; the person waits for the file.
+- Symptom: a wait loop of the lane's own never ends.
+  Cause: it waited for a word on the last line of a log whose last line is the shell's own "exited" line.
+  Fix: end it by its process id; wait for a line the job writes, anywhere in the log, and bound every loop.
+- Symptom (found by reading, before any run showed it): after "New" or "Open", the Fit tool's "placed" numbers name operators of the other project, and a fit still running would put its procedure there.
+  Cause: the tool kept operator numbers and a running process across a change of project; a fit takes many seconds, long enough for the person to open something else.
+  Fix: keep the document's generation with the fit; compare at the end, place nothing in another project and say it. The proof starts a two-second fit, starts a new project meanwhile, and checks the new project has one empty page and an empty journal.
+  How it was found: listing every member of the tool that outlives one fit and asking what each means after the document changed.
+- Symptom: the Stereo panel fits its dock at 1280 by 800 in English, Japanese, Korean and both Chinese catalogues, and asks for 339 to 451 pixels in a dock of 319 in German, Spanish, French, Portuguese and Polish.
+  Cause: two. The depth controls come from the shared library and were left as the library lays them out (labels beside fields, check boxes on one line); only the panel's own controls had been narrowed. And a `QGroupBox` title is one line that counts in the least width: "Les deux yeux à partir de la carte de profondeur" alone asked for 336 pixels around controls that need 210.
+  Fix: narrow the library's controls the same way from the panel (form rows wrapped, labels wrapped, button and check box words on several lines, combo boxes with a short least width); a group title wider than 250 pixels becomes a bold heading of several lines inside the group, the group keeping the words as its accessible name. Run the fit proof in every language, never in English alone; on a failure let it name the widest parts and, per group, what the group asks for against what its parts ask for (that difference showed the title).
+  How it was found: the final run repeats the panel proof in each of the nine other languages; a run in English alone was green.
+- Symptom: of about seventy real clicks sent while the real fitter runs, one does not land, in one run of three.
+  Cause: it is the last one. The sentence at the fit's end is four lines longer than the one while it runs, so the button moved down 64 pixels between the proof's aim and the click's arrival. A person clicking at that moment would have missed it too.
+  Fix: give the sentence its room from the start (a least height of five lines, aligned to the top).
+  How it was found: the proof writes, for each lost click, where the button stood before and stands after, whether the fitter still runs, and what the tool said before and after. Without that line the loss looked like the machine's load.
+- Symptom: a control reports itself as failed: "a changed picture passed".
+  Cause: the control changed every zero byte of the drawn picture, and then every 255: the picture is three bytes a pixel with no alpha, a brick wall's values run from 6 to 238, so both times the changed picture was the picture.
+  Fix: change every byte (`tr '\000-\377' '\001-\377\000'`), and run a new control once by hand to see it fail for the reason it is there.
+  How it was found: a histogram of the picture's bytes (`od -An -tu1 -v | sort -n | uniq -c`).
+- Symptom: three exported stereo PNG files of different pictures have the same size to the byte.
+  Cause: none; the core's writer stores the pixels without compression, so the size follows from the picture's size alone (8,390,353 bytes for two eyes of 1,024 pixels with alpha). Compare checksums, not sizes.
+
 ## What the parts are good for
 
 - The `.ops` blocks are a table a program can read: generate the parameter panel and the partner's operator list from them, so the editor, the server and the documentation cannot drift apart.
@@ -650,6 +792,12 @@ So Werkkzeug4 does not run on Linux today, with or without the four pull request
 - The stereo part at the end of a file is a pattern for any format whose first reader takes a pointer and stops: what the old program reads stays byte for byte, and the new values cost a file that is not stereo nothing.
 - `editor/tests/stereo-scenarios.inc` has the three helpers a stereo proof needs: both eyes from one ScreenShot2 picture, the pixels that differ inside and outside a rectangle, and the whole-pixel shift between the eyes with its control.
 - `editor/tests/fixtures/make-photographs.py` makes one stereo photograph per packing family in a few lines of Pillow and `struct`.
+- `swz-fit`'s five kinds of lines are an interface any fitter can be put behind: a front end that reads them needs no change when the fitter does.
+- `tests/fake-fitter.sh` is the pattern for proving a tool around a slow program: a stand-in that speaks the program's own words, takes the time it is told and fails on request.
+- `wz place FILE.k|new OUT.k NAME=SCRIPT... --pair LEFT,RIGHT` lays found procedures on pages from a command line; with `wz stereo OUT.k PAIR.pns --png --canvas N` a pair of fitted procedures is a marked stereo picture without a window.
+- One script drawn by two programs to the same bytes is the cheapest proof that two homes of one operator agree.
+- The editor's `Heart` (a 2 ms timer and the longest gap) measures any "the window goes on meanwhile" claim in a dozen lines.
+- A cross-eyed pair cut to equal squares and written as a stereo PNG with `sTER` (left eye first) is a fixture, a deliverable and a photograph's credit line at once.
 
 ## Credits
 
@@ -662,5 +810,7 @@ The proof's real input uses KWin's fake input protocol (`org_kde_kwin_fake_input
 The relief's mapping is the edition's stereo texture module's (relief mapping after Fábio Policarpo, Manuel M. Oliveira and João L. D. Comba, 2005, and parallax occlusion mapping after Natalya Tatarchuk, 2006, as the module's own notes credit them); the 3D area follows Marble's `StereoLayer` and stereo-layer's surface, and is declared through `libstereo-declare`.
 The stereo photograph is read by stereo-layer and the edition's KImageFormats; MPO is CIPA DC-007, the JPS block is the JPS format's own, `sTER` is the PNG Extensions' chunk (version 1.4.0, 3.6); the photographs of the proof are made with Pillow (Jeffrey A. Clark and contributors).
 The compositor without the stereo protocol in the proof is Weston (the Wayland project).
+The fitter and its nine modern operators are the edition's "procedures from pixels" work, credited in [a procedure fitted to a bitmap](procedural-texture-from-a-bitmap.md); the two eyes from a picture and its depth map are made by stereo-layer's depth library.
+The stereo photographs the Fit tool was tried on are by Robbie Sproule (Montreal), as Wikimedia Commons records them: "Bark 1", "Moss 1" and "Sand pile", CC BY 2.0, cross-eyed pairs; each eye's square was cut at the photograph's own pixels.
 WebAssembly builds ran in wasmtime (Bytecode Alliance).
 The people whose work this plan reads or builds on, by the names their own pages give: wxthss82, wzman, Gregor Riepl (onitake), Frantsishak (KkriegerNet), kznsq, Mason Liu (kkrieger-wasm), Alfredo (varrtto), Steven Schronk, Rodz Labs and the Material Maker contributors, Nicolas Brown and the TextureLab contributors, Cedric Guillemet (Imogen).

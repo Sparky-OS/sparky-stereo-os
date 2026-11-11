@@ -3,7 +3,7 @@
 must be a font that has this type of drawing"; on the snowflakes: "the more operations are missing the final tip
 pattern, the inner losangles are nice, the lines crossing not nice").
 
-m2d_glyphsearch.py PICTURE.ppm INDEXDIR OUT.tsv [rotations=N] [part=whole|ring|centre] [inner=R] [top=K] [drawings=1] [tolerant=1]
+m2d_glyphsearch.py PICTURE.ppm INDEXDIR OUT.tsv [rotations=N] [part=whole|ring|centre] [inner=R] [top=K] [drawings=1] [tolerant=1] [names=REGEX] [crop=X,Y,W,H]
 
 The motif: the picture's ink (the lighter of the two shades, Otsu's threshold) split into pieces along the rows and
 columns that hold no ink; the first piece is the motif. Its ink is cut to its box and laid on 16 by 16 cells by
@@ -14,11 +14,13 @@ it (its middle). The score is the cells both hold over the cells either holds, a
 tenth of how far the widths over heights differ (in doublings); tolerant=1 counts as held a cell within one cell of
 held ink on the other side too (thin lines drawn a cell apart still meet), averaged with the strict score;
 drawings=1 keeps only characters that are drawings (Unicode's So and Sm, and private use, where icon fonts put their
-pictures: Daniel, "when fonts are pure drawing, it's even better"); rotations=N also turns the motif N times around its
+pictures: Daniel, "when fonts are pure drawing, it's even better"); names=REGEX keeps only characters whose Unicode
+name matches (the candidates are still ranked by the pixels alone); crop=X,Y,W,H takes the motif from that box
+(a part of a motif, such as one arm's tip); rotations=N also turns the motif N times around its
 centre (a flower's leaves stand at any angle) and keeps each glyph's best turn. Every glyph of the index is read
 (17,166,578 entries of 48 bytes: font, character, width over height, form, pieces, 32 bytes of cells).
 The index is data: nothing in it is run."""
-import os, sys, unicodedata
+import os, re, sys, unicodedata
 import numpy as np
 from PIL import Image
 
@@ -30,6 +32,7 @@ inner = float(opts.get('inner', '0.45'))
 top = int(opts.get('top', '40'))
 drawings = opts.get('drawings', '0') == '1'
 tolerant = opts.get('tolerant', '0') == '1'
+names_re = re.compile(opts['names'], re.I) if 'names' in opts else None
 ROWM_L = np.uint64(0xFFFEFFFEFFFEFFFE)  # a cell moved one to the right stays in its row (bit x of a row is column x)
 ROWM_R = np.uint64(0x7FFF7FFF7FFF7FFF)
 
@@ -67,6 +70,11 @@ def runs(v):
     return r
 
 
+if 'crop' in opts:
+    cx, cy, cw_, ch_ = [int(v) for v in opts['crop'].split(',')]
+    sub = np.zeros_like(ink)
+    sub[cy:cy + ch_, cx:cx + cw_] = ink[cy:cy + ch_, cx:cx + cw_]
+    ink = sub
 cols = runs(ink.any(0))
 x0, x1 = max(cols, key=lambda r: r[1] - r[0])
 rows = runs(ink[:, x0:x1].any(1))
@@ -125,9 +133,19 @@ for s in range(0, len(ix), CH):
     bits = np.ascontiguousarray(blk['bits']).view('<u8').reshape(-1, 4) & selw
     la = np.log2(np.maximum(blk['aspect'], 1e-3))
     keep = None
-    if drawings:
-        cps = blk['cp']
-        keep = np.array([(0xE000 <= c <= 0xF8FF) or c >= 0xF0000 or unicodedata.category(chr(c)) in ('So', 'Sm') for c in cps.tolist()])
+    if drawings or names_re:
+        cps = np.asarray(blk['cp'])
+        uc, inv = np.unique(cps, return_inverse=True)
+
+        def ok(c):
+            if c > 0x10FFFF:
+                return False  # glyphs the font maps to no character carry their glyph number past Unicode's range
+            if drawings and not ((0xE000 <= c <= 0xF8FF) or c >= 0xF0000 or unicodedata.category(chr(c)) in ('So', 'Sm')):
+                return False
+            if names_re and not names_re.search(unicodedata.name(chr(c), '')):
+                return False
+            return True
+        keep = np.array([ok(int(c)) for c in uc])[inv]
     if tolerant:
         dbits = dilate(bits) & selw
     for ang, q, qa, _, qd in queries:

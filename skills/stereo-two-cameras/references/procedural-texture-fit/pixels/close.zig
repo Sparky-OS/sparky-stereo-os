@@ -154,6 +154,20 @@ fn bandSd(t: []const f32, n: usize, r: usize, mask: ?[]const bool) f32 {
 }
 
 /// the spread of the values over a mask
+/// a spread that the few lightest or darkest marks do not lead (milestone 2d: the mortar's lime specks are drawn by
+/// their own layer, so its colours are matched on the middle half): the interquartile range over 1.349
+fn robustSd(t: []const f32, sel: []const bool) f32 {
+    var v: std.ArrayList(f32) = .empty;
+    defer v.deinit(alloc);
+    for (t, sel) |x, s| {
+        if (s) v.append(alloc, x) catch unreachable;
+    }
+    if (v.items.len < 8) return 0;
+    std.mem.sort(f32, v.items, {}, std.sort.asc(f32));
+    const n = v.items.len;
+    return (v.items[(3 * n) / 4] - v.items[n / 4]) / 1.349;
+}
+
 fn maskedSd(t: []const f32, mask: []const bool) f32 {
     var s: f64 = 0;
     var s2: f64 = 0;
@@ -389,6 +403,7 @@ pub const Ctx = struct {
     off: []const u8,
     on: []const u8 = "", // milestone 2d: layers the eye asked for below their readings' thresholds (on=spots)
     marks_soft: bool = true, // milestone 2d: the spots' softness and blend read (marks=fixed: milestone 2c's)
+    joints_full: bool = false, // milestone 2d: the structure's joints were read again at 1:1
     grain_cap: bool = true, // milestone 2d: a piece's grain may not exceed the picture's faces in any band
     full: []const f32,
     N: usize,
@@ -651,8 +666,12 @@ fn structLayers(cx: *Ctx, C: *const View, H: *const View) void {
         const c0 = w[18];
         var bcc = c0;
         const ccs = if (cx.grain_cap) [_]f64{ c0, 2 * c0, 4 * c0 } else [_]f64{ c0, c0, c0 };
+        // with the joints read at 1:1, a chip bites at most half the joint's width into a piece (deeper bites, lit,
+        // drew black broken edges on the bricks: by eye)
+        const jw_read: f64 = @as(f32, @bitCast(cx.g.nodes[t_old].w[5]));
         for (ccs, 0..) |cc, cci| for ([_]f32{ 0, 0.03, 0.06, 0.1, 0.15 }) |ch| {
             if (cci > 0 and (ch == 0 or cc == ccs[cci - 1])) continue;
+            if (cx.joints_full and ch > 0.5 * jw_read) continue;
             w[17] = ch;
             w[18] = cc;
             const keep = g.n;
@@ -812,10 +831,93 @@ fn mortarLayers(cx: *Ctx, C: *const View) void {
     const kd = keyOf(C, dc.rgb, n);
     dc.free();
     defer alloc.free(kd);
-    const pj = maskedSd(C.pic.t, jm);
-    const dj = maskedSd(kd, jm);
+    // milestone 2d: the joints' spread read on their core (two pixels in from their edges at 1:1), where the
+    // mortar's own colours are; the edges hold the pieces' shadows and chips, and a joint read at 1:1 is wide
+    const jf = alloc.alloc(f32, n * n) catch unreachable;
+    defer alloc.free(jf);
+    for (0..n * n) |i| jf[i] = if (jm[i]) 1 else 0;
+    const jb = R.blur(jf, n, 2);
+    defer alloc.free(jb);
+    const jcore = alloc.alloc(bool, n * n) catch unreachable;
+    defer alloc.free(jcore);
+    var ncore: usize = 0;
+    for (0..n * n) |i| {
+        jcore[i] = jm[i] and (!cx.joints_full or jb[i] > 0.99);
+        if (jcore[i]) ncore += 1;
+    }
+    const jmm = if (ncore > 200) jcore else jm;
+    const pj = maskedSd(C.pic.t, jmm);
+    const dj = maskedSd(kd, jmm);
     note("mortar: the joints' colours spread {d:.4} in the picture, {d:.4} drawn (noise in the mortar from twice the drawn and 0.01 more)\n", .{ pj, dj });
-    if (pj > 2 * dj + 0.01) {
+    if (pj > 2 * dj + 0.01 and cx.grain_cap) {
+        // milestone 2d (Daniel on the metal plate: "colors still off"): the mortar's own colours, not only its
+        // shade: the joints' own main colour axis (the plate's green against its rust, the mortar's greys), the
+        // noise coloured by a Ramp at the same ranks of that axis among the joints' pixels, mixed into the joints by
+        // an amount chosen so their spread along that axis agrees with the picture's
+        var mj = [3]f64{ 0, 0, 0 };
+        var nj: f64 = 0;
+        for (0..n * n) |i| {
+            if (!jmm[i]) continue;
+            inline for (0..3) |q| mj[q] += C.pic.rgb[3 * i + q];
+            nj += 1;
+        }
+        inline for (0..3) |q| mj[q] /= @max(1, nj);
+        var cv = [9]f64{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        for (0..n * n) |i| {
+            if (!jmm[i]) continue;
+            inline for (0..3) |a| {
+                inline for (0..3) |b| cv[a * 3 + b] += (C.pic.rgb[3 * i + a] - mj[a]) * (C.pic.rgb[3 * i + b] - mj[b]);
+            }
+        }
+        var ax = [3]f64{ 0.577, 0.577, 0.577 };
+        for (0..30) |_| {
+            var nx = [3]f64{ 0, 0, 0 };
+            inline for (0..3) |a| {
+                inline for (0..3) |b| nx[a] += cv[a * 3 + b] * ax[b];
+            }
+            const l = @sqrt(nx[0] * nx[0] + nx[1] * nx[1] + nx[2] * nx[2]) + 1e-12;
+            inline for (0..3) |a| ax[a] = nx[a] / l;
+        }
+        const tj = alloc.alloc(f32, n * n) catch unreachable;
+        defer alloc.free(tj);
+        for (0..n * n) |i| {
+            var v: f64 = 0;
+            inline for (0..3) |q| v += (C.pic.rgb[3 * i + q] - mj[q]) * ax[q];
+            tj[i] = @floatCast(v);
+        }
+        const picj = F.Pic{ .n = n, .rgb = C.pic.rgb, .t = tj, .tsort = tj };
+        const pja = robustSd(tj, jmm);
+        const nz = F.add(g, F.noiseNode(0, 96, 96, 4, 0.7, 0, 2, 13));
+        var dn = drawIn(g, nz, C);
+        const rw = F.rampWords(dn.grey, null, &picj, jmm, false, null);
+        dn.free();
+        const mr = F.add(g, F.mk(F.K_RAMP, &rw, &.{nz}));
+        var best_k: f32 = 0;
+        var best_d: f32 = 1e9;
+        for ([_]f32{ 0.06, 0.12, 0.2, 0.32, 0.5, 0.75, 1.0 }) |k| {
+            const keep = g.n;
+            const lm = F.add(g, F.mk(F.K_LAYER, &.{ 2, 0, 0.12, 0.03, k, 0, 0 }, &.{ cx.root, mr, cx.st.tiles }));
+            var dd = drawIn(g, lm, C);
+            g.n = keep;
+            const k2 = alloc.alloc(f32, n * n) catch unreachable;
+            for (0..n * n) |i| {
+                var v: f64 = 0;
+                inline for (0..3) |q| v += (dd.rgb[3 * i + q] - mj[q]) * ax[q];
+                k2[i] = @floatCast(v);
+            }
+            dd.free();
+            const sv = robustSd(k2, jmm);
+            alloc.free(k2);
+            note("  mortar colours {d:.2}: the joints spread {d:.4} along their own colour axis, the middle half's spread (the picture's {d:.4})\n", .{ k, sv, pja });
+            if (F.absDiff(sv, pja) < best_d) {
+                best_d = F.absDiff(sv, pja);
+                best_k = k;
+            }
+        }
+        cx.root = F.add(g, F.mk(F.K_LAYER, &.{ 2, 0, 0.12, 0.03, best_k, 0, 0 }, &.{ cx.root, mr, cx.st.tiles }));
+        note("mortar: its own colours (a Ramp along the joints' colour axis {d:.2} {d:.2} {d:.2}) laid {d:.2} into the joints\n", .{ ax[0], ax[1], ax[2], best_k });
+        push(cx, "+ mortar's own colours (Noise, Ramp, Layer)");
+    } else if (pj > 2 * dj + 0.01) {
         var best_k: f32 = 0;
         var best_d: f32 = 1e9;
         const nz = F.add(g, F.noiseNode(0, 96, 96, 4, 0.7, 0, 2, 13));
@@ -826,7 +928,7 @@ fn mortarLayers(cx: *Ctx, C: *const View) void {
             g.n = keep;
             const k2 = keyOf(C, dd.rgb, n);
             dd.free();
-            const sv = maskedSd(k2, jm);
+            const sv = maskedSd(k2, jmm);
             alloc.free(k2);
             note("  mortar noise {d:.2}: the joints spread {d:.4} (the picture's {d:.4})\n", .{ k, sv, pj });
             if (F.absDiff(sv, pj) < best_d) {
@@ -1489,6 +1591,13 @@ fn pitsLayer(cx: *Ctx, C: *const View) void {
     const asp = @min(3.0, @max(0.5, b.down));
     cx.root = F.add(g, scatter2(cx.root, cells, 0.5, size, 0.5, col, 0.2, 53, -0.5, 0.35, asp, 8, 0, 0.35, 3, -0.3));
     note("pits: Scatter version 2, {d} cells across, rough sunk discs\n", .{cells});
+    if (cx.st.ok and cx.joints_full) {
+        // milestone 2d: with the joints read at 1:1 the pieces' edges are narrow, and the light read on the pits
+        // darkens them into black outlines (by eye); on such a structure the pits stay colour only
+        note("  light on them: not laid on a structure whose joints were read at 1:1 (the pieces' narrow edges went black)\n", .{});
+        push(cx, "+ pits (Scatter)");
+        return;
+    }
     lightOn(cx, .{ .r = 12, .k = 2.5, .dark = true, .min = 40, .max = 1500 }, .{ b.left_light, b.up_light }, C);
     push(cx, "+ pits (Scatter, Shade)");
 }

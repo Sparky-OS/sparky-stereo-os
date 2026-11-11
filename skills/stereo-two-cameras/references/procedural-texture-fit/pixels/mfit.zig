@@ -365,7 +365,7 @@ fn readNoiseCand(g: *P.Graph, pic: *const Pic, kind: u32, rev: bool, fx: i32, fy
     };
 }
 
-pub const Struct = struct { tiles: usize = 0, layout: u32 = 0, nx: i32 = 1, ny: i32 = 1, floor: f32 = 0.3, ok: bool = false, jc: ?[3]f32 = null };
+pub const Struct = struct { tiles: usize = 0, layout: u32 = 0, nx: i32 = 1, ny: i32 = 1, floor: f32 = 0.3, ok: bool = false, jc: ?[3]f32 = null, full: bool = false, hollow_ly: ?f32 = null };
 
 /// the words version 3 of Tiles adds (milestone 2d): the joint's hollow, the second seed's offset, the framed tiles'
 /// central square
@@ -732,7 +732,7 @@ pub fn run(path: [*:0]const u8, prefix: []const u8, opt: MOpt) void {
     }
     var st = if (motif or opt.seeds != null) Struct{} else readStructure(&g, &pic, &rd, opt);
     if (st.ok and opt.full != null) {
-        if (opt.joints_full) jointsAtFull(&g, &st, opt.full.?, opt.framed, CL.refused(opt.on, "framed")) else note("joints at 1:1: not read (joints=scan: the scan's width at 512 kept)\n", .{});
+        if (opt.joints_full) jointsAtFull(&g, &st, opt.full.?, opt.framed, CL.refused(opt.on, "framed"), CL.refused(opt.on, "hollow")) else note("joints at 1:1: not read (joints=scan: the scan's width at 512 kept)\n", .{});
     }
     if (opt.seeds != null and !motif) note("structure: not read (a figure on a ground: its motif is the seed's)\n", .{});
     var colour: usize = 0;
@@ -1012,6 +1012,13 @@ pub fn run(path: [*:0]const u8, prefix: []const u8, opt: MOpt) void {
             lit_src = .slopes;
         }
     }
+    var lit_from_hollow = false;
+    if (lit_reading == null and st.hollow_ly != null) {
+        lit_from_hollow = true;
+        lit_reading = .{ 0, -st.hollow_ly.? };
+        lit_src = .slopes;
+        note("light: none read on the relief; the hollow's light (0, {d:.1}) laid, so its u shows\n", .{st.hollow_ly.?});
+    }
     if (!opt.light and lit_reading != null) {
         note("light: read, and left off by eye (light=0: the sheet of the rungs shows it with and without)\n", .{});
         lit_reading = null;
@@ -1025,7 +1032,9 @@ pub fn run(path: [*:0]const u8, prefix: []const u8, opt: MOpt) void {
             var best_d: f32 = 0.004;
             var bd: f32 = 1e9;
             const target = len;
-            for ([_]f32{ 0.001, 0.002, 0.004, 0.008, 0.016 }) |dp| {
+            // a light that was not read but laid for the hollow keeps the depth its profile was compared at
+            const depths: []const f32 = if (lit_from_hollow) &[_]f32{0.004} else &[_]f32{ 0.001, 0.002, 0.004, 0.008, 0.016 };
+            for (depths) |dp| {
                 const keep = g.n;
                 const sx = add(&g, mk(K_SHADE, &.{ 1, lx, ly, 0.8, dp, 0.8 }, &.{colour}));
                 var ds = drawNode(&g, sx, n);
@@ -1048,7 +1057,7 @@ pub fn run(path: [*:0]const u8, prefix: []const u8, opt: MOpt) void {
     // 7. close up (milestone 2c): what the eye misses at 1:1, each layer by its own reading of the full-size picture
     if (opt.close and opt.full != null) {
         const fimg0 = P.readPpm(opt.full.?);
-        var cx = CL.Ctx{ .g = &g, .rd = &rd, .st = st, .nb = nb, .root = colour, .main_ramp = main_ramp, .face_layer = face_layer, .second = second_mask != null, .second_layer = second_layer, .motif = opt.seeds != null, .rungs = &rungs, .off = opt.off, .on = opt.on, .marks_soft = opt.marks_soft, .grain_cap = opt.grain_cap, .full = fimg0.rgb, .N = fimg0.w, .grain_in_field = opt.grain_in_field };
+        var cx = CL.Ctx{ .g = &g, .rd = &rd, .st = st, .nb = nb, .root = colour, .main_ramp = main_ramp, .face_layer = face_layer, .second = second_mask != null, .second_layer = second_layer, .motif = opt.seeds != null, .rungs = &rungs, .off = opt.off, .on = opt.on, .joints_full = st.full, .marks_soft = opt.marks_soft, .grain_cap = opt.grain_cap, .full = fimg0.rgb, .N = fimg0.w, .grain_in_field = opt.grain_in_field };
         colour = CL.run(&cx);
     } else if (!opt.close) note("close up: left out (close=0: milestone 2b's procedure)\n", .{});
     const whole_root = colour;
@@ -1300,7 +1309,7 @@ fn jointAt(gm: JGeom, N: usize, i: usize, j: usize) ?struct { s: f32, horiz: boo
     return .{ .s = if (dl < dr) dl else -dr, .horiz = false };
 }
 
-fn profileOf(t: []const f32, rgb: ?[]const f32, N: usize, gm: JGeom, prof: *Prof, centre: [2]f32, half: f32, jcol: *[4]f64) void {
+fn profileOf(t: []const f32, rgb: ?[]const f32, N: usize, gm: JGeom, prof: *Prof, centre: [2]f32, half: f32, jcol: *[4]f64, use: [2]bool) void {
     for (0..N) |j| {
         for (0..N) |i| {
             const ja = jointAt(gm, N, i, j) orelse continue;
@@ -1316,6 +1325,7 @@ fn profileOf(t: []const f32, rgb: ?[]const f32, N: usize, gm: JGeom, prof: *Prof
                 prof.vn[ix] += 1;
             }
             if (rgb) |c| {
+                if (!(if (ja.horiz) use[0] else use[1])) continue;
                 const off = if (ja.horiz) centre[0] else centre[1];
                 if (@abs(ja.s - off) <= half) {
                     inline for (0..3) |q| jcol[q] += c[3 * (j * N + i) + q];
@@ -1398,7 +1408,8 @@ fn readJoint(p: *const Prof, horiz: bool, reach: i32) JRead {
 /// depth, the bevel (from half depth to a tenth), the joints' own colour, and the joint's profile inside: where the
 /// joint's sides are darker than its middle on the side under a piece, a hollow lit from above, chosen among
 /// hollows drawn with a light by the drawn profile that agrees best with the picture's.
-fn jointsAtFull(g: *P.Graph, st: *Struct, path: [*:0]const u8, try_framed: bool, ask_framed: bool) void {
+fn jointsAtFull(g: *P.Graph, st: *Struct, path: [*:0]const u8, try_framed: bool, ask_framed: bool, ask_hollow: bool) void {
+    st.full = true;
     // the drawings at full size are large: the memory of drawn pictures is emptied when this reading ends
     defer P.cacheClear();
     var layout = st.layout;
@@ -1418,7 +1429,7 @@ fn jointsAtFull(g: *P.Graph, st: *Struct, path: [*:0]const u8, try_framed: bool,
     const reach: i32 = @intFromFloat(@min(@as(f32, PD), 0.35 * mpx));
     var pr = Prof{};
     var jc0 = [4]f64{ 0, 0, 0, 0 };
-    profileOf(t, null, N, gm, &pr, .{ 0, 0 }, 0, &jc0);
+    profileOf(t, null, N, gm, &pr, .{ 0, 0 }, 0, &jc0, .{ true, true });
     const hj = readJoint(&pr, true, reach);
     const vj = readJoint(&pr, false, reach);
     if (!hj.ok and !vj.ok) {
@@ -1439,10 +1450,10 @@ fn jointsAtFull(g: *P.Graph, st: *Struct, path: [*:0]const u8, try_framed: bool,
     // the joints' own colour, in their core at full size
     var pr2 = Prof{};
     var jc = [4]f64{ 0, 0, 0, 0 };
-    profileOf(t, img.rgb, N, gm, &pr2, .{ 0, 0 }, @max(0.5, 0.25 * w50), &jc);
+    profileOf(t, img.rgb, N, gm, &pr2, .{ 0, 0 }, @max(0.5, 0.25 * w50), &jc, .{ hj.ok, vj.ok });
     if (jc[3] > 50) {
         st.jc = .{ @floatCast(jc[0] / jc[3]), @floatCast(jc[1] / jc[3]), @floatCast(jc[2] / jc[3]) };
-        note("joints at 1:1: their colour {x:0>6} (the picture's mean in their core, {d:.0} pixels)\n", .{ @as(u32, @intFromFloat(colourWord(st.jc.?))) & 0xffffff, jc[3] });
+        note("joints at 1:1: their colour {x:0>6} (the picture's mean in their core, {d:.0} pixels, {s})\n", .{ @as(u32, @intFromFloat(colourWord(st.jc.?))) & 0xffffff, jc[3], if (hj.ok and vj.ok) "both directions" else if (hj.ok) "the horizontal joints, whose place was read" else "the upright joints, whose place was read" });
     }
     // the hollow: inside the horizontal joints, the picture's profile against hollows drawn with a light from above
     // and from below; a hollow only where it agrees 0.05 better than the flat joint
@@ -1453,6 +1464,9 @@ fn jointsAtFull(g: *P.Graph, st: *Struct, path: [*:0]const u8, try_framed: bool,
         var flat_c: f32 = -2;
         var best_h: f32 = 0;
         var best_ly: f32 = -0.6;
+        var ask_c: f32 = -2;
+        var ask_h: f32 = 0;
+        var ask_ly: f32 = -0.6;
         for ([_]f32{ -0.6, 0.6 }) |ly| {
             for ([_]f32{ 0, 0.25, 0.5, 0.75, 1.0 }) |hv| {
                 const keep = g.n;
@@ -1463,7 +1477,7 @@ fn jointsAtFull(g: *P.Graph, st: *Struct, path: [*:0]const u8, try_framed: bool,
                 g.n = keep;
                 var dp = Prof{};
                 var dummy = [4]f64{ 0, 0, 0, 0 };
-                profileOf(dd.grey, null, N, gm, &dp, .{ 0, 0 }, 0, &dummy);
+                profileOf(dd.grey, null, N, gm, &dp, .{ 0, 0 }, 0, &dummy, .{ true, true });
                 dd.free();
                 // the shapes inside the joint, each less its mean, correlated
                 var ma: f64 = 0;
@@ -1489,6 +1503,11 @@ fn jointsAtFull(g: *P.Graph, st: *Struct, path: [*:0]const u8, try_framed: bool,
                 const cr: f32 = @floatCast(sab / (@sqrt(saa * sbb) + 1e-12));
                 note("  hollow {d:.2}, light at 0, {d:.1}: the joint's profile agrees {d:.3} with the picture's\n", .{ hv, ly, cr });
                 if (hv == 0 and cr > flat_c) flat_c = cr;
+                if (hv > 0 and cr > ask_c) {
+                    ask_c = cr;
+                    ask_h = hv;
+                    ask_ly = ly;
+                }
                 if (cr > best_c) {
                     best_c = cr;
                     best_h = hv;
@@ -1496,8 +1515,13 @@ fn jointsAtFull(g: *P.Graph, st: *Struct, path: [*:0]const u8, try_framed: bool,
                 }
             }
         }
-        if (best_h > 0 and best_c >= flat_c + 0.05) {
+        if (ask_hollow) {
+            x3.hollow = ask_h;
+            st.hollow_ly = ask_ly;
+            note("joints at 1:1: a hollow asked for by eye (on=hollow; Daniel: \"mortar usually has a \"u\" shape to it in a depression\"): {d:.2}, the one whose profile agrees best ({d:.3}, flat {d:.3}), with a light at 0, {d:.1} unless one is read on the relief\n", .{ ask_h, ask_c, flat_c, ask_ly });
+        } else if (best_h > 0 and best_c >= flat_c + 0.05) {
             x3.hollow = best_h;
+            st.hollow_ly = best_ly;
             note("joints at 1:1: a hollow {d:.2} (a u in a depression; with a light at 0, {d:.1} it agrees {d:.3}, flat {d:.3}; the light itself is read later on the whole relief)\n", .{ best_h, best_ly, best_c, flat_c });
         } else note("joints at 1:1: flat (no hollow agrees 0.05 better than the flat joint: {d:.3} against {d:.3})\n", .{ best_c, flat_c });
     } else if (layout <= 2) note("joints at 1:1: the hollow not read (joints under 6 pixels at full size, or no horizontal joint)\n", .{});

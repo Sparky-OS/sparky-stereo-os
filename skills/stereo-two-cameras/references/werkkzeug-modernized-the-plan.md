@@ -2,7 +2,8 @@
 
 Written on 2026-11-10 (ORDER 514, milestone 1), by Claude Fable 5.2 with Daniel Campos Ramos.
 It holds what Farbrausch's open tools are, what builds where, who already works on them, the plan for an editor on KDE Plasma where people and AI partners build procedural textures together, and, since milestone 2 (11 November 2026), the recipe and the traps of the editor's core: Stereo Werkkzeug, the part without a window.
-The window, the partners' server and the stereo preview are not built yet.
+Since milestone 3 (the same day) it also holds the maths the core carries inside, so that one procedure draws the same bytes with every C library and in WebAssembly, and the partners' server, which an AI partner reaches the open project through.
+The window and the stereo preview are not built yet.
 Later milestones grow this page into the editor's contributor skill.
 
 **Check freshness first.**
@@ -71,8 +72,8 @@ They are where to look for how a modern texture editor behaves; none of them ope
 The core is a folder, `stereo_werkkzeug`, in the edition's fork of `fr_public`: Zig for everything new, Farbrausch's `wz3_bitmap_code.cpp` compiled as it is, one C header for every front end.
 "Stereo" marks the edition's work on a program whose origin is Farbrausch's, as in Stereo KWin; Farbrausch is credited wherever the name appears.
 
-1. Build: `./build.sh OUT` (Zig 0.16). It makes the operator table from Farbrausch's sources, then `OUT/wz` (the command), `OUT/libstereo_werkkzeug.a` with `stereo_werkkzeug.h`, and `OUT/capi_test`.
-2. Prove: `tests/run-all.sh OUT`. One line per step; expect "55 steps passed, 0 failed". The steps that are controls pass when the check under them fails (a change made behind the journal's back, one flipped bit in one picture).
+1. Build: `./build.sh OUT` (Zig 0.16). It makes the operator table from Farbrausch's sources, then `OUT/wz` (the command), `OUT/libstereo_werkkzeug.a` with `stereo_werkkzeug.h`, `OUT/capi_test` and `OUT/swz-mcp` (the partners' server). `SWZ_TARGET=x86_64-linux-musl` makes static programs; `SWZ_TARGET=wasm32-wasi` makes `OUT/wz.wasm`, the command only.
+2. Prove: `tests/run-all.sh OUT`. One line per step; expect "62 steps passed, 0 failed" (Python 3 is needed for the step that proves the partners' server). The steps that are controls pass when the check under them fails (a change made behind the journal's back, one flipped bit in one picture).
 3. Look: `wz textures FILE.k` lists the named textures, `wz draw FILE.k NAME OUT.png --png` draws one, `wz text FILE.k --labels` prints the project for reading, `wz graph FILE.k NAME` prints one texture's operators as typed text.
 
 What to expect on `werkkzeug3/data/kkrieger.k`: version 13, 217 pages, 29,347 operators, 854 named textures; 742 draw, 112 are refused by name because they hold a Text operator (drawn with Text handed on when asked, which the output says).
@@ -118,6 +119,50 @@ The parameter panel, the partner's operator list, the text form and a new operat
 Every change is made inside a step with an author (a person or a partner, by name) and a label.
 Undo and redo move operators and pages between the document and the journal without allocating, so neither can fail half way.
 A partner's step is refused until the person has chosen how partners work: applied and shown, kept as a suggestion, or asked about each time (Daniel Campos Ramos, 11 November 2026: asked once, all three offered, the answer kept). In the two suggesting ways the step is recorded, taken back out of the document and held until the person takes or drops it.
+
+## The maths, carried inside: working recipe
+
+**Why.** Farbrausch's operators call four functions whose results the C standard leaves to the library: `sinf`, `cosf`, `powf` and `atan2f`. Libraries round a few values differently, so one procedure drew two pictures: six of the 854 textures of `kkrieger.k` differed between a glibc program and a musl or WebAssembly one. A procedure that is sent instead of a picture must draw the same bytes wherever it arrives, so the core carries one implementation and compiles it into every program.
+
+**Which.** musl 1.2.6's four functions and the files they need (19 sources, `libm.h`, `fp_arch.h`), copied unchanged into `maths/musl/` with musl's `COPYRIGHT` (MIT; the files' own notices name Sun Microsystems and Arm Limited). Take them from the release archive and check it: `sha256sum` against the published digest, `gpg --verify` with musl's key in a throwaway `GNUPGHOME`. `maths/musl-1.2.6.sha256` lists every file, and `build.sh` stops when one differs.
+
+**How it is wired.**
+
+1. `maths/swzm_prefix.h` is forced in front of every musl file (`-include`): it reads the system headers first, then gives every function and table a name of the core's own (`#define sinf swzm_sinf`, and every name `libm.h` declares as hidden).
+2. `shim/base/types.hpp` calls only `swzm_sinf`, `swzm_cosf`, `swzm_powf`, `swzm_atan2f`; square root, absolute value and rounding up are the compiler's built-ins, exact by IEEE 754.
+3. Compile the maths and the operators with `-ffp-contract=off -fno-math-errno` for every target.
+4. Check what the object still asks of a C library: `nm -u bridge.o | grep -E ' (sinf|cosf|powf|atan2f|exp2f|sqrtf)'` must print nothing.
+
+**How the three builds are compared.** `tests/same-bytes.sh GLIBC_DIR MUSL_DIR WASM_DIR...` runs `wz manifest` in each build (the WebAssembly ones in `wasmtime`), which prints one SHA-256 per texture over every byte of the picture, and compares the tables with `cmp`: glibc with musl, each with WebAssembly, and glibc with the stored table `tests/reference/kkrieger-854.tsv`. Expect 854 of 854 in every pair, with and without SIMD in WebAssembly. Two more steps keep the claim honest: the edition's first renderer for these operators, built with g++ and the carried maths compiled by gcc, draws the same 854 (`kkrieger-854-gxx-carried.tsv`: another compiler, another bridge), and against the first reference, drawn with glibc 2.43's own functions (`kkrieger-854-glibc.tsv`), exactly the six textures of `glibc-differences.tsv` differ, by 1 to 17 bytes of 786,432, each by one step.
+
+## The partners' server (swz-mcp): working recipe
+
+One program, `swz-mcp --project FILE.k`, serves one open project to an AI partner over the Model Context Protocol on standard input and output. It is written in Zig over the core's C header only (`@cImport`), like every front end.
+
+1. The person chooses once how partners work: `wz partners` shows the three ways and what is kept; `wz partners apply-and-show`, `suggest-only` or `ask-each-time` keeps the choice in `~/.config/stereowerkkzeugrc` (group `[Partners]`, key `Mode`; the editor will share the file); `wz partners forget` takes it back. Nothing is preset, and the server only reads the file.
+2. Register it with the assistant's own command, for example `claude mcp add --scope user stereo-werkkzeug -- /path/swz-mcp --project /path/FILE.k --person-socket "$XDG_RUNTIME_DIR/stereo-werkkzeug.sock"`.
+3. Prove it: `python3 tests/mcp-proof.py OUT`. Expect "123 checks passed, 0 failed". A scripted partner speaks both protocol revisions, a scripted person answers on the socket, and each check compares with something outside the server: the file's own SHA-256, the reference table, what `wz` prints, a PNG decoded in the test.
+
+What it offers, and to whom:
+
+| Who | What | How |
+|---|---|---|
+| The partner | Read the project: pages, operators, parameters under the names of werkkzeug3's own panels, the journal | `project_info`, `list_pages`, `list_operators`, `read_operator`, `list_textures`, `list_classes`, `describe_class`, `journal` |
+| The partner | Draw a texture: the picture as a PNG and its SHA-256; export a texture's operators or the project's text | `draw_texture`, `export_texture`, `export_project_text` |
+| The partner | Change the project, each change one journalled step under its name, taken the way the person chose | `set_parameters`, `rename_operator`, `set_link`, `set_string`, `place_operator`, `set_bypass`, `set_hidden`, `add_operator`, `remove_operator`, `add_page`, `rename_page`, `remove_page` |
+| The partner | Take back its own last step, only under "apply and show" | `undo` |
+| The person only | Choose the way of working | `wz partners ...` |
+| The person only | Take or drop a suggestion, undo and redo anything, save | the person's socket: `take`, `drop`, `undo`, `redo`, `status`, `save PATH` |
+
+Rules worth copying into any server of this kind:
+
+- **Serve both protocol eras.** A request that carries `io.modelcontextprotocol/protocolVersion` in `params._meta` is 2026-07-28 and is answered statelessly (`resultType`, `server/discover`, `-32022` with `data.supported` for another version, `-32602` without `clientCapabilities`); `initialize` selects 2025-11-25 for the process. The step's author is the client's own name: `clientInfo.name` of `initialize`, or of each modern request.
+- **Two kinds of refusal** (2025-11-25, server/tools, "Error Handling"). A message the protocol cannot accept gets the protocol's code: `-32700` not JSON, `-32600` not a request, `-32601` no such method, `-32602` wrong params or an unknown tool. What a tool refuses, a wrong argument included, is a result with `isError: true` and the reason as a sentence, so a model can correct itself.
+- **Generate from the table.** The class list of `add_operator` is written from the operator table when the tools are listed; `describe_class` returns the JSON Schema of one class's parameters, made from the same table, and `set_parameters` checks against it.
+- **The person's choice is read, never written,** and read again at every change, so a change of mind applies to a running server.
+- **A partner's tools cannot answer for the person:** no tool saves, chooses the mode, or takes a suggestion; "ask each time" asks on the person's socket and the partner's call waits for the answer (`--ask-seconds`).
+- **A partner can set what a person could type:** a number outside the range of werkkzeug3's own panel is refused with the range.
+- **The specification asks for a rate limit** ("Servers MUST ... rate limit tool invocations"): `--calls-per-10s`, refused with a sentence.
 
 ## Werkkzeug4 itself on Linux: what a probe found
 
@@ -174,7 +219,7 @@ So Werkkzeug4 does not run on Linux today, with or without the four pull request
   Found by: the exit status (128 + 4), no panic text, and the same graph drawing in the g++ build.
 - Symptom: six of 854 pictures differ from the g++ reference in 1 to 17 bytes of 786,432.
   Cause: a program linked by Zig carries Zig's own `sinf` and `cosf` (compiler-rt), which win over the C library's at link time and round a few values differently; `powf` and `atan2f` still come from the C library.
-  Fix: on glibc, call the library's functions under their `_Float32` names, `sinf32` and `cosf32` (ISO/IEC TS 18661-3; the same code). A static musl build and a WebAssembly build keep the six differences: say so wherever "the same pixels" is claimed.
+  Fix: carry one maths library inside the core (see "The maths, carried inside"). The first fix, calling glibc's own functions under their `_Float32` names (`sinf32`, `cosf32`; ISO/IEC TS 18661-3), matched the glibc reference but left a musl and a WebAssembly build drawing six other pictures.
   Found by: building the reference renderer three ways (g++ with glibc, `zig c++` with glibc, `zig c++` with musl: 0, 0 and the same six), then `nm` on the program (`t sinf`, `t cosf` beside `U powf@GLIBC`).
 - Symptom: the unchanged operator file fails with `'base/types2.hpp' file not found`.
   Cause: `#include "genvector.hpp"` in quotes looks beside the including file first and finds Werkkzeug4's real header, which wants two more Altona headers.
@@ -205,6 +250,71 @@ So Werkkzeug4 does not run on Linux today, with or without the four pull request
   Fix: none in the published tree; a Linux renderer needs the shaders without Cg.
   Found by: `Document::_Create` in `altona/tools/makeproject/doc.cpp` and the `build "ogl2_x11"` block of `makeproject.txt`.
 
+## Traps found while carrying the maths and building for WebAssembly
+
+- Symptom: every musl maths file fails to compile against glibc's headers: `conflicting types for '__sin'`.
+  Cause: musl's `libm.h` declares its own helpers (`__sin`, `__cos`, `__tan`, ...) with other arguments than glibc's `math.h` declares the same names.
+  Fix: rename every name `libm.h` declares as hidden, not only the ones compiled: `grep -oE 'hidden [a-z_ ]+\**\s*(__[a-z0-9_]+)\(' libm.h`.
+  Found by: the compiler's note pointing at `bits/mathcalls.h`.
+- Symptom: `sinf.c`, `cosf.c` and `atanf.c` are not in the musl that Zig ships.
+  Cause: Zig provides those functions itself (compiler-rt) and leaves the files out of its copy of musl 1.2.5.
+  Fix: take the files from musl's own release archive; the other maths files of Zig's copy are byte for byte musl 1.2.5's.
+  Found by: `ls lib/zig/libc/musl/src/math`, then `cmp` of all 144 shared files against the release.
+- Symptom: the operator object asks the C library for `exp2f`, which the source never calls.
+  Cause: the compiler knows `powf` and turns `powf(2, x)` into `exp2f(x)`; it would also fold a call with constant arguments using the build machine's library.
+  Fix: call the carried functions under names the compiler does not know (`swzm_powf`); then no call is rewritten or folded.
+  Found by: `nm -u bridge.o`.
+- Symptom: one texture of 854 differs in WebAssembly only (`g.tex.ultimatebot2.bump`).
+  Cause: `Cell` computes `sRange7fff(sFPow(v0*amp,gamma)*0x8000)`; the power is far above what an integer holds, and C leaves that conversion undefined. x86 gives the lowest integer (clamped to 0); WebAssembly's saturating conversion gives the highest (clamped to 0x7fff).
+  Fix: build for the WebAssembly processor without that instruction, `-mcpu=mvp+simd128` (or `mvp`): the conversion the compiler then writes gives the lowest integer for a value out of range, as x86 does. The operator file stays unchanged. An ARM build would meet the same question and is not built or measured yet.
+  Found by: printing the texture's graph (`wz graph`), drawing its first 1, 2, 3 ... lines with `wz drawgraph` in both builds and comparing: line 1, the `Cell`, already differed.
+- Symptom: the WebAssembly run stops at the 597th texture: `bad_alloc was thrown in -fno-exceptions mode`, with `operator new` under `clone(GenBitmap*)` in the trace; the native run finishes but holds 2.7 GB.
+  Cause: the stand-in `wObject::Release()` did nothing. `RotateMul` (the TransformMul operator) makes two working pictures and releases them, so every TransformMul kept both for good; WebAssembly's memory ends at 4 GB and never shrinks.
+  Fix: a stand-in that counts and frees (`if (--RefCount <= 0) delete this;`). The same run then peaks at 42 MB.
+  Found by: wasmtime's backtrace, `grep -n 'Release()' wz3_bitmap_code.cpp`, and the peak of the native run measured with Python's `resource.getrusage(RUSAGE_CHILDREN)`.
+- Symptom: a WASI build fails with `root source file struct 'wz' has no member named 'main'`, or links but never runs `main`.
+  Cause: a C compiler names `main(argc, argv)` `__main_argc_argv` for WASI; a `pub export fn main` written in Zig keeps the name `main`.
+  Fix: `pub fn main(init: std.process.Init.Minimal) u8` and `init.args.vector`; Zig's start code exports the name each system calls.
+  Found by: `std/start.zig`, the branch for `is_wasm` with libc.
+- Symptom: the WASI link asks for `fork`, `pipe`, `waitpid`, though the code returns before using them.
+  Cause: `extern` declarations that the function body names are kept even when a check on the target returns first.
+  Fix: choose a struct of real `extern` functions or of stand-ins by `builtin.os.tag` at compile time.
+- Symptom: `setjmp.h` is refused for WebAssembly.
+  Cause: it needs the exception-handling extension, which not every runtime has.
+  Fix: there the bridge's own checks still refuse with a sentence; a failed check inside the operator code prints its sentence and ends the module.
+- Symptom: a reference table says "identical" for pictures whose alpha differs.
+  Cause: the first table's checksum covered red, green and blue only.
+  Fix: `wz manifest` hashes every byte and writes `# checksum: rgba`; `wz verify` reads that line and still reads the older tables.
+
+## Traps found while building the partners' server
+
+- Symptom: a client rejects a reply as invalid JSON, for a project that draws fine.
+  Cause: werkkzeug3 keeps names and strings as single bytes (Latin-1); JSON is UTF-8.
+  Fix: turn every byte of the project's text into its Unicode character on the way out, and UTF-8 back into single bytes on the way in; a character above U+00FF is refused by name.
+  Found by: the page names of `kkrieger.k` and RFC 8259, section 8.1.
+- Symptom: an answer holds the same name twice in one JSON object (`"Passes [word 0]"` for a Blur operator), which a client's parser quietly turns into one.
+  Cause: werkkzeug3's panel has two lines with the same label for the same word in 16 classes; it shows one of them, depending on the operator's other values.
+  Fix: the same label for the same words is one parameter (the further lines are counted and said); a label used for other words gets its word added. The proof reads every reply with a parser that reports a name used twice, and asks `describe_class` for all 218 classes.
+  Found by: counting labels per class in the generated table, after `read_operator` printed a name that looked wrong.
+- Symptom: the person's front end reads "a suggestion waits" as the answer to its next command, and every answer after it is one line late.
+  Cause: notices and answers shared one line format.
+  Fix: an answer begins with `ok` or `refused`, a notice with `event` or `ask`; a front end skips notices while it waits for an answer.
+  Found by: the first run of the scripted person.
+- Symptom: none yet, but one waited: starting the server with `--person-socket` naming an existing file would have removed that file.
+  Cause: the usual `unlink` before `bind`.
+  Fix: never remove what is at the path; when `bind` fails the server says so and does not start. Only the socket the server made is removed, at its own end.
+  Found by: rereading the code against "never touch the user's file"; the proof now starts the server on a text file and reads the file back.
+- Symptom: a test expects ten steps in the journal after one step was undone and nine were added, and finds nine.
+  Cause: a new step drops the steps that were undone before it; that is the journal's rule, not a fault.
+- Symptom: `std.hash.Adler32.init` is not there (Zig 0.16).
+  Fix: `std.hash.Adler32.hash(bytes)`.
+- Symptom: `local variable shadows declaration` for a function added to a long file.
+  Cause: Zig refuses a local with the name of a file-level function; an older local was called `partners`.
+  Fix: name the new function after what it does (`partnersCommand`).
+- Symptom: a backgrounded test shows no output until it ends.
+  Cause: `... | tee LOG | cut -c1-300` buffers.
+  Fix: write the log to a file and read the file.
+
 ## What the parts are good for
 
 - The `.ops` blocks are a table a program can read: generate the parameter panel and the partner's operator list from them, so the editor, the server and the documentation cannot drift apart.
@@ -214,8 +324,15 @@ So Werkkzeug4 does not run on Linux today, with or without the four pull request
 - `kkrieger.k` is a ready test set for drawing: 854 named textures, 15,000 operators between them, and a reference that any compiler can rebuild.
 - The text form makes a project reviewable with `diff`: change one parameter in the editor, and one line of text changes.
 - Random damage is a cheap test of a reader: flip three bytes, read; whatever is read must write back as the same bytes, and whatever is not must be refused with a sentence.
+- `wz manifest FILE.k` is a build's fingerprint: one checksum per texture. Two builds draw the same pictures exactly when `cmp` finds their tables equal.
+- Bisecting a graph finds the operator that differs between two builds in minutes: typed text is one operator per line, and its first N lines are a graph too.
+- `tests/mcp-proof.py` is a pattern for proving any MCP server: start it as a client does, check every line it writes, compare each answer with a second source, and play the person from a second channel.
+- The settings file is KConfig's form on purpose: the editor will read and write the same key with KConfig, and the server and `wz` need no library for it.
 
 ## Credits
 
 Farbrausch and .theprodukkt, as the `fr_public` README names them: Fabian "ryg" Giesen, Sebastian "Wayfinder" Grillmaier, Tammo "kb" Hinrichs, Thomas "fiver2" Mahlke, Christoph "giZMo" Muetze, Dierk "Chaos" Ohlerich, Kai "cp" Poethkow, Ronny Pries, Dennis "Exoticorn" Ranke, Leonard "paniq" Ritter and Bastian "Tron" Zuehlke; 49Games GmbH in Altona's licence; Sean Barrett for the stb libraries inside Altona.
+The maths carried inside the core is musl's (release 1.2.6, MIT): Rich Felker and the musl contributors, with Sun Microsystems (SunPro), Ian Lance Taylor and Bruce D. Evans for the single-precision sine, cosine and arc tangent and Arm Limited for `powf`, as the files and musl's `COPYRIGHT` name them.
+The partners' server follows the Model Context Protocol's specification (revisions 2025-11-25 and 2026-07-28), by the Model Context Protocol project and its contributors, and the two-era pattern of the edition's own skills server.
+WebAssembly builds ran in wasmtime (Bytecode Alliance).
 The people whose work this plan reads or builds on, by the names their own pages give: wxthss82, wzman, Gregor Riepl (onitake), Frantsishak (KkriegerNet), kznsq, Mason Liu (kkrieger-wasm), Alfredo (varrtto), Steven Schronk, Rodz Labs and the Material Maker contributors, Nicolas Brown and the TextureLab contributors, Cedric Guillemet (Imogen).

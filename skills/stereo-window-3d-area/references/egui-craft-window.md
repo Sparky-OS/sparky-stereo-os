@@ -61,6 +61,12 @@ Unequal source grids need an explicit native-view refusal rather than silently f
   Its first-launch offer waits for earlier dialogs and library startup to finish, so it can appear later.
   Dismiss it after the selected image has finished loading, then settle and capture.
   Apply the same sequence to edition and untouched-stock controls; inspect the complete image and compare without masks.
+- Symptom: ordinary controls differ in 106 pixels although full-resolution exports match exactly.
+  Compare the actual stage buffers: the edition cached a CPU preview while stock used GPU stages.
+  LightCraft's `gpu::device` deliberately returns `None` during `WINDOW_PENDING` adoption.
+  Read-only poll `app.gpu` until the default adapter is available before importing in both controls;
+  leave GPU enablement and processing unchanged. Retain the readiness and stage-cache witnesses.
+  Both backend comparisons then matched every RGB pixel, without a tolerance or mask.
   This removed the startup rejection in the fresh X11 capture without changing the application.
 - Symptom: Stereo Monitor enablement tests pass, but its host receives zero pictures after a rebase.
   FilmCraft's old update called `stereo_monitor::tick`; that call was lost when main split logic from drawing.

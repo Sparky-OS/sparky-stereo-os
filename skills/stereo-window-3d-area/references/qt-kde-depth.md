@@ -16,11 +16,11 @@ One shared interface produces two views, rather than two independently running a
 In the edition's KWin, `WorkspaceScene::paintWindow` computes `StereoDepth::eyeShift`, passes the translation in `WindowPaintData`, and calls the existing effects paint path.
 `drawStereoShadow` places a shadow at its receiving plane; ordinary surface content is reused per eye, while stereo surfaces select their actual eye image.
 The pair has one frame time. See [desktop depth](../../../docs/depth-on-the-desktop.md) and [the shared representation](../../../docs/how-it-works.md).
-Whole-window depth is implemented, and so is control-level depth for windows styled by Union; a common Theme Editor remains a proposal.
+Whole-window depth is implemented, and so is control-level depth for windows styled by Stereo Union; a common Theme Editor remains a proposal.
 
 ## Control-level depth: the pair contract (built, 23 October 2026)
 
-Union, Qt and Stereo KWin share four window properties and one protocol object; read [Depth inside every window](../../../docs/depth-inside-windows.md) for the values and their roles.
+Stereo Union, Qt and Stereo KWin share four window properties and one protocol object; read [Depth inside every window](../../../docs/depth-inside-windows.md) for the values and their roles.
 - Stereo KWin tells a surface whether its elements may show depth now and which of its edges lie on the output's edge (`kde_stereo_depth_v1.depth_state`, version 3 of `kde_stereo_content_v1`); libstereo-declare 1.5 wraps it.
 - The style sets the window's `_q_stereo_depth` and each element's `_q_stereo_parallax` (qreal, device pixels, positive when nearer).
 - Qt sets `_q_stereo_views` to 2 for the platform, `_q_stereo_pair` while it draws the pair, and `_q_stereo_eye` (1 left, 2 right, 0 between frames); the style moves nothing itself while `_q_stereo_pair` is set.

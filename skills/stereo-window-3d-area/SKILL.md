@@ -4,7 +4,7 @@ metadata:
 name: stereo-window-3d-area
 description: >-
   Stereo content in an ordinary Qt, KDE or GTK 4 window, and depth of the desktop's own elements: a declared
-  subsurface under a hole in the window, Union's depth values, the levels sunk, screen and popped within the person's
+  subsurface under a hole in the window, Stereo Union's depth values, the levels sunk, screen and popped within the person's
   limits, menus, popups, tooltips, select lists, notifications and dialogs at depth (xdg_popup), the 10 px popup
   border, KWin's effects with their own depth (Fall Apart, Sheet, Glide, Zoom, drag), and the boot splash at the
   person's limits (popped= and sunk= on the kernel line, a Plymouth guest). Load it when a popup menu at the screen
@@ -18,7 +18,7 @@ description: >-
 
 ## Working recipe
 
-1. Classify the task: stereo media/scene surface, whole-window depth, or control-level depth (built for Union-styled Qt Quick and Qt Widgets windows on Wayland). Choose the appropriate pattern below.
+1. Classify the task: stereo media/scene surface, whole-window depth, or control-level depth (built for Stereo Union-styled Qt Quick and Qt Widgets windows on Wayland). Choose the appropriate pattern below.
 2. Trace content, declaration, compositing, clipping and logical input separately; test resize, overlap, close/reopen and mode changes.
 3. Return both-eye captures, declaration count, geometry and 2D baseline. Shared styling does not imply shared rendering or an implemented stereo consumer.
 

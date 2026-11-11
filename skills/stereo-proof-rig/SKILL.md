@@ -101,7 +101,7 @@ Traps:
 
 ## Element depth inside a window
 
-A window whose elements show depth (Union on the edition's Qt, [Depth inside every window](../../docs/depth-inside-windows.md)) is measured element by element.
+A window whose elements show depth (Stereo Union on the edition's Qt, [Depth inside every window](../../docs/depth-inside-windows.md)) is measured element by element.
 
 1. **A 3D mode on the virtual output.** Start KWin with `KWIN_VIRTUAL_STEREO_MODES=1`, which gives `--virtual` outputs the 3D twins a monitor gets, and restore a saved `kwinoutputconfig.json` in one of them (side by side half), so the window is awake from its first frame.
 2. **The user's limits, written as System Settings writes them:** `kwinrc`, `[StereoDepth]`, `SunkLimit`, `PoppedLimit` and `ElementLimit`. Run the shipped values (`SunkLimit` 10, `PoppedLimit` 4, `ElementLimit` 1) and the measuring scale (`ElementLimit=12`): at 1 px, shares of 0.111 or 0.333 px change no pixel and 0.667 px changes one, so only the larger scale makes every share and every cut measurable. Never report 12 as a default.

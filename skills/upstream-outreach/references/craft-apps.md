@@ -109,3 +109,12 @@ The replay had appended the older stereo rows and header after the current track
 Keep the current row's content and status, add the feature details and live test references there, remove the appended duplicates, and refresh the generated summary with `cargo xtask parity --write`.
 The focused parity check then passed; the receiving full gate remains required before the port is committed.
 Run a repository's inexpensive tracker/reference check early alongside compile diagnostics after a large rebase, so documentation errors appear before its long native test stage.
+
+## Save As regression sees no warnings for JPEG
+
+PhotoCraft's layered stereo Save As regression failed on `copy.jpg` after rebasing because its direct `save_as` call stopped at the newer JPEG Options prompt.
+The empty warning list described a pending answer, not a completed export.
+The `save_to` prompt branch and the already passing edition regression exposed the cause.
+Complete the existing UI command with `menus::invoke(..., "file.saveAs", json!({"path": path, "jpegFormat": "baseline"}))` before checking the metadata-loss warning and unchanged editable identity.
+Keep those assertions; do not suppress the prompt in production or claim the save completed merely because its initial call succeeded.
+Run the focused regression first, then the receiving branch's full gate; another branch's passing result does not certify an omitted test port.

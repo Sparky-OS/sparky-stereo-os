@@ -25,7 +25,7 @@
 5. Test the installed result in separate, fresh containers.
    Acceptance must install real font files and make `fc-match Arial` select Arial.
    Refusal must leave no downloaded fonts and explain the result.
-   A failed download must fail visibly and supply `dpkg-reconfigure ttf-mscorefonts-installer` as the retry command.
+   A failed download must fail visibly and supply `dpkg --configure ttf-mscorefonts-installer` after the connection is repaired; use `dpkg-reconfigure ttf-mscorefonts-installer` after a deliberate refusal.
    On a metered connection the shared notice must show the measured size and source in the frontend the person used before fetching the data.
    Keep an unmetered control and inspect the resulting ISO for both package selection and font data.
 6. Before modifying upstream packaging, search current upstream sources, changes and reports, and carry an existing suitable implementation with credit.
@@ -73,7 +73,7 @@ The ISO gate also rejects an undeclared stock installer package and the download
 
 The live installer carries `calamares-settings-sparky-stereo`'s `lib/core-fonts` helper.
 Calamares invokes `core-fonts --window TARGET`; the text installer invokes `core-fonts --terminal TARGET` before unmounting the target.
-Both run the target's interactive apt, with debconf's readline frontend overriding the installer's global noninteractive setting.
+The text path runs the target's interactive apt with debconf's readline frontend. The graphical path shows a KDE window; never open a terminal from Calamares for the licence.
 The helper enables `contrib` on enabled HTTPS Debian sources in classic or deb822 form, preserving other sources and components.
 It requires the candidate's download declaration before starting installation.
 The package's default consent answer is false, and the helper never supplies an answer.
@@ -85,25 +85,43 @@ The test indexes the real candidate in a local apt source and types the test ans
 The `accept`, `refuse`, `noninteractive` and `failed-download` cases check actual fonts, consent presentation, visible results and retry guidance.
 The `metered` and `unmetered` cases substitute only NetworkManager's answer, keeping apt, the reader and package metadata real.
 The retry cases run from the refused or failed installation state and check real Arial with fontconfig.
-For the graphical join, `tests/corefonts-gui.py` in the Calamares settings recipe runs under a private `xvfb-run` and `dbus-run-session` with a disposable target root, using actual Konsole and keyboard events.
-Its acceptance, refusal and close cases check the visible question and resulting target state.
-These isolated targets establish the package and terminal join; a developer-image installation is a separate proof and must be named separately.
+For the graphical join, `tests/corefonts-gui.py` in the Calamares settings recipe runs in a fresh private KWin Wayland / D-Bus session, with the published edition KWin and Qt packages and a copied target root.
+Drive actual Wayland input and capture with KWin ScreenShot2; Xvfb and terminal text do not prove this path.
+Keep English and another language, acceptance, refusal and window-close captures, the actual debconf answer and the target font/package state.
+Build the root yourself from the build scripts' published sources and pins. Name every omitted layer when the root is partial; do not ask for a developer-image fixture the scripts already define.
+
+## KDE debconf integration
+
+Debian testing's `debconf-kde-helper` and `libdebconf-kde1` 1.2.1-1 use Qt6. Inspect the actual archive candidate rather than assuming an older Qt5 implementation.
+`DEBIAN_FRONTEND=kde` starts the stock helper with inherited FIFO descriptors. It would run inside the target chroot and need the live desktop's runtime socket there.
+For Calamares, embed `DebconfKde::DebconfGui` in the live root and use its documented UNIX socket interface: target `DEBIAN_FRONTEND=passthrough`, `DEBCONF_PIPE=/run/.../debconf`, with the same socket created at `TARGET/run/.../debconf` by the live process.
+This is the KDE debconf renderer and protocol; no GUI licence parser or acceptance preseed is needed.
+
+The stock boolean widget calls its radio choices OK/Cancel. A small native embedding can offer explicit translated Accept/Decline actions and still let KDE debconf send/store the answer.
+Queue the licence note and default-false boolean before one `db_go`, so the scrollable licence and consent actions share a window.
+Only an actual Accept action selects true. Decline is the keyboard default, and closing the licence submits false through the same frontend, then shows that fonts were not installed and how to retry.
+Do not cancel the frontend connection on licence close and accidentally invoke debconf's automatic fallback.
+Keep the original legal text intact; localize the question, actions and result in all edition languages.
+
+Read the candidate's declaration with the shared ORDER 399 `declaration()` and `assess()` functions in `sparky_install_downloads.py`.
+Render the same metered decision, measured bytes and source in the graphical frontend before apt installs the package. Replace only the reader's terminal instruction with the frontend's buttons.
+Suppress the duplicate terminal notice for that already-displayed transaction only; do not create another package size table or metering policy.
+Check frontend startup before apt, fail visibly if it disappears, and keep refusal separate from a failed download. Both must say the next action in the person's frontend.
 
 ## Further traps found during the implementation
 
 - **Symptom:** refusal displays the same EULA question twice in one apt transaction.
   **Cause:** apt preconfiguration and postinst both invoke debconf's config script; unconditionally resetting `seen` after a false answer discards the first refusal.
   **Fix:** honour the first answer during ordinary configuration, and reset the prompt after refusal only for an explicit `reconfigure` call.
-  **Found by:** the actual Konsole refusal test stopped at the second question; the earlier candidate's transcript contained two questions and failed the new single-question assertion.
+  **Found by:** the original terminal refusal test stopped at the second question; the earlier candidate's transcript contained two questions and failed the new single-question assertion.
 - **Symptom:** a scripted acceptance still refuses the licence, with `noyes` visible in the transcript.
   **Cause:** readline pre-fills the default `no`, so a test that appends `yes` does not replace the default.
   **Fix:** clear the input with Ctrl+U before typing the test answer, and advance the EULA's `[More]` pages before answering.
-  **Found by:** reading the real terminal transcript and observing Konsole's displayed text on its private D-Bus session.
-- **Symptom:** a terminal closes and the installer appears to have finished the package step.
-  **Cause:** a terminal application's process status need not be the command's status.
-  **Fix:** require the command's explicit completion result in a private temporary directory; a missing result is a visible failure.
-  This is temporary process communication, not a second persistent failure store.
-  **Found by:** inspecting terminal process behaviour and retaining the close-before-answer test.
+  **Found by:** reading the real terminal transcript and the retained terminal transcript.
+- **Symptom:** Calamares opens a terminal with a paged licence and a typed answer.
+  **Cause:** reusing the text installer's readline presentation for the graphical route.
+  **Fix:** use KDE debconf in a live window; retain readline only for the text installer. A terminal completion-file workaround does not meet the graphical design.
+  **Found by:** review against the newcomer/defaults decision, followed by Debian testing frontend source inspection.
 - **Symptom:** `dpkg-reconfigure ttf-mscorefonts-installer` reports that the package is broken or not fully installed after a failed download.
   **Cause:** Debian's synchronous downloader exits 1, leaving the package half-configured, and dpkg-reconfigure requires `--force` in that state.
   **Fix:** retain `dpkg-reconfigure ttf-mscorefonts-installer` for a deliberate refusal, and use `dpkg --configure ttf-mscorefonts-installer` to retry failed configuration after repairing the download problem.
@@ -116,4 +134,17 @@ These isolated targets establish the package and terminal join; a developer-imag
 - **Symptom:** an isolated target's apt update cannot resolve archive hosts.
   **Cause:** exporting a container omits the contents of its mounted resolver file.
   **Fix:** provide the disposable target with its test container's resolver and CA bundle before running the actual install helper.
-  **Found by:** the apt diagnostic in Konsole, which occurred before any licence question or font download.
+  **Found by:** the apt diagnostic in the isolated terminal, which occurred before any licence question or font download.
+
+- **Symptom:** the KDE window offers generic OK/Cancel choices rather than explicit licence actions.
+  **Cause:** libdebconf-kde's generic Boolean widget uses KStandardGuiItem labels.
+  **Fix:** keep its renderer and socket protocol in a native embedding and customize the licence actions; package that executable through the native Lean Code pipeline, separately from the script-only settings adapter.
+  **Found by:** inspecting Debian's authenticated source and upstream DebconfBoolean.cpp / DebconfGui.h before implementing the installer join.
+- **Symptom:** a partial root has unpacked but unconfigured Calamares and installer packages.
+  **Cause:** mount-skipped mmdebstrap has no proc for systemd-tmpfiles; GRUB probes the container filesystem; Sparky artwork expects desktop-base's directories.
+  **Fix:** retain the build script's os-prober and grub-mkconfig diversions, include desktop-base from its base list, and finish the authored root as an ordinary Docker container with its own proc/dev namespace. Name this adaptation and omitted hardware/ISO stages; never claim a boot test.
+  **Found by:** retained dpkg errors for cryptsetup-bin, sparky-info and sparky-artwork in the published-repository partial-root build.
+- **Symptom:** a host tar stream omits files with permission-denied errors.
+  **Cause:** files created by container root are not necessarily readable by the host user, especially private skel settings.
+  **Fix:** export/tar the owned root from inside its container and check the pipeline's status; do not relax packaged file permissions to make a copy work.
+  **Found by:** the partial-root export's explicit tar diagnostics.

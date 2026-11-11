@@ -14,9 +14,14 @@ The credit remains in [the one merges list](../../../docs/upstream-merges.md).
    Follow the recipe's imports to other recipe directories and forks.
    A historical recipe folder or a filename search alone does not identify the shipped source.
 2. Resolve the upstream commit on the correct project's history.
-   In an owned audit clone with complete history and tags, run `git tag --contains COMMIT`.
+   Prefer the forge API to downloading history. For GitHub, compare `COMMIT...TAG`:
+   `ahead` with zero `behind_by`, or `identical`, proves the commit is an ancestor of the tag.
+   The reverse comparison, `TAG...COMMIT`, proves containment only when `behind` or `identical`.
+   Save the requested URL, observation time, status, ahead/behind counts and tag release metadata.
+   In an existing, complete repository, `git tag --contains COMMIT` is another read-only check.
    Check the containing tags against the project's release record and record the first released version, tag, publication date and URL.
    A development snapshot, release candidate or prerelease stays labelled as such.
+   A published prerelease can be a named rebase target; do not silently call it stable or invent a stable-only gate.
    Record the stable-branch commit separately when a backport has a different hash.
    Missing tags in a shallow or stale clone do not prove that no release contains the fix.
 3. Match the carried patch to that fix by content.
@@ -56,6 +61,42 @@ The credit remains in [the one merges list](../../../docs/upstream-merges.md).
    Check for a retained publication stage, an active process or an object store borrowed by another repository.
    Permission errors, missing objects and incomplete comparisons leave the candidate kept with the unanswered check named.
    A proposal-only audit makes no removals and reports zero space actually freed.
+
+## Bounded API and duplicate-copy recipe
+
+Keep API responses in a scratch file, with a response-size limit and timeout. Print only an explicitly selected
+scalar or count. Do not stringify a list of records to discover its shape: that prints all nested diffs and release assets.
+Follow wrappers to the actual JSON, validate its shape, and keep compact receipts with the original response checksum.
+For large histories, request one comparison commit where supported; some forges still return the complete changed-file list.
+
+An exact duplicate is a different proof from a landed commit. Hash both regular files with SHA-256, record their
+allocated blocks, inode/device and link count, and name the retained copy for every candidate. Do not follow symlinks.
+Exclude protected runner files and reports before making the removal manifest. Count separate allocated inodes once;
+shared hard links and nested candidate directories must not inflate the reclaimable total. An unmatched file keeps its
+own path even if most of its directory is duplicate. Recheck both files immediately before applying removal.
+
+A lane marked done can still hold the only surviving test evidence for an open review. Query the live review state,
+record its current head, and list bundle heads without extracting them (`git bundle list-heads FILE`). A newer review
+head does not prove that an older bundle or historical experiments are preserved upstream. A broken evidence symlink
+is not a backup: resolve it and verify the target exists before declaring the other copy redundant.
+
+## Further traps
+
+- **Symptom:** an audit fills its output disk while making read-only API calls.
+  **Cause:** a diagnostic prints whole JSON records, including repeated tool envelopes and large diffs.
+  **Fix:** redirect raw data to bounded scratch storage and print only whitelisted fields; check free bytes before
+  each step and stop automatically when the intended write would reach the floor.
+  **Found by:** output sizes and an ENOSPC write failure showed the log copies, rather than Git objects, exhausted storage.
+- **Symptom:** a containing-tag check appears successful after a request failed.
+  **Cause:** a tool returned an error envelope inside a successful outer JSON response, or a saved JSON response was
+  damaged by manual text redaction.
+  **Fix:** unwrap and validate the actual payload, require the expected comparison fields, and retain parse/API failures
+  as failures. Repair through a new bounded request; never interpret a missing field as a zero count.
+  **Found by:** parsing cached responses and inspecting their nested `content` and `structuredContent` fields.
+- **Symptom:** a finished lane's handoff looks entirely disposable.
+  **Cause:** it holds duplicate files beside unique evidence, and its old evidence symlink points to a removed target.
+  **Fix:** use an individual duplicate-file manifest and preserve the unique evidence and unproved Git history.
+  **Found by:** comparing file hashes and resolving the supposed retained evidence path.
 
 ## Traps found while inventorying retirement candidates
 

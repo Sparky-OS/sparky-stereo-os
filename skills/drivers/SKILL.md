@@ -8,10 +8,9 @@ description: >-
   the real-time flavour), DKMS modules on a new kernel (NVIDIA, ZFS, openssl for signing, first-boot MOK enrolment,
   linux-headers without gcc), udev rules for wheels tested without hardware (umockdev), HDMI-CEC, VRAM protection,
   patches carried with provenance. Load it when a 3D mode is missing, the TV never switches to 3D, a DKMS build fails on
-  a new kernel, dkms says openssl not found and the module is unsigned, modprobe says Key was rejected by service,
-  ConditionFirstBoot never fires, nouveau reports firmware unavailable, amdgpu hangs with a page fault, ring timeout and
-  a device coredump, an old Radeon repeats a successful IP block soft reset with device wedged but no recovery needed,
-  virtio-gpu oopses with stereo on, or a udev chmod hides its failure behind || true.
+  a new kernel, dkms says openssl not found, modprobe says Key was rejected by service, ConditionFirstBoot never fires,
+  nouveau reports firmware unavailable, amdgpu hangs with a page fault, ring timeout and a device coredump or repeats
+  an IP block soft reset with device wedged, virtio-gpu oopses with stereo on, or a udev chmod hides its failure.
 ---
 
 # Drivers: 3D modes and deep colour in the kernel

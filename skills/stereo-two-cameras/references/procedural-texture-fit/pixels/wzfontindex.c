@@ -202,6 +202,14 @@ static int g_npaths, g_cappaths;
 static int collect(const char *p, const struct stat *st, int type, struct FTW *ftw)
 {
   (void) st; (void) ftw;
+  /* milestone 2e: a link was skipped without a word (nftw with FTW_PHYS reports it as FTW_SL): 67 of the 3,256
+     files fc-list names are links, and 44 of the files behind them lay outside the indexed folders. A link to a
+     readable font file is indexed by the link's name; a link whose target cannot be read is said. */
+  if (type == FTW_SL && is_font(p)) {
+    struct stat t;
+    if (stat(p, &t) != 0 || !S_ISREG(t.st_mode)) { fprintf(stderr, "a link whose target is not a readable file, not indexed: %s\n", p); return 0; }
+    type = FTW_F;
+  }
   if (type != FTW_F || !is_font(p)) return 0;
   if (g_npaths >= g_cappaths) { g_cappaths = g_cappaths ? 2 * g_cappaths : 4096; g_paths = realloc(g_paths, (size_t) g_cappaths * sizeof *g_paths); }
   g_paths[g_npaths++] = strdup(p);

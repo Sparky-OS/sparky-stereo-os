@@ -6220,6 +6220,9 @@ fn drawGrid(g: *const Graph, side: usize, win: Win, maxoct: u32) ?*anyopaque {
         const cp = wzb_new(@intCast(cw), @intCast(cw)) orelse die("out of memory", .{});
         @memcpy(wzb_data(cp)[0 .. cw * cw * 4], wzb_data(bm)[0 .. cw * cw * 4]);
         parts[q] = cp;
+        // the tile's own pictures are not needed again: up to sixteen procedures' worth would fill the memory of
+        // drawn pictures (a 2 by 4 Grid at 2048 ran out of WebAssembly's memory)
+        cacheClear();
     }
     modern.c.cv = .{ .w = cw, .h = cw, .m = m, .wx = win.x, .wy = win.y, .ws = win.s, .maxoct = maxoct };
     var out: ?*anyopaque = null;
@@ -6275,6 +6278,7 @@ fn drawStack(g: *const Graph, side: usize, win: Win, maxoct: u32) ?*anyopaque {
             @memcpy(dst[j * side * 4 .. (j + 1) * side * 4], src[a .. a + side * 4]);
         }
         parts[q] = cp;
+        cacheClear();
     }
     modern.c.cv = .{ .w = side, .h = side, .m = 0, .wx = win.x, .wy = win.y, .ws = win.s, .maxoct = maxoct };
     var out: ?*anyopaque = null;

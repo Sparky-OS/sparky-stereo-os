@@ -4,7 +4,8 @@
 m2e_run.py BINARY JOBFILE [PAR]
 JOBFILE: one job per line, "OUTFILE ARG..." (the arguments after the binary); a job whose OUTFILE exists is skipped;
 the job's output goes to OUTFILE.out. The binary runs from a copy named by its SHA-256 (a rebuild while jobs run
-changes nothing). Containers are named ppx-508-2e-*; core files off; no network."""
+changes nothing). Containers are named ppx-508-2e-*; core files off; no network. WZ_FONTINDEX and MOUNTS (extra
+read-only folders, docker's -v words) from the environment where given (milestone 2e's supplement font index)."""
 import hashlib, os, shutil, subprocess, sys, time
 
 S = '/var/tmp/procedures-from-pixels-508'
@@ -40,9 +41,9 @@ def start(job):
     name = 'ppx-508-2e-%d-%d' % (os.getpid(), k)
     cmd = ['docker', 'run', '--rm', '--name', name, '--network', 'none', '--ulimit', 'core=0', '--cpus', '1',
            '--user', '%d:%d' % (os.getuid(), os.getgid()), '-e', 'HOME=' + S,
-           '-e', 'WZ_FONTMAP=', '-e', 'WZ_FONTINDEX=%s/candidates.tsv' % ix, '-e', 'WZ_GLYPHINDEX=',
+           '-e', 'WZ_FONTMAP=', '-e', 'WZ_FONTINDEX=' + os.environ.get('WZ_FONTINDEX', '%s/candidates.tsv' % ix), '-e', 'WZ_GLYPHINDEX=',
            '-v', '/usr/share/fonts:/usr/share/fonts:ro', '-v', '/usr/local/share/fonts:/usr/local/share/fonts:ro',
-           '-v', '/usr/share/texmf:/usr/share/texmf:ro', '-v', '%s:%s' % (S, S), '-v', '%s:%s:ro' % (W, W), '-w', S,
+           '-v', '/usr/share/texmf:/usr/share/texmf:ro'] + os.environ.get('MOUNTS', '').split() + ['-v', '%s:%s' % (S, S), '-v', '%s:%s:ro' % (W, W), '-w', S,
            'ppx-508-base:forky', run_bin] + args
     f = open(out + '.out', 'w')
     return (subprocess.Popen(cmd, stdout=f, stderr=subprocess.STDOUT, env=env), f, job, time.time())

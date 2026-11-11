@@ -4,6 +4,7 @@ Written on 2026-11-10 (ORDER 514, milestone 1), by Claude Fable 5.2 with Daniel 
 It holds what Farbrausch's open tools are, what builds where, who already works on them, the plan for an editor on KDE Plasma where people and AI partners build procedural textures together, and, since milestone 2 (11 November 2026), the recipe and the traps of the editor's core: Stereo Werkkzeug, the part without a window.
 Since milestone 3 (the same day) it also holds the maths the core carries inside, so that one procedure draws the same bytes with every C library and in WebAssembly, and the partners' server, which an AI partner reaches the open project through.
 Since milestone 4 (the same day) it holds the editor's first light: a KDE program over the C interface, its parameter panel made from Farbrausch's table, a live picture drawn in a process of its own, the core's sentences in ten languages, and AI partners working in the open window.
+Since milestone 5 (the same day) it holds building in the window: operators dragged onto the page with the core's connection rules shown while they are dragged, a preview that can be pinned and tiled, the two sides of a step side by side, a partner's change marked on the page, and a proof that sends real pointer and key events through the compositor.
 The stereo preview, new operators and the Text operator are not built yet.
 Later milestones grow this page into the editor's contributor skill.
 
@@ -74,7 +75,7 @@ The core is a folder, `stereo_werkkzeug`, in the edition's fork of `fr_public`: 
 "Stereo" marks the edition's work on a program whose origin is Farbrausch's, as in Stereo KWin; Farbrausch is credited wherever the name appears.
 
 1. Build: `./build.sh OUT` (Zig 0.16). It makes the operator table from Farbrausch's sources, then `OUT/wz` (the command), `OUT/libstereo_werkkzeug.a` with `stereo_werkkzeug.h`, `OUT/capi_test`, `OUT/swz-mcp` (the partners' server), `OUT/libswz_front.a` with `stereo_werkkzeug_front.h` and `OUT/front_test` (the front library), and `OUT/swz-draw` (the drawing process of a live preview). `SWZ_TARGET=x86_64-linux-musl` makes static programs; `SWZ_TARGET=wasm32-wasi` makes `OUT/wz.wasm`, the command only.
-2. Prove: `tests/run-all.sh OUT`. One line per step; expect "65 steps passed, 0 failed" (Python 3 is needed for the step that proves the partners' server; with `SWZ_SDK_PYTHON` naming a Python that has the `mcp` package, the server is also run under the official SDK's client, 119 checks; without it that step says it was not run). The steps that are controls pass when the check under them fails (a change made behind the journal's back, one flipped bit in one picture).
+2. Prove: `tests/run-all.sh OUT`. One line per step; expect "65 steps passed, 0 failed" (the C test of the interface has 386 checks since milestone 5, the front library's 259) (Python 3 is needed for the step that proves the partners' server; with `SWZ_SDK_PYTHON` naming a Python that has the `mcp` package, the server is also run under the official SDK's client, 119 checks; without it that step says it was not run). The steps that are controls pass when the check under them fails (a change made behind the journal's back, one flipped bit in one picture).
 3. Look: `wz textures FILE.k` lists the named textures, `wz draw FILE.k NAME OUT.png --png` draws one, `wz text FILE.k --labels` prints the project for reading, `wz graph FILE.k NAME` prints one texture's operators as typed text.
 
 What to expect on `werkkzeug3/data/kkrieger.k`: version 13, 217 pages, 29,347 operators, 854 named textures; 742 draw, 112 are refused by name because they hold a Text operator (drawn with Text handed on when asked, which the output says).
@@ -173,7 +174,7 @@ The editor is `stereo_werkkzeug/editor`: Qt 6 Widgets and KDE Frameworks 6 (KXml
 
 1. Build: `./build.sh CORE`, then `cmake -S editor -B ED -DSWZ_CORE_DIR=CORE && cmake --build ED`. The core's folder gives `libstereo_werkkzeug.a`, `libswz_front.a`, their two headers, `swz-draw`, `swz-mcp` and `wz`.
 2. Check: `ctest --test-dir ED` (the editor's catalogue is the one the built core prints; the nine translated catalogues are whole).
-3. Prove the window: `ED/bin/editor-proof SCENARIO FR_PUBLIC OUT [PARTNER...]` inside a private compositor (see "Proving a window" below). Expect, per scenario: `open-edit` 35 checks, `partner-first` 24, `partner-apply` 17, `partner-suggest` 15, `partner-ask` 15, `refusal` 6, `settings` 6, `socket-kept` 4, `socket-stale` 1, each ending "N checks passed, 0 failed". Run `refusal` once per language (`LANG`, `LC_ALL` and `LANGUAGE` set, the locale generated in the image): the same refusal of the core comes out as another sentence in each.
+3. Prove the window: `ED/bin/editor-proof SCENARIO FR_PUBLIC OUT [PARTNER...]` inside a private compositor (see "Proving a window" below). Expect, per scenario: `open-edit` 35 checks, `partner-first` 24, `partner-apply` 17, `partner-suggest` 15, `partner-ask` 15, `refusal` 6, `settings` 6, `socket-kept` 4, `socket-stale` 1, and the ones that send real input (see "Building in the window"): `build` 72, `look` 29, `examples` 23, `show-apply` 19, `show-suggest` 20, `show-drop` 19, `show-ask` 14, `partner-draws` 15, `desktop` 12, each ending "N checks passed, 0 failed". Run `refusal` once per language (`LANG`, `LC_ALL` and `LANGUAGE` set, the locale generated in the image): the same refusal of the core comes out as another sentence in each.
 
 ### Keep the logic on the core's side of the window
 
@@ -219,6 +220,69 @@ Write sentence families so that the changing part stands after a colon in its di
 The proof program is the editor's own classes with a script instead of a person (`editor/tests/editor-proof.cpp`), run in a private session: a session bus, KWin on a virtual output, one fresh session per scenario ([stereo-proof-rig](../../stereo-proof-rig/SKILL.md)).
 Each check compares with something outside the window: the opened file's SHA-256, the reference table's checksum of the texture, the partner's own answers (the official MCP SDK's client, `editor/tests/sdk-partner.py`), the settings file on disk.
 Pictures are KWin's (`ScreenShot2`); a picture that is one colour all over fails its check.
+
+## Building in the window: working recipe
+
+The window is where a person makes a texture from an empty page. What it takes, in the order it was built:
+
+### A place is tried in the core, not judged in the window
+
+`swz_place_check(doc, id, class, page, x, y, width, &out)` tries a place without taking it: for an operator of the page, or with id 0 for a new one of a class.
+
+1. werkkzeug3's own rule for a place comes first (`WinPage::CheckDest` and `MoveDest` in `winpage.cpp`): inside the page's grid of 192 columns and 96 rows, and no cell shared with another operator of the same list. A place that fails it is refused with a sentence that names what stands there. `swz_place` and `swz_add_op` refuse the same places, so a partner's tool cannot make what the editor cannot.
+2. Otherwise the place is put on in memory, the connection rules are run on the whole document (`graph.connect`, the same function that decides what is drawn), and the answer is read off: what the rules would say of the operator there (0, or why it would not be drawn), which operators it would take, which would take it, and which others the rules would newly mark. The place is put back before the call returns; nothing is journalled.
+3. The window calls it once for each cell the pointer crosses and paints the answer: a green, amber or red place, the operators it would take outlined, and the sentence in words under it (colour alone says nothing to some people). On `kkrieger.k` one trial takes 6 to 8 ms on a machine at rest (15 to 17 ms under load), for a page of 583 operators as for one of 748: the cost is the whole project's connections, not the page.
+4. On release the window asks for the change itself and shows the core's refusal when there is one. It never looks for a free place nearby: an invalid place is said, not fixed.
+
+Give every operator an id that starts at 1. The first version numbered from 0, and every front end reads 0 as "no operator": the first operator of a new project could not be selected, and `swz_place_check` took it for "a new operator".
+
+### The operator list
+
+All 218 classes in a tree with a search line, grouped as werkkzeug3's own "add operator" menus group them (`WinPage::AddOps`: Misc, Texture, Mesh, Scene, IPP, MinMesh, by what a class makes; the front library's `swz_class_group`). A class the build does not draw is still listed and can be placed, since the project file carries it; the list says so where the person chooses, in italics and in the tooltip.
+Two ways onto the page, because both are how people work: drag the class (a `QDrag` with the class id as its data, the page shows the rules while it is over it), or press `a` on the page, type a part of the name and press Enter (it goes under the selected operator and as wide as it, or to the cell that was clicked).
+
+### Keys that belong to the page
+
+werkkzeug3's single-letter keys (`a` add, `b` bypass, `h` hide) and Delete are handled in the page's own `keyPressEvent`, not as shortcuts of the window: a shortcut on a plain letter or on Delete would take the key away from every text field. F2 and Insert are safe as window shortcuts.
+
+### The preview: pinned, sized, tiled
+
+- Pinned, the preview keeps its operator while the selection moves; it redraws whenever the project changes, so the person sees a texture change while working on an operator far above it. When the pinned operator is removed, the preview says so and follows the selection again.
+- The picture sits in a scroll area and is painted at a whole multiple when enlarged (no smoothing), fitted by default; "pixel for pixel", larger and smaller go by factors of two.
+- Three by three paints the same picture nine times, edge to edge: a seam shows as a line. The proof reads it back from the compositor's picture of the screen: the tile to the right, the one below and the last are the first tile again, and a third of a tile further the comparison fails.
+- The time under the picture is the one the drawing process measured, the size the picture's own.
+
+### The two sides of a step
+
+`swz_graph_pack_across(doc, id, ...)` packs a texture as it is on the other side of the journal's last step: for a partner's waiting suggestion as it would be when taken, for an applied step as it was before. The core replays or reverts the step in memory (the journal's own undo and redo, which allocate nothing), packs, and puts it back.
+With `swz_graph_pack` for the side the project is on, a window draws "before" and "after" in two drawing processes without changing the document: "Before and After" is a second preview made of that, with Take and Drop for a suggestion and Undo for an applied step. The same widget sits in the "ask each time" question.
+`swz_step_ops(doc, step, ids, kinds, max)` says which operators a step changed, added or removed; the window marks them on the page, dashed while the step only waits.
+The check that keeps it honest: the "after" picture shown for a suggestion must be the picture the preview shows once the suggestion is taken, and for an applied step the picture the partner itself drew after its change.
+
+### A partner's picture does not hold the window
+
+`draw_texture` used to run inside the window's thread for as long as the operators took. The front library now gives it in two halves: `swz_partner_draw_begin` finds the texture the arguments name and hands out its packed graph, the window draws it in `swz-draw` as it draws its own preview, and `swz_partner_draw_end` makes the answer from the picture (the same bytes as the whole tool: the test compares the PNGs). When the project changed meanwhile so that the name now means another operator, the second half refuses and says so.
+Measured in the proof (`partner-draws`) on a machine at rest: a partner drew 54 pictures in 8.2 s, 6.0 s of it the operators' own time, while the proof's person clicked operators on the largest page; every click landed, and the window's longest standstill while a picture was under way was 16 to 32 ms over three runs. With other builds loading the machine the same pictures took 24.7 s of operator time, up to 1.5 s each, and the longest standstill was 131 ms. The tools that only read still run in the window's thread; the longest, `list_textures` over 854 textures, held it for 77 to 141 ms.
+Ask of such a measure what it is relative to: the check is "less than a quarter of a second, and less than a fifth of the slowest picture's own time", and it prints the three numbers.
+
+### The examples, the icon and the file type
+
+- The starting projects are kept as the core's text form (`editor/examples/*.txt`), packed by `wz pack` at build time and carried inside the program as resources. An example opens as a project without a file: saving asks for a name, and nothing can write the example.
+- The icon is one SVG, installed as `hicolor/scalable/apps/stereowerkkzeug.svg` and also inside the program, where it is drawn with `QSvgRenderer`, so that a build tree and a system without Qt's SVG plugins show it too.
+- The file type is `application/x-werkkzeug3-project`: the glob `*.k` and two magic rules, `nova`, the number 1 and `<<<<` for the outer form with the player's part, and `<<<<` with the editor's class number for the document alone. Test the magic on every file you have, and on two that must not match (a text that begins with "nova", any other text).
+
+### Proving it with real input
+
+The checks of milestone 4 posted events into the program. A drag cannot be proved that way: on Wayland the compositor starts it, from a real button press. So the proof sends the person's input to the compositor and lets it come back as the person's would.
+
+1. `editor/tests/realinput.cpp` speaks KWin's `org_kde_kwin_fake_input` on a connection of its own (the protocol file is KDE's; the rig's `fakeinput` tool speaks the same, see [stereo-proof-rig](../../stereo-proof-rig/references/input-delivery.md)). KWin takes it when started with `KWIN_WAYLAND_NO_PERMISSION_CHECKS=1`.
+2. The window is shown full screen on the private output, so a point of the window is the same point of the screen (a Wayland client is not told where its window is). Popups are placed relative to their parent, so `mapToGlobal` is right for menus too. A dialog is a window of its own whose place the client does not know: drive it with keys.
+3. The steps run in a thread of their own (`runInput`), and the window's thread turns its event loop meanwhile. Reading what the window shows goes through `onWindow` (a blocking queued call).
+4. A drag is a press, a dozen moves, a short stay, then the release; while the button is held the steps read the page's state and take a picture of the screen from that thread.
+5. Whatever opens a dialog must be answered in the same run of steps: the window's thread stays inside the dialog until it closes.
+6. The control: the same scenario with KWin started without the leave for fake input passes one check (the window is there) and fails the next two (nothing could be sent; the first key did not arrive). Make the function that sends say whether anything was sent: the first version returned true with no connection, and a check named "real input reaches the compositor" passed in the control.
+
+The rig's image needs what a Plasma session has: `plasma-integration` (KDE's own file dialog, driven by typing the path and Enter) and `qt6-svg-plugins` (without the SVG icon engine no themed icon is drawn, and every button shows as text).
 
 ## Werkkzeug4 itself on Linux: what a probe found
 
@@ -430,6 +494,47 @@ So Werkkzeug4 does not run on Linux today, with or without the four pull request
   Cause: werkkzeug3 marks an animated value with `*` and may add one digit; only the star had been taken off.
   Fix: take off both, as `WinPara::Label` does.
 
+## Traps found while building in the window
+
+- Symptom: in a new project the first operator cannot be selected, and a trial of its place answers "0x0 is not a class of werkkzeug3".
+  Cause: operator ids started at 0, and 0 stands for "no operator" in the window and for "a new operator" in the trial.
+  Fix: ids start at 1 in the reader and in a new document.
+  Found by: the C test of the trial, on a document made with `swz_new`.
+- Symptom: the proof stands still after a click on a menu entry that opens a dialog, and the dialog is never answered.
+  Cause: the click is delivered inside `processEvents`, the action opens a dialog with its own event loop, and the proof's next line would only run when that loop ends.
+  Fix: answer the dialog from the thread that sends the input, in the same run of steps (wait until the dialog is the active modal window, type, press Enter).
+  Found by: the log ending at the picture taken just before the click, and the F2 dialog, answered inside one run, working.
+- Symptom: after an undo a click lands one row below the operator it was aimed at.
+  Cause: the window's message bar sat above the page and was just closing; the page moved up under the pointer.
+  Fix: put the message bar under the page, so that nothing said moves what the person points at. Compute a click's place right before the click, never before an animation.
+  Found by: the proof's picture, where the new operator stood in row 3 instead of row 2.
+- Symptom: a message about a move stays in the window after the move was undone.
+  Fix: remember the journal's state when a message is said and close the message when the state is another; a new drag closes it too.
+- Symptom: three classes are shown for "perlin", and the test expected one.
+  Cause: mesh and scene operators carry the word too.
+  Fix: count the expected number from the core's table in the test, not by hand.
+- Symptom: `msgmerge --compendium` fills every new entry but the ones with plural forms, for languages with two or three forms.
+  Fix: `msgcat --use-first COMPENDIUM.po OLD.po`, then `msgmerge` against the template.
+  Found by: `msgattrib --untranslated` listing exactly the five plural entries.
+- Symptom: the toolbar and the preview's buttons show words instead of icons in the private session.
+  Cause: the image had the Breeze icon theme but not Qt's SVG icon engine (`qt6-svg-plugins`).
+  Found by: `ls /usr/lib/x86_64-linux-gnu/qt6/plugins/iconengines` (no such folder).
+- Symptom: the file dialog in the private session is Qt's plain one.
+  Cause: without `plasma-integration` Qt has no KDE platform theme.
+  Fix: install it in the image; the dialog's class is then `KDEPlatformFileDialog` (the proof prints it).
+- Symptom: a check of "the largest page" expects 583 operators and finds 748.
+  Cause: `kkrieger.k` has a page that shows 583 (`logo.kkrieger`), and five larger ones; the largest, `the.room`, shows 748.
+  Fix: find the page by counting, and say the count.
+- Symptom: a partner's drawing looks free of any standstill, yet the window stood still for 150 ms in the same run.
+  Cause: the measure only counted the time while the drawing process ran; the answer was made after it, and another tool (`list_textures`) ran in the window's thread.
+  Fix: count from the request to the answer, and time each call in the window's thread by its tool's name.
+- Symptom: a check of the window's longest standstill fails in the last run and never before.
+  Cause: its limit was an absolute 100 ms, and other work loaded the machine fourfold (the pictures' own time shows it).
+  Fix: an absolute limit a person would still call "the window goes on", and a limit relative to what is being drawn; say both runs in the report.
+  Found by: the proof's own line with the operators' time (24.7 s against 5.8 s) and `uptime`.
+- Symptom: `QDrag::exec()` is feared to freeze the proof.
+  Cause: none; on Linux "this function does not block the event loop" (Qt's documentation of `QDrag::exec`), events go on being delivered. What matters is only that the proof's own steps do not wait inside the window's thread.
+
 ## What the parts are good for
 
 - The `.ops` blocks are a table a program can read: generate the parameter panel and the partner's operator list from them, so the editor, the server and the documentation cannot drift apart.
@@ -446,6 +551,10 @@ So Werkkzeug4 does not run on Linux today, with or without the four pull request
 - `wz messages` is the list a translator needs and a reviewer can count: 332 sentences in milestone 4, each with its number. With the window's 124 strings each of the nine catalogues holds 456 entries.
 - `editor/tests/sdk-partner.py` is a partner of twenty lines: an assistant's whole way into the window, to copy when a new tool needs a proof.
 - The proof program's `capture` scenario takes one picture of a private session's screen from any script.
+- `swz_place_check` is a rule engine a front end can ask as often as it likes: the same call serves a drag, a keyboard move and a partner that wants to know before it changes anything.
+- `swz_graph_pack_across` gives "before and after" for any step without an undo: a review of a partner's work needs no second document.
+- `editor/tests/realinput.cpp` is a small client any Qt proof can take: a pointer and a keyboard that go through the compositor, with `runInput` and `onWindow` for the two threads.
+- The text form of a project is good for shipping examples: three files of ten lines each, readable in a diff, packed at build time.
 
 ## Credits
 
@@ -454,5 +563,6 @@ The maths carried inside the core is musl's (release 1.2.6, MIT): Rich Felker an
 The partners' server follows the Model Context Protocol's specification (revisions 2025-11-25 and 2026-07-28), by the Model Context Protocol project and its contributors, and the two-era pattern of the edition's own skills server.
 The partners' server is proved under the official MCP SDK for Python (the `mcp` package, by the Model Context Protocol project, MIT).
 The editor is built on Qt (The Qt Company and the Qt Project) and KDE Frameworks (the KDE community): KXmlGui, KConfig, KI18n, KIO, KWidgetsAddons, KCoreAddons; its pictures are taken with KWin's ScreenShot2.
+The proof's real input uses KWin's fake input protocol (`org_kde_kwin_fake_input`, by Martin Gräßlin, LGPL-2.1-or-later) and follows the proof rig's `fakeinput` tool; the rules for a place on the page are werkkzeug3's own (`winpage.cpp`, Farbrausch).
 WebAssembly builds ran in wasmtime (Bytecode Alliance).
 The people whose work this plan reads or builds on, by the names their own pages give: wxthss82, wzman, Gregor Riepl (onitake), Frantsishak (KkriegerNet), kznsq, Mason Liu (kkrieger-wasm), Alfredo (varrtto), Steven Schronk, Rodz Labs and the Material Maker contributors, Nicolas Brown and the TextureLab contributors, Cedric Guillemet (Imogen).

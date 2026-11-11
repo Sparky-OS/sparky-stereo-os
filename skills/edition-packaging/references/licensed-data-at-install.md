@@ -86,7 +86,7 @@ The `accept`, `refuse`, `noninteractive` and `failed-download` cases check actua
 The `metered` and `unmetered` cases substitute only NetworkManager's answer, keeping apt, the reader and package metadata real.
 The retry cases run from the refused or failed installation state and check real Arial with fontconfig.
 For the graphical join, `tests/corefonts-gui.py` in the Calamares settings recipe runs in a fresh private KWin Wayland / D-Bus session, with the published edition KWin and Qt packages and a copied target root.
-Drive actual Wayland input and capture with KWin ScreenShot2; Xvfb and terminal text do not prove this path.
+Drive actual Wayland input and capture the compositor output; Xvfb and terminal text do not prove this path. Use ScreenShot2 with an EGL backend. In a device-free virtual QPainter session, the guarded capture-qpainter.py test reads the actual compositor output buffer instead and records its dimensions, format and hash; do not call that a ScreenShot2 capture.
 Keep English and another language, acceptance, refusal and window-close captures, the actual debconf answer and the target font/package state.
 Build the root yourself from the build scripts' published sources and pins. Name every omitted layer when the root is partial; do not ask for a developer-image fixture the scripts already define.
 
@@ -148,3 +148,20 @@ Check frontend startup before apt, fail visibly if it disappears, and keep refus
   **Cause:** files created by container root are not necessarily readable by the host user, especially private skel settings.
   **Fix:** export/tar the owned root from inside its container and check the pipeline's status; do not relax packaged file permissions to make a copy work.
   **Found by:** the partial-root export's explicit tar diagnostics.
+
+- **Symptom:** the target fails before the KDE question with Text::Iconv->new missing.
+  **Cause:** a minimal no-Recommends root omitted debconf-i18n; Passthrough needs its Unicode conversion module and translated-template support.
+  **Fix:** make debconf-i18n a dependency of the graphical installer settings, so the live root and its copied target have the required ten-language runtime before apt preconfiguration.
+  **Found by:** the actual signed-repository partial-root GUI transaction, then inspecting Debconf/Encoding.pm and debconf-i18n's Depends.
+- **Symptom:** native --version and loader gates pass but the licence helper exits before its first window.
+  **Cause:** the embedding assumed a vertical top-level layout; the inspected KDE frontend uses a grid.
+  **Fix:** attach to its existing horizontal navigation bar, check that it exists, and retain actual constructor/window tests in addition to the headless startup gate.
+  **Found by:** the first real apt GUI run, which installed no fonts, followed by reading DebconfGui.ui.
+- **Symptom:** every ScreenShot2 request is Cancelled despite a real managed Wayland window.
+  **Cause:** device-free virtual KWin 6.7 uses QPainter; ScreenShotManager requires EGL. A headless software-Weston parent also lacks the dmabuf-v4 interface nested KWin requires.
+  **Fix:** where no render device is authorized, capture the private QPainter compositor's actual ShmGraphicsBuffer output with strict PID/runtime/backend/size guards, and retain the raw-buffer hash. KWin 6.7.4 uses XRGB8888; reject an ambiguous buffer instead of selecting a stale image. This proves the 2D window, not stereo output or GPU rendering.
+  **Found by:** Qdrant's KDE-renderer lesson, supportInformation reporting QPainter, official virtual_qpainter_backend.cpp, a managed-label control frame, and then the real English/Portuguese licence frames.
+- **Symptom:** an abbreviated Calamares font-job proof fails before the helper with Missing variables: LANG.
+  **Cause:** omitting the normal mount/locale phase also omits rootMountPoint and localeConf.LANG.
+  **Fix:** a test-only registration job supplies those values for an already copied disposable target; use the installed font shellprocess config byte for byte, start at the exec phase, and assert that the following marker job runs. Never supply an EULA answer. The isolated -c application directory also needs the installed qml and branding directories.
+  **Found by:** the real Calamares log, upstream CommandList.cpp / locale/Global.cpp, and a successful actual font-job run ending with target Arial and completion: succeeded.

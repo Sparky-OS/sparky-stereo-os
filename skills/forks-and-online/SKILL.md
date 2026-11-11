@@ -6,7 +6,7 @@ description: >-
   commits in no branch, worktrees, partial clones, uncommitted files, git rev-list --not --remotes with patch-id) and
   tell merged, superseded, missing and uncommitted work apart; cut releases that Zenodo keeps for good, the Sponsor
   button, our own libraries' repositories, where large files go. Load it when a report says done but nothing is online,
-  origin points at upstream, a push is refused by branch protection or a public-surface rule, KDE Invent runs CI on a
+  origin points at upstream, a released upstream fix may retire a carried patch or local tree, a push is refused by branch protection or a public-surface rule, KDE Invent runs CI on a
   push, a release or DOI is needed, or an audit of many clones is due.
 ---
 
@@ -19,6 +19,9 @@ description: >-
 3. Before saying something is online, audit: fetch every remote, list what no remote holds, and sort it with the rules below.
 4. Read what you publish. Run the repository's own audit, if it has one, and look for credentials before the first push of anything new.
 5. Record what you pushed (repository, branch, commit) where the task's report or receipt lives.
+
+For retiring released fixes, start with [retiring carried patches and local copies](references/retiring-released-work.md).
+Prove the release before dropping its patch, the complete remaining distribution changes before retiring a package, and every local change before freeing a tree.
 
 **Check freshness first.**
 Written on 2026-10-29, after a full audit of more than a hundred clones found work that had been reported as done but was never pushed, and clones whose `origin` was the upstream project.

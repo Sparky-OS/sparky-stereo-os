@@ -7,7 +7,8 @@ description: >-
   (kde-ci-local), container test harnesses (setpriv for an unprivileged uid, proot and exit status, dpkg --unpack for a
   real postrm, a read-copy of the repository for a gate). Load it when a test needs a cable, a TV or a laptop, a bench
   machine must be reserved or recovered, tests pass as root but fail for the person, a CI image lacks the edition's
-  Xwayland, QSignalSpy::wait loses a signal, a KWin autotest flakes, or a kernel test could brick a board.
+  Xwayland, QSignalSpy::wait loses a signal, a KWin autotest flakes, a kernel test could brick a board, or a GPU test
+  could wedge the GPU until a reboot.
 ---
 
 # Testing on real machines and televisions
@@ -222,5 +223,5 @@ Each is quoted from its own pages and licences, checked on 2026-11-04.
 
 ## Lessons from the lanes, October to November 2026
 
-[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (13 entries).
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 11 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (17 entries).
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

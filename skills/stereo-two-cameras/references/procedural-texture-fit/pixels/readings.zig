@@ -482,6 +482,44 @@ pub fn octaves(t: []const f32, n: usize) [NBAND]f32 {
     return out;
 }
 
+/// milestone 2e: every band down to the picture's two by two means (a quarter's fit had read only the seven finest,
+/// 1 to 64 pixels at 512, and drew no patches larger than an eighth of its own canvas: Fable's review of 2d, measured
+/// with m2e_bands.py); the bands a picture is too small for stay 0 in both
+pub const NBAND_ALL = 10;
+pub fn octavesAll(t: []const f32, n: usize) [NBAND_ALL]f32 {
+    var out = [_]f32{0} ** NBAND_ALL;
+    var cur = alloc.alloc(f32, n * n) catch unreachable;
+    @memcpy(cur, t);
+    var m = n;
+    var k: usize = 0;
+    while (k < NBAND_ALL and m >= 2) : (k += 1) {
+        const h = m / 2;
+        const nxt = alloc.alloc(f32, h * h) catch unreachable;
+        for (0..h) |y| {
+            for (0..h) |x| nxt[y * h + x] = 0.25 * (cur[2 * y * m + 2 * x] + cur[2 * y * m + 2 * x + 1] + cur[(2 * y + 1) * m + 2 * x] + cur[(2 * y + 1) * m + 2 * x + 1]);
+        }
+        var v: f64 = 0;
+        for (0..m) |y| {
+            for (0..m) |x| {
+                const d = cur[y * m + x] - nxt[(y / 2) * h + x / 2];
+                v += d * d;
+            }
+        }
+        out[k] = @floatCast(@log(v / @as(f64, @floatFromInt(m * m)) + 1e-12));
+        alloc.free(cur);
+        cur = nxt;
+        m = h;
+    }
+    alloc.free(cur);
+    return out;
+}
+
+pub fn octDistAll(a: [NBAND_ALL]f32, b: [NBAND_ALL]f32) f32 {
+    var s: f32 = 0;
+    for (a, b) |x, y| s += (x - y) * (x - y);
+    return s;
+}
+
 pub fn octDist(a: [NBAND]f32, b: [NBAND]f32) f32 {
     var s: f32 = 0;
     for (a, b) |x, y| s += (x - y) * (x - y);

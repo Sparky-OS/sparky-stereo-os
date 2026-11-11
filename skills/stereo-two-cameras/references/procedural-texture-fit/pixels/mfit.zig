@@ -46,6 +46,8 @@ pub fn note(comptime fmt: []const u8, args: anytype) void {
 /// milestone 2d: every seed word the fit writes is moved by this much (mfit seed=N), so the four quarters of a picture
 /// fitted apart draw four different instances of their noises, not one instance four times
 pub var seed_base: i32 = 0;
+/// milestone 2e: the noise's frequency read on every band (bands=7: the seven finest, as milestones 2b to 2d)
+pub var bands_all: bool = true;
 
 pub fn mk(k: usize, v: []const f64, ins: []const usize) P.Node {
     var nd = P.Node{ .op = @intCast(P.OP_MODERN + k) };
@@ -267,11 +269,12 @@ fn readNoise(g: *P.Graph, pic: *const Pic, rd: *const P.Reading) Built {
     // the frequency of the first octave and the fall: the drawing's strength per octave made to agree with the
     // picture's (the whole row of octaves, as a Laplacian pyramid measures it)
     const op = R.octaves(pic.t, n);
+    const opa = R.octavesAll(pic.t, n);
+    if (bands_all) note("noise: every band read, down to the picture's two by two means (bands=7 reads the seven finest, as before)\n", .{});
     var bd: f32 = 1e9;
     for ([_]i32{ 1, 2, 4, 8, 16 }) |f| {
         for ([_]f32{ 0.4, 0.5, 0.6, 0.7, 0.8, 0.9 }) |gv| {
-            const od = readNoiseOct(g, pic, kind, rev, f, f, octFor(n, f), gv);
-            const d = R.octDist(od, op);
+            const d = if (bands_all) R.octDistAll(readNoiseOctAll(g, pic, kind, rev, f, f, octFor(n, f), gv), opa) else R.octDist(readNoiseOct(g, pic, kind, rev, f, f, octFor(n, f), gv), op);
             note("  {d} cells, gain {d:.1}: octaves differ {d:.3}\n", .{ f, gv, d });
             if (d < bd) {
                 bd = d;
@@ -344,6 +347,18 @@ fn readNoiseOct(g: *P.Graph, pic: *const Pic, kind: u32, rev: bool, fx: i32, fy:
     dr.free();
     defer alloc.free(rk);
     return R.octaves(rk, n);
+}
+
+fn readNoiseOctAll(g: *P.Graph, pic: *const Pic, kind: u32, rev: bool, fx: i32, fy: i32, oct: i32, gain: f32) [R.NBAND_ALL]f32 {
+    const n = pic.n;
+    const keep = g.n;
+    const ix = add(g, noiseNode(kind, fx, fy, oct, gain, 0, 2, 1));
+    var dr = drawNode(g, ix, n);
+    g.n = keep;
+    const rk = ranked(dr.grey, pic, rev);
+    dr.free();
+    defer alloc.free(rk);
+    return R.octavesAll(rk, n);
 }
 
 fn readNoiseCand(g: *P.Graph, pic: *const Pic, kind: u32, rev: bool, fx: i32, fy: i32, oct: i32, gain: f32, warp: f32, wf: i32, what: NRead) f32 {
@@ -700,12 +715,14 @@ pub const MOpt = struct {
     on: []const u8 = "", // on=NAME,...: close-up layers the eye asked for below their readings' thresholds (spots); their values still read
     marks_soft: bool = true, // marks=fixed: the second material's and the spots' edges as milestone 2c drew them; else their softness read
     grain_cap: bool = true, // grainfit=closest: a piece's grain chosen closest to the picture's bands (milestone 2c); else the closest that exceeds none of them
+    bands_all: bool = true, // bands=7: the noise's frequency read on the seven finest bands (milestones 2b to 2d); else every band down to two by two
 };
 
 pub fn run(path: [*:0]const u8, prefix: []const u8, opt: MOpt) void {
     const t0 = P.seconds();
     P.say_refusals = true;
     seed_base = opt.seed;
+    bands_all = opt.bands_all;
     if (opt.seed != 0) note("seeds: every seed word moved by {d} (seed={d})\n", .{ opt.seed, opt.seed });
     const img = P.readPpm(path);
     const n = img.w;

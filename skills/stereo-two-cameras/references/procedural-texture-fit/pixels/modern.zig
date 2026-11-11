@@ -14,10 +14,16 @@ pub const scatter = @import("ops/scatter.zig");
 pub const wear = @import("ops/wear.zig");
 pub const tint = @import("ops/tint.zig");
 pub const quad = @import("ops/quad.zig");
+pub const grid = @import("ops/grid.zig");
+pub const stack = @import("ops/stack.zig");
 
-pub const list = .{ noise, cells, tiles, ramp, layer, shade, scatter, wear, tint, quad };
+pub const list = .{ noise, cells, tiles, ramp, layer, shade, scatter, wear, tint, quad, grid, stack };
 /// Quad's place in the list: a procedure whose last operator is a Quad draws its four inputs each on its own canvas
 pub const K_QUAD = 9;
+/// Grid (milestone 2e): cols by rows procedures per picture, each on its own canvas, the procedure's last operator
+pub const K_GRID = 10;
+/// Stack (milestone 2e): whole procedures laid over each other, the procedure's last operator
+pub const K_STACK = 11;
 pub const count = list.len;
 
 /// i whole number, f decimal, c colour: the packing p2p's operator table uses
@@ -87,7 +93,7 @@ fn pixOf(p: ?*anyopaque) c.Pix {
 
 /// Draw modern operator k on the canvas c.cv. 0 and the new bitmap in out, or 1 and a sentence in err.
 pub fn apply(k: usize, w: []const u32, inp: []const ?*anyopaque, out: *?*anyopaque, err: []u8) c_int {
-    var pins: [8]c.Pix = undefined;
+    var pins: [16]c.Pix = undefined;
     for (inp, 0..) |p, i| {
         pins[i] = pixOf(p);
         // every input is drawn on the canvas, except a Scatter's seed (its second input), which is a small picture

@@ -78,7 +78,7 @@ pub fn seconds() f64 {
 // ---------------------------------------------------------------- operators
 
 const NW = 28; // werkkzeug3 stores at most 14 words; the modern Ramp 18, Tiles version 2 24
-const MAXIN = 8;
+const MAXIN = 16; // a Grid of 4 by 4 procedures (milestone 2e); werkkzeug3 takes at most 8
 pub const MAXN = 220;
 
 const OpInfo = struct { name: [:0]const u8, kinds: []const u8, nin: u8 };
@@ -6050,9 +6050,11 @@ pub fn hasModern(g: *const Graph) bool {
 /// widest neighbourhood any node reads (Shade one pixel, Wear its radius or length), cut away by cropRgba.
 pub fn drawCanvas(g: *const Graph, side: usize, win: Win, maxoct: u32) ?*anyopaque {
     if (isQuad(g.nodes[g.root].op)) return drawQuad(g, side, win, maxoct);
+    if (isGrid(g.nodes[g.root].op)) return drawGrid(g, side, win, maxoct);
+    if (isStack(g.nodes[g.root].op)) return drawStack(g, side, win, maxoct);
     for (g.nodes[0..g.root]) |nd| {
-        if (isQuad(nd.op)) {
-            say("refused: a Quad is the procedure's last operator (it draws four procedures, each on its own canvas)\n", .{});
+        if (isQuad(nd.op) or isGrid(nd.op) or isStack(nd.op)) {
+            say("refused: a {s} is the procedure's last operator (it draws whole procedures, each on its own canvas)\n", .{ops[nd.op].name});
             return null;
         }
     }
@@ -6103,8 +6105,8 @@ fn drawQuad(g: *const Graph, side: usize, win: Win, maxoct: u32) ?*anyopaque {
         var reach: f32 = 0;
         var any = false;
         for (subs[q].nodes[0 .. subs[q].root + 1]) |nd| {
-            if (isQuad(nd.op)) {
-                say("refused: a Quad's inputs hold another Quad (one Quad per procedure, its last operator)\n", .{});
+            if (isQuad(nd.op) or isGrid(nd.op) or isStack(nd.op)) {
+                say("refused: a Quad's inputs hold a {s} (one Quad per procedure, its last operator; a Stack may lay Quads)\n", .{ops[nd.op].name});
                 return null;
             }
             if (!isModern(nd.op)) continue;
@@ -6151,6 +6153,261 @@ fn drawQuad(g: *const Graph, side: usize, win: Win, maxoct: u32) ?*anyopaque {
     return out;
 }
 var quad_serial: u64 = 0;
+
+pub fn isGrid(op: u8) bool {
+    return op == OP_MODERN + modern.K_GRID;
+}
+pub fn isStack(op: u8) bool {
+    return op == OP_MODERN + modern.K_STACK;
+}
+
+/// the widest margin any of the given procedures needs on a canvas whose pixels are pxs parts of their own picture
+fn marginFor(sub: *const Graph, pxs: f32) usize {
+    var reach: f32 = 0;
+    var any = false;
+    for (sub.nodes[0 .. sub.root + 1]) |nd| {
+        if (!isModern(nd.op)) continue;
+        const r = modern.marginOf(nd.op - OP_MODERN, nd.w[0..wordsOf(&nd)]);
+        if (r > 0) any = true;
+        reach += r;
+    }
+    return if (any) @as(usize, @intFromFloat(@ceil(reach / pxs))) + 2 else 0;
+}
+
+/// More procedures per picture (milestone 2e): a Grid's cols * rows inputs, input q (row q / cols, column q % cols)
+/// drawn on its own canvas at the places s (x - col / cols), s (y - row / rows), s the smaller of cols and rows, every
+/// canvas of one side and margin; then the Grid lays them together with its seam (Quad's rule for any count).
+fn drawGrid(g: *const Graph, side: usize, win: Win, maxoct: u32) ?*anyopaque {
+    const rt = g.nodes[g.root];
+    const cols: usize = @intCast(rt.w[1]);
+    const rows: usize = @intCast(rt.w[2]);
+    const nt = cols * rows;
+    if (cols < 1 or rows < 1 or cols > 4 or rows > 4 or rt.nin != nt) {
+        say("refused: a Grid of {d} by {d} tiles takes {d} procedures, the graph gives {d}\n", .{ cols, rows, nt, rt.nin });
+        return null;
+    }
+    const sc = modern.grid.scaleOf(cols, rows);
+    const subs = alloc.alloc(Graph, nt) catch die("out of memory", .{});
+    defer alloc.free(subs);
+    const pxs = sc * win.s / @as(f32, @floatFromInt(side));
+    var m: usize = 0;
+    for (0..nt) |q| {
+        subs[q] = quadPart(g, q);
+        for (subs[q].nodes[0 .. subs[q].root + 1]) |nd| {
+            if (isQuad(nd.op) or isGrid(nd.op) or isStack(nd.op)) {
+                say("refused: a Grid's inputs hold a {s} (one Grid per procedure, its last operator; a Stack may lay Grids)\n", .{ops[nd.op].name});
+                return null;
+            }
+        }
+        m = @max(m, marginFor(&subs[q], pxs));
+    }
+    m = (m + 1) & ~@as(usize, 1);
+    const cw = side + 2 * m;
+    var parts: [modern.grid.MAXT]?*anyopaque = [_]?*anyopaque{null} ** modern.grid.MAXT;
+    defer for (parts) |p| {
+        if (p != null) wzb_free(p);
+    };
+    for (0..nt) |q| {
+        const col: f32 = @floatFromInt(q % cols);
+        const row: f32 = @floatFromInt(q / cols);
+        const fc: f32 = @floatFromInt(cols);
+        const fr: f32 = @floatFromInt(rows);
+        modern.c.cv = .{ .w = cw, .h = cw, .m = m, .wx = sc * (win.x - col / fc), .wy = sc * (win.y - row / fr), .ws = sc * win.s, .maxoct = maxoct };
+        const bm = draw(&subs[q], 0) orelse {
+            say("refused: the Grid's procedure {d} does not draw\n", .{q + 1});
+            return null;
+        };
+        const cp = wzb_new(@intCast(cw), @intCast(cw)) orelse die("out of memory", .{});
+        @memcpy(wzb_data(cp)[0 .. cw * cw * 4], wzb_data(bm)[0 .. cw * cw * 4]);
+        parts[q] = cp;
+    }
+    modern.c.cv = .{ .w = cw, .h = cw, .m = m, .wx = win.x, .wy = win.y, .ws = win.s, .maxoct = maxoct };
+    var out: ?*anyopaque = null;
+    var err: [300]u8 = [_]u8{0} ** 300;
+    var w: [32]u32 = [_]u32{0} ** 32;
+    const nk = wordsOf(&rt);
+    for (0..nk) |p| w[p] = rt.w[p];
+    const r = modern.apply(modern.K_GRID, w[0..nk], parts[0..nt], &out, &err);
+    if (r != 0) {
+        say("refused: Grid: {s}\n", .{std.mem.sliceTo(&err, 0)});
+        return null;
+    }
+    quad_serial += 1;
+    cachePut(mix(0x51ad0002, quad_serial), out);
+    return out;
+}
+
+/// Results laid over each other (milestone 2e): a Stack's inputs, each a whole procedure (a Quad or a Grid among
+/// them), drawn over the same window, their inner pixels copied to canvases without a margin; then the Stack lays
+/// them, the bottom one first. The Stack's own canvas has no margin.
+fn drawStack(g: *const Graph, side: usize, win: Win, maxoct: u32) ?*anyopaque {
+    const rt = g.nodes[g.root];
+    if (rt.nin < 2 or rt.nin > modern.stack.MAXL) {
+        say("refused: a Stack lays two to four procedures, the graph gives {d}\n", .{rt.nin});
+        return null;
+    }
+    var parts: [modern.stack.MAXL]?*anyopaque = [_]?*anyopaque{null} ** modern.stack.MAXL;
+    defer for (parts) |p| {
+        if (p != null) wzb_free(p);
+    };
+    for (0..rt.nin) |q| {
+        var sub = quadPart(g, q);
+        for (sub.nodes[0..sub.root]) |nd| {
+            if (isStack(nd.op)) {
+                say("refused: a Stack's procedure {d} holds another Stack (one Stack per procedure, its last operator)\n", .{q + 1});
+                return null;
+            }
+        }
+        if (isStack(sub.nodes[sub.root].op)) {
+            say("refused: a Stack's procedure {d} is another Stack\n", .{q + 1});
+            return null;
+        }
+        const bm = drawCanvas(&sub, side, win, maxoct) orelse {
+            say("refused: the Stack's procedure {d} does not draw\n", .{q + 1});
+            return null;
+        };
+        const cv = modern.c.cv;
+        const cp = wzb_new(@intCast(side), @intCast(side)) orelse die("out of memory", .{});
+        const src = wzb_data(bm);
+        const dst = wzb_data(cp);
+        for (0..side) |j| {
+            const a = ((j + cv.m) * cv.w + cv.m) * 4;
+            @memcpy(dst[j * side * 4 .. (j + 1) * side * 4], src[a .. a + side * 4]);
+        }
+        parts[q] = cp;
+    }
+    modern.c.cv = .{ .w = side, .h = side, .m = 0, .wx = win.x, .wy = win.y, .ws = win.s, .maxoct = maxoct };
+    var out: ?*anyopaque = null;
+    var err: [300]u8 = [_]u8{0} ** 300;
+    var w: [32]u32 = [_]u32{0} ** 32;
+    const nk = wordsOf(&rt);
+    for (0..nk) |p| w[p] = rt.w[p];
+    const r = modern.apply(modern.K_STACK, w[0..nk], parts[0..rt.nin], &out, &err);
+    if (r != 0) {
+        say("refused: Stack: {s}\n", .{std.mem.sliceTo(&err, 0)});
+        return null;
+    }
+    quad_serial += 1;
+    cachePut(mix(0x51ad0003, quad_serial), out);
+    return out;
+}
+
+/// a procedure's mean colour, drawn alone on its own canvas at 256 pixels (the smooth seam's field passes through it)
+fn meanWord(sub: *const Graph, what: []const u8) u32 {
+    const side: usize = 256;
+    const rgba = alloc.alloc(u8, side * side * 4) catch die("out of memory", .{});
+    defer alloc.free(rgba);
+    const bm = drawCanvas(sub, side, .{}, 99) orelse die("{s} does not draw", .{what});
+    cropRgba(bm, rgba);
+    var s = [3]f64{ 0, 0, 0 };
+    for (0..side * side) |k| {
+        inline for (0..3) |ch| s[ch] += @floatFromInt(rgba[4 * k + ch]);
+    }
+    var word: u32 = 0xff000000;
+    inline for (0..3) |ch| {
+        const v: u32 = @intFromFloat(@floor(s[ch] / @as(f64, @floatFromInt(side * side)) + 0.5));
+        word |= @as(u32, @min(v, 255)) << (16 - 8 * ch);
+    }
+    return word;
+}
+
+fn sameNode(a: *const Node, b: *const Node) bool {
+    if (a.op != b.op or a.nin != b.nin) return false;
+    if (!std.mem.eql(u8, a.in[0..a.nin], b.in[0..b.nin])) return false;
+    const na = wordsOf(a);
+    if (na != wordsOf(b) or !std.mem.eql(u32, a.w[0..na], b.w[0..na])) return false;
+    return std.mem.eql(u16, &a.s, &b.s);
+}
+
+/// copy a procedure's nodes into g after its own; the root's new place. A node equal to one already in g (the same
+/// operator, words and inputs: two layers built on one structure share it) is stored once (milestone 2e).
+fn appendGraph(g: *Graph, sub: *const Graph, what: []const u8) usize {
+    var map: [MAXN]u8 = undefined;
+    for (sub.nodes[0..sub.n], 0..) |nd0, i| {
+        var nd = nd0;
+        for (nd.in[0..nd.nin]) |*v| v.* = map[v.*];
+        var found: ?usize = null;
+        for (g.nodes[0..g.n], 0..) |*x, k| {
+            if (sameNode(x, &nd)) {
+                found = k;
+                break;
+            }
+        }
+        if (found) |k| {
+            map[i] = @intCast(k);
+            continue;
+        }
+        if (g.n + 2 > MAXN) die("{s}: the procedures hold more than {d} operators", .{ what, MAXN - 1 });
+        g.nodes[g.n] = nd;
+        map[i] = @intCast(g.n);
+        g.n += 1;
+    }
+    return map[sub.root];
+}
+
+/// p2p grid: cols * rows tiles' procedures (row by row from the top left) joined under a Grid, each one's mean
+/// colour measured on its own canvas
+fn gridJoin(out: []const u8, cols: usize, rows: usize, paths: []const [*:0]const u8, seam: u32, band: f32) void {
+    const nt = cols * rows;
+    if (paths.len != nt) die("grid: {d} by {d} tiles take {d} procedures, {d} given", .{ cols, rows, nt, paths.len });
+    var g = alloc.create(Graph) catch die("out of memory", .{});
+    g.* = Graph{};
+    var gn = Node{ .op = @intCast(OP_MODERN + modern.K_GRID), .nin = @intCast(nt), .nw = @intCast(modern.grid.params.len) };
+    gn.w[0] = 1;
+    gn.w[1] = @intCast(cols);
+    gn.w[2] = @intCast(rows);
+    gn.w[3] = seam;
+    gn.w[4] = @bitCast(band);
+    for (5..modern.grid.params.len) |k| gn.w[k] = 0xff808080;
+    for (0..nt) |q| {
+        var sub = parseScript(readFile(paths[q]));
+        sub.prune();
+        if (isQuad(sub.nodes[sub.root].op) or isGrid(sub.nodes[sub.root].op) or isStack(sub.nodes[sub.root].op)) die("grid: {s} is already a {s}", .{ paths[q], ops[sub.nodes[sub.root].op].name });
+        gn.w[5 + q] = meanWord(&sub, "grid: a tile's procedure");
+        gn.in[q] = @intCast(appendGraph(g, &sub, "grid"));
+        say("tile {d} (row {d}, column {d}): {d} operators, {d} bytes, mean colour {x:0>6}\n", .{ q + 1, q / cols, q % cols, sub.n, sub.bytes(), gn.w[5 + q] & 0xffffff });
+    }
+    g.nodes[g.n] = gn;
+    g.root = g.n;
+    g.n += 1;
+    var buf: [1 << 18]u8 = undefined;
+    writeFile(out, scriptText(g, &buf));
+    say("grid: {d} by {d}, {d} operators, {d} bytes (seam {s}, band {d:.3})\n", .{ cols, rows, g.n, g.bytes(), ([_][]const u8{ "cut", "mix", "keep", "smooth" })[seam], band });
+}
+
+pub const StackLayer = struct { mode: u32 = 0, amount: f32 = 0.5, lo: f32 = 0.4, hi: f32 = 0.6 };
+
+/// p2p stack: two to four whole procedures (the bottom one first) joined under a Stack with each upper layer's mask
+fn stackJoin(out: []const u8, paths: []const [*:0]const u8, lay: []const StackLayer) void {
+    if (paths.len < 2 or paths.len > modern.stack.MAXL) die("stack: two to four procedures, {d} given", .{paths.len});
+    var g = alloc.create(Graph) catch die("out of memory", .{});
+    g.* = Graph{};
+    var sn = Node{ .op = @intCast(OP_MODERN + modern.K_STACK), .nin = @intCast(paths.len), .nw = @intCast(modern.stack.params.len) };
+    sn.w[0] = 1;
+    for (1..modern.stack.MAXL) |l| {
+        const L = if (l < lay.len) lay[l] else StackLayer{};
+        sn.w[1 + 4 * (l - 1)] = L.mode;
+        sn.w[2 + 4 * (l - 1)] = @bitCast(L.amount);
+        sn.w[3 + 4 * (l - 1)] = @bitCast(L.lo);
+        sn.w[4 + 4 * (l - 1)] = @bitCast(L.hi);
+    }
+    const mn = [_][]const u8{ "alpha", "height", "dark", "light" };
+    for (paths, 0..) |p, q| {
+        var sub = parseScript(readFile(p));
+        sub.prune();
+        if (isStack(sub.nodes[sub.root].op)) die("stack: {s} is already a Stack", .{p});
+        sn.in[q] = @intCast(appendGraph(g, &sub, "stack"));
+        if (q == 0) {
+            say("layer 1 (bottom): {s}, {d} operators, {d} bytes\n", .{ p, sub.n, sub.bytes() });
+        } else say("layer {d}: {s}, {d} operators, {d} bytes; laid by {s}, amount {d:.2}, from {d:.3} to {d:.3}\n", .{ q + 1, p, sub.n, sub.bytes(), mn[lay[q].mode], lay[q].amount, lay[q].lo, lay[q].hi });
+    }
+    g.nodes[g.n] = sn;
+    g.root = g.n;
+    g.n += 1;
+    var buf: [1 << 18]u8 = undefined;
+    writeFile(out, scriptText(g, &buf));
+    say("stack: {d} layers, {d} operators, {d} bytes\n", .{ paths.len, g.n, g.bytes() });
+}
 
 /// p2p quad: the four quarters' procedures joined into one graph under a Quad, each input's mean colour measured
 /// on its own canvas (at 256 pixels) for the seam that keeps the contrast
@@ -6314,9 +6571,13 @@ pub fn mainC(argc: c_int, argv: [*]const [*:0]const u8) callconv(.c) c_int {
                 mo.marks_soft = true;
             } else if (std.mem.eql(u8, a, "grainfit=closest")) {
                 mo.grain_cap = false;
+            } else if (std.mem.eql(u8, a, "bands=7")) {
+                mo.bands_all = false;
+            } else if (std.mem.eql(u8, a, "bands=all")) {
+                mo.bands_all = true;
             } else if (std.mem.eql(u8, a, "grainfit=cap")) {
                 mo.grain_cap = true;
-            } else die("mfit: {s} is not known (full=FULL.ppm, tile=SIDE, seeds=CHOSEN, light=0|1, close=0|1, off=LAYER,..., grainat=colour|field, seed=N, joints=full|scan, pairs=0|1, framed=0|1, grainfit=cap|closest, on=LAYER,..., marks=read|fixed)", .{a});
+            } else die("mfit: {s} is not known (full=FULL.ppm, tile=SIDE, seeds=CHOSEN, light=0|1, close=0|1, off=LAYER,..., grainat=colour|field, seed=N, joints=full|scan, pairs=0|1, framed=0|1, grainfit=cap|closest, on=LAYER,..., marks=read|fixed, bands=all|7)", .{a});
         }
         mfit.run(argv[2], argStr(argv, 3), mo);
         return 0;
@@ -6342,6 +6603,73 @@ pub fn mainC(argc: c_int, argv: [*]const [*:0]const u8) callconv(.c) c_int {
         }
         say_refusals = true;
         quadJoin(argStr(argv, 2), .{ argv[3], argv[4], argv[5], argv[6] }, seam, band);
+        return 0;
+    }
+    if (n >= 6 and std.mem.eql(u8, argStr(argv, 1), "grid")) {
+        // p2p grid OUT.script COLS ROWS TILE.script... [seam=cut|mix|keep|smooth] [band=B]   (milestone 2e: cols by rows
+        // procedures, each fitted to one tile of the picture, row by row from the top left)
+        const cols = std.fmt.parseInt(usize, argStr(argv, 3), 10) catch die("grid: COLS is a whole number", .{});
+        const rows = std.fmt.parseInt(usize, argStr(argv, 4), 10) catch die("grid: ROWS is a whole number", .{});
+        if (cols < 1 or cols > 4 or rows < 1 or rows > 4) die("grid: 1 to 4 columns and rows", .{});
+        var seam: u32 = 3;
+        var band: f32 = 0.03;
+        var paths: [16][*:0]const u8 = undefined;
+        var np: usize = 0;
+        for (5..n) |i| {
+            const a = argStr(argv, i);
+            if (std.mem.eql(u8, a, "seam=cut")) {
+                seam = 0;
+            } else if (std.mem.eql(u8, a, "seam=mix")) {
+                seam = 1;
+            } else if (std.mem.eql(u8, a, "seam=keep")) {
+                seam = 2;
+            } else if (std.mem.eql(u8, a, "seam=smooth")) {
+                seam = 3;
+            } else if (std.mem.startsWith(u8, a, "band=")) {
+                band = std.fmt.parseFloat(f32, a[5..]) catch die("bad {s}", .{a});
+            } else if (std.mem.indexOfScalar(u8, a, '=') != null) {
+                die("grid: {s} is not known (seam=cut|mix|keep|smooth, band=PARTS-OF-THE-PICTURE)", .{a});
+            } else {
+                if (np >= 16) die("grid: more than 16 procedures", .{});
+                paths[np] = argv[i];
+                np += 1;
+            }
+        }
+        say_refusals = true;
+        gridJoin(argStr(argv, 2), cols, rows, paths[0..np], seam, band);
+        return 0;
+    }
+    if (n >= 5 and std.mem.eql(u8, argStr(argv, 1), "stack")) {
+        // p2p stack OUT.script BOTTOM.script [mask=alpha|height|dark|light amount=A lo=L hi=H] LAYER.script ...
+        // (milestone 2e: whole procedures laid over each other; the options before a layer's script are that layer's)
+        var paths: [4][*:0]const u8 = undefined;
+        var lay: [4]StackLayer = [_]StackLayer{.{}} ** 4;
+        var cur = StackLayer{};
+        var np: usize = 0;
+        for (3..n) |i| {
+            const a = argStr(argv, i);
+            if (std.mem.startsWith(u8, a, "mask=")) {
+                const v = a[5..];
+                cur.mode = if (std.mem.eql(u8, v, "alpha")) 0 else if (std.mem.eql(u8, v, "height")) 1 else if (std.mem.eql(u8, v, "dark")) 2 else if (std.mem.eql(u8, v, "light")) 3 else die("stack: mask={s} is not known (alpha, height, dark, light)", .{v});
+            } else if (std.mem.startsWith(u8, a, "amount=")) {
+                cur.amount = std.fmt.parseFloat(f32, a[7..]) catch die("bad {s}", .{a});
+            } else if (std.mem.startsWith(u8, a, "lo=")) {
+                cur.lo = std.fmt.parseFloat(f32, a[3..]) catch die("bad {s}", .{a});
+            } else if (std.mem.startsWith(u8, a, "hi=")) {
+                cur.hi = std.fmt.parseFloat(f32, a[3..]) catch die("bad {s}", .{a});
+            } else if (std.mem.indexOfScalar(u8, a, '=') != null) {
+                die("stack: {s} is not known (mask=alpha|height|dark|light, amount=A, lo=L, hi=H before a layer's script)", .{a});
+            } else {
+                if (np >= 4) die("stack: more than four procedures", .{});
+                if (np == 0 and (cur.mode != 0 or cur.amount != 0.5)) die("stack: the bottom procedure is laid on nothing; give a layer's mask and amount before the layer's own script", .{});
+                paths[np] = argv[i];
+                lay[np] = cur;
+                cur = StackLayer{};
+                np += 1;
+            }
+        }
+        say_refusals = true;
+        stackJoin(argStr(argv, 2), paths[0..np], lay[0..np]);
         return 0;
     }
     if (n >= 4 and std.mem.eql(u8, argStr(argv, 1), "seed")) {

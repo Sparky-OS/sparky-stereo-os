@@ -1,5 +1,6 @@
 #!/bin/sh
-# Milestone 3, phase D: the final page at dial-up (the dial-up matrix ran the page before three changes: a job stops at
+# Milestone 3, phase D: the final page at dial-up on the AMD iGPU and with the WebAssembly player (the RTX's in phase E,
+# m3_final_nv.sh) (the dial-up matrix ran the page before three changes: a job stops at
 # its next operator once its picture is in, passes timed by GPU timestamps, the panel's headline and legend).
 # m3_final.sh OUTBASE
 set -eu
@@ -10,7 +11,5 @@ mkdir -p "$OUT"
 run amd final-amd-d56-c6 "speed=d56&conns=6&fps=5" 1700 &
 sleep 120
 run nvidia final-wa-d56-c2 "speed=d56&conns=2&fps=5&player=wasm" 1700 &
-sleep 120
-run nvidia final-nv-d144-c6 "speed=d144&conns=6&fps=5" 600 &
 wait
 echo "phase D finished"

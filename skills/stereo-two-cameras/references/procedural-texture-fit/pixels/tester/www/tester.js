@@ -355,7 +355,7 @@ function maybeSettled() {
     if (worker) worker.terminate();
     R.playerOff = now();
   }
-  if (S.proof) setTimeout(finishProof, 3000);
+  if (S.proof) setTimeout(finishProof, S.nostop ? 20000 : 3000);    // the negative control is watched longer
 }
 
 let frames = 0;

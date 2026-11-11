@@ -9,7 +9,8 @@ no network and installs nothing.
 The virtual link: every request whose query carries link=1 is sent through one link of a set rate in bytes per
 second, shared by all such requests at once (each connection takes its turn chunk by chunk, so N connections share
 the rate fairly). A chunk is written when its slot on the link has passed, so the bytes leave at the set rate; a slot
-may start up to 0.1 s in the past, so a sender that wakes late makes the time up (a token bucket 0.1 s deep). The
+may start up to 0.1 s in the past (five chunks' time where chunks are capped, above 25.6 Mbit/s), so a sender that
+wakes late makes the time up (a token bucket that deep). The
 tester sets the rate with POST /link {"rate": BYTES_PER_SECOND} (0: no limit). Every chunk sent is recorded
 (GET /link/log; POST /link/reset clears it) so the rate the page shows can be checked against the bytes really sent.
 HTTP headers are not counted or limited; only bodies are.
@@ -59,7 +60,8 @@ class Link:
                 n = min(self.chunk(), len(data) - pos)
                 now = time.monotonic()
                 if self.rate > 0:
-                    start = max(now - self.BURST, self.free_at)
+                    # the bucket's depth: 0.1 s, or five chunks' time where chunks are capped (above 25.6 Mbit/s)
+                    start = max(now - min(self.BURST, 5 * self.chunk() / self.rate), self.free_at)
                     self.free_at = start + n / self.rate
                     due = self.free_at
                 else:

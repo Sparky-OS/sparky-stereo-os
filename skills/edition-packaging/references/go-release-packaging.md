@@ -61,3 +61,26 @@ Successful module downloads and checksum verification alone do not establish tha
 On 2026-11-11 UTC, edgetk v1.5.21 declared 117 modules.
 Six matched the Forky package lookup above; five of those archive versions differed from the effective pinned versions.
 This supports a vendored build route for that unchanged release; it does not establish module download success, an offline build or cryptographic correctness.
+
+## Check the complete toolchain contract after vendoring
+
+1. Check the APIs the command actually calls before pinning a newly declared module.
+   A higher semantic version can omit aliases the caller still uses.
+   In m511, v0.0.0-psi provides ParsePrivateKey and MarshalPKCS8PublicKey, while v0.0.0-rho does not.
+   That compatibility distinction was established from the tagged source, not inferred from the version names.
+2. For an upstream dependency fix that has merged but has no tag, verify tag ancestry and ask Go for the canonical pseudo-version of the exact merge commit.
+   For example, `go mod download -json MODULE@COMMIT` returns Version and Origin.Hash; retain those fields and the checksums.
+   Do not construct the timestamp by hand or assume `@latest` includes an untagged fix.
+3. Run the actual command build in a clean container with networking disabled and only vendored dependencies available.
+   Keep application source unchanged while assessing a module-only proposal.
+   Separate a successful vendor input from a successful command build and an installed-package test.
+
+- **Symptom:** download, tidy, verification and vendoring succeed, but compilation says `package crypto/go.cypherpunks.su/gogost/v6/gost3410 is not in std`.
+  **Cause:** this edgetk source names a package below the standard-library crypto namespace; module reconciliation cannot supply it.
+  A diagnostic import substitution then exposed EncryptAsn1/DecryptAsn1 calls missing from standard crypto/ecdsa types.
+  **Fix:** obtain upstream's reproducible standard-library/toolchain input, or prepare a separately reviewed source adaptation with its encryption behavior established first.
+  Never silently substitute a different encryption implementation to make a dependency-only PR compile.
+  **Found by:** clean offline Forky builds of both dependency branches with Go 1.27.3, followed by the compiler output from a disposable one-line diagnostic substitution and `go doc crypto/ecdsa.PublicKey` / `PrivateKey`.
+
+The edgetk reconciliation above has now reached successful vendoring on local dependency-fix proposals.
+The stock-Go command build remains blocked by its source/toolchain contract; no package or CLI verification is established by the isolated e521 library probe.

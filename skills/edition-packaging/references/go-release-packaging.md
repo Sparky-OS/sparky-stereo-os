@@ -23,6 +23,12 @@ Keep upstream's module files unchanged when the task requires an unmodified tagg
 If vendoring asks to update them, retain the failure and reconcile it with upstream before changing the release.
 Review dependency licences as well as the top-level licence.
 
+Run `go mod download`, `go mod verify`, then `go mod vendor` in the disposable source tree.
+Set `GOTOOLCHAIN=local` and `GOFLAGS=-mod=readonly` when the build contract requires the packaged module files unchanged.
+Check their hashes before and after preparation.
+Repeat vendoring with `GOPROXY=off` in a container with networking disabled before calling the dependency input complete.
+Successful module downloads and checksum verification alone do not establish that all imports can be built.
+
 ## Traps found during release reconciliation
 
 - **Symptom:** an inventory lists `golang.org/x/crypto v0.45.0`, but the release selects v0.38.0.
@@ -38,6 +44,17 @@ Review dependency licences as well as the top-level licence.
   **Cause:** examples and cross-tool scripts were mistaken for a unit test suite.
   **Fix:** inventory the actual test files, run available checks in a container, and state the separate scope of installed smoke checks.
   **Found by:** the edgetk v1.5.21 tree had 38 files and no `*_test.go` or Actions workflow.
+
+- **Symptom:** `go mod verify` prints `all modules verified`, then `go mod vendor` reports `no required module provides package`.
+  **Cause:** edgetk v1.5.21 imports curupira2, m511, smaz, snow2 and sosemanuk without a requirement in the resolved module graph.
+  **Fix:** when the contract requires that release's exact dependency graph, stop packaging and retain the missing-module diagnostics for upstream's next complete release.
+  Do not follow the diagnostic's `go get` suggestion or invent dependency versions.
+  **Found by:** Go 1.27.3 in Forky, first with network access and then with `GOPROXY=off` and `--network none`; both vendoring attempts failed on the same five imports while go.mod and go.sum hashes stayed identical.
+- **Symptom:** removing a Go module cache with an ordinary recursive deletion leaves directories behind or reports `Directory not empty`.
+  **Cause:** downloaded modules have read-only directories; changing a file's mode alone does not make its parent directory writable for deletion.
+  **Fix:** use `go clean -modcache` inside the build container with its task-owned GOMODCACHE, or make directories writable before removing that known cache tree.
+  Never apply the cleanup to a shared cache.
+  **Found by:** a failed Python cache cleanup during lane edgetk-package-511; making the cache directories writable allowed complete removal.
 
 ## Measured reconciliation
 

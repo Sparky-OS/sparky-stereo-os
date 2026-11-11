@@ -5,7 +5,8 @@ It holds what Farbrausch's open tools are, what builds where, who already works 
 Since milestone 3 (the same day) it also holds the maths the core carries inside, so that one procedure draws the same bytes with every C library and in WebAssembly, and the partners' server, which an AI partner reaches the open project through.
 Since milestone 4 (the same day) it holds the editor's first light: a KDE program over the C interface, its parameter panel made from Farbrausch's table, a live picture drawn in a process of its own, the core's sentences in ten languages, and AI partners working in the open window.
 Since milestone 5 (the same day) it holds building in the window: operators dragged onto the page with the core's connection rules shown while they are dragged, a preview that can be pinned and tiled, the two sides of a step side by side, a partner's change marked on the page, and a proof that sends real pointer and key events through the compositor.
-The stereo preview, new operators and the Text operator are not built yet.
+Since milestone 6 (the same day) it holds the stereo preview: the three kinds of stereo project and where their values live in the file, the two eyes drawn by the core with the stereo texture module's own mapping, the preview's 3D area in a Qt Widgets dock, a stereo photograph as a project's source with its per-file corrections, and the proofs read from the compositor's own picture of both eyes.
+New operators, the Text operator and the fitter as a tool are not built yet.
 Later milestones grow this page into the editor's contributor skill.
 
 **Check freshness first.**
@@ -284,6 +285,68 @@ The checks of milestone 4 posted events into the program. A drag cannot be prove
 
 The rig's image needs what a Plasma session has: `plasma-integration` (KDE's own file dialog, driven by typing the path and Enter) and `qt6-svg-plugins` (without the SVG icon engine no themed icon is drawn, and every button shows as text).
 
+## The stereo preview: working recipe
+
+What is true for every Qt program's 3D area is in [stereo-window-3d-area](../../stereo-window-3d-area/SKILL.md) and its [lessons](../../stereo-window-3d-area/references/lessons-2026-11.md); this section is the editor's own part.
+
+### Three kinds of stereo project, and nothing else
+
+Daniel's words of 10 and 11 November 2026 fix the kinds: a picture whose relief gives each eye its picture (the relief lies at the surface or behind it, a few pixels in front allowed); two procedures, one for each eye; a stereo photograph as the source, whose two eyes are the targets of two procedures.
+Nothing is worked out between the eyes: no matching, no estimate of depth.
+
+- The values are the project's (`swz_stereo`, `swz_set_stereo`): the kind, two operators (the picture and its relief, or the left and the right eye), for a relief its depth (pixels behind and in front for an eye 1920 wide, the three heights, wrap or cut at the edge), for a photograph its file's name. They are journalled as a whole, so undo and redo are one swap.
+- **In the file they are a part of their own after the last byte werkkzeug3 reads**: `SWZS`, a version, a length, the values, a checksum, the part's length, `SZWS`. `WerkkzeugApp::Read` takes a pointer, reads the document and the player's document and stops, so it never looks there; `WerkkzeugApp::Write` writes its own model, so a file werkkzeug3 saves again has lost them. A project that is not stereo writes no such part: its bytes are what they always were. Say both facts where the person can read them (`wz info`, the README).
+- Operators are named in the file by their place, as werkkzeug3's own events are, and by their stable id in memory.
+- The text form has one `stereo` line and packs to the same bytes.
+- The start of a relief's depth is the stereo texture module's own (10 behind, nothing in front, black the deepest, white the surface, the picture tiles); the relief itself is always named by the person, an operator or the picture's own brightness.
+
+### One mapping: reuse the stereo texture module's functions, and prove it
+
+The relief's two eyes are drawn by the edition's stereo texture module (`parallaxMap` and `eye`, relief mapping once per eye); the core carries those two functions unchanged in `src/stereo.zig`.
+The proof that it is one mapping and not a second: `wz stereograph GRAPH OUT` draws a typed graph with the module's own lines (`lit`, `height`, `depth`, `edge`), and every stereo drawing of the module's native build is compared with it, pixel for pixel, at three eye widths (27 of 27 the same).
+The relief's pixels are for an eye 1920 wide and scale with the width of the eye the picture is shown in, in the picture's own pixels: a picture shown once is its own width, three by three is three pictures wide.
+
+### Drawn in the drawing process, as every picture
+
+`swz_stereo_job` packs what a drawing needs (the way, the depth, the eye width, one or two packed graphs); `swz-draw` takes a job as it takes a graph and answers with the two eyes side by side, the left eye first.
+The window never runs the mapping in its own thread: a 1024 pixel relief is hundreds of millions of ray steps.
+A pair is two pictures of one size side by side; eyes of two sizes are refused with both sizes in the sentence, never resized.
+
+### The 3D area in a Qt Widgets dock
+
+1. `StereoArea::prepareWindow(mainWindow)` first thing in the window's constructor: where the compositor offers the stereo protocol and the declaration library started, the window gets `WA_TranslucentBackground` and an event filter that paints its ground. Elsewhere nothing changes and the window is the ordinary window.
+2. The picture's canvas (inside a `QScrollArea`, inside a `QDockWidget`) paints a transparent rectangle with `CompositionMode_Source` where the picture shows, and nothing else there.
+3. The surface below the window holds **the part of each eye that shows**, copied from the eyes as the core drew them: a crop at the picture's own pixels, wrapped for three by three. Its destination (`wp_viewport`) is the rectangle that part has in the window. The compositor resizes it once; the program fits nothing to the window. Fitted, enlarged, three by three and pinned all fall out of that one rule.
+4. "Render resolution per eye" is a largest eye: the picture's own size first; a wider eye is made smaller by a whole factor, each pixel the mean of its block. Two eyes larger than a surface can hold are said, with the size, never silently made smaller.
+5. A 100 ms timer looks at the place again while two eyes are shown (a dock was moved, the window resized); a key of the eyes' serial number, the crop and the place keeps it from committing the same picture again.
+6. Messages belong to the preview, in a widget of their own: the desktop takes no declaration; the declaration failed (with the system's words); the preview floats in a window of its own (a floated dock is a top level without the alpha buffer); the two eyes do not fit a surface.
+
+### The program's three options, and the project's values
+
+The 3D menu holds Show in 3D (off at the start, kept like every setting), Render Resolution per Eye and Display Settings (`kcmshell6 kcm_kscreen`), and a proof counts its entries.
+Everything else about stereo is the project's and lives in the Stereo panel: it changes by journalled steps and is saved when the person saves.
+The program draws its own pictures, so no action of it swaps eyes; the proof looks through the action collection for one.
+
+### A stereo photograph as the source
+
+- Read through the edition's shared readers (`Stereo::Picture::load` of stereo-layer, with the edition's KImageFormats for JPS and MPO and the edition's Qt for PNG's `sTER`): never a list of formats of the editor's own.
+- The person's corrections (the input packing and "Swap left and right eyes") are kept for that one file in the program's state file (`KSharedConfig::openStateConfig()`, a group per absolute path), not in the project and not in the photograph. An entry with nothing set is deleted.
+- "Save the Correction to the File" writes the format's own mark (PNG's `sTER`, inserted after the header without touching the picture's bytes), reads the file back with nothing chosen, compares the two eyes, puts the file back when they differ, and forgets the stored entry when they are the same. A format or a correction it cannot write is refused with the reason, the file untouched, the correction kept.
+- The project keeps the file's name; the two eyes are the fitter's targets. The preview shows them beside the two procedures: inside each eye the photograph's eye, then the procedure's, each at its own size.
+
+### Proofs read from the compositor's own picture
+
+With stereo content on the screen, Stereo KWin's ScreenShot2 holds both eyes side by side, each the screen's size; the proof cuts it in two.
+
+1. **The 2D control:** 3D off, 0 pixels differ between the eyes over the whole screen.
+2. **Geometry against a prediction:** a relief that is a white square (the surface) on black (the deepest level), 60 pixels behind for an eye 1920 wide. Pixel for pixel on a 256 pixel picture the deepest level is 60 * 256 / 1920 = 8 pixels apart, three by three (an eye 768 wide) 24. The proof finds the whole-pixel shift that lays the right eye's strip over the left eye's and asks for 0 pixels left over; one pixel beside the prediction must not fit (the control). The middle of the square has 0 differing pixels.
+3. **Left eye first:** two procedures that differ on purpose, a red picture for the left eye and a blue one for the right; the screen's left eye is red. And the screen's left eye equals the core's left eye pixel for pixel.
+4. **The window's own elements:** outside the area's rectangle 0 pixels differ between the eyes.
+5. **The declaration:** one fresh run with `WAYLAND_DEBUG=client`: one `get_subsurface`, one `place_below`, one `kde_stereo_content_manager_v1.create` on that surface, one `set_content(3)`, none on the window's surface.
+6. **A refused declaration:** an environment switch makes every declaration fail as a compositor's refusal would; the preview says it and the screen shows the left eye's picture once, the same in both eyes.
+7. **A compositor without the protocol:** the same scenario under Weston's headless backend; the message is read from the widget, in each of the ten languages.
+8. **A photograph per packing family:** MPO, JPS with and without its block, PNG with `sTER` in both modes, a plain side by side pair, a plain top and bottom pair (the packing chosen), a plain pair the wrong way round (the swap); in every case the left eye is the red picture.
+
 ## Werkkzeug4 itself on Linux: what a probe found
 
 Measured on 11 November 2026 in a Debian testing container, g++ 16.2.0, from `fr_public` at `8c8f82c`. Nothing of it is packaged.
@@ -535,6 +598,33 @@ So Werkkzeug4 does not run on Linux today, with or without the four pull request
 - Symptom: `QDrag::exec()` is feared to freeze the proof.
   Cause: none; on Linux "this function does not block the event loop" (Qt's documentation of `QDrag::exec`), events go on being delivered. What matters is only that the proof's own steps do not wait inside the window's thread.
 
+## Traps found while building the stereo preview
+
+- Symptom: `find_package(StereoLayer)` fails with "The imported target Stereo::Av references the file libstereo-av.so... but this file does not exist".
+  Cause: stereo-layer's CMake config names all of its libraries, and `libstereo-layer-dev` 1.17.1 does not depend on the others' development packages.
+  Fix: install `libstereo-av-dev`, `libstereo-dibr-dev` and `libstereo-policy-dev` beside it.
+  Found by: the configure log's own sentence.
+- Symptom: installing the edition's KImageFormats into a test image fails: "libheif-plugin-x265 Depends libx265-217 but none of the choices are installable".
+  Cause: the edition's media libraries stand on deb-multimedia, and the image had no such source.
+  Fix: install `deb-multimedia-keyring` from the edition's repository, add the source, and simulate first: refuse the install when its `Inst` lines name the compositor, Qt, Mesa or the declaration library (a pin above 1000 lets apt go down a version).
+  Found by: `apt-get -s` and reading its conflict text; a first script piped apt into `tail` and built an image with nothing installed, exit 0.
+- Symptom: an MPO written by Pillow is "read as one picture, not as a pair".
+  Cause: the reader asks for what CIPA DC-007 calls a stereo pair: both entries of the type "multi-frame image, disparity" (0x020002) and each picture's view number (MPIndividualNum, 0xB101). Pillow writes a baseline primary and an undefined second picture.
+  Fix: write the fixture's two MP headers yourself (`editor/tests/fixtures/make-photographs.py`).
+  Found by: the reader's own test generator in the published source's patches.
+- Symptom: a `.jps` without its block gives the eyes "the wrong way round" in a test that put the left picture on the left.
+  Cause: none; a JPS without the `_JPSJPS_` block is read in the usual order, the right eye's picture on the left. A fixture for "JPS" has two files: the usual order without a block, and a block that says left first.
+- Symptom: the screen's left eye differs from the core's left eye in 536 of 32,768 pixels, by up to 192 levels, although the shift between the eyes is exact.
+  Cause: the preview's facts had grown by a line, the dock was too low for it, and the label lay over the bottom of the picture: text drawn by the window over the hole, the same in both eyes.
+  Fix: a higher dock and a shorter text; nothing in the 3D area.
+  Found by: cutting the area out of both eyes and looking at it.
+- Symptom: the proof's check "each eye 256 by 256 in a place of 256 by 256" fails while the geometry checks pass.
+  Cause: the preview's room is lower than the picture, so only a part shows, and only that part is handed over. That is the design; the check asked for more than the design says.
+  Fix: check that the eye's size is the place's size at pixel for pixel and that the width is the picture's.
+- Symptom: after 3D is switched off, the compositor's picture still holds two eyes.
+  Cause: the surface is still declared, with nothing attached. The two eyes are the same picture.
+  Fix: none needed; the 2D control compares the two halves and accepts one picture or two equal ones.
+
 ## What the parts are good for
 
 - The `.ops` blocks are a table a program can read: generate the parameter panel and the partner's operator list from them, so the editor, the server and the documentation cannot drift apart.
@@ -555,6 +645,11 @@ So Werkkzeug4 does not run on Linux today, with or without the four pull request
 - `swz_graph_pack_across` gives "before and after" for any step without an undo: a review of a partner's work needs no second document.
 - `editor/tests/realinput.cpp` is a small client any Qt proof can take: a pointer and a keyboard that go through the compositor, with `runInput` and `onWindow` for the two threads.
 - The text form of a project is good for shipping examples: three files of ten lines each, readable in a diff, packed at build time.
+- `wz stereo FILE.k OUT --png` and `wz stereograph GRAPH OUT --png` make a marked stereo picture from a command line; `wz pnscheck FILE` is a chunk parser that can fail (the signature, every checksum, `sTER` once and before the picture's data, a width that is two eyes and the mark's padding).
+- `swz_pns_check` lets a program read its own export back before it tells the person the file is written.
+- The stereo part at the end of a file is a pattern for any format whose first reader takes a pointer and stops: what the old program reads stays byte for byte, and the new values cost a file that is not stereo nothing.
+- `editor/tests/stereo-scenarios.inc` has the three helpers a stereo proof needs: both eyes from one ScreenShot2 picture, the pixels that differ inside and outside a rectangle, and the whole-pixel shift between the eyes with its control.
+- `editor/tests/fixtures/make-photographs.py` makes one stereo photograph per packing family in a few lines of Pillow and `struct`.
 
 ## Credits
 
@@ -564,5 +659,8 @@ The partners' server follows the Model Context Protocol's specification (revisio
 The partners' server is proved under the official MCP SDK for Python (the `mcp` package, by the Model Context Protocol project, MIT).
 The editor is built on Qt (The Qt Company and the Qt Project) and KDE Frameworks (the KDE community): KXmlGui, KConfig, KI18n, KIO, KWidgetsAddons, KCoreAddons; its pictures are taken with KWin's ScreenShot2.
 The proof's real input uses KWin's fake input protocol (`org_kde_kwin_fake_input`, by Martin Gräßlin, LGPL-2.1-or-later) and follows the proof rig's `fakeinput` tool; the rules for a place on the page are werkkzeug3's own (`winpage.cpp`, Farbrausch).
+The relief's mapping is the edition's stereo texture module's (relief mapping after Fábio Policarpo, Manuel M. Oliveira and João L. D. Comba, 2005, and parallax occlusion mapping after Natalya Tatarchuk, 2006, as the module's own notes credit them); the 3D area follows Marble's `StereoLayer` and stereo-layer's surface, and is declared through `libstereo-declare`.
+The stereo photograph is read by stereo-layer and the edition's KImageFormats; MPO is CIPA DC-007, the JPS block is the JPS format's own, `sTER` is the PNG Extensions' chunk (version 1.4.0, 3.6); the photographs of the proof are made with Pillow (Jeffrey A. Clark and contributors).
+The compositor without the stereo protocol in the proof is Weston (the Wayland project).
 WebAssembly builds ran in wasmtime (Bytecode Alliance).
 The people whose work this plan reads or builds on, by the names their own pages give: wxthss82, wzman, Gregor Riepl (onitake), Frantsishak (KkriegerNet), kznsq, Mason Liu (kkrieger-wasm), Alfredo (varrtto), Steven Schronk, Rodz Labs and the Material Maker contributors, Nicolas Brown and the TextureLab contributors, Cedric Guillemet (Imogen).

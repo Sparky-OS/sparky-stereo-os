@@ -118,3 +118,15 @@ The `save_to` prompt branch and the already passing edition regression exposed t
 Complete the existing UI command with `menus::invoke(..., "file.saveAs", json!({"path": path, "jpegFormat": "baseline"}))` before checking the metadata-loss warning and unchanged editable identity.
 Keep those assertions; do not suppress the prompt in production or claim the save completed merely because its initial call succeeded.
 Run the focused regression first, then the receiving branch's full gate; another branch's passing result does not certify an omitted test port.
+
+## Duotone pixels match, but the warning counts a virtual layer
+
+PhotoCraft's stereo ink rendering initially matched ordinary export pixels but reported that two layers were flattened for a single-layer Duotone document.
+The RGB preparation adds a temporary ink adjustment, which the flat renderer counts as another layer.
+The ordinary Duotone exporter already removes that artificial-layer warning; reuse its policy in the stereo path only when the same preparation was used.
+A regression comparing ordinary and stereo warnings failed on MPO before that correction.
+Check the ink-to-RGB notice and actual RGB layer-loss notice separately, along with exact PNG colors and the JPEG encoder's bounded color difference.
+Do not hide unrelated fidelity warnings or suppress flattening notices for ordinary RGB documents.
+
+After building the complete CI feature graph, use the same workspace, features and test targets with a nextest filter for focused checks when appropriate.
+A package-only default-feature invocation can select a different graph and rebuild shared dependencies; it is useful coverage when intentional, and is not a substitute for the full receiving gate.

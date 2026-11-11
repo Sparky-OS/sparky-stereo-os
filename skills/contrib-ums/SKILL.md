@@ -72,3 +72,8 @@ UMS's CI runs the Java tests on Windows, macOS and Linux, and a test that denies
 - **How it was found:** the failed job's log is `gh api repos/UniversalMediaServer/UniversalMediaServer/actions/jobs/<job id>/logs` (job ids are in `gh pr view <n> --json statusCheckRollup`); `gh run view --log` printed nothing here. Reading a log starts no CI.
 - **Local run without Docker:** Maven 3.9.x from archive.apache.org (verify the `.sha512`), then `mvn -B -q -Dtest=<Class> -Dsurefire.failIfNoSpecifiedTests=false test` with `-Dmaven.repo.local` in scratch; a JDK 17 or newer is enough (the build targets release 17). The first run downloads dependencies and takes several minutes. For red, delete the production line under test, rerun, restore it.
 - **What only Windows CI confirms:** that the regular-file technique also fails the write on Windows. Java's `FileOutputStream` opening `<file>\name` fails there too (the parent is not a directory), but no Windows JVM was run locally.
+
+## Splitting an integration branch into offers
+
+Use the [single-subject stereo offer recipe](references/splitting-stereo-offers.md) when refusal fixes, layout support, metadata fixes and a renderer profile are interleaved.
+It covers separate worktrees and target directories, explicit prerequisite bases, offline Java builds, encoded-mark checks and failing controls that reach runtime.

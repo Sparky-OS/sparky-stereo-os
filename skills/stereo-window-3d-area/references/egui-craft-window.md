@@ -29,7 +29,25 @@ An embedded canvas needs its own subsurface/child-window integration and overlay
    Clean the one Cargo target between worktrees as well as projects: reuse can select a branch's same-named crate artifact in the control build.
    Compare ordinary 2D captures byte for byte on both backends.
 
+For an editor with square-pixel previews, keep those previews separate from the stored eye grids.
+Do not feed an expanded preview or a viewport-sized texture to the native window.
+A request for the full source can still render into its requested box: derive the output
+dimensions from the edited native frame, and carry sample aspect independently.
+Account for retained original grids in the source cache's byte budget and identity checks.
+Unequal source grids need an explicit native-view refusal rather than silently fitting one view to the other.
+
 ## Measured traps
+
+- Symptom: a logic-only test appears to set a texture limit, but never reports it to the app.
+  A `Headless` harness property is consumed by its `step`, not by a separate `Context::run_ui`
+  closure that calls only app logic. Send `RawInput::max_texture_side` in that closure and
+  assert the app received it. The tested egui font atlas requires a width of at least 1024;
+  use a larger source view to test cap independence, rather than an invalid smaller atlas.
+- Symptom: native sample IDs are correct but a PNG pair's displayed shape is wrong.
+  Preserve the PNG decoder's `pHYs` information through view copies. [PNG 3 §11.3.4.3
+  and §13.6](https://www.w3.org/TR/png-3/#11pHYs) define sample width/height as ppuY/ppuX, including unit 0. Keep it as a reduced
+  positive rational and invert it when EXIF or an edit exchanges the axes. This is metadata
+  for the native window; it does not call for expanding its sample buffers.
 
 - Symptom: the control socket connects, but import returns `FilmCraft is still starting; send the request again`.
   The listener starts before the app can drain its command queue; `control_server.rs` explicitly rejects the request before queueing it.
@@ -69,6 +87,19 @@ An embedded canvas needs its own subsurface/child-window integration and overlay
   Record the backing filesystem, memory limit and actual free-space measurement with the test result.
 
 ## A retained SHM pool is a direct native-grid witness
+
+An editor's finishing pass can intentionally change input samples through colour
+conversion and dithering. A LightCraft native ID probe initially differed from
+its source PNG in 327 pixels, each by one channel step. Its existing Bayer
+dither and colour processing were byte-identical to stock main. Ordinary
+single-eye exports matched the native buffer exactly.
+
+Keep two independent checks: compare decoder copies with decoded input samples
+before rendering, then compare native output with ordinary single-eye renders
+from untouched stock main using the same settings and GPU path. Validate all
+reference images against that stock build. Preserve the initial mismatch and a
+swapped-eye failing control. Do not disable intended processing, mask pixels or
+relax an exact comparison to make the probe pass.
 
 A preload recorder may produce no dump even while a dynamically dispatched client logs valid `wl_shm` requests.
 Geometry in the protocol log alone does not prove that the samples were copied.

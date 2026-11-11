@@ -70,6 +70,8 @@ Confirm each against the submitted head, then cite the fixing commit and a regre
 Current craft-contrib core rule 15 says a pull request does not say an agent wrote it.
 The edition's policy asks for disclosure once, and a task may explicitly require it in a fresh PR.
 Record the conflict and the responsible person's explicit instruction in the private handoff; do not quietly rewrite either project's rules or misrepresent what they require.
+Leave conflicting attribution wording unresolved in the draft until that person decides; the private handoff quotes the exact rule and links its pinned source.
+Keep doing authorized local implementation and verification while that public-submission decision is pending.
 A local draft is not authorization to send.
 
 ## When a rebased gate disagrees with main

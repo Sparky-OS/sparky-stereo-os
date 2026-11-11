@@ -28,6 +28,8 @@
 //!
 //! The operators are Farbrausch's own code (wzbridge.cpp over werkkzeug4's wz3_bitmap_code.cpp).
 const std = @import("std");
+const modern = @import("modern.zig");
+const mfit = @import("mfit.zig");
 
 extern "c" fn wzb_init() void;
 extern "c" fn wzb_set_limit(bytes: usize) void;
@@ -47,18 +49,18 @@ extern "c" fn fclose(f: ?*anyopaque) c_int;
 extern "c" fn fread(p: [*]u8, s: usize, n: usize, f: ?*anyopaque) usize;
 extern "c" fn fwrite(p: [*]const u8, s: usize, n: usize, f: ?*anyopaque) usize;
 extern "c" fn write(fd: c_int, p: [*]const u8, n: usize) isize;
-extern "c" fn clock() c_long;
+extern "c" fn clock() i64; // clock_t: long on x86-64, long long in wasi-libc
 extern "c" fn exit(code: c_int) noreturn;
 
-const alloc = std.heap.c_allocator;
+pub const alloc = std.heap.c_allocator;
 
-fn say(comptime fmt: []const u8, args: anytype) void {
+pub fn say(comptime fmt: []const u8, args: anytype) void {
     var buf: [4096]u8 = undefined;
     const s = std.fmt.bufPrint(&buf, fmt, args) catch return;
     _ = write(2, s.ptr, s.len);
 }
 
-fn die(comptime fmt: []const u8, args: anytype) noreturn {
+pub fn die(comptime fmt: []const u8, args: anytype) noreturn {
     say(fmt ++ "\n", args);
     exit(1);
 }
@@ -69,19 +71,19 @@ fn sayNotes() void {
     while (it.next()) |line| say("text: {s}\n", .{line});
 }
 
-fn seconds() f64 {
+pub fn seconds() f64 {
     return @as(f64, @floatFromInt(clock())) / 1000000.0;
 }
 
 // ---------------------------------------------------------------- operators
 
-const NW = 14;
+const NW = 20; // werkkzeug3 stores at most 14 words; the modern Ramp 18
 const MAXIN = 8;
-const MAXN = 220;
+pub const MAXN = 220;
 
 const OpInfo = struct { name: [:0]const u8, kinds: []const u8, nin: u8 };
 // i = whole number, f = decimal, c = colour: the packing of werkkzeug3's operator table (lane 473x's wzlang.py)
-const ops = [_]OpInfo{
+const werk_ops = [_]OpInfo{
     .{ .name = "Flat", .kinds = "iic", .nin = 0 },
     .{ .name = "Perlin", .kinds = "iiiififffcc", .nin = 0 },
     .{ .name = "Cell", .kinds = "iiccciiffifif", .nin = 0 },
@@ -114,8 +116,22 @@ const ops = [_]OpInfo{
     // letters (whole pixels, then parts of the picture), line height; and two strings: the text and the font's name
     .{ .name = "Text", .kinds = "ffffciiff", .nin = 1 },
 };
+/// milestone 2b: the modern operators follow werkkzeug3's (ops/*.zig, each with its table; modern.zig lists them)
+pub const OP_MODERN = werk_ops.len;
+pub const ops = blk: {
+    var a: [werk_ops.len + modern.count]OpInfo = undefined;
+    for (werk_ops, 0..) |o, i| a[i] = o;
+    for (0..modern.count) |k| {
+        const P = modern.paramsOf(k);
+        a[werk_ops.len + k] = .{ .name = modern.nameOf(k), .kinds = modern.kindsOf(P), .nin = modern.inputsOf(k) };
+    }
+    break :blk a;
+};
+fn isModern(op: u8) bool {
+    return op >= OP_MODERN;
+}
 const OP_TEXT = 28;
-const OP_FLAT = 0;
+pub const OP_FLAT = 0;
 const OP_NORMALS = 16;
 const OP_TRANSFORM = 13;
 const OP_MERGE = 21;
@@ -149,18 +165,19 @@ fn fixedWord(op: u8, p: usize) bool {
     return false;
 }
 
-const Node = struct {
+pub const Node = struct {
     op: u8 = 0,
     nin: u8 = 0,
     in: [MAXIN]u8 = [_]u8{0} ** MAXIN,
     nw: u8 = 0,
     w: [NW]u32 = [_]u32{0} ** NW,
     lock: bool = false, // values read from the picture that the tuning must keep (a repeat count)
-    lockw: u16 = 0, // single values the tuning must keep (where a shape's centre was read)
+    lockw: u32 = 0, // single values the tuning must keep (where a shape's centre was read)
     shape: bool = false, // the Transform that repeats the read shape: the relief's height
     is_base: bool = false, // the top of the surface layer, marked while the cleaning moves operators
     keep: bool = false, // built from a reading: the cleaning by the inner measure does not remove it
     grey: bool = false, // its colours are tuned as greys: a light or an added noise changes shade, not hue
+    hue: bool = false, // milestone 2b: its colours are retuned by brightness and saturation only, so a tile keeps the whole picture's hue
     s: [3]u16 = .{ 0, 0, 0 }, // Text: its text and its font's name, as places in the string pool (0 is the empty string); version 2 adds the axis values
 };
 
@@ -168,7 +185,7 @@ const Node = struct {
 var spool: [512][:0]const u8 = undefined;
 var spool_n: usize = 0;
 
-fn intern(bytes: []const u8) u16 {
+pub fn intern(bytes: []const u8) u16 {
     if (spool_n == 0) {
         spool[0] = "";
         spool_n = 1;
@@ -194,13 +211,13 @@ fn stringBytes(i: u16) usize {
     return 4 + 4 * ((strOf(i).len + 1 + 3) / 4);
 }
 
-const Graph = struct {
+pub const Graph = struct {
     n: usize = 0,
     root: usize = 0,
     nodes: [MAXN]Node = undefined,
 
     /// werkkzeug3's storage: one class byte and the parameter words of every operator
-    fn bytes(g: *const Graph) usize {
+    pub fn bytes(g: *const Graph) usize {
         var b: usize = 0;
         for (g.nodes[0..g.n]) |nd| {
             b += 1 + 4 * @as(usize, wordsOf(&nd));
@@ -211,7 +228,7 @@ const Graph = struct {
     }
 
     /// put a node at position pos; the nodes from pos on move up by one
-    fn insert(g: *Graph, pos: usize, nd: Node) void {
+    pub fn insert(g: *Graph, pos: usize, nd: Node) void {
         if (g.n >= MAXN) die("graph too large", .{});
         var i = g.n;
         while (i > pos) : (i -= 1) g.nodes[i] = g.nodes[i - 1];
@@ -226,7 +243,7 @@ const Graph = struct {
     }
 
     /// every operator after `from` that took `old` takes `new` instead
-    fn rewire(g: *Graph, from: usize, old: usize, new: usize) void {
+    pub fn rewire(g: *Graph, from: usize, old: usize, new: usize) void {
         for (g.nodes[from + 1 .. g.n]) |*x| {
             for (x.in[0..x.nin]) |*v| {
                 if (v.* == old) v.* = @intCast(new);
@@ -236,7 +253,7 @@ const Graph = struct {
     }
 
     /// drop the operators the result does not use
-    fn prune(g: *Graph) void {
+    pub fn prune(g: *Graph) void {
         var used = [_]bool{false} ** MAXN;
         used[g.root] = true;
         var i = g.root + 1;
@@ -263,7 +280,7 @@ const Graph = struct {
 
 // ---------------------------------------------------------------- files
 
-fn readFile(path: [*:0]const u8) []u8 {
+pub fn readFile(path: [*:0]const u8) []u8 {
     const f = fopen(path, "rb") orelse die("cannot open {s}", .{path});
     var list: std.ArrayList(u8) = .empty;
     var buf: [65536]u8 = undefined;
@@ -276,7 +293,7 @@ fn readFile(path: [*:0]const u8) []u8 {
     return list.items;
 }
 
-fn writeFile(path: []const u8, data: []const u8) void {
+pub fn writeFile(path: []const u8, data: []const u8) void {
     var pz: [1024]u8 = undefined;
     const p = std.fmt.bufPrintZ(&pz, "{s}", .{path}) catch die("path too long", .{});
     const f = fopen(p.ptr, "wb") orelse die("cannot write {s}", .{path});
@@ -284,9 +301,9 @@ fn writeFile(path: []const u8, data: []const u8) void {
     _ = fclose(f);
 }
 
-const Image = struct { w: usize, h: usize, rgb: []f32 };
+pub const Image = struct { w: usize, h: usize, rgb: []f32 };
 
-fn readPpm(path: [*:0]const u8) Image {
+pub fn readPpm(path: [*:0]const u8) Image {
     const d = readFile(path);
     var it = std.mem.tokenizeAny(u8, d[0..@min(d.len, 64)], " \t\r\n");
     const magic = it.next() orelse die("{s}: not a PPM", .{path});
@@ -302,7 +319,7 @@ fn readPpm(path: [*:0]const u8) Image {
     return .{ .w = w, .h = h, .rgb = rgb };
 }
 
-fn writePpm(path: []const u8, rgba: []const u8, w: usize, h: usize) void {
+pub fn writePpm(path: []const u8, rgba: []const u8, w: usize, h: usize) void {
     var out = alloc.alloc(u8, 32 + w * h * 3) catch die("out of memory", .{});
     defer alloc.free(out);
     const hd = std.fmt.bufPrint(out[0..32], "P6\n{d} {d}\n255\n", .{ w, h }) catch unreachable;
@@ -314,7 +331,7 @@ fn writePpm(path: []const u8, rgba: []const u8, w: usize, h: usize) void {
     writeFile(path, out[0 .. hd.len + w * h * 3]);
 }
 
-fn parseScript(text: []const u8) Graph {
+pub fn parseScript(text: []const u8) Graph {
     var g = Graph{};
     var names: [MAXN][]const u8 = undefined;
     var lines = std.mem.tokenizeAny(u8, text, "\r\n");
@@ -380,7 +397,7 @@ fn parseScript(text: []const u8) Graph {
     return g;
 }
 
-fn scriptText(g: *const Graph, buf: []u8) []u8 {
+pub fn scriptText(g: *const Graph, buf: []u8) []u8 {
     var n: usize = 0;
     for (g.nodes[0..g.n], 0..) |nd, i| {
         n += (std.fmt.bufPrint(buf[n..], "v{d} {s} ", .{ i, ops[nd.op].name }) catch die("script too long", .{})).len;
@@ -417,7 +434,7 @@ var cache_cap: usize = 1500;
 var n_draw: u64 = 0; // operators really drawn
 var n_eval: u64 = 0; // graphs asked for
 var n_refused: u64 = 0;
-var say_refusals: bool = false; // render says why an operator refused; the fitter tries values in silence
+pub var say_refusals: bool = false; // render says why an operator refused; the fitter tries values in silence
 
 fn cacheClear() void {
     for (cache) |*s| {
@@ -450,7 +467,7 @@ fn mix(h: u64, v: u64) u64 {
 
 /// Draw the graph; size 0 keeps the sizes written in it, another value draws every generator at 2^size.
 /// The bitmap belongs to the memory: do not free it. null: an operator refused its values.
-fn draw(g: *const Graph, size: u32) ?*anyopaque {
+pub fn draw(g: *const Graph, size: u32) ?*anyopaque {
     n_eval += 1;
     if (cache_count > cache_cap) cacheClear();
     var hs: [MAXN]u64 = undefined;
@@ -460,7 +477,7 @@ fn draw(g: *const Graph, size: u32) ?*anyopaque {
         var w: [32]u32 = [_]u32{0} ** 32;
         const nk = wordsOf(nd);
         for (0..nk) |p| w[p] = nd.w[p];
-        if (size != 0) {
+        if (size != 0 and !isModern(nd.op)) {
             if (isGenerator(nd.op)) {
                 w[0] = size;
                 w[1] = size;
@@ -471,6 +488,17 @@ fn draw(g: *const Graph, size: u32) ?*anyopaque {
             }
         }
         var h: u64 = mix(0x1234567, @as(u64, nd.op) + (@as(u64, size) << 8));
+        if (isModern(nd.op)) {
+            // a modern operator draws on the canvas: its size, margin, window and level of detail are part of its key
+            const cv = modern.c.cv;
+            h = mix(h, cv.w);
+            h = mix(h, cv.h);
+            h = mix(h, cv.m);
+            h = mix(h, @as(u32, @bitCast(cv.wx)));
+            h = mix(h, @as(u32, @bitCast(cv.wy)));
+            h = mix(h, @as(u32, @bitCast(cv.ws)));
+            h = mix(h, cv.maxoct);
+        }
         for (0..nk) |p| h = mix(h, w[p]);
         if (nd.op == OP_TEXT) {
             for (nd.s) |si| {
@@ -490,7 +518,10 @@ fn draw(g: *const Graph, size: u32) ?*anyopaque {
         var out: ?*anyopaque = null;
         var err: [300]u8 = [_]u8{0} ** 300;
         if (nd.op == OP_TEXT) wzb_strings3(strOf(nd.s[0]).ptr, strOf(nd.s[1]).ptr, strOf(nd.s[2]).ptr);
-        const r = wzb_apply(ops[nd.op].name.ptr, &w, nd.nin, &inp, &out, &err, 300);
+        const r = if (isModern(nd.op))
+            modern.apply(nd.op - OP_MODERN, w[0..nk], inp[0..nd.nin], &out, &err)
+        else
+            wzb_apply(ops[nd.op].name.ptr, &w, nd.nin, &inp, &out, &err, 300);
         n_draw += 1;
         if (r != 0) {
             if (say_refusals) say("refused: v{d} {s}: {s}\n", .{ i, ops[nd.op].name, std.mem.sliceTo(&err, 0) });
@@ -754,7 +785,7 @@ fn distance(a: *const Pyr, t: *const Pyr) f32 {
     return @floatCast(place_weight * place + texture_weight * tex + spread_weight * cd * 8.0);
 }
 
-const Target = struct {
+pub const Target = struct {
     size: u32, // exponent of the side
     pyr: Pyr,
     scratch: Pyr,
@@ -762,7 +793,7 @@ const Target = struct {
     slow: f64, // a drawing that takes longer than this is refused: the device must draw it
 };
 
-fn makeTarget(img: Image, size: u32) Target {
+pub fn makeTarget(img: Image, size: u32) Target {
     const side = @as(usize, 1) << @intCast(size);
     if (img.w != img.h or img.w < side or img.w % side != 0) die("the picture must be square, a power of two, at least {d} pixels", .{side});
     var t = Target{ .size = size, .pyr = pyrAlloc(side), .scratch = pyrAlloc(side), .rgba = alloc.alloc(u8, side * side * 4) catch die("out of memory", .{}), .slow = 0.2 * @as(f64, @floatFromInt(side * side)) / 16384.0 };
@@ -783,7 +814,7 @@ fn makeTarget(img: Image, size: u32) Target {
     return t;
 }
 
-fn freeTarget(t: *Target) void {
+pub fn freeTarget(t: *Target) void {
     pyrFree(&t.pyr);
     pyrFree(&t.scratch);
     alloc.free(t.rgba);
@@ -1084,6 +1115,33 @@ fn tune(g: *Graph, t: *Target, first: usize, last: usize, budget_in: i64, deep: 
                     },
                     'c' => {
                         const step: i32 = @intFromFloat(@max(2.0, 48.0 * scale));
+                        if (g.nodes[i].hue) {
+                            // milestone 2b: brightness (every channel scaled alike) and saturation (every channel moved
+                            // toward or away from their mean); the ratios between the channels' departures stay, so
+                            // the hue stays the whole picture's and a grey stays grey
+                            const fs = [_]f32{ 1, -1 };
+                            for (0..2) |kind| {
+                                for (fs) |sgn| {
+                                    var k: usize = 0;
+                                    while (k < 3) : (k += 1) {
+                                        const cur = g.nodes[i].w[p];
+                                        var c: [3]f32 = undefined;
+                                        inline for (0..3) |q| c[q] = @floatFromInt((cur >> (16 - 8 * q)) & 0xff);
+                                        const d = sgn * @as(f32, @floatFromInt(step)) / 255.0;
+                                        const m = (c[0] + c[1] + c[2]) / 3.0;
+                                        var v = cur & 0xff000000;
+                                        inline for (0..3) |q| {
+                                            const nvf = if (kind == 0) c[q] * (1.0 + d) else m + (c[q] - m) * (1.0 + 2.0 * d);
+                                            const nv: u32 = @intFromFloat(@min(255.0, @max(0.0, nvf + 0.5)));
+                                            v |= nv << (16 - 8 * q);
+                                        }
+                                        if (!tryWord(g, t, i, p, v, &best, &budget)) break;
+                                        improved = true;
+                                    }
+                                }
+                            }
+                            continue;
+                        }
                         if (g.nodes[i].grey) {
                             const ds = [_]i32{ step, -step };
                             for (ds) |d| {
@@ -1254,7 +1312,7 @@ fn randomMove(g: *Graph) Move {
 const OP_PERLIN = 1;
 const OP_GLOWRECT = 10;
 
-const Reading = struct {
+pub const Reading = struct {
     n: usize = 0,
     c0: u32 = 0,
     c1: u32 = 0,
@@ -1830,7 +1888,7 @@ fn meanCell(t: []const f32, n: usize, nx: usize, ny: usize, tm: f64, cell: *[]f3
     return @floatCast(ve / @max(vt, 1e-9));
 }
 
-fn readPicture(t: *Target) Reading {
+pub fn readPicture(t: *Target) Reading {
     var r = Reading{};
     const n = @as(usize, 1) << @intCast(t.size);
     r.n = n;
@@ -4499,7 +4557,7 @@ fn axisOf(n: f32, o: f32, w0: f32, ws: f32) Axis {
 const CellItem = struct { cx: f32 = 0.5, cy: f32 = 0.5, hw: f32 = 0.25, hh: f32 = 0.25, seed: ?*const Seed = null };
 
 /// A seed: a glyph of a font that lies over the motif of the cell, called by its key and its character.
-const Seed = struct {
+pub const Seed = struct {
     have: bool = false,
     key: [:0]const u8 = "",
     label: []const u8 = "",
@@ -4524,11 +4582,11 @@ const Seed = struct {
 /// the seeds of a seed file: one glyph over the whole motif, or one per piece of it (a flower and its leaves); they
 /// share the whole picture's repeat
 const MAXSEED = 12;
-var seeds: [MAXSEED]Seed = undefined;
-var nseeds: usize = 0;
+pub var seeds: [MAXSEED]Seed = undefined;
+pub var nseeds: usize = 0;
 
 /// The window of the whole picture a tile is: its left, its top and its side, in shares of the whole picture.
-const Win = struct { x: f32 = 0, y: f32 = 0, s: f32 = 1 };
+pub const Win = struct { x: f32 = 0, y: f32 = 0, s: f32 = 1 };
 
 /// The tile's reading takes the repeat from the whole picture's: what repeats is a property of the whole surface, and a
 /// tile holds too few repeats to read it (a 512 pixel tile of a 2048 pixel brick wall holds one and a half bricks).
@@ -4584,7 +4642,7 @@ fn instances(a: Axis, c: f32, h: f32, out: *[8][2]f32) usize {
 /// A seed's glyph drawn white into the box (centre and half sizes, in the units of a picture of side pixels); the
 /// glyph's own ink is stretched to the box, so a picture whose two axes have other scales gets the glyph right
 /// once Transform has repeated it. Always Text version 2 (the font's key), in its outline form.
-fn seedText(sd: *const Seed, cx: f32, cy: f32, hw: f32, hh: f32, side: f32) Node {
+pub fn seedText(sd: *const Seed, cx: f32, cy: f32, hw: f32, hh: f32, side: f32) Node {
     const bw = 2.0 * hw * side;
     const bh = 2.0 * hh * side;
     const em = bh / @max(sd.gv[1], 1e-4);
@@ -4776,7 +4834,7 @@ fn parseF(tok: ?[]const u8) f32 {
 }
 
 /// The seed file `p2p seed` writes: one name and its values per line; `cand` lines are the record of the search.
-fn loadSeed(path: [*:0]const u8) void {
+pub fn loadSeed(path: [*:0]const u8) void {
     const text = readFile(path);
     var lines = std.mem.splitScalar(u8, text, '\n');
     while (lines.next()) |line| {
@@ -5537,10 +5595,11 @@ fn fit(target_path: [*:0]const u8, prior_path: [*:0]const u8, prefix: []const u8
             // or every tile would repeat the same field (Daniel's 473x note: "only seeds and a few values change")
             if (!opt.from_free) {
                 for (ops[x.op].kinds, 0..) |kd, wi| {
-                    if (kd == 'i' and !(x.op == OP_PERLIN and wi == 5)) x.lockw |= @as(u16, 1) << @intCast(wi);
+                    if (kd == 'i' and !(x.op == OP_PERLIN and wi == 5)) x.lockw |= @as(u32, 1) << @intCast(wi);
                 }
             }
         }
+        if (opt.fix) fixTileFaults(&g, opt.win);
         if (opt.structure == .seed) {
             // the seeds at the tile's own place over the retuned surface; they are locked (placed, never tuned)
             const colour = g.root;
@@ -5916,7 +5975,50 @@ const Options = struct {
     seedfile: ?[*:0]const u8 = null, // the seed `p2p seed` found on the whole picture
     from: ?[*:0]const u8 = null, // a procedure found on the whole picture: the tile keeps its operators and retunes their values
     from_free: bool = false, // with from: the whole-number values are retuned too (the first try; the tiles drift apart)
+    fix: bool = true, // milestone 2b: with from and window, the three faults of milestone 2 fixed (fix=0 gives milestone 2's tiles)
 };
+
+/// Milestone 2b, the three faults of milestone 2's tiles (the whole picture's procedure retuned on a tile):
+///  1. a noise's frequency follows the window: werkkzeug's Perlin draws 2^freq cells across whatever it is drawn on,
+///     so on a tile a quarter of the picture wide the same words draw the whole picture's octaves four times finer;
+///     the tile takes freq + log2(side), and octaves coarser than one cell across the tile are dropped (said);
+///  2. a light stands at the whole picture's place: Bump's light position (in parts of the picture it is drawn on)
+///     is moved by the window, its height scaled with it, and locked, so every tile is lit from the same lamp;
+///  3. the colour retune keeps hue: every colour is retuned by brightness and saturation only.
+fn fixTileFaults(g: *Graph, w: Win) void {
+    var sh: i32 = 0;
+    var s = w.s;
+    while (s < 0.999 and sh < 12) : (sh += 1) s *= 2;
+    if (@abs(s - 1.0) > 0.001) die("window side {d} is not a power of two of the picture (1, 1/2, 1/4, ...)", .{w.s});
+    for (g.nodes[0..g.n], 0..) |*x, i| {
+        x.hue = true;
+        if (x.op == OP_PERLIN and sh > 0) {
+            var f: i32 = @bitCast(x.w[2]);
+            var o: i32 = @bitCast(x.w[3]);
+            f -= sh;
+            if (f < 0) {
+                say("v{d} Perlin: {d} octave(s) coarser than one cell across this tile are dropped (the tile's own colours carry them)\n", .{ i, -f });
+                o += f;
+                f = 0;
+            }
+            if (o < 1) o = 1;
+            x.w[2] = @bitCast(f);
+            x.w[3] = @bitCast(o);
+            x.lockw |= (1 << 2) | (1 << 3);
+        }
+        if (x.op == OP_BUMP) {
+            if (x.w[0] != 2) {
+                const px = f32of(x.w[1]);
+                const py = f32of(x.w[2]);
+                const pz = f32of(x.w[3]);
+                x.w[1] = wordOf((px - w.x) / w.s);
+                x.w[2] = wordOf((py - w.y) / w.s);
+                x.w[3] = wordOf(pz / w.s);
+            }
+            x.lockw |= (1 << 0) | (1 << 1) | (1 << 2) | (1 << 3) | (1 << 4) | (1 << 5);
+        }
+    }
+}
 
 /// What adds structure. Each needs its own reading; the inner measure accepts any of them on almost any
 /// picture, so none is tried without one, and the choice between the allowed ones is the eye's.
@@ -5936,17 +6038,89 @@ fn allowed(rd: *const Reading, st: Structure, opt: Options) bool {
     };
 }
 
+pub fn hasModern(g: *const Graph) bool {
+    for (g.nodes[0..g.n]) |nd| {
+        if (isModern(nd.op)) return true;
+    }
+    return false;
+}
+
+/// Draw a graph of modern operators on a canvas of side pixels showing window win of the picture: the margin is the
+/// widest neighbourhood any node reads (Shade one pixel, Wear its radius or length), cut away by cropRgba.
+pub fn drawCanvas(g: *const Graph, side: usize, win: Win, maxoct: u32) ?*anyopaque {
+    var reach: f32 = 0;
+    var any = false;
+    for (g.nodes[0 .. g.root + 1]) |nd| {
+        if (!isModern(nd.op)) continue;
+        const r = modern.marginOf(nd.op - OP_MODERN, nd.w[0..wordsOf(&nd)]);
+        if (r > 0) any = true;
+        reach += r; // neighbourhoods chained one after another add up
+    }
+    const pxs = win.s / @as(f32, @floatFromInt(side));
+    var m: usize = if (any) @as(usize, @intFromFloat(@ceil(reach / pxs))) + 2 else 0;
+    m = (m + 1) & ~@as(usize, 1); // even, so a canvas of a power-of-two side stays a multiple of four pixels
+    modern.c.cv = .{ .w = side + 2 * m, .h = side + 2 * m, .m = m, .wx = win.x, .wy = win.y, .ws = win.s, .maxoct = maxoct };
+    return draw(g, 0);
+}
+
+pub fn cropRgba(bm: ?*anyopaque, rgba: []u8) void {
+    const cv = modern.c.cv;
+    const full = alloc.alloc(u8, cv.w * cv.h * 4) catch die("out of memory", .{});
+    defer alloc.free(full);
+    wzb_rgba(bm, full.ptr);
+    const side = cv.w - 2 * cv.m;
+    for (0..side) |j| {
+        const a = ((j + cv.m) * cv.w + cv.m) * 4;
+        @memcpy(rgba[j * side * 4 .. (j + 1) * side * 4], full[a .. a + side * 4]);
+    }
+}
+
+/// the material's height (alpha), 16 bits per pixel as a PGM (the 15-bit value times two): the relief milestone 3's
+/// stereo reads, at the drawing's own size
+fn writeHeight(path: []const u8, bm: ?*anyopaque) void {
+    const cv = modern.c.cv;
+    const side = cv.w - 2 * cv.m;
+    const d = modern.c.Pix{ .d = wzb_data16(bm), .w = cv.w, .h = cv.h };
+    var out = alloc.alloc(u8, 32 + side * side * 2) catch die("out of memory", .{});
+    defer alloc.free(out);
+    const hd = std.fmt.bufPrint(out[0..32], "P5\n{d} {d}\n65535\n", .{ side, side }) catch unreachable;
+    for (0..side) |j| {
+        for (0..side) |i| {
+            const v: u32 = @as(u32, d.d[4 * ((j + cv.m) * cv.w + i + cv.m) + 3]) * 2;
+            const o = hd.len + 2 * (j * side + i);
+            out[o] = @intCast(v >> 8);
+            out[o + 1] = @intCast(v & 0xff);
+        }
+    }
+    writeFile(path, out[0 .. hd.len + side * side * 2]);
+}
+extern "c" fn wzb_data(p: ?*anyopaque) [*]u16;
+fn wzb_data16(p: ?*anyopaque) [*]u16 {
+    return wzb_data(p);
+}
+
 fn argStr(argv: [*]const [*:0]const u8, i: usize) []const u8 {
     return std.mem.span(argv[i]);
 }
 
+// The entry: the C library's start calls main natively; for WebAssembly, p2p_wasm.zig is the root and gives the same
+// function the name WASI's start (wasi-libc's crt1-command) calls, __main_argc_argv (lane 514's finding).
 pub export fn main(argc: c_int, argv: [*]const [*:0]const u8) c_int {
+    return mainC(argc, argv);
+}
+
+pub fn mainC(argc: c_int, argv: [*]const [*:0]const u8) callconv(.c) c_int {
     const n: usize = @intCast(argc);
     wzb_init();
     makeFilters();
     wzb_set_limit(@as(usize, 3) << 30);
     cache = alloc.alloc(Slot, CACHE) catch die("out of memory", .{});
     for (cache) |*s| s.* = .{};
+    if (n >= 2 and std.mem.eql(u8, argStr(argv, 1), "kinds")) {
+        // p2p kinds: every operator's packing (i whole number, f decimal, c colour), werkkzeug3's then the modern ones
+        for (ops) |o| say("{s} {s}\n", .{ o.name, o.kinds });
+        return 0;
+    }
     if (n >= 3 and std.mem.eql(u8, argStr(argv, 1), "fontindex")) {
         // p2p fontindex SOURCE=FOLDER ... > index.tsv   (sources in the order their copies are preferred)
         return fi_index(@intCast(n - 2), @constCast(argv + 2));
@@ -5957,16 +6131,62 @@ pub export fn main(argc: c_int, argv: [*]const [*:0]const u8) c_int {
         const m: c_int = if (n >= 5) std.fmt.parseInt(c_int, argStr(argv, 4), 10) catch die("bad shard count", .{}) else 1;
         return gi_build(argv[2], k, m);
     }
+    if (n >= 4 and std.mem.eql(u8, argStr(argv, 1), "mfit")) {
+        // p2p mfit WHOLE.ppm OUT-PREFIX [full=FULL.ppm] [tile=512]   (milestone 2b: the modern operators, the whole first)
+        var mo = mfit.MOpt{};
+        for (4..n) |i| {
+            const a = argStr(argv, i);
+            if (std.mem.startsWith(u8, a, "full=")) {
+                mo.full = argv[i] + 5;
+            } else if (std.mem.startsWith(u8, a, "tile=")) {
+                mo.tile = std.fmt.parseInt(usize, a[5..], 10) catch die("bad {s}", .{a});
+            } else if (std.mem.startsWith(u8, a, "seeds=")) {
+                mo.seeds = argv[i] + 6;
+            } else if (std.mem.startsWith(u8, a, "light=")) {
+                mo.light = a[6] == '1';
+            } else die("mfit: {s} is not known (full=FULL.ppm, tile=SIDE, seeds=CHOSEN, light=0|1)", .{a});
+        }
+        mfit.run(argv[2], argStr(argv, 3), mo);
+        return 0;
+    }
     if (n >= 4 and std.mem.eql(u8, argStr(argv, 1), "seed")) {
         // p2p seed WHOLE.ppm OUT.seed   (the glyph index of WZ_GLYPHINDEX and WZ_FONTINDEX)
         seedRead(argv[2], argStr(argv, 3));
         return 0;
     }
     if (n >= 4 and std.mem.eql(u8, argStr(argv, 1), "render")) {
-        // p2p render SCRIPT OUT.ppm [SIZE-EXPONENT]
+        // p2p render SCRIPT OUT.ppm [SIZE-EXPONENT] [window=X,Y,SIDE] [lod=OCTAVES] [height=OUT.pgm]
         const g = parseScript(readFile(argv[2]));
         const size: u32 = if (n > 4) std.fmt.parseInt(u32, argStr(argv, 4), 10) catch 0 else 0;
         say_refusals = true;
+        if (hasModern(&g)) {
+            var win = Win{};
+            var lod: u32 = 99;
+            var hpath: ?[]const u8 = null;
+            for (5..n) |i| {
+                const a = argStr(argv, i);
+                if (std.mem.startsWith(u8, a, "window=")) {
+                    var it = std.mem.tokenizeScalar(u8, a[7..], ',');
+                    win.x = std.fmt.parseFloat(f32, it.next() orelse die("window=X,Y,SIDE", .{})) catch die("bad {s}", .{a});
+                    win.y = std.fmt.parseFloat(f32, it.next() orelse die("window=X,Y,SIDE", .{})) catch die("bad {s}", .{a});
+                    win.s = std.fmt.parseFloat(f32, it.next() orelse die("window=X,Y,SIDE", .{})) catch die("bad {s}", .{a});
+                } else if (std.mem.startsWith(u8, a, "lod=")) {
+                    lod = std.fmt.parseInt(u32, a[4..], 10) catch die("bad {s}", .{a});
+                } else if (std.mem.startsWith(u8, a, "height=")) {
+                    hpath = a[7..];
+                } else die("render: {s} is not known (window=X,Y,SIDE, lod=OCTAVES, height=OUT.pgm)", .{a});
+            }
+            if (size == 0) die("render: a procedure of modern operators is drawn at the size asked for: give the size exponent (9 is 512 pixels)", .{});
+            const side = @as(usize, 1) << @intCast(size);
+            const bm = drawCanvas(&g, side, win, lod) orelse die("the procedure does not draw", .{});
+            const rgba = alloc.alloc(u8, side * side * 4) catch die("out of memory", .{});
+            cropRgba(bm, rgba);
+            writePpm(argStr(argv, 3), rgba, side, side);
+            if (hpath) |hp| writeHeight(hp, bm);
+            sayNotes();
+            say("{d} operators, {d} bytes, {d}x{d}, window {d},{d} side {d}, margin {d}\n", .{ g.n, g.bytes(), side, side, win.x, win.y, win.s, modern.c.cv.m });
+            return 0;
+        }
         const bm = draw(&g, size) orelse die("the procedure does not draw", .{});
         const w: usize = @intCast(wzb_width(bm));
         const h: usize = @intCast(wzb_height(bm));
@@ -6036,6 +6256,8 @@ pub export fn main(argc: c_int, argv: [*]const [*:0]const u8) c_int {
                 opt.win.x = std.fmt.parseFloat(f32, it.next() orelse die("window=X,Y,SIDE", .{})) catch die("bad {s}", .{a});
                 opt.win.y = std.fmt.parseFloat(f32, it.next() orelse die("window=X,Y,SIDE", .{})) catch die("bad {s}", .{a});
                 opt.win.s = std.fmt.parseFloat(f32, it.next() orelse die("window=X,Y,SIDE", .{})) catch die("bad {s}", .{a});
+            } else if (std.mem.eql(u8, k, "fix")) {
+                opt.fix = v[0] == '1';
             } else if (std.mem.eql(u8, k, "fromfree")) {
                 opt.from_free = v[0] == '1';
             } else if (std.mem.eql(u8, k, "from")) {

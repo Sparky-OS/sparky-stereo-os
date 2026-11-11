@@ -7,6 +7,11 @@ Usage: script2text.py FOUND.script [SIZE-EXPONENT] > FOUND.txt      (default siz
 import json, os, struct, sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src", "farbrausch"))
 from wzlang import PACK
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from opkinds import kinds as _kinds
+PACK = dict(PACK)
+for _k, _v in _kinds().items():
+    PACK.setdefault(_k, _v)   # the modern operators of milestone 2b
 size = int(sys.argv[2]) if len(sys.argv) > 2 else 9
 out = None
 for line in open(sys.argv[1]):

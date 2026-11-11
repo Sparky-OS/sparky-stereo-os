@@ -8,6 +8,10 @@ here = os.path.dirname(os.path.abspath(__file__))
 src = here + "/p2p.zig" if os.path.exists(here + "/p2p.zig") else os.path.dirname(here) + "/src/p2p.zig"
 for m in re.finditer(r'\.name = "(\w+)", \.kinds = "(\w*)"', open(src).read()):
     kinds[m.group(1)] = m.group(2)
+sys.path.insert(0, here)
+from opkinds import kinds as _kinds
+for _k, _v in _kinds().items():
+    kinds.setdefault(_k, _v)   # the modern operators of milestone 2b
 last = None
 for line in sys.stdin:
     # quoted strings (a Text operator's text and font name) are taken out first: they may hold spaces
@@ -22,6 +26,10 @@ for line in sys.stdin:
     v2 = op == "Text" and len(vals) == len(k) + 3
     if v2:
         k = k + "iii"
+    if op == "Ramp" and len(vals) < len(k) and len(vals) >= 6 and len(vals) % 2 == 0:
+        # a Ramp typed with fewer than eight stops: the stored operator holds eight, the unused ones repeat the last
+        while len(vals) < len(k):
+            vals += ["1", vals[-1]]
     if len(vals) != len(k):
         sys.exit("%s: %s takes %d values, %d given" % (name, op, len(k), len(vals)))
     out = []

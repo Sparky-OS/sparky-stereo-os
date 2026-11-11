@@ -11,22 +11,40 @@
 #include "wz3_bitmap_code.cpp"
 #include <stdint.h>
 #include <stdio.h>
+#if !defined(__wasm__)
 #include <setjmp.h>
+#endif
 
 static size_t g_live = 0;                    // bytes of bitmaps alive
 static size_t g_limit = (size_t) 192 << 20;  // the most the graph may hold at once
 static char g_fail[160];
+#if !defined(__wasm__)
 static jmp_buf g_jb;
+#endif
 static int g_jb_on = 0;
 
 extern "C" void wzb_fail(const char *what, int line)
 {
   snprintf(g_fail, sizeof g_fail, "the operator code stopped on a check (%.100s, line %d)", what, line);
+#if !defined(__wasm__)
   if (g_jb_on) longjmp(g_jb, 1);   // the fitter tries values no artist typed: a failed check refuses the candidate
+#else
+  // WebAssembly without the exception extension has no longjmp: the drawing path says the check and stops (lane
+  // 514's finding); the fitter, which needs the refusal, runs natively
+  fprintf(stderr, "%s\n", g_fail);
+#endif
   __builtin_trap();
 }
 
 extern "C" const char *wzb_failure(void) { return g_fail; }
+#if defined(__wasm__)
+// the stand-in of wasm/setjmp.h: an error that would jump (FreeType's rasterizer, libpng) is said, and the program stops
+extern "C" _Noreturn void longjmp(int *, int)
+{
+  fprintf(stderr, "stopped: a library (FreeType's rasterizer or libpng) asked for a long jump after an error; this WebAssembly build has none\n");
+  abort();
+}
+#endif
 extern "C" void wzb_init(void) { xInitPerlin(); }
 extern "C" void wzb_set_limit(size_t bytes) { g_limit = bytes; }
 extern "C" size_t wzb_live(void) { return g_live; }
@@ -208,6 +226,20 @@ extern "C" void wzb_free(void *p)
   delete b;
 }
 
+// Milestone 2b: an empty bitmap for a modern operator (ops/*.zig draws into it), and its pixels (blue, green, red,
+// alpha; 15 bits each), so the modern operators and werkkzeug's own take each other's pictures.
+extern "C" void *wzb_new(int xs, int ys)
+{
+  if (xs < 1 || ys < 1 || (long long) xs * ys > (1LL << 26)) return 0;
+  if ((size_t) xs * ys * sizeof(sU64) + g_live > g_limit) return 0;
+  GenBitmap *o = new GenBitmap;
+  o->Init(xs, ys);
+  memset(o->Data, 0, sizeof(sU64) * o->Size);
+  g_live += (size_t) o->Size * sizeof(sU64);
+  return o;
+}
+extern "C" uint16_t *wzb_data(void *p) { return (uint16_t *) ((GenBitmap *) p)->Data; }
+
 extern "C" int wzb_width(void *p) { return ((GenBitmap *) p)->XSize; }
 extern "C" int wzb_height(void *p) { return ((GenBitmap *) p)->YSize; }
 
@@ -342,7 +374,9 @@ static int wzb_apply_inner(const char *name, const uint32_t *w32, int nin, void 
 extern "C" int wzb_apply(const char *name, const uint32_t *w32, int nin, void **inp, void **out, char *err, int errlen)
 {
   g_jb_on = 1;
+#if !defined(__wasm__)
   if (setjmp(g_jb)) { g_jb_on = 0; snprintf(err, errlen, "%s", g_fail); return 2; }
+#endif
   int r = wzb_apply_inner(name, w32, nin, inp, out, err, errlen);
   g_jb_on = 0;
   return r;

@@ -999,6 +999,129 @@ Traps of the seeds:
   Cause: Zig refuses a name that hides a declaration of the file.
   Fix: give the file's own globals names no function uses (`seeds`, `nseeds`).
 
+### The seventh round: modern operators, the whole picture first (milestone 2b)
+
+Daniel (11 November 2026): "Opus was having a hard time understanding the goal moved from - let's make it work like they did - to - let's modernize and expand what's possible"; "many many effects are now regular and we have more to include into it"; "for now we are aiming the web, so, web gpu, web assembler you name it - all that my 3060 and amd igpu can do and up, starting also from a10 gpus"; on GPUs rounding differently: "it's ok, this is not a dataset, but a graphics thing".
+The sixth round measured where werkkzeug's 2004 operators stop: at 111 to 224 bytes a tile the bark is a flat noise, the brick wall has no bricks, the checker needs a glyph to exist, the rust is quilted.
+The method stays (pixels in, procedures out, tiles, ladder, seeds, the eye as judge); the operator set and the budget change: "modern small", kilobytes where they buy the surface, the bytes stated beside the picture's.
+
+#### The three faults of the sixth round, fixed
+
+The tile path of the sixth round (the whole picture's procedure retuned on each tile, `from=`) now takes the tile's window (`window=X,Y,SIDE`) and fixes three faults (`fix=0` gives the sixth round's tiles):
+1. **A tile's noise has the picture's frequencies.** werkkzeug's `Perlin` draws 2^freq cells across whatever it is drawn on, so on a tile a quarter of the picture wide the same words drew the whole's octaves four times finer. The tile takes freq + log2(side); octaves coarser than one cell across the tile are dropped and said (`v0 Perlin: 2 octave(s) coarser than one cell across this tile are dropped`).
+2. **The light stands at the whole picture's place.** `Bump`'s light position is in parts of the picture it is drawn on; it is moved by the window, its height scaled with it, and locked, so every tile is lit from the one lamp (the quilted rust is gone).
+3. **The colour retune keeps hue.** Colours are retuned by brightness (every channel scaled alike) and saturation (every channel moved toward or away from their mean), never channel by channel; a grey stays grey (the purple and green tiles are gone).
+
+#### The modern operators
+
+Nine operators, each in its own file under [`pixels/ops/`](procedural-texture-fit/pixels/ops/) with its parameter table in the shape of Stereo Werkkzeug's operator table (kind, label, word, default, range, step, choices), so that table can take them; [`modern.zig`](procedural-texture-fit/pixels/modern.zig) lists them.
+Every one carries a version word first (1 today): a drawing refuses a version it does not know, with a sentence.
+They join werkkzeug3's operators in the same graph and the same script (`p2p kinds` prints every operator's packing), and the playback is the same `p2p render`.
+
+| operator | what it draws | its parameters | how the fitter reads it from the pixels | bytes | source |
+|---|---|---|---|---|---|
+| `Noise` | fractal gradient noise over the whole picture: fbm, ridged, billowed; another frequency across than down (grain); the place warped by noise | kind, cells across, cells down, octaves, gain, warp, warp cells, seed, contrast | the kind by the skew of the detail (thin dark or light lines) after the drawing is put in the picture's order of values; ridged and billowed only where the picture's lines run clearly (structure-tensor coherence 0.65 or more); the first octave and the gain by the whole row of octave strengths (a Laplacian pyramid) made to agree; the stretch by the change across against down; the warp by how the lines bend | 41 | Perlin 1985 and 2002 (gradient noise, the improved fade); Musgrave in Ebert et al. (fbm, ridged); Quilez, "domain warping" |
+| `Cells` | cellular noise: cracks (F2 - F1), stones and pebbles (a dome per cell with a gap), patches or scales (a shade per cell), optionally warped | kind, cells across, down, jitter, width, warp, warp cells, seed, variation | long thin dark pieces of the detail (6 times as long as wide, 24 pixels or more) over 0.015 of the picture: their spacing gives the cells, their width the crack width | 41 | Worley 1996 |
+| `Tiles` | structure by distance: grid, bond, checker, hexagons, lozenges turned per cell, studs, octagons with diamond inserts, planks of uneven length, square tiles with upright inserts; joint, bevel, rounded corners, per-piece shade and jitter, warped edges; grey 0 in the joints, the piece's shade on its face, inserts at 1; the height in alpha | layout, pieces across, down, bond, joint, bevel, round, jitter, variation, seed, warp, warp cells, floor, size, phase across, down | the repeat of the first round, then every layout's mean cell laid over the picture's mean cell at every shift (the best correlation gives the layout, the pieces per cell and the place of the joints); lozenges only where the cell's edges run on the diagonals (0.12 or more: the tread plate 0.185, the others 0.04 to 0.08); the joint's width and bevel (and an insert's size) by the same laying, with at least 0.3 of the picture left as faces | 69 | Quilez's 2D distance functions (rounded box, rhombus); the hexagons as F2 - F1 on a lattice |
+| `Ramp` | a gradient map of up to eight stops | stops, eight places and colours | the field's values at eight ranks and the picture's mean colour at the same ranks of its main colour axis (a histogram match); a structure's joints take their own measured colour first | 73 | the rank match of histogram specification |
+| `Layer` | one material over another by a mask's soft threshold: mix, multiply, add, or the detail mode (the top's departure from mid grey added, for texture in a structure's faces); the height kept, mixed, raised, lowered or multiplied | colour mode, lo, hi, amount, height mode, height amount | a second material where the first round's reading finds colours off the main axis as one cluster; its patches by their size (the mask's correlation length), raggedness (edge per pixel inside) and coverage | 29 | werkkzeug's `Mask`, with the height carried |
+| `Shade` | a material lit from a direction by its own height (Lambert), the slope in parts of the picture | direction across, down, up, depth, strength | on a structure, the picture's brightness regressed on the drawn relief's slopes (a fit share of 0.01 or more); else the light and dark sides of pits or stones; the depth by making the drawing's reading agree | 25 | Lambert's cosine law |
+| `Scatter` | a seed placed many times on a jittered grid: a glyph drawn by `Text` (any font) or a soft disc stretched by an aspect; size, turn and shade each its own | cells across, down, density, size, size variation, turn, jitter, colour, colour variation, seed, height, softness, aspect, opacity, phase across, down | pits and specks: compact dark or light pieces of the detail, 8 or more of 2.5 pixels or more at 512 (read on a structure's faces only); stones: light pieces of 5 pixels or more at a coarser scale; a motif: the seed the eye chose in the sixth round | 69 | ours |
+| `Wear` | cavity dirt, worn edges, drips running down from a source, growth from points, read from the relief or a mask | kind, radius, length, lo, hi, amount, colour, noise cells, noise amount, seed, gain | drips: the second material's mask runs 1.5 times longer down than across | 49 | ours |
+| `Tint` | a tile's own brightness and saturation, weighted by a tent over the tile so neighbouring tints add up to a smooth field | tile left, top, side, brightness, saturation | measured: the tile's mean brightness and saturation against the whole procedure's drawing at the tile's window; laid where they differ by 3 % or 8 % | 25 | ours |
+
+The rules every operator keeps, so a WGSL twin follows line for line and WebAssembly draws the same bytes:
+- **A pure function of the place.** Places are parts of the whole picture (0 to 1, repeating); a drawing is a canvas showing a window of it (`render ... window=X,Y,SIDE`), so a tile is the same procedure drawn over a quarter of the picture. Integer frequencies repeat over the picture.
+- **No maths library.** Only + - * /, sqrt and floor, which IEEE 754 rounds the same everywhere; the sixteen gradient directions are written out; a turn uses a polynomial sine and cosine; the hash is lowbias32 (Chris Wellons).
+- **Bounded loops.** A cell search looks at 3 by 3 cells, a scatter at most 7 by 7, a drip at most its length.
+- **Neighbourhoods on a margin.** `Shade` reads one pixel each way, `Wear` its radius or length; the canvas is drawn that much wider and cut, and the blur sums whole numbers (the 15-bit values), so a pixel's answer does not depend on where the canvas starts.
+- **The proof:** for each of the thirteen pictures, the sixteen tiles of 512 drawn each through its own window and put together are the whole drawn at 2048, byte for byte (0 pixels differ), with `Shade`, `Scatter` and a glyph's `Text` inside.
+
+#### The fit, the whole picture first
+
+`p2p mfit WHOLE.ppm OUT [full=FULL.ppm] [seeds=CHOSEN] [light=0]` reads the whole picture at 512, builds the procedure layer by layer, each layer only where its reading allows it, and prints every reading with what it decided:
+1. the surface's `Noise` and its `Ramp` (the colours at the same ranks);
+2. a structure (`Tiles`, the noise laid into the faces by `Layer` in the detail mode, the amount chosen so the share of the faces' variation that lies between pieces agrees with the picture's), or a motif (`Scatter` of the seed's glyph drawn by `Text` on a 128 pixel stamp, the ground's colours read from the ground's pixels only);
+3. a second material, drips, cracks, stones, pits, specks, the light, each by its reading;
+4. with `full=`, the tiles: the whole procedure drawn at each tile's window at full size, and a `Tint` only where the tile's brightness or saturation differs from it.
+Every layer is a rung (`OUT.rNN.script`): the procedure up to there, a thinner version of the final one. `OUT.whole.script` is the whole picture's procedure without the tiles' Tints.
+No choice is made by the inner measure: where a reading cannot give a value directly, candidates are drawn and the one whose reading equals the picture's is taken.
+What the eye refuses is an option: `light=0` leaves a read light off (the terracotta's light raised its joints into crosses on the sheet of the rungs).
+
+```sh
+sh pixels/build.sh BUILD FR FREETYPE LIBS                              # BUILD/p2p
+BUILD/p2p mfit TILES/L0-0-0.ppm OUT/NAME full=FULL/NAME.ppm            # OUT/NAME.script, .whole.script, .rNN.script, .log
+BUILD/p2p mfit TILES/L0-0-0.ppm OUT/NAME full=FULL/NAME.ppm seeds=NAME.chosen   # a figure on a ground: the sixth round's seed
+BUILD/p2p render OUT/NAME.script NAME.ppm 11 height=NAME-h.pgm         # the whole at 2048 and its relief in 16 bits
+BUILD/p2p render OUT/NAME.script NAME-t-1-2.ppm 9 window=0.5,0.25,0.25 # the tile of row 1, column 2 at 512: the same pixels
+python3 pixels/m2b_renderset.py OUT NAME DRAWN native BUILD/p2p > set.sh   # the whole, its 16 tiles and its rungs
+python3 pixels/m2b_sheets.py SCRATCH EVIDENCE FONT                     # overviews, sheets at 1:1, what each operator bought, the table
+```
+
+#### The WebAssembly build of the drawing path
+
+`P2P_TARGET=wasm32-wasi sh pixels/build.sh BUILD-WASM FR FREETYPE LIBS` builds the same program (`p2p.wasm`, 21 MB) from the same source: Farbrausch's operators with the SSE2 stand-in of lanes 503 and 514 (`shim/portable/emmintrin.h`), the first WebAssembly processor with SIMD and without the saturating float-to-integer conversions (`-mcpu=mvp+simd128`, lane 514's finding), FreeType, HarfBuzz, plutosvg, libpng, zlib and Brotli for `Text`, and the modern operators.
+It runs in wasmtime 50.0.1 with the font folders mapped: `wasmtime run --dir SCRATCH::SCRATCH --dir /usr/share/fonts::/usr/share/fonts --env WZ_FONTINDEX=... p2p.wasm render ...` (precompiled once with `wasmtime compile`).
+The thirteen final procedures drawn natively and in WebAssembly, 262 pictures (the wholes at 2048 and their 16-bit heights, 208 tiles, 28 rungs), are the same bytes (`evidence/m2b/checksums.tsv` in the lane, SHA-256 beside SHA-256).
+The maths: both builds take Zig's own (compiler-rt and musl's) for every function the operator code calls, linked into each program, and the modern operators call none; lane 514 carries musl 1.2.6's functions under names of its own, which a glibc build needs too.
+
+#### What the fifteen gave (the seventh round's sheets, looked at before these words)
+
+- **Now the surface at a glance:** the brick wall (bricks in a running bond, light mortar measured from its own pixels, each brick its own shade), the floor of slabs (the checker of two shades with its joints, no glyph needed), the terracotta (black upright inserts where four tiles meet, at their places, the joints between), the snowflakes (the seed's glyph three times, on a clean ground), the plaster, the concrete and the rust (multi-scale clouds in their colours, no quilting).
+- **Nearly:** the coast (moss and sand in patches; no stones), the rock (mottled; no pits or wet patches), the bark (dark furrows running down, ridged and stretched; too regular, no moss, no knots), the tread plate (lozenges turned per cell at their places; too dark and flat, the lit edges missing).
+- **Not the surface:** the rusted metal (marbled swirls where the picture has rust spots and drips), the poinsettias (the ground only: the eye refused every seed in the sixth round, so the flowers stay with the image).
+- **Close up, nothing is the picture:** the brick faces are marbled instead of grained, joints are uniform, and every mark of the photographs (stains, pits, chips, moss, knots, drips, veins) stays with the image, the last layer.
+- **Bytes:** the whole picture's procedure 114 to 383 bytes, the tiles' Tints 0 to 400 more (114 to 562 bytes in all, against milestone 2's 1,776 to 4,257); with the picture, 23.7 to 39.7 % smaller than the picture with its lower-resolution copies.
+- **What each operator bought** (the sheet of the rungs): `Tiles` with `Ramp` made the bond, the checker and the inserts; `Scatter` with `Text` made the snowflakes; `Layer` laid the rusted metal's second colour; `Tint` evened tiles' brightness where they differed; the light (`Shade`) was read on the terracotta only and the eye left it off. `Cells` (cracks), `Wear` (drips), stones and the other `Tiles` layouts were read on none of the fifteen: their readings stayed under their thresholds, said in each log.
+
+Traps of the seventh round:
+- Symptom: every candidate layout reports that the cells agree -2.000 and the first is chosen.
+  Cause: the search for the best shift started at -2 and, for an unsigned match, compared against the absolute value of the best so far (2), so nothing beat it.
+  Fix: keep the best key apart from the best correlation. Found by: the candidates printed with their numbers.
+- Symptom: a fitted structure does not draw ("a step of the procedure does not draw").
+  Cause: the phase read from the shift was -1.8 pieces, outside the parameter's range.
+  Fix: take the phase within the layout's period (a bond and a checker repeat every two pieces). Found by: turning on `say_refusals` in the fitter.
+- Symptom: the typed form of a graph turns the modern light into werkkzeug's `Light` (11 values asked for 6 given).
+  Cause: one name in two families; the converters and `opIndex` take the first.
+  Fix: the modern light is `Shade`; no modern name repeats one of werkkzeug3's.
+- Symptom: every photograph comes back as a uniform fine grain.
+  Cause: the frequency was matched by crossings of a band of detail, which the finest octaves fill whatever the first octave is.
+  Fix: match the whole row of octave strengths (the Laplacian pyramid) over the first octave and the gain together. Found by: the first octave chosen at 16 for every picture.
+- Symptom: rusted metal comes back as orange worms.
+  Cause: a ridged kind is closer by the detail's skew alone; spots and lines both skew.
+  Fix: ridged and billowed are tried only where the picture's lines run clearly (coherence 0.65: bark 0.708; rusted metal 0.558, rock 0.413).
+- Symptom: the terracotta's square inserts are drawn as lozenges.
+  Cause: a large lozenge's ground lies over a dark square as well as an insert does, either sign.
+  Fix: lozenges only where the cell's edges run on the diagonals; inserts laid by their grey, signed (read as darker than the tiles; a light insert is not read yet).
+- Symptom: inserts dark brown with a dark ring around every joint.
+  Cause: the inserts' value lay between the joints' and the faces', so every bevel passed through the insert colour, and the faces' texture moved the inserts' values.
+  Fix: inserts at 1, above every piece, coloured by a `Layer` whose mask is the structure itself.
+- Symptom: the joint scan makes the joints a quarter of a piece wide, or leaves no faces at all.
+  Cause: a wide joint stands in for a larger insert; a layout of joints alone still correlates with dark squares.
+  Fix: the insert's size is read with the joints, and a candidate must leave at least 0.3 of the picture as faces.
+- Symptom: the poinsettias' ground gets bright green blotches from the tiles' Tints.
+  Cause: the tile's brightness included the white flowers the procedure does not draw.
+  Fix: where a motif stays with the image, a tile is measured on its ground only (0 of 16 tiles then differ).
+- Symptom: hundreds of pits of one and a half pixels on every photograph.
+  Cause: the detail's own grain passes a blob test.
+  Fix: pits and specks need 2.5 pixels or more at 512; on a structure they are read on its faces only, and their colour among the faces.
+- Symptom: the WebAssembly build stops in FreeType's and libpng's headers ("Setjmp/longjmp support requires Exception handling support").
+  Cause: wasi-libc refuses `setjmp.h` without the exception extension.
+  Fix: `wasm/setjmp.h` for that build only: `setjmp` returns 0, `longjmp` (a real function, since libpng takes its address) says which library jumped and stops; the bridge's own refusal by `longjmp` is left out there.
+- Symptom: `WASI lacks a true mmap` in plutovg.
+  Fix: `-D_WASI_EMULATED_MMAN` and `-lwasi-emulated-mman` (and the process-clock and signal emulations).
+- Symptom: wasmtime refuses the module: "type mismatch: expected i32, found i64".
+  Cause: `clock()` declared in Zig as returning `c_long`; wasi-libc's `clock_t` is `long long`.
+  Fix: declare it as `i64` (the same on x86-64). Found by: listing the module's C functions declared by hand in Zig.
+- Symptom: Zig's start code wants `root.main` natively, and exports `__main_argc_argv` itself for WASI when it finds one.
+  Fix: the native root keeps `pub export fn main`; the WebAssembly root is `p2p_wasm.zig`, which has no `main` and exports the same function as `__main_argc_argv`.
+- Symptom: the joints of the brick wall and the tread plate stay at the starting width, and the log says "the cells agree -1.000".
+  Cause: the joint scan accepts only a shift under an eighth of the cell, and a shift of -1 pixel was counted as cw - 1; when nothing passed, the starting width stayed without a word.
+  Fix: the shift's distance is taken either way (the brick wall's joints are then read: 0.02 of a brick, bevel 0.14), and where still no width agrees (the tread plate) the log says the starting width is kept, said and not chosen.
+- Symptom: a render set draws nothing and every line says "No such file or directory".
+  Cause: the native set was written with the arguments in the WebAssembly order.
+  Fix: `m2b_renderset.py FITDIR NAME OUTDIR native|wasm BINARY`.
+
 ### Where the procedures stop (so far)
 
 On .kkrieger's own textures, which are procedures, the reverse now gets the material at a glance for the plain noises, the regular repeats and the walls in a bond, and a recognisable drawing for the wood and the carved ornament; nothing is right close up.
@@ -1008,7 +1131,9 @@ Over every free and open font and the machine's own, any character is found the 
 It stops at letters bent by a `Distort` (found clean, often whole, in another design), at four twirls and more, at letters under about 20 pixels, at a text stretched by more than a third, at a single stroke standing alone (an r, a t), at letters that touch (rt), at a word that is one piece of ink (joined Arabic, a Devanagari word under its headline), at thin line drawings (hieroglyphs), at a text over a material, and at telling clones of one design apart (Times, Helvetica and Arial copies draw the same letters within a pixel).
 On photographs at full size, tile by tile, one procedure retuned per tile gives each part of the picture its own colours and grain, and the whole stays one surface where the second judge and the eye agree (coast, concrete, plaster, rock, rusted metal); the bark's furrows and knots, the coast's stones, the rock's pits and cracks, the rust's stains, the rusted metal's drips, a wall's bond and a slab's veins stay with the image, the last layer.
 Where a picture repeats a motif, a glyph found over the whole index draws it at every place in a few bytes (snowflakes, a checker of slabs, a wall's mortar), and the box `GlowRect` draws where the motif is a box; a motif no glyph lies over (a poinsettia), or a cell that averages two motifs (a tread plate's lozenges in two directions), stays with the image.
-Not built yet: a `Distort` for ragged patch edges, for bent letters and for stones of uneven length, the rounded bevel of a stone, a text read over a material (its ink is a second colour, which the second-material reading already finds), a font page, rings (as against spirals), a tile's noise frequencies shifted by its window's scale, a noise's colours retuned as one hue, a cell of two motifs, and a disc as a seed (the box only, so far).
+With the modern operators of the seventh round, one procedure for the whole picture draws any tile at its own window with no seam (the tiles put together are the whole, byte for byte, natively and in WebAssembly), and the laid surfaces come back from their pixels in their layout: bricks in a bond with their mortar's colour, a checker of slabs, square inserts where four tiles meet, lozenges turned per cell, and a motif scattered from its glyph; noise-like photographs come back as their colours in clouds of the right scales, a grain that runs one way as ridged and stretched noise.
+They stop at the marks: stains, pits, chips, moss, knots, drips, veins and the grain inside a brick stay with the image; rust spots come back as swirls; a motif no glyph lies over (the poinsettias) stays with the image whole.
+Not built yet: a `Distort` for bent letters, a text read over a material, a font page, rings (as against spirals), a cell of two motifs, a light insert, and readings for the operators no picture of the fifteen took (cracks, drips, stones, hexagons, studs, planks).
 
 ## Where it fails
 
@@ -1049,4 +1174,4 @@ Not built yet: a `Distort` for ragged patch edges, for bent letters and for ston
 
 ## Credits
 
-OpenKTG: Fabian "ryg" Giesen. werkkzeug3: Dierk Ohlerich, Fabian Giesen, Thomas Mahlke, Christoph Muetze, Tammo Hinrichs and Bastian Zuehlke, as its licence names them. The pictures of the first run: Poly Haven, CC0. Relief mapping: Fábio Policarpo, Manuel M. Oliveira and João L. D. Comba (2005). Parallax occlusion mapping: Natalya Tatarchuk (2006). The stereo photographs of bark and ground: Robbie Sproule, CC BY 2.0, on Wikimedia Commons. MaterialX: the Academy Software Foundation's project, its standard nodes document by Doug Smythe and Jonathan Stone. The reverse from pixels: Yiwei Hu, Chengan He, Valentin Deschaintre, Julie Dorsey and Holly Rushmeier (2022) for the order (parts, layered noise, tuning together); Ariel Elnekave and Yair Weiss (2022) for comparing textures by their patches along random directions; Robert Hooke and T. A. Jeeves (1961) for direct search; the bridge to the operators started as lane 503's, from lane 473x's renderer. Text: the FreeType Project (David Turner, Robert Wilhelm, Werner Lemberg) for the font renderer; Liberation Fonts (SIL Open Font License 1.1) and DejaVu Fonts (Bitstream Vera licence) as the stand-ins named in the font map; .theprodukkt's capture of the title screen on Wikimedia Commons (BSD licence). Any font, any character: HarfBuzz (Behdad Esfahbod and the contributors its AUTHORS file names) for shaping and COLR painting; SheenBidi (Muhammad Tayyab Akram) for UAX #9 and the script runs; plutosvg and plutovg (Samuel Ugochukwu) for SVG glyphs; libpng, zlib (Jean-loup Gailly and Mark Adler) and Brotli for colour bitmaps, WOFF and WOFF2; the Unicode Consortium's UAX #9, UAX #24 and Blocks.txt; the Google Fonts repository and Debian's font packages (the Debian Fonts Team and each package's maintainers), every font credited from its own name table in the lane's evidence; Microsoft's core fonts read where the person installed them, never shipped. Tiles and seeds: the variance-preserving blend of Eric Heitz and Fabrice Neyret (2018); Otsu's threshold (Nobuyuki Otsu, 1979); fontTools (MIT licence, copyright Just van Rossum, as its LICENSE states) for cutting a font to one glyph; the pictures of the sixth round from Poly Haven (Rob Tuytel; Dimitrios Savva and Rico Cilliers; Amal Kumar) and ambientCG, all CC0; the seeds' fonts as their own name tables credit them: Symbola (George Douros), Murecho (Neil Summerour), Gothic A1 (HanYang I&C), Inconsolata (Raph Levien, Cyreal, Brenton Simpson).
+OpenKTG: Fabian "ryg" Giesen. werkkzeug3: Dierk Ohlerich, Fabian Giesen, Thomas Mahlke, Christoph Muetze, Tammo Hinrichs and Bastian Zuehlke, as its licence names them. The pictures of the first run: Poly Haven, CC0. Relief mapping: Fábio Policarpo, Manuel M. Oliveira and João L. D. Comba (2005). Parallax occlusion mapping: Natalya Tatarchuk (2006). The stereo photographs of bark and ground: Robbie Sproule, CC BY 2.0, on Wikimedia Commons. MaterialX: the Academy Software Foundation's project, its standard nodes document by Doug Smythe and Jonathan Stone. The reverse from pixels: Yiwei Hu, Chengan He, Valentin Deschaintre, Julie Dorsey and Holly Rushmeier (2022) for the order (parts, layered noise, tuning together); Ariel Elnekave and Yair Weiss (2022) for comparing textures by their patches along random directions; Robert Hooke and T. A. Jeeves (1961) for direct search; the bridge to the operators started as lane 503's, from lane 473x's renderer. Text: the FreeType Project (David Turner, Robert Wilhelm, Werner Lemberg) for the font renderer; Liberation Fonts (SIL Open Font License 1.1) and DejaVu Fonts (Bitstream Vera licence) as the stand-ins named in the font map; .theprodukkt's capture of the title screen on Wikimedia Commons (BSD licence). Any font, any character: HarfBuzz (Behdad Esfahbod and the contributors its AUTHORS file names) for shaping and COLR painting; SheenBidi (Muhammad Tayyab Akram) for UAX #9 and the script runs; plutosvg and plutovg (Samuel Ugochukwu) for SVG glyphs; libpng, zlib (Jean-loup Gailly and Mark Adler) and Brotli for colour bitmaps, WOFF and WOFF2; the Unicode Consortium's UAX #9, UAX #24 and Blocks.txt; the Google Fonts repository and Debian's font packages (the Debian Fonts Team and each package's maintainers), every font credited from its own name table in the lane's evidence; Microsoft's core fonts read where the person installed them, never shipped. Tiles and seeds: the variance-preserving blend of Eric Heitz and Fabrice Neyret (2018); Otsu's threshold (Nobuyuki Otsu, 1979); fontTools (MIT licence, copyright Just van Rossum, as its LICENSE states) for cutting a font to one glyph; the pictures of the sixth round from Poly Haven (Rob Tuytel; Dimitrios Savva and Rico Cilliers; Amal Kumar) and ambientCG, all CC0; the seeds' fonts as their own name tables credit them: Symbola (George Douros), Murecho (Neil Summerour), Gothic A1 (HanYang I&C), Inconsolata (Raph Levien, Cyreal, Brenton Simpson). Modern operators (seventh round, written from the texts, no code copied): Ken Perlin, "An Image Synthesizer" (SIGGRAPH 1985) and "Improving Noise" (SIGGRAPH 2002); F. Kenton Musgrave in Ebert, Musgrave, Peachey, Perlin and Worley, "Texturing and Modeling: A Procedural Approach" (fractal sums, ridged multifractals); Steven Worley, "A Cellular Texture Basis Function" (SIGGRAPH 1996); Inigo Quilez's articles on domain warping and 2D distance functions (iquilezles.org); Chris Wellons's lowbias32 hash ("Prospecting for Hash Functions", public domain); Peter Burt and Edward Adelson's Laplacian pyramid (1983) for the strength per octave; Josef Bigun and Gösta Granlund (1987) and Michael Kass and Andrew Witkin (1987) for the structure tensor. The WebAssembly build: the SSE2 stand-in written for lane 503 and carried by lane 514 (Daniel Campos Ramos with Claude), lane 514's findings on the saturating conversion and WASI's entry; wasi-libc's emulations (the WebAssembly project); wasmtime 50.0.1 (the Bytecode Alliance, Apache-2.0 with the LLVM exception) to run it, not shipped.

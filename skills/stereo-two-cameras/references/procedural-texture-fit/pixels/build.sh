@@ -16,9 +16,12 @@ HB=$(one "$L/harfbuzz-*"); SB=$(one "$L/sheenbidi-*"); PVG=$(one "$L/*plutovg-*"
 PNG=$(one "$L/libpng-*"); ZL=$(one "$L/zlib-*"); BR=$(one "$L/*brotli-*")
 [ -f "$L/Blocks.txt" ] || { echo "no Blocks.txt in $L" >&2; exit 1; }
 ZIG=${ZIG:-$HOME/.local/bin/zig}
+# the lane's tree keeps Farbrausch's stand-ins in farbrausch/; the skill's copy keeps shim/ beside this file and
+# patch_wz3.py in ../werkkzeug/
+if [ -d "$HERE/farbrausch" ]; then FB=$HERE/farbrausch; PATCH=$FB/patch_wz3.py; PATCHOPT=""; else FB=$HERE; PATCH=$HERE/../werkkzeug/patch_wz3.py; PATCHOPT=--keep-text; fi
 GEN=$OUT/gen
 mkdir -p "$GEN/wz4frlib"
-python3 "$HERE/farbrausch/patch_wz3.py" "$FR/altona_wz4/wz4/wz4frlib/wz3_bitmap_code.cpp" "$GEN/wz3_bitmap_code.cpp"
+python3 "$PATCH" $PATCHOPT "$FR/altona_wz4/wz4/wz4frlib/wz3_bitmap_code.cpp" "$GEN/wz3_bitmap_code.cpp"
 cp "$FR/altona_wz4/wz4/wz4frlib/wz3_bitmap_code.hpp" "$GEN/"
 cp "$GEN/wz3_bitmap_code.hpp" "$GEN/wz4frlib/"
 # Unicode's blocks, for the font index's coverage column
@@ -106,7 +109,10 @@ sed -e 's|^/\* #define FT_CONFIG_OPTION_SYSTEM_ZLIB \*/|#define FT_CONFIG_OPTION
     "$FT/include/freetype/config/ftoption.h" > "$GEN/ftoption-p2p.h"
 for o in SYSTEM_ZLIB USE_PNG USE_BROTLI SVG; do grep -q "^#define FT_CONFIG_OPTION_$o" "$GEN/ftoption-p2p.h" || { echo "FreeType option $o not set" >&2; exit 1; }; done
 cp "$PNG/scripts/pnglibconf.h.prebuilt" "$GEN/pnglibconf.h"
-INC="-I $GEN -I $FT/include -I $ZL -I $PNG -I $BR/c/include -I $HB/src -I $SB/Headers -I $PVG/include -I $PSVG/source"
+# WebAssembly: wasm/setjmp.h stands in for the C library's (which WASI refuses), ahead of every other header
+# and wasi-libc's emulations where a library reads a file by mapping it (plutovg) or asks for the process's clock
+case "${P2P_TARGET:-}" in wasm32-*) WINC="-I $HERE/wasm -D_WASI_EMULATED_MMAN -D_WASI_EMULATED_PROCESS_CLOCKS -D_WASI_EMULATED_SIGNAL" ;; *) WINC="" ;; esac
+INC="$WINC -I $GEN -I $FT/include -I $ZL -I $PNG -I $BR/c/include -I $HB/src -I $SB/Headers -I $PVG/include -I $PSVG/source"
 FTC="-O2 -w -DFT2_BUILD_LIBRARY -DFT_CONFIG_MODULES_H=<ftmodule-p2p.h> -DFT_CONFIG_OPTIONS_H=<ftoption-p2p.h> $INC"
 FTD="-DFT_CONFIG_MODULES_H=<ftmodule-p2p.h> -DFT_CONFIG_OPTIONS_H=<ftoption-p2p.h>"
 HBC="-O2 -w -fno-exceptions -fno-rtti $FTD -DHAVE_FREETYPE=1 -DHAVE_PNG=1 -DHB_NO_MT -DHAVE_FT_GET_VAR_BLEND_COORDINATES -DHAVE_FT_SET_VAR_BLEND_COORDINATES -DHAVE_FT_DONE_MM_VAR -DHAVE_FT_GET_TRANSFORM $INC"
@@ -124,9 +130,18 @@ PNGSRC=$(for f in png pngerror pngget pngmem pngpread pngread pngrio pngrtran pn
 BRSRC=$(ls "$BR"/c/common/*.c "$BR"/c/dec/*.c | tr '\n' ' ')
 PVGSRC=$(ls "$PVG"/source/*.c | tr '\n' ' ')
 # shellcheck disable=SC2086
-"$ZIG" build-exe p2p.zig -cflags -fno-exceptions -fno-rtti -w -fpermissive -fno-strict-aliasing -O2 -msse2 -DSTEREOTEX_WASM -I "$GEN" -I "$HERE/farbrausch/shim" -- wzbridge.cpp \
+# P2P_TARGET=wasm32-wasi builds the same program for WebAssembly (OUT/p2p.wasm): the SSE2 stand-in of lane 514
+# (shim/portable/emmintrin.h) instead of the processor's SSE2, and the first WebAssembly processor with SIMD but
+# without the saturating float-to-integer conversions, which draw another picture where the operator code converts
+# a number too large for an integer (Cell's power; lane 514). Everything else is the same source.
+TARGET=${P2P_TARGET:-x86_64-linux-musl}
+case "$TARGET" in
+  wasm32-*) CPUF="-I $FB/shim/portable"; TOPT="-mcpu=mvp+simd128 --stack 16777216 -lwasi-emulated-mman -lwasi-emulated-process-clocks -lwasi-emulated-signal"; BIN="$OUT/p2p.wasm"; ROOT=p2p_wasm.zig ;;
+  *) CPUF="-msse2"; TOPT=""; BIN="$OUT/p2p"; ROOT=p2p.zig ;;
+esac
+"$ZIG" build-exe "$ROOT" -cflags -fno-exceptions -fno-rtti -w -fpermissive -fno-strict-aliasing -O2 $CPUF -DSTEREOTEX_WASM -I "$GEN" -I "$FB/shim" -- wzbridge.cpp \
   -cflags $HBC -- "$HB/src/harfbuzz.cc" "$HB/src/hb-raster-image.cc" "$HB/src/hb-raster-draw.cc" "$HB/src/hb-raster-paint.cc" \
   -cflags $FTC -- wzfont.c wztext2.c wzfontindex.c $FTSRC \
   -cflags $CC -I "$SB/Source" -- "$SB/Source/SheenBidi.c" \
   -cflags $CC -- $PVGSRC "$PSVG/source/plutosvg.c" $ZLSRC $PNGSRC $BRSRC \
-  -target x86_64-linux-musl -O "${OPTMODE:-ReleaseFast}" -lc -lc++ -j4 -femit-bin="$OUT/p2p"
+  -target "$TARGET" $TOPT -O "${OPTMODE:-ReleaseFast}" -lc -lc++ -j4 -femit-bin="$BIN"

@@ -61,7 +61,7 @@ Why the screen needs less:
 So on a screen, most of the scene goes a little behind the screen plane, and the nearest things come a little in front: **a gentle pop**.
 Our measured defaults:
 - **Half-Life 2 on a 46-inch television:** separation 2.5 game units (about 64 mm) with the screen plane at 120 units ([formula](formula.md)).
-- **The edition's browser:** 2 % of the view's width for a point at infinity.
+- **The edition's browser:** for a point at infinity, the sunk limit of your depth limits (Display Settings, built on the screen you use), in the screen's pixels: with the default limits 10 on a 1280 pixel wide screen that is 6.7 pixels whatever the canvas's width.
 
 The edition's browser will get both modes for WebXR pages, its next step there: one for 3D screens and anaglyph (gentle) and one for a phone in a viewer (larger).
 The person chooses between them; they are never chosen automatically, because one desktop can show a 3D television and a viewer at the same time.
@@ -116,7 +116,7 @@ flowchart LR
 
 **Route A: a plain WebGL page, unchanged.**
 Draw your scene with one camera, as today, and the browser draws it once per eye from that camera: parallel axes, off-axis frustums, never toe-in ([dom/canvas/WebGLStereoCamera.h](https://github.com/Sparky-OS/waterfox/blob/stereo3d/dom/canvas/WebGLStereoCamera.h)).
-- **On for every site in the edition's browser:** right-click the page, **3D Canvas**: Off, On, and Less, Normal, More or Most Depth (1, 2, 3 or 4 % of the view's width at infinity), kept per site. Choose Off for a site to draw it with one camera again.
+- **On for every site in the edition's browser:** right-click the page, **3D Canvas**: Off or On, kept per site, and **Display Configuration**, KDE's page where your depth limits are (the browser has no depth setting of its own: the depth is your limit). Choose Off for a site to draw it with one camera again.
 - **What it needs from your page:** the camera reaches the GPU as a `mat4` uniform, the projection or the view-projection product, which three.js, Babylon.js and PlayCanvas all do.
 - **Post-processing** (bloom, an effect composer) gets a render target per eye, so effects drawn from the scene are stereo too.
 - **The HTML around the canvas stays 2D**, identical in both eyes.

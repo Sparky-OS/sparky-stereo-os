@@ -37,13 +37,13 @@ ipdFactor = s * D * (2 * tan(vFov/2) * aspect) / (m2v * eyeSeparation)       con
 p(Z) = s * (1 - D / Z)                      the popped limit is met at Z = D * s / (s + q)
 ```
 
-That is the browser's form (its far parallax and `dom.vr.flat.screen-plane-mm`, default 1 m).
+That is the form of the browser's flat display (its far parallax and a plane from the scene; the person's `dom.vr.flat.screen-plane-mm` was removed from the edition's browser in ORDER 473u round 3).
 The eye separation is divided out, so the limits hold on any display; the metres-to-world scale cancels in the separation and moves the convergence.
 A scene nearer than D s / (s + q) pops past the popped limit: the camera does what the geometry says and a finished picture is never shifted; the person who wants a scene to reach nearer moves the plane (D = Znear (s + q) / s).
 The runtime logs one `Depth limits:` line with the values in force, that distance included, whenever they change.
 The runtime's comfort rule (the plane no nearer than the viewer) still holds, and the line says when it binds.
 
-The person's choices on top, with the browser's names (`dom.vr.flat.mode`, `depth-strength`, `screen-plane-mm`):
+The person's choices on top, with the names the runtimes and the upstream browser offer use (`dom.vr.flat.mode`, `depth-strength`, `screen-plane-mm`; the edition's browser no longer has them):
 
 | Choice | Environment | File in the configuration directory |
 | --- | --- | --- |

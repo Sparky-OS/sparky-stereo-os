@@ -11,7 +11,8 @@ description: >-
   comments. Load it when a disk fills with kernels or logs, a removal would take the running kernel, a cleaner would
   delete the evidence of a crash or shows Access denied on a mailbox, a tool exits 0 with no message on an unreadable
   HOME, system mail piles up, nvidia-persistenced fails on a machine without the card, thermald fails at every boot on an
-  AMD CPU, or a GRUB test in a container shows English and an empty menu.
+  AMD CPU, a GRUB test in a container shows English and an empty menu, or a shared build machine's disks fill with
+  finished lanes' build trees, duplicate files and Docker images.
 ---
 
 # System housekeeping
@@ -124,6 +125,7 @@ Debian's postinst enables such a unit wherever the package is installed, so the 
 2. **Dry-run every removal** (`apt-get -s`). Read what else it would install, upgrade or remove. A per-version companion package that installed tools still depend on must stay, or apt upgrades those tools behind your back.
 3. **Look at each folder before removing it:** owner (`dpkg -S`; on merged-usr, check both `/lib` and `/usr/lib` paths), whether a matching package is installed, what is inside.
 4. **Keep what explains a crash** you may report (one dump, its trace) before cleaning the rest.
+5. **A shared build machine** (several lanes on the same disks and the same Docker daemon) is cleaned by proof: [what is safe in a finished lane's scratch, which stages and evidence stay, Docker by name, duplicates shared by hard links](references/shared-build-machine-cleanup.md), with the traps met (a "second copy" that was a symlink, an orphaned worktree, a removal loop that stopped without logging).
 
 ## Kept problems: dismiss and bring back
 

@@ -43,7 +43,8 @@ Check freshness: re-read `CONTRIBUTING.md`, `doc/developer.texi` and `doc/commun
 - Trailers in one block at the end, no blank line between them: `Fixes: #NNNNN` first when an issue tracks the bug (master uses this form, for example 5fd305b8f42), then `Signed-off-by:`, then `Assisted-by:` for AI assistance. A trailer separated by a blank line is not parsed as a trailer.
 
 ## Tests (FATE)
-- Expected results live in `tests/ref/fate/...`; the test prints what it observes and FATE compares. Never hard-code expectations in C constants.
+- Expected results live in `tests/ref/fate/...`; the test prints what it observes and FATE compares. Never hard-code expectations in C constants, and never let a callback in a test program decide by itself: a `get_format()` that returned `AV_PIX_FMT_NONE` on an unexpected query result hid a failed query in every case that expected `none` anyway (#25398). Print the result (`query_failed=%d`) and go on.
+- A test is as small as the change it proves: run it on the unfixed code, keep the cases whose output changes plus one control, and show each kept case is needed with a mutation only it catches (the bot rates "tests larger than the change they cover" as moderate). Wider coverage of existing behaviour goes in a pull request of its own.
 - A new test fails on unpatched master and passes with the change; run the full applicable FATE with GCC and clang and report both totals.
 - The test goes in its own commit, after the fix, so every commit passes FATE and the fix can be backported alone. A maintainer asked for this on #25398 (2026-10-24: "Please do not mix tests and fixes in the same commit"). It is not written in `doc/developer.texi`; the nearest text is "Bug fixes intended for backporting should stay focused".
 - New samples go to the fate-suite through someone with samples access.
@@ -53,6 +54,9 @@ Check freshness: re-read `CONTRIBUTING.md`, `doc/developer.texi` and `doc/commun
 ## The review bot
 - A review bot (Forgejo_Fairy) reviews pull requests and classifies them (for example `minor_issues_approve`, `moderate_issues`). Mentioning it in a comment asks it to review again.
 - Answer it point by point, like any reviewer: fixed (the commit), shown correct (the evidence: code path, clause, probe), or outside this pull request (a separate patch).
+- Reproduce each finding before changing anything: the review often names the mutation it ran (for example "I forced `frame_params()` to fail"); run the same probe on the old head and keep its output as the red column. When a change to the test makes sentences of the pull request description untrue (what the reference covers, the FATE totals), rewrite them in the same round.
+- The mail carries only the summary lines: read the whole review, an issue comment on the pull request, and fetch the branches it kept on `Forgejo_Fairy/FFmpeg` (`fairy/prN-tooling` probes, `fairy/prN-*-fix` amendments) to reproduce before changing anything; carry an amendment with credit ([recipe and traps](references/lessons-2026-11.md#a-third-bot-round-on-the-frame-packing-filters-order-523-2026-11-11)).
+- When the bot says a fix is only partly done, compare the unit the clause states its rule for (the coded video sequence, every earlier message, every message) with the unit the fix used (the access unit, the same id, the first message).
 
 ## CI
 - Infrastructure failures happen (the win64 job's rsync of the fate-suite was refused once); show the log line and ask a maintainer to re-run, since only maintainers can.
@@ -64,5 +68,5 @@ Check freshness: re-read `CONTRIBUTING.md`, `doc/developer.texi` and `doc/commun
 
 ## Lessons from the lanes, October to November 2026
 
-[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (9 entries, and a section on multilayer HEVC and the 3D reference displays SEI).
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (9 entries, a section on multilayer HEVC and the 3D reference displays SEI, and one on a third review round of the frame packing filters).
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

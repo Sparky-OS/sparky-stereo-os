@@ -10,7 +10,7 @@ async function main() {
   const gltf = await (await fetch('scene/scene.gltf')).json();
   const procs = gltf.extensions.SPARKY_texture_mixed.procedures;
   const adapter = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' });
-  const device = await adapter.requestDevice({ requiredLimits: { maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize, maxBufferSize: adapter.limits.maxBufferSize } });
+  const device = await adapter.requestDevice({ requiredFeatures: adapter.features.has('timestamp-query') ? ['timestamp-query'] : [], requiredLimits: { maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize, maxBufferSize: adapter.limits.maxBufferSize } });
   const gpu = new GpuPlayer(device, 'ops/');
   const out = { adapter: adapter.info.vendor + ' ' + adapter.info.architecture, textures: {} };
   for (const p of procs) {
@@ -29,8 +29,11 @@ async function main() {
     await post(`${TAG}-${name}-tiles.rgb`, tiles);
     const subs = gpu.submissions.slice(s0);
     const wholeSubs = subs.filter((s) => s.piece === 'whole');
+    const gmax = (l) => Math.max(...l.map((s) => (s.gpuMs != null ? s.gpuMs : 0)));
+    const tileSubs = subs.filter((s) => s.piece !== 'whole');
     out.textures[name] = { submissionsWhole: wholeSubs.length, longestWholeMs: Math.max(...wholeSubs.map((s) => s.ms)), sumWholeMs: wholeSubs.reduce((a, s) => a + s.ms, 0),
-      submissionsTiles: subs.length - wholeSubs.length, longestTileMs: Math.max(...subs.filter((s) => s.piece !== 'whole').map((s) => s.ms)) };
+      longestWholeGpuMs: gmax(wholeSubs), sumWholeGpuMs: wholeSubs.reduce((a, s) => a + (s.gpuMs || 0), 0),
+      submissionsTiles: tileSubs.length, longestTileMs: Math.max(...tileSubs.map((s) => s.ms)), longestTileGpuMs: gmax(tileSubs) };
     log(name + ' ' + JSON.stringify(out.textures[name]));
   }
   await post(TAG + '-twins.json', JSON.stringify(out, null, 1));

@@ -111,14 +111,20 @@ async function startPlayer() {
     if (adapter) {
       const info = adapter.info || {};
       R.adapter = { vendor: info.vendor, architecture: info.architecture, device: info.device, description: info.description };
-      const device = await adapter.requestDevice({ requiredLimits: { maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize, maxBufferSize: adapter.limits.maxBufferSize } });
+      const features = adapter.features.has('timestamp-query') ? ['timestamp-query'] : [];
+      const device = await adapter.requestDevice({ requiredFeatures: features, requiredLimits: { maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize, maxBufferSize: adapter.limits.maxBufferSize } });
       device.lost.then((i) => { if (!R.playerOff) say('msgProcedureFailed', 'WebGPU', 'device lost: ' + i.message); });
       gpu = new GpuPlayer(device, 'ops/');
+      // a texture whose picture is in gets no more GPU work: the job running for it stops at its next operator
+      gpu.cancelled = (owner) => { const tx = texs.find((x) => x.name === owner); return !S.nostop && !!tx && tx.times.picArrived != null; };
+      if (!gpu.ts) R.messages.push({ t: now(), text: t('msgNoTimestamps') });
       gpu.onSubmit = (rec) => {
         R.submissions++;
         const tx = texs.find((x) => x.name === rec.owner);
         if (tx) { tx.subs++; tx.lastWork = rec.t + rec.ms; if (tx.times.stop != null && rec.t >= tx.times.stop) tx.subsAfterStop++; if (tx.times.picArrived != null && rec.t >= tx.times.picArrived) tx.subsAfterPicture++; }
-        if (!R.longest || rec.ms > R.longest.ms) R.longest = { ...rec };
+        R.longest = { ...gpu.longest };
+        R.longestWall = { ...gpu.longestWall };
+        if (rec.gpuMs != null) R.gpuTimed = (R.gpuTimed || 0) + 1;
       };
       R.player = 'webgpu';
       R.playerNote = t('playerWebgpu', [info.vendor, info.architecture, info.description].filter(Boolean).join(' '));
@@ -204,8 +210,8 @@ async function runJobs() {
         if (S.nostop && tx.times.stop != null) jobs.push({ ...j });    // the negative control: never stops
       }
     } catch (e) {
-      tx.failed = true;
-      say('msgProcedureFailed', tx.name, e.message || e);
+      if (e.message === 'cancelled') { tx.cancelledJobs = (tx.cancelledJobs || 0) + 1; }
+      else { tx.failed = true; say('msgProcedureFailed', tx.name, e.message || e); }
     }
     await new Promise((r) => setTimeout(r, 0));
   }
@@ -274,10 +280,11 @@ async function main() {
     if (bad) { tx.failed = true; say('msgUnknownVersion', tx.name, bad); continue; }
     for (let e = 0; e < tx.eyes; e++) jobs.push({ tx, eye: e, kind: 'whole' });
   }
-  // the WGSL operators these procedures use, compiled at once and side by side
+  // the models next (the drawing needs them), while the WGSL operators these procedures use are compiled side by side
+  const modelsIn = Promise.all(modelComps.map((c) => loader.get(c)));
   if (gpu) await Promise.all([...new Set(texs.filter((x) => x.g).flatMap((x) => [...x.g.nodes, ...(x.gRight ? x.gRight.nodes : [])].map((n) => n.op)))].map((op) => gpu.pipeline(op)));
   runJobs();       // (2) drawing starts at once from the procedures
-  const bufs = await Promise.all(modelComps.map((c) => loader.get(c)));
+  const bufs = await modelsIn;
   const map = new Map(gltf.buffers.map((b, i) => [b.uri, bufs[i]]));
   scene.load(gltf, map);
   for (const tx of texs) if (!tx.ext) tx.mode = 'none';
@@ -421,7 +428,8 @@ let ui = {};
 function renderPanel() {
   const p = document.getElementById('panel');
   p.textContent = '';
-  p.append(el('h1', { textContent: t('panel') }), el('p', { className: 'note', textContent: t('panelNote') }));
+  ui.head = el('div', { className: 'headline' });
+  p.append(el('h1', { textContent: t('panel') }), ui.head, el('p', { className: 'note', textContent: t('panelNote') }));
   const sel = el('select', { id: 'speed' });
   for (const [id, label] of PRESETS) sel.append(el('option', { value: id, textContent: label, selected: id === S.speed }));
   const kb = el('input', { id: 'kbps', type: 'number', min: 1, step: 0.1, value: S.kbps, hidden: S.speed !== 'custom', style: 'width:90px' });
@@ -453,7 +461,7 @@ function renderPanel() {
   ui.xrBtn = el('button', { textContent: t('enter3d'), hidden: true });
   ui.xrLine = el('div', { className: 'note' });
   const legend = el('div', { className: 'legend' });
-  for (const [k, c] of [['legendProcedure', '--proc'], ['legendDownload', '--down'], ['legendBlend', '--blend'], ['legendPicture', '--pic']]) legend.append(el('span', {}, el('i', { style: `background:var(${c})` }), t(k)));
+  for (const [k, c] of [['legendProcedure', '--proc'], ['legendDownload', '--down'], ['legendBlend', '--blend'], ['legendPicture', '--pic'], ['legendTick', '--fg']]) legend.append(el('span', {}, el('i', { style: `background:var(${c})` + (k === 'legendTick' ? ';width:2px' : '') }), t(k)));
   p.append(el('h2', { textContent: t('summary') }), ui.summary, el('h2', { textContent: t('simulated') }), ui.stream, ui.streamText,
     el('h2', { textContent: t('timeline') }), legend, ui.timeline, el('h2', { textContent: t('player') }), ui.player, ui.msgs,
     el('div', { className: 'row' }, ui.xrBtn), ui.xrLine, ui.detailHead = el('h2', { textContent: t('component') }), ui.detail);
@@ -491,7 +499,12 @@ function render() {
     tr(t('pictures') + ` (${nI})`, fmtBytes(pic), limited(pic, 'picture')),
     tr(t('otherParts'), fmtBytes(other), limited(other, 'other')),
     tr(t('total'), fmtBytes(proc + pic + other), S.limit === 'everything' ? time(proc + pic + other) : time(pic)),
-    tr(t('usableAfter'), '', S.limit === 'everything' ? (bps > 0 ? time(firstBytes) : t('noLimit')) : t('notLimited')));
+    tr(t('usableAfter'), '', (() => {
+      const est = S.limit === 'everything' ? (bps > 0 ? time(firstBytes) : t('noLimit')) : t('notLimited');
+      return R.firstFrame != null ? t('usableBoth', est, fmtTime(R.firstFrame / 1000)) : est;
+    })()));
+  ui.head.textContent = R.firstFrame != null ? t('headline', fmtTime(R.firstFrame / 1000), fmtBytes(proc), fmtBytes(pic), bps > 0 ? time(pic) : t('noLimit'))
+    : t('headlineWait', fmtBytes(proc), fmtBytes(pic), bps > 0 ? time(pic) : t('noLimit'));
   const lim = comps.filter((c) => c.limited);
   const got = lim.reduce((a, c) => a + c.received, 0), all = lim.reduce((a, c) => a + c.size, 0) || 1;
   ui.stream.firstChild.style.width = (100 * got / all).toFixed(1) + '%';
@@ -519,7 +532,11 @@ function render() {
   }
   drawTimeline();
   const lines = [R.playerNote || ''];
-  if (R.longest) lines.push(t(R.player === 'wasm' ? 'longestPiece' : 'longest') + ': ' + t('longestValue', R.longest.ms.toFixed(1), R.longest.owner, R.longest.piece));
+  if (R.longest) {
+    const gms = R.longest.gpuMs != null;
+    lines.push(t(R.player === 'wasm' ? 'longestPiece' : gms ? 'longest' : 'longestWall') + ': ' + t('longestValue', (gms ? R.longest.gpuMs : R.longest.ms).toFixed(gms ? 2 : 1), R.longest.owner, R.longest.piece));
+    if (gms && R.longestWall) lines.push(t('longestWall') + ': ' + t('longestValue', R.longestWall.ms.toFixed(1), R.longestWall.owner, R.longestWall.piece));
+  }
   if (R.player === 'webgpu') lines.push(t('submissions', R.submissions, texs.reduce((a, x) => a + x.subsAfterStop, 0)));
   if (R.player === 'wasm') lines.push(t('wasmCalls', R.wasm.calls, texs.reduce((a, x) => a + x.wasmAfterStop, 0)));
   if (R.playerOff) lines.push(t('playerOff'));
@@ -542,8 +559,12 @@ function drawTimeline() {
   const end = Math.max(now(), 1000), x0 = 110, sx = (w - x0 - 4) / end;
   const X = (tm) => x0 + tm * sx;
   g.font = '11px system-ui'; g.fillStyle = col('--muted');
-  g.fillText('0', x0, 10);
-  g.fillText(fmtTime(end / 1000), w - 50, 10);
+  for (let q = 0; q <= 4; q++) {
+    const tx0 = x0 + (w - x0 - 4) * q / 4;
+    g.fillRect(tx0, 12, 1, 3);
+    const label = q ? fmtTime(end * q / 4000) : '0';
+    g.fillText(label, Math.min(tx0 - (q ? g.measureText(label).width / 2 : 0), w - g.measureText(label).width), 10);
+  }
   texs.forEach((tx, k) => {
     const y = 16 + k * rowH;
     g.fillStyle = col('--fg');
@@ -557,6 +578,7 @@ function drawTimeline() {
     bar(T.stop, null, '--pic');
     if (tx.lastWork != null) { g.fillStyle = col('--fg'); g.fillRect(X(tx.lastWork), y + 1, 1.5, rowH - 3); }
     if (tx.failed || tx.picFailed) { g.fillStyle = col('--bad'); g.fillText('!', w - 10, y + 11); }
+    if (T.procFirst == null && T.blendStart != null) { g.fillStyle = col('--muted'); g.fillText(t('pictureFirst'), x0 + 2, y + 11); }
   });
 }
 setInterval(render, 250);
@@ -572,7 +594,7 @@ async function finishProof() {
   R.end = now();
   R.measuredWhole = measuredRate(0);
   R.frames = frames;
-  if (gpu) R.submissionLog = gpu.submissions.map((s) => [s.owner, s.piece, +s.t.toFixed(2), +s.ms.toFixed(3)]);
+  if (gpu) R.submissionLog = gpu.submissions.map((s) => [s.owner, s.piece, +s.t.toFixed(2), +s.ms.toFixed(3), s.gpuMs == null ? null : +s.gpuMs.toFixed(4)]);
   await fetch('/save?name=' + encodeURIComponent(S.tag + '-result.json'), { method: 'POST', body: JSON.stringify(R) });
   await fetch('/done', { method: 'POST', body: 'ok' });
 }

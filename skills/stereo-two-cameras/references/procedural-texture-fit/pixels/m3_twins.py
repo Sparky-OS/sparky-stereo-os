@@ -33,5 +33,5 @@ for name, rel in native.items():
         diff = np.abs(g - n).max(axis=2)
         print('%-28s %-5s max %3d levels, %.3f %% of pixels differ' % (name, kind, diff.max(), 100 * (diff > 0).mean()))
     t = info['textures'][name]
-    print('%-28s whole: %d submissions, longest %.1f ms, sum %.1f ms; tiles: %d submissions, longest %.1f ms' % (
-        name, t['submissionsWhole'], t['longestWholeMs'], t['sumWholeMs'], t['submissionsTiles'], t['longestTileMs']))
+    print('%-28s whole at 2048: %d submissions, longest %.1f ms on the GPU (%.1f ms submit to done), GPU sum %.1f ms; 16 tiles: %d submissions, longest %.1f ms on the GPU (%.1f ms submit to done)' % (
+        name, t['submissionsWhole'], t.get('longestWholeGpuMs', -1), t['longestWholeMs'], t.get('sumWholeGpuMs', -1), t['submissionsTiles'], t.get('longestTileGpuMs', -1), t['longestTileMs']))

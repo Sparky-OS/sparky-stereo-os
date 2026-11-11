@@ -47,7 +47,7 @@ for d in sorted(glob.glob(os.path.join(base, '*'))):
         tag, r.get('player'), ('%.1f kbit/s' % (bps / 1000)) if bps else 'none', s['conns'], s['limit'],
         fmt(r.get('firstFrame')), fmt(r.get('allIn')), pr(r.get('measuredWhole')), pr(srv),
         '-' if worst is None else '%.1f %%' % (100 * worst),
-        ('%.0f ms' % lg['ms']) + (' (%s, %s)' % (lg.get('owner'), lg.get('piece'))) if lg else '-',
+        (('%.2f ms GPU, %.0f ms submit to done' % (lg['gpuMs'], (r.get('longestWall') or lg)['ms'])) if lg.get('gpuMs') is not None else ('%.0f ms' % lg['ms'])) + (' (%s, %s)' % (lg.get('owner'), lg.get('piece'))) if lg else '-',
         drawn, inflight, after, 'yes' if r.get('playerOff') else ('no' if s.get('nostop') else 'NOT SETTLED')))
 head = ['| run | player | set rate | connections | limit | first frame from procedures | every picture in | page rate against set | server rate against set | worst 1 s window | longest GPU submission (or processor piece) | drawn from procedure before its picture | work after a picture arrived (in flight) | work after a texture stopped | player shut down |',
         '|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|']

@@ -88,16 +88,46 @@ export class GpuPlayer {
     this.submissions = [];           // { owner, piece, t (ms since page start), ms }
     this.longest = { ms: 0, owner: '', piece: '' };
     this.onSubmit = null;
+    this.cancelled = null;          // (owner) => true when that texture's procedure is no longer wanted
+    // the GPU's own time of each compute pass, where the browser offers timestamps (WebGPU 'timestamp-query')
+    this.ts = device.features.has('timestamp-query');
+    if (this.ts) {
+      this.qs = device.createQuerySet({ type: 'timestamp', count: 2 });
+      this.qres = device.createBuffer({ size: 16, usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC });
+      this.qread = device.createBuffer({ size: 16, usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST });
+    }
   }
 
-  async submit(buffers) {
+  // a compute pass, with its beginning and end stamped on the GPU when the browser can
+  beginPass(enc) {
+    return enc.beginComputePass(this.ts ? { timestampWrites: { querySet: this.qs, beginningOfPassWriteIndex: 0, endOfPassWriteIndex: 1 } } : {});
+  }
+
+  // one submission: refused when its texture no longer wants the procedure (the job stops at the next operator);
+  // timed by the wall clock (submit to done) and, for a pass, by the GPU's own stamps
+  async submit(enc, stamped = true) {
+    if (this.cancelled && this.cancelled(this.owner)) throw new Error('cancelled');
+    if (this.ts && stamped) {
+      enc.resolveQuerySet(this.qs, 0, 2, this.qres, 0);
+      enc.copyBufferToBuffer(this.qres, 0, this.qread, 0, 16);
+    }
     const t0 = performance.now();
-    this.device.queue.submit(buffers);
+    const cb = enc.finish();
+    this.device.queue.submit([cb]);
     await this.device.queue.onSubmittedWorkDone();
     const ms = performance.now() - t0;
-    const rec = { owner: this.owner, piece: this.piece, t: t0, ms };
+    let gpuMs = null;
+    if (this.ts && stamped) {
+      await this.qread.mapAsync(GPUMapMode.READ);
+      const q = new BigUint64Array(this.qread.getMappedRange().slice(0));
+      this.qread.unmap();
+      gpuMs = q[1] >= q[0] ? Number(q[1] - q[0]) / 1e6 : null;
+    }
+    const rec = { owner: this.owner, piece: this.piece, t: t0, ms, gpuMs };
     this.submissions.push(rec);
-    if (ms > this.longest.ms) this.longest = rec;
+    // the longest by the GPU's own time where the browser stamps passes, else from submit to done
+    if (this.ts ? gpuMs != null && (this.longest.gpuMs == null || gpuMs > this.longest.gpuMs) : ms > this.longest.ms) this.longest = rec;
+    if (!this.longestWall || ms > this.longestWall.ms) this.longestWall = rec;
     if (this.onSubmit) this.onSubmit(rec);
     return ms;
   }
@@ -174,12 +204,12 @@ export class GpuPlayer {
       for (let ps = 0; ps < passes; ps++) {
         const ub = this.uniform(cv, nd, nd.ins.length, ps, 0, 0, lod);
         const enc = d.createCommandEncoder();
-        const cp = enc.beginComputePass();
+        const cp = this.beginPass(enc);
         cp.setPipeline(p);
         cp.setBindGroup(0, d.createBindGroup({ layout: p.getBindGroupLayout(0), entries: entries(ub) }));
         cp.dispatchWorkgroups(Math.ceil(cv.w / 8), Math.ceil(cv.h / 8));
         cp.end();
-        ms += await this.submit([enc.finish()]);
+        ms += await this.submit(enc);
         ub.destroy();
       }
       if (wtmp) wtmp.destroy();
@@ -212,12 +242,12 @@ export class GpuPlayer {
     const entries = [{ binding: 0, resource: { buffer: ub } }, { binding: 1, resource: { buffer: out } }];
     parts.forEach((b, k) => entries.push({ binding: 2 + k, resource: { buffer: b } }));
     const enc = d.createCommandEncoder();
-    const cp = enc.beginComputePass();
+    const cp = this.beginPass(enc);
     cp.setPipeline(p);
     cp.setBindGroup(0, d.createBindGroup({ layout: p.getBindGroupLayout(0), entries }));
     cp.dispatchWorkgroups(Math.ceil(cv.w / 8), Math.ceil(cv.h / 8));
     cp.end();
-    ms += await this.submit([enc.finish()]);
+    ms += await this.submit(enc);
     ub.destroy();
     for (const b of parts) b.destroy();
     return { buf: out, cv, ms };
@@ -253,14 +283,14 @@ export class GpuPlayer {
       }
       const ub = this.uniform(cv, rt, nt, q, 0, 0, lod);
       const enc = d.createCommandEncoder();
-      const cp = enc.beginComputePass();
+      const cp = this.beginPass(enc);
       cp.setPipeline(p);
       cp.setBindGroup(0, d.createBindGroup({ layout: p.getBindGroupLayout(0), entries: [
         { binding: 0, resource: { buffer: ub } }, { binding: 1, resource: { buffer: out } },
         { binding: 2, resource: { buffer: part || first } }, { binding: 3, resource: { buffer: acc } }] }));
       cp.dispatchWorkgroups(Math.ceil(cv.w / 8), Math.ceil(cv.h / 8));
       cp.end();
-      ms += await this.submit([enc.finish()]);
+      ms += await this.submit(enc);
       ub.destroy();
       if (part && q > 0) part.destroy();
     }
@@ -290,20 +320,20 @@ export class GpuPlayer {
         lay = d.createBuffer({ size: side * side * 8, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST });
         const ce = d.createCommandEncoder();
         for (let j = 0; j < side; j++) ce.copyBufferToBuffer(r.buf, ((j + r.cv.m) * r.cv.w + r.cv.m) * 8, lay, j * side * 8, side * 8);
-        ms += await this.submit([ce.finish()]);
+        ms += await this.submit(ce, false);
         r.buf.destroy();
         if (l === 0) first = lay;
       }
       const ub = this.uniform(cv, rt, n, l, 0, 0, lod);
       const enc = d.createCommandEncoder();
-      const cp = enc.beginComputePass();
+      const cp = this.beginPass(enc);
       cp.setPipeline(p);
       cp.setBindGroup(0, d.createBindGroup({ layout: p.getBindGroupLayout(0), entries: [
         { binding: 0, resource: { buffer: ub } }, { binding: 1, resource: { buffer: out } },
         { binding: 2, resource: { buffer: lay || first } }, { binding: 3, resource: { buffer: acc } }] }));
       cp.dispatchWorkgroups(Math.ceil(side / 8), Math.ceil(side / 8));
       cp.end();
-      ms += await this.submit([enc.finish()]);
+      ms += await this.submit(enc);
       ub.destroy();
       if (lay && l > 0) lay.destroy();
     }
@@ -320,7 +350,7 @@ export class GpuPlayer {
     const rb = d.createBuffer({ size: cv.w * cv.h * 8, usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST });
     const enc = d.createCommandEncoder();
     enc.copyBufferToBuffer(buf, 0, rb, 0, cv.w * cv.h * 8);
-    await this.submit([enc.finish()]);
+    await this.submit(enc, false);
     await rb.mapAsync(GPUMapMode.READ);
     const px = new Uint32Array(rb.getMappedRange().slice(0));
     rb.unmap();

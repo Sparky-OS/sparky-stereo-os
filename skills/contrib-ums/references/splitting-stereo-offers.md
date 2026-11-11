@@ -76,3 +76,19 @@ For alternating frames, write left and right raw frames independently, concatena
 The encoded mark regression can use the actual `getVideoFilterOptions` result with an existing SEI-only fixture, so a test of a copied filter string cannot conceal a missing production filter.
 
 Recorded from the UMS offer split in November 2026, lane ums-dlna-headsets-94.
+
+## Rebase after the prerequisite offers merge as squashes
+
+Fetch and record the new upstream base, then apply only the subject's own diff from its old prerequisite base.
+A merge of the old prerequisite history can conflict with an upstream squash even when the intended final change is small.
+Start a shared test file from upstream's current text and add only the new subject's assertions and necessary fixture substitutions.
+Check that upstream..HEAD contains one commit and that the final diff repeats neither prerequisite nor unrelated build changes.
+Update the changed-file style audit's base too; an obsolete combined prerequisite base no longer describes the offer.
+
+- **Symptom:** restoring all production to upstream makes the new tests fail compilation because enum constants and helper methods do not exist there.
+  **Cause:** the tests intentionally exercise the new API as well as its behavior.
+  **Fix for an exact production-removal control:** first compile the tests on the green branch, retain those exact test classes, restore every changed production file to upstream and delete all production classes.
+  Run `compile surefire:test`, without test compilation, then verify the retained test-class hashes are unchanged and every restored production source equals upstream.
+  Report assertion failures separately from missing-field/method errors; the latter show the absent API and are not a measured wrong-picture result.
+  Restore the offer and rebuild production and tests green before handing back its jar.
+  **How found:** the strict removal run used the upstream source while the same compiled tests retained their new enum/helper references; its JUnit reports distinguish behavioral assertions from linkage errors.

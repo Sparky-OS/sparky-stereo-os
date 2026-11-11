@@ -29,3 +29,15 @@ A trap gives its symptom, its cause, its fix and how the cause was found; a reci
 
 - sView save facts: JPS cannot describe columns, checkerboard, quincunx, green magenta, yellow blue; lossless JPEG (SOF3) has no DQT for the JPS section to follow; red cyan anaglyph keeps its swap because it has no reversed layout; the snapshot save (Ctrl+S, .pns) writes sTER through FFmpeg's pngenc for any width without padding, breaking the divisible by 8 rule; Matroska TrackCombinePlanes, ASF StereoscopicLayout and MPO eye order (CIPA DC-007 IndividualNum) are marks sView reads but cannot write. (lane sview-messages-349b)
 
+
+## Shared depth choices and JPS writing (ORDER 526)
+
+- Symptom: changing depth assembly options has no effect on a packed picture-with-depth input, whether declared or selected by hand.
+  Cause: the shared load helper passes options for separate depth images but calls the packed-image helper with defaults.
+  Fix: stereo-layer 1.17.4 passes the chosen options through one private unpacker for all four packed depth layouts; the existing public helper retains its default behavior and ABI.
+  Found by: compare each loaded eye with direct `Picture::fromDepth` using non-default options, then compare that oracle with the defaults to prove sensitivity; cover both orders, thumbnails, in-memory pictures and swap corrections.
+- Symptom: a saved JPS reopens as stereo but a segment parser finds no `_JPSJPS_` APP3 block.
+  Cause: the format plugin swaps the halves and writes a right-first comment, while readers assume right-first for an unmarked JPS.
+  Fix: KImageFormats stereo3d6 writes the complete VRex descriptor, reports its fields, and refuses unsupported layouts before writing; the fixed comment is removed because it could contradict explicit layouts.
+  Found by: parse JPEG segments independently and reopen every write; cover the four stereo layouts, both orders, mono display choices, half-size flags, separation, comments and unchanged device bytes on refusal.
+  Exporting a new JPEG and changing only an existing JPEG's metadata are distinct operations: do not claim that an encoding writer preserves compressed bytes.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Copy the milestone 3 runs' screenshots into the evidence folder as JPEG (quality 85, full size) and their records
+"""Copy the milestone 3 runs' screenshots into the evidence folder as JPEG (quality 80, full size; a chosen set, see the code) and their records
 as small JSON: m3_evidence.py RUNS-DIR EVIDENCE-DIR. The submission logs stay in the scratch folder (large)."""
 import glob, json, os, sys
 from PIL import Image
@@ -12,7 +12,12 @@ for png in sorted(glob.glob(os.path.join(runs, '*', '*.png'))):
     base = os.path.basename(png)
     if not base.startswith(tag + '-') or base[len(tag) + 1:][:1] not in '12345':
         continue
-    Image.open(png).convert('RGB').save(os.path.join(ev, 'screens', base[:-4] + '.jpg'), quality=85)
+    # every screenshot of the panel runs, the final page's runs and the special runs; of the matrix, the early one
+    # (drawn from the procedures) and the last one; the rest stay in the scratch folder
+    full = tag.startswith(('panel-', 'final-', 'broken', 'nogpu', 'nostop-amd'))
+    if not full and base[len(tag) + 1:][:1] not in '25':
+        continue
+    Image.open(png).convert('RGB').save(os.path.join(ev, 'screens', base[:-4] + '.jpg'), quality=80)
     n += 1
 for rp in sorted(glob.glob(os.path.join(runs, '*', '*-result.json'))):
     r = json.load(open(rp))

@@ -13,9 +13,11 @@ rows = []
 for d in sorted(glob.glob(os.path.join(base, '*'))):
     tag = os.path.basename(d)
     rp, lp = os.path.join(d, tag + '-result.json'), os.path.join(d, tag + '-linklog.json')
+    if tag.startswith(('strip-', 'twins-', 'ignore')):
+        continue                     # pages of their own (the blend strips, the twins, the ignoring viewer)
     if not os.path.exists(rp):
         if os.path.isdir(d):
-            rows.append('| %s | no result (still running, or stopped: see its folder) |' % tag)
+            rows.append('| %s | no record: stopped at its timeout before every texture had stopped (its screenshots and the page state are in its folder) |' % tag)
         continue
     r = json.load(open(rp))
     if 'settings' not in r:          # the ignoring viewer's record, not a tester run
@@ -31,13 +33,15 @@ for d in sorted(glob.glob(os.path.join(base, '*'))):
             srv = (sum(n for _, n, _ in L) - L[0][1]) * 8 / (t1 - t0) if t1 > t0 else None
             # whole one-second windows inside the transfer, from the first chunk on
             if bps and t1 - t0 >= 3:
-                k = 1
-                worst = 0.0
-                while t0 + k + 1 <= t1:
-                    a, b = t0 + k, t0 + k + 1
-                    by = sum(n for t, n, _ in L if a < t <= b)
-                    worst = max(worst, abs(by * 8 - bps) / bps)
-                    k += 1
+                # bytes per whole second from the first chunk on, the first and the last second left out
+                secs = int(t1 - t0)
+                bins = [0] * (secs + 1)
+                for t, n, _ in L:
+                    k = int(t - t0)
+                    if k <= secs:
+                        bins[k] += n
+                inner = bins[1:secs]
+                worst = max(abs(by * 8 - bps) / bps for by in inner) if inner else None
     texs = r['textures']
     after = sum(x.get('subsAfterStop', 0) + x.get('wasmAfterStop', 0) for x in texs)
     inflight = sum(x.get('subsAfterPicture', 0) for x in texs)

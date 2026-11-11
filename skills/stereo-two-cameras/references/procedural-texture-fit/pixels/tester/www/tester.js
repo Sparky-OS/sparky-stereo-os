@@ -500,7 +500,7 @@ function render() {
     tr(t('otherParts'), fmtBytes(other), limited(other, 'other')),
     tr(t('total'), fmtBytes(proc + pic + other), S.limit === 'everything' ? time(proc + pic + other) : time(pic)),
     tr(t('usableAfter'), '', (() => {
-      const est = S.limit === 'everything' ? (bps > 0 ? time(firstBytes) : t('noLimit')) : t('notLimited');
+      const est = S.limit === 'everything' ? (bps > 0 ? time(firstBytes) : t('noLimit')) : t(R.firstFrame != null ? 'notLimitedShort' : 'notLimited');
       return R.firstFrame != null ? t('usableBoth', est, fmtTime(R.firstFrame / 1000)) : est;
     })()));
   ui.head.textContent = R.firstFrame != null ? t('headline', fmtTime(R.firstFrame / 1000), fmtBytes(proc), fmtBytes(pic), bps > 0 ? time(pic) : t('noLimit'))

@@ -48,6 +48,10 @@ pub fn note(comptime fmt: []const u8, args: anytype) void {
 pub var seed_base: i32 = 0;
 /// milestone 2e: the noise's frequency read on every band (bands=7: the seven finest, as milestones 2b to 2d)
 pub var bands_all: bool = true;
+/// milestone 2e: a thin joint's warp no wider than a quarter of it (jointwarp=keep: as before)
+pub var joint_wobble: bool = true;
+/// milestone 2e (on=darkjoint): a joint's colour is its darkest line
+pub var joint_dark: bool = false;
 
 pub fn mk(k: usize, v: []const f64, ins: []const usize) P.Node {
     var nd = P.Node{ .op = @intCast(P.OP_MODERN + k) };
@@ -716,6 +720,13 @@ pub const MOpt = struct {
     marks_soft: bool = true, // marks=fixed: the second material's and the spots' edges as milestone 2c drew them; else their softness read
     grain_cap: bool = true, // grainfit=closest: a piece's grain chosen closest to the picture's bands (milestone 2c); else the closest that exceeds none of them
     bands_all: bool = true, // bands=7: the noise's frequency read on the seven finest bands (milestones 2b to 2d); else every band down to two by two
+    struct_from: ?[*:0]const u8 = null, // struct=WHOLE.script: a tile's structure is the whole picture's (milestone 2e, the floor's four internal tiles)
+    struct_cols: usize = 2,
+    struct_rows: usize = 2,
+    struct_col: usize = 0,
+    struct_row: usize = 0,
+    struct_none: bool = false, // struct=none: no structure read (a tile of a picture whose whole has none: a tile laid beside its mirror image would read the mirror as a repeat)
+    joint_wobble: bool = true, // jointwarp=keep: the joints' warp and the pieces' jitter as milestone 2d wrote them; else no wider than a quarter of a thin joint read at 1:1
 };
 
 pub fn run(path: [*:0]const u8, prefix: []const u8, opt: MOpt) void {
@@ -747,8 +758,14 @@ pub fn run(path: [*:0]const u8, prefix: []const u8, opt: MOpt) void {
         P.loadSeed(sp);
         if (P.nseeds == 1) motif = true else note("motif: the seed file holds {d} seeds, one per piece: the eye refused them in milestone 2, so the motif stays with the image\n", .{P.nseeds});
     }
-    var st = if (motif or opt.seeds != null) Struct{} else readStructure(&g, &pic, &rd, opt);
-    if (st.ok and opt.full != null) {
+    if (opt.struct_none) note("structure: not read (struct=none: the whole picture has none)\n", .{});
+    var st = if (motif or opt.seeds != null or opt.struct_none) Struct{} else if (opt.struct_from) |sf| structFrom(&g, sf, opt) else readStructure(&g, &pic, &rd, opt);
+    if (st.ok and opt.full != null and opt.struct_from != null) {
+        st.full = true;
+        note("joints at 1:1: the whole picture's, kept (their place, width and colour: the tiles must meet where the whole lays its joints)\n", .{});
+    } else if (st.ok and opt.full != null) {
+        joint_wobble = opt.joint_wobble;
+        joint_dark = CL.refused(opt.on, "darkjoint");
         if (opt.joints_full) jointsAtFull(&g, &st, opt.full.?, opt.framed, CL.refused(opt.on, "framed"), CL.refused(opt.on, "hollow")) else note("joints at 1:1: not read (joints=scan: the scan's width at 512 kept)\n", .{});
     }
     if (opt.seeds != null and !motif) note("structure: not read (a figure on a ground: its motif is the seed's)\n", .{});
@@ -861,7 +878,9 @@ pub fn run(path: [*:0]const u8, prefix: []const u8, opt: MOpt) void {
     var second_mask: ?usize = null;
     var second_layer: usize = 0;
     var second_col = [3]f32{ 0, 0, 0 };
-    if (rd.off >= 0.01 and rd.off_coh >= 0.8) {
+    const second_asked = CL.refused(opt.on, "second") and rd.off >= 0.003 and rd.off_coh >= 0.5 and !(rd.off >= 0.01 and rd.off_coh >= 0.8);
+    if (second_asked) note("second material: asked for by eye (on=second) below the reading's threshold: {d:.3} of the pixels off the axis, alike {d:.2} (laid from 0.010 and 0.80)\n", .{ rd.off, rd.off_coh });
+    if ((rd.off >= 0.01 and rd.off_coh >= 0.8) or second_asked) {
         second_col = rgbOfWord(rd.off_col);
         const sel = alloc.alloc(bool, n * n) catch unreachable;
         defer alloc.free(sel);
@@ -952,6 +971,10 @@ pub fn run(path: [*:0]const u8, prefix: []const u8, opt: MOpt) void {
         } else note("drips: none (the patches run {d:.0} pixels down, {d:.0} across)\n", .{ ld, cl });
     } else note("second material: none (milestone 1's reading: {d:.3} of the pixels off the axis, alike {d:.2})\n", .{ rd.off, rd.off_coh });
 
+    // 3b. milestone 2e (Daniel on the metal plate: "since this is a green rusted "paint", it's green an brownish to
+    // bronze right?"): colours apart by their hue, where the eye asks for them (on=hue)
+    if (CL.refused(opt.on, "hue")) colour = hueGroups(&g, &pic, nb, colour, &rungs);
+
     // 4. cracks: long thin dark pieces (not on a figure on a ground: the motif's own edges would count)
     const ground_only = opt.seeds != null;
     if (ground_only) note("cracks, stones, pits and specks: not read on a figure on a ground (the motif's edges would count as them)\n", .{});
@@ -1018,8 +1041,13 @@ pub fn run(path: [*:0]const u8, prefix: []const u8, opt: MOpt) void {
         rungs.append(alloc, .{ .root = colour, .label = "+ specks (Scatter)" }) catch unreachable;
     } else note("specks: {d} light blobs of about {d:.1} pixels (8 or more of 2.5 pixels or more are specks)\n", .{ specks.count, specks.radius });
 
+    // 6a. milestone 2e: the bevel and its light (on=bevel, on=shadow) are laid after the close-up layers (a wider
+    // bevel leaves too few faces for their readings), with the light read on the widened bevel there
+    const want_bevel = st.ok and (CL.refused(opt.on, "bevel") or CL.refused(opt.on, "shadow"));
+    if (want_bevel) note("bevel: asked for by eye; laid after the close-up layers, with its light\n", .{});
+
     // 6. the light: on a structure, the picture's light against the drawn relief's slopes
-    if (st.ok) {
+    if (st.ok and !want_bevel) {
         var dc = drawNode(&g, colour, n);
         defer dc.free();
         const lr = slopeLight(pic.t, dc.h, n);
@@ -1076,7 +1104,13 @@ pub fn run(path: [*:0]const u8, prefix: []const u8, opt: MOpt) void {
         const fimg0 = P.readPpm(opt.full.?);
         var cx = CL.Ctx{ .g = &g, .rd = &rd, .st = st, .nb = nb, .root = colour, .main_ramp = main_ramp, .face_layer = face_layer, .second = second_mask != null, .second_layer = second_layer, .motif = opt.seeds != null, .rungs = &rungs, .off = opt.off, .on = opt.on, .joints_full = st.full, .marks_soft = opt.marks_soft, .grain_cap = opt.grain_cap, .full = fimg0.rgb, .N = fimg0.w, .grain_in_field = opt.grain_in_field };
         colour = CL.run(&cx);
+        st = cx.st;
     } else if (!opt.close) note("close up: left out (close=0: milestone 2b's procedure)\n", .{});
+    if (want_bevel) {
+        colour = bevelAndLight(&g, &pic, &st, colour, CL.refused(opt.on, "shadow"), &rungs);
+        // the readings drew many candidates at full size: the memory of drawn pictures is emptied
+        P.cacheClear();
+    }
     const whole_root = colour;
     // 8. tiles: the whole picture's procedure at each tile's place, and a tile's own correction where it differs
     var ntint: usize = 0;
@@ -1463,11 +1497,43 @@ fn jointsAtFull(g: *P.Graph, st: *Struct, path: [*:0]const u8, try_framed: bool,
     // the bevel: from half depth to a quarter, never wider than half the joint (a shadow or a stain beside the joint
     // reaches further than the pieces' rounded edge)
     const bevel = std.math.clamp(@min(0.5 * (w10 - w50), 0.5 * w50) / mpx, 0.002, 0.5);
+
     note("joints at 1:1: {d:.1} pixels wide at half depth, {d:.1} at a quarter (horizontal {d:.1}, upright {d:.1}; centres moved {d:.1} and {d:.1} pixels); the joint {d:.4} of a piece, the bevel {d:.4} (the scan at 512 read {d:.4} and {d:.4})\n", .{ w50, w10, hj.w50, vj.w50, hj.centre, vj.centre, joint, bevel, tw(g, ti, 5), tw(g, ti, 6) });
     // the joints' own colour, in their core at full size
     var pr2 = Prof{};
     var jc = [4]f64{ 0, 0, 0, 0 };
     profileOf(t, img.rgb, N, gm, &pr2, .{ 0, 0 }, @max(0.5, 0.25 * w50), &jc, .{ hj.ok, vj.ok });
+    if (joint_dark) {
+        // milestone 2e (on=darkjoint): the joint's colour is its darkest line, not the mean of its core: a thin joint's
+        // core holds the faces' light beside it. The profile's darkest pixel each side, its colour read there
+        var dk = [4]f64{ 0, 0, 0, 0 };
+        var best: [2]i32 = .{ 0, 0 };
+        for (0..2) |d| {
+            const ok = if (d == 0) hj.ok else vj.ok;
+            if (!ok) continue;
+            var lo: f64 = 1e9;
+            var k: i32 = -reach;
+            while (k <= reach) : (k += 1) {
+                const v = if (d == 0) pr2.h(k) else pr2.v(k);
+                const nn = if (d == 0) pr2.hn[@intCast(k + PD)] else pr2.vn[@intCast(k + PD)];
+                if (nn > 0 and v < lo) {
+                    lo = v;
+                    best[d] = k;
+                }
+            }
+        }
+        var pr3 = Prof{};
+        profileOf(t, img.rgb, N, gm, &pr3, .{ @floatFromInt(best[0]), @floatFromInt(best[1]) }, 0.5, &dk, .{ hj.ok, vj.ok });
+        if (dk[3] > 50) {
+            st.jc = .{ @floatCast(dk[0] / dk[3]), @floatCast(dk[1] / dk[3]), @floatCast(dk[2] / dk[3]) };
+            note("joints at 1:1: their colour {x:0>6}, the darkest line of the profile ({d} and {d} pixels from the drawn lines; asked for by eye, on=darkjoint)\n", .{ @as(u32, @intFromFloat(colourWord(st.jc.?))) & 0xffffff, best[0], best[1] });
+            if (best[0] != 0 and hj.ok) gm.phy += @as(f32, @floatFromInt(best[0])) / (Nf / gm.ny);
+            if (best[1] != 0 and vj.ok) gm.phx += @as(f32, @floatFromInt(best[1])) / (Nf / gm.nx);
+            g.nodes[ti].w[15] = @bitCast(gm.phx);
+            g.nodes[ti].w[16] = @bitCast(gm.phy);
+        }
+        jc[3] = 0;
+    }
     if (jc[3] > 50) {
         st.jc = .{ @floatCast(jc[0] / jc[3]), @floatCast(jc[1] / jc[3]), @floatCast(jc[2] / jc[3]) };
         note("joints at 1:1: their colour {x:0>6} (the picture's mean in their core, {d:.0} pixels, {s})\n", .{ @as(u32, @intFromFloat(colourWord(st.jc.?))) & 0xffffff, jc[3], if (hj.ok and vj.ok) "both directions" else if (hj.ok) "the horizontal joints, whose place was read" else "the upright joints, whose place was read" });
@@ -1591,6 +1657,306 @@ fn jointsAtFull(g: *P.Graph, st: *Struct, path: [*:0]const u8, try_framed: bool,
     const round = @min(tw(g, ti, 7), 2 * joint);
     if (round < tw(g, ti, 7)) note("joints at 1:1: the corners rounded {d:.4} of a piece (no more than twice the joint)\n", .{round});
     g.nodes[ti] = tilesNodeV(layout, @intFromFloat(gm.nx), @intFromFloat(gm.ny), gm.bond, joint, bevel, round, tw(g, ti, 9), size, gm.phx, gm.phy, x);
+    // milestone 2e (the floor's one-pixel joint "stair-stepped and of uneven width", Daniel: "with a tin adjustment"):
+    // the layout's warp moved the joint by up to 3 pixels at 2048, more than the joint is wide; no wider than a
+    // quarter of the joint now (jointwarp=keep: as before), and the edges filtered over their pixel (Tiles version 4)
+    if (joint_wobble and w50 < 3.0) {
+        const wmax = 0.25 * w50 / Nf;
+        const wcur = tw(g, ti, 11);
+        if (wcur > wmax) {
+            g.nodes[ti].w[11] = @bitCast(wmax);
+            note("joints at 1:1: the layout's warp {d:.4} of the picture is wider than a quarter of the joint; {d:.5} now\n", .{ wcur, wmax });
+        }
+        // the pieces' jitter moves each piece's edge inward by its own amount (0.02 of a piece, ten pixels of a
+        // slab of 512): two neighbours' edges then stand apart and a one-pixel joint is drawn twice, a face's width
+        // apart; no more than a quarter of the joint either
+        const jmax = 0.25 * w50 / mpx;
+        const jcur = tw(g, ti, 8);
+        if (jcur > jmax) {
+            g.nodes[ti].w[8] = @bitCast(jmax);
+            note("joints at 1:1: the pieces' jitter {d:.4} of a piece is wider than a quarter of the joint; {d:.5} now\n", .{ jcur, jmax });
+        }
+        toV4(g, ti);
+        note("joints at 1:1: under 3 pixels: their edges filtered over the pixel they fall in (Tiles version 4)\n", .{});
+    }
+}
+
+/// milestone 2e (on=hue; Daniel on the metal plate: "it's green an brownish to bronze right?"): the picture's
+/// coloured pixels told apart by their hue (HSV's, on the colours blurred over three pixels), the main hue their
+/// mean; those more than 15 degrees warmer or cooler than it, each where it covers half a percent of the picture or more (spots count), laid as patches of their own colours (Noise mask at the patches' size and edge,
+/// a Ramp at the field's ranks from those pixels' colours), the warmer first. Every number said.
+fn hueGroups(g: *P.Graph, pic: *const Pic, nb: Built, colour_in: usize, rungs: *std.ArrayList(Rung)) usize {
+    const n = pic.n;
+    const hue_blur: usize = 12;
+    var colour = colour_in;
+    const ang = alloc.alloc(f32, n * n) catch unreachable;
+    defer alloc.free(ang);
+    const chr = alloc.alloc(f32, n * n) catch unreachable;
+    defer alloc.free(chr);
+    // the colours blurred first (a pixel's own hue is noise, a patch's is not: over twelve pixels at 512 for patches,
+    // three for spots); the hue as HSV
+    // measures it, in degrees (red 0, yellow 60, green 120); coloured where saturation is 0.15 or more and the
+    // brightest channel 0.1 or more
+    var ch3: [3][]f32 = undefined;
+    for (0..3) |q| {
+        const src = alloc.alloc(f32, n * n) catch unreachable;
+        defer alloc.free(src);
+        for (0..n * n) |i| src[i] = pic.rgb[3 * i + q];
+        ch3[q] = R.blur(src, n, hue_blur);
+    }
+    defer for (ch3) |x| alloc.free(x);
+    var sx: f64 = 0;
+    var sy: f64 = 0;
+    for (0..n * n) |i| {
+        const r = ch3[0][i];
+        const gg = ch3[1][i];
+        const b = ch3[2][i];
+        const mx = @max(r, @max(gg, b));
+        const mn = @min(r, @min(gg, b));
+        const d = mx - mn;
+        chr[i] = if (mx >= 0.1 and d / @max(mx, 1e-6) >= 0.15) 1 else 0;
+        var h: f32 = 0;
+        if (d > 1e-6) {
+            if (mx == r) h = 60.0 * (gg - b) / d else if (mx == gg) h = 60.0 * ((b - r) / d + 2.0) else h = 60.0 * ((r - gg) / d + 4.0);
+        }
+        if (h < 0) h += 360.0;
+        ang[i] = h * std.math.pi / 180.0;
+        if (chr[i] > 0) {
+            sx += @cos(ang[i]);
+            sy += @sin(ang[i]);
+        }
+    }
+    const cq: f32 = 0.5;
+    const mean: f32 = @floatCast(std.math.atan2(sy, sx));
+    note("hue: the coloured pixels' main hue {d:.0} degrees (HSV: red 0, yellow 60, green 120)\n", .{mean * 180.0 / std.math.pi});
+    const sel = alloc.alloc(bool, n * n) catch unreachable;
+    defer alloc.free(sel);
+    const mask = alloc.alloc(f32, n * n) catch unreachable;
+    defer alloc.free(mask);
+    for ([_]f32{ -1, 1 }, 0..) |side, gi| {
+        var cnt: usize = 0;
+        for (0..n * n) |i| {
+            var d = ang[i] - mean;
+            if (d > std.math.pi) d -= 2 * std.math.pi;
+            if (d < -std.math.pi) d += 2 * std.math.pi;
+            sel[i] = chr[i] >= cq and d * side > 15.0 * std.math.pi / 180.0;
+            mask[i] = if (sel[i]) 1 else 0;
+            if (sel[i]) cnt += 1;
+        }
+        const share = @as(f32, @floatFromInt(cnt)) / @as(f32, @floatFromInt(n * n));
+        const what = if (side < 0) "warmer" else "cooler";
+        if (share < 0.005) {
+            note("hue: {s} pixels {d:.3} of the picture (laid from 0.005): none\n", .{ what, share });
+            continue;
+        }
+        const col = meanColour(pic, sel);
+        const cl = @max(R.corrLength(mask, n, false), 1.0);
+        const cells: i32 = @max(1, @as(i32, @intFromFloat(@as(f32, @floatFromInt(n)) / (2.5 * cl))));
+        const epa_pic = R.edgePerArea(mask, n, 0.5);
+        var bw: f32 = 0;
+        var bdd: f32 = 1e9;
+        var lo: f32 = 0.5;
+        var hi: f32 = 0.6;
+        const seed: i32 = 21 + @as(i32, @intCast(gi));
+        for ([_]f32{ 0, 0.02, 0.05, 0.1 }) |wv| {
+            const keep = g.n;
+            const mx = add(g, noiseNode(0, cells, cells, 6, 0.6, wv, cells * 2, seed));
+            var dm = drawNode(g, mx, n);
+            g.n = keep;
+            const thr = R.quantile(dm.grey, 1.0 - share);
+            const bin = alloc.alloc(f32, n * n) catch unreachable;
+            for (dm.grey, 0..) |v, i| bin[i] = if (v > thr) 1 else 0;
+            const epa = R.edgePerArea(bin, n, 0.5);
+            alloc.free(bin);
+            if (absDiff(epa, epa_pic) < bdd) {
+                bdd = absDiff(epa, epa_pic);
+                bw = wv;
+                lo = R.quantile(dm.grey, 1.0 - 1.3 * share);
+                hi = R.quantile(dm.grey, 1.0 - 0.7 * share);
+            }
+            dm.free();
+        }
+        const mx = add(g, noiseNode(0, cells, cells, 6, 0.6, bw, cells * 2, seed));
+        var dn = drawNode(g, nb.field, n);
+        const rw = rampWords(dn.grey, null, pic, sel, nb.reversed, null);
+        dn.free();
+        const r2 = add(g, mk(K_RAMP, &rw, &.{nb.field}));
+        colour = add(g, mk(K_LAYER, &.{ 1, 0, lo, hi, 1, 0, 0 }, &.{ colour, r2, mx }));
+        note("hue: {s} pixels {d:.3} of the picture, mean {x:0>6}, patches about {d:.0} pixels across ({d} cells, warp {d:.2}): laid where its noise is above {d:.3} to {d:.3}\n", .{ what, share, @as(u32, @intFromFloat(colourWord(col))) & 0xffffff, cl, cells, bw, lo, hi });
+        rungs.append(alloc, .{ .root = colour, .label = if (side < 0) "+ the warmer hue's patches (Noise, Ramp, Layer)" else "+ the cooler hue's patches (Noise, Ramp, Layer)" }) catch unreachable;
+    }
+    return colour;
+}
+
+/// milestone 2e (on=bevel, on=shadow; Daniel on the metal plate: "we also need some sort of bezel arround the shapes to
+/// simulate the depth (or a depth map and shadow - the one that is procedural and yeald better results)"): the pieces'
+/// bevel widened to the width whose slopes the picture's light agrees with best, the light read on it (laid even under
+/// the reading's threshold, said, since the eye asked), then Shade (bevel) or Shade with its cast shadow (shadow)
+fn bevelAndLight(g: *P.Graph, pic: *const Pic, st: *Struct, colour_in: usize, shadow: bool, rungs: *std.ArrayList(Rung)) usize {
+    const n = pic.n;
+    const ti = st.tiles;
+    const old_bv = tw(g, ti, 6);
+    var best_bv = old_bv;
+    var best_sh: f32 = -1;
+    var best_lr = [3]f32{ 0, 0, 0 };
+    // the relief the light reads is a copy of the structure with its own bevel: the colours keep the structure as
+    // it was read (a bevel wider than a narrow piece's half width would leave the piece no face to colour)
+    for ([_]f32{ old_bv, 0.02, 0.04, 0.06, 0.1, 0.15 }) |bv| {
+        const keep = g.n;
+        var rn = g.nodes[ti];
+        rn.w[6] = @bitCast(bv);
+        const rx = add(g, rn);
+        var dc = drawNode(g, rx, n);
+        g.n = keep;
+        const lr = slopeLight(pic.t, dc.h, n);
+        dc.free();
+        P.cacheClear();
+        note("  bevel {d:.3} of a piece: the picture brightens {d:.3} across, {d:.3} down with its slopes (fit share {d:.3})\n", .{ bv, lr[0], lr[1], lr[2] });
+        if (lr[2] > best_sh) {
+            best_sh = lr[2];
+            best_bv = bv;
+            best_lr = lr;
+        }
+    }
+    var rn = g.nodes[ti];
+    rn.w[6] = @bitCast(best_bv);
+    const relief = add(g, rn);
+    note("bevel: asked for by eye ({s}); {d:.3} of a piece, where the picture's light agrees best with the slopes (fit share {d:.3}; it was {d:.3})\n", .{ if (shadow) "on=shadow" else "on=bevel", best_bv, best_sh, old_bv });
+    const len = @sqrt(best_lr[0] * best_lr[0] + best_lr[1] * best_lr[1]);
+    var lx: f32 = -0.42;
+    var ly: f32 = -0.42;
+    if (len > 1e-4) {
+        lx = -best_lr[0] / len * 0.6;
+        ly = -best_lr[1] / len * 0.6;
+        if (best_sh < 0.01) note("light: under the reading's threshold (fit share {d:.3}, laid from 0.010), laid because the eye asked for the bevel\n", .{best_sh});
+    } else note("light: no direction read on the bevel; from the top left (-0.42, -0.42), said\n", .{});
+    var best_d: f32 = 0.004;
+    var bd: f32 = 1e9;
+    for ([_]f32{ 0.001, 0.002, 0.004, 0.008, 0.016 }) |dp| {
+        const keep = g.n;
+        const sx = add(g, mk(K_SHADE, &.{ 2, lx, ly, 0.8, dp, 0.8, 0, 0, 1 }, &.{ colour_in, relief }));
+        var ds = drawNode(g, sx, n);
+        var dt = drawNode(g, relief, n);
+        g.n = keep;
+        const lr2 = slopeLight(ds.grey, dt.h, n);
+        dt.free();
+        ds.free();
+        const got = @sqrt(lr2[0] * lr2[0] + lr2[1] * lr2[1]);
+        note("  depth {d:.3}: the drawing brightens {d:.3} with the slope (the picture {d:.3})\n", .{ dp, got, len });
+        if (absDiff(got, len) < bd) {
+            bd = absDiff(got, len);
+            best_d = dp;
+        }
+    }
+    if (shadow) {
+        const c = castShadow(g, pic, colour_in, relief, lx, ly, best_d);
+        rungs.append(alloc, .{ .root = c, .label = "+ the bevel, its light and its cast shadow (Shade version 2)" }) catch unreachable;
+        return c;
+    }
+    const c = add(g, mk(K_SHADE, &.{ 2, lx, ly, 0.8, best_d, 0.8, 0, 0, 1 }, &.{ colour_in, relief }));
+    note("light: from {d:.2}, {d:.2} (across, down; up 0.8), depth {d:.3} (Shade version 2 reading the structure's own relief, on the widened bevel; no shadow)\n", .{ lx, ly, best_d });
+    rungs.append(alloc, .{ .root = c, .label = "+ the bevel and its light (Shade)" }) catch unreachable;
+    return c;
+}
+
+/// milestone 2e (on=shadow; Daniel: "a depth map and shadow - the one that is procedural"): the light laid with its
+/// cast shadow (Shade version 2), the shadow's length and strength those whose drawing agrees best with the
+/// picture's own detail (the grey less its blur over eight pixels, at 512)
+fn castShadow(g: *P.Graph, pic: *const Pic, colour: usize, relief: usize, lx: f32, ly: f32, depth: f32) usize {
+    const n = pic.n;
+    const pb = R.blur(pic.t, n, 8);
+    defer alloc.free(pb);
+    var best_l: f32 = 0;
+    var best_k: f32 = 0;
+    var bd: f64 = 1e18;
+    // lengths up to more than a piece: a domed piece (a wide bevel) casts a shadow only where the light lies lower
+    // than its slope, so the shadow's length is read against the pieces' own size
+    for ([_]f32{ 0, 0.01, 0.02, 0.04, 0.08, 0.12 }) |sl| {
+        for ([_]f32{ 0.3, 0.5, 0.7 }) |sk| {
+            if (sl == 0 and sk != 0.3) continue;
+            const keep = g.n;
+            const sx = add(g, mk(K_SHADE, &.{ 2, lx, ly, 0.8, depth, 0.8, if (sl == 0) 0 else sk, sl, 16 }, &.{ colour, relief }));
+            var ds = drawNode(g, sx, n);
+            g.n = keep;
+            const db = R.blur(ds.grey, n, 8);
+            var d: f64 = 0;
+            for (0..n * n) |i| {
+                const e = (ds.grey[i] - db[i]) - (pic.t[i] - pb[i]);
+                d += e * e;
+            }
+            alloc.free(db);
+            ds.free();
+            P.cacheClear();
+            note("  shadow {d:.3} of the picture long, strength {d:.1}: detail differs {d:.5}\n", .{ sl, if (sl == 0) 0 else sk, d / @as(f64, @floatFromInt(n * n)) });
+            if (d < bd) {
+                bd = d;
+                best_l = sl;
+                best_k = if (sl == 0) 0 else sk;
+            }
+        }
+    }
+    note("light: from {d:.2}, {d:.2} (across, down; up 0.8), depth {d:.3}, its cast shadow {d:.3} of the picture long, strength {d:.1} (Shade version 2, asked for by eye: on=shadow)\n", .{ lx, ly, depth, best_l, best_k });
+    return add(g, mk(K_SHADE, &.{ 2, lx, ly, 0.8, depth, 0.8, best_k, best_l, 16 }, &.{ colour, relief }));
+}
+
+/// a Tiles node at version 4 (milestone 2e: edges filtered over their pixel), its words filled to version 3's
+pub fn toV4(g: *P.Graph, ti: usize) void {
+    var nd = &g.nodes[ti];
+    const ver = nd.w[0];
+    if (ver < 2) {
+        const v2 = [_]f32{ 0, 64, 0, 256, 3, 0, 16 };
+        for (v2, 0..) |v, k| {
+            const kd = P.ops[P.OP_MODERN + K_TILES].kinds[17 + k];
+            nd.w[17 + k] = if (kd == 'i') @bitCast(@as(i32, @intFromFloat(v))) else @bitCast(v);
+        }
+    }
+    if (ver < 3) {
+        const v3 = [_]f32{ 0, 0.5, 0.5, 0.33 };
+        for (v3, 0..) |v, k| nd.w[24 + k] = @bitCast(v);
+    }
+    nd.w[0] = 4;
+    nd.nw = 28;
+}
+
+/// milestone 2e: the whole picture's structure for a tile's fit (struct=WHOLE.script): its first Tiles, with the
+/// tile's share of the pieces and its phase moved by the tiles before it, so the tile drawn at its place in a Quad or
+/// a Grid lays its pieces where the whole lays them (the pieces across must divide by the scale the tile is drawn at)
+fn structFrom(g: *P.Graph, path: [*:0]const u8, opt: MOpt) Struct {
+    const w = P.parseScript(P.readFile(path));
+    var ti: ?usize = null;
+    for (w.nodes[0..w.n], 0..) |nd, k| {
+        if (nd.op == P.OP_MODERN + K_TILES) {
+            ti = k;
+            break;
+        }
+    }
+    const k = ti orelse P.die("struct={s}: the procedure holds no Tiles", .{path});
+    var nd = w.nodes[k];
+    nd.nin = 0;
+    const s: i32 = @intCast(@min(opt.struct_cols, opt.struct_rows));
+    const nx: i32 = @bitCast(nd.w[2]);
+    const ny: i32 = @bitCast(nd.w[3]);
+    if (@mod(nx, s) != 0 or @mod(ny, s) != 0) P.die("struct={s}: {d} by {d} pieces do not divide by the tile's scale {d}", .{ path, nx, ny, s });
+    const fc: f32 = @floatFromInt(opt.struct_cols);
+    const fr: f32 = @floatFromInt(opt.struct_rows);
+    const phx = @as(f32, @bitCast(nd.w[15])) - @as(f32, @floatFromInt(opt.struct_col)) * @as(f32, @floatFromInt(nx)) / fc;
+    const phy = @as(f32, @bitCast(nd.w[16])) - @as(f32, @floatFromInt(opt.struct_row)) * @as(f32, @floatFromInt(ny)) / fr;
+    nd.w[2] = @bitCast(@divExact(nx, s));
+    nd.w[3] = @bitCast(@divExact(ny, s));
+    nd.w[15] = @bitCast(phx);
+    nd.w[16] = @bitCast(phy);
+    const ix = add(g, nd);
+    // the joints' colour: the whole's Ramp's first stop at 0 (its joints' own colour)
+    var jc: ?[3]f32 = null;
+    for (w.nodes[0..w.n]) |rn| {
+        if (rn.op == P.OP_MODERN + K_RAMP and rn.w[2] == 0) {
+            jc = rgbOfWord(rn.w[3]);
+            break;
+        }
+    }
+    note("structure: the whole picture's ({s}), {d} by {d} pieces here (the tile at column {d}, row {d} of {d} by {d}), phase {d:.3}, {d:.3}\n", .{ path, @divExact(nx, s), @divExact(ny, s), opt.struct_col, opt.struct_row, opt.struct_cols, opt.struct_rows, phx, phy });
+    if (jc) |c| note("structure: the joints' colour {x:0>6}, the whole's\n", .{@as(u32, @intFromFloat(colourWord(c))) & 0xffffff});
+    return .{ .tiles = ix, .layout = nd.w[1], .nx = @divExact(nx, s), .ny = @divExact(ny, s), .floor = 0.3, .ok = true, .jc = jc };
 }
 
 /// the share of the faces' variation that lies between pieces: the variance of the means of the pieces (pieces told

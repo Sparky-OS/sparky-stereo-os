@@ -207,7 +207,8 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     let r = rnd01(hash(cid ^ 0x1b873593u));
     var cellv: f32;
     if (lay == 2) { cellv = 0.25 + 0.5 * parity + 0.25 * vary * (r - 0.5); } else { cellv = 0.5 + vary * (r - 0.5); }
-    let h = ss(0.0, bw, -sd);
+    var h = ss(0.0, bw, -sd);
+    if (ver >= 4u) { h = ss(-0.5 * pxs(), max(bw, 0.5 * pxs()), -sd); }
     var face = select(floor_ + (0.85 - floor_) * clamp01(cellv), 1.0, insert);
     var rough = 0.0;
     if (!insert && (grain > 0.0 || stain > 0.0)) {

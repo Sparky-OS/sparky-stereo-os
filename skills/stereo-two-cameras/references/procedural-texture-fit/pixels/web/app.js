@@ -22,7 +22,7 @@ const f32 = Math.fround;
 const bitsToF = (w) => { const b = new DataView(new ArrayBuffer(4)); b.setUint32(0, w >>> 0, true); return b.getFloat32(0, true); };
 
 // ------------------------------------------------------------------ the script (the fitter's typed words)
-const MODERN = { Noise: 'noise', Cells: 'cells', Tiles: 'tiles', Ramp: 'ramp', Layer: 'layer', Shade: 'shade', Scatter: 'scatter', Wear: 'wear', Tint: 'tint', Quad: 'quad' };
+const MODERN = { Noise: 'noise', Cells: 'cells', Tiles: 'tiles', Ramp: 'ramp', Layer: 'layer', Shade: 'shade', Scatter: 'scatter', Wear: 'wear', Tint: 'tint', Quad: 'quad', Grid: 'grid', Stack: 'stack' };
 
 function parse(text) {
   const nodes = [];
@@ -48,7 +48,7 @@ function parse(text) {
 // the reach of a node's neighbourhood in parts of the picture (modern.zig's marginOf): Shade one pixel, Wear its radius
 // or its drips' length; the canvas is drawn that much wider (p2p.zig's drawCanvas, in single precision as there)
 function marginOf(nd) {
-  if (nd.op === 'Shade') return f32(1e-9);
+  if (nd.op === 'Shade') return nd.words[0] >= 2 ? f32(Math.max(f32(1e-9), bitsToF(nd.words[7]))) : f32(1e-9);
   if (nd.op === 'Wear') return f32(bitsToF(nd.words[1] === 2 ? nd.words[3] : nd.words[2]));
   return 0;
 }
@@ -158,7 +158,9 @@ function uniform(cv, nd, nin, pass, sw, sh) {
 // for the GPU; the root's buffer and the canvas. Buffers are freed after their last reader.
 async function drawGpu(g, side, win, mForced) {
   if (g.nodes[g.root].op === 'Quad') return drawQuadGpu(g, side, win);
-  for (let i = 0; i < g.root; i++) if (g.nodes[i].op === 'Quad') throw new Error('a Quad is the procedure\'s last operator');
+  if (g.nodes[g.root].op === 'Grid') return drawGridGpu(g, side, win);
+  if (g.nodes[g.root].op === 'Stack') return drawStackGpu(g, side, win);
+  for (let i = 0; i < g.root; i++) if (['Quad', 'Grid', 'Stack'].includes(g.nodes[i].op)) throw new Error(`a ${g.nodes[i].op} is the procedure's last operator`);
   const cv = canvasFor(g, side, win, mForced);
   const need = needed(g);
   const readers = new Array(g.nodes.length).fill(0);
@@ -198,6 +200,7 @@ async function drawGpu(g, side, win, mForced) {
         e.push({ binding: 4, resource: { buffer: wtmp } });
       } else {
         ins.forEach((b, k) => e.push({ binding: 2 + k, resource: { buffer: b } }));
+        if (nd.op === 'Shade' && ins.length === 1) e.push({ binding: 3, resource: { buffer: ins[0] } });
       }
       return e;
     };
@@ -272,6 +275,105 @@ async function drawQuadGpu(g, side, win) {
   ms += performance.now() - t0;
   ub.destroy();
   for (const b of parts) b.destroy();
+  return { buf: out, cv, ms };
+}
+
+// More procedures per picture (milestone 2e; p2p.zig's drawGrid): tile q (row q / cols, column q % cols) drawn on its
+// own canvas at the places s (x - col / cols), s (y - row / rows), s the smaller of cols and rows; then one Grid pass
+// per tile adds its share into 32-bit sums and a last pass quantises (grid.wgsl: eight storage buffers per stage).
+async function drawGridGpu(g, side, win) {
+  const rt = g.nodes[g.root];
+  const cols = rt.words[1], rows = rt.words[2], nt = cols * rows;
+  if (rt.ins.length !== nt) throw new Error(`Grid of ${cols} by ${rows} takes ${nt} procedures, the graph gives ${rt.ins.length}`);
+  const sc = f32(Math.min(cols, rows));
+  const subs = rt.ins.map((k) => quadPart(g, k));
+  for (const sg of subs) for (const nd of sg.nodes) if (['Quad', 'Grid', 'Stack'].includes(nd.op)) throw new Error(`a Grid's procedures hold a ${nd.op}`);
+  const local = { x: 0, y: 0, s: f32(sc * win.s) };
+  let m = 0;
+  for (const sg of subs) m = Math.max(m, canvasFor(sg, side, local).m);
+  const cv = { w: side + 2 * m, h: side + 2 * m, m, wx: win.x, wy: win.y, ws: win.s, side };
+  const p = await pipeline('Grid');
+  const out = device.createBuffer({ size: cv.w * cv.h * 8, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC });
+  const acc = device.createBuffer({ size: cv.w * cv.h * 16, usage: GPUBufferUsage.STORAGE });
+  let ms = 0;
+  let first = null;
+  for (let q = 0; q <= nt; q++) {
+    let part = null;
+    if (q < nt) {
+      const col = q % cols, row = Math.floor(q / cols);
+      const wx = f32(sc * f32(f32(win.x) - f32(col / cols)));
+      const wy = f32(sc * f32(f32(win.y) - f32(row / rows)));
+      const r = await drawGpu(subs[q], side, { x: wx, y: wy, s: f32(sc * win.s) }, m);
+      part = r.buf;
+      ms += r.ms;
+      if (q === 0) first = part;
+    }
+    const ub = uniform(cv, rt, nt, q, 0, 0);
+    const enc = device.createCommandEncoder();
+    const cp = enc.beginComputePass();
+    cp.setPipeline(p);
+    cp.setBindGroup(0, device.createBindGroup({ layout: p.getBindGroupLayout(0), entries: [
+      { binding: 0, resource: { buffer: ub } }, { binding: 1, resource: { buffer: out } },
+      { binding: 2, resource: { buffer: part || first } }, { binding: 3, resource: { buffer: acc } }] }));
+    cp.dispatchWorkgroups(Math.ceil(cv.w / 8), Math.ceil(cv.h / 8));
+    cp.end();
+    const t0 = performance.now();
+    device.queue.submit([enc.finish()]);
+    await device.queue.onSubmittedWorkDone();
+    ms += performance.now() - t0;
+    ub.destroy();
+    if (part && q > 0) part.destroy();
+  }
+  first.destroy();
+  acc.destroy();
+  return { buf: out, cv, ms };
+}
+
+// Results laid over each other (milestone 2e; p2p.zig's drawStack): each procedure drawn over the same window, its
+// inner pixels copied to a picture without a margin; one Stack pass per layer over 32-bit values, then a last pass
+// quantises.
+async function drawStackGpu(g, side, win) {
+  const rt = g.nodes[g.root];
+  const n = rt.ins.length;
+  if (n < 2 || n > 4) throw new Error(`a Stack lays two to four procedures, the graph gives ${n}`);
+  const subs = rt.ins.map((k) => quadPart(g, k));
+  const cv = { w: side, h: side, m: 0, wx: win.x, wy: win.y, ws: win.s, side };
+  const p = await pipeline('Stack');
+  const out = device.createBuffer({ size: side * side * 8, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC });
+  const acc = device.createBuffer({ size: side * side * 16, usage: GPUBufferUsage.STORAGE });
+  let ms = 0;
+  let first = null;
+  for (let l = 0; l <= n; l++) {
+    let lay = null;
+    if (l < n) {
+      if (subs[l].nodes[subs[l].root].op === 'Stack') throw new Error('a Stack\'s procedure is another Stack');
+      const r = await drawGpu(subs[l], side, win);
+      ms += r.ms;
+      lay = device.createBuffer({ size: side * side * 8, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST });
+      const ce = device.createCommandEncoder();
+      for (let j = 0; j < side; j++) ce.copyBufferToBuffer(r.buf, ((j + r.cv.m) * r.cv.w + r.cv.m) * 8, lay, j * side * 8, side * 8);
+      device.queue.submit([ce.finish()]);
+      r.buf.destroy();
+      if (l === 0) first = lay;
+    }
+    const ub = uniform(cv, rt, n, l, 0, 0);
+    const enc = device.createCommandEncoder();
+    const cp = enc.beginComputePass();
+    cp.setPipeline(p);
+    cp.setBindGroup(0, device.createBindGroup({ layout: p.getBindGroupLayout(0), entries: [
+      { binding: 0, resource: { buffer: ub } }, { binding: 1, resource: { buffer: out } },
+      { binding: 2, resource: { buffer: lay || first } }, { binding: 3, resource: { buffer: acc } }] }));
+    cp.dispatchWorkgroups(Math.ceil(side / 8), Math.ceil(side / 8));
+    cp.end();
+    const t0 = performance.now();
+    device.queue.submit([enc.finish()]);
+    await device.queue.onSubmittedWorkDone();
+    ms += performance.now() - t0;
+    ub.destroy();
+    if (lay && l > 0) lay.destroy();
+  }
+  first.destroy();
+  acc.destroy();
   return { buf: out, cv, ms };
 }
 

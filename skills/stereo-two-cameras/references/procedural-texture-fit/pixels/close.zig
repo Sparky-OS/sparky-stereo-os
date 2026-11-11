@@ -713,7 +713,11 @@ fn structLayers(cx: *Ctx, C: *const View, H: *const View) void {
         var b0 = [3]f32{ 0, 0, 0 };
         // milestone 2d: finer grain cells too (Daniel on the bricks: "too much granulated"; a grain of 256 cells
         // across adds its detail at 8 to 12 pixels, where the picture's faces are already matched)
-        const gcs = if (cx.grain_cap) [_]f64{ 256, 512, 1024 } else [_]f64{ 256, 256, 256 };
+        // milestone 2e (Daniel on the terracotta: "just need more very fine granularity"): on=finegrain tries only
+        // the finest grains, of 1024 and 2048 cells across the picture (one or two pixels at 2048)
+        const fine = refused(cx.on, "finegrain");
+        if (fine) note("grain: the finest grains only, asked for by eye (on=finegrain): 1024 and 2048 cells\n", .{});
+        const gcs = if (fine) [_]f64{ 1024, 2048, 2048 } else if (cx.grain_cap) [_]f64{ 256, 512, 1024 } else [_]f64{ 256, 256, 256 };
         for (gcs, 0..) |gc, gci| for ([_]f32{ 0, 0.25, 0.5, 0.75, 1.0 }) |gr| {
             if (gci > 0 and (gr == 0 or gc == gcs[gci - 1])) continue;
             for ([_]f32{ 0, 0.3, 0.6 }) |sn| {

@@ -6571,13 +6571,30 @@ pub fn mainC(argc: c_int, argv: [*]const [*:0]const u8) callconv(.c) c_int {
                 mo.marks_soft = true;
             } else if (std.mem.eql(u8, a, "grainfit=closest")) {
                 mo.grain_cap = false;
+            } else if (std.mem.eql(u8, a, "struct=none")) {
+                mo.struct_none = true;
+            } else if (std.mem.startsWith(u8, a, "struct=")) {
+                // struct=WHOLE.script,COLS,ROWS,COL,ROW: the tile's structure is the whole picture's (milestone 2e)
+                var it = std.mem.tokenizeScalar(u8, a[7..], ',');
+                const path = it.next() orelse die("struct=WHOLE.script,COLS,ROWS,COL,ROW", .{});
+                mo.struct_cols = std.fmt.parseInt(usize, it.next() orelse die("struct=WHOLE.script,COLS,ROWS,COL,ROW", .{}), 10) catch die("bad {s}", .{a});
+                mo.struct_rows = std.fmt.parseInt(usize, it.next() orelse die("struct=WHOLE.script,COLS,ROWS,COL,ROW", .{}), 10) catch die("bad {s}", .{a});
+                mo.struct_col = std.fmt.parseInt(usize, it.next() orelse die("struct=WHOLE.script,COLS,ROWS,COL,ROW", .{}), 10) catch die("bad {s}", .{a});
+                mo.struct_row = std.fmt.parseInt(usize, it.next() orelse die("struct=WHOLE.script,COLS,ROWS,COL,ROW", .{}), 10) catch die("bad {s}", .{a});
+                const z = alloc.allocSentinel(u8, path.len, 0) catch die("out of memory", .{});
+                @memcpy(z, path);
+                mo.struct_from = z.ptr;
+            } else if (std.mem.eql(u8, a, "jointwarp=keep")) {
+                mo.joint_wobble = false;
+            } else if (std.mem.eql(u8, a, "jointwarp=quarter")) {
+                mo.joint_wobble = true;
             } else if (std.mem.eql(u8, a, "bands=7")) {
                 mo.bands_all = false;
             } else if (std.mem.eql(u8, a, "bands=all")) {
                 mo.bands_all = true;
             } else if (std.mem.eql(u8, a, "grainfit=cap")) {
                 mo.grain_cap = true;
-            } else die("mfit: {s} is not known (full=FULL.ppm, tile=SIDE, seeds=CHOSEN, light=0|1, close=0|1, off=LAYER,..., grainat=colour|field, seed=N, joints=full|scan, pairs=0|1, framed=0|1, grainfit=cap|closest, on=LAYER,..., marks=read|fixed, bands=all|7)", .{a});
+            } else die("mfit: {s} is not known (full=FULL.ppm, tile=SIDE, seeds=CHOSEN, light=0|1, close=0|1, off=LAYER,..., grainat=colour|field, seed=N, joints=full|scan, pairs=0|1, framed=0|1, grainfit=cap|closest, on=LAYER,..., marks=read|fixed, bands=all|7, struct=WHOLE.script,COLS,ROWS,COL,ROW, jointwarp=quarter|keep)", .{a});
         }
         mfit.run(argv[2], argStr(argv, 3), mo);
         return 0;

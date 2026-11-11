@@ -21,6 +21,10 @@
 //! across and down, so the two seeds of a tread plate stand apart instead of in a line) and framed tiles (each square
 //! tile of a small central square and four trapezoids around it, the long side at the tile's border, the short side
 //! at the square; square inserts over the corners where four tiles meet, as the inserts layout draws them).
+//! Version 4 (milestone 2e, Daniel on the floor tiles: "2d looker better, with a tin adjustment"; the second judge saw
+//! the one-pixel joint "stair-stepped and of uneven width"): the edge between a joint and a piece filtered over the
+//! pixel it falls in (the rise starts half a pixel outside the piece and takes at least one pixel), so a joint of one
+//! or two pixels is drawn as an even line at any angle; the words are version 3's.
 //! Output: red, green and blue: 0 in the joints, the piece's shade (between the floor value and 0.85) inside, rising
 //! across the bevel; inserts (octagons and inserts layouts) at 1, above every piece, so a Layer can take them apart. Alpha: the height, 0 in the joint, 1 on
 //! a piece's face.
@@ -30,7 +34,7 @@ pub const name = "Tiles";
 pub const version: u32 = 1;
 pub const inputs: u8 = 0;
 pub const params = [_]c.Param{
-    .{ .kind = .int, .label = "version", .offset = 0, .def = 3, .min = 1, .max = 3 },
+    .{ .kind = .int, .label = "version", .offset = 0, .def = 4, .min = 1, .max = 4 },
     .{ .kind = .cycle, .label = "layout", .offset = 1, .def = 0, .min = 0, .max = 10, .choices = "grid|bond|checker|hexagons|lozenges|studs|octagons|planks|inserts|pairs|framed" },
     .{ .kind = .int, .label = "pieces across", .offset = 2, .def = 4, .min = 1, .max = 1024 },
     .{ .kind = .int, .label = "pieces down", .offset = 3, .def = 8, .min = 1, .max = 1024 },
@@ -62,7 +66,7 @@ pub const params = [_]c.Param{
     .{ .kind = .float, .label = "inner", .offset = 27, .def = 0.33, .min = 0.02, .max = 0.9, .step = 0.01 },
 };
 
-/// the words a version stores: 17 in version 1, 24 in version 2, 28 in version 3
+/// the words a version stores: 17 in version 1, 24 in version 2, 28 in versions 3 and 4
 pub fn wordCount(ver: u32) usize {
     return if (ver >= 3) 28 else if (ver >= 2) 24 else 17;
 }
@@ -96,7 +100,7 @@ fn rhombus(px: f32, py: f32, bx: f32, by: f32) f32 {
 
 pub fn draw(out: c.Pix, ins: []const c.Pix, w: []const u32) error{Refused}!void {
     _ = ins;
-    const ver = try c.versionUpTo(name, w, 3);
+    const ver = try c.versionUpTo(name, w, 4);
     const layout = try c.int(&params, w, 1);
     const nx = try c.int(&params, w, 2);
     const ny = try c.int(&params, w, 3);
@@ -343,7 +347,7 @@ pub fn draw(out: c.Pix, ins: []const c.Pix, w: []const u32) error{Refused}!void 
                 0.25 + 0.5 * parity + 0.25 * vary * (r - 0.5)
             else
                 0.5 + vary * (r - 0.5);
-            const h = c.smoothstep(0, bw, -sd);
+            const h = if (ver >= 4) c.smoothstep(-0.5 * c.cv.px(), @max(bw, 0.5 * c.cv.px()), -sd) else c.smoothstep(0, bw, -sd);
             var face = if (insert) 1.0 else floor + (0.85 - floor) * c.clamp01(cellv);
             var rough: f32 = 0;
             if (!insert and (grain > 0 or stain > 0)) {

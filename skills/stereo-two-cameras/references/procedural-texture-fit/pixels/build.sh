@@ -1,5 +1,6 @@
 #!/bin/sh
 # Build p2p (the fitter) natively: build.sh OUTDIR FR_PUBLIC_DIR
+# OPTMODE=ReleaseSafe gives a checked build (slower), for finding a crash the fast build hides.
 # FR_PUBLIC_DIR is an unchanged clone of github.com/farbrausch/fr_public; needs Zig 0.16 in ZIG or ~/.local/bin/zig, and python3.
 set -eu
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -14,4 +15,4 @@ cp "$GEN/wz3_bitmap_code.hpp" "$GEN/wz4frlib/"
 cd "$HERE"
 export ZIG_GLOBAL_CACHE_DIR="$OUT/zigcache" ZIG_LOCAL_CACHE_DIR="$OUT/zigcache/local"
 "$ZIG" build-exe p2p.zig -cflags -fno-exceptions -fno-rtti -w -fpermissive -fno-strict-aliasing -O2 -msse2 -DSTEREOTEX_WASM -I "$GEN" -I "$HERE/shim" -- wzbridge.cpp \
-  -target x86_64-linux-musl -O ReleaseFast -lc -lc++ -j4 -femit-bin="$OUT/p2p"
+  -target x86_64-linux-musl -O "${OPTMODE:-ReleaseFast}" -lc -lc++ -j4 -femit-bin="$OUT/p2p"

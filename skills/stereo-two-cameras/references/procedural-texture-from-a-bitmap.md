@@ -458,10 +458,122 @@ More traps:
   Cause: the typed text printed decimals with six digits.
   Fix: nine digits (`%.9g`); then 0 of 262,144 pixels differ on four graphs.
 
+### The third round: every structure needs its own reading, and the eye chooses (milestone 1c)
+
+The second round left one rule: an operator that adds structure is never tried because the inner measure likes it.
+Each one now has a reading of its own, measured on the picture and never searched, and the fitter refuses a structure whose reading does not allow it (`structure NAME is refused`).
+
+| structure | operator | the reading, and how it is measured | allowed when | what the pictures gave |
+|---|---|---|---|---|
+| patches | `Cell` as a `Mask` | flat patches: at a quarter of the side, the share of places whose 5 by 5 surroundings differ by less than 0.08; hard edges: the share of the picture's change that sits in the 5 % of places that change most | flat 0.03 or more and edges 0.35 or more | camouflage 0.05 and 0.39; every other picture 0.00 to 0.02 flat |
+| second | `Mask` | a colour off the main colour axis: the share of pixels further than 0.10 from the line between the two colours, and how alike their offsets are (1 is one colour) | share 0.01 or more and alike 0.8 or more | rusted metal photograph 0.018 and 0.94; the noises 0.000 to 0.003 |
+| grain | `Transform` | the change from a pixel to its neighbour across against the change to the one below; the larger says which way the fibres run | 1.2 or more | wood 2.13, fibrous wall 1.38, rusted metal 1.36; the others 1.03 to 1.11 |
+| rings | `Twirl` | at half the side, for every centre on a grid of 4 pixels and a disc of a tenth of the side: the share of the change that runs along the radius (0.5 for lines in no order, 1 for rings), taken as the smaller of the disc's inner and outer half, so one round blob does not count | 0.74 or more; up to three centres | wood 0.89, 0.83, 0.82; carved stone 0.85, 0.81, 0.75; the others 0.54 to 0.66 |
+| mirror | `Transform` with a negative scale | two ring centres that lie level (within one radius), and how much better the way the lines run around one agrees with the other turned left to right than as it lies | 0.10 or more | carved stone 0.55 turned against 0.40 as it lies; wood has no level pair |
+| shape | `GlowRect`, `Transform` | the repeat of the first round (column and row means, the peak test, the cell) | a cell with a shape | tiles 2 by 2; the walls |
+| bond | `TransformMul` | the picture cut into its rows; every row's mean across against the next row's, as it lies and moved sideways; the bricks per row from a row against itself | the moved row agrees better by 0.2 or more | brick wall 0.44 at 0.58 of a brick, 16 rows of 8; block wall 0.61 at 0.59, 8 rows of 4; the tiles 0.00 |
+
+A repeat is read first, and where one is found the other structures are not tried: a grid is its own mirror picture, and a wall's rows read as grain (1.25 on the brick wall).
+The thresholds sit in the gaps these fourteen pictures leave; the narrow ones are the patches (0.05 against 0.02) and the mirror (0.14).
+
+**The outline trick.**
+.kkrieger's artists made outlines by blurring a shape, subtracting the shape and setting the brightness.
+`appendOutline` builds the joints that way: the shape in white on black, repeated; `Blur` as wide as the joint read from the picture; `Merge` in mode 1 (the first input minus the second), which leaves what the blur carried out of the shapes; `HSCB` with the brightness set so the outline's brightest place becomes full (the fitter draws the outline once to find it); `Range` from white to the joints' colour; `Merge` in mode 2 into the surface.
+The joints' colour is measured, not searched: the cell's darkest line over the shape's own brightness, both on the picture's colour axis, so the mortar is the darker shade of the bricks' own colour.
+The blurred shape is the height for `Normals` and `Bump`, which lights the edge of every brick.
+No thin drawn joints are built any more.
+
+**The bond the artists' way.**
+`TransformMul` is `GenBitmap::RotateMul`.
+Read in `wz3_bitmap_code.cpp` and checked with drawings: with mode 16 it merges the picture with a moved copy of itself `count` times, each move twice the last, so `count` 4 lays 16 rows; the first move is (t - 0.5) / (2^count - 1); without mode 16 it adds `count` copies of the first picture, the i-th moved i times (t - 0.5) / count; and a move of t - 0.5 carries the picture by minus that.
+One brick is drawn, a `Transform` repeats it across, and a `TransformMul` lays the rows, each one row down and the measured part of a brick sideways.
+.kkrieger's own walls are built the same way, and the measured 0.58 of a brick is what their graphs hold (0.583).
+
+**The mirror and the spiral.**
+A `GlowRect` at the ring's centre, a `Twirl` there and a second one, a `Transform` with scale -1 across about the mirror line, both merged (`Merge` 0), and that drawing as the height of a lit relief.
+The centres, the radius and the mirror line are read; only the turn is tried (four values).
+
+**The visual check.**
+One run builds one structure (`structure=plain|shape|patches|second|grain|rings|mirror`); its best candidate is kept without the pay test, and what a reading built is not removed or faded by the tuning.
+`choices.py` puts the finished drawing of every allowed structure beside the original, at most four, whole and close up, with bytes and the inner measure, and marks the lowest measure as the program's choice.
+The person or the model looking chooses by eye and writes why; a few values are set the same way, by looking (`stretch=8`, `relief=0`, `surface2=1`, `blur=0.002`, `jointw=1`).
+
+```sh
+BUILD/p2p fit NAME.ppm WORK/prior.txt OUT/x readonly=1          # the readings, then: allowed by the readings: plain shape ...
+BUILD/p2p fit NAME.ppm WORK/prior.txt OUT/shape/NAME structure=shape
+python3 pixels/choices.py REF OUT sheet.jpg NAME plain shape    # original | plain | shape, whole and close up
+printf 'v0 Flat - 8 8 #ff000000\nv1 GlowRect v0 0.3 0.3 0.01 0.01 0.15 0.05 #ffffffff 1 0.5 1 0\n' | python3 pixels/text2script.py > t.script   # a test graph, to see what an operator does
+```
+
+What the eye chose on the eleven pictures (eight of .kkrieger's, and three CC0 photographs from Poly Haven reduced to 512 pixels, which replaced .kkrieger's rust, rusty metal and rock after Daniel asked for better sources):
+
+| picture | allowed | the program's choice | chosen by eye | found |
+|---|---|---|---|---|
+| concrete wall | plain | plain | plain | 3 operators, 111 B |
+| camouflage | plain, patches | patches | patches | 8, 212 B |
+| rust (photograph) | plain | plain | plain | 5, 141 B |
+| rusted metal (photograph) | plain, second, grain | second | second without the relief | 7, 171 B |
+| fibrous wall | plain, grain | plain | grain | 5, 161 B |
+| rock (photograph) | plain | plain | plain | 3, 111 B |
+| stone tiles | plain, shape | shape | shape, the surface 2 by 2, no relief | 9, 193 B |
+| brick wall | plain, shape | shape | shape | 14, 330 B |
+| stone-block wall | plain, shape | shape | shape | 15, 347 B |
+| wood | plain, grain, rings | rings | rings with stretch 8 and no relief | 5, 165 B |
+| carved stone | plain, rings, mirror | mirror | mirror | 11, 295 B |
+
+- **Now right at a glance, by the fitting model's eye:** the brick wall and the block wall (a wall in its bond, mortar in the darker shade of the bricks), the tiles (thin dark joints with no shine, finer granules), the concrete.
+- **Recognisable, not right:** wood (long fibres with three spiral knots where the original has its rings; no rings, and the fibres repeat as regular stripes); the carved stone (two lit spirals, mirror twins, at the right places; wound too tight, and the arcs above them are not built); camouflage (flat patches in the picture's greens, with straight polygon edges where the original has ragged flakes); the fibrous wall (fibres running down; soft, with a regular rhythm).
+- **The photographs:** the colours and the kind of surface come back (a warm brown rust, orange over grey, a sand-coloured granular stone); the speckles and drips of the rusted metal, the rust's stains and the rock's cracks and pits do not. That is where the image stays the last layer.
+- **Program against eye:** they differ on three of the eleven. On the wood the inner measure prefers 0.47 (sideways smears) to 0.80 (the fibres and knots the eye takes); on the fibrous wall 0.21 (lit worm shapes) to 0.51 (fibres).
+- **The readings run on the fitter's own drawings** (a test that can fail): the found brick wall reads 16 rows of 8 in a bond at 0.58, as the original does; the found wood reads rings at the same three places; the found tiles do not read as a repeat (the joints are fainter than the original's); the found carved stone reads one ring and no mirror pair; the found camouflage reads a false ring at 0.76.
+- **Against the fair baseline:** the three photographs' lower-resolution copies are 390,825, 414,440 and 591,032 bytes (31.6, 40.7 and 34.6 % of the 2048 pixel JPEG); the found procedures are 111 to 171 bytes and hold only the material's look.
+
+Traps of the third round:
+- Symptom: the program ends at once after `rung 0` with no message, and a checked build reports `integer overflow` at a line of unrelated older code.
+  Cause: `const m = @min(n, 256)` gives the smallest type that holds the bound (a 9-bit number), so `m * m` overflows; the fast build has no check, and the checked build's line number is wrong because the reading is inlined.
+  Fix: `const m: usize = @min(n, 256)`.
+  Found by: a build with `-O ReleaseSafe` and a line printed before and after each new reading.
+- Symptom: a carving does not read as a mirror picture (0.11 to 0.27, the same as wood and rust).
+  Cause: brightness, and edge strength too, follow the light: a flank facing the light is bright, its mirror twin faces away; and the ornament is a small part of the picture.
+  Fix: compare only which way the lines run (the change across squared minus the change down squared, and twice their product, each made the same length), around a level pair of ring centres, turned against as it lies; rings alone are their own mirror picture, so the difference of the two is the reading.
+  Found by: four versions printed on the wood and the carved stone side by side.
+- Symptom: a cloud reads as "repeats 1 by 2" and gets a shape.
+  Cause: joints seen in the row means were trusted even when the cell predicted the other repeats far worse than no cell (-78 %).
+  Fix: trust them only above -10 % (thin joints give about -3 %); the refusal is printed.
+- Symptom: with a full search the brick wall has no bricks, though a quick run had them.
+  Cause: the tuning lowered the outline `Blur`'s strength to 0.23 and set `HSCB`'s brightness to 0, and the cleaning removed operators that "did not earn their bytes".
+  Fix: what a reading built is marked kept and its values locked; the brightness is set from the outline's own drawing.
+  Found by: printing the found graph; the operators were there with the values changed.
+- Symptom: a noise is merged into the shape instead of the surface.
+  Cause: the cleaning removed an operator below the surface layer's top and the index kept pointing one further.
+  Fix: the top is marked before the cleaning and found again after it.
+- Symptom: patches are allowed and built, and the drawing shows clouds; or it shows a web of lines.
+  Cause: the tuning turned every cell white; and `Cell` draws edges in modes 1, 3 and 7.
+  Fix: `Cell` in mode 2 (every cell one flat shade, read in `GenBitmap::Cell` and drawn), its shades, the `Flat` and the `Mask` locked; only the count and the seed are tried.
+- Symptom: a `Blur` of 0.006 over the patches smears them away.
+  Cause: the value is the operator's own radius, far wider than it looks; the artists' camouflage uses 0.0024.
+  Fix: 0.002; 0.004 looked the same.
+- Symptom: one knot becomes a swirl half the picture wide, or a disc turned as one plate with a visible rim.
+  Cause: the `Twirl`'s radius and its fall were tuned by the inner measure (the fall went to 0).
+  Fix: the centre and the radius are the reading's, the fall is one of two tried values; only the turn is tuned.
+- Symptom: wood fibres come out as worms at a slant, or as sideways smears.
+  Cause: `Distort` by a noise, and the relief's own `Blur` over a stretched noise.
+  Fix: grain is a `Transform` that repeats the layer across the fibres, in the direction the reading gives; how long the fibres are is set by eye (`stretch=8`), and the relief is left off for wood (`relief=0`).
+- Symptom: with the surface repeated 2 by 2, a white line runs beside every joint.
+  Cause: the relief lights the blurred shape's edge, and the finer surface shows it.
+  Fix: no relief for that choice; the `Bump`'s shine colour is locked at black in every relief, since a glossy groove is wrong to the eye.
+- Symptom: `p2p render` of a rung script fails.
+  Cause: rung scripts carry no size.
+  Fix: give the size as the last argument (`render SCRIPT OUT.ppm 8` for 256 pixels).
+- Symptom: two launches of the same job list at once: `Conflict. The container name ... is already in use`.
+  Cause: a wait loop that started the jobs was thought to have ended without starting them.
+  Fix: one launcher; check the container list by name before starting another.
+
 ### Where the procedures stop (so far)
 
-On .kkrieger's own textures, which are procedures, the reverse gets the material at a glance for the plain noises and the regular repeats, and nothing close up.
-What it misses is named above by operator; the next steps are a `Mask` for a second material, `Distort` and `Twirl` for grain, the bond's second shape with its bevel, and the same method tile by tile on photographs, where the image stays the last layer.
+On .kkrieger's own textures, which are procedures, the reverse now gets the material at a glance for the plain noises, the regular repeats and the walls in a bond, and a recognisable drawing for the wood and the carved ornament; nothing is right close up.
+On photographs it gets the colours and the kind of surface, and none of the marks that make the photograph that surface (speckles, drips, stains, cracks): those stay with the image, the last layer.
+Not built yet: a `Distort` for ragged patch edges and for stones of uneven length, the rounded bevel of a stone, text (font glyphs used as shapes), rings (as against spirals), and the same method tile by tile on photographs.
 
 ## Where it fails
 

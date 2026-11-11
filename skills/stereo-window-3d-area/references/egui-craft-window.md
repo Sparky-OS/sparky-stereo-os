@@ -38,6 +38,11 @@ Unequal source grids need an explicit native-view refusal rather than silently f
 
 ## Measured traps
 
+- Symptom: native workspace tests and Clippy pass, but the final wasm gate reports
+  `missing field stereo_view in initializer of Services`.
+  The browser host has an explicit service literal that native target checks do not compile.
+  Set the native-only service to `None` there, preserve the ordinary browser loupe,
+  and rerun the receiving gate including wasm before committing.
 - Symptom: a logic-only test appears to set a texture limit, but never reports it to the app.
   A `Headless` harness property is consumed by its `step`, not by a separate `Context::run_ui`
   closure that calls only app logic. Send `RawInput::max_texture_side` in that closure and

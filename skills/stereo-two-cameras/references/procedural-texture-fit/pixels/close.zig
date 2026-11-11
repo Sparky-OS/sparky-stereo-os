@@ -1108,6 +1108,8 @@ fn spotsLayer(cx: *Ctx, C: *const View, H: *const View) void {
     const near = R.blur(rb_f, n, @intFromFloat(@max(2, 2 * am.rad)));
     defer alloc.free(near);
     const stain_thr = R.quantile(H.pic.t, 0.35);
+    // the first material: the lighter half, away from every spot and stain (the lightest three tenths read greyer
+    // than the metal between the spots, and the tiles' Tints then pushed the whole toward yellow: by eye)
     const base_thr = R.quantile(H.pic.t, 0.5);
     const clean = alloc.alloc(bool, n * n) catch unreachable;
     defer alloc.free(clean);
@@ -1161,8 +1163,9 @@ fn spotsLayer(cx: *Ctx, C: *const View, H: *const View) void {
     note("spots: {d} cells across, size {d:.2} of a cell, {d:.1} times as long down, gathered {d:.1}; the spot {x:0>6}, the stain {x:0>6}\n", .{ cells, size, asp, clu, @as(u32, @intFromFloat(F.colourWord(spot_c))) & 0xffffff, @as(u32, @intFromFloat(F.colourWord(halo_c))) & 0xffffff });
     note("halo: beside the spots {d:.3} of the pixels are stained, far from them {d:.3} (a halo from 1.5 times)\n", .{ ringv, farv });
     if (ringv >= 1.5 * farv and ringv > 0.02 and !refused(cx.off, "halo")) {
-        const rr = @min(0.1, 2.0 * am.rad / @as(f32, @floatFromInt(n)));
-        colour = F.add(g, F.mk(F.K_WEAR, &.{ 1, 3, rr, 0.05, 0.3, 0.8, 0.45, F.colourWord(halo_c), @as(f64, @floatFromInt(cells)) * 2, 0.3, 33, 1.0 }, &.{ colour, sm }));
+        // the stain reaches as far as the picture's stained ring does (two radii beyond the spot), at its share
+        const rr = @min(0.1, 3.0 * am.rad / @as(f32, @floatFromInt(n)));
+        colour = F.add(g, F.mk(F.K_WEAR, &.{ 1, 3, rr, 0.05, 0.15, 0.6, @min(0.9, 1.5 * ringv), F.colourWord(halo_c), @as(f64, @floatFromInt(cells)) * 2, 0.3, 33, 4.0 }, &.{ colour, sm }));
         note("halo: Wear grow over {d:.4} of the picture in the stain's colour\n", .{rr});
     }
     // runs down: at 1:1 the darkest fifth stays alike further down than across

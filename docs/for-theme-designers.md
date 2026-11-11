@@ -29,9 +29,9 @@ Each part is marked **built** or **designed (coming)**.
 
 The edition's own look, Stereo Oxygen, made from KDE's Oxygen, is the first theme being made this way.
 
-**Where depth lives in Union: in the theme's own shadows, and one value (built).**
+**Where depth lives in Stereo Union: in the theme's own shadows, and one value (built).**
 KDE is moving its styling to Union, its new style engine, and we asked in public where a depth value belongs: [Real depth for Ocean's elevation, a design question for Union](https://discuss.kde.org/t/real-depth-for-oceans-elevation-a-design-question-for-union/50744).
-The answer is built in the edition's Union: an outer shadow raises an element and an inset shadow sinks it, by its strength, and `depth: sunk | screen | popped | <percentage> | <number>` declares it where the drawing does not say.
+The answer is built in Stereo Union, the edition's fork of Union: an outer shadow raises an element and an inset shadow sinks it, by its strength, and `depth: sunk | screen | popped | <percentage> | <number>` declares it where the drawing does not say.
 A window's own elements move by a pixel or less, inside `ElementLimit`; menus and popups a window draws inside itself use the desktop's limits.
 How it reaches every window, the values with their roles, and what is still flat: [Depth inside every window](depth-inside-windows.md).
 Designers who care how depth should be declared in KDE's styles are still welcome in that thread.

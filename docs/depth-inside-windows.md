@@ -33,11 +33,11 @@ They are in pixels of a view 1920 pixels wide, the unit Stereo KWin uses on ever
 
 **The theme gives the sign and the strength, with what it already draws.**
 An outer shadow shows a box "as if it were lifted above the canvas", and an inset one "as if the box were cut out of the canvas and shifted behind it" ([CSS Backgrounds and Borders 3, §6.1](https://www.w3.org/TR/css-backgrounds-3/#box-shadow)).
-Union reads exactly that: an outer shadow raises an element and an inset shadow sinks it.
+Stereo Union reads exactly that: an outer shadow raises an element and an inset shadow sinks it.
 The strongest shadow in the window is a whole step of `ElementLimit`, and weaker shadows take a share of it by their blur, offset and opacity: more shadow, outer or inset, means more separation (Daniel, 23 October 2026).
 An element with no shadow lies on what it is drawn on.
 A depth the theme declares always wins (`depth: sunk | screen | popped | <percentage> | <number>`), so a theme without shadows, or a high contrast theme, still says where its elements stand.
-Union's Breeze declares only what its drawing does not say: a flat tool button rises under the pointer, as Qt raises it, and the menus, popups, tooltips and dialogs drawn inside a window are popped.
+Stereo Union's Breeze declares only what its drawing does not say: a flat tool button rises under the pointer, as Qt raises it, and the menus, popups, tooltips and dialogs drawn inside a window are popped.
 
 **Levels fit inside the limit, the way Stereo KWin fits menus.**
 An element stands on what it lies on, so a raised button on a raised card stands one step out from the card.
@@ -59,7 +59,7 @@ Five parts take part, each in the layer that owns its piece of the work.
    Version 3 of `kde_stereo_content_v1` (our [plasma-wayland-protocols](https://invent.kde.org/danielcamposramos/plasma-wayland-protocols/-/tree/stereo3d-6.7)) adds `kde_stereo_depth_v1`.
    Its `depth_state` event says whether the surface is awake (on a stereo output, and the active window on top of what it overlaps, a popup, a panel or the desktop, not a window in the pile).
    It also says which of the surface's edges lie on the output's edge, where nothing comes nearer than the screen.
-2. **Union, the style, says where each element stands.**
+2. **Stereo Union, the style, says where each element stands.**
    It reads the user's limits and works out each element's depth from the theme, as above.
    It sets two values the toolkit reads: the window's `_q_stereo_depth`, and each element's `_q_stereo_parallax`, its shift between the eyes in device pixels.
    It hears from Stereo KWin through [libstereo-declare](https://github.com/Sparky-OS/libstereo-declare) 1.5.
@@ -110,37 +110,37 @@ Each is a piece of work, written here with its owning place and its test.
 
 ## What stays exactly as it was
 
-- A 2D screen, a window in the pile, a session with the limits at zero, another compositor, or a style other than Union: the same pixels as before.
+- A 2D screen, a window in the pile, a session with the limits at zero, another compositor, or a style other than Stereo Union: the same pixels as before.
 - Layout, sizes, input and accessibility positions, in every case, because depth is drawn, never laid out.
 - Stereo content inside a window, which keeps its own declaration and its own eyes.
 
 ## How it was proven
 
 Everything below ran on the six packages installed together in a fresh container, as an upgrade from the edition as published (89 packages upgraded, none removed), with Stereo KWin's headless virtual output switched into a 3D mode (side by side half), on the AMD card.
-Each element's disparity is compared with a prediction worked out by hand from the theme's CSS, not from Union's code, and measured to a hundredth of a pixel against the same window on a 2D output.
+Each element's disparity is compared with a prediction worked out by hand from the theme's CSS, not from Stereo Union's code, and measured to a hundredth of a pixel against the same window on a 2D output.
 
 | Window | Limits (`SunkLimit`/`PoppedLimit`/`ElementLimit`) | Elements at the predicted disparity |
 |---|---|---|
-| Union's Breeze, Qt Quick, threaded render loop | 10/4/1, the shipped values | 18 of 18 |
+| Stereo Union's Breeze, Qt Quick, threaded render loop | 10/4/1, the shipped values | 18 of 18 |
 | The same, basic render loop | 10/4/1 | 18 of 18 |
 | The same | 4/10/1, the two desktop limits swapped | 18 of 18: the in-window popup at +10, its button at +11 |
 | The same | 10/4/12, the measuring scale | 18 of 18 |
 | The measuring style's ladders, Qt Quick | 10/4/1 | 14 of 14; the 0.111 and 0.333 px shares change no pixel |
 | The same | 10/4/12 | 14 of 14, strictly ordered: shadows 1.3, 4 and 8, levels 4, 8 and 12, insets -2, -6 and -12, tabs -12, -6, 0, -6 and -12 |
-| Union's Breeze, Qt Widgets | 10/4/1 and 10/4/12 | 15 of 15, both |
+| Stereo Union's Breeze, Qt Widgets | 10/4/1 and 10/4/12 | 15 of 15, both |
 | Debian's Qt Quick instead of the edition's (negative control) | 10/4/1, ladders 10/4/12 | 11 of 18; ladders 1 of 14 |
 | Every depth package taken back to the published edition, Union without its depth, only Stereo KWin new (negative control) | 10/4/1, ladders 10/4/12 | 10 of 18; ladders 1 of 14; Widgets 7 of 15 |
 
 - **The cut:** at 12 px, beside each of the three sunk fields 0 pixels differ from the 2D window in either eye, while 231 to 751 pixels inside each of them moved.
 - **2D:** the same windows on a 2D output, Qt Quick and Qt Widgets: 0 differing pixels in the whole 1920x1080 capture against the edition as published, with Union built without its depth.
 - **Depth off:** with the limits at zero on the 3D output, both eyes: 0 differing pixels against the 2D window.
-- **On the wire:** Union's `get_depth` and `depth_state(1, 0)`; Qt's `get_depth` and `set_desktop_depth(1)`; Mesa's 1800x520 buffer, two views of a 900x520 window, with `create` and `set_content(3)` on the same commit; one `wp_viewport` on the surface, Qt's own.
+- **On the wire:** Stereo Union's `get_depth` and `depth_state(1, 0)`; Qt's `get_depth` and `set_desktop_depth(1)`; Mesa's 1800x520 buffer, two views of a 900x520 window, with `create` and `set_content(3)` on the same commit; one `wp_viewport` on the surface, Qt's own.
 - **Idle:** an idle window drawn as a pair rendered 7 frames over the case with the threaded loop and 4 with the basic loop, each half counted: no frames of its own.
 - **Nothing else moved:** the one-resize cases of every stereo surface give the same PSNR as the previous KWin, to the hundredth (64.24, 63.31, 56.47, 56.02 and 69.13 dB, the control without a destination 8.11 dB), and so do the X11 views at another size (63.42 and 64.24 dB).
 
 ## Credits
 
-Union is KDE's style engine, by Arjen Hiemstra, Akseli Lahtinen, Joshua Goins, Martin Sh, Niccolò Venerandi and Noah Davis.
+Stereo Union is the edition's fork of Union, KDE's style engine, by Arjen Hiemstra, Akseli Lahtinen, Joshua Goins, Martin Sh, Niccolò Venerandi and Noah Davis.
 Its Debian packaging, which the edition's package keeps, is by Patrick Franz and Rik Mills.
 Reading an element's depth from its shadow was proposed by Samuele on [KDE Discuss](https://discuss.kde.org/t/real-depth-for-oceans-elevation-a-design-question-for-union/50744), and Daniel took it there.
 The values, their roles, and the rule that a window's insides move by a pixel or less are Daniel's.

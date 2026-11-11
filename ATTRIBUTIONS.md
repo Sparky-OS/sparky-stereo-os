@@ -831,7 +831,7 @@ The IEM route is proposed; its processing latency was not measured by the AMB te
 ## Certificate management and ICP-Brasil interoperability
 
 - **Paweł "pavroo" Pijanowski**, author of Sparky CA (2018), and **Daniel Campos Ramos**, its 2020 and 2026 work, as credited in Sparky CA's original copyright records.
-- **Pedro F. Albanese**, author of [e521](https://github.com/pedroalbanese/e521), as recorded in its ISC license. Our interoperability fixes and public-only OpenSSL prototype follow his reference implementation.
+- **Pedro F. Albanese**, author of [e521](https://github.com/pedroalbanese/e521) and [EDGE Toolkit (edgetk)](https://github.com/pedroalbanese/edgetk), as recorded in their ISC licences. Our interoperability fixes and public-only OpenSSL prototype follow his reference implementation.
 - **Instituto Nacional de Tecnologia da Informação (ITI)**, for the published ICP-Brasil certificates, bundle hashes and DOC-ICP-01.01 algorithm standard.
 - **The OpenSSL Project**, **Network Security Services (NSS)** and their contributors, for certificate verification, provider APIs and browser stores.
 - **The Python Software Foundation and Python contributors**, for the separate arithmetic/hash oracle used to check the reference implementation.

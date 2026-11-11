@@ -1,4 +1,4 @@
-// Tiles (versions 1 and 2): the WGSL twin of tiles.zig. Bindings: 1 the output.
+// Tiles (versions 1 to 3): the WGSL twin of tiles.zig. Bindings: 1 the output.
 @group(0) @binding(1) var<storage, read_write> outp: array<vec2<u32>>;
 
 fn len2(x: f32, y: f32) -> f32 { return sqrt(x * x + y * y); }
@@ -42,6 +42,8 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     if (ver >= 2u) {
         chip = wf(17u); ccells = wi(18u); grain = wf(19u); gcells = wi(20u); goct = word(21u); stain = wf(22u); scells = wi(23u);
     }
+    var hollow = 0.0; var sox = 0.5; var soy = 0.5; var inner = 0.33;
+    if (ver >= 3u) { hollow = wf(24u); sox = wf(25u); soy = wf(26u); inner = wf(27u); }
     let fnx = f32(nx);
     let fny = f32(ny);
     let cw = 1.0 / fnx;
@@ -126,6 +128,60 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
             sd = tile_cut;
             cid = hash3(wrapi(col, nx), wrapi(row, ny), seed);
         }
+    } else if (lay == 9) {
+        let col = i32(floor(X));
+        let row = i32(floor(Y));
+        let half = 0.5 * size * len2(cw, ch);
+        var best = 1e9;
+        for (var dr = -1; dr <= 1; dr++) {
+            for (var dk = -1; dk <= 1; dk++) {
+                for (var sdi = 0u; sdi < 2u; sdi++) {
+                    let s = select(-1.0, 1.0, sdi == 0u);
+                    let ox = select(0.5 + sox, 0.5, sdi == 0u);
+                    let oy = select(0.5 + soy, 0.5, sdi == 0u);
+                    let lx = (X - (f32(col + dk) + ox)) * cw;
+                    let ly = (Y - (f32(row + dr) + oy)) * ch;
+                    let ax = 0.70710678 * (lx + s * ly);
+                    let ay = 0.70710678 * (ly - s * lx);
+                    let d = rhombus(ax, ay, half, half * round_) + 0.5 * jw;
+                    if (d < best) { best = d; cid = hash3(wrapi(col + dk, nx), wrapi(row + dr, ny), seed ^ (sdi * 0x2b7eu)); }
+                }
+            }
+        }
+        sd = best;
+    } else if (lay == 10) {
+        let col = i32(floor(X));
+        let row = i32(floor(Y));
+        let fx = X - floor(X);
+        let fy = Y - floor(Y);
+        let ccol = select(col + 1, col, fx < 0.5);
+        let crow = select(row + 1, row, fy < 0.5);
+        let qx = select(fx - 1.0, fx, fx < 0.5) * cw;
+        let qy = select(fy - 1.0, fy, fy < 0.5) * ch;
+        let dins = max(abs(qx), abs(qy)) - 0.5 * size * m;
+        let tile = roundBox((fx - 0.5) * cw, (fy - 0.5) * ch, 0.5 * (cw - jw), 0.5 * (ch - jw), rr);
+        let lx = abs((fx - 0.5) * cw);
+        let ly = abs((fy - 0.5) * ch);
+        let a = 0.5 * inner * m;
+        let mx = max(lx, ly);
+        var part = 0u;
+        var dint = 0.0;
+        if (mx <= a) {
+            dint = a - mx;
+        } else {
+            dint = min(mx - a, 0.70710678 * abs(lx - ly));
+            if (ly >= lx) { part = select(2u, 1u, fy < 0.5); } else { part = select(4u, 3u, fx < 0.5); }
+        }
+        let piece = max(tile, -(dint - 0.5 * jw));
+        let tile_cut = max(piece, -(dins - jw));
+        if (dins < tile_cut) {
+            sd = dins;
+            insert = true;
+            cid = hash3(wrapi(ccol, nx), wrapi(crow, ny), seed ^ 0x5151u);
+        } else {
+            sd = tile_cut;
+            cid = hash3(wrapi(col, nx), wrapi(row, ny), seed ^ (part * 0x9e37u));
+        }
     } else {
         let row = i32(floor(Y));
         let rh = hash3(0, wrapi(row, ny), seed ^ 0x4242u);
@@ -167,5 +223,12 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     let g = h * face;
     var hh = h;
     if (insert) { hh = 0.6 * h; } else if (grain > 0.0) { hh = clamp01(h * (1.0 + 0.3 * grain * rough)); }
+    if (hollow > 0.0 && !insert) {
+        let hj = 0.5 * hollow;
+        if (sd >= 0.0) {
+            let t = clamp01(1.0 - sd / max(1e-6, 0.5 * jw));
+            hh = hj * t * t;
+        } else { hh = hj + (1.0 - hj) * hh; }
+    }
     outp[id.y * u.w + id.x] = pack(vec4<f32>(g, g, g, hh));
 }

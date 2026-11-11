@@ -13,8 +13,11 @@ pub const shade = @import("ops/shade.zig");
 pub const scatter = @import("ops/scatter.zig");
 pub const wear = @import("ops/wear.zig");
 pub const tint = @import("ops/tint.zig");
+pub const quad = @import("ops/quad.zig");
 
-pub const list = .{ noise, cells, tiles, ramp, layer, shade, scatter, wear, tint };
+pub const list = .{ noise, cells, tiles, ramp, layer, shade, scatter, wear, tint, quad };
+/// Quad's place in the list: a procedure whose last operator is a Quad draws its four inputs each on its own canvas
+pub const K_QUAD = 9;
 pub const count = list.len;
 
 /// i whole number, f decimal, c colour: the packing p2p's operator table uses

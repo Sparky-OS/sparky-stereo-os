@@ -124,7 +124,7 @@ pub fn rewire(g: *P.Graph, root: usize, old: usize, new: usize, map: []usize) us
     return map[root];
 }
 
-fn refused(off: []const u8, name: []const u8) bool {
+pub fn refused(off: []const u8, name: []const u8) bool {
     var it = std.mem.tokenizeScalar(u8, off, ',');
     while (it.next()) |x| {
         if (std.mem.eql(u8, x, name)) return true;
@@ -364,6 +364,10 @@ fn scatter2(base: usize, cells: i32, dens: f32, size: f32, svar: f32, col: [3]f3
     return F.mk(F.K_SCATTER, &.{ 2, @floatFromInt(cells), @floatFromInt(cells), dens, size, svar, 0.5, 0.8, F.colourWord(col), cvar, @floatFromInt(seed), height, soft, aspect, 1, 0, 0, @floatFromInt(ccl), clu, rough, @floatFromInt(rcl), core }, &.{base});
 }
 
+fn scatter2o(base: usize, cells: i32, dens: f32, size: f32, svar: f32, col: [3]f32, cvar: f32, seed: i32, height: f32, soft: f32, aspect: f32, ccl: i32, clu: f32, rough: f32, rcl: i32, core: f32, opacity: f32) P.Node {
+    return F.mk(F.K_SCATTER, &.{ 2, @floatFromInt(cells), @floatFromInt(cells), dens, size, svar, 0.5, 0.8, F.colourWord(col), cvar, @floatFromInt(seed), height, soft, aspect, opacity, 0, 0, @floatFromInt(ccl), clu, rough, @floatFromInt(rcl), core }, &.{base});
+}
+
 /// What the close-up phase starts from and builds on
 pub const Ctx = struct {
     g: *P.Graph,
@@ -383,6 +387,9 @@ pub const Ctx = struct {
     field: usize = 0, // the surface's field as the Ramps read it (the grain layer once it is laid)
     rungs: *std.ArrayList(F.Rung),
     off: []const u8,
+    on: []const u8 = "", // milestone 2d: layers the eye asked for below their readings' thresholds (on=spots)
+    marks_soft: bool = true, // milestone 2d: the spots' softness and blend read (marks=fixed: milestone 2c's)
+    grain_cap: bool = true, // milestone 2d: a piece's grain may not exceed the picture's faces in any band
     full: []const f32,
     N: usize,
 };
@@ -590,15 +597,22 @@ fn structLayers(cx: *Ctx, C: *const View, H: *const View) void {
     const t_old = cx.st.tiles;
     const n = C.pic.n;
     const tn = g.nodes[t_old];
-    // version 2 of the same Tiles: its 17 words, then chip, chip cells, grain, grain cells, octaves, stain, stain cells
-    var w = [_]f64{0} ** 24;
+    // version 2 of the same Tiles: its 17 words, then chip, chip cells, grain, grain cells, octaves, stain, stain cells;
+    // a version 3 node (milestone 2d: a hollow joint, pairs, framed tiles) keeps its version and its four last words
+    var wfull = [_]f64{0} ** 28;
     const kinds = P.ops[P.OP_MODERN + F.K_TILES].kinds;
-    for (0..17) |i| w[i] = switch (kinds[i]) {
+    const v3 = tn.w[0] >= 3;
+    const nw: usize = if (v3) 28 else 24;
+    for (0..17) |i| wfull[i] = switch (kinds[i]) {
         'i' => @floatFromInt(@as(i32, @bitCast(tn.w[i]))),
         'f' => @floatCast(@as(f32, @bitCast(tn.w[i]))),
         else => @floatFromInt(tn.w[i]),
     };
-    w[0] = 2;
+    if (v3) {
+        for (24..28) |i| wfull[i] = @floatCast(@as(f32, @bitCast(tn.w[i])));
+    }
+    wfull[0] = if (v3) 3 else 2;
+    const w = wfull[0..nw];
     const pieces: f64 = @floatFromInt(@max(cx.st.nx, cx.st.ny));
     w[17] = 0;
     w[18] = 6 * pieces;
@@ -633,10 +647,16 @@ fn structLayers(cx: *Ctx, C: *const View, H: *const View) void {
     if (refused(cx.off, "chips")) note("chips: left off by eye (off=chips)\n", .{}) else {
         var best_d: f32 = 1e9;
         var e0: f32 = 0;
-        for ([_]f32{ 0, 0.03, 0.06, 0.1, 0.15 }) |ch| {
+        // milestone 2d: finer chip cells too (with the joints read at 1:1 the bevel no longer hides a coarse bite)
+        const c0 = w[18];
+        var bcc = c0;
+        const ccs = if (cx.grain_cap) [_]f64{ c0, 2 * c0, 4 * c0 } else [_]f64{ c0, c0, c0 };
+        for (ccs, 0..) |cc, cci| for ([_]f32{ 0, 0.03, 0.06, 0.1, 0.15 }) |ch| {
+            if (cci > 0 and (ch == 0 or cc == ccs[cci - 1])) continue;
             w[17] = ch;
+            w[18] = cc;
             const keep = g.n;
-            const ti = F.add(g, F.mk(F.K_TILES, &w, &.{}));
+            const ti = F.add(g, F.mk(F.K_TILES, w, &.{}));
             var dt = drawIn(g, ti, C);
             g.n = keep;
             const dm = alloc.alloc(bool, n * n) catch unreachable;
@@ -645,12 +665,14 @@ fn structLayers(cx: *Ctx, C: *const View, H: *const View) void {
             alloc.free(dm);
             dt.free();
             if (ch == 0) e0 = e;
-            note("  chip {d:.2}: the joints' outline {d:.4} per pixel inside (the picture's {d:.4})\n", .{ ch, e, e_pic });
+            note("  chip {d:.2} of {d} cells: the joints' outline {d:.4} per pixel inside (the picture's {d:.4})\n", .{ ch, @as(i32, @intFromFloat(cc)), e, e_pic });
             if (F.absDiff(e, e_pic) < best_d) {
                 best_d = F.absDiff(e, e_pic);
                 chip = ch;
+                bcc = cc;
             }
-        }
+        };
+        w[18] = bcc;
         if (e_pic < 1.2 * e0) {
             chip = 0;
             note("chips: none (the picture's joints are not more ragged than drawn: {d:.4} against {d:.4}; chips from 1.2 times)\n", .{ e_pic, e0 });
@@ -664,16 +686,23 @@ fn structLayers(cx: *Ctx, C: *const View, H: *const View) void {
     var map: [P.MAXN]usize = undefined;
     var bg: f32 = 0;
     var bs: f32 = 0;
+    var bgc: f64 = 256;
     if (refused(cx.off, "grain")) note("grain: left off by eye (off=grain)\n", .{}) else {
         var best_d: f32 = 1e9;
         var first = true;
         var d1_0: f32 = 0;
-        for ([_]f32{ 0, 0.25, 0.5, 0.75, 1.0 }) |gr| {
+        var b0 = [3]f32{ 0, 0, 0 };
+        // milestone 2d: finer grain cells too (Daniel on the bricks: "too much granulated"; a grain of 256 cells
+        // across adds its detail at 8 to 12 pixels, where the picture's faces are already matched)
+        const gcs = if (cx.grain_cap) [_]f64{ 256, 512, 1024 } else [_]f64{ 256, 256, 256 };
+        for (gcs, 0..) |gc, gci| for ([_]f32{ 0, 0.25, 0.5, 0.75, 1.0 }) |gr| {
+            if (gci > 0 and (gr == 0 or gc == gcs[gci - 1])) continue;
             for ([_]f32{ 0, 0.3, 0.6 }) |sn| {
                 w[19] = gr;
+                w[20] = gc;
                 w[22] = sn;
                 const keep = g.n;
-                const nr = structBuild(cx, H, &w, &map);
+                const nr = structBuild(cx, H, w, &map);
                 var dd = drawIn(g, nr, C);
                 g.n = keep;
                 const k = keyOf(C, dd.rgb, n);
@@ -686,23 +715,29 @@ fn structLayers(cx: *Ctx, C: *const View, H: *const View) void {
                 alloc.free(kb);
                 if (first) {
                     d1_0 = d1;
+                    b0 = .{ d1, d3, d12 };
                     first = false;
                 }
                 const dist = @log((d1 + 1e-4) / (p1 + 1e-4)) * @log((d1 + 1e-4) / (p1 + 1e-4)) + @log((d3 + 1e-4) / (p3 + 1e-4)) * @log((d3 + 1e-4) / (p3 + 1e-4)) + @log((d12 + 1e-4) / (p12 + 1e-4)) * @log((d12 + 1e-4) / (p12 + 1e-4));
-                note("  grain {d:.2}, stain {d:.2}: the faces' detail {d:.4} {d:.4} {d:.4} (the picture's {d:.4} {d:.4} {d:.4})\n", .{ gr, sn, d1, d3, d12, p1, p3, p12 });
-                if (dist < best_d) {
+                // milestone 2d (Daniel on the bricks: "too much granulated"): the grain may not raise a band of the
+                // drawn faces above the picture's (or above the faces without grain, where they are above it already)
+                const over = cx.grain_cap and (d1 > @max(p1, 1.02 * b0[0]) or d3 > @max(p3, 1.02 * b0[1]) or d12 > @max(p12, 1.02 * b0[2]));
+                note("  grain {d:.2} of {d} cells, stain {d:.2}: the faces' detail {d:.4} {d:.4} {d:.4} (the picture's {d:.4} {d:.4} {d:.4}){s}\n", .{ gr, @as(i32, @intFromFloat(gc)), sn, d1, d3, d12, p1, p3, p12, if (over) ": raises a band above the picture's, not taken" else "" });
+                if (!over and dist < best_d) {
+                    bgc = gc;
                     best_d = dist;
                     bg = gr;
                     bs = sn;
                 }
             }
-        }
-        if (p1 < 1.4 * d1_0 and bg == 0 and bs == 0) note("grain: none in the faces (the picture's faces {d:.4}, drawn {d:.4})\n", .{ p1, d1_0 }) else note("grain: each piece's own grain {d:.2} and stain {d:.2} (Tiles version 2)\n", .{ bg, bs });
+        };
+        if (p1 < 1.4 * d1_0 and bg == 0 and bs == 0) note("grain: none in the faces (the picture's faces {d:.4}, drawn {d:.4})\n", .{ p1, d1_0 }) else note("grain: each piece's own grain {d:.2} of {d} cells and stain {d:.2} (Tiles version 2)\n", .{ bg, @as(i32, @intFromFloat(bgc)), bs });
     }
     w[19] = bg;
+    w[20] = bgc;
     w[22] = bs;
     if (chip == 0 and bg == 0 and bs == 0) return;
-    cx.root = structBuild(cx, H, &w, &map);
+    cx.root = structBuild(cx, H, w, &map);
     cx.main_ramp = map[cx.main_ramp];
     cx.face_layer = map[cx.face_layer];
     cx.st.tiles = map[t_old];
@@ -711,7 +746,7 @@ fn structLayers(cx: *Ctx, C: *const View, H: *const View) void {
 
 /// the structure drawn by Tiles version 2 with words w, the faces' Ramp read again on H as milestone 2b read it, the
 /// rest rewired; the new root (map: each old node's copy)
-fn structBuild(cx: *Ctx, H: *const View, w: *const [24]f64, map: []usize) usize {
+fn structBuild(cx: *Ctx, H: *const View, w: []const f64, map: []usize) usize {
     const g = cx.g;
     const n = H.pic.n;
     const ti = F.add(g, F.mk(F.K_TILES, w, &.{}));
@@ -1092,7 +1127,10 @@ fn spotsLayer(cx: *Ctx, C: *const View, H: *const View) void {
     defer alloc.free(am.region);
     defer am.comps.deinit(alloc);
     note("spots: the darkest fifth of the whole at {d}, its granules joined, lies {d:.2} in {d} compact marks of about {d:.1} pixels, gathered {d:.1}, {d:.2} spreads darker than the rest (spots: 0.45 in 30 or more, 5 pixels, 2.2 spreads)\n", .{ n, am.share, am.comps.items.len, am.rad, am.disp, am.contrast });
-    if (am.share < 0.45 or am.comps.items.len < 30 or am.rad < 5 or am.contrast < 2.2) return;
+    if (am.share < 0.45 or am.comps.items.len < 30 or am.rad < 5 or am.contrast < 2.2) {
+        if (!refused(cx.on, "spots")) return;
+        note("spots: asked for by eye (on=spots) below the reading's thresholds; every value below is still read from the pixels\n", .{});
+    }
     const region = am.region;
     var map: [P.MAXN]usize = undefined;
     // milestone 2b's second material goes: the spots carry it now
@@ -1184,8 +1222,35 @@ fn spotsLayer(cx: *Ctx, C: *const View, H: *const View) void {
         colour = F.add(g, F.mk(F.K_WEAR, &.{ 1, 2, 0.01, len, 0.2, 0.7, 0.5, F.colourWord(halo_c), @as(f64, @floatFromInt(cells)) * 4, 0.6, 35, 1.0 }, &.{ colour, sm }));
         note("drips: Wear drips {d:.3} of the picture long from the spots\n", .{len});
     }
-    // the spots themselves: the same instances as the mask, the spot's colour, darker granules at the core
-    colour = F.add(g, scatter2(colour, cells, 0.9, size, 0.8, spot_c, 0.25, 31, -0.2, 0.5, asp, 8, clu, 0.6, 3, -0.45));
+    // the spots themselves: the same instances as the mask, the spot's colour, darker granules at the core; milestone
+    // 2d: their softness and how much they are laid (blend) read from the darkest fifth's edges and contrast
+    var soft: f32 = 0.5;
+    var opac: f32 = 1;
+    if (cx.marks_soft) {
+        const pe = F.markEdge(H.pic.t, n);
+        var bd: f32 = 1e9;
+        for ([_]f32{ 0.5, 0.7, 0.85, 1.0 }) |sf| {
+            for ([_]f32{ 1, 0.75, 0.5 }) |op| {
+                const keep = g.n;
+                const cand = F.add(g, scatter2o(colour, cells, 0.9, size, 0.8, spot_c, 0.25, 31, -0.2, sf, asp, 8, clu, 0.6, 3, -0.45, op));
+                var dd = drawIn(g, cand, H);
+                g.n = keep;
+                const k = keyOf(H, dd.rgb, n);
+                dd.free();
+                const de = F.markEdge(k, n);
+                alloc.free(k);
+                const d = @abs(@log((de[0] + 1e-4) / (pe[0] + 1e-4))) + @abs(@log((de[1] + 1e-4) / (pe[1] + 1e-4)));
+                note("  spots softness {d:.2}, laid {d:.2}: edges {d:.3}, contrast {d:.2} (the picture's {d:.3}, {d:.2})\n", .{ sf, op, de[0], de[1], pe[0], pe[1] });
+                if (d < bd) {
+                    bd = d;
+                    soft = sf;
+                    opac = op;
+                }
+            }
+        }
+        note("spots: softness {d:.2}, laid {d:.2} (read: the darkest fifth's edges and contrast)\n", .{ soft, opac });
+    }
+    colour = F.add(g, scatter2o(colour, cells, 0.9, size, 0.8, spot_c, 0.25, 31, -0.2, soft, asp, 8, clu, 0.6, 3, -0.45, opac));
     cx.root = colour;
     cx.spots = true;
     push(cx, "+ spots that gather, their halo and runs (Ramp on the first material, Scatter, Wear)");

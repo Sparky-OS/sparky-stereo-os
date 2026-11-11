@@ -437,7 +437,7 @@ var n_eval: u64 = 0; // graphs asked for
 var n_refused: u64 = 0;
 pub var say_refusals: bool = false; // render says why an operator refused; the fitter tries values in silence
 
-fn cacheClear() void {
+pub fn cacheClear() void {
     for (cache) |*s| {
         if (s.used and s.bm != null) wzb_free(s.bm);
         s.* = .{};
@@ -6049,6 +6049,13 @@ pub fn hasModern(g: *const Graph) bool {
 /// Draw a graph of modern operators on a canvas of side pixels showing window win of the picture: the margin is the
 /// widest neighbourhood any node reads (Shade one pixel, Wear its radius or length), cut away by cropRgba.
 pub fn drawCanvas(g: *const Graph, side: usize, win: Win, maxoct: u32) ?*anyopaque {
+    if (isQuad(g.nodes[g.root].op)) return drawQuad(g, side, win, maxoct);
+    for (g.nodes[0..g.root]) |nd| {
+        if (isQuad(nd.op)) {
+            say("refused: a Quad is the procedure's last operator (it draws four procedures, each on its own canvas)\n", .{});
+            return null;
+        }
+    }
     var reach: f32 = 0;
     var any = false;
     for (g.nodes[0 .. g.root + 1]) |nd| {
@@ -6062,6 +6069,141 @@ pub fn drawCanvas(g: *const Graph, side: usize, win: Win, maxoct: u32) ?*anyopaq
     m = (m + 1) & ~@as(usize, 1); // even, so a canvas of a power-of-two side stays a multiple of four pixels
     modern.c.cv = .{ .w = side + 2 * m, .h = side + 2 * m, .m = m, .wx = win.x, .wy = win.y, .ws = win.s, .maxoct = maxoct };
     return draw(g, 0);
+}
+
+pub fn isQuad(op: u8) bool {
+    return op == OP_MODERN + modern.K_QUAD;
+}
+
+extern "c" fn wzb_new(xs: c_int, ys: c_int) ?*anyopaque;
+
+/// one input of a Quad as a procedure of its own: the graph up to that input's root, what it does not use dropped
+pub fn quadPart(g: *const Graph, q: usize) Graph {
+    var sub = g.*;
+    sub.root = g.nodes[g.root].in[q];
+    sub.prune();
+    return sub;
+}
+
+/// Four procedures per picture (milestone 2d): the Quad's four inputs, each drawn on its own canvas (input q at the
+/// place 2x - column, 2y - row of the window's place x, y), every canvas of one side and margin so the Quad reads
+/// pixel k of each under its own pixel k; then the Quad lays them together with its seam.
+fn drawQuad(g: *const Graph, side: usize, win: Win, maxoct: u32) ?*anyopaque {
+    const rt = g.nodes[g.root];
+    if (rt.nin != 4) {
+        say("refused: a Quad takes four procedures, the graph gives {d}\n", .{rt.nin});
+        return null;
+    }
+    const subs = alloc.alloc(Graph, 4) catch die("out of memory", .{});
+    defer alloc.free(subs);
+    const pxs = 2.0 * win.s / @as(f32, @floatFromInt(side));
+    var m: usize = 0;
+    for (0..4) |q| {
+        subs[q] = quadPart(g, q);
+        var reach: f32 = 0;
+        var any = false;
+        for (subs[q].nodes[0 .. subs[q].root + 1]) |nd| {
+            if (isQuad(nd.op)) {
+                say("refused: a Quad's inputs hold another Quad (one Quad per procedure, its last operator)\n", .{});
+                return null;
+            }
+            if (!isModern(nd.op)) continue;
+            const r = modern.marginOf(nd.op - OP_MODERN, nd.w[0..wordsOf(&nd)]);
+            if (r > 0) any = true;
+            reach += r;
+        }
+        const mq: usize = if (any) @as(usize, @intFromFloat(@ceil(reach / pxs))) + 2 else 0;
+        m = @max(m, mq);
+    }
+    m = (m + 1) & ~@as(usize, 1);
+    const cw = side + 2 * m;
+    var parts: [4]?*anyopaque = .{ null, null, null, null };
+    defer for (parts) |p| {
+        if (p != null) wzb_free(p);
+    };
+    for (0..4) |q| {
+        const col: f32 = @floatFromInt(q % 2);
+        const row: f32 = @floatFromInt(q / 2);
+        modern.c.cv = .{ .w = cw, .h = cw, .m = m, .wx = 2.0 * win.x - col, .wy = 2.0 * win.y - row, .ws = 2.0 * win.s, .maxoct = maxoct };
+        const bm = draw(&subs[q], 0) orelse {
+            say("refused: the Quad's procedure {d} does not draw\n", .{q + 1});
+            return null;
+        };
+        // a copy of its own: the memory of drawn pictures may be cleared by the next procedure's drawing
+        const cp = wzb_new(@intCast(cw), @intCast(cw)) orelse die("out of memory", .{});
+        @memcpy(wzb_data(cp)[0 .. cw * cw * 4], wzb_data(bm)[0 .. cw * cw * 4]);
+        parts[q] = cp;
+    }
+    modern.c.cv = .{ .w = cw, .h = cw, .m = m, .wx = win.x, .wy = win.y, .ws = win.s, .maxoct = maxoct };
+    var out: ?*anyopaque = null;
+    var err: [300]u8 = [_]u8{0} ** 300;
+    var w: [32]u32 = [_]u32{0} ** 32;
+    const nk = wordsOf(&rt);
+    for (0..nk) |p| w[p] = rt.w[p];
+    const r = modern.apply(modern.K_QUAD, w[0..nk], parts[0..4], &out, &err);
+    if (r != 0) {
+        say("refused: Quad: {s}\n", .{std.mem.sliceTo(&err, 0)});
+        return null;
+    }
+    // into the memory of drawn pictures, so it is freed with them
+    quad_serial += 1;
+    cachePut(mix(0x51ad0001, quad_serial), out);
+    return out;
+}
+var quad_serial: u64 = 0;
+
+/// p2p quad: the four quarters' procedures joined into one graph under a Quad, each input's mean colour measured
+/// on its own canvas (at 256 pixels) for the seam that keeps the contrast
+fn quadJoin(out: []const u8, paths: [4][*:0]const u8, seam: u32, band: f32) void {
+    var g = alloc.create(Graph) catch die("out of memory", .{});
+    g.* = Graph{};
+    var roots: [4]usize = undefined;
+    var means: [4]u32 = undefined;
+    const names = [_][]const u8{ "top left", "top right", "bottom left", "bottom right" };
+    const side: usize = 256;
+    const rgba = alloc.alloc(u8, side * side * 4) catch die("out of memory", .{});
+    defer alloc.free(rgba);
+    for (0..4) |q| {
+        var sub = parseScript(readFile(paths[q]));
+        sub.prune();
+        if (isQuad(sub.nodes[sub.root].op)) die("quad: {s} is already a Quad", .{paths[q]});
+        const bm = drawCanvas(&sub, side, .{}, 99) orelse die("quad: the {s} procedure ({s}) does not draw", .{ names[q], paths[q] });
+        cropRgba(bm, rgba);
+        var s = [3]f64{ 0, 0, 0 };
+        for (0..side * side) |k| {
+            inline for (0..3) |ch| s[ch] += @floatFromInt(rgba[4 * k + ch]);
+        }
+        var word: u32 = 0xff000000;
+        inline for (0..3) |ch| {
+            const v: u32 = @intFromFloat(@floor(s[ch] / @as(f64, @floatFromInt(side * side)) + 0.5));
+            word |= @as(u32, @min(v, 255)) << (16 - 8 * ch);
+        }
+        means[q] = word;
+        const off = g.n;
+        if (off + sub.n + 1 > MAXN) die("quad: the four procedures hold more than {d} operators", .{MAXN - 1});
+        for (sub.nodes[0..sub.n]) |nd0| {
+            var nd = nd0;
+            for (nd.in[0..nd.nin]) |*v| v.* = @intCast(@as(usize, v.*) + off);
+            g.nodes[g.n] = nd;
+            g.n += 1;
+        }
+        roots[q] = off + sub.root;
+        say("{s}: {d} operators, {d} bytes, mean colour {x:0>6}\n", .{ names[q], sub.n, sub.bytes(), word & 0xffffff });
+    }
+    var qn = Node{ .op = @intCast(OP_MODERN + modern.K_QUAD), .nin = 4, .nw = 7 };
+    qn.w[0] = 1;
+    qn.w[1] = seam;
+    qn.w[2] = @bitCast(band);
+    for (0..4) |q| {
+        qn.w[3 + q] = means[q];
+        qn.in[q] = @intCast(roots[q]);
+    }
+    g.nodes[g.n] = qn;
+    g.root = g.n;
+    g.n += 1;
+    var buf: [1 << 17]u8 = undefined;
+    writeFile(out, scriptText(g, &buf));
+    say("quad: {d} operators, {d} bytes (seam {s}, band {d:.3})\n", .{ g.n, g.bytes(), ([_][]const u8{ "cut", "mix", "keep", "smooth" })[seam], band });
 }
 
 pub fn cropRgba(bm: ?*anyopaque, rgba: []u8) void {
@@ -6154,9 +6296,52 @@ pub fn mainC(argc: c_int, argv: [*]const [*:0]const u8) callconv(.c) c_int {
                 mo.grain_in_field = true;
             } else if (std.mem.eql(u8, a, "grainat=colour")) {
                 mo.grain_in_field = false;
-            } else die("mfit: {s} is not known (full=FULL.ppm, tile=SIDE, seeds=CHOSEN, light=0|1, close=0|1, off=LAYER,..., grainat=colour|field)", .{a});
+            } else if (std.mem.startsWith(u8, a, "seed=")) {
+                mo.seed = std.fmt.parseInt(i32, a[5..], 10) catch die("bad {s}", .{a});
+            } else if (std.mem.eql(u8, a, "joints=scan")) {
+                mo.joints_full = false;
+            } else if (std.mem.eql(u8, a, "joints=full")) {
+                mo.joints_full = true;
+            } else if (std.mem.startsWith(u8, a, "pairs=")) {
+                mo.pairs = a[6] == '1';
+            } else if (std.mem.startsWith(u8, a, "framed=")) {
+                mo.framed = a[7] == '1';
+            } else if (std.mem.startsWith(u8, a, "on=")) {
+                mo.on = a[3..];
+            } else if (std.mem.eql(u8, a, "marks=fixed")) {
+                mo.marks_soft = false;
+            } else if (std.mem.eql(u8, a, "marks=read")) {
+                mo.marks_soft = true;
+            } else if (std.mem.eql(u8, a, "grainfit=closest")) {
+                mo.grain_cap = false;
+            } else if (std.mem.eql(u8, a, "grainfit=cap")) {
+                mo.grain_cap = true;
+            } else die("mfit: {s} is not known (full=FULL.ppm, tile=SIDE, seeds=CHOSEN, light=0|1, close=0|1, off=LAYER,..., grainat=colour|field, seed=N, joints=full|scan, pairs=0|1, framed=0|1, grainfit=cap|closest, on=LAYER,..., marks=read|fixed)", .{a});
         }
         mfit.run(argv[2], argStr(argv, 3), mo);
+        return 0;
+    }
+    if (n >= 7 and std.mem.eql(u8, argStr(argv, 1), "quad")) {
+        // p2p quad OUT.script TL.script TR.script BL.script BR.script [seam=cut|mix|keep] [band=B]   (milestone 2d: four
+        // procedures, each fitted to one quarter of the picture as a picture of its own, laid together by a Quad)
+        var seam: u32 = 3;
+        var band: f32 = 0.03;
+        for (7..n) |i| {
+            const a = argStr(argv, i);
+            if (std.mem.eql(u8, a, "seam=cut")) {
+                seam = 0;
+            } else if (std.mem.eql(u8, a, "seam=mix")) {
+                seam = 1;
+            } else if (std.mem.eql(u8, a, "seam=keep")) {
+                seam = 2;
+            } else if (std.mem.eql(u8, a, "seam=smooth")) {
+                seam = 3;
+            } else if (std.mem.startsWith(u8, a, "band=")) {
+                band = std.fmt.parseFloat(f32, a[5..]) catch die("bad {s}", .{a});
+            } else die("quad: {s} is not known (seam=cut|mix|keep|smooth, band=PARTS-OF-THE-PICTURE)", .{a});
+        }
+        say_refusals = true;
+        quadJoin(argStr(argv, 2), .{ argv[3], argv[4], argv[5], argv[6] }, seam, band);
         return 0;
     }
     if (n >= 4 and std.mem.eql(u8, argStr(argv, 1), "seed")) {

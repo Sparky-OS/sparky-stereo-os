@@ -14,6 +14,13 @@
 //! cells): the noise is read at the piece's own place in the noise (an offset drawn from the piece), so neighbouring
 //! bricks or slabs never share a pattern across a joint, as cut stone and fired brick never do. The grain also
 //! roughens the face's height a little. Version 1 graphs draw byte for byte as before.
+//! Version 3 (milestone 2d, Daniel's verdicts on the sheets of 2c): the joint as a hollow (hollow: the height inside
+//! the joint rises as the square of the distance from its centre line, a "u" in a depression, so a light drawn on it
+//! shades the side under the upper piece, as mortar sits in a hollow between bricks; the colour stays the joint's),
+//! two more layouts: pairs (two lozenges in every cell, the second turned the other way and moved by its own offset
+//! across and down, so the two seeds of a tread plate stand apart instead of in a line) and framed tiles (each square
+//! tile of a small central square and four trapezoids around it, the long side at the tile's border, the short side
+//! at the square; square inserts over the corners where four tiles meet, as the inserts layout draws them).
 //! Output: red, green and blue: 0 in the joints, the piece's shade (between the floor value and 0.85) inside, rising
 //! across the bevel; inserts (octagons and inserts layouts) at 1, above every piece, so a Layer can take them apart. Alpha: the height, 0 in the joint, 1 on
 //! a piece's face.
@@ -23,8 +30,8 @@ pub const name = "Tiles";
 pub const version: u32 = 1;
 pub const inputs: u8 = 0;
 pub const params = [_]c.Param{
-    .{ .kind = .int, .label = "version", .offset = 0, .def = 2, .min = 1, .max = 2 },
-    .{ .kind = .cycle, .label = "layout", .offset = 1, .def = 0, .min = 0, .max = 8, .choices = "grid|bond|checker|hexagons|lozenges|studs|octagons|planks|inserts" },
+    .{ .kind = .int, .label = "version", .offset = 0, .def = 3, .min = 1, .max = 3 },
+    .{ .kind = .cycle, .label = "layout", .offset = 1, .def = 0, .min = 0, .max = 10, .choices = "grid|bond|checker|hexagons|lozenges|studs|octagons|planks|inserts|pairs|framed" },
     .{ .kind = .int, .label = "pieces across", .offset = 2, .def = 4, .min = 1, .max = 1024 },
     .{ .kind = .int, .label = "pieces down", .offset = 3, .def = 8, .min = 1, .max = 1024 },
     .{ .kind = .float, .label = "bond", .offset = 4, .def = 0.5, .min = 0, .max = 1, .step = 0.01 },
@@ -48,11 +55,16 @@ pub const params = [_]c.Param{
     .{ .kind = .int, .label = "grain octaves", .offset = 21, .def = 3, .min = 1, .max = 8 },
     .{ .kind = .float, .label = "stain", .offset = 22, .def = 0, .min = 0, .max = 1, .step = 0.01 },
     .{ .kind = .int, .label = "stain cells", .offset = 23, .def = 16, .min = 1, .max = 4096 },
+    // version 3
+    .{ .kind = .float, .label = "hollow", .offset = 24, .def = 0, .min = 0, .max = 1, .step = 0.05 },
+    .{ .kind = .float, .label = "second across", .offset = 25, .def = 0.5, .min = -1, .max = 1, .step = 0.01 },
+    .{ .kind = .float, .label = "second down", .offset = 26, .def = 0.5, .min = -1, .max = 1, .step = 0.01 },
+    .{ .kind = .float, .label = "inner", .offset = 27, .def = 0.33, .min = 0.02, .max = 0.9, .step = 0.01 },
 };
 
-/// the words a version stores: 17 in version 1, 24 in version 2
+/// the words a version stores: 17 in version 1, 24 in version 2, 28 in version 3
 pub fn wordCount(ver: u32) usize {
-    return if (ver >= 2) 24 else 17;
+    return if (ver >= 3) 28 else if (ver >= 2) 24 else 17;
 }
 
 pub fn margin(w: []const u32) f32 {
@@ -84,7 +96,7 @@ fn rhombus(px: f32, py: f32, bx: f32, by: f32) f32 {
 
 pub fn draw(out: c.Pix, ins: []const c.Pix, w: []const u32) error{Refused}!void {
     _ = ins;
-    const ver = try c.versionUpTo(name, w, 2);
+    const ver = try c.versionUpTo(name, w, 3);
     const layout = try c.int(&params, w, 1);
     const nx = try c.int(&params, w, 2);
     const ny = try c.int(&params, w, 3);
@@ -117,6 +129,17 @@ pub fn draw(out: c.Pix, ins: []const c.Pix, w: []const u32) error{Refused}!void 
         stain = try c.flt(&params, w, 22);
         scells = try c.int(&params, w, 23);
     }
+    var hollow: f32 = 0;
+    var sox: f32 = 0.5;
+    var soy: f32 = 0.5;
+    var inner: f32 = 0.33;
+    if (ver >= 3) {
+        hollow = try c.flt(&params, w, 24);
+        sox = try c.flt(&params, w, 25);
+        soy = try c.flt(&params, w, 26);
+        inner = try c.flt(&params, w, 27);
+    }
+    if (ver < 3 and layout > 8) return c.refuse("Tiles: layout {d} needs version 3", .{layout});
     const fnx: f32 = @floatFromInt(nx);
     const fny: f32 = @floatFromInt(ny);
     const cw = 1.0 / fnx;
@@ -222,6 +245,73 @@ pub fn draw(out: c.Pix, ins: []const c.Pix, w: []const u32) error{Refused}!void 
                         cid = c.hash3(c.wrap(col, nx), c.wrap(row, ny), seed);
                     }
                 },
+                9 => {
+                    // pairs: two lozenges in every cell, the first at the cell's centre turned one way, the second
+                    // turned the other way and moved by its offset (in parts of the cell); each is looked for in
+                    // the cell and its neighbours, since a lozenge reaches over its cell's border
+                    const col: i32 = @intFromFloat(@floor(X));
+                    const row: i32 = @intFromFloat(@floor(Y));
+                    const half = 0.5 * size * len2(cw, ch);
+                    var best: f32 = 1e9;
+                    var dr: i32 = -1;
+                    while (dr <= 1) : (dr += 1) {
+                        var dk: i32 = -1;
+                        while (dk <= 1) : (dk += 1) {
+                            for (0..2) |sdi| {
+                                const s: f32 = if (sdi == 0) 1.0 else -1.0;
+                                const ox: f32 = if (sdi == 0) 0.5 else 0.5 + sox;
+                                const oy: f32 = if (sdi == 0) 0.5 else 0.5 + soy;
+                                const lx = (X - (@as(f32, @floatFromInt(col + dk)) + ox)) * cw;
+                                const ly = (Y - (@as(f32, @floatFromInt(row + dr)) + oy)) * ch;
+                                const ax = 0.70710678 * (lx + s * ly);
+                                const ay = 0.70710678 * (ly - s * lx);
+                                const d = rhombus(ax, ay, half, half * round) + 0.5 * jw;
+                                if (d < best) {
+                                    best = d;
+                                    cid = c.hash3(c.wrap(col + dk, nx), c.wrap(row + dr, ny), seed ^ @as(u32, @intCast(sdi * 0x2b7e)));
+                                }
+                            }
+                        }
+                    }
+                    sd = best;
+                },
+                10 => {
+                    // framed tiles: the inserts layout's square tile, cut into a small central square (inner, in
+                    // parts of the piece) and four trapezoids by joints along the square's edges and along the
+                    // diagonals from its corners to the tile's corners; the inserts over the corners as layout 8
+                    const col: i32 = @intFromFloat(@floor(X));
+                    const row: i32 = @intFromFloat(@floor(Y));
+                    const fx = X - @floor(X);
+                    const fy = Y - @floor(Y);
+                    const ccol = if (fx < 0.5) col else col + 1;
+                    const crow = if (fy < 0.5) row else row + 1;
+                    const qx = (if (fx < 0.5) fx else fx - 1.0) * cw;
+                    const qy = (if (fy < 0.5) fy else fy - 1.0) * ch;
+                    const dins = @max(@abs(qx), @abs(qy)) - 0.5 * size * m;
+                    const tile = roundBox((fx - 0.5) * cw, (fy - 0.5) * ch, 0.5 * (cw - jw), 0.5 * (ch - jw), rr);
+                    const lx = @abs((fx - 0.5) * cw);
+                    const ly = @abs((fy - 0.5) * ch);
+                    const a = 0.5 * inner * m;
+                    const mx = @max(lx, ly);
+                    var part: u32 = 0;
+                    var dint: f32 = 0;
+                    if (mx <= a) {
+                        dint = a - mx;
+                    } else {
+                        dint = @min(mx - a, 0.70710678 * @abs(lx - ly));
+                        part = if (ly >= lx) (if (fy < 0.5) @as(u32, 1) else 2) else (if (fx < 0.5) @as(u32, 3) else 4);
+                    }
+                    const piece = @max(tile, -(dint - 0.5 * jw));
+                    const tile_cut = @max(piece, -(dins - jw));
+                    if (dins < tile_cut) {
+                        sd = dins;
+                        insert = true;
+                        cid = c.hash3(c.wrap(ccol, nx), c.wrap(crow, ny), seed ^ 0x5151);
+                    } else {
+                        sd = tile_cut;
+                        cid = c.hash3(c.wrap(col, nx), c.wrap(row, ny), seed ^ (part *% 0x9e37));
+                    }
+                },
                 else => {
                     // planks of uneven length: each row is cut at some of its whole-number places (size: the share
                     // of places cut), the row moved by a length of its own; a plank spans at most eight places
@@ -269,7 +359,16 @@ pub fn draw(out: c.Pix, ins: []const c.Pix, w: []const u32) error{Refused}!void 
                 face = @min(0.9, @max(floor, face));
             }
             const g = h * face;
-            const hh = if (insert) 0.6 * h else if (grain > 0) c.clamp01(h * (1.0 + 0.3 * grain * rough)) else h;
+            var hh = if (insert) 0.6 * h else if (grain > 0) c.clamp01(h * (1.0 + 0.3 * grain * rough)) else h;
+            if (hollow > 0 and !insert) {
+                // the joint as a hollow: from its centre line (0) the height rises as the square of the distance to
+                // half the hollow at the pieces' edges, where the bevel takes it on to the face
+                const hj = 0.5 * hollow;
+                if (sd >= 0) {
+                    const t = c.clamp01(1.0 - sd / @max(1e-6, 0.5 * jw));
+                    hh = hj * t * t;
+                } else hh = hj + (1.0 - hj) * hh;
+            }
             c.putc(out, j * out.w + i, .{ g, g, g, hh });
         }
     }

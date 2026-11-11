@@ -22,7 +22,7 @@ const f32 = Math.fround;
 const bitsToF = (w) => { const b = new DataView(new ArrayBuffer(4)); b.setUint32(0, w >>> 0, true); return b.getFloat32(0, true); };
 
 // ------------------------------------------------------------------ the script (the fitter's typed words)
-const MODERN = { Noise: 'noise', Cells: 'cells', Tiles: 'tiles', Ramp: 'ramp', Layer: 'layer', Shade: 'shade', Scatter: 'scatter', Wear: 'wear', Tint: 'tint' };
+const MODERN = { Noise: 'noise', Cells: 'cells', Tiles: 'tiles', Ramp: 'ramp', Layer: 'layer', Shade: 'shade', Scatter: 'scatter', Wear: 'wear', Tint: 'tint', Quad: 'quad' };
 
 function parse(text) {
   const nodes = [];
@@ -52,7 +52,7 @@ function marginOf(nd) {
   if (nd.op === 'Wear') return f32(bitsToF(nd.words[1] === 2 ? nd.words[3] : nd.words[2]));
   return 0;
 }
-function canvasFor(g, side, win) {
+function canvasFor(g, side, win, mForced) {
   let reach = f32(0);
   let any = false;
   for (let i = 0; i <= g.root; i++) {
@@ -65,6 +65,7 @@ function canvasFor(g, side, win) {
   const pxs = f32(f32(win.s) / f32(side));
   let m = any ? Math.ceil(f32(reach / pxs)) + 2 : 0;
   m = (m + 1) & ~1;
+  if (mForced !== undefined) m = mForced;
   return { w: side + 2 * m, h: side + 2 * m, m, wx: win.x, wy: win.y, ws: win.s, side };
 }
 
@@ -155,8 +156,10 @@ function uniform(cv, nd, nin, pass, sw, sh) {
 
 // Draw the procedure on the canvas of side pixels showing window win: encode every needed node, submit once, wait
 // for the GPU; the root's buffer and the canvas. Buffers are freed after their last reader.
-async function drawGpu(g, side, win) {
-  const cv = canvasFor(g, side, win);
+async function drawGpu(g, side, win, mForced) {
+  if (g.nodes[g.root].op === 'Quad') return drawQuadGpu(g, side, win);
+  for (let i = 0; i < g.root; i++) if (g.nodes[i].op === 'Quad') throw new Error('a Quad is the procedure\'s last operator');
+  const cv = canvasFor(g, side, win, mForced);
   const need = needed(g);
   const readers = new Array(g.nodes.length).fill(0);
   for (let i = 0; i <= g.root; i++) if (need[i]) for (const k of g.nodes[i].ins) readers[k]++;
@@ -222,6 +225,54 @@ async function drawGpu(g, side, win) {
   for (const b of transient) b.destroy();
   for (const b of pool) b.destroy();
   return { buf: bufs[g.root], cv, ms: t };
+}
+
+// one input of a Quad as a procedure of its own: the nodes it needs, renumbered (p2p.zig's quadPart)
+function quadPart(g, r) {
+  const keep = new Set();
+  const visit = (i) => { if (keep.has(i)) return; keep.add(i); for (const j of g.nodes[i].ins) visit(j); };
+  visit(r);
+  const order = [...keep].sort((a, b) => a - b);
+  const map = new Map(order.map((i, k) => [i, k]));
+  const nodes = order.map((i) => ({ ...g.nodes[i], ins: g.nodes[i].ins.map((j) => map.get(j)) }));
+  return { nodes, root: map.get(r) };
+}
+
+// Four procedures per picture (milestone 2d; p2p.zig's drawQuad): input q drawn on its own canvas, at the place
+// 2x - column, 2y - row, every canvas of one side and margin; then the Quad pass lays them together with its seam.
+async function drawQuadGpu(g, side, win) {
+  const rt = g.nodes[g.root];
+  if (rt.ins.length !== 4) throw new Error(`Quad takes four procedures, the graph gives ${rt.ins.length}`);
+  const subs = rt.ins.map((k) => quadPart(g, k));
+  const local = { x: 0, y: 0, s: f32(2 * win.s) };
+  let m = 0;
+  for (const sg of subs) m = Math.max(m, canvasFor(sg, side, local).m);
+  const parts = [];
+  let ms = 0;
+  for (let q = 0; q < 4; q++) {
+    const r = await drawGpu(subs[q], side, { x: f32(f32(2 * win.x) - (q % 2)), y: f32(f32(2 * win.y) - (q >> 1)), s: f32(2 * win.s) }, m);
+    parts.push(r.buf);
+    ms += r.ms;
+  }
+  const cv = { w: side + 2 * m, h: side + 2 * m, m, wx: win.x, wy: win.y, ws: win.s, side };
+  const p = await pipeline('Quad');
+  const out = device.createBuffer({ size: cv.w * cv.h * 8, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC });
+  const ub = uniform(cv, rt, 4, 0, 0, 0);
+  const entries = [{ binding: 0, resource: { buffer: ub } }, { binding: 1, resource: { buffer: out } }];
+  parts.forEach((b, k) => entries.push({ binding: 2 + k, resource: { buffer: b } }));
+  const enc = device.createCommandEncoder();
+  const cp = enc.beginComputePass();
+  cp.setPipeline(p);
+  cp.setBindGroup(0, device.createBindGroup({ layout: p.getBindGroupLayout(0), entries }));
+  cp.dispatchWorkgroups(Math.ceil(cv.w / 8), Math.ceil(cv.h / 8));
+  cp.end();
+  const t0 = performance.now();
+  device.queue.submit([enc.finish()]);
+  await device.queue.onSubmittedWorkDone();
+  ms += performance.now() - t0;
+  ub.destroy();
+  for (const b of parts) b.destroy();
+  return { buf: out, cv, ms };
 }
 
 async function readRgb(res) {

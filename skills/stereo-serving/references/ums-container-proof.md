@@ -82,6 +82,9 @@ The other outputs, same sources: a 2D renderer (`ml`, `mr`) receives one view at
 - **Symptom:** `rm -r` of a proof folder says permission denied.
   **Cause:** containers ran as root and wrote the outputs.
   **Fix:** run every container with `--user $(id -u):$(id -g)`.
+- **Symptom:** the scratch folder holds a `home/.config` that only root can remove.
+  **Cause:** the profile folder is mounted inside the home folder, and Docker creates the missing mount point as root.
+  **Fix:** create `home/.config/UMS` yourself before the first run; clear a root-owned one through a container.
 - **Symptom:** Maven stops at `.git directory is not found!`, or at a `corepack yarn install` that wants the network, or at an Ant `get` of UMS's FFmpeg.
   **Cause:** the build is made for a git checkout with network access, and the platform profile that matches the machine runs the front end and the binary download.
   **Fix:** the flags in "The rerun". **How found:** each failure names its plugin and goal; the flag is the plugin's own `skip` property.

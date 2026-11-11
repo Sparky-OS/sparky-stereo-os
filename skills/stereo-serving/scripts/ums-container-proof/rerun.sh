@@ -147,7 +147,7 @@ fixtures() {
 }
 
 start_server() {
-  fresh "$RUN/profile"; mkdir -p "$RUN/profile/data" "$RUN/home"
+  fresh "$RUN/profile"; mkdir -p "$RUN/profile/data" "$RUN/home/.config/UMS"
   cat > "$RUN/profile/UMS.conf" <<EOF
 server_name = UMS 94 Proof
 append_profile_name = true

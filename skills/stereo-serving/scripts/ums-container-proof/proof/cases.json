@@ -1,0 +1,769 @@
+{
+ "server_ip": "192.0.2.1",
+ "instances": {
+  "flat": {
+   "ip": "192.0.2.2",
+   "identity": "flat",
+   "user_agent": "FlatHeadset/1.0",
+   "ssdp": true
+  },
+  "bravia": {
+   "ip": "192.0.2.3",
+   "identity": "bravia",
+   "user_agent": "UPnP/1.0 DLNADOC/1.50 BRAVIA",
+   "ssdp": true
+  },
+  "monol": {
+   "ip": "192.0.2.4",
+   "identity": "plain",
+   "user_agent": "ProofMonoLeft/1.0",
+   "ssdp": false
+  },
+  "monor": {
+   "ip": "192.0.2.5",
+   "identity": "plain",
+   "user_agent": "ProofMonoRight/1.0",
+   "ssdp": false
+  },
+  "anaglyph": {
+   "ip": "192.0.2.6",
+   "identity": "plain",
+   "user_agent": "ProofAnaglyph/1.0",
+   "ssdp": false
+  },
+  "ts": {
+   "ip": "192.0.2.7",
+   "identity": "plain",
+   "user_agent": "ProofTransportStream/1.0",
+   "ssdp": false
+  },
+  "generic": {
+   "ip": "192.0.2.8",
+   "identity": "plain",
+   "user_agent": "ProofGeneric/1.0",
+   "ssdp": false
+  },
+  "control": {
+   "ip": "192.0.2.9",
+   "identity": "plain",
+   "user_agent": "ProofControl/1.0",
+   "ssdp": false,
+   "control_only": true
+  }
+ },
+ "cases": [
+  {
+   "id": "flat/full-sbs-left",
+   "instance": "flat",
+   "title": "full-sbs-left",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     1920,
+     1080
+    ],
+    "pixels": {
+     "left": "red",
+     "right": "cyan"
+    },
+    "mark": "side by side"
+   }
+  },
+  {
+   "id": "flat/half-sbs",
+   "instance": "flat",
+   "title": "half-sbs",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     1920,
+     540
+    ],
+    "pixels": {
+     "left": "red",
+     "right": "cyan"
+    },
+    "mark": "side by side"
+   }
+  },
+  {
+   "id": "flat/top-bottom",
+   "instance": "flat",
+   "title": "top-bottom",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     3840,
+     540
+    ],
+    "pixels": {
+     "left": "red",
+     "right": "cyan"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "flat/right-first",
+   "instance": "flat",
+   "title": "right-first",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     1920,
+     1080
+    ],
+    "pixels": {
+     "left": "red",
+     "right": "cyan"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "flat/rows-first-left",
+   "instance": "flat",
+   "title": "rows-first-left",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     3840,
+     540
+    ],
+    "pixels": {
+     "left": "red",
+     "right": "cyan"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "flat/rows-first-right",
+   "instance": "flat",
+   "title": "rows-first-right",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     3840,
+     540
+    ],
+    "pixels": {
+     "left": "red",
+     "right": "cyan"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "flat/columns-first-left",
+   "instance": "flat",
+   "title": "columns-first-left",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     1920,
+     1080
+    ],
+    "pixels": {
+     "left": "red",
+     "right": "cyan"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "flat/columns-first-right",
+   "instance": "flat",
+   "title": "columns-first-right",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     1920,
+     1080
+    ],
+    "pixels": {
+     "left": "red",
+     "right": "cyan"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "flat/checker-first-left",
+   "instance": "flat",
+   "title": "checker-first-left",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     1920,
+     1080
+    ],
+    "pixels": {
+     "left": "red",
+     "right": "cyan"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "flat/checker-first-right",
+   "instance": "flat",
+   "title": "checker-first-right",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     1920,
+     1080
+    ],
+    "pixels": {
+     "left": "red",
+     "right": "cyan"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "flat/frames-first-left",
+   "instance": "flat",
+   "title": "frames-first-left",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     2560,
+     720
+    ],
+    "pixels": {
+     "left": "red",
+     "right": "cyan"
+    },
+    "fps": 25,
+    "mark": null
+   }
+  },
+  {
+   "id": "flat/frames-first-right",
+   "instance": "flat",
+   "title": "frames-first-right",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     2560,
+     720
+    ],
+    "pixels": {
+     "left": "red",
+     "right": "cyan"
+    },
+    "fps": 25,
+    "mark": null
+   }
+  },
+  {
+   "id": "flat/mono-left (2D stays 2D)",
+   "instance": "flat",
+   "title": "mono-left",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     1920,
+     1080
+    ],
+    "pixels": {
+     "centre": "red"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "flat/anaglyph-cyan-red (cannot be converted: refused)",
+   "instance": "flat",
+   "title": "anaglyph-cyan-red",
+   "expect": {
+    "offered": false
+   }
+  },
+  {
+   "id": "flat/seek-sbs from the start",
+   "instance": "flat",
+   "title": "seek-sbs",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     1920,
+     1080
+    ],
+    "pixels": {
+     "left": "red",
+     "right": "cyan"
+    },
+    "mark": "side by side"
+   }
+  },
+  {
+   "id": "flat/seek-sbs after Seek 0:00:05",
+   "instance": "flat",
+   "title": "seek-sbs",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     1920,
+     1080
+    ],
+    "pixels": {
+     "left": "green",
+     "right": "cyan"
+    },
+    "mark": "side by side"
+   },
+   "seek": "0:00:05"
+  },
+  {
+   "id": "bravia/sei-sbs-left",
+   "instance": "bravia",
+   "title": "sei-sbs-left",
+   "expect": {
+    "size": [
+     1920,
+     1080
+    ],
+    "pixels": {
+     "left": "red",
+     "right": "cyan"
+    },
+    "codec": "mpeg2video",
+    "mark": "side by side",
+    "container": "mpeg"
+   }
+  },
+  {
+   "id": "bravia/sei-tb-left",
+   "instance": "bravia",
+   "title": "sei-tb-left",
+   "expect": {
+    "size": [
+     1920,
+     1080
+    ],
+    "pixels": {
+     "top": "red",
+     "bottom": "cyan"
+    },
+    "codec": "mpeg2video",
+    "mark": "top and bottom",
+    "container": "mpeg"
+   }
+  },
+  {
+   "id": "monol/full-sbs-left",
+   "instance": "monol",
+   "title": "full-sbs-left",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     960,
+     1080
+    ],
+    "pixels": {
+     "centre": "red"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "monol/top-bottom",
+   "instance": "monol",
+   "title": "top-bottom",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     1920,
+     540
+    ],
+    "pixels": {
+     "centre": "red"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "monol/right-first",
+   "instance": "monol",
+   "title": "right-first",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     960,
+     1080
+    ],
+    "pixels": {
+     "centre": "red"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "monol/rows-first-right",
+   "instance": "monol",
+   "title": "rows-first-right",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     1920,
+     540
+    ],
+    "pixels": {
+     "centre": "red"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "monol/frames-first-right",
+   "instance": "monol",
+   "title": "frames-first-right",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     1280,
+     720
+    ],
+    "pixels": {
+     "centre": "red"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "monol/mono-left (2D stays 2D)",
+   "instance": "monol",
+   "title": "mono-left",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     1920,
+     1080
+    ],
+    "pixels": {
+     "centre": "red"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "monor/full-sbs-left",
+   "instance": "monor",
+   "title": "full-sbs-left",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     960,
+     1080
+    ],
+    "pixels": {
+     "centre": "cyan"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "monor/right-first",
+   "instance": "monor",
+   "title": "right-first",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     960,
+     1080
+    ],
+    "pixels": {
+     "centre": "cyan"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "monor/top-bottom",
+   "instance": "monor",
+   "title": "top-bottom",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     1920,
+     540
+    ],
+    "pixels": {
+     "centre": "cyan"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "monor/columns-first-right",
+   "instance": "monor",
+   "title": "columns-first-right",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     960,
+     1080
+    ],
+    "pixels": {
+     "centre": "cyan"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "monor/checker-first-left",
+   "instance": "monor",
+   "title": "checker-first-left",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     960,
+     1080
+    ],
+    "pixels": {
+     "centre": "cyan"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "anaglyph/full-sbs-left",
+   "instance": "anaglyph",
+   "title": "full-sbs-left",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     960,
+     1080
+    ],
+    "pixels": {
+     "centre": "white"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "anaglyph/right-first",
+   "instance": "anaglyph",
+   "title": "right-first",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     960,
+     1080
+    ],
+    "pixels": {
+     "centre": "white"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "anaglyph/top-bottom",
+   "instance": "anaglyph",
+   "title": "top-bottom",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     1920,
+     540
+    ],
+    "pixels": {
+     "centre": "white"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "anaglyph/columns-first-right",
+   "instance": "anaglyph",
+   "title": "columns-first-right",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     960,
+     1080
+    ],
+    "pixels": {
+     "centre": "white"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "anaglyph/checker-first-right",
+   "instance": "anaglyph",
+   "title": "checker-first-right",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     960,
+     1080
+    ],
+    "pixels": {
+     "centre": "white"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "anaglyph/frames-first-left",
+   "instance": "anaglyph",
+   "title": "frames-first-left",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     1280,
+     720
+    ],
+    "pixels": {
+     "centre": "white"
+    },
+    "mark": null
+   }
+  },
+  {
+   "id": "ts/full-sbs-left (video copied: stock FFmpeg writes no SEI into a copy)",
+   "instance": "ts",
+   "title": "full-sbs-left",
+   "expect": {
+    "size": [
+     1920,
+     1080
+    ],
+    "pixels": {
+     "left": "red",
+     "right": "cyan"
+    },
+    "container": "mpegts",
+    "codec": "h264",
+    "mark": null
+   }
+  },
+  {
+   "id": "ts/top-bottom",
+   "instance": "ts",
+   "title": "top-bottom",
+   "expect": {
+    "size": [
+     3840,
+     540
+    ],
+    "pixels": {
+     "left": "red",
+     "right": "cyan"
+    },
+    "container": "mpegts",
+    "codec": "h264",
+    "mark": "side by side"
+   }
+  },
+  {
+   "id": "ts/rows-first-left",
+   "instance": "ts",
+   "title": "rows-first-left",
+   "expect": {
+    "size": [
+     3840,
+     540
+    ],
+    "pixels": {
+     "left": "red",
+     "right": "cyan"
+    },
+    "container": "mpegts",
+    "codec": "h264",
+    "mark": "side by side"
+   }
+  },
+  {
+   "id": "ts/checker-first-right",
+   "instance": "ts",
+   "title": "checker-first-right",
+   "expect": {
+    "size": [
+     1920,
+     1080
+    ],
+    "pixels": {
+     "left": "red",
+     "right": "cyan"
+    },
+    "container": "mpegts",
+    "codec": "h264",
+    "mark": "side by side"
+   }
+  },
+  {
+   "id": "ts/seek-sbs after Seek 0:00:05 (video copied)",
+   "instance": "ts",
+   "title": "seek-sbs",
+   "expect": {
+    "size": [
+     1920,
+     1080
+    ],
+    "pixels": {
+     "left": "green",
+     "right": "cyan"
+    },
+    "container": "mpegts",
+    "codec": "h264",
+    "mark": null
+   },
+   "seek": "0:00:05"
+  },
+  {
+   "id": "generic/top-bottom (no profile: must fail)",
+   "instance": "generic",
+   "title": "top-bottom",
+   "expect": {
+    "container": "mpeg",
+    "codec": "mpeg2video",
+    "size": [
+     3840,
+     540
+    ],
+    "pixels": {
+     "left": "red",
+     "right": "cyan"
+    }
+   }
+  }
+ ]
+}

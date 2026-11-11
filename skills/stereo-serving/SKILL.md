@@ -59,10 +59,47 @@ Describing a television's frame in the desktop's terms ("two views at their own 
     - Without it, FFmpeg's libx264 wrapper writes the SEI from the frame's Stereo 3D side data (side by side 3, top and bottom 4), or x264's `frame-packing` parameter sets it; the wrapper drops the mark for a right-eye-first frame, with a warning. FFmpeg's libx265 wrapper reads no stereo side data.
   - **MPEG-2:** it cannot carry the frame packing SEI, but it has its own mark, the JP3D user data: `S3D_video_format_signaling`, the identifier `JP3D`, a length of 3 and a 7-bit `S3D_video_format_type` (0x03 side by side, 0x04 top and bottom, 0x08 2D). It is the `Stereo_Video_Format_Signaling` user data of Sony's patent [EP 2434767 A1](https://patents.google.com/patent/EP2434767A1/en) (Ikuo Tsukagoshi), in the user data of the picture or sequence header; its side by side carries the left view in the first half, and it has no eye-order field, so send the left view first. FFmpeg's `mpeg2video` encoder writes it from the frame's stereo 3D side data and its decoder reads it ([mpeg12enc.c](https://github.com/FFmpeg/FFmpeg/blob/master/libavcodec/mpeg12enc.c) and [mpeg12dec.c](https://github.com/FFmpeg/FFmpeg/blob/master/libavcodec/mpeg12dec.c), Vittorio Giovara, 2013).
   - Tested on 2026-10-23 on a Sony KDL-46EX725: an MPEG-2 half side-by-side clip carrying JP3D switched it to 3D by itself, and the same clip without JP3D stayed flat.
-- **A conversion loses the mark in stock FFmpeg.** Its `stereo3d` filter copies the input frame's properties and never writes the output layout onto the frame, so the encoder writes no mark, or the input's. Check the output's mark with ffprobe, not only its size.
+- **A conversion keeps the old layout's mark in stock FFmpeg.** Its `stereo3d` filter copies the input frame's Stereo 3D side data and never writes the output layout onto the frame, so the encoder writes the mark of the layout the picture had: x264 marks a converted top and bottom film `top and bottom` whatever its `frame-packing` option says, and a mono output keeps `side by side` user data in MPEG-2. Put `sidedata=mode=delete:type=STEREO3D` after the conversion, so that x264's `frame-packing` option writes the output layout's SEI. MPEG-2 then carries no mark after a conversion (FFmpeg 6.1 has no filter that sets the side data). Check the output's mark with `ffmpeg -vf showinfo` (it prints `Stereo 3D: type - side by side`), not only its size.
 - **Universal Media Server's MEncoder engine carries no 3D:** it writes no mark and converts no layout; for a 3D source it only converts the subtitles. Use its FFmpeg engine for a 3D conversion.
 - **Keep the eye order.** Read it from the stream's mark, the container's mark or the person's choice, as [`stereo-video`](../stereo-video/SKILL.md) says, and write the declaration with the order you actually send.
 - **Subtitles** burned into a converted stream go into each view at the same place, at the screen plane, before packing.
+
+## Every input packing, at the edge
+
+A server honours every packing its input can declare and sends the renderer one layout.
+Each row is proved in containers (see below) from the declaration to the picture the renderer receives; the views are never resampled.
+Every layout goes to full side by side with the left view first, and from there to the layout the renderer asks for (`Output3DFormat`).
+
+| The input declares | Clause | Route in FFmpeg |
+|---|---|---|
+| side by side, top and bottom, full or half, either eye first | H.264 D.2.26 table D-9 values 3 and 4 (H.265 D.3.16); Matroska StereoMode 1, 2, 3, 11 | `stereo3d=IN:sbsl` |
+| row interleaved | table D-9 value 2 (figures D-4 and D-5); StereoMode 6, 7 | `stereo3d=irl:sbsl`, `irr:sbsl` |
+| column interleaved | value 1 (figures D-2 and D-3); StereoMode 8, 9 | `stereo3d=icl:sbsl`; right eye first is read as left first and put on the other side, `icl:sbsr` (`icr` swaps the views in FFmpeg 6.1) |
+| checkerboard | value 0 (figure D-1); StereoMode 4, 5 | `stereo3d` has no checkerboard input: `geq` with `interpolation=n`, each view compacted from its own samples |
+| alternating frames | value 5 (figure D-11); StereoMode 13, 14 | `stereo3d=al:sbsl`, `ar:sbsl` (pairs two frames, halves the rate) |
+| quincunx side by side, anaglyph | value 3 with the quincunx flag; StereoMode 10, 12 | not converted: a warning names the file, the layout and the renderer, and the file is not offered |
+
+Convert before scaling or burning subtitles for the layouts that mix the views, because scaling a picture that interleaves them mixes them.
+Interleaved packings in 4:2:0 already mixed the chroma of both views inside each 2x2 block when they were encoded, which no conversion can undo: a fixture for them needs 4:4:4.
+
+## The outputs
+
+| The renderer is | `Output3DFormat` | It receives |
+|---|---|---|
+| a headset (Flat Headset) | `sbsl` | full side by side, left first, each view at its own resolution, MPEG-PS |
+| a 2D screen | `ml` or `mr` | one view at the size it has |
+| an anaglyph-only screen | `arcc` (red cyan, colour) | one picture; red from the left view, green and blue from the right |
+| a Sony Bravia with its own profile | none | the file's layout kept; in MPEG-2 its JP3D user data, in H.264 the frame packing SEI |
+| H.264 in MPEG-TS | `sbsl` | the SEI `side by side` after a conversion; no SEI when UMS copies a file marked only in its container, with stock FFmpeg |
+| the PC | none | the file as it is: our players decode any packing and declare the pair to KWin |
+
+## The PC as a renderer
+
+A phone or a controller can send a film to the PC: [Rygel](https://gnome.pages.gitlab.gnome.org/rygel/)'s MPRIS plugin turns any MPRIS2 player on the session bus into a UPnP AV MediaRenderer (Debian's rygel 46.1, LGPL-2+; Macast, the other candidate, is not in Debian and had no release since 2022).
+UMS needs a profile for it (`PcStereoPlayer.conf`, matched on Rygel's manufacturer and model strings) with no `Output3DFormat`, so the file goes as it is: our players decode any packing and declare the pair to the compositor.
+The player must advertise the video types it plays (`SupportedMimeTypes`), or Rygel answers error 714.
+Proved in containers with VLC behind Rygel: the film UMS lists for the PC is pushed, plays and is streamed unconverted ([`references/ums-container-proof.md`](references/ums-container-proof.md)).
+The service listens on the network and accepts a URL from any device on it; whether it is on by default is not decided, and a default needs a recorded decision before any package ships it.
 
 ## Profiles
 
@@ -82,7 +119,8 @@ Describing a television's frame in the desktop's terms ("two views at their own 
 
 ## Proof in containers
 
-Universal Media Server, a scripted controller and an emulated renderer on an internal network prove the matched profile, the layout filter and what the renderer receives for full and half side by side, top and bottom, right eye first, 2D and an input that cannot be converted: recipe, expected table and traps in [`references/ums-container-proof.md`](references/ums-container-proof.md).
+Universal Media Server, a scripted controller and emulated renderers on an internal network prove the matched profile (live, through SSDP), every packing above, each output, MPEG-TS with a seek, the control calls and the refusal; a control that must go red is part of the run.
+One command reruns it, offline, with one line per case: recipe, expected table and traps in [`references/ums-container-proof.md`](references/ums-container-proof.md).
 
 ## Proof on the real device
 

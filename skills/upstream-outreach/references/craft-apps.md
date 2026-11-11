@@ -80,6 +80,12 @@ PhotoCraft's [passing gate at de7e1eec](https://github.com/storytold/photocraft/
 The older Clippy complained about unchanged PSD callback and cursor-range code.
 Match the actual gate compiler, Clippy, font input and software GPU checks, then repeat the unchanged-source check; do not silence the diagnostic or fold an environment workaround into a media fix.
 
+A login shell can silently select the older compiler even after the SDK was corrected.
+In the November LightCraft port, `docker exec ... rustc --version` reported 1.99.1, but the diagnostic's `bash -lc` reset `PATH` and ran Debian's 1.97.1 Cargo, compiler and Clippy.
+Comparing `command -v` and versions inside the exact command shell exposed the difference; duplicate Cargo metadata headers independently identified both compilers.
+Use a non-login shell that preserves the SDK environment, or explicitly select its pinned tools, and print Cargo, rustc, Clippy and rustfmt versions in that same shell before the gate.
+Record the mismatched run separately; it does not establish the required-toolchain result.
+
 Read the environment on the specific CI job too, not only its shell command.
 PhotoCraft’s corpus job at de7e1eec runs `cargo xtask test-corpus` with `CARGO_PROFILE_RELEASE_LTO=false` and `CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16`.
 The default release profile applies thin LTO separately to many integration-test binaries, which needlessly changed the local build workload.

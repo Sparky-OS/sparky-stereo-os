@@ -57,3 +57,63 @@ Debian 3.8.1's `mstt_exit_with_error` prints that the fonts are not installed, s
 Retain that behaviour when adding consent and declarations.
 This is source inspection of the failure handler, not a network-failure test.
 The package records CAB-file SHA-256 checksums in `var/lib/msttcorefonts/cabfiles.sha256sums`, which provides an existing integrity mechanism to inspect before writing another downloader.
+
+## Target installation recipe, ORDER 519
+
+The build repository's `sparky-os/packages/msttcorefonts/build.sh` rebuilds verified plain Debian 3.8.1, with Michael Vogt's Ubuntu EULA presentation adapted to Debian's synchronous downloader.
+Set `OUT` to an empty output directory and run the recipe from a committed checkout.
+The recipe uses the commit date, downloads the pinned Debian native source and checks SHA-256 `211f86e82b56cf87461da4bb21136b096a57ae70ed9bcb6eb27f34c407295bf3`.
+It builds plain authored source and binary candidates for testing; publication must still run the edition's Lean Code qualification.
+Never import a published `+lc1` tree as authored source without the plain-source restoration tool.
+
+The 11 CAB archives measured on 2026-11-11 total **3,934,864 bytes**, with every SHA-256 matching Debian's `cabfiles.sha256sums`.
+The candidate declares that total and `https://downloads.sourceforge.net/corefonts/` in the shared control fields.
+The Microsoft font data is absent from both the binary package and its source archive.
+The ISO gate also rejects an undeclared stock installer package and the downloaded font directory, so forgetting the declaration cannot let fonts onto the image.
+
+The live installer carries `calamares-settings-sparky-stereo`'s `lib/core-fonts` helper.
+Calamares invokes `core-fonts --window TARGET`; the text installer invokes `core-fonts --terminal TARGET` before unmounting the target.
+Both run the target's interactive apt, with debconf's readline frontend overriding the installer's global noninteractive setting.
+The helper enables `contrib` on enabled HTTPS Debian sources in classic or deb822 form, preserving other sources and components.
+It requires the candidate's download declaration before starting installation.
+The package's default consent answer is false, and the helper never supplies an answer.
+The person's deliberate refusal is printed with a retry command and allows the operating-system installation to continue without those fonts.
+A download failure fails the apt transaction and is reported by the installer.
+
+Run `tests/runtime.py` from the font recipe in separate disposable containers with the real shared apt hook and its language files installed.
+The test indexes the real candidate in a local apt source and types the test answer into debconf rather than preseeding acceptance.
+The `accept`, `refuse`, `noninteractive` and `failed-download` cases check actual fonts, consent presentation, visible results and retry guidance.
+The `metered` and `unmetered` cases substitute only NetworkManager's answer, keeping apt, the reader and package metadata real.
+The retry cases run from the refused or failed installation state and check real Arial with fontconfig.
+For the graphical join, `tests/corefonts-gui.py` in the Calamares settings recipe runs under a private `xvfb-run` and `dbus-run-session` with a disposable target root, using actual Konsole and keyboard events.
+Its acceptance, refusal and close cases check the visible question and resulting target state.
+These isolated targets establish the package and terminal join; a developer-image installation is a separate proof and must be named separately.
+
+## Further traps found during the implementation
+
+- **Symptom:** refusal displays the same EULA question twice in one apt transaction.
+  **Cause:** apt preconfiguration and postinst both invoke debconf's config script; unconditionally resetting `seen` after a false answer discards the first refusal.
+  **Fix:** honour the first answer during ordinary configuration, and reset the prompt after refusal only for an explicit `reconfigure` call.
+  **Found by:** the actual Konsole refusal test stopped at the second question; the earlier candidate's transcript contained two questions and failed the new single-question assertion.
+- **Symptom:** a scripted acceptance still refuses the licence, with `noyes` visible in the transcript.
+  **Cause:** readline pre-fills the default `no`, so a test that appends `yes` does not replace the default.
+  **Fix:** clear the input with Ctrl+U before typing the test answer, and advance the EULA's `[More]` pages before answering.
+  **Found by:** reading the real terminal transcript and observing Konsole's displayed text on its private D-Bus session.
+- **Symptom:** a terminal closes and the installer appears to have finished the package step.
+  **Cause:** a terminal application's process status need not be the command's status.
+  **Fix:** require the command's explicit completion result in a private temporary directory; a missing result is a visible failure.
+  This is temporary process communication, not a second persistent failure store.
+  **Found by:** inspecting terminal process behaviour and retaining the close-before-answer test.
+- **Symptom:** `dpkg-reconfigure ttf-mscorefonts-installer` reports that the package is broken or not fully installed after a failed download.
+  **Cause:** Debian's synchronous downloader exits 1, leaving the package half-configured, and dpkg-reconfigure requires `--force` in that state.
+  **Fix:** retain `dpkg-reconfigure ttf-mscorefonts-installer` for a deliberate refusal, and use `dpkg --configure ttf-mscorefonts-installer` to retry failed configuration after repairing the download problem.
+  **Found by:** reading dpkg-reconfigure's installed-state check and strengthening the real recovery test to assert both Arial and dpkg's `installed` state.
+  The earlier `--force` suggestion restored fonts but left the package half-configured; that attempt is retained as a failing regression control.
+- **Symptom:** direct source extraction cannot find `msttcorefonts-3.8.1/debian/changelog` although apt source extraction worked.
+  **Cause:** the verified native tarball contains `msttcorefonts/`, while apt names its extraction with the version.
+  **Fix:** create the destination explicitly and extract with `--strip-components=1` after checking the archive hash.
+  **Found by:** the build-driver rehearsal and inspecting the archive's top-level members.
+- **Symptom:** an isolated target's apt update cannot resolve archive hosts.
+  **Cause:** exporting a container omits the contents of its mounted resolver file.
+  **Fix:** provide the disposable target with its test container's resolver and CA bundle before running the actual install helper.
+  **Found by:** the apt diagnostic in Konsole, which occurred before any licence question or font download.

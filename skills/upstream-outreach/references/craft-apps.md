@@ -84,3 +84,12 @@ Read the environment on the specific CI job too, not only its shell command.
 PhotoCraft’s corpus job at de7e1eec runs `cargo xtask test-corpus` with `CARGO_PROFILE_RELEASE_LTO=false` and `CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16`.
 The default release profile applies thin LTO separately to many integration-test binaries, which needlessly changed the local build workload.
 Match the job’s explicit overrides while retaining its complete package, feature and test selection; record an interrupted mismatched-profile attempt separately from the resulting gate.
+
+## Dependency resolution passes, but the rebased source does not compile
+
+`cargo metadata` checks the dependency graph, not field names, constructor shapes or the receiving app's lint policy.
+FilmCraft's November port still used a removed toast field, an unboxed media item in a test and an `egui::ComboBox` forbidden by its newer shared-widget policy.
+The compiler diagnostics, current type definitions and existing callers identified these mismatches.
+Preserve the live path's newer behavior when removing obsolete helpers; reconnecting an old helper can discard changes made on main.
+For several independent compile errors, `cargo clippy --workspace --all-targets --keep-going -- -D warnings` collects the remaining diagnostics together.
+This is a diagnostic step, not a replacement gate: run the receiving project's unchanged complete gate before committing or calling the port green.

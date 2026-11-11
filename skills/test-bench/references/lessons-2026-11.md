@@ -1,7 +1,11 @@
-# test-bench: lessons from the lanes of 25 October to 6 November 2026
+# test-bench: lessons from the lanes of 25 October to 11 November 2026
 
 Harvested by ORDER 429 from the accepted lane reports; each line names the lane it came from.
 A trap gives its symptom, its cause, its fix and how the cause was found; a recipe gives the commands and the result to expect.
+
+## Recipes that worked
+
+- A kit for a GPU test that can wedge the machine's GPU, run by the person or the main session on the bench: one command, run as the logged-in user (the workload never runs as root) with `sudo -n` only for the kernel log, the devcoredump and debugfs; guards before any GPU work (nothing else holds the GPU's card and render nodes, checked with `fuser`, since a wedge traps every holder in D state; no ring timeout already in this boot's log; the CPU temperature start gate; the session and the compositor recorded before and compared after); the workload started with `setsid` so it can be killed as a group; one kernel log follower per case (`sudo -n dmesg --follow-new`), not a poll; at the first `ring ... timeout` of that GPU, keep up to three devcoredumps (free each by writing to its `data` file so the next reset leaves its own), the fence state and the D-state tasks for a bounded window, stop the workload, then count timeouts for a few more seconds: any new one means WEDGED and the exit status says "reboot first". A control job under the watchdog runs first and must leave the kernel log silent. A self-test runs the same script against a fake sysfs, a fake kernel log (a script that prints the loop and drops a devcoredump) and a fake workload, red and green, plus a sabotaged copy that must fail. (lane a10-hainan-webgpu-wedge-525)
 
 ## Traps: the symptom, the cause, the fix, how it was found
 
@@ -13,6 +17,12 @@ A trap gives its symptom, its cause, its fix and how the cause was found; a reci
 - Symptom: proot hides a child's exit status. Fix: tests write explicit inner status files and an absent file or non-zero status fails the harness (lane time-shortcuts-359)
 - A Claude lane's `sh -c 'rm -rf $VAR ...'` is refused by the safety check even in a container script; use fresh unique directories instead of removing variable paths (lane graphics-page-227)
 - Symptom: a test's EXIT trap fails. Cause: the trap referenced a BUS variable though no bus was started. Fix: the trap removes only its scratch. Found by: the old test erroring on exit. (lane no-fallbacks-drivers-346f2)
+
+- Symptom: after a test, `sudo dmesg --follow` (or any follower) keeps running although the script killed the background job. Cause: a shell function run in the background is a subshell; killing `$!` kills the subshell, and the command it started is left orphaned. Fix: `exec` the command inside the function, so the background job is the command itself. Found by: listing the processes left after the self-test. (lane a10-hainan-webgpu-wedge-525)
+- Symptom: a guard that refuses when a process holds a device file refuses even for its own test, naming the script's own shells. Cause: the test shell opened the file on a spare descriptor, and every child of the script inherited it. Fix: hold the file from a separate process (`sleep 600 7<file &`), and match the holder's name in the check. Found by: the refusal listing `bash` processes as holders. (lane a10-hainan-webgpu-wedge-525)
+- Symptom: a watchdog that polls `sudo dmesg` twice a second fills the journal with sudo session lines. Cause: each poll is a new sudo session. Fix: one `dmesg --follow-new` per case into a file, read by the loop. (lane a10-hainan-webgpu-wedge-525)
+
+- Symptom: after a GPU wedge, `systemctl reboot` hangs for many minutes with the kernel still printing the reset loop; nobody at the machine can help it. Cause: at reboot the kernel runs every driver's shutdown hook (`kernel_restart` → `device_shutdown`), and amdgpu's waits for each ring's last fence with no time limit (`amdgpu_fence_wait_empty` → `dma_fence_wait(fence, false)`), while TTM's delayed delete and the exiting program wait on the same fence; `reboot -ff` still runs the hooks. Fix: after a wedge, `sync`, then SysRq through `/proc/sysrq-trigger` as root: `s` (emergency sync), `u` (remount read-only), `b` (`emergency_restart`, "without shutting down any hardware"); the kernel's sysrq.rst says the trigger file is always allowed for root. Found by: a 12.5-minute reboot on the bench laptop, then reading the shutdown path in the kernel source; which wait held that reboot was not shown. (lane a10-hainan-webgpu-wedge-525)
 
 ## Perks of the part
 

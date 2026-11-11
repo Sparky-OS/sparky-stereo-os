@@ -281,6 +281,11 @@ async function main() {
     if (!adapter) throw new Error('WebGPU gave no adapter');
     result.adapter = { vendor: adapter.info.vendor, architecture: adapter.info.architecture, device: adapter.info.device, description: adapter.info.description };
     log(`adapter: ${JSON.stringify(result.adapter)}`);
+    if (adapter.info.architecture === 'swiftshader' || adapter.info.isFallbackAdapter) {
+      // said, not hidden: the drawings are right on a software adapter, but its timings are the processor's
+      result.software = true;
+      log('the adapter is a software one (SwiftShader): the drawings are right, the timings are not the GPU\'s; on NVIDIA run the browser with a display (see run-browser.sh, XVFB=1)');
+    }
     device = await adapter.requestDevice({ requiredLimits: { maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize, maxBufferSize: adapter.limits.maxBufferSize } });
     device.lost.then((i) => log('device lost: ' + i.message));
     for (const name of names) {

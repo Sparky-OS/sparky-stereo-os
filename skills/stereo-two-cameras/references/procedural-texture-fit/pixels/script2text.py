@@ -25,6 +25,9 @@ for line in open(sys.argv[1]):
     v2 = op == "Text" and len(words) >= 10 and words[9] == 2
     if v2:
         kinds = kinds + "iii"
+    elif len(words) < len(kinds) and op not in ("Text",):
+        # a modern operator of an earlier version stores fewer words (Tiles version 1 has 17 of version 2's 24)
+        kinds = kinds[:len(words)]
     strs = [bytes.fromhex(x[2:]).decode("utf-8") if v2 else bytes.fromhex(x[2:]).decode("latin-1") for x in p[3:] if x.startswith("s=")]
     vals = []
     for i, k in enumerate(kinds):

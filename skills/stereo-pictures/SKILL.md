@@ -90,6 +90,16 @@ Test preservation, enum semantics, pair extraction and actual display separately
 Carry layout/eye-order information through export and reopen; then exercise stereo-view close/reopen so a correct file does not hide a stale UI state.
 Attribute an upstream implementation to its actual authors; filing a report or contributing a follow-up does not make the original implementation ours.
 
+## Depth choices and saved JPS descriptors
+
+Packed picture-with-depth input uses the same chosen `DepthOptions` as a separate depth image in stereo-layer 1.17.4.
+Test declared and hand-chosen layouts against direct `Picture::fromDepth` with those options, and prove that the chosen result differs from the defaults.
+Comparing only the declared and manual paths passed while both ignored the options.
+
+Save JPEG stereo through KImageFormats' `jps` writer after the person chooses to save.
+The [descriptor reference](references/jps-descriptor.md) lists all layouts, fields, defaults and refusals, with the primary specification.
+Check both the bytes and a reader round trip: an unmarked `.jps` can reopen correctly through the right-first fallback while containing no descriptor.
+
 ## Lessons from the lanes, October to November 2026
 
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (13 entries).

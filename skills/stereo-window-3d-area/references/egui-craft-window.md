@@ -57,6 +57,10 @@ Unequal source grids need an explicit native-view refusal rather than silently f
 - Symptom: the control socket connects, but import returns `FilmCraft is still starting; send the request again`.
   The listener starts before the app can drain its command queue; `control_server.rs` explicitly rejects the request before queueing it.
   Poll the read-only `ui.menu.list` with a deadline until the handler is ready, then issue import once.
+- Symptom: an ordinary LightCraft control is dimmed by `Lens Profiles` despite an initial dialog cancel.
+  Its first-launch offer waits for earlier dialogs and library startup to finish, so it can appear later.
+  Dismiss it after the selected image has finished loading, then settle and capture.
+  Apply the same sequence to edition and untouched-stock controls; inspect the complete image and compare without masks.
   This removed the startup rejection in the fresh X11 capture without changing the application.
 - Symptom: Stereo Monitor enablement tests pass, but its host receives zero pictures after a rebase.
   FilmCraft's old update called `stereo_monitor::tick`; that call was lost when main split logic from drawing.

@@ -5,11 +5,11 @@ description: >-
   dependency policy, apt pins (:any, Signed-By), conffiles, the signed repository and a publication round, DEP-11 and
   Contents, the ISO, reproducible sources (SOURCE_DATE_EPOCH), the build record and the Lean Code gate,
   installed-package proof, ten languages. Load it when a package will not install (Breaks, Multi-Arch: same, dpkg
-  --auto-deconfigure), apt picks Debian's build or swaps in a dummy at dist-upgrade, two builds of one source differ,
+  --auto-deconfigure), apt picks Debian's build or a dummy at dist-upgrade, two builds of one source differ,
   apt-get update exits 0 on a failed fetch, lc1 says the build record is not complete, a Qt header is missing after a
-  qt6-base update, a pin leaves a binding or development package uninstallable, a systemd unit is proven only by hand
-  or journalctl -u shows none of its lines, a preinst prompt stops a non-interactive install, a language probe shows
-  English, a CMake consumer reports a missing imported library or include directory, or an index must be regenerated.
+  qt6-base update, a pin leaves a binding or development package uninstallable, a systemd unit's proof shows none
+  of its journal lines, a preinst prompt stops a non-interactive install, a language probe shows
+  English, a CMake consumer misses an imported library, or an index must be regenerated.
 ---
 
 # Packaging the edition

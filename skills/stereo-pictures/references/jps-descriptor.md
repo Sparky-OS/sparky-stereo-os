@@ -35,3 +35,8 @@ The shared picture engine removes a declared separation when taking out the two 
 
 The writer tests inspect each APP3 independently and reopen every successful write.
 They cover both orders, mono display choices, all four half-size flag combinations, separation including 255, comments, and refusals that leave the device bytes untouched.
+
+When replacing an existing file, open a `QSaveFile`, pass that device to `QImageWriter`, and commit only after writing succeeds.
+A filename-based `QImageWriter` can open and truncate its destination before the format handler validates the image.
+The handler's unchanged-buffer refusal tests do not establish atomic replacement of an existing file.
+Read the committed file back through the format reader.

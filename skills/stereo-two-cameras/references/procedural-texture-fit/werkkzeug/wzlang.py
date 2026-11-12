@@ -17,7 +17,11 @@ PACK = {"Flat": "iic", "Perlin": "iiiififffcc", "Color": "ic", "Merge": "i", "Gl
         "Dots": "ccii", "Blur": "ifff", "Mask": "i", "HSCB": "ffff", "Transform": "fffffiii", "Distort": "fi", "Normals": "fi",
         "Light": "iffffffccfff", "Bump": "ifffffccfffcff", "Cell": "iiccciiffifif", "Gradient": "iiccfffi", "Range": "icc",
         "TransformMul": "ffffficiic", "Twirl": "ffffffi", "Sharpen": "ifff", "ColorBalance": "fffffffff", "Unwrap": "i",
-        "Bricks": "iicccffiiiiiff", "Bulge": "f", "Paste": "fffffffi"}
+        "Bricks": "iicccffiiiiiff", "Bulge": "f", "Paste": "fffffffi",
+        # Text: x, y, font height, character width (0: the font's own), colour, flags, space around a font page's letters
+        # (pixels, then parts of the picture), line height; its two strings (the text, the font's name) follow the values.
+        # Only the fitter (pixels/) draws it; wzrender and the playback module refuse it.
+        "Text": "ffffciiff"}
 # Light and Bump take position x, y, z and direction a, b after the mode
 PACK["Light"] = "ifffffccfff"
 PACK["Bump"] = "ifffffccfffcff"

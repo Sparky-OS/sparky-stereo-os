@@ -1,0 +1,9 @@
+# The font map: which font file draws each font name of werkkzeug's Text operator.
+#   name = font file | the sentence said in every caption
+# The file is taken relative to this map's folder. Point WZ_FONTMAP at your copy of this file.
+# An empty font name in a graph is "arial": werkkzeug3's own rule (FontBegin in _start.cpp).
+# Arial, Times New Roman and Verdana are Microsoft's and are not shipped here. These lines name free fonts
+# (Debian: fonts-liberation, fonts-dejavu-core); a person who has the named fonts points the lines at them.
+arial = LiberationSans-Regular.ttf | Liberation Sans 2.1.5 stands in for Arial (metric-compatible)
+times new roman = LiberationSerif-Regular.ttf | Liberation Serif 2.1.5 stands in for Times New Roman (metric-compatible)
+verdana = DejaVuSans.ttf | DejaVu Sans 2.37 stands in for Verdana (not metric-compatible: its letters are a different width)

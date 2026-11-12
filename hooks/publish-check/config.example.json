@@ -1,0 +1,34 @@
+{
+  "enabled": true,
+  "workspace": "/path/to/your/workspace",
+  "paths": {
+    "state": "state/hooks"
+  },
+  "our_identities": ["you@example.org"],
+  "allowed_emails": [],
+  "allowed_email_regex": ["@users\\.noreply\\.github\\.com$"],
+  "never_name": [
+    {"regex": "\\bproject-codename\\b", "why": "a name that is never published"}
+  ],
+  "private_remotes_regex": "\\.private(\\.git)?$",
+  "checks": {
+    "never_name": true,
+    "secrets": true,
+    "emails": true,
+    "location_data": true,
+    "style": true
+  },
+  "style": {
+    "mid_sentence_dash": true,
+    "hard_wrapped_markdown": true,
+    "phrases": [
+      {"regex": "\\bthe owner\\b", "say": "name the person"}
+    ]
+  },
+  "on_hard_finding": "ask",
+  "publish_commands": [],
+  "mail_commands": ["\\bsendmail\\b", "\\bmsmtp\\b"],
+  "never_commit_paths_regex": "(^|/)(evidence|captures)/|(^|/)[^/]*REPORT[^/]*\\.md$",
+  "provenance_paths_regex": "copyright|COPYRIGHT|changelog|CHANGELOG|/debian/|control$|\\.patch$|\\.diff$|\\.debdiff$",
+  "state_keep_days": 30
+}

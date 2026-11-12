@@ -863,6 +863,10 @@ So Werkkzeug4 does not run on Linux today, with or without the four pull request
 - Symptom: `wl_shm` seems not to offer `xbgr16161616` on a compositor that has it.
   Cause: the formats are announced after the bind; one round trip sees the globals only.
   Fix: one more round trip before the first buffer is made.
+- Symptom: after a new row is added to the Fit tool, one real click at a fit's end is lost again, in Portuguese only and in about half the runs.
+  Cause: the new row made the tool taller than its dock, so nothing stretches any more and every change of a sentence's height moves what stands below. In Portuguese the sentence under the two pictures takes three lines and goes away when the procedure is placed: the button moved up 27 pixels. The room kept for the state's sentence in the earlier milestone covered one sentence in one language.
+  Fix: every sentence that changes while the person works keeps the room of its tallest text so far (after each `setText`, raise the label's least height to `heightForWidth(width())`, never lower it), aligned to the top.
+  Found by: making the proof write, for a click that did not land, where every named part of the tool stood before and after; the two lists differed in two heights. Reruns alone (green three times, then red) had looked like the machine's load.
 
 ## What the parts are good for
 

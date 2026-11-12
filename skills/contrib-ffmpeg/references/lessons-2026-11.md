@@ -145,3 +145,45 @@ Traps:
 Measured facts:
 - On 5dc77d2118 the walk had `V` in 15 of 72 rows; after the fix none, and no row that passed before is refused.
 - The bot's single H.265 cancellation (fairy/pr25395-single-cancel): the cancellation packet for 2,000, 4,000 and 8,000 ids took 0.1 to 0.5 ms against 3.6, 11 and 37 ms with one cancellation per id (same build, loaded machine). H.264 keeps one per id: a message with a repetition period promises a later one of its own id (D.2.26, p.391).
+
+## A fifth bot round: a rule the skill already had (ORDER 530, 2026-11-12)
+
+The bot rated a test helper as moderate: `set_non_packed()` compared the flags it had just written with constants and called `exit(1)`.
+This skill had said since October that a test prints what it observes and never decides.
+The helper came from the fourth round's own lesson ("set the bit, escape again, and read the flag back"), written as a check in C, and the review before the push ran FATE, which passes on it.
+So the round began with [the audit](pre-push-audit.md), every rule of the skill against the whole series, before the reported line was touched.
+
+What the audit found beside the reported helper, in the same test program:
+- `show()` left with `exit(2)` on a cancellation and on a message that did not parse, and `describe()` and `sei_layout()` on a message longer than its NAL unit: verdicts on the filter's output. Now printed (` cancel`, ` short`, ` truncated-sei`).
+- The parameter sets with the flag cleared, which the constraint walk feeds to the filter, were made by running the filter under test, and a failure there called `exit(1)`. Now made in the test and printed.
+- Two cases left when the filter refused its option. Now ` error`, and `e` in a walk.
+- 77 silent `exit(1)` and 7 `return 1` on memory, packet copies and the sample: now one helper that prints the line to stderr.
+- The subject of the test commit was `tests: ...`; master writes `tests/api: ...`.
+None of it changed a reference line of an existing case, which is why no test run had shown it.
+
+Recipe for a finding in a tracker of persistent messages (here: "a replacement can remove a required same-id repetition"):
+1. Read the clause for every statement the field makes. H.264 D.2.26 (V16 p.391) says two things about a repetition period greater than 1: the message persists until a later one with its id, and "another frame packing arrangement SEI message with the same value of" its id "shall be present" for a frame output within the period, "unless the bitstream ends or a new coded video sequence begins without output of such a frame". H.265 D.3.16 has a one-bit persistence flag and no such sentence.
+2. Give each statement its own state. A cancellation with another id ends the arrangement (the first statement) and leaves the id owed a message (the second). The tracker gets a fourth kind of message and a second set of ids, kept through the folding of old messages in a second tree, cleared where the first one is.
+3. A filter that cannot know the picture order counts or the future keeps the property instead of checking it: wherever it writes, it also writes a cancellation for every id still owed a message, since the messages it replaces there may have been the one required, and a cancellation is a message with the id.
+4. Walk the family with an oracle that reads the bytes itself and takes the packet timestamps as picture order counts: here 2 sources of the message x 3 things between x 3 things before the end of the period x 4 histories, 72 rows of 12 codes, 864 combinations.
+
+Traps:
+- Symptom: a walk shows no `V` for a mutation that keeps what is owed across a flush or a sequence start. Cause: an extra cancellation breaks no rule, so `o` stays `o`. Fix: a fifth code, `c`, for an output that keeps the rule with a cancellation of the id beside the new message; the reference then shows where the filter acts, and the mutations of the reset and of the folded state change rows only through it. Found by: listing, before the first run, what each planned mutation would change in the codes.
+- Symptom: the row "message decoded last" passes on the unfixed library. Cause: the packet with the message was the IDR picture, and an IDR picture decoded last starts a new coded video sequence, where nothing is owed. Fix: an IDR picture first, the message on the second picture. Found by: working the row out by hand before running it.
+- Symptom: none in the tests; read in the tracker. Cause: a cancellation recorded right after another one of the same access unit was dropped as redundant, which is true for what is in force and false for what is owed: the dropped one is the message its own id was waiting for. Fix: record every one. Found by: asking of every shortcut in the old state what the new state needs from it.
+- Symptom: a mutation that leaves messages with a repetition period out of the "in force" list changes no label. Cause: the second pass, over the ids owed a message, writes the same cancellation. It is an equivalent change in H.264, where both passes run; say so instead of adding a case.
+- Symptom: `git fetch fairy` took minutes and created more than 600 remote branches. Cause: no refspec. Fix: `git fetch fairy '+refs/heads/fairy/pr25395-*:refs/remotes/fairy/fairy/pr25395-*'`.
+- Symptom: a variable set on the host (`DIFFLINES=200 tools/dev.sh ...`) had no effect inside the container. Cause: `docker run` passes only the variables named with `-e`. Fix: name it in the wrapper.
+- Symptom: after pointing a build directory at another worktree of the same commit, make rebuilt everything. Cause: a new worktree's files carry the time of its checkout, newer than every object. Fix: keep one worktree per build directory and move it with `git checkout`, which touches only the files that differ.
+
+How the conditional observation was answered (a helper sequence with one packet without a decoding timestamp): establish each half of its premise separately.
+- Do real files mix packets with and without a decoding timestamp? `ffprobe -select_streams v:0 -show_entries stream=codec_name:packet=pts,dts -of csv` over every file of the fate-suite: of 556 H.264 and HEVC streams, 9 do (Matroska, the first one or two packets).
+- Does any stream hold a picture for 64 later packets? For every packet, the distance to the last later packet with a smaller pts: the largest is 27 (`mov/mov_editlist_reorder_delay.mp4`).
+- The helper's own sequence through the filter: the documented error with one packet without a decoding timestamp, a pass with one on every packet.
+Say which half is established, which is not, and that no conforming stream with the ordering was built.
+
+Measured facts:
+- On b8d15d57ff the walk had `V` in 8 of 72 rows (16 of 864 combinations), all with a cancellation of another id between and nothing before the end of the period; after the fix none: 14 became `c`, 2 became `e` (the message decoded last), no other cell changed.
+- The sweep of the series: 115 negated conditions and 27 named mutations; every label of the four references changes under at least one; 9 conditions and one named mutation change none. FFmpeg's HEVC parser starts a new packet at an end of sequence NAL unit (`libavcodec/hevc/parser.c`, the `nut >= HEVC_NAL_VPS && nut <= HEVC_NAL_EOB_NUT` test), so a filter sees it in front of the next pictures; the H.264 parser leaves it with the access unit it ends.
+- FFmpeg's H.264 decoder forgets the frame packing state on a flush (`h264_decode_flush()` calls `ff_h264_sei_uninit()`, which clears `common.frame_packing.present`), which is the model a bitstream filter's flush follows.
+- git parses a trailer block that is glued to the paragraph above it when most of that paragraph's lines look like trailers, so a count of parsed trailers does not show a missing blank line.

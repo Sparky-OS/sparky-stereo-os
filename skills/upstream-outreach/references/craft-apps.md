@@ -166,3 +166,44 @@ Do not hide unrelated fidelity warnings or suppress flattening notices for ordin
 
 After building the complete CI feature graph, use the same workspace, features and test targets with a nextest filter for focused checks when appropriate.
 A package-only default-feature invocation can select a different graph and rebuild shared dependencies; it is useful coverage when intentional, and is not a substitute for the full receiving gate.
+
+## Keep the app and shared-library revision together
+
+An app gate on an older library revision proves that binding only.
+Record the app revision and every sibling-path library revision with each gate and GUI build.
+When a newer shared API breaks an app test, check the app's current main before writing a port.
+Dylan M. Taylor's [2bb0273d](https://github.com/storytold/filmcraft/commit/2bb0273d0fea73041f8cbe7d394929ec9d3f7faf) already updates six Matroska oracle constructors for `OpenOptions::index_limit`.
+Those constructors use `..OpenOptions::default()` while retaining their indexing and CRC choices.
+Carry the upstream change with its credit; a replay at the preceding library revision is not a receiving test for the newer one.
+
+## Separate a launcher failure from a failed gate
+
+If a container exits before the first Cargo line, inspect its state, exit code and logs before removing it.
+Reproduce the launch with a trivial payload before changing Rust code or retrying the suite.
+A GNU timeout 9.10 run reproduced exit 125 with `true` when timeout was the final shell command.
+Keeping the enclosing shell restored the expected statuses: success 0, failure 1 and expiration 124.
+The measured fix retains the shell and propagates the payload status:
+
+```sh
+gate_status=0
+timeout 120m cargo xtask ci || gate_status=$?
+exit "$gate_status"
+```
+
+Check all three statuses; a wrapper that only proves success can hide a failed test.
+This observation does not establish a general Cargo or coreutils defect.
+
+## Establish an audio test's queued lead
+
+A fixed warm-up sleep does not prove that a background mixer published the frames a test will consume.
+A channel-mapping test with four 512-frame callbacks needs 2048 frames queued before requiring zero underruns.
+Use a bounded readiness signal while retaining every exact sample and underrun assertion.
+admbe’s open [FilmCraft #3058](https://github.com/storytold/filmcraft/pull/3058) already uses a published-block wait for this case, through its new `blocks_mixed` statistic.
+A backport to the preceding producer API can acknowledge prior publications at the next mixer entry while preserving that API.
+Verify publication in the producer's actual order, not merely that a mixing call started or returned.
+If the next mixer entry acknowledges preceding ring publications, its Release counter and the test's Acquire load establish that order.
+See Rust's [atomic ordering documentation](https://doc.rust-lang.org/std/sync/atomic/enum.Ordering.html).
+A controlled producer delay can distinguish a missing precondition from bad channel mapping.
+The old warm-up produces expected silence when the first block drains.
+Establishing the lead preserves the exact samples.
+Keep the delayed-producer red and green witnesses separately from the ordinary complete gate.

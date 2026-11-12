@@ -173,3 +173,5 @@ Record any promised next action and wait for a response; do not schedule reminde
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 
 [A series of small patches to one maintainer's Go library](references/small-patch-series-to-a-go-library.md): the recipe for sending fixes and tests one subject at a time after a maintainer said yes (fresh upstream first, a straight line of branches, red and green shown, his commit style), and the independent-vector method with its traps (e521, ORDER 493).
+
+For the Craft Apps' shared rules, bots, and response clock, read [Craft contribution practice](references/craft-apps.md).

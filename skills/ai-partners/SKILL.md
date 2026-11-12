@@ -137,6 +137,8 @@ Use actual clock timestamps, retain failed attempts, and inspect representative 
 Reviewer checks should run without an AI account; document the same CLI or CI command available to the author.
 Read the actual diff before writing its commit message: state the problem, reason and checked result, without inventing intent.
 For KDE changes, apply [the development practices reference](../native-linux/references/kde-development-practices.md); advice from one talk is not a project-wide contribution policy.
+When evaluating objections to AI-assisted contributions, use [arguments against AI-assisted work and what answers each](references/arguments-against-ai-assisted-work.md).
+It maps concerns to observable requirements, separates measurements from policies, and keeps unresolved legal, cultural and autonomy questions visible.
 
 ## Security habits for what an assistant writes
 

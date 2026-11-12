@@ -4,7 +4,7 @@ Written on 2026-11-11 from Qt 6.11.2 (the edition's qt6-base 6.11.2+dfsg-5+stere
 Read it before changing how a QWidget window is painted, flushed or measured.
 Neither prototype is shipped: both live behind one environment variable in a lane's build, and the numbers below are what they measured.
 
-- `QT_WIDGETS_GPU_PAINT=1` (or `opengl`): the widgets painted by Qt's OpenGL paint engine. Slower than CPU painting for a terminal: one draw call for each thing painted.
+- `QT_WIDGETS_GPU_PAINT=1` (or `opengl`): the widgets painted by Qt's OpenGL paint engine. It takes more processor than CPU painting for a terminal (one draw call for each thing painted) and stays available as the person's choice.
 - `QT_WIDGETS_GPU_PAINT=batch`: the widgets' painting recorded and drawn in a few draw calls through the window's RHI. The picture is the CPU path's to a level or two of rounding, text included, at scales 1, 1.25 and 2.
 
 ## The three ways a widget window is drawn
@@ -105,6 +105,29 @@ What remained after that, at every scale, on both GPUs, with grey and LCD text: 
 - **Stop animations and the blinking cursor for captures** (`kdeglobals`: `[KDE]` `CursorBlinkRate=0`, `AnimationDurationFactor=0`), and capture the CPU path twice first: what differs between two captures of the same path (a button that fades after a message arrived) is the program's, not the painting's.
 - **Typing latency:** a preloaded library sends key events to the widget with the focus (`QCoreApplication::sendEvent()`), printing the time of each; the repaint manager prints the time each frame is handed to the compositor; pair each key with the first frame after it. This is the time to the commit, not to the light on the screen. A terminal adds its own wait before it repaints (Konsole: about 10 ms), which dominates.
 - **Memory:** `Rss` and `Pss` from `/proc/PID/smaps_rollup` at the end of the run, the kernel driver's count from `/proc/PID/fdinfo` (`drm-total-memory`, amdgpu), and `nvidia-smi --query-gpu=memory.used`. A process with an OpenGL context carries the driver: about 25 to 50 MB more with Mesa, about 100 MB more with NVIDIA's.
+
+## What the measurement is for
+
+Widgets move to the GPU to free the processor for other work, first of all on small machines.
+A few milliseconds of paint time are not something a person sees at this scale, so they do not decide anything.
+- **The headline of every report is the processor load a program takes for the same work** (per frame, or at a fixed frame rate), on the smallest machine available first. Paint time in milliseconds is supporting detail.
+- **The three ways stay the person's choice:** the processor, Qt's OpenGL paint engine, and batched painting. A path that measures worse on one machine is not removed.
+- **Compare like with like:** a program that draws real content sends many items in few draw calls, as a game does. One draw call for each rectangle is the first prototype's limit, not a fair picture of GPU painting.
+
+Measured on a small laptop on 2026-11-12 (AMD A10, a Carrizo iGPU and a Hainan discrete GPU, the names taken from each run's `GL_RENDERER` line):
+
+| Program | Processor painting | OpenGL paint engine | Batched |
+|---|---|---|---|
+| Konsole, share of one core | 88 to 92 % | 114 to 116 % | the same or a little less, with 18 to 24 % more frames on the Hainan (about 22 % less processor for each frame) |
+| Kate, share of one core | 48 to 50 % | 64 to 68 % | the same or a little less |
+| Dolphin, share of one core | 61 to 71 % | 100 to 108 % | the same or a little less |
+
+Batched painting also halved the paint time there (Konsole 11.6 to 5.0 ms, Kate 2.7 to 1.5, Dolphin 4.2 to 2.4) and cost about 40 MB more for each program and 0.4 to about 1 % of a core at idle.
+Still owed: the load at a fixed amount of work, so that a path that draws more frames is not charged for them.
+
+Two traps from that run:
+- **Symptom:** the results' "igpu" and "dgpu" labels are the wrong way round. **Cause:** the kit named the cards by their order, not by what drew. **Fix:** name the card from the `GL_RENDERER` line of each run. **Found by:** reading the renderer line in each log beside its label.
+- **Symptom:** the summary script fails on the laptop and works on the station. **Cause:** the laptop's locale writes a decimal comma, and the script parsed a point. **Fix:** run the measuring tools under `LC_ALL=C` and accept both in the parser. **Found by:** the traceback's `could not convert string to float: '11,6'`.
 
 ## What the first prototype measured (2026-11-11)
 

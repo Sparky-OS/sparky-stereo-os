@@ -1,0 +1,22 @@
+{
+  "enabled": true,
+  "workspace": "/path/to/your/workspace",
+  "paths": {
+    "queue": "partners/queue",
+    "drafts": "private/drafts",
+    "state": "state/hooks"
+  },
+  "checks": {
+    "program_output_modes": true,
+    "declaration": true,
+    "lane_notes_in_push": true,
+    "keeping_own_modes": true
+  },
+  "watch_write_paths": ["partners/queue", "private/drafts"],
+  "display_stack": ["kwin", "kscreen", "libkscreen", "gamescope", "wiz3d", "plasma-wayland-protocols", "sparky-stereo-os"],
+  "allow_words": [],
+  "lane_paths_regex": "(^|/)(REPORT[^/]*\\.md|next-prompt[^/]*|AGENTS\\.md|BRIEF\\.md|evidence/|round\\d+/|ci-diagnosis/|package-proof/)",
+  "publish_commands": [],
+  "on_finding": "ask",
+  "state_keep_days": 30
+}

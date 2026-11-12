@@ -1,0 +1,10 @@
+{
+  "claude": [
+    {"event": "PreToolUse", "matcher": "Bash", "timeout": 30},
+    {"event": "PreToolUse", "matcher": "Edit|Write", "timeout": 30}
+  ],
+  "codex": [
+    {"event": "PreToolUse", "matcher": "Bash", "timeout": 30},
+    {"event": "PreToolUse", "matcher": "apply_patch", "timeout": 30}
+  ]
+}

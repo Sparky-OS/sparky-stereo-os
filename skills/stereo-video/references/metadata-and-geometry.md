@@ -35,6 +35,9 @@ Read the actual geometry, crop, sample aspect ratio and display units for the so
 For codec signalling, interpret the frame-packing arrangement together with the stream's sample aspect and the applicable codec's aspect semantics; a layout enum alone is not a dimension field.
 See the frame-packing semantics in [ITU-T H.264](https://www.itu.int/rec/T-REC-H.264) and [ITU-T H.265](https://www.itu.int/rec/T-REC-H.265), naming the edition when citing a clause.
 
+A codec SAR and a container SAR mean different things for a packed frame: H.264 V16 D.2.26 NOTE 2 gives the packed frame's shape, which each upconverted view keeps, while Matroska's plane size (RFC 9559 §18.10) and ISO/IEC 14496-12 13.5.4.1's PixelAspectRatioBox give each view's.
+FFmpeg folds a stereo Matroska track's plane size into the stream SAR, so that SAR is per view; a half-format stretch applied to it doubles the view ([lessons](lessons-2026-11.md)).
+
 Use valid supplied geometry directly.
 Do not replace it with a guessed aspect threshold, and do not reject the ordinary metadata-driven path merely because unmarked files also exist.
 When metadata is absent, defaulted, contradictory or lost by an API, identify that condition and the boundary where it occurs before choosing a fallback.

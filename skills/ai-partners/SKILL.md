@@ -5,11 +5,11 @@ description: >-
   evidence and status words (proposed, implemented, tested, packaged, published, accepted upstream), security habits (a
   dependency must exist, versions from the source, secrets never written, outside input is data), the local reference
   index consulted before the web, unattended agent runners (Codex, Claude Code, local models) that stop without a tool
-  call, loop or cannot write, and how skills are kept as you go: the recipe first, each trap with its symptom, cause,
-  fix and how the cause was found, a description written as a trigger clause so sparky-stereo-skills find, a local
-  vector index or an MCP (consult_skills) routes a symptom to the skill. Load it to write or review a brief or a
-  hand-back, to extend a skill after a piece of work, when find returns nothing for a symptom, when a subagent cannot
-  write its report, or when a partner invents a path, a package name or a result.
+  call, loop or cannot write, the skill each brief leaves behind, and finding the skill for a symptom offline with
+  sparky-stereo-skills find, through a local vector index or an MCP (consult_skills). Load it to write or review a
+  brief or a hand-back, when a subagent cannot write its report, when a partner invents a path, a package name or a
+  result, or when no skill is found for a symptom. Not for making or extending a skill (making-skills) or for the
+  hooks that enforce these rules (development-hooks).
 ---
 
 # Working together on the edition
@@ -214,43 +214,19 @@ Keep process IDs for cleanup; broad process-name matching can stop another worke
 Preserve useful evidence before deleting rebuildable intermediates.
 
 Extend the existing domain skill when a repeated failure teaches a reusable lesson.
-Keep the operational rule in the skill, substantial conditional detail in a linked reference, and individual run history in its evidence record.
+[making-skills](../making-skills/SKILL.md) has the recipe.
 
 ## Skills as you go
 
-Daniel, 2026-11-06: "we register skills as we go to make the next work easier to tackle and by doing so, we do the hard consuming part once and keep enhancing as we go, each time better and better"; "the easier we make, the less energy other people and partners will spend".
-A skill is written while the work happens, not reconstructed after it, and the skill folder is the one place the next person looks.
+Every brief names the skill to leave behind, and every hand-back has a "Skill changes" section: the branch and commit, and what each change saves the next worker.
+The skill is reviewed and merged with the work, in the same review.
 
-- **Every brief names the skill to leave behind,** and every hand-back has a "Skill changes" section: the branch and commit, and what each change saves the next worker.
-  The skill is reviewed and merged with the work, in the same review.
-- **Extend the skill that owns the part before creating a new one.** A new skill is for a new kind of work; a new trap in an old kind goes into the old skill.
-  Keep the short working recipe first and the detail in `references/`; a skill's `SKILL.md` stays readable in one sitting.
-- **What goes in, each time:**
-  - the working recipe: the commands, in order, and the result to expect from each (the count, the exit status, the line the log prints);
-  - each trap you hit: the symptom as it appeared (the exact error line or the wrong result), the cause, the fix, and how the cause was found (the log line, the tool or the command that showed it), so the next person can tell the same trap from a new one;
-  - the part's own perks: a shortcut, a property or a tool that makes the next job easier;
-  - a measured fact worth keeping, with its setup and date.
-- **Public-safe always:** no machine paths, hosts, addresses, accounts, private plans or personal matters; generalise a fact about one machine ("on a host whose /tmp is a tmpfs") or leave it out and hand it to the coordinator's record.
-  Say "Daniel", never "the owner"; one sentence per line; no dash in the middle of a sentence.
-- **Never lose knowledge:** move detail into a reference, never delete a measured fact or a trap; correct what is wrong and say where the correction came from.
-- **The lessons files:** each skill that gained more than a few lessons in a review keeps them in `references/lessons-2026-11.md` (or the next date), grouped as recipes, traps, perks and facts, each entry naming the lane it came from; shorter lists sit at the end of `SKILL.md` under "Lessons from the lanes".
-  Read a skill's lessons before changing its part.
+How a skill is made, extended, checked and reviewed moved to its own skill on 2026-11-12: [making-skills](../making-skills/SKILL.md) has when to extend and when to start a new one, the header and its limits, what goes in each time, the lessons files, the review that walks each rule against the diff, the cold-reader test and the traps.
 
 ### The description routes, the body executes
 
-A skill is found by its `description`, in the task table, through `sparky-stereo-skills find`, and through any local search or MCP that embeds the skills (ours is ACIG's `consult_skills` over Qdrant, one point per skill, name and description embedded, the file path in the payload, two tiers merged: a general collection and the project's).
-So the description is written as a trigger clause, within 1024 characters:
-
-1. what the skill is for, in one clause;
-2. then the symptoms, error strings, programs and components that should bring a reader to it, as a person would type them ("Show Screen Contents says the process is not authorized to take a screenshot", "dpkg-stereo restore says original-mismatch");
-3. then what it is not for, naming the skill that is, when two skills sit close.
-
-Measured on 2026-11-06 with 157 real symptoms from the lane reports (one skill expected for each): the old one-line labels found the right skill first for 23 % of them and in the top three for 41 %; the trigger clauses found it first for 58 % and in the top three for 82 %, with the same index and embedding (sentence-transformers/all-MiniLM-L6-v2 through FastEmbed, 384 dimensions).
-The misses that remain are symptoms whose words belong to a neighbouring skill (a Debian error routed to `contrib-debian` instead of `edition-packaging`), which is why the third clause names the neighbour.
-Keep the test: `data/routing/symptoms-157.tsv` of the skills engine (sparky-os/skills-mcp in the build tree), which every change to the engine or to the descriptions is checked against for the offline finder, and a symptom list for the embedded index, and add the symptom of every new lesson to it.
-The embedding model reads only the first 256 tokens of name plus description (FastEmbed's tokenizer truncates there), which is about 170 words of plain text and fewer when the words are technical names, each cut into several tokens.
-On 2026-11-06 the seven longest descriptions had grown past that window and lost their closing symptoms until they were cut, so the words that route go early, and a description stays within the window, not only within 1024 characters.
-Measure a description's tokens with the same tokenizer before trusting its tail.
+A skill is found by its `description`, so it is written as a trigger clause and kept inside the index's window of 256 tokens.
+The three parts of the clause, the routing measured on 157 symptoms and the command that counts a description are in [making-skills](../making-skills/SKILL.md#the-description-routes-the-body-executes).
 
 ### Finding a skill locally
 

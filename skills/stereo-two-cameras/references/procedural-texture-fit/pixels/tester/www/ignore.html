@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Ignoring viewer</title>
+<style>body{margin:0;background:#9eb3c7}canvas{display:block}</style>
+<script type="importmap">{ "imports": { "three": "/npm/three/package/build/three.module.js", "three/addons/": "/npm/three/package/examples/jsm/" } }</script>
+</head>
+<body>
+<script type="module">
+// The courtyard opened by a viewer that does not know the mixed texture (three.js 0.186.0's GLTFLoader, MIT): it must
+// show the pictures and never fetch a procedure (ORDER 508, milestone 3). Proofs only.
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+const warnings = [];
+const warn = console.warn;
+console.warn = (...a) => { warnings.push(a.join(' ')); warn(...a); };
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(1100, 1000);
+document.body.append(renderer.domElement);
+new GLTFLoader().load('scene/scene.gltf', async (g) => {
+  const cam = g.cameras[0];
+  cam.aspect = 1.1; cam.updateProjectionMatrix();
+  g.scene.add(new THREE.AmbientLight(0xffffff, 1.2));
+  renderer.render(g.scene, cam);
+  const mats = [];
+  g.scene.traverse((o) => { if (o.isMesh) mats.push({ mesh: o.name, material: o.material.name, map: o.material.map ? [o.material.map.image.width, o.material.map.image.height] : null }); });
+  const fetched = performance.getEntriesByType('resource').map((e) => new URL(e.name).pathname).filter((p) => p.startsWith('/scene/'));
+  const out = { three: THREE.REVISION, extensionsUsed: g.parser.json.extensionsUsed, mats, fetched, procedureFetched: fetched.some((p) => p.endsWith('.p2p')), warnings };
+  await fetch('/save?name=ignore-result.json', { method: 'POST', body: JSON.stringify(out, null, 1) });
+  setTimeout(() => fetch('/done', { method: 'POST', body: 'ok' }), 1500);
+}, undefined, async (e) => { await fetch('/save?name=ignore-result.json', { method: 'POST', body: JSON.stringify({ error: String(e) }) }); fetch('/done', { method: 'POST', body: 'failed' }); });
+</script>
+</body>
+</html>

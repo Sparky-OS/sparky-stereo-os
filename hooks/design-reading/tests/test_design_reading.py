@@ -136,13 +136,16 @@ class DesignReading(testkit.HookCase):
         self.assertIsNone(self.run_hook(self.bash('ls')))
 
     def test_parallel_reads_all_count(self):
-        self.run_hook(self.event('SessionStart', source='startup'))
+        """A tool runs several reads at once, and the hook runs once for each: no read may be lost."""
         import subprocess
-        procs = []
-        for name in ('check-every-default.md', 'one-format-inside.md'):
-            procs.append(subprocess.Popen([sys.executable, '-B', os.path.join(testkit.HOOKS, self.hook, 'hook.py'), '--config', self.config],
-                                          stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True))
-        for proc, name in zip(procs, ('check-every-default.md', 'one-format-inside.md')):
+        names = [f'fact-{n}.md' for n in range(12)]
+        for name in names:
+            testkit.write(self.memory(name), 'A fact.\n')
+        self.configure(core=names)
+        self.run_hook(self.event('SessionStart', source='startup'))
+        command = [sys.executable, '-B', os.path.join(testkit.HOOKS, self.hook, 'hook.py'), '--config', self.config]
+        procs = [subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True) for _ in names]
+        for proc, name in zip(procs, names):
             proc.stdin.write(json.dumps(self.read(self.memory(name))))
             proc.stdin.close()
         for proc in procs:

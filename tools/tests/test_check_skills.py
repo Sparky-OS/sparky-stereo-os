@@ -167,6 +167,23 @@ class CheckSkills(unittest.TestCase):
                 there.write_text('')
                 self.assertEqual(check(tree).returncode, 0)
 
+    def test_anchors_are_checked_on_request(self):
+        body = ('# Title\n\n## The first part\n\nSee [below](#the-second-part-with-code) and [the page](references/more.md#a-heading).\n\n'
+                '## The second part, with `code`\n\nText.\n\n```sh\necho "[not a link](#nowhere)"\n```\n')
+        tree = make_tree(self.tmp, {'demo': skill('demo', 'Text.', body=body)})
+        more = tree / 'skills/demo/references/more.md'
+        more.parent.mkdir()
+        more.write_text('# More\n\n## A heading\n\n<a id="kept-name"></a>\nBack to [the skill](../SKILL.md#the-first-part), [the mark](#kept-name) '
+                        'and [the second of two](#again-1).\n\n## Again\n\n## Again\n')
+        r = check(tree, '--anchors')
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn('5 local anchors land on a heading', r.stdout)
+        more.write_text('# More\n\n## Another heading\n')
+        self.assertEqual(check(tree).returncode, 0)  # without the option, the file being there is enough
+        r = check(tree, '--anchors')
+        self.assertEqual(r.returncode, 1)
+        self.assertIn('skills/demo/SKILL.md: no heading or mark #a-heading in skills/demo/references/more.md', r.stderr)
+
     def test_an_empty_tree_fails(self):
         (self.tmp / 'skills').mkdir()
         r = check(self.tmp)

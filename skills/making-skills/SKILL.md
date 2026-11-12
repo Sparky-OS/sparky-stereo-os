@@ -166,13 +166,14 @@ The format's limit is 500 lines; the skills of this folder run from about 50 lin
 ```sh
 python3 tools/check-skills.py                      # headers, both description limits, every local link
 python3 tools/check-skills.py --count <name>       # this skill's size against its two limits
-python3 tools/tests/test_check_skills.py           # only when the checker or its data changed: "Ran 17 tests ... OK"
+python3 tools/check-skills.py --anchors            # after a heading moved or changed its name: every local #fragment lands on a heading
+python3 tools/tests/test_check_skills.py           # only when the checker or its data changed: "Ran 18 tests ... OK"
 python3 hooks/publish-check/publish_check.py --config YOUR/publish-check.json --files skills/<name>/SKILL.md    # "publish-check: clean", exit 0
 ```
 
 `check-skills.py` needs `python3` and `python3-yaml`, nothing else, and no network.
 `YOUR/publish-check.json` is the file that `python3 hooks/install.py init WORKSPACE` writes to `WORKSPACE/private/hooks/`, with your own names put in ([adopt the hooks](../development-hooks/SKILL.md#working-recipe-adopt-the-hooks)).
-It checks the header, the limits and that every local link's file exists, in the skills, in the pages of `hooks/` and `tools/` and in the two entry pages; it does not check that a fact is true, that an external address answers or that an anchor exists.
+It checks the header, the limits and that every local link's file exists, in the skills, in the pages of `hooks/` and `tools/` and in the two entry pages; with `--anchors` it also checks that each local link with a `#fragment` lands on a heading or an `<a id>` of its page; it does not check that a fact is true or that an external address answers.
 For a heading you moved or renamed, search the repository for links to its old anchor, and keep the heading or leave `<a id="old-anchor"></a>` where the text now starts ([keep every link that points in](../writing-front-pages/SKILL.md#keep-every-link-that-points-in)).
 The [publish check](../../hooks/publish-check/README.md) looks for what must never be in a public file: a person's address, a secret, a name that is never published.
 The skills package runs `check-skills.py` when it is built, so a header that fails stops the package, not only the merge.
@@ -241,6 +242,7 @@ A skill that only its author can find or follow is not finished.
 - **Symptom:** after a section moves to another skill, links across the repository land on a page that no longer has the heading; `check-skills.py` still passes.
   **Cause:** the check proves that a linked file exists, not that its anchor does, and thirty pages linked the one heading that moved (`ai-partners/SKILL.md#skills-as-you-go`).
   **Fix:** before moving a heading, count who links to it; keep the heading in place with one line that points to the new home.
+  Then run `python3 tools/check-skills.py --anchors`: since 2026-11-12 it fails on a fragment that no heading of the page answers.
   **How found:** `grep -rno 'ai-partners/SKILL.md#[a-z0-9-]*' . | sort | uniq -c`, run before this skill was cut out of ai-partners.
 - **Symptom:** `check-skills.py` fails on a skill nobody touched: "metadata must map text keys to text values".
   **Cause:** a line `metadata:` with nothing under it, left on 2026-10-24 when its `requires-packages` line was removed; YAML reads it as an empty value, and no tool complained for nineteen days.

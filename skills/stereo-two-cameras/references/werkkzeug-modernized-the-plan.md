@@ -422,6 +422,54 @@ Where no window holds the project the tool is refused and says where it works.
 4. A partner under the official SDK's client: refused while the person has chosen no picture (it leaves a marker file at its first refusal, and the proof's person chooses then), applied or held afterwards.
 5. The corrections, each against the compositor's own picture or the file's own bytes: the start in 3D and the opt-out, 80 pixels of parallax at 600 pixels behind (600 * 256 / 1920), a floated dock's two eyes, the JPS block's 20 bytes with the rest of the file unchanged, an MPO's two changed bytes, two eyes from a depth map.
 
+## Extending the editor: working recipe
+
+What a later round adds comes in through what is already there: a new fitter through the adapter, new operators through the table, depth and the object view through the drawing process.
+
+### A new fitter version through the narrow interface
+
+- Replace the fitter's folder with the new version and compare every file with its source commit (`cmp`); nothing in it is edited.
+- New operators of the fitter are new classes at the end of the list: an operator's class id is its place, so nothing already saved moves.
+- An operator that lays whole procedures (`Quad`: four, `Grid`: up to four by four, `Stack`: two to four results over each other) is a procedure's last operator, and each procedure under it is drawn on a canvas of its own. The core's drawing does what the fitter's own program does: for input `q` of a Quad the canvas shows the place `2x - column, 2y - row`; for a Grid tile `s (x - col / cols), s (y - row / rows)` with `s` the smaller of columns and rows; a Stack's procedures share the window and are cut to the picture before they are laid. One margin for all canvases of a Quad or a Grid, the widest any of them needs.
+- The adapter does the new work, the window none: `swz-fit --procedures 4|4x2|2x4|16` cuts the picture into tiles (a tile that is not square is laid beside or below its own mirror image into a square), runs the fitter on each tile by the fitter's own recipe (simple procedures, a seed of its own for each, no structure read where a mirror image would be read as a repeat), four at a time, and joins them with the fitter's own `quad` and `grid` commands; `--layers 1,4` lays whole results with its `stack` command. The answer is still one `procedure 0 0 0 1 FILE` line.
+- On the page, each procedure under a Quad, a Grid or a Stack is a stack of its own, named, and the joining operator takes it through a Load: sixteen procedures side by side above one Grid are wider than a page's 192 columns.
+- Prove it on the fitter's own procedures: every typed procedure of its evidence, drawn by its program and by the core (typed, and placed on a page and drawn from the project file), compared byte for byte. `wz script GRAPH OUT.script` turns typed text into the fitter's script for that.
+- The stand-in fitter learns the joining commands too (the parts' operators renamed under one joining operator), and writes every command line it was started with to a log: the proof reads what the adapter asked for.
+
+### Carrying other people's operators
+
+- Read the licence in the files themselves and the pull request's own text first. A file head that says "distributed under a BSD license, see LICENSE.txt" in a tree whose `LICENSE.txt` is BSD 2-clause is carried under that licence, head unchanged, author named from the commits' own author field.
+- Carry the files unchanged in a folder of their own with a record beside them: whose work, from which commit, fetched how, each file's SHA-256, what is left out and why, what to do when upstream changes it. A test checks the checksums.
+- Where the work comes with its own declaration of parameters (Werkkzeug4's `.ops` file: names, ranges, defaults, choices, and a code block for each operator), generate the table and the calling code from it: a parameter structure filled from the operator's words, and the author's own code block compiled around it. The arithmetic is then the author's, and only the form is ours. Keep the generated files in the tree and have a test make them again and compare.
+- Take what the program can use (a texture editor takes bitmap operators, not mesh operators) and say what was left out.
+- Carry an operator only when nothing in the table does its work: of OpenKTG's thirteen, twelve are the ancestors of operators already there, and one (the colour matrix) is not.
+- A library with its own names for common types (OpenKTG's `types.hpp` beside Altona's) is a translation unit of its own behind one `extern "C"` function.
+- Check which maths functions the new code calls. Any that the C library decides (here the natural logarithm) is carried with the others, so the same procedure still draws the same bytes with glibc, with musl and in WebAssembly.
+- One reference table (name, checksum of the drawn bytes) for every added operator at its defaults, compared by every build.
+
+### 16 bits a channel, end to end
+
+- Find the depth the operators already hold before adding any. werkkzeug's operators hold fifteen bits a channel (0 to 0x7fff, in sixteen-bit words); the narrowing to eight bits was only at the way out.
+- Hand the samples out without narrowing where sixteen are asked for: `(x << 1) | (x >> 14)` makes 0x7fff into 0xffff, and each sample's high byte is then exactly the eight-bit sample.
+- A PNG of sixteen bits says the truth about its samples in `sBIT` (15 significant bits; PNG third edition, 11.3.2.4); `sTER` stays right after the header for a pair.
+- The depth is the project's own value: journalled like any change, in a part of the file after everything the old program reads, absent for eight bits so that an old file stays the old bytes.
+- Every step that works on samples needs its sixteen-bit form (the relief's step between the eyes, the drawing process's answer, the composition of the two eyes for the desktop). The eight-bit form of a step that another program is compared with stays as it is.
+- To the desktop: a `wl_shm` buffer of `xbgr16161616` where the compositor announces that format (listen to `wl_shm.format`, and wait one more round trip for the announcements); Qt's `Format_RGBX64` has the same bytes on a little-endian machine. Where the format is not offered, eight bits go over and the window says so.
+- A toolkit's own widgets paint with eight bits: say that in the window instead of implying sixteen.
+- Proofs read the saved values: the file's own samples counted (how many values a channel takes, how many samples are not an eight-bit value repeated in both bytes), by the writer's reader and by another reader (Qt's PNG reader gave `Format_RGBA64`); the buffer format read from `WAYLAND_DEBUG`.
+
+### The material view: one world, two cameras
+
+- A texture on a lit sphere, plane or cube with its relief is a real 3D scene, so it is drawn with two cameras, never by shifting one picture.
+- The cameras stand side by side with parallel axes. Both look through one window, a rectangle in the plane through the object's centre: the ray of a pixel goes from the camera through that pixel's place in the window. That is the off-axis projection, and the window's plane has no parallax.
+- Each eye finds its own point of the relief along its own ray (a march below the surface in the surface's own frame), so the relief has depth of its own in the pair; the light and the texture exist once.
+- The relief lies below the surface, never above it, and the object's outline stays the smooth shape's.
+- Publish the scene's numbers (camera distance, half the window's height, how far apart the cameras are, the wall's distance, the object's sizes) from one call, so that a proof predicts from the numbers and not from the drawing code.
+- The prediction in closed form: a point at depth `z` has the parallax `apart * (1 - distance / z)` in scene units, times `eye_width / window_width` in pixels, positive behind the screen. For a sphere, the tangent lines from each camera give the outline's left and right end; for a plane and a cube, each corner turned and projected through the window gives the bounding box. Upright positions do not depend on the camera: the rows of the outline must be the same in both eyes, which is the check that catches cameras turned inward.
+- Measure on a plain red texture (the wall is grey): the bounding box of the pixels whose red is well above their blue, in each eye of the compositor's picture, at one scene pixel to one screen pixel. Within one pixel of the prediction; predictions for cameras turned inward and for cameras twice as far apart must fail.
+- With 3D off the scene has one camera, in the middle, and both eyes of the screen are the same picture to the last pixel.
+- The program keeps its three 3D options. The view opens in 3D where the desktop takes the declaration; the pair goes to the same declared surface as every stereo picture of the program.
+
 ## Werkkzeug4 itself on Linux: what a probe found
 
 Measured on 11 November 2026 in a Debian testing container, g++ 16.2.0, from `fr_public` at `8c8f82c`. Nothing of it is packaged.
@@ -767,6 +815,55 @@ So Werkkzeug4 does not run on Linux today, with or without the four pull request
 - Symptom: three exported stereo PNG files of different pictures have the same size to the byte.
   Cause: none; the core's writer stores the pixels without compression, so the size follows from the picture's size alone (8,390,353 bytes for two eyes of 1,024 pixels with alpha). Compare checksums, not sizes.
 
+## Traps found while extending the editor
+
+- Symptom: a procedure whose last operator is a Grid is refused when it is laid on a page: "Grid does not make a picture".
+  Cause: werkkzeug3 has a mesh operator of the same name, earlier in the table, and the lookup by name took the first.
+  Fix: a name that several classes share is the picture-making class first (the core's table and the partners' lookup).
+  Found by: the refusal's own sentence, then listing the table's names that occur twice.
+- Symptom: sixteen procedures for one picture cannot be placed: "the procedure is 192 columns wide and a page has 192".
+  Cause: the inputs of an operator stand side by side in the row above it.
+  Fix: each whole procedure under a Quad, a Grid or a Stack is a stack of its own, named, reached through a Load.
+  Found by: the stand-in fitter with a ten-operator procedure for each of sixteen tiles.
+- Symptom: a refusal of a carried operator reads "count 1 -3.72066e-103 is outside -3.72066e-103..-3.72066e-103".
+  Cause: the bridge's own sentence writer knows `%d` and `%s` only and read a `double` as something else.
+  Fix: write the numbers into words first and pass them as `%s`.
+  Found by: the test of a value outside the author's range.
+- Symptom: a symbol search with `grep -rn --include=*.hpp 'a\|b'` over a source tree finds nothing, and the code that calls the functions seems to have no definitions.
+  Cause: the search's own options, not the tree.
+  Fix: search the one file with `grep -a -n`; here the two functions were declared in Altona's `types.hpp` all along.
+  Found by: the header that had to hold them.
+- Symptom: in the proof, a real click on a dialog's button never arrives.
+  Cause: a dialog is a window of its own, and under Wayland a client does not know where the compositor put it, so a pointer position worked out from the main window is wrong.
+  Fix: give the button the focus and press Enter by a real key.
+  Found by: the dialog staying open in the proof's picture.
+- Symptom: the object's outline is measured cut off at column 306.
+  Cause: the preview's dock is 307 pixels wide at 1280 by 800, narrower than the eye's picture.
+  Fix: put the other docks away and `resizeDocks` before measuring at one scene pixel to one screen pixel; check the size of the place first.
+  Found by: the check that each eye is handed over whole.
+- Symptom: a check that waits to see a stand-in fit running fails although the fit was made.
+  Cause: the stand-in ends before the wait looks.
+  Fix: wait for the result, never for the state in between.
+- Symptom: the partners' server answers "Too many calls" in the middle of a proof.
+  Cause: new checks pushed one part of the proof over the server's own limit of calls in ten seconds.
+  Fix: let the ten seconds pass between the parts; the limit is the server's design, not a fault.
+- Symptom: a comparison that ran in the background reports differences that are gone when it is run again.
+  Cause: the program under test was rebuilt at the same path while the comparison ran.
+  Fix: final proofs run from an exported commit in a folder of their own.
+- Symptom: in the material view a brick wall's mortar stands at the surface and the bricks sink into it.
+  Cause: the relief was read from the picture's brightness, and the mortar is the lightest part; the procedure's own height says the opposite.
+  Fix: where the project names no relief, read a modern procedure's height where it holds it (its alpha) and only a texture without a height of its own by its brightness; say in the output which was read, and let the caller choose.
+  Found by: looking at the two pictures side by side before handing any to a person.
+- Symptom: the proof's summary says "0 buffers" of the 16-bit format although the window says the desktop took 16 bits.
+  Cause: the format's number was worked out by hand and was wrong (`xbgr16161616` is `0x38344258`, 942948952).
+  Fix: read the number from the log's own `wl_shm.format` lines, or print it from the header, before counting with it; a count of 0 is checked against the raw log before it is believed.
+- Symptom: after new tools are added, every scenario with a partner in it fails by one check.
+  Cause: the tool count is written in three proof scripts (the server's, the SDK client's, the partner in the window), and the class count in two more.
+  Fix: search every test for the old numbers before the long run (`grep -rn '28 tools\|== 227'`).
+- Symptom: `wl_shm` seems not to offer `xbgr16161616` on a compositor that has it.
+  Cause: the formats are announced after the bind; one round trip sees the globals only.
+  Fix: one more round trip before the first buffer is made.
+
 ## What the parts are good for
 
 - The `.ops` blocks are a table a program can read: generate the parameter panel and the partner's operator list from them, so the editor, the server and the documentation cannot drift apart.
@@ -799,6 +896,11 @@ So Werkkzeug4 does not run on Linux today, with or without the four pull request
 - The editor's `Heart` (a 2 ms timer and the longest gap) measures any "the window goes on meanwhile" claim in a dozen lines.
 - A cross-eyed pair cut to equal squares and written as a stereo PNG with `sTER` (left eye first) is a fixture, a deliverable and a photograph's credit line at once.
 
+- `tools/gen_extra.py` is the pattern for taking operators from a Werkkzeug4 `.ops` file: the author's parameters become the table, the author's code block is compiled around a filled parameter structure.
+- `wz script GRAPH OUT.script` and `wz drawgraph GRAPH OUT` let two programs draw one typed procedure; `wz material GRAPH OUT.pns --png --shape cube` makes a marked stereo picture of a texture on an object from a command line; `wz pnscheck` now says a file's bits, its `sBIT` and how many values its samples take.
+- `tests/material-proof.py` is a closed-form check of two cameras that needs only the scene's published numbers and the drawn pair, with two wrong-camera controls.
+- `swz-fit --procedures` and `--layers` give any front end four, eight and sixteen procedures and layered results without a line of its own.
+
 ## Credits
 
 Farbrausch and .theprodukkt, as the `fr_public` README names them: Fabian "ryg" Giesen, Sebastian "Wayfinder" Grillmaier, Tammo "kb" Hinrichs, Thomas "fiver2" Mahlke, Christoph "giZMo" Muetze, Dierk "Chaos" Ohlerich, Kai "cp" Poethkow, Ronny Pries, Dennis "Exoticorn" Ranke, Leonard "paniq" Ritter and Bastian "Tron" Zuehlke; 49Games GmbH in Altona's licence; Sean Barrett for the stb libraries inside Altona.
@@ -810,7 +912,8 @@ The proof's real input uses KWin's fake input protocol (`org_kde_kwin_fake_input
 The relief's mapping is the edition's stereo texture module's (relief mapping after Fábio Policarpo, Manuel M. Oliveira and João L. D. Comba, 2005, and parallax occlusion mapping after Natalya Tatarchuk, 2006, as the module's own notes credit them); the 3D area follows Marble's `StereoLayer` and stereo-layer's surface, and is declared through `libstereo-declare`.
 The stereo photograph is read by stereo-layer and the edition's KImageFormats; MPO is CIPA DC-007, the JPS block is the JPS format's own, `sTER` is the PNG Extensions' chunk (version 1.4.0, 3.6); the photographs of the proof are made with Pillow (Jeffrey A. Clark and contributors).
 The compositor without the stereo protocol in the proof is Weston (the Wayland project).
-The fitter and its nine modern operators are the edition's "procedures from pixels" work, credited in [a procedure fitted to a bitmap](procedural-texture-from-a-bitmap.md); the two eyes from a picture and its depth map are made by stereo-layer's depth library.
+The fitter and its modern operators (twelve since its tenth round: Quad, Grid and Stack lay whole procedures) are the edition's "procedures from pixels" work, credited in [a procedure fitted to a bitmap](procedural-texture-from-a-bitmap.md); the two eyes from a picture and its depth map are made by stereo-layer's depth library.
 The stereo photographs the Fit tool was tried on are by Robbie Sproule (Montreal), as Wikimedia Commons records them: "Bark 1", "Moss 1" and "Sand pile", CC BY 2.0, cross-eyed pairs; each eye's square was cut at the photograph's own pixels.
 WebAssembly builds ran in wasmtime (Bytecode Alliance).
 The people whose work this plan reads or builds on, by the names their own pages give: wxthss82, wzman, Gregor Riepl (onitake), Frantsishak (KkriegerNet), kznsq, Mason Liu (kkrieger-wasm), Alfredo (varrtto), Steven Schronk, Rodz Labs and the Material Maker contributors, Nicolas Brown and the TextureLab contributors, Cedric Guillemet (Imogen).
+The thirty bitmap operators carried from `fr_public` pull request #108 are the work of wangxin (wxthss82 on GitHub), under the tree's BSD 2-clause licence; the colour matrix is OpenKTG's, written by Fabian "ryg" Giesen in 2007 and placed in the public domain; the seam that keeps the detail's contrast follows Eric Heitz and Fabrice Neyret (2018); Blend's modes are those of W3C Compositing and Blending Level 1; the natural logarithm carried with the maths is musl's (Arm Limited); the sixteen-bit pictures follow the PNG specification, third edition (W3C), for `sBIT`.

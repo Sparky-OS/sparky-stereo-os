@@ -139,6 +139,8 @@ class WhatGoesOut(Case):
             'reportbug --ui text -b somepackage': 'a bug report by mail',
             f'git -C {fork} push origin fix-branch': 'a push to a fork of another project',
             f'cd {fork} && git push --force-with-lease origin fix-branch': 'a push to a fork of another project',
+            f'git -C {fork} push -o ci.skip origin fix-branch': 'a push to a fork of another project',
+            f'git -C {fork} push -u -o ci.skip upstream fix-branch': "a push to another project's forge",
             f'git -C {fork} push upstream fix-branch': "a push to another project's forge",
             'git push https://github.com/Our-Org/kwin.git stereo3d': 'a push to a fork of another project',
             'git push git@invent.kde.org:someone/kwin.git work': "a push to another project's forge",

@@ -64,7 +64,7 @@ def files_in(words, cwd):
 def check_push(cfg, words, cwd, rep):
     repo = hookkit.git_folder(words, cwd)
     rest = hookkit.git_subcommand(words)[1]
-    places = [w for w in rest if not w.startswith('-')]
+    places = hookkit.push_places(rest)
     remote = places[0] if places else 'origin'
     refs = [p.lstrip('+').split(':', 1)[0] for p in places[1:]]
     if '--all' in rest or '--mirror' in rest:

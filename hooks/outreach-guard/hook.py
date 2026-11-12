@@ -103,7 +103,7 @@ def one_command(words, rules, cwd):
         return 'a bug report by mail', ''  # with -o it only writes the report to a file
     sub, rest = hookkit.git_subcommand(words)
     if sub == 'push':
-        places = [w for w in rest if not w.startswith('-')]
+        places = hookkit.push_places(rest)
         remote = places[0] if places else 'origin'
         if '://' in remote or '@' in remote or GITHUB.search(remote + ' '):
             return rules.address_goes_out(remote), remote

@@ -60,6 +60,9 @@ class ReadingShell(unittest.TestCase):
         self.assertEqual(hookkit.git_subcommand(['git', '--no-pager', 'log', '-p']), ('log', ['-p']))
         self.assertEqual(hookkit.git_subcommand(['git']), (None, []))
         self.assertEqual(hookkit.git_subcommand(['echo', 'git', 'push']), (None, []))
+        self.assertEqual(hookkit.push_places(['-u', '-o', 'ci.skip', '--force-with-lease', 'origin', 'HEAD:refs/heads/x']),
+                         ['origin', 'HEAD:refs/heads/x'])
+        self.assertEqual(hookkit.push_places(['--all']), [])
         self.assertEqual(hookkit.git_folder(['git', '-C', 'sub', 'push'], '/work'), '/work/sub')
         self.assertEqual(hookkit.git_folder(['git', 'push'], '/work'), '/work')
 

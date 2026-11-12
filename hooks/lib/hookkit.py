@@ -168,6 +168,20 @@ def git_subcommand(words):
     return (words[i], words[i + 1:]) if i < len(words) else (None, [])
 
 
+def push_places(rest):
+    """The remote and the refs of a `git push`, from the words after "push": its options are left out, and so is
+    the value of -o (a push option such as ci.skip)."""
+    places, skip = [], False
+    for word in rest:
+        if skip:
+            skip = False
+        elif word == '-o':
+            skip = True
+        elif not word.startswith('-'):
+            places.append(word)
+    return places
+
+
 def git_folder(words, cwd):
     """The folder a git command line acts in: its -C option, else cwd."""
     for i, word in enumerate(words[:-1]):

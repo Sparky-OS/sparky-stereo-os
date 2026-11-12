@@ -168,7 +168,8 @@ class ToolHook(Case):
     def test_a_push_with_a_secret_asks_the_person(self):
         repo = self.repo()
         self.commit(repo, 'notes.txt', f'key: {TOKEN}\n')
-        for command in (f'git -C {repo} push origin main', f'cd {repo} && git push', f'cd {repo} && git push origin HEAD:refs/heads/lane'):
+        for command in (f'git -C {repo} push origin main', f'cd {repo} && git push', f'cd {repo} && git push origin HEAD:refs/heads/lane',
+                        f'git -C {repo} push -o ci.skip origin main'):
             with self.subTest(command):
                 out = self.run_hook(self.bash(command))
                 self.assertEqual(self.decision(out), 'ask')

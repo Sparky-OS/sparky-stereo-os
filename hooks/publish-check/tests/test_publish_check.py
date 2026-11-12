@@ -146,6 +146,16 @@ class Checker(Case):
         self.configure(checks={'location_data': False})
         self.assertEqual(self.checker('--files', picture).returncode, 0)
 
+    def test_the_real_reader_on_a_file_it_cannot_read(self):
+        if not shutil.which('exiftool'):
+            self.skipTest('exiftool is not installed: its exit status on an empty picture was not run')
+        empty = testkit.write(os.path.join(self.tmp, 'empty.png'), '')
+        result = self.checker('--files', empty)
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn('location data NOT checked: exiftool exited 1', result.stdout)
+        text = testkit.write(os.path.join(self.tmp, 'text.jpg'), 'not an image')
+        self.assertEqual(self.checker('--files', text).returncode, 0)  # no picture, so no location data in it
+
     def test_commits_no_remote_has_are_checked_and_pushed_ones_are_not(self):
         repo = self.repo()
         self.commit(repo, 'old.txt', f'{TOKEN}\n')

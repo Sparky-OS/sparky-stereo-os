@@ -262,7 +262,7 @@ def check_media(cfg, path, name):
         return rep
     if r.returncode:
         rep.add(True, name, f'location data NOT checked: exiftool exited {r.returncode}; '
-                'check that the file is readable and supported, then run the check again')
+                'check that the file can be read and is not empty, then run the check again')
         return rep
     tags = [ln.split(':', 1)[0].strip() for ln in r.stdout.splitlines() if ln.strip()]
     if tags:

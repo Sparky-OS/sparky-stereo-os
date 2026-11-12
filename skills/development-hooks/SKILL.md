@@ -100,8 +100,9 @@ Extend the hook that already stands at that moment (another pattern, another che
 - **A media check says clean after its reader failed.**
   **Symptom:** the metadata reader exits with an error, but the publish check finds no location tags and reports clean.
   **Cause:** the checker only looked at the reader's output, ignoring its exit status.
-  **Fix:** a nonzero exit now reports `location data NOT checked`; repair the unreadable or unsupported file and run the check again.
+  **Fix:** a nonzero exit now reports `location data NOT checked`; make the file readable and run the check again.
   **How found:** a substitute metadata reader exits 2 with empty output; the test requires a hard finding and also checks the existing `location_data` switch.
+  The real reader (exiftool 13.55) was then run as the check runs it: 130 pictures of this repository all exit 0, an empty file and a file it cannot open exit 1, and a text file under a picture's name exits 0 with no tags, so it passes as a file without location data.
 - **Failing closed locks a session, or loses a report.**
   **Symptom:** every tool call of a session is refused and nothing the partner does helps; or a lane ends and its report never arrives.
   **Cause:** a hook that exits with an error of its own, or refuses the very tool that would repair things. For a hand-back, Claude Code's reference says what a refusal does: "Claude Code then tells the subagent, up to three times, that its report wasn't delivered and to call the tool again. If your hook keeps denying, the subagent ends without delivering a report through this tool".

@@ -48,6 +48,17 @@ A trap gives its symptom, its cause, its fix and how the cause was found; a reci
 - Symptom: a headless capture that worked suddenly answers a plain 1920x1080 picture with `stereo 0`, and it looks as if KWin lost stereo. Cause: the program under test has exited, most often by a `timeout` in the harness that was shorter than the capture series, so the later captures show an empty desktop. Fix: keep the program alive for the whole series, and check its PID before each capture. Found by: the harness log, where `timeout -s INT 40` ended the program before capture three (lane 486).
 - Symptom: a measured disparity is off by a constant fraction of a pixel (0.8 px in the case found) against the prediction. Cause: the prediction used the window's size, while a docked panel inside the program changed the aspect of the 3D viewport. Fix: predict from the viewport the program reports, never from the window. Found by: printing the program's own viewport beside the window geometry (lane 486).
 
+- Symptom: a Python ScreenShot2 client prints a D-Bus cancellation traceback but never exits.
+  Cause: its pipe reader is a non-daemon thread, and the exception bypasses release of the client’s duplicate write descriptor, so the reader never sees EOF.
+  Fix: release the Gio UnixFDList in a `finally` block, bound the reader join, and make the reader a daemon as the final shutdown safeguard.
+  Found by comparing the same rejected request before and after the cleanup change: the fixed negative control exits 1 in three seconds, and the render-node smoke capture still succeeds.
+  Do not count the rejected capture as a stereo proof (lane craft-apps-232, 2026-11-10).
+- Symptom: a virtual compositor says `Operation not permitted` before it logs anything.
+  Check the binary’s file capabilities and the container’s capability boundary before changing KWin source.
+  The test image carried `cap_sys_nice=ep`; removing that file capability in the disposable image allowed an unprivileged compositor to start, with identical executable bytes.
+  A passwd entry for the test UID is also required by the private session bus.
+  The subsequent no-render-node capture was cancelled; the authorized render-node control succeeded, confirming the existing render-node trap above rather than a client regression (lane craft-apps-232, 2026-11-10).
+
 ## Perks of the part
 
 - A headless audio rig for player timing: PipeWire + WirePlumber on a null sink at the user's clock rate and allowed rates, `pw-record` of the sink monitor, an analysis script (onset, gaps, jumps, lag spread) and a second one for the player's own drift view; works in a container with a passwd entry for the uid. (lane players-shared-layer)

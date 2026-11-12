@@ -87,8 +87,10 @@ if args.count is not None:
             print(f'{tokens:4d} {limit}  {chars:4d} of {DESCRIPTION_MAX} characters  {name}{"  OVER" if over else ""}')
     sys.exit(1 if any_over else 0)
 
-# Scope to operational instructions, their references and the maintainer entry pages.
-paths = sorted((ROOT / 'skills').rglob('*.md')) + [ROOT / 'AGENTS.md', ROOT / 'docs/maintainer-workflow.md']
+# Scope to operational instructions, their references, the pages of the hooks section and of the tools, and the
+# maintainer entry pages. A snapshot without a hooks or a tools folder is checked for what it has.
+paths = (sorted((ROOT / 'skills').rglob('*.md')) + sorted((ROOT / 'hooks').rglob('*.md'))
+         + sorted((ROOT / 'tools').rglob('*.md')) + [ROOT / 'AGENTS.md', ROOT / 'docs/maintainer-workflow.md'])
 for path in paths:
     if not path.is_file():
         errors.append(f'Missing entry page: {path.relative_to(ROOT)}')

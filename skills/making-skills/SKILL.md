@@ -150,12 +150,12 @@ Keep the short working recipe first and the detail in `references/`; a skill's `
 ```sh
 python3 tools/check-skills.py                      # headers, both description limits, every local link
 python3 tools/check-skills.py --count <name>       # this skill's size against its two limits
-python3 tools/tests/test_check_skills.py           # only when the checker or its data changed: "Ran 16 tests ... OK"
+python3 tools/tests/test_check_skills.py           # only when the checker or its data changed: "Ran 17 tests ... OK"
 python3 hooks/publish-check/publish_check.py --config YOUR/publish-check.json --files skills/<name>/SKILL.md
 ```
 
 `check-skills.py` needs `python3` and `python3-yaml`, nothing else, and no network.
-It checks the header, the limits and that every local link's file exists; it does not check that a fact is true, that an external address answers or that an anchor exists.
+It checks the header, the limits and that every local link's file exists, in the skills, in the pages of `hooks/` and `tools/` and in the two entry pages; it does not check that a fact is true, that an external address answers or that an anchor exists.
 For a heading you moved or renamed, search the repository for links to its old anchor, and keep the heading or leave `<a id="old-anchor"></a>` where the text now starts ([keep every link that points in](../writing-front-pages/SKILL.md#keep-every-link-that-points-in)).
 The [publish check](../../hooks/publish-check/README.md) looks for what must never be in a public file: a person's address, a secret, a name that is never published.
 The skills package runs `check-skills.py` when it is built, so a header that fails stops the package, not only the merge.

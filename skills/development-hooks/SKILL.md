@@ -79,7 +79,7 @@ Extend the hook that already stands at that moment (another pattern, another che
 7. **Tests first, by piping.** Subclass `testkit.HookCase`: it makes a toy workspace with `install.py`'s own `init`, runs the hook as a tool runs it and gives the answer back. Write what must be refused and, beside it, what must pass: the reads, the workspace's own repositories, text that is only written to a file. Run each test red once (take the rule out) before trusting its green.
 8. **Wire it:** `wiring.json` lists the events and matchers per tool; `python3 hooks/install.py wire claude WORKSPACE --only <name>` shows the result.
 9. **Write its page:** what it runs on, what it refuses or adds, why (with the words that asked for it), its configuration, how it fails.
-10. **Check:** `python3 hooks/tests/run.py` (the whole section, with the test that no path of one machine and no address is in it) and the publish check on every file.
+10. **Check:** `python3 hooks/tests/run.py` (the whole section, with the test that no path of one machine and no address is in it), `python3 tools/check-skills.py` (every local link of the new page) and the publish check on every file.
 
 ## Traps
 

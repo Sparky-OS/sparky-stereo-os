@@ -153,6 +153,20 @@ class CheckSkills(unittest.TestCase):
         self.assertEqual(r.returncode, 1)
         self.assertIn('skills/demo/SKILL.md: missing or escaping local link references/absent.md', r.stderr)
 
+    def test_a_broken_local_link_in_a_hooks_page_or_a_tools_page_fails(self):
+        tree = make_tree(self.tmp, {'demo': skill('demo', 'Text.')})
+        for folder, page, target in (('hooks/demo', 'README.md', '../lib/kit.py'), ('tools/counter', 'README.md', 'data.txt')):
+            with self.subTest(folder):
+                (tree / folder).mkdir(parents=True)
+                (tree / folder / page).write_text(f'See [the file]({target}).\n')
+                r = check(tree)
+                self.assertEqual(r.returncode, 1)
+                self.assertIn(f'{folder}/{page}: missing or escaping local link {target}', r.stderr)
+                there = (tree / folder / target).resolve()
+                there.parent.mkdir(parents=True, exist_ok=True)
+                there.write_text('')
+                self.assertEqual(check(tree).returncode, 0)
+
     def test_an_empty_tree_fails(self):
         (self.tmp / 'skills').mkdir()
         r = check(self.tmp)

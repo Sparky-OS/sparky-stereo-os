@@ -9,7 +9,9 @@ description: >-
   apt-get update exits 0 on a failed fetch, lc1 says the build record is not complete, a Qt header is missing after a
   qt6-base update, a pin leaves a binding or development package uninstallable, a systemd unit's proof shows none
   of its journal lines, a preinst prompt stops a non-interactive install, a language probe shows
-  English, a CMake consumer misses an imported library, or an index must be regenerated.
+  English, a CMake consumer misses an imported library, twenty Rust programs each carry the same crates (cargo fails
+  to select a version in a merged lock, a feature changes a trait's signature, dpkg-shlibdeps finds no dependency for
+  a Rust dylib), or an index must be regenerated.
 ---
 
 # Packaging the edition
@@ -24,6 +26,7 @@ description: >-
 6. A staged recipe that waited while a shared tool moved is redone on the new main as [rebasing a staged recipe](references/rebasing-a-staged-recipe.md) says.
 7. A package that downloads licensed data during installation follows [licensed data at install time](references/licensed-data-at-install.md): inspect consent, declare the download once, keep the data off the ISO and test refusal and retry.
 8. A development package must install every payload its CMake export needs; use [CMake development dependencies](references/cmake-development-dependencies.md) to check sibling packages with a clean installed consumer.
+9. A family of Rust programs that share their crates is built in one workspace and ships the shared crates once, as Rust dynamic libraries whose names carry their ABI: [a Rust suite as shared libraries](references/rust-suite-shared-libraries.md) has the recipe, the measured sizes and the traps.
 
 **Check freshness first.**
 Written on 2026-10-07; the developer tasks and the skills package on 2026-10-16; provenance, Paweł's formula, rebuilt packages, the repository and the ISO on 2026-10-23, from rules dated 2026-10-02 to 2026-10-22; pins by architecture and the packages that are not ours on 2026-10-31; the i386 blocks, the order of pin files and the conversion to conffiles on 2026-11-01.

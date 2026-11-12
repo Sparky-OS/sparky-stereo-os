@@ -34,7 +34,7 @@ Only our own commits are checked (the author is one of `our_identities`), and on
 ## Why
 
 Daniel approved it on 2026-10-14: one check that runs before every push, pull request, comment and mail.
-Each of its findings had been caught by hand at least once before the check existed: a photo with its location, a credential printed into a log, a name that is never published.
+Each of its findings had been caught by hand at least once before the check existed: a photo with its location, a credential printed, a name that is never published.
 
 ## Configuration
 

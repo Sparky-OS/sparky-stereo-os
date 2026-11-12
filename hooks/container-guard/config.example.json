@@ -1,0 +1,12 @@
+{
+  "enabled": true,
+  "workspace": "/path/to/your/workspace",
+  "paths": {
+    "state": "state/hooks"
+  },
+  "engines": ["docker", "podman"],
+  "protected": ["reference-index", "registry-mirror"],
+  "refuse_unfiltered_lists": true,
+  "refuse_global_prune": false,
+  "state_keep_days": 30
+}

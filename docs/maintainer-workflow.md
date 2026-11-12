@@ -61,7 +61,8 @@ That archive is for extraction and file access, not a promise that every client'
 
 ## Updating the instructions package
 
-Run `python3 tools/check-skills.py` in the public checkout.
+Run `python3 tools/check-skills.py` in the public checkout; it also counts every description against the index's window ([making-skills](../skills/making-skills/SKILL.md)).
+`python3 tools/tests/test_check_skills.py` tests the checker, and `python3 hooks/tests/run.py` tests [the hooks of the development cycle](../hooks/README.md).
 Review changed claims and links, then pin a reviewed source commit in the package build.
 Do not label a package with an old commit while copying uncommitted files into it.
 Local candidate snapshots must say they include working-tree changes and carry a file manifest; release snapshots must name the actual committed source.

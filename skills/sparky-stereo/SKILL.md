@@ -157,6 +157,8 @@ Load the one that matches the work; the [program list](../../docs/programs-in-de
 | [`user-groups`](../user-groups/SKILL.md) | The groups every desktop user gets, never a root-equivalent one |
 | [`system-housekeeping`](../system-housekeeping/SKILL.md) | Self-pruning defaults (kernels, logs, crash dumps, GRUB) and cleaning a system safely |
 | [`ai-partners`](../ai-partners/SKILL.md) | AI assistants joining the work: roles, briefs, proof, review, upstream manners, provenance |
+| [`making-skills`](../making-skills/SKILL.md) | Writing a skill or extending one: the header and its limits, the description that routes, lessons files, the review, the cold-reader test |
+| [`development-hooks`](../development-hooks/SKILL.md) | The hooks an AI tool or git runs by itself during the work, the workspace layout they assume, and how to add one |
 | [`search-upstream-first`](../search-upstream-first/SKILL.md) | Before fixing a bug in software we did not write: search upstream's branch, merge requests and issues, carry upstream's commit with credit when it exists |
 | [`upstream-outreach`](../upstream-outreach/SKILL.md) | Bringing AI-assisted work to projects and people: a heads-up to the maintainer before any merge request, evidence first, one ask, one knock, the right venue |
 | [`audio`](../audio/SKILL.md) | PipeWire, WirePlumber and KDE's Sound page: the audio house format, routing, formats, passthrough, virtual surround, MIDI |
@@ -166,7 +168,7 @@ Load the one that matches the work; the [program list](../../docs/programs-in-de
 | [`qt-android-ci`](../qt-android-ci/SKILL.md) | Qt Multimedia's Android tests run locally on a headless emulator, the way Qt's CI runs them: build, compare patch sets, read the results |
 
 
-**Leave a skill behind.** When work in a new area is accepted, write what the next person needs as a skill in this folder, or extend the one it belongs to, and add it to this table.
+**Leave a skill behind.** When work in a new area is accepted, write what the next person needs as a skill in this folder, or extend the one it belongs to, and add it to this table ([making-skills](../making-skills/SKILL.md) has the recipe).
 ---
 
 # Where these came from

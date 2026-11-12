@@ -106,7 +106,7 @@ Extend the hook that already stands at that moment (another pattern, another che
   **Symptom:** `gh pr view` is refused; a push to the workspace's own project is refused; a script written to a file with a here-document is refused because its text holds the words of a push; a commit whose message says "push" is refused.
   **Cause:** a regular expression searched over the whole command line.
   **Fix:** judge the simple commands a line runs (`event.commands()`): the program, its subcommand, its options. Text a command only writes is skipped, text handed to `bash -c` or to a shell's here-document is read. Name what is ours in the configuration, and ask git where a remote goes instead of guessing from its name.
-  **How found:** on 2026-11-12 a workstation's guard refused, twice, the command that wrote these hooks' own source files, because the files held the words; the lists of what must pass are now tests.
+  **How found:** on 2026-11-12 a workstation's guard refused, three times, a command that wrote or changed these hooks' own source files, because the files held the words; the lists of what must pass are now tests.
 - **A guard cannot be tested by a file that breaks its rule.**
   **Symptom:** the test file of a check is itself stopped by that check: a planted token fails the publish check, a planted sentence is stopped by the contract guard.
   **Fix:** put the planted thing together while the test runs (`'gh' + 'p_' + ...`), and say so at the top of the file.

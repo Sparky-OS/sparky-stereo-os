@@ -76,6 +76,20 @@ class ReadingShell(unittest.TestCase):
             with self.subTest(line):
                 self.assertIsNone(hookkit.shell_commands(line))
 
+    def test_what_begins_a_comment(self):
+        # the six lines of the Advanced Bash-Scripting Guide, chapter 3 "Special Characters", on the # character
+        cases = {
+            'echo "The # here does not begin a comment."': [['echo', 'The # here does not begin a comment.']],
+            "echo 'The # here does not begin a comment.'": [['echo', 'The # here does not begin a comment.']],
+            'echo The \\# here does not begin a comment.': [['echo', 'The', '#', 'here', 'does', 'not', 'begin', 'a', 'comment.']],
+            'echo The # here begins a comment.': [['echo', 'The']],
+            'echo ${PATH#*:}       # Parameter substitution, not a comment.': [['echo', '${PATH#*:}']],
+            'echo $(( 2#101011 ))  # Base conversion, not a comment.': [['echo', '$(( 2#101011 ))']],
+        }
+        for line, want in cases.items():
+            with self.subTest(line):
+                self.assertEqual(hookkit.shell_commands(line), want)
+
     def test_the_text_a_command_only_carries_is_left_out(self):
         line = ("ls  # a comment: git push fork branch\ncat > plan.md <<'EOF'\ngit push fork branch\nEOF\n"
                 "curl -s \\\n  example.org\nbash <<'SH'\necho kept  # dropped\nSH")

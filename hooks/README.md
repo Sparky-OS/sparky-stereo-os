@@ -80,9 +80,11 @@ To leave: `python3 hooks/install.py unwire FILE` takes these hooks out of a sett
 ```sh
 python3 hooks/tests/run.py            # every hook's tests and the shared ones; python3 and git are all they need
 python3 hooks/tests/run.py outreach   # one hook
+sh hooks/tests/clean-machine.sh       # the whole proof, for a machine that has nothing but this repository
 ```
 
 Each test makes a toy workspace in the default layout with `install.py`'s own `init`, pipes an event into the hook and reads the answer.
+[`clean-machine.sh`](tests/clean-machine.sh) adds the skills check, the wiring written to a file and run, the outreach guard's refuse, read, consult, pass by hand, and the publish check over this section with the example configuration; it prints one PASS or FAIL line per step and writes only under a temporary folder.
 
 ## Add a hook, or change one
 

@@ -32,7 +32,7 @@ The programs, their example configurations and their tests are in [`hooks/`](../
 3. **Check:** `python3 hooks/install.py check WORKSPACE` reads every configuration the way the hooks do and names each file a configuration points to that does not exist. It ends with "Every configuration reads, and every file it names exists." and exit 0, or with the count of things to fix and exit 1.
 4. **Wire a tool:** `python3 hooks/install.py wire claude WORKSPACE` prints the settings block; with `--write FILE` it merges the block into that settings file and keeps a copy named `FILE.before-hooks-DATE` beside it. For Codex: `wire codex`. For commits: `python3 hooks/install.py git REPOSITORY WORKSPACE` prints two `git config` commands.
 5. **Watch the first run.** A hook whose path is wrong does not stop anything: the tool shows a "hook error" notice and carries on. In Claude Code, `/hooks` lists what is wired.
-6. **Run the tests after any change:** `python3 hooks/tests/run.py` ends with `N test files, N tests: all passed`.
+6. **Run the tests after any change:** `python3 hooks/tests/run.py` ends with `N test files, N tests: all passed`; `sh hooks/tests/clean-machine.sh` runs the whole proof on a machine that has only this repository and ends with `clean-machine proof: every step passed`.
 7. **To leave:** `python3 hooks/install.py unwire FILE` takes these hooks out of a settings file and leaves every other entry as it was.
 
 ## What each hook is for
@@ -132,6 +132,6 @@ Extend the hook that already stands at that moment (another pattern, another che
 
 ## Not proved yet
 
-Written on 2026-11-12: the hooks' tests pipe events shaped as each tool's documentation shows them, on a clean machine with only this repository.
+Written on 2026-11-12: the hooks' tests pipe events shaped as each tool's documentation shows them, and they passed in a container with nothing but this repository, without network, as an ordinary user, on a read-only file system.
 A live session of Claude Code or of Codex running these scripts was not part of that proof; the Codex dialect in particular was written from its documentation alone.
 When you run them live, add what you find here.

@@ -24,7 +24,7 @@ def reading_text(kit, pending, why):
     lines = [f'[Required reading ({why}). These files hold the recorded designs. Each one is read in full, with the '
              'file-reading tool, before any other tool runs; until then other tools are refused.]']
     lines += [f'- {os.path.join(memory, name)}' for name in pending]
-    hint = kit.cfg.get('lookup_hint')
+    hint = kit.lookup_hint('WORD...')
     if hint:
         lines.append('Before a brief, an acceptance or a report of a default or a choice: search the memory by content '
                      f'for the package and the feature words ({hint}), read what it names and quote the lines that govern.')

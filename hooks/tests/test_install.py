@@ -90,13 +90,10 @@ class Install(unittest.TestCase):
         self.assertIn('design-reading: on; first_call on, gap on, lane_named on, session_start on', r.stdout)
         self.assertIn('core file not found: ' + os.path.join(self.ws, 'memory', 'check-every-default.md'), r.stdout)
         self.assertIn('always_read file not found: ' + os.path.join(self.ws, 'memory', 'how-we-write-upstream.md'), r.stdout)
+        self.assertNotIn('upstream-outreach', r.stdout)   # found in this checkout's skills, through "skills:"
         for name in ('check-every-default.md', 'one-format-inside.md', 'how-we-write-upstream.md'):
             with open(os.path.join(self.ws, 'memory', name), 'w') as f:
                 f.write('A fact.\n')
-        cfg = self.config('outreach-guard')
-        cfg['always_read'] = [os.path.join(os.path.dirname(HOOKS), 'skills', 'upstream-outreach', 'SKILL.md'), 'memory/how-we-write-upstream.md']
-        with open(install.config_path(self.ws, 'outreach-guard'), 'w') as f:
-            json.dump(cfg, f)
         r = run('check', self.ws)
         self.assertEqual(r.returncode, 0, r.stdout)
         self.assertIn('Every configuration reads, and every file it names exists.', r.stdout)

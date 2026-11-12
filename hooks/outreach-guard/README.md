@@ -36,7 +36,7 @@ One file, `private/hooks/outreach-guard.json`; [`config.example.json`](config.ex
 | `enabled` | `true` | The whole hook. |
 | `paths.memory`, `paths.skills`, `paths.state` | the default layout | Where the memory, the skills and this hook's state are. |
 | `window_seconds` | `14400` | How long a read and a consult stay good. |
-| `always_read` | the outreach skill and one example memory file | Files read before anything is sent, as paths from the workspace or absolute. A file that does not exist is not demanded, and that is logged. |
+| `always_read` | the outreach skill and one example memory file | Files read before anything is sent: `skills:NAME/SKILL.md` and `memory:FILE.md` are taken from those folders of the layout, any other path from the workspace, or absolute. A file that does not exist is not demanded; `install.py check` names it and the hook logs it. |
 | `projects` | thirteen patterns | What in a command or in a remote's address names a project, and the contrib skill that goes with it. |
 | `require_consult`, `consult_tools` | `true`; one example tool name | Whether a consult is asked for, and which tools count as one. With no tool listed, none is asked for. |
 | `own_owners`, `own_repos`, `own_urls` | placeholders | The accounts and projects that are ours. A fork of another project under our account is not in `own_repos`: a push to it can update an open pull request. |
@@ -44,7 +44,7 @@ One file, `private/hooks/outreach-guard.json`; [`config.example.json`](config.ex
 | `mail_commands` | three | Programs that send mail. |
 | `resolve_remotes` | `true` | Ask git for a remote's address. When off, or when git gives none, a remote named in `fork_remote_names` counts as a fork. |
 | `checklist` | eight lines | What is shown when the command passes. |
-| `lookup_hint` | the lookup command | Shown in the refusal. |
+| `lookup_hint` | `true` | The memory lookup shown in the refusal: `true` for this section's own, a text to replace it, `false` to hide it. |
 
 ## How it fails
 

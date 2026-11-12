@@ -188,8 +188,9 @@ def handle(event, kit):
             lines += [f'- {p}' for p in missing]
         if no_consult:
             lines.append(f'Consulted the reference index for this subject ({", ".join(tools)}); an empty answer is recorded as it is.')
-        if kit.cfg.get('lookup_hint'):
-            lines.append(f'Search the memory by content for the project and the subject too ({kit.cfg["lookup_hint"]}).')
+        hint = kit.lookup_hint('PROJECT SUBJECT')
+        if hint:
+            lines.append(f'Search the memory by content for the project and the subject too ({hint}).')
         lines.append('Then send the same command again.')
         kit.log('refused.log', f'{why} | {short}')
         return kit.deny('\n'.join(lines))

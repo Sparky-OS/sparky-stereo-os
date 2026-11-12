@@ -27,6 +27,6 @@
   "read_tools": ["Read", "Glob", "Grep", "ToolSearch", "TaskOutput"],
   "free_tool_prefixes": ["mcp__"],
   "lane_named_max": 16,
-  "lookup_hint": "python3 repos/sparky-stereo-os/hooks/lib/design_lookup.py --memory memory WORD...",
+  "lookup_hint": true,
   "state_keep_days": 30
 }

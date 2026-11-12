@@ -286,8 +286,22 @@ class Kit:
         return self.resolve(value)
 
     def resolve(self, value):
-        value = os.path.expanduser(str(value))
+        """A path of the configuration: absolute, or from the workspace, or from a folder of the layout when it is
+        written "memory:file.md" or "skills:name/SKILL.md"."""
+        value = str(value)
+        key, colon, rest = value.partition(':')
+        if colon and key in LAYOUT:
+            return os.path.normpath(os.path.join(self.path(key), rest))
+        value = os.path.expanduser(value)
         return os.path.normpath(value if os.path.isabs(value) else os.path.join(self.workspace, value))
+
+    def lookup_hint(self, words):
+        """The command that searches the memory by content, for a refusal or a reading text: the configuration's
+        own text, none when it says false, else the lookup beside this file."""
+        hint = self.cfg.get('lookup_hint', True)
+        if hint is True:
+            return f'python3 {os.path.join(os.path.dirname(os.path.abspath(__file__)), "design_lookup.py")} --memory {self.path("memory")} {words}'
+        return hint or ''
 
     def on(self, key, default=True):
         """A switch under "on" in the configuration: what the hook enforces is the person's choice."""

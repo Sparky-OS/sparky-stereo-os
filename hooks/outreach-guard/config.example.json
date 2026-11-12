@@ -8,8 +8,8 @@
   },
   "window_seconds": 14400,
   "always_read": [
-    "repos/sparky-stereo-os/skills/upstream-outreach/SKILL.md",
-    "memory/how-we-write-upstream.md"
+    "skills:upstream-outreach/SKILL.md",
+    "memory:how-we-write-upstream.md"
   ],
   "projects": [
     {"pattern": "code\\.ffmpeg\\.org|FFmpeg/FFmpeg|ffmpeg-devel", "skill": "contrib-ffmpeg"},
@@ -48,6 +48,6 @@
     "The project's own rules on AI text and disclosure were read again; assistance is said once.",
     "The reference index was consulted for the subject; the ledger row follows the send."
   ],
-  "lookup_hint": "python3 repos/sparky-stereo-os/hooks/lib/design_lookup.py --memory memory PROJECT SUBJECT",
+  "lookup_hint": true,
   "state_keep_days": 30
 }

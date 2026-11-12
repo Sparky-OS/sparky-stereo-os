@@ -39,7 +39,7 @@ One file, `private/hooks/design-reading.json` in the default layout; [`config.ex
 | `read_tools`, `free_tool_prefixes` | Claude Code's reading tools; `mcp__` | The tools that are never refused. |
 | `shell_reads` | the tool's own | Whether a plain `cat FILE` counts as reading a file in full. On by default only where the tool has no reading tool (Codex). |
 | `lane_named_max` | `16` | The most files a lane's own list adds. |
-| `lookup_hint` | the lookup command | Shown in the reading text: how to search the memory by content. |
+| `lookup_hint` | `true` | Shown in the reading text: how to search the memory by content. `true` names the lookup of this section with the workspace's memory folder; a text replaces it; `false` hides it. |
 | `state_keep_days` | `30` | How long the state of a session that is not seen again is kept. |
 
 ## How it fails

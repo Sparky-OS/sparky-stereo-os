@@ -7,7 +7,8 @@
    (a name that is never published, a secret, location data, another person's address), except addresses in
    provenance files (copyright, changelog, control, patches), which stay as the provenance rules say.
 The configuration is the file named by `git config sparky.publishCheckConfig`, else by SPARKY_PUBLISH_CHECK_CONFIG.
-When the check cannot run (no configuration, a broken one), the commit goes ahead and this hook says so.
+When the check cannot run (no configuration, a broken one), the commit goes ahead and this hook says so;
+with `git config sparky.publishCheckOnFailure block` the commit is refused instead.
 To pass a finding that was looked at and is wrong: git commit --no-verify.
 """
 import json
@@ -60,8 +61,7 @@ def main():
         print('Take them out of the commit: git restore --staged PATH', file=sys.stderr)
         return 1
     if problem:
-        print(f'pre-commit: the publish check did not run: {problem}. The commit goes ahead unchecked.', file=sys.stderr)
-        return 0
+        return pc.unchecked('pre-commit', problem)
     if not raw.get('enabled', True):
         return 0
     cfg = pc.Config(raw)
@@ -102,6 +102,5 @@ def main():
 if __name__ == '__main__':
     try:
         sys.exit(main())
-    except Exception as e:  # the check could not run: say so, and let the commit go ahead
-        print(f'pre-commit: the publish check could not run ({type(e).__name__}: {e}). The commit goes ahead unchecked.', file=sys.stderr)
-        sys.exit(0)
+    except Exception as e:  # the check could not run: say so, and let the commit go ahead unless the repository asks otherwise
+        sys.exit(pc.unchecked('pre-commit', f'{type(e).__name__}: {e}'))

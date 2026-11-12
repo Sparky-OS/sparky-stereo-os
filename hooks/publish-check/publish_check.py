@@ -271,6 +271,21 @@ def check_media(cfg, path, name):
     return rep
 
 
+def unchecked(hook, problem):
+    """A git hook's answer when the check could not run. The commit goes ahead and says so; a repository that
+    prefers a refused commit to an unchecked one asks for that: git config sparky.publishCheckOnFailure block."""
+    try:
+        choice = subprocess.run(['git', 'config', '--get', 'sparky.publishCheckOnFailure'], capture_output=True, text=True, timeout=30).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        choice = ''
+    if choice == 'block':
+        print(f'{hook}: the publish check did not run: {problem}. The commit is refused, as sparky.publishCheckOnFailure asks: '
+              'repair the check, or commit this once without it (git commit --no-verify).', file=sys.stderr)
+        return 1
+    print(f'{hook}: the publish check did not run: {problem}. The commit goes ahead unchecked.', file=sys.stderr)
+    return 0
+
+
 def check_files(cfg, paths):
     rep = Report()
     for p in paths:

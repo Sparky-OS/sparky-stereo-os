@@ -90,4 +90,7 @@ The publish check also runs as two git hooks, for commits made by anyone, with o
 python3 hooks/install.py git REPOSITORY WORKSPACE      # prints the two git config commands; it runs nothing
 ```
 
+When the check cannot run, a commit goes ahead and the hook says so.
+With `--on-failure block` the command prints a third line, `git config sparky.publishCheckOnFailure block`, and such a commit is refused with the cause named.
+
 `core.hooksPath` replaces the repository's own hooks folder, so a repository that already has hooks of its own calls [`publish-check/git/pre-commit`](publish-check/git/pre-commit) and [`commit-msg`](publish-check/git/commit-msg) from them instead.

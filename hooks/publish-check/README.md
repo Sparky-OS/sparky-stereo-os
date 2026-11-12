@@ -61,6 +61,7 @@ For the git hooks, name the file once per repository: `python3 hooks/install.py 
 
 The tool hook fails open and says so, like every hook here.
 The git hooks say so on the terminal: without a configuration, or with one that cannot be read, they print that the check did not run and that the commit goes ahead unchecked.
+A repository that prefers a refused commit to an unchecked one says so with `git config sparky.publishCheckOnFailure block` (`install.py git REPOSITORY WORKSPACE --on-failure block` prints the line); the refusal names the cause and `git commit --no-verify` as the way past it.
 The private-record paths are refused even then, because that check needs no configuration.
 A picture is never passed unchecked: without `exiftool` the finding is "location data NOT checked", which is hard.
 The same finding appears when `exiftool` exits with an error (an empty file, a file it cannot open) or does not answer in 60 seconds; its empty output counts as clean only when it exited 0.
@@ -79,5 +80,5 @@ The first command prints two style notes and exits 0.
 
 ## Tests
 
-`python3 hooks/tests/run.py publish-check` runs 31 tests in [`tests/`](tests/test_publish_check.py): the checker, the tool hook and both git hooks in real repositories made for the test.
+`python3 hooks/tests/run.py publish-check` runs 32 tests in [`tests/`](tests/test_publish_check.py): the checker, the tool hook and both git hooks in real repositories made for the test.
 The secrets and addresses they plant are put together while the test runs, so the test file itself passes the check.

@@ -345,6 +345,21 @@ class GitHooks(Case):
         self.assertIn('cannot be read', r.stderr)
         self.assertIn('The commit goes ahead unchecked', r.stderr)
 
+    def test_a_repository_can_ask_for_a_refused_commit_when_the_check_cannot_run(self):
+        repo = self.hooked(configured=False)
+        self.git(repo, 'config', 'sparky.publishCheckOnFailure', 'block')
+        r = self.commit(repo, 'notes.txt', 'clean\n')
+        self.assertEqual(r.returncode, 1)
+        self.assertIn('pre-commit: the publish check did not run: no configuration', r.stderr)
+        self.assertIn('The commit is refused, as sparky.publishCheckOnFailure asks', r.stderr)
+        self.git(repo, 'config', 'sparky.publishCheckConfig', self.config)
+        with open(self.config, 'w') as f:
+            f.write('{broken')
+        r = self.commit(repo, 'notes.txt', 'clean\n')
+        self.assertEqual(r.returncode, 1)
+        self.assertIn('cannot be read', r.stderr)
+        self.assertEqual(self.git(repo, 'commit', '-q', '--no-verify', '-m', 'looked at').returncode, 0)
+
     def test_switched_off(self):
         repo = self.hooked()
         self.configure(enabled=False)

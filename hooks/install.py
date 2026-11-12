@@ -7,7 +7,8 @@
   install.py wire TOOL WORKSPACE [--write FILE] [--only HOOK,...] [--on-failure block]
                                                print the wiring for claude or codex; --write merges it into FILE
   install.py unwire FILE                       take this folder's hooks out of a settings file
-  install.py git REPOSITORY WORKSPACE          point a repository's git hooks at publish-check (prints the commands)
+  install.py git REPOSITORY WORKSPACE          point a repository's git hooks at publish-check (prints the commands;
+                                               --on-failure block adds the line that refuses an unchecked commit)
 
 Nothing is written outside WORKSPACE unless --write or unwire names the file, and an existing file is never replaced
 without a unique copy beside it (FILE.before-hooks-DATE-UNIQUE). init never overwrites a file that exists.
@@ -258,6 +259,8 @@ def main(argv=None):
     p = sub.add_parser('git', help='print the commands that point a repository\'s git hooks at publish-check')
     p.add_argument('repository')
     p.add_argument('workspace')
+    p.add_argument('--on-failure', choices=['block', 'continue'], default='continue',
+                   help='what a commit does when the check cannot run: go ahead and say so (the default), or be refused')
     a = ap.parse_args(argv)
     try:
         if a.action == 'init':
@@ -294,7 +297,10 @@ def main(argv=None):
             cfg = config_path(os.path.abspath(os.path.expanduser(a.workspace)), 'publish-check')
             print(f'git -C {shlex.quote(repo)} config core.hooksPath {shlex.quote(os.path.join(HOOKS, "publish-check", "git"))}')
             print(f'git -C {shlex.quote(repo)} config sparky.publishCheckConfig {shlex.quote(cfg)}')
-            print('# to undo: git -C REPOSITORY config --unset core.hooksPath; git -C REPOSITORY config --unset sparky.publishCheckConfig')
+            if a.on_failure == 'block':
+                print(f'git -C {shlex.quote(repo)} config sparky.publishCheckOnFailure block')
+            print('# to undo: git -C REPOSITORY config --unset core.hooksPath; git -C REPOSITORY config --unset sparky.publishCheckConfig'
+                  + ('; git -C REPOSITORY config --unset sparky.publishCheckOnFailure' if a.on_failure == 'block' else ''))
     except (hookkit.HookError, OSError, ValueError) as e:
         sys.exit(f'install.py: {e}')
     return 0

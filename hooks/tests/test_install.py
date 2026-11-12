@@ -250,6 +250,10 @@ class Install(unittest.TestCase):
         self.assertEqual(r.returncode, 0)
         self.assertIn(f"config core.hooksPath {HOOKS}/publish-check/git", r.stdout)
         self.assertIn("config sparky.publishCheckConfig", r.stdout)
+        self.assertNotIn('publishCheckOnFailure', r.stdout)
+        r = run('git', os.path.join(self.tmp, 'some repo'), self.ws, '--on-failure', 'block')
+        self.assertIn('config sparky.publishCheckOnFailure block', r.stdout)
+        self.assertIn('--unset sparky.publishCheckOnFailure', r.stdout)
         self.assertFalse(os.path.exists(os.path.join(self.tmp, 'some repo')))
 
 

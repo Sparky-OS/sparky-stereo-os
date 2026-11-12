@@ -41,6 +41,7 @@ Run every command from the top folder of this repository's checkout; they need `
    `FILE` is the tool's settings file: for Claude Code `~/.claude/settings.json` for all your projects or `.claude/settings.local.json` in one; for Codex `~/.codex/hooks.json`, written the same way with the same copy ([the tools page](../../hooks/TOOLS.md) has the rest).
    Claude Code normally picks a changed settings file up by itself; if the hooks have not appeared after a few seconds, start a new session.
    The two `git config` lines set `core.hooksPath` to `hooks/publish-check/git` and name the configuration; while that is set, git runs only that folder's `pre-commit` and `commit-msg`, so a repository with hooks of its own calls these two from them instead ([git](../../hooks/TOOLS.md#git)).
+   When the check cannot run, a commit goes ahead and says so; with `--on-failure block` the command prints a third line, and such a commit is refused instead.
 5. **Watch the first run.** A hook whose path is wrong does not stop anything: the tool shows a "hook error" notice and carries on. In Claude Code, `/hooks` lists what is wired.
    In Codex, open `/hooks`, review the commands and configuration paths, and trust the entries you intend to run.
    Check the expected refusal or context on an event the hook covers; an enabled entry alone proves only that the settings were loaded.

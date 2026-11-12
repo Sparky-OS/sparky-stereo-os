@@ -55,7 +55,7 @@ It is a guard rail, not a wall.
 A program that hides a command where no reader of shell text finds it (inside a script file, behind an alias) is not seen.
 
 Logs, in `state/hooks/outreach-guard/`: `refused.log` and `passed.log` (the reason and the first 200 characters of each command), `errors.log`.
-These are summaries, not complete replay inputs; [the log trap](../../skills/development-hooks/SKILL.md#traps) explains what to retain privately when a decision needs investigation.
+These are summaries, not complete replay inputs; [the log trap](../../skills/development-hooks/references/lessons-2026-11.md#traps-the-symptom-the-cause-the-fix-how-it-was-found) explains what to retain privately when a decision needs investigation.
 
 ## Try it by hand
 

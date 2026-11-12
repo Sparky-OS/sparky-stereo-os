@@ -133,3 +133,16 @@ On 2026-11-10, PhotoCraft's full, half-width and half-height ID pictures matched
 The Wayland swapped-eye references differed at every pixel.
 Displayed sample shape matched its rational pixel aspect, single-resize PSNR was 58.94–69.46 dB, and there were zero eye differences outside the media window.
 This result covers the tested opaque RGB8 path; it is not a deep-colour, stock-main 2D or other-platform proof.
+
+## Prove the decoder feature that changed
+
+LightCraft's default desktop feature set excludes HEIF, while its Linux gate separately tests the HEIF codecs and engine.
+For a HEIF change, build both the untouched stock GUI and the candidate with `cargo build -p lightcraft --features heif`, keeping their other defaults equal and recording the feature flags with each ELF hash.
+Use a synthetic HEIF whose primary image and two eye images have different samples; the metadata-only stereo fixture's identical eye samples cannot establish eye identity.
+For a tiled PCM fixture, decode each distinct coded tile with HM and compare it with the chosen YCbCr samples, then require every reused tile to match a checked stream.
+Export the standalone left and right HEIF images as ordinary pictures through untouched stock to obtain the finishing and dithering oracle.
+Compare the candidate's native pair with those exports on Wayland and X11, retain swapped-eye failures and check the area outside the media rectangle.
+Compare complete ordinary HEIF captures against stock too, using the same default GPU readiness sequence and no masks.
+The measured aligned 384 by 256 grids produced exact native and displayed eye pixels, and exact whole-output ordinary controls on both backends.
+Keep that aligned-file identity claim separate from the declared-size crop correction carried by [craft-libs #841](https://github.com/storytold/craft-libs/pull/841); the former app decoder could expose coded padding on other files.
+This is opaque RGB8 synthetic coverage; real-camera HEIC, padded-file GUI behavior, HDR and other platforms need their own checks.

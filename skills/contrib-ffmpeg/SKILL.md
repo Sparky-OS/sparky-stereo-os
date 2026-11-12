@@ -37,6 +37,11 @@ Check freshness: re-read `CONTRIBUTING.md`, `doc/developer.texi` and `doc/commun
 - Each commit builds and passes its own tests on its own.
 - After squashing, rewrite the message to describe what the commit does now, not what it did before the review.
 
+## Before pushing: the audit
+- FATE passes on a test that breaks the rules below, so running the tests does not find a breach. Before the tests are rerun, walk [the audit](references/pre-push-audit.md) against the diff: 26 rules about a series, a commit message, a test and a reply, each with the search that finds a breach (`grep -nE 'exit\(|abort\(|assert|return [1-9]' tests/api/X.c`, `git log --format=%B BASE..HEAD | awk 'length > 72'`, `git show --stat` per commit, the new test run on the commit before the change).
+- The lane lists every rule with "checked: how" in its hand-back; the reviewer who pushes repeats it on the head that will be pushed.
+- When a reviewer finds a breach of a rule this skill already states, the round starts with the whole audit, not with the reported line: on #25395 one reported helper led to six more places in the same program ([the fifth round](references/lessons-2026-11.md#a-fifth-bot-round-a-rule-the-skill-already-had-order-530-2026-11-12)).
+
 ## Commit messages
 - Subject `area/sub: what it does`, imperative (`avcodec/vvc: keep the current picture after an output error`).
 - Body: the problem, the change, the proof, wrapped at 72 characters per line except code, URLs and trailers. FFmpeg's `doc/git-howto.texi`, "Writing a commit message": "These details should not exceed 60-72 characters per line, except when containing code." Our one-sentence-per-line style is for our own documents, never for an FFmpeg commit (a reviewer asked for the wrap on #25398, 2026-10-24).
@@ -44,6 +49,8 @@ Check freshness: re-read `CONTRIBUTING.md`, `doc/developer.texi` and `doc/commun
 
 ## Tests (FATE)
 - Expected results live in `tests/ref/fate/...`; the test prints what it observes and FATE compares. Never hard-code expectations in C constants, and never let a callback in a test program decide by itself: a `get_format()` that returned `AV_PIX_FMT_NONE` on an unexpected query result hid a failed query in every case that expected `none` anyway (#25398). Print the result (`query_failed=%d`) and go on.
+- A test program ends by itself only when it cannot be set up (memory, the sample, a copy of a packet), and then with a message. `exit()`, `abort()`, an assert or a non-zero return on a value that the code under test produced is a hard-coded expectation, and so is a helper that checks the test's own fixture: the bot rated `if (ps[0] != 1 || ps[1] != 1) exit(1);` as moderate on #25395, and the fix was one printed line in the reference (`non-packed-source: vps=1 sps=1`). A reader of the output prints what it cannot parse (`truncated-sei`) instead of leaving.
+- Fixtures and the oracle of a walk are made by the test, never by running the code under test: an input produced by the filter agrees with whatever the filter does.
 - A test is as small as the change it proves: run it on the unfixed code, keep the cases whose output changes plus one control, and show each kept case is needed with a mutation only it catches (the bot rates "tests larger than the change they cover" as moderate). Wider coverage of existing behaviour goes in a pull request of its own.
 - A new test fails on unpatched master and passes with the change; run the full applicable FATE with GCC and clang and report both totals.
 - The test goes in its own commit, after the fix, so every commit passes FATE and the fix can be backported alone. A maintainer asked for this on #25398 (2026-10-24: "Please do not mix tests and fixes in the same commit"). It is not written in `doc/developer.texi`; the nearest text is "Bug fixes intended for backporting should stay focused".
@@ -57,6 +64,7 @@ Check freshness: re-read `CONTRIBUTING.md`, `doc/developer.texi` and `doc/commun
 - Reproduce each finding before changing anything: the review often names the mutation it ran (for example "I forced `frame_params()` to fail"); run the same probe on the old head and keep its output as the red column. When a change to the test makes sentences of the pull request description untrue (what the reference covers, the FATE totals), rewrite them in the same round.
 - The mail carries only the summary lines: read the whole review, an issue comment on the pull request, and fetch the branches it kept on `Forgejo_Fairy/FFmpeg` (`fairy/prN-tooling` probes, `fairy/prN-*-fix` amendments) to reproduce before changing anything; carry an amendment with credit ([recipe and traps](references/lessons-2026-11.md#a-third-bot-round-on-the-frame-packing-filters-order-523-2026-11-11)).
 - When the bot says a fix is only partly done, compare the unit the clause states its rule for (the coded video sequence, every earlier message, every message) with the unit the fix used (the access unit, the same id, the first message).
+- A message can make two statements with one field: H.264's repetition period greater than 1 says how long the arrangement persists and also requires a later message with its id (D.2.26). Model each statement of a clause as its own state; what ends one (a cancellation with another id) need not end the other.
 - When the bot finds neighbours of the last fix again, stop fixing cases: write the invariant down (what must hold, for every decoder start, once a picture is output), generate every combination of the dimensions its cases vary, and check each output with an oracle in the test that does not use the code under test ([recipe and traps](references/lessons-2026-11.md#a-fourth-bot-round-the-invariant-and-the-walk-order-527-2026-11-11)).
 
 ## CI
@@ -69,5 +77,5 @@ Check freshness: re-read `CONTRIBUTING.md`, `doc/developer.texi` and `doc/commun
 
 ## Lessons from the lanes, October to November 2026
 
-[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (9 entries, a section on multilayer HEVC and the 3D reference displays SEI, one on a third review round of the frame packing filters, and one on stating the invariant and walking the family in the fourth).
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (9 entries, a section on multilayer HEVC and the 3D reference displays SEI, one on a third review round of the frame packing filters, one on stating the invariant and walking the family in the fourth, and one on the fifth, where the bot found a rule of this skill broken).
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

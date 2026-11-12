@@ -310,11 +310,11 @@ def _commands(lexer, tokens, depth):
     for token in list(tokens) + [('newline',)]:
         kind = token[0]
         if kind == 'word':
+            subs += token[2]  # a substitution runs wherever it stands, in a redirection's target too
             if skip:
                 skip = False  # the target of a redirection is a file, not a word of the command
             else:
                 current.append(token[1])
-                subs += token[2]
             continue
         skip = False
         if kind == 'heredoc':
@@ -612,7 +612,7 @@ class Kit:
             os.replace(tmp, self._state_file)
 
     def _prune(self):
-        """Once a day, drop the state of sessions not seen for "state_keep_days" (30) and cut logs over 1 MiB."""
+        """Once a day, drop the state of sessions not seen for "state_keep_days" (30) and move a log over 1 MiB aside (NAME.log.1, one older copy)."""
         stamp = os.path.join(self.state_dir, '.pruned')
         try:
             if self.now - os.path.getmtime(stamp) < 86400:

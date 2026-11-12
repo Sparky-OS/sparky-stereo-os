@@ -65,6 +65,7 @@ class ReadingShell(unittest.TestCase):
             "echo $'it\\'s' && git push fork branch": [['echo', "it's"], PUSH],
             'echo issue#12 ${x#prefix} $# && git push fork branch': [['echo', 'issue#12', '${x#prefix}', '$#'], PUSH],
             'diff <(git push fork branch) notes.txt': [['diff'], PUSH, ['notes.txt']],
+            'echo done > "$(git push fork branch)"': [['echo', 'done'], PUSH],
             message: [['git', 'commit', '-m', '$(...)'], ['cat'], PUSH],
             'echo "see #12: git push fork branch"': [['echo', 'see #12: git push fork branch']],
             "note='git push fork branch'; echo \"$note\"": [['echo', '$note']],

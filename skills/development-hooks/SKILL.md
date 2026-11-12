@@ -164,7 +164,7 @@ Extend the hook that already stands at that moment (another pattern, another che
 - `python3 hooks/lib/design_lookup.py --memory WORKSPACE/memory WORD...` finds a recorded design by the content of the memory files, for a person as well as for the hook that uses it.
 - `hooks/publish-check/publish_check.py` is a command of its own: `--files`, `--text` on stdin, a repository's unpushed commits, `--audit N`.
 - A hook can be tried by hand with one `printf` piped into it; six of the seven pages have the lines, and the contract guard's events are in its tests, because its page cannot print a sentence that the guard would stop.
-- The logs in `state/hooks/NAME/` (`refused.log`, `passed.log`, `errors.log`) are the record of what the hooks did, for a review; a log over 1 MiB is cut, a session's state is dropped after `state_keep_days` (30), and a full event kept to reproduce a decision goes under `private/`.
+- The logs in `state/hooks/NAME/` (`refused.log`, `passed.log`, `errors.log`) are the record of what the hooks did, for a review; a log over 1 MiB is moved aside as `NAME.log.1`, a session's state is dropped after `state_keep_days` (30), and a full event kept to reproduce a decision goes under `private/`.
 
 ## Not proved yet
 

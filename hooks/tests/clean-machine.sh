@@ -48,6 +48,7 @@ hook() { python3 "$REPO/hooks/$1/hook.py" --config "$W/private/hooks/$1.json"; }
 
 step "1. the skills check, with the description window"
 run "check-skills.py" 1 python3 tools/check-skills.py
+run "check-skills.py --anchors: every local link with a fragment lands on a heading" 1 python3 tools/check-skills.py --anchors
 if python3 tools/check-skills.py --count >"$WORK/count.txt"; then pass "check-skills.py --count: no description over a limit"; else fail "a description is over a limit"; fi
 head -n 3 "$WORK/count.txt" | sed 's/^/    /'
 

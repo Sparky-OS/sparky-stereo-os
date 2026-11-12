@@ -149,6 +149,12 @@ The same regressions failed at level 0 and passed at level 1 with their explicit
 Narrow package-specific dev profiles restored the donor setting, like the shared workspace's existing Affinity exception.
 Record this as a build-profile correction, not a claim to have made the parser nonrecursive or proved every caller's stack size.
 
+A reopen test also failed when a fast injected log-writer failure made a snapshot due inside the command's own persist.
+The snapshot retained the changed flag, so the product correctly allowed reopening; the test had not established its intended no-snapshot precondition.
+A bounded first-write handshake held the injected failure until the command returned, keeping the original refusal, unsaved-state, data-retention and retry assertions and the separate positive snapshot/reopen test.
+A controlled run first forced the observed interleaving and checked that the successful reopen retained the change; the corrected seven-test slow-drive group then passed without changing production persistence code.
+Do not replace that synchronization with a longer sleep or remove the refusal assertion.
+
 ## Duotone pixels match, but the warning counts a virtual layer
 
 PhotoCraft's stereo ink rendering initially matched ordinary export pixels but reported that two layers were flattened for a single-layer Duotone document.

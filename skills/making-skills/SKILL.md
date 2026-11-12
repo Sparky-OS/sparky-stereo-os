@@ -169,6 +169,7 @@ The skill's diff is reviewed in the same review as the work's diff, by the same 
    For each rule write what it forbids, then search the work's diff for that.
    The result is a table: the rule, what it forbids, what was searched, what was found.
    A rule the diff breaks stops the review, however green the tests are.
+   A skill whose rules are walked often can hold the walk itself, each rule with the search that finds a breach, as [contrib-ffmpeg's audit](../contrib-ffmpeg/references/pre-push-audit.md) does.
 2. **Walk the new lessons against their evidence.** For each new trap, open the log line, the capture or the measurement it names.
    A lesson that says "on the hardware" needs the run on the hardware; a number from a model of the code is a prediction until the device confirms it.
 3. **Run the checks above yourself;** a hand-back's "PASS" is a lead.
@@ -203,6 +204,8 @@ A skill that only its author can find or follow is not finished.
   **Cause:** the skill was loaded at the start, and nobody walked its rules against the diff at the end; a test checks only the cases its author thought of.
   **Fix:** step 1 of the review above, before any rerun: each rule, what it forbids, searched in the diff.
   **How found:** fixtures with a square drawn at display size showed the wrong shapes, and Daniel named the rule (2026-11-12): "if a video declare 'i am stereo', why would you try to detect if it is stereo?"; the corrected lesson is in [stereo-video's lessons](../stereo-video/references/lessons-2026-11.md).
+  It happened in a second skill on 2026-11-12: `contrib-ffmpeg` had said since October that a test prints what it observes and never decides, and a test helper that compared its own result with constants and called `exit(1)` reached a review, because the project's test suite passes on such a helper.
+  That skill now holds the walk as a page, 26 rules, each with the search that finds a breach; run over the whole series, it found six more places beside the reported one ([the audit](../contrib-ffmpeg/references/pre-push-audit.md), [its lesson](../contrib-ffmpeg/references/lessons-2026-11.md#a-fifth-bot-round-a-rule-the-skill-already-had-order-530-2026-11-12)).
 - **Symptom:** a lessons file states how a fix behaves, and the next merge the same evening says the hardware measured otherwise.
   For the soft-reset loop of an old Radeon, the lesson merged in the afternoon of 2026-11-11 came from reading the kernel's code and from a user-space model of it, which predicted about seventeen timeouts for one of two candidate fixes; with a 60 s job on the laptop it was three, 10.8 s after submission.
   **Cause:** the lesson was written and merged with the round, before the test kernels had run on the device; an 8 s job had not told the two fixes apart.

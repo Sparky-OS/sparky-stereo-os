@@ -133,6 +133,22 @@ LightCraft's accepted head shared an older base with the later main; requiring t
 Use the actual merge base for restoration, retain the observed main separately, and verify the bundle and advertised head.
 Then reconcile the later source changes explicitly; a valid bundle does not mean they were integrated.
 
+## A shared-library port landed while the app pull request stayed open
+
+Symptom: a maintainer says the HEIF work landed through craft-libs, but the app branch still carries a decoder copy and stereo commits.
+Read the merged diff and its explicit exclusions before dropping commits.
+In [craft-libs #841](https://github.com/storytold/craft-libs/pull/841), only the synthetic `Spec::stereo` part of Mitch Lindgren's LightCraft import commit was ported; app detection, catalog, badges, filters and views were outside that port.
+The primary metadata reader came from a different contributor's pull request.
+Map original commits to functions and retained app changes, including partially superseded commits; preserve their authors and check squash co-author trailers rather than calling the original hashes main ancestors.
+Use the shared implementation once, and keep any still-missing selected-item API in that owner.
+An app's migration to the shared crate can itself still be open; carry it credited and name that dependency instead of describing it as merged.
+
+Symptom: the extracted KRA and ORA crates' existing small-stack regressions abort in the shared workspace while their donor app passed.
+Compare build profiles as well as source: PhotoCraft builds its own crates at dev optimisation level 1, while the new shared crate inherited level 0.
+The same regressions failed at level 0 and passed at level 1 with their explicit 512 KiB stacks, nesting limits and assertions unchanged.
+Narrow package-specific dev profiles restored the donor setting, like the shared workspace's existing Affinity exception.
+Record this as a build-profile correction, not a claim to have made the parser nonrecursive or proved every caller's stack size.
+
 ## Duotone pixels match, but the warning counts a virtual layer
 
 PhotoCraft's stereo ink rendering initially matched ordinary export pixels but reported that two layers were flattened for a single-layer Duotone document.

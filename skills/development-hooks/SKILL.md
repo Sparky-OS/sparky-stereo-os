@@ -78,6 +78,7 @@ Extend the hook that already stands at that moment (another pattern, another che
    For a shell line use `event.commands()`, the simple commands the line runs, not a search of its text.
 4. **Answer with** `kit.deny(reason)`, `kit.ask(reason)`, `kit.context(text)` or nothing. A refusal says what was refused, why, what to do next and when the same call will pass.
 5. **Keep state in `kit.state`,** a dictionary saved per session and per lane behind a lock; log with `kit.log('refused.log', line)`.
+   The lock is taken when the logic first touches `kit.state` and held until the run ends, so touch it only on the path that needs it: a hook that keeps no state never waits.
 6. **Configuration:** every path through `kit.path(...)`, every list and number from `kit.cfg`, a switch for each part read with `kit.on(...)`. The example holds placeholders and the edition's defaults, all on; nothing of one machine, no real name, no address.
 7. **Tests first, by piping.** Subclass `testkit.HookCase`: it makes a toy workspace with `install.py`'s own `init`, runs the hook as a tool runs it and gives the answer back. Write what must be refused and, beside it, what must pass: the reads, the workspace's own repositories, text that is only written to a file. Run each test red once (take the rule out) before trusting its green.
 8. **Wire it:** `wiring.json` lists the events and matchers per tool; `python3 hooks/install.py wire claude WORKSPACE --only <name>` shows the result.
@@ -118,6 +119,8 @@ Extend the hook that already stands at that moment (another pattern, another che
   **How found:** twelve reads piped in at once: without the lock a read was lost in 5 of 10 runs, with it in none (`test_parallel_reads_all_count`). Codex's page says "Subagent hooks use the parent session id", so a lane's own state is not proved there.
   A later test held the lock past its five-second timeout and found that the hook still wrote state without it.
   A timeout now lets the action through with an explicit notice, leaves the saved state intact and asks for a retry after the other hook finishes.
+  That made a second gap visible: the kit took the lock for every hook, so a guard that keeps no state waited five seconds behind a long run of itself and then let its command through unchecked.
+  The lock is now taken when a hook first touches `kit.state`; the publish check, the contract guard and the container guard never take it (`test_a_long_check_of_another_command_does_not_let_this_one_through`).
 - **Listed and enabled, with no run proved.**
   **Symptom:** Codex lists a hook as enabled, but no event or answer has been recorded.
   **Cause:** registration, trust and event delivery are separate checks; an enabled hook may still be untrusted.

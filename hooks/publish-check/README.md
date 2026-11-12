@@ -79,5 +79,5 @@ The first command prints two style notes and exits 0.
 
 ## Tests
 
-`python3 hooks/tests/run.py publish-check` runs 29 tests in [`tests/`](tests/test_publish_check.py): the checker, the tool hook and both git hooks in real repositories made for the test.
+`python3 hooks/tests/run.py publish-check` runs 30 tests in [`tests/`](tests/test_publish_check.py): the checker, the tool hook and both git hooks in real repositories made for the test.
 The secrets and addresses they plant are put together while the test runs, so the test file itself passes the check.

@@ -533,7 +533,7 @@ class Kit:
             raise HookError(f'no workspace: set "workspace" in {config_path}')
         self.workspace = os.path.abspath(os.path.expanduser(str(workspace)))
         self.state_dir = os.path.join(self.path('state'), name)
-        self.state = {}
+        self._state = None
         self._state_file = None
         self._lock = None
 
@@ -566,28 +566,40 @@ class Kit:
         """A switch under "on" in the configuration: what the hook enforces is the person's choice."""
         return bool((self.cfg.get('on') or {}).get(key, default))
 
-    def open_state(self, event):
+    def bind(self, event):
+        """Name the state of the session or agent this event belongs to. Nothing is read and no lock is taken until
+        the hook's logic touches `state`."""
         os.makedirs(self.state_dir, exist_ok=True)
         key = hashlib.sha1(event.session.encode()).hexdigest()[:16]
         self._state_file = os.path.join(self.state_dir, key + '.json')
-        self._lock = open(os.path.join(self.state_dir, key + '.lock'), 'w')
-        for _ in range(50):  # parallel tool calls run this hook several times at once
-            try:
-                fcntl.flock(self._lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                break
-            except OSError:
-                time.sleep(0.1)
-        else:
-            raise HookError(f'state lock not taken after 5 s: {self._state_file}; retry after the other hook finishes')
-        try:
-            with open(self._state_file, encoding='utf-8') as f:
-                self.state = json.load(f)
-        except (OSError, ValueError):
-            self.state = {}
         self._prune()
 
+    @property
+    def state(self):
+        """What this hook remembers for the session or agent: a dictionary, read behind a lock that is held until
+        the run ends, so a tool that starts the hook several times at once cannot lose an update. A hook that keeps
+        no state never takes the lock, and so never waits for another run of itself."""
+        if self._state is None:
+            if self._state_file is None:
+                raise HookError('the state was asked for before the event was read')
+            self._lock = open(self._state_file[:-5] + '.lock', 'w')
+            for _ in range(50):  # parallel tool calls run this hook several times at once
+                try:
+                    fcntl.flock(self._lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    break
+                except OSError:
+                    time.sleep(0.1)
+            else:
+                raise HookError(f'state lock not taken after 5 s: {self._state_file}; retry after the other hook finishes')
+            try:
+                with open(self._state_file, encoding='utf-8') as f:
+                    self._state = json.load(f)
+            except (OSError, ValueError):
+                self._state = {}
+        return self._state
+
     def save_state(self):
-        if self._state_file:
+        if self._state is not None:
             tmp = f'{self._state_file}.{os.getpid()}.tmp'
             with open(tmp, 'w', encoding='utf-8') as f:
                 json.dump(self.state, f)
@@ -724,7 +736,7 @@ def main(name, handle, argv=None):
         kit = Kit(name, cfg, config_path)
         state_dir = kit.state_dir
         event = Event(payload, dialect_of(argv, cfg))
-        kit.open_state(event)
+        kit.bind(event)
         answer = handle(event, kit)
         kit.save_state()
         if answer:

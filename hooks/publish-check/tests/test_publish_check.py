@@ -193,6 +193,15 @@ class ToolHook(Case):
                 self.assertIn('Fix it first, or let the person decide', self.reason(out))
         self.assertIn('looks like a GitHub token', self.log('findings.log'))
 
+    def test_a_long_check_of_another_command_does_not_let_this_one_through(self):
+        repo = self.repo()
+        self.commit(repo, 'notes.txt', f'key: {TOKEN}\n')
+        with self.state_lock_held():  # as while another run of this hook is still checking
+            out = self.run_hook(self.bash(f'git -C {repo} push origin main'))
+        self.assertEqual(self.decision(out), 'ask')
+        self.assertIn('looks like a GitHub token', self.reason(out))
+        self.assertEqual(self.log('errors.log'), '')
+
     def test_a_clean_push_and_other_git_commands_pass(self):
         repo = self.repo()
         self.commit(repo, 'notes.txt', 'Plain notes.\n')

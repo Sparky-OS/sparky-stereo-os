@@ -74,6 +74,12 @@ class ContainerGuard(testkit.HookCase):
         self.configure(refuse_unfiltered_lists=True, enabled=False)
         self.assertIsNone(self.run_hook(self.bash(f'{D} kill $({D} ps -q)')))
 
+    def test_a_guard_that_keeps_no_state_does_not_wait_for_another_run(self):
+        with self.state_lock_held():
+            out = self.run_hook(self.bash(f'{D} kill $({D} ps -q)'))
+        self.assertEqual(self.decision(out), 'deny')
+        self.assertEqual(self.log('errors.log'), '')
+
 
 if __name__ == '__main__':
     unittest.main()

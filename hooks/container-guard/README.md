@@ -43,5 +43,5 @@ Logs, in `state/hooks/container-guard/`: `refused.log`, `errors.log`.
 
 ## Tests
 
-`python3 hooks/tests/run.py container-guard` runs 6 tests in [`tests/`](tests/test_container_guard.py): eight commands that are refused, eight that pass, the protected names, the prune switch and text that is only written to a file.
+`python3 hooks/tests/run.py container-guard` runs 7 tests in [`tests/`](tests/test_container_guard.py): eight commands that are refused, eight that pass, the protected names, the prune switch, text that is only written to a file, and a refusal while another run holds the state lock.
 The engine's name is put into each command while the test runs, so the test file can be written on a machine where a guard like this one is on duty.

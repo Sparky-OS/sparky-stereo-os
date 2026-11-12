@@ -5,6 +5,9 @@ Every test makes a toy workspace in the default layout (made by install.py's own
 assume is the layout a person gets), writes the hook's configuration from its example, and runs the hook the way a
 tool runs it: the event as JSON on stdin, the answer read from stdout. Nothing outside the temporary folder is used.
 """
+import contextlib
+import fcntl
+import hashlib
 import json
 import os
 import shutil
@@ -137,6 +140,16 @@ class HookCase(unittest.TestCase):
             return ''
         with open(path, encoding='utf-8') as f:
             return f.read()
+
+    @contextlib.contextmanager
+    def state_lock_held(self, session='session-1'):
+        """Hold the lock of this hook's state for a session of the test, as another run of the hook would."""
+        folder = os.path.join(self.ws, 'state', 'hooks', self.hook)
+        os.makedirs(folder, exist_ok=True)
+        key = hashlib.sha1(os.path.join(self.tmp, session + '.jsonl').encode()).hexdigest()[:16]
+        with open(os.path.join(folder, key + '.lock'), 'w') as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            yield
 
     # events a tool sends
     def bash(self, command, phase='PreToolUse', **kw):

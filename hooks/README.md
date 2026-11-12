@@ -74,7 +74,8 @@ To leave: `python3 hooks/install.py unwire FILE` takes these hooks out of a sett
 - **What it enforces is the person's choice.** Every hook has `enabled`, every part of a hook has its own switch, and the edition's defaults are on.
 - **Its state follows the event's identity:** the agent id, else the transcript, else the session.
   Separate lanes need separate identities from the tool; that delivery is not yet proved under Codex.
-  Updates hold a lock; if it stays busy for five seconds, the action goes through with a notice and no state is changed.
+  A hook that keeps state updates it behind a lock; if the lock stays busy for five seconds, that hook lets the action through with a notice and changes no state.
+  A guard that keeps no state takes no lock, so it never waits for another run of itself.
 - **It reads shell text as a shell would run it.** A comment and the text a command only writes to a file are not commands; a command after a comment, on lines joined by a backslash, inside a loop, a condition or a substitution, behind `bash -c` or in a here-document handed to a shell is one. It is a guard rail, not a wall.
 - **Nothing private is in it.** No path of a machine, no list, no contact: each hook reads one configuration file, and that file stays in `private/`.
 

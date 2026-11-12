@@ -41,6 +41,17 @@ A script file that holds such a loop is not seen, so the house rule stays writte
 
 Logs, in `state/hooks/container-guard/`: `refused.log`, `errors.log`.
 
+## Try it by hand
+
+```sh
+W=$(mktemp -d) && python3 hooks/install.py init "$W" >/dev/null
+E=docker   # the engine's name, kept apart so that this page can be shown where a guard of this kind is on duty
+printf '{"hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"%s kill $(%s ps -q)"},"session_id":"demo","cwd":"/"}' "$E" "$E" \
+  | python3 hooks/container-guard/hook.py --config "$W/private/hooks/container-guard.json"
+```
+
+It prints the refusal as the tool would receive it; nothing is run.
+
 ## Tests
 
 `python3 hooks/tests/run.py container-guard` runs 7 tests in [`tests/`](tests/test_container_guard.py): eight commands that are refused, eight that pass, the protected names, the prune switch, text that is only written to a file, and a refusal while another run holds the state lock.

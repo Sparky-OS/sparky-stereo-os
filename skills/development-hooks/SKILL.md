@@ -27,16 +27,28 @@ The programs, their example configurations and their tests are in [`hooks/`](../
 
 ## Working recipe: adopt the hooks
 
+Run every command from the top folder of this repository's checkout; they need `python3` and `git`, and were run with Python 3.12 and 3.14.
+`WORKSPACE` is a folder of yours for the work, new or existing; the checkout may stay where it is, because `init` writes its place into the configurations.
+
 1. **Make the workspace:** `python3 hooks/install.py init WORKSPACE` makes [the default layout](#the-default-layout) and one configuration per hook in `WORKSPACE/private/hooks/`. It prints `wrote` for each file it makes and `kept` for each that exists; it overwrites nothing.
+   It also makes four starter files for you to fill in: `memory/MEMORY.md`, `partners/HOUSE-RULES.md`, `private/README.md` and `private/ledger.md`, the list of what was sent, to whom and when.
 2. **Put your own values in:** the memory files every session reads (`design-reading.json`, `core`), your accounts and projects (`outreach-guard.json`, `own_owners` and `own_repos`), your identities and the names you never publish (`publish-check.json`), your floors (`disk-floors.json`). Switch off what you do not want: every hook has `enabled`, every part its own switch.
+   Each hook's page has the table of its keys with their defaults; the values to replace are the placeholders: `your-github-user`, `you@example.org`, the two memory names under `core`.
 3. **Check:** `python3 hooks/install.py check WORKSPACE` reads every configuration the way the hooks do and names each file a configuration points to that does not exist. It ends with "Every configuration reads, and every file it names exists." and exit 0, or with the count of things to fix and exit 1.
    Run it again after moving or removing a rule file: a missing core file is skipped, and a missing outreach file is logged and skipped.
+   A file that does not exist cannot be read, so a hook does not ask for it; that is why `check` must pass before you rely on the hooks, and why it also names a `core` list left empty.
 4. **Wire a tool:** `python3 hooks/install.py wire claude WORKSPACE` prints the settings block; with `--write FILE` it merges the block into that settings file and keeps a copy named `FILE.before-hooks-DATE-UNIQUE` beside it. For Codex: `wire codex`. For commits: `python3 hooks/install.py git REPOSITORY WORKSPACE` prints two `git config` commands.
+   `FILE` is the tool's settings file: for Claude Code `~/.claude/settings.json` for all your projects or `.claude/settings.local.json` in one; for Codex `~/.codex/hooks.json`, written the same way with the same copy ([the tools page](../../hooks/TOOLS.md) has the rest).
+   Claude Code normally picks a changed settings file up by itself; if the hooks have not appeared after a few seconds, start a new session.
+   The two `git config` lines set `core.hooksPath` to `hooks/publish-check/git` and name the configuration; while that is set, git runs only that folder's `pre-commit` and `commit-msg`, so a repository with hooks of its own calls these two from them instead ([git](../../hooks/TOOLS.md#git)).
 5. **Watch the first run.** A hook whose path is wrong does not stop anything: the tool shows a "hook error" notice and carries on. In Claude Code, `/hooks` lists what is wired.
    In Codex, open `/hooks`, review the commands and configuration paths, and trust the entries you intend to run.
    Check the expected refusal or context on an event the hook covers; an enabled entry alone proves only that the settings were loaded.
+   Six of the seven hooks' pages have a "Try it by hand" line that pipes one event in and prints the answer, without sending, deleting or publishing anything.
 6. **Run the tests after any change:** `python3 hooks/tests/run.py` ends with `N test files, N tests: all passed`; `sh hooks/tests/clean-machine.sh` runs the whole proof on a machine that has only this repository and ends with `clean-machine proof: every step passed`.
+   Both need `python3`, `python3-yaml` and `git` only; the proof works in a temporary folder and removes it.
 7. **To leave:** `python3 hooks/install.py unwire FILE` takes these hooks out of a settings file and leaves every other entry as it was.
+   It does not touch the configurations, the state or the logs under `WORKSPACE`, and it does not undo the git wiring: `git -C REPOSITORY config --unset core.hooksPath` and the same for `sparky.publishCheckConfig` do.
 
 ## What each hook is for
 
@@ -50,7 +62,9 @@ The programs, their example configurations and their tests are in [`hooks/`](../
 | disk-floors | Before a command that fills a disk; while a floor is crossed | Free space in GiB against each folder's floor | [disk-floors](../../hooks/disk-floors/README.md) |
 | container-guard | Before a command that stops or removes containers | Refused when it would act on every container of a shared daemon, or on a protected service | [container-guard](../../hooks/container-guard/README.md) |
 
-Every one ships switched on, as the edition uses them; `disk-floors` only tells, and one part of `container-guard` (refusing a prune of everything) ships off.
+Every one ships switched on, as the edition uses them; `disk-floors` only tells, also under a floor, unless `below_floor` says `ask` or `deny`, and one part of `container-guard` (refusing a prune of everything) ships off.
+Each hook's page lists the default of every part.
+A long gap is 3300 seconds without a call (`gap_seconds`); a compaction arrives as a session start whose source is `compact`; a lane is one piece of work handed to another agent, and its first call is the first event that carries a new agent id.
 
 ## The default layout
 
@@ -64,7 +78,10 @@ The repository ships examples only; the lists that make a check useful (identiti
 - **A refusal is a stop, not an argument.** Do what it says: read the files it lists in full, add the sections it names, fix the sentence. Then send the same call again.
 - **Never work around it:** no other tool for the same act, no split command, no edit of the hook or its configuration to get past. If the hook is wrong, say so in the hand-back with the command it refused; the person changes the configuration.
 - **"Ask" means the person decides.** A lane that nobody watches cannot be answered: fix what the finding names instead of waiting.
+  Where a tool cannot ask from a hook, an ask arrives as a refusal that gives the reason (`ask_becomes`, `deny` as shipped).
 - **A notice that a hook could not run** ("Hook NAME could not run and let the action through") is not a pass of the check: the action went unchecked. Report it.
+  The notice is for the person and nothing needs to be sent again, but what the check would have looked at was not looked at: run it by hand where it matters, for example `python3 hooks/publish-check/publish_check.py --config WORKSPACE/private/hooks/publish-check.json --files FILE`, which prints `publish-check: clean` when nothing is found.
+- **A refused hand-back** names the sections that are missing. After two refusals the next one goes through with a notice that lists what is still missing, so a report is never lost.
 
 ## Add a hook, or extend one
 
@@ -73,14 +90,17 @@ Extend the hook that already stands at that moment (another pattern, another che
 
 1. **Name the moment and the answer:** which event (session start, a prompt, before a tool, after a tool), which tool, and whether the hook refuses, asks the person, or adds a line of context. Check in [the tools page](../../hooks/TOOLS.md) that the tool can do it.
 2. **Make the folder** `hooks/<name>/` with the same five things as the others: `hook.py`, `config.example.json`, `wiring.json`, `tests/test_<name>.py`, `README.md`.
-3. **Write the logic on the plain event.** `hook.py` defines `handle(event, kit)` and calls `hookkit.main('<name>', handle)`; it never names a tool.
+   Copy the smallest hook, `hooks/container-guard/`, as the template: it has the imports, a `handle`, the three files and a test of each kind.
+3. **Write the logic on the plain event.** `hook.py` defines `handle(event, kit)` and calls `hookkit.main('<name>', handle)`; it never names a tool's own word such as `Bash`, it asks for the plain one (`event.tool == 'shell'`).
    The event gives `kind` (`session-start`, `prompt`, `before-tool`, `after-tool`), `tool` (`shell`, `read`, `write`, `edit`, `dispatch`, `handback`, or the tool's own name), `command`, `path`, `text`, `agent`, and `reads()` (the files this event read in full).
    For a shell line use `event.commands()`, the simple commands the line runs, not a search of its text.
+   The reader knows `sh`, `bash`, `dash`, `zsh` and `ksh` with three levels of `-c`, and wrappers such as `env`, `sudo`, `timeout`, `nice` and `xargs`.
+   The kit's words: the plain event is a tool's event under the kit's own names, a dialect is the table that turns one tool's names into them, and the reference index is whatever local search of reference documents your tools offer, named under `consult_tools`.
 4. **Answer with** `kit.deny(reason)`, `kit.ask(reason)`, `kit.context(text)` or nothing. A refusal says what was refused, why, what to do next and when the same call will pass.
 5. **Keep state in `kit.state`,** a dictionary saved per session and per lane behind a lock; log with `kit.log('refused.log', line)`.
    The lock is taken when the logic first touches `kit.state` and held until the run ends, so touch it only on the path that needs it: a hook that keeps no state never waits.
 6. **Configuration:** every path through `kit.path(...)`, every list and number from `kit.cfg`, a switch for each part read with `kit.on(...)`. The example holds placeholders and the edition's defaults, all on; nothing of one machine, no real name, no address.
-7. **Tests first, by piping.** Subclass `testkit.HookCase`: it makes a toy workspace with `install.py`'s own `init`, runs the hook as a tool runs it and gives the answer back. Write what must be refused and, beside it, what must pass: the reads, the workspace's own repositories, text that is only written to a file. Run each test red once (take the rule out) before trusting its green.
+7. **Test by piping.** Subclass `testkit.HookCase`: it makes a toy workspace with `install.py`'s own `init`, runs the hook as a tool runs it and gives the answer back. Write what must be refused and, beside it, what must pass: the reads, the workspace's own repositories, text that is only written to a file. Run each test red once (take the rule out) before trusting its green.
 8. **Wire it:** `wiring.json` lists the events and matchers per tool; `python3 hooks/install.py wire claude WORKSPACE --only <name>` shows the result.
 9. **Write its page:** what it runs on, what it refuses or adds, why (with the words that asked for it), its configuration, how it fails.
 10. **Check:** `python3 hooks/tests/run.py` (the whole section, with the test that no path of one machine and no address is in it), `python3 tools/check-skills.py` (every local link of the new page) and the publish check on every file.
@@ -142,8 +162,8 @@ Extend the hook that already stands at that moment (another pattern, another che
 
 - `python3 hooks/lib/design_lookup.py --memory WORKSPACE/memory WORD...` finds a recorded design by the content of the memory files, for a person as well as for the hook that uses it.
 - `hooks/publish-check/publish_check.py` is a command of its own: `--files`, `--text` on stdin, a repository's unpushed commits, `--audit N`.
-- Every hook can be tried by hand with one `printf` piped into it; each page has the lines.
-- The logs in `state/hooks/NAME/` (`refused.log`, `passed.log`, `errors.log`) are the record of what the hooks did, for a review.
+- A hook can be tried by hand with one `printf` piped into it; six of the seven pages have the lines, and the contract guard's events are in its tests, because its page cannot print a sentence that the guard would stop.
+- The logs in `state/hooks/NAME/` (`refused.log`, `passed.log`, `errors.log`) are the record of what the hooks did, for a review; a log over 1 MiB is cut, a session's state is dropped after `state_keep_days` (30), and a full event kept to reproduce a decision goes under `private/`.
 
 ## Not proved yet
 

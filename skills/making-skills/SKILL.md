@@ -26,24 +26,26 @@ A skill is written while the work happens, not reconstructed after it, and the s
 ## Working recipe
 
 1. **Extend or start new.** Find the skill that owns the part: `sparky-stereo-skills find "<the symptom, as a person would type it>"`, then the [task table](../README.md). Extend it; start a new skill only for a new kind of work ([which](#extend-or-start-a-new-skill)).
+   The helper comes with the `sparky-stereo-skills` package; without it, read the task table and search the folder for the error's own words (`grep -rn "<the error string>" skills/`).
 2. **Make the folder:** `skills/<name>/SKILL.md`, with `references/` beside it when the detail asks for one ([the folder and the name](#the-folder-and-the-name)).
 3. **Write the header:** `name`, `description`, and `metadata: requires-packages` for a skill that only matters where a package is installed ([the header and its limits](#the-header-and-its-limits)).
-4. **Write the description as a trigger clause and count it:** `python3 tools/check-skills.py --count <name>` prints `NNN of 256 tokens  NNN of 1024 characters`. Both numbers stay under their limit ([the description](#the-description-routes-the-body-executes)).
+4. **Write the description as a trigger clause and count it:** `python3 tools/check-skills.py --count <name>` prints `NNN of 256 tokens  NNN of 1024 characters`. Both numbers stay at or under their limit: 256 tokens and 1024 characters pass, one more fails ([the description](#the-description-routes-the-body-executes)).
 5. **Write the body, recipe first:** the commands in order with the result to expect from each, then each trap with its symptom, cause, fix and how the cause was found ([what goes in](#what-goes-in-each-time)).
 6. **Move detail to `references/`,** and the lessons of a review to `references/lessons-YYYY-MM.md` ([references and lessons](#references-and-lessons-files)).
-7. **Register it:** a row in the [task table](../README.md), a row in [sparky-stereo's part four](../sparky-stereo/SKILL.md#part-four-which-skill-next), a link from each neighbour skill.
+7. **Register it:** a row in the [task table](../README.md) (one line: the task in a person's words, then the link to the skill), a row in [sparky-stereo's part four](../sparky-stereo/SKILL.md#part-four-which-skill-next), a link from each neighbour skill.
 8. **Run the checks:** `python3 tools/check-skills.py` must print `PASS: N skill headers, descriptions within 1024 characters and the index window of 256 tokens, and local file targets in N instruction/reference pages`; then the publish check on every changed file ([the checks](#the-checks)).
 9. **Hand it back with the work.** The hand-back's "Skill changes" names the branch, the commit and what each change saves the next worker; the review walks every rule against the diff ([the review](#reviewed-with-the-work)).
 10. **Test that it is found and followed** by a reader who was not there ([the test](#found-and-followed-by-a-cold-reader)).
 11. **After the merge, rebuild what is derived:** every index is made from the files, and the skills package takes the reviewed commit.
-    Check the package's exported tree too: the skills, their linked pages and the hook programs must come from that same commit ([the archive trap](#traps-this-project-met)).
+    Check the package's exported tree too: the skills, their linked pages and the hook programs must come from that same commit ([the archive trap](#traps-this-project-met)); the package's recipe is `packages/sparky-stereo-skills/build.sh` in the edition's build repository.
 
 ## Extend or start a new skill
 
 Extend the skill that owns the part before creating a new one.
-If you keep explaining the same fix, save what was learned there while the result is fresh, so another contributor can repeat it.
-Use the [recipe and trap fields below](#what-goes-in-each-time); the run's logs stay in your evidence.
 A new skill is for a new kind of work; a new trap in an old kind goes into the old skill.
+If you keep explaining the same fix, save what was learned in the skill that owns the part while the result is fresh, so another contributor can repeat it.
+Use the [recipe and trap fields below](#what-goes-in-each-time); the run's logs stay in your evidence.
+When the finder prints nothing, or two skills fit, the part belongs to the skill whose programs or error strings the symptom names; say the choice in the hand-back, and write the symptom into that skill's description or task row so the next search finds it.
 A new skill is right when no existing name is where a reader would look: another project to contribute to (`contrib-<project>`, opening with "The rules that come first"), another layer of the system, another kind of work with its own recipe and checks.
 This skill is an example: making a skill had become work of its own, with its own checks and traps, inside a skill about briefs.
 
@@ -64,6 +66,7 @@ The name is the folder's name: lower-case letters, digits and single hyphens, at
 It says what a reader would look for: the subject (`stereo-video`), the project (`contrib-ffmpeg`), the work (`writing-front-pages`).
 Do not take a name an AI tool ships a skill under, such as `skill-creator`: a tool that finds two skills of one name shows one of them.
 Check with `sparky-stereo-skills list` and with your own tool's list.
+A program in `scripts/` ships with the skill and is run by its path, from a checkout or from the installed folder; the recipe names what it needs and the result to expect ([edition-packaging's scripts](../edition-packaging/scripts) are examples).
 
 ## The header and its limits
 
@@ -82,7 +85,7 @@ metadata:
 | --- | --- | --- |
 | `name` | 1 to 64 characters, lower-case letters, digits and single hyphens, equal to the folder's name | the format: "Must match the parent directory name" |
 | `description` | 1 to 1024 characters | the format |
-| `name` plus `description` | 256 tokens, the two the model adds included | the index's embedding model: "input text longer than 256 word pieces is truncated" |
+| `name` plus `description` | 256 tokens, the start token and the end token the model adds included (`--count` counts them) | the index's embedding model: "input text longer than 256 word pieces is truncated" |
 | `metadata` | text keys to text values | the format: "A map from string keys to string values" |
 | `SKILL.md` | under 500 lines | the format: "Keep your main `SKILL.md` under 500 lines" |
 
@@ -90,7 +93,7 @@ metadata:
 - **`requires-packages`** names the Debian packages that make the skill matter, separated by `|`; `sparky-stereo-skills link` links the skill while one of them is installed.
   A skill without it always links: the contract, the working method, the skills about contributing.
   Write the line exactly as above, under `metadata:` with two spaces in front: the helper reads that line as text, so the same value written as `metadata: {requires-packages: ...}` or with four spaces is valid YAML that `link` never sees.
-  Every package named must exist: `apt-cache policy NAME` shows a candidate ([a dependency must exist](../ai-partners/SKILL.md#security-habits-for-what-an-assistant-writes)).
+  Every package named must exist: `apt-cache policy NAME` shows a candidate from the archive you expect, the edition's or Debian's ([a dependency must exist](../ai-partners/SKILL.md#security-habits-for-what-an-assistant-writes)).
 - **A long description is a folded block,** `description: >-`, as above. Whatever reads the header must parse it as YAML: a reader that takes the first line gets `>-` for a description.
 
 ## The description routes, the body executes
@@ -106,6 +109,7 @@ So the description is written as a trigger clause, within 1024 characters:
 Measured on 2026-11-06 with 157 real symptoms from the lane reports (one skill expected for each): the old one-line labels found the right skill first for 23 % of them and in the top three for 41 %; the trigger clauses found it first for 58 % and in the top three for 82 %, with the same index and embedding (sentence-transformers/all-MiniLM-L6-v2 through FastEmbed, 384 dimensions).
 The misses that remain are symptoms whose words belong to a neighbouring skill (a Debian error routed to `contrib-debian` instead of `edition-packaging`), which is why the third clause names the neighbour.
 Keep the test: `data/routing/symptoms-157.tsv` of the skills engine (sparky-os/skills-mcp in the build tree), which every change to the engine or to the descriptions is checked against for the offline finder, and a symptom list for the embedded index, and add the symptom of every new lesson to it.
+That file has two columns separated by a tab, the symptom and the skill that should answer it, and it lives with the engine in the build repository, so a new line there is a change to that repository.
 
 **The window.**
 The embedding model reads only the first 256 tokens of name plus description (FastEmbed's tokenizer truncates there), which is about 170 words of plain text and fewer when the words are technical names, each cut into several tokens.
@@ -119,7 +123,7 @@ python3 tools/check-skills.py --count stereo-video
 python3 tools/check-skills.py --count          # every skill, largest first; exit 1 when one is over
 ```
 
-The count is the model's own, made without the model ([how](../../tools/skill-window/README.md)).
+The count follows the model's own word list and rules, which ship in `tools/skill-window/`, so it needs no model, no download and no package beyond python3 ([how](../../tools/skill-window/README.md)).
 When a description is at the window and a new lesson brings a new symptom, take a trigger out for the one you add, or shorten two.
 Nothing is lost: the body and the lessons files keep every symptom, and the index of the bodies finds them there.
 
@@ -134,11 +138,14 @@ Nothing is lost: the body and the lessons files keep every symptom, and the inde
   For a workaround not measured yet, write "Untested workaround" beside it, name the source that suggests it, and say which result would confirm or refute it.
   Keep it out of the working recipe until that run succeeds; replace the prediction with the measured result when it does, or correct it when it fails.
 - **Public-safe always:** no machine paths, hosts, addresses, accounts, private plans or personal matters; generalise a fact about one machine ("on a host whose /tmp is a tmpfs") or leave it out and hand it to the coordinator's record.
+  Cite evidence by what it is, never by where it lies: the order or the lane, the command, the count and the date; the logs themselves stay with the lane's report.
   Say "Daniel", never "the owner"; one sentence per line; no dash in the middle of a sentence; every rule tied to its clause, its commit or its measurement.
 - **Never lose knowledge:** move detail into a reference, never delete a measured fact or a trap; correct what is wrong and say where the correction came from.
+  A corrected statement replaces the wrong one in the page; the old wording stays in the repository's history.
 
 Open the body with a "Check freshness first" line that says when it was written, so a reader knows how old its versions are.
 Keep the short working recipe first and the detail in `references/`; a skill's `SKILL.md` stays readable in one sitting.
+The format's limit is 500 lines; the skills of this folder run from about 50 lines to under 400.
 
 ## References and lessons files
 
@@ -148,6 +155,7 @@ Keep the short working recipe first and the detail in `references/`; a skill's `
   When troubleshooting notes make the page too long, move each whole trap with its symptom, cause, fix and evidence together, and keep a short pointer under any heading that has incoming links.
   Keep a procedure's steps together too; a reference starts where a reader has enough context to follow it.
 - **The lessons files:** each skill that gained more than a few lessons in a review keeps them in `references/lessons-2026-11.md` (or the next date), grouped as recipes, traps, perks and facts, each entry naming the lane it came from; shorter lists sit at the end of `SKILL.md` under "Lessons from the lanes".
+  As a rule of thumb, more than five lessons from one review make a lessons file.
   Read a skill's lessons before changing its part.
 - **Write the symptom first in every lesson.** The index of the bodies embeds the first 256 tokens of each entry, and a search for the error string finds the entry only if the string is there.
 - **The run's own history stays out:** logs, captures and the list of attempts are the lane's evidence, not the skill's text.
@@ -159,10 +167,11 @@ Keep the short working recipe first and the detail in `references/`; a skill's `
 python3 tools/check-skills.py                      # headers, both description limits, every local link
 python3 tools/check-skills.py --count <name>       # this skill's size against its two limits
 python3 tools/tests/test_check_skills.py           # only when the checker or its data changed: "Ran 17 tests ... OK"
-python3 hooks/publish-check/publish_check.py --config YOUR/publish-check.json --files skills/<name>/SKILL.md
+python3 hooks/publish-check/publish_check.py --config YOUR/publish-check.json --files skills/<name>/SKILL.md    # "publish-check: clean", exit 0
 ```
 
 `check-skills.py` needs `python3` and `python3-yaml`, nothing else, and no network.
+`YOUR/publish-check.json` is the file that `python3 hooks/install.py init WORKSPACE` writes to `WORKSPACE/private/hooks/`, with your own names put in ([adopt the hooks](../development-hooks/SKILL.md#working-recipe-adopt-the-hooks)).
 It checks the header, the limits and that every local link's file exists, in the skills, in the pages of `hooks/` and `tools/` and in the two entry pages; it does not check that a fact is true, that an external address answers or that an anchor exists.
 For a heading you moved or renamed, search the repository for links to its old anchor, and keep the heading or leave `<a id="old-anchor"></a>` where the text now starts ([keep every link that points in](../writing-front-pages/SKILL.md#keep-every-link-that-points-in)).
 The [publish check](../../hooks/publish-check/README.md) looks for what must never be in a public file: a person's address, a secret, a name that is never published.
@@ -189,15 +198,20 @@ The skill's diff is reviewed in the same review as the work's diff, by the same 
 A skill that only its author can find or follow is not finished.
 
 - **Found.** For each new symptom, `sparky-stereo-skills find "<the symptom>"` on your checkout (`SPARKY_STEREO_REFERENCE=$PWD` in front) must print the skill among its first three; with a local vector index, ask the same symptom there after the rebuild.
+  The offline finder reads the files as they are, so an edited description is searched at once; an embedded index answers from its last rebuild.
   The offline finder ranks words, not meaning: a symptom whose words appear in no description and no task row is not found until one of them names it.
 - **Followed.** Give a reader who was not there only the skill and one task it covers: a model from another lab with no project context, or a person.
+  Give `SKILL.md` alone first, since it must carry the recipe; add a reference only when the step of the task names it (`context <name> --reference PATH`).
+  The reviewer chooses the reader, not the author.
   For a model without file tools, `sparky-stereo-skills context <name>` makes the text.
   Ask for the commands in order, the result to expect from each, and what it would do when a named trap appears.
   It passes when the answer needs no fact the skill does not hold; every question the reader asks and every step it invents is a line the skill lacks.
 - **By a small model too.** The skill holds the knowledge and the model follows: exact commands, the expected result to check after each, one task per recipe.
   A recipe a small local model can follow is one a tired person can follow.
 - **Honestly.** Record the answers word for word, say which reader read what, change one thing and test again.
+  One question to one reader, with the text and nothing private in it; a call that is refused is recorded and not sent again in a loop.
   A self-review is not a cold reader, and one lab asked twice is one reader ([the newcomer test](../writing-front-pages/SKILL.md#the-newcomer-test)).
+  This page had its own test on 2026-11-12: a model of another lab, given `SKILL.md` alone, answered the four questions of a task from the text and listed twenty-two things the page did not say; its list became lines of this page.
 
 ## Traps this project met
 
@@ -234,7 +248,7 @@ A skill that only its author can find or follow is not finished.
   **How found:** the first run of the check that reads `metadata` as the format defines it.
 - **Symptom:** `sparky-stereo-skills find` prints nothing for a symptom the skill's lessons file holds word for word.
   **Cause:** the offline finder ranks the name, the description and the task table, not the bodies, and its stemmer is English only.
-  **Fix:** put the symptom's own words into the description or the task row, and search the bodies' index for error strings.
+  **Fix:** put the symptom's own words into the description or the task row, and search the bodies' index for error strings (without an index: `grep -rn "<the error string>" skills/`).
   **How found:** the 28 of 157 symptoms the descriptions missed, 26 of which a body held ([ai-partners' lessons](../ai-partners/references/lessons-2026-11.md)).
   A separate list of 24 symptoms written before reading the `making-skills` and `development-hooks` descriptions missed this skill for saving a learned fix, long troubleshooting notes and an unmeasured workaround on 2026-11-12.
   Adding those triggers brought the expected skill into the first three for all 24, from 21 before, within 232 tokens for this description and its name.

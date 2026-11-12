@@ -256,6 +256,12 @@ class _Lexer:
         return pos
 
 
+def _runs_a_shell(words):
+    """Whether a simple command hands what it reads to a shell: a shell named anywhere among its words
+    (`sudo -u x bash`, `docker exec -i c sh`), or a remote one (`ssh host`)."""
+    return bool(words) and (os.path.basename(words[0]) == 'ssh' or any(os.path.basename(w) in SHELLS for w in words))
+
+
 def _commands(lexer, tokens, depth):
     """The simple commands of a token list, in order, each as its words: wrappers and the shell's own keywords taken
     off, the text given to `sh -c` read too; after each, the commands of its substitutions, and after each pipeline
@@ -289,7 +295,7 @@ def _commands(lexer, tokens, depth):
     def end_pipeline():
         found = []
         for i, (_, docs) in enumerate(pipeline):
-            shell_reads = any(w and os.path.basename(w[0]) in SHELLS for w, _ in pipeline[i:])
+            shell_reads = any(_runs_a_shell(w) for w, _ in pipeline[i:])
             for _, start, stop in docs:
                 if start is None:
                     continue

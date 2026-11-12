@@ -107,9 +107,14 @@ class ReadingShell(unittest.TestCase):
         python = "python3 - <<'PY'\nprint(\"it's a git push fork\")\nPY"
         self.assertEqual(hookkit.shell_commands(python), [['python3', '-']])
         for line in ("bash <<'EOF'\ngit push fork branch\nEOF", "bash -s <<EOF\ngit push fork branch\nEOF",
-                     "cat <<'EOF' | sh\ngit push fork branch\nEOF", "sudo sh <<-EOF\n\tgit push fork branch\n\tEOF"):
+                     "cat <<'EOF' | sh\ngit push fork branch\nEOF", "sudo sh <<-EOF\n\tgit push fork branch\n\tEOF",
+                     "engine exec -i box bash <<'EOF'\ngit push fork branch\nEOF", "ssh host <<'EOF'\ngit push fork branch\nEOF",
+                     "cat <<'EOF' | ssh host bash\ngit push fork branch\nEOF", "cat <<'EOF' | tee copy.sh | sh\ngit push fork branch\nEOF"):
             with self.subTest(line):
                 self.assertIn(PUSH, hookkit.shell_commands(line))
+        for line in ("cat <<'EOF' | tee plan.md\ngit push fork branch\nEOF", "cat <<'EOF' | wc -l\ngit push fork branch\nEOF"):
+            with self.subTest(line):
+                self.assertNotIn(PUSH, hookkit.shell_commands(line))
 
     def test_a_line_that_is_not_shell_gives_none(self):
         self.assertIsNone(hookkit.shell_commands('echo "unbalanced'))

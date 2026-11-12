@@ -260,6 +260,10 @@ def check_media(cfg, path, name):
     except subprocess.TimeoutExpired:
         rep.add(True, name, 'location data NOT checked: exiftool did not answer in 60 s')
         return rep
+    if r.returncode:
+        rep.add(True, name, f'location data NOT checked: exiftool exited {r.returncode}; '
+                'check that the file is readable and supported, then run the check again')
+        return rep
     tags = [ln.split(':', 1)[0].strip() for ln in r.stdout.splitlines() if ln.strip()]
     if tags:
         rep.add(True, name, 'location data (' + ', '.join(sorted({t.split()[-1] for t in tags}))

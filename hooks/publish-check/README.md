@@ -63,6 +63,7 @@ The tool hook fails open and says so, like every hook here.
 The git hooks say so on the terminal: without a configuration, or with one that cannot be read, they print that the check did not run and that the commit goes ahead unchecked.
 The private-record paths are refused even then, because that check needs no configuration.
 A picture is never passed unchecked: without `exiftool` the finding is "location data NOT checked", which is hard.
+The same finding appears when `exiftool` exits with an error or times out; an empty output alone does not mean the file is clean.
 The command exits 0 when clean or with style notes only, 1 on a hard finding, 2 on a usage or setup error.
 
 ## Try it by hand
@@ -78,5 +79,5 @@ The first command prints two style notes and exits 0.
 
 ## Tests
 
-`python3 hooks/tests/run.py publish-check` runs 28 tests in [`tests/`](tests/test_publish_check.py): the checker, the tool hook and both git hooks in real repositories made for the test.
+`python3 hooks/tests/run.py publish-check` runs 29 tests in [`tests/`](tests/test_publish_check.py): the checker, the tool hook and both git hooks in real repositories made for the test.
 The secrets and addresses they plant are put together while the test runs, so the test file itself passes the check.

@@ -133,6 +133,19 @@ class Checker(Case):
         self.configure(checks={'location_data': False})
         self.assertEqual(self.checker('--files', picture).returncode, 0)
 
+    def test_failed_metadata_read_is_not_reported_clean(self):
+        binary = testkit.write(os.path.join(self.tmp, 'bin', 'exiftool'),
+                               '#!/bin/sh\necho "Cannot read this media" >&2\nexit 2\n')
+        os.chmod(binary, 0o755)
+        self.env['PATH'] = os.path.dirname(binary) + os.pathsep + self.env['PATH']
+        picture = testkit.write(os.path.join(self.tmp, 'unreadable.jpg'), 'not an image')
+        result = self.checker('--files', picture)
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn('location data NOT checked: exiftool exited 2', result.stdout)
+        self.assertNotIn('publish-check: clean', result.stdout)
+        self.configure(checks={'location_data': False})
+        self.assertEqual(self.checker('--files', picture).returncode, 0)
+
     def test_commits_no_remote_has_are_checked_and_pushed_ones_are_not(self):
         repo = self.repo()
         self.commit(repo, 'old.txt', f'{TOKEN}\n')

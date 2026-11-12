@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 sys.dont_write_bytecode = True
 HOOKS = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -82,6 +83,34 @@ class Install(unittest.TestCase):
         os.mkdir(scratch)
         run('init', self.ws, '--scratch', scratch)
         self.assertEqual(self.config('disk-floors')['floors_gib'][scratch], 2)
+
+    def test_paths_with_json_characters_survive_init_and_wiring(self):
+        self.ws = os.path.join(self.tmp, 'work "quoted" \\ name')
+        scratch = os.path.join(self.tmp, 'scratch "quoted" \\ name')
+        os.mkdir(scratch)
+        result = run('init', self.ws, '--scratch', scratch)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        for name in ALL:
+            self.assertEqual(self.config(name)['workspace'], self.ws)
+        self.assertEqual(self.config('disk-floors')['floors_gib'][scratch], 2)
+        command = install.command_for('design-reading', self.ws, 'claude')
+        result = subprocess.run(command, shell=True, input='{}', capture_output=True, text=True)
+        self.assertEqual((result.returncode, result.stderr, result.stdout), (0, '', ''))
+
+    def test_each_settings_write_keeps_its_own_backup(self):
+        settings = os.path.join(self.tmp, 'settings.json')
+        with open(settings, 'w') as f:
+            json.dump({'version': 0}, f)
+        with mock.patch.object(install.time, 'strftime', return_value='same-second'):
+            for version in (1, 2):
+                install.write_settings(settings, {'version': version}, say=lambda line: None)
+        copies = [n for n in os.listdir(self.tmp) if n.startswith('settings.json.before-hooks-')]
+        self.assertEqual(len(copies), 2)
+        versions = []
+        for copy in copies:
+            with open(os.path.join(self.tmp, copy)) as f:
+                versions.append(json.load(f)['version'])
+        self.assertEqual(sorted(versions), [0, 1])
 
     def test_check_names_what_is_missing_and_passes_when_nothing_is(self):
         run('init', self.ws)

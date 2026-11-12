@@ -10,7 +10,7 @@
   install.py git REPOSITORY WORKSPACE          point a repository's git hooks at publish-check (prints the commands)
 
 Nothing is written outside WORKSPACE unless --write or unwire names the file, and an existing file is never replaced
-without a copy beside it (FILE.before-hooks-DATE). init never overwrites a file that exists.
+without a unique copy beside it (FILE.before-hooks-DATE-UNIQUE). init never overwrites a file that exists.
 """
 import argparse
 import json
@@ -18,6 +18,7 @@ import os
 import shlex
 import shutil
 import sys
+import tempfile
 import time
 
 sys.dont_write_bytecode = True
@@ -71,9 +72,10 @@ def init_workspace(workspace, scratch=None, say=print):
             say(f'kept   {target}')
             continue
         with open(os.path.join(HOOKS, name, 'config.example.json'), encoding='utf-8') as f:
-            text = f.read().replace(PLACEHOLDER_WORKSPACE, workspace)
+            # Placeholders occur inside JSON strings, including disk-floor keys.
+            text = f.read().replace(PLACEHOLDER_WORKSPACE, json.dumps(workspace)[1:-1])
         if scratch:
-            text = text.replace(PLACEHOLDER_SCRATCH, os.path.abspath(os.path.expanduser(scratch)))
+            text = text.replace(PLACEHOLDER_SCRATCH, json.dumps(os.path.abspath(os.path.expanduser(scratch)))[1:-1])
         cfg = json.loads(text)
         floors = cfg.get('floors_gib')
         if isinstance(floors, dict):
@@ -207,7 +209,9 @@ def read_settings(path):
 
 def write_settings(path, settings, say=print):
     if os.path.exists(path):
-        copy = f'{path}.before-hooks-{time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())}'
+        prefix = os.path.basename(path) + '.before-hooks-' + time.strftime('%Y%m%dT%H%M%SZ', time.gmtime()) + '-'
+        with tempfile.NamedTemporaryFile(prefix=prefix, dir=os.path.dirname(os.path.abspath(path)), delete=False) as backup:
+            copy = backup.name
         shutil.copy2(path, copy)
         say(f'copy   {copy}')
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)

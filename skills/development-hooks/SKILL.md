@@ -30,7 +30,7 @@ The programs, their example configurations and their tests are in [`hooks/`](../
 1. **Make the workspace:** `python3 hooks/install.py init WORKSPACE` makes [the default layout](#the-default-layout) and one configuration per hook in `WORKSPACE/private/hooks/`. It prints `wrote` for each file it makes and `kept` for each that exists; it overwrites nothing.
 2. **Put your own values in:** the memory files every session reads (`design-reading.json`, `core`), your accounts and projects (`outreach-guard.json`, `own_owners` and `own_repos`), your identities and the names you never publish (`publish-check.json`), your floors (`disk-floors.json`). Switch off what you do not want: every hook has `enabled`, every part its own switch.
 3. **Check:** `python3 hooks/install.py check WORKSPACE` reads every configuration the way the hooks do and names each file a configuration points to that does not exist. It ends with "Every configuration reads, and every file it names exists." and exit 0, or with the count of things to fix and exit 1.
-4. **Wire a tool:** `python3 hooks/install.py wire claude WORKSPACE` prints the settings block; with `--write FILE` it merges the block into that settings file and keeps a copy named `FILE.before-hooks-DATE` beside it. For Codex: `wire codex`. For commits: `python3 hooks/install.py git REPOSITORY WORKSPACE` prints two `git config` commands.
+4. **Wire a tool:** `python3 hooks/install.py wire claude WORKSPACE` prints the settings block; with `--write FILE` it merges the block into that settings file and keeps a copy named `FILE.before-hooks-DATE-UNIQUE` beside it. For Codex: `wire codex`. For commits: `python3 hooks/install.py git REPOSITORY WORKSPACE` prints two `git config` commands.
 5. **Watch the first run.** A hook whose path is wrong does not stop anything: the tool shows a "hook error" notice and carries on. In Claude Code, `/hooks` lists what is wired.
    In Codex, open `/hooks`, review the commands and configuration paths, and trust the entries you intend to run.
    Check the expected refusal or context on an event the hook covers; an enabled entry alone proves only that the settings were loaded.
@@ -85,6 +85,21 @@ Extend the hook that already stands at that moment (another pattern, another che
 
 ## Traps
 
+- **A workspace name breaks setup.**
+  **Symptom:** `install.py init` reports a JSON error for a path containing a double quote or backslash.
+  **Cause:** inserting the path directly into JSON changes its syntax.
+  **Fix:** quote the path for the shell when calling `init`; the installer escapes it separately for JSON, including disk-floor keys.
+  **How found:** a test initializes a workspace and scratch folder with both characters, reads every configuration and runs the generated hook command.
+- **Rewiring loses the original settings backup.**
+  **Symptom:** after two writes, only the later settings remain in the backup.
+  **Cause:** a timestamp with one-second resolution gives both copies the same name.
+  **Fix:** the installer reserves a unique backup name for each write, even within the same second.
+  **How found:** two writes with a fixed clock must retain both preceding versions.
+- **A media check says clean after its reader failed.**
+  **Symptom:** the metadata reader exits with an error, but the publish check finds no location tags and reports clean.
+  **Cause:** the checker only looked at the reader's output, ignoring its exit status.
+  **Fix:** a nonzero exit now reports `location data NOT checked`; repair the unreadable or unsupported file and run the check again.
+  **How found:** a substitute metadata reader exits 2 with empty output; the test requires a hard finding and also checks the existing `location_data` switch.
 - **Failing closed locks a session, or loses a report.**
   **Symptom:** every tool call of a session is refused and nothing the partner does helps; or a lane ends and its report never arrives.
   **Cause:** a hook that exits with an error of its own, or refuses the very tool that would repair things. For a hand-back, Claude Code's reference says what a refusal does: "Claude Code then tells the subagent, up to three times, that its report wasn't delivered and to call the tool again. If your hook keeps denying, the subagent ends without delivering a report through this tool".

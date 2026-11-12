@@ -78,6 +78,7 @@ def char_class(ch):
 
 
 def _normalize(text):
+    """The text as the model's tokenizer sees it before it looks words up: its words are what split() gives."""
     out = []
     for ch in text:
         cls = char_class(ch)
@@ -87,21 +88,6 @@ def _normalize(text):
     text = unicodedata.normalize('NFD', ''.join(out))
     # the accents a letter decomposes into vanish too; lowercase one character at a time, as the tokenizer does
     return ''.join(ch.lower() for ch in text if char_class(ch) != VANISH)
-
-
-def _words(text):
-    for chunk in text.split():
-        word = []
-        for ch in chunk:
-            if char_class(ch) == ALONE:
-                if word:
-                    yield ''.join(word)
-                    word = []
-                yield ch
-            else:
-                word.append(ch)
-        if word:
-            yield ''.join(word)
 
 
 def _pieces(word, vocab):
@@ -137,7 +123,7 @@ def tokenize(text, vocab=None):
         else:
             at, special = min(hits)
             segment, rest = rest[:at], rest[at + len(special):]
-        for word in _words(_normalize(segment)):
+        for word in _normalize(segment).split():
             out.extend(_pieces(word, vocab))
         if special:
             out.append(special)

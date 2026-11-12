@@ -34,6 +34,16 @@ class Install(unittest.TestCase):
         with open(install.config_path(self.ws, name)) as f:
             return json.load(f)
 
+    def configure(self, name, **changes):
+        cfg = self.config(name)
+        for key, value in changes.items():
+            if isinstance(value, dict) and isinstance(cfg.get(key), dict):
+                cfg[key].update(value)
+            else:
+                cfg[key] = value
+        with open(install.config_path(self.ws, name), 'w') as f:
+            json.dump(cfg, f)
+
     def test_every_hook_folder_is_whole(self):
         self.assertEqual(install.hook_names(), ALL)
         for name in ALL:
@@ -126,6 +136,12 @@ class Install(unittest.TestCase):
         r = run('check', self.ws)
         self.assertEqual(r.returncode, 0, r.stdout)
         self.assertIn('Every configuration reads, and every file it names exists.', r.stdout)
+        self.configure('design-reading', core=[])
+        r = run('check', self.ws)
+        self.assertEqual(r.returncode, 1)
+        self.assertIn('"core" names no file, so nothing is required reading', r.stdout)
+        self.configure('design-reading', on={'session_start': False, 'first_call': False, 'gap': False})
+        self.assertEqual(run('check', self.ws).returncode, 0)
         with open(install.config_path(self.ws, 'disk-floors'), 'w') as f:
             f.write('{nope')
         r = run('check', self.ws)

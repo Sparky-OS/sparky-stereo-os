@@ -115,6 +115,11 @@ def check_workspace(workspace, say=print):
         for core in cfg.get('core') or []:
             if not os.path.exists(os.path.join(memory, core)):
                 notes.append(f'core file not found: {os.path.join(memory, core)}')
+        on = cfg.get('on') or {}
+        if cfg.get('enabled', True) and 'core' in cfg and not cfg['core'] \
+                and any(on.get(k, True) for k in ('session_start', 'first_call', 'gap')):
+            notes.append('"core" names no file, so nothing is required reading at a session start, a first call or after a gap: '
+                         'name the files, or switch those three off under "on"')
         for rel in cfg.get('always_read') or []:
             if not os.path.exists(kit.resolve(rel)):
                 notes.append(f'always_read file not found: {kit.resolve(rel)}')

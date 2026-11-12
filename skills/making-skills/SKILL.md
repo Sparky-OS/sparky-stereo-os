@@ -1,11 +1,12 @@
 ---
 name: making-skills
 description: >-
-  Make, extend, check and review a skill of this folder: a new skill or an extension, the folder and its name, the
+  Make, extend, check and review a skill: the folder and its name, the
   header and its limits (64 and 1024 characters, the index window of 256 tokens counted by check-skills.py --count),
   the description as a trigger clause, the recipe first, each trap with symptom, cause, fix and how it was found,
   references and lessons files, requires-packages, the task table, the review that walks every rule against the
-  diff, the cold-reader and small-model test. Load it when a skill is never found for its symptom, find returns
+  diff, the cold-reader and small-model test. Load it to save what was learned for another contributor, move long
+  troubleshooting notes, record a workaround not measured yet, or when a skill is never found for its symptom, find returns
   nothing, a description lost its last triggers, check-skills says over the index's window, a heading moved and links
   broke, a lesson was merged before the hardware ran, the next round broke a rule a skill already taught, or a brief
   names a skill to leave behind. Not for briefs and hand-backs (ai-partners) or hooks (development-hooks).
@@ -39,6 +40,8 @@ A skill is written while the work happens, not reconstructed after it, and the s
 ## Extend or start a new skill
 
 Extend the skill that owns the part before creating a new one.
+If you keep explaining the same fix, save what was learned there while the result is fresh, so another contributor can repeat it.
+Use the [recipe and trap fields below](#what-goes-in-each-time); the run's logs stay in your evidence.
 A new skill is for a new kind of work; a new trap in an old kind goes into the old skill.
 A new skill is right when no existing name is where a reader would look: another project to contribute to (`contrib-<project>`, opening with "The rules that come first"), another layer of the system, another kind of work with its own recipe and checks.
 This skill is an example: making a skill had become work of its own, with its own checks and traps, inside a skill about briefs.
@@ -127,6 +130,8 @@ Nothing is lost: the body and the lessons files keep every symptom, and the inde
 - **The part's own perks:** a shortcut, a property or a tool that makes the next job easier.
 - **A measured fact worth keeping,** with its setup and date.
 - **How each thing is known.** A lesson says whether it comes from reading the source, from a model of it, from a test, from the installed package or from the device ([evidence and status](../ai-partners/SKILL.md#evidence-and-status)); a prediction is written as a prediction, with the run that will test it.
+  For a workaround not measured yet, write "Untested workaround" beside it, name the source that suggests it, and say which result would confirm or refute it.
+  Keep it out of the working recipe until that run succeeds; replace the prediction with the measured result when it does, or correct it when it fails.
 - **Public-safe always:** no machine paths, hosts, addresses, accounts, private plans or personal matters; generalise a fact about one machine ("on a host whose /tmp is a tmpfs") or leave it out and hand it to the coordinator's record.
   Say "Daniel", never "the owner"; one sentence per line; no dash in the middle of a sentence; every rule tied to its clause, its commit or its measurement.
 - **Never lose knowledge:** move detail into a reference, never delete a measured fact or a trap; correct what is wrong and say where the correction came from.
@@ -139,6 +144,8 @@ Keep the short working recipe first and the detail in `references/`; a skill's `
 - **A reference** holds what one step needs only sometimes: a long recipe, a table of cases, the record of a study.
   It opens with a bold lead, "**For** who: what they get", and `SKILL.md` links it with one line that says what it holds and how many traps.
   Link from `SKILL.md` to the reference, not from reference to reference in a chain.
+  When troubleshooting notes make the page too long, move each whole trap with its symptom, cause, fix and evidence together, and keep a short pointer under any heading that has incoming links.
+  Keep a procedure's steps together too; a reference starts where a reader has enough context to follow it.
 - **The lessons files:** each skill that gained more than a few lessons in a review keeps them in `references/lessons-2026-11.md` (or the next date), grouped as recipes, traps, perks and facts, each entry naming the lane it came from; shorter lists sit at the end of `SKILL.md` under "Lessons from the lanes".
   Read a skill's lessons before changing its part.
 - **Write the symptom first in every lesson.** The index of the bodies embeds the first 256 tokens of each entry, and a search for the error string finds the entry only if the string is there.
@@ -223,6 +230,9 @@ A skill that only its author can find or follow is not finished.
   **Cause:** the offline finder ranks the name, the description and the task table, not the bodies, and its stemmer is English only.
   **Fix:** put the symptom's own words into the description or the task row, and search the bodies' index for error strings.
   **How found:** the 28 of 157 symptoms the descriptions missed, 26 of which a body held ([ai-partners' lessons](../ai-partners/references/lessons-2026-11.md)).
+  A separate list of 24 symptoms written before reading the `making-skills` and `development-hooks` descriptions missed this skill for saving a learned fix, long troubleshooting notes and an unmeasured workaround on 2026-11-12.
+  Adding those triggers brought the expected skill into the first three for all 24, from 21 before, within 232 tokens for this description and its name.
+  Keep the original queries and both runs; a list used to improve a description becomes a regression check, and another reader supplies the next independent test.
 - **Symptom:** the check fails on a link from a skill to a page that exists only on another branch.
   **Fix:** link the page by its full address on the main branch until both branches are merged ([selling to a newcomer, traps](../writing-front-pages/references/selling-to-a-newcomer.md#traps-met-while-shrinking)).
 

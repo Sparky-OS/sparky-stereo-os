@@ -32,6 +32,8 @@ The programs, their example configurations and their tests are in [`hooks/`](../
 3. **Check:** `python3 hooks/install.py check WORKSPACE` reads every configuration the way the hooks do and names each file a configuration points to that does not exist. It ends with "Every configuration reads, and every file it names exists." and exit 0, or with the count of things to fix and exit 1.
 4. **Wire a tool:** `python3 hooks/install.py wire claude WORKSPACE` prints the settings block; with `--write FILE` it merges the block into that settings file and keeps a copy named `FILE.before-hooks-DATE` beside it. For Codex: `wire codex`. For commits: `python3 hooks/install.py git REPOSITORY WORKSPACE` prints two `git config` commands.
 5. **Watch the first run.** A hook whose path is wrong does not stop anything: the tool shows a "hook error" notice and carries on. In Claude Code, `/hooks` lists what is wired.
+   In Codex, open `/hooks`, review the commands and configuration paths, and trust the entries you intend to run.
+   Check the expected refusal or context on an event the hook covers; an enabled entry alone proves only that the settings were loaded.
 6. **Run the tests after any change:** `python3 hooks/tests/run.py` ends with `N test files, N tests: all passed`; `sh hooks/tests/clean-machine.sh` runs the whole proof on a machine that has only this repository and ends with `clean-machine proof: every step passed`.
 7. **To leave:** `python3 hooks/install.py unwire FILE` takes these hooks out of a settings file and leaves every other entry as it was.
 
@@ -98,6 +100,12 @@ Extend the hook that already stands at that moment (another pattern, another che
   **Cause:** state kept per machine, or per session where lanes share the session; and a tool that runs several reads at once starts the hook once for each, so each run reads the old state and writes its own.
   **Fix:** the key is the agent's id, else the transcript, else the session; the state is read, changed and written behind a lock.
   **How found:** twelve reads piped in at once: without the lock a read was lost in 5 of 10 runs, with it in none (`test_parallel_reads_all_count`). Codex's page says "Subagent hooks use the parent session id", so a lane's own state is not proved there.
+- **Listed and enabled, with no run proved.**
+  **Symptom:** Codex lists a hook as enabled, but no event or answer has been recorded.
+  **Cause:** registration, trust and event delivery are separate checks; an enabled hook may still be untrusted.
+  **Fix:** review it in `/hooks`, then verify its effect in an authorized session using a disposable workspace and profile.
+  Record the event and answer there; when only registration was checked, say so and leave event delivery unproved.
+  **How found:** Codex 0.167.1 loaded all seven hooks as 15 enabled but untrusted handlers in an isolated profile, with no hook load errors or warnings; the probe started no conversation and captured no events ([the wiring proof](../../hooks/TOOLS.md#codex)).
 - **A refusal that only says no.**
   **Symptom:** the partner sends the same call again, gives up, or finds another way to do the same thing.
   **Cause:** the reason names the rule and not the next step.
@@ -134,4 +142,5 @@ Extend the hook that already stands at that moment (another pattern, another che
 
 Written on 2026-11-12: the hooks' tests pipe events shaped as each tool's documentation shows them, and they passed in a container with nothing but this repository, without network, as an ordinary user, on a read-only file system.
 A live session of Claude Code or of Codex running these scripts was not part of that proof; the Codex dialect in particular was written from its documentation alone.
+Codex 0.167.1 later loaded the generated wiring in an isolated profile; this checks registration only, with event delivery and response handling still unproved.
 When you run them live, add what you find here.

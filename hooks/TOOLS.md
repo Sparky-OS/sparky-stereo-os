@@ -40,13 +40,18 @@ The tests pipe events shaped as the reference shows them and as a workstation's 
 
 ## Codex
 
-The dialect and the wiring are written from [Codex's hooks page](https://developers.openai.com/codex/hooks) and tested by piping events shaped as that page shows; they were not run under Codex.
+The dialect and the wiring are written from [Codex's hooks page](https://developers.openai.com/codex/hooks) and tested by piping events shaped as that page shows.
+On 2026-11-12, Codex 0.167.1's app-server `hooks/list` loaded the generated wiring for all seven hooks as 15 enabled handlers in an isolated profile, with no hook load errors or warnings.
+Every handler was untrusted.
+That probe started no conversation and captured no events, so event delivery, refusals and response handling remain unproved under Codex.
 
 ```sh
 python3 hooks/install.py wire codex WORKSPACE          # prints the content for ~/.codex/hooks.json or REPO/.codex/hooks.json
 ```
 
 Codex reads hooks from `~/.codex/hooks.json`, `~/.codex/config.toml`, `<repo>/.codex/hooks.json` and `<repo>/.codex/config.toml`, and "Non-managed hooks must be reviewed and trusted before they run": open `/hooks` in its CLI once after wiring.
+Review the commands and configuration paths before trusting them, then check the expected effect of each hook in a disposable workspace and profile.
+An enabled entry establishes that Codex loaded it; record a matching event and the hook's answer before claiming that it ran.
 
 What is the same: the event names (`SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PostToolUse`), the JSON on stdin, `permissionDecision: "deny"` with its reason, and `additionalContext`.
 

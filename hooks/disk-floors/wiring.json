@@ -1,0 +1,8 @@
+{
+  "claude": [
+    {"event": "PreToolUse", "matcher": "Bash", "timeout": 10}
+  ],
+  "codex": [
+    {"event": "PreToolUse", "matcher": "Bash", "timeout": 10}
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "enabled": true,
+  "workspace": "/path/to/your/workspace",
+  "paths": {
+    "state": "state/hooks"
+  },
+  "floors_gib": {
+    "/": 12,
+    "/path/to/your/workspace": 2,
+    "/path/to/your/scratch": 2
+  },
+  "below_floor": "context",
+  "remind_seconds": 600,
+  "state_keep_days": 30
+}

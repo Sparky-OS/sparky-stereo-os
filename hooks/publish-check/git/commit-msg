@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-2.0-or-later
+"""commit-msg: the commit message must pass the publish check
+(no name that is never published, no secret, no other person's address outside the trailers).
+
+The configuration is the file named by `git config sparky.publishCheckConfig`, else by SPARKY_PUBLISH_CHECK_CONFIG.
+When the check cannot run (no configuration, a broken one), the commit goes ahead and this hook says so;
+with `git config sparky.publishCheckOnFailure block` the commit is refused instead.
+"""
+import json
+import os
+import subprocess
+import sys
+
+sys.dont_write_bytecode = True
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
+import publish_check as pc  # noqa: E402
+
+
+def main():
+    r = subprocess.run(['git', 'config', '--get', 'sparky.publishCheckConfig'], capture_output=True, text=True)
+    path = r.stdout.strip() or os.environ.get('SPARKY_PUBLISH_CHECK_CONFIG', '')
+    if not path:
+        return pc.unchecked('commit-msg', 'no configuration (git config sparky.publishCheckConfig /path/to/publish-check.json)')
+    with open(path, encoding='utf-8') as f:
+        raw = json.load(f)
+    if not raw.get('enabled', True):
+        return 0
+    cfg = pc.Config(raw)
+    with open(sys.argv[1], encoding='utf-8', errors='replace') as f:
+        message = ''.join(line for line in f if not line.startswith('#'))
+    report = pc.Report()
+    for line in message.splitlines():
+        pc.check_line(cfg, report, 'commit message', line, prose=False, code=False)
+    stops = list(dict.fromkeys(report.hard))
+    if stops:
+        print('commit-msg: the publish check found what must not enter this repository:', file=sys.stderr)
+        print('\n'.join('STOP  ' + s for s in stops), file=sys.stderr)
+        print('Change the message; for a finding that was looked at and is wrong: git commit --no-verify', file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == '__main__':
+    try:
+        sys.exit(main())
+    except Exception as e:  # the check could not run: say so, and let the commit go ahead unless the repository asks otherwise
+        sys.exit(pc.unchecked('commit-msg', f'{type(e).__name__}: {e}'))

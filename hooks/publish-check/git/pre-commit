@@ -1,0 +1,106 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-2.0-or-later
+"""pre-commit: keep the private record and what is never published out of a repository.
+
+1. Refuses staged paths that belong to the private record (by default evidence/, captures/ and any REPORT*.md).
+2. Runs the publish check on the staged version of every added or changed regular file and refuses a hard finding
+   (a name that is never published, a secret, location data, another person's address), except addresses in
+   provenance files (copyright, changelog, control, patches), which stay as the provenance rules say.
+The configuration is the file named by `git config sparky.publishCheckConfig`, else by SPARKY_PUBLISH_CHECK_CONFIG.
+When the check cannot run (no configuration, a broken one), the commit goes ahead and this hook says so;
+with `git config sparky.publishCheckOnFailure block` the commit is refused instead.
+To pass a finding that was looked at and is wrong: git commit --no-verify.
+"""
+import json
+import os
+import re
+import subprocess
+import sys
+import tempfile
+
+sys.dont_write_bytecode = True
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
+import publish_check as pc  # noqa: E402
+
+NEVER_COMMIT = r'(^|/)(evidence|captures)/|(^|/)[^/]*REPORT[^/]*\.md$'
+PROVENANCE = r'copyright|COPYRIGHT|changelog|CHANGELOG|/debian/|control$|\.patch$|\.diff$|\.debdiff$'
+
+
+def git(*args, binary=False):
+    r = subprocess.run(['git', *args], capture_output=True, timeout=120)
+    if r.returncode != 0:
+        raise RuntimeError(r.stderr.decode(errors='replace').strip())
+    return r.stdout if binary else r.stdout.decode(errors='replace')
+
+
+def configuration():
+    try:
+        path = git('config', '--get', 'sparky.publishCheckConfig').strip()
+    except RuntimeError:
+        path = ''
+    return path or os.environ.get('SPARKY_PUBLISH_CHECK_CONFIG', '')
+
+
+def main():
+    staged = [p for p in git('diff', '--cached', '--name-only', '-z', '--diff-filter=ACMR').split('\0') if p]
+    path = configuration()
+    raw = {}
+    problem = ''
+    if not path:
+        problem = 'no configuration (git config sparky.publishCheckConfig /path/to/publish-check.json)'
+    else:
+        try:
+            with open(path, encoding='utf-8') as f:
+                raw = json.load(f)
+        except (OSError, ValueError) as e:
+            problem = f'the configuration {path} cannot be read ({e})'
+    record = [p for p in staged if re.search(raw.get('never_commit_paths_regex') or NEVER_COMMIT, p)]
+    if record:
+        print('pre-commit: private record staged (evidence, captures and reports stay outside a repository):', file=sys.stderr)
+        print('\n'.join(record), file=sys.stderr)
+        print('Take them out of the commit: git restore --staged PATH', file=sys.stderr)
+        return 1
+    if problem:
+        return pc.unchecked('pre-commit', problem)
+    if not raw.get('enabled', True):
+        return 0
+    cfg = pc.Config(raw)
+    provenance = re.compile(raw.get('provenance_paths_regex') or PROVENANCE)
+    stops = []
+    with tempfile.TemporaryDirectory() as tmp:
+        files = []
+        for name in staged:
+            mode = git('ls-files', '-s', '--', name).split(' ', 1)[0]
+            if mode not in ('100644', '100755'):
+                continue
+            target = os.path.join(tmp, name)
+            os.makedirs(os.path.dirname(target), exist_ok=True)
+            with open(target, 'wb') as f:
+                f.write(git('show', ':' + name, binary=True))
+            files.append(name)
+        if not files:
+            return 0
+        here = os.getcwd()
+        os.chdir(tmp)
+        try:
+            report = pc.check_files(cfg, files)
+        finally:
+            os.chdir(here)
+        for line in dict.fromkeys(report.hard):
+            name = line.split(':', 1)[0]
+            if "another person's email address" in line and provenance.search(name):
+                continue
+            stops.append(line)
+    if stops:
+        print('pre-commit: the publish check found what must not enter this repository:', file=sys.stderr)
+        print('\n'.join('STOP  ' + s for s in stops), file=sys.stderr)
+        print('Fix the file and stage it again; for a finding that was looked at and is wrong: git commit --no-verify', file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == '__main__':
+    try:
+        sys.exit(main())
+    except Exception as e:  # the check could not run: say so, and let the commit go ahead unless the repository asks otherwise
+        sys.exit(pc.unchecked('pre-commit', f'{type(e).__name__}: {e}'))

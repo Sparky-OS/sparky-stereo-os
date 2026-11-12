@@ -1,0 +1,12 @@
+{
+  "claude": [
+    {"event": "SessionStart", "matcher": "startup|resume|clear|compact", "timeout": 20},
+    {"event": "PreToolUse", "matcher": "Agent|Task|SubagentHandback", "timeout": 20},
+    {"event": "PreToolUse", "matcher": "Edit|Write", "timeout": 20}
+  ],
+  "codex": [
+    {"event": "SessionStart", "matcher": "startup|resume|clear|compact", "timeout": 20},
+    {"event": "PreToolUse", "matcher": "spawn_agent|Agent", "timeout": 20},
+    {"event": "PreToolUse", "matcher": "apply_patch", "timeout": 20}
+  ]
+}

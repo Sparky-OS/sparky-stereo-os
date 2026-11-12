@@ -1,0 +1,37 @@
+{
+  "enabled": true,
+  "workspace": "/path/to/your/workspace",
+  "paths": {
+    "memory": "memory",
+    "memory_index": "memory/MEMORY.md",
+    "queue": "partners/queue",
+    "state": "state/hooks"
+  },
+  "on": {
+    "dispatch": true,
+    "dispatch_reminder": true,
+    "brief_lookup": true,
+    "handback": true,
+    "waiting_lanes": true
+  },
+  "brief": {
+    "headings": ["Design", "The skill to leave behind"],
+    "design_names_a_memory": true,
+    "design_quotes": true,
+    "must_say": ["Design check", "Skill changes"]
+  },
+  "handback": {
+    "first_line": "^STATUS: ",
+    "final_status": "^STATUS: (review|blocked|done)",
+    "must_have": ["Design check", "Corpus consulted", "Skill changes"],
+    "max_refusals": 2
+  },
+  "waiting_lanes": {
+    "status": "^STATUS: (review|blocked)",
+    "max_age_days": 3,
+    "max_listed": 12
+  },
+  "lookup_also": [],
+  "lookup_max_files": 8,
+  "state_keep_days": 30
+}

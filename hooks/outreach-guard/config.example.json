@@ -1,0 +1,53 @@
+{
+  "enabled": true,
+  "workspace": "/path/to/your/workspace",
+  "paths": {
+    "memory": "memory",
+    "skills": "repos/sparky-stereo-os/skills",
+    "state": "state/hooks"
+  },
+  "window_seconds": 14400,
+  "always_read": [
+    "skills:upstream-outreach/SKILL.md",
+    "memory:how-we-write-upstream.md"
+  ],
+  "projects": [
+    {"pattern": "code\\.ffmpeg\\.org|FFmpeg/FFmpeg|ffmpeg-devel", "skill": "contrib-ffmpeg"},
+    {"pattern": "UniversalMediaServer", "skill": "contrib-ums"},
+    {"pattern": "invent\\.kde\\.org|bugs\\.kde\\.org", "skill": "contrib-kde"},
+    {"pattern": "codereview\\.qt-project\\.org|bugreports\\.qt\\.io", "skill": "contrib-qt"},
+    {"pattern": "lore\\.kernel\\.org|vger\\.kernel\\.org|lists\\.freedesktop\\.org|amd-gfx|dri-devel|linux-kernel", "skill": "contrib-kernel"},
+    {"pattern": "bugs\\.debian\\.org|reportbug|salsa\\.debian\\.org", "skill": "contrib-debian"},
+    {"pattern": "mpv-player/mpv", "skill": "contrib-mpv"},
+    {"pattern": "code\\.videolan\\.org|videolan/vlc", "skill": "contrib-vlc"},
+    {"pattern": "x265|Multicorewareinc", "skill": "contrib-x265"},
+    {"pattern": "HandBrake", "skill": "contrib-handbrake"},
+    {"pattern": "mkvtoolnix", "skill": "contrib-mkvtoolnix"},
+    {"pattern": "PeerTube", "skill": "contrib-peertube"},
+    {"pattern": "mplayer", "skill": "contrib-mplayer"}
+  ],
+  "require_consult": true,
+  "consult_tools": ["mcp__reference__consult_knowledge"],
+  "own_owners": ["your-github-user", "your-organization"],
+  "own_repos": ["sparky-stereo-os"],
+  "own_urls": [],
+  "forges": [
+    "code\\.ffmpeg\\.org", "invent\\.kde\\.org", "gitlab\\.", "codeberg\\.org", "api\\.github\\.com",
+    "salsa\\.debian\\.org", "code\\.videolan\\.org", "codereview\\.qt-project\\.org"
+  ],
+  "mail_commands": ["\\bgit\\s+send-email\\b", "\\bsendmail\\b", "\\bmsmtp\\b"],
+  "resolve_remotes": true,
+  "fork_remote_names": ["fork", "upstream"],
+  "checklist": [
+    "The person who sends it saw the complete text and approved it or changed it; this is exactly that text.",
+    "One subject per pull or merge request; a prerequisite is a request of its own.",
+    "Every related open issue is listed in the project's own form (Fixes, Closes, Related).",
+    "The project's whole CI is green on the exact commit of every branch pushed, on the fork or run locally with the logs kept; \"no checks reported\" is not green.",
+    "The series was checked rule by rule against the project's contrib skill: what each rule forbids, searched in the diff.",
+    "Maintainers can edit the pull request.",
+    "The project's own rules on AI text and disclosure were read again; assistance is said once.",
+    "The reference index was consulted for the subject; the ledger row follows the send."
+  ],
+  "lookup_hint": true,
+  "state_keep_days": 30
+}

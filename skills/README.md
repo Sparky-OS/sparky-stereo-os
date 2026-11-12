@@ -7,7 +7,7 @@ These are edition-maintenance procedures, not a general application-development 
 Start with [AGENTS.md](../AGENTS.md), the [edition contract](sparky-stereo/SKILL.md) and [working together](ai-partners/SKILL.md).
 Then choose one task below. Each domain starts with a short working recipe; detailed sections retain the measurements and traps that motivated it.
 Historical versions and test results are evidence for their stated setup, not a guarantee about newer software.
-Core skills are `sparky-stereo`, `ai-partners`, `search-upstream-first`, `upstream-outreach`, `edition-packaging` and `writing-front-pages`; they always link.
+Core skills are `sparky-stereo`, `ai-partners`, `making-skills`, `development-hooks`, `search-upstream-first`, `upstream-outreach`, `edition-packaging` and `writing-front-pages`; they always link.
 
 | Your task | Read next |
 | --- | --- |
@@ -40,6 +40,8 @@ Core skills are `sparky-stereo`, `ai-partners`, `search-upstream-first`, `upstre
 | Brazilian certificate sources and algorithms | [brazil-certificates](brazil-certificates/SKILL.md) |
 | Sparky CA trust-store implementation | [certificate-manager](certificate-manager/SKILL.md) |
 | A task brief, handoff or review for a person or an AI partner; an unattended runner that stops, loops or cannot write | [ai-partners](ai-partners/SKILL.md) |
+| A new skill or an extension of one: the header and its limits, the description as a trigger clause inside the index's window, lessons files, the review that walks each rule against the diff, the cold-reader test | [making-skills](making-skills/SKILL.md) |
+| Hooks: a rule an AI tool or git enforces by itself (the designs read after a compaction, briefs and hand-backs, the outreach guard, the publish check), the workspace layout they assume, a hook that refuses a tool call, adding one | [development-hooks](development-hooks/SKILL.md), with [`hooks/`](../hooks/README.md) |
 | A bug in a program the edition did not write, before writing any fix | [search-upstream-first](search-upstream-first/SKILL.md) |
 | Forks, pushing, and checking that the work is online; releases and DOIs, the Sponsor button, our own libraries' repositories, where large files go | [forks-and-online](forks-and-online/SKILL.md) |
 | A maintainer message, contribution or follow-up | [upstream-outreach](upstream-outreach/SKILL.md) |
@@ -78,12 +80,16 @@ A selected section is explicitly labelled as an excerpt. Read additional linked 
 
 ## Improving a skill
 
+[making-skills](making-skills/SKILL.md) is the skill for this: its recipe, its checks and the traps this folder met.
+The short form follows.
+
 Keep its existing name and path so installed integrations keep finding it.
 Write the decision, the minimum inputs, the operation and the observable result; preserve useful evidence and credits.
 Keep substantial conditional detail in a linked reference, and individual run history in its evidence record.
 Use a valid YAML `name` and `description`; run `python3 tools/check-skills.py` and check the actual instructions as a reader.
+Count a description before you commit it: `python3 tools/check-skills.py --count <name>` prints its tokens against the index's window of 256 and its characters against 1024.
 The description and the task table are how a reader finds a skill: name the programs, tools and symptoms a person would type, and add the symptom to `data/routing/symptoms-157.tsv` of the skills engine (sparky-os/skills-mcp in the build tree), which every change to the engine or to the descriptions is checked against when a new kind of work arrives.
-Write the description as a trigger clause: what the skill is for, then the symptoms, error strings, programs and components that should bring a reader to it, then what it is not for and which skill is, within 1024 characters ([ai-partners, the description routes](ai-partners/SKILL.md#the-description-routes-the-body-executes)).
-Write the skill as you go, while the work happens: the recipe first, each trap with its symptom, cause, fix and how the cause was found, the part's perks; longer harvests go to `references/lessons-<date>.md` ([ai-partners, skills as you go](ai-partners/SKILL.md#skills-as-you-go)).
+Write the description as a trigger clause: what the skill is for, then the symptoms, error strings, programs and components that should bring a reader to it, then what it is not for and which skill is, within 1024 characters ([making-skills, the description routes](making-skills/SKILL.md#the-description-routes-the-body-executes)).
+Write the skill as you go, while the work happens: the recipe first, each trap with its symptom, cause, fix and how the cause was found, the part's perks; longer harvests go to `references/lessons-<date>.md` ([making-skills, what goes in](making-skills/SKILL.md#what-goes-in-each-time)).
 A local vector index or an MCP over these files finds a skill by the same description; the files stay the source and the index is rebuilt after every merge ([finding a skill locally](ai-partners/SKILL.md#finding-a-skill-locally)).
-The validator checks discovery metadata and local file targets, not technical truth, external URLs or every Markdown anchor.
+The validator checks discovery metadata, both limits of a description and local file targets, not technical truth, external URLs or every Markdown anchor.

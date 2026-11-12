@@ -57,6 +57,7 @@ Check freshness: re-read `CONTRIBUTING.md`, `doc/developer.texi` and `doc/commun
 - Reproduce each finding before changing anything: the review often names the mutation it ran (for example "I forced `frame_params()` to fail"); run the same probe on the old head and keep its output as the red column. When a change to the test makes sentences of the pull request description untrue (what the reference covers, the FATE totals), rewrite them in the same round.
 - The mail carries only the summary lines: read the whole review, an issue comment on the pull request, and fetch the branches it kept on `Forgejo_Fairy/FFmpeg` (`fairy/prN-tooling` probes, `fairy/prN-*-fix` amendments) to reproduce before changing anything; carry an amendment with credit ([recipe and traps](references/lessons-2026-11.md#a-third-bot-round-on-the-frame-packing-filters-order-523-2026-11-11)).
 - When the bot says a fix is only partly done, compare the unit the clause states its rule for (the coded video sequence, every earlier message, every message) with the unit the fix used (the access unit, the same id, the first message).
+- When the bot finds neighbours of the last fix again, stop fixing cases: write the invariant down (what must hold, for every decoder start, once a picture is output), generate every combination of the dimensions its cases vary, and check each output with an oracle in the test that does not use the code under test ([recipe and traps](references/lessons-2026-11.md#a-fourth-bot-round-the-invariant-and-the-walk-order-527-2026-11-11)).
 
 ## CI
 - Infrastructure failures happen (the win64 job's rsync of the fate-suite was refused once); show the log line and ask a maintainer to re-run, since only maintainers can.
@@ -68,5 +69,5 @@ Check freshness: re-read `CONTRIBUTING.md`, `doc/developer.texi` and `doc/commun
 
 ## Lessons from the lanes, October to November 2026
 
-[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (9 entries, a section on multilayer HEVC and the 3D reference displays SEI, and one on a third review round of the frame packing filters).
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (9 entries, a section on multilayer HEVC and the 3D reference displays SEI, one on a third review round of the frame packing filters, and one on stating the invariant and walking the family in the fourth).
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

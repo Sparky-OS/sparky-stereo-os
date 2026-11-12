@@ -1,0 +1,60 @@
+# Deploy the demos folder to GitHub Pages.
+# The repository's Pages source is "GitHub Actions" (build type "workflow"), so nothing is served until this runs.
+# Every demo is a folder of plain files under demos/ (demos/procedural-texture-rendering/ is the first); the site is
+# that folder as it is: no build step, no generator.
+name: Deploy the demos to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'demos/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+# only what a deployment needs
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# one deployment at a time; a run under way is left to finish
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Check the folder
+        run: |
+          set -eu
+          test -f demos/index.html
+          test -f demos/procedural-texture-rendering/index.html
+          # GitHub Pages: no symbolic or hard links in the artifact, and a published site of at most 1 GB
+          if [ -n "$(find demos -type l)" ]; then echo "symbolic links in demos/"; exit 1; fi
+          size=$(du -sm demos | cut -f1)
+          echo "demos/ is ${size} MB"
+          test "$size" -lt 1000
+          # every file the page names is there, the scene's sizes are the files', no address starts at the host's root
+          python3 .github/scripts/check_site.py demos/procedural-texture-rendering
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: demos
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

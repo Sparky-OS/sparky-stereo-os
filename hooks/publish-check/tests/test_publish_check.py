@@ -20,6 +20,7 @@ CHECKER = os.path.join(FOLDER, 'publish_check.py')
 TOKEN = 'gh' + 'p_' + 'a1B2' * 9                     # shaped like a forge token
 STRANGER = 'jane.roe' + '@' + 'not-reserved.zz'      # an address outside the domains reserved for examples
 OURS = 'you' + '@' + 'example.org'
+NAMED = 'project' + '-codename'                      # the example configuration's name that is never published
 DASH = 'It works — on every screen.'
 TINY_JPEG = bytes.fromhex(
     'ffd8ffe000104a46494600010100000100010000ffdb004300080606070605080707070909080a0c140d0c0b0b0c1912130f141d1a1f1e1d'
@@ -73,7 +74,7 @@ class Checker(Case):
         cases = {
             'looks like a GitHub token': f'token in a log: {TOKEN}\n',
             f"another person's email address {STRANGER}": f'Write to {STRANGER} for access.\n',
-            'names a name that is never published': 'It builds on project-codename internally.\n',
+            'names a name that is never published': f'It builds on {NAMED} internally.\n',
             'looks like a private key': '-----BEGIN ' + 'OPENSSH PRIVATE KEY-----\n',
             'looks like a password or key written as a literal': 'pass' + 'word = "hunter2hunter2"\n',
         }
@@ -88,6 +89,7 @@ class Checker(Case):
                 'Signed-off-by: A Maintainer <maintainer' + '@' + 'kernel-like.zz>\n'
                 'https://lore.example.zz/r/20261112.abc' + '@' + 'mail.zz/\n'
                 'A file: logo@2x.png, a unit: getty@tty1.service\n'
+                'A remote: git@github.com:some/project.git\n'
                 'noreply: 1234+someone' + '@' + 'users.noreply.github.com\n')
         r = self.checker('--text', stdin=text)
         self.assertEqual(r.returncode, 0, r.stdout)
@@ -109,7 +111,7 @@ class Checker(Case):
 
     def test_each_check_has_a_switch(self):
         self.configure(checks={'secrets': False, 'emails': False, 'never_name': False, 'style': False})
-        r = self.checker('--text', stdin=f'{TOKEN} {STRANGER} project-codename {DASH}\n')
+        r = self.checker('--text', stdin=f'{TOKEN} {STRANGER} {NAMED} {DASH}\n')
         self.assertEqual((r.returncode, r.stdout), (0, 'publish-check: clean\n'))
 
     def test_location_data_in_a_picture(self):
@@ -195,7 +197,7 @@ class ToolHook(Case):
         out = self.run_hook(self.bash(f'gh issue comment 5 --repo some/project --body-file {body}'))
         self.assertEqual(self.decision(out), 'ask')
         self.assertIn(f"body.md:2: another person's email address {STRANGER}", self.reason(out))
-        heredoc = f'gh pr create --repo some/project --title t --body "$(cat <<\'EOF\'\nA fix.\nIt names project-codename here.\nEOF\n)"'
+        heredoc = f'gh pr create --repo some/project --title t --body "$(cat <<\'EOF\'\nA fix.\nIt names {NAMED} here.\nEOF\n)"'
         out = self.run_hook(self.bash(heredoc))
         self.assertEqual(self.decision(out), 'ask')
         self.assertIn('command line 3: names a name that is never published', self.reason(out))

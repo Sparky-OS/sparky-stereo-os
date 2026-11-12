@@ -53,6 +53,16 @@ class PublicSafe(unittest.TestCase):
                 for key, value in (cfg.get('paths') or {}).items():
                     self.assertFalse(os.path.isabs(value), f'{name}: paths.{key} is absolute')
 
+    def test_the_section_passes_its_own_publish_check_with_the_example_configuration(self):
+        import subprocess
+        checked = [p for p in files() if not p.endswith(('vocab.txt', 'window-goldens.tsv', 'char-classes.txt'))]
+        checked += [os.path.join(REPO, 'tools', 'check-skills.py'), os.path.join(REPO, 'tools', 'skill-window', 'wordpiece.py'),
+                    os.path.join(REPO, 'tools', 'skill-window', 'regenerate.py'), os.path.join(REPO, 'tools', 'skill-window', 'README.md')]
+        r = subprocess.run([sys.executable, '-B', os.path.join(HOOKS, 'publish-check', 'publish_check.py'), '--config',
+                            os.path.join(HOOKS, 'publish-check', 'config.example.json'), '--files', *checked], capture_output=True, text=True)
+        self.assertEqual((r.returncode, r.stdout, r.stderr), (0, 'publish-check: clean\n', ''))
+        self.assertGreater(len(checked), 50)
+
     def test_no_bytecode_and_no_state_is_left_in_the_section(self):
         left = [p for p in files() if p.endswith(('.pyc', '.log', '.lock')) or '/state/' in p]
         self.assertEqual(left, [])

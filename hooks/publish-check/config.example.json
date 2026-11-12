@@ -8,7 +8,7 @@
   "allowed_emails": [],
   "allowed_email_regex": ["@users\\.noreply\\.github\\.com$"],
   "never_name": [
-    {"regex": "\\bproject-codename\\b", "why": "a name that is never published"}
+    {"regex": "\\bproject[- ]codename\\b", "why": "a name that is never published"}
   ],
   "private_remotes_regex": "\\.private(\\.git)?$",
   "checks": {

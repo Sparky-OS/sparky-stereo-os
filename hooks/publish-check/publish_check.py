@@ -160,6 +160,8 @@ def check_line(cfg, rep, where, line, prose, code=False):
             addr = m.group(0)
             if cfg.email_ok(addr) or message_id_or_url(line, m.start(), m.end(), addr):
                 continue
+            if re.match(r':[\w~./-]', line[m.end():]):
+                continue  # user@host:path is the address of a remote, not of a person
             if TRAILER.search(line) or (code and CREDIT_LINE.search(line)):
                 continue
             rep.add((prose or not code) and not log, where,

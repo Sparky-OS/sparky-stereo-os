@@ -76,8 +76,12 @@ A temporary file beside the original is written, read byte-for-byte, decoded thr
 Keep saves serialized; the check before rename is not a lock against another program modifying the file in the last interval.
 No JPEG encoder runs in this operation.
 
-For JPS, the descriptor APP3 is replaced or inserted after initial APP0/APP1 segments.
-All other bytes remain unchanged, including every scan of a progressive JPEG, EXIF/XMP, colour profiles, comments and opaque metadata.
+With policy 1.17.6, non-Qt callers use `stereo_jpeg_inspect` / `stereo_jpeg_correct` for the complete JPEG/MPO rewrite and supply their own verified transaction, as the [migration recipe](correction-writer-audit.md#working-migration-for-a-non-qt-application) describes.
+The Qt save uses the same complete-file codec.
+
+For an existing JPS, only its descriptor word changes; insertion uses APP3 after initial APP0/APP1 segments.
+All other bytes remain unchanged, including every scan of a progressive JPEG, EXIF/XMP, colour profiles, comments, opaque metadata and opaque bytes after EOI.
+An immediate unindexed second JPEG is refused rather than treated as an opaque trailer.
 Existing compatible half-size flags, separation, display, descriptor extensions and ASCII comments are retained.
 Unknown/reserved fields, ambiguous duplicate descriptors and unsupported layouts are refused with a message.
 Lossless JPEG is currently refused because the picture reader cannot verify its decoded eyes; inserting APP3 does not require DQT.

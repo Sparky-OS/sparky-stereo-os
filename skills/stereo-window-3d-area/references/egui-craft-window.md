@@ -216,3 +216,12 @@ Keep the entire ordinary control window inside the virtual output and compare th
   Check the rig's authorized render-node access and compositor log before changing the application.
   A software-rendered session can still need that node for the tested capture path.
   Repeat in a fresh private session and require captured pixels, not only a successful protocol event.
+
+## A refused proof launch must explain itself
+
+Symptom: the proof launcher exits 1 without a message before creating a container.
+A bare shell regular-expression check under `set -e` rejected the case label silently.
+Validate the argument count, case-label pattern, flow, frame, binary and existing receipt explicitly, printing the refused value or accepted shape to stderr.
+Keep invalid-label, invalid-flow, invalid-frame and missing-binary controls that fail with a diagnostic before Docker starts.
+The cause was found by running the rejected argument list with captured exit status and stderr; an empty stderr was the red witness.
+Do not relax a safety pattern just to make a label work without saying what it accepts.

@@ -1,0 +1,14 @@
+{
+  "claude": [
+    {"event": "SessionStart", "matcher": "startup|resume|clear|compact", "timeout": 20},
+    {"event": "UserPromptSubmit", "timeout": 20},
+    {"event": "PreToolUse", "matcher": "*", "timeout": 20},
+    {"event": "PostToolUse", "matcher": "Read", "timeout": 20}
+  ],
+  "codex": [
+    {"event": "SessionStart", "matcher": "startup|resume|clear|compact", "timeout": 20},
+    {"event": "UserPromptSubmit", "timeout": 20},
+    {"event": "PreToolUse", "matcher": "*", "timeout": 20},
+    {"event": "PostToolUse", "matcher": "Bash", "timeout": 20}
+  ]
+}

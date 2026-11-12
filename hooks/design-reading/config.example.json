@@ -1,0 +1,32 @@
+{
+  "enabled": true,
+  "workspace": "/path/to/your/workspace",
+  "paths": {
+    "memory": "memory",
+    "memory_index": "memory/MEMORY.md",
+    "queue": "partners/queue",
+    "state": "state/hooks"
+  },
+  "core": [
+    "check-every-default.md",
+    "one-format-inside.md"
+  ],
+  "also_on_subject": [
+    "display-design.md (any change to a display or an output)"
+  ],
+  "subject_rules": [
+    {"pattern": "translat|every string", "read": ["required-languages.md"]}
+  ],
+  "gap_seconds": 3300,
+  "on": {
+    "session_start": true,
+    "first_call": true,
+    "gap": true,
+    "lane_named": true
+  },
+  "read_tools": ["Read", "Glob", "Grep", "ToolSearch", "TaskOutput"],
+  "free_tool_prefixes": ["mcp__"],
+  "lane_named_max": 16,
+  "lookup_hint": "python3 repos/sparky-stereo-os/hooks/lib/design_lookup.py --memory memory WORD...",
+  "state_keep_days": 30
+}

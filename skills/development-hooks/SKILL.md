@@ -171,4 +171,5 @@ Extend the hook that already stands at that moment (another pattern, another che
 Written on 2026-11-12: the hooks' tests pipe events shaped as each tool's documentation shows them, and they passed in a container with nothing but this repository, without network, as an ordinary user, on a read-only file system.
 A live session of Claude Code or of Codex running these scripts was not part of that proof; the Codex dialect in particular was written from its documentation alone.
 Codex 0.167.1 later loaded the generated wiring in an isolated profile; this checks registration only, with event delivery and response handling still unproved.
+A reader of another lab, given this page alone on 2026-11-12, answered four questions on adopting the hooks and adding one from the text, and listed thirty-three things the page did not say; its list became lines of this page.
 When you run them live, add what you find here.

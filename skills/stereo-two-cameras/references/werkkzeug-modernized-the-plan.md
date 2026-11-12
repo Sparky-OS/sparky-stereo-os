@@ -997,6 +997,14 @@ So Werkkzeug4 does not run on Linux today, with or without the four pull request
   Fix: the operator code stays as published. The bridge bounds what goes into `HSCB` (a sample above the range reads the table's top), counts the samples and says the count in the drawing's notes. The 854 textures with every Text drawn are now drawn by each build, and by one build twice, in the same-bytes proof.
   Found by: drawing the texture three times (three checksums); drawing each Text alone (stable); drawing the graph cut after each operator, three times each, until the first operator that was not stable; replacing the first Text by a flat grey (stable: no highlight); comparing two drawings (34 places, all where the picture before the `HSCB` was at full scale); then reading `HSCB`, its table and `Bump`'s add in the source.
   The lesson for any proof of "the same bytes": compare a build with itself as well as with the others, and draw the references with every operator switched on. A table where an operator is handed on cannot reach what that operator's picture does to the operators after it.
+- Symptom: in nine languages the sentence about a missing font is translated and still holds English words: "licence class: not stated in the font", "by (not stated)".
+  Cause: the words are values the core puts into its sentence. A catalogue translates a sentence's frame, and every value was taken as a name.
+  Fix: the few values that are the core's own words (what a record does not state, a licence class that is words) are said with the window's catalogue entries where the sentence is filled; names, numbers, files and the licences' short names stay.
+  Found by: reading the "said:" lines the proof writes in every language, not only its count of green checks. A check now refuses the English words in every other language.
+- Symptom: after a new sentence is translated, the working proof still shows it in English and two checks are red, while the build is right.
+  Cause: the proof rig reads the compiled catalogues from an install folder, and the working build had not been installed into it.
+  Fix: install the working build into the rig's folder before a language run (`DESTDIR=... cmake --install`).
+  Found by: the same commit was green in the run that builds and installs from the commit.
 - Symptom: a task says the shared library "has" a function, and the package on the machine does not.
   Cause: the fix was merged and not yet published, and one of the two functions came two versions later.
   Fix: read the library's changelog and the published package's version first; build against the source at the commit that has both, say which, and say that the published package is not proven.

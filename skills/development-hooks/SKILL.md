@@ -30,6 +30,7 @@ The programs, their example configurations and their tests are in [`hooks/`](../
 1. **Make the workspace:** `python3 hooks/install.py init WORKSPACE` makes [the default layout](#the-default-layout) and one configuration per hook in `WORKSPACE/private/hooks/`. It prints `wrote` for each file it makes and `kept` for each that exists; it overwrites nothing.
 2. **Put your own values in:** the memory files every session reads (`design-reading.json`, `core`), your accounts and projects (`outreach-guard.json`, `own_owners` and `own_repos`), your identities and the names you never publish (`publish-check.json`), your floors (`disk-floors.json`). Switch off what you do not want: every hook has `enabled`, every part its own switch.
 3. **Check:** `python3 hooks/install.py check WORKSPACE` reads every configuration the way the hooks do and names each file a configuration points to that does not exist. It ends with "Every configuration reads, and every file it names exists." and exit 0, or with the count of things to fix and exit 1.
+   Run it again after moving or removing a rule file: a missing core file is skipped, and a missing outreach file is logged and skipped.
 4. **Wire a tool:** `python3 hooks/install.py wire claude WORKSPACE` prints the settings block; with `--write FILE` it merges the block into that settings file and keeps a copy named `FILE.before-hooks-DATE-UNIQUE` beside it. For Codex: `wire codex`. For commits: `python3 hooks/install.py git REPOSITORY WORKSPACE` prints two `git config` commands.
 5. **Watch the first run.** A hook whose path is wrong does not stop anything: the tool shows a "hook error" notice and carries on. In Claude Code, `/hooks` lists what is wired.
    In Codex, open `/hooks`, review the commands and configuration paths, and trust the entries you intend to run.
@@ -115,6 +116,8 @@ Extend the hook that already stands at that moment (another pattern, another che
   **Cause:** state kept per machine, or per session where lanes share the session; and a tool that runs several reads at once starts the hook once for each, so each run reads the old state and writes its own.
   **Fix:** the key is the agent's id, else the transcript, else the session; the state is read, changed and written behind a lock.
   **How found:** twelve reads piped in at once: without the lock a read was lost in 5 of 10 runs, with it in none (`test_parallel_reads_all_count`). Codex's page says "Subagent hooks use the parent session id", so a lane's own state is not proved there.
+  A later test held the lock past its five-second timeout and found that the hook still wrote state without it.
+  A timeout now lets the action through with an explicit notice, leaves the saved state intact and asks for a retry after the other hook finishes.
 - **Listed and enabled, with no run proved.**
   **Symptom:** Codex lists a hook as enabled, but no event or answer has been recorded.
   **Cause:** registration, trust and event delivery are separate checks; an enabled hook may still be untrusted.
@@ -145,6 +148,13 @@ Extend the hook that already stands at that moment (another pattern, another che
   A hook reads the command it is shown; a script file, an alias or a program that starts another are not seen.
   Codex's page says it for every tool: "Treat tool hooks as a useful guardrail, not a complete enforcement boundary."
   Keep the rule written in the skill and the house rules as well.
+- **A saved log cannot replay the whole command.**
+  **Symptom:** replaying a refused or passed log entry no longer produces its original decision.
+  **Cause:** the outreach logs keep only the first 200 characters and flatten line breaks; they also omit the working folder and session's reading state.
+  A prefix can lose the sending command or end inside a quote or here-document.
+  **Fix:** keep a private full event and answer when reproducing a problem, with the relevant configuration and state; inspect them for secrets before sharing any example.
+  Keep synthetic complete commands separate from saved fragments, and never execute a logged send to test its classification.
+  **How found:** replaying ten saved entries on 2026-11-12 reproduced a quoted-text false refusal, but nine entries ended at the 200-character limit; a complete synthetic POST exercised the gate that its truncated prefix could not.
 
 ## Perks
 

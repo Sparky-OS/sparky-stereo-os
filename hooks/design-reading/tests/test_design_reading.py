@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Tests of the design-reading hook: events piped in, answers read. Run: python3 hooks/tests/run.py design-reading"""
+import fcntl
 import json
 import os
 import sys
@@ -38,6 +39,23 @@ class DesignReading(testkit.HookCase):
         self.assertIn(self.memory('check-every-default.md'), text)
         self.assertIn(self.memory('one-format-inside.md'), text)
         self.assertIn('display-design.md (any change to a display or an output)', text)
+
+    def test_a_busy_state_lock_fails_open_without_changing_state(self):
+        self.run_hook(self.event('SessionStart', source='startup'))
+        path = self.state_file()
+        with open(path, 'rb') as f:
+            original = f.read()
+        with open(path[:-5] + '.lock', 'w') as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            result = self.run_raw(json.dumps(self.read(self.memory('check-every-default.md'))))
+        self.assertEqual((result.returncode, result.stderr), (0, ''))
+        self.assertIn('state lock not taken after 5 s', result.stdout)
+        self.assertIn('let the action through', result.stdout)
+        with open(path, 'rb') as f:
+            self.assertEqual(f.read(), original)
+        self.assertIn('state lock not taken', self.log('errors.log'))
+        self.read_all()
+        self.assertIsNone(self.run_hook(self.bash('ls')))
 
     def test_tools_are_refused_until_every_file_is_read_in_full(self):
         self.run_hook(self.event('SessionStart', source='startup'))

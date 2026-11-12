@@ -333,7 +333,7 @@ class Kit:
             except OSError:
                 time.sleep(0.1)
         else:
-            self.log('errors.log', f'state lock not taken after 5 s: {self._state_file}')
+            raise HookError(f'state lock not taken after 5 s: {self._state_file}; retry after the other hook finishes')
         try:
             with open(self._state_file, encoding='utf-8') as f:
                 self.state = json.load(f)

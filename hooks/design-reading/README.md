@@ -65,4 +65,4 @@ event PreToolUse Bash '{"command":"ls"}' | run                                  
 
 ## Tests
 
-`python3 hooks/tests/run.py design-reading` runs 21 tests in [`tests/`](tests/test_design_reading.py): the triggers, partial reads, sessions and agents kept apart, parallel reads, the switches, Codex's `cat`, and every way of failing open.
+`python3 hooks/tests/run.py design-reading` runs 22 tests in [`tests/`](tests/test_design_reading.py): the triggers, partial reads, sessions and agents kept apart, parallel reads, a held state lock, the switches, Codex's `cat`, and every way of failing open.

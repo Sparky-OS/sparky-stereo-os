@@ -36,6 +36,7 @@ A skill is written while the work happens, not reconstructed after it, and the s
 9. **Hand it back with the work.** The hand-back's "Skill changes" names the branch, the commit and what each change saves the next worker; the review walks every rule against the diff ([the review](#reviewed-with-the-work)).
 10. **Test that it is found and followed** by a reader who was not there ([the test](#found-and-followed-by-a-cold-reader)).
 11. **After the merge, rebuild what is derived:** every index is made from the files, and the skills package takes the reviewed commit.
+    Check the package's exported tree too: the skills, their linked pages and the hook programs must come from that same commit ([the archive trap](#traps-this-project-met)).
 
 ## Extend or start a new skill
 
@@ -200,6 +201,11 @@ A skill that only its author can find or follow is not finished.
 
 ## Traps this project met
 
+- **Symptom:** the skills check passes in a checkout but fails in the package's snapshot, or an installed recipe names a hook that is absent.
+  **Cause:** a recipe's `git archive` path list includes `skills` and `tools` but omits `hooks`, even though the new pages link there.
+  **Fix:** include `hooks` in the snapshot, keep executable scripts executable, and run the check on the exported tree; verify its `SOURCE` commit and `MANIFEST.sha256` too.
+  **How found:** running the skills package's archive and validation steps in isolation on 2026-11-12 failed before the archive-list patch and passed with all 49 tracked hook files after it.
+  That proves the archive step; installing a built package is a separate check.
 - **Symptom:** a skill stops being found for the symptoms written last in its description; nothing fails anywhere.
   **Cause:** every review adds triggers, and name plus description passes the index's 256 tokens; the index embeds the head and drops the tail without a word.
   Nothing in this repository counted tokens, so it showed only after each merge, when the index was rebuilt: on 2026-11-06 the seven longest descriptions were over, and from that day to 2026-11-11 sixteen commits say in their subject that a description was brought back inside the window.

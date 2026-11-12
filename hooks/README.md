@@ -60,7 +60,8 @@ python3 hooks/install.py check WORKSPACE           # reads every configuration a
 python3 hooks/install.py wire claude WORKSPACE     # prints the wiring; --write FILE merges it into a settings file
 ```
 
-`init` never overwrites a file, and nothing is written outside `WORKSPACE` unless `--write` names the file.
+`init` never overwrites a file, and nothing is written outside `WORKSPACE` unless `--write` or `unwire` names the settings file.
+A settings write keeps a unique backup beside that file, including when two writes happen within one second.
 A workspace that already has its folders elsewhere keeps them: put their paths under `paths` in each configuration.
 To leave: `python3 hooks/install.py unwire FILE` takes these hooks out of a settings file and leaves every other entry as it was.
 
@@ -71,7 +72,9 @@ To leave: `python3 hooks/install.py unwire FILE` takes these hooks out of a sett
 - **It fails open, and says so.** A hook that cannot run (no configuration, a broken one, an error inside it) lets the action through, writes the reason to `errors.log` in its state folder and tells the person in one line. A broken guard never becomes a wall.
 - **A refusal says what to do next.** It names the files to read, the sections that are missing or the command to run instead, and when the same command can be sent again.
 - **What it enforces is the person's choice.** Every hook has `enabled`, every part of a hook has its own switch, and the edition's defaults are on.
-- **Its state is per session and per lane,** so one partner's reading never counts for another.
+- **Its state follows the event's identity:** the agent id, else the transcript, else the session.
+  Separate lanes need separate identities from the tool; that delivery is not yet proved under Codex.
+  Updates hold a lock; if it stays busy for five seconds, the action goes through with a notice and no state is changed.
 - **It reads shell text as a careful reader would.** Text a command only writes to a file is not a command; a command inside `bash -c` or a here-document handed to a shell is. It is a guard rail, not a wall.
 - **Nothing private is in it.** No path of a machine, no list, no contact: each hook reads one configuration file, and that file stays in `private/`.
 

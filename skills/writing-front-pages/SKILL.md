@@ -1,5 +1,4 @@
 ---
-metadata:
 name: writing-front-pages
 description: >-
   Write the first text a stranger meets: README openings, profiles, calls for testers, list and page openings, About

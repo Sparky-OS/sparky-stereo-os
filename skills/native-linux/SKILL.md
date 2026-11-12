@@ -5,13 +5,12 @@ name: native-linux
 description: >-
   Native Linux stereo routes: GLX quad buffer, EGL multiview, Vulkan, Qt,
   X11 declarations, libstereo-declare, SDL, GLFW, GLUT, FLTK, Ogre,
-  raylib, plib, KWin's buffer formats, eye delivery and the 2D fallback. Load it when GLX offers no stereo visual, a
-  program's stereo option does nothing, a child window is invisible to the compositor, an X11 child gets no
+  raylib, plib, KWin's buffer formats, eye delivery, the 2D fallback. Load it when GLX offers no stereo visual, a stereo option does nothing, a child window is invisible to the compositor, an X11 child gets no
   WL_SURFACE_SERIAL in CI, wp_viewporter says the surface already has a viewport, a mono EGL window draws at half its
   width, a video crashes KWin switching between ARGB and NV12, a Vulkan swapchain errors with NATIVE_WINDOW_IN_USE, a
   toolkit lacks stereo, a canvas or video looks pixelated or black in the stereo browser, the browser's video is
   green on NVIDIA, a gl-stereo layer change needs the saver receipts again, the saver list says "Not offered", or a QWidget
-  window's painting (CPU or GPU) must be measured.
+  window's painting (CPU, GPU) must be measured.
 ---
 
 # Native Linux programs

@@ -14,6 +14,7 @@ Core skills are `sparky-stereo`, `ai-partners`, `making-skills`, `development-ho
 | Native toolkit, GLX/EGL/Vulkan or window integration | [native-linux](native-linux/SKILL.md), then [stereo-window-3d-area](stereo-window-3d-area/SKILL.md) |
 | Theme, Canvas Painter, StyleKit or KWin effects depth | [stereo-window-3d-area](stereo-window-3d-area/SKILL.md) and its [Qt/KDE depth reference](stereo-window-3d-area/references/qt-kde-depth.md) |
 | A scene with cameras and view-dependent rendering | [stereo-two-cameras](stereo-two-cameras/SKILL.md) |
+| A texture as a procedure first and its picture last: procedures fitted to a picture's pixels, a glTF scene that draws before its pictures arrive, a web demo on a static host whose page simulates a slow link (its rate, a hidden tab's throttled timers), the page's accessibility checks against WCAG | [stereo-two-cameras](stereo-two-cameras/SKILL.md), its [procedural texture reference](stereo-two-cameras/references/procedural-texture-from-a-bitmap.md) |
 | Video decoding, editing, export or streaming | [stereo-video](stereo-video/SKILL.md) |
 | Serving or casting to a television, player or phone over the network | [stereo-serving](stereo-serving/SKILL.md) |
 | Photos, format marks or thumbnails | [stereo-pictures](stereo-pictures/SKILL.md) |

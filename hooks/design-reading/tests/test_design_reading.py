@@ -149,7 +149,10 @@ class DesignReading(testkit.HookCase):
     def test_core_files_that_do_not_exist_are_not_demanded(self):
         self.configure(core=['absent.md', 'one-format-inside.md'])
         out = self.run_hook(self.bash('ls'))
-        self.assertNotIn('absent.md', self.reason(out))
+        reason = self.reason(out)
+        self.assertNotIn('- ' + self.memory('absent.md'), reason)
+        self.assertIn('Not asked for, because the file does not exist: ' + self.memory('absent.md'), reason)
+        self.assertIn('Correct "core" in ' + self.config, reason)
         self.run_hook(self.read(self.memory('one-format-inside.md')))
         self.assertIsNone(self.run_hook(self.bash('ls')))
 

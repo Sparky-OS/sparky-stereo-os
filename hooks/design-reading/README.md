@@ -31,7 +31,7 @@ One file, `private/hooks/design-reading.json` in the default layout; [`config.ex
 | --- | --- | --- |
 | `enabled` | `true` | The whole hook. |
 | `paths.memory`, `paths.memory_index`, `paths.queue`, `paths.state` | the default layout | Where the memory files, their index, the lanes' folders and this hook's state are. |
-| `core` | two example names | The memory files every context reads. A name that does not exist in the memory folder is not demanded. |
+| `core` | two example names | The memory files every context reads. A name that does not exist in the memory folder is not demanded, and the reading text says which one and where to correct it. |
 | `also_on_subject` | one example | Lines shown as a reminder: which file to read before work on which subject. |
 | `subject_rules` | one example | A pattern and the files a lane reads when its prompt or its brief matches it. |
 | `gap_seconds` | `3300` | How long without a call before the reading starts again. |

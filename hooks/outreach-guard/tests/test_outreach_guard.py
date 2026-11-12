@@ -107,12 +107,17 @@ class Sequence(Case):
         self.passes(command)
         self.refused(command, agent='agent-5')
 
-    def test_a_file_the_configuration_names_but_does_not_exist_is_not_demanded_and_is_logged(self):
+    def test_a_file_the_configuration_names_but_does_not_exist_is_not_demanded_and_is_said(self):
         self.configure(always_read=['memory/absent.md', 'memory/how-we-write-upstream.md'])
+        command = 'gh issue create --repo someone/project --title t'
+        absent = 'Not asked for, because the file does not exist: ' + self.memory('absent.md')
+        reason = self.refused(command)
+        self.assertIn(absent, reason)
+        self.assertNotIn('- ' + self.memory('absent.md'), reason)
         self.do_reading(self.voice)
         self.run_hook(self.consult())
-        self.passes('gh issue create --repo someone/project --title t')
-        self.assertIn('does not exist, so it is not demanded', self.log('errors.log'))
+        self.assertIn(absent, self.added_context(self.passes(command)))
+        self.assertEqual(self.log('errors.log').count('does not exist, so it is not demanded'), 1)
 
     def test_without_a_consult_tool_or_with_the_switch_off_no_consult_is_asked(self):
         self.do_reading(self.outreach, self.voice)

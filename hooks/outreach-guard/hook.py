@@ -154,16 +154,18 @@ def needed(text, kit):
     for project in kit.cfg.get('projects') or []:
         if re.search(project['pattern'], text, re.I):
             need.append(os.path.join(skills, project['skill'], 'SKILL.md'))
-    out = []
+    out, absent = [], []
     for path in need:
-        if path in out:
+        if path in out or path in absent:
             continue
         if os.path.exists(path):
             out.append(path)
-        elif path not in kit.state.setdefault('missing_said', []):
+            continue
+        absent.append(path)
+        if path not in kit.state.setdefault('missing_said', []):
             kit.state['missing_said'].append(path)
             kit.log('errors.log', f'a file the configuration asks to be read does not exist, so it is not demanded: {path}')
-    return out
+    return out, absent
 
 
 def handle(event, kit):
@@ -185,7 +187,10 @@ def handle(event, kit):
         return None
     window = float(kit.cfg.get('window_seconds', 14400))
     read = state.get('read', {})
-    missing = [p for p in needed(text, kit) if kit.now - read.get(os.path.realpath(p), 0) > window]
+    need, absent = needed(text, kit)
+    missing = [p for p in need if kit.now - read.get(os.path.realpath(p), 0) > window]
+    not_asked = ('Not asked for, because the file does not exist: ' + ', '.join(absent)
+                 + f'. Correct the configuration ({kit.config_path}).') if absent else ''
     tools = kit.cfg.get('consult_tools') or []
     no_consult = bool(kit.cfg.get('require_consult', True)) and bool(tools) and kit.now - state.get('consult', 0) > window
     short = ' '.join(event.acting_command().split())[:200]
@@ -196,6 +201,8 @@ def handle(event, kit):
             lines += [f'- {p}' for p in missing]
         if no_consult:
             lines.append(f'Consulted the reference index for this subject ({", ".join(tools)}); an empty answer is recorded as it is.')
+        if not_asked:
+            lines.append(not_asked)
         hint = kit.lookup_hint('PROJECT SUBJECT')
         if hint:
             lines.append(f'Search the memory by content for the project and the subject too ({hint}).')
@@ -205,9 +212,9 @@ def handle(event, kit):
     kit.log('passed.log', f'{why} | {short}')
     checklist = kit.cfg.get('checklist') or []
     if not checklist:
-        return None
+        return kit.context(not_asked) if not_asked else None
     return kit.context('[Outreach: the rules were read. Before this goes out, each of these holds, or it stops here.]\n'
-                       + '\n'.join(f'- {line}' for line in checklist))
+                       + '\n'.join(f'- {line}' for line in checklist) + ('\n' + not_asked if not_asked else ''))
 
 
 if __name__ == '__main__':

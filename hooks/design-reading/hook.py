@@ -24,6 +24,10 @@ def reading_text(kit, pending, why):
     lines = [f'[Required reading ({why}). These files hold the recorded designs. Each one is read in full, with the '
              'file-reading tool, before any other tool runs; until then other tools are refused.]']
     lines += [f'- {os.path.join(memory, name)}' for name in pending]
+    absent = [n for n in kit.cfg.get('core') or [] if not os.path.exists(os.path.join(memory, n))]
+    if absent:
+        lines.append('Not asked for, because the file does not exist: ' + ', '.join(os.path.join(memory, n) for n in absent)
+                     + f'. Correct "core" in {kit.config_path}.')
     hint = kit.lookup_hint('WORD...')
     if hint:
         lines.append('Before a brief, an acceptance or a report of a default or a choice: search the memory by content '

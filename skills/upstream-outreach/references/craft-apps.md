@@ -35,7 +35,9 @@ A catalog listing is not permission to transplant their UI or approve another th
 
 ## Local policies differ
 
-AniCraft requires crates.io-only dependencies and a cargo-deny gate.
+AniCraft’s `AGENTS.md` says crates.io-only dependencies and requires a cargo-deny gate.
+At main `9e49ae93`, `deny.toml` and `docs/legal/compliance.md` also explicitly allowlist Storytold’s craft-libs repository for the pinned updater.
+Read those actual policy files together; do not infer permission for a new desktop dependency from the updater’s existing exception.
 A shared library existing in craft-libs does not establish that an unpublished git dependency is permitted there.
 TextureCraft and MaterialCraft explicitly put shared code in craft-libs; FigCraft and Craft Anything retain no-code-sharing text.
 For an edition task that explicitly requires shared engines, implement the edition library and adapters on its own branch.
@@ -211,3 +213,16 @@ A controlled producer delay can distinguish a missing precondition from bad chan
 The old warm-up produces expected silence when the first block drains.
 Establishing the lead preserves the exact samples.
 Keep the delayed-producer red and green witnesses separately from the ordinary complete gate.
+
+## Measure the optional inputs, not their variable names
+
+AniCraft’s Linux gate calls the shared workflow with a pinned craft-fonts checkout.
+Its current build script looks for `Inter-Regular.ttf` and `JetBrainsMono-Regular.ttf`, while the supplied shared checkout may contain neither name.
+Record the actual build warnings and generated font payload, and give the untouched stock control the same input and fallback.
+A set `CRAFT_FONTS_REQUIRED=1` does not prove an app implements that requirement or embedded the intended faces.
+Do not copy unrelated font files into another project’s sources to hide the warning.
+
+Check the receiving app’s exact gate before imposing a suite-wide formatter command.
+A newer formatter can rewrite untouched owner files even when the app’s actual gate is tests and strict Clippy.
+Inspect the diff before committing, restore unrelated formatting churn, and rerun the semantic checks on the isolated change.
+Keep a mutating formatter run separate from an unchanged-source gate receipt.

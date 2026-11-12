@@ -133,6 +133,12 @@ Extend the hook that already stands at that moment (another pattern, another che
   **Cause:** a regular expression searched over the whole command line.
   **Fix:** judge the simple commands a line runs (`event.commands()`): the program, its subcommand, its options. Text a command only writes is skipped, text handed to `bash -c` or to a shell's here-document is read. Name what is ours in the configuration, and ask git where a remote goes instead of guessing from its name.
   **How found:** on 2026-11-12 a workstation's guard refused, three times, a command that wrote or changed these hooks' own source files, because the files held the words; the lists of what must pass are now tests.
+- **A reader that misses what the shell runs.**
+  **Symptom:** a send passes unseen when it comes after a comment line, on lines joined by a backslash, inside a loop or a condition, between braces, in backticks, in a substitution inside double quotes or behind `bash -lc`; every test is green.
+  **Cause:** the first reader turned each line end into a separator and handed the text to a word splitter, whose comment rule then ran to the end of the whole command and which knows no continuation lines and no keywords such as `do` or `then`; the tests held only the forms their author had thought of.
+  **Fix:** `hookkit.shell_commands` reads quotes, comments, continuation lines, here-documents and substitutions itself and takes the shell's keywords off the front of a command; a line it cannot read (a quote left open) is judged by its text, for every kind of send.
+  Write the test list from the shell's grammar, not from memory: each way a command can be reached, with the same send in each, and beside it the text that must stay quiet.
+  **How found:** on 2026-11-12 the review of a replayed log line that the guard could not read led to a list of thirty valid forms holding one send: the reader saw seven of them, and all thirty after the change, with eight lines that only carry such text still passing.
 - **A guard cannot be tested by a file that breaks its rule.**
   **Symptom:** the test file of a check is itself stopped by that check: a planted token fails the publish check, a planted sentence is stopped by the contract guard.
   **Fix:** put the planted thing together while the test runs (`'gh' + 'p_' + ...`), and say so at the top of the file.

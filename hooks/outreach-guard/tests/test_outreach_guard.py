@@ -200,6 +200,54 @@ class WhatGoesOut(Case):
         piped = f"cat <<'EOF' | sh\ngit -C {fork} push origin x\nEOF"
         self.assertIn('a push to a fork of another project', self.refused(piped))
 
+    def test_a_send_is_seen_in_every_form_a_shell_runs_it(self):
+        fork = self.repo('ffmpeg', origin='https://github.com/Our-Org/FFmpeg.git')
+        send = f'git -C {fork} push origin x'
+        post = 'curl -X POST https://code.ffmpeg.org/api/v1/repos/FFmpeg/FFmpeg/issues/1/comments'
+        cases = {
+            'a comment line first': f'# send the branch\n{send}',
+            'a comment after another command': f'cd /tmp  # elsewhere\n{send}',
+            'a comment with an apostrophe first': f"# here's the reply\n{post} -d @body.json",
+            'continuation lines': f'curl -sS -X POST \\\n  -H "Accept: application/json" \\\n  {post.split()[-1]} \\\n  -d @body.json',
+            'a send on continuation lines': send.replace(' push', ' \\\n  push'),
+            'a loop': f'for b in one two; do {send}; done',
+            'a loop on lines': f'for b in one two\ndo\n  {send}\ndone',
+            'a condition': f'if {send}; then echo sent; fi',
+            'a then branch': f'if test -d /tmp; then {send}; fi',
+            'an else branch': f'if test -d /nowhere; then echo no; else {send}; fi',
+            'a while loop': f'while ! {send}; do sleep 5; done',
+            'braces': f'{{ {send}; }}',
+            'a negation': f'! {send}',
+            'backticks': f'echo `{send}`',
+            'a substitution in double quotes': f'echo "$({send})"',
+            'an assignment from a substitution': f'out=$({send}) && echo "$out"',
+            'a login shell': f'bash -lc "{send}"',
+            'after a quoted shift sign': f'echo "1 << 3 is 8"\n{send}',
+            'after arithmetic': f'echo $((1 << 3))\n{send}',
+            'ANSI-C quoting': post + " --data $'it\\'s done'",
+            'a hash inside a word': f'echo issue#12 && {send}',
+            'a function body': f'send() {{ {send}; }}; send',
+            'a here-document read by a shell, after a comment': f"# run it\nbash <<'EOF'\n{send}\nEOF",
+        }
+        for name, command in cases.items():
+            with self.subTest(name):
+                self.refused(command)
+
+    def test_text_a_command_only_carries_is_not_a_send(self):
+        cases = {
+            'a comment that names a send': '# later: git push fork branch\nls',
+            'a comment after a command': 'ls  # then gh pr create --repo other/project',
+            'a hash inside a quoted word': 'echo "see #12: git push fork branch"',
+            'a variable holding the words': "note='gh pr create --repo other/project'; echo \"$note\"",
+            'continuation lines of a read': 'curl -s \\\n  https://code.ffmpeg.org/api/v1/repos/FFmpeg/FFmpeg/pulls/1',
+            'a message from a here-document': "git commit -F - <<'EOF'\nexplain: don't git push fork (yet), \"quoted\"\nEOF",
+            'a message from a substitution': 'git commit -m "$(cat <<\'EOF\'\nwhy we do not gh pr create --repo other/project (yet): it\'s early\nEOF\n)"',
+            'a here-document piped to a file writer': "cat <<'EOF' | tee plan.md\ngit push fork branch\nEOF",
+        }
+        for name, command in cases.items():
+            with self.subTest(name):
+                self.assertIsNone(self.run_hook(self.bash(command)))
+
     def test_without_git_s_answer_the_remote_s_name_decides(self):
         self.configure(resolve_remotes=False)
         self.assertIn('a push to a fork remote', self.refused('git push fork branch'))
@@ -208,6 +256,13 @@ class WhatGoesOut(Case):
 
     def test_a_line_that_cannot_be_read_as_shell_is_judged_by_its_text(self):
         self.assertIn('a pull request', self.refused('gh pr create --repo other/project --title "unbalanced'))
+        self.assertIn('forge write', self.refused('gh api -X POST repos/other/project/issues -f title="cut here'))
+        cut = 'curl -X POST https://code.ffmpeg.org/api/v1/repos/FFmpeg/FFmpeg/issues/1/comments -H "Authorization: token'
+        self.assertIn("a write to another project's forge", self.refused(cut))
+        self.assertIn('a bug report by mail', self.refused('reportbug somepackage --subject "cut here'))
+        self.assertIsNone(self.run_hook(self.bash('reportbug -o report.eml somepackage --subject "cut here')))
+        self.assertIsNone(self.run_hook(self.bash('curl -s https://code.ffmpeg.org/api/v1/repos/FFmpeg/FFmpeg/pulls/1 -H "cut here')))
+        self.assertIsNone(self.run_hook(self.bash('curl -X POST https://api.github.com/repos/Our-Org/our-library/issues -d "cut here')))
         self.assertIsNone(self.run_hook(self.bash('echo "unbalanced quote and nothing else')))
 
     def test_other_tools_and_other_events_are_left_alone(self):

@@ -182,7 +182,10 @@ class ToolHook(Case):
         repo = self.repo()
         self.commit(repo, 'notes.txt', f'key: {TOKEN}\n')
         for command in (f'git -C {repo} push origin main', f'cd {repo} && git push', f'cd {repo} && git push origin HEAD:refs/heads/lane',
-                        f'git -C {repo} push -o ci.skip origin main'):
+                        f'git -C {repo} push -o ci.skip origin main',
+                        f'# publish the branch\ngit -C {repo} push origin main', f'git -C {repo} \\\n  push origin main',
+                        f'for b in main; do git -C {repo} push origin $b; done', f'if git -C {repo} push origin main; then echo sent; fi',
+                        f'bash -lc "git -C {repo} push origin main"', f'echo "$(git -C {repo} push origin main)"'):
             with self.subTest(command):
                 out = self.run_hook(self.bash(command))
                 self.assertEqual(self.decision(out), 'ask')

@@ -60,16 +60,283 @@ PATCH_FILE = re.compile(r'^\*\*\* (?:Add|Update) File: (.+)$', re.M)
 
 
 SHELLS = {'sh', 'bash', 'dash', 'zsh', 'ksh'}
-WRAPPERS = {'env', 'command', 'exec', 'nohup', 'time', 'timeout', 'nice', 'ionice', 'stdbuf', 'setsid', 'sudo', 'xargs'}
+WRAPPERS = {'env', 'command', 'builtin', 'exec', 'nohup', 'time', 'timeout', 'nice', 'ionice', 'stdbuf', 'setsid', 'sudo',
+            'doas', 'xargs'}
 WRAPPER_OPTIONS_WITH_VALUE = {'-u', '-g', '-n', '-s', '-k', '-I', '-P', '-L', '-d', '-c', '-C', '-p', '-r', '-t', '-D', '-h'}
+# words of the shell's own grammar that stand in front of a simple command: `do CMD`, `then CMD`, `! CMD`, `{ CMD; }`
+KEYWORDS = {'if', 'then', 'else', 'elif', 'fi', 'do', 'done', 'while', 'until', '!', '{', '}', 'coproc'}
+OPERATORS = ('&&', '||', ';;', '|&', '<<<', '<<-', '<<', '&>>', '>>', '<&', '>&', '>|', '&>', '<>', ';', '&', '|', '(', ')',
+             '<', '>')  # the longer ones first
+REDIRECTIONS = {'<<<', '<<-', '<<', '&>>', '>>', '<&', '>&', '>|', '&>', '<>', '<', '>'}
+PIPES = {'|', '|&'}
+SHELL_COMMAND_OPTION = re.compile(r'-[A-Za-z]*c[A-Za-z]*')  # -c, -lc, -ec
 HEREDOC = re.compile(r'<<-?[ \t]*(?:\'([\w.-]+)\'|"([\w.-]+)"|\\?([\w.-]+))([^\n]*)\n')
 ASSIGNMENT = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*=')
 
 
-def acting_text(command):
-    """The command without the text it only carries: the body of a here-document counts as commands when a shell
-    reads it (bash <<EOF) and is dropped otherwise (cat > file <<EOF, python3 - <<EOF), so a file being written
-    is not taken for a command being run."""
+class Unreadable(Exception):
+    """A shell text with a quote or a substitution left open."""
+
+
+class _Lexer:
+    """Reads shell text as far as a guard needs: words with their quotes taken off, operators, comments,
+    continuation lines, here-documents and command substitutions. Nothing is expanded and nothing is run.
+    `drops` collects the spans of the text that a command only carries (comments, joined line ends, and later the
+    here-documents no shell reads)."""
+
+    def __init__(self, text):
+        self.text = text
+        self.drops = []
+
+    def lex(self, pos, close=None, end=None):
+        """The tokens from pos to `end`, or to the `)` or the backtick that closes a substitution; returns them with
+        the position after. A token is ('word', value, substitutions), ('op', operator), ('newline',) or
+        ['heredoc', body start, body end]."""
+        text = self.text
+        n = len(text) if end is None else end
+        tokens, word, subs, started = [], [], [], False
+        pending, depth = [], 0
+
+        def flush():
+            nonlocal word, subs, started
+            if started:
+                tokens.append(('word', ''.join(word), subs))
+            word, subs, started = [], [], False
+
+        while pos < n:
+            c = text[pos]
+            two = text[pos:pos + 2]
+            if c == '\\':
+                if two == '\\\n':
+                    self.drops.append((pos, pos + 2))  # a continuation line: the two lines are one
+                else:
+                    word.append(text[pos + 1:pos + 2])
+                    started = True
+                pos += 2
+            elif c == "'":
+                stop = text.find("'", pos + 1, n)
+                if stop < 0:
+                    raise Unreadable
+                word.append(text[pos + 1:stop])
+                started, pos = True, stop + 1
+            elif c == '"' or two == '$"':
+                started, pos = True, self._double(pos + len(two if c == '$' else c), n, word, subs)
+            elif two == "$'":
+                started, pos = True, self._ansi(pos + 2, n, word)
+            elif text.startswith('$((', pos) or (two == '((' and not started):
+                stop = self._balanced(pos + (3 if c == '$' else 2), n, 2, '(', ')')  # arithmetic: no commands inside
+                word.append(text[pos:stop])
+                started, pos = True, stop
+            elif two == '${':
+                stop = self._balanced(pos + 2, n, 1, '{', '}')
+                word.append(text[pos:stop])
+                started, pos = True, stop
+            elif two == '$(':
+                inner, pos = self.lex(pos + 2, ')', n)
+                subs.append(inner)
+                word.append('$(...)')
+                started = True
+            elif c == '`':
+                if close == '`':
+                    flush()
+                    return tokens, pos + 1
+                inner, pos = self.lex(pos + 1, '`', n)
+                subs.append(inner)
+                word.append('`...`')
+                started = True
+            elif c == '#' and not started:
+                stop = text.find('\n', pos, n)
+                stop = n if stop < 0 else stop
+                self.drops.append((pos, stop))  # a comment, to the end of its line
+                pos = stop
+            elif c == '\n':
+                flush()
+                tokens.append(('newline',))
+                pos += 1
+                for token, word_end, strip_tabs in pending:
+                    token[1] = pos
+                    while True:
+                        stop = text.find('\n', pos, n)
+                        stop = n if stop < 0 else stop
+                        line = text[pos:stop].lstrip('\t') if strip_tabs else text[pos:stop]
+                        if line == word_end or (close == ')' and line.startswith(word_end + ')')):
+                            token[2] = pos
+                            pos = min(stop + 1, n) if line == word_end else stop - len(line) + len(word_end)
+                            break
+                        if stop >= n:  # no closing line: the shell takes everything that is left
+                            token[2] = pos = n
+                            break
+                        pos = stop + 1
+                pending = []
+            elif c in ' \t':
+                flush()
+                pos += 1
+            else:
+                op = next((o for o in OPERATORS if text.startswith(o, pos)), None)
+                if op is None:
+                    word.append(c)
+                    started = True
+                    pos += 1
+                    continue
+                flush()
+                pos += len(op)
+                if op == ')' and close == ')':
+                    if depth == 0:
+                        return tokens, pos
+                    depth -= 1
+                elif op == '(':
+                    depth += 1
+                tokens.append(('op', op))
+                if op in ('<<', '<<-'):
+                    while pos < n and text[pos] in ' \t':
+                        pos += 1
+                    stop = pos
+                    while stop < n and text[stop] not in ' \t\n;&|()<>':
+                        stop += 1
+                    word_end = text[pos:stop].replace("'", '').replace('"', '').replace('\\', '')
+                    if word_end:
+                        token = ['heredoc', None, None]
+                        tokens += [('word', word_end, []), token]
+                        pending.append((token, word_end, op == '<<-'))
+                        pos = stop
+        flush()
+        if close is not None:
+            raise Unreadable
+        return tokens, pos
+
+    def _double(self, pos, n, word, subs):
+        text = self.text
+        while pos < n:
+            c = text[pos]
+            if c == '"':
+                return pos + 1
+            if c == '\\' and pos + 1 < n:
+                following = text[pos + 1]
+                if following == '\n':
+                    self.drops.append((pos, pos + 2))
+                else:
+                    word.append(following if following in '"\\$`' else c + following)
+                pos += 2
+            elif text.startswith('$((', pos):
+                stop = self._balanced(pos + 3, n, 2, '(', ')')
+                word.append(text[pos:stop])
+                pos = stop
+            elif text.startswith('$(', pos):
+                inner, pos = self.lex(pos + 2, ')', n)
+                subs.append(inner)
+                word.append('$(...)')
+            elif c == '`':
+                inner, pos = self.lex(pos + 1, '`', n)
+                subs.append(inner)
+                word.append('`...`')
+            else:
+                word.append(c)
+                pos += 1
+        raise Unreadable
+
+    def _ansi(self, pos, n, word):
+        text = self.text
+        while pos < n:
+            c = text[pos]
+            if c == "'":
+                return pos + 1
+            if c == '\\' and pos + 1 < n:
+                word.append(text[pos + 1])
+                pos += 2
+            else:
+                word.append(c)
+                pos += 1
+        raise Unreadable
+
+    def _balanced(self, pos, n, depth, opening, closing):
+        text = self.text
+        while pos < n and depth:
+            depth += (text[pos] == opening) - (text[pos] == closing)
+            pos += 1
+        return pos
+
+
+def _commands(lexer, tokens, depth):
+    """The simple commands of a token list, in order, each as its words: wrappers and the shell's own keywords taken
+    off, the text given to `sh -c` read too; after each, the commands of its substitutions, and after each pipeline
+    the commands of the here-documents a shell of that pipeline reads. The here-documents no shell reads are added
+    to the lexer's drops. None when a text handed to a shell cannot be read."""
+    out, pipeline = [], []
+    current, subs, heredocs, skip = [], [], [], False
+
+    def end_command():
+        nonlocal current, subs, heredocs
+        words = _unwrap(current)
+        pipeline.append((words, heredocs))
+        found = [words] if words else []
+        if words:
+            name = os.path.basename(words[0])
+            inner = None
+            if name in SHELLS:
+                at = next((i for i, w in enumerate(words[1:], 1) if SHELL_COMMAND_OPTION.fullmatch(w)), None)
+                if at is not None and at + 1 < len(words):
+                    inner = words[at + 1]
+            elif name == 'eval':
+                inner = ' '.join(words[1:])
+            if inner is not None and depth < 3:
+                found = shell_commands(inner, depth + 1)
+        for inner_tokens in subs:
+            more = _commands(lexer, inner_tokens, depth)
+            found = None if found is None or more is None else found + more
+        current, subs, heredocs = [], [], []
+        return found
+
+    def end_pipeline():
+        found = []
+        for i, (_, docs) in enumerate(pipeline):
+            shell_reads = any(w and os.path.basename(w[0]) in SHELLS for w, _ in pipeline[i:])
+            for _, start, stop in docs:
+                if start is None:
+                    continue
+                if shell_reads:
+                    more = _commands(lexer, lexer.lex(start, None, stop)[0], depth)
+                    found = None if found is None or more is None else found + more
+                else:
+                    lexer.drops.append((start, stop))
+        pipeline.clear()
+        return found
+
+    for token in list(tokens) + [('newline',)]:
+        kind = token[0]
+        if kind == 'word':
+            if skip:
+                skip = False  # the target of a redirection is a file, not a word of the command
+            else:
+                current.append(token[1])
+                subs += token[2]
+            continue
+        skip = False
+        if kind == 'heredoc':
+            heredocs.append(token)
+            continue
+        if kind == 'op' and token[1] in REDIRECTIONS:
+            skip = True
+            if current and current[-1].isdigit():
+                current.pop()  # the descriptor number of 2>&1
+            continue
+        found = end_command()
+        if found is not None and not (kind == 'op' and token[1] in PIPES):
+            more = end_pipeline()
+            found = None if more is None else found + more
+        if found is None:
+            return None
+        out += found
+    return out
+
+
+def _read(command):
+    lexer = _Lexer(command)
+    commands = _commands(lexer, lexer.lex(0)[0], 0)
+    return commands, lexer.drops
+
+
+def _acting_text_by_pattern(command):
+    """acting_text for a line that cannot be read as shell: here-documents found by their look alone."""
     out, pos = [], 0
     while True:
         m = HEREDOC.search(command, pos)
@@ -88,62 +355,40 @@ def acting_text(command):
     return ''.join(out)
 
 
-def shell_commands(command, depth=0):
-    """The simple commands a shell line runs, each as its list of words, wrappers such as env or timeout taken off
-    and the text given to sh -c read as commands too. None when the line cannot be read as shell (the caller then
-    searches the text instead). A guard built on this is a guard rail, not a wall: a program can still hide a
-    command where no reader of shell text finds it."""
-    text = acting_text(command).replace('\n', ' ; ')
+def acting_text(command):
+    """The command without the text it only carries: comments, and the body of a here-document unless a shell
+    reads it (bash <<EOF, cat <<EOF | sh), so a file being written (cat > file <<EOF, python3 - <<EOF) is not taken
+    for a command being run. Lines joined by a backslash are one line."""
     try:
-        lex = shlex.shlex(text, posix=True, punctuation_chars=True)
-        lex.whitespace_split = True
-        tokens = list(lex)
-    except ValueError:
+        _, drops = _read(command)
+    except Unreadable:
+        return _acting_text_by_pattern(command)
+    out, pos = [], 0
+    for start, stop in sorted(drops):
+        if start >= pos:
+            out.append(command[pos:start])
+            pos = stop
+    out.append(command[pos:])
+    return ''.join(out)
+
+
+def shell_commands(command, depth=0):
+    """The simple commands a shell line runs, each as its list of words: comments left out, continuation lines
+    joined, wrappers such as env or timeout and keywords such as `do` or `then` taken off, and read as commands too:
+    the text given to `sh -c`, a command substitution (also inside double quotes) and a here-document a shell reads.
+    None when the line cannot be read as shell (the caller then searches the text instead). A guard built on this
+    is a guard rail, not a wall: a program can still hide a command where no reader of shell text finds it."""
+    try:
+        return _read(command)[0]
+    except Unreadable:
         return None
-    commands, current, skip = [], [], False
-    for token in tokens:
-        if skip:
-            skip = False
-            continue
-        if token and all(c in '();<>|&' for c in token):
-            if '<' in token or '>' in token:
-                skip = True  # a redirection: its target is a file, not a word of the command
-                if current and current[-1].isdigit():
-                    current.pop()  # the descriptor number of 2>&1
-                continue
-            if current:
-                commands.append(current)
-            current = []
-        else:
-            current.append(token)
-    if current:
-        commands.append(current)
-    out = []
-    for words in commands:
-        words = _unwrap(words)
-        if not words:
-            continue
-        name = os.path.basename(words[0])
-        inner = None
-        if name in SHELLS and '-c' in words[1:] and words.index('-c') + 1 < len(words):
-            inner = words[words.index('-c') + 1]
-        elif name == 'eval':
-            inner = ' '.join(words[1:])
-        if inner is not None and depth < 3:
-            sub = shell_commands(inner, depth + 1)
-            if sub is None:
-                return None
-            out += sub
-        else:
-            out.append(words)
-    return out
 
 
 def _unwrap(words):
-    """Drop leading VAR=value words and wrapper programs with their own options."""
+    """Drop leading VAR=value words, the shell's keywords and wrapper programs with their own options."""
     words = list(words)
     while words:
-        if ASSIGNMENT.match(words[0]):
+        if ASSIGNMENT.match(words[0]) or words[0] in KEYWORDS:
             words.pop(0)
         elif os.path.basename(words[0]) in WRAPPERS:
             wrapper = os.path.basename(words.pop(0))

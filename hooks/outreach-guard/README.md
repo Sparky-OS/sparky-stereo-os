@@ -49,7 +49,9 @@ One file, `private/hooks/outreach-guard.json`; [`config.example.json`](config.ex
 ## How it fails
 
 Open, and it says so: a failure inside the hook lets the command through, is written to `errors.log` and told to the person in one line.
-The guard reads shell text; it is a guard rail, not a wall.
+The guard reads shell text as a shell would run it: comments left out, lines joined by a backslash read as one, and the commands inside loops, conditions, substitutions, `bash -c` and here-documents handed to a shell read too.
+A line it cannot read, with a quote left open, is judged by its text.
+It is a guard rail, not a wall.
 A program that hides a command where no reader of shell text finds it (inside a script file, behind an alias) is not seen.
 
 Logs, in `state/hooks/outreach-guard/`: `refused.log` and `passed.log` (the reason and the first 200 characters of each command), `errors.log`.
@@ -76,4 +78,4 @@ Run it from the top of this repository, so that `skills/` is the real skills fol
 
 ## Tests
 
-`python3 hooks/tests/run.py outreach-guard` runs 17 tests in [`tests/`](tests/test_outreach_guard.py): the refuse, read, consult, pass sequence, the window closing, eighteen commands that send, eight on our own repositories and sixteen that read or work locally, text written to files, and Codex reading with `cat`.
+`python3 hooks/tests/run.py outreach-guard` runs 19 tests in [`tests/`](tests/test_outreach_guard.py): the refuse, read, consult, pass sequence, the window closing, twenty commands that send and the same send in twenty-three forms a shell runs it in, eight on our own repositories and sixteen that read or work locally, text a command only carries, lines that cannot be read as shell, and Codex reading with `cat`.

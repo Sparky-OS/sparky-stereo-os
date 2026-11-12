@@ -32,11 +32,56 @@ class ReadingShell(unittest.TestCase):
             'echo start\ngit push fork branch': [['echo', 'start'], PUSH],
             'git push fork branch > log.txt 2>&1': [PUSH],
             '(cd repo; git push fork branch)': [['cd', 'repo'], PUSH],
-            'echo $(git push fork branch)': [['echo', '$'], PUSH],
+            'echo $(git push fork branch)': [['echo', '$(...)'], PUSH],
         }
         for line, want in cases.items():
             with self.subTest(line):
                 self.assertEqual(hookkit.shell_commands(line), want)
+
+    def test_valid_shell_that_a_word_splitter_gets_wrong(self):
+        message = 'git commit -m "$(cat <<\'EOF\'\nit\'s (a message) with "quotes"\nEOF\n)" && git push fork branch'
+        cases = {
+            '# a comment first\ngit push fork branch': [PUSH],
+            "# here's a comment with an apostrophe\ngit push fork branch": [PUSH],
+            'cd repo  # a comment after a command\ngit push fork branch': [['cd', 'repo'], PUSH],
+            'ls  # only named in a comment: git push fork branch': [['ls']],
+            'git push \\\n  fork branch': [PUSH],
+            'for b in one two; do git push fork branch; done': [['for', 'b', 'in', 'one', 'two'], PUSH],
+            'for b in one two\ndo\n  git push fork branch\ndone': [['for', 'b', 'in', 'one', 'two'], PUSH],
+            'if git push fork branch; then echo ok; fi': [PUSH, ['echo', 'ok']],
+            'if test -d repo; then echo no; else git push fork branch; fi': [['test', '-d', 'repo'], ['echo', 'no'], PUSH],
+            'while ! git push fork branch; do sleep 5; done': [PUSH, ['sleep', '5']],
+            '{ git push fork branch; }': [PUSH],
+            'send() { git push fork branch; }; send': [['send'], PUSH, ['send']],
+            'echo `git push fork branch`': [['echo', '`...`'], PUSH],
+            'echo "$(git push fork branch)"': [['echo', '$(...)'], PUSH],
+            'echo "`git push fork branch`"': [['echo', '`...`'], PUSH],
+            'out=$(git push fork branch) && echo "$out"': [PUSH, ['echo', '$out']],
+            'bash -lc "git push fork branch"': [PUSH],
+            "bash -ec 'cd repo && git push fork branch'": [['cd', 'repo'], PUSH],
+            'echo "1 << 3 is 8"\ngit push fork branch': [['echo', '1 << 3 is 8'], PUSH],
+            'echo $((1 << 3))\ngit push fork branch': [['echo', '$((1 << 3))'], PUSH],
+            "python3 -c 'print(1 << 3)'\ngit push fork branch": [['python3', '-c', 'print(1 << 3)'], PUSH],
+            "echo $'it\\'s' && git push fork branch": [['echo', "it's"], PUSH],
+            'echo issue#12 ${x#prefix} $# && git push fork branch': [['echo', 'issue#12', '${x#prefix}', '$#'], PUSH],
+            'diff <(git push fork branch) notes.txt': [['diff'], PUSH, ['notes.txt']],
+            message: [['git', 'commit', '-m', '$(...)'], ['cat'], PUSH],
+            'echo "see #12: git push fork branch"': [['echo', 'see #12: git push fork branch']],
+            "note='git push fork branch'; echo \"$note\"": [['echo', '$note']],
+        }
+        for line, want in cases.items():
+            with self.subTest(line):
+                self.assertEqual(hookkit.shell_commands(line), want)
+        for line in ('echo $(git push fork branch', 'echo `git push fork branch', "echo $'unclosed"):
+            with self.subTest(line):
+                self.assertIsNone(hookkit.shell_commands(line))
+
+    def test_the_text_a_command_only_carries_is_left_out(self):
+        line = ("ls  # a comment: git push fork branch\ncat > plan.md <<'EOF'\ngit push fork branch\nEOF\n"
+                "curl -s \\\n  example.org\nbash <<'SH'\necho kept  # dropped\nSH")
+        self.assertEqual(hookkit.acting_text(line),
+                         "ls  \ncat > plan.md <<'EOF'\nEOF\ncurl -s   example.org\nbash <<'SH'\necho kept  \nSH")
+        self.assertEqual(hookkit.acting_text('echo "unclosed # not a comment'), 'echo "unclosed # not a comment')
 
     def test_text_in_quotes_is_one_word_not_a_command(self):
         got = hookkit.shell_commands('git commit -m "explain the git push to the fork" && echo ok')

@@ -24,8 +24,11 @@ GH_FIELDS = {'-f', '-F', '--field', '--raw-field', '--input'}
 CURL_SENDS = {'-d', '--data', '--data-binary', '--data-raw', '--data-urlencode', '--json', '-T', '--upload-file', '-F', '--form'}
 GITHUB = re.compile(r'github\.com[:/]([\w.-]+)/([\w.-]+?)(?:\.git)?(?:[\s/\'"]|$)')
 REPOS_NAMED = re.compile(r'(?:--repo|-R)[ =]+([\w.-]+)/([\w.-]+)|\brepos/([\w.-]+)/([\w.-]+)')
-# only when a line cannot be read as shell: the same questions asked of its text
+# only when a line cannot be read as shell (a quote left open): the same questions asked of its text
 TEXT_GH = re.compile(r'\bgh\s+(?:pr|issue)\s+(?:create|comment|review|edit|close|reopen|merge)\b')
+TEXT_GH_API = re.compile(r'\bgh\s+api\b[^|;&\n]*(?:(?:-X|--method)[ =]*(?:POST|PATCH|PUT|DELETE)|\s(?:-f|-F|--field|--raw-field|--input)\b)')
+TEXT_CURL = re.compile(r'\bcurl\b[^|;&\n]*(?:(?:-X|--request)[ =]*(?:POST|PATCH|PUT|DELETE)|\s(?:-d|-T|-F)\s|--data|--json\b|--upload-file\b|--form\b)')
+TEXT_BUG = re.compile(r'\breportbug\b(?![^|;&\n]*\s(?:-o|--output)\b)')
 TEXT_PUSH = re.compile(r'\bgit\b[^|;&\n]*\bpush\b')
 
 
@@ -121,10 +124,15 @@ def outward(event, rules):
     acting = event.acting_command()
     commands = event.commands()
     if commands is None:  # not readable as shell: ask the text, as a careful reader would
-        if TEXT_GH.search(acting) and not rules.named_are_ours(acting):
-            return 'a pull request, issue or comment on a repository that is not ours', acting
+        if (TEXT_GH.search(acting) or TEXT_GH_API.search(acting)) and not rules.named_are_ours(acting):
+            return 'a pull request, issue, comment or forge write on a repository that is not ours', acting
+        if TEXT_CURL.search(acting) and any(r.search(acting) for r in rules.forges) \
+                and not rules.named_are_ours(acting) and not any(r.search(acting) for r in rules.own_urls):
+            return "a write to another project's forge", acting
         if any(r.search(acting) for r in rules.mail):
             return 'a mail', acting
+        if TEXT_BUG.search(acting):
+            return 'a bug report by mail', acting
         if TEXT_PUSH.search(acting):
             why = rules.address_goes_out(acting)
             if not why and re.search(r'\bpush\b[^|;&\n]*\b(?:' + '|'.join(map(re.escape, rules.fork_remotes)) + r')\b', acting) and rules.fork_remotes:

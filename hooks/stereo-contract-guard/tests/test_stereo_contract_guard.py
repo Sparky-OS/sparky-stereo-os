@@ -173,6 +173,10 @@ class Push(Case):
         out = self.run_hook(self.bash(f'git -C {repo} push origin main'))
         self.assertEqual(self.decision(out), 'ask')
         self.assertIn('lane notes in the pushed tip: REPORT.md, evidence/run.log', self.reason(out))
+        for command in (f'# send it\ngit -C {repo} push origin main', f'git -C {repo} \\\n  push origin main',
+                        f'for b in main; do git -C {repo} push origin $b; done', f'bash -lc "git -C {repo} push origin main"'):
+            with self.subTest(command):
+                self.assertEqual(self.decision(self.run_hook(self.bash(command))), 'ask')
         self.git(repo, 'rm', '-q', 'REPORT.md', 'evidence/run.log')
         self.git(repo, 'commit', '-q', '-m', 'Remove the lane notes')
         self.assertIsNone(self.run_hook(self.bash(f'git -C {repo} push origin main')))

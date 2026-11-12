@@ -56,7 +56,7 @@ Keep upstream catalog identifiers such as `pt-br` or `zh-hant` where their looku
 
 ## The closure that exposed the gap
 
-PhotoCraft [#7818](https://github.com/storytold/photocraft/pull/7818) was closed on 2026-11-05 after the author left FredApps' 2026-10-19 requested changes unanswered for over two weeks.
+PhotoCraft [#7818](https://github.com/storytold/photocraft/pull/7818) was closed on 2026-11-05 with FredApps' requested changes of 2026-10-19 still open: the review clock runs from the review, so answer it, or say when the answer comes.
 The maintainer invited a current-main rebase and a reopened or fresh PR.
 That historical closure is not today's thirty-day rule.
 FredApps corrected his own point 2: PNG normalization remains a maintainer decision; he withdrew the claim that the cited issue promised unchanged stored pixels.
@@ -69,8 +69,12 @@ Confirm each against the submitted head, then cite the fixing commit and a regre
 
 Read the exact wording before declaring an attribution-policy conflict.
 Craft core rule 15 says a pull request does not say an agent wrote it; acknowledging assistance does not make the assistant its author.
-Keep the person as author and accountable reviewer, with no agent author/co-author or “Generated with” line.
-Retain the instructed `Assisted-by:` commit trailer and acknowledge AI assistance once in the fresh pull request description; do not repeat it in replies.
+Keep the person as author and accountable reviewer, with no “Generated with” line in the pull request.
+Our new commits carry an `Assisted-by:` trailer; acknowledge AI assistance once in the fresh pull request description and do not repeat it in replies.
+Do not rewrite a trailer that is already in a commit, ours or anyone's: a commit trailer is not the pull request saying an agent wrote it, and the projects use the other form themselves.
+Measured on 2026-11-12 over the last 400 commits of each main branch: LightCraft carried 128 `Co-Authored-By` trailers naming a model, PhotoCraft 78 and FilmCraft 107, maintainers' commits among them, and none carried `Assisted-by`.
+LightCraft's About ▸ Models page reads the `Co-Authored-By` trailers (`crates/ui-egui/src/dialogs/credits.rs`, `docs/contributors.md`), so removing one removes a credit the program shows.
+Count before proposing a history rewrite: `git log -400 --format='%(trailers:key=Co-Authored-By,valueonly)' origin/main`.
 Do not claim a person's review happened before it did: a draft's first-person review assertion must be checked by that person before sending.
 A local draft is not authorization to send.
 

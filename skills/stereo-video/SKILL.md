@@ -6,11 +6,11 @@ description: >-
   Stereo video: the marks (frame packing SEI, JP3D, st3d, sv3d, StereoMode), writers and readers (x264, x265,
   mkvmerge, Kdenlive, UMS, FFmpeg, Qt Multimedia, mpv, VLC, Dragon), metadata precedence, unpacking by copying, 360
   and VR180, depth video, the per-file eye swap. Load it when a 3D film plays flat, the mark is lost after the first
-  frame or a transcode, the eyes are swapped, a half side-by-side file is pre-scaled, a server's 2D view of a 3D file comes out twice too wide (SAR 2:1, DAR 32:9) or still marked 3D, mpv shows one view, a depth map
-  does not rotate, a GPU encoder writes no SEI, an FFmpeg hwaccel assertion fails
-  in pthread_frame.c, VLC hangs after a minimize, a
-  Qt Multimedia player aborts at the next file ("QOpenGLContext current in a different thread"), logs "Handle type:
-  NoHandle", or its 3D video copies into wl_shm buffers.
+  frame or a transcode, the eyes are swapped, a half side-by-side file is pre-scaled, a server's 2D view of a 3D file
+  is twice too wide (SAR 2:1) or still marked 3D, mpv shows one view, a depth map does not rotate, a GPU encoder
+  writes no SEI, an FFmpeg hwaccel assertion fails in pthread_frame.c, VLC hangs after a minimize, a Qt Multimedia
+  player aborts at the next file ("QOpenGLContext current in a different thread"), logs "Handle type: NoHandle", or
+  copies 3D video into wl_shm buffers.
 ---
 
 # Stereo video, end to end

@@ -247,6 +247,11 @@ The files are the source; every index is derived from them and rebuilt after a m
   The Markdown files stay what people read; an MCP only routes to them.
   [Serving skills over MCP](references/skills-over-mcp.md) has the protocol eras a server must speak, the Skills extension, how each assistant registers a local server and where it reads skills, and what Debian ships.
 
+## Rules that run by themselves
+
+A rule that a skill states and that keeps being broken becomes a hook: a small program the AI tool, or git, runs at the moment the rule matters.
+[development-hooks](../development-hooks/SKILL.md) has the hooks of the development cycle (the designs read again after a compaction, briefs and hand-backs checked, the outreach guard, the publish check, the stereo contract guard), the workspace layout they assume, how to adopt them and how to add one.
+
 ## Lessons from the lanes, October to November 2026
 
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (13 entries).

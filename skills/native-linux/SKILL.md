@@ -10,7 +10,8 @@ description: >-
   WL_SURFACE_SERIAL in CI, wp_viewporter says the surface already has a viewport, a mono EGL window draws at half its
   width, a video crashes KWin switching between ARGB and NV12, a Vulkan swapchain errors with NATIVE_WINDOW_IN_USE, a
   toolkit lacks stereo, a canvas or video looks pixelated or black in the stereo browser, the browser's video is
-  green on NVIDIA, a gl-stereo layer change needs the saver receipts again, or the saver list says "Not offered".
+  green on NVIDIA, a gl-stereo layer change needs the saver receipts again, the saver list says "Not offered", or a QWidget
+  window's painting (CPU or GPU, QT_WIDGETS_RHI, the OpenGL paint engine) must be changed or measured.
 ---
 
 # Native Linux programs
@@ -33,6 +34,7 @@ An imperative 2D API can produce coordinated eye views; shared styling does not 
 Record exact toolkit/backend versions and loaded libraries before adopting an API from a talk.
 For KDE application or toolkit changes, use [the development review recipe](references/kde-development-practices.md): translation context/extraction, QML tooling, lifetime, CI and privileged-action checks.
 Qt's own window frame around a stereo window (both routes, the recipe, the traps): [qt-client-decorations.md](references/qt-client-decorations.md).
+How Qt Widgets reach the screen (the raster backing store, the RHI composition, the OpenGL paint engine), how to paint them on the chosen GPU in a few draw calls (a recording paint engine on the RHI, one glyph texture, text that stays the raster engine's, LCD antialiasing by dual-source blending), how to measure CPU against GPU painting fairly and check the picture cell by cell, what two prototypes measured and their traps: [qt-widgets-painting.md](references/qt-widgets-painting.md).
 
 | The program uses | What happens in the edition | Its part |
 |---|---|---|

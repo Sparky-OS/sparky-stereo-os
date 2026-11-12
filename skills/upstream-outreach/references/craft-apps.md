@@ -119,6 +119,20 @@ Complete the existing UI command with `menus::invoke(..., "file.saveAs", json!({
 Keep those assertions; do not suppress the prompt in production or claim the save completed merely because its initial call succeeded.
 Run the focused regression first, then the receiving branch's full gate; another branch's passing result does not certify an omitted test port.
 
+## Rebase succeeds, but two branches assigned the same catalog version
+
+LightCraft's stereo branch and later upstream Lens Blur work both used catalog version 13.
+The replay compiled, but a regression requiring an upgrade before appending stereo operations failed: the journal reported no upgrade for version 13.
+Read the receiving journal's format history and writer constant together; preserving both history entries does not change the writer.
+Assign the newly combined format the next version and update operation/field version checks.
+Test both older forms independently: upstream Lens Blur data and the earlier edition's stereo metadata must survive opening, migration, appending and reopening.
+The writer-14 correction passed the complete nine-stage gate, including HEIF and wasm; focused catalog tests alone were not the receiving gate.
+
+When restoring that branch from a bundle, distinguish the main revision observed later from the actual ancestor used as a bundle prerequisite.
+LightCraft's accepted head shared an older base with the later main; requiring the later main itself to be its ancestor incorrectly rejected a valid checkpoint.
+Use the actual merge base for restoration, retain the observed main separately, and verify the bundle and advertised head.
+Then reconcile the later source changes explicitly; a valid bundle does not mean they were integrated.
+
 ## Duotone pixels match, but the warning counts a virtual layer
 
 PhotoCraft's stereo ink rendering initially matched ordinary export pixels but reported that two layers were flattened for a single-layer Duotone document.

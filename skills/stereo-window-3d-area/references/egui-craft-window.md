@@ -61,6 +61,12 @@ Unequal source grids need an explicit native-view refusal rather than silently f
   Its first-launch offer waits for earlier dialogs and library startup to finish, so it can appear later.
   Dismiss it after the selected image has finished loading, then settle and capture.
   Apply the same sequence to edition and untouched-stock controls; inspect the complete image and compare without masks.
+- Symptom: complete ordinary captures compare equal while startup dialogs cover the photograph.
+  The probe wrote an obsolete `seenVersion`; a disk notice blocked the underlying What's New dialog from being presented and recording the current version, so cancelling it could make it due again.
+  Read the actual version from the pinned source for private test setup, acknowledge the disk notice through its registered OK button, and require a stable interval with no notices or modal widgets before exporting or capturing.
+  Record that state witness and inspect the complete image as well as comparing every pixel.
+  Preserve the application's warning threshold: its 20 GiB or 10 percent low-space notice can be legitimate above the build lane's floor.
+  Repeat affected captures with fresh names and keep the obscured attempts as diagnostics.
 - Symptom: ordinary controls differ in 106 pixels although full-resolution exports match exactly.
   Compare the actual stage buffers: the edition cached a CPU preview while stock used GPU stages.
   LightCraft's `gpu::device` deliberately returns `None` during `WINDOW_PENDING` adoption.

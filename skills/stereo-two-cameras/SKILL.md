@@ -89,3 +89,5 @@ An engine with its own camera class, post stack and UI (Froglet's Amoebius: Unit
 Which licence, which AI position, whether it can be built from source, which stereo field it has (or none) and whether a native program can sit inside the browser are read from the project's own repository, not from its web page: the recipe, the read-only commands and the traps (NOASSERTION, a bulk licence folder, source-available viewers, code search that lags) are in [references/reading-a-web-3d-project.md](references/reading-a-web-3d-project.md).
 
 Assets (scans, models, materials) for a stereo world come with a licence of their own: what a free operating system may ship, fetch at install, credit, and train on is read from the licence agreement's clauses, not from a marketplace's summary box: [references/reading-an-asset-marketplace-licence.md](references/reading-an-asset-marketplace-licence.md).
+
+For a shared Rust camera core and a renderer with wgpu per-view targets, read [the Rust scene reference](references/rust-wgpu-scene.md) before wiring the adapter.

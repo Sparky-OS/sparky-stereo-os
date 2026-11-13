@@ -226,3 +226,44 @@ Check the receiving app’s exact gate before imposing a suite-wide formatter co
 A newer formatter can rewrite untouched owner files even when the app’s actual gate is tests and strict Clippy.
 Inspect the diff before committing, restore unrelated formatting churn, and rerun the semantic checks on the isolated change.
 Keep a mutating formatter run separate from an unchanged-source gate receipt.
+
+## Read the current review clock
+
+A historical two-week closure, such as PhotoCraft #7818, is evidence about that review, not a timeless suite-wide deadline.
+The current core rule 14 at `dde09ea31e2e457f5b4653a6e76f7cdf55944bdf` requires an answer to actionable author feedback in seven days, a reminder at fourteen and eligibility for a maintainer-decided closure at thirty.
+Suggestions and unconfirmed bot findings do not start that clock; waiting on a maintainer pauses it, and an actual fix, explanation or agreed plan resets it.
+Read the receiving repository’s stamped rule before describing its current practice; retain the original dates when recounting an older lapse.
+
+## A new whole-workspace gate can expose an existing upstream failure
+
+Symptom: the current craft-libs workspace test process aborts in `craft-kra`'s 512 KiB nested-document test before reaching a new camera crate.
+Search the failing path's default-branch commits, open and merged pull requests, and issues before changing a stack limit or writing another parser fix.
+Dylan M. Taylor's [PR #1126](https://github.com/storytold/craft-libs/pull/1126) already supplies an explicit layer stack and its lint follow-up.
+A file-scoped port can retain his authorship, original author date and both source commit references while keeping unrelated rendering changes out of a stereo subject.
+Keep the failing whole gate and the passing reader regression, then rerun the whole gate.
+An existing upstream fix needs credit and a receiving test, not a duplicate contribution.
+
+
+### Whole-library features need their declared test inputs
+
+Symptom: a whole `craft-libs` all-features run fails every keymap dialog and the PSD corpus tests, although the default workspace passed.
+Cause: the dialog suite requires the pinned `craft-fonts` checkout named in its own workflow, and PSD's opt-in `corpus` feature deliberately fails without the PhotoCraft PSD and ATN corpus.
+Fix: supply `CRAFT_FONTS_DIR` at the workflow's exact revision and `CRAFT_PSD_CORPUS` at the verified PhotoCraft corpus root; keep every assertion enabled.
+Found by reading the failure messages, `keymap.yml`, `tests/support/fonts.rs` and PSD's `corpus_dir` implementation.
+A missing input is not evidence of a new camera defect, and a selected-test pass is not a whole-workspace pass.
+
+### Control methods and engine commands are different surfaces
+
+Symptom: a TextureCraft engine regression stops at `UnknownCommand("session.inspect")`, before reaching the intended stereo assertion.
+Cause: `session.inspect` is a desktop control-channel method; the engine registers `project.inspect` and exposes `inspect::session` directly.
+Fix: use the registered engine command or the direct inspector in engine tests, keeping the control-channel spelling in desktop RPC clients.
+How found: reading the command registry and control protocol after the failed test.
+Also read the current project limits before making a fixture: the inspected project minimum was 128 texture pixels, so a 64-pixel project failed before the feature test.
+That is independent of a 64×64 upload tile and the chosen per-eye render dimensions.
+Keep those failed fixture attempts as diagnostics, then rerun the intended semantic red before implementing the feature.
+
+Symptom: regenerating a lockfile offline rejects an already locked yanked transitive version.
+Cause: `cargo generate-lockfile` resolves the entire graph again; it is not the minimal operation for adding one local shared crate.
+Keep the existing lockfile and let an ordinary offline check add the new path dependency, then verify that existing package versions are retained and use `--locked` for acceptance gates.
+The observed check added six window dependencies and removed no existing package versions.
+A bare egui UI-library check can also lack a native window-system feature; use that project's actual app, all-targets gate or test targets, which supply the platform features, rather than adding a host-specific feature to production manifests.

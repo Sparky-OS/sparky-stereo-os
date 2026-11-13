@@ -1748,6 +1748,10 @@ A fast connection may have no instant at which all surfaces are simultaneously p
 
 #### Traps found while showing the point
 
+- Symptom: moving the measurements panel also turns its live speed adjustment into a deferred setting.
+  Cause: treating all detailed fields alike loses the original ability to change the current limiter.
+  Fix: keep detailed speed and custom rate live, let only the main speed choice replay, and mark the originally deferred fields as pending.
+  Found by: rereading the before-page control inventory against the final handlers; then measuring byte rates before and after both detailed preset and custom-rate changes without navigation.
 - Symptom: changing connection count appears to do nothing, and changing language loses the choice.
   Cause: fields held deferred values only in DOM nodes; language rendering replaced those nodes with active-run settings.
   Fix: one pending-settings object, one visible note per changed field, one replay path, and a language change that only replaces labels.

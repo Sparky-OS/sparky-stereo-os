@@ -77,12 +77,7 @@ export class Presentation {
       'split-position-label':'splitPosition', 'split-computed':'computedLabel', 'split-photo':'photoLabel',
       'compare-note':'compareNote', 'surfaces-title':'surfacesTitle',
     })) text(id, t(key));
-    const quick = byId('quick-speed');
-    quick.textContent = '';
-    for (const [value, key] of [['d144','quick144'],['d56','quick56'],['dsl8','quickDsl'],['none','quickNone']]) {
-      quick.add(new Option(t(key), value, false, value === this.settings.speed));
-    }
-    if (![...quick.options].some((o) => o.value === this.settings.speed)) quick.add(new Option(t('quickOther'), this.settings.speed, true, true));
+    this.speedChoices();
     const method = byId('compare-method');
     method.textContent = '';
     method.add(new Option(t('holdChoice'), 'hold'));
@@ -91,8 +86,17 @@ export class Presentation {
     this.pendingNotes();
   }
 
+  speedChoices() {
+    const quick = byId('quick-speed');
+    quick.textContent = '';
+    for (const [value, key] of [['d144','quick144'],['d56','quick56'],['dsl8','quickDsl'],['none','quickNone']]) {
+      quick.add(new Option(t(key), value, false, value === this.settings.speed));
+    }
+    if (![...quick.options].some((o) => o.value === this.settings.speed)) quick.add(new Option(t('quickOther'), this.settings.speed, true, true));
+  }
+
   pendingNotes() {
-    for (const [id, key] of [['speed','speed'],['kbps','kbps'],['conns','conns'],['limit','limit'],['blend','blend'],['blendsec','blendSec'],['link','link']]) {
+    for (const [id, key] of [['conns','conns'],['limit','limit'],['blend','blend'],['blendsec','blendSec'],['link','link']]) {
       const note = byId(id + '-pending');
       if (!note) continue;
       note.textContent = t('pendingSetting');

@@ -625,14 +625,28 @@ function renderPanel() {
   const kbErr = el('div', { className: 'field-error', id: 'kbps-error', hidden: true });
   kbErr.setAttribute('role', 'alert');
   kb.setAttribute('aria-describedby', 'kbps-error');
-  sel.onchange = () => { pending.speed = sel.value; kb.hidden = pending.speed !== 'custom'; presentation.pendingNotes(); };
-  kb.oninput = kb.onchange = () => {
-    const v = +kb.value;
+  sel.onchange = async () => {
+    S.speed = pending.speed = sel.value;
+    kb.hidden = S.speed !== 'custom';
+    R.settings.bitsPerSecond = bitsPerSecond();
+    presentation.speedChoices();
+    await setRate();
+    render();
+  };
+  kb.oninput = () => {
     pending.kbps = kb.value;
-    kbErr.hidden = v > 0;
-    kbErr.textContent = v > 0 ? '' : t('customBad', fmtRate(bitsPerSecond()));
-    if (v > 0) kb.removeAttribute('aria-invalid'); else kb.setAttribute('aria-invalid','true');
-    presentation.pendingNotes();
+    const valid = +kb.value > 0;
+    kbErr.hidden = valid;
+    kbErr.textContent = valid ? '' : t('customBad', fmtRate(bitsPerSecond()));
+    if (valid) kb.removeAttribute('aria-invalid'); else kb.setAttribute('aria-invalid','true');
+  };
+  kb.onchange = async () => {
+    kb.oninput();
+    if (!(+kb.value > 0)) return;
+    S.kbps = +kb.value;
+    R.settings.bitsPerSecond = bitsPerSecond();
+    await setRate();
+    render();
   };
   const conns = el('select', { id: 'conns' });
   for (let i = 1; i <= 6; i++) conns.append(el('option', { value: i, textContent: String(i), selected: i === +pending.conns }));
@@ -643,13 +657,13 @@ function renderPanel() {
   det.onchange = () => { S.detailed = det.checked; render(); };
   const mot = el('input', { id: 'motion', type: 'checkbox', checked: S.motion });
   mot.onchange = () => { S.motion = mot.checked; };
-  for (const [input, key] of [[sel,'speed'],[kb,'kbps'],[conns,'conns'],[lim,'limit'],[bl,'blend'],[bs,'blendSec'],[linkSel,'link']]) {
+  for (const [input, key] of [[conns,'conns'],[lim,'limit'],[bl,'blend'],[bs,'blendSec'],[linkSel,'link']]) {
     if (!input) continue;
     const note = el('span', { id: input.id + '-pending', className:'pending', hidden: true });
     note.setAttribute('role','status');
     input.setAttribute('aria-describedby', [input.getAttribute('aria-describedby'), note.id].filter(Boolean).join(' '));
     input._pendingNote = note;
-    if (![sel,kb].includes(input)) input.oninput = input.onchange = () => { pending[key] = input.value; presentation.pendingNotes(); };
+    input.oninput = input.onchange = () => { pending[key] = input.value; presentation.pendingNotes(); };
   }
   const check = (input, text) => { const l = el('label', { className: 'check' }, input, ' ' + text); return l; };
   p.append(row(t('speed'), 'speed', sel, kb, kbErr), row(t('connections'), 'conns', conns), row(t('limitTo'), 'limit', lim), row(t('blend'), 'blend', bl), row(t('blendSeconds'), 'blendsec', bs),

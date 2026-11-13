@@ -1010,6 +1010,11 @@ So Werkkzeug4 does not run on Linux today, with or without the four pull request
   Fix: the panel stands in a scroll area like the other tools; what the person needs to act comes first and is in view without scrolling; each changing sentence gets the height its words need at the panel's width. Two details of Qt decide whether that works: a scroll area that resizes its widget gives a layout with height-for-width its preferred height, so a list's 192-pixel hint must not be asked for (vertical policy Ignored, a least height of one row); and a label's height for a width is never less than its least height, so take the least height away before measuring, or one measurement at a narrow width stays for ever.
   Found by: looking at the pictures the proof takes, in more than one language; then printing the label's height for three widths, its least height and its size hint in a check's detail (324 pixels for every width).
   A check now asks that the parts that place a glyph are in view as the dock opens, and that both sentences are whole.
+- Symptom: after the panel got its scroll area, the same scenario is green in English and red in Polish, French and German: the panel's left edge is cut.
+  Cause: a dock widens to its panel's least width, and a scroll area does not; in those languages one button's words are wider than the dock as it opens, so the area scrolled sideways.
+  Fix: no sideways scroll bar, and the scroll area's least width is the panel's least width plus the upright bar's.
+  Found by: the check that asks whether the grid's corner is in view, which was written for the upright direction, and the picture in German.
+  Run a layout change in every language before the long run: the widest words decide.
 - Symptom: a message says "another version (7.3.0) than the one the project was made with (7.3.0)".
   Cause: two files of one font can name the same version (a distribution's rebuild); the checksum is what tells them apart.
   Fix: a sentence of its own for that case: both name the version, their checksums differ.

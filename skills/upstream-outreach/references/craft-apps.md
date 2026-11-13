@@ -345,3 +345,11 @@ Fix: put required-input exports around the entire gate and executable build, or 
 How found: a real native `ui.set language=ko` probe rejected the archived executable even though CI's required-input test body had run.
 Rebuild and repeat the native captures on the corrected executable; preserve the first binary and failed probe as diagnostics.
 Add a runtime non-English-language request to every capture so this build-input error cannot pass an English geometry proof again.
+
+Symptom: `git bundle verify` reports a complete history, but fetching it into a fresh bare repository fails to read a parent at an old shallow boundary.
+Cause: the source repository still records a shallow boundary from an earlier checkpoint; the bundle does not contain a traversable full ancestor graph.
+Fix: inspect `git rev-parse --is-shallow-repository`, restore ancestors from the validated public source with `git fetch --unshallow`, and compare every existing local branch head before and after.
+Then recreate the bundle and actually fetch it into a new database, compare its advertised heads and trees, and run `git fsck --full`.
+How found: the first fresh catalog restore reported the missing parent even though bundle verification had succeeded; the source's shallow flag confirmed the cause.
+If complete ancestors cannot be obtained, state the exact prerequisite or shallow boundary and do not claim full history.
+Never rewrite an author, parent or date to make a checkpoint appear complete.

@@ -3,6 +3,7 @@ Draft proposal, not submitted. Written in the glTF extension template (extension
 Text: CC-BY-4.0.
 -->
 
+<a id="khr_texture_procedural_rendering"></a>
 # Dynamic Procedural Texture Rendering
 
 Draft identifier: `KHR_texture_procedural_rendering`.

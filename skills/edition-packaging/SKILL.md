@@ -27,6 +27,7 @@ description: >-
 8. A development package must install every payload its CMake export needs; use [CMake development dependencies](references/cmake-development-dependencies.md) to check sibling packages with a clean installed consumer.
 9. A family of Rust programs that share their crates is built in one workspace and ships the shared crates once, as Rust dynamic libraries whose names carry their ABI: [a Rust suite as shared libraries](references/rust-suite-shared-libraries.md) has the recipe, the measured sizes and the traps.
 10. A program the edition may not publish, handed to one tester as a local `.deb` with one page of steps: [a private package for one tester](references/private-package-for-one-tester.md) has the recipe (a version that cannot collide, installing a single `.deb` in a live session, the proof in a virtual machine, what the page must carry) and the traps.
+11. For a Go release, [reconcile the tagged source and modules](references/go-release-packaging.md) before choosing Debian dependencies or vendoring.
 
 **Check freshness first.**
 Written on 2026-10-07; the developer tasks and the skills package on 2026-10-16; provenance, Paweł's formula, rebuilt packages, the repository and the ISO on 2026-10-23, from rules dated 2026-10-02 to 2026-10-22; pins by architecture and the packages that are not ours on 2026-10-31; the i386 blocks, the order of pin files and the conversion to conffiles on 2026-11-01.

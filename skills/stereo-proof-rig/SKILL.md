@@ -56,6 +56,13 @@ For a defect that shows only after many runs in one session: one compositor sess
 ScreenShot2 draws each eye itself, and the `--virtual` backend draws its own output once, never per eye: to see the compositor's own choice to draw the scene per eye, run KWin on a DRM output (VKMS in a virtual machine) and read the scanned-out frame.
 The recipe, the vocabulary of the results, the VM and the traps: [relaunch-soak.md](references/relaunch-soak.md).
 
+## A real output read back (the frame the display gets)
+
+A capture answers what KWin would draw for each eye; it does not read the output, and it is one moment.
+For a declared scene that looks flat on a real 3D output, read three things in one guest session and make them agree: every buffer the program committed, to the last one (the recorder, `scripts/wlrec.c`, with a limit above the run's commits); the frame a DRM output scans out (VKMS and `drm-grab`, or QMP `screendump` of a guest without GL); and KWin's own choice per frame (`kwin_core.debug`).
+The last committed buffer decides the layer: halves that differ there and not on the output name the compositor; equal halves there name the program, its toolkit or Mesa, and the plain two-layer Vulkan client `vk2layer` tells Mesa from the toolkit.
+The recipe, the tools (`tools/vkms-stereo-bench/realoutput`) and the traps: [real-output-readback.md](references/real-output-readback.md).
+
 ## Test material that a script can read
 
 - **Video:** two coloured sources, the left view red with "LEFT" and the right view blue with "RIGHT", both stamped with the same frame number, packed side by side or top and bottom, either eye first; marked with the frame packing SEI (x264's `--frame-packing`, also a clip whose SEI comes only on keyframes) or Matroska's `StereoMode`; plus a plain 2D clip and an undeclared 32:9 clip.
@@ -163,7 +170,7 @@ Traps met in this rig:
 - **Searching vertical offsets** in block matching picks false matches on repeated patterns; match on the same row and check the vertical profile on its own.
 - **`LIBGL_ALWAYS_SOFTWARE=1` does not move KWin's scene to llvmpipe.** With a render node given, KWin's virtual backend draws through EGL on that card (radeonsi's shader statistics appear in `kwin.log` with `QT_LOGGING_RULES='kwin_*.debug=true'`), so the rig's "software" and `--gpu` runs give the same captures. KWin opens the first render node that opens: with Docker's CDI that is the NVIDIA card, without it the AMD one. Name a run by the card you gave it, and check the log.
 - **A window capture on Wayland includes the compositor's title bar:** offset the analysis by it.
-- **A ScreenShot2 pair is not the output's picture.** ScreenShot2 renders each eye itself, and the `--virtual` backend's output layer has no eyes, so its own frames are drawn once; a capture proves the declaration and the eye quads, never KWin's choice to draw the output per eye. Read the scanout of a DRM output for that ([relaunch-soak.md](references/relaunch-soak.md)).
+- **A ScreenShot2 pair is not the output's picture.** ScreenShot2 renders each eye itself, and the `--virtual` backend's output layer has no eyes, so its own frames are drawn once; a capture proves the declaration and the eye quads, never KWin's choice to draw the output per eye. Read the scanout of a DRM output for that ([relaunch-soak.md](references/relaunch-soak.md)). And a capture is one moment: a program that hands over one picture in some frames only is caught by reading every committed buffer to the last ([real-output-readback.md](references/real-output-readback.md)).
 - **Never edit a script while it runs.** `dash` reads a script as it goes: a soak whose script was changed under it read on from its old offset and stopped with `Syntax error: "}" unexpected`. Run a copy; replace a client binary by renaming a new file over it.
 - **Eyes that differ only where a window has alpha under its own opaque region.** KWin's occlusion culling leaves the target unpainted below a window's opaque region, and a surface with an alpha channel still blends over what is left there (the Wayland protocol allows that artifact when a client declares a wrong opaque region).
   In 2D the leftover is usually the previous frame of the same picture, so it rarely shows; in stereo the capture draws the right eye over the left eye's finished picture in one target, and a 3D output's per-eye buffers keep their own history, so one eye came out lighter (found on 2026-10-31 with a program that blits with alpha below 1 under its opaque region).

@@ -82,5 +82,42 @@ This supports a vendored build route for that unchanged release; it does not est
   Never silently substitute a different encryption implementation to make a dependency-only PR compile.
   **Found by:** clean offline Forky builds of both dependency branches with Go 1.27.3, followed by the compiler output from a disposable one-line diagnostic substitution and `go doc crypto/ecdsa.PublicKey` / `PrivateKey`.
 
-The edgetk reconciliation above has now reached successful vendoring on local dependency-fix proposals.
-The stock-Go command build remains blocked by its source/toolchain contract; no package or CLI verification is established by the isolated e521 library probe.
+That block was upstream's to lift, and it was: on 2026-11-13 the author replaced the modified standard-library packages with an ordinary module (`gitverse.ru/uzer_007/gogost/v2`) and dropped the calls stock Go lacks, so commit a8e445b ("v1.5.22") builds with standard Go.
+The section below is the package that followed.
+
+## The vendored build, with modules hosted outside GitHub (edgetk 1.5.22, ORDER 511)
+
+1. **Where the modules come from.** Run the download once with a new, empty `GOMODCACHE` and `GOPROXY=https://proxy.golang.org` (no `,direct`): if it succeeds, every module, whatever host its path names, came from the Go module proxy and no version-control host was contacted.
+   edgetk's 126 modules did, the two on gitverse.ru and the one on gitee.com included, so the build container needs neither `git` nor access to those hosts.
+   Record each module's source as its proxy address (`https://proxy.golang.org/MODULE/@v/VERSION.zip`, capitals written as `!x`) with the `h1:` line of upstream's own `go.sum`; `go mod verify` is the integrity check, and `sum.golang.org` is never asked for a module `go.sum` already names.
+   A module the proxy does not hold would fail here by name: that one needs `GOPROXY=...,direct`, `git` in the container and its host reachable, and is recorded as such.
+2. **Keep upstream's module files unchanged.** Take the SHA-256 of `go.mod` and `go.sum` before `go mod download`, `go mod verify`, `go mod vendor` and check them after (`sha256sum -c`), with `GOFLAGS=-mod=readonly`.
+   Never build with `-mod=mod`: it rewrote edgetk's `go.mod` (six requirements lost `// indirect`) without saying a word.
+3. **The vendor tree is an upstream tarball of its own** (`NAME_V.orig-vendor.tar.xz`, a component of a 3.0 (quilt) source, unpacked in `vendor/`), made with `tar --sort=name --format=gnu --mtime=@COMMIT_TIME --owner=0 --group=0 --numeric-owner` so the same commit gives the same bytes.
+   Pin the tree, not the tarball: the SHA-256 of the sorted `sha256sum` list of every file under `vendor/` stays the same across tar and xz versions and across Go patch releases (Go 1.27.1 and Debian's 1.27.4 gave the same tree).
+4. **The package build reads no network:** `GOTOOLCHAIN=local GOPROXY=off GOFLAGS="-mod=vendor -trimpath -buildvcs=false" CGO_ENABLED=0`, `GOCACHE` and `HOME` inside `debian/`, `dh $@ --buildsystem=none` with `go build -o debian/.build/NAME ./cmd/NAME`.
+   Use Debian's Go when it is at least the `go` line of `go.mod` (`apt-cache policy golang-go golang-1.NN-go` in the build image; Forky had 1.27.4 for `go 1.27.1`); `GOTOOLCHAIN=local` then stops Go from fetching another toolchain.
+5. **Licences come from the module cache, one row per module.** For each module of `vendor/modules.txt`, read the licence files at the module's root in the cache (`GOMODCACHE/MODULE@VERSION/`), classify the text, and when there is none read the first lines of its Go files for a statement.
+   Generate `debian/copyright` from that table and let the build stop when the committed file differs from the generated one (`cmp`), so the file cannot go stale when a module changes.
+   Name what is missing as it is: edgetk vendors 123 modules, 63 of them (all in the author's own account) have no licence file, 22 of those state a licence in their sources, and 41 state nothing; they are listed as `not-stated`, never guessed.
+   One copyleft module decides the binary: `github.com/pedroalbanese/gogost` is GPL-3 (Sergey Matveev's GoGOST), so the static program is distributed under GPL-3 terms though edgetk itself is ISC; say so in the header of `debian/copyright`.
+6. **Lean Code: preserve `vendor/`.** The toolkit's source projection reads `.h` and `.c` as C. In a Go vendor tree the `.h` files are Go assembler headers (`#include`d by `.s` files, read by `cmd/asm`) and the `.c` files are for gccgo.
+   Ship `debian/sparky-lean-preserve.json` with the one pattern `vendor/*` and its reason, in the form `lean.debian_prepare` writes (`json.dumps(plan, indent=2)` and a newline); `release/build-dh-lean.sh` has no option for `--preserve-source`, and a plan already in `debian/` is the one the build reads.
+7. **Tests at build time.** When the tree has a Go test, `override_dh_auto_test` runs it; with a `main.go` that `go vet` objects to, that is `go test -count=1 -vet=off ./cmd/NAME/`.
+
+### Traps
+
+- **Symptom:** the build stops in `execute_before_dh_auto_configure` with `vendor/.../mul_amd64.h: check failed: GCC sees different tokens or directives`. **Cause:** a Go assembler header taken for a C header by the Lean Code source projection. **Fix:** the preserve plan of step 6. **How found:** the file's first lines are Plan 9 assembler macros, and only `.s` files include it.
+- **Symptom:** `dwz: debian/NAME/usr/bin/NAME: Unknown debugging section .debug_addr`, then `dh_dwz: error`. **Cause:** dwz does not read the DWARF 5 sections a Go binary carries. **Fix:** an empty `override_dh_dwz:` in `debian/rules`, as dh-golang does for every Go package. **How found:** the build and its test had passed; the error names the tool and the section.
+- **Symptom:** `make: Warning: File 'debian/rules' has modification time 1431 s in the future`. **Cause:** the changelog entry's date was later than the clock, and the source is dated by its newest changelog entry. **Fix:** date the entry at or before the moment it is written (`date -u -R`).
+- **Symptom:** a wrapper prints "exit 0" for a build that failed. **Cause:** `(time build) > log; echo $?` followed by `tail` reports the last command. **Fix:** write the build's own status into the log (`build > log 2>&1; echo "BUILD EXIT $?" >> log`) and read that line.
+- **Symptom:** a licence scan of `vendor/` finds fewer licence files than the module cache. **Cause:** `go mod vendor` copies only the packages a build needs, with the legal files beside them; a module's other folders stay behind. **Fix:** scan the module's root in the cache, which holds the whole module as published.
+- **Symptom:** lintian reports `license-problem-undefined-license bsd-unspecified` on a generated `debian/copyright`. **Cause:** a made-up short name that begins like a real licence family is taken for a reference to a licence with no text. **Fix:** name such a stanza by what the file says (`licence-file-says-only-BSD`), with its own paragraph. **How found:** the two lines lintian named were the stanza and its paragraph.
+- **Symptom:** a licence classifier calls a GPL text "GPL and LGPL". **Cause:** the GPL's own text names the Lesser GPL. **Fix:** decide GNU licences by the title in the first lines, not by a phrase anywhere in the text.
+
+### Measured on edgetk 1.5.22 (a8e445b), 2026-11-13
+
+The source package is 278 KB of upstream and 2.97 MB of vendored modules (1,874 files, 26 MB unpacked); the binary package is 4.5 MB with one static program of 18 MB.
+One build through `release/build-dh-lean.sh` takes about four and a half minutes on four cores, the Go compile twice (the program, then its test binary).
+The Lean Code gates pass with nothing projected in the source (the seven eligible files are all in `vendor/` and preserved) and nothing to project in the payload.
+lintian 2.143.0 leaves two errors that belong to the edition's toolkit on every package (`gcc` in Build-Depends without a version, the lc record in the debug package) and `no-manual-page`, since upstream ships no manual.

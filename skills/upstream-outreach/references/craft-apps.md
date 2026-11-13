@@ -294,3 +294,27 @@ Cause: a formatter was still changing a new test when the source guard recorded 
 Fix: wait for formatting and intentional lockfile resolution to finish before freezing source and harness hashes, then run the gate without source mutations.
 How found: the before/after receipt isolated the changed stock-control test hash; a fresh run on fixed sources passed both the checks and the unchanged-source guard.
 Keep the refused receipt as diagnostic evidence and use only the fixed-source run for acceptance.
+
+### A moving stable compiler and carried prerequisites
+
+When a workflow says `stable`, read the current signed Rust channel manifest before choosing the SDK; record the actual compiler version beside the gate result.
+A previously accepted image can cease to represent that workflow overnight.
+For standalone toolchains, verify the official signing certificate's pinned fingerprint, the manifest signature and each component hash before running an installer.
+
+Symptom: the same workspace passes its previous compiler but fails strict Clippy on the next stable compiler.
+Cause: the gate followed `stable` while the private SDK retained an older release.
+Fix: use the workflow's current compiler, search the affected upstream file and carry an existing baseline fix with its author's identity and date.
+How found: the official channel changed from Rust 1.99.1 to 1.100.0; the new Clippy diagnostic named `craft-cms::synth`, and upstream already had Dylan M. Taylor's baseline fix.
+Do not change an unrelated application's dependency pins merely because a library's workspace lint failed.
+
+Symptom: carrying an upstream baseline fix makes a plotter golden test expect `TB54,0,0`, but the branch's command encoder omits it.
+Cause: that fix assumed an earlier functional prerequisite from upstream main.
+Fix: carry the prerequisite with its author, rather than weakening the golden output back to the old encoder.
+How found: the failing expected command sequence, the upstream file log and the prerequisite's source diff; all 14 plotter goldens then passed.
+This is a byte-stream test, not a claim of testing a physical cutter.
+
+Symptom: an exact-carry audit rejects a correctly applied cherry-pick.
+Cause: raw Git diffs also contain blob hashes and hunk line numbers, and some files in the original commit may already be present from an earlier carry.
+Fix: compare author/date, the resulting affected file bytes where appropriate, and every changed hunk byte while excluding only Git's index hashes and hunk locations.
+Preserve whitespace; a stable patch-id alone is insufficient for a byte-for-byte claim.
+How found: the two already-carried KRA/ORA files matched upstream exactly, while the root Cargo manifest retained the branch's own stereo dependencies outside the imported hunk.

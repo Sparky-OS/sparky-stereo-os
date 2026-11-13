@@ -211,6 +211,45 @@ The programs: every built file has the same size in both forms, two authored bui
 Between the forms the files differ where positions are stored: `.data.rel.ro` (panic locations), `.rodata`, the crate metadata section `.rustc` of the dynamic libraries, the build ID, and a few bytes of `.text` (2 to 8,130 per file); the differing bytes were not classified one by one.
 The files the programs write (a PSD and a JPEG from a 4000x3000 picture) have the same SHA-256 in both forms.
 
+## A whole suite through the adapter (2026-11-13)
+
+Three applications with every vendored crate (48,463 C-family and Rust files in the source tree), projected in the package build of `craft-suite` by toolkit 0.1.29 with `["c", "rust"]`.
+
+- **Projected:** 26,261 files; 14,810 had no removable comment; the rest stayed as authored with a reason: files read as data by `include_bytes!` and `include_str!` (about 2,100), carriage returns (516), crates whose build script reads Rust source (331), inner attributes on the first line that the reader takes for an interpreter line (3,345 in the 25 most frequent reasons, see the trap below), and the font and catalogue repositories' own tools (preserved by plan: not compiled).
+- **What the compiler read**, from its dep-info: 13,660 files, 8,205 of them projected; 309,373,328 bytes and 6,889,873 lines authored, 298,282,892 bytes and 6,721,945 lines lean: 3.58 % fewer bytes, 2.44 % fewer lines.
+  Of those bytes 51.3 MB are fonts and data read through `include_bytes!`, which no projection touches.
+- **Vendored checksums:** 1,154 `.cargo-checksum.json` manifests were bound to the projection report before cargo ran, each changed entry proved by the report's hash before and after; the manifests are found at any depth, because the suite keeps one vendor folder per source.
+- **The time:** about 15 minutes of a 48-minute build on four CPUs, one check per file; the same projection alone on one CPU took 902 s.
+- **The programs' work:** the files the command-line programs write equal the static, authored build's, byte for byte.
+- **Four interleaved builds** of the three-app workspace (authored, lean, authored, lean; one cargo run each from an empty target, four CPUs, every round on a machine other work was loading, load average 6 to 29), `perf stat` user-space instructions:
+
+  | Round | Instructions | Wall | User CPU | Memory peak of the build |
+  | --- | --- | --- | --- | --- |
+  | authored 1 | 23,260,286,116,700 | 2,340 s | 7,629 s | 13.2 GB |
+  | lean 1 | 23,259,246,093,679 | 2,936 s | 8,470 s | 12.7 GB |
+  | authored 2 | 23,259,047,457,558 | 2,806 s | 8,502 s | 15.2 GB |
+  | lean 2 | 23,259,782,785,843 | 2,781 s | 8,602 s | 12.7 GB |
+
+  The first lean build ran 1,040 million instructions fewer than the authored one before it (0.0045 %), the second 735 million more than its pair (0.0032 %); the two authored builds differ by 1,239 million.
+  So on the whole suite the projection shows no difference in instructions: the means differ by 152 million (0.00065 %), less than two builds of one form differ.
+  Time and memory followed the machine's load, not the form.
+  Two authored builds gave byte-identical stripped files, two lean builds too; between the forms all ten files differ and every size is equal.
+
+Traps:
+
+- Symptom: the projection stops on a vendored C header with `check failed: clang unavailable: the c token and directive stream needs its raw lexer`.
+  Cause: an assembler header (`aws-lc-sys`, s2n-bignum's `_internal_s2n_bignum_arm.h`) is checked with clang's raw lexer, and the build container had no clang.
+  Fix: `lean.debian_prepare --build-dependency clang`.
+  Found by: the message; it came after 13 minutes, so run the projection alone on the unpacked source before the first full build (`python3 -m lean.source_tree project TREE`, then the checksum step).
+- Symptom: more than 3,300 Rust files are left with the reason `interpreter [allow(unused_imports)]: no qualified adapter` (or `[cfg(feature`, `[no_std]`, `[warn(rust_2018_idioms)]`).
+  Cause: a file that starts with an inner attribute `#![...]` is taken for a file with an interpreter line by the reader that runs before the Rust adapter, although the Rust reference says a shebang is `#!` not followed by `[`.
+  Fix: not made in this round; those files stay authored, which is safe and costs part of the saving.
+  The next change to the toolkit is to let the Rust adapter decide for `.rs` files, with the red case a crate root that opens with `#![no_std]`.
+  Found by: counting the report's `left` rows by reason.
+- Symptom: a patch for the generated workspace applies to the authored tree and fails on the lean one.
+  Cause: its context lines hold a plain comment.
+  Fix: change whole lines by content, never by context (the suite's `suite-fixups.json`).
+
 ## What it is not
 
 - Not for installed files: Debian's `librust-*-dev` packages and `rust-src` are read by cargo, which checks each file against `.cargo-checksum.json`, and by rust-analyzer; `consumers.choose` leaves them with that reason.

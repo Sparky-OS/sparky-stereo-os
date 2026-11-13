@@ -258,6 +258,29 @@ Measured facts:
 - 29 mutations of the conditions the fix adds: 26 change named rows or cases. Four conditions that changed nothing were removed as equivalent (a message that only a decoder starting at a key frame has is always persistent, so "it ends nothing" needs no test of its own in what is in force), and six got a case each; a mutation that changes nothing is first a question about the row, then about the condition.
 - A quick pre-check that makes a later condition redundant hides that condition from single mutations: mutate the pair together to show that the case covers it.
 
+## An eighth bot round: what the code writes is in the model too
+
+Symptom: the frame-packing tracker correctly preserved input messages on their originating picture, but insertion left a retained id-0 arrangement in force beside the new id-0 arrangement on that same picture.
+Cause: the filter's own message was outside the model; a special case on the numeric value zero assumed ordinary same-id replacement without asking which picture the retained message belonged to.
+Fix: extend the model to every message the filter writes, then ask the tracker for the origin relation instead of exempting an id's value.
+How the cause was found: the reviewer's real metadata-filter plus `dump_extra` chain printed two persistent id-0 arrangements before the first picture; the existing reader ignored surviving id 0, and the previous family varied only a different input id.
+A special case on a value is a belief the model was never asked about.
+
+Recipe:
+1. Before editing, write what each action creates, removes, retains or repeats, on which picture and with which id. Apply every lifetime statement to those messages, including generated cancellations and decoder-start metadata.
+2. Derive cancellation from the picture relation. H.264 V16 D.2.26 p.391 and H.265 V11 D.3.16 pp.353 to 354 require a strictly later picture for ordinary same-id replacement. A retained persistent origin not provably older needs a preceding cancellation; a provably older origin of that id is ended by the replacement itself.
+3. Keep the two meanings of extradata apart: where an arrangement applies from and the picture its message belongs to. Retaining it for a later decoder start does not make its origin an older picture at the current start; a write can have an earlier or indistinguishable output position, so checking only the current access unit misses that relation.
+4. Search branches on numeric ids, exemption flags and producer identity. Give each its clause-derived statement or replace it with a query about origins. A producer marker may be needed because an emitted packet cannot be changed; it gives no different persistence rule.
+5. Cross same/different input id with source, same-picture composition, operation, timestamps and codec using the existing walker and setup. The reader identifies the replacement by message identity and write location, then checks every retained id, including the written id.
+6. Keep a conservative-cancellation amendment as a mutation. A reader that prints only whether the output is valid cannot distinguish a necessary cancellation from an unnecessary one; observe cancellation syntax too, with strictly older same-id rows as controls.
+7. Ask the model the same question again: are its generated cancellations, repeated key-frame messages, new extradata and the messages a delete action leaves behind all represented? Give each its rows or the statement that covers it.
+
+Traps:
+- Symptom: the first-picture probe passes, but a later write can still leave a retained arrangement. Cause: the query tests only access-unit identity, overlooking extradata that applies before all pictures while its origin is not provably older. Fix: ask whether ordinary replacement is proved by a strictly older origin, and keep earlier-position and indistinguishable-position controls. Found by: applying the second model question to P8's separate application position and origin.
+- Symptom: GCC rejects H.264 inline assembly with impossible register constraints in a combined sanitizer build before tests run. Cause: sanitizer instrumentation changes the register requirements of existing assembly. Fix: use `--disable-asm --optflags=-O1` for the instrumented C build, keep address and undefined sanitizers in every linked library, and use the normal assembly configuration for full compiler runs. Found by: the compiler diagnostic in `libavcodec/x86/h264_cabac.c`, not a runtime finding in the changed code.
+- Symptom: the new table calls existing other-id cancellations unnecessary. Cause: it used the fixture's true order where the filter has only ambiguous timestamps, or future sequence information unavailable to it. Fix: distinguish the exact same-id replacement rule from conservative actions justified under every possible order, and retain the original family's stated allowances. Found by: comparing the unchanged-head row with its true POC and separate timestamp columns before editing production.
+- Symptom: a first-picture diagnostic prints no output and exits with usage. Cause: the shared API test takes a codec selector before the sample path. Fix: use `api-bsf-frame-packing-test h264 sample.h264` or `hevc sample.hevc`, retain stderr, and check the process status. Found by: the usage line in the direct-capture log, despite FATE having successfully run the same binary.
+
 ## Preparing a follow-up patch from an old branch
 
 Recipe:

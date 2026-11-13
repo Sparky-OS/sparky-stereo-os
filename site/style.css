@@ -83,7 +83,8 @@ td img { max-width: 5rem; }
   .more-links { columns: 1; }
   .gallery { gap: .3rem; }
   .site-header { gap: .5rem; }
-  p, li { overflow-wrap: anywhere; hyphens: auto; }
+  /* Hyphenate by the page's language, long words only: a German compound, not "every". */
+  p, li { overflow-wrap: anywhere; hyphens: auto; hyphenate-limit-chars: 12 4 4; }
 }
 @media print {
   .lang, .skip { display: none; }
@@ -111,10 +112,13 @@ main p, main li, main dd, main blockquote, .site-footer p { max-inline-size: 66c
 main p, .site-footer p { text-wrap: pretty; }
 /* Each language's own system fonts by name, so one page never shows another
  * language's forms of the shared Han characters; none is fetched. */
-:lang(ja) { font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", Meiryo, "Noto Sans CJK JP", "Noto Sans JP", system-ui, sans-serif; }
-:lang(ko) { font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans CJK KR", "Noto Sans KR", system-ui, sans-serif; }
-:lang(zh-CN) { font-family: "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC", system-ui, sans-serif; }
-:lang(zh-TW) { font-family: "PingFang TC", "Microsoft JhengHei UI", "Microsoft JhengHei", "Noto Sans CJK TC", "Noto Sans TC", system-ui, sans-serif; }
+:root:lang(ja), [lang="ja"] { font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", Meiryo, "Noto Sans CJK JP", "Noto Sans JP", system-ui, sans-serif; }
+:root:lang(ko), [lang="ko"] { font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans CJK KR", "Noto Sans KR", system-ui, sans-serif; }
+:root:lang(zh-CN), [lang="zh-CN"] { font-family: "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC", system-ui, sans-serif; }
+:root:lang(zh-TW), [lang="zh-TW"] { font-family: "PingFang TC", "Microsoft JhengHei UI", "Microsoft JhengHei", "Noto Sans CJK TC", "Noto Sans TC", system-ui, sans-serif; }
+/* The rules above name a page or a marked passage, never every element in it:
+ * code keeps its own font, and another language's name in the menu keeps its own. */
+[lang="en"], [lang="pt-BR"], [lang="pl"], [lang="fr"], [lang="de"], [lang="es"] { font-family: system-ui, sans-serif; }
 :root:lang(ja), :root:lang(ko), :root:lang(zh) { line-height: 1.8; }
 :root:lang(ja) main p, :root:lang(ja) main li, :root:lang(ja) main dd, :root:lang(ja) .site-footer p,
 :root:lang(ko) main p, :root:lang(ko) main li, :root:lang(ko) main dd, :root:lang(ko) .site-footer p,

@@ -455,3 +455,12 @@ How found: the complete FilmCraft run passed 5,076 tests and failed that one pre
 Rerun the whole gate after the controlled check; a one-test pass does not establish full CI success.
 
 The corrected full Linux gate then passed all 5,077 native tests and eight doctests, plus its layer, asset and WebAssembly checks, with production and test source unchanged.
+
+Symptom: LightCraft's `tiles_sharing_one_payload_count_its_bytes_once` expects the distinct-byte refusal but receives `264 image data chunks, expected 65536` after a shared TIFF update.
+Cause: `ImageInfo::chunks` bounds allocated descriptors by file length; its returned length is no longer the declared offsets count.
+The fixture still declares all 65,536 offsets pointing to one 256-byte payload.
+Fix: carry the existing upstream RAW comparison of `info.offsets.len()` against the required grid count, preserving the later distinct-byte plausibility check and the unchanged regression.
+[LightCraft #4165](https://github.com/storytold/lightcraft/pull/4165), by Dylan M. Taylor, includes that exact hunk in e4dd081d; shared [craft-libs #1102](https://github.com/storytold/craft-libs/pull/1102) explains the same transition after the RAW migration.
+Identify the applicable hunk and retain its author's date rather than importing unrelated gain-map and HEIF changes or padding the fixture to evade the descriptor cap.
+How found: the full receiving gate reached the unchanged RAW regression, inspection separated declared offsets from bounded descriptors, and the upstream search named the existing fix.
+All ten related tile tests passed with that original hunk and no assertion change; the whole receiving gate must also pass before closing the dependency step.

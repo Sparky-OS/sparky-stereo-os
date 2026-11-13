@@ -298,3 +298,11 @@ Cause: the private software adapter intentionally triggered the application's ex
 Fix: acknowledge the visible Keep Using CPU button through the public UI input API, verify the notice clears, and apply the same action to candidate and stock controls.
 Disclose the software compositor and preserve the warning, chosen action and result in the proof record; do not change the product default or mask the dialog's pixels.
 How found: inspecting the captured interface exposed the modal; after acknowledgement the complete ordinary candidate and stock pictures were pixel-identical on both backends.
+
+Symptom: LightCraft's accepted ordinary-control oracle waits for its default GPU, but the copied media runner reports that the software adapter is skipped because the CPU pipeline is faster.
+Cause: a global `VK_DRIVER_FILES` override selected lavapipe for both the private compositor and the application, changing the control's required device environment.
+Fix: keep the compositor on lavapipe and remove that override only from the LightCraft child, matching the accepted default-device recipe for candidate and stock.
+Preserve the readiness requirement, production fallback policy and complete unmasked comparison; do not weaken the oracle to accept a different rendering path.
+Keep this in a separate Light helper so other applications' software proofs retain their original harness bytes.
+How found: the application explained its deliberate software refusal, the original recipe had no driver override, and the unchanged controls then used AMD RADV RENOIR and matched all 2,880,000 RGB pixels across Wayland and X11.
+Repeat the full native, lifecycle, HEIF and ordinary proof set after this controlled check; those focused ordinary comparisons alone do not close the receiving step.

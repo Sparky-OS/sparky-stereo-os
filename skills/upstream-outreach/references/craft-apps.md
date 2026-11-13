@@ -326,3 +326,9 @@ Keep advisory, bans, license and source checks enabled; offline mode still enfor
 If the project's xtask hardcodes the command, keep its workflow and source unchanged and record any transparent tool wrapper as an explicit transport adjustment, including the database revision and real tool version.
 How found: the failed command named the absent RustSec clone; cargo-deny 0.20.2's global help and `check.rs` distinguish `Fetch::Disallow(maximum_db_staleness)` from its online fetch mode.
 The separately fetched database made all four offline checks pass; an empty database must remain a failure rather than a successful skip.
+
+Symptom: the whole app suite passes its new feature tests but fails `the_flatpak_manifests_pin_the_craft_i18n_rev`.
+Cause: the native catalog input was advanced while the two existing Flatpak source pins retained the old revision.
+Fix: update every existing catalog-pin consumer in the same feature change, retaining the equality regression and the upstream packaging design.
+How found: nextest named the one failed test; its definition reads both manifests and compares their source commits with `craft-i18n.rev`.
+This source consistency check does not establish that an unpublished catalog commit can already be fetched by a package builder; record local-only inputs and do not claim a Flatpak build.

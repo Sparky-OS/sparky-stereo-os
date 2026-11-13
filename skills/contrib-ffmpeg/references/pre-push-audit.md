@@ -57,15 +57,21 @@ Every rule has the search that finds a breach; write the result of each in the h
 20. **A family, not a case.**
     When a finding is a neighbour of an earlier one, the invariant is written in the test's comment, every combination is generated, and the oracle prints one code per combination ([the recipe](lessons-2026-11.md#a-fourth-bot-round-the-invariant-and-the-walk-order-527-2026-11-11)). The red column is the walk on the unchanged library.
     The expected result of every row is written before the fix, from the clause and by something that does not read the code under test (a table, a small script), and the walk's output is checked against it ([state the obligation before the fix](lessons-2026-11.md#a-sixth-bot-round-state-the-obligation-before-the-fix-order-534-2026-11-12)). A row whose expected result the statement does not give is a gap in the statement.
-21. **Sanitizers after the last test change**, full FATE with GCC and clang on the head that will be pushed, the load average beside the totals, an intermittent entry named and rerun 30 times and never counted as a pass.
+21. **Every statement of the clause has the same key.**
+    `grep -n 'pos\b\|pts\|picture' FILE` in the state the fix touches: for each field that stands for a picture, say whether it is its identity or its place in output order, and check that every statement (what is in force, what is owed, what a cancellation ends) uses the same pair, in the live state and in the folded one ([the model before the family](lessons-2026-11.md#a-seventh-bot-round-the-model-before-the-family-order-538-2026-11-13)).
+22. **A picture is never its timestamp.**
+    `grep -n -- '->pts\|->dts' T` in the readers and `grep -n '== *pos\|< *pos\|<= *pos' FILE` in the code: a comparison of timestamps answers "later", never "the same picture". The walk has a column where two pictures share a timestamp, the reader gets the picture order counts apart from the packets, and each such combination prints what holds either way or a refusal.
+23. **The test is smaller than the change, and its machinery exists once.**
+    `git diff --numstat BASE..HEAD`: the test program's lines against the additions outside `tests/` and `doc/`. `grep -c 'split_nals\|next_message\|av_bsf_alloc\|av_bsf_init' T`: one walker over NAL units and SEI messages, one reader of the message, one setup of the filter. After a restructuring, the new program built against the unchanged library prints the old references.
+24. **Sanitizers after the last test change**, full FATE with GCC and clang on the head that will be pushed, the load average beside the totals, an intermittent entry named and rerun 30 times and never counted as a pass.
 
 ## A reply
 
-22. **Every finding answered once:** fixed (the commit and the test), shown correct (the clause, the code path, the probe), or outside this pull request (its own patch, named).
-23. **Every clause with its edition and page**, read in the local copy (the page of a `pdftotext` line is the next footer below it).
-24. **No AI line**: the description has it. Thanks for what the reviewer actually did.
-25. **The description still true:** read every sentence of the pull request description against the new head (what the references cover, the FATE totals, the intermittent entries) and hand back the sentences to replace.
-26. **Earlier promises kept:** read the earlier replies in the thread for "its own patch" and "its own pull request", and say where each stands.
+25. **Every finding answered once:** fixed (the commit and the test), shown correct (the clause, the code path, the probe), or outside this pull request (its own patch, named).
+26. **Every clause with its edition and page**, read in the local copy (the page of a `pdftotext` line is the next footer below it).
+27. **No AI line**: the description has it. Thanks for what the reviewer actually did.
+28. **The description still true:** read every sentence of the pull request description against the new head (what the references cover, the FATE totals, the intermittent entries) and hand back the sentences to replace.
+29. **Earlier promises kept:** read the earlier replies in the thread for "its own patch" and "its own pull request", and say where each stands.
 
 ## Traps met while writing this list
 

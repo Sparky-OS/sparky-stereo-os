@@ -200,7 +200,7 @@ Apply the physical eye offset to camera-space x after the original central view 
 Do not narrow a large world-space origin to f32 or point each eye at the unchanged world target.
 Expand normalized depth rounding outward, and include the near clipping plane when geometry crosses it, so the camera budget cannot miss newly clipped corners.
 Keep the headlight at the central camera while geometric eyes, visibility/depth targets and resolved images are private.
-These are renderer bridge requirements; the PRC adapter still needs its own tests and native capture before it can be called proved.
+These are renderer bridge requirements; each adapter must carry its own raster regressions and native capture, rather than borrowing a core-only result.
 
 Symptom: the orthographic camera's analytic baseline is correct, but the rendered disparities do not match it.
 Cause: the match arm shadows the render grid's pixel height with the world's orthographic height when restoring the projection coefficient.
@@ -223,3 +223,20 @@ Cause: multiplying the normalized camera offset by an extreme f64 model scale ca
 Fix: refuse unrepresentable physical baselines and eye offsets before drawing or publishing the pair.
 How found: the overflow regression accepted an infinite baseline; a separate tiny-scale regression first proved the ordinary scene visible, then found that the stereo call accepted an underflowed baseline.
 Zero budget retains the exact ordinary path.
+
+## A finite f64 rasterizer at the native window
+
+For an embedded PRC model, retain a cheap immutable working-file snapshot keyed by document ID, edit generation and page.
+Parse the document, decompress its model stream and assemble the world on the worker, not during UI painting.
+Both geometric eyes borrow that same placed mesh set and central headlight; each owns its depth target and image.
+Publish a single complete picture and the metadata belonging to it, never a poster raster or two independent document reads.
+This renderer completes one raster pass per eye and has no temporal accumulation; record one and one, rather than inventing progressive sample counters.
+
+A measured original PRC fixture has camera depths 4 and 6, target distance 5 and vertical field of view 30 degrees.
+For its solid background use zero infinity coefficient; the popped budget of 12 native pixels gives e*f=240 and predicted disparities +12 and -8.
+The actual native application and compositor measured those values at a 640 by 360 window, with zero vertical shift and every native/display sample identical.
+At a 320 by 180 window the selected source grid stayed 640 by 360 per eye, the native budget doubled and the native disparities became +24 and -16, while the displayed values stayed +12 and -8.
+The identical block-matching oracle rejected reversed eyes, and the far-surface disocclusion remained visible.
+These are two measured features at two sizes, not a dense accuracy claim for every model.
+Keep the ordinary renderer entry point and headless tool defaults, including its per-eye grid and size bound, unless the person chooses another resolution.
+The capture must open the actual original PDF and parse its PRC annotation through the production loader; rendering only directly constructed test meshes does not verify that path.

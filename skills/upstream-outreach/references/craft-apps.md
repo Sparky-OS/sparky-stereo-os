@@ -1,5 +1,24 @@
 # Craft Apps: contributions and review follow-through
 
+## Converge the actual dependency graph
+
+When a suite needs one shared-library revision, inspect every tracked Cargo manifest, including the web frontends and root patches.
+Record each consumer's old sources before changing an edition branch; keep a clean offer branch separate.
+After binding the new revision, inspect resolved package manifests and sources as well as the lockfile.
+Every package owned by craft-libs must come from the selected checkout or revision, including UI helpers, updater, codecs and vendored reader patches.
+Run each receiving app's complete gate and repeat proofs for the shared paths that changed.
+
+Source-audit trap: the stereo crate uses the new checkout, while the app still resolves helpers and web crates from several older craft-libs revisions.
+Cause: changing the visible stereo dependency does not change unrelated workspace entries or child manifests.
+Fix: converge the whole resolved graph and retain a before/after source inventory; a successful metadata command still does not establish compilation or native output.
+How found: an inventory of seven apps' root and web manifests showed local stereo crates beside independently pinned UI, updater, image and web helpers.
+
+Source-audit trap: a catalog revision file is present, but the executable still embeds its local translations.
+Cause: a revision file does not create a build-script input; pre-cutover apps can ignore CRAFT_I18N_DIR entirely.
+Fix: inspect the actual build and lookup paths, carry an existing upstream migration with its authorship when available, and verify required-input and ordinary-output controls before claiming a common catalog.
+How found: source inspection found three local-catalog consumers alongside four apps that already read the shared input.
+Do not describe an unused catalog pin as convergence or silently discard untranslated local rows during migration.
+
 Checked 2026-11-10 against [craft-contrib](https://github.com/storytold/craft-contrib), revision cb0d67e, and the app repositories' current rules.
 Read the receiving repository again before preparing a submission: the suite changes quickly.
 

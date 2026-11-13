@@ -216,3 +216,66 @@ Keep the entire ordinary control window inside the virtual output and compare th
   Check the rig's authorized render-node access and compositor log before changing the application.
   A software-rendered session can still need that node for the tested capture path.
   Repeat in a fresh private session and require captured pixels, not only a successful protocol event.
+
+## A refused proof launch must explain itself
+
+Symptom: the proof launcher exits 1 without a message before creating a container.
+A bare shell regular-expression check under `set -e` rejected the case label silently.
+Validate the argument count, case-label pattern, flow, frame, binary and existing receipt explicitly, printing the refused value or accepted shape to stderr.
+Keep invalid-label, invalid-flow, invalid-frame and missing-binary controls that fail with a diagnostic before Docker starts.
+The cause was found by running the rejected argument list with captured exit status and stderr; an empty stderr was the red witness.
+Do not relax a safety pattern just to make a label work without saying what it accepts.
+
+## Render size and the live movie player
+
+Keep exactly three scene-view options: enable 3D, render resolution per eye, and a shortcut to the desktop's Display Settings.
+For an authored planar stage, default the render size to the document stage size and say why: it preserves the authored sampling and the desktop scales once.
+A chosen size changes the vector rasterizer's view transform and target dimensions, never resizes an already rendered eye.
+Fit a different aspect uniformly with centered margins, preserving the document and its shapes.
+Convert the compositor's native-pixel budget into stage units before the stage transform; otherwise doubling the render resolution doubles the displayed depth by mistake.
+The measured non-stage-resolution case rendered a 320×180 stage directly into two 640×360 eyes, declared one 1280×360 buffer, and retained +8, 0 and −12 pixel layer disparities with zero vertical disparity.
+
+When an editor has a separate Test Movie player, capture its actual immutable PlayerState for both eye jobs, including its script overrides, button states, clip clocks and text.
+The authoring session's playhead is not the interactive player's clock.
+Keep one pending pair until both eye jobs finish; dropping old frames is allowed, pairing different player states is not.
+Cache keys include a playback revision that changes for input and script state even when the global timeline frame stays the same.
+Tick the stereo mirror after the existing player handles input and advances, without adding another animation clock.
+The ordinary player window still owns input unless native input routing has its own implementation and proof.
+
+Trap: a script-override fixture targeted a raw shape and found no override in either eye.
+The evaluator deliberately addresses symbol and text instances; inspect its instance lookup before treating the fixture as a product failure.
+Use a real symbol instance and retain the root instance identity when testing overridden transforms and cache invalidation.
+The corrected fixture and strict engine tests passed.
+
+For a played-sequence proof, author a zero-plane marker whose position encodes the frame number, alongside constant near and far markers.
+Capture several distinct played positions and infer the identity independently from each eye's pixels.
+Freeze only the private test app while sampling a completed native buffer, resume it between samples, and keep the compositor running.
+Require both identities to agree, the analytic layer disparities and vertical alignment, exact native samples, and a wrong-eye control that fails.
+A proof that uses two independent players or only the editor's frame selector cannot establish interactive pairing.
+
+## A wgpu model companion
+
+Keep native presentation in the UI layer and the shared camera algebra below it, without a desktop dependency.
+Use the existing model renderer and its uploaded world; a separate window is not a second simulation.
+Encode the pair in `CallbackTrait::finish_prepare`, after all ordinary viewport `prepare` calls, and map the copies on a later UI frame after submission.
+Keep at most one pending pair, preserve its immutable frame and mesh identity, and present only after both readbacks complete.
+An idle view needs no repeated full-image readback once its content key and private temporal accumulation settle.
+Closing releases the native window, pending copies and both private render targets.
+
+Keep the host optional and create it only when enabled or when its resolution dialog opens.
+The ordinary editor surface remains undeclared and its renderer keeps its original entry point.
+For an explicit per-eye resolution, render directly at that grid and keep it fixed through native window resizes.
+When the default follows an existing viewport, use its rounded physical pixel edges; multiplying only its logical width can disagree by a sample at fractional scale.
+State the default's sampling reason in the dialog, and let the desktop perform the display resize once.
+
+For a whole-window 2D comparison, first identify the UI's live diagnostics.
+If the status bar draws elapsed UI time, feed the same fixed public timing field into the candidate and pristine stock test harness before each frame.
+Compare every output pixel, require the whole picture to be stable, disclose that controlled input and separately prove the actual native ordinary viewport.
+A masked status bar or an unchanged viewport crop cannot establish whole-window identity.
+
+Trap: a new required language appears in the picker but the app has no catalog for it.
+Create an explicitly partial catalog for that app in the shared data repository, retain common translations, and record authorship and native-speaker review status.
+Do not write its words into another app's translation source.
+Retain the app's existing optional languages when adding the required ones.
+Check the font fallback's language mapping too; a translated non-Latin picker name can otherwise fail the app's existing script test.
+A shared Han font is not evidence of a dedicated Traditional Chinese typeface or native-speaker review.

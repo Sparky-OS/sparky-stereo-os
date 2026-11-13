@@ -233,7 +233,7 @@
     },
     "detail": {
       "source": "docs/edition-in-detail.zh-CN.md",
-      "sha256": "6f6bb658bf3f56fa98bfd6224c97a216a0ed66080370bfce6745cd71e7cec3ee",
+      "sha256": "e851c91b876ffebad722d57a623d9720f2e9fe0c4db4ccac1d5fde8c59e009e2",
       "blocks": [
         {
           "type": "heading",
@@ -927,95 +927,95 @@
         },
         {
           "type": "paragraph",
-          "line": 236,
+          "line": 237,
           "key": "detail.credit.paragraph03"
         },
         {
           "type": "paragraph",
-          "line": 238,
+          "line": 239,
           "key": "detail.credit.paragraph04"
         },
         {
           "type": "paragraph",
-          "line": 240,
+          "line": 241,
           "key": "detail.credit.paragraph05"
         },
         {
           "type": "item",
-          "line": 241,
+          "line": 242,
           "key": "detail.credit.item01"
         },
         {
           "type": "item",
-          "line": 242,
+          "line": 243,
           "key": "detail.credit.item02"
         },
         {
           "type": "item",
-          "line": 243,
+          "line": 244,
           "key": "detail.credit.item03"
         },
         {
           "type": "item",
-          "line": 244,
+          "line": 245,
           "key": "detail.credit.item04"
         },
         {
           "type": "item",
-          "line": 245,
+          "line": 246,
           "key": "detail.credit.item05"
         },
         {
           "type": "paragraph",
-          "line": 247,
+          "line": 248,
           "key": "detail.credit.paragraph06"
         },
         {
           "type": "paragraph",
-          "line": 249,
+          "line": 250,
           "key": "detail.credit.paragraph07"
         },
         {
           "type": "paragraph",
-          "line": 251,
+          "line": 252,
           "key": "detail.credit.paragraph08"
         },
         {
           "type": "paragraph",
-          "line": 253,
+          "line": 254,
           "key": "detail.credit.paragraph09"
         },
         {
           "type": "anchors",
           "raw": "<a id=\"licence\"></a>",
-          "line": 255
+          "line": 256
         },
         {
           "type": "heading",
           "level": 2,
-          "line": 256,
+          "line": 257,
           "key": "detail.licence.heading01",
           "id": "许可",
           "english_id": "licence"
         },
         {
           "type": "paragraph",
-          "line": 258,
+          "line": 259,
           "key": "detail.licence.paragraph01"
         },
         {
           "type": "quote",
-          "line": 260,
+          "line": 261,
           "key": "detail.licence.quote01"
         },
         {
           "type": "paragraph",
-          "line": 263,
+          "line": 264,
           "key": "detail.licence.paragraph02"
         },
         {
           "type": "paragraph",
-          "line": 265,
+          "line": 266,
           "key": "detail.licence.paragraph03"
         }
       ],
@@ -1185,10 +1185,11 @@
     "detail.who-builds-it.heading01": "谁在构建",
     "detail.who-builds-it.paragraph01.link01": "https://github.com/Sparky-OS/org.kde.video",
     "detail.who-builds-it.paragraph01.link02": "https://github.com/Sparky-OS/wiz3D",
-    "detail.who-builds-it.paragraph01.link03": "ai-provenance.md",
-    "detail.who-builds-it.paragraph01.link04": "hardware.md",
-    "detail.who-builds-it.paragraph01.link05": "measurements/kwin-stereo-cost-a10-2026-10-23.md",
-    "detail.who-builds-it.paragraph01": "Daniel 来自巴西利亚的一个贫民区，目前有两位人类贡献者：Jeromy Streets，他的 Plasma 视频壁纸（[org.kde.video]({{detail.who-builds-it.paragraph01.link01}})）现已进入 Sparky-OS，并由他维护；还有 Eff（effcol），他让 iZ3D 的代码以 [wiz3D]({{detail.who-builds-it.paragraph01.link02}}) 的形式继续存在，并在这里维护它。\nLinux 上的立体显示已经等待志愿者多年：早期尝试停滞，是因为评审者没有 3D 显示器，而这项工作横跨内核、Mesa、KWin、FFmpeg、播放器和网页标准。\n没有其他开发者站出来接手，所以这里其他的工作伙伴是 AI，由 Daniel 指挥和核对，并列入[AI 来源记录]({{detail.who-builds-it.paragraph01.link03}})。\n如果你更希望它由人类亲手构建，我们非常欢迎：每个 fork 都公开，每个任务都开放。\n所有内容都在两台普通机器上构建和测试：一台家用电脑和一台 2016 年的笔记本（[硬件]({{detail.who-builds-it.paragraph01.link04}})）。\n在那台笔记本上，每个桌面用例在 2D 和 3D 中都保持 24 fps：[KWin 为立体付出的代价，已测量]({{detail.who-builds-it.paragraph01.link05}})。",
+    "detail.who-builds-it.paragraph01.link03": "https://github.com/Sparky-OS/sparky-ca",
+    "detail.who-builds-it.paragraph01.link04": "ai-provenance.md",
+    "detail.who-builds-it.paragraph01.link05": "hardware.md",
+    "detail.who-builds-it.paragraph01.link06": "measurements/kwin-stereo-cost-a10-2026-10-23.md",
+    "detail.who-builds-it.paragraph01": "Daniel 来自巴西利亚的一个贫民区，目前有三位人类贡献者：Jeromy Streets，他的 Plasma 视频壁纸（[org.kde.video]({{detail.who-builds-it.paragraph01.link01}})）现已进入 Sparky-OS，并由他维护；还有 Eff（effcol），他让 iZ3D 的代码以 [wiz3D]({{detail.who-builds-it.paragraph01.link02}}) 的形式继续存在，并在这里维护它；还有 Pedro F. Albanese（pedroalbanese），他是 [Sparky CA]({{detail.who-builds-it.paragraph01.link03}}) 所依赖的 Ed521 签名库的作者，并在这里与 Daniel 一起维护 Sparky CA。\nLinux 上的立体显示已经等待志愿者多年：早期尝试停滞，是因为评审者没有 3D 显示器，而这项工作横跨内核、Mesa、KWin、FFmpeg、播放器和网页标准。\n没有其他开发者站出来接手，所以这里其他的工作伙伴是 AI，由 Daniel 指挥和核对，并列入[AI 来源记录]({{detail.who-builds-it.paragraph01.link04}})。\n如果你更希望它由人类亲手构建，我们非常欢迎：每个 fork 都公开，每个任务都开放。\n所有内容都在两台普通机器上构建和测试：一台家用电脑和一台 2016 年的笔记本（[硬件]({{detail.who-builds-it.paragraph01.link05}})）。\n在那台笔记本上，每个桌面用例在 2D 和 3D 中都保持 24 fps：[KWin 为立体付出的代价，已测量]({{detail.who-builds-it.paragraph01.link06}})。",
     "detail.where-it-is-going.heading01": "去向",
     "detail.where-it-is-going.paragraph01.link01": "https://www.w3.org/community/pm-kr/",
     "detail.where-it-is-going.paragraph01.link02": "https://www.w3.org/publications/spec-generator/?type=respec&url=https://raw.githubusercontent.com/w3c-cg/pm-kr/main/reports/source/stereo-3d-adoption-report.html",
@@ -1348,7 +1349,15 @@
     "detail.credit.table01.alt04": "Follow Jeromy",
     "detail.credit.table01.image04": "https://img.shields.io/badge/Follow-halverneus-2777AD?style=flat-square&logo=github",
     "detail.credit.table01.link07": "https://github.com/halverneus",
-    "detail.credit.table01": "| | |\n| --- | --- |\n| <a href=\"{{detail.credit.table01.link01}}\"><img src=\"{{detail.credit.table01.image01}}\" width=\"72\" alt=\"{{detail.credit.table01.alt01}}\"></a> | **Eff (effcol)**<br>维护[wiz3D]({{detail.credit.table01.link02}})，这是用于 DirectX、OpenGL、AMD HD3D 和 NVIDIA 3D Vision 的通用立体 3D 包装器，基于 iZ3D，面向所有系统，同时维护这里的软件包[Sparky-OS/wiz3D]({{detail.credit.table01.link03}})。<br>[![{{detail.credit.table01.alt02}}]({{detail.credit.table01.image02}})]({{detail.credit.table01.link04}}) |\n| <a href=\"{{detail.credit.table01.link05}}\"><img src=\"{{detail.credit.table01.image03}}\" width=\"72\" alt=\"{{detail.credit.table01.alt03}}\"></a> | **Jeromy Streets (halverneus)**<br>创建并维护[org.kde.video]({{detail.credit.table01.link06}})，这是 KDE Plasma 的视频壁纸和锁屏。<br>[![{{detail.credit.table01.alt04}}]({{detail.credit.table01.image04}})]({{detail.credit.table01.link07}}) |",
+    "detail.credit.table01.link08": "https://github.com/pedroalbanese",
+    "detail.credit.table01.image05": "https://github.com/pedroalbanese.png?size=96",
+    "detail.credit.table01.alt05": "Pedro F. Albanese",
+    "detail.credit.table01.link09": "https://github.com/Sparky-OS/sparky-ca",
+    "detail.credit.table01.link10": "https://github.com/pedroalbanese/e521",
+    "detail.credit.table01.alt06": "Follow Pedro",
+    "detail.credit.table01.image06": "https://img.shields.io/badge/Follow-pedroalbanese-2777AD?style=flat-square&logo=github",
+    "detail.credit.table01.link11": "https://github.com/pedroalbanese",
+    "detail.credit.table01": "| | |\n| --- | --- |\n| <a href=\"{{detail.credit.table01.link01}}\"><img src=\"{{detail.credit.table01.image01}}\" width=\"72\" alt=\"{{detail.credit.table01.alt01}}\"></a> | **Eff (effcol)**<br>维护[wiz3D]({{detail.credit.table01.link02}})，这是用于 DirectX、OpenGL、AMD HD3D 和 NVIDIA 3D Vision 的通用立体 3D 包装器，基于 iZ3D，面向所有系统，同时维护这里的软件包[Sparky-OS/wiz3D]({{detail.credit.table01.link03}})。<br>[![{{detail.credit.table01.alt02}}]({{detail.credit.table01.image02}})]({{detail.credit.table01.link04}}) |\n| <a href=\"{{detail.credit.table01.link05}}\"><img src=\"{{detail.credit.table01.image03}}\" width=\"72\" alt=\"{{detail.credit.table01.alt03}}\"></a> | **Jeromy Streets (halverneus)**<br>创建并维护[org.kde.video]({{detail.credit.table01.link06}})，这是 KDE Plasma 的视频壁纸和锁屏。<br>[![{{detail.credit.table01.alt04}}]({{detail.credit.table01.image04}})]({{detail.credit.table01.link07}}) |\n| <a href=\"{{detail.credit.table01.link08}}\"><img src=\"{{detail.credit.table01.image05}}\" width=\"72\" alt=\"{{detail.credit.table01.alt05}}\"></a> | **Pedro F. Albanese (pedroalbanese)**<br>与 Daniel 一起维护 [Sparky CA]({{detail.credit.table01.link09}})，这是安装巴西 ICP-Brasil 证书并使其保持最新的工具；他是 [e521]({{detail.credit.table01.link10}}) 的作者，该库实现了 ICP-Brasil 一个根证书所用的 Ed521 签名。<br>[![{{detail.credit.table01.alt06}}]({{detail.credit.table01.image06}})]({{detail.credit.table01.link11}}) |",
     "detail.credit.paragraph03": "**版本：**Sparky Stereo OS 9 \"Mashtabba\"，基于 Debian 14 \"Forky\"，仅使用 KDE Plasma。",
     "detail.credit.paragraph04.link01": "../ATTRIBUTIONS.md",
     "detail.credit.paragraph04": "这个发行版立足的所有人，逐名列出：[ATTRIBUTIONS.md]({{detail.credit.paragraph04.link01}})。",

@@ -218,7 +218,7 @@
     },
     "detail": {
       "source": "docs/edition-in-detail.md",
-      "sha256": "81a8fd9ac913d8f7474fe0a2ec2460a1904c4cd51f19b26234407a584637cf6c",
+      "sha256": "7515a31014d9d471bc5636460887b3a049c0a88ea1f1f01875932b88db44b03c",
       "blocks": [
         {
           "type": "heading",
@@ -851,90 +851,90 @@
         },
         {
           "type": "paragraph",
-          "line": 219,
+          "line": 220,
           "key": "detail.credit.paragraph03"
         },
         {
           "type": "paragraph",
-          "line": 221,
+          "line": 222,
           "key": "detail.credit.paragraph04"
         },
         {
           "type": "paragraph",
-          "line": 223,
+          "line": 224,
           "key": "detail.credit.paragraph05"
         },
         {
           "type": "item",
-          "line": 224,
+          "line": 225,
           "key": "detail.credit.item01"
         },
         {
           "type": "item",
-          "line": 225,
+          "line": 226,
           "key": "detail.credit.item02"
         },
         {
           "type": "item",
-          "line": 226,
+          "line": 227,
           "key": "detail.credit.item03"
         },
         {
           "type": "item",
-          "line": 227,
+          "line": 228,
           "key": "detail.credit.item04"
         },
         {
           "type": "item",
-          "line": 228,
+          "line": 229,
           "key": "detail.credit.item05"
         },
         {
           "type": "paragraph",
-          "line": 230,
+          "line": 231,
           "key": "detail.credit.paragraph06"
         },
         {
           "type": "paragraph",
-          "line": 232,
+          "line": 233,
           "key": "detail.credit.paragraph07"
         },
         {
           "type": "paragraph",
-          "line": 234,
+          "line": 235,
           "key": "detail.credit.paragraph08"
         },
         {
           "type": "paragraph",
-          "line": 236,
+          "line": 237,
           "key": "detail.credit.paragraph09"
         },
         {
           "type": "heading",
           "level": 2,
-          "line": 238,
+          "line": 239,
           "key": "detail.licence.heading01",
           "id": "licence",
           "english_id": "licence"
         },
         {
           "type": "paragraph",
-          "line": 240,
+          "line": 241,
           "key": "detail.licence.paragraph01"
         },
         {
           "type": "quote",
-          "line": 242,
+          "line": 243,
           "key": "detail.licence.quote01"
         },
         {
           "type": "paragraph",
-          "line": 245,
+          "line": 246,
           "key": "detail.licence.paragraph02"
         },
         {
           "type": "paragraph",
-          "line": 247,
+          "line": 248,
           "key": "detail.licence.paragraph03"
         }
       ],
@@ -1240,10 +1240,11 @@
     "detail.who-builds-it.heading01": "Who builds it",
     "detail.who-builds-it.paragraph01.link01": "https://github.com/Sparky-OS/org.kde.video",
     "detail.who-builds-it.paragraph01.link02": "https://github.com/Sparky-OS/wiz3D",
-    "detail.who-builds-it.paragraph01.link03": "ai-provenance.md",
-    "detail.who-builds-it.paragraph01.link04": "hardware.md",
-    "detail.who-builds-it.paragraph01.link05": "measurements/kwin-stereo-cost-a10-2026-10-23.md",
-    "detail.who-builds-it.paragraph01": "Daniel, from a favela in Brasília, with two human contributors so far: Jeromy Streets, whose video wallpaper for Plasma ([org.kde.video]({{detail.who-builds-it.paragraph01.link01}})) now lives in Sparky-OS with him as its maintainer, and Eff (effcol), who keeps iZ3D's code alive as [wiz3D]({{detail.who-builds-it.paragraph01.link02}}) and maintains it here.\nStereo on Linux waited years for volunteers: earlier attempts stalled because reviewers had no 3D display, and the work spans the kernel, Mesa, KWin, FFmpeg, the players and the web standards.\nNo other developer came forward to carry it, so the other partners at work here are AI ones, directed and checked by Daniel and named in [AI provenance]({{detail.who-builds-it.paragraph01.link03}}).\nIf you would rather see it built by human hands, you are more than welcome: every fork is public, and every task is open.\nIt is all built and tested on two ordinary machines, a home PC and a 2016 laptop: [the hardware]({{detail.who-builds-it.paragraph01.link04}}).\nOn that laptop, every desktop case holds 24 fps in 2D and 3D: [what stereo costs KWin, measured]({{detail.who-builds-it.paragraph01.link05}}).",
+    "detail.who-builds-it.paragraph01.link03": "https://github.com/Sparky-OS/sparky-ca",
+    "detail.who-builds-it.paragraph01.link04": "ai-provenance.md",
+    "detail.who-builds-it.paragraph01.link05": "hardware.md",
+    "detail.who-builds-it.paragraph01.link06": "measurements/kwin-stereo-cost-a10-2026-10-23.md",
+    "detail.who-builds-it.paragraph01": "Daniel, from a favela in Brasília, with three human contributors so far: Jeromy Streets, whose video wallpaper for Plasma ([org.kde.video]({{detail.who-builds-it.paragraph01.link01}})) now lives in Sparky-OS with him as its maintainer, and Eff (effcol), who keeps iZ3D's code alive as [wiz3D]({{detail.who-builds-it.paragraph01.link02}}) and maintains it here, and Pedro F. Albanese (pedroalbanese), who wrote the Ed521 signature library that [Sparky CA]({{detail.who-builds-it.paragraph01.link03}}) relies on and maintains Sparky CA here with Daniel.\nStereo on Linux waited years for volunteers: earlier attempts stalled because reviewers had no 3D display, and the work spans the kernel, Mesa, KWin, FFmpeg, the players and the web standards.\nNo other developer came forward to carry it, so the other partners at work here are AI ones, directed and checked by Daniel and named in [AI provenance]({{detail.who-builds-it.paragraph01.link04}}).\nIf you would rather see it built by human hands, you are more than welcome: every fork is public, and every task is open.\nIt is all built and tested on two ordinary machines, a home PC and a 2016 laptop: [the hardware]({{detail.who-builds-it.paragraph01.link05}}).\nOn that laptop, every desktop case holds 24 fps in 2D and 3D: [what stereo costs KWin, measured]({{detail.who-builds-it.paragraph01.link06}}).",
     "detail.where-it-is-going.heading01": "Where it is going",
     "detail.where-it-is-going.paragraph01.link01": "https://www.w3.org/community/pm-kr/",
     "detail.where-it-is-going.paragraph01.link02": "https://www.w3.org/publications/spec-generator/?type=respec&url=https://raw.githubusercontent.com/w3c-cg/pm-kr/main/reports/source/stereo-3d-adoption-report.html",
@@ -1410,7 +1411,15 @@
     "detail.credit.table01.alt04": "Follow Jeromy",
     "detail.credit.table01.image04": "https://img.shields.io/badge/Follow-halverneus-2777AD?style=flat-square&logo=github",
     "detail.credit.table01.link07": "https://github.com/halverneus",
-    "detail.credit.table01": "| | |\n| --- | --- |\n| <a href=\"{{detail.credit.table01.link01}}\"><img src=\"{{detail.credit.table01.image01}}\" width=\"72\" alt=\"{{detail.credit.table01.alt01}}\"></a> | **Eff (effcol)**<br>Maintains [wiz3D]({{detail.credit.table01.link02}}), the universal stereoscopic 3D wrapper for DirectX, OpenGL, AMD HD3D and NVIDIA 3D Vision, based on iZ3D, for every system, and its package here, [Sparky-OS/wiz3D]({{detail.credit.table01.link03}}).<br>[![{{detail.credit.table01.alt02}}]({{detail.credit.table01.image02}})]({{detail.credit.table01.link04}}) |\n| <a href=\"{{detail.credit.table01.link05}}\"><img src=\"{{detail.credit.table01.image03}}\" width=\"72\" alt=\"{{detail.credit.table01.alt03}}\"></a> | **Jeromy Streets (halverneus)**<br>Created and maintains [org.kde.video]({{detail.credit.table01.link06}}), the video wallpaper and lock screen for KDE Plasma.<br>[![{{detail.credit.table01.alt04}}]({{detail.credit.table01.image04}})]({{detail.credit.table01.link07}}) |",
+    "detail.credit.table01.link08": "https://github.com/pedroalbanese",
+    "detail.credit.table01.image05": "https://github.com/pedroalbanese.png?size=96",
+    "detail.credit.table01.alt05": "Pedro F. Albanese",
+    "detail.credit.table01.link09": "https://github.com/Sparky-OS/sparky-ca",
+    "detail.credit.table01.link10": "https://github.com/pedroalbanese/e521",
+    "detail.credit.table01.alt06": "Follow Pedro",
+    "detail.credit.table01.image06": "https://img.shields.io/badge/Follow-pedroalbanese-2777AD?style=flat-square&logo=github",
+    "detail.credit.table01.link11": "https://github.com/pedroalbanese",
+    "detail.credit.table01": "| | |\n| --- | --- |\n| <a href=\"{{detail.credit.table01.link01}}\"><img src=\"{{detail.credit.table01.image01}}\" width=\"72\" alt=\"{{detail.credit.table01.alt01}}\"></a> | **Eff (effcol)**<br>Maintains [wiz3D]({{detail.credit.table01.link02}}), the universal stereoscopic 3D wrapper for DirectX, OpenGL, AMD HD3D and NVIDIA 3D Vision, based on iZ3D, for every system, and its package here, [Sparky-OS/wiz3D]({{detail.credit.table01.link03}}).<br>[![{{detail.credit.table01.alt02}}]({{detail.credit.table01.image02}})]({{detail.credit.table01.link04}}) |\n| <a href=\"{{detail.credit.table01.link05}}\"><img src=\"{{detail.credit.table01.image03}}\" width=\"72\" alt=\"{{detail.credit.table01.alt03}}\"></a> | **Jeromy Streets (halverneus)**<br>Created and maintains [org.kde.video]({{detail.credit.table01.link06}}), the video wallpaper and lock screen for KDE Plasma.<br>[![{{detail.credit.table01.alt04}}]({{detail.credit.table01.image04}})]({{detail.credit.table01.link07}}) |\n| <a href=\"{{detail.credit.table01.link08}}\"><img src=\"{{detail.credit.table01.image05}}\" width=\"72\" alt=\"{{detail.credit.table01.alt05}}\"></a> | **Pedro F. Albanese (pedroalbanese)**<br>Maintains [Sparky CA]({{detail.credit.table01.link09}}) with Daniel, the tool that installs Brazil's ICP-Brasil certificates and keeps them current, and wrote [e521]({{detail.credit.table01.link10}}), the library for the Ed521 signatures that one ICP-Brasil root uses.<br>[![{{detail.credit.table01.alt06}}]({{detail.credit.table01.image06}})]({{detail.credit.table01.link11}}) |",
     "detail.credit.paragraph03": "**Version:** Sparky Stereo OS 9 \"Mashtabba\", based on Debian 14 \"Forky\", KDE Plasma only.",
     "detail.credit.paragraph04.link01": "../ATTRIBUTIONS.md",
     "detail.credit.paragraph04": "Everyone this edition stands on, by name: [ATTRIBUTIONS.md]({{detail.credit.paragraph04.link01}}).",

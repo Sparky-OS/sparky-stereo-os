@@ -233,7 +233,7 @@
     },
     "detail": {
       "source": "docs/edition-in-detail.ja.md",
-      "sha256": "0c873b62c6234fc98284c7ca21deac2d174b7ad188c9bbad07dcc2b585becac2",
+      "sha256": "8389b86d3a7d058b34aaa8450782587a415b57ac13146327673601fb52f52f07",
       "blocks": [
         {
           "type": "heading",
@@ -377,645 +377,645 @@
         {
           "type": "anchors",
           "raw": "<a id=\"where-it-is-going\"></a>",
-          "line": 84
+          "line": 85
         },
         {
           "type": "heading",
           "level": 2,
-          "line": 85,
+          "line": 86,
           "key": "detail.where-it-is-going.heading01",
           "id": "今後の方向性",
           "english_id": "where-it-is-going"
         },
         {
           "type": "paragraph",
-          "line": 87,
+          "line": 88,
           "key": "detail.where-it-is-going.paragraph01"
         },
         {
           "type": "anchors",
           "raw": "<a id=\"create\"></a>",
-          "line": 95
+          "line": 96
         },
         {
           "type": "heading",
           "level": 2,
-          "line": 96,
+          "line": 97,
           "key": "detail.create.heading01",
           "id": "制作",
           "english_id": "create"
         },
         {
           "type": "paragraph",
-          "line": 98,
+          "line": 99,
           "key": "detail.create.paragraph01"
         },
         {
           "type": "paragraph",
-          "line": 101,
+          "line": 102,
           "key": "detail.create.paragraph02"
         },
         {
           "type": "item",
-          "line": 107,
+          "line": 108,
           "key": "detail.create.item01"
         },
         {
           "type": "item",
-          "line": 108,
+          "line": 109,
           "key": "detail.create.item02"
         },
         {
           "type": "item",
-          "line": 110,
+          "line": 111,
           "key": "detail.create.item03"
         },
         {
           "type": "item",
-          "line": 111,
+          "line": 112,
           "key": "detail.create.item04"
         },
         {
           "type": "item",
-          "line": 113,
+          "line": 114,
           "key": "detail.create.item05"
         },
         {
           "type": "anchors",
           "raw": "<a id=\"scan\"></a>",
-          "line": 117
+          "line": 118
         },
         {
           "type": "paragraph",
-          "line": 118,
+          "line": 119,
           "key": "detail.create.paragraph03"
         },
         {
           "type": "paragraph",
-          "line": 130,
+          "line": 131,
           "key": "detail.create.paragraph04"
         },
         {
           "type": "anchors",
           "raw": "<a id=\"for-theme-designers-and-customizers\"></a>",
-          "line": 132
+          "line": 133
         },
         {
           "type": "heading",
           "level": 3,
-          "line": 133,
+          "line": 134,
           "key": "detail.for-theme-designers-and-customizers.heading01",
           "id": "テーマをデザインカスタマイズする方へ",
           "english_id": "for-theme-designers-and-customizers"
         },
         {
           "type": "paragraph",
-          "line": 135,
+          "line": 136,
           "key": "detail.for-theme-designers-and-customizers.paragraph01"
         },
         {
           "type": "anchors",
           "raw": "<a id=\"science-and-engineering\"></a>",
-          "line": 137
+          "line": 138
         },
         {
           "type": "heading",
           "level": 2,
-          "line": 138,
+          "line": 139,
           "key": "detail.science-and-engineering.heading01",
           "id": "科学と工学",
           "english_id": "science-and-engineering"
         },
         {
           "type": "paragraph",
-          "line": 140,
+          "line": 141,
           "key": "detail.science-and-engineering.paragraph01"
         },
         {
           "type": "item",
-          "line": 142,
+          "line": 143,
           "key": "detail.science-and-engineering.item01"
         },
         {
           "type": "item",
-          "line": 143,
+          "line": 144,
           "key": "detail.science-and-engineering.item02"
         },
         {
           "type": "item",
-          "line": 144,
+          "line": 145,
           "key": "detail.science-and-engineering.item03"
         },
         {
           "type": "item",
-          "line": 145,
+          "line": 146,
           "key": "detail.science-and-engineering.item04"
         },
         {
           "type": "paragraph",
-          "line": 148,
+          "line": 149,
           "key": "detail.science-and-engineering.paragraph02"
         },
         {
           "type": "anchors",
           "raw": "<a id=\"watch-and-play\"></a>",
-          "line": 150
+          "line": 151
         },
         {
           "type": "heading",
           "level": 2,
-          "line": 151,
+          "line": 152,
           "key": "detail.watch-and-play.heading01",
           "id": "鑑賞とゲーム",
           "english_id": "watch-and-play"
         },
         {
           "type": "paragraph",
-          "line": 153,
+          "line": 154,
           "key": "detail.watch-and-play.paragraph01"
         },
         {
           "type": "item",
-          "line": 154,
+          "line": 155,
           "key": "detail.watch-and-play.item01"
         },
         {
           "type": "item",
-          "line": 156,
+          "line": 157,
           "key": "detail.watch-and-play.item02"
         },
         {
           "type": "item",
-          "line": 157,
+          "line": 158,
           "key": "detail.watch-and-play.item03"
         },
         {
           "type": "item",
-          "line": 158,
+          "line": 159,
           "key": "detail.watch-and-play.item04"
         },
         {
           "type": "item",
-          "line": 159,
+          "line": 160,
           "key": "detail.watch-and-play.item05"
         },
         {
           "type": "paragraph",
-          "line": 163,
+          "line": 164,
           "key": "detail.watch-and-play.paragraph02"
         },
         {
           "type": "anchors",
           "raw": "<a id=\"seen-in-3d\"></a>",
-          "line": 165
+          "line": 166
         },
         {
           "type": "heading",
           "level": 3,
-          "line": 166,
+          "line": 167,
           "key": "detail.seen-in-3d.heading01",
           "id": "3dで見る",
           "english_id": "seen-in-3d"
         },
         {
           "type": "paragraph",
-          "line": 168,
+          "line": 169,
           "key": "detail.seen-in-3d.paragraph01"
         },
         {
           "type": "item",
-          "line": 174,
+          "line": 175,
           "key": "detail.seen-in-3d.item01"
         },
         {
           "type": "item",
-          "line": 181,
+          "line": 182,
           "key": "detail.seen-in-3d.item02"
         },
         {
           "type": "item",
-          "line": 186,
+          "line": 187,
           "key": "detail.seen-in-3d.item03"
         },
         {
           "type": "item",
-          "line": 190,
+          "line": 191,
           "key": "detail.seen-in-3d.item04"
         },
         {
           "type": "item",
-          "line": 194,
+          "line": 195,
           "key": "detail.seen-in-3d.item05"
         },
         {
           "type": "anchors",
           "raw": "<a id=\"depth-on-the-desktop\"></a>",
-          "line": 199
+          "line": 200
         },
         {
           "type": "anchors",
           "raw": "<a id=\"the-stereo-desktop-new-frontiers-for-theme-design\"></a>",
-          "line": 200
+          "line": 201
         },
         {
           "type": "heading",
           "level": 2,
-          "line": 201,
+          "line": 202,
           "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.heading01",
           "id": "ステレオデスクトップテーマデザインの新しい領域",
           "english_id": "the-stereo-desktop-new-frontiers-for-theme-design"
         },
         {
           "type": "paragraph",
-          "line": 203,
+          "line": 204,
           "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph01"
         },
         {
           "type": "item",
-          "line": 207,
+          "line": 208,
           "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item01"
         },
         {
           "type": "item",
-          "line": 209,
+          "line": 210,
           "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item02"
         },
         {
           "type": "item",
-          "line": 211,
+          "line": 212,
           "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item03"
         },
         {
           "type": "item",
-          "line": 214,
+          "line": 215,
           "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item04"
         },
         {
           "type": "item",
-          "line": 218,
+          "line": 219,
           "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item05"
         },
         {
           "type": "item",
-          "line": 220,
+          "line": 221,
           "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item06"
         },
         {
           "type": "item",
-          "line": 224,
+          "line": 225,
           "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item07"
         },
         {
           "type": "item",
-          "line": 228,
+          "line": 229,
           "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item08"
         },
         {
           "type": "paragraph",
-          "line": 231,
+          "line": 232,
           "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph02"
         },
         {
           "type": "paragraph",
-          "line": 236,
+          "line": 237,
           "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03"
         },
         {
           "type": "anchors",
           "raw": "<a id=\"for-developers\"></a>",
-          "line": 239
+          "line": 240
         },
         {
           "type": "heading",
           "level": 2,
-          "line": 240,
+          "line": 241,
           "key": "detail.for-developers.heading01",
           "id": "開発者向け",
           "english_id": "for-developers"
         },
         {
           "type": "paragraph",
-          "line": 242,
+          "line": 243,
           "key": "detail.for-developers.paragraph01"
         },
         {
           "type": "item",
-          "line": 244,
+          "line": 245,
           "key": "detail.for-developers.item01"
         },
         {
           "type": "item",
-          "line": 245,
+          "line": 246,
           "key": "detail.for-developers.item02"
         },
         {
           "type": "item",
-          "line": 246,
+          "line": 247,
           "key": "detail.for-developers.item03"
         },
         {
           "type": "item",
-          "line": 247,
+          "line": 248,
           "key": "detail.for-developers.item04"
         },
         {
           "type": "item",
-          "line": 249,
+          "line": 250,
           "key": "detail.for-developers.item05"
         },
         {
           "type": "anchors",
           "raw": "<a id=\"how-it-works\"></a>",
-          "line": 251
+          "line": 252
         },
         {
           "type": "heading",
           "level": 2,
-          "line": 252,
+          "line": 253,
           "key": "detail.how-it-works.heading01",
           "id": "仕組み",
           "english_id": "how-it-works"
         },
         {
           "type": "paragraph",
-          "line": 254,
+          "line": 255,
           "key": "detail.how-it-works.paragraph01"
         },
         {
           "type": "paragraph",
-          "line": 258,
+          "line": 259,
           "key": "detail.how-it-works.paragraph02"
         },
         {
           "type": "item",
-          "line": 259,
+          "line": 260,
           "key": "detail.how-it-works.item01"
         },
         {
           "type": "item",
-          "line": 260,
+          "line": 261,
           "key": "detail.how-it-works.item02"
         },
         {
           "type": "item",
-          "line": 261,
+          "line": 262,
           "key": "detail.how-it-works.item03"
         },
         {
           "type": "paragraph",
-          "line": 263,
+          "line": 264,
           "key": "detail.how-it-works.paragraph03"
         },
         {
           "type": "anchors",
           "raw": "<a id=\"stereo-in-the-open-stack-not-in-one-product\"></a>",
-          "line": 268
+          "line": 269
         },
         {
           "type": "heading",
           "level": 2,
-          "line": 269,
+          "line": 270,
           "key": "detail.stereo-in-the-open-stack-not-in-one-product.heading01",
           "id": "一つの製品ではなくオープンなスタックでステレオを",
           "english_id": "stereo-in-the-open-stack-not-in-one-product"
         },
         {
           "type": "paragraph",
-          "line": 271,
+          "line": 272,
           "key": "detail.stereo-in-the-open-stack-not-in-one-product.paragraph01"
         },
         {
           "type": "anchors",
           "raw": "<a id=\"programs-the-edition-changes-for-stereo-3d-and-deep-colour\"></a>",
-          "line": 274
+          "line": 275
         },
         {
           "type": "heading",
           "level": 2,
-          "line": 275,
+          "line": 276,
           "key": "detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.heading01",
           "id": "ステレオ3dとディープカラーのために変更するプログラム",
           "english_id": "programs-the-edition-changes-for-stereo-3d-and-deep-colour"
         },
         {
           "type": "paragraph",
-          "line": 277,
+          "line": 278,
           "key": "detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.paragraph01"
         },
         {
           "type": "anchors",
           "raw": "<a id=\"our-branches-on-kdes-gitlab\"></a>",
-          "line": 280
+          "line": 281
         },
         {
           "type": "heading",
           "level": 2,
-          "line": 281,
+          "line": 282,
           "key": "detail.our-branches-on-kdes-gitlab.heading01",
           "id": "kdeのgitlabにある私たちのブランチ",
           "english_id": "our-branches-on-kdes-gitlab"
         },
         {
           "type": "paragraph",
-          "line": 283,
+          "line": 284,
           "key": "detail.our-branches-on-kdes-gitlab.paragraph01"
         },
         {
           "type": "anchors",
           "raw": "<a id=\"merged-outside-sparky-stereo\"></a>",
-          "line": 285
+          "line": 286
         },
         {
           "type": "heading",
           "level": 2,
-          "line": 286,
+          "line": 287,
           "key": "detail.merged-outside-sparky-stereo.heading01",
           "id": "sparky-stereoの外でマージされた成果",
           "english_id": "merged-outside-sparky-stereo"
         },
         {
           "type": "paragraph",
-          "line": 288,
+          "line": 289,
           "key": "detail.merged-outside-sparky-stereo.paragraph01"
         },
         {
           "type": "paragraph",
-          "line": 294,
+          "line": 295,
           "key": "detail.merged-outside-sparky-stereo.paragraph02"
         },
         {
           "type": "anchors",
           "raw": "<a id=\"documents\"></a>",
-          "line": 300
+          "line": 301
         },
         {
           "type": "heading",
           "level": 2,
-          "line": 301,
+          "line": 302,
           "key": "detail.documents.heading01",
           "id": "ドキュメント",
           "english_id": "documents"
         },
         {
           "type": "paragraph",
-          "line": 303,
+          "line": 304,
           "key": "detail.documents.paragraph01"
         },
         {
           "type": "anchors",
           "raw": "<a id=\"tools\"></a>",
-          "line": 306
+          "line": 307
         },
         {
           "type": "heading",
           "level": 2,
-          "line": 307,
+          "line": 308,
           "key": "detail.tools.heading01",
           "id": "ツール",
           "english_id": "tools"
         },
         {
           "type": "paragraph",
-          "line": 309,
+          "line": 310,
           "key": "detail.tools.paragraph01"
         },
         {
           "type": "anchors",
           "raw": "<a id=\"the-base-three-open-lists\"></a>",
-          "line": 312
+          "line": 313
         },
         {
           "type": "heading",
           "level": 2,
-          "line": 313,
+          "line": 314,
           "key": "detail.the-base-three-open-lists.heading01",
           "id": "基盤となる三つのオープンなリスト",
           "english_id": "the-base-three-open-lists"
         },
         {
           "type": "paragraph",
-          "line": 315,
+          "line": 316,
           "key": "detail.the-base-three-open-lists.paragraph01"
         },
         {
           "type": "anchors",
           "raw": "<a id=\"credit\"></a>",
-          "line": 318
+          "line": 319
         },
         {
           "type": "heading",
           "level": 2,
-          "line": 319,
+          "line": 320,
           "key": "detail.credit.heading01",
           "id": "クレジット",
           "english_id": "credit"
         },
         {
           "type": "paragraph",
-          "line": 321,
+          "line": 322,
           "key": "detail.credit.paragraph01"
         },
         {
           "type": "paragraph",
-          "line": 323,
+          "line": 324,
           "key": "detail.credit.paragraph02"
         },
         {
           "type": "table",
-          "line": 325,
+          "line": 326,
           "key": "detail.credit.table01"
         },
         {
           "type": "paragraph",
-          "line": 330,
+          "line": 332,
           "key": "detail.credit.paragraph03"
         },
         {
           "type": "paragraph",
-          "line": 333,
+          "line": 335,
           "key": "detail.credit.paragraph04"
         },
         {
           "type": "paragraph",
-          "line": 335,
+          "line": 337,
           "key": "detail.credit.paragraph05"
         },
         {
           "type": "item",
-          "line": 336,
+          "line": 338,
           "key": "detail.credit.item01"
         },
         {
           "type": "item",
-          "line": 338,
+          "line": 340,
           "key": "detail.credit.item02"
         },
         {
           "type": "item",
-          "line": 340,
+          "line": 342,
           "key": "detail.credit.item03"
         },
         {
           "type": "item",
-          "line": 341,
+          "line": 343,
           "key": "detail.credit.item04"
         },
         {
           "type": "item",
-          "line": 342,
+          "line": 344,
           "key": "detail.credit.item05"
         },
         {
           "type": "paragraph",
-          "line": 346,
+          "line": 348,
           "key": "detail.credit.paragraph06"
         },
         {
           "type": "paragraph",
-          "line": 348,
+          "line": 350,
           "key": "detail.credit.paragraph07"
         },
         {
           "type": "paragraph",
-          "line": 350,
+          "line": 352,
           "key": "detail.credit.paragraph08"
         },
         {
           "type": "paragraph",
-          "line": 352,
+          "line": 354,
           "key": "detail.credit.paragraph09"
         },
         {
           "type": "anchors",
           "raw": "<a id=\"licence\"></a>",
-          "line": 354
+          "line": 356
         },
         {
           "type": "heading",
           "level": 2,
-          "line": 355,
+          "line": 357,
           "key": "detail.licence.heading01",
           "id": "ライセンス",
           "english_id": "licence"
         },
         {
           "type": "paragraph",
-          "line": 357,
+          "line": 359,
           "key": "detail.licence.paragraph01"
         },
         {
           "type": "quote",
-          "line": 360,
+          "line": 362,
           "key": "detail.licence.quote01"
         },
         {
           "type": "paragraph",
-          "line": 364,
+          "line": 366,
           "key": "detail.licence.paragraph02"
         },
         {
           "type": "paragraph",
-          "line": 367,
+          "line": 369,
           "key": "detail.licence.paragraph03"
         }
       ],
@@ -1185,10 +1185,11 @@
     "detail.who-builds-it.heading01": "制作している人",
     "detail.who-builds-it.paragraph01.link01": "https://github.com/Sparky-OS/org.kde.video",
     "detail.who-builds-it.paragraph01.link02": "https://github.com/Sparky-OS/wiz3D",
-    "detail.who-builds-it.paragraph01.link03": "ai-provenance.md",
-    "detail.who-builds-it.paragraph01.link04": "hardware.md",
-    "detail.who-builds-it.paragraph01.link05": "measurements/kwin-stereo-cost-a10-2026-10-23.md",
-    "detail.who-builds-it.paragraph01": "ブラジリアのファヴェーラからDanielが制作し、これまでに二人の人間の貢献者が参加しています。\nJeromy StreetsのPlasma向け動画壁紙（[org.kde.video]({{detail.who-builds-it.paragraph01.link01}})）は、現在はSparky-OSに置かれ、本人がメンテナーを務めています。\nEff (effcol)は、iZ3Dのコードを[wiz3D]({{detail.who-builds-it.paragraph01.link02}})として存続させ、ここで保守しています。\nLinuxのステレオ対応は何年もボランティアを待っていました。\n以前の取り組みはレビュー担当者に3Dディスプレイがなかったために停滞し、作業はカーネル、Mesa、KWin、FFmpeg、プレーヤー、ウェブ標準にまたがります。\nほかにこの作業を引き受ける開発者が現れなかったため、ここで働くほかのパートナーはAIで、Danielが指示と検証を行い、[AIによる貢献の記録]({{detail.who-builds-it.paragraph01.link03}})に名前を記しています。\n人の手で作りたいと思う方の参加も歓迎します。\nすべてのフォークを公開し、どの作業にも参加できます。\nビルドとテストはすべて、家庭用PCと2016年製ノートPCという普通の2台で行っています：[使用機器]({{detail.who-builds-it.paragraph01.link04}})。\nそのノートPCでは、デスクトップのすべてのテストケースで2Dでも3Dでも24 fpsを維持しています：[KWinのステレオ表示にかかる負荷の実測]({{detail.who-builds-it.paragraph01.link05}})。",
+    "detail.who-builds-it.paragraph01.link03": "https://github.com/Sparky-OS/sparky-ca",
+    "detail.who-builds-it.paragraph01.link04": "ai-provenance.md",
+    "detail.who-builds-it.paragraph01.link05": "hardware.md",
+    "detail.who-builds-it.paragraph01.link06": "measurements/kwin-stereo-cost-a10-2026-10-23.md",
+    "detail.who-builds-it.paragraph01": "ブラジリアのファヴェーラからDanielが制作し、これまでに三人の人間の貢献者が参加しています。\nJeromy StreetsのPlasma向け動画壁紙（[org.kde.video]({{detail.who-builds-it.paragraph01.link01}})）は、現在はSparky-OSに置かれ、本人がメンテナーを務めています。\nEff (effcol)は、iZ3Dのコードを[wiz3D]({{detail.who-builds-it.paragraph01.link02}})として存続させ、ここで保守しています。\nPedro F. Albanese (pedroalbanese)は、[Sparky CA]({{detail.who-builds-it.paragraph01.link03}})が依拠するEd521署名ライブラリの作者で、ここでDanielとともにSparky CAを保守しています。\nLinuxのステレオ対応は何年もボランティアを待っていました。\n以前の取り組みはレビュー担当者に3Dディスプレイがなかったために停滞し、作業はカーネル、Mesa、KWin、FFmpeg、プレーヤー、ウェブ標準にまたがります。\nほかにこの作業を引き受ける開発者が現れなかったため、ここで働くほかのパートナーはAIで、Danielが指示と検証を行い、[AIによる貢献の記録]({{detail.who-builds-it.paragraph01.link04}})に名前を記しています。\n人の手で作りたいと思う方の参加も歓迎します。\nすべてのフォークを公開し、どの作業にも参加できます。\nビルドとテストはすべて、家庭用PCと2016年製ノートPCという普通の2台で行っています：[使用機器]({{detail.who-builds-it.paragraph01.link05}})。\nそのノートPCでは、デスクトップのすべてのテストケースで2Dでも3Dでも24 fpsを維持しています：[KWinのステレオ表示にかかる負荷の実測]({{detail.who-builds-it.paragraph01.link06}})。",
     "detail.where-it-is-going.heading01": "今後の方向性",
     "detail.where-it-is-going.paragraph01.link01": "https://www.w3.org/community/pm-kr/",
     "detail.where-it-is-going.paragraph01.link02": "https://www.w3.org/publications/spec-generator/?type=respec&url=https://raw.githubusercontent.com/w3c-cg/pm-kr/main/reports/source/stereo-3d-adoption-report.html",
@@ -1348,7 +1349,15 @@
     "detail.credit.table01.alt04": "Jeromyをフォロー",
     "detail.credit.table01.image04": "https://img.shields.io/badge/Follow-halverneus-2777AD?style=flat-square&logo=github",
     "detail.credit.table01.link07": "https://github.com/halverneus",
-    "detail.credit.table01": "| | |\n| --- | --- |\n| <a href=\"{{detail.credit.table01.link01}}\"><img src=\"{{detail.credit.table01.image01}}\" width=\"72\" alt=\"{{detail.credit.table01.alt01}}\"></a> | **Eff (effcol)**<br>[wiz3D]({{detail.credit.table01.link02}})と、このエディション向けのパッケージ[Sparky-OS/wiz3D]({{detail.credit.table01.link03}})を保守しています。wiz3DはiZ3Dを基にした、DirectX、OpenGL、AMD HD3D、NVIDIA 3D Vision向けの汎用ステレオスコピック3Dラッパーで、あらゆるシステムを対象とします。<br>[![{{detail.credit.table01.alt02}}]({{detail.credit.table01.image02}})]({{detail.credit.table01.link04}}) |\n| <a href=\"{{detail.credit.table01.link05}}\"><img src=\"{{detail.credit.table01.image03}}\" width=\"72\" alt=\"{{detail.credit.table01.alt03}}\"></a> | **Jeromy Streets (halverneus)**<br>KDE Plasma向けの動画壁紙とロック画面、[org.kde.video]({{detail.credit.table01.link06}})を作成し、保守しています。<br>[![{{detail.credit.table01.alt04}}]({{detail.credit.table01.image04}})]({{detail.credit.table01.link07}}) |",
+    "detail.credit.table01.link08": "https://github.com/pedroalbanese",
+    "detail.credit.table01.image05": "https://github.com/pedroalbanese.png?size=96",
+    "detail.credit.table01.alt05": "Pedro F. Albanese",
+    "detail.credit.table01.link09": "https://github.com/Sparky-OS/sparky-ca",
+    "detail.credit.table01.link10": "https://github.com/pedroalbanese/e521",
+    "detail.credit.table01.alt06": "Pedroをフォロー",
+    "detail.credit.table01.image06": "https://img.shields.io/badge/Follow-pedroalbanese-2777AD?style=flat-square&logo=github",
+    "detail.credit.table01.link11": "https://github.com/pedroalbanese",
+    "detail.credit.table01": "| | |\n| --- | --- |\n| <a href=\"{{detail.credit.table01.link01}}\"><img src=\"{{detail.credit.table01.image01}}\" width=\"72\" alt=\"{{detail.credit.table01.alt01}}\"></a> | **Eff (effcol)**<br>[wiz3D]({{detail.credit.table01.link02}})と、このエディション向けのパッケージ[Sparky-OS/wiz3D]({{detail.credit.table01.link03}})を保守しています。wiz3DはiZ3Dを基にした、DirectX、OpenGL、AMD HD3D、NVIDIA 3D Vision向けの汎用ステレオスコピック3Dラッパーで、あらゆるシステムを対象とします。<br>[![{{detail.credit.table01.alt02}}]({{detail.credit.table01.image02}})]({{detail.credit.table01.link04}}) |\n| <a href=\"{{detail.credit.table01.link05}}\"><img src=\"{{detail.credit.table01.image03}}\" width=\"72\" alt=\"{{detail.credit.table01.alt03}}\"></a> | **Jeromy Streets (halverneus)**<br>KDE Plasma向けの動画壁紙とロック画面、[org.kde.video]({{detail.credit.table01.link06}})を作成し、保守しています。<br>[![{{detail.credit.table01.alt04}}]({{detail.credit.table01.image04}})]({{detail.credit.table01.link07}}) |\n| <a href=\"{{detail.credit.table01.link08}}\"><img src=\"{{detail.credit.table01.image05}}\" width=\"72\" alt=\"{{detail.credit.table01.alt05}}\"></a> | **Pedro F. Albanese (pedroalbanese)**<br>Danielとともに[Sparky CA]({{detail.credit.table01.link09}})を保守しています。ブラジルのICP-Brasil証明書をインストールし、最新に保つツールです。ICP-Brasilのルート証明書の一つが使うEd521署名のライブラリ、[e521]({{detail.credit.table01.link10}})の作者です。<br>[![{{detail.credit.table01.alt06}}]({{detail.credit.table01.image06}})]({{detail.credit.table01.link11}}) |",
     "detail.credit.paragraph03": "**バージョン：** Sparky Stereo OS 9 \"Mashtabba\"。\nDebian 14 \"Forky\"を基にし、KDE Plasmaのみを使います。",
     "detail.credit.paragraph04.link01": "../ATTRIBUTIONS.md",
     "detail.credit.paragraph04": "このエディションの基盤を築いたすべての人を、名前とともに記しています：[ATTRIBUTIONS.md]({{detail.credit.paragraph04.link01}})。",

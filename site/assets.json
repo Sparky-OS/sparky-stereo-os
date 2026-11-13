@@ -48,5 +48,15 @@
     "sha256": "d6fa22877281aceed3f30d0b39028d3c1c39730fd83baae812708bc3dafa3665",
     "retrieved": "2026-11-13",
     "final_url": "https://zenodo.org/badge/DOI/10.5281/zenodo.23309024.svg"
+  },
+  "https://github.com/pedroalbanese.png?size=96": {
+    "file": "assets/reference-11.jpg",
+    "sha256": "d75b76b96073926f6bac9c6faab5e6af812b2f42e69a94a361b9bee915a89e3f",
+    "retrieved": "2026-11-13",
+    "final_url": "https://avatars.githubusercontent.com/u/68971450?s=96&v=4"
+  },
+  "https://img.shields.io/badge/Follow-pedroalbanese-2777AD?style=flat-square&logo=github": {
+    "text_only": true,
+    "reason": "The badge host did not supply a usable image; preserve its existing alternative text as the link label."
   }
 }

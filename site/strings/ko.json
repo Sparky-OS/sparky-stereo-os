@@ -233,7 +233,7 @@
     },
     "detail": {
       "source": "docs/edition-in-detail.ko.md",
-      "sha256": "344803f894fa3ed1197dfd991a30cbf8a78fbabcbb4362775ef03fbb41a48a28",
+      "sha256": "27a3f33dd400ab9214fd0fefa1b5467a311727bc6d665284b6d9fe8446548ccb",
       "blocks": [
         {
           "type": "heading",
@@ -927,95 +927,95 @@
         },
         {
           "type": "paragraph",
-          "line": 236,
+          "line": 237,
           "key": "detail.credit.paragraph03"
         },
         {
           "type": "paragraph",
-          "line": 238,
+          "line": 239,
           "key": "detail.credit.paragraph04"
         },
         {
           "type": "paragraph",
-          "line": 240,
+          "line": 241,
           "key": "detail.credit.paragraph05"
         },
         {
           "type": "item",
-          "line": 241,
+          "line": 242,
           "key": "detail.credit.item01"
         },
         {
           "type": "item",
-          "line": 242,
+          "line": 243,
           "key": "detail.credit.item02"
         },
         {
           "type": "item",
-          "line": 243,
+          "line": 244,
           "key": "detail.credit.item03"
         },
         {
           "type": "item",
-          "line": 244,
+          "line": 245,
           "key": "detail.credit.item04"
         },
         {
           "type": "item",
-          "line": 245,
+          "line": 246,
           "key": "detail.credit.item05"
         },
         {
           "type": "paragraph",
-          "line": 247,
+          "line": 248,
           "key": "detail.credit.paragraph06"
         },
         {
           "type": "paragraph",
-          "line": 249,
+          "line": 250,
           "key": "detail.credit.paragraph07"
         },
         {
           "type": "paragraph",
-          "line": 251,
+          "line": 252,
           "key": "detail.credit.paragraph08"
         },
         {
           "type": "paragraph",
-          "line": 253,
+          "line": 254,
           "key": "detail.credit.paragraph09"
         },
         {
           "type": "anchors",
           "raw": "<a id=\"licence\"></a>",
-          "line": 255
+          "line": 256
         },
         {
           "type": "heading",
           "level": 2,
-          "line": 256,
+          "line": 257,
           "key": "detail.licence.heading01",
           "id": "라이선스",
           "english_id": "licence"
         },
         {
           "type": "paragraph",
-          "line": 258,
+          "line": 259,
           "key": "detail.licence.paragraph01"
         },
         {
           "type": "quote",
-          "line": 260,
+          "line": 261,
           "key": "detail.licence.quote01"
         },
         {
           "type": "paragraph",
-          "line": 263,
+          "line": 264,
           "key": "detail.licence.paragraph02"
         },
         {
           "type": "paragraph",
-          "line": 265,
+          "line": 266,
           "key": "detail.licence.paragraph03"
         }
       ],
@@ -1185,10 +1185,11 @@
     "detail.who-builds-it.heading01": "누가 만듭니다",
     "detail.who-builds-it.paragraph01.link01": "https://github.com/Sparky-OS/org.kde.video",
     "detail.who-builds-it.paragraph01.link02": "https://github.com/Sparky-OS/wiz3D",
-    "detail.who-builds-it.paragraph01.link03": "ai-provenance.md",
-    "detail.who-builds-it.paragraph01.link04": "hardware.md",
-    "detail.who-builds-it.paragraph01.link05": "measurements/kwin-stereo-cost-a10-2026-10-23.md",
-    "detail.who-builds-it.paragraph01": "Brasília의 favela 출신 Daniel, 현재까지 두 명의 인간 기여자: Jeromy Streets는 Plasma용 비디오 배경화면([org.kde.video]({{detail.who-builds-it.paragraph01.link01}}))을 만들었고 이제 Sparky-OS에서 유지 관리자로 함께하며, Eff (effcol)는 iZ3D의 코드를 [wiz3D]({{detail.who-builds-it.paragraph01.link02}})로 살려내고 여기서 유지 관리합니다.\nLinux의 스테레오는 수년간 자원봉사자를 기다렸습니다: 이전 시도는 리뷰어에게 3D 디스플레이가 없어서 중단되었고, 작업은 커널, Mesa, KWin, FFmpeg, 플레이어 및 웹 표준에 걸쳐 있습니다.\n이를 이어갈 다른 개발자가 나서지 않아, 여기서 함께 일하는 다른 파트너는 AI 파트너이며, Daniel이 지시하고 확인하며 [AI 출처]({{detail.who-builds-it.paragraph01.link03}})에 명시되어 있습니다.\n인간의 손으로 만들어지는 것을 보고 싶다면 언제든 환영합니다: 모든 포크는 공개이고, 모든 작업은 열려 있습니다.\n모든 것은 가정용 PC와 2016년 노트북, 두 대의 일반 기계에서 구축되고 테스트됩니다: [하드웨어]({{detail.who-builds-it.paragraph01.link04}}).\n그 노트북에서 데스크톱의 모든 경우가 2D와 3D 모두 초당 24프레임을 유지합니다: [KWin에서 스테레오가 드는 비용, 측정 결과]({{detail.who-builds-it.paragraph01.link05}}) (영어).",
+    "detail.who-builds-it.paragraph01.link03": "https://github.com/Sparky-OS/sparky-ca",
+    "detail.who-builds-it.paragraph01.link04": "ai-provenance.md",
+    "detail.who-builds-it.paragraph01.link05": "hardware.md",
+    "detail.who-builds-it.paragraph01.link06": "measurements/kwin-stereo-cost-a10-2026-10-23.md",
+    "detail.who-builds-it.paragraph01": "Brasília의 favela 출신 Daniel, 현재까지 세 명의 인간 기여자: Jeromy Streets는 Plasma용 비디오 배경화면([org.kde.video]({{detail.who-builds-it.paragraph01.link01}}))을 만들었고 이제 Sparky-OS에서 유지 관리자로 함께하며, Eff (effcol)는 iZ3D의 코드를 [wiz3D]({{detail.who-builds-it.paragraph01.link02}})로 살려내고 여기서 유지 관리하며, Pedro F. Albanese (pedroalbanese)는 [Sparky CA]({{detail.who-builds-it.paragraph01.link03}})가 의존하는 Ed521 서명 라이브러리의 저자로, 여기서 Daniel과 함께 Sparky CA를 유지 관리합니다.\nLinux의 스테레오는 수년간 자원봉사자를 기다렸습니다: 이전 시도는 리뷰어에게 3D 디스플레이가 없어서 중단되었고, 작업은 커널, Mesa, KWin, FFmpeg, 플레이어 및 웹 표준에 걸쳐 있습니다.\n이를 이어갈 다른 개발자가 나서지 않아, 여기서 함께 일하는 다른 파트너는 AI 파트너이며, Daniel이 지시하고 확인하며 [AI 출처]({{detail.who-builds-it.paragraph01.link04}})에 명시되어 있습니다.\n인간의 손으로 만들어지는 것을 보고 싶다면 언제든 환영합니다: 모든 포크는 공개이고, 모든 작업은 열려 있습니다.\n모든 것은 가정용 PC와 2016년 노트북, 두 대의 일반 기계에서 구축되고 테스트됩니다: [하드웨어]({{detail.who-builds-it.paragraph01.link05}}).\n그 노트북에서 데스크톱의 모든 경우가 2D와 3D 모두 초당 24프레임을 유지합니다: [KWin에서 스테레오가 드는 비용, 측정 결과]({{detail.who-builds-it.paragraph01.link06}}) (영어).",
     "detail.where-it-is-going.heading01": "진행 방향",
     "detail.where-it-is-going.paragraph01.link01": "https://www.w3.org/community/pm-kr/",
     "detail.where-it-is-going.paragraph01.link02": "https://www.w3.org/publications/spec-generator/?type=respec&url=https://raw.githubusercontent.com/w3c-cg/pm-kr/main/reports/source/stereo-3d-adoption-report.html",
@@ -1348,7 +1349,15 @@
     "detail.credit.table01.alt04": "Follow Jeromy",
     "detail.credit.table01.image04": "https://img.shields.io/badge/Follow-halverneus-2777AD?style=flat-square&logo=github",
     "detail.credit.table01.link07": "https://github.com/halverneus",
-    "detail.credit.table01": "| | |\n| --- | --- |\n| <a href=\"{{detail.credit.table01.link01}}\"><img src=\"{{detail.credit.table01.image01}}\" width=\"72\" alt=\"{{detail.credit.table01.alt01}}\"></a> | **Eff (effcol)**<br>[wiz3D]({{detail.credit.table01.link02}})를 유지 관리합니다: iZ3D를 기반으로 DirectX, OpenGL, AMD HD3D 및 NVIDIA 3D Vision을 위한 보편적인 스테레오스코픽 3D 래퍼이며, 모든 시스템을 위한 것입니다; 여기의 [Sparky-OS/wiz3D]({{detail.credit.table01.link03}}) 패키지도 유지 관리합니다.<br>[![{{detail.credit.table01.alt02}}]({{detail.credit.table01.image02}})]({{detail.credit.table01.link04}}) |\n| <a href=\"{{detail.credit.table01.link05}}\"><img src=\"{{detail.credit.table01.image03}}\" width=\"72\" alt=\"{{detail.credit.table01.alt03}}\"></a> | **Jeromy Streets (halverneus)**<br>KDE Plasma용 비디오 배경화면과 잠금 화면인 [org.kde.video]({{detail.credit.table01.link06}})를 만들고 유지 관리합니다.<br>[![{{detail.credit.table01.alt04}}]({{detail.credit.table01.image04}})]({{detail.credit.table01.link07}}) |",
+    "detail.credit.table01.link08": "https://github.com/pedroalbanese",
+    "detail.credit.table01.image05": "https://github.com/pedroalbanese.png?size=96",
+    "detail.credit.table01.alt05": "Pedro F. Albanese",
+    "detail.credit.table01.link09": "https://github.com/Sparky-OS/sparky-ca",
+    "detail.credit.table01.link10": "https://github.com/pedroalbanese/e521",
+    "detail.credit.table01.alt06": "Follow Pedro",
+    "detail.credit.table01.image06": "https://img.shields.io/badge/Follow-pedroalbanese-2777AD?style=flat-square&logo=github",
+    "detail.credit.table01.link11": "https://github.com/pedroalbanese",
+    "detail.credit.table01": "| | |\n| --- | --- |\n| <a href=\"{{detail.credit.table01.link01}}\"><img src=\"{{detail.credit.table01.image01}}\" width=\"72\" alt=\"{{detail.credit.table01.alt01}}\"></a> | **Eff (effcol)**<br>[wiz3D]({{detail.credit.table01.link02}})를 유지 관리합니다: iZ3D를 기반으로 DirectX, OpenGL, AMD HD3D 및 NVIDIA 3D Vision을 위한 보편적인 스테레오스코픽 3D 래퍼이며, 모든 시스템을 위한 것입니다; 여기의 [Sparky-OS/wiz3D]({{detail.credit.table01.link03}}) 패키지도 유지 관리합니다.<br>[![{{detail.credit.table01.alt02}}]({{detail.credit.table01.image02}})]({{detail.credit.table01.link04}}) |\n| <a href=\"{{detail.credit.table01.link05}}\"><img src=\"{{detail.credit.table01.image03}}\" width=\"72\" alt=\"{{detail.credit.table01.alt03}}\"></a> | **Jeromy Streets (halverneus)**<br>KDE Plasma용 비디오 배경화면과 잠금 화면인 [org.kde.video]({{detail.credit.table01.link06}})를 만들고 유지 관리합니다.<br>[![{{detail.credit.table01.alt04}}]({{detail.credit.table01.image04}})]({{detail.credit.table01.link07}}) |\n| <a href=\"{{detail.credit.table01.link08}}\"><img src=\"{{detail.credit.table01.image05}}\" width=\"72\" alt=\"{{detail.credit.table01.alt05}}\"></a> | **Pedro F. Albanese (pedroalbanese)**<br>Daniel과 함께 [Sparky CA]({{detail.credit.table01.link09}})를 유지 관리합니다. 브라질 ICP-Brasil 인증서를 설치하고 최신 상태로 유지하는 도구입니다. ICP-Brasil 루트 인증서 하나가 사용하는 Ed521 서명 라이브러리 [e521]({{detail.credit.table01.link10}})의 저자입니다.<br>[![{{detail.credit.table01.alt06}}]({{detail.credit.table01.image06}})]({{detail.credit.table01.link11}}) |",
     "detail.credit.paragraph03": "**버전:** Sparky Stereo OS 9 \"Mashtabba\", Debian 14 \"Forky\" 기반이며 KDE Plasma만 사용합니다.",
     "detail.credit.paragraph04.link01": "../ATTRIBUTIONS.md",
     "detail.credit.paragraph04": "이 에디션이 기반으로 삼은 모든 사람, 이름으로: [ATTRIBUTIONS.md]({{detail.credit.paragraph04.link01}}).",

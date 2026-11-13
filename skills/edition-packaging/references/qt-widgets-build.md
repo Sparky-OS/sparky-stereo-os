@@ -36,6 +36,10 @@ Traps and how they were found:
   **Cause:** the earlier build image never needed that tool.
   **Fix:** install the verified quilt candidate before extending the series.
   **Found by:** the first real source-preparation run, not a shell syntax check.
+- **Symptom:** lintian finds an unstripped KAuth helper even though the recipe has a strip step.
+  **Cause:** the file selector names `kauth/HELPER`, while KF6 installs it under `kauth/libexec/HELPER`; the shared-library dependency scan misses the same file.
+  **Fix:** select the actual installed path in both steps and check the resulting binary package, rather than only the staging command.
+  **Found by:** lintian's exact installed filename compared with the recipe's two `find` expressions.
 
 No source-only gate proves a final `.deb`, runtime dependencies, installed painting or processor offload.
 Those remain separate recorded results.

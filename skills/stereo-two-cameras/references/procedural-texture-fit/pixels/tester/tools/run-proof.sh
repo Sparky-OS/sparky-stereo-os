@@ -11,6 +11,7 @@
 #   ALSO=PATH=DIR[,PATH=DIR]: more folders for the local server (proofs only); ALSOMOUNT=DIR: a folder outside the
 #   tree to mount read-only for them. DRIVER: the program that watches the run (drive.py; a11y.py; hidden.py).
 #   AMD_DEVICE: the render node of the GPU for the amd route (default /dev/dri/renderD128, with its group).
+#   AMD_GROUP: the render node's numeric group when the Docker host's device is not visible to this shell.
 # The container: PREFIX-GPU-TAG (PREFIX default ptr-run), no network but its own loopback, core files off, the
 # person's uid, at most two processors, no display of the person's. The page, the server and the driver all run
 # inside it. IMAGE: an image with Chromium, Mesa's Vulkan drivers (radv, lavapipe), Xvfb and python3 (default
@@ -26,7 +27,9 @@ IMAGE=${IMAGE:-ptr-webgpu:latest}
 mkdir -p "$OUT"; OUT=$(cd "$OUT" && pwd)
 case $GPU in
   nvidia) DEV="--device nvidia.com/gpu=0"; ICD=/etc/vulkan/icd.d/nvidia_icd.json; XV=1; FL="--ozone-platform=x11 --enable-features=Vulkan --use-angle=vulkan" ;;
-  amd) NODE=${AMD_DEVICE:-/dev/dri/renderD128}; DEV="--device $NODE --group-add $(stat -c %g "$NODE")"; ICD=/usr/share/vulkan/icd.d/radeon_icd.json; XV=0; FL="--headless=new --enable-features=Vulkan --use-angle=vulkan" ;;
+  amd) NODE=${AMD_DEVICE:-/dev/dri/renderD128}; AMD_GID=${AMD_GROUP:-$(stat -c %g "$NODE")};
+    case $AMD_GID in ''|*[!0-9]*) echo "AMD_GROUP must be a numeric group id" >&2; exit 2 ;; esac
+    DEV="--device $NODE --group-add $AMD_GID"; ICD=/usr/share/vulkan/icd.d/radeon_icd.json; XV=0; FL="--headless=new --enable-features=Vulkan --use-angle=vulkan" ;;
   cpu) DEV=""; ICD=/usr/share/vulkan/icd.d/lvp_icd.json; XV=0; FL="--headless=new --enable-features=Vulkan --use-angle=vulkan" ;;
   *) echo "GPU must be nvidia, amd or cpu" >&2; exit 2 ;;
 esac
@@ -39,7 +42,7 @@ SUBPATH=${SUBPATH:-demos/procedural-texture-rendering/}
 PORT=8537
 mkdir -p "$S/home"
 rm -f "$OUT/DONE"
-docker run --rm --name "$NAME" --network none --ulimit core=0 --shm-size 1g --cpus 2 $DEV \
+docker run --rm --name "$NAME" --platform linux/amd64 --network none --ulimit core=0 --shm-size 1g --cpus 2 $DEV \
   --user "$(id -u):$(id -g)" -e HOME="$S/home" -e VK_DRIVER_FILES="$ICD" -e VK_ICD_FILENAMES="$ICD" -e XV="$XV" \
   -e HOSTMODE="$HOSTMODE" -e SUBPATH="$SUBPATH" -e ALSO="${ALSO:-}" -e WINDOW="${WINDOW:-1600,1500}" -e EXTRA="${EXTRA:-}" -e CONTROL="${CONTROL:-}" -e HIDE="${HIDE:-}" -e TAIL="${TAIL:-}" \
   -v "$W:$W:ro" -v "$OUT:$OUT" -v "$S/home:$S/home" ${ALSOMOUNT:+-v "$ALSOMOUNT:$ALSOMOUNT:ro"} \

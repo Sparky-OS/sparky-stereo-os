@@ -1698,6 +1698,101 @@ The other figures are in the sections above: the player's size and bytes, the au
 
 Perks: `Browser.setWindowBounds` with `windowState: minimized` hides a headless page, so a hidden tab can be tested without a desktop; `Emulation.setEmulatedMedia` gives the dark scheme and reduced motion; `Accessibility.getFullAXTree` is the screen reader's reading without a screen reader; a `<select>` moved with one arrow key is a real change event.
 
+### The thirteenth round: a demo page that shows its point (ORDER 540)
+
+Dynamic Procedural Texture Rendering draws the surfaces before their photographs arrive, replaces each surface with its photograph, then stops computing that procedure.
+The page should let someone see those events without learning the download instrument first.
+This round changes the presentation and controls; the scene, procedure players and link rule remain the same files.
+
+#### Recipe: reconcile, present, verify
+
+1. Before editing, compare the static folder byte for byte with the published source, capture 1280 × 900 and 360 × 800 viewports, and inventory every control as immediate, deferred or address-only.
+   A speed change can alter the active link while showing no change to a scene whose photographs are already in.
+   Record that distinction rather than assuming the control is broken.
+2. Put the scene, its visible state and replaying speed choices first.
+   Use the actual material states for the count: a downloaded photograph still blending is not yet a photograph-only surface.
+   Keep the canvas description too, and make each surface's state visible in words, not just colour.
+3. Keep the old panel in a native details disclosure, initially closed.
+   Leave Play again in a sticky control row so someone can apply a pending setting after scrolling through measurements.
+   Each deferred field gets its own pending message and description; live settings and pending settings are separate objects.
+4. Restart by copying the current URLSearchParams and changing only the selected settings.
+   Keep proof, tag, frame-control, scene, language and unknown parameters.
+   Changing language rebuilds labels from the pending values, and retains the disclosure state.
+   An incoming fragment inside the old panel opens its new disclosure once; a subsequent language change must not reopen a disclosure the person closed.
+5. Show three small illustrated steps: the recipe arrives, its surface is computed, the photograph takes over and computing stops.
+   Keep the explanation short, preserve individual-input and proposal status, and keep the longer About and all credits below.
+6. Offer both momentary hold and split comparison, with hold as the default because it shows the whole scene at its normal framing.
+   Retain the last computed WebGL drawings before their ordinary release, detach them from normal materials, and use them only during comparison.
+   Never ask the procedure player to draw again: it stays stopped.
+   Split uses two scissor regions with the same camera and projection, restoring texture modes and GL state after each draw.
+   This costs retained texture memory; it is not a new compression or player result.
+7. A hold control needs key down/up, pointer up/cancel, lost pointer capture, blur and hidden-page release paths.
+   Its name stays stable, its pressed state is exposed, and split has a named native range input with arrow-key operation.
+   If a photograph arrived before a computed drawing was available, say comparison is unavailable and suggest replay at a slower speed rather than inventing a drawing after computation stopped.
+8. Read every catalogue against English, not only the new keys; keep a correction ledger with the old text, corrected text and reason.
+   Run the structural string check, the extended accessibility driver and stage captures from a frozen tree.
+
+```sh
+python3 pixels/tester/tools/check_strings.py SITE
+HOST=static DRIVER=a11y.py sh pixels/tester/tools/run-proof.sh amd OUT audit 'speed=dsl8&conns=6&lang=en&fps=5' 900
+HOST=static DRIVER=ui-proof.py sh pixels/tester/tools/run-proof.sh amd OUT_GPU slow 'speed=d56&conns=6&lang=en&fps=5&motion=0' 1100
+HOST=static DRIVER=ui-proof.py sh pixels/tester/tools/run-proof.sh cpu OUT_CPU slow 'speed=d56&conns=6&lang=en&fps=5&motion=0' 1100
+# Also run each player at speed=dsl8; every container uses a fresh browser session.
+```
+
+IMAGE, SCRATCH, PREFIX, TREE and DOCKER_HOST come from the test environment.
+The AMD_GROUP override is only needed when the launching shell cannot stat the Docker host's render node; it must be numeric.
+A pass requires the driver's DONE and JSON checks, not only the launcher's cleanup exit status.
+The stage driver writes computed, partial, all, held and split screenshots at both viewport sizes whenever those states actually occur.
+A fast connection may have no instant at which all surfaces are simultaneously procedure-only; the slow case supplies that capture, and the fast case's recorded states must say what really happened.
+
+#### Traps found while showing the point
+
+- Symptom: moving the measurements panel also turns its live speed adjustment into a deferred setting.
+  Cause: treating all detailed fields alike loses the original ability to change the current limiter.
+  Fix: keep detailed speed and custom rate live, let only the main speed choice replay, and mark the originally deferred fields as pending.
+  Found by: rereading the before-page control inventory against the final handlers; then measuring byte rates before and after both detailed preset and custom-rate changes without navigation.
+- Symptom: changing connection count appears to do nothing, and changing language loses the choice.
+  Cause: fields held deferred values only in DOM nodes; language rendering replaced those nodes with active-run settings.
+  Fix: one pending-settings object, one visible note per changed field, one replay path, and a language change that only replaces labels.
+  Found by: selecting one connection while six downloads continued, then changing language and reading the reset fields.
+- Symptom: a replay loses proof and frame-control settings.
+  Cause: the restart handler constructed a new query from a whitelist of visible controls.
+  Fix: copy the current query, overwrite selected settings, retain everything else, and verify both named proof parameters and an unknown parameter after actual navigation.
+  Found by: comparing location.search before and after Play again in the browser driver.
+- Symptom: the page reports photographs as complete before they have replaced the computed surface.
+  Cause: download progress was treated as material state.
+  Fix: count texture mode picture after its blend, not a component's download state; keep download time and blend completion distinct.
+  Found by: observing the material mode during the interval between picture arrival and procedure stop.
+- Symptom: comparison would restart the player or show an empty surface.
+  Cause: the normal finish path deletes the computed GL texture.
+  Fix: retain that drawing for comparison, keep it detached from normal materials, and never enqueue new procedure jobs.
+  Found by: reading releaseProcedure, then checking that holding changes the scene image, releasing restores the photograph pixel for pixel, and submission counts stay unchanged.
+- Symptom: holding shows the computed drawing while the state line and labels still say photograph.
+  Cause: the presentation counted the normal material state even during the temporary comparison draw.
+  Fix: give hold and split their own state sentences, update the per-surface words and the canvas alternative, and keep the saved-drawing description explicit.
+  Found by: inspecting the held phone screenshot after the ordinary-view checks had passed.
+- Symptom: the hold control leaves the computed view active after the pointer or focus goes away.
+  Cause: handling only down/up misses cancellation and focus loss.
+  Fix: release on pointercancel, lostpointercapture, blur and visibility change too; expose the state through aria-pressed.
+  Found by: the keyboard hold followed by moving focus to another control.
+- Symptom: the first-screen count lies just below a small viewport, although there is no horizontal overflow.
+  Cause: testing reflow alone says nothing about which content is initially visible.
+  Fix: also measure the actual scene, state, speed and replay rectangles against the viewport; keep comparison controls beside the scene and detailed runtime notes in the disclosure.
+  Found by: the 360 × 800 baseline and a later 320 × 640 check whose state extended 1.6 CSS pixels below the edge.
+- Symptom: an accessibility check rejects a valid custom-speed description or cannot find an English reduced-motion note.
+  Cause: it expected exactly one aria-describedby ID, and a previous language test changed persisted language.
+  Fix: test membership in the ID list; give each independent test case an explicit language.
+  Found by: the failing check's own data, showing the error ID plus the new pending-note ID, and a Portuguese note in the tree.
+- Symptom: a DevTools readiness wait times out although the scene has already drawn.
+  Cause: returning a DOM element by value serializes to an empty object, false in the Python driver; attaching before the served document also produced an invalid base URL.
+  Fix: wait for the served document and return an explicit boolean from readiness predicates.
+  Found by: reading testerState through another DevTools connection while the wait was still running.
+
+Perks: the existing renderer can display retained drawings without changes to its shaders, geometry or camera; the ordinary view still samples photographs alone.
+A real keyboard down/up plus a scene-only screenshot comparison tests the hold path without counting button-style changes as image evidence.
+A structural translation pass cannot detect that wording means spatially beside instead of concurrently, or that longest describes a physical piece rather than time; those required the complete catalogue reading.
+
 ### Where the procedures stop (so far)
 
 On .kkrieger's own textures, which are procedures, the reverse now gets the material at a glance for the plain noises, the regular repeats and the walls in a bond, and a recognisable drawing for the wood and the carved ornament; nothing is right close up.

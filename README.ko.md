@@ -1,6 +1,6 @@
 # Sparky Stereo OS
 
-🇨🇦 [English](README.md) · 🇧🇷 [Português](README.pt-BR.md) · 🇵🇱 [Polski](README.pl.md) · 🇫🇷 [Français](README.fr.md) · 🇩🇪 [Deutsch](README.de.md) · 🇯🇵 [日本語](README.ja.md) · 🇰🇷 [한국어](README.ko.md) · 🇨🇳 [简体中文](README.zh-CN.md) · 🇭🇰 [繁體中文](README.zh-TW.md)
+🇨🇦 [English](README.md) · 🇧🇷 [Português](README.pt-BR.md) · 🇵🇱 [Polski](README.pl.md) · 🇫🇷 [Français](README.fr.md) · 🇩🇪 [Deutsch](README.de.md) · 🇲🇽 [Español](README.es.md) · 🇯🇵 [日本語](README.ja.md) · 🇰🇷 [한국어](README.ko.md) · 🇨🇳 [简体中文](README.zh-CN.md) · 🇭🇰 [繁體中文](README.zh-TW.md)
 
 **이미 가지고 있는 화면에서 3D로 만들고 탐험하세요: 그림을 그리고, 사진과 비디오를 편집하고, 분자와 지구본을 연구한 다음, 영화를 보고 게임을 즐기세요.**
 3D TV와 3D 프로젝터, VR 헤드셋, 무안경 3D 디스플레이, 적청 안경을 쓴 모든 모니터 등 모든 종류의 3D 화면을 위해 만들어졌습니다.
@@ -19,7 +19,7 @@ Sparky Stereo OS는 Daniel Ramos의 SparkyLinux 에디션(Paweł "pavroo" Pijano
 **상태: 테스터용 베타 1입니다.** 3D TV, 적청 안경을 쓴 일반 모니터, 저렴한 뷰어에 넣은 Android 휴대폰에서 테스트했습니다. 무안경 디스플레이와 독립형 헤드셋은 진행 중입니다.
 
 **다음 단계: 사용 중인 Windows PC에서 USB 메모리로, 아무것도 설치하지 않고 사용해 보세요:** [한 페이지, 열 단계(영어)](docs/guides/try-on-windows.en.md)
-<br>다운로드를 요청하고 여러분의 3D 장비를 알려 주세요. 원하는 언어로: [🇨🇦](https://github.com/Sparky-OS/sparky-stereo-os/issues/26) [🇧🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/25) [🇵🇱](https://github.com/Sparky-OS/sparky-stereo-os/issues/27) [🇫🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/80) [🇩🇪](https://github.com/Sparky-OS/sparky-stereo-os/issues/153) [🇯🇵](https://github.com/Sparky-OS/sparky-stereo-os/issues/81) [🇰🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/83) [🇨🇳](https://github.com/Sparky-OS/sparky-stereo-os/issues/84) [🇭🇰](https://github.com/Sparky-OS/sparky-stereo-os/issues/85)
+<br>다운로드를 요청하고 여러분의 3D 장비를 알려 주세요. 원하는 언어로: [🇨🇦](https://github.com/Sparky-OS/sparky-stereo-os/issues/26) [🇧🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/25) [🇵🇱](https://github.com/Sparky-OS/sparky-stereo-os/issues/27) [🇫🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/80) [🇩🇪](https://github.com/Sparky-OS/sparky-stereo-os/issues/153) [🇲🇽](ISSUE-ES) [🇯🇵](https://github.com/Sparky-OS/sparky-stereo-os/issues/81) [🇰🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/83) [🇨🇳](https://github.com/Sparky-OS/sparky-stereo-os/issues/84) [🇭🇰](https://github.com/Sparky-OS/sparky-stereo-os/issues/85)
 
 - <a id="science-and-engineering"></a>**[과학 및 공학](docs/edition-in-detail.ko.md#science-and-engineering):** Marble의 지구본, KAlgebra의 그래프, Kalzium의 분자를 3D로; 3D 모델과 회로 기판은 진행 중입니다. 스캔은 계획 중입니다: 부품, 현장, 표본을 찍은 비디오가 3D 모델이 됩니다.
 - <a id="create"></a>**[만들기](docs/edition-in-detail.ko.md#create):** 3D로 그리고 딥 컬러(8비트 대신 색상당 16비트)로 그리며, 3D 사진과 비디오를 편집합니다. 스캔은 계획 중입니다: 물체나 장소를 찍은 비디오가 둘러볼 수 있는 3D 모델이 됩니다.

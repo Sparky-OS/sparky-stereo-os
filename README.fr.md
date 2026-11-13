@@ -1,6 +1,6 @@
 # Sparky Stereo OS
 
-🇨🇦 [English](README.md) · 🇧🇷 [Português](README.pt-BR.md) · 🇵🇱 [Polski](README.pl.md) · 🇫🇷 [Français](README.fr.md) · 🇩🇪 [Deutsch](README.de.md) · 🇯🇵 [日本語](README.ja.md) · 🇰🇷 [한국어](README.ko.md) · 🇨🇳 [简体中文](README.zh-CN.md) · 🇭🇰 [繁體中文](README.zh-TW.md)
+🇨🇦 [English](README.md) · 🇧🇷 [Português](README.pt-BR.md) · 🇵🇱 [Polski](README.pl.md) · 🇫🇷 [Français](README.fr.md) · 🇩🇪 [Deutsch](README.de.md) · 🇲🇽 [Español](README.es.md) · 🇯🇵 [日本語](README.ja.md) · 🇰🇷 [한국어](README.ko.md) · 🇨🇳 [简体中文](README.zh-CN.md) · 🇭🇰 [繁體中文](README.zh-TW.md)
 
 **Créez et explorez en 3D sur l'écran que vous avez déjà : peinture, retouche de photos et de vidéos, étude de molécules et de globes, puis films et jeux.**
 Il est conçu pour tous les types d'écrans 3D : téléviseurs et projecteurs 3D, casques VR, écrans 3D sans lunettes et n'importe quel écran avec des lunettes rouge-cyan.
@@ -19,7 +19,7 @@ Sparky Stereo OS, l'édition de Daniel Ramos de SparkyLinux (par Paweł « pavro
 **État : bêta 1, pour les testeurs.** Testé sur des téléviseurs 3D, sur des écrans ordinaires avec des lunettes rouge-cyan et sur un téléphone Android dans une visionneuse peu coûteuse ; les écrans sans lunettes et les casques autonomes sont en cours.
 
 **Étape suivante : essayez-le sur votre PC Windows, depuis une clé USB, sans rien installer :** [une page, dix étapes (en anglais)](docs/guides/try-on-windows.en.md).
-<br>Demandez le téléchargement et parlez-nous de votre matériel 3D, dans votre langue : [🇨🇦](https://github.com/Sparky-OS/sparky-stereo-os/issues/26) [🇧🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/25) [🇵🇱](https://github.com/Sparky-OS/sparky-stereo-os/issues/27) [🇫🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/80) [🇩🇪](https://github.com/Sparky-OS/sparky-stereo-os/issues/153) [🇯🇵](https://github.com/Sparky-OS/sparky-stereo-os/issues/81) [🇰🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/83) [🇨🇳](https://github.com/Sparky-OS/sparky-stereo-os/issues/84) [🇭🇰](https://github.com/Sparky-OS/sparky-stereo-os/issues/85)
+<br>Demandez le téléchargement et parlez-nous de votre matériel 3D, dans votre langue : [🇨🇦](https://github.com/Sparky-OS/sparky-stereo-os/issues/26) [🇧🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/25) [🇵🇱](https://github.com/Sparky-OS/sparky-stereo-os/issues/27) [🇫🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/80) [🇩🇪](https://github.com/Sparky-OS/sparky-stereo-os/issues/153) [🇲🇽](ISSUE-ES) [🇯🇵](https://github.com/Sparky-OS/sparky-stereo-os/issues/81) [🇰🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/83) [🇨🇳](https://github.com/Sparky-OS/sparky-stereo-os/issues/84) [🇭🇰](https://github.com/Sparky-OS/sparky-stereo-os/issues/85)
 
 - <a id="science-and-engineering"></a>**[Science et ingénierie](docs/edition-in-detail.fr.md#science-and-engineering) :** le globe de Marble, les tracés de KAlgebra et les molécules de Kalzium en 3D ; les modèles 3D et les circuits imprimés sont en cours. Le scan 3D est prévu : une vidéo d'une pièce, d'un site ou d'un spécimen devient un modèle 3D.
 - <a id="create"></a>**[Créer](docs/edition-in-detail.fr.md#create) :** peindre en 3D et en couleurs profondes (16 bits par couleur au lieu de 8), et retoucher des photos et des vidéos 3D. Le scan 3D est prévu : une vidéo d'un objet ou d'un lieu devient un modèle 3D dans lequel on peut se déplacer.

@@ -1,6 +1,6 @@
 # Sparky Stereo OS
 
-🇨🇦 [English](README.md) · 🇧🇷 [Português](README.pt-BR.md) · 🇵🇱 [Polski](README.pl.md) · 🇫🇷 [Français](README.fr.md) · 🇩🇪 [Deutsch](README.de.md) · 🇯🇵 [日本語](README.ja.md) · 🇰🇷 [한국어](README.ko.md) · 🇨🇳 [简体中文](README.zh-CN.md) · 🇭🇰 [繁體中文](README.zh-TW.md)
+🇨🇦 [English](README.md) · 🇧🇷 [Português](README.pt-BR.md) · 🇵🇱 [Polski](README.pl.md) · 🇫🇷 [Français](README.fr.md) · 🇩🇪 [Deutsch](README.de.md) · 🇲🇽 [Español](README.es.md) · 🇯🇵 [日本語](README.ja.md) · 🇰🇷 [한국어](README.ko.md) · 🇨🇳 [简体中文](README.zh-CN.md) · 🇭🇰 [繁體中文](README.zh-TW.md)
 
 **在你已有的屏幕上以 3D 方式创作和探索：绘图，编辑照片和视频，研究分子和地球仪，然后看电影、玩游戏。**
 它为各种 3D 屏幕而设计：3D 电视和 3D 投影机、VR 头显、裸眼 3D 显示器，以及配上红青眼镜的任何显示器。
@@ -19,7 +19,7 @@ Sparky Stereo OS 是 Daniel Ramos 的 SparkyLinux 发行版（SparkyLinux 由 Pa
 **状态：beta 1，面向测试者。**已在 3D 电视、配红青眼镜的普通显示器以及放进便宜观片盒的 Android 手机上测试；裸眼 3D 显示器和独立头显仍在进行中。
 
 **下一步：在你的 Windows 电脑上用 U 盘试用，无需安装任何东西：**[一页，十个步骤（英文）](docs/guides/try-on-windows.en.md)
-<br>索取下载链接，并用你的语言告诉我们你的 3D 设备： [🇨🇦](https://github.com/Sparky-OS/sparky-stereo-os/issues/26) [🇧🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/25) [🇵🇱](https://github.com/Sparky-OS/sparky-stereo-os/issues/27) [🇫🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/80) [🇩🇪](https://github.com/Sparky-OS/sparky-stereo-os/issues/153) [🇯🇵](https://github.com/Sparky-OS/sparky-stereo-os/issues/81) [🇰🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/83) [🇨🇳](https://github.com/Sparky-OS/sparky-stereo-os/issues/84) [🇭🇰](https://github.com/Sparky-OS/sparky-stereo-os/issues/85)
+<br>索取下载链接，并用你的语言告诉我们你的 3D 设备： [🇨🇦](https://github.com/Sparky-OS/sparky-stereo-os/issues/26) [🇧🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/25) [🇵🇱](https://github.com/Sparky-OS/sparky-stereo-os/issues/27) [🇫🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/80) [🇩🇪](https://github.com/Sparky-OS/sparky-stereo-os/issues/153) [🇲🇽](ISSUE-ES) [🇯🇵](https://github.com/Sparky-OS/sparky-stereo-os/issues/81) [🇰🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/83) [🇨🇳](https://github.com/Sparky-OS/sparky-stereo-os/issues/84) [🇭🇰](https://github.com/Sparky-OS/sparky-stereo-os/issues/85)
 
 - <a id="science-and-engineering"></a>**[科学与工程](docs/edition-in-detail.zh-CN.md#science-and-engineering)：**Marble 的地球仪、KAlgebra 的曲线图和 Kalzium 的分子都以 3D 显示；3D 模型和电路板仍在进行中。扫描已在计划中：把拍摄零件、现场或标本的视频变成 3D 模型。
 - <a id="create"></a>**[创作](docs/edition-in-detail.zh-CN.md#create)：**在 3D 中绘图，并在深度颜色（每种颜色 16 位而不是 8 位）中绘图，编辑 3D 照片和视频。扫描已在计划中：把拍摄物体或场所的视频变成可以在其中漫游的 3D 模型。

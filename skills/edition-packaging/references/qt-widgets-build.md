@@ -43,3 +43,14 @@ Traps and how they were found:
 
 No source-only gate proves a final `.deb`, runtime dependencies, installed painting or processor offload.
 Those remain separate recorded results.
+
+## An incremental binary build needs a separate source archive check
+
+Symptom: `dpkg-buildpackage -nc` produces binary changes but no new `.dsc`.
+Cause: this route implicitly selects a binary build when no explicit full-build type is given.
+For the normal recipe, use its full source/build pipeline unchanged.
+If validating an incremental rebuild, retain a clean authored source with the exact prepared rules, control, changelog and toolkit, pack its source archive, re-extract it and compare every changed compiler input through the qualified projection manifest.
+Do not pack an active projected source/build tree as though it were the authored archive.
+The missing `.dsc`, dpkg-buildpackage's log and a 27-input re-extraction comparison identified and checked this boundary.
+A tools image that has dpkg-source may still lack `dch`; verify preparation prerequisites before running `lean.debian_prepare`.
+The measured tools image failed there; using the already prepared build's exact generated rules and changelog completed the clean source archive, with matching control and preserved-source plan.

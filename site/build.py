@@ -279,6 +279,16 @@ class Renderer:
         foot = re.sub(r'<a id="([^"]+)"></a>',dedupe,foot)
         return text, foot
 
+    def description(self, catalog, kind):
+        """The page's own first sentence as its description: the source's words, without their markup."""
+        lines = expand(catalog['strings'][f'{kind}.intro.paragraph01'], catalog['strings']).split('\n')
+        first = lines[0]
+        for line in lines[1:]:  # a bold lead that closes on a later line is one lead
+            if not first.startswith('**') or first.count('**') % 2 == 0: break
+            first += ' ' + line
+        first = re.sub(r'!?\[([^\]]*)\]\([^)]*\)', r'\1', re.sub(r'<[^>]+>', '', first))
+        return escape(unescape(first.replace('**', '').replace('`', '')).strip(), quote=True)
+
     def render(self, lang, kind):
         catalog = self.catalogs[lang]
         title = expand(catalog['strings'][f'{kind}.intro.heading01'],catalog['strings'])
@@ -297,7 +307,7 @@ class Renderer:
         menu.append('</ul></details>')
         alternates.append(f'<link rel="alternate" hreflang="x-default" href="{self.canonical("en",kind)}">')
         return Template((SITE/'templates/shell.html').read_text()).substitute(
-            lang=LANGUAGES[lang][0],title=escape(title),kind=kind,document=document,
+            lang=LANGUAGES[lang][0],title=escape(title),description=self.description(catalog,kind),kind=kind,document=document,
             home=self.url(page_path(lang,'home')),wordmark=self.url(catalog['strings']['site.wordmark.image']),wordmark_alt=escape(catalog['strings']['site.wordmark.alt'],quote=True),
             stylesheet=self.url('assets/style.css'),canonical=self.canonical(lang,kind),
             alternates='\n'.join(alternates),menu='\n'.join(menu),
@@ -320,7 +330,7 @@ def build(output, cfg):
     links = ''.join(f'<li><a href="{renderer.url(page_path(l,"home"))}" lang="{tag}" hreflang="{tag}">{flag} {name}</a></li>' for l,(tag,flag,name) in LANGUAGES.items())
     document = Template((SITE/'templates/404.html').read_text()).substitute(links=links)
     pages['404.html'] = Template((SITE/'templates/shell.html').read_text()).substitute(
-        lang='en',title='404 · Sparky Stereo OS',kind='error',document=document,
+        lang='en',title='404 · Sparky Stereo OS',description=renderer.description(catalogs['en'],'home'),kind='error',document=document,
         home=renderer.url('index.html'),wordmark=renderer.url(catalogs['en']['strings']['site.wordmark.image']),wordmark_alt=escape(catalogs['en']['strings']['site.wordmark.alt'],quote=True),
         stylesheet=renderer.url('assets/style.css'),canonical=cfg['origin']+renderer.url('404.html'),
         alternates='',menu='',script='')

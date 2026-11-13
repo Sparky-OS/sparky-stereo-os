@@ -63,7 +63,7 @@ ol { padding-left: 1.8rem; }
 ol > li { padding: .5rem 0 .5rem .3rem; }
 ol > li::marker { font-weight: bold; }
 .more-links { columns: 2; padding-left: 1.3rem; }
-.more-links li { break-inside: avoid; }
+.more-links li { break-inside: avoid; margin: 0; padding: .25rem 0; }
 .site-footer { border-top: 1px solid var(--border); font-size: .95rem; }
 .site-footer h2:first-child { margin-top: .5rem; }
 .badge-link { display: inline; }

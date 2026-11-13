@@ -83,6 +83,95 @@ It also compiles a program in both forms and checks that `line!()` and the panic
   Fix: none needed for a build's own output folder; a crate that keeps sources under `src/build/` stays authored there.
   Found by: reading the walker's list of skipped folder names.
 
+## The compiler itself, measured on a small machine
+
+**Preparation status, 2026-11-13:** source preparation has compiler-backed controls; the compiler build and hardware timings are separate acceptance steps.
+This recipe accompanies `tools/rust-lean-experiment` in the distribution build tree; run its source-preparation driver with the pinned toolkit and compiler in a container.
+Its recipe is `prepare.py AUTHORED OUTPUT`, then `verify.py AUTHORED OUTPUT`.
+For Debian's pinned 1.99.1+dfsg1-1~exp1, pass `--checksum-baseline tools/rust-lean-experiment/debian-1.99.1-checksum-baseline.json` to preparation, as the driver's README specifies.
+The complete source pass inventoried 70,016 Rust files: 31,233 passed the compiler lexer checks, and 38,783 stayed authored for recorded consumers, fixtures or carriage returns.
+The independent verifier checked all file contents, modes and links against the manifests.
+It leaves the authored source intact and makes B with the existing renderer and C with comment-form documentation removed where the consumer scan permits it.
+The manifests bind file contents, modes and links; `source-report.json` names preserved inputs and C's crate exceptions.
+The preparation compiler checks B's complete token listing, and checks C after excluding doc attributes on both sides.
+Explicit doc attributes stay in the source.
+This check establishes lexical scope only; keep `build_qualified` false until the fixed compiler build and its consumers pass.
+
+Source-tree totals include fixtures the build never compiles.
+Intersect the final manifests with actual build dep-info before calling a number "what the compiler reads".
+The measurement kit must retain the source identities and preparation evidence, build each form with the same seed and configuration, and compare installed files and compiler workloads separately.
+Full timing and unattended-runner qualification remain required before reporting results.
+
+- Symptom: a source-preparation walker omits Rust code under a directory named `build`.
+  Cause: the generic source walker excludes that name at every depth.
+  Fix for the compiler experiment: inventory every Rust source independently, apply the same renderer and consumer checks, and list preserved fixtures explicitly.
+  Found by: reading `source_tree.EXCLUDED`; a synthetic `src/build/unit.rs` control confirms projection and manifest coverage.
+- Symptom: removing docs can change macro expansion although the remaining ordinary tokens match.
+  Cause: the compiler's `rustc_macros::rustc_queries!` reads doc attributes and generates replacement documentation when they are absent.
+  Fix: keep docs in its caller crate for C and record why; apply equivalent review to other documentation-consuming macros.
+  Found by: source inspection of `compiler/rustc_macros/src/query.rs`, `doc_comments.is_empty()` and `doc_comment_from_desc`, and a preparation control that fails without the exception.
+  This is a source-consumer finding, not a successful full compiler build.
+- Symptom: a modified vendored source is accepted without proving which checksum it replaced.
+  Cause: rewriting a Cargo manifest by its current files alone loses the old source identity.
+  Fix: change only entries whose old and new digests match the projection ledger; reject a mismatching old digest and retain the authored manifests.
+  Found by: the compiler experiment's checksum negative control and complete-tree corruption control.
+- Symptom: preparation stops at `blake3` because the Cargo checksum does not name the authored `build.rs`.
+  Cause: Debian's rustc 1.99.1+dfsg1-1~exp1 source already has ten Rust files changed by Debian patches while Cargo still records the upstream digests.
+  Fix: establish a separate exact-tree baseline, require the old digest to match an applied quilt backup, and accept only the reviewed upstream-to-patched-to-projected hash chain.
+  Keep the original metadata in A and count the reconciliation separately from removed source bytes.
+  Another tree or an unreviewed hash pair must stop; Debian's later checksum-pruning build step does not replace the provenance check.
+  Found by: the full-tree preparation's explicit checksum failure, then all ten discrepancies matched `.pc` backups of patches in `.pc/applied-patches`; negative controls reject an unreviewed replacement.
+
+### Preparing the offline compiler experiment
+
+After the lexical preparation, apply the same edition packaging and C/C++ pass to every form.
+Keep the packaged `rust-src` authored: restore each staged Rust file only when it matches either its bound form or its authored original, and refuse any other content.
+Seal the final tree after these changes, with a full file/mode/link manifest and an archive checksum.
+C must pass a real stage-1 compiler/library/tool check before it can be called build-qualified.
+Bootstrap paths differ by command: read `bootstrap check --help --verbose` before choosing targets; in 1.99.1 cargo and wasm-component-ld have build rules but no check rules, so qualify those with an explicit offline build.
+Keep failed attempts and build-led documentation exceptions, restore a failing crate from the qualified B tree, and bind its old/new Cargo hashes again in the clean final tree.
+
+The runner recipe is in the build repository's `tools/rust-lean-experiment`.
+Its one-command kit uses an immutable image, a fixed seed and offline crates, fresh targets, interleaved A/B rounds, and atomic whole-step receipts.
+`./run.sh` starts or resumes; `./status.sh` reads its state; `./pause.sh` requests a pause after the current step.
+A receipt binds the kit version, plan, source identity, result hashes and machine state.
+An interrupted step is not a result, and a finished result is checked before it is skipped.
+Measure a local sample under the preparation CPU limit and state the hardware scaling assumption and uncertainty; a forecast is not a measurement on the small machine.
+Keep final compilers from whole builds even when the repeated subject must be smaller to fit the time budget.
+See [a long unattended measurement on a laptop](../../test-bench/references/unattended-laptop.md) for the runner controls and their qualification.
+
+- Symptom: C's bootstrap fails in syn's punctuation/delimiter macro invocations although ordinary token equality passed.
+  Cause: `syn` 2.0.118 matches documentation attributes in `define_punctuation_structs!`, `define_punctuation!` and `define_delimiters!`.
+  Fix: retain that crate's documentation by restoring exact B bytes and list the build error as its reason.
+  Found by: the real offline C bootstrap's three macro matching errors in `vendor/syn-2.0.118/src/token.rs`; 38 changed Rust files needed B restoration.
+- Symptom: the native census assertion expects seven projected files and rejects the prepared overlay.
+  Cause: eight LLVM-wrapper/header inputs have three consumer outcomes, not one: five project, two structured-doc consumers stay authored, and Linker.cpp has no removable comments.
+  Fix: bind the complete census and its reasons rather than asserting a guessed projected count.
+  Found by: the source pass's report and its explicit failed assertion, then the same verified result for A, B and C.
+- Symptom: perf reports nonzero hardware instructions but zero synthetic duration_time/user_time/system_time events.
+  Cause: those synthetic counters in the preparation container do not supply usable timing; their presence does not establish a valid measurement.
+  Fix: choose the documented plain perf summary for elapsed/user/system time, preserve its raw output and reject absent/zero elapsed time or instructions.
+  Found by: an actual perf probe compared with the plain summary; the collector also accepts decimal commas and points and rejects ambiguous grouped numbers.
+
+The completed preparation qualification built C's first full compiler stage, standard library and every named tool with the edition recipe's environment. This establishes the prepared C exception list for that stage, not successful final stage-2 packages or laptop performance. The kit's small container dry run is a separate claim. Restore authored Cargo checksum manifests alongside authored rust-src; verify existing authored entries, and list Debian's removed/regenerated WIT artifacts separately rather than inventing replacement upstream digests.
+
+- Symptom: later C tools fail after the compiler itself built.
+  Cause: syn 3.0.3 also matches doc attributes; icu_properties 2.2.0's property macros require them.
+  Fix: restore the failing crates' exact B inputs and their bound checksum chain in a clean C tree.
+  Found by: actual rust-analyzer dependency errors (three syn macro failures) and Cargo's ICU dependency errors (70 macro failures); the complete stage-1 tool build then passed with 38 and 12 retained files respectively.
+- Symptom: direct bootstrap builds fail in libssh2-sys despite installed system libraries.
+  Cause: bypassing Debian's make target loses LIBSSH2_SYS_USE_PKG_CONFIG=1 and other recipe environment.
+  Fix: invoke the recipe's build target with a reviewed RUSTBUILD_FLAGS target list; retain the recipe environment for repeated stages too.
+  Found by: the explicit failure and comparison with debian/rules, followed by a successful complete stage-1 tool build.
+- Symptom: a sealed form changes when the recipe regenerates WIT Rust files.
+  Cause: Debian creates two Rust literals outside build/, after source preparation.
+  Fix: capture the original producer here, project and lexer-check its literals, bind form-specific assets and copy them only after verifying the original native regeneration. Restore their authored bytes in rust-src. Refuse any unexpected generator, version, path or output hash.
+  Found by: the recipe's actual generation, an independent rustc lexer comparison, and A/B/C regeneration/restoration controls. Native outputs remain the original recipe's outputs.
+- Symptom: the panic resolver refuses stdio.rs as an unknown interpreter.
+  Cause: generic consumer discovery reads its first-line Rust #![attribute] as a shebang.
+  Fix for the experiment: select the unchanged Rust lexer explicitly for the already manifest-bound .rs input, then use the existing content resolver. Do not change the shipped adapter implicitly.
+  Found by: an actual C std panic at lean line 1144; the explicit Rust selection resolves it to authored line 1168. The small fixture includes the same first-line syntax.
+
 ## Measured on a two-app workspace (rustc 1.99.1, release build, four CPUs, a busy machine)
 
 Counts over every Rust file of the 783 packages in the resolved graph (22,268 files, 367.8 MB, 9,787,209 lines), with [`scripts/rust-comment-census.py`](../scripts/rust-comment-census.py):

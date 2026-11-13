@@ -195,7 +195,8 @@ How found: a regression with no environment was rejected by the old validator; t
 The existing perspective-environment and orthographic tests retain their earlier predictions.
 
 For an f64 CAD or PRC rasterizer using an f32 camera core, express the shared camera in its local basis and measure distances in the existing positive eye-to-target distance.
-Keep original world vertices and the ordinary f64 raster projection; restore physical eye offsets along the original right vector and apply the shared core's off-axis projection delta.
+Keep original world vertices and the ordinary f64 raster projection.
+Apply the physical eye offset to camera-space x after the original central view transform and before clipping or perspective division, then apply the shared core's off-axis projection delta.
 Do not narrow a large world-space origin to f32 or point each eye at the unchanged world target.
 Expand normalized depth rounding outward, and include the near clipping plane when geometry crosses it, so the camera budget cannot miss newly clipped corners.
 Keep the headlight at the central camera while geometric eyes, visibility/depth targets and resolved images are private.
@@ -210,3 +211,15 @@ Symptom: an orthographic model very close to the eye gets a zero baseline.
 Cause: its depth scan applies the perspective near-plane threshold even though the ordinary orthographic rasterizer does not clip there.
 Fix: admit representable positive orthographic depths while retaining perspective clipping and outward rounding.
 How found: put all vertices at a positive depth below the perspective threshold and require a finite positive baseline before checking the complete raster suite.
+
+Symptom: a stereo scene changes pixels when its world origin is moved far from zero, even though its represented relative geometry is unchanged.
+Cause: adding a small eye offset to an absolute f64 eye coordinate rounds the offset before vertices enter view space.
+Fix: implement the parallel view translation in local camera coordinates; keep the central eye for headlight shading.
+How found: a world at x=1e15 failed an all-pixel comparison with a rebased copy of those same represented vertices; the local translation restores equivalence.
+Build the reference from the already represented points, because adding the large origin may itself quantize the input geometry.
+
+Symptom: a complete pair reports an infinite physical baseline, or silently turns a nonzero normalized baseline into a flat pair.
+Cause: multiplying the normalized camera offset by an extreme f64 model scale can overflow or underflow even when both inputs are finite.
+Fix: refuse unrepresentable physical baselines and eye offsets before drawing or publishing the pair.
+How found: the overflow regression accepted an infinite baseline; a separate tiny-scale regression first proved the ordinary scene visible, then found that the stereo call accepted an underflowed baseline.
+Zero budget retains the exact ordinary path.

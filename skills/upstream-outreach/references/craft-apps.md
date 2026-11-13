@@ -382,7 +382,7 @@ Keep the secure extraction filter; do not disable it to preserve an incidental g
 ## A shared dependency fails a receiving app’s source guard
 
 Symptom: the shared library’s Linux gate passes, but an app refuses its lockfile because a transitive Windows-only Git dependency points outside Storytold.
-Cause: the shared library carries an open maintainer fix through its author’s fork, while the receiving app deliberately restricts Git sources.
+Cause: the shared library carries an open contributor fix through its author’s fork, while the receiving app deliberately restricts Git sources.
 Fix: retain the needed fix and its original author/date; use a documented permissive source snapshot in the shared owner when that fits the project’s rules.
 Keep the real source URL, revision, licence, original hashes and exact carried patch; never relabel a fork URL, add a hidden Cargo source replacement or weaken the receiving workflow.
 Then resolve the complete graph and rerun the unchanged receiving guard and gate.
@@ -400,3 +400,26 @@ Cause: path dependencies are included in that check and can inherit the parent f
 Fix: preserve the dependency’s own formatting configuration and record any minimal formatting-only import adjustments separately from the credited upstream patch.
 Never call a modified full snapshot byte-identical; verify the carried fix’s affected file or changed hunk bytes independently.
 How found: the imported print wrapper had two layout-only differences under default rustfmt; its carried PrintTicket file still matched upstream exactly.
+
+## Complete catalog branches and format-pin prerequisites
+
+Symptom: an all-branches log shows accepted translations, but the selected catalog tree has no app files for them.
+Cause: the candidate was based on one app’s catalog topic; other accepted topics existed as refs without being merged into that tree.
+Fix: check each topic with `git merge-base --is-ancestor <accepted-topic> HEAD`, inspect `git ls-tree -r --name-only HEAD -- locales`, and verify the files the receiving app actually reads.
+Compose the topic histories, retain every attribution block, then run the data repository’s complete gate and the apps’ required-input checks.
+How found: the source audit found zero AniCraft and MaterialCraft catalogs in the candidate, despite their commits appearing in `git log --all`; merging their accepted history restored their exact file bytes.
+A matching revision file or an existing Git object does not establish catalog consumption.
+
+Symptom: a required catalog cutover cannot provide languages already offered by the app, or loses many existing translations.
+Cause: the shared checkout predates the app’s latest in-repository catalogs.
+Fix: read its recorded sync base in ATTRIBUTION.md and use the official `tools/sync_app.py` delta migration against the accepted app head.
+Preserve untouched shared corrections, check the round trip, credit the real source and rerun the data gate; do not silently embed English instead.
+How found: FilmCraft’s check reported four missing registered app catalogs and 20,136 missing or different rows; its delta migration reproduced all 55,697 eligible source rows without changing common.tsv.
+Prefetch the historical source blobs before running the migration offline; a partial clone can know a commit without holding its catalog contents.
+
+Symptom: a shared format upgrade makes the old app test fail with a corrupt-file error naming `full_composite`.
+Cause: the app’s last format pin skipped that optional member, while the new shared envelope deliberately validates it like the thumbnail and composite paths.
+Fix: read the shared format contract and search upstream before adding another parser API or relaxing its guard.
+[PhotoCraft #13092](https://github.com/storytold/photocraft/pull/13092), by dotCooCoo, contains the exact pin-transition regression: a malformed path must return Corrupt naming the field, while a bundle without the optional member still opens.
+How found: the full receiving gate named the old assertion, and the PR’s original non-merge commit fb7368e5d explained the same transition.
+Carry the original author and date; when the edition’s common-source binding supersedes the PR’s Git pin and lock lines, identify that scope and verify the applicable test hunk instead of claiming whole-commit byte identity.

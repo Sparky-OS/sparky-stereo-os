@@ -181,7 +181,7 @@ They are written so the next person, or the next model, ports a solved pattern i
 
 From the lanes of 25 October to 6 November 2026; add the next lesson here as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 
-- Symptom: uefi.org and a vendor support site answer 403 to the fetch tool and to curl with a browser agent. Fix: `curl https://web.archive.org/web/2025id_/URL` returns the capture (gzip, decompress before parsing); the capture date is in the final URL; cite it. WebFetch cannot reach web.archive.org. Skill line: "A page behind a bot wall is read from the Wayback Machine's copy". (lane lutz-crash-course-231)
+- Symptom: uefi.org and a vendor support site answer 403 to the fetch tool and to curl with a browser agent. Fix: `curl https://web.archive.org/web/2025id_/URL` returns the capture (gzip, decompress before parsing); the capture date is in the final URL; cite it. WebFetch cannot reach web.archive.org. Skill line: "A page behind a bot wall is read from the Wayback Machine's copy". (lane crash-course-231)
 - Audit of 3,309 default rows sorted by origin: 175 rows are edition-owned (32 behaviour groups); the rest are Debian, upstream, theme values, or recorded decisions. Only edition-owned rows are questions for the person; theme files collapse to 16 records covering 840 value rows (lane design-audit-355)
 
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

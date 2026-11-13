@@ -31,11 +31,39 @@ def expand(value, strings):
     return re.sub(r'\{\{([^}]+)\}\}', lambda m: strings[m.group(1)], value)
 
 
+def picture_size(path):
+    """Width and height of a PNG, GIF, JPEG or sized SVG read from the file itself, or None."""
+    data = path.read_bytes()
+    if data[:8] == b'\x89PNG\r\n\x1a\n' and data[12:16] == b'IHDR':
+        return int.from_bytes(data[16:20], 'big'), int.from_bytes(data[20:24], 'big')
+    if data[:6] in (b'GIF87a', b'GIF89a'):
+        return int.from_bytes(data[6:8], 'little'), int.from_bytes(data[8:10], 'little')
+    if data.lstrip()[:1] == b'<':  # an SVG: its size in pixels, or the shape of its view box
+        root = re.search(rb'<svg\b[^>]*>', data[:4096])
+        w = root and re.search(rb'\bwidth="(\d+(?:\.\d+)?)(?:px)?"', root.group(0))
+        h = root and re.search(rb'\bheight="(\d+(?:\.\d+)?)(?:px)?"', root.group(0))
+        if w and h: return round(float(w.group(1))), round(float(h.group(1)))
+        box = root and re.search(rb'\bviewBox="[\d.+-]+[ ,]+[\d.+-]+[ ,]+([\d.]+)[ ,]+([\d.]+)"', root.group(0))
+        return (round(float(box.group(1))), round(float(box.group(2)))) if box else None  # its shape, at least
+    if data[:2] == b'\xff\xd8':
+        i = 2
+        while i + 9 < len(data):
+            if data[i] != 0xff: return None
+            marker = data[i + 1]
+            if marker == 0xff: i += 1; continue
+            if 0xd0 <= marker <= 0xd9 or marker == 0x01: i += 2; continue
+            if marker in (0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf):
+                return int.from_bytes(data[i + 7:i + 9], 'big'), int.from_bytes(data[i + 5:i + 7], 'big')
+            i += 2 + int.from_bytes(data[i + 2:i + 4], 'big')
+    return None
+
+
 class Renderer:
     def __init__(self, catalogs, cfg):
         self.catalogs = catalogs
         self.cfg = cfg
         self.assets = {}
+        self.asset_paths = {}
         self.routes = {source: (lang, kind) for lang, c in catalogs.items()
                        for kind, d in c['pages'].items() for source in [d['source']]}
         self.external_assets = json.loads((SITE/'assets.json').read_text())
@@ -64,6 +92,7 @@ class Renderer:
             if not path.is_file(): raise ValueError('Missing asset: ' + rel)
             dest = 'assets/media/' + rel
         self.assets[dest] = path
+        self.asset_paths[self.url(dest)] = path
         return self.url(dest)
 
     def link(self, target, source):
@@ -93,8 +122,13 @@ class Renderer:
         cls = 'screenshot' if not urlsplit(src).scheme else 'badge'
         # GitHub permits percentage widths in its Markdown HTML. HTML itself
         # requires integer dimensions; responsive sizing belongs in the CSS.
-        dims = ''
-        if width and width.isdigit(): dims = f' width="{width}"'
+        # Each picture says its real size, read from its file, so the page keeps
+        # its place before it arrives; a width the source gives in pixels wins.
+        dims = ''; size = picture_size(self.asset_paths[url])
+        if width and width.isdigit():
+            dims = f' width="{width}"' + (f' height="{round(int(width) * size[1] / size[0])}"' if size else '')
+        elif size:
+            dims = f' width="{size[0]}" height="{size[1]}"'
         return f'<img class="{cls}" src="{escape(url, quote=True)}" alt="{escape(alt, quote=True)}"{dims} loading="lazy" decoding="async">'
 
     def inline(self, value, source):
@@ -222,7 +256,10 @@ class Renderer:
                     if kind == 'home' and '.intro.paragraph' in key:
                         css = {'01':'lead intro-copy','02':'intro-copy','03':'hero','04':'gallery','05':'caption','06':'status','07':'next-step'}.get(key[-2:], '')
                     if '<img ' in value and not css: css = 'gallery' if value.count('<img ')>1 else 'hero'
-                    active.append('<div class="'+css+'">' + self.inline(value,source) + '</div>' if css in ('hero','gallery') else '<p' + (f' class="{css}"' if css else '') + '>' + self.inline(value,source) + '</p>')
+                    rendered = self.inline(value,source)
+                    if kind == 'home' and key == 'home.intro.paragraph03':
+                        rendered = rendered.replace(' loading="lazy"', '')  # the first screen's picture loads at once
+                    active.append('<div class="'+css+'">' + rendered + '</div>' if css in ('hero','gallery') else '<p' + (f' class="{css}"' if css else '') + '>' + self.inline(value,source) + '</p>')
                     if kind == 'home' and key in ('home.intro.paragraph05', 'home.intro.paragraph07'):
                         active.append('</div>')  # the caption ends the pictures' column; the next step ends the first screen
                 else: raise ValueError('Unsupported block: ' + typ)

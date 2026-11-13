@@ -83,6 +83,36 @@ It also compiles a program in both forms and checks that `line!()` and the panic
   Fix: none needed for a build's own output folder; a crate that keeps sources under `src/build/` stays authored there.
   Found by: reading the walker's list of skipped folder names.
 
+## The compiler itself, measured on a small machine
+
+**Preparation status, 2026-11-13:** source preparation has compiler-backed controls; the compiler build and hardware timings are separate acceptance steps.
+This recipe accompanies `tools/rust-lean-experiment` in the distribution build tree; run its source-preparation driver with the pinned toolkit and compiler in a container.
+Its recipe is `prepare.py AUTHORED OUTPUT`, then `verify.py AUTHORED OUTPUT`.
+It leaves the authored source intact and makes B with the existing renderer and C with comment-form documentation removed where the consumer scan permits it.
+The manifests bind file contents, modes and links; `source-report.json` names preserved inputs and C's crate exceptions.
+The preparation compiler checks B's complete token listing, and checks C after excluding doc attributes on both sides.
+Explicit doc attributes stay in the source.
+This check establishes lexical scope only; keep `build_qualified` false until the fixed compiler build and its consumers pass.
+
+Source-tree totals include fixtures the build never compiles.
+Intersect the final manifests with actual build dep-info before calling a number "what the compiler reads".
+The measurement kit must retain the source identities and preparation evidence, build each form with the same seed and configuration, and compare installed files and compiler workloads separately.
+Full timing and unattended-runner qualification remain required before reporting results.
+
+- Symptom: a source-preparation walker omits Rust code under a directory named `build`.
+  Cause: the generic source walker excludes that name at every depth.
+  Fix for the compiler experiment: inventory every Rust source independently, apply the same renderer and consumer checks, and list preserved fixtures explicitly.
+  Found by: reading `source_tree.EXCLUDED`; a synthetic `src/build/unit.rs` control confirms projection and manifest coverage.
+- Symptom: removing docs can change macro expansion although the remaining ordinary tokens match.
+  Cause: the compiler's `rustc_macros::rustc_queries!` reads doc attributes and generates replacement documentation when they are absent.
+  Fix: keep docs in its caller crate for C and record why; apply equivalent review to other documentation-consuming macros.
+  Found by: source inspection of `compiler/rustc_macros/src/query.rs`, `doc_comments.is_empty()` and `doc_comment_from_desc`, and a preparation control that fails without the exception.
+  This is a source-consumer finding, not a successful full compiler build.
+- Symptom: a modified vendored source is accepted without proving which checksum it replaced.
+  Cause: rewriting a Cargo manifest by its current files alone loses the old source identity.
+  Fix: change only entries whose old and new digests match the projection ledger; reject a mismatching old digest and retain the authored manifests.
+  Found by: the compiler experiment's checksum negative control and complete-tree corruption control.
+
 ## Measured on a two-app workspace (rustc 1.99.1, release build, four CPUs, a busy machine)
 
 Counts over every Rust file of the 783 packages in the resolved graph (22,268 files, 367.8 MB, 9,787,209 lines), with [`scripts/rust-comment-census.py`](../scripts/rust-comment-census.py):

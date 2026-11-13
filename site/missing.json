@@ -1,0 +1,127 @@
+{
+  "en": {
+    "missing_pages": [],
+    "missing_keys": [],
+    "additional_keys": []
+  },
+  "pt_BR": {
+    "missing_pages": [],
+    "missing_keys": [
+      "detail.documents.glossary",
+      "detail.documents.glossary.link01",
+      "detail.where-it-is-going.after-tpac-report",
+      "detail.where-it-is-going.after-tpac-report.link01",
+      "detail.where-it-is-going.tpac-report",
+      "detail.where-it-is-going.tpac-report.link01",
+      "detail.where-it-is-going.tpac-report.link02",
+      "windows.when-you-want-more.paragraph01.link01"
+    ],
+    "additional_keys": [
+      "windows.intro.paragraph02.link02"
+    ]
+  },
+  "pl": {
+    "missing_pages": [
+      "windows"
+    ],
+    "missing_keys": [
+      "detail.documents.glossary",
+      "detail.documents.glossary.link01",
+      "detail.where-it-is-going.after-tpac-report",
+      "detail.where-it-is-going.after-tpac-report.link01",
+      "detail.where-it-is-going.tpac-report",
+      "detail.where-it-is-going.tpac-report.link01",
+      "detail.where-it-is-going.tpac-report.link02"
+    ],
+    "additional_keys": []
+  },
+  "fr": {
+    "missing_pages": [
+      "windows"
+    ],
+    "missing_keys": [
+      "detail.documents.glossary",
+      "detail.documents.glossary.link01",
+      "detail.where-it-is-going.after-tpac-report",
+      "detail.where-it-is-going.after-tpac-report.link01",
+      "detail.where-it-is-going.tpac-report",
+      "detail.where-it-is-going.tpac-report.link01",
+      "detail.where-it-is-going.tpac-report.link02"
+    ],
+    "additional_keys": []
+  },
+  "de": {
+    "missing_pages": [
+      "detail"
+    ],
+    "missing_keys": [],
+    "additional_keys": []
+  },
+  "es": {
+    "missing_pages": [
+      "detail"
+    ],
+    "missing_keys": [],
+    "additional_keys": []
+  },
+  "ja": {
+    "missing_pages": [
+      "windows"
+    ],
+    "missing_keys": [
+      "detail.documents.glossary",
+      "detail.documents.glossary.link01",
+      "detail.where-it-is-going.after-tpac-report",
+      "detail.where-it-is-going.after-tpac-report.link01",
+      "detail.where-it-is-going.tpac-report",
+      "detail.where-it-is-going.tpac-report.link01",
+      "detail.where-it-is-going.tpac-report.link02"
+    ],
+    "additional_keys": []
+  },
+  "ko": {
+    "missing_pages": [
+      "windows"
+    ],
+    "missing_keys": [
+      "detail.documents.glossary",
+      "detail.documents.glossary.link01",
+      "detail.where-it-is-going.after-tpac-report",
+      "detail.where-it-is-going.after-tpac-report.link01",
+      "detail.where-it-is-going.tpac-report",
+      "detail.where-it-is-going.tpac-report.link01",
+      "detail.where-it-is-going.tpac-report.link02"
+    ],
+    "additional_keys": []
+  },
+  "zh_CN": {
+    "missing_pages": [
+      "windows"
+    ],
+    "missing_keys": [
+      "detail.documents.glossary",
+      "detail.documents.glossary.link01",
+      "detail.where-it-is-going.after-tpac-report",
+      "detail.where-it-is-going.after-tpac-report.link01",
+      "detail.where-it-is-going.tpac-report",
+      "detail.where-it-is-going.tpac-report.link01",
+      "detail.where-it-is-going.tpac-report.link02"
+    ],
+    "additional_keys": []
+  },
+  "zh_TW": {
+    "missing_pages": [
+      "windows"
+    ],
+    "missing_keys": [
+      "detail.documents.glossary",
+      "detail.documents.glossary.link01",
+      "detail.where-it-is-going.after-tpac-report",
+      "detail.where-it-is-going.after-tpac-report.link01",
+      "detail.where-it-is-going.tpac-report",
+      "detail.where-it-is-going.tpac-report.link01",
+      "detail.where-it-is-going.tpac-report.link02"
+    ],
+    "additional_keys": []
+  }
+}

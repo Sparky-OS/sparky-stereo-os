@@ -1,0 +1,1579 @@
+{
+  "language": "pt_BR",
+  "pages": {
+    "home": {
+      "source": "README.pt-BR.md",
+      "sha256": "094e441e75dc64a1f8daad06c5ccc1617172087516a9d75f1a5aaac508d259fb",
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 1,
+          "line": 1,
+          "key": "home.intro.heading01",
+          "id": "sparky-stereo-os",
+          "english_id": "sparky-stereo-os"
+        },
+        {
+          "type": "paragraph",
+          "line": 5,
+          "key": "home.intro.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 10,
+          "key": "home.intro.paragraph02"
+        },
+        {
+          "type": "paragraph",
+          "line": 13,
+          "key": "home.intro.paragraph03"
+        },
+        {
+          "type": "paragraph",
+          "line": 15,
+          "key": "home.intro.paragraph04"
+        },
+        {
+          "type": "paragraph",
+          "line": 17,
+          "key": "home.intro.paragraph05"
+        },
+        {
+          "type": "paragraph",
+          "line": 19,
+          "key": "home.intro.paragraph06"
+        },
+        {
+          "type": "paragraph",
+          "line": 21,
+          "key": "home.intro.paragraph07"
+        },
+        {
+          "type": "item",
+          "line": 24,
+          "key": "home.intro.item01"
+        },
+        {
+          "type": "item",
+          "line": 25,
+          "key": "home.intro.item02"
+        },
+        {
+          "type": "item",
+          "line": 26,
+          "key": "home.intro.item03"
+        },
+        {
+          "type": "item",
+          "line": 27,
+          "key": "home.intro.item04"
+        },
+        {
+          "type": "item",
+          "line": 28,
+          "key": "home.intro.item05"
+        },
+        {
+          "type": "item",
+          "line": 29,
+          "key": "home.intro.item06"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"depth-on-the-desktop\"></a><a id=\"the-stereo-desktop-new-frontiers-for-theme-design\"></a>",
+          "line": 31
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 32,
+          "key": "home.the-stereo-desktop-new-frontiers-for-theme-design.heading01",
+          "id": "a-área-de-trabalho-estéreo-novas-fronteiras-para-o-design-de-temas",
+          "english_id": "the-stereo-desktop-new-frontiers-for-theme-design"
+        },
+        {
+          "type": "paragraph",
+          "line": 34,
+          "key": "home.the-stereo-desktop-new-frontiers-for-theme-design.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"how-it-works\"></a>",
+          "line": 36
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 37,
+          "key": "home.how-it-works.heading01",
+          "id": "como-funciona",
+          "english_id": "how-it-works"
+        },
+        {
+          "type": "paragraph",
+          "line": 39,
+          "key": "home.how-it-works.paragraph01"
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 42,
+          "key": "home.more-about-the-edition.heading01",
+          "id": "mais-sobre-a-edição",
+          "english_id": "more-about-the-edition"
+        },
+        {
+          "type": "item",
+          "line": 44,
+          "key": "home.more-about-the-edition.item01"
+        },
+        {
+          "type": "item",
+          "line": 45,
+          "key": "home.more-about-the-edition.item02"
+        },
+        {
+          "type": "item",
+          "line": 46,
+          "key": "home.more-about-the-edition.item03"
+        },
+        {
+          "type": "item",
+          "line": 47,
+          "key": "home.more-about-the-edition.item04"
+        },
+        {
+          "type": "item",
+          "line": 48,
+          "key": "home.more-about-the-edition.item05"
+        },
+        {
+          "type": "item",
+          "line": 49,
+          "key": "home.more-about-the-edition.item06"
+        },
+        {
+          "type": "item",
+          "line": 50,
+          "key": "home.more-about-the-edition.item07"
+        },
+        {
+          "type": "item",
+          "line": 51,
+          "key": "home.more-about-the-edition.item08"
+        },
+        {
+          "type": "item",
+          "line": 52,
+          "key": "home.more-about-the-edition.item09"
+        },
+        {
+          "type": "item",
+          "line": 53,
+          "key": "home.more-about-the-edition.item10"
+        },
+        {
+          "type": "item",
+          "line": 54,
+          "key": "home.more-about-the-edition.item11"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"credit\"></a>",
+          "line": 56
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 57,
+          "key": "home.credit.heading01",
+          "id": "créditos",
+          "english_id": "credit"
+        },
+        {
+          "type": "paragraph",
+          "line": 59,
+          "key": "home.credit.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 62,
+          "key": "home.credit.paragraph02"
+        },
+        {
+          "type": "paragraph",
+          "line": 64,
+          "key": "home.credit.paragraph03"
+        },
+        {
+          "type": "paragraph",
+          "line": 66,
+          "key": "home.credit.paragraph04"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"licence\"></a>",
+          "line": 68
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 69,
+          "key": "home.licence.heading01",
+          "id": "licença",
+          "english_id": "licence"
+        },
+        {
+          "type": "paragraph",
+          "line": 71,
+          "key": "home.licence.paragraph01"
+        }
+      ],
+      "language_row": "🇨🇦 [English](README.md) · 🇧🇷 [Português](README.pt-BR.md) · 🇵🇱 [Polski](README.pl.md) · 🇫🇷 [Français](README.fr.md) · 🇩🇪 [Deutsch](README.de.md) · 🇲🇽 [Español](README.es.md) · 🇯🇵 [日本語](README.ja.md) · 🇰🇷 [한국어](README.ko.md) · 🇨🇳 [简体中文](README.zh-CN.md) · 🇭🇰 [繁體中文](README.zh-TW.md)"
+    },
+    "detail": {
+      "source": "docs/edition-in-detail.pt-BR.md",
+      "sha256": "ed193c538c2546cf7325d940ff2a7bc3326bdb80bb0a954ef5d849641cb69fe8",
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 1,
+          "line": 1,
+          "key": "detail.intro.heading01",
+          "id": "sparky-stereo-os-em-detalhe",
+          "english_id": "sparky-stereo-os-in-detail"
+        },
+        {
+          "type": "paragraph",
+          "line": 5,
+          "key": "detail.intro.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 8,
+          "key": "detail.intro.paragraph02"
+        },
+        {
+          "type": "paragraph",
+          "line": 12,
+          "key": "detail.intro.paragraph03"
+        },
+        {
+          "type": "paragraph",
+          "line": 15,
+          "key": "detail.intro.paragraph04"
+        },
+        {
+          "type": "paragraph",
+          "line": 17,
+          "key": "detail.intro.paragraph05"
+        },
+        {
+          "type": "paragraph",
+          "line": 19,
+          "key": "detail.intro.paragraph06"
+        },
+        {
+          "type": "paragraph",
+          "line": 24,
+          "key": "detail.intro.paragraph07"
+        },
+        {
+          "type": "paragraph",
+          "line": 26,
+          "key": "detail.intro.paragraph08"
+        },
+        {
+          "type": "paragraph",
+          "line": 28,
+          "key": "detail.intro.paragraph09"
+        },
+        {
+          "type": "item",
+          "line": 30,
+          "key": "detail.intro.item01"
+        },
+        {
+          "type": "item",
+          "line": 31,
+          "key": "detail.intro.item02"
+        },
+        {
+          "type": "item",
+          "line": 32,
+          "key": "detail.intro.item03"
+        },
+        {
+          "type": "item",
+          "line": 33,
+          "key": "detail.intro.item04"
+        },
+        {
+          "type": "item",
+          "line": 34,
+          "key": "detail.intro.item05"
+        },
+        {
+          "type": "paragraph",
+          "line": 36,
+          "key": "detail.intro.paragraph10"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"vr-is-also-a-stereo-monitor\"></a>",
+          "line": 39
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 40,
+          "key": "detail.vr-is-also-a-stereo-monitor.heading01",
+          "id": "vr-também-é-um-monitor-estéreo",
+          "english_id": "vr-is-also-a-stereo-monitor"
+        },
+        {
+          "type": "paragraph",
+          "line": 42,
+          "key": "detail.vr-is-also-a-stereo-monitor.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 46,
+          "key": "detail.vr-is-also-a-stereo-monitor.paragraph02"
+        },
+        {
+          "type": "item",
+          "line": 47,
+          "key": "detail.vr-is-also-a-stereo-monitor.item01"
+        },
+        {
+          "type": "item",
+          "line": 48,
+          "key": "detail.vr-is-also-a-stereo-monitor.item02"
+        },
+        {
+          "type": "item",
+          "line": 49,
+          "key": "detail.vr-is-also-a-stereo-monitor.item03"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"who-builds-it\"></a>",
+          "line": 51
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 52,
+          "key": "detail.who-builds-it.heading01",
+          "id": "quem-constrói",
+          "english_id": "who-builds-it"
+        },
+        {
+          "type": "paragraph",
+          "line": 54,
+          "key": "detail.who-builds-it.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"where-it-is-going\"></a>",
+          "line": 61
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 62,
+          "key": "detail.where-it-is-going.heading01",
+          "id": "para-onde-vamos",
+          "english_id": "where-it-is-going"
+        },
+        {
+          "type": "paragraph",
+          "line": 64,
+          "key": "detail.where-it-is-going.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"create\"></a>",
+          "line": 70
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 71,
+          "key": "detail.create.heading01",
+          "id": "criar",
+          "english_id": "create"
+        },
+        {
+          "type": "paragraph",
+          "line": 73,
+          "key": "detail.create.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 75,
+          "key": "detail.create.paragraph02"
+        },
+        {
+          "type": "item",
+          "line": 79,
+          "key": "detail.create.item01"
+        },
+        {
+          "type": "item",
+          "line": 80,
+          "key": "detail.create.item02"
+        },
+        {
+          "type": "item",
+          "line": 81,
+          "key": "detail.create.item03"
+        },
+        {
+          "type": "item",
+          "line": 82,
+          "key": "detail.create.item04"
+        },
+        {
+          "type": "item",
+          "line": 83,
+          "key": "detail.create.item05"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"scan\"></a>",
+          "line": 85
+        },
+        {
+          "type": "paragraph",
+          "line": 86,
+          "key": "detail.create.paragraph03"
+        },
+        {
+          "type": "paragraph",
+          "line": 92,
+          "key": "detail.create.paragraph04"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"for-theme-designers-and-customizers\"></a>",
+          "line": 94
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "line": 95,
+          "key": "detail.for-theme-designers-and-customizers.heading01",
+          "id": "para-quem-cria-e-personaliza-temas",
+          "english_id": "for-theme-designers-and-customizers"
+        },
+        {
+          "type": "paragraph",
+          "line": 97,
+          "key": "detail.for-theme-designers-and-customizers.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"science-and-engineering\"></a>",
+          "line": 99
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 100,
+          "key": "detail.science-and-engineering.heading01",
+          "id": "ciência-e-engenharia",
+          "english_id": "science-and-engineering"
+        },
+        {
+          "type": "paragraph",
+          "line": 102,
+          "key": "detail.science-and-engineering.paragraph01"
+        },
+        {
+          "type": "item",
+          "line": 103,
+          "key": "detail.science-and-engineering.item01"
+        },
+        {
+          "type": "item",
+          "line": 104,
+          "key": "detail.science-and-engineering.item02"
+        },
+        {
+          "type": "item",
+          "line": 105,
+          "key": "detail.science-and-engineering.item03"
+        },
+        {
+          "type": "item",
+          "line": 106,
+          "key": "detail.science-and-engineering.item04"
+        },
+        {
+          "type": "paragraph",
+          "line": 108,
+          "key": "detail.science-and-engineering.paragraph02"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"watch-and-play\"></a>",
+          "line": 110
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 111,
+          "key": "detail.watch-and-play.heading01",
+          "id": "assistir-e-jogar",
+          "english_id": "watch-and-play"
+        },
+        {
+          "type": "paragraph",
+          "line": 113,
+          "key": "detail.watch-and-play.paragraph01"
+        },
+        {
+          "type": "item",
+          "line": 114,
+          "key": "detail.watch-and-play.item01"
+        },
+        {
+          "type": "item",
+          "line": 115,
+          "key": "detail.watch-and-play.item02"
+        },
+        {
+          "type": "item",
+          "line": 116,
+          "key": "detail.watch-and-play.item03"
+        },
+        {
+          "type": "item",
+          "line": 117,
+          "key": "detail.watch-and-play.item04"
+        },
+        {
+          "type": "item",
+          "line": 118,
+          "key": "detail.watch-and-play.item05"
+        },
+        {
+          "type": "paragraph",
+          "line": 120,
+          "key": "detail.watch-and-play.paragraph02"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"seen-in-3d\"></a>",
+          "line": 122
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "line": 123,
+          "key": "detail.seen-in-3d.heading01",
+          "id": "visto-em-3d",
+          "english_id": "seen-in-3d"
+        },
+        {
+          "type": "paragraph",
+          "line": 125,
+          "key": "detail.seen-in-3d.paragraph01"
+        },
+        {
+          "type": "item",
+          "line": 128,
+          "key": "detail.seen-in-3d.item01"
+        },
+        {
+          "type": "item",
+          "line": 129,
+          "key": "detail.seen-in-3d.item02"
+        },
+        {
+          "type": "item",
+          "line": 130,
+          "key": "detail.seen-in-3d.item03"
+        },
+        {
+          "type": "item",
+          "line": 131,
+          "key": "detail.seen-in-3d.item04"
+        },
+        {
+          "type": "item",
+          "line": 132,
+          "key": "detail.seen-in-3d.item05"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"depth-on-the-desktop\"></a>",
+          "line": 134
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"the-stereo-desktop-new-frontiers-for-theme-design\"></a>",
+          "line": 135
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 136,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.heading01",
+          "id": "a-área-de-trabalho-estéreo-novas-fronteiras-para-o-design-de-temas",
+          "english_id": "the-stereo-desktop-new-frontiers-for-theme-design"
+        },
+        {
+          "type": "paragraph",
+          "line": 138,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph01"
+        },
+        {
+          "type": "item",
+          "line": 141,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item01"
+        },
+        {
+          "type": "item",
+          "line": 142,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item02"
+        },
+        {
+          "type": "item",
+          "line": 143,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item03"
+        },
+        {
+          "type": "item",
+          "line": 144,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item04"
+        },
+        {
+          "type": "item",
+          "line": 145,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item05"
+        },
+        {
+          "type": "item",
+          "line": 146,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item06"
+        },
+        {
+          "type": "item",
+          "line": 147,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item07"
+        },
+        {
+          "type": "item",
+          "line": 148,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item08"
+        },
+        {
+          "type": "paragraph",
+          "line": 150,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph02"
+        },
+        {
+          "type": "paragraph",
+          "line": 154,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"for-developers\"></a>",
+          "line": 156
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 157,
+          "key": "detail.for-developers.heading01",
+          "id": "para-desenvolvedores",
+          "english_id": "for-developers"
+        },
+        {
+          "type": "paragraph",
+          "line": 159,
+          "key": "detail.for-developers.paragraph01"
+        },
+        {
+          "type": "item",
+          "line": 161,
+          "key": "detail.for-developers.item01"
+        },
+        {
+          "type": "item",
+          "line": 162,
+          "key": "detail.for-developers.item02"
+        },
+        {
+          "type": "item",
+          "line": 163,
+          "key": "detail.for-developers.item03"
+        },
+        {
+          "type": "item",
+          "line": 164,
+          "key": "detail.for-developers.item04"
+        },
+        {
+          "type": "item",
+          "line": 165,
+          "key": "detail.for-developers.item05"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"how-it-works\"></a>",
+          "line": 167
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 168,
+          "key": "detail.how-it-works.heading01",
+          "id": "como-funciona",
+          "english_id": "how-it-works"
+        },
+        {
+          "type": "paragraph",
+          "line": 170,
+          "key": "detail.how-it-works.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 172,
+          "key": "detail.how-it-works.paragraph02"
+        },
+        {
+          "type": "item",
+          "line": 173,
+          "key": "detail.how-it-works.item01"
+        },
+        {
+          "type": "item",
+          "line": 174,
+          "key": "detail.how-it-works.item02"
+        },
+        {
+          "type": "item",
+          "line": 175,
+          "key": "detail.how-it-works.item03"
+        },
+        {
+          "type": "paragraph",
+          "line": 177,
+          "key": "detail.how-it-works.paragraph03"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"stereo-in-the-open-stack-not-in-one-product\"></a>",
+          "line": 179
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 180,
+          "key": "detail.stereo-in-the-open-stack-not-in-one-product.heading01",
+          "id": "estéreo-nas-camadas-abertas-não-num-único-produto",
+          "english_id": "stereo-in-the-open-stack-not-in-one-product"
+        },
+        {
+          "type": "paragraph",
+          "line": 182,
+          "key": "detail.stereo-in-the-open-stack-not-in-one-product.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"programs-the-edition-changes-for-stereo-3d-and-deep-colour\"></a>",
+          "line": 185
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 186,
+          "key": "detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.heading01",
+          "id": "programas-que-a-edição-modifica-para-estéreo-3d-e-maior-profundidade-de-cor",
+          "english_id": "programs-the-edition-changes-for-stereo-3d-and-deep-colour"
+        },
+        {
+          "type": "paragraph",
+          "line": 188,
+          "key": "detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"our-branches-on-kdes-gitlab\"></a>",
+          "line": 191
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 192,
+          "key": "detail.our-branches-on-kdes-gitlab.heading01",
+          "id": "nossas-branches-no-gitlab-do-kde",
+          "english_id": "our-branches-on-kdes-gitlab"
+        },
+        {
+          "type": "paragraph",
+          "line": 194,
+          "key": "detail.our-branches-on-kdes-gitlab.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"merged-outside-sparky-stereo\"></a>",
+          "line": 196
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 197,
+          "key": "detail.merged-outside-sparky-stereo.heading01",
+          "id": "incorporado-fora-do-sparky-stereo",
+          "english_id": "merged-outside-sparky-stereo"
+        },
+        {
+          "type": "paragraph",
+          "line": 199,
+          "key": "detail.merged-outside-sparky-stereo.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 203,
+          "key": "detail.merged-outside-sparky-stereo.paragraph02"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"documents\"></a>",
+          "line": 208
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 209,
+          "key": "detail.documents.heading01",
+          "id": "documentos",
+          "english_id": "documents"
+        },
+        {
+          "type": "paragraph",
+          "line": 211,
+          "key": "detail.documents.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"tools\"></a>",
+          "line": 213
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 214,
+          "key": "detail.tools.heading01",
+          "id": "ferramentas",
+          "english_id": "tools"
+        },
+        {
+          "type": "paragraph",
+          "line": 216,
+          "key": "detail.tools.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"the-base-three-open-lists\"></a>",
+          "line": 218
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 219,
+          "key": "detail.the-base-three-open-lists.heading01",
+          "id": "a-base-três-listas-abertas",
+          "english_id": "the-base-three-open-lists"
+        },
+        {
+          "type": "paragraph",
+          "line": 221,
+          "key": "detail.the-base-three-open-lists.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"credit\"></a>",
+          "line": 223
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 224,
+          "key": "detail.credit.heading01",
+          "id": "créditos",
+          "english_id": "credit"
+        },
+        {
+          "type": "paragraph",
+          "line": 226,
+          "key": "detail.credit.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 228,
+          "key": "detail.credit.paragraph02"
+        },
+        {
+          "type": "table",
+          "line": 230,
+          "key": "detail.credit.table01"
+        },
+        {
+          "type": "paragraph",
+          "line": 236,
+          "key": "detail.credit.paragraph03"
+        },
+        {
+          "type": "paragraph",
+          "line": 238,
+          "key": "detail.credit.paragraph04"
+        },
+        {
+          "type": "paragraph",
+          "line": 240,
+          "key": "detail.credit.paragraph05"
+        },
+        {
+          "type": "item",
+          "line": 241,
+          "key": "detail.credit.item01"
+        },
+        {
+          "type": "item",
+          "line": 242,
+          "key": "detail.credit.item02"
+        },
+        {
+          "type": "item",
+          "line": 243,
+          "key": "detail.credit.item03"
+        },
+        {
+          "type": "item",
+          "line": 244,
+          "key": "detail.credit.item04"
+        },
+        {
+          "type": "item",
+          "line": 245,
+          "key": "detail.credit.item05"
+        },
+        {
+          "type": "paragraph",
+          "line": 247,
+          "key": "detail.credit.paragraph06"
+        },
+        {
+          "type": "paragraph",
+          "line": 249,
+          "key": "detail.credit.paragraph07"
+        },
+        {
+          "type": "paragraph",
+          "line": 251,
+          "key": "detail.credit.paragraph08"
+        },
+        {
+          "type": "paragraph",
+          "line": 253,
+          "key": "detail.credit.paragraph09"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"licence\"></a>",
+          "line": 255
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 256,
+          "key": "detail.licence.heading01",
+          "id": "licença",
+          "english_id": "licence"
+        },
+        {
+          "type": "paragraph",
+          "line": 258,
+          "key": "detail.licence.paragraph01"
+        },
+        {
+          "type": "quote",
+          "line": 260,
+          "key": "detail.licence.quote01"
+        },
+        {
+          "type": "paragraph",
+          "line": 263,
+          "key": "detail.licence.paragraph02"
+        },
+        {
+          "type": "paragraph",
+          "line": 265,
+          "key": "detail.licence.paragraph03"
+        }
+      ],
+      "language_row": "[English](edition-in-detail.md) · [Português](edition-in-detail.pt-BR.md) · [Polski](edition-in-detail.pl.md) · [Français](edition-in-detail.fr.md) · [日本語](edition-in-detail.ja.md) · [한국어](edition-in-detail.ko.md) · [简体中文](edition-in-detail.zh-CN.md) · [繁體中文](edition-in-detail.zh-TW.md)"
+    },
+    "windows": {
+      "source": "docs/guides/try-on-windows.pt-BR.md",
+      "sha256": "08c49975c2a92b3113b70999b7543d9f2e55e4073dad9a1a24a99310172149a3",
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 1,
+          "line": 1,
+          "key": "windows.intro.heading01",
+          "id": "experimente-no-seu-pc-com-windows",
+          "english_id": "try-it-on-your-windows-pc"
+        },
+        {
+          "type": "paragraph",
+          "line": 5,
+          "key": "windows.intro.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 7,
+          "key": "windows.intro.paragraph02"
+        },
+        {
+          "type": "paragraph",
+          "line": 11,
+          "key": "windows.intro.paragraph03"
+        },
+        {
+          "type": "step",
+          "line": 13,
+          "key": "windows.intro.step01"
+        },
+        {
+          "type": "step",
+          "line": 17,
+          "key": "windows.intro.step02"
+        },
+        {
+          "type": "step",
+          "line": 21,
+          "key": "windows.intro.step03"
+        },
+        {
+          "type": "step",
+          "line": 23,
+          "key": "windows.intro.step04"
+        },
+        {
+          "type": "step",
+          "line": 27,
+          "key": "windows.intro.step05"
+        },
+        {
+          "type": "step",
+          "line": 31,
+          "key": "windows.intro.step06"
+        },
+        {
+          "type": "step",
+          "line": 33,
+          "key": "windows.intro.step07"
+        },
+        {
+          "type": "step",
+          "line": 39,
+          "key": "windows.intro.step08"
+        },
+        {
+          "type": "step",
+          "line": 45,
+          "key": "windows.intro.step09"
+        },
+        {
+          "type": "step",
+          "line": 54,
+          "key": "windows.intro.step10"
+        },
+        {
+          "type": "paragraph",
+          "line": 58,
+          "key": "windows.intro.paragraph04"
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 61,
+          "key": "windows.when-you-want-more.heading01",
+          "id": "quando-quiser-mais",
+          "english_id": "when-you-want-more"
+        },
+        {
+          "type": "paragraph",
+          "line": 63,
+          "key": "windows.when-you-want-more.paragraph01"
+        },
+        {
+          "type": "item",
+          "line": 65,
+          "key": "windows.when-you-want-more.item01"
+        },
+        {
+          "type": "item",
+          "line": 66,
+          "key": "windows.when-you-want-more.item02"
+        },
+        {
+          "type": "item",
+          "line": 67,
+          "key": "windows.when-you-want-more.item03"
+        },
+        {
+          "type": "item",
+          "line": 68,
+          "key": "windows.when-you-want-more.item04"
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 70,
+          "key": "windows.why-step-1-comes-first.heading01",
+          "id": "por-que-o-passo-1-vem-primeiro",
+          "english_id": "why-step-1-comes-first"
+        },
+        {
+          "type": "paragraph",
+          "line": 72,
+          "key": "windows.why-step-1-comes-first.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 79,
+          "key": "windows.why-step-1-comes-first.paragraph02"
+        }
+      ],
+      "language_row": "🇨🇦 [English](try-on-windows.en.md) · 🇩🇪 [Deutsch](try-on-windows.de.md) · 🇧🇷 [Português](try-on-windows.pt-BR.md) · 🇲🇽 [Español](try-on-windows.es.md)"
+    }
+  },
+  "strings": {
+    "site.language.name": "Português",
+    "site.language.flag": "🇧🇷",
+    "site.wordmark.image": "assets/wordmark.png",
+    "site.wordmark.alt": "SPARKYOS / POWERED BY DEBIAN / STEREO 3D EDITION",
+    "home.intro.heading01": "Sparky Stereo OS",
+    "home.intro.paragraph01": "**Crie e explore em 3D na tela que você já tem: pinte, edite fotos e vídeos, estude moléculas e globos, depois assista a filmes e jogue.**\nEle é feito para todo tipo de tela 3D: TVs e projetores 3D, headsets de VR, telas 3D sem óculos e qualquer monitor com óculos vermelho e ciano.\nNum monitor 2D comum, a mesma área de trabalho funciona sem nenhuma mudança.\nSparky Stereo OS, a edição de Daniel Ramos do SparkyLinux (de Paweł \"pavroo\" Pijanowski), é um sistema Linux com uma nova área de trabalho Stereo KDE Plasma.",
+    "home.intro.paragraph02.link01": "docs/lean-code-packages.md#why-it-matters",
+    "home.intro.paragraph02": "**Mais leve para a sua máquina e para o planeta:** todo pacote vem sem os comentários e anotações que os programas nunca leem, então o mesmo trabalho exige menos processamento, menos energia e menos desgaste.\n[Medido]({{home.intro.paragraph02.link01}}) em um laptop de 2016: preparar um programa para o compilador dá 2 a 4% menos trabalho do que com os mesmos arquivos sem os comentários removidos, e nada se perde.",
+    "home.intro.paragraph03.link01": "docs/edition-in-detail.pt-BR.md#seen-in-3d",
+    "home.intro.paragraph03.image01": "docs/screenshots/translucent-stereo-desktop-anaglyph.jpg",
+    "home.intro.paragraph03.alt01": "A área de trabalho estéreo em 3D com janelas translúcidas: o menu Configurações do Dolphin e sua lista de esquemas de cores à frente, as janelas de vidro atrás recuando em sequência, o monitor do sistema e o papel de parede ao fundo (anáglifo vermelho e ciano)",
+    "home.intro.paragraph03": "<a href=\"{{home.intro.paragraph03.link01}}\"><img src=\"{{home.intro.paragraph03.image01}}\" width=\"99%\" alt=\"{{home.intro.paragraph03.alt01}}\"></a>",
+    "home.intro.paragraph04.link01": "docs/edition-in-detail.pt-BR.md#seen-in-3d",
+    "home.intro.paragraph04.image01": "docs/screenshots/doom-2016-in-a-window-anaglyph.jpg",
+    "home.intro.paragraph04.alt01": "DOOM (2016) numa janela, em 3D, com o painel plano do Plasma abaixo (anáglifo vermelho e ciano)",
+    "home.intro.paragraph04.link02": "docs/edition-in-detail.pt-BR.md#seen-in-3d",
+    "home.intro.paragraph04.image02": "docs/screenshots/marble-globe-anaglyph.jpg",
+    "home.intro.paragraph04.alt02": "O globo do Marble à frente das estrelas, em 3D (anáglifo vermelho e ciano)",
+    "home.intro.paragraph04.link03": "docs/edition-in-detail.pt-BR.md#seen-in-3d",
+    "home.intro.paragraph04.image03": "docs/screenshots/stereo-desktop-anaglyph.jpg",
+    "home.intro.paragraph04.alt03": "A área de trabalho estéreo em 3D: o painel no plano da tela, uma janela de som à frente dele e as janelas atrás recuando em sequência (anáglifo vermelho e ciano)",
+    "home.intro.paragraph04": "<a href=\"{{home.intro.paragraph04.link01}}\"><img src=\"{{home.intro.paragraph04.image01}}\" width=\"32%\" alt=\"{{home.intro.paragraph04.alt01}}\"></a> <a href=\"{{home.intro.paragraph04.link02}}\"><img src=\"{{home.intro.paragraph04.image02}}\" width=\"32%\" alt=\"{{home.intro.paragraph04.alt02}}\"></a> <a href=\"{{home.intro.paragraph04.link03}}\"><img src=\"{{home.intro.paragraph04.image03}}\" width=\"32%\" alt=\"{{home.intro.paragraph04.alt03}}\"></a>",
+    "home.intro.paragraph05.link01": "docs/edition-in-detail.pt-BR.md#seen-in-3d",
+    "home.intro.paragraph05": "*Óculos vermelho e ciano mostram essas imagens em 3D ([mais]({{home.intro.paragraph05.link01}})).*",
+    "home.intro.paragraph06": "**Situação: beta 1, para testadores.** Testado em TVs 3D, em monitores comuns com óculos vermelho e ciano e em um celular Android num visor de baixo custo; as telas sem óculos e os headsets autônomos estão em desenvolvimento.",
+    "home.intro.paragraph07.link01": "docs/guides/try-on-windows.pt-BR.md",
+    "home.intro.paragraph07.link02": "https://github.com/Sparky-OS/sparky-stereo-os/issues/26",
+    "home.intro.paragraph07.link03": "https://github.com/Sparky-OS/sparky-stereo-os/issues/25",
+    "home.intro.paragraph07.link04": "https://github.com/Sparky-OS/sparky-stereo-os/issues/27",
+    "home.intro.paragraph07.link05": "https://github.com/Sparky-OS/sparky-stereo-os/issues/80",
+    "home.intro.paragraph07.link06": "https://github.com/Sparky-OS/sparky-stereo-os/issues/153",
+    "home.intro.paragraph07.link07": "https://github.com/Sparky-OS/sparky-stereo-os/issues/351",
+    "home.intro.paragraph07.link08": "https://github.com/Sparky-OS/sparky-stereo-os/issues/81",
+    "home.intro.paragraph07.link09": "https://github.com/Sparky-OS/sparky-stereo-os/issues/83",
+    "home.intro.paragraph07.link10": "https://github.com/Sparky-OS/sparky-stereo-os/issues/84",
+    "home.intro.paragraph07.link11": "https://github.com/Sparky-OS/sparky-stereo-os/issues/85",
+    "home.intro.paragraph07": "**Próximo passo: experimente no seu PC com Windows, pelo pendrive, sem instalar nada:** [uma página, dez passos]({{home.intro.paragraph07.link01}}).\n<br>Peça o download e conte sobre seu equipamento 3D, no seu idioma: [🇨🇦]({{home.intro.paragraph07.link02}}) [🇧🇷]({{home.intro.paragraph07.link03}}) [🇵🇱]({{home.intro.paragraph07.link04}}) [🇫🇷]({{home.intro.paragraph07.link05}}) [🇩🇪]({{home.intro.paragraph07.link06}}) [🇲🇽]({{home.intro.paragraph07.link07}}) [🇯🇵]({{home.intro.paragraph07.link08}}) [🇰🇷]({{home.intro.paragraph07.link09}}) [🇨🇳]({{home.intro.paragraph07.link10}}) [🇭🇰]({{home.intro.paragraph07.link11}})",
+    "home.intro.item01.link01": "docs/edition-in-detail.pt-BR.md#science-and-engineering",
+    "home.intro.item01": "<a id=\"science-and-engineering\"></a>**[Ciência e engenharia]({{home.intro.item01.link01}}):** o globo do Marble, os gráficos do KAlgebra e as moléculas do Kalzium em 3D; modelos 3D e placas de circuito estão em desenvolvimento. Escanear em 3D está planejado: um vídeo de uma peça, de um local ou de um espécime vira um modelo 3D.",
+    "home.intro.item02.link01": "docs/edition-in-detail.pt-BR.md#create",
+    "home.intro.item02": "<a id=\"create\"></a>**[Criar]({{home.intro.item02.link01}}):** pinte em 3D e com maior profundidade de cor (16 bits por cor em vez de 8), e edite fotos e vídeos 3D. Escanear em 3D está planejado: um vídeo de um objeto ou de um lugar vira um modelo 3D para você explorar.",
+    "home.intro.item03.link01": "docs/edition-in-detail.pt-BR.md#watch-and-play",
+    "home.intro.item03": "<a id=\"watch-and-play\"></a>**[Assistir e jogar]({{home.intro.item03.link01}}):** filmes, fotos e jogos 3D, numa janela ou em tela cheia.",
+    "home.intro.item04.link01": "docs/edition-in-detail.pt-BR.md#vr-is-also-a-stereo-monitor",
+    "home.intro.item04": "<a id=\"vr-is-also-a-stereo-monitor\"></a>**[VR também é um monitor estéreo]({{home.intro.item04.link01}}):** um headset, ou um celular num visor, também é uma tela 3D para esta área de trabalho.",
+    "home.intro.item05.link01": "docs/edition-in-detail.pt-BR.md#for-developers",
+    "home.intro.item05": "<a id=\"for-developers\"></a>**[Desenvolver]({{home.intro.item05.link01}}):** torne seu programa 3D uma vez; a área de trabalho o adapta a cada tela.",
+    "home.intro.item06.link01": "docs/other-distributions.md",
+    "home.intro.item06": "**[Outra distribuição?]({{home.intro.item06.link01}})** Por que não fazemos pacotes para ela e como seus mantenedores podem adotar nossas correções.",
+    "home.the-stereo-desktop-new-frontiers-for-theme-design.heading01": "A área de trabalho estéreo: novas fronteiras para o design de temas",
+    "home.the-stereo-desktop-new-frontiers-for-theme-design.paragraph01.link01": "docs/edition-in-detail.pt-BR.md#depth-on-the-desktop",
+    "home.the-stereo-desktop-new-frontiers-for-theme-design.paragraph01": "**Nesta área de trabalho, um tema decide o que vem para a frente e o que vai para o fundo:** [novas fronteiras para o design de temas]({{home.the-stereo-desktop-new-frontiers-for-theme-design.paragraph01.link01}}).",
+    "home.how-it-works.heading01": "Como funciona",
+    "home.how-it-works.paragraph01.link01": "docs/edition-in-detail.pt-BR.md#how-it-works",
+    "home.how-it-works.paragraph01": "<a id=\"why-one-format-full-side-by-side-at-any-resolution\"></a>**Os programas descrevem cada imagem; a área de trabalho a adapta a cada tela.** No estéreo, as duas vistas viajam juntas num único buffer no formato full side by side. A extensão HDR proposta preserva a descrição de cor da imagem e as informações de reconstrução por meio dessa mesma divisão do trabalho.\n[Em detalhe]({{home.how-it-works.paragraph01.link01}})",
+    "home.more-about-the-edition.heading01": "Mais sobre a edição",
+    "home.more-about-the-edition.item01.link01": "docs/edition-in-detail.pt-BR.md#who-builds-it",
+    "home.more-about-the-edition.item01": "<a id=\"who-builds-it\"></a>[Quem constrói]({{home.more-about-the-edition.item01.link01}})",
+    "home.more-about-the-edition.item02.link01": "docs/edition-in-detail.pt-BR.md#where-it-is-going",
+    "home.more-about-the-edition.item02": "<a id=\"where-it-is-going\"></a>[Para onde vamos]({{home.more-about-the-edition.item02.link01}})",
+    "home.more-about-the-edition.item03.link01": "docs/edition-in-detail.pt-BR.md#seen-in-3d",
+    "home.more-about-the-edition.item03": "<a id=\"seen-in-3d\"></a>[Visto em 3D]({{home.more-about-the-edition.item03.link01}})",
+    "home.more-about-the-edition.item04.link01": "docs/edition-in-detail.pt-BR.md#for-theme-designers-and-customizers",
+    "home.more-about-the-edition.item04": "<a id=\"for-theme-designers-and-customizers\"></a>[Para quem cria e personaliza temas]({{home.more-about-the-edition.item04.link01}})",
+    "home.more-about-the-edition.item05.link01": "docs/edition-in-detail.pt-BR.md#stereo-in-the-open-stack-not-in-one-product",
+    "home.more-about-the-edition.item05": "<a id=\"stereo-in-the-open-stack-not-in-one-product\"></a>[Estéreo nas camadas abertas, não num único produto]({{home.more-about-the-edition.item05.link01}})",
+    "home.more-about-the-edition.item06.link01": "docs/edition-in-detail.pt-BR.md#programs-the-edition-changes-for-stereo-3d-and-deep-colour",
+    "home.more-about-the-edition.item06": "<a id=\"programs-the-edition-changes-for-stereo-3d-and-deep-colour\"></a>[Programas que a edição modifica para estéreo 3D e maior profundidade de cor]({{home.more-about-the-edition.item06.link01}})",
+    "home.more-about-the-edition.item07.link01": "docs/edition-in-detail.pt-BR.md#our-branches-on-kdes-gitlab",
+    "home.more-about-the-edition.item07": "<a id=\"our-branches-on-kdes-gitlab\"></a>[Nossas branches no GitLab do KDE]({{home.more-about-the-edition.item07.link01}})",
+    "home.more-about-the-edition.item08.link01": "docs/edition-in-detail.pt-BR.md#merged-outside-sparky-stereo",
+    "home.more-about-the-edition.item08": "<a id=\"merged-outside-sparky-stereo\"></a>[Incorporado fora do Sparky Stereo]({{home.more-about-the-edition.item08.link01}})",
+    "home.more-about-the-edition.item09.link01": "docs/edition-in-detail.pt-BR.md#documents",
+    "home.more-about-the-edition.item09": "<a id=\"documents\"></a>[Documentos]({{home.more-about-the-edition.item09.link01}})",
+    "home.more-about-the-edition.item10.link01": "docs/edition-in-detail.pt-BR.md#tools",
+    "home.more-about-the-edition.item10": "<a id=\"tools\"></a>[Ferramentas]({{home.more-about-the-edition.item10.link01}})",
+    "home.more-about-the-edition.item11.link01": "docs/edition-in-detail.pt-BR.md#the-base-three-open-lists",
+    "home.more-about-the-edition.item11": "<a id=\"the-base-three-open-lists\"></a>[A base: três listas abertas]({{home.more-about-the-edition.item11.link01}})",
+    "home.credit.heading01": "Créditos",
+    "home.credit.paragraph01.link01": "ATTRIBUTIONS.md",
+    "home.credit.paragraph01": "Sparky Stereo OS, a edição de Daniel Ramos (Capitain Jack) do SparkyLinux (de Paweł \"pavroo\" Pijanowski).\nTodas as pessoas em cujo trabalho esta edição se apoia, pelo nome: [ATTRIBUTIONS.md]({{home.credit.paragraph01.link01}}).",
+    "home.credit.paragraph02.alt01": "DOI",
+    "home.credit.paragraph02.image01": "https://zenodo.org/badge/DOI/10.5281/zenodo.23309024.svg",
+    "home.credit.paragraph02.link01": "https://doi.org/10.5281/zenodo.23309024",
+    "home.credit.paragraph02": "**Cite:** [![{{home.credit.paragraph02.alt01}}]({{home.credit.paragraph02.image01}})]({{home.credit.paragraph02.link01}})",
+    "home.credit.paragraph03.alt01": "Patrocine Daniel",
+    "home.credit.paragraph03.image01": "https://img.shields.io/badge/Sponsor-danielcamposramos-EA4AAA?style=flat-square&logo=githubsponsors",
+    "home.credit.paragraph03.link01": "https://github.com/sponsors/danielcamposramos",
+    "home.credit.paragraph03.alt02": "Doe para o SparkyLinux",
+    "home.credit.paragraph03.image02": "https://img.shields.io/badge/Donate-SparkyLinux-2777AD?style=flat-square",
+    "home.credit.paragraph03.link02": "https://sparkylinux.org/donate/",
+    "home.credit.paragraph03": "**Apoie:** [![{{home.credit.paragraph03.alt01}}]({{home.credit.paragraph03.image01}})]({{home.credit.paragraph03.link01}}) [![{{home.credit.paragraph03.alt02}}]({{home.credit.paragraph03.image02}})]({{home.credit.paragraph03.link02}}) Patrocinar Daniel financia esta edição, e uma doação ao SparkyLinux apoia a distribuição de Paweł, a base sobre a qual ela é construída.",
+    "home.credit.paragraph04.link01": "docs/edition-in-detail.pt-BR.md#credit",
+    "home.credit.paragraph04": "[Em detalhe]({{home.credit.paragraph04.link01}})",
+    "home.licence.heading01": "Licença",
+    "home.licence.paragraph01.link01": "https://creativecommons.org/licenses/by/4.0/",
+    "home.licence.paragraph01.link02": "docs/edition-in-detail.pt-BR.md#licence",
+    "home.licence.paragraph01": "Os documentos estão sob a [licença Creative Commons Atribuição 4.0 Internacional]({{home.licence.paragraph01.link01}}) (CC BY 4.0): compartilhe e adapte, dando crédito ao Sparky Stereo OS.\n[Em detalhe]({{home.licence.paragraph01.link02}})",
+    "detail.intro.heading01": "Sparky Stereo OS em detalhe",
+    "detail.intro.paragraph01.link01": "../README.pt-BR.md",
+    "detail.intro.paragraph01": "**Para** quem quer o quadro completo: cada seção da página inicial por inteiro, com suas imagens, medições, créditos e links.\n[Voltar à página inicial]({{detail.intro.paragraph01.link01}})",
+    "detail.intro.paragraph02.link01": "https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md",
+    "detail.intro.paragraph02": "**Crie e explore em 3D na tela que você já tem: pinte, edite fotos e vídeos, estude moléculas e globos, depois assista a filmes e jogue.**\nFunciona em uma TV 3D, em qualquer monitor comum com óculos vermelho e ciano baratos e, agora, em um celular Android compatível num visor de baixo custo: uma [área de trabalho estéreo utilizável por USB]({{detail.intro.paragraph02.link01}}), testada em hardware mais antigo.\nSparky Stereo OS, a edição de Daniel Ramos do SparkyLinux (de Paweł \"pavroo\" Pijanowski), é um sistema Linux com uma nova área de trabalho Stereo KDE Plasma.",
+    "detail.intro.paragraph03.link01": "lean-code-packages.md#why-it-matters",
+    "detail.intro.paragraph03": "**Mais leve para a sua máquina e para o planeta:** todo pacote vem sem os comentários e anotações que os programas nunca leem, então o mesmo trabalho exige menos processamento, menos energia e menos desgaste.\n[Medido]({{detail.intro.paragraph03.link01}}): ler os cabeçalhos C++ dá de 2 a 4% menos trabalho do que no Debian, sem perder nada.",
+    "detail.intro.paragraph04.link01": "architectural-synthesis.md",
+    "detail.intro.paragraph04.link02": "architecture-infographic.md",
+    "detail.intro.paragraph04": "**Conheça a arquitetura:** [guia ilustrado e mapa do repositório]({{detail.intro.paragraph04.link01}}), com um [infográfico em tamanho completo e sua versão em texto]({{detail.intro.paragraph04.link02}}), adaptados e verificados a partir da pesquisa de Daniel com Gemini / NotebookLM.",
+    "detail.intro.paragraph05.link01": "#seen-in-3d",
+    "detail.intro.paragraph05.image01": "screenshots/translucent-stereo-desktop-anaglyph.jpg",
+    "detail.intro.paragraph05.alt01": "A área de trabalho estéreo em 3D com janelas translúcidas: o menu Configurações do Dolphin e sua lista de esquemas de cores à frente, as janelas de vidro atrás recuando em sequência, o monitor do sistema e o papel de parede ao fundo (anáglifo vermelho e ciano)",
+    "detail.intro.paragraph05": "<a href=\"{{detail.intro.paragraph05.link01}}\"><img src=\"{{detail.intro.paragraph05.image01}}\" width=\"99%\" alt=\"{{detail.intro.paragraph05.alt01}}\"></a>",
+    "detail.intro.paragraph06": "**Área de trabalho estéreo:** a própria área de trabalho tem profundidade.\nO que você está usando fica no plano da tela e seus menus vêm para a frente, como o menu e o submenu do Marble aqui, enquanto as janelas atrás recuam uma após a outra, como papéis numa pilha, com o papel de parede ao fundo.\nUm programa 3D mantém sua própria profundidade dentro da janela, como o globo do Marble.\nAlguns pixels cada um, dentro dos limites que você escolhe.",
+    "detail.intro.paragraph07.link01": "#seen-in-3d",
+    "detail.intro.paragraph07.image01": "screenshots/doom-2016-in-a-window-anaglyph.jpg",
+    "detail.intro.paragraph07.alt01": "DOOM (2016) numa janela, em 3D, com o painel plano do Plasma abaixo (anáglifo vermelho e ciano)",
+    "detail.intro.paragraph07.link02": "#seen-in-3d",
+    "detail.intro.paragraph07.image02": "screenshots/marble-globe-anaglyph.jpg",
+    "detail.intro.paragraph07.alt02": "O globo do Marble à frente das estrelas, em 3D (anáglifo vermelho e ciano)",
+    "detail.intro.paragraph07.link03": "#seen-in-3d",
+    "detail.intro.paragraph07.image03": "screenshots/stereo-desktop-anaglyph.jpg",
+    "detail.intro.paragraph07.alt03": "A área de trabalho estéreo em 3D: o painel no plano da tela, uma janela de som à frente dele e as janelas atrás recuando em sequência (anáglifo vermelho e ciano)",
+    "detail.intro.paragraph07": "<a href=\"{{detail.intro.paragraph07.link01}}\"><img src=\"{{detail.intro.paragraph07.image01}}\" width=\"32%\" alt=\"{{detail.intro.paragraph07.alt01}}\"></a> <a href=\"{{detail.intro.paragraph07.link02}}\"><img src=\"{{detail.intro.paragraph07.image02}}\" width=\"32%\" alt=\"{{detail.intro.paragraph07.alt02}}\"></a> <a href=\"{{detail.intro.paragraph07.link03}}\"><img src=\"{{detail.intro.paragraph07.image03}}\" width=\"32%\" alt=\"{{detail.intro.paragraph07.alt03}}\"></a>",
+    "detail.intro.paragraph08.link01": "#seen-in-3d",
+    "detail.intro.paragraph08": "*Óculos vermelho e ciano mostram essas imagens em 3D ([mais]({{detail.intro.paragraph08.link01}})).*",
+    "detail.intro.paragraph09.link01": "https://github.com/Sparky-OS/flat-headset/tree/main/apk",
+    "detail.intro.paragraph09.link02": "#where-it-is-going",
+    "detail.intro.paragraph09": "**Em desenvolvimento:** o [APK de desenvolvimento do Flat Headset e as instruções correspondentes para atualizar o PC]({{detail.intro.paragraph09.link01}}) estão disponíveis, e uma ISO de desenvolvimento para testadores já inicia em PCs novos com Secure Boot ativado, em PCs mais antigos com BIOS e em máquinas com UEFI de 32 bits; a ISO final da edição estéreo ainda está sendo preparada ([para onde vamos]({{detail.intro.paragraph09.link02}})).",
+    "detail.intro.item01.link01": "#create",
+    "detail.intro.item01": "**[Criar]({{detail.intro.item01.link01}}):** pinte em 3D e com maior profundidade de cor (16 bits por cor em vez de 8), e edite fotos e vídeos 3D.",
+    "detail.intro.item02.link01": "#science-and-engineering",
+    "detail.intro.item02": "**[Ciência e engenharia]({{detail.intro.item02.link01}}):** o globo do Marble, os gráficos do KAlgebra e as moléculas do Kalzium em 3D; modelos 3D e placas de circuito estão em desenvolvimento.",
+    "detail.intro.item03.link01": "#watch-and-play",
+    "detail.intro.item03": "**[Assistir e jogar]({{detail.intro.item03.link01}}):** filmes, fotos e jogos 3D, numa janela ou em tela cheia.",
+    "detail.intro.item04.link01": "#for-developers",
+    "detail.intro.item04": "**[Desenvolver]({{detail.intro.item04.link01}}):** torne seu programa 3D uma vez; a área de trabalho o adapta a cada tela.",
+    "detail.intro.item05.link01": "other-distributions.md",
+    "detail.intro.item05": "**[Outra distribuição?]({{detail.intro.item05.link01}})** Por que não fazemos pacotes para ela e como seus mantenedores podem adotar nossas correções.",
+    "detail.intro.paragraph10.link01": "https://github.com/Sparky-OS/sparky-stereo-os/issues/26",
+    "detail.intro.paragraph10.link02": "https://github.com/Sparky-OS/sparky-stereo-os/issues/25",
+    "detail.intro.paragraph10.link03": "https://github.com/Sparky-OS/sparky-stereo-os/issues/27",
+    "detail.intro.paragraph10.link04": "https://github.com/Sparky-OS/sparky-stereo-os/issues/80",
+    "detail.intro.paragraph10.link05": "https://github.com/Sparky-OS/sparky-stereo-os/issues/153",
+    "detail.intro.paragraph10.link06": "https://github.com/Sparky-OS/sparky-stereo-os/issues/351",
+    "detail.intro.paragraph10.link07": "https://github.com/Sparky-OS/sparky-stereo-os/issues/81",
+    "detail.intro.paragraph10.link08": "https://github.com/Sparky-OS/sparky-stereo-os/issues/83",
+    "detail.intro.paragraph10.link09": "https://github.com/Sparky-OS/sparky-stereo-os/issues/84",
+    "detail.intro.paragraph10.link10": "https://github.com/Sparky-OS/sparky-stereo-os/issues/85",
+    "detail.intro.paragraph10": "**Próximo passo: conte sobre seu equipamento 3D** e receba a notícia assim que estiver pronto.\n<br>Inscreva-se no seu idioma: [🇨🇦]({{detail.intro.paragraph10.link01}}) [🇧🇷]({{detail.intro.paragraph10.link02}}) [🇵🇱]({{detail.intro.paragraph10.link03}}) [🇫🇷]({{detail.intro.paragraph10.link04}}) [🇩🇪]({{detail.intro.paragraph10.link05}}) [🇲🇽]({{detail.intro.paragraph10.link06}}) [🇯🇵]({{detail.intro.paragraph10.link07}}) [🇰🇷]({{detail.intro.paragraph10.link08}}) [🇨🇳]({{detail.intro.paragraph10.link09}}) [🇭🇰]({{detail.intro.paragraph10.link10}})",
+    "detail.vr-is-also-a-stereo-monitor.heading01": "VR também é um monitor estéreo",
+    "detail.vr-is-also-a-stereo-monitor.paragraph01": "**Seu headset VR está juntando poeira no armário?**\nO Sparky Stereo OS o transforma de volta numa tela 3D: jogue jogos 3D, assista a filmes 3D, edite conteúdo 3D, escreva e-mails e programe em toda a área de trabalho em 3D, e jogue jogos PCVR pelo SteamVR onde seu headset funciona no Linux.\nUm celular Android compatível num visor barato já funciona hoje; headsets autônomos como o Quest são os próximos, ainda não testados.",
+    "detail.vr-is-also-a-stereo-monitor.paragraph02": "A maioria dos headsets tem um par de telas pequenas, uma para cada olho, e os demais dividem uma tela em duas, assim como uma TV 3D, então esta mesma área de trabalho atende aos dois.",
+    "detail.vr-is-also-a-stereo-monitor.item01.link01": "https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md",
+    "detail.vr-is-also-a-stereo-monitor.item01.link02": "https://github.com/Sparky-OS/flat-headset/tree/main/apk",
+    "detail.vr-is-also-a-stereo-monitor.item01.link03": "https://github.com/Sparky-OS/flat-headset#the-first-test-12-october-2026",
+    "detail.vr-is-also-a-stereo-monitor.item01.link04": "https://github.com/Sparky-OS/flat-headset#the-desktop-on-the-phone-14-october-2026",
+    "detail.vr-is-also-a-stereo-monitor.item01": "**A tela 3D que já está no seu bolso:** um visor barato do tipo Cardboard transforma um celular Android compatível numa tela para a área de trabalho estéreo, em cores, com uma imagem separada para cada olho. Em 19 de outubro, Daniel considerou utilizável a configuração USB com imagens acima e abaixo, cada uma com metade da altura, num Redmi Note 7 e num notebook A10 de 2016: a área de trabalho funciona e o mouse responde bem. O vídeo melhorou bastante, mas ainda tem algumas interrupções; o primeiro teste no Wi-Fi doméstico parece mais próximo do USB, enquanto o Direct Wi-Fi tem pausas mais longas. A resolução completa e mais dispositivos ainda precisam de testes ([medições e limites]({{detail.vr-is-also-a-stereo-monitor.item01.link01}})). O PC faz a renderização, dando outro uso a um celular mais antigo. O [APK de desenvolvimento, o código-fonte e as instruções correspondentes para atualizar o PC]({{detail.vr-is-also-a-stereo-monitor.item01.link02}}) estão disponíveis juntos; atualize primeiro o pendrive de desenvolvimento ou o PC instalado. O visualizador Android continua sendo uma versão de teste. Fotos do [primeiro teste]({{detail.vr-is-also-a-stereo-monitor.item01.link03}}) e da [área de trabalho no celular]({{detail.vr-is-also-a-stereo-monitor.item01.link04}}).",
+    "detail.vr-is-also-a-stereo-monitor.item02": "**Filmes em VR:** Bino reproduz filmes de 360° e 180°, planos ou em 3D, em qualquer tela 3D, e o mouse gira a vista.",
+    "detail.vr-is-also-a-stereo-monitor.item03": "**Jogos em VR:** Half-Life 2 e DOOM (2016) chegam a uma tela 3D por seus modos VR.",
+    "detail.who-builds-it.heading01": "Quem constrói",
+    "detail.who-builds-it.paragraph01.link01": "https://github.com/Sparky-OS/org.kde.video",
+    "detail.who-builds-it.paragraph01.link02": "https://github.com/Sparky-OS/wiz3D",
+    "detail.who-builds-it.paragraph01.link03": "https://github.com/Sparky-OS/sparky-ca",
+    "detail.who-builds-it.paragraph01.link04": "ai-provenance.md",
+    "detail.who-builds-it.paragraph01.link05": "hardware.md",
+    "detail.who-builds-it.paragraph01.link06": "measurements/kwin-stereo-cost-a10-2026-10-23.md",
+    "detail.who-builds-it.paragraph01": "Daniel, de uma favela em Brasília, com três colaboradores humanos até agora: Jeromy Streets, cujo papel de parede de vídeo para Plasma ([org.kde.video]({{detail.who-builds-it.paragraph01.link01}})) agora está na Sparky-OS com ele como mantenedor, e Eff (effcol), que mantém vivo o código do iZ3D como [wiz3D]({{detail.who-builds-it.paragraph01.link02}}) e cuida dele aqui, e Pedro F. Albanese (pedroalbanese), autor da biblioteca de assinaturas Ed521 de que o [Sparky CA]({{detail.who-builds-it.paragraph01.link03}}) depende, que mantém o Sparky CA aqui com Daniel.\nO estéreo no Linux esperou anos por voluntários: tentativas anteriores pararam porque os revisores não tinham uma tela 3D, e o trabalho envolve o kernel, Mesa, KWin, FFmpeg, os reprodutores e os padrões da web.\nNenhum outro desenvolvedor se apresentou para levar isso adiante, então os demais parceiros que trabalham aqui são de IA, orientados e verificados por Daniel e identificados em [Proveniência de IA]({{detail.who-builds-it.paragraph01.link04}}).\nSe você prefere ver isso construído por mãos humanas, será mais que bem-vindo: todos os forks são públicos e todas as tarefas estão abertas.\nTudo é construído e testado em duas máquinas comuns, um PC doméstico e um notebook de 2016: [o hardware]({{detail.who-builds-it.paragraph01.link05}}).\nNesse notebook, todos os cenários da área de trabalho mantêm 24 fps em 2D e 3D: [quanto o estéreo custa ao KWin, com medições]({{detail.who-builds-it.paragraph01.link06}}).",
+    "detail.where-it-is-going.heading01": "Para onde vamos",
+    "detail.where-it-is-going.paragraph01.link01": "https://www.w3.org/community/pm-kr/",
+    "detail.where-it-is-going.paragraph01.link02": "https://www.w3.org/publications/spec-generator/?type=respec&url=https://raw.githubusercontent.com/w3c-cg/pm-kr/main/reports/source/stereo-3d-adoption-report.html",
+    "detail.where-it-is-going.paragraph01.link03": "talks/2026-10-13-w3c-me-ig.md",
+    "detail.where-it-is-going.paragraph01": "A edição é a prova em funcionamento, e o que ela descobre volta para os padrões abertos.\nDaniel preside o [Procedural Memory Knowledge Representation Community Group (PM-KR)]({{detail.where-it-is-going.paragraph01.link01}}) do W3C com Milton Ponson.\nNosso relatório [Estéreo 3D no Linux e na Web]({{detail.where-it-is-going.paragraph01.link02}}) está lá como uma proposta individual, material para discussão no grupo: quais especificações estabelecidas já comportam 3D, o que o Linux e a web nunca adotaram e do que um navegador precisaria.\nTambém é o assunto da nossa apresentação no Media and Entertainment Interest Group do W3C em 13 de outubro de 2026 ([slides]({{detail.where-it-is-going.paragraph01.link03}})).\nParticipar do grupo é gratuito com uma conta W3C, e toda ajuda é bem-vinda: teste na sua tela, revise o relatório ou traga seu caso de uso.",
+    "detail.create.heading01": "Criar",
+    "detail.create.paragraph01": "**Pinte, edite fotos e vídeos em 3D e pinte com maior profundidade de cor: 16 bits por cor em vez de 8.**",
+    "detail.create.paragraph02.link01": "https://github.com/storytold/artcraft",
+    "detail.create.paragraph02": "**Em desenvolvimento: os apps Craft em 3D.**\nOs apps Craft do [ArtCraft]({{detail.create.paragraph02.link01}}) da storytold são a suíte criativa que estamos levando ao 3D: uma família de programas, da edição de fotos e vídeos ao CAD, à animação 2D, à arte vetorial, à pintura de texturas e aos materiais, escrita em Rust sob a licença MIT ou Apache-2.0.\nPhotoCraft e FilmCraft estão publicados com 3D; estamos passando esse trabalho, e o do LightCraft, para as versões atuais deles, e planejando os outros apps.",
+    "detail.create.item01": "**Pintura:** Krita pinta numa tela de 16 bits e numa tela 3D com 16 bits em cada olho.",
+    "detail.create.item02": "**Fotos:** digiKam e Showfoto mostram fotos 3D no álbum, na Mesa de Luz, na Apresentação de slides e no editor; KolourPaint edita uma imagem 3D e a salva com sua marca 3D.",
+    "detail.create.item03": "**Vídeo:** no Kdenlive, um clipe conhece sua disposição 3D, os monitores podem mostrá-lo em 3D e a renderização mantém a marca 3D.",
+    "detail.create.item04.link01": "https://storysplat.com",
+    "detail.create.item04": "<a id=\"stories\"></a>**Histórias:** [StorySplat]({{detail.create.item04.link01}}) (\"Transforme suas digitalizações 3D em passeios interativos\") cria passeios dentro de digitalizações 3D de lugares reais, direto no navegador, e seu 3D View os mostra em 3D em qualquer uma das saídas registradas, com o primeiro teste lado a lado numa televisão Sony 3D.",
+    "detail.create.item05.link01": "https://invent.kde.org/niccolove/plasma-studio",
+    "detail.create.item05.link02": "https://github.com/Sparky-OS/svgstereo",
+    "detail.create.item05.link03": "https://invent.kde.org/danielcamposramos/plasma-studio",
+    "detail.create.item05": "**Planejado, mais adiante:** [Plasma Studio]({{detail.create.item05.link01}}), app do KDE de Niccolò Venerandi para vídeo, áudio, fotos, arte vetorial e 3D num só lugar. Suas cenas 3D teriam uma vista por olho, e sua arte vetorial ganharia profundidade com o [SVGStereo]({{detail.create.item05.link02}}), nossa marca 3D para desenhos SVG; o [nosso fork]({{detail.create.item05.link03}}) fica guardado para esse estudo.",
+    "detail.create.paragraph03.link01": "https://github.com/harry7557558/spirula-studio",
+    "detail.create.paragraph03.link02": "https://github.com/Sparky-OS/spirula-studio",
+    "detail.create.paragraph03.link03": "#stories",
+    "detail.create.paragraph03": "**Planejado: escanear um objeto ou um lugar para criar um modelo 3D.**\nVocê grava um vídeo em volta de um objeto ou andando por um lugar, com o celular por exemplo, e o programa transforma esse vídeo num modelo 3D para você explorar, no seu próprio computador.\nO programa é o [Spirula Studio]({{detail.create.paragraph03.link01}}), de Harry (J.X.) C., sob a GPLv3; o modelo que ele cria se chama 3D Gaussian splat, e ele também gera uma malha texturizada a partir dele.\n**Planejado:** a edição ainda não traz o programa, e ele ainda não mostra seus modelos em 3D com uma vista por olho; esse trabalho será feito no [nosso fork]({{detail.create.paragraph03.link02}}).\nCom o modelo escaneado em mãos, o [StorySplat]({{detail.create.paragraph03.link03}}) conta a história dele: cria passeios a partir de digitalizações 3D desse tipo e já os mostra em 3D hoje; ainda falta testar um modelo do Spirula Studio no StorySplat.",
+    "detail.create.paragraph04.link01": "#programs-the-edition-changes-for-stereo-3d-and-deep-colour",
+    "detail.create.paragraph04": "Cada programa em detalhe: [Programas]({{detail.create.paragraph04.link01}}).",
+    "detail.for-theme-designers-and-customizers.heading01": "Para quem cria e personaliza temas",
+    "detail.for-theme-designers-and-customizers.paragraph01.link01": "#depth-on-the-desktop",
+    "detail.for-theme-designers-and-customizers.paragraph01": "**Nesta área de trabalho, um tema decide o que vem para a frente e o que vai para o fundo:** [novas fronteiras para o design de temas]({{detail.for-theme-designers-and-customizers.paragraph01.link01}}).",
+    "detail.science-and-engineering.heading01": "Ciência e engenharia",
+    "detail.science-and-engineering.paragraph01": "**Estude e projete em 3D: um globo, gráficos e moléculas já funcionam em 3D, e modelos 3D e placas de circuito estão em desenvolvimento.**",
+    "detail.science-and-engineering.item01": "**Aprendizado e ciência:** o globo do Marble, os gráficos do KAlgebra, as moléculas do Kalzium e o cubo do Kubrick, em 3D por padrão numa área de trabalho 3D.",
+    "detail.science-and-engineering.item02": "**Modelos 3D e placas de circuito:** prévias 3D no OpenSCAD, KiCad e F3D estão em desenvolvimento.",
+    "detail.science-and-engineering.item03.link01": "#scan",
+    "detail.science-and-engineering.item03": "**Escanear:** transformar um vídeo de uma peça, de um local ou de um espécime num modelo 3D está planejado, com o Spirula Studio ([Escanear]({{detail.science-and-engineering.item03.link01}})).",
+    "detail.science-and-engineering.item04.link01": "https://displayxr.org",
+    "detail.science-and-engineering.item04.link02": "https://github.com/Sparky-OS/flat-headset",
+    "detail.science-and-engineering.item04": "**Da mesa ao cliente, em cores:** o mesmo modelo com profundidade num monitor 3D sem óculos na mesa do engenheiro (com [DisplayXR]({{detail.science-and-engineering.item04.link01}}), em desenvolvimento), numa TV 3D ou num projetor para uma equipe ou uma turma em treinamento, e no próprio celular de cada trabalhador e cliente num visor de papelão ([Flat Headset]({{detail.science-and-engineering.item04.link02}})). É aberto de ponta a ponta, então ninguém fica preso a um fabricante de telas.",
+    "detail.science-and-engineering.paragraph02.link01": "#programs-the-edition-changes-for-stereo-3d-and-deep-colour",
+    "detail.science-and-engineering.paragraph02": "Cada programa em detalhe: [Programas]({{detail.science-and-engineering.paragraph02.link01}}).",
+    "detail.watch-and-play.heading01": "Assistir e jogar",
+    "detail.watch-and-play.paragraph01": "**Filmes, fotos e jogos 3D aparecem em 3D na própria janela ou em tela cheia, e o restante da área de trabalho fica como está.**",
+    "detail.watch-and-play.item01.link01": "https://www.hdmi.org/resource/brand",
+    "detail.watch-and-play.item01": "**Telas:** uma TV, monitor ou projetor 3D, incluindo os aparelhos [HDMI®]({{detail.watch-and-play.item01.link01}}) 3D de 2010 a 2013, ou qualquer monitor comum com óculos vermelho e ciano; cada tela pode mostrar um tipo diferente de 3D ao mesmo tempo, e monitores 3D sem óculos estão em desenvolvimento com a equipe DisplayXR.",
+    "detail.watch-and-play.item02": "**Filmes:** vídeos 3D são reproduzidos em 3D no Haruna, VLC, mpv, Bino, PlasmaTube e outros.",
+    "detail.watch-and-play.item03": "**Fotos:** Gwenview, digiKam e KolourPaint mostram fotos 3D (MPO, JPS e PNG estéreo) em 3D.",
+    "detail.watch-and-play.item04.link01": "formula.md",
+    "detail.watch-and-play.item04": "**Jogos:** DOOM (2016) numa janela e Half-Life 2, ambos por um modo VR ([a fórmula]({{detail.watch-and-play.item04.link01}})).",
+    "detail.watch-and-play.item05.link01": "https://lore.kernel.org/all/20260511113104.563854162@infradead.org/",
+    "detail.watch-and-play.item05.link02": "https://pixelcluster.dev/VRAM-Mgmt-fixed/",
+    "detail.watch-and-play.item05": "**Um kernel ajustado para jogar:** a edição usa Linux 7.3 com nossos patches estéreo. Seu novo escalonador elevou a menor taxa de quadros de um jogo de 4 para 29 fps numa CPU mais antiga no teste do próprio autor ([os números]({{detail.watch-and-play.item05.link01}})), e permite que placas AMD com pouca memória de vídeo mantenham a memória de um jogo na placa ([a mudança]({{detail.watch-and-play.item05.link02}})).",
+    "detail.watch-and-play.paragraph02.link01": "#programs-the-edition-changes-for-stereo-3d-and-deep-colour",
+    "detail.watch-and-play.paragraph02": "Cada programa, o que ele ganha e como foi comprovado: [Programas]({{detail.watch-and-play.paragraph02.link01}}).",
+    "detail.seen-in-3d.heading01": "Visto em 3D",
+    "detail.seen-in-3d.paragraph01.link01": "screenshots/README.md",
+    "detail.seen-in-3d.paragraph01.link02": "photos/README.md",
+    "detail.seen-in-3d.paragraph01": "As imagens desta página são capturas de tela feitas com o Spectacle da edição, que preserva os dois olhos.\nÓculos vermelho e ciano as mostram em 3D aqui; os arquivos MPO abrem em 3D nos programas de fotos da edição, em qualquer uma das saídas registradas. Todas elas, cada uma com sua versão vermelho e ciano e um download direto em MPO: [a galeria de capturas de tela]({{detail.seen-in-3d.paragraph01.link01}}). As próprias fotos 3D de Daniel, feitas com um celular LG Optimus 3D de 2014 a 2016, com os originais: [a galeria de fotos]({{detail.seen-in-3d.paragraph01.link02}}).",
+    "detail.seen-in-3d.item01.link01": "https://raw.githubusercontent.com/Sparky-OS/sparky-stereo-os/main/docs/screenshots/translucent-stereo-desktop.mpo",
+    "detail.seen-in-3d.item01": "**Área de trabalho estéreo, translúcida** ([MPO]({{detail.seen-in-3d.item01.link01}})), na TV 3D, em 15 de outubro de 2026. As janelas são de vidro, então é possível ver a pilha através delas. Medido entre os olhos: Dolphin, a janela em foco, 0 px, e seu menu Configurações +5 px (à frente, no limite de avanço escolhido pelo usuário); a longa lista de esquemas de cores 0 px, porque toca o topo da tela e um elemento avançado que toca a borda fica no plano da tela; Thunderbird atrás -3 px; o widget do monitor do sistema e o papel de parede -10 px; o painel 0 px. Os dois endereços de e-mail estão desfocados nos dois olhos.",
+    "detail.seen-in-3d.item02.link01": "screenshots/stereo-desktop-dialogs.mpo",
+    "detail.seen-in-3d.item02": "**Área de trabalho estéreo, um menu sobre outro** ([MPO]({{detail.seen-in-3d.item02.link01}})), numa TV 3D em frame packing, em 13 de outubro de 2026. Medido entre os olhos: a janela do Marble em foco 0 px, seu menu Configurações +2 px e o submenu Painéis +4 px, as quatro janelas atrás -3, -5, -8 e -10 px, os widgets e o papel de parede -10 px; dentro da janela, o próprio 3D do Marble: os rótulos da Terra +12 px, os das estrelas -13 px. As mensagens no chat Diolinux atrás estão desfocadas.",
+    "detail.seen-in-3d.item03.link01": "screenshots/doom-2016-in-a-window.mpo",
+    "detail.seen-in-3d.item03.link02": "https://github.com/CactusVRStudios/KHARVOX",
+    "detail.seen-in-3d.item03": "**DOOM (2016) numa janela comum** ([MPO]({{detail.seen-in-3d.item03.link01}})), baseado em [KHARVOX]({{detail.seen-in-3d.item03.link02}}), o mod de conversão de DOOM (2016) para VR da CactusVRStudios (MIT): o jogo tem profundidade enquanto o painel e a moldura da janela ficam planos nos dois olhos. Medido entre os olhos: a rocha mais próxima com 23 px de separação, as montanhas distantes 1 px, o painel 0 px.",
+    "detail.seen-in-3d.item04.link01": "screenshots/marble-globe.mpo",
+    "detail.seen-in-3d.item04": "**O globo do Marble** ([MPO]({{detail.seen-in-3d.item04.link01}})): a Terra à frente da tela (+11 px) e as estrelas atrás dela (-12 px), com o painel lateral plano. Esta captura é anterior às correções feitas desde então; a imagem do menu sobre outro menu mostra o Marble de hoje.",
+    "detail.seen-in-3d.item05.link01": "screenshots/stereo-desktop.mpo",
+    "detail.seen-in-3d.item05": "**Área de trabalho estéreo, uma janela suspensa** ([MPO]({{detail.seen-in-3d.item05.link01}})), no mesmo dia. Medido entre os olhos: o painel 0 px (no plano da tela), a janela de som +4 px (à frente), as três janelas atrás -3, -7 e -10 px, e o widget do monitor do sistema -10 px, ao fundo com o papel de parede.",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.heading01": "A área de trabalho estéreo: novas fronteiras para o design de temas",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph01": "**Pela primeira vez, um tema decide o que vem para a frente e o que vai para o fundo, além da aparência das coisas.**\nPor décadas, sombras, chanfros e botões em relevo apenas davam essa impressão; na área de trabalho estéreo isso é real e suave: alguns pixels, dentro dos limites que você escolhe (Configurações do sistema, \"Profundidade 3D\").",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item01.link01": "#seen-in-3d",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item01": "**O que você usa vem para a frente:** menus, dicas, notificações e caixas de diálogo avançam na sua direção, e a janela em que você trabalha fica no plano da tela. *Implementado e visto numa TV 3D em 13 de outubro de 2026 ([a imagem no topo]({{detail.the-stereo-desktop-new-frontiers-for-theme-design.item01.link01}})).*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item02": "**O restante recua:** as janelas atrás recuam uma após a outra, como papéis numa pilha, e o papel de parede fica ao fundo. *Implementado.*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item03": "**Os pequenos elementos mantêm seu lugar:** o ponteiro assume o nível do que está sob ele, uma sombra fica sobre aquilo em que incide, e uma janela fixada, como uma webcam sobre seus slides, continua à frente de tudo. *Implementado.*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item04": "**Papéis de parede em 3D:** uma foto 3D como fundo mantém seus próprios avanços e recuos, bem atrás de todas as janelas. *Implementado.* Os fundos de vídeo 3D vêm a seguir, com o papel de parede de vídeo de Jeromy Streets. *Em breve.*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item05": "**Protetores de tela em 3D:** o clássico campo de estrelas e os protetores estéreo, em 3D real. *Implementado.*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item06": "**Imagens e ícones em 3D:** fotos 3D aparecem em 3D nas prévias do Dolphin e nos visualizadores de imagens. *Implementado.* Ícones desenhados em pares, um para cada olho, fazem parte do Stereo Oxygen, o visual próprio da edição. *Em breve.*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item07": "**Efeitos que realmente avançam e recuam:** uma janela sendo fechada pode voar em pedaços na sua direção ou mergulhar atrás da tela e quicar num chão. *Implementado na nossa branch do KWin, chegando no próximo pacote.* Alternadores de janelas que se abrem em leque em 3D e o Cubo da área de trabalho em 3D real. *Em breve.*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item08": "**3D desde que você liga:** a tela de inicialização e a tela de login seguem o modo 3D salvo para sua tela principal. *Implementado.*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph02": "**E continua sendo uma área de trabalho 2D normal.**\nNuma tela comum, nada muda: o mesmo tema, a mesma disposição, os mesmos efeitos, desenhados uma vez.\nO 3D aparece apenas onde uma tela pode mostrá-lo ou através de óculos vermelho e ciano, e um tema feito para 3D também é um tema 2D completo.",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03.link01": "depth-on-the-desktop.md",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03.link02": "for-theme-designers.md",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03.link03": "https://github.com/Sparky-OS/sparky-stereo-os/issues/78",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03": "<a id=\"the-desktop-cube-what-one-format-makes-possible\"></a>Os detalhes: [Profundidade na área de trabalho]({{detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03.link01}}) e [Para quem cria e personaliza temas]({{detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03.link02}}); ideias, esboços e maquetes 3D são bem-vindos na [issue de temas]({{detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03.link03}}).",
+    "detail.for-developers.heading01": "Para desenvolvedores",
+    "detail.for-developers.paragraph01": "**Torne um programa 3D uma vez: entregue as imagens dos dois olhos à área de trabalho, e ela cuida de cada tela.**\nVocê pode desenvolver e verificar o trabalho na tela que já tem.",
+    "detail.for-developers.item01.link01": "develop-3d-on-an-ordinary-monitor.md",
+    "detail.for-developers.item01": "[Desenvolva 3D e XR num monitor comum]({{detail.for-developers.item01.link01}}): comece aqui.",
+    "detail.for-developers.item02.link01": "web-3d-in-stereo.md",
+    "detail.for-developers.item02": "[Sua cena 3D em estéreo, a partir de uma página web]({{detail.for-developers.item02.link01}}): three.js, WebGL e WebXR, dos óculos vermelho e ciano em qualquer navegador a todas as telas 3D.",
+    "detail.for-developers.item03.link01": "house-formats.md",
+    "detail.for-developers.item03.link02": "stereo-labor-division.md",
+    "detail.for-developers.item03": "[Formatos da edição]({{detail.for-developers.item03.link01}}) e [Divisão do trabalho estéreo]({{detail.for-developers.item03.link02}}): as regras, vinculadas às especificações.",
+    "detail.for-developers.item04.link01": "test-stereo-without-a-3d-tv.md",
+    "detail.for-developers.item04.link02": "stereo-vm.md",
+    "detail.for-developers.item04.link03": "https://repo.sparkyos.org/bench/kwin-root/",
+    "detail.for-developers.item04": "[Teste estéreo sem uma TV 3D]({{detail.for-developers.item04.link01}}) e [Uma máquina virtual com tela 3D]({{detail.for-developers.item04.link02}}): teste a saída 3D numa tela virtual ou numa máquina virtual; um sistema de arquivos raiz pronto com Stereo KWin está no [nosso servidor de repositório]({{detail.for-developers.item04.link03}}).",
+    "detail.for-developers.item05.link01": "../skills/README.md",
+    "detail.for-developers.item05": "[Skills]({{detail.for-developers.item05.link01}}): instruções para pessoas e assistentes de IA que trabalham na edição.",
+    "detail.how-it-works.heading01": "Como funciona",
+    "detail.how-it-works.paragraph01": "<a id=\"why-one-format-full-side-by-side-at-any-resolution\"></a>**Os programas descrevem cada imagem; a área de trabalho a adapta a cada tela.** No estéreo, as duas vistas viajam juntas num único buffer no formato full side by side. A extensão HDR proposta preserva a descrição de cor da imagem e as informações de reconstrução por meio dessa mesma divisão do trabalho.",
+    "detail.how-it-works.paragraph02": "**O contrato estéreo em três linhas.**",
+    "detail.how-it-works.item01": "**Stereo KWin** (o compositor do KDE Plasma, com nossas mudanças estéreo) usa full side by side, em qualquer resolução.",
+    "detail.how-it-works.item02": "**Os programas** decodificam ou geram estéreo em qualquer padrão e entregam full side by side, em qualquer resolução, ao Stereo KWin.",
+    "detail.how-it-works.item03": "**As saídas** (os filtros do Stereo KWin no final, um por tipo de tela) convertem esse formato no que cada tela precisa.",
+    "detail.how-it-works.paragraph03.link01": "how-it-works.md",
+    "detail.how-it-works.paragraph03.link02": "stereo-hdr-content.md",
+    "detail.how-it-works.paragraph03": "Por que full side by side, uma área de trabalho em duas TVs 3D a partir de duas GPUs e como o mesmo princípio se estende ao HDR: [Como funciona]({{detail.how-it-works.paragraph03.link01}}). A [declaração HDR]({{detail.how-it-works.paragraph03.link02}}) é um projeto que aguarda implementação e testes em dispositivos com diferentes formatos; a representação de intercâmbio HDR continua sendo uma escolha de engenharia a validar. Os testes existentes de estéreo e de profundidade de cor não validam esse caminho HDR.",
+    "detail.stereo-in-the-open-stack-not-in-one-product.heading01": "Estéreo nas camadas abertas, não num único produto",
+    "detail.stereo-in-the-open-stack-not-in-one-product.paragraph01.link01": "open-stack.md",
+    "detail.stereo-in-the-open-stack-not-in-one-product.paragraph01": "Em outros lugares, o estéreo fica preso a um produto: um headset, um injetor de um fabricante, um kernel de um fabricante.\nAqui, ele é uma propriedade das camadas abertas (KDE, o kernel, os formatos de arquivo), então chega à tela que você já tem: [Estéreo nas camadas abertas]({{detail.stereo-in-the-open-stack-not-in-one-product.paragraph01.link01}}).",
+    "detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.heading01": "Programas que a edição modifica para estéreo 3D e maior profundidade de cor",
+    "detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.paragraph01.link01": "programs.md",
+    "detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.paragraph01.link02": "programs-in-detail.md",
+    "detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.paragraph01": "O que o 3D traz a cada programa, de filmes e fotos a globos e moléculas: [Programas]({{detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.paragraph01.link01}}).\nComo cada um foi modificado e verificado, por área (o caminho até a tela, vídeo, ciência e engenharia, imagens, simuladores, o sistema e o que ainda não está pronto): [Programas em detalhe]({{detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.paragraph01.link02}}).",
+    "detail.our-branches-on-kdes-gitlab.heading01": "Nossas branches no GitLab do KDE",
+    "detail.our-branches-on-kdes-gitlab.paragraph01.link01": "https://invent.kde.org/danielcamposramos",
+    "detail.our-branches-on-kdes-gitlab.paragraph01.link02": "kde-branches.md",
+    "detail.our-branches-on-kdes-gitlab.paragraph01": "Cada mudança no KDE é uma branch do nosso fork no [invent.kde.org]({{detail.our-branches-on-kdes-gitlab.paragraph01.link01}}), testada pela própria CI do KDE antes de ser proposta ao projeto original: [as branches e seus resultados de CI]({{detail.our-branches-on-kdes-gitlab.paragraph01.link02}}).",
+    "detail.merged-outside-sparky-stereo.heading01": "Incorporado fora do Sparky Stereo",
+    "detail.merged-outside-sparky-stereo.paragraph01.link01": "https://www.iana.org/assignments/matroska",
+    "detail.merged-outside-sparky-stereo.paragraph01.link02": "upstream-merges.md#registered-identifiers",
+    "detail.merged-outside-sparky-stereo.paragraph01": "**26 de outubro de 2026: a IANA atribuiu os valores StereoMode 15 a 20 do Matroska** aos quadros que empacotam imagem e profundidade, após atribuir os tipos de planos 3 a 5 em 20 de outubro às trilhas de profundidade separadas do olho esquerdo, do olho direito e do fundo.\nOs dois registros citam nossa especificação stereo-layer.\n[Registro atual]({{detail.merged-outside-sparky-stereo.paragraph01.link01}}) e [marco do registro e contribuições incorporadas aos projetos originais]({{detail.merged-outside-sparky-stereo.paragraph01.link02}}).",
+    "detail.merged-outside-sparky-stereo.paragraph02.link01": "upstream-merges.md",
+    "detail.merged-outside-sparky-stereo.paragraph02.link02": "proofs/README.md",
+    "detail.merged-outside-sparky-stereo.paragraph02.link03": "what-people-said.md",
+    "detail.merged-outside-sparky-stereo.paragraph02": "Quando um programa quebra o estéreo ou a profundidade de cor no caminho até a tela, a correção vai para o projeto do próprio programa.\nProjetos como HandBrake, mpv, Qt Multimedia e PeerTube incorporaram correções do nosso trabalho; cada uma, com o mantenedor que a incorporou e o que está em revisão, está em [Incorporado fora do Sparky Stereo]({{detail.merged-outside-sparky-stereo.paragraph02.link01}}).\nCada parte é mostrada em funcionamento antes de ser considerada pronta, com os números e uma imagem em anáglifo e MPO: [Comprovações]({{detail.merged-outside-sparky-stereo.paragraph02.link02}}).\nO que pessoas que trabalham com estéreo disseram sobre o projeto, em público e com links: [O que disseram]({{detail.merged-outside-sparky-stereo.paragraph02.link03}}).",
+    "detail.documents.heading01": "Documentos",
+    "detail.documents.paragraph01.link01": "formula.md",
+    "detail.documents.paragraph01.link02": "first-runs/kwin-2026-10-01/README.md",
+    "detail.documents.paragraph01.link03": "talks/2026-10-13-w3c-me-ig.md",
+    "detail.documents.paragraph01.link04": "./",
+    "detail.documents.paragraph01": "[A fórmula do motor VR para a tela 3D]({{detail.documents.paragraph01.link01}}), [as primeiras execuções do KWin em TVs reais]({{detail.documents.paragraph01.link02}}) e [os slides da apresentação no W3C]({{detail.documents.paragraph01.link03}}) de 13 de outubro de 2026; todas as páginas estão em [docs]({{detail.documents.paragraph01.link04}}).",
+    "detail.tools.heading01": "Ferramentas",
+    "detail.tools.paragraph01.link01": "../tools/vkms-stereo-bench/README.md",
+    "detail.tools.paragraph01.link02": "../tools/hibernate-bench/README.md",
+    "detail.tools.paragraph01": "[vkms-stereo-bench]({{detail.tools.paragraph01.link01}}) verifica modos 3D numa tela virtual, e [hibernate-bench]({{detail.tools.paragraph01.link02}}) verifica a hibernação com Secure Boot, ambos numa máquina virtual.",
+    "detail.the-base-three-open-lists.heading01": "A base: três listas abertas",
+    "detail.the-base-three-open-lists.paragraph01.link01": "https://github.com/danielcamposramos/awesome-stereoscopy",
+    "detail.the-base-three-open-lists.paragraph01.link02": "https://github.com/danielcamposramos/awesome-linux-hdr",
+    "detail.the-base-three-open-lists.paragraph01.link03": "https://github.com/danielcamposramos/awesome-vr",
+    "detail.the-base-three-open-lists.paragraph01": "A pesquisa por trás desta edição é pública, em três listas com curadoria que qualquer pessoa pode copiar (CC0): [awesome-stereoscopy]({{detail.the-base-three-open-lists.paragraph01.link01}}) para estéreo 3D, [awesome-linux-hdr]({{detail.the-base-three-open-lists.paragraph01.link02}}) para HDR e maior profundidade de cor, e [awesome-vr]({{detail.the-base-three-open-lists.paragraph01.link03}}) para realidade virtual.",
+    "detail.credit.heading01": "Créditos",
+    "detail.credit.paragraph01": "Sparky Stereo OS, a edição de Daniel Ramos (Capitain Jack) do SparkyLinux (de Paweł \"pavroo\" Pijanowski).",
+    "detail.credit.paragraph02.link01": "https://github.com/Sparky-OS",
+    "detail.credit.paragraph02": "**Mantenedores de pacotes**, cada um com plenos direitos sobre seu próprio repositório na [Sparky-OS]({{detail.credit.paragraph02.link01}}):",
+    "detail.credit.table01.link01": "https://github.com/effcol",
+    "detail.credit.table01.image01": "https://github.com/effcol.png?size=96",
+    "detail.credit.table01.alt01": "Eff",
+    "detail.credit.table01.link02": "https://github.com/effcol/wiz3D",
+    "detail.credit.table01.link03": "https://github.com/Sparky-OS/wiz3D",
+    "detail.credit.table01.alt02": "Siga Eff",
+    "detail.credit.table01.image02": "https://img.shields.io/badge/Follow-effcol-2777AD?style=flat-square&logo=github",
+    "detail.credit.table01.link04": "https://github.com/effcol",
+    "detail.credit.table01.link05": "https://github.com/halverneus",
+    "detail.credit.table01.image03": "https://github.com/halverneus.png?size=96",
+    "detail.credit.table01.alt03": "Jeromy Streets",
+    "detail.credit.table01.link06": "https://github.com/Sparky-OS/org.kde.video",
+    "detail.credit.table01.alt04": "Siga Jeromy",
+    "detail.credit.table01.image04": "https://img.shields.io/badge/Follow-halverneus-2777AD?style=flat-square&logo=github",
+    "detail.credit.table01.link07": "https://github.com/halverneus",
+    "detail.credit.table01.link08": "https://github.com/pedroalbanese",
+    "detail.credit.table01.image05": "https://github.com/pedroalbanese.png?size=96",
+    "detail.credit.table01.alt05": "Pedro F. Albanese",
+    "detail.credit.table01.link09": "https://github.com/Sparky-OS/sparky-ca",
+    "detail.credit.table01.link10": "https://github.com/pedroalbanese/e521",
+    "detail.credit.table01.alt06": "Siga Pedro",
+    "detail.credit.table01.image06": "https://img.shields.io/badge/Follow-pedroalbanese-2777AD?style=flat-square&logo=github",
+    "detail.credit.table01.link11": "https://github.com/pedroalbanese",
+    "detail.credit.table01": "| | |\n| --- | --- |\n| <a href=\"{{detail.credit.table01.link01}}\"><img src=\"{{detail.credit.table01.image01}}\" width=\"72\" alt=\"{{detail.credit.table01.alt01}}\"></a> | **Eff (effcol)**<br>Mantém [wiz3D]({{detail.credit.table01.link02}}), o wrapper universal de 3D estereoscópico para DirectX, OpenGL, AMD HD3D e NVIDIA 3D Vision, baseado no iZ3D, para todos os sistemas, e seu pacote aqui, [Sparky-OS/wiz3D]({{detail.credit.table01.link03}}).<br>[![{{detail.credit.table01.alt02}}]({{detail.credit.table01.image02}})]({{detail.credit.table01.link04}}) |\n| <a href=\"{{detail.credit.table01.link05}}\"><img src=\"{{detail.credit.table01.image03}}\" width=\"72\" alt=\"{{detail.credit.table01.alt03}}\"></a> | **Jeromy Streets (halverneus)**<br>Criou e mantém [org.kde.video]({{detail.credit.table01.link06}}), o papel de parede de vídeo e a tela de bloqueio para KDE Plasma.<br>[![{{detail.credit.table01.alt04}}]({{detail.credit.table01.image04}})]({{detail.credit.table01.link07}}) |\n| <a href=\"{{detail.credit.table01.link08}}\"><img src=\"{{detail.credit.table01.image05}}\" width=\"72\" alt=\"{{detail.credit.table01.alt05}}\"></a> | **Pedro F. Albanese (pedroalbanese)**<br>Mantém o [Sparky CA]({{detail.credit.table01.link09}}) com Daniel, a ferramenta que instala os certificados da ICP-Brasil e os mantém atualizados, e é o autor da [e521]({{detail.credit.table01.link10}}), a biblioteca das assinaturas Ed521 usadas por uma raiz da ICP-Brasil.<br>[![{{detail.credit.table01.alt06}}]({{detail.credit.table01.image06}})]({{detail.credit.table01.link11}}) |",
+    "detail.credit.paragraph03": "**Versão:** Sparky Stereo OS 9 \"Mashtabba\", baseado em Debian 14 \"Forky\", somente KDE Plasma.",
+    "detail.credit.paragraph04.link01": "../ATTRIBUTIONS.md",
+    "detail.credit.paragraph04": "Todas as pessoas em cujo trabalho esta edição se apoia, pelo nome: [ATTRIBUTIONS.md]({{detail.credit.paragraph04.link01}}).",
+    "detail.credit.paragraph05": "**Agradecimentos especiais:**",
+    "detail.credit.item01": "**David Fattal**, cofundador da Leia e mantenedor do DisplayXR, pelo incentivo, tempo e esforço, e por testar nossa área de trabalho nas telas 3D que ele constrói.",
+    "detail.credit.item02": "**Milton Ponson** e **Christoph Dorn**, os braços de Daniel no grupo PM-KR do W3C, todos os membros desse grupo, e **Dave Raggett**, **Ian Jacobs** e **Chris Needham**, do W3C, que abriram suas portas a este trabalho.",
+    "detail.credit.item03": "**Tim Berners-Lee** e todas as pessoas que construíram a Internet, camada por camada, e a entregaram a todos.",
+    "detail.credit.item04": "A equipe **Foottroller**, por abrir caminho para andar em VR com os próprios pés no Linux.",
+    "detail.credit.item05": "**Eric Allard**, o engenheiro que deu vida a Johnny 5 em *Short Circuit*; os roteiristas do filme, **S. S. Wilson** e **Brent Maddock**; e sua música, de **El DeBarge**, **Peter Wolf**, **Ina Wolf** e **David Shire**, ouvida muitas vezes durante a construção desta edição.",
+    "detail.credit.paragraph06.alt01": "DOI",
+    "detail.credit.paragraph06.image01": "https://zenodo.org/badge/DOI/10.5281/zenodo.23309024.svg",
+    "detail.credit.paragraph06.link01": "https://doi.org/10.5281/zenodo.23309024",
+    "detail.credit.paragraph06": "**Cite:** [![{{detail.credit.paragraph06.alt01}}]({{detail.credit.paragraph06.image01}})]({{detail.credit.paragraph06.link01}})",
+    "detail.credit.paragraph07.alt01": "Estrelas no GitHub",
+    "detail.credit.paragraph07.image01": "https://img.shields.io/github/stars/Sparky-OS/sparky-stereo-os?style=flat-square&logo=github&label=Stars",
+    "detail.credit.paragraph07.link01": "https://github.com/Sparky-OS/sparky-stereo-os/stargazers",
+    "detail.credit.paragraph07": "**Dê uma estrela:** [![{{detail.credit.paragraph07.alt01}}]({{detail.credit.paragraph07.image01}})]({{detail.credit.paragraph07.link01}}) ⭐ Se o Sparky Stereo OS é útil para você, uma estrela ajuda outras pessoas a encontrá-lo.",
+    "detail.credit.paragraph08.alt01": "Patrocine Daniel",
+    "detail.credit.paragraph08.image01": "https://img.shields.io/badge/Sponsor-danielcamposramos-EA4AAA?style=flat-square&logo=githubsponsors",
+    "detail.credit.paragraph08.link01": "https://github.com/sponsors/danielcamposramos",
+    "detail.credit.paragraph08.alt02": "Doe para o SparkyLinux",
+    "detail.credit.paragraph08.image02": "https://img.shields.io/badge/Donate-SparkyLinux-2777AD?style=flat-square",
+    "detail.credit.paragraph08.link02": "https://sparkylinux.org/donate/",
+    "detail.credit.paragraph08": "**Apoie:** [![{{detail.credit.paragraph08.alt01}}]({{detail.credit.paragraph08.image01}})]({{detail.credit.paragraph08.link01}}) [![{{detail.credit.paragraph08.alt02}}]({{detail.credit.paragraph08.image02}})]({{detail.credit.paragraph08.link02}}) Patrocinar Daniel financia esta edição, e uma doação ao SparkyLinux apoia a distribuição de Paweł, a base sobre a qual ela é construída.",
+    "detail.credit.paragraph09.link01": "https://sourceforge.net/p/sparkyos/",
+    "detail.credit.paragraph09.image01": "https://sourceforge.net/sflogo.php?type=18&group_id=3189517",
+    "detail.credit.paragraph09.alt01": "SparkyOS no SourceForge",
+    "detail.credit.paragraph09.image02": "https://sourceforge.net/sflogo.php?type=17&group_id=3189517",
+    "detail.credit.paragraph09": "<a href=\"{{detail.credit.paragraph09.link01}}\"><picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"{{detail.credit.paragraph09.image01}}\"><img alt=\"{{detail.credit.paragraph09.alt01}}\" src=\"{{detail.credit.paragraph09.image02}}\" width=\"200\"></picture></a>",
+    "detail.licence.heading01": "Licença",
+    "detail.licence.paragraph01.link01": "https://creativecommons.org/licenses/by/4.0/",
+    "detail.licence.paragraph01": "Os documentos estão sob a [licença Creative Commons Atribuição 4.0 Internacional]({{detail.licence.paragraph01.link01}}) (CC BY 4.0): compartilhe e adapte, dando crédito ao Sparky Stereo OS.",
+    "detail.licence.quote01.link01": "https://archive.org/details/GuerillaOpenAccessManifesto",
+    "detail.licence.quote01": "\"Informação é poder. Mas, como todo poder, há quem queira guardá-lo para si.\"\n— Aaron Swartz, [*Guerilla Open Access Manifesto*]({{detail.licence.quote01.link01}}) (julho de 2008)",
+    "detail.licence.paragraph02.link01": "../LICENSE-GPL-2.0",
+    "detail.licence.paragraph02": "Os scripts em `docs/first-runs/` e as ferramentas em `tools/` são código e estão sob a GNU General Public License, versão 2 ou posterior (GPL-2.0-or-later); veja [LICENSE-GPL-2.0]({{detail.licence.paragraph02.link01}}).",
+    "detail.licence.paragraph03": "HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.",
+    "windows.intro.heading01": "Experimente no seu PC com Windows",
+    "windows.intro.paragraph01": "**Para** quem tem um PC com Windows e um pendrive: veja o desktop 3D na sua própria tela em dez passos, sem instalar nada e sem mudar o Windows.",
+    "windows.intro.paragraph02.link01": "beta1-install-classic-linux.en.md",
+    "windows.intro.paragraph02.link02": "beta1-dev-kit.pt-BR.md",
+    "windows.intro.paragraph02": "O Sparky Stereo OS inicia pelo pendrive e roda a partir dele e da memória.\nEle não altera nada nos seus discos, a não ser que você mesmo abra o instalador, e nada do que você fizer na sessão fica guardado depois de reiniciar.\nEsta é a beta 1: qualquer pessoa pode experimentar, e o link do download é dado a pedido (passo 3). Cada passo vem do [guia completo, em inglês]({{windows.intro.paragraph02.link01}}), onde cada um foi executado na imagem da beta 1, e do [kit em português]({{windows.intro.paragraph02.link02}}).",
+    "windows.intro.paragraph03": "**Primeiro, o caminho seguro. Depois, o 3D.**",
+    "windows.intro.step01.link01": "https://support.microsoft.com/pt-br/windows/find-your-bitlocker-recovery-key-6b71ad27-0b89-ea08-f143-056f5ab347d6",
+    "windows.intro.step01": "**Guarde a chave de recuperação do BitLocker e faça backup dos seus arquivos.**\nMuitos PCs com Windows criptografam o disco sem que ninguém tenha ligado isso, e o Windows pode pedir uma chave de 48 dígitos depois de uma mudança na forma como o PC inicia.\nEncontre a chave agora, pela página da própria Microsoft: [Encontrar a chave de recuperação do BitLocker]({{windows.intro.step01.link01}}).\n**Confira:** você consegue ler a chave no papel ou em outro aparelho, não só neste PC.",
+    "windows.intro.step02": "**Deixe o Secure Boot ligado.**\nO Secure Boot é a verificação do próprio PC de que só sistemas assinados podem iniciar.\nNão mude nada nas configurações do firmware (a \"BIOS\"): o pendrive é assinado e inicia com o Secure Boot ligado.\nDesligar o Secure Boot pode fazer o Windows pedir a chave de recuperação na próxima inicialização.",
+    "windows.intro.step03.link01": "https://github.com/Sparky-OS/sparky-stereo-os/issues/25",
+    "windows.intro.step03": "**Peça o download.**\nO link vai para testadores: peça no [tópico dos testadores]({{windows.intro.step03.link01}}) e conte qual tela 3D ou quais óculos você tem, se tiver.",
+    "windows.intro.step04.link01": "beta1-dev-kit.pt-BR.md#baixe-e-confira-a-imagem",
+    "windows.intro.step04": "**Confira o arquivo.**\nIsso prova que o download está completo e não foi alterado.\nEm um Prompt de Comando (digite `cmd` no menu Iniciar), na pasta do download, rode `certutil -hashfile sparky-stereo-os-9-mashtabba-beta1-x86_64.iso SHA256` e compare o resultado com [a soma do kit]({{windows.intro.step04.link01}}).\n**Confira:** todos os caracteres são iguais. Se não forem, baixe de novo.",
+    "windows.intro.step05.link01": "https://rufus.ie",
+    "windows.intro.step05.link02": "beta1-dev-kit.pt-BR.md#experimente-pelo-pendrive",
+    "windows.intro.step05": "**Grave em um pendrive de pelo menos 8 GB.**\nTudo o que está no pendrive é apagado.\nNo [Rufus]({{windows.intro.step05.link01}}), um programa gratuito para Windows que grava pendrives, escolha o pendrive e o arquivo, clique em START e, quando ele perguntar, escolha “Write in DD Image mode” ([o pendrive no kit]({{windows.intro.step05.link02}})).\nO próprio Rufus não foi executado nos nossos testes; o modo DD faz a mesma cópia exata da ferramenta que foi testada.",
+    "windows.intro.step06": "**Reinicie e escolha o pendrive.**\nAperte a tecla do menu de inicialização ao ligar o PC (F12 ou F11 em muitos PCs, F8 nas placas ASUS, às vezes Esc) e escolha a entrada do pendrive que começa com \"UEFI:\".",
+    "windows.intro.step07.alt01": "O menu de inicialização do pendrive",
+    "windows.intro.step07.image01": "images/beta1/boot-menu-uefi.jpg",
+    "windows.intro.step07": "**Escolha \"Sparky Stereo OS (live)\".**\n\n![{{windows.intro.step07.alt01}}]({{windows.intro.step07.image01}})\n\nA tela mostra então duas linhas em inglês, \"error: bad shim loader signature.\" e \"The Sparky Stereo OS key is not enrolled: starting Debian's signed kernel instead.\"\nAs duas são esperadas na primeira tentativa, e nada está quebrado: espere dez segundos e o sistema inicia.",
+    "windows.intro.step08.alt01": "A sessão ao vivo",
+    "windows.intro.step08.image01": "images/beta1/live-desktop.jpg",
+    "windows.intro.step08": "**Espere o desktop.**\nA primeira inicialização leva alguns minutos, porque tudo é lido do pendrive.\n\n![{{windows.intro.step08.alt01}}]({{windows.intro.step08.image01}})\n\n**Se as letras estiverem pequenas demais:** clique com o botão direito no desktop, escolha Configure Display Settings e aumente Scale.",
+    "windows.intro.step09.alt01": "Controles Anaglyph e Other stereo formats na configuração de tela",
+    "windows.intro.step09.image01": "images/beta1/display-settings.jpg",
+    "windows.intro.step09": "**Ligue o 3D na sua tela.**\nAbra \"System Settings\" e \"Display Configuration\".\nCom óculos vermelho e ciano em qualquer monitor: ligue \"Anaglyph\" (o nome do 3D em vermelho e ciano), clique em Apply e escolha a resolução marcada com \"(anaglyph, modern screens)\".\nCom uma TV 3D, um projetor 3D ou um monitor 3D: ligue \"Other stereo formats\", clique em Apply e escolha o formato da sua tela na lista da taxa de atualização.\nSem nenhum dos dois, o desktop continua um desktop 2D comum.\n\n![{{windows.intro.step09.alt01}}]({{windows.intro.step09.image01}})\n\n**Confira:** aparece a pergunta sobre manter a configuração da tela; confirme se a imagem estiver certa, ou espere dez segundos e ela volta sozinha.",
+    "windows.intro.step10": "**Explore, depois desligue e tire o pendrive.**\nAbra uma foto 3D no Gwenview ou um filme 3D no Bino ou no mpv, e passe uma janela por cima de outra para ver a profundidade do próprio desktop.\nDepois de desligar e tirar o pendrive, o Windows inicia como antes.",
+    "windows.intro.paragraph04": "**O que você acabou de fazer:** rodou um sistema completo a partir do pendrive.\nNada foi gravado nos seus discos, e o pendrive não guarda nada da sessão.",
+    "windows.when-you-want-more.heading01": "Quando quiser mais",
+    "windows.when-you-want-more.paragraph01": "Uma página de cada vez:",
+    "windows.when-you-want-more.item01.link01": "beta1-dev-kit.pt-BR.md#autorize-a-chave-para-o-secure-boot",
+    "windows.when-you-want-more.item01": "**O kernel da própria edição e o driver da NVIDIA, com o Secure Boot ainda ligado:** [autorize a chave para o Secure Boot]({{windows.when-you-want-more.item01.link01}}), uma vez por computador.",
+    "windows.when-you-want-more.item02.link01": "beta1-dev-kit.pt-BR.md#use-o-desktop-3d-na-sua-tela",
+    "windows.when-you-want-more.item02": "**Os formatos 3D:** [use o desktop 3D na sua tela]({{windows.when-you-want-more.item02.link01}}).",
+    "windows.when-you-want-more.item03.link01": "beta1-dev-kit.pt-BR.md#instale-ao-lado-do-windows",
+    "windows.when-you-want-more.item03": "**Instalar ao lado do Windows:** [instale ao lado do Windows]({{windows.when-you-want-more.item03.link01}}).",
+    "windows.when-you-want-more.item04.link01": "beta1-dev-kit.pt-BR.md#o-que-esta-beta-ainda-não-faz-tão-bem",
+    "windows.when-you-want-more.item04": "**O que ainda não funciona tão bem:** [o que esta beta ainda não faz tão bem]({{windows.when-you-want-more.item04.link01}}).",
+    "windows.why-step-1-comes-first.heading01": "Por que o passo 1 vem primeiro",
+    "windows.why-step-1-comes-first.paragraph01.link01": "https://support.microsoft.com/en-us/windows/device-encryption-in-windows-cf7e2b6f-3e70-4882-9532-18633605b7df",
+    "windows.why-step-1-comes-first.paragraph01.link02": "https://learn.microsoft.com/en-us/windows/security/operating-system-security/data-protection/bitlocker/countermeasures",
+    "windows.why-step-1-comes-first.paragraph01.link03": "https://learn.microsoft.com/en-us/windows/security/operating-system-security/data-protection/bitlocker/recovery-overview",
+    "windows.why-step-1-comes-first.paragraph01": "A criptografia pode estar ligada sem que ninguém a tenha escolhido: a Microsoft descreve a Criptografia do Dispositivo como um recurso que liga o BitLocker automaticamente na unidade do sistema ([Device Encryption in Windows]({{windows.why-step-1-comes-first.paragraph01.link01}})).\nO Windows guarda a chave de um disco criptografado em um chip da placa-mãe e só a libera enquanto o PC inicia do mesmo jeito de quando a chave foi guardada.\nA Microsoft, no original em inglês: \"By default, BitLocker provides integrity protection for Secure Boot by utilizing the TPM PCR[7] measurement\" ([BitLocker countermeasures]({{windows.why-step-1-comes-first.paragraph01.link02}})).\nEntre os eventos que a Microsoft lista como causa da recuperação estão \"Changes to the boot manager\" e \"On devices with TPM 1.2, changing the BIOS or firmware boot device order\" ([BitLocker recovery overview]({{windows.why-step-1-comes-first.paragraph01.link03}})).\nCom a chave guardada, uma tela de recuperação custa um minuto de digitação.\nSem ela, os arquivos daquele disco se perdem.",
+    "windows.why-step-1-comes-first.paragraph02": "Sparky Stereo OS, a edição de Daniel Ramos do SparkyLinux (de Paweł \"pavroo\" Pijanowski)."
+  }
+}

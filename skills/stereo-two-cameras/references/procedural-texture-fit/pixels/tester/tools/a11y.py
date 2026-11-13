@@ -37,13 +37,17 @@ def shot(name):
     devtools.screenshot(ws, os.path.join(out, '%s-%s.png' % (tag, name)))
 
 
-base = ev('location.origin + location.pathname')
+base = devtools.wait_for(ws, "location.protocol === 'http:' && !!document.getElementById('panel') && location.origin + location.pathname", timeout=30)
+metrics_ready = True
 
 
 def go(query, wait='document.getElementById("panel-title") && window.testerState && true', t=60):
+    if 'lang=' not in query: query += '&lang=en'
+    origin = ev('performance.timeOrigin')
     ws.call('Page.navigate', {'url': base + '?' + query})
     time.sleep(0.5)
-    v = devtools.wait_for(ws, wait, timeout=t)
+    v = devtools.wait_for(ws, 'performance.timeOrigin !== ' + str(origin) + ' && (' + wait + ')', timeout=t)
+    if v: ev('document.getElementById("measurements").open = true')
     return v
 
 
@@ -157,7 +161,8 @@ TARGETS_JS = r'''(() => {
 # ---------------------------------------------------------------- 1. the page, settled, in light and dark
 if not devtools.wait_for(ws, 'window.testerResult && true', timeout=min(timeout, 300)):
     check('setup', 'the scene finished loading before the checks', False, ev('JSON.stringify(window.testerState && testerState())'))
-ev('document.getElementById("timeline-details").open = true')
+check('first screen', 'Details and measurements starts closed', ev('document.getElementById("measurements").open') is False, ev('document.getElementById("measurements").open'))
+ev('document.getElementById("measurements").open = true; document.getElementById("timeline-details").open = true')
 time.sleep(0.6)
 for scheme in ('light', 'dark'):
     media(scheme=scheme)
@@ -228,7 +233,7 @@ check('4.1.2 Name, Role, Value', 'every control, progress bar, image, table and 
       not stats['unnamed'], 'unnamed: %s; roles: %s' % (stats['unnamed'], json.dumps(stats['roles'])))
 joined = '\n'.join(lines)
 need = ['[combobox] Connection speed', '[combobox] Connections', '[combobox] Limit applies to', '[combobox] Procedure to picture', '[spinbutton] Blend time (s)',
-        '[button] Restart with these settings', '[checkbox] Detailed', '[checkbox] Camera motion', '[combobox] Language']
+        '[button] Play again', '[checkbox] Detailed', '[checkbox] Camera motion', '[combobox] Language']
 missing = [x for x in need if x not in joined]
 check('1.3.1 Info and Relationships; 3.3.2 Labels or Instructions', 'each control is read with its visible label (label for=id)', not missing, 'not found in the reading: %s' % missing)
 img = [l for l in lines if l.strip().startswith('[image]') or l.strip().startswith('[img]')]
@@ -293,8 +298,8 @@ before = ev('document.getElementById("speed").value + " | " + document.querySele
 key('ArrowDown', 'ArrowDown', 40)
 time.sleep(0.5)
 after = ev('document.getElementById("speed").value + " | " + document.querySelector("#panel table tbody tr:nth-child(2) td:last-child").textContent')
-check('2.1.1 Keyboard', 'the arrow key changes the connection speed and the times follow at once', before != after, '%s -> %s' % (before, after))
-check('3.2.2 On Input', 'changing the speed does not reload or move the focus', ev('document.activeElement.id') == 'speed' and ev('window.testerResult && true'), ev('document.activeElement.id'))
+check('2.1.1 Keyboard', 'the arrow key changes the detailed speed and marks it as pending', before != after and ev('!document.getElementById("speed-pending").hidden'), '%s -> %s' % (before, after))
+check('3.2.2 On Input', 'changing the detailed speed does not reload or move focus; it explicitly waits for Play again', ev('document.activeElement.id') == 'speed' and ev('window.testerResult && true'), ev('document.activeElement.id'))
 ev('document.getElementById("detailed").focus()')
 key(' ', 'Space', 32)
 time.sleep(0.4)
@@ -311,14 +316,14 @@ time.sleep(0.3)
 ev('(() => { const k = document.getElementById("kbps"); k.value = "0"; k.dispatchEvent(new Event("change")); })()')
 time.sleep(0.3)
 err = ev('(() => { const e = document.getElementById("kbps-error"), k = document.getElementById("kbps"); return { shown: !e.hidden, text: e.textContent, invalid: k.getAttribute("aria-invalid"), describedby: k.getAttribute("aria-describedby"), label: k.getAttribute("aria-label") }; })()')
-check('3.3.1 Error Identification', 'a custom speed of 0 is refused in words beside the field, which is marked invalid and described by the message', err['shown'] and 'above 0' in err['text'] and err['invalid'] == 'true' and err['describedby'] == 'kbps-error', err)
+check('3.3.1 Error Identification', 'a custom speed of 0 is refused in words beside the field, which is marked invalid and described by the message', err['shown'] and 'above 0' in err['text'] and err['invalid'] == 'true' and 'kbps-error' in err['describedby'].split(), err)
 shot('focus')
 tg = ev(TARGETS_JS)
 check('2.5.8 Target Size (Minimum)', 'every link, button, list, field and checkbox (with its label) is at least 24 by 24 CSS pixels, links inside a sentence apart (%d targets)' % tg['count'], not tg['small'], 'smaller: %s; all: %s' % (tg['small'], tg['all']))
 
 # ---------------------------------------------------------------- 4. small windows, zoom, text spacing
 go('speed=none&conns=6&fps=5&detailed=1', wait='window.testerState && testerState().settled && true', t=120)
-ev('document.getElementById("timeline-details").open = true')
+ev('document.getElementById("measurements").open = true; document.getElementById("timeline-details").open = true')
 metrics(320, 640)
 time.sleep(1.0)
 o = ev(OVERFLOW_JS)
@@ -346,6 +351,89 @@ check('1.4.12 Text Spacing', 'with line height 1.5, paragraph spacing 2, letter 
 shot('text-spacing')
 ev('document.getElementById("spacing-test").remove()')
 ws.call('Emulation.clearDeviceMetricsOverride')
+
+# ---------------------------------------------------------------- scene-first controls and comparisons
+metrics(1280,900)
+go('speed=dsl8&conns=6&fps=5&motion=0&lang=en&proof=1', wait='window.testerResult && testerState().comparison.ready && true', t=120)
+ev('document.getElementById("measurements").open = false; window.scrollTo(0,0)')
+check('4.1.3 Status Messages', 'the visible scene state is atomic and a status region',
+      ev('document.getElementById("scene-state").getAttribute("role") === "status" && document.getElementById("scene-state").getAttribute("aria-atomic") === "true"'), ev('document.getElementById("scene-state").textContent'))
+check('1.4.1 Use of Color', 'each of seven visible surface labels says photograph in words',
+      ev('document.querySelectorAll("#surface-states li").length === 7 && [...document.querySelectorAll("#surface-states li")].every(e=>e.textContent.includes("photograph"))'),ev('document.getElementById("surface-states").textContent'))
+import hashlib,base64
+
+def scene_png():
+    rect=ev('(()=>{const r=document.getElementById("scene").getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,scale:1};})()')
+    return base64.b64decode(ws.call('Page.captureScreenshot',{'format':'png','clip':rect})['data'])
+
+a=scene_png()
+ev('document.getElementById("compare-hold").focus({preventScroll:true})')
+key_down={'type':'keyDown','key':' ','code':'Space','text':' ','windowsVirtualKeyCode':32}
+ws.call('Input.dispatchKeyEvent',key_down)
+time.sleep(.4)
+b=scene_png()
+check('1.1.1; 4.1.3', 'held comparison describes the saved computed view in its state, labels and image alternative', ev('document.getElementById("scene-state").textContent.includes("saved computed") && document.getElementById("scene-text").textContent.includes("saved computed") && [...document.querySelectorAll("#surface-states li")].every(e=>e.dataset.state==="procedure")'),ev('document.getElementById("scene-state").textContent'))
+held=ev('testerState().comparison.holding && document.getElementById("compare-hold").getAttribute("aria-pressed") === "true"')
+ws.call('Input.dispatchKeyEvent',{'type':'keyUp','key':' ','code':'Space','windowsVirtualKeyCode':32})
+time.sleep(.4)
+c=scene_png()
+check('2.1.1; 4.1.2', 'Space holds the saved computed scene, keyup restores the photographs pixel for pixel', held and a!=b and a==c,
+      {'photograph':hashlib.sha256(a).hexdigest(),'held':hashlib.sha256(b).hexdigest(),'restored':hashlib.sha256(c).hexdigest()})
+ev('document.getElementById("compare-method").focus()')
+key('ArrowDown','ArrowDown',40)
+time.sleep(.4)
+d=scene_png()
+check('2.1.1', 'the keyboard selects split comparison, with a named range control', ev('testerState().comparison.method === "split" && !document.getElementById("split-control").hidden && !!document.querySelector("label[for=split-position]")') and d!=a and d!=b, hashlib.sha256(d).hexdigest())
+check('1.1.1; 4.1.3', 'split comparison describes both views in words', ev('document.getElementById("scene-state").textContent.includes("left") && document.getElementById("scene-state").textContent.includes("right") && [...document.querySelectorAll("#surface-states li")].every(e=>e.textContent.includes("computed / photograph"))'),ev('document.getElementById("scene-state").textContent'))
+ev('document.getElementById("split-position").focus()')
+before=ev('document.getElementById("split-position").value')
+key('ArrowRight','ArrowRight',39)
+check('2.1.1', 'the split position works with arrow keys',ev('document.getElementById("split-position").value')!=before,ev('document.getElementById("split-position").value'))
+# Return to Hold, check cancel/blur and verify no procedure work was restarted.
+ev('(()=>{const s=document.getElementById("compare-method");s.value="hold";s.dispatchEvent(new Event("change"));})()')
+ev('document.getElementById("compare-hold").focus({preventScroll:true})')
+subs=ev('testerState().submissions')
+ws.call('Input.dispatchKeyEvent',key_down)
+ev('document.getElementById("quick-speed").focus({preventScroll:true})')
+check('2.5.2 Pointer Cancellation; 2.1.1', 'leaving the hold control releases comparison', not ev('testerState().comparison.holding'), ev('document.getElementById("compare-hold").getAttribute("aria-pressed")'))
+ws.call('Input.dispatchKeyEvent',{'type':'keyUp','key':' ','code':'Space','windowsVirtualKeyCode':32})
+# Pointer down is reversed by pointer up, including release away from the button.
+r=ev('(()=>{const r=document.getElementById("compare-hold").getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()')
+ws.call('Input.dispatchMouseEvent',{'type':'mousePressed','x':r['x'],'y':r['y'],'button':'left','buttons':1,'clickCount':1})
+pointer_held=ev('testerState().comparison.holding')
+ws.call('Input.dispatchMouseEvent',{'type':'mouseReleased','x':1,'y':600,'button':'left','buttons':0,'clickCount':1})
+check('2.5.2 Pointer Cancellation', 'pointer down previews and pointer up away from the control reverses it', pointer_held and not ev('testerState().comparison.holding'),{'held':pointer_held,'released':not ev('testerState().comparison.holding')})
+check('five-step contract', 'comparison never restarts the procedure player', ev('testerState().playerOff != null && testerState().submissions')==subs, {'submissions':subs,'after':ev('testerState().submissions')})
+for width,height in [(360,800),(320,640)]:
+    metrics(width,height);time.sleep(.4)
+    boxes=ev('Object.fromEntries(["scene","scene-state","quick-speed","restart"].map(id=>{const r=document.getElementById(id).getBoundingClientRect();return [id,[r.top,r.bottom,r.width]];}))')
+    check('first screen',f'{width}px: scene, state, speed and Play again are visible without scrolling', all(v[0]>=0 and v[1]<=height for v in boxes.values()),boxes)
+metrics(1280,900)
+ev('document.getElementById("measurements").open = true')
+for id,value in [('conns','2'),('limit','everything'),('blend','cross'),('blendsec','0.7')]:
+    ev('(()=>{const e=document.getElementById(%s);e.value=%s;e.dispatchEvent(new Event("change"));})()' % (json.dumps(id),json.dumps(value)))
+check('3.3.2', 'every changed deferred setting has a visible pending message', ev('["conns","limit","blend","blendsec"].every(id=>!document.getElementById(id+"-pending").hidden)'),True)
+ev('(()=>{const e=document.getElementById("lang");e.value="pt_BR";e.dispatchEvent(new Event("change"));})()')
+devtools.wait_for(ws,'document.documentElement.lang === "pt-BR"',20)
+pending=ev('({values:["conns","limit","blend","blendsec"].map(id=>document.getElementById(id).value),open:document.getElementById("measurements").open})')
+check('settings preservation', 'language preserves all pending values and the open measurements disclosure', pending['values']==['2','everything','cross','0.7'] and pending['open'],pending)
+ev('document.getElementById("measurements").open = false; (()=>{const e=document.getElementById("lang");e.value="fr";e.dispatchEvent(new Event("change"));})()')
+devtools.wait_for(ws,'document.documentElement.lang === "fr"',20)
+check('settings preservation', 'language also preserves a closed disclosure and every pending value', ev('document.getElementById("measurements").open === false && ["conns","limit","blend","blendsec"].map(id=>document.getElementById(id).value).join(",") === "2,everything,cross,0.7"'),ev('document.getElementById("measurements").open'))
+# Keep supplied and unknown address parameters across a real replay.
+ev('(()=>{const q=new URLSearchParams(location.search);for(const [k,v] of Object.entries({proof:"1",tag:"kept",fps:"5",full:"2048",tile:"512",first:"256",nostop:"0",extra:"keep"}))q.set(k,v);history.replaceState(null,"",location.pathname+"?"+q);})()')
+ev('document.getElementById("restart").focus()')
+origin=ev('performance.timeOrigin')
+key('Enter','Enter',13)
+ok=devtools.wait_for(ws, 'performance.timeOrigin !== '+str(origin)+' && window.testerState && testerState().firstFrame != null',120)
+params=ev('Object.fromEntries(new URLSearchParams(location.search))')
+check('settings preservation', 'Play again keeps proof, frame and unknown URL parameters and applies pending settings', ok and all(params.get(k)==v for k,v in {'proof':'1','tag':'kept','fps':'5','full':'2048','tile':'512','first':'256','nostop':'0','extra':'keep','conns':'2','limit':'everything','blend':'cross','blendsec':'0.7'}.items()),params)
+# The first-screen speed choice must actually reload and preserve those same parameters.
+ev('document.getElementById("quick-speed").focus()')
+origin=ev('performance.timeOrigin')
+ev('(()=>{const e=document.getElementById("quick-speed");e.value="dsl8";e.dispatchEvent(new Event("change"));})()')
+ok=devtools.wait_for(ws, 'performance.timeOrigin !== '+str(origin)+' && window.testerState && testerState().firstFrame != null',120)
+check('3.2.2; first screen', 'the speed choice is advised to replay, really restarts, and retains the proof tag',ok and ev('new URLSearchParams(location.search).get("tag") === "kept"') and ev('!!document.getElementById("quick-hint").textContent'),ev('location.search'))
 
 # ---------------------------------------------------------------- 5. motion
 go('speed=dsl8&conns=6&fps=10', wait='window.testerState && testerState().firstFrame && true', t=120)
@@ -388,7 +476,7 @@ for l in LANGS:
         shot('reflow-320-' + l)
         ws.call('Emulation.clearDeviceMetricsOverride')
 ok = all(langs[l]['lang'] == TAGS[l] and langs[l]['chosen'] == l and not langs[l]['leftover'] for l in LANGS)
-distinct = len({langs[l]['restart'] for l in LANGS}) == 10 and len({langs[l]['panel'] for l in LANGS}) >= 9
+distinct = len({langs[l]['restart'] for l in LANGS}) >= 9 and len({langs[l]['panel'] for l in LANGS}) >= 9
 check('3.1.1 Language of Page', 'in each of the ten languages the html element declares that language and the panel\'s words are that language\'s', ok and distinct, {l: [langs[l]['lang'], langs[l]['panel'], langs[l]['restart']] for l in LANGS})
 # changing the language in the page: by keyboard, without a reload, the focus stays on the list
 go('speed=none&conns=6&fps=5&lang=en', wait='document.getElementById("panel-title") && window.testerState && testerState().firstFrame && true', t=90)
@@ -396,6 +484,11 @@ ev('window.__mark = 1; document.getElementById("lang").focus()')
 key('ArrowDown', 'ArrowDown', 40)
 changed = devtools.wait_for(ws, 'document.documentElement.lang === "pl" && document.getElementById("panel-title").textContent', timeout=10)
 check('3.2.2 On Input', 'choosing another language changes the page\'s words in place: no reload, and the focus stays on the language list', bool(changed) and ev('window.__mark') == 1 and ev('document.activeElement.id') == 'lang', {'panel title': changed, 'focus': ev('document.activeElement.id'), 'html lang': ev('document.documentElement.lang')})
+
+origin=ev('performance.timeOrigin')
+ws.call('Page.navigate',{'url':base+'?speed=none&conns=6&lang=en&fps=5&proof=1#panel'})
+ok=devtools.wait_for(ws,'performance.timeOrigin !== '+str(origin)+' && window.testerState && testerState().firstFrame != null',90)
+check('address compatibility', 'the old #panel fragment opens the new measurements disclosure', ok and ev('document.getElementById("measurements").open'),ev('location.hash'))
 
 with open(os.path.join(out, tag + '-a11y.json'), 'w', encoding='utf-8') as f:
     json.dump({'checks': checks, 'languages': langs}, f, indent=1, ensure_ascii=False)

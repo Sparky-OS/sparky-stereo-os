@@ -11,7 +11,7 @@ site = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(os.pat
 LANGS = ['pl', 'pt_BR', 'fr', 'de', 'es', 'ja', 'ko', 'zh_CN', 'zh_TW']
 # strings that are names, units or symbols: the same in every language is right
 SAME_OK = {'hTitle', 'presetIsdn', 'presetDsl', 'presetMobile', 'longestValue', 'problem', 'total', 'kindScript', 'kindModel',
-           'tlTexture', 'summaryPart', 'linkChoice'}
+           'tlTexture', 'summaryPart', 'linkChoice', 'quickDsl'}
 # words that are the same in one language and English
 SAME_OK_LANG = {'fr': {'aLicenceLink', 'presetFibre'}, 'de': {'a3dH'}, 'es': {'presetCable'}}
 

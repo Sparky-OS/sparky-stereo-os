@@ -112,6 +112,12 @@ Full timing and unattended-runner qualification remain required before reporting
   Cause: rewriting a Cargo manifest by its current files alone loses the old source identity.
   Fix: change only entries whose old and new digests match the projection ledger; reject a mismatching old digest and retain the authored manifests.
   Found by: the compiler experiment's checksum negative control and complete-tree corruption control.
+- Symptom: preparation stops at `blake3` because the Cargo checksum does not name the authored `build.rs`.
+  Cause: Debian's rustc 1.99.1+dfsg1-1~exp1 source already has ten Rust files changed by Debian patches while Cargo still records the upstream digests.
+  Fix: establish a separate exact-tree baseline, require the old digest to match an applied quilt backup, and accept only the reviewed upstream-to-patched-to-projected hash chain.
+  Keep the original metadata in A and count the reconciliation separately from removed source bytes.
+  Another tree or an unreviewed hash pair must stop; Debian's later checksum-pruning build step does not replace the provenance check.
+  Found by: the full-tree preparation's explicit checksum failure, then all ten discrepancies matched `.pc` backups of patches in `.pc/applied-patches`; negative controls reject an unreviewed replacement.
 
 ## Measured on a two-app workspace (rustc 1.99.1, release build, four CPUs, a busy machine)
 

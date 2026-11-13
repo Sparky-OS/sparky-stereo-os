@@ -356,3 +356,90 @@ What the numbers say:
 - **Symptom:** a frame with one thin vertical line uploads 7 MB. **Cause:** the raster-drawn parts are packed in rows across an image as wide as the window, and the whole rows were uploaded. **Fix:** upload the columns in use. **Found by:** `uploaded_kB` in the statistics of a terminal with a scroll bar.
 - **Symptom:** Konsole's "frames per second" in the DOOM fire benchmark follow the painting path only a little. **Cause:** Konsole repaints about 20 times a second whatever arrives, and the fire is 13,400 rectangles and no glyph (block characters are drawn as rectangles); the count measures how fast the terminal reads. Of an 8 ms paint pass the engine's own calls take about 1 ms and the draw 0.15 ms; the rest is the program's paint code and `QPainter`'s front end. **Found by:** the statistics' `rectangles`, `glyphs` and `engine_ms` (`QT_WIDGETS_PAINT_STATS=2`).
 - **Symptom:** a measuring matrix started with a shell tool's ten-minute limit is still wanted an hour later. **Fix:** start it detached, write a last line when it ends, and wait for that line in short waits; never replace the libraries a running matrix mounts.
+
+## Find where the processor time goes before choosing a default
+
+Added 2026-11-13 after the small-machine fixed-work run.
+A shorter paint pass is not evidence that the process uses less processor.
+The GUI-thread paint timer measures a wall-time interval; process accounting includes every thread, parsing, layout, driver work, flushes and work outside that interval.
+Waiting for a frame can lengthen a timer without consuming the same amount of processor.
+Only matched profiles can show which work replaced a saving.
+
+1. Keep the fixed workload, requested frames, actual paints, rate, geometry, source commit and loaded-library hashes identical.
+2. Inside the isolated rig, check `perf stat -e cpu-clock:u -- true` before a long run.
+   Missing perf and refused events are explicit unavailable results, not empty successful profiles.
+   [Kernel perf security](https://docs.kernel.org/admin-guide/perf-security.html) describes CAP_PERFMON; grant only a container-scoped capability when authorized, never change the person's host perf policy for a probe.
+3. Build the same Qt with matching debug information or frame pointers; preserve build IDs and the unstripped libraries used by the measured process.
+   A Release ELF's symbol table can name functions but is not line-level debug information.
+   Use `readelf -S` to check for `.debug_info` and `readelf -n` for the build ID.
+4. Record only the owned client and nested compositor, across the same work window:
+   `perf record -e cpu-clock:u -F 99 --call-graph dwarf,8192 -p CLIENT_PID,KWIN_PID -o perf.data -- sleep 20`.
+   Attach before the work begins or align the start to its absolute monotonic time; save the actual profile interval and reject a missed window.
+   Keep profiler overhead separate from the unprofiled load table.
+5. Read `perf report --stdio --no-children --sort comm,dso,symbol -i perf.data` and unresolved-symbol counts.
+   Separate the program, Qt text/layout, the paint engine, region/copy work, RHI flush and the GL driver, including its worker threads.
+   Do not add inclusive call-tree percentages: the caller and its descendants overlap.
+   Scale exclusive user samples by measured user CPU time, and leave system CPU time and unresolved samples as separate buckets.
+6. Limit only the experiment when comparing a small machine: record the container's CPU count/quota, cpuset, throttling, frequency and temperature alongside each row.
+   A quota changes available execution time; it does not make a newer processor the older architecture.
+   Accept a claimed calibration only after both processor-painting control rows and their spread match the reference closely enough, with the actual mismatch stated.
+   No small-machine calibration or function attribution was established in the first milestone 4 rig because perf access was refused.
+7. Measure each proposed engine change again at the same work, on both paths and cards, with a red control and a quiet three-round table.
+   Keep the three choices; a profile is a reason to test a change, not a reason to silently change Automatic.
+
+### The small machine changed the conclusion
+
+Processor milliseconds per requested frame, program and nested compositor together, median of three quiet runs on an AMD A10 with Carrizo and Hainan (118 valid runs in the complete matrix).
+The card names came from the run's renderer, not the order of the device nodes.
+
+| Work | Processor painting | Batched, Hainan | Batched, Carrizo |
+|---|---|---|---|
+| Terminal animation | 34.6 | 32.3 | 33.7 |
+| Terminal text | 30.7 | 28.8 | 30.8 |
+| File manager scrolling | 11.7 | 12.6 | 11.3 |
+| Editor scrolling | 9.9 | 9.9 | 10.7 |
+| Editor typing | 25.6 | 30.6 | 31.7 |
+
+Compare with the Ryzen/RTX station table above: its quiet terminal rows saved 20 to 40 percent, while this machine's terminal gain is 0 to 7 percent inside the spread.
+Editor typing costs 20 to 24 percent more batched on the small machine.
+The small machine's animation paint interval fell from 16.2 ms to 8.4 ms plus a 4.6 ms flush, while the program's processor time stayed about 30 ms per requested frame.
+That establishes the discrepancy, not its per-function cause.
+There is no verified profile assigning the remainder to layout, uploads or driver threads yet.
+Automatic stays processor painting; a measured rule per program is a proposal requiring a design decision, not a shipped default.
+
+### A decorated pair on the GPU
+
+The client-side frame is identical in the two eyes, with the content in its own half of one double-width FBO.
+The Wayland EGL platform advertises this capability to Widgets; other platforms keep their existing frame exception.
+The blitter draws the decoration with its full texture coordinates and then samples the left or right half of the content texture into that eye's content rectangle.
+This route also avoids changing a previously mono decoration context into a native two-view context.
+
+Measured in the rig on AMD and NVIDIA, scales 1 and 1.25, through a resize and hide/show:
+
+| Check | Batched | Qt OpenGL engine |
+|---|---|---|
+| Requested disparities 0.5, -0.5, 1.5, -1.5, 0.25, 1 | exact | known multisample grid error; 0.226 for 0.25 at scale 1.25 |
+| Vertical disparity | 0 | centroid residual at most 0.024 px |
+| Frame pixels differing between eyes | 0 | 0 |
+| Earlier build / flat-exception control | all disparities 0 | |
+| 2D new against earlier build | 0 differing pixels | |
+
+This still paints a window once per eye.
+It does not implement both eyes from one recorded paint callback and does not establish that pair's processor cost.
+The fractional-scale blitter fix and the one-row extent remainder remain separate: QTBUG-149635's attachment shows the same visible right/bottom seam class, not a proof that its dimensions reproduce our exact rounding disagreement.
+
+### Traps found while packaging and profiling
+
+- **Symptom:** an AMD-pinned run says it rendered on NVIDIA but its summary says valid.
+  **Cause:** glvnd tried NVIDIA first, while the placement check ran only if engine counters were present.
+  **Fix:** name Mesa's EGL vendor for AMD pins and reject GPU placement as unverified when the kernel exposes no engine-time evidence.
+  **Found by:** a two-GPU dry run's renderer line, empty fdinfo counters and an old parser accepting the same input the corrected parser rejects.
+  A vendor string alone does not prove a physical GPU when two cards share that renderer family.
+- **Symptom:** the lane build works but the exported patch series cannot build the engine or embed its shaders.
+  **Cause:** a partial Git snapshot omitted the edited Gui CMake file; its build still read the untracked file.
+  **Fix:** compare every build input against the published source, capture the CMake diff and qualify the source package independently.
+  **Found by:** `git ls-files src/gui/CMakeLists.txt` returned nothing while the file contained the new source and resource entries.
+- **Symptom:** a Git patch containing baked shader binaries cannot be applied by quilt.
+  **Cause:** quilt applies text patches, not Git binary patch payloads.
+  **Fix:** carry the checked baked resources through source format 3.0's explicit `debian/source/include-binaries`, with text-only quilt patches.
+  **Found by:** auditing the `.qsb` entries before source preparation, then checking the repacked and re-extracted source.

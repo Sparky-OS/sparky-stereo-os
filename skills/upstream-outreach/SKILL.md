@@ -175,3 +175,5 @@ Read the traps before a change to this part, and add the next lesson there as yo
 [A series of small patches to one maintainer's Go library](references/small-patch-series-to-a-go-library.md): the recipe for sending fixes and tests one subject at a time after a maintainer said yes (fresh upstream first, a straight line of branches, red and green shown, his commit style), and the independent-vector method with its traps (e521, ORDER 493).
 
 For the Craft Apps' shared rules, bots, and response clock, read [Craft contribution practice](references/craft-apps.md).
+
+For a test of a vendor's closed program that ends in a summary to the vendor (two lists, ours and theirs, facts without a severity), read [trying a vendor's closed program](../edition-packaging/references/trying-a-vendors-closed-program.md).

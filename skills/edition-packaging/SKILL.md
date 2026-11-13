@@ -27,6 +27,7 @@ description: >-
 8. A development package must install every payload its CMake export needs; use [CMake development dependencies](references/cmake-development-dependencies.md) to check sibling packages with a clean installed consumer.
 9. A family of Rust programs that share their crates is built in one workspace and ships the shared crates once, as Rust dynamic libraries whose names carry their ABI: [a Rust suite as shared libraries](references/rust-suite-shared-libraries.md) has the recipe, the measured sizes and the traps.
 10. A program the edition may not publish, handed to one tester as a local `.deb` with one page of steps: [a private package for one tester](references/private-package-for-one-tester.md) has the recipe (a version that cannot collide, installing a single `.deb` in a live session, the proof in a virtual machine, what the page must carry) and the traps.
+11. A vendor's closed program tested on the edition for its vendor (their terms first, the Linux route to its end, a sample of theirs, timing on two kernel flavours, the whole-desktop screenshot, the link-only app center entry, two lists): [trying a vendor's closed program](references/trying-a-vendors-closed-program.md) has the recipe and the traps.
 11. For a Go release, [reconcile the tagged source and modules](references/go-release-packaging.md) before choosing Debian dependencies or vendoring.
 
 **Check freshness first.**

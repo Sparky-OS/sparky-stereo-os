@@ -19,7 +19,7 @@ Esta es la beta 1: cualquiera puede probarla, y el enlace de descarga se entrega
    No cambie nada en la configuración del firmware (la "BIOS"): la memoria USB está firmada y arranca con Secure Boot activado.
    Desactivar Secure Boot puede hacer que Windows pida la clave de recuperación en su siguiente arranque.
 3. **Pida la descarga.**
-   El enlace es para probadores: pídalo en el [hilo de probadores](ISSUE-ES) y diga qué pantalla 3D o qué gafas tiene, si tiene alguna.
+   El enlace es para probadores: pídalo en el [hilo de probadores](https://github.com/Sparky-OS/sparky-stereo-os/issues/351) y diga qué pantalla 3D o qué gafas tiene, si tiene alguna.
 4. **Compruebe el archivo.**
    Esto demuestra que la descarga está completa y sin cambios.
    En un Símbolo del sistema (escriba `cmd` en el menú Inicio), en la carpeta de la descarga, ejecute `certutil -hashfile sparky-stereo-os-9-mashtabba-beta1-x86_64.iso SHA256` y compare el resultado con [la suma de la guía larga](beta1-install-classic-linux.en.md#1-download-and-check-the-image).

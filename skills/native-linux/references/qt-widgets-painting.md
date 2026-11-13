@@ -475,7 +475,8 @@ Record exact versions and build IDs.
    Sum every program thread, record the compositor separately, and name each driver thread.
    A native driver worker has kernel and scheduling costs that user-space instruction counts cannot turn into milliseconds.
 5. Record actual paint callbacks as well as requested inputs.
-   Callgrind often slows execution about fifty times; these samples had about 25 to 146 times the native program CPU accounting, which is tooling overhead, not application speed.
+   Callgrind often slows execution about fifty times; these samples had about 25 to 146 times the native program CPU accounting.
+   That ratio includes changed repaint work as well as instrumentation; it is not application speed.
    Instrumentation changed coalescing: 12 animation inputs produced 65/71 paints, 12 text inputs produced one paint on either path, and 20 keys produced 25/21 paints.
    Instructions per input are not instructions for an identical paint count.
    Neither GPU instructions nor kernel work inside driver ioctls is counted by Callgrind.

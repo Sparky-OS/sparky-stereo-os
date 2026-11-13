@@ -1,6 +1,6 @@
 # Auf dem eigenen Windows-PC ausprobieren
 
-🇨🇦 [English](try-on-windows.en.md) · 🇩🇪 [Deutsch](try-on-windows.de.md) · 🇧🇷 [Português](try-on-windows.pt-BR.md)
+🇨🇦 [English](try-on-windows.en.md) · 🇩🇪 [Deutsch](try-on-windows.de.md) · 🇧🇷 [Português](try-on-windows.pt-BR.md) · 🇲🇽 [Español](try-on-windows.es.md)
 
 **Für** alle mit einem Windows-PC und einem USB-Stick: den 3D-Desktop in zehn Schritten auf dem eigenen Bildschirm sehen, ohne etwas zu installieren und ohne Windows zu verändern.
 

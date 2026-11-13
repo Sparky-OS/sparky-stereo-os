@@ -177,3 +177,5 @@ Read the traps before a change to this part, and add the next lesson there as yo
 [Adding a program to a distribution's app center](references/adding-a-program-to-an-app-center.md): the recipe for an entry that fetches a program from its author's own release (the tool's precedents first, the author's checksum pinned, the size said before the download, verify then extract then place, each failure with its own message, the proof through the tool's own windows in the distribution's containers, one subject per pull request), with nine traps (KamLynk in SparkyLinux's APTus AppCenter, ORDER 547).
 
 For the Craft Apps' shared rules, bots, and response clock, read [Craft contribution practice](references/craft-apps.md).
+
+For a test of a vendor's closed program that ends in a summary to the vendor (two lists, ours and theirs, facts without a severity), read [trying a vendor's closed program](../edition-packaging/references/trying-a-vendors-closed-program.md).

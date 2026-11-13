@@ -1005,6 +1005,15 @@ So Werkkzeug4 does not run on Linux today, with or without the four pull request
   Cause: the proof rig reads the compiled catalogues from an install folder, and the working build had not been installed into it.
   Fix: install the working build into the rig's folder before a language run (`DESTDIR=... cmake --install`).
   Found by: the same commit was green in the run that builds and installs from the commit.
+- Symptom: in the proof's own picture a panel's sentence is cut in the middle, and every check is green.
+  Cause: the dock is shorter than the panel's parts, and a word-wrapped label is squeezed below the height its words need.
+  Fix: the panel stands in a scroll area like the other tools; what the person needs to act comes first and is in view without scrolling; each changing sentence gets the height its words need at the panel's width. Two details of Qt decide whether that works: a scroll area that resizes its widget gives a layout with height-for-width its preferred height, so a list's 192-pixel hint must not be asked for (vertical policy Ignored, a least height of one row); and a label's height for a width is never less than its least height, so take the least height away before measuring, or one measurement at a narrow width stays for ever.
+  Found by: looking at the pictures the proof takes, in more than one language; then printing the label's height for three widths, its least height and its size hint in a check's detail (324 pixels for every width).
+  A check now asks that the parts that place a glyph are in view as the dock opens, and that both sentences are whole.
+- Symptom: a message says "another version (7.3.0) than the one the project was made with (7.3.0)".
+  Cause: two files of one font can name the same version (a distribution's rebuild); the checksum is what tells them apart.
+  Fix: a sentence of its own for that case: both name the version, their checksums differ.
+  Found by: reading the proof's picture of the case made by appending one byte to the font file.
 - Symptom: a task says the shared library "has" a function, and the package on the machine does not.
   Cause: the fix was merged and not yet published, and one of the two functions came two versions later.
   Fix: read the library's changelog and the published package's version first; build against the source at the commit that has both, say which, and say that the published package is not proven.

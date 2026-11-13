@@ -122,6 +122,37 @@ Full timing and unattended-runner qualification remain required before reporting
   Another tree or an unreviewed hash pair must stop; Debian's later checksum-pruning build step does not replace the provenance check.
   Found by: the full-tree preparation's explicit checksum failure, then all ten discrepancies matched `.pc` backups of patches in `.pc/applied-patches`; negative controls reject an unreviewed replacement.
 
+### Preparing the offline compiler experiment
+
+After the lexical preparation, apply the same edition packaging and C/C++ pass to every form.
+Keep the packaged `rust-src` authored: restore each staged Rust file only when it matches either its bound form or its authored original, and refuse any other content.
+Seal the final tree after these changes, with a full file/mode/link manifest and an archive checksum.
+C must pass a real stage-1 compiler/library/tool check before it can be called build-qualified.
+Bootstrap paths differ by command: read `bootstrap check --help --verbose` before choosing targets; in 1.99.1 cargo and wasm-component-ld have build rules but no check rules, so qualify those with an explicit offline build.
+Keep failed attempts and build-led documentation exceptions, restore a failing crate from the qualified B tree, and bind its old/new Cargo hashes again in the clean final tree.
+
+The runner recipe is in the build repository's `tools/rust-lean-experiment`.
+Its one-command kit uses an immutable image, a fixed seed and offline crates, fresh targets, interleaved A/B rounds, and atomic whole-step receipts.
+`./run.sh` starts or resumes; `./status.sh` reads its state; `./pause.sh` requests a pause after the current step.
+A receipt binds the kit version, plan, source identity, result hashes and machine state.
+An interrupted step is not a result, and a finished result is checked before it is skipped.
+Measure a local sample under the preparation CPU limit and state the hardware scaling assumption and uncertainty; a forecast is not a measurement on the small machine.
+Keep final compilers from whole builds even when the repeated subject must be smaller to fit the time budget.
+See [a long unattended measurement on a laptop](../../test-bench/references/unattended-laptop.md) for the runner controls and their qualification.
+
+- Symptom: C's bootstrap fails in syn's punctuation/delimiter macro invocations although ordinary token equality passed.
+  Cause: `syn` 2.0.118 matches documentation attributes in `define_punctuation_structs!`, `define_punctuation!` and `define_delimiters!`.
+  Fix: retain that crate's documentation by restoring exact B bytes and list the build error as its reason.
+  Found by: the real offline C bootstrap's three macro matching errors in `vendor/syn-2.0.118/src/token.rs`; 38 changed Rust files needed B restoration.
+- Symptom: the native census assertion expects seven projected files and rejects the prepared overlay.
+  Cause: eight LLVM-wrapper/header inputs have three consumer outcomes, not one: five project, two structured-doc consumers stay authored, and Linker.cpp has no removable comments.
+  Fix: bind the complete census and its reasons rather than asserting a guessed projected count.
+  Found by: the source pass's report and its explicit failed assertion, then the same verified result for A, B and C.
+- Symptom: perf reports nonzero hardware instructions but zero synthetic duration_time/user_time/system_time events.
+  Cause: those synthetic counters in the preparation container do not supply usable timing; their presence does not establish a valid measurement.
+  Fix: choose the documented plain perf summary for elapsed/user/system time, preserve its raw output and reject absent/zero elapsed time or instructions.
+  Found by: an actual perf probe compared with the plain summary; the collector also accepts decimal commas and points and rejects ambiguous grouped numbers.
+
 ## Measured on a two-app workspace (rustc 1.99.1, release build, four CPUs, a busy machine)
 
 Counts over every Rust file of the 783 packages in the resolved graph (22,268 files, 367.8 MB, 9,787,209 lines), with [`scripts/rust-comment-census.py`](../scripts/rust-comment-census.py):

@@ -6,7 +6,7 @@ description: >-
   rules, inventory and reservations, the unattended lab model (BayLibre, LAVA, labgrid), KDE's CI run locally
   (kde-ci-local), container test harnesses (setpriv for an unprivileged uid, proot and exit status, dpkg --unpack for a
   real postrm, a read-copy of the repository for a gate). Load it when a test needs a cable, a TV or a laptop, a bench
-  machine must be reserved or recovered, tests pass as root but fail for the person, a CI image lacks the edition's
+  machine must be reserved or recovered, a long unattended measurement must resume, tests pass as root but fail for the person, a CI image lacks the edition's
   Xwayland, QSignalSpy::wait loses a signal, a KWin autotest flakes, a kernel test could brick a board, or a GPU test
   could wedge the GPU until a reboot.
 ---
@@ -27,6 +27,12 @@ Prices, models and project pages named here change; check each on its own page b
 The virtual benches come before any real one.
 [`stereo-proof-rig`](../stereo-proof-rig/SKILL.md) proves what the compositor hands an output, and [`vkms-stereo`](../vkms-stereo/SKILL.md) proves the kernel's 3D modes with no display at all.
 A real machine and a real television are for what a virtual one cannot show: a cable, a panel, a heat limit, a driver on real silicon.
+
+## A long unattended measurement on a laptop
+
+Prepare and qualify the kit before the person copies it to the bench.
+Use [the unattended laptop recipe](references/unattended-laptop.md): fixed offline inputs, whole-step receipts, a bounded disk/temperature guard, a killed-step resume proof and a small complete container dry run.
+A dry run proves the scripts, and the laptop supplies the eventual measurements.
 
 ## The reliability definition, and our model
 

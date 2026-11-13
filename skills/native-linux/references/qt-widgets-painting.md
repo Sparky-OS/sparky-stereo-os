@@ -404,12 +404,13 @@ Compare with the Ryzen/RTX station table above: its quiet terminal rows saved 20
 Editor typing costs 20 to 24 percent more batched on the small machine.
 The small machine's animation paint interval fell from 16.2 ms to 8.4 ms plus a 4.6 ms flush, while the program's processor time stayed about 30 ms per requested frame.
 That establishes the discrepancy, not its per-function cause.
-There is no verified profile assigning the remainder to layout, uploads or driver threads yet.
+Permission-free station profiles below identify shared work and added driver costs; they do not allocate the small machine’s remaining milliseconds by function.
 Automatic stays processor painting; a measured rule per program is a proposal requiring a design decision, not a shipped default.
 
-### A decorated pair on the GPU
+### A decorated pair candidate on the GPU
 
-The client-side frame is identical in the two eyes, with the content in its own half of one double-width FBO.
+This candidate is excluded from the package after the fractional edge failures below; the existing client-frame exception stays.
+In its scoped successful rows, the client-side frame is identical in the two eyes, with the content in its own half of one double-width FBO.
 The Wayland EGL platform advertises this capability to Widgets; other platforms keep their existing frame exception.
 The blitter draws the decoration with its full texture coordinates and then samples the left or right half of the content texture into that eye's content rectangle.
 This route also avoids changing a previously mono decoration context into a native two-view context.
@@ -450,3 +451,82 @@ An additional logical-width-941 case at scale 1.25 fails on both cards: content 
   **Cause:** quilt applies text patches, not Git binary patch payloads.
   **Fix:** carry the checked baked resources through source format 3.0's explicit `debian/source/include-binaries`, with text-only quilt patches.
   **Found by:** auditing the `.qsb` entries before source preparation, then checking the repacked and re-extracted source.
+
+### When perf is refused: fixed-work Callgrind and native thread time
+
+Symptom: even `perf record -e cpu-clock:u` fails with permission denied in the isolated container, including with `CAP_PERFMON`.
+Cause found by the actual event-open failure and the kernel policy readout; container capabilities did not make this event available.
+Keep the host security policy unchanged.
+Use Debian's `valgrind` package, fetched through HTTPS apt in a separate tools image, and matching program/library debug packages.
+`valgrind-dbg` did not exist in the measured Debian archive; verify package candidates rather than inventing a debug package.
+The Qt build's own dbgsym packages resolve its inline and LTO functions; Konsole also needs its KPart debug package, and Kate needs KTextEditor debug symbols.
+Record exact versions and build IDs.
+
+1. Reuse the fixed-work kit's feed and typing driver, with a short fixed input count, after startup settles.
+   The measured continuation used the first 12 terminal animation/text records and 20 typing events, identical files, rates and sequence on both paths.
+2. Launch the client with `valgrind --tool=callgrind --instr-atstart=no --separate-threads=yes --trace-children=no --callgrind-out-file=callgrind.out.%p`.
+   Enable with `callgrind_control --instr=on PID`, zero before work, then dump the measured part after input completion and drain.
+   Keep all client thread files for that part, including driver workers; exclude the terminal feed child and later shutdown dumps.
+3. Read `callgrind_annotate --inclusive=yes --auto=no --threshold=100 FILE` for call roots, and group disjoint self costs for totals.
+   Inclusive callers and descendants overlap and must not be summed.
+   Keep generic memcpy/memset separate unless caller edges establish its purpose; not every copy is an atlas upload.
+4. Beside it, repeat natively and snapshot `/proc/PID/task/TID/{comm,stat,schedstat}` over the same input/completion window.
+   The first schedstat field is nanoseconds spent on the processor; retain user/system ticks too.
+   Sum every program thread, record the compositor separately, and name each driver thread.
+   A native driver worker has kernel and scheduling costs that user-space instruction counts cannot turn into milliseconds.
+5. Record actual paint callbacks as well as requested inputs.
+   Callgrind often slows execution about fifty times; these samples had about 25 to 146 times the native program CPU accounting, which is tooling overhead, not application speed.
+   Instrumentation changed coalescing: 12 animation inputs produced 65/71 paints, 12 text inputs produced one paint on either path, and 20 keys produced 25/21 paints.
+   Instructions per input are not instructions for an identical paint count.
+   Neither GPU instructions nor kernel work inside driver ioctls is counted by Callgrind.
+6. Do not emulate a small CPU by relabelling the station.
+   Here a four-CPU cgroup quota left native animation/text processor controls at 14.64/8.50 ms per requested input, far from the A10's 34.6/30.7 ms rows, with different windows and contention.
+   No architecture/frequency calibration was established and the small machine's exact attribution stays open.
+
+Measured on the AMD station path, M user-space instructions per requested input, with matching debug symbols:
+
+| Work | Processor painting | Batched | Observation |
+|---|---:|---:|---|
+| Terminal animation | 171.698 | 90.069 | raster/blending and memory fills fall; parser/model stays almost unchanged |
+| Terminal text | 8.088 | 7.508 | text shaping stays on the processor; text coalesced to one paint |
+| Editor typing | 22.064 | 21.652 | completion and shaping remain; copies, submission and driver costs are added |
+
+For typing, `QTextEngine::shapeText` has 53.22/53.28 M inclusive instructions for the complete fixed work, while `paintAndFlush` falls from 131.93 to 104.67 M.
+Self raster/blending falls from 3.284 to 1.310 M instructions per key, but generic copies rise from 2.978 to 3.527 M and driver work appears at 0.334 M on the GUI thread plus 0.202 M on workers.
+Native typing totals were 279/334 ms in the first pair and 230/416 ms in bounded-shutdown repeats, all contended; these are diagnostic samples, not a quiet penalty percentage.
+The first batched run has 28.4 ms in the driver's `cs0` thread, absent on the processor path.
+This explains why a shorter paint alone cannot establish total offload: parsing, shaping and completion remain, with new copy/submission/driver work.
+It does not prove which group dominates the A10's remaining 30 ms.
+Candidates in Qt are fewer scratch clears/copies, dirty upload regions and a point/underline fast path; none has a measured saving or changes Automatic.
+
+Primary references: [Callgrind manual](https://valgrind.org/docs/manual/cl-manual.html), [cost and call-edge format](https://valgrind.org/docs/manual/cl-format.html), [kernel schedstat](https://www.kernel.org/doc/html/latest/scheduler/sched-stats.html).
+
+Additional traps found by the raw runs:
+
+- Symptom: a self-cost parser differs from Callgrind's header by a few instructions.
+  Cause: the optional header summary differs from the file's final totals in these measured files.
+  Fix: require the parsed disjoint self sum to equal the totals footer exactly, and retain both counters; skip call-arc costs when summing self instructions.
+  The format specification and footer comparison identified the right consistency check.
+- Symptom: a native terminal run times out although every input and resulting paint completed.
+  Cause: the final paint preceded the controller reading the feed completion file, and a nonblinking terminal has no later paint.
+  Fix: wait for a bounded quiet processor drain after feed completion; preserve the failed run.
+  The feed, paint timestamps and idle process identified this ordering error.
+- Symptom: a typing measurement finishes but the container waits indefinitely at shutdown.
+  Cause: the editor's unsaved-document shutdown did not end after TERM.
+  Fix: bound termination and kill only the owned PID before waiting; retain the completed measurement and label forced shutdown.
+- Symptom: a new compiler reports the vector-path conversion used but never defined.
+  Cause: the batched engine relied on an inline definition available through a previous compiler's PCH.
+  Fix: include `private/qpainterpath_p.h` explicitly; the nonmatching-PCH compilation exposed the missing direct include.
+
+### Equal eye extents are necessary but not sufficient
+
+The rejected CSD candidate rounded the complete double width, while the compositor recognized twice the rounded single-eye width.
+At width 941 and scale 1.25 these are 2353 and 2352 pixels, so its pair guard selected the mono mapping.
+A trial equalized extents and added the right-eye residual; width 941 then passed on AMD.
+But width 942 at 1.25 failed with 1926 unequal content-rim pixels, despite identical frame pixels.
+The residual was added after primitive pixel rounding, leaving different coverage at the two content edges.
+The next change must keep the depth shift separate from a local physical eye origin, apply origin/clip transforms consistently before rounding, and then place each eye at its equal integer boundary.
+Keep both red cases.
+Qualify odd and even widths at 100, 125, 150 and 175 percent on both cards, both GPU engines, lifecycle and controls before removing the client-frame exception.
+The partial trial is not that qualification; its CSD patches stay out of the recipe.
+Both eyes from one recorded paint callback also remains unimplemented: shifted/clipped left-eye records cannot reconstruct right-eye-only coverage or style parts with their own depth.

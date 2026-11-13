@@ -153,7 +153,12 @@ class Renderer:
 
     def content(self, catalog, kind):
         doc = catalog['pages'][kind]; source = doc['source']; strings = catalog['strings']
-        output = ['<div class="opening"><div class="opening-copy">'] if kind == 'home' else []; footer = []; active = output; list_type = None; used_ids = set()
+        # The home page's first screen is one group: the opening, then the drawing
+        # with the pictures and their caption, then status and next step, in the
+        # source's order. The stylesheet sets the group in two columns on a wide screen.
+        output = ['<div class="first"><div class="opening-copy">'] if kind == 'home' else []; footer = []; active = output; list_type = None; used_ids = set()
+        if kind == 'home' and not all(f'home.intro.paragraph0{n}' in strings for n in range(1, 8)):
+            raise ValueError(f'{source}: the first screen needs its seven opening paragraphs')
         def anchor(value):
             if value in used_ids: return ''
             used_ids.add(value)
@@ -212,12 +217,14 @@ class Renderer:
                         # The drawing's place holds no picture of its own: where no drawing
                         # can run, the stylesheet removes the place and the front page's own
                         # picture, which follows, is the first thing after the opening.
-                        active.append('</div><div class="depth-decoration" aria-hidden="true"><canvas aria-hidden="true"></canvas></div></div>')
+                        active.append('</div><div class="art"><div class="depth-decoration" aria-hidden="true"><canvas aria-hidden="true"></canvas></div>')
                     css = ''
                     if kind == 'home' and '.intro.paragraph' in key:
                         css = {'01':'lead intro-copy','02':'intro-copy','03':'hero','04':'gallery','05':'caption','06':'status','07':'next-step'}.get(key[-2:], '')
                     if '<img ' in value and not css: css = 'gallery' if value.count('<img ')>1 else 'hero'
                     active.append('<div class="'+css+'">' + self.inline(value,source) + '</div>' if css in ('hero','gallery') else '<p' + (f' class="{css}"' if css else '') + '>' + self.inline(value,source) + '</p>')
+                    if kind == 'home' and key in ('home.intro.paragraph05', 'home.intro.paragraph07'):
+                        active.append('</div>')  # the caption ends the pictures' column; the next step ends the first screen
                 else: raise ValueError('Unsupported block: ' + typ)
         close_list()
         if kind != 'home':

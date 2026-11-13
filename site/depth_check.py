@@ -106,7 +106,10 @@ def run(endpoint,base,output):
                 assert state['fallback'] and not state['ready'] and not state['draws'] and not state['pending'],state
             else:
                 assert state['ready'] and state['draws']>0 and not state['fallback'],state
-                assert state['bounds']['bottom']<browser.evaluate('document.querySelector(".status").getBoundingClientRect().top',session)
+                # Decoration: never over the status or the next step, wherever the layout puts them.
+                assert not browser.evaluate('''(()=>{const a=document.querySelector(".depth-decoration").getBoundingClientRect();
+                    return [".status",".next-step"].some(q=>{const b=document.querySelector(q).getBoundingClientRect();
+                    return a.left<b.right&&b.left<a.right&&a.top<b.bottom&&b.top<a.bottom})})()''',session)
                 state['levels']=levels(state['matrices'],json.loads(browser.evaluate("document.querySelector('.depth-decoration canvas').dataset.scene",session)));state['levels']['control']=levels_control()
             if case!='context-loss':
                 shot=browser.call('Page.captureScreenshot',{'format':'png'},session)

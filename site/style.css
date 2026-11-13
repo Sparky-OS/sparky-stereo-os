@@ -29,7 +29,7 @@ a { color: var(--link); text-underline-offset: .18em; }
 a:hover { text-decoration-thickness: .15em; }
 a:focus-visible, summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; border-radius: 2px; }
 .site-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .65rem max(1rem, calc((100% - 72rem) / 2)); border-bottom: 1px solid var(--border); background: var(--surface); }
-.brand { display: block; width: min(55vw, 21rem); padding: .3rem .6rem; background: #262423; border-radius: .35rem; }
+.brand { display: block; width: min(50vw, 17rem); padding: .3rem .6rem; background: #262423; border-radius: .35rem; }
 .brand img { display: block; width: 100%; height: auto; }
 .lang { flex: 0 0 auto; position: relative; }
 .lang summary { cursor: pointer; padding: .45rem .6rem; min-height: 44px; font-size: 1.1rem; }
@@ -39,16 +39,17 @@ a:focus-visible, summary:focus-visible { outline: 3px solid var(--focus); outlin
 main, .site-footer { max-width: 72rem; margin: auto; padding: 1.5rem 1.25rem; }
 .detail main, .windows main { max-width: 56rem; }
 h1, h2, h3 { line-height: 1.25; text-wrap: balance; }
-h1 { font-size: clamp(1.6rem, 4vw, 2.35rem); margin: 0 0 1rem; }
+h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); margin: 0 0 .7rem; }
 h2 { font-size: 1.5rem; margin-top: 2.3rem; }
 h3 { font-size: 1.2rem; margin-top: 1.8rem; }
 p { margin: .9rem 0; }
 .home .lead { font-size: 1.12rem; }
-.home .lead strong { display: block; font-size: clamp(1.2rem, 2.6vw, 1.6rem); line-height: 1.35; margin-bottom: .5rem; }
+.home .lead strong { display: block; font-size: clamp(1.2rem, 2.2vw, 1.45rem); line-height: 1.3; margin-bottom: .5rem; }
 .home .intro-copy { max-width: 64rem; }
 img { max-width: 100%; height: auto; }
 .screenshot { display: block; margin: .65rem auto; border-radius: .25rem; }
 .hero { margin: 1.2rem 0 .7rem; }
+.hero a { display: block; }
 .hero img { width: 100%; }
 .gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .65rem; margin: .5rem 0; }
 .gallery a, .gallery img { display: block; width: 100%; }
@@ -101,21 +102,33 @@ td img { max-width: 5rem; }
 .maintainers dt, .maintainers dd { margin: 0; }
 .maintainers dt img { width: 72px; }
 
-.opening { display: block; }
+/* The first screen. On a wide screen: what it is, its status and the next step
+ * in one column, the drawing and the pictures beside them, so a visitor sees
+ * all of it without scrolling. The fourth row takes the pictures' extra height. */
+.first { display: block; }
+.art .hero { margin: 0 0 .6rem; }
+.art .gallery { margin: 0; }
+.art .caption { margin: .5rem 0 0; }
+@media (min-width: 60.01rem) {
+  .first { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); grid-template-rows: auto auto auto 1fr; column-gap: 2.5rem; align-items: start; }
+  .first > .opening-copy { grid-column: 1; grid-row: 1; }
+  .first > .art { grid-column: 2; grid-row: 1 / span 4; }
+  .first > .status { grid-column: 1; grid-row: 2; }
+  .first > .next-step { grid-column: 1; grid-row: 3; }
+  .first > .status, .first > .next-step { margin: .45rem 0; }
+}
 /* The drawing's place exists only while a drawing can run. With scripts off or
- * reduced motion asked for, it is not there and the page's own picture follows
- * the opening, once; depth.js marks the place depth-off where WebGL is missing. */
-.depth-decoration { display: none; position: relative; height: 20rem; border-radius: .5rem; overflow: hidden; background: radial-gradient(ellipse, #315876 0, #262423 75%); }
+ * reduced motion asked for, it is not there and the page's own picture is the
+ * first thing in its column, once; depth.js marks the place depth-off where
+ * WebGL is missing. Its width stays under 30rem, where the edition's published
+ * browser (2 percent of the canvas) keeps the menu inside the default popped limit. */
+.depth-decoration { display: none; position: relative; height: 17rem; max-width: 30rem; margin: 0 0 .6rem; border-radius: .5rem; overflow: hidden; background: radial-gradient(ellipse, #315876 0, #262423 75%); }
 .depth-decoration canvas { display: block; width: 100%; height: 100%; }
 @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
   .depth-decoration { display: block; }
   .depth-decoration.depth-off { display: none; }
-  @media (min-width: 60.01rem) {
-    .opening { display: grid; grid-template-columns: minmax(0, 1fr) minmax(16rem, 26rem); gap: 1.5rem; align-items: center; }
-    .opening:has(.depth-off) { display: block; }
-  }
   @media (max-width: 60rem) {
-    .depth-decoration { height: 10rem; margin: .3rem 0; }
+    .depth-decoration { height: 11rem; margin: .3rem auto .6rem; }
   }
 }
 @media print {

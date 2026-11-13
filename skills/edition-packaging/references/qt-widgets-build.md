@@ -54,3 +54,25 @@ Do not pack an active projected source/build tree as though it were the authored
 The missing `.dsc`, dpkg-buildpackage's log and a 27-input re-extraction comparison identified and checked this boundary.
 A tools image that has dpkg-source may still lack `dch`; verify preparation prerequisites before running `lean.debian_prepare`.
 The measured tools image failed there; using the already prepared build's exact generated rules and changelog completed the clean source archive, with matching control and preserved-source plan.
+
+## Keep the catalog template and compiled translations together
+
+Symptom: the Graphics build says a message is missing from a translated PO file, although the changed QML message and all nine PO catalogs agree.
+Cause: its POT template still has the old message; the problems-catalog consumer treats that template as its source authority.
+Fix: update or re-extract the template with the QML and PO changes, then run the actual catalog build and load the installed MO catalogs for all nine translated languages.
+The exact old key in the error and template identified the mismatch; the earlier C-locale warnings were not this failure.
+The corrected installed English page and all nine contextual translations remove an unsupported processor-offload promise while keeping all painting choices.
+
+## Recover compiler commands and a lost log relay
+
+- Symptom: the package build has no `compile_commands.json` for the requested Clang check.
+  Cause: its CMake invocation did not enable database export.
+  Fix: read `ninja -C BUILD -t compdb`, retain that database, select the changed translation units and compile their actual flags with Clang.
+  Drop GCC-only LTO-object flags and the GCC PCH; write objects and dependency files to a separate scratch path.
+  The measured 13-unit check then passed without warnings, including the explicit vector-path definition include.
+  Object compilation is not a full Clang module link or Qt CI.
+- Symptom: a host Docker client exits 143 and its build log freezes, while the owned container keeps compiling.
+  The reason for the client termination was not established.
+  Fix: inspect only the owned container before restarting work, reconnect `docker logs --follow`, and register `docker wait` before it exits.
+  Retain the interrupted relay and direct container exit status separately.
+  The measured build continued to exit 0 and passed its 33-package link and 64-package payload gates; a frozen relay alone was not a failed build.

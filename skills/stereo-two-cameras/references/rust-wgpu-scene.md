@@ -46,6 +46,20 @@ Pure projection tests establish the camera algebra; they do not establish GPU un
 
 ## Traps found while testing the camera core
 
+### Prepare sample rays once per eye
+
+For a CPU ray renderer, prepare the checked inverse eye view-projection once, then unproject its native pixel samples.
+`EyeCamera::rays()` returns a prepared `RayGrid`; `RayGrid::ray([x, y])` takes NDC with Y up and depth in 0..1.
+Its origin is on the near clipping plane, matching the existing OrbitCamera ray contract, rather than behind that plane at the physical eye.
+Retain the renderer's existing supersample positions and trace the original immutable world for every sample.
+
+Trap: unprojection can divide an infinite far point by zero.
+For homogeneous near and far points A and B, use origin `A.xyz/A.w` and normalize `B.xyz*A.w - A.xyz*B.w` for the direction.
+This also handles `B.w=0`, where B is a direction at infinity.
+Reject singular matrices before inverse, and reject nonfinite sample coordinates or directions explicitly.
+The cause was identified from the homogeneous far-plane calculation; new tests compare ray-plane intersections with independent perspective and orthographic equations, including an infinite-far projection and a singular matrix with `glam-assert` enabled.
+The first test run failed on the absent prepared-ray API; the implementation then passed the same tests.
+
 Symptom: a finite zero-scale affine view panics inside `glam::Mat4::inverse` when a consumer enables `glam-assert`.
 Cause: checking the inverse for finiteness comes after glam's singular-matrix assertion.
 Fix: check finite nonzero determinants before inversion, then validate inverse, product and resulting eye matrices.

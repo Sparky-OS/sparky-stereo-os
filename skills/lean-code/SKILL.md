@@ -10,7 +10,7 @@ description: >-
   on a lean system. Load it when dpkg --verify or debsums report changed files, dpkg-stereo --verify --deep exits 1 with
   OLDFORM rows, restore says original-mismatch, a fresh install shows a conffile such as gprofng.rc as changed by the
   person, an edited conffile was replaced without a prompt, a projected script breaks, a package lacks its lc mark, the
-  gate says supplied input changed after its universe was frozen, bwrap cannot mount proc, or a test baseline changes.
+  gate says supplied input changed after its universe was frozen, bwrap cannot mount proc, a test baseline changes, or compiler comments need measurement.
 ---
 
 # Lean Code on Sparky Stereo OS
@@ -88,7 +88,7 @@ A route that rebuilds a published source must carry its `debian/sparky-lean-pres
 ### Rust build inputs
 
 Since toolkit 0.1.29 a source tree whose language plan names `rust` has its Rust files projected before compilation: non-doc comments go, doc comments stay because they are attributes, and line numbers in panic messages name lean lines.
-[The Rust adapter](references/rust-adapter.md) has the rule for each kind of comment that is data, the counts and measurements on a real workspace, the recipe and five traps.
+[The Rust adapter](references/rust-adapter.md) has the rule for each kind of comment that is data, the counts and measurements on a real workspace, the source and offline compiler-kit recipes, coverage limits and observed traps.
 
 ### Reproducible sources
 

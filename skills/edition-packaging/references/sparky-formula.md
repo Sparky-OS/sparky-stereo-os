@@ -94,6 +94,7 @@ A file the person deleted before the conversion comes back once, since the old v
   The edition's own fork is `sparky-aptus-stereo-appcenter` in [the build tree](https://github.com/Sparky-OS/sparky-stereo-os-build/tree/main/sparky-os/sparky-aptus-stereo-appcenter).
   Never overwrite his files.
 - Vendor downloads follow his pattern (`wget`, then `apt-get install ./x.deb` in `sparky-xterm`), plus what his lacks: check a known SHA-256 before installing.
+  A program that is not a package at all (an AppImage from its author's release) is an entry of its own kind: [adding a program to a distribution's app center](../../upstream-outreach/references/adding-a-program-to-an-app-center.md) has the recipe and the proof.
 
 ## Working with Paweł
 

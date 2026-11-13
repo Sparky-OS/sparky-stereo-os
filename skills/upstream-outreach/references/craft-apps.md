@@ -267,3 +267,15 @@ Cause: `cargo generate-lockfile` resolves the entire graph again; it is not the 
 Keep the existing lockfile and let an ordinary offline check add the new path dependency, then verify that existing package versions are retained and use `--locked` for acceptance gates.
 The observed check added six window dependencies and removed no existing package versions.
 A bare egui UI-library check can also lack a native window-system feature; use that project's actual app, all-targets gate or test targets, which supply the platform features, rather than adding a host-specific feature to production manifests.
+
+### Stock and edition worktrees in one Cargo target
+
+Symptom: a release rebuild says `no field stereo on type Session` although the checked edition source defines it and its complete development gate passes.
+Cause: a shared target still contains release artifacts from the preceding stock workspace with the same package names; the dependency metadata uses relative workspace paths.
+How found: the release build reused the engine instead of compiling it, then failed in the changed UI; resetting every workspace package's release artifacts made the same unchanged source rebuild successfully.
+Use `cargo metadata --no-deps --format-version 1 --locked --offline` to identify `workspace_members`, then pass every corresponding package name to `cargo clean --release` with repeated `-p` arguments before switching between those trees.
+Keep third-party dependencies only when their source inputs are unchanged; the app's workspace artifacts must be rebuilt from the intended tree.
+A full `cargo clean` also resets the target and is the normal boundary between completed apps.
+For a baseline comparison, reset before building stock too, retain both compilation logs and use the identical temporary whole-UI test on each side.
+A runtime command-registry and session-inspection check can confirm that the candidate has the added API and pristine stock does not.
+Source cleanliness and a source hash alone do not prove which cached library was linked.

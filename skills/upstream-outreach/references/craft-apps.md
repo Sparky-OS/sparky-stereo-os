@@ -378,3 +378,25 @@ Cause: `tarfile`'s secure `data` filter intentionally strips group-write permiss
 Fix: retain original source modes in the manifest and write explicit safe 0644 or 0755 source-archive headers, while checking tested executable bytes and modes exactly.
 How found: compare source, stored member and extracted modes beside their matching hashes before changing the check.
 Keep the secure extraction filter; do not disable it to preserve an incidental group-write bit.
+
+## A shared dependency fails a receiving app’s source guard
+
+Symptom: the shared library’s Linux gate passes, but an app refuses its lockfile because a transitive Windows-only Git dependency points outside Storytold.
+Cause: the shared library carries an open maintainer fix through its author’s fork, while the receiving app deliberately restricts Git sources.
+Fix: retain the needed fix and its original author/date; use a documented permissive source snapshot in the shared owner when that fits the project’s rules.
+Keep the real source URL, revision, licence, original hashes and exact carried patch; never relabel a fork URL, add a hidden Cargo source replacement or weaken the receiving workflow.
+Then resolve the complete graph and rerun the unchanged receiving guard and gate.
+How found: PhotoCraft’s actual workflow check named the inherited winprint fork, and the shared print manifest named the pending driver-options fix it required.
+A Linux pass does not prove Windows printing.
+
+Symptom: vendoring a source package also imports document fixtures with embedded fonts of unestablished redistribution terms.
+Cause: a package’s source licence does not establish every embedded asset’s terms.
+Fix: preserve required source notices and replace those binary fixtures with original, attributed font-free patterns, with a sidecar and hash for every file.
+Keep the original test sources; compare the independently rasterized representations and state which platform renderer was not run.
+How found: the original print-test PDF’s FontFile2 objects named DengXian and MS-Gothic; the replacement PDFs listed zero fonts and rasterized exactly to their matching TIFFs.
+
+Symptom: `cargo fmt --all --check` rewrites vendored source under the containing workspace’s formatting choices.
+Cause: path dependencies are included in that check and can inherit the parent formatting file.
+Fix: preserve the dependency’s own formatting configuration and record any minimal formatting-only import adjustments separately from the credited upstream patch.
+Never call a modified full snapshot byte-identical; verify the carried fix’s affected file or changed hunk bytes independently.
+How found: the imported print wrapper had two layout-only differences under default rustfmt; its carried PrintTicket file still matched upstream exactly.

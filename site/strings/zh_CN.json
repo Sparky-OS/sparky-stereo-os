@@ -1,0 +1,1386 @@
+{
+  "language": "zh_CN",
+  "pages": {
+    "home": {
+      "source": "README.zh-CN.md",
+      "sha256": "2dceb21da4cbb5cc0ba6a156516cdf9986fc996862966cda0c6271dbb752adf0",
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 1,
+          "line": 1,
+          "key": "home.intro.heading01",
+          "id": "sparky-stereo-os",
+          "english_id": "sparky-stereo-os"
+        },
+        {
+          "type": "paragraph",
+          "line": 5,
+          "key": "home.intro.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 10,
+          "key": "home.intro.paragraph02"
+        },
+        {
+          "type": "paragraph",
+          "line": 13,
+          "key": "home.intro.paragraph03"
+        },
+        {
+          "type": "paragraph",
+          "line": 15,
+          "key": "home.intro.paragraph04"
+        },
+        {
+          "type": "paragraph",
+          "line": 17,
+          "key": "home.intro.paragraph05"
+        },
+        {
+          "type": "paragraph",
+          "line": 19,
+          "key": "home.intro.paragraph06"
+        },
+        {
+          "type": "paragraph",
+          "line": 21,
+          "key": "home.intro.paragraph07"
+        },
+        {
+          "type": "item",
+          "line": 24,
+          "key": "home.intro.item01"
+        },
+        {
+          "type": "item",
+          "line": 25,
+          "key": "home.intro.item02"
+        },
+        {
+          "type": "item",
+          "line": 26,
+          "key": "home.intro.item03"
+        },
+        {
+          "type": "item",
+          "line": 27,
+          "key": "home.intro.item04"
+        },
+        {
+          "type": "item",
+          "line": 28,
+          "key": "home.intro.item05"
+        },
+        {
+          "type": "item",
+          "line": 29,
+          "key": "home.intro.item06"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"depth-on-the-desktop\"></a><a id=\"the-stereo-desktop-new-frontiers-for-theme-design\"></a>",
+          "line": 31
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 32,
+          "key": "home.the-stereo-desktop-new-frontiers-for-theme-design.heading01",
+          "id": "立体桌面主题设计的新边界",
+          "english_id": "the-stereo-desktop-new-frontiers-for-theme-design"
+        },
+        {
+          "type": "paragraph",
+          "line": 34,
+          "key": "home.the-stereo-desktop-new-frontiers-for-theme-design.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"how-it-works\"></a>",
+          "line": 36
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 37,
+          "key": "home.how-it-works.heading01",
+          "id": "工作原理",
+          "english_id": "how-it-works"
+        },
+        {
+          "type": "paragraph",
+          "line": 39,
+          "key": "home.how-it-works.paragraph01"
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 42,
+          "key": "home.more-about-the-edition.heading01",
+          "id": "关于本发行版的更多内容",
+          "english_id": "more-about-the-edition"
+        },
+        {
+          "type": "item",
+          "line": 44,
+          "key": "home.more-about-the-edition.item01"
+        },
+        {
+          "type": "item",
+          "line": 45,
+          "key": "home.more-about-the-edition.item02"
+        },
+        {
+          "type": "item",
+          "line": 46,
+          "key": "home.more-about-the-edition.item03"
+        },
+        {
+          "type": "item",
+          "line": 47,
+          "key": "home.more-about-the-edition.item04"
+        },
+        {
+          "type": "item",
+          "line": 48,
+          "key": "home.more-about-the-edition.item05"
+        },
+        {
+          "type": "item",
+          "line": 49,
+          "key": "home.more-about-the-edition.item06"
+        },
+        {
+          "type": "item",
+          "line": 50,
+          "key": "home.more-about-the-edition.item07"
+        },
+        {
+          "type": "item",
+          "line": 51,
+          "key": "home.more-about-the-edition.item08"
+        },
+        {
+          "type": "item",
+          "line": 52,
+          "key": "home.more-about-the-edition.item09"
+        },
+        {
+          "type": "item",
+          "line": 53,
+          "key": "home.more-about-the-edition.item10"
+        },
+        {
+          "type": "item",
+          "line": 54,
+          "key": "home.more-about-the-edition.item11"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"credit\"></a>",
+          "line": 56
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 57,
+          "key": "home.credit.heading01",
+          "id": "致谢",
+          "english_id": "credit"
+        },
+        {
+          "type": "paragraph",
+          "line": 59,
+          "key": "home.credit.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 62,
+          "key": "home.credit.paragraph02"
+        },
+        {
+          "type": "paragraph",
+          "line": 64,
+          "key": "home.credit.paragraph03"
+        },
+        {
+          "type": "paragraph",
+          "line": 66,
+          "key": "home.credit.paragraph04"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"licence\"></a>",
+          "line": 68
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 69,
+          "key": "home.licence.heading01",
+          "id": "许可",
+          "english_id": "licence"
+        },
+        {
+          "type": "paragraph",
+          "line": 71,
+          "key": "home.licence.paragraph01"
+        }
+      ],
+      "language_row": "🇨🇦 [English](README.md) · 🇧🇷 [Português](README.pt-BR.md) · 🇵🇱 [Polski](README.pl.md) · 🇫🇷 [Français](README.fr.md) · 🇩🇪 [Deutsch](README.de.md) · 🇲🇽 [Español](README.es.md) · 🇯🇵 [日本語](README.ja.md) · 🇰🇷 [한국어](README.ko.md) · 🇨🇳 [简体中文](README.zh-CN.md) · 🇭🇰 [繁體中文](README.zh-TW.md)"
+    },
+    "detail": {
+      "source": "docs/edition-in-detail.zh-CN.md",
+      "sha256": "6f6bb658bf3f56fa98bfd6224c97a216a0ed66080370bfce6745cd71e7cec3ee",
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 1,
+          "line": 1,
+          "key": "detail.intro.heading01",
+          "id": "sparky-stereo-os-详细介绍",
+          "english_id": "sparky-stereo-os-in-detail"
+        },
+        {
+          "type": "paragraph",
+          "line": 5,
+          "key": "detail.intro.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 8,
+          "key": "detail.intro.paragraph02"
+        },
+        {
+          "type": "paragraph",
+          "line": 12,
+          "key": "detail.intro.paragraph03"
+        },
+        {
+          "type": "paragraph",
+          "line": 15,
+          "key": "detail.intro.paragraph04"
+        },
+        {
+          "type": "paragraph",
+          "line": 17,
+          "key": "detail.intro.paragraph05"
+        },
+        {
+          "type": "paragraph",
+          "line": 19,
+          "key": "detail.intro.paragraph06"
+        },
+        {
+          "type": "paragraph",
+          "line": 24,
+          "key": "detail.intro.paragraph07"
+        },
+        {
+          "type": "paragraph",
+          "line": 26,
+          "key": "detail.intro.paragraph08"
+        },
+        {
+          "type": "paragraph",
+          "line": 28,
+          "key": "detail.intro.paragraph09"
+        },
+        {
+          "type": "item",
+          "line": 30,
+          "key": "detail.intro.item01"
+        },
+        {
+          "type": "item",
+          "line": 31,
+          "key": "detail.intro.item02"
+        },
+        {
+          "type": "item",
+          "line": 32,
+          "key": "detail.intro.item03"
+        },
+        {
+          "type": "item",
+          "line": 33,
+          "key": "detail.intro.item04"
+        },
+        {
+          "type": "item",
+          "line": 34,
+          "key": "detail.intro.item05"
+        },
+        {
+          "type": "paragraph",
+          "line": 36,
+          "key": "detail.intro.paragraph10"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"vr-is-also-a-stereo-monitor\"></a>",
+          "line": 39
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 40,
+          "key": "detail.vr-is-also-a-stereo-monitor.heading01",
+          "id": "vr-也是一种立体显示器",
+          "english_id": "vr-is-also-a-stereo-monitor"
+        },
+        {
+          "type": "paragraph",
+          "line": 42,
+          "key": "detail.vr-is-also-a-stereo-monitor.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 46,
+          "key": "detail.vr-is-also-a-stereo-monitor.paragraph02"
+        },
+        {
+          "type": "item",
+          "line": 47,
+          "key": "detail.vr-is-also-a-stereo-monitor.item01"
+        },
+        {
+          "type": "item",
+          "line": 48,
+          "key": "detail.vr-is-also-a-stereo-monitor.item02"
+        },
+        {
+          "type": "item",
+          "line": 49,
+          "key": "detail.vr-is-also-a-stereo-monitor.item03"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"who-builds-it\"></a>",
+          "line": 51
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 52,
+          "key": "detail.who-builds-it.heading01",
+          "id": "谁在构建",
+          "english_id": "who-builds-it"
+        },
+        {
+          "type": "paragraph",
+          "line": 54,
+          "key": "detail.who-builds-it.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"where-it-is-going\"></a>",
+          "line": 61
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 62,
+          "key": "detail.where-it-is-going.heading01",
+          "id": "去向",
+          "english_id": "where-it-is-going"
+        },
+        {
+          "type": "paragraph",
+          "line": 64,
+          "key": "detail.where-it-is-going.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"create\"></a>",
+          "line": 70
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 71,
+          "key": "detail.create.heading01",
+          "id": "创作",
+          "english_id": "create"
+        },
+        {
+          "type": "paragraph",
+          "line": 73,
+          "key": "detail.create.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 75,
+          "key": "detail.create.paragraph02"
+        },
+        {
+          "type": "item",
+          "line": 79,
+          "key": "detail.create.item01"
+        },
+        {
+          "type": "item",
+          "line": 80,
+          "key": "detail.create.item02"
+        },
+        {
+          "type": "item",
+          "line": 81,
+          "key": "detail.create.item03"
+        },
+        {
+          "type": "item",
+          "line": 82,
+          "key": "detail.create.item04"
+        },
+        {
+          "type": "item",
+          "line": 83,
+          "key": "detail.create.item05"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"scan\"></a>",
+          "line": 85
+        },
+        {
+          "type": "paragraph",
+          "line": 86,
+          "key": "detail.create.paragraph03"
+        },
+        {
+          "type": "paragraph",
+          "line": 92,
+          "key": "detail.create.paragraph04"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"for-theme-designers-and-customizers\"></a>",
+          "line": 94
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "line": 95,
+          "key": "detail.for-theme-designers-and-customizers.heading01",
+          "id": "供主题设计师和自定义者",
+          "english_id": "for-theme-designers-and-customizers"
+        },
+        {
+          "type": "paragraph",
+          "line": 97,
+          "key": "detail.for-theme-designers-and-customizers.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"science-and-engineering\"></a>",
+          "line": 99
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 100,
+          "key": "detail.science-and-engineering.heading01",
+          "id": "科学与工程",
+          "english_id": "science-and-engineering"
+        },
+        {
+          "type": "paragraph",
+          "line": 102,
+          "key": "detail.science-and-engineering.paragraph01"
+        },
+        {
+          "type": "item",
+          "line": 103,
+          "key": "detail.science-and-engineering.item01"
+        },
+        {
+          "type": "item",
+          "line": 104,
+          "key": "detail.science-and-engineering.item02"
+        },
+        {
+          "type": "item",
+          "line": 105,
+          "key": "detail.science-and-engineering.item03"
+        },
+        {
+          "type": "item",
+          "line": 106,
+          "key": "detail.science-and-engineering.item04"
+        },
+        {
+          "type": "paragraph",
+          "line": 108,
+          "key": "detail.science-and-engineering.paragraph02"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"watch-and-play\"></a>",
+          "line": 110
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 111,
+          "key": "detail.watch-and-play.heading01",
+          "id": "观看和游玩",
+          "english_id": "watch-and-play"
+        },
+        {
+          "type": "paragraph",
+          "line": 113,
+          "key": "detail.watch-and-play.paragraph01"
+        },
+        {
+          "type": "item",
+          "line": 114,
+          "key": "detail.watch-and-play.item01"
+        },
+        {
+          "type": "item",
+          "line": 115,
+          "key": "detail.watch-and-play.item02"
+        },
+        {
+          "type": "item",
+          "line": 116,
+          "key": "detail.watch-and-play.item03"
+        },
+        {
+          "type": "item",
+          "line": 117,
+          "key": "detail.watch-and-play.item04"
+        },
+        {
+          "type": "item",
+          "line": 118,
+          "key": "detail.watch-and-play.item05"
+        },
+        {
+          "type": "paragraph",
+          "line": 120,
+          "key": "detail.watch-and-play.paragraph02"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"seen-in-3d\"></a>",
+          "line": 122
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "line": 123,
+          "key": "detail.seen-in-3d.heading01",
+          "id": "用-3d-查看",
+          "english_id": "seen-in-3d"
+        },
+        {
+          "type": "paragraph",
+          "line": 125,
+          "key": "detail.seen-in-3d.paragraph01"
+        },
+        {
+          "type": "item",
+          "line": 128,
+          "key": "detail.seen-in-3d.item01"
+        },
+        {
+          "type": "item",
+          "line": 129,
+          "key": "detail.seen-in-3d.item02"
+        },
+        {
+          "type": "item",
+          "line": 130,
+          "key": "detail.seen-in-3d.item03"
+        },
+        {
+          "type": "item",
+          "line": 131,
+          "key": "detail.seen-in-3d.item04"
+        },
+        {
+          "type": "item",
+          "line": 132,
+          "key": "detail.seen-in-3d.item05"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"depth-on-the-desktop\"></a>",
+          "line": 134
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"the-stereo-desktop-new-frontiers-for-theme-design\"></a>",
+          "line": 135
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 136,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.heading01",
+          "id": "立体桌面主题设计的新边界",
+          "english_id": "the-stereo-desktop-new-frontiers-for-theme-design"
+        },
+        {
+          "type": "paragraph",
+          "line": 138,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph01"
+        },
+        {
+          "type": "item",
+          "line": 141,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item01"
+        },
+        {
+          "type": "item",
+          "line": 142,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item02"
+        },
+        {
+          "type": "item",
+          "line": 143,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item03"
+        },
+        {
+          "type": "item",
+          "line": 144,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item04"
+        },
+        {
+          "type": "item",
+          "line": 145,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item05"
+        },
+        {
+          "type": "item",
+          "line": 146,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item06"
+        },
+        {
+          "type": "item",
+          "line": 147,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item07"
+        },
+        {
+          "type": "item",
+          "line": 148,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item08"
+        },
+        {
+          "type": "paragraph",
+          "line": 150,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph02"
+        },
+        {
+          "type": "paragraph",
+          "line": 154,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"for-developers\"></a>",
+          "line": 156
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 157,
+          "key": "detail.for-developers.heading01",
+          "id": "面向开发者",
+          "english_id": "for-developers"
+        },
+        {
+          "type": "paragraph",
+          "line": 159,
+          "key": "detail.for-developers.paragraph01"
+        },
+        {
+          "type": "item",
+          "line": 161,
+          "key": "detail.for-developers.item01"
+        },
+        {
+          "type": "item",
+          "line": 162,
+          "key": "detail.for-developers.item02"
+        },
+        {
+          "type": "item",
+          "line": 163,
+          "key": "detail.for-developers.item03"
+        },
+        {
+          "type": "item",
+          "line": 164,
+          "key": "detail.for-developers.item04"
+        },
+        {
+          "type": "item",
+          "line": 165,
+          "key": "detail.for-developers.item05"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"how-it-works\"></a>",
+          "line": 167
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 168,
+          "key": "detail.how-it-works.heading01",
+          "id": "工作原理",
+          "english_id": "how-it-works"
+        },
+        {
+          "type": "paragraph",
+          "line": 170,
+          "key": "detail.how-it-works.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 172,
+          "key": "detail.how-it-works.paragraph02"
+        },
+        {
+          "type": "item",
+          "line": 173,
+          "key": "detail.how-it-works.item01"
+        },
+        {
+          "type": "item",
+          "line": 174,
+          "key": "detail.how-it-works.item02"
+        },
+        {
+          "type": "item",
+          "line": 175,
+          "key": "detail.how-it-works.item03"
+        },
+        {
+          "type": "paragraph",
+          "line": 177,
+          "key": "detail.how-it-works.paragraph03"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"stereo-in-the-open-stack-not-in-one-product\"></a>",
+          "line": 179
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 180,
+          "key": "detail.stereo-in-the-open-stack-not-in-one-product.heading01",
+          "id": "开放栈中的立体而不是单一产品中的立体",
+          "english_id": "stereo-in-the-open-stack-not-in-one-product"
+        },
+        {
+          "type": "paragraph",
+          "line": 182,
+          "key": "detail.stereo-in-the-open-stack-not-in-one-product.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"programs-the-edition-changes-for-stereo-3d-and-deep-colour\"></a>",
+          "line": 185
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 186,
+          "key": "detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.heading01",
+          "id": "这个发行版为立体-3d-和深度颜色修改的程序",
+          "english_id": "programs-the-edition-changes-for-stereo-3d-and-deep-colour"
+        },
+        {
+          "type": "paragraph",
+          "line": 188,
+          "key": "detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"our-branches-on-kdes-gitlab\"></a>",
+          "line": 191
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 192,
+          "key": "detail.our-branches-on-kdes-gitlab.heading01",
+          "id": "我们在-kde-gitlab-上的分支",
+          "english_id": "our-branches-on-kdes-gitlab"
+        },
+        {
+          "type": "paragraph",
+          "line": 194,
+          "key": "detail.our-branches-on-kdes-gitlab.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"merged-outside-sparky-stereo\"></a>",
+          "line": 196
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 197,
+          "key": "detail.merged-outside-sparky-stereo.heading01",
+          "id": "已合并到-sparky-stereo-之外",
+          "english_id": "merged-outside-sparky-stereo"
+        },
+        {
+          "type": "paragraph",
+          "line": 199,
+          "key": "detail.merged-outside-sparky-stereo.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 204,
+          "key": "detail.merged-outside-sparky-stereo.paragraph02"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"documents\"></a>",
+          "line": 209
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 210,
+          "key": "detail.documents.heading01",
+          "id": "文档",
+          "english_id": "documents"
+        },
+        {
+          "type": "paragraph",
+          "line": 212,
+          "key": "detail.documents.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"tools\"></a>",
+          "line": 214
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 215,
+          "key": "detail.tools.heading01",
+          "id": "工具",
+          "english_id": "tools"
+        },
+        {
+          "type": "paragraph",
+          "line": 217,
+          "key": "detail.tools.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"the-base-three-open-lists\"></a>",
+          "line": 219
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 220,
+          "key": "detail.the-base-three-open-lists.heading01",
+          "id": "基础三份开放列表",
+          "english_id": "the-base-three-open-lists"
+        },
+        {
+          "type": "paragraph",
+          "line": 222,
+          "key": "detail.the-base-three-open-lists.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"credit\"></a>",
+          "line": 224
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 225,
+          "key": "detail.credit.heading01",
+          "id": "致谢",
+          "english_id": "credit"
+        },
+        {
+          "type": "paragraph",
+          "line": 227,
+          "key": "detail.credit.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 229,
+          "key": "detail.credit.paragraph02"
+        },
+        {
+          "type": "table",
+          "line": 231,
+          "key": "detail.credit.table01"
+        },
+        {
+          "type": "paragraph",
+          "line": 236,
+          "key": "detail.credit.paragraph03"
+        },
+        {
+          "type": "paragraph",
+          "line": 238,
+          "key": "detail.credit.paragraph04"
+        },
+        {
+          "type": "paragraph",
+          "line": 240,
+          "key": "detail.credit.paragraph05"
+        },
+        {
+          "type": "item",
+          "line": 241,
+          "key": "detail.credit.item01"
+        },
+        {
+          "type": "item",
+          "line": 242,
+          "key": "detail.credit.item02"
+        },
+        {
+          "type": "item",
+          "line": 243,
+          "key": "detail.credit.item03"
+        },
+        {
+          "type": "item",
+          "line": 244,
+          "key": "detail.credit.item04"
+        },
+        {
+          "type": "item",
+          "line": 245,
+          "key": "detail.credit.item05"
+        },
+        {
+          "type": "paragraph",
+          "line": 247,
+          "key": "detail.credit.paragraph06"
+        },
+        {
+          "type": "paragraph",
+          "line": 249,
+          "key": "detail.credit.paragraph07"
+        },
+        {
+          "type": "paragraph",
+          "line": 251,
+          "key": "detail.credit.paragraph08"
+        },
+        {
+          "type": "paragraph",
+          "line": 253,
+          "key": "detail.credit.paragraph09"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"licence\"></a>",
+          "line": 255
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 256,
+          "key": "detail.licence.heading01",
+          "id": "许可",
+          "english_id": "licence"
+        },
+        {
+          "type": "paragraph",
+          "line": 258,
+          "key": "detail.licence.paragraph01"
+        },
+        {
+          "type": "quote",
+          "line": 260,
+          "key": "detail.licence.quote01"
+        },
+        {
+          "type": "paragraph",
+          "line": 263,
+          "key": "detail.licence.paragraph02"
+        },
+        {
+          "type": "paragraph",
+          "line": 265,
+          "key": "detail.licence.paragraph03"
+        }
+      ],
+      "language_row": "[English](edition-in-detail.md) · [Português](edition-in-detail.pt-BR.md) · [Polski](edition-in-detail.pl.md) · [Français](edition-in-detail.fr.md) · [日本語](edition-in-detail.ja.md) · [한국어](edition-in-detail.ko.md) · [简体中文](edition-in-detail.zh-CN.md) · [繁體中文](edition-in-detail.zh-TW.md)"
+    }
+  },
+  "strings": {
+    "home.intro.heading01": "Sparky Stereo OS",
+    "home.intro.paragraph01": "**在你已有的屏幕上以 3D 方式创作和探索：绘图，编辑照片和视频，研究分子和地球仪，然后看电影、玩游戏。**\n它为各种 3D 屏幕而设计：3D 电视和 3D 投影机、VR 头显、裸眼 3D 显示器，以及配上红青眼镜的任何显示器。\n在普通的 2D 显示器上，同一个桌面无需任何改动即可使用。\nSparky Stereo OS 是 Daniel Ramos 的 SparkyLinux 发行版（SparkyLinux 由 Paweł \"pavroo\" Pijanowski 制作），是一个带有全新 Stereo KDE Plasma 桌面的 Linux 系统。",
+    "home.intro.paragraph02.link01": "docs/lean-code-packages.md#why-it-matters",
+    "home.intro.paragraph02": "**对你的电脑和地球都更轻：**每个软件包都去掉了程序从不读取的注释和说明，因此同样的工作需要更少的处理、更少的能耗和更少的磨损。\n[实测]({{home.intro.paragraph02.link01}})（一台 2016 年的笔记本电脑）：为编译器准备程序的工作量比使用未去除注释的相同文件少 2% 到 4%，且没有任何损失。",
+    "home.intro.paragraph03.link01": "docs/edition-in-detail.zh-CN.md#seen-in-3d",
+    "home.intro.paragraph03.image01": "docs/screenshots/translucent-stereo-desktop-anaglyph.jpg",
+    "home.intro.paragraph03.alt01": "3D 立体桌面，带半透明窗口：Dolphin 的设置菜单和配色方案列表在前面，后面的玻璃窗口一层层退开，系统监视器和壁纸最深（红青立体图）",
+    "home.intro.paragraph03": "<a href=\"{{home.intro.paragraph03.link01}}\"><img src=\"{{home.intro.paragraph03.image01}}\" width=\"99%\" alt=\"{{home.intro.paragraph03.alt01}}\"></a>",
+    "home.intro.paragraph04.link01": "docs/edition-in-detail.zh-CN.md#seen-in-3d",
+    "home.intro.paragraph04.image01": "docs/screenshots/doom-2016-in-a-window-anaglyph.jpg",
+    "home.intro.paragraph04.alt01": "窗口中的 DOOM (2016)，3D 显示，下面是平面 Plasma 面板（红青立体图）",
+    "home.intro.paragraph04.link02": "docs/edition-in-detail.zh-CN.md#seen-in-3d",
+    "home.intro.paragraph04.image02": "docs/screenshots/marble-globe-anaglyph.jpg",
+    "home.intro.paragraph04.alt02": "Marble 的地球仪在星空前面，3D 显示（红青立体图）",
+    "home.intro.paragraph04.link03": "docs/edition-in-detail.zh-CN.md#seen-in-3d",
+    "home.intro.paragraph04.image03": "docs/screenshots/stereo-desktop-anaglyph.jpg",
+    "home.intro.paragraph04.alt03": "3D 立体桌面：面板在屏幕上，声音弹出窗口在它前面，后面的窗口依次退开（红青立体图）",
+    "home.intro.paragraph04": "<a href=\"{{home.intro.paragraph04.link01}}\"><img src=\"{{home.intro.paragraph04.image01}}\" width=\"32%\" alt=\"{{home.intro.paragraph04.alt01}}\"></a> <a href=\"{{home.intro.paragraph04.link02}}\"><img src=\"{{home.intro.paragraph04.image02}}\" width=\"32%\" alt=\"{{home.intro.paragraph04.alt02}}\"></a> <a href=\"{{home.intro.paragraph04.link03}}\"><img src=\"{{home.intro.paragraph04.image03}}\" width=\"32%\" alt=\"{{home.intro.paragraph04.alt03}}\"></a>",
+    "home.intro.paragraph05.link01": "docs/edition-in-detail.zh-CN.md#seen-in-3d",
+    "home.intro.paragraph05": "*戴上红青眼镜即可看到这些画面的 3D 效果（[更多]({{home.intro.paragraph05.link01}})）。*",
+    "home.intro.paragraph06": "**状态：beta 1，面向测试者。**已在 3D 电视、配红青眼镜的普通显示器以及放进便宜观片盒的 Android 手机上测试；裸眼 3D 显示器和独立头显仍在进行中。",
+    "home.intro.paragraph07.link01": "docs/guides/try-on-windows.en.md",
+    "home.intro.paragraph07.link02": "https://github.com/Sparky-OS/sparky-stereo-os/issues/26",
+    "home.intro.paragraph07.link03": "https://github.com/Sparky-OS/sparky-stereo-os/issues/25",
+    "home.intro.paragraph07.link04": "https://github.com/Sparky-OS/sparky-stereo-os/issues/27",
+    "home.intro.paragraph07.link05": "https://github.com/Sparky-OS/sparky-stereo-os/issues/80",
+    "home.intro.paragraph07.link06": "https://github.com/Sparky-OS/sparky-stereo-os/issues/153",
+    "home.intro.paragraph07.link07": "https://github.com/Sparky-OS/sparky-stereo-os/issues/351",
+    "home.intro.paragraph07.link08": "https://github.com/Sparky-OS/sparky-stereo-os/issues/81",
+    "home.intro.paragraph07.link09": "https://github.com/Sparky-OS/sparky-stereo-os/issues/83",
+    "home.intro.paragraph07.link10": "https://github.com/Sparky-OS/sparky-stereo-os/issues/84",
+    "home.intro.paragraph07.link11": "https://github.com/Sparky-OS/sparky-stereo-os/issues/85",
+    "home.intro.paragraph07": "**下一步：在你的 Windows 电脑上用 U 盘试用，无需安装任何东西：**[一页，十个步骤（英文）]({{home.intro.paragraph07.link01}})\n<br>索取下载链接，并用你的语言告诉我们你的 3D 设备： [🇨🇦]({{home.intro.paragraph07.link02}}) [🇧🇷]({{home.intro.paragraph07.link03}}) [🇵🇱]({{home.intro.paragraph07.link04}}) [🇫🇷]({{home.intro.paragraph07.link05}}) [🇩🇪]({{home.intro.paragraph07.link06}}) [🇲🇽]({{home.intro.paragraph07.link07}}) [🇯🇵]({{home.intro.paragraph07.link08}}) [🇰🇷]({{home.intro.paragraph07.link09}}) [🇨🇳]({{home.intro.paragraph07.link10}}) [🇭🇰]({{home.intro.paragraph07.link11}})",
+    "home.intro.item01.link01": "docs/edition-in-detail.zh-CN.md#science-and-engineering",
+    "home.intro.item01": "<a id=\"science-and-engineering\"></a>**[科学与工程]({{home.intro.item01.link01}})：**Marble 的地球仪、KAlgebra 的曲线图和 Kalzium 的分子都以 3D 显示；3D 模型和电路板仍在进行中。扫描已在计划中：把拍摄零件、现场或标本的视频变成 3D 模型。",
+    "home.intro.item02.link01": "docs/edition-in-detail.zh-CN.md#create",
+    "home.intro.item02": "<a id=\"create\"></a>**[创作]({{home.intro.item02.link01}})：**在 3D 中绘图，并在深度颜色（每种颜色 16 位而不是 8 位）中绘图，编辑 3D 照片和视频。扫描已在计划中：把拍摄物体或场所的视频变成可以在其中漫游的 3D 模型。",
+    "home.intro.item03.link01": "docs/edition-in-detail.zh-CN.md#watch-and-play",
+    "home.intro.item03": "<a id=\"watch-and-play\"></a>**[观看和游玩]({{home.intro.item03.link01}})：**3D 电影、照片和游戏，可以在窗口或全屏中显示。",
+    "home.intro.item04.link01": "docs/edition-in-detail.zh-CN.md#vr-is-also-a-stereo-monitor",
+    "home.intro.item04": "<a id=\"vr-is-also-a-stereo-monitor\"></a>**[VR 也是一种立体显示器]({{home.intro.item04.link01}}):** 头显，或放进观片盒的手机，同样是这个桌面的 3D 屏幕。",
+    "home.intro.item05.link01": "docs/edition-in-detail.zh-CN.md#for-developers",
+    "home.intro.item05": "<a id=\"for-developers\"></a>**[开发]({{home.intro.item05.link01}})：**只需把程序做一次 3D 适配；桌面会自动适配到每块屏幕。",
+    "home.intro.item06.link01": "docs/other-distributions.md",
+    "home.intro.item06": "**[其他发行版？]({{home.intro.item06.link01}})** 为什么我们不为它打包，以及它的维护者如何采用我们的修复。",
+    "home.the-stereo-desktop-new-frontiers-for-theme-design.heading01": "立体桌面：主题设计的新边界",
+    "home.the-stereo-desktop-new-frontiers-for-theme-design.paragraph01.link01": "docs/edition-in-detail.zh-CN.md#depth-on-the-desktop",
+    "home.the-stereo-desktop-new-frontiers-for-theme-design.paragraph01": "**在这个桌面上，主题可以决定什么浮出、什么沉入：**[主题设计的新边界]({{home.the-stereo-desktop-new-frontiers-for-theme-design.paragraph01.link01}})。",
+    "home.how-it-works.heading01": "工作原理",
+    "home.how-it-works.paragraph01.link01": "docs/edition-in-detail.zh-CN.md#how-it-works",
+    "home.how-it-works.paragraph01": "<a id=\"why-one-format-full-side-by-side-at-any-resolution\"></a>**程序描述每一幅画面；桌面把它适配到每一块屏幕。**对立体显示来说，两个视图一起放在同一个完整左右并排的缓冲区中传递。提议的 HDR 扩展会通过同样的分工保留画面的颜色描述和重建信息。\n[详细内容]({{home.how-it-works.paragraph01.link01}})",
+    "home.more-about-the-edition.heading01": "关于本发行版的更多内容",
+    "home.more-about-the-edition.item01.link01": "docs/edition-in-detail.zh-CN.md#who-builds-it",
+    "home.more-about-the-edition.item01": "<a id=\"who-builds-it\"></a>[谁在构建]({{home.more-about-the-edition.item01.link01}})",
+    "home.more-about-the-edition.item02.link01": "docs/edition-in-detail.zh-CN.md#where-it-is-going",
+    "home.more-about-the-edition.item02": "<a id=\"where-it-is-going\"></a>[去向]({{home.more-about-the-edition.item02.link01}})",
+    "home.more-about-the-edition.item03.link01": "docs/edition-in-detail.zh-CN.md#seen-in-3d",
+    "home.more-about-the-edition.item03": "<a id=\"seen-in-3d\"></a>[用 3D 查看]({{home.more-about-the-edition.item03.link01}})",
+    "home.more-about-the-edition.item04.link01": "docs/edition-in-detail.zh-CN.md#for-theme-designers-and-customizers",
+    "home.more-about-the-edition.item04": "<a id=\"for-theme-designers-and-customizers\"></a>[供主题设计师和自定义者]({{home.more-about-the-edition.item04.link01}})",
+    "home.more-about-the-edition.item05.link01": "docs/edition-in-detail.zh-CN.md#stereo-in-the-open-stack-not-in-one-product",
+    "home.more-about-the-edition.item05": "<a id=\"stereo-in-the-open-stack-not-in-one-product\"></a>[开放栈中的立体，而不是单一产品中的立体]({{home.more-about-the-edition.item05.link01}})",
+    "home.more-about-the-edition.item06.link01": "docs/edition-in-detail.zh-CN.md#programs-the-edition-changes-for-stereo-3d-and-deep-colour",
+    "home.more-about-the-edition.item06": "<a id=\"programs-the-edition-changes-for-stereo-3d-and-deep-colour\"></a>[这个发行版为立体 3D 和深度颜色修改的程序]({{home.more-about-the-edition.item06.link01}})",
+    "home.more-about-the-edition.item07.link01": "docs/edition-in-detail.zh-CN.md#our-branches-on-kdes-gitlab",
+    "home.more-about-the-edition.item07": "<a id=\"our-branches-on-kdes-gitlab\"></a>[我们在 KDE GitLab 上的分支]({{home.more-about-the-edition.item07.link01}})",
+    "home.more-about-the-edition.item08.link01": "docs/edition-in-detail.zh-CN.md#merged-outside-sparky-stereo",
+    "home.more-about-the-edition.item08": "<a id=\"merged-outside-sparky-stereo\"></a>[已合并到 Sparky Stereo 之外]({{home.more-about-the-edition.item08.link01}})",
+    "home.more-about-the-edition.item09.link01": "docs/edition-in-detail.zh-CN.md#documents",
+    "home.more-about-the-edition.item09": "<a id=\"documents\"></a>[文档]({{home.more-about-the-edition.item09.link01}})",
+    "home.more-about-the-edition.item10.link01": "docs/edition-in-detail.zh-CN.md#tools",
+    "home.more-about-the-edition.item10": "<a id=\"tools\"></a>[工具]({{home.more-about-the-edition.item10.link01}})",
+    "home.more-about-the-edition.item11.link01": "docs/edition-in-detail.zh-CN.md#the-base-three-open-lists",
+    "home.more-about-the-edition.item11": "<a id=\"the-base-three-open-lists\"></a>[基础：三份开放列表]({{home.more-about-the-edition.item11.link01}})",
+    "home.credit.heading01": "致谢",
+    "home.credit.paragraph01.link01": "ATTRIBUTIONS.md",
+    "home.credit.paragraph01": "Sparky Stereo OS，Daniel Ramos（Capitain Jack）的 SparkyLinux 发行版（SparkyLinux 由 Paweł \"pavroo\" Pijanowski 制作）。\n这个发行版立足的所有人，逐名列出：[ATTRIBUTIONS.md]({{home.credit.paragraph01.link01}})。",
+    "home.credit.paragraph02.alt01": "DOI",
+    "home.credit.paragraph02.image01": "https://zenodo.org/badge/DOI/10.5281/zenodo.23309024.svg",
+    "home.credit.paragraph02.link01": "https://doi.org/10.5281/zenodo.23309024",
+    "home.credit.paragraph02": "**引用它：**[![{{home.credit.paragraph02.alt01}}]({{home.credit.paragraph02.image01}})]({{home.credit.paragraph02.link01}})",
+    "home.credit.paragraph03.alt01": "Sponsor Daniel",
+    "home.credit.paragraph03.image01": "https://img.shields.io/badge/Sponsor-danielcamposramos-EA4AAA?style=flat-square&logo=githubsponsors",
+    "home.credit.paragraph03.link01": "https://github.com/sponsors/danielcamposramos",
+    "home.credit.paragraph03.alt02": "Donate to SparkyLinux",
+    "home.credit.paragraph03.image02": "https://img.shields.io/badge/Donate-SparkyLinux-2777AD?style=flat-square",
+    "home.credit.paragraph03.link02": "https://sparkylinux.org/donate/",
+    "home.credit.paragraph03": "**支持它：**[![{{home.credit.paragraph03.alt01}}]({{home.credit.paragraph03.image01}})]({{home.credit.paragraph03.link01}}) [![{{home.credit.paragraph03.alt02}}]({{home.credit.paragraph03.image02}})]({{home.credit.paragraph03.link02}}) 赞助 Daniel 可以支持这个发行版，向 SparkyLinux 捐款则支持它赖以构建的 Paweł 的发行版。",
+    "home.credit.paragraph04.link01": "docs/edition-in-detail.zh-CN.md#credit",
+    "home.credit.paragraph04": "[详细内容]({{home.credit.paragraph04.link01}})",
+    "home.licence.heading01": "许可",
+    "home.licence.paragraph01.link01": "https://creativecommons.org/licenses/by/4.0/",
+    "home.licence.paragraph01.link02": "docs/edition-in-detail.zh-CN.md#licence",
+    "home.licence.paragraph01": "文档采用[Creative Commons Attribution 4.0 International 许可]({{home.licence.paragraph01.link01}})（CC BY 4.0）：可以分享和改编，只需为 Sparky Stereo OS 署名。\n[详细内容]({{home.licence.paragraph01.link02}})",
+    "detail.intro.heading01": "Sparky Stereo OS 详细介绍",
+    "detail.intro.paragraph01.link01": "../README.zh-CN.md",
+    "detail.intro.paragraph01": "**适合**想了解全貌的读者：首页每一节的完整内容，包括图片、测量数据、致谢和链接。\n[返回首页]({{detail.intro.paragraph01.link01}})",
+    "detail.intro.paragraph02.link01": "https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md",
+    "detail.intro.paragraph02": "**在你现有的 2D 和 3D 设备上以 3D 方式创作和探索：绘图，编辑照片和视频，研究分子和地球仪，然后看电影、玩游戏。**\n3D 电视可以使用，任何普通显示器配上便宜的红青眼镜也可以，现在一台兼容的 Android 手机放进便宜的观片盒也能使用：这是一套[可通过 USB 使用的立体桌面]({{detail.intro.paragraph02.link01}})，已在旧硬件上测试。\nSparky Stereo OS 是 Daniel Ramos 的 SparkyLinux 发行版（SparkyLinux 由 Paweł \"pavroo\" Pijanowski 制作），是一个带有全新 Stereo KDE Plasma 桌面的 Linux 系统。",
+    "detail.intro.paragraph03.link01": "lean-code-packages.md#why-it-matters",
+    "detail.intro.paragraph03": "**对你的电脑和地球都更轻：**每个软件包都去掉了程序从不读取的注释和说明，因此同样的工作需要更少的处理、更少的能耗和更少的磨损。\n[实测]({{detail.intro.paragraph03.link01}})：读取 C++ 头文件的工作量比 Debian 少 2% 到 4%，且没有任何损失。",
+    "detail.intro.paragraph04.link01": "architectural-synthesis.md",
+    "detail.intro.paragraph04.link02": "architecture-infographic.md",
+    "detail.intro.paragraph04": "**阅读架构介绍：**[带插图的指南和仓库地图]({{detail.intro.paragraph04.link01}})，附带[完整尺寸信息图和文本版]({{detail.intro.paragraph04.link02}})，改编并核对了 Daniel 的 Gemini / NotebookLM 研究。",
+    "detail.intro.paragraph05.link01": "#seen-in-3d",
+    "detail.intro.paragraph05.image01": "screenshots/translucent-stereo-desktop-anaglyph.jpg",
+    "detail.intro.paragraph05.alt01": "3D 立体桌面，带半透明窗口：Dolphin 的设置菜单和配色方案列表在前面，后面的玻璃窗口一层层退开，系统监视器和壁纸最深（红青立体图）",
+    "detail.intro.paragraph05": "<a href=\"{{detail.intro.paragraph05.link01}}\"><img src=\"{{detail.intro.paragraph05.image01}}\" width=\"99%\" alt=\"{{detail.intro.paragraph05.alt01}}\"></a>",
+    "detail.intro.paragraph06": "**立体桌面：**桌面本身有深度。\n你正在使用的界面在屏幕上，它的菜单会向观众靠近，比如这里的 Marble 菜单和子菜单；而后面的一层层窗口则依次退开，像一叠纸张，壁纸最深。\n3D 程序会在自己的窗口里保留自身的深度，比如 Marble 的地球仪。\n每个只有几像素，并且在你选择的范围内。",
+    "detail.intro.paragraph07.link01": "#seen-in-3d",
+    "detail.intro.paragraph07.image01": "screenshots/doom-2016-in-a-window-anaglyph.jpg",
+    "detail.intro.paragraph07.alt01": "窗口中的 DOOM (2016)，3D 显示，下面是平面 Plasma 面板（红青立体图）",
+    "detail.intro.paragraph07.link02": "#seen-in-3d",
+    "detail.intro.paragraph07.image02": "screenshots/marble-globe-anaglyph.jpg",
+    "detail.intro.paragraph07.alt02": "Marble 的地球仪在星空前面，3D 显示（红青立体图）",
+    "detail.intro.paragraph07.link03": "#seen-in-3d",
+    "detail.intro.paragraph07.image03": "screenshots/stereo-desktop-anaglyph.jpg",
+    "detail.intro.paragraph07.alt03": "3D 立体桌面：面板在屏幕上，声音弹出窗口在它前面，后面的窗口依次退开（红青立体图）",
+    "detail.intro.paragraph07": "<a href=\"{{detail.intro.paragraph07.link01}}\"><img src=\"{{detail.intro.paragraph07.image01}}\" width=\"32%\" alt=\"{{detail.intro.paragraph07.alt01}}\"></a> <a href=\"{{detail.intro.paragraph07.link02}}\"><img src=\"{{detail.intro.paragraph07.image02}}\" width=\"32%\" alt=\"{{detail.intro.paragraph07.alt02}}\"></a> <a href=\"{{detail.intro.paragraph07.link03}}\"><img src=\"{{detail.intro.paragraph07.image03}}\" width=\"32%\" alt=\"{{detail.intro.paragraph07.alt03}}\"></a>",
+    "detail.intro.paragraph08.link01": "#seen-in-3d",
+    "detail.intro.paragraph08": "*戴上红青眼镜即可看到这些画面的 3D 效果（[更多]({{detail.intro.paragraph08.link01}})）。*",
+    "detail.intro.paragraph09.link01": "https://github.com/Sparky-OS/flat-headset/tree/main/apk",
+    "detail.intro.paragraph09.link02": "#where-it-is-going",
+    "detail.intro.paragraph09": "**开发中：**[Flat Headset 开发 APK 和配套的电脑更新说明]({{detail.intro.paragraph09.link01}})已经提供，供测试者使用的开发 ISO 现在可以在开启 Secure Boot 的新电脑、旧 BIOS 电脑和 32 位 UEFI 机器上启动；最终的立体发行版 ISO 仍在准备中（[去向]({{detail.intro.paragraph09.link02}})）。",
+    "detail.intro.item01.link01": "#create",
+    "detail.intro.item01": "**[创作]({{detail.intro.item01.link01}})：**在 3D 中绘图，并在深度颜色（每种颜色 16 位而不是 8 位）中绘图，编辑 3D 照片和视频。",
+    "detail.intro.item02.link01": "#science-and-engineering",
+    "detail.intro.item02": "**[科学与工程]({{detail.intro.item02.link01}})：**Marble 的地球仪、KAlgebra 的曲线图和 Kalzium 的分子都以 3D 显示；3D 模型和电路板仍在进行中。",
+    "detail.intro.item03.link01": "#watch-and-play",
+    "detail.intro.item03": "**[观看和游玩]({{detail.intro.item03.link01}})：**3D 电影、照片和游戏，可以在窗口或全屏中显示。",
+    "detail.intro.item04.link01": "#for-developers",
+    "detail.intro.item04": "**[开发]({{detail.intro.item04.link01}})：**只需把程序做一次 3D 适配；桌面会自动适配到每块屏幕。",
+    "detail.intro.item05.link01": "other-distributions.md",
+    "detail.intro.item05": "**[其他发行版？]({{detail.intro.item05.link01}})** 为什么我们不为它打包，以及它的维护者如何采用我们的修复。",
+    "detail.intro.paragraph10.link01": "https://github.com/Sparky-OS/sparky-stereo-os/issues/26",
+    "detail.intro.paragraph10.link02": "https://github.com/Sparky-OS/sparky-stereo-os/issues/25",
+    "detail.intro.paragraph10.link03": "https://github.com/Sparky-OS/sparky-stereo-os/issues/27",
+    "detail.intro.paragraph10.link04": "https://github.com/Sparky-OS/sparky-stereo-os/issues/80",
+    "detail.intro.paragraph10.link05": "https://github.com/Sparky-OS/sparky-stereo-os/issues/153",
+    "detail.intro.paragraph10.link06": "https://github.com/Sparky-OS/sparky-stereo-os/issues/351",
+    "detail.intro.paragraph10.link07": "https://github.com/Sparky-OS/sparky-stereo-os/issues/81",
+    "detail.intro.paragraph10.link08": "https://github.com/Sparky-OS/sparky-stereo-os/issues/83",
+    "detail.intro.paragraph10.link09": "https://github.com/Sparky-OS/sparky-stereo-os/issues/84",
+    "detail.intro.paragraph10.link10": "https://github.com/Sparky-OS/sparky-stereo-os/issues/85",
+    "detail.intro.paragraph10": "**下一步：告诉我们你的 3D 设备**，它准备好时你会最先收到消息。\n<br>用你的语言报名：[🇨🇦]({{detail.intro.paragraph10.link01}}) [🇧🇷]({{detail.intro.paragraph10.link02}}) [🇵🇱]({{detail.intro.paragraph10.link03}}) [🇫🇷]({{detail.intro.paragraph10.link04}}) [🇩🇪]({{detail.intro.paragraph10.link05}}) [🇲🇽]({{detail.intro.paragraph10.link06}}) [🇯🇵]({{detail.intro.paragraph10.link07}}) [🇰🇷]({{detail.intro.paragraph10.link08}}) [🇨🇳]({{detail.intro.paragraph10.link09}}) [🇭🇰]({{detail.intro.paragraph10.link10}})",
+    "detail.vr-is-also-a-stereo-monitor.heading01": "VR 也是一种立体显示器",
+    "detail.vr-is-also-a-stereo-monitor.paragraph01": "**你的 VR 头显是不是在柜子里吃灰？**\nSparky Stereo OS 能让它重新变成一块 3D 屏幕：玩 3D 游戏、看 3D 电影、编辑 3D 内容、在整个桌面上用 3D 写邮件和写代码，而且在你的头显能在 Linux 上工作的情况下，还能通过 SteamVR 玩 PCVR 游戏。\n把兼容的 Android 手机放进便宜的观片盒里，今天就能用；Quest 这类独立头显是下一步的目标，尚未测试。",
+    "detail.vr-is-also-a-stereo-monitor.paragraph02": "大多数头显是两块小屏幕，每只眼睛一块；其余设备则像 3D 电视一样把一块屏幕分成两半，所以同一个桌面可以同时服务这两类设备。",
+    "detail.vr-is-also-a-stereo-monitor.item01.link01": "https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md",
+    "detail.vr-is-also-a-stereo-monitor.item01.link02": "https://github.com/Sparky-OS/flat-headset/tree/main/apk",
+    "detail.vr-is-also-a-stereo-monitor.item01.link03": "https://github.com/Sparky-OS/flat-headset#the-first-test-12-october-2026",
+    "detail.vr-is-also-a-stereo-monitor.item01.link04": "https://github.com/Sparky-OS/flat-headset#the-desktop-on-the-phone-14-october-2026",
+    "detail.vr-is-also-a-stereo-monitor.item01": "**口袋里已有的 3D 屏幕：**便宜的 Cardboard 式观片盒可以把一台兼容的 Android 手机变成立体桌面屏幕，全彩显示，每只眼睛有独立画面。10 月 19 日，Daniel 认可了在 Redmi Note 7 和一台 2016 年 A10 笔记本上通过 USB 上下半屏的设置：桌面可用，鼠标响应正常。视频已大幅改善，但仍有些不流畅；首次家庭 Wi-Fi 测试感觉接近 USB，而 Direct Wi-Fi 的停顿更长。完整分辨率和更多设备仍需测试（[测量和限制]({{detail.vr-is-also-a-stereo-monitor.item01.link01}})）。由电脑负责绘制，旧手机因此有了新用途。[开发 APK、源码和配套电脑更新说明]({{detail.vr-is-also-a-stereo-monitor.item01.link02}})一起提供；请先更新开发 Live USB 或已安装的电脑。Android 观片盒仍为测试版本。这里有一组照片：[首次测试]({{detail.vr-is-also-a-stereo-monitor.item01.link03}})和[手机上的桌面]({{detail.vr-is-also-a-stereo-monitor.item01.link04}})。",
+    "detail.vr-is-also-a-stereo-monitor.item02": "**VR 电影：**Bino 可以在任何 3D 屏幕上播放 360° 和 180° 电影，平面或 3D 均可，鼠标可以转动视角。",
+    "detail.vr-is-also-a-stereo-monitor.item03": "**VR 游戏：**Half-Life 2 和 DOOM (2016) 可通过它们的 VR 模式显示到 3D 屏幕。",
+    "detail.who-builds-it.heading01": "谁在构建",
+    "detail.who-builds-it.paragraph01.link01": "https://github.com/Sparky-OS/org.kde.video",
+    "detail.who-builds-it.paragraph01.link02": "https://github.com/Sparky-OS/wiz3D",
+    "detail.who-builds-it.paragraph01.link03": "ai-provenance.md",
+    "detail.who-builds-it.paragraph01.link04": "hardware.md",
+    "detail.who-builds-it.paragraph01.link05": "measurements/kwin-stereo-cost-a10-2026-10-23.md",
+    "detail.who-builds-it.paragraph01": "Daniel 来自巴西利亚的一个贫民区，目前有两位人类贡献者：Jeromy Streets，他的 Plasma 视频壁纸（[org.kde.video]({{detail.who-builds-it.paragraph01.link01}})）现已进入 Sparky-OS，并由他维护；还有 Eff（effcol），他让 iZ3D 的代码以 [wiz3D]({{detail.who-builds-it.paragraph01.link02}}) 的形式继续存在，并在这里维护它。\nLinux 上的立体显示已经等待志愿者多年：早期尝试停滞，是因为评审者没有 3D 显示器，而这项工作横跨内核、Mesa、KWin、FFmpeg、播放器和网页标准。\n没有其他开发者站出来接手，所以这里其他的工作伙伴是 AI，由 Daniel 指挥和核对，并列入[AI 来源记录]({{detail.who-builds-it.paragraph01.link03}})。\n如果你更希望它由人类亲手构建，我们非常欢迎：每个 fork 都公开，每个任务都开放。\n所有内容都在两台普通机器上构建和测试：一台家用电脑和一台 2016 年的笔记本（[硬件]({{detail.who-builds-it.paragraph01.link04}})）。\n在那台笔记本上，每个桌面用例在 2D 和 3D 中都保持 24 fps：[KWin 为立体付出的代价，已测量]({{detail.who-builds-it.paragraph01.link05}})。",
+    "detail.where-it-is-going.heading01": "去向",
+    "detail.where-it-is-going.paragraph01.link01": "https://www.w3.org/community/pm-kr/",
+    "detail.where-it-is-going.paragraph01.link02": "https://www.w3.org/publications/spec-generator/?type=respec&url=https://raw.githubusercontent.com/w3c-cg/pm-kr/main/reports/source/stereo-3d-adoption-report.html",
+    "detail.where-it-is-going.paragraph01.link03": "talks/2026-10-13-w3c-me-ig.md",
+    "detail.where-it-is-going.paragraph01": "这个发行版是工作的证据，它发现的问题会回流到开放标准。\nDaniel 和 Milton Ponson 共同主持 W3C [Procedural Memory Knowledge Representation Community Group (PM-KR)]({{detail.where-it-is-going.paragraph01.link01}})。\n我们的报告 [Stereo 3D on Linux and the Web]({{detail.where-it-is-going.paragraph01.link02}}) 在那里作为个人提案，是小组讨论的输入：哪些既有规范已经支持 3D，Linux 和网页从未采用什么，以及浏览器还需要什么。\n它也是我们在 2026 年 10 月 13 日 W3C Media and Entertainment Interest Group 演讲的主题（[幻灯片]({{detail.where-it-is-going.paragraph01.link03}})）。\n使用 W3C 账号加入小组免费，欢迎帮助：在你的显示器上测试、审阅报告，或带上你的使用场景。",
+    "detail.create.heading01": "创作",
+    "detail.create.paragraph01": "**在 3D 中绘图、编辑照片和编辑视频，并在深度颜色中绘图：每种颜色 16 位，而不是 8 位。**",
+    "detail.create.paragraph02.link01": "https://github.com/storytold/artcraft",
+    "detail.create.paragraph02": "**开发中：3D 版 Craft 应用。**\n[ArtCraft]({{detail.create.paragraph02.link01}})（storytold 出品）旗下的 Craft 应用，是我们正在带入 3D 的创意套件：一个程序家族，从照片和视频编辑到 CAD、2D 动画、矢量图、纹理绘制和材质，用 Rust 编写，采用 MIT 或 Apache-2.0 许可证。\nPhotoCraft 和 FilmCraft 已带 3D 发布；我们正在把这项工作连同 LightCraft 的工作迁移到它们的当前版本，并为其余应用制定计划。",
+    "detail.create.item01": "**绘画：**Krita 可以在 16 位画布上绘画，也可以在每只眼睛 16 位的 3D 画布上绘画。",
+    "detail.create.item02": "**照片：**digiKam 和 Showfoto 在相册、光桌、幻灯片和编辑器中显示 3D 照片；KolourPaint 可以编辑 3D 图片，并保存它的 3D 标记。",
+    "detail.create.item03": "**视频：**在 Kdenlive 中，片段会识别自己的 3D 布局，监视器可以 3D 显示，渲染结果也会保留 3D 标记。",
+    "detail.create.item04.link01": "https://storysplat.com",
+    "detail.create.item04": "<a id=\"stories\"></a>**故事：**[StorySplat]({{detail.create.item04.link01}})（\"把你的 3D 扫描变成互动漫游\"）可以在浏览器中直接在真实场所的 3D 扫描里构建漫游，它的 3D View 可以在任何已注册的输出上以 3D 显示这些漫游，并首次在 Sony 3D 电视上左右并排测试。",
+    "detail.create.item05.link01": "https://invent.kde.org/niccolove/plasma-studio",
+    "detail.create.item05.link02": "https://github.com/Sparky-OS/svgstereo",
+    "detail.create.item05.link03": "https://invent.kde.org/danielcamposramos/plasma-studio",
+    "detail.create.item05": "**计划中，稍后：**[Plasma Studio]({{detail.create.item05.link01}}) 是 Niccolò Venerandi 开发的 KDE 应用，把视频、音频、照片、矢量图和 3D 集于一处。按设想，它的 3D 场景将为每只眼睛各提供一个视图，它的矢量图将通过 [SVGStereo]({{detail.create.item05.link02}})（我们为 SVG 绘图定义的 3D 标记）获得深度；[我们的分支]({{detail.create.item05.link03}})为这项研究保留着。",
+    "detail.create.paragraph03.link01": "https://github.com/harry7557558/spirula-studio",
+    "detail.create.paragraph03.link02": "https://github.com/Sparky-OS/spirula-studio",
+    "detail.create.paragraph03.link03": "#stories",
+    "detail.create.paragraph03": "**计划中：把物体或场所扫描成 3D 模型。**\n你用手机等设备围着物体或穿过一个场所拍一段视频，程序就在你自己的电脑上把它变成可以在其中漫游的 3D 模型。\n这个程序是 [Spirula Studio]({{detail.create.paragraph03.link01}})，作者 Harry (J.X.) C.，采用 GPLv3 许可证；它生成的模型叫做 3D Gaussian splat（3D 高斯泼溅），还可以由此生成带纹理的网格。\n**计划中：**本版还没有收录它，它也还不能以左右眼各一个视图的方式用 3D 显示模型；这项工作将在[我们的分支]({{detail.create.paragraph03.link02}})中进行。\n有了扫描结果，就可以用 [StorySplat]({{detail.create.paragraph03.link03}}) 讲述它的故事：它用这类 3D 扫描构建漫游，而且今天就能以 3D 显示；把 Spirula Studio 的扫描放进 StorySplat 还有待试验。",
+    "detail.create.paragraph04.link01": "#programs-the-edition-changes-for-stereo-3d-and-deep-colour",
+    "detail.create.paragraph04": "每个程序的完整说明：[程序]({{detail.create.paragraph04.link01}})。",
+    "detail.for-theme-designers-and-customizers.heading01": "供主题设计师和自定义者",
+    "detail.for-theme-designers-and-customizers.paragraph01.link01": "#depth-on-the-desktop",
+    "detail.for-theme-designers-and-customizers.paragraph01": "**在这个桌面上，主题可以决定什么浮出、什么沉入：**[主题设计的新边界]({{detail.for-theme-designers-and-customizers.paragraph01.link01}})。",
+    "detail.science-and-engineering.heading01": "科学与工程",
+    "detail.science-and-engineering.paragraph01": "**在 3D 中学习和设计：地球仪、曲线图和分子今天就能以 3D 工作，3D 模型和电路板仍在进行中。**",
+    "detail.science-and-engineering.item01": "**学习和科学：**Marble 的地球仪、KAlgebra 的曲线图、Kalzium 的分子和 Kubrick 立方体，在 3D 桌面上默认以 3D 显示。",
+    "detail.science-and-engineering.item02": "**3D 模型和电路板：**OpenSCAD、KiCad 和 F3D 的 3D 预览正在进行中。",
+    "detail.science-and-engineering.item03.link01": "#scan",
+    "detail.science-and-engineering.item03": "**扫描：**计划用 Spirula Studio 把拍摄零件、现场或标本的视频变成 3D 模型（[扫描]({{detail.science-and-engineering.item03.link01}})）。",
+    "detail.science-and-engineering.item04.link01": "https://displayxr.org",
+    "detail.science-and-engineering.item04.link02": "https://github.com/Sparky-OS/flat-headset",
+    "detail.science-and-engineering.item04": "**从工作台到客户，全程全彩：**同一个模型可以显示在工程师桌上的裸眼 3D 显示器（配合 [DisplayXR]({{detail.science-and-engineering.item04.link01}})，进行中）、团队或培训教室使用的 3D 电视或投影仪，以及每位工人和客户自己手机插入纸板观片盒的画面（[Flat Headset]({{detail.science-and-engineering.item04.link02}})）。它端到端开放，因此没有人被绑定到某一家显示器厂商。",
+    "detail.science-and-engineering.paragraph02.link01": "#programs-the-edition-changes-for-stereo-3d-and-deep-colour",
+    "detail.science-and-engineering.paragraph02": "每个程序的完整说明：[程序]({{detail.science-and-engineering.paragraph02.link01}})。",
+    "detail.watch-and-play.heading01": "观看和游玩",
+    "detail.watch-and-play.paragraph01": "**3D 电影、照片和游戏可以在自己的窗口或全屏中显示，桌面的其余部分保持不变。**",
+    "detail.watch-and-play.item01.link01": "https://www.hdmi.org/resource/brand",
+    "detail.watch-and-play.item01": "**屏幕：**3D 电视、显示器或投影仪，包括 2010 到 2013 年的 [HDMI®]({{detail.watch-and-play.item01.link01}}) 3D 套件，或者任何普通显示器配红青眼镜；每块屏幕可以同时显示不同类型的 3D，裸眼 3D 显示器正在与 DisplayXR 团队一起推进。",
+    "detail.watch-and-play.item02": "**电影：**3D 视频可以在 Haruna、VLC、mpv、Bino、PlasmaTube 等播放器中以 3D 播放。",
+    "detail.watch-and-play.item03": "**照片：**Gwenview、digiKam 和 KolourPaint 以 3D 显示 3D 照片（MPO、JPS 和立体 PNG）。",
+    "detail.watch-and-play.item04.link01": "formula.md",
+    "detail.watch-and-play.item04": "**游戏：**窗口中的 DOOM (2016) 和 Half-Life 2，都通过 VR 模式（[公式]({{detail.watch-and-play.item04.link01}})）。",
+    "detail.watch-and-play.item05.link01": "https://lore.kernel.org/all/20260511113104.563854162@infradead.org/",
+    "detail.watch-and-play.item05.link02": "https://pixelcluster.dev/VRAM-Mgmt-fixed/",
+    "detail.watch-and-play.item05": "**为游戏调优的内核：**发行版运行 Linux 7.3，带我们的立体补丁。它的全新调度器在作者自己的测试中，把一款游戏在旧 CPU 上的最低帧率从 4 fps 提高到 29 fps（[数据]({{detail.watch-and-play.item05.link01}})），并让显存很小的 AMD 显卡把游戏内存留在显卡上（[修改]({{detail.watch-and-play.item05.link02}})）。",
+    "detail.watch-and-play.paragraph02.link01": "#programs-the-edition-changes-for-stereo-3d-and-deep-colour",
+    "detail.watch-and-play.paragraph02": "每个程序、它得到了什么以及如何证明：[程序]({{detail.watch-and-play.paragraph02.link01}})。",
+    "detail.seen-in-3d.heading01": "用 3D 查看",
+    "detail.seen-in-3d.paragraph01.link01": "screenshots/README.md",
+    "detail.seen-in-3d.paragraph01.link02": "photos/README.md",
+    "detail.seen-in-3d.paragraph01": "本页图片是用发行版中的 Spectacle 截取的，它保留了两只眼睛的画面。\n戴上红青眼镜即可在这里看到它们的 3D 效果；MPO 文件可以在发行版图片程序中，在任意已注册的输出上以 3D 打开。所有图片，每张都带红青版本和直接 MPO 下载：[截图画廊]({{detail.seen-in-3d.paragraph01.link01}})。Daniel 用 LG Optimus 3D 手机在 2014 到 2016 年拍摄的 3D 照片，含原图：[照片画廊]({{detail.seen-in-3d.paragraph01.link02}})。",
+    "detail.seen-in-3d.item01.link01": "https://raw.githubusercontent.com/Sparky-OS/sparky-stereo-os/main/docs/screenshots/translucent-stereo-desktop.mpo",
+    "detail.seen-in-3d.item01": "**立体桌面，半透明**（[MPO]({{detail.seen-in-3d.item01.link01}})），在 3D 电视上，2026 年 10 月 15 日。窗口是玻璃，所以能透过它看到后面的层。双眼间测量：Dolphin，焦点窗口，0 px，它的设置菜单 +5 px（前面，位于用户设置的浮出上限）；很长的配色方案列表 0 px，因为它碰到屏幕顶部，而碰到边缘的浮出元素会留在屏幕上；Thunderbird 后面 -3 px；系统监视器部件和壁纸 -10 px；面板 0 px。两个电子邮件地址在两只眼睛中都做了模糊处理。",
+    "detail.seen-in-3d.item02.link01": "screenshots/stereo-desktop-dialogs.mpo",
+    "detail.seen-in-3d.item02": "**立体桌面，菜单上叠菜单**（[MPO]({{detail.seen-in-3d.item02.link01}})），在帧封装的 3D 电视上，2026 年 10 月 13 日。双眼间测量：焦点 Marble 窗口 0 px，它的设置菜单 +2 px，面板子菜单 +4 px，后面的四个窗口 -3、-5、-8 和 -10 px，部件和壁纸 -10 px；窗口内部，Marble 自身的 3D：地球标签 +12 px，星星 -13 px。后面 Diolinux 聊天中的消息是模糊的。",
+    "detail.seen-in-3d.item03.link01": "screenshots/doom-2016-in-a-window.mpo",
+    "detail.seen-in-3d.item03.link02": "https://github.com/CactusVRStudios/KHARVOX",
+    "detail.seen-in-3d.item03": "**普通窗口中的 DOOM (2016)**（[MPO]({{detail.seen-in-3d.item03.link01}})），基于 [KHARVOX]({{detail.seen-in-3d.item03.link02}})，CactusVRStudios 的 DOOM (2016) VR 转换模组（MIT）：游戏有深度，而面板和窗口边框在两只眼睛中都保持平面。双眼间测量：最近的岩石相距 23 px，远山 1 px，面板 0 px。",
+    "detail.seen-in-3d.item04.link01": "screenshots/marble-globe.mpo",
+    "detail.seen-in-3d.item04": "**Marble 的地球仪**（[MPO]({{detail.seen-in-3d.item04.link01}})）：地球在屏幕前（+11 px），星星在它后面（-12 px），侧面板保持平面。这张截图早于之后的修复；菜单上叠菜单的图片展示的是今天的 Marble。",
+    "detail.seen-in-3d.item05.link01": "screenshots/stereo-desktop.mpo",
+    "detail.seen-in-3d.item05": "**立体桌面，弹出窗口**（[MPO]({{detail.seen-in-3d.item05.link01}})），同一天。双眼间测量：面板 0 px（在屏幕上），声音弹出窗口 +4 px（前面），后面的三个窗口 -3、-7 和 -10 px，系统监视器部件 -10 px，和壁纸一起在最深处。",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.heading01": "立体桌面：主题设计的新边界",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph01": "**这是第一次，主题不只决定外观，还决定什么浮出、什么沉入。**\n几十年来，阴影、斜边和凸起按钮都只是装样子；在立体桌面上，这是真的，而且是温和的：每个只有几像素，在你选择的范围内（系统设置，\"3D 深度\"）。",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item01.link01": "#seen-in-3d",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item01": "**你使用的东西会浮出：**菜单、工具提示、通知和对话框朝你浮现，你正在工作的窗口保持在屏幕上。*已构建，并已在 2026 年 10 月 13 日在 3D 电视上看到（[顶部图片]({{detail.the-stereo-desktop-new-frontiers-for-theme-design.item01.link01}})）。*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item02": "**其余的会沉入：**后面的窗口像一叠纸张一样依次退后，壁纸沉得最深。*已构建。*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item03": "**小东西会守住位置：**指针会跟随它所在元素的层级，阴影落在它碰到的东西上，而像投影上方的摄像头那样的置顶窗口，会继续浮在所有东西上方。*已构建。*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item04": "**3D 壁纸：**一张 3D 照片作为背景时会保留自身的浮出和沉入，远远落在每个窗口后面。*已构建。*接下来是配合 Jeromy Streets 的视频壁纸实现的 3D 视频背景。*即将到来。*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item05": "**3D 屏幕保护程序：**经典的星空屏保和立体屏保，以真实 3D 显示。*已构建。*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item06": "**3D 图片和图标：**3D 照片会在 Dolphin 的预览和图片查看器中以 3D 显示。*已构建。*成对绘制的图标，每只眼睛一个，是 Stereo Oxygen 的一部分，这是发行版自己的外观。*即将到来。*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item07": "**真正会浮出和沉入的效果：**正在关闭的窗口可以碎片状飞向你，或者沉到屏幕后面并在地板上反弹。*已在我们的 KWin 分支上构建，即将进入下一个软件包。*在 3D 中展开的窗口切换器，以及真实 3D 的桌面立方体。*即将到来。*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item08": "**开机就有 3D：**启动画面和登录界面会跟随你为主屏幕保存的 3D 模式。*已构建。*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph02": "**而它仍然是一个普通的 2D 桌面。**\n在普通屏幕上没有变化：同样的主题、同样的布局、同样的效果，只绘制一次。\n3D 只出现在能显示它的屏幕上，或者通过红青眼镜显示，而为 3D 制作的主题也是完整的 2D 主题。",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03.link01": "depth-on-the-desktop.md",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03.link02": "for-theme-designers.md",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03.link03": "https://github.com/Sparky-OS/sparky-stereo-os/issues/78",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03": "<a id=\"the-desktop-cube-what-one-format-makes-possible\"></a>详细信息：[桌面上的深度]({{detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03.link01}})和[供主题设计师和自定义者]({{detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03.link02}})；欢迎在[主题 issue]({{detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03.link03}})中提出想法、草图和 3D 草图。",
+    "detail.for-developers.heading01": "面向开发者",
+    "detail.for-developers.paragraph01": "**只需把程序做一次 3D 适配：把双眼画面交给桌面，它会照顾每一块屏幕。**\n你可以在自己已有的屏幕上编写并检查工作。",
+    "detail.for-developers.item01.link01": "develop-3d-on-an-ordinary-monitor.md",
+    "detail.for-developers.item01": "[在普通显示器上开发 3D 和 XR]({{detail.for-developers.item01.link01}})：从这里开始。",
+    "detail.for-developers.item02.link01": "web-3d-in-stereo.md",
+    "detail.for-developers.item02": "[从网页开始的立体 3D 场景]({{detail.for-developers.item02.link01}})：three.js、WebGL 和 WebXR，从任何浏览器中的红青眼镜到每一块 3D 屏幕。",
+    "detail.for-developers.item03.link01": "house-formats.md",
+    "detail.for-developers.item03.link02": "stereo-labor-division.md",
+    "detail.for-developers.item03": "[内部格式]({{detail.for-developers.item03.link01}})和[立体分工]({{detail.for-developers.item03.link02}})：与规范绑定的规则。",
+    "detail.for-developers.item04.link01": "test-stereo-without-a-3d-tv.md",
+    "detail.for-developers.item04.link02": "stereo-vm.md",
+    "detail.for-developers.item04.link03": "https://repo.sparkyos.org/bench/kwin-root/",
+    "detail.for-developers.item04": "[不用 3D 电视测试立体]({{detail.for-developers.item04.link01}})和[带 3D 显示器的虚拟机]({{detail.for-developers.item04.link02}})：在虚拟显示器或虚拟机中测试 3D 输出；带 Stereo KWin 的现成根文件系统在[我们的仓库服务器]({{detail.for-developers.item04.link03}})上。",
+    "detail.for-developers.item05.link01": "../skills/README.md",
+    "detail.for-developers.item05": "[技能]({{detail.for-developers.item05.link01}})：为参与发行版的人和 AI 助手提供的说明。",
+    "detail.how-it-works.heading01": "工作原理",
+    "detail.how-it-works.paragraph01": "<a id=\"why-one-format-full-side-by-side-at-any-resolution\"></a>**程序描述每一幅画面；桌面把它适配到每一块屏幕。**对立体显示来说，两个视图一起放在同一个完整左右并排的缓冲区中传递。提议的 HDR 扩展会通过同样的分工保留画面的颜色描述和重建信息。",
+    "detail.how-it-works.paragraph02": "**三行立体契约。**",
+    "detail.how-it-works.item01": "**Stereo KWin**（KDE Plasma 的合成器，带我们的立体修改）支持完整左右并排，任意分辨率。",
+    "detail.how-it-works.item02": "**程序**按任意标准解码或生成立体画面，并以完整左右并排、任意分辨率交给 Stereo KWin。",
+    "detail.how-it-works.item03": "**输出**（Stereo KWin 末端的滤镜，每种屏幕一种）把它转换成每块屏幕需要的形式。",
+    "detail.how-it-works.paragraph03.link01": "how-it-works.md",
+    "detail.how-it-works.paragraph03.link02": "stereo-hdr-content.md",
+    "detail.how-it-works.paragraph03": "为什么是完整左右并排，怎么让一台桌面使用两块 GPU 上的两台 3D 电视，以及同样的原则如何扩展到 HDR：[工作原理]({{detail.how-it-works.paragraph03.link01}})。[HDR 声明]({{detail.how-it-works.paragraph03.link02}})是等待实现和跨格式设备测试的设计；HDR 交换表示仍是一个需要验证的工程选择。既有的立体和深度颜色测试没有验证那条 HDR 路径。",
+    "detail.stereo-in-the-open-stack-not-in-one-product.heading01": "开放栈中的立体，而不是单一产品中的立体",
+    "detail.stereo-in-the-open-stack-not-in-one-product.paragraph01.link01": "open-stack.md",
+    "detail.stereo-in-the-open-stack-not-in-one-product.paragraph01": "在其他地方，立体和单一产品绑在一起：一台头显、一家厂商的注入器、一家厂商的内核。\n在这里，它是开放层（KDE、内核、文件格式）的属性，因此它能到达你已经拥有的屏幕：[开放栈中的立体]({{detail.stereo-in-the-open-stack-not-in-one-product.paragraph01.link01}})。",
+    "detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.heading01": "这个发行版为立体 3D 和深度颜色修改的程序",
+    "detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.paragraph01.link01": "programs.md",
+    "detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.paragraph01.link02": "programs-in-detail.md",
+    "detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.paragraph01": "3D 给每个程序带来了什么，从电影和照片到地球仪和分子：[程序]({{detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.paragraph01.link01}})。\n每个程序如何修改、如何证明，按领域分列（显示路径、视频、科学与工程、图像、模拟器、系统，以及尚未完成的部分）：[程序详情]({{detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.paragraph01.link02}})。",
+    "detail.our-branches-on-kdes-gitlab.heading01": "我们在 KDE GitLab 上的分支",
+    "detail.our-branches-on-kdes-gitlab.paragraph01.link01": "https://invent.kde.org/danielcamposramos",
+    "detail.our-branches-on-kdes-gitlab.paragraph01.link02": "kde-branches.md",
+    "detail.our-branches-on-kdes-gitlab.paragraph01": "每一个 KDE 修改都是我们 fork 上的分支，托管在 [invent.kde.org]({{detail.our-branches-on-kdes-gitlab.paragraph01.link01}})，先经过 KDE 自己的 CI 测试，再提交上游：[分支及其 CI 结果]({{detail.our-branches-on-kdes-gitlab.paragraph01.link02}})。",
+    "detail.merged-outside-sparky-stereo.heading01": "已合并到 Sparky Stereo 之外",
+    "detail.merged-outside-sparky-stereo.paragraph01.link01": "https://www.iana.org/assignments/matroska",
+    "detail.merged-outside-sparky-stereo.paragraph01.link02": "upstream-merges.md#registered-identifiers",
+    "detail.merged-outside-sparky-stereo.paragraph01": "**2026 年 10 月 26 日，IANA 为 Matroska 分配了 StereoMode 15 至 20**，用于在同一帧中打包图像和深度的布局。\n此前，IANA 已于 10 月 20 日为左眼、右眼和背景的独立深度轨道分配了平面类型 3 至 5。\n两项注册均引用我们的 stereo-layer 规范。\n[实时注册表]({{detail.merged-outside-sparky-stereo.paragraph01.link01}})及[注册表里程碑和上游合并]({{detail.merged-outside-sparky-stereo.paragraph01.link02}})。",
+    "detail.merged-outside-sparky-stereo.paragraph02.link01": "upstream-merges.md",
+    "detail.merged-outside-sparky-stereo.paragraph02.link02": "proofs/README.md",
+    "detail.merged-outside-sparky-stereo.paragraph02.link03": "what-people-said.md",
+    "detail.merged-outside-sparky-stereo.paragraph02": "如果某个程序在通往屏幕的路上破坏了立体或深度颜色，修复会提交给那个程序自己的项目。\nHandBrake、mpv、Qt Multimedia 和 PeerTube 等项目已经合并了我们工作中的修复；每一个项目，连同合并它的维护者以及正在评审的内容，都在[已合并到 Sparky Stereo 之外]({{detail.merged-outside-sparky-stereo.paragraph02.link01}})。\n每个部分都会先展示它确实工作，再称为完成，并附带数据和一张红青与 MPO 图片：[证明]({{detail.merged-outside-sparky-stereo.paragraph02.link02}})。\n从事立体工作的同行如何评价它，公开并且带链接：[他们的评价]({{detail.merged-outside-sparky-stereo.paragraph02.link03}})。",
+    "detail.documents.heading01": "文档",
+    "detail.documents.paragraph01.link01": "formula.md",
+    "detail.documents.paragraph01.link02": "first-runs/kwin-2026-10-01/README.md",
+    "detail.documents.paragraph01.link03": "talks/2026-10-13-w3c-me-ig.md",
+    "detail.documents.paragraph01.link04": "./",
+    "detail.documents.paragraph01": "[VR 引擎到 3D 显示器的公式]({{detail.documents.paragraph01.link01}})，[KWin 在真实电视上的首次运行]({{detail.documents.paragraph01.link02}})，以及 2026 年 10 月 13 日的[W3C 演讲幻灯片]({{detail.documents.paragraph01.link03}})；每一页都在[docs]({{detail.documents.paragraph01.link04}})中。",
+    "detail.tools.heading01": "工具",
+    "detail.tools.paragraph01.link01": "../tools/vkms-stereo-bench/README.md",
+    "detail.tools.paragraph01.link02": "../tools/hibernate-bench/README.md",
+    "detail.tools.paragraph01": "[vkms-stereo-bench]({{detail.tools.paragraph01.link01}}) 在虚拟显示器上检查 3D 模式，[hibernate-bench]({{detail.tools.paragraph01.link02}}) 在 Secure Boot 下检查休眠，两者都在虚拟机中运行。",
+    "detail.the-base-three-open-lists.heading01": "基础：三份开放列表",
+    "detail.the-base-three-open-lists.paragraph01.link01": "https://github.com/danielcamposramos/awesome-stereoscopy",
+    "detail.the-base-three-open-lists.paragraph01.link02": "https://github.com/danielcamposramos/awesome-linux-hdr",
+    "detail.the-base-three-open-lists.paragraph01.link03": "https://github.com/danielcamposramos/awesome-vr",
+    "detail.the-base-three-open-lists.paragraph01": "这个发行版背后的研究是公开的，分为三份任何人都可以复制的精选列表（CC0）：立体 3D 的[awesome-stereoscopy]({{detail.the-base-three-open-lists.paragraph01.link01}})，HDR 和深度颜色的[awesome-linux-hdr]({{detail.the-base-three-open-lists.paragraph01.link02}})，以及虚拟现实的[awesome-vr]({{detail.the-base-three-open-lists.paragraph01.link03}})。",
+    "detail.credit.heading01": "致谢",
+    "detail.credit.paragraph01": "Sparky Stereo OS，Daniel Ramos（Capitain Jack）的 SparkyLinux 发行版（SparkyLinux 由 Paweł \"pavroo\" Pijanowski 制作）。",
+    "detail.credit.paragraph02.link01": "https://github.com/Sparky-OS",
+    "detail.credit.paragraph02": "**软件包维护者**，各自对自己的仓库拥有完整权利，位于[Sparky-OS]({{detail.credit.paragraph02.link01}})：",
+    "detail.credit.table01.link01": "https://github.com/effcol",
+    "detail.credit.table01.image01": "https://github.com/effcol.png?size=96",
+    "detail.credit.table01.alt01": "Eff",
+    "detail.credit.table01.link02": "https://github.com/effcol/wiz3D",
+    "detail.credit.table01.link03": "https://github.com/Sparky-OS/wiz3D",
+    "detail.credit.table01.alt02": "Follow Eff",
+    "detail.credit.table01.image02": "https://img.shields.io/badge/Follow-effcol-2777AD?style=flat-square&logo=github",
+    "detail.credit.table01.link04": "https://github.com/effcol",
+    "detail.credit.table01.link05": "https://github.com/halverneus",
+    "detail.credit.table01.image03": "https://github.com/halverneus.png?size=96",
+    "detail.credit.table01.alt03": "Jeromy Streets",
+    "detail.credit.table01.link06": "https://github.com/Sparky-OS/org.kde.video",
+    "detail.credit.table01.alt04": "Follow Jeromy",
+    "detail.credit.table01.image04": "https://img.shields.io/badge/Follow-halverneus-2777AD?style=flat-square&logo=github",
+    "detail.credit.table01.link07": "https://github.com/halverneus",
+    "detail.credit.table01": "| | |\n| --- | --- |\n| <a href=\"{{detail.credit.table01.link01}}\"><img src=\"{{detail.credit.table01.image01}}\" width=\"72\" alt=\"{{detail.credit.table01.alt01}}\"></a> | **Eff (effcol)**<br>维护[wiz3D]({{detail.credit.table01.link02}})，这是用于 DirectX、OpenGL、AMD HD3D 和 NVIDIA 3D Vision 的通用立体 3D 包装器，基于 iZ3D，面向所有系统，同时维护这里的软件包[Sparky-OS/wiz3D]({{detail.credit.table01.link03}})。<br>[![{{detail.credit.table01.alt02}}]({{detail.credit.table01.image02}})]({{detail.credit.table01.link04}}) |\n| <a href=\"{{detail.credit.table01.link05}}\"><img src=\"{{detail.credit.table01.image03}}\" width=\"72\" alt=\"{{detail.credit.table01.alt03}}\"></a> | **Jeromy Streets (halverneus)**<br>创建并维护[org.kde.video]({{detail.credit.table01.link06}})，这是 KDE Plasma 的视频壁纸和锁屏。<br>[![{{detail.credit.table01.alt04}}]({{detail.credit.table01.image04}})]({{detail.credit.table01.link07}}) |",
+    "detail.credit.paragraph03": "**版本：**Sparky Stereo OS 9 \"Mashtabba\"，基于 Debian 14 \"Forky\"，仅使用 KDE Plasma。",
+    "detail.credit.paragraph04.link01": "../ATTRIBUTIONS.md",
+    "detail.credit.paragraph04": "这个发行版立足的所有人，逐名列出：[ATTRIBUTIONS.md]({{detail.credit.paragraph04.link01}})。",
+    "detail.credit.paragraph05": "**特别感谢：**",
+    "detail.credit.item01": "**David Fattal**，Leia 联合创始人和 DisplayXR 维护者，感谢他的鼓励、时间和努力，也感谢他在自己制造的 3D 显示器上测试我们的桌面。",
+    "detail.credit.item02": "**Milton Ponson** 和 **Christoph Dorn**，Daniel 在 W3C PM-KR 小组中的代表，该小组的每位成员，以及 W3C 的 **Dave Raggett**、**Ian Jacobs** 和 **Chris Needham**，是他们为这项工作打开了门。",
+    "detail.credit.item03": "**Tim Berners-Lee**，以及所有一层一层建成互联网，并把它交给所有人的人。",
+    "detail.credit.item04": "**Foottroller** 团队，感谢他们为 Linux 打开了用双脚走进 VR 的大门。",
+    "detail.credit.item05": "**Eric Allard**，让 Johnny 5 在 *Short Circuit* 中活过来的工程师；这部电影的编剧 **S. S. Wilson** 和 **Brent Maddock**；以及它的音乐作者 **El DeBarge**、**Peter Wolf**、**Ina Wolf** 和 **David Shire**，在这版系统制作期间反复播放。",
+    "detail.credit.paragraph06.alt01": "DOI",
+    "detail.credit.paragraph06.image01": "https://zenodo.org/badge/DOI/10.5281/zenodo.23309024.svg",
+    "detail.credit.paragraph06.link01": "https://doi.org/10.5281/zenodo.23309024",
+    "detail.credit.paragraph06": "**引用它：**[![{{detail.credit.paragraph06.alt01}}]({{detail.credit.paragraph06.image01}})]({{detail.credit.paragraph06.link01}})",
+    "detail.credit.paragraph07.alt01": "GitHub stars",
+    "detail.credit.paragraph07.image01": "https://img.shields.io/github/stars/Sparky-OS/sparky-stereo-os?style=flat-square&logo=github&label=Stars",
+    "detail.credit.paragraph07.link01": "https://github.com/Sparky-OS/sparky-stereo-os/stargazers",
+    "detail.credit.paragraph07": "**点星：**[![{{detail.credit.paragraph07.alt01}}]({{detail.credit.paragraph07.image01}})]({{detail.credit.paragraph07.link01}}) ⭐ 如果 Sparky Stereo OS 对你有用，一颗星可以帮助更多人找到它。",
+    "detail.credit.paragraph08.alt01": "Sponsor Daniel",
+    "detail.credit.paragraph08.image01": "https://img.shields.io/badge/Sponsor-danielcamposramos-EA4AAA?style=flat-square&logo=githubsponsors",
+    "detail.credit.paragraph08.link01": "https://github.com/sponsors/danielcamposramos",
+    "detail.credit.paragraph08.alt02": "Donate to SparkyLinux",
+    "detail.credit.paragraph08.image02": "https://img.shields.io/badge/Donate-SparkyLinux-2777AD?style=flat-square",
+    "detail.credit.paragraph08.link02": "https://sparkylinux.org/donate/",
+    "detail.credit.paragraph08": "**支持它：**[![{{detail.credit.paragraph08.alt01}}]({{detail.credit.paragraph08.image01}})]({{detail.credit.paragraph08.link01}}) [![{{detail.credit.paragraph08.alt02}}]({{detail.credit.paragraph08.image02}})]({{detail.credit.paragraph08.link02}}) 赞助 Daniel 可以支持这个发行版，向 SparkyLinux 捐款则支持它赖以构建的 Paweł 的发行版。",
+    "detail.credit.paragraph09.link01": "https://sourceforge.net/p/sparkyos/",
+    "detail.credit.paragraph09.image01": "https://sourceforge.net/sflogo.php?type=18&group_id=3189517",
+    "detail.credit.paragraph09.alt01": "SparkyOS on SourceForge",
+    "detail.credit.paragraph09.image02": "https://sourceforge.net/sflogo.php?type=17&group_id=3189517",
+    "detail.credit.paragraph09": "<a href=\"{{detail.credit.paragraph09.link01}}\"><picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"{{detail.credit.paragraph09.image01}}\"><img alt=\"{{detail.credit.paragraph09.alt01}}\" src=\"{{detail.credit.paragraph09.image02}}\" width=\"200\"></picture></a>",
+    "detail.licence.heading01": "许可",
+    "detail.licence.paragraph01.link01": "https://creativecommons.org/licenses/by/4.0/",
+    "detail.licence.paragraph01": "文档采用[Creative Commons Attribution 4.0 International 许可]({{detail.licence.paragraph01.link01}})（CC BY 4.0）：可以分享和改编，只需为 Sparky Stereo OS 署名。",
+    "detail.licence.quote01.link01": "https://archive.org/details/GuerillaOpenAccessManifesto",
+    "detail.licence.quote01": "\"信息就是力量。但和所有力量一样，总有人想把它只留给自己。\"\n— Aaron Swartz，[*Guerilla Open Access Manifesto*]({{detail.licence.quote01.link01}})（2008 年 7 月）",
+    "detail.licence.paragraph02.link01": "../LICENSE-GPL-2.0",
+    "detail.licence.paragraph02": "`docs/first-runs/` 下的脚本和 `tools/` 下的工具是代码，采用 GNU General Public License, version 2 or later（GPL-2.0-or-later）许可；见[LICENSE-GPL-2.0]({{detail.licence.paragraph02.link01}})。",
+    "detail.licence.paragraph03": "HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc."
+  }
+}

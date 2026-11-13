@@ -1,0 +1,1386 @@
+{
+  "language": "ko",
+  "pages": {
+    "home": {
+      "source": "README.ko.md",
+      "sha256": "da948372584d6df4bdb35d21fb9e4571d407c650d89781a4a9b4079234e302f7",
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 1,
+          "line": 1,
+          "key": "home.intro.heading01",
+          "id": "sparky-stereo-os",
+          "english_id": "sparky-stereo-os"
+        },
+        {
+          "type": "paragraph",
+          "line": 5,
+          "key": "home.intro.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 10,
+          "key": "home.intro.paragraph02"
+        },
+        {
+          "type": "paragraph",
+          "line": 13,
+          "key": "home.intro.paragraph03"
+        },
+        {
+          "type": "paragraph",
+          "line": 15,
+          "key": "home.intro.paragraph04"
+        },
+        {
+          "type": "paragraph",
+          "line": 17,
+          "key": "home.intro.paragraph05"
+        },
+        {
+          "type": "paragraph",
+          "line": 19,
+          "key": "home.intro.paragraph06"
+        },
+        {
+          "type": "paragraph",
+          "line": 21,
+          "key": "home.intro.paragraph07"
+        },
+        {
+          "type": "item",
+          "line": 24,
+          "key": "home.intro.item01"
+        },
+        {
+          "type": "item",
+          "line": 25,
+          "key": "home.intro.item02"
+        },
+        {
+          "type": "item",
+          "line": 26,
+          "key": "home.intro.item03"
+        },
+        {
+          "type": "item",
+          "line": 27,
+          "key": "home.intro.item04"
+        },
+        {
+          "type": "item",
+          "line": 28,
+          "key": "home.intro.item05"
+        },
+        {
+          "type": "item",
+          "line": 29,
+          "key": "home.intro.item06"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"depth-on-the-desktop\"></a><a id=\"the-stereo-desktop-new-frontiers-for-theme-design\"></a>",
+          "line": 31
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 32,
+          "key": "home.the-stereo-desktop-new-frontiers-for-theme-design.heading01",
+          "id": "스테레오-데스크톱-테마-디자인의-새로운-지평",
+          "english_id": "the-stereo-desktop-new-frontiers-for-theme-design"
+        },
+        {
+          "type": "paragraph",
+          "line": 34,
+          "key": "home.the-stereo-desktop-new-frontiers-for-theme-design.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"how-it-works\"></a>",
+          "line": 36
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 37,
+          "key": "home.how-it-works.heading01",
+          "id": "작동-방식",
+          "english_id": "how-it-works"
+        },
+        {
+          "type": "paragraph",
+          "line": 39,
+          "key": "home.how-it-works.paragraph01"
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 42,
+          "key": "home.more-about-the-edition.heading01",
+          "id": "에디션에-대해-더-알아보기",
+          "english_id": "more-about-the-edition"
+        },
+        {
+          "type": "item",
+          "line": 44,
+          "key": "home.more-about-the-edition.item01"
+        },
+        {
+          "type": "item",
+          "line": 45,
+          "key": "home.more-about-the-edition.item02"
+        },
+        {
+          "type": "item",
+          "line": 46,
+          "key": "home.more-about-the-edition.item03"
+        },
+        {
+          "type": "item",
+          "line": 47,
+          "key": "home.more-about-the-edition.item04"
+        },
+        {
+          "type": "item",
+          "line": 48,
+          "key": "home.more-about-the-edition.item05"
+        },
+        {
+          "type": "item",
+          "line": 49,
+          "key": "home.more-about-the-edition.item06"
+        },
+        {
+          "type": "item",
+          "line": 50,
+          "key": "home.more-about-the-edition.item07"
+        },
+        {
+          "type": "item",
+          "line": 51,
+          "key": "home.more-about-the-edition.item08"
+        },
+        {
+          "type": "item",
+          "line": 52,
+          "key": "home.more-about-the-edition.item09"
+        },
+        {
+          "type": "item",
+          "line": 53,
+          "key": "home.more-about-the-edition.item10"
+        },
+        {
+          "type": "item",
+          "line": 54,
+          "key": "home.more-about-the-edition.item11"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"credit\"></a>",
+          "line": 56
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 57,
+          "key": "home.credit.heading01",
+          "id": "크레딧",
+          "english_id": "credit"
+        },
+        {
+          "type": "paragraph",
+          "line": 59,
+          "key": "home.credit.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 62,
+          "key": "home.credit.paragraph02"
+        },
+        {
+          "type": "paragraph",
+          "line": 64,
+          "key": "home.credit.paragraph03"
+        },
+        {
+          "type": "paragraph",
+          "line": 66,
+          "key": "home.credit.paragraph04"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"licence\"></a>",
+          "line": 68
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 69,
+          "key": "home.licence.heading01",
+          "id": "라이선스",
+          "english_id": "licence"
+        },
+        {
+          "type": "paragraph",
+          "line": 71,
+          "key": "home.licence.paragraph01"
+        }
+      ],
+      "language_row": "🇨🇦 [English](README.md) · 🇧🇷 [Português](README.pt-BR.md) · 🇵🇱 [Polski](README.pl.md) · 🇫🇷 [Français](README.fr.md) · 🇩🇪 [Deutsch](README.de.md) · 🇲🇽 [Español](README.es.md) · 🇯🇵 [日本語](README.ja.md) · 🇰🇷 [한국어](README.ko.md) · 🇨🇳 [简体中文](README.zh-CN.md) · 🇭🇰 [繁體中文](README.zh-TW.md)"
+    },
+    "detail": {
+      "source": "docs/edition-in-detail.ko.md",
+      "sha256": "344803f894fa3ed1197dfd991a30cbf8a78fbabcbb4362775ef03fbb41a48a28",
+      "blocks": [
+        {
+          "type": "heading",
+          "level": 1,
+          "line": 1,
+          "key": "detail.intro.heading01",
+          "id": "sparky-stereo-os-자세히-보기",
+          "english_id": "sparky-stereo-os-in-detail"
+        },
+        {
+          "type": "paragraph",
+          "line": 5,
+          "key": "detail.intro.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 8,
+          "key": "detail.intro.paragraph02"
+        },
+        {
+          "type": "paragraph",
+          "line": 12,
+          "key": "detail.intro.paragraph03"
+        },
+        {
+          "type": "paragraph",
+          "line": 15,
+          "key": "detail.intro.paragraph04"
+        },
+        {
+          "type": "paragraph",
+          "line": 17,
+          "key": "detail.intro.paragraph05"
+        },
+        {
+          "type": "paragraph",
+          "line": 19,
+          "key": "detail.intro.paragraph06"
+        },
+        {
+          "type": "paragraph",
+          "line": 24,
+          "key": "detail.intro.paragraph07"
+        },
+        {
+          "type": "paragraph",
+          "line": 26,
+          "key": "detail.intro.paragraph08"
+        },
+        {
+          "type": "paragraph",
+          "line": 28,
+          "key": "detail.intro.paragraph09"
+        },
+        {
+          "type": "item",
+          "line": 30,
+          "key": "detail.intro.item01"
+        },
+        {
+          "type": "item",
+          "line": 31,
+          "key": "detail.intro.item02"
+        },
+        {
+          "type": "item",
+          "line": 32,
+          "key": "detail.intro.item03"
+        },
+        {
+          "type": "item",
+          "line": 33,
+          "key": "detail.intro.item04"
+        },
+        {
+          "type": "item",
+          "line": 34,
+          "key": "detail.intro.item05"
+        },
+        {
+          "type": "paragraph",
+          "line": 36,
+          "key": "detail.intro.paragraph10"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"vr-is-also-a-stereo-monitor\"></a>",
+          "line": 39
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 40,
+          "key": "detail.vr-is-also-a-stereo-monitor.heading01",
+          "id": "vr도-스테레오-모니터입니다",
+          "english_id": "vr-is-also-a-stereo-monitor"
+        },
+        {
+          "type": "paragraph",
+          "line": 42,
+          "key": "detail.vr-is-also-a-stereo-monitor.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 46,
+          "key": "detail.vr-is-also-a-stereo-monitor.paragraph02"
+        },
+        {
+          "type": "item",
+          "line": 47,
+          "key": "detail.vr-is-also-a-stereo-monitor.item01"
+        },
+        {
+          "type": "item",
+          "line": 48,
+          "key": "detail.vr-is-also-a-stereo-monitor.item02"
+        },
+        {
+          "type": "item",
+          "line": 49,
+          "key": "detail.vr-is-also-a-stereo-monitor.item03"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"who-builds-it\"></a>",
+          "line": 51
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 52,
+          "key": "detail.who-builds-it.heading01",
+          "id": "누가-만듭니다",
+          "english_id": "who-builds-it"
+        },
+        {
+          "type": "paragraph",
+          "line": 54,
+          "key": "detail.who-builds-it.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"where-it-is-going\"></a>",
+          "line": 61
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 62,
+          "key": "detail.where-it-is-going.heading01",
+          "id": "진행-방향",
+          "english_id": "where-it-is-going"
+        },
+        {
+          "type": "paragraph",
+          "line": 64,
+          "key": "detail.where-it-is-going.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"create\"></a>",
+          "line": 70
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 71,
+          "key": "detail.create.heading01",
+          "id": "만들기",
+          "english_id": "create"
+        },
+        {
+          "type": "paragraph",
+          "line": 73,
+          "key": "detail.create.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 75,
+          "key": "detail.create.paragraph02"
+        },
+        {
+          "type": "item",
+          "line": 79,
+          "key": "detail.create.item01"
+        },
+        {
+          "type": "item",
+          "line": 80,
+          "key": "detail.create.item02"
+        },
+        {
+          "type": "item",
+          "line": 81,
+          "key": "detail.create.item03"
+        },
+        {
+          "type": "item",
+          "line": 82,
+          "key": "detail.create.item04"
+        },
+        {
+          "type": "item",
+          "line": 83,
+          "key": "detail.create.item05"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"scan\"></a>",
+          "line": 85
+        },
+        {
+          "type": "paragraph",
+          "line": 86,
+          "key": "detail.create.paragraph03"
+        },
+        {
+          "type": "paragraph",
+          "line": 92,
+          "key": "detail.create.paragraph04"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"for-theme-designers-and-customizers\"></a>",
+          "line": 94
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "line": 95,
+          "key": "detail.for-theme-designers-and-customizers.heading01",
+          "id": "테마-디자이너와-커스터마이저를-위해",
+          "english_id": "for-theme-designers-and-customizers"
+        },
+        {
+          "type": "paragraph",
+          "line": 97,
+          "key": "detail.for-theme-designers-and-customizers.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"science-and-engineering\"></a>",
+          "line": 99
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 100,
+          "key": "detail.science-and-engineering.heading01",
+          "id": "과학-및-공학",
+          "english_id": "science-and-engineering"
+        },
+        {
+          "type": "paragraph",
+          "line": 102,
+          "key": "detail.science-and-engineering.paragraph01"
+        },
+        {
+          "type": "item",
+          "line": 103,
+          "key": "detail.science-and-engineering.item01"
+        },
+        {
+          "type": "item",
+          "line": 104,
+          "key": "detail.science-and-engineering.item02"
+        },
+        {
+          "type": "item",
+          "line": 105,
+          "key": "detail.science-and-engineering.item03"
+        },
+        {
+          "type": "item",
+          "line": 106,
+          "key": "detail.science-and-engineering.item04"
+        },
+        {
+          "type": "paragraph",
+          "line": 108,
+          "key": "detail.science-and-engineering.paragraph02"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"watch-and-play\"></a>",
+          "line": 110
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 111,
+          "key": "detail.watch-and-play.heading01",
+          "id": "보기-및-플레이",
+          "english_id": "watch-and-play"
+        },
+        {
+          "type": "paragraph",
+          "line": 113,
+          "key": "detail.watch-and-play.paragraph01"
+        },
+        {
+          "type": "item",
+          "line": 114,
+          "key": "detail.watch-and-play.item01"
+        },
+        {
+          "type": "item",
+          "line": 115,
+          "key": "detail.watch-and-play.item02"
+        },
+        {
+          "type": "item",
+          "line": 116,
+          "key": "detail.watch-and-play.item03"
+        },
+        {
+          "type": "item",
+          "line": 117,
+          "key": "detail.watch-and-play.item04"
+        },
+        {
+          "type": "item",
+          "line": 118,
+          "key": "detail.watch-and-play.item05"
+        },
+        {
+          "type": "paragraph",
+          "line": 120,
+          "key": "detail.watch-and-play.paragraph02"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"seen-in-3d\"></a>",
+          "line": 122
+        },
+        {
+          "type": "heading",
+          "level": 3,
+          "line": 123,
+          "key": "detail.seen-in-3d.heading01",
+          "id": "3d로-보기",
+          "english_id": "seen-in-3d"
+        },
+        {
+          "type": "paragraph",
+          "line": 125,
+          "key": "detail.seen-in-3d.paragraph01"
+        },
+        {
+          "type": "item",
+          "line": 128,
+          "key": "detail.seen-in-3d.item01"
+        },
+        {
+          "type": "item",
+          "line": 129,
+          "key": "detail.seen-in-3d.item02"
+        },
+        {
+          "type": "item",
+          "line": 130,
+          "key": "detail.seen-in-3d.item03"
+        },
+        {
+          "type": "item",
+          "line": 131,
+          "key": "detail.seen-in-3d.item04"
+        },
+        {
+          "type": "item",
+          "line": 132,
+          "key": "detail.seen-in-3d.item05"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"depth-on-the-desktop\"></a>",
+          "line": 134
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"the-stereo-desktop-new-frontiers-for-theme-design\"></a>",
+          "line": 135
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 136,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.heading01",
+          "id": "스테레오-데스크톱-테마-디자인의-새로운-지평",
+          "english_id": "the-stereo-desktop-new-frontiers-for-theme-design"
+        },
+        {
+          "type": "paragraph",
+          "line": 138,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph01"
+        },
+        {
+          "type": "item",
+          "line": 141,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item01"
+        },
+        {
+          "type": "item",
+          "line": 142,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item02"
+        },
+        {
+          "type": "item",
+          "line": 143,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item03"
+        },
+        {
+          "type": "item",
+          "line": 144,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item04"
+        },
+        {
+          "type": "item",
+          "line": 145,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item05"
+        },
+        {
+          "type": "item",
+          "line": 146,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item06"
+        },
+        {
+          "type": "item",
+          "line": 147,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item07"
+        },
+        {
+          "type": "item",
+          "line": 148,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.item08"
+        },
+        {
+          "type": "paragraph",
+          "line": 150,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph02"
+        },
+        {
+          "type": "paragraph",
+          "line": 154,
+          "key": "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"for-developers\"></a>",
+          "line": 156
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 157,
+          "key": "detail.for-developers.heading01",
+          "id": "개발자를-위해",
+          "english_id": "for-developers"
+        },
+        {
+          "type": "paragraph",
+          "line": 159,
+          "key": "detail.for-developers.paragraph01"
+        },
+        {
+          "type": "item",
+          "line": 161,
+          "key": "detail.for-developers.item01"
+        },
+        {
+          "type": "item",
+          "line": 162,
+          "key": "detail.for-developers.item02"
+        },
+        {
+          "type": "item",
+          "line": 163,
+          "key": "detail.for-developers.item03"
+        },
+        {
+          "type": "item",
+          "line": 164,
+          "key": "detail.for-developers.item04"
+        },
+        {
+          "type": "item",
+          "line": 165,
+          "key": "detail.for-developers.item05"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"how-it-works\"></a>",
+          "line": 167
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 168,
+          "key": "detail.how-it-works.heading01",
+          "id": "작동-방식",
+          "english_id": "how-it-works"
+        },
+        {
+          "type": "paragraph",
+          "line": 170,
+          "key": "detail.how-it-works.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 172,
+          "key": "detail.how-it-works.paragraph02"
+        },
+        {
+          "type": "item",
+          "line": 173,
+          "key": "detail.how-it-works.item01"
+        },
+        {
+          "type": "item",
+          "line": 174,
+          "key": "detail.how-it-works.item02"
+        },
+        {
+          "type": "item",
+          "line": 175,
+          "key": "detail.how-it-works.item03"
+        },
+        {
+          "type": "paragraph",
+          "line": 177,
+          "key": "detail.how-it-works.paragraph03"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"stereo-in-the-open-stack-not-in-one-product\"></a>",
+          "line": 179
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 180,
+          "key": "detail.stereo-in-the-open-stack-not-in-one-product.heading01",
+          "id": "단일-제품이-아닌-열린-스택의-스테레오",
+          "english_id": "stereo-in-the-open-stack-not-in-one-product"
+        },
+        {
+          "type": "paragraph",
+          "line": 182,
+          "key": "detail.stereo-in-the-open-stack-not-in-one-product.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"programs-the-edition-changes-for-stereo-3d-and-deep-colour\"></a>",
+          "line": 185
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 186,
+          "key": "detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.heading01",
+          "id": "에디션이-스테레오-3d와-딥-컬러를-위해-변경하는-프로그램",
+          "english_id": "programs-the-edition-changes-for-stereo-3d-and-deep-colour"
+        },
+        {
+          "type": "paragraph",
+          "line": 188,
+          "key": "detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"our-branches-on-kdes-gitlab\"></a>",
+          "line": 191
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 192,
+          "key": "detail.our-branches-on-kdes-gitlab.heading01",
+          "id": "kde-gitlab의-우리-브랜치",
+          "english_id": "our-branches-on-kdes-gitlab"
+        },
+        {
+          "type": "paragraph",
+          "line": 194,
+          "key": "detail.our-branches-on-kdes-gitlab.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"merged-outside-sparky-stereo\"></a>",
+          "line": 196
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 197,
+          "key": "detail.merged-outside-sparky-stereo.heading01",
+          "id": "sparky-stereo-외부에서-병합됨",
+          "english_id": "merged-outside-sparky-stereo"
+        },
+        {
+          "type": "paragraph",
+          "line": 199,
+          "key": "detail.merged-outside-sparky-stereo.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 204,
+          "key": "detail.merged-outside-sparky-stereo.paragraph02"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"documents\"></a>",
+          "line": 209
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 210,
+          "key": "detail.documents.heading01",
+          "id": "문서",
+          "english_id": "documents"
+        },
+        {
+          "type": "paragraph",
+          "line": 212,
+          "key": "detail.documents.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"tools\"></a>",
+          "line": 214
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 215,
+          "key": "detail.tools.heading01",
+          "id": "도구",
+          "english_id": "tools"
+        },
+        {
+          "type": "paragraph",
+          "line": 217,
+          "key": "detail.tools.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"the-base-three-open-lists\"></a>",
+          "line": 219
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 220,
+          "key": "detail.the-base-three-open-lists.heading01",
+          "id": "기반-세-개의-열린-목록",
+          "english_id": "the-base-three-open-lists"
+        },
+        {
+          "type": "paragraph",
+          "line": 222,
+          "key": "detail.the-base-three-open-lists.paragraph01"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"credit\"></a>",
+          "line": 224
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 225,
+          "key": "detail.credit.heading01",
+          "id": "크레딧",
+          "english_id": "credit"
+        },
+        {
+          "type": "paragraph",
+          "line": 227,
+          "key": "detail.credit.paragraph01"
+        },
+        {
+          "type": "paragraph",
+          "line": 229,
+          "key": "detail.credit.paragraph02"
+        },
+        {
+          "type": "table",
+          "line": 231,
+          "key": "detail.credit.table01"
+        },
+        {
+          "type": "paragraph",
+          "line": 236,
+          "key": "detail.credit.paragraph03"
+        },
+        {
+          "type": "paragraph",
+          "line": 238,
+          "key": "detail.credit.paragraph04"
+        },
+        {
+          "type": "paragraph",
+          "line": 240,
+          "key": "detail.credit.paragraph05"
+        },
+        {
+          "type": "item",
+          "line": 241,
+          "key": "detail.credit.item01"
+        },
+        {
+          "type": "item",
+          "line": 242,
+          "key": "detail.credit.item02"
+        },
+        {
+          "type": "item",
+          "line": 243,
+          "key": "detail.credit.item03"
+        },
+        {
+          "type": "item",
+          "line": 244,
+          "key": "detail.credit.item04"
+        },
+        {
+          "type": "item",
+          "line": 245,
+          "key": "detail.credit.item05"
+        },
+        {
+          "type": "paragraph",
+          "line": 247,
+          "key": "detail.credit.paragraph06"
+        },
+        {
+          "type": "paragraph",
+          "line": 249,
+          "key": "detail.credit.paragraph07"
+        },
+        {
+          "type": "paragraph",
+          "line": 251,
+          "key": "detail.credit.paragraph08"
+        },
+        {
+          "type": "paragraph",
+          "line": 253,
+          "key": "detail.credit.paragraph09"
+        },
+        {
+          "type": "anchors",
+          "raw": "<a id=\"licence\"></a>",
+          "line": 255
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "line": 256,
+          "key": "detail.licence.heading01",
+          "id": "라이선스",
+          "english_id": "licence"
+        },
+        {
+          "type": "paragraph",
+          "line": 258,
+          "key": "detail.licence.paragraph01"
+        },
+        {
+          "type": "quote",
+          "line": 260,
+          "key": "detail.licence.quote01"
+        },
+        {
+          "type": "paragraph",
+          "line": 263,
+          "key": "detail.licence.paragraph02"
+        },
+        {
+          "type": "paragraph",
+          "line": 265,
+          "key": "detail.licence.paragraph03"
+        }
+      ],
+      "language_row": "[English](edition-in-detail.md) · [Português](edition-in-detail.pt-BR.md) · [Polski](edition-in-detail.pl.md) · [Français](edition-in-detail.fr.md) · [日本語](edition-in-detail.ja.md) · [한국어](edition-in-detail.ko.md) · [简体中文](edition-in-detail.zh-CN.md) · [繁體中文](edition-in-detail.zh-TW.md)"
+    }
+  },
+  "strings": {
+    "home.intro.heading01": "Sparky Stereo OS",
+    "home.intro.paragraph01": "**이미 가지고 있는 화면에서 3D로 만들고 탐험하세요: 그림을 그리고, 사진과 비디오를 편집하고, 분자와 지구본을 연구한 다음, 영화를 보고 게임을 즐기세요.**\n3D TV와 3D 프로젝터, VR 헤드셋, 무안경 3D 디스플레이, 적청 안경을 쓴 모든 모니터 등 모든 종류의 3D 화면을 위해 만들어졌습니다.\n일반 2D 모니터에서는 같은 데스크톱이 아무 변경 없이 그대로 작동합니다.\nSparky Stereo OS는 Daniel Ramos의 SparkyLinux 에디션(Paweł \"pavroo\" Pijanowski 제작)으로, 새로운 Stereo KDE Plasma 데스크톱을 갖춘 Linux 시스템입니다.",
+    "home.intro.paragraph02.link01": "docs/lean-code-packages.md#why-it-matters",
+    "home.intro.paragraph02": "**컴퓨터에도 지구에도 가볍게:** 모든 패키지는 프로그램이 읽지 않는 주석과 메모를 빼고 제공되므로, 같은 작업에 처리, 전력, 기기 마모가 더 적게 듭니다.\n[측정 결과]({{home.intro.paragraph02.link01}})(2016년 노트북): 컴파일러를 위해 프로그램을 준비하는 작업이 주석을 지우지 않은 같은 파일보다 2~4% 적으며, 잃는 것은 없습니다.",
+    "home.intro.paragraph03.link01": "docs/edition-in-detail.ko.md#seen-in-3d",
+    "home.intro.paragraph03.image01": "docs/screenshots/translucent-stereo-desktop-anaglyph.jpg",
+    "home.intro.paragraph03.alt01": "반투명 창이 있는 3D 스테레오 데스크톱: Dolphin의 설정 메뉴와 색 구성표 목록이 앞에 있고, 유리 창들이 뒤로 한 단계씩 물러서며, 시스템 모니터와 배경화면이 가장 깊은 곳에 있습니다 (적청 애너글리프)",
+    "home.intro.paragraph03": "<a href=\"{{home.intro.paragraph03.link01}}\"><img src=\"{{home.intro.paragraph03.image01}}\" width=\"99%\" alt=\"{{home.intro.paragraph03.alt01}}\"></a>",
+    "home.intro.paragraph04.link01": "docs/edition-in-detail.ko.md#seen-in-3d",
+    "home.intro.paragraph04.image01": "docs/screenshots/doom-2016-in-a-window-anaglyph.jpg",
+    "home.intro.paragraph04.alt01": "창 안의 DOOM (2016), 3D로, 아래에 평면 Plasma 패널이 있습니다 (적청 애너글리프)",
+    "home.intro.paragraph04.link02": "docs/edition-in-detail.ko.md#seen-in-3d",
+    "home.intro.paragraph04.image02": "docs/screenshots/marble-globe-anaglyph.jpg",
+    "home.intro.paragraph04.alt02": "별들 앞의 Marble 지구본, 3D로 (적청 애너글리프)",
+    "home.intro.paragraph04.link03": "docs/edition-in-detail.ko.md#seen-in-3d",
+    "home.intro.paragraph04.image03": "docs/screenshots/stereo-desktop-anaglyph.jpg",
+    "home.intro.paragraph04.alt03": "3D 스테레오 데스크톱: 화면의 패널, 그 앞의 사운드 팝업, 뒤로 물러서는 창들 (적청 애너글리프)",
+    "home.intro.paragraph04": "<a href=\"{{home.intro.paragraph04.link01}}\"><img src=\"{{home.intro.paragraph04.image01}}\" width=\"32%\" alt=\"{{home.intro.paragraph04.alt01}}\"></a> <a href=\"{{home.intro.paragraph04.link02}}\"><img src=\"{{home.intro.paragraph04.image02}}\" width=\"32%\" alt=\"{{home.intro.paragraph04.alt02}}\"></a> <a href=\"{{home.intro.paragraph04.link03}}\"><img src=\"{{home.intro.paragraph04.image03}}\" width=\"32%\" alt=\"{{home.intro.paragraph04.alt03}}\"></a>",
+    "home.intro.paragraph05.link01": "docs/edition-in-detail.ko.md#seen-in-3d",
+    "home.intro.paragraph05": "*적청 안경으로 이들을 3D로 볼 수 있습니다 ([더 보기]({{home.intro.paragraph05.link01}})).*",
+    "home.intro.paragraph06": "**상태: 테스터용 베타 1입니다.** 3D TV, 적청 안경을 쓴 일반 모니터, 저렴한 뷰어에 넣은 Android 휴대폰에서 테스트했습니다. 무안경 디스플레이와 독립형 헤드셋은 진행 중입니다.",
+    "home.intro.paragraph07.link01": "docs/guides/try-on-windows.en.md",
+    "home.intro.paragraph07.link02": "https://github.com/Sparky-OS/sparky-stereo-os/issues/26",
+    "home.intro.paragraph07.link03": "https://github.com/Sparky-OS/sparky-stereo-os/issues/25",
+    "home.intro.paragraph07.link04": "https://github.com/Sparky-OS/sparky-stereo-os/issues/27",
+    "home.intro.paragraph07.link05": "https://github.com/Sparky-OS/sparky-stereo-os/issues/80",
+    "home.intro.paragraph07.link06": "https://github.com/Sparky-OS/sparky-stereo-os/issues/153",
+    "home.intro.paragraph07.link07": "https://github.com/Sparky-OS/sparky-stereo-os/issues/351",
+    "home.intro.paragraph07.link08": "https://github.com/Sparky-OS/sparky-stereo-os/issues/81",
+    "home.intro.paragraph07.link09": "https://github.com/Sparky-OS/sparky-stereo-os/issues/83",
+    "home.intro.paragraph07.link10": "https://github.com/Sparky-OS/sparky-stereo-os/issues/84",
+    "home.intro.paragraph07.link11": "https://github.com/Sparky-OS/sparky-stereo-os/issues/85",
+    "home.intro.paragraph07": "**다음 단계: 사용 중인 Windows PC에서 USB 메모리로, 아무것도 설치하지 않고 사용해 보세요:** [한 페이지, 열 단계(영어)]({{home.intro.paragraph07.link01}})\n<br>다운로드를 요청하고 여러분의 3D 장비를 알려 주세요. 원하는 언어로: [🇨🇦]({{home.intro.paragraph07.link02}}) [🇧🇷]({{home.intro.paragraph07.link03}}) [🇵🇱]({{home.intro.paragraph07.link04}}) [🇫🇷]({{home.intro.paragraph07.link05}}) [🇩🇪]({{home.intro.paragraph07.link06}}) [🇲🇽]({{home.intro.paragraph07.link07}}) [🇯🇵]({{home.intro.paragraph07.link08}}) [🇰🇷]({{home.intro.paragraph07.link09}}) [🇨🇳]({{home.intro.paragraph07.link10}}) [🇭🇰]({{home.intro.paragraph07.link11}})",
+    "home.intro.item01.link01": "docs/edition-in-detail.ko.md#science-and-engineering",
+    "home.intro.item01": "<a id=\"science-and-engineering\"></a>**[과학 및 공학]({{home.intro.item01.link01}}):** Marble의 지구본, KAlgebra의 그래프, Kalzium의 분자를 3D로; 3D 모델과 회로 기판은 진행 중입니다. 스캔은 계획 중입니다: 부품, 현장, 표본을 찍은 비디오가 3D 모델이 됩니다.",
+    "home.intro.item02.link01": "docs/edition-in-detail.ko.md#create",
+    "home.intro.item02": "<a id=\"create\"></a>**[만들기]({{home.intro.item02.link01}}):** 3D로 그리고 딥 컬러(8비트 대신 색상당 16비트)로 그리며, 3D 사진과 비디오를 편집합니다. 스캔은 계획 중입니다: 물체나 장소를 찍은 비디오가 둘러볼 수 있는 3D 모델이 됩니다.",
+    "home.intro.item03.link01": "docs/edition-in-detail.ko.md#watch-and-play",
+    "home.intro.item03": "<a id=\"watch-and-play\"></a>**[보기 및 플레이]({{home.intro.item03.link01}}):** 3D 영화, 사진, 게임을 창 또는 전체 화면으로.",
+    "home.intro.item04.link01": "docs/edition-in-detail.ko.md#vr-is-also-a-stereo-monitor",
+    "home.intro.item04": "<a id=\"vr-is-also-a-stereo-monitor\"></a>**[VR도 스테레오 모니터입니다]({{home.intro.item04.link01}}):** 헤드셋도, 뷰어에 넣은 휴대폰도 이 데스크톱의 3D 화면이 됩니다.",
+    "home.intro.item05.link01": "docs/edition-in-detail.ko.md#for-developers",
+    "home.intro.item05": "<a id=\"for-developers\"></a>**[개발]({{home.intro.item05.link01}}):** 프로그램을 한 번 3D로 만드세요; 데스크톱이 각 화면에 맞게 조정합니다.",
+    "home.intro.item06.link01": "docs/other-distributions.md",
+    "home.intro.item06": "**[다른 배포판?]({{home.intro.item06.link01}})** 패키징하지 않는 이유와 유지 관리자가 우리의 수정 사항을 채택하는 방법.",
+    "home.the-stereo-desktop-new-frontiers-for-theme-design.heading01": "스테레오 데스크톱: 테마 디자인의 새로운 지평",
+    "home.the-stereo-desktop-new-frontiers-for-theme-design.paragraph01.link01": "docs/edition-in-detail.ko.md#depth-on-the-desktop",
+    "home.the-stereo-desktop-new-frontiers-for-theme-design.paragraph01": "**이 데스크톱에서 테마가 무엇이 튀어나오고 무엇이 들어가는지 결정합니다:** [테마 디자인의 새로운 지평]({{home.the-stereo-desktop-new-frontiers-for-theme-design.paragraph01.link01}}).",
+    "home.how-it-works.heading01": "작동 방식",
+    "home.how-it-works.paragraph01.link01": "docs/edition-in-detail.ko.md#how-it-works",
+    "home.how-it-works.paragraph01": "<a id=\"why-one-format-full-side-by-side-at-any-resolution\"></a>**프로그램은 각 그림을 설명하고, 데스크톱은 각 화면에 맞게 조정합니다.** 스테레오에서는 두 보기가 하나의 풀 사이드 바이 사이드 버퍼에서 함께 이동합니다. 제안된 HDR 확장은 같은 작업 분배를 통해 그림의 색상 설명과 복구 정보를 유지합니다.\n[자세히]({{home.how-it-works.paragraph01.link01}})",
+    "home.more-about-the-edition.heading01": "에디션에 대해 더 알아보기",
+    "home.more-about-the-edition.item01.link01": "docs/edition-in-detail.ko.md#who-builds-it",
+    "home.more-about-the-edition.item01": "<a id=\"who-builds-it\"></a>[누가 만듭니다]({{home.more-about-the-edition.item01.link01}})",
+    "home.more-about-the-edition.item02.link01": "docs/edition-in-detail.ko.md#where-it-is-going",
+    "home.more-about-the-edition.item02": "<a id=\"where-it-is-going\"></a>[진행 방향]({{home.more-about-the-edition.item02.link01}})",
+    "home.more-about-the-edition.item03.link01": "docs/edition-in-detail.ko.md#seen-in-3d",
+    "home.more-about-the-edition.item03": "<a id=\"seen-in-3d\"></a>[3D로 보기]({{home.more-about-the-edition.item03.link01}})",
+    "home.more-about-the-edition.item04.link01": "docs/edition-in-detail.ko.md#for-theme-designers-and-customizers",
+    "home.more-about-the-edition.item04": "<a id=\"for-theme-designers-and-customizers\"></a>[테마 디자이너와 커스터마이저를 위해]({{home.more-about-the-edition.item04.link01}})",
+    "home.more-about-the-edition.item05.link01": "docs/edition-in-detail.ko.md#stereo-in-the-open-stack-not-in-one-product",
+    "home.more-about-the-edition.item05": "<a id=\"stereo-in-the-open-stack-not-in-one-product\"></a>[단일 제품이 아닌 열린 스택의 스테레오]({{home.more-about-the-edition.item05.link01}})",
+    "home.more-about-the-edition.item06.link01": "docs/edition-in-detail.ko.md#programs-the-edition-changes-for-stereo-3d-and-deep-colour",
+    "home.more-about-the-edition.item06": "<a id=\"programs-the-edition-changes-for-stereo-3d-and-deep-colour\"></a>[에디션이 스테레오 3D와 딥 컬러를 위해 변경하는 프로그램]({{home.more-about-the-edition.item06.link01}})",
+    "home.more-about-the-edition.item07.link01": "docs/edition-in-detail.ko.md#our-branches-on-kdes-gitlab",
+    "home.more-about-the-edition.item07": "<a id=\"our-branches-on-kdes-gitlab\"></a>[KDE GitLab의 우리 브랜치]({{home.more-about-the-edition.item07.link01}})",
+    "home.more-about-the-edition.item08.link01": "docs/edition-in-detail.ko.md#merged-outside-sparky-stereo",
+    "home.more-about-the-edition.item08": "<a id=\"merged-outside-sparky-stereo\"></a>[Sparky Stereo 외부에서 병합됨]({{home.more-about-the-edition.item08.link01}})",
+    "home.more-about-the-edition.item09.link01": "docs/edition-in-detail.ko.md#documents",
+    "home.more-about-the-edition.item09": "<a id=\"documents\"></a>[문서]({{home.more-about-the-edition.item09.link01}})",
+    "home.more-about-the-edition.item10.link01": "docs/edition-in-detail.ko.md#tools",
+    "home.more-about-the-edition.item10": "<a id=\"tools\"></a>[도구]({{home.more-about-the-edition.item10.link01}})",
+    "home.more-about-the-edition.item11.link01": "docs/edition-in-detail.ko.md#the-base-three-open-lists",
+    "home.more-about-the-edition.item11": "<a id=\"the-base-three-open-lists\"></a>[기반: 세 개의 열린 목록]({{home.more-about-the-edition.item11.link01}})",
+    "home.credit.heading01": "크레딧",
+    "home.credit.paragraph01.link01": "ATTRIBUTIONS.md",
+    "home.credit.paragraph01": "Sparky Stereo OS, Daniel Ramos (Capitain Jack)의 SparkyLinux 에디션 (Paweł \"pavroo\" Pijanowski 제작).\n이 에디션이 기반으로 삼은 모든 사람, 이름으로: [ATTRIBUTIONS.md]({{home.credit.paragraph01.link01}}).",
+    "home.credit.paragraph02.alt01": "DOI",
+    "home.credit.paragraph02.image01": "https://zenodo.org/badge/DOI/10.5281/zenodo.23309024.svg",
+    "home.credit.paragraph02.link01": "https://doi.org/10.5281/zenodo.23309024",
+    "home.credit.paragraph02": "**인용:** [![{{home.credit.paragraph02.alt01}}]({{home.credit.paragraph02.image01}})]({{home.credit.paragraph02.link01}})",
+    "home.credit.paragraph03.alt01": "Sponsor Daniel",
+    "home.credit.paragraph03.image01": "https://img.shields.io/badge/Sponsor-danielcamposramos-EA4AAA?style=flat-square&logo=githubsponsors",
+    "home.credit.paragraph03.link01": "https://github.com/sponsors/danielcamposramos",
+    "home.credit.paragraph03.alt02": "SparkyLinux 기부",
+    "home.credit.paragraph03.image02": "https://img.shields.io/badge/Donate-SparkyLinux-2777AD?style=flat-square",
+    "home.credit.paragraph03.link02": "https://sparkylinux.org/donate/",
+    "home.credit.paragraph03": "**후원:** [![{{home.credit.paragraph03.alt01}}]({{home.credit.paragraph03.image01}})]({{home.credit.paragraph03.link01}}) [![{{home.credit.paragraph03.alt02}}]({{home.credit.paragraph03.image02}})]({{home.credit.paragraph03.link02}}) Daniel 후원은 이 에디션을 지원하고, SparkyLinux 기부는 그 기반이 되는 Paweł의 배포판을 지원합니다.",
+    "home.credit.paragraph04.link01": "docs/edition-in-detail.ko.md#credit",
+    "home.credit.paragraph04": "[자세히]({{home.credit.paragraph04.link01}})",
+    "home.licence.heading01": "라이선스",
+    "home.licence.paragraph01.link01": "https://creativecommons.org/licenses/by/4.0/",
+    "home.licence.paragraph01.link02": "docs/edition-in-detail.ko.md#licence",
+    "home.licence.paragraph01": "문서는 [Creative Commons Attribution 4.0 International 라이선스]({{home.licence.paragraph01.link01}}) (CC BY 4.0)로 제공됩니다: Sparky Stereo OS의 출처를 남기면 공유하고 수정할 수 있습니다.\n[자세히]({{home.licence.paragraph01.link02}})",
+    "detail.intro.heading01": "Sparky Stereo OS 자세히 보기",
+    "detail.intro.paragraph01.link01": "../README.ko.md",
+    "detail.intro.paragraph01": "**대상:** 전체 그림을 알고 싶은 분. 첫 페이지의 모든 섹션 전문을 그림, 측정값, 크레딧, 링크와 함께 담았습니다.\n[첫 페이지로 돌아가기]({{detail.intro.paragraph01.link01}})",
+    "detail.intro.paragraph02.link01": "https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md",
+    "detail.intro.paragraph02": "**이미 가지고 있는 화면에서 3D로 만들고 탐험하세요: 그림을 그리고, 사진과 비디오를 편집하고, 분자와 지구본을 연구한 다음, 영화를 보고 게임을 즐기세요.**\n3D TV가 작동하고, 값싼 적청 안경을 쓴 일반 모니터도 작동하며, 이제 저렴한 뷰어에 넣은 호환 Android 휴대폰도 작동합니다: [USB를 통한 사용 가능한 스테레오 데스크톱]({{detail.intro.paragraph02.link01}}), 구형 하드웨어에서 테스트되었습니다.\nSparky Stereo OS는 Daniel Ramos의 SparkyLinux 에디션(Paweł \"pavroo\" Pijanowski 제작)으로, 새로운 Stereo KDE Plasma 데스크톱을 갖춘 Linux 시스템입니다.",
+    "detail.intro.paragraph03.link01": "lean-code-packages.md#why-it-matters",
+    "detail.intro.paragraph03": "**컴퓨터에도 지구에도 가볍게:** 모든 패키지는 프로그램이 읽지 않는 주석과 메모를 빼고 제공되므로, 같은 작업에 처리, 전력, 기기 마모가 더 적게 듭니다.\n[측정 결과]({{detail.intro.paragraph03.link01}}): C++ 헤더를 읽는 작업이 Debian보다 2~4% 적으며, 잃는 것은 없습니다.",
+    "detail.intro.paragraph04.link01": "architectural-synthesis.md",
+    "detail.intro.paragraph04.link02": "architecture-infographic.md",
+    "detail.intro.paragraph04": "**아키텍처 읽기:** [그림 가이드 및 저장소 지도]({{detail.intro.paragraph04.link01}}), [전체 크기 인포그래픽 및 텍스트 버전]({{detail.intro.paragraph04.link02}}) 포함, Daniel의 Gemini / NotebookLM 연구에서 각색 및 검증되었습니다.",
+    "detail.intro.paragraph05.link01": "#seen-in-3d",
+    "detail.intro.paragraph05.image01": "screenshots/translucent-stereo-desktop-anaglyph.jpg",
+    "detail.intro.paragraph05.alt01": "반투명 창이 있는 3D 스테레오 데스크톱: Dolphin의 설정 메뉴와 색 구성표 목록이 앞에 있고, 유리 창들이 뒤로 한 단계씩 물러서며, 시스템 모니터와 배경화면이 가장 깊은 곳에 있습니다 (적청 애너글리프)",
+    "detail.intro.paragraph05": "<a href=\"{{detail.intro.paragraph05.link01}}\"><img src=\"{{detail.intro.paragraph05.image01}}\" width=\"99%\" alt=\"{{detail.intro.paragraph05.alt01}}\"></a>",
+    "detail.intro.paragraph06": "**스테레오 데스크톱:** 데스크톱 자체에 깊이가 있습니다.\n사용 중인 것이 화면에 있고 그 메뉴가 앞으로 나옵니다. 여기 Marble의 메뉴와 하위 메뉴처럼 말이죠. 뒤의 창들은 종이 더미처럼 하나씩 뒤로 물러서고, 배경화면이 가장 깊습니다.\n3D 프로그램은 Marble의 지구본처럼 창 안에 자체 깊이를 유지합니다.\n각각 몇 픽셀씩, 사용자가 선택한 한도 내에서요.",
+    "detail.intro.paragraph07.link01": "#seen-in-3d",
+    "detail.intro.paragraph07.image01": "screenshots/doom-2016-in-a-window-anaglyph.jpg",
+    "detail.intro.paragraph07.alt01": "창 안의 DOOM (2016), 3D로, 아래에 평면 Plasma 패널이 있습니다 (적청 애너글리프)",
+    "detail.intro.paragraph07.link02": "#seen-in-3d",
+    "detail.intro.paragraph07.image02": "screenshots/marble-globe-anaglyph.jpg",
+    "detail.intro.paragraph07.alt02": "별들 앞의 Marble 지구본, 3D로 (적청 애너글리프)",
+    "detail.intro.paragraph07.link03": "#seen-in-3d",
+    "detail.intro.paragraph07.image03": "screenshots/stereo-desktop-anaglyph.jpg",
+    "detail.intro.paragraph07.alt03": "3D 스테레오 데스크톱: 화면의 패널, 그 앞의 사운드 팝업, 뒤로 물러서는 창들 (적청 애너글리프)",
+    "detail.intro.paragraph07": "<a href=\"{{detail.intro.paragraph07.link01}}\"><img src=\"{{detail.intro.paragraph07.image01}}\" width=\"32%\" alt=\"{{detail.intro.paragraph07.alt01}}\"></a> <a href=\"{{detail.intro.paragraph07.link02}}\"><img src=\"{{detail.intro.paragraph07.image02}}\" width=\"32%\" alt=\"{{detail.intro.paragraph07.alt02}}\"></a> <a href=\"{{detail.intro.paragraph07.link03}}\"><img src=\"{{detail.intro.paragraph07.image03}}\" width=\"32%\" alt=\"{{detail.intro.paragraph07.alt03}}\"></a>",
+    "detail.intro.paragraph08.link01": "#seen-in-3d",
+    "detail.intro.paragraph08": "*적청 안경으로 이들을 3D로 볼 수 있습니다 ([더 보기]({{detail.intro.paragraph08.link01}})).*",
+    "detail.intro.paragraph09.link01": "https://github.com/Sparky-OS/flat-headset/tree/main/apk",
+    "detail.intro.paragraph09.link02": "#where-it-is-going",
+    "detail.intro.paragraph09": "**개발 중:** [Flat Headset 개발 APK 및 일치하는 PC 업데이트 지침]({{detail.intro.paragraph09.link01}})이 제공되며, 테스터용 개발 ISO는 이제 Secure Boot가 켜진 최신 PC, 오래된 BIOS PC, 32비트 UEFI 기기에서 부팅됩니다; 최종 스테레오 에디션 ISO는 아직 준비 중입니다 ([진행 방향]({{detail.intro.paragraph09.link02}})).",
+    "detail.intro.item01.link01": "#create",
+    "detail.intro.item01": "**[만들기]({{detail.intro.item01.link01}}):** 3D로 그리고 딥 컬러(8비트 대신 색상당 16비트)로 그리며, 3D 사진과 비디오를 편집합니다.",
+    "detail.intro.item02.link01": "#science-and-engineering",
+    "detail.intro.item02": "**[과학 및 공학]({{detail.intro.item02.link01}}):** Marble의 지구본, KAlgebra의 그래프, Kalzium의 분자를 3D로; 3D 모델과 회로 기판은 진행 중입니다.",
+    "detail.intro.item03.link01": "#watch-and-play",
+    "detail.intro.item03": "**[보기 및 플레이]({{detail.intro.item03.link01}}):** 3D 영화, 사진, 게임을 창 또는 전체 화면으로.",
+    "detail.intro.item04.link01": "#for-developers",
+    "detail.intro.item04": "**[개발]({{detail.intro.item04.link01}}):** 프로그램을 한 번 3D로 만드세요; 데스크톱이 각 화면에 맞게 조정합니다.",
+    "detail.intro.item05.link01": "other-distributions.md",
+    "detail.intro.item05": "**[다른 배포판?]({{detail.intro.item05.link01}})** 패키징하지 않는 이유와 유지 관리자가 우리의 수정 사항을 채택하는 방법.",
+    "detail.intro.paragraph10.link01": "https://github.com/Sparky-OS/sparky-stereo-os/issues/26",
+    "detail.intro.paragraph10.link02": "https://github.com/Sparky-OS/sparky-stereo-os/issues/25",
+    "detail.intro.paragraph10.link03": "https://github.com/Sparky-OS/sparky-stereo-os/issues/27",
+    "detail.intro.paragraph10.link04": "https://github.com/Sparky-OS/sparky-stereo-os/issues/80",
+    "detail.intro.paragraph10.link05": "https://github.com/Sparky-OS/sparky-stereo-os/issues/153",
+    "detail.intro.paragraph10.link06": "https://github.com/Sparky-OS/sparky-stereo-os/issues/351",
+    "detail.intro.paragraph10.link07": "https://github.com/Sparky-OS/sparky-stereo-os/issues/81",
+    "detail.intro.paragraph10.link08": "https://github.com/Sparky-OS/sparky-stereo-os/issues/83",
+    "detail.intro.paragraph10.link09": "https://github.com/Sparky-OS/sparky-stereo-os/issues/84",
+    "detail.intro.paragraph10.link10": "https://github.com/Sparky-OS/sparky-stereo-os/issues/85",
+    "detail.intro.paragraph10": "**다음 단계: 여러분의 3D 장비에 대해 알려주세요** 그리고 준비되면 가장 먼저 소식을 들으세요.\n<br>언어별로 가입하세요: [🇨🇦]({{detail.intro.paragraph10.link01}}) [🇧🇷]({{detail.intro.paragraph10.link02}}) [🇵🇱]({{detail.intro.paragraph10.link03}}) [🇫🇷]({{detail.intro.paragraph10.link04}}) [🇩🇪]({{detail.intro.paragraph10.link05}}) [🇲🇽]({{detail.intro.paragraph10.link06}}) [🇯🇵]({{detail.intro.paragraph10.link07}}) [🇰🇷]({{detail.intro.paragraph10.link08}}) [🇨🇳]({{detail.intro.paragraph10.link09}}) [🇭🇰]({{detail.intro.paragraph10.link10}})",
+    "detail.vr-is-also-a-stereo-monitor.heading01": "VR도 스테레오 모니터입니다",
+    "detail.vr-is-also-a-stereo-monitor.paragraph01": "**VR 헤드셋이 수납장 안에서 먼지를 쌓고 있나요?**\nSparky Stereo OS는 헤드셋을 다시 3D 화면으로 바꿔 줍니다: 3D 게임을 하고, 3D 영화를 보고, 3D 콘텐츠를 편집하고, 이메일을 쓰고 데스크톱 전체에서 3D로 코딩하고, Linux에서 헤드셋이 작동하는 곳에서는 SteamVR을 통해 PCVR 게임을 즐길 수 있습니다.\n호환 Android 휴대폰을 저렴한 뷰어에 넣는 방식은 오늘 이미 작동합니다. Quest 같은 독립형 헤드셋은 그 다음 대상으로, 아직 테스트되지 않았습니다.",
+    "detail.vr-is-also-a-stereo-monitor.paragraph02": "대부분의 헤드셋은 각 눈에 하나씩, 한 쌍의 작은 화면이고, 나머지는 3D TV처럼 한 화면을 둘로 나눕니다. 그래서 이 하나의 데스크톱이 둘 다 지원합니다.",
+    "detail.vr-is-also-a-stereo-monitor.item01.link01": "https://github.com/Sparky-OS/flat-headset/blob/main/docs/usb-desktop-2026-10-19.md",
+    "detail.vr-is-also-a-stereo-monitor.item01.link02": "https://github.com/Sparky-OS/flat-headset/tree/main/apk",
+    "detail.vr-is-also-a-stereo-monitor.item01.link03": "https://github.com/Sparky-OS/flat-headset#the-first-test-12-october-2026",
+    "detail.vr-is-also-a-stereo-monitor.item01.link04": "https://github.com/Sparky-OS/flat-headset#the-desktop-on-the-phone-14-october-2026",
+    "detail.vr-is-also-a-stereo-monitor.item01": "**이미 주머니에 있는 3D 화면:** 저렴한 Cardboard 스타일 뷰어가 호환 Android 휴대폰을 스테레오 데스크톱용 화면으로 바꿉니다. 풀 컬러로, 각 눈에 별도의 뷰를 제공합니다. 10월 19일, Daniel은 Redmi Note 7과 2016년 A10 노트북에서 USB 절반 상하 설정을 사용 가능한 것으로 승인했습니다: 데스크톱이 작동하고 마우스가 반응합니다. 비디오는 많이 개선되었지만 여전히 다소 끊깁니다; 첫 가정 Wi-Fi 테스트는 USB에 더 가깝게 느껴지고, Direct Wi-Fi는 더 긴 멈춤이 있습니다. 전체 해상도와 더 많은 기기는 여전히 테스트가 필요합니다 ([측정 및 한계]({{detail.vr-is-also-a-stereo-monitor.item01.link01}})). PC가 그리기를 담당하므로 구형 휴대폰에 또 다른 용도를 제공합니다. [개발 APK, 소스 및 일치하는 PC 업데이트 지침]({{detail.vr-is-also-a-stereo-monitor.item01.link02}})이 함께 제공됩니다; 개발 라이브 USB 또는 설치된 PC를 먼저 업데이트하세요. Android 뷰어는 테스트 빌드로 유지됩니다. [첫 테스트]({{detail.vr-is-also-a-stereo-monitor.item01.link03}})와 [휴대폰의 데스크톱]({{detail.vr-is-also-a-stereo-monitor.item01.link04}}) 사진.",
+    "detail.vr-is-also-a-stereo-monitor.item02": "**VR 영화:** Bino가 360° 및 180° 영화를 평면 또는 3D로, 어떤 3D 화면에서든 재생하고, 마우스가 시점을 돌립니다.",
+    "detail.vr-is-also-a-stereo-monitor.item03": "**VR 게임:** Half-Life 2와 DOOM (2016)이 VR 모드를 통해 3D 화면에 도달합니다.",
+    "detail.who-builds-it.heading01": "누가 만듭니다",
+    "detail.who-builds-it.paragraph01.link01": "https://github.com/Sparky-OS/org.kde.video",
+    "detail.who-builds-it.paragraph01.link02": "https://github.com/Sparky-OS/wiz3D",
+    "detail.who-builds-it.paragraph01.link03": "ai-provenance.md",
+    "detail.who-builds-it.paragraph01.link04": "hardware.md",
+    "detail.who-builds-it.paragraph01.link05": "measurements/kwin-stereo-cost-a10-2026-10-23.md",
+    "detail.who-builds-it.paragraph01": "Brasília의 favela 출신 Daniel, 현재까지 두 명의 인간 기여자: Jeromy Streets는 Plasma용 비디오 배경화면([org.kde.video]({{detail.who-builds-it.paragraph01.link01}}))을 만들었고 이제 Sparky-OS에서 유지 관리자로 함께하며, Eff (effcol)는 iZ3D의 코드를 [wiz3D]({{detail.who-builds-it.paragraph01.link02}})로 살려내고 여기서 유지 관리합니다.\nLinux의 스테레오는 수년간 자원봉사자를 기다렸습니다: 이전 시도는 리뷰어에게 3D 디스플레이가 없어서 중단되었고, 작업은 커널, Mesa, KWin, FFmpeg, 플레이어 및 웹 표준에 걸쳐 있습니다.\n이를 이어갈 다른 개발자가 나서지 않아, 여기서 함께 일하는 다른 파트너는 AI 파트너이며, Daniel이 지시하고 확인하며 [AI 출처]({{detail.who-builds-it.paragraph01.link03}})에 명시되어 있습니다.\n인간의 손으로 만들어지는 것을 보고 싶다면 언제든 환영합니다: 모든 포크는 공개이고, 모든 작업은 열려 있습니다.\n모든 것은 가정용 PC와 2016년 노트북, 두 대의 일반 기계에서 구축되고 테스트됩니다: [하드웨어]({{detail.who-builds-it.paragraph01.link04}}).\n그 노트북에서 데스크톱의 모든 경우가 2D와 3D 모두 초당 24프레임을 유지합니다: [KWin에서 스테레오가 드는 비용, 측정 결과]({{detail.who-builds-it.paragraph01.link05}}) (영어).",
+    "detail.where-it-is-going.heading01": "진행 방향",
+    "detail.where-it-is-going.paragraph01.link01": "https://www.w3.org/community/pm-kr/",
+    "detail.where-it-is-going.paragraph01.link02": "https://www.w3.org/publications/spec-generator/?type=respec&url=https://raw.githubusercontent.com/w3c-cg/pm-kr/main/reports/source/stereo-3d-adoption-report.html",
+    "detail.where-it-is-going.paragraph01.link03": "talks/2026-10-13-w3c-me-ig.md",
+    "detail.where-it-is-going.paragraph01": "에디션은 작동하는 증거이며, 발견한 것은 공개 표준으로 돌아갑니다.\nDaniel은 Milton Ponson과 함께 W3C [절차적 기억 지식 표현 커뮤니티 그룹 (PM-KR)]({{detail.where-it-is-going.paragraph01.link01}})의 의장입니다.\n우리의 보고서 [Linux와 웹의 스테레오 3D]({{detail.where-it-is-going.paragraph01.link02}})가 개별 제안으로 있으며, 그룹이 논의할 입력 자료입니다: 어떤 기존 사양이 이미 3D를 지원하는지, Linux와 웹이 채택하지 않은 것은 무엇인지, 브라우저에 필요한 것은 무엇인지.\n이는 2026년 10월 13일 W3C 미디어 및 엔터테인먼트 관심 그룹에서의 우리 발표 주제이기도 합니다 ([슬라이드]({{detail.where-it-is-going.paragraph01.link03}})).\nW3C 계정으로 그룹 가입은 무료이며, 도움을 환영합니다: 여러분의 디스플레이에서 테스트하고, 보고서를 검토하거나, 사용 사례를 가져오세요.",
+    "detail.create.heading01": "만들기",
+    "detail.create.paragraph01": "**3D로 그림을 그리고, 사진과 비디오를 편집하고, 딥 컬러로 그리세요: 8비트 대신 색상당 16비트.**",
+    "detail.create.paragraph02.link01": "https://github.com/storytold/artcraft",
+    "detail.create.paragraph02": "**개발 중: 3D로 만나는 Craft 앱.**\nstorytold의 [ArtCraft]({{detail.create.paragraph02.link01}})가 내놓은 Craft 앱은 우리가 3D로 가져오고 있는 크리에이티브 스위트입니다. 사진과 비디오 편집부터 CAD, 2D 애니메이션, 벡터 아트, 텍스처 페인팅, 머티리얼까지 아우르는 프로그램 제품군으로, Rust로 작성되었고 라이선스는 MIT 또는 Apache-2.0입니다.\nPhotoCraft와 FilmCraft는 3D와 함께 게시되어 있습니다. 그 작업과 LightCraft의 작업을 각 앱의 현재 버전으로 옮기고 있으며, 나머지 앱은 계획을 세우고 있습니다.",
+    "detail.create.item01": "**그리기:** Krita가 16비트 캔버스에 그리고, 각 눈에 16비트인 3D 캔버스에도 그립니다.",
+    "detail.create.item02": "**사진:** digiKam과 Showfoto가 앨범, 라이트 테이블, 슬라이드쇼 및 편집기에서 3D 사진을 보여줍니다; KolourPaint가 3D 사진을 편집하고 3D 표시와 함께 저장합니다.",
+    "detail.create.item03": "**비디오:** Kdenlive에서 클립이 자신의 3D 레이아웃을 알고, 모니터가 3D로 보여줄 수 있으며, 렌더가 3D 표시를 유지합니다.",
+    "detail.create.item04.link01": "https://storysplat.com",
+    "detail.create.item04": "<a id=\"stories\"></a>**스토리:** [StorySplat]({{detail.create.item04.link01}}) (\"3D 스캔을 대화형 투어로 바꾸세요\")이 실제 장소의 3D 스캔 안에서 브라우저에서 바로 투어를 만들고, 3D View가 등록된 출력에서 3D로 보여줍니다. Sony 3D 텔레비전에서 나란히 처음 테스트되었습니다.",
+    "detail.create.item05.link01": "https://invent.kde.org/niccolove/plasma-studio",
+    "detail.create.item05.link02": "https://github.com/Sparky-OS/svgstereo",
+    "detail.create.item05.link03": "https://invent.kde.org/danielcamposramos/plasma-studio",
+    "detail.create.item05": "**계획 중, 나중에:** [Plasma Studio]({{detail.create.item05.link01}})는 Niccolò Venerandi가 만든, 비디오, 오디오, 사진, 벡터 아트와 3D를 한곳에 담은 KDE 앱입니다. 3D 장면은 눈마다 하나의 뷰를 갖고, 벡터 아트는 SVG 그림을 위한 우리의 3D 표시인 [SVGStereo]({{detail.create.item05.link02}})로 깊이를 갖게 하려는 구상입니다. [우리 포크]({{detail.create.item05.link03}})는 그 연구를 위해 남겨 두었습니다.",
+    "detail.create.paragraph03.link01": "https://github.com/harry7557558/spirula-studio",
+    "detail.create.paragraph03.link02": "https://github.com/Sparky-OS/spirula-studio",
+    "detail.create.paragraph03.link03": "#stories",
+    "detail.create.paragraph03": "**계획 중: 물체나 장소를 스캔해 3D 모델로.**\n휴대폰 등으로 물체 주위를 돌면서 또는 장소 안을 걸으면서 비디오를 찍으면, 프로그램이 그 비디오를 둘러볼 수 있는 3D 모델로 바꿉니다. 모두 자신의 컴퓨터에서 처리합니다.\n프로그램은 Harry (J.X.) C.가 만든 [Spirula Studio]({{detail.create.paragraph03.link01}})이며 라이선스는 GPLv3입니다. 만들어지는 모델은 3D Gaussian splat이라고 부르고, 여기서 텍스처가 입혀진 메시도 만들 수 있습니다.\n**계획 중:** 이 에디션에는 아직 들어 있지 않고, 눈마다 다른 시점으로 모델을 3D로 보여 주는 기능도 아직 없습니다. 그 작업은 [우리 포크]({{detail.create.paragraph03.link02}})에서 진행할 예정입니다.\n스캔이 준비되면 [StorySplat]({{detail.create.paragraph03.link03}})으로 그 이야기를 들려줄 수 있습니다. StorySplat은 이런 종류의 3D 스캔으로 투어를 만들고, 이미 3D로 보여 줍니다. Spirula Studio의 스캔을 StorySplat에서 써 보는 일은 아직 남아 있습니다.",
+    "detail.create.paragraph04.link01": "#programs-the-edition-changes-for-stereo-3d-and-deep-colour",
+    "detail.create.paragraph04": "각 프로그램 전체: [프로그램]({{detail.create.paragraph04.link01}}).",
+    "detail.for-theme-designers-and-customizers.heading01": "테마 디자이너와 커스터마이저를 위해",
+    "detail.for-theme-designers-and-customizers.paragraph01.link01": "#depth-on-the-desktop",
+    "detail.for-theme-designers-and-customizers.paragraph01": "**이 데스크톱에서 테마가 무엇이 튀어나오고 무엇이 들어가는지 결정합니다:** [테마 디자인의 새로운 지평]({{detail.for-theme-designers-and-customizers.paragraph01.link01}}).",
+    "detail.science-and-engineering.heading01": "과학 및 공학",
+    "detail.science-and-engineering.paragraph01": "**3D로 연구하고 설계하세요: 지구본, 그래프, 분자가 오늘 3D로 작동하고, 3D 모델과 회로 기판은 진행 중입니다.**",
+    "detail.science-and-engineering.item01": "**학습 및 과학:** Marble의 지구본, KAlgebra의 그래프, Kalzium의 분자와 Kubrick 큐브가 3D 데스크톱에서 기본적으로 3D로.",
+    "detail.science-and-engineering.item02": "**3D 모델 및 회로 기판:** OpenSCAD, KiCad, F3D의 3D 미리보기가 진행 중입니다.",
+    "detail.science-and-engineering.item03.link01": "#scan",
+    "detail.science-and-engineering.item03": "**스캔:** 부품, 현장, 표본을 찍은 비디오를 3D 모델로 바꾸는 기능을 Spirula Studio로 계획하고 있습니다 ([스캔]({{detail.science-and-engineering.item03.link01}})).",
+    "detail.science-and-engineering.item04.link01": "https://displayxr.org",
+    "detail.science-and-engineering.item04.link02": "https://github.com/Sparky-OS/flat-headset",
+    "detail.science-and-engineering.item04": "**책상에서 클라이언트까지, 풀 컬러로:** 엔지니어 책상의 무안경 3D 모니터에서 ([DisplayXR]({{detail.science-and-engineering.item04.link01}})과 함께, 진행 중), 팀이나 교육 수업을 위한 3D TV나 프로젝터에서, 그리고 모든 직원과 클라이언트의 휴대폰에서 Cardboard 뷰어로 ([Flat Headset]({{detail.science-and-engineering.item04.link02}})) 같은 모델을 깊이 있게. 끝에서 끝까지 개방되어 있어 누구도 한 디스플레이 제조사에 묶이지 않습니다.",
+    "detail.science-and-engineering.paragraph02.link01": "#programs-the-edition-changes-for-stereo-3d-and-deep-colour",
+    "detail.science-and-engineering.paragraph02": "각 프로그램 전체: [프로그램]({{detail.science-and-engineering.paragraph02.link01}}).",
+    "detail.watch-and-play.heading01": "보기 및 플레이",
+    "detail.watch-and-play.paragraph01": "**3D 영화, 사진, 게임이 자체 창이나 전체 화면에서 3D로 표시되고, 데스크톱의 나머지는 그대로 유지됩니다.**",
+    "detail.watch-and-play.item01.link01": "https://www.hdmi.org/resource/brand",
+    "detail.watch-and-play.item01": "**화면:** 3D TV, 모니터 또는 프로젝터, 2010년부터 2013년까지의 [HDMI®]({{detail.watch-and-play.item01.link01}}) 3D 세트 포함, 또는 적청 안경을 쓴 일반 모니터; 각 화면이 동시에 다른 종류의 3D를 보여줄 수 있으며, 무안경 3D 모니터는 DisplayXR 팀과 함께 진행 중입니다.",
+    "detail.watch-and-play.item02": "**영화:** 3D 비디오가 Haruna, VLC, mpv, Bino, PlasmaTube 등에서 3D로 재생됩니다.",
+    "detail.watch-and-play.item03": "**사진:** Gwenview, digiKam, KolourPaint가 3D 사진(MPO, JPS, 스테레오 PNG)을 3D로 보여줍니다.",
+    "detail.watch-and-play.item04.link01": "formula.md",
+    "detail.watch-and-play.item04": "**게임:** 창 안의 DOOM (2016)과 Half-Life 2, 둘 다 VR 모드를 통해 ([공식]({{detail.watch-and-play.item04.link01}})).",
+    "detail.watch-and-play.item05.link01": "https://lore.kernel.org/all/20260511113104.563854162@infradead.org/",
+    "detail.watch-and-play.item05.link02": "https://pixelcluster.dev/VRAM-Mgmt-fixed/",
+    "detail.watch-and-play.item05": "**게임에 맞춘 커널:** 에디션은 저희 스테레오 패치를 적용한 Linux 7.3을 사용합니다. 새 스케줄러는 작성자 본인의 테스트에서 오래된 CPU로 게임의 최저 프레임 레이트를 4에서 29 fps로 끌어올렸고([수치]({{detail.watch-and-play.item05.link01}})), 비디오 메모리가 적은 AMD 그래픽 카드가 게임의 메모리를 카드에 유지할 수 있게 합니다([변경 내용]({{detail.watch-and-play.item05.link02}})).",
+    "detail.watch-and-play.paragraph02.link01": "#programs-the-edition-changes-for-stereo-3d-and-deep-colour",
+    "detail.watch-and-play.paragraph02": "각 프로그램, 얻는 것과 입증 방법: [프로그램]({{detail.watch-and-play.paragraph02.link01}}).",
+    "detail.seen-in-3d.heading01": "3D로 보기",
+    "detail.seen-in-3d.paragraph01.link01": "screenshots/README.md",
+    "detail.seen-in-3d.paragraph01.link02": "photos/README.md",
+    "detail.seen-in-3d.paragraph01": "이 페이지의 사진들은 에디션의 Spectacle로 촬영한 스크린샷이며, 양쪽 눈을 모두 유지합니다.\n적청 안경으로 여기서 3D로 볼 수 있습니다; MPO 파일은 에디션의 사진 프로그램에서 등록된 출력에서 3D로 열립니다. 각각 적청 버전과 직접 MPO 다운로드가 있는 모든 것: [스크린샷 갤러리]({{detail.seen-in-3d.paragraph01.link01}}). 2014년부터 2016년까지 LG Optimus 3D 휴대폰으로 촬영한 Daniel의 3D 사진, 원본 포함: [사진 갤러리]({{detail.seen-in-3d.paragraph01.link02}}).",
+    "detail.seen-in-3d.item01.link01": "https://raw.githubusercontent.com/Sparky-OS/sparky-stereo-os/main/docs/screenshots/translucent-stereo-desktop.mpo",
+    "detail.seen-in-3d.item01": "**스테레오 데스크톱, 반투명** ([MPO]({{detail.seen-in-3d.item01.link01}})), 3D TV에서, 2026년 10월 15일. 창들이 유리라서 더미가 비쳐 보입니다. 양안 간 측정: Dolphin, 포커스된 창, 0 px, 그 설정 메뉴 +5 px (앞, 사용자의 팝 한도에서); 긴 색 구성표 목록 0 px, 화면 상단에 닿아 있고 가장자리에 닿는 팝된 것은 화면에 머물기 때문; Thunderbird 뒤 -3 px; 시스템 모니터 위젯과 배경화면 -10 px; 패널 0 px. 두 이메일 주소는 양쪽 눈에서 흐리게 처리되었습니다.",
+    "detail.seen-in-3d.item02.link01": "screenshots/stereo-desktop-dialogs.mpo",
+    "detail.seen-in-3d.item02": "**스테레오 데스크톱, 메뉴 위의 메뉴** ([MPO]({{detail.seen-in-3d.item02.link01}})), 프레임 패킹의 3D TV에서, 2026년 10월 13일. 양안 간 측정: 포커스된 Marble 창 0 px, 그 설정 메뉴 +2 px, Panels 하위 메뉴 +4 px, 뒤의 네 창 -3, -5, -8, -10 px, 위젯과 배경화면 -10 px; 창 안에서 Marble 자체의 3D: 지구 라벨 +12 px, 별들 -13 px. 뒤의 Diolinux 채팅 메시지는 흐리게 처리되었습니다.",
+    "detail.seen-in-3d.item03.link01": "screenshots/doom-2016-in-a-window.mpo",
+    "detail.seen-in-3d.item03.link02": "https://github.com/CactusVRStudios/KHARVOX",
+    "detail.seen-in-3d.item03": "**일반 창 안의 DOOM (2016)** ([MPO]({{detail.seen-in-3d.item03.link01}})), [KHARVOX]({{detail.seen-in-3d.item03.link02}}) 기반, CactusVRStudios의 DOOM (2016) VR 변환 모드 (MIT): 게임에는 깊이가 있고 패널과 창 테두리는 양쪽 눈에서 평면 그대로입니다. 양안 간 측정: 가장 가까운 바위 23 px, 먼 산 1 px, 패널 0 px.",
+    "detail.seen-in-3d.item04.link01": "screenshots/marble-globe.mpo",
+    "detail.seen-in-3d.item04": "**Marble의 지구본** ([MPO]({{detail.seen-in-3d.item04.link01}})): 지구는 화면 앞에 (+11 px), 별들은 그 뒤에 (-12 px), 옆 패널은 평면입니다. 이 캡처는 이후 수정 이전의 것입니다; 지금의 Marble은 메뉴 위의 메뉴 그림에서 볼 수 있습니다.",
+    "detail.seen-in-3d.item05.link01": "screenshots/stereo-desktop.mpo",
+    "detail.seen-in-3d.item05": "**스테레오 데스크톱, 팝업** ([MPO]({{detail.seen-in-3d.item05.link01}})), 같은 날. 양안 간 측정: 패널 0 px (화면에), 사운드 팝업 +4 px (앞에), 뒤의 세 창 -3, -7, -10 px, 시스템 모니터 위젯 -10 px, 배경화면과 함께 가장 뒤에.",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.heading01": "스테레오 데스크톱: 테마 디자인의 새로운 지평",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph01": "**처음으로 사용 가능한 데스크톱에서 테마가 무엇이 튀어나오고 무엇이 들어가는지 결정합니다, 외모뿐이 아니라.**\n수십 년 동안 그림자, 베벨과 돌출된 버튼은 그럴듯한 모양이었을 뿐입니다; 스테레오 데스크톱에서는 실제이고 부드럽습니다: 몇 픽셀, 사용자가 선택한 한도 내에서 (시스템 설정, \"3D Depth\").",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item01.link01": "#seen-in-3d",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item01": "**사용하는 것은 튀어나옵니다:** 메뉴, 도구 설명, 알림 및 대화 상자가 사용자 쪽으로 나오고, 작업 중인 창은 화면에 머뭅니다. *구축되었으며 2026년 10월 13일 3D TV에서 확인했습니다 ([맨 위 그림]({{detail.the-stereo-desktop-new-frontiers-for-theme-design.item01.link01}})).*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item02": "**나머지는 뒤로 물러납니다:** 뒤의 창들은 종이 더미처럼 하나씩 뒤로 물러나고, 배경화면이 가장 깊이 들어갑니다. *구축됨.*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item03": "**작은 요소들은 자리를 지킵니다:** 포인터는 그 위에 있는 것의 레벨을 따르고, 그림자는 떨어지는 곳에 놓이며, 슬라이드 위의 웹캠처럼 고정된 창은 모든 것 위로 계속 튀어나옵니다. *구축됨.*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item04": "**배경화면을 3D로:** 배경화면인 3D 사진은 자체 팝과 깊이를 유지하며, 모든 창보다 훨씬 뒤에 있습니다. *구축됨.* 다음은 Jeromy Streets의 비디오 배경화면과 함께 3D 비디오 배경화면입니다. *예정됨.*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item05": "**3D 화면 보호기:** 기본 별밭 화면 보호기와 스테레오 화면 보호기를 실제 3D로. *구축됨.*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item06": "**3D 사진과 아이콘:** 3D 사진은 Dolphin의 미리보기와 사진 뷰어에서 3D로 표시됩니다. *구축됨.* 각 눈에 한 개씩 그린 한 쌍의 아이콘은 에디션 고유의 모습인 Stereo Oxygen의 일부입니다. *예정됨.*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item07": "**실제로 튀어나오고 들어가는 효과:** 닫히는 창은 조각으로 사용자 쪽으로 날아가거나 화면 뒤로 들어가 바닥에 튕길 수 있습니다. *우리 KWin 브랜치에 구축되었으며 다음 패키지에 제공됩니다.* 3D로 부채꼴로 펼쳐지는 창 전환기와 실제 3D의 Desktop Cube도 예정되어 있습니다. *예정됨.*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.item08": "**전원을 켠 순간부터 3D:** 부트 스플래시와 로그인 화면이 주 화면에 저장한 3D 모드를 따릅니다. *구축됨.*",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph02": "**그리고 이것은 여전히 정상적인 2D 데스크톱입니다.**\n일반 화면에서는 아무것도 바뀌지 않습니다: 같은 테마, 같은 레이아웃, 같은 효과를 한 번만 그립니다.\n3D는 화면이 표시할 수 있는 곳에서만 나타나거나 적청 안경을 통해 나타나며, 3D를 위해 만든 테마도 완전한 2D 테마입니다.",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03.link01": "depth-on-the-desktop.md",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03.link02": "for-theme-designers.md",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03.link03": "https://github.com/Sparky-OS/sparky-stereo-os/issues/78",
+    "detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03": "<a id=\"the-desktop-cube-what-one-format-makes-possible\"></a>자세한 내용: [데스크톱의 깊이]({{detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03.link01}}), [테마 디자이너와 커스터마이저를 위해]({{detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03.link02}}); 아이디어, 스케치 및 3D 목업은 [테마 이슈]({{detail.the-stereo-desktop-new-frontiers-for-theme-design.paragraph03.link03}})에 환영합니다.",
+    "detail.for-developers.heading01": "개발자를 위해",
+    "detail.for-developers.paragraph01": "**프로그램을 한 번 3D로 만드세요: 데스크톱에 양쪽 눈을 주면 모든 화면을 맡습니다.**\n이미 있는 화면에서 작업을 작성하고 확인할 수 있습니다.",
+    "detail.for-developers.item01.link01": "develop-3d-on-an-ordinary-monitor.md",
+    "detail.for-developers.item01": "[일반 모니터에서 3D 및 XR 개발]({{detail.for-developers.item01.link01}}): 여기에서 시작하세요.",
+    "detail.for-developers.item02.link01": "web-3d-in-stereo.md",
+    "detail.for-developers.item02": "[웹 페이지에서 스테레오로 보는 3D 장면]({{detail.for-developers.item02.link01}}): three.js, WebGL 및 WebXR, 모든 브라우저의 적청 안경에서 모든 3D 화면까지.",
+    "detail.for-developers.item03.link01": "house-formats.md",
+    "detail.for-developers.item03.link02": "stereo-labor-division.md",
+    "detail.for-developers.item03": "[자체 형식]({{detail.for-developers.item03.link01}}), [스테레오 작업 분배]({{detail.for-developers.item03.link02}}): 규격에 연결된 규칙.",
+    "detail.for-developers.item04.link01": "test-stereo-without-a-3d-tv.md",
+    "detail.for-developers.item04.link02": "stereo-vm.md",
+    "detail.for-developers.item04.link03": "https://repo.sparkyos.org/bench/kwin-root/",
+    "detail.for-developers.item04": "[3D TV 없이 스테레오 테스트]({{detail.for-developers.item04.link01}}), [3D 화면이 있는 가상 머신]({{detail.for-developers.item04.link02}}): 가상 화면 또는 가상 머신에서 3D 출력을 테스트하세요; Stereo KWin이 포함된 준비된 루트 파일 시스템은 [우리 저장소 서버]({{detail.for-developers.item04.link03}})에 있습니다.",
+    "detail.for-developers.item05.link01": "../skills/README.md",
+    "detail.for-developers.item05": "[스킬]({{detail.for-developers.item05.link01}}): 이 에디션에서 작업하는 사람과 AI 어시스턴트를 위한 지침.",
+    "detail.how-it-works.heading01": "작동 방식",
+    "detail.how-it-works.paragraph01": "<a id=\"why-one-format-full-side-by-side-at-any-resolution\"></a>**프로그램은 각 그림을 설명하고, 데스크톱은 각 화면에 맞게 조정합니다.** 스테레오에서는 두 보기가 하나의 풀 사이드 바이 사이드 버퍼에서 함께 이동합니다. 제안된 HDR 확장은 같은 작업 분배를 통해 그림의 색상 설명과 복구 정보를 유지합니다.",
+    "detail.how-it-works.paragraph02": "**세 줄짜리 스테레오 계약입니다.**",
+    "detail.how-it-works.item01": "**Stereo KWin** (우리의 스테레오 변경이 있는 KDE Plasma 컴포지터)은 어떤 해상도에서든 풀 사이드 바이 사이드를 사용합니다.",
+    "detail.how-it-works.item02": "**프로그램**은 어떤 표준으로든 스테레오를 디코딩하거나 만들고, 어떤 해상도에서든 풀 사이드 바이 사이드를 Stereo KWin에 전달합니다.",
+    "detail.how-it-works.item03": "**출력** (끝에서 Stereo KWin의 필터, 화면 종류마다 하나씩)은 각 화면에 필요한 것으로 변환합니다.",
+    "detail.how-it-works.paragraph03.link01": "how-it-works.md",
+    "detail.how-it-works.paragraph03.link02": "stereo-hdr-content.md",
+    "detail.how-it-works.paragraph03": "왜 풀 사이드 바이 사이드인지, 두 GPU에서 두 3D TV로 하나의 데스크톱을 쓰는 방법과 같은 원리가 HDR로 어떻게 확장되는지: [작동 방식]({{detail.how-it-works.paragraph03.link01}}). [HDR 선언]({{detail.how-it-works.paragraph03.link02}})은 구현과 범 형식 장치 테스트가 필요한 설계이며; HDR 교환 표현은 검증해야 할 공학 선택으로 남아 있습니다. 기존의 스테레오 및 딥 컬러 테스트는 이 HDR 경로를 검증하지 않습니다.",
+    "detail.stereo-in-the-open-stack-not-in-one-product.heading01": "단일 제품이 아닌 열린 스택의 스테레오",
+    "detail.stereo-in-the-open-stack-not-in-one-product.paragraph01.link01": "open-stack.md",
+    "detail.stereo-in-the-open-stack-not-in-one-product.paragraph01": "다른 곳에서 스테레오는 하나의 제품인 한 헤드셋, 한 제조사의 인젝터, 한 제조사의 커널에 묶입니다.\n여기에서는 열린 층 (KDE, 커널, 파일 형식)의 속성이므로 사용자가 이미 가진 화면에 도달합니다: [열린 스택의 스테레오]({{detail.stereo-in-the-open-stack-not-in-one-product.paragraph01.link01}}).",
+    "detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.heading01": "에디션이 스테레오 3D와 딥 컬러를 위해 변경하는 프로그램",
+    "detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.paragraph01.link01": "programs.md",
+    "detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.paragraph01.link02": "programs-in-detail.md",
+    "detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.paragraph01": "영화와 사진에서 지구본과 분자까지, 각 프로그램에 3D가 무엇을 가져다 주는지: [프로그램]({{detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.paragraph01.link01}}).\n각 프로그램이 화면 경로, 비디오, 과학과 공학, 이미지, 시뮬레이터, 시스템과 아직 끝나지 않은 항목별로 어떻게 변경되고 입증되었는지: [프로그램 상세]({{detail.programs-the-edition-changes-for-stereo-3d-and-deep-colour.paragraph01.link02}}).",
+    "detail.our-branches-on-kdes-gitlab.heading01": "KDE GitLab의 우리 브랜치",
+    "detail.our-branches-on-kdes-gitlab.paragraph01.link01": "https://invent.kde.org/danielcamposramos",
+    "detail.our-branches-on-kdes-gitlab.paragraph01.link02": "kde-branches.md",
+    "detail.our-branches-on-kdes-gitlab.paragraph01": "모든 KDE 변경은 [invent.kde.org]({{detail.our-branches-on-kdes-gitlab.paragraph01.link01}})의 우리 포크에서 만든 브랜치이며, 업스트림에 제안하기 전에 KDE 자체 CI로 테스트됩니다: [브랜치와 CI 결과]({{detail.our-branches-on-kdes-gitlab.paragraph01.link02}}).",
+    "detail.merged-outside-sparky-stereo.heading01": "Sparky Stereo 외부에서 병합됨",
+    "detail.merged-outside-sparky-stereo.paragraph01.link01": "https://www.iana.org/assignments/matroska",
+    "detail.merged-outside-sparky-stereo.paragraph01.link02": "upstream-merges.md#registered-identifiers",
+    "detail.merged-outside-sparky-stereo.paragraph01": "**2026년 10월 26일, IANA가 Matroska StereoMode 15부터 20까지를 할당했습니다.**\n이 값들은 한 프레임에 영상과 깊이를 함께 배치하는 형식을 나타내며, 10월 20일에 왼쪽 눈, 오른쪽 눈, 배경의 독립된 깊이 트랙에 할당된 평면 유형 3부터 5까지에 이은 등록입니다.\n두 등록 모두 우리의 stereo-layer 규격을 참조합니다.\n[현재 레지스트리]({{detail.merged-outside-sparky-stereo.paragraph01.link01}}) 및 [등록 기점과 업스트림 병합]({{detail.merged-outside-sparky-stereo.paragraph01.link02}}).",
+    "detail.merged-outside-sparky-stereo.paragraph02.link01": "upstream-merges.md",
+    "detail.merged-outside-sparky-stereo.paragraph02.link02": "proofs/README.md",
+    "detail.merged-outside-sparky-stereo.paragraph02.link03": "what-people-said.md",
+    "detail.merged-outside-sparky-stereo.paragraph02": "프로그램이 화면으로 가는 길에서 스테레오나 딥 컬러를 망가뜨리면, 수정은 그 프로그램 자체 프로젝트로 갑니다.\nHandBrake, mpv, Qt Multimedia 및 PeerTube 같은 프로젝트는 우리 작업에서 온 수정을 병합했습니다; 병합한 유지 관리자와 검토 중인 항목까지, 전체는 [Sparky Stereo 외부에서 병합됨]({{detail.merged-outside-sparky-stereo.paragraph02.link01}})에 있습니다.\n각 조각은 끝났다고 말하기 전에 작동하는 것으로 보여주며, 수치와 적청 애너글리프 및 MPO 그림이 함께 있습니다: [입증]({{detail.merged-outside-sparky-stereo.paragraph02.link02}}).\n스테레오로 작업하는 사람들이 이에 대해 공개적으로 말한 것과 링크: [사람들의 평가]({{detail.merged-outside-sparky-stereo.paragraph02.link03}}).",
+    "detail.documents.heading01": "문서",
+    "detail.documents.paragraph01.link01": "formula.md",
+    "detail.documents.paragraph01.link02": "first-runs/kwin-2026-10-01/README.md",
+    "detail.documents.paragraph01.link03": "talks/2026-10-13-w3c-me-ig.md",
+    "detail.documents.paragraph01.link04": "./",
+    "detail.documents.paragraph01": "[VR 엔진에서 3D 화면으로 가는 공식]({{detail.documents.paragraph01.link01}}), [실제 TV에서의 첫 KWin 실행]({{detail.documents.paragraph01.link02}}), 2026년 10월 13일의 [W3C 발표 슬라이드]({{detail.documents.paragraph01.link03}}); 모든 페이지는 [docs]({{detail.documents.paragraph01.link04}})에 있습니다.",
+    "detail.tools.heading01": "도구",
+    "detail.tools.paragraph01.link01": "../tools/vkms-stereo-bench/README.md",
+    "detail.tools.paragraph01.link02": "../tools/hibernate-bench/README.md",
+    "detail.tools.paragraph01": "[vkms-stereo-bench]({{detail.tools.paragraph01.link01}})는 가상 화면에서 3D 모드를 점검하고, [hibernate-bench]({{detail.tools.paragraph01.link02}})는 Secure Boot 상태의 절전 복구를 점검합니다; 둘 다 가상 머신에서입니다.",
+    "detail.the-base-three-open-lists.heading01": "기반: 세 개의 열린 목록",
+    "detail.the-base-three-open-lists.paragraph01.link01": "https://github.com/danielcamposramos/awesome-stereoscopy",
+    "detail.the-base-three-open-lists.paragraph01.link02": "https://github.com/danielcamposramos/awesome-linux-hdr",
+    "detail.the-base-three-open-lists.paragraph01.link03": "https://github.com/danielcamposramos/awesome-vr",
+    "detail.the-base-three-open-lists.paragraph01": "이 에디션 뒤의 연구는 누구나 복제할 수 있는 (CC0) 세 개의 정리된 공개 목록에 있습니다: 스테레오 3D의 [awesome-stereoscopy]({{detail.the-base-three-open-lists.paragraph01.link01}}), HDR과 딥 컬러의 [awesome-linux-hdr]({{detail.the-base-three-open-lists.paragraph01.link02}}), 가상 현실의 [awesome-vr]({{detail.the-base-three-open-lists.paragraph01.link03}}).",
+    "detail.credit.heading01": "크레딧",
+    "detail.credit.paragraph01": "Sparky Stereo OS, Daniel Ramos (Capitain Jack)의 SparkyLinux 에디션 (Paweł \"pavroo\" Pijanowski 제작).",
+    "detail.credit.paragraph02.link01": "https://github.com/Sparky-OS",
+    "detail.credit.paragraph02": "**패키지 유지 관리자**, 각자 [Sparky-OS]({{detail.credit.paragraph02.link01}})에서 자신의 저장소에 대한 전체 권리를 갖습니다:",
+    "detail.credit.table01.link01": "https://github.com/effcol",
+    "detail.credit.table01.image01": "https://github.com/effcol.png?size=96",
+    "detail.credit.table01.alt01": "Eff",
+    "detail.credit.table01.link02": "https://github.com/effcol/wiz3D",
+    "detail.credit.table01.link03": "https://github.com/Sparky-OS/wiz3D",
+    "detail.credit.table01.alt02": "Follow Eff",
+    "detail.credit.table01.image02": "https://img.shields.io/badge/Follow-effcol-2777AD?style=flat-square&logo=github",
+    "detail.credit.table01.link04": "https://github.com/effcol",
+    "detail.credit.table01.link05": "https://github.com/halverneus",
+    "detail.credit.table01.image03": "https://github.com/halverneus.png?size=96",
+    "detail.credit.table01.alt03": "Jeromy Streets",
+    "detail.credit.table01.link06": "https://github.com/Sparky-OS/org.kde.video",
+    "detail.credit.table01.alt04": "Follow Jeromy",
+    "detail.credit.table01.image04": "https://img.shields.io/badge/Follow-halverneus-2777AD?style=flat-square&logo=github",
+    "detail.credit.table01.link07": "https://github.com/halverneus",
+    "detail.credit.table01": "| | |\n| --- | --- |\n| <a href=\"{{detail.credit.table01.link01}}\"><img src=\"{{detail.credit.table01.image01}}\" width=\"72\" alt=\"{{detail.credit.table01.alt01}}\"></a> | **Eff (effcol)**<br>[wiz3D]({{detail.credit.table01.link02}})를 유지 관리합니다: iZ3D를 기반으로 DirectX, OpenGL, AMD HD3D 및 NVIDIA 3D Vision을 위한 보편적인 스테레오스코픽 3D 래퍼이며, 모든 시스템을 위한 것입니다; 여기의 [Sparky-OS/wiz3D]({{detail.credit.table01.link03}}) 패키지도 유지 관리합니다.<br>[![{{detail.credit.table01.alt02}}]({{detail.credit.table01.image02}})]({{detail.credit.table01.link04}}) |\n| <a href=\"{{detail.credit.table01.link05}}\"><img src=\"{{detail.credit.table01.image03}}\" width=\"72\" alt=\"{{detail.credit.table01.alt03}}\"></a> | **Jeromy Streets (halverneus)**<br>KDE Plasma용 비디오 배경화면과 잠금 화면인 [org.kde.video]({{detail.credit.table01.link06}})를 만들고 유지 관리합니다.<br>[![{{detail.credit.table01.alt04}}]({{detail.credit.table01.image04}})]({{detail.credit.table01.link07}}) |",
+    "detail.credit.paragraph03": "**버전:** Sparky Stereo OS 9 \"Mashtabba\", Debian 14 \"Forky\" 기반이며 KDE Plasma만 사용합니다.",
+    "detail.credit.paragraph04.link01": "../ATTRIBUTIONS.md",
+    "detail.credit.paragraph04": "이 에디션이 기반으로 삼은 모든 사람, 이름으로: [ATTRIBUTIONS.md]({{detail.credit.paragraph04.link01}}).",
+    "detail.credit.paragraph05": "**특별 감사:**",
+    "detail.credit.item01": "**David Fattal**, Leia의 공동 창립자이자 DisplayXR의 유지 관리자, 격려와 시간과 노력, 그리고 그가 만든 3D 화면들에서 우리 데스크톱을 테스트한 것에 대해.",
+    "detail.credit.item02": "**Milton Ponson**과 **Christoph Dorn**, W3C PM-KR 그룹에서 Daniel의 대변인, 그 그룹의 모든 구성원, 그리고 W3C의 **Dave Raggett**, **Ian Jacobs**, **Chris Needham**, 이 작업을 위한 문을 열어 준 분들.",
+    "detail.credit.item03": "**Tim Berners-Lee**와 층층이 인터넷을 만들어 모두에게 내어 준 모든 사람.",
+    "detail.credit.item04": "**Foottroller** 팀, Linux에서 발을 리듬 장치로 쓰는 VR 걷기를 열어 준 것에 대해.",
+    "detail.credit.item05": "**Eric Allard**, *Short Circuit*에서 Johnny 5를 살아 있게 만든 공학자; 영화 작가 **S. S. Wilson**과 **Brent Maddock**; 그리고 **El DeBarge**, **Peter Wolf**, **Ina Wolf**, **David Shire**의 음악, 이 에디션을 만드는 동안 여러 번 들려 주었습니다.",
+    "detail.credit.paragraph06.alt01": "DOI",
+    "detail.credit.paragraph06.image01": "https://zenodo.org/badge/DOI/10.5281/zenodo.23309024.svg",
+    "detail.credit.paragraph06.link01": "https://doi.org/10.5281/zenodo.23309024",
+    "detail.credit.paragraph06": "**인용:** [![{{detail.credit.paragraph06.alt01}}]({{detail.credit.paragraph06.image01}})]({{detail.credit.paragraph06.link01}})",
+    "detail.credit.paragraph07.alt01": "GitHub stars",
+    "detail.credit.paragraph07.image01": "https://img.shields.io/github/stars/Sparky-OS/sparky-stereo-os?style=flat-square&logo=github&label=Stars",
+    "detail.credit.paragraph07.link01": "https://github.com/Sparky-OS/sparky-stereo-os/stargazers",
+    "detail.credit.paragraph07": "**스타를 눌러 주세요:** [![{{detail.credit.paragraph07.alt01}}]({{detail.credit.paragraph07.image01}})]({{detail.credit.paragraph07.link01}}) ⭐ Sparky Stereo OS가 유용하다면 스타가 다른 사람도 찾는 데 도움이 됩니다.",
+    "detail.credit.paragraph08.alt01": "Sponsor Daniel",
+    "detail.credit.paragraph08.image01": "https://img.shields.io/badge/Sponsor-danielcamposramos-EA4AAA?style=flat-square&logo=githubsponsors",
+    "detail.credit.paragraph08.link01": "https://github.com/sponsors/danielcamposramos",
+    "detail.credit.paragraph08.alt02": "SparkyLinux 기부",
+    "detail.credit.paragraph08.image02": "https://img.shields.io/badge/Donate-SparkyLinux-2777AD?style=flat-square",
+    "detail.credit.paragraph08.link02": "https://sparkylinux.org/donate/",
+    "detail.credit.paragraph08": "**후원:** [![{{detail.credit.paragraph08.alt01}}]({{detail.credit.paragraph08.image01}})]({{detail.credit.paragraph08.link01}}) [![{{detail.credit.paragraph08.alt02}}]({{detail.credit.paragraph08.image02}})]({{detail.credit.paragraph08.link02}}) Daniel 후원은 이 에디션을 지원하고, SparkyLinux 기부는 그 기반이 되는 Paweł의 배포판을 지원합니다.",
+    "detail.credit.paragraph09.link01": "https://sourceforge.net/p/sparkyos/",
+    "detail.credit.paragraph09.image01": "https://sourceforge.net/sflogo.php?type=18&group_id=3189517",
+    "detail.credit.paragraph09.alt01": "SparkyOS on SourceForge",
+    "detail.credit.paragraph09.image02": "https://sourceforge.net/sflogo.php?type=17&group_id=3189517",
+    "detail.credit.paragraph09": "<a href=\"{{detail.credit.paragraph09.link01}}\"><picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"{{detail.credit.paragraph09.image01}}\"><img alt=\"{{detail.credit.paragraph09.alt01}}\" src=\"{{detail.credit.paragraph09.image02}}\" width=\"200\"></picture></a>",
+    "detail.licence.heading01": "라이선스",
+    "detail.licence.paragraph01.link01": "https://creativecommons.org/licenses/by/4.0/",
+    "detail.licence.paragraph01": "문서는 [Creative Commons Attribution 4.0 International 라이선스]({{detail.licence.paragraph01.link01}}) (CC BY 4.0)로 제공됩니다: Sparky Stereo OS의 출처를 남기면 공유하고 수정할 수 있습니다.",
+    "detail.licence.quote01.link01": "https://archive.org/details/GuerillaOpenAccessManifesto",
+    "detail.licence.quote01": "\"정보는 힘입니다. 그러나 모든 힘처럼, 자기만 차지하려는 사람들이 있습니다.\"\n— Aaron Swartz, [*Guerilla Open Access Manifesto*]({{detail.licence.quote01.link01}}) (2008년 7월)",
+    "detail.licence.paragraph02.link01": "../LICENSE-GPL-2.0",
+    "detail.licence.paragraph02": "`docs/first-runs/` 아래의 스크립트와 `tools/` 아래의 도구는 코드이며 GNU General Public License, version 2 or later (GPL-2.0-or-later)로 제공됩니다; [LICENSE-GPL-2.0]({{detail.licence.paragraph02.link01}})을 보십시오.",
+    "detail.licence.paragraph03": "HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc."
+  }
+}

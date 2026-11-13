@@ -318,3 +318,11 @@ Cause: raw Git diffs also contain blob hashes and hunk line numbers, and some fi
 Fix: compare author/date, the resulting affected file bytes where appropriate, and every changed hunk byte while excluding only Git's index hashes and hunk locations.
 Preserve whitespace; a stable patch-id alone is insufficient for a byte-for-byte claim.
 How found: the two already-carried KRA/ORA files matched upstream exactly, while the root Cargo manifest retained the branch's own stereo dependencies outside the imported hunk.
+
+Symptom: the whole gate passes tests, WASM and licenses, then cargo-deny fails resolving the RustSec database host in an isolated container.
+Cause: Cargo's `CARGO_NET_OFFLINE` does not set cargo-deny's separate global offline flag; its default check still fetches the advisory database.
+Fix: fetch public check data in a separate preparation step, then use `cargo deny --offline --log-level error check` in the isolated check environment.
+Keep advisory, bans, license and source checks enabled; offline mode still enforces the configured maximum database age.
+If the project's xtask hardcodes the command, keep its workflow and source unchanged and record any transparent tool wrapper as an explicit transport adjustment, including the database revision and real tool version.
+How found: the failed command named the absent RustSec clone; cargo-deny 0.20.2's global help and `check.rs` distinguish `Fetch::Disallow(maximum_db_staleness)` from its online fetch mode.
+The separately fetched database made all four offline checks pass; an empty database must remain a failure rather than a successful skip.

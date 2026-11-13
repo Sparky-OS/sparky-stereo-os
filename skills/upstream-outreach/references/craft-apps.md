@@ -439,3 +439,10 @@ Fix: audit the ancestry and actual source of every previously received library r
 Retain the newer window, protocol and camera paths while restoring container metadata, native sample grids and selected-item decoding in their shared owners.
 How found: FilmCraft's real receiving compile named the missing field; comparing its accepted library tree also found the stereo grid module and selected HEIF API absent.
 A successful library gate establishes the selected source's checks, not that the candidate contains every earlier edition feature.
+
+Symptom: a source-owner check passes even when a resolved shared crate points to an older sibling checkout.
+Cause: it rejected old Git sources and checked selected PDF backends, but did not compare every shared package's resolved manifest with its canonical owner.
+Fix: map package names from the selected library's crate and vendor manifests to their canonical manifest paths, then compare the complete locked Cargo metadata graph, including helpers and web dependencies.
+Keep build-input revision checks too; a matching revision file does not establish which source Cargo compiled.
+How found: changing only the resolved stereo-window manifest path in a saved graph made the old checker return success; the complete-owner checker rejected that control and accepted the unchanged actual graph.
+Run the receiving app's own full gate and bind its executable and fresh proofs to that same owner; a metadata check alone is not compilation or runtime evidence.

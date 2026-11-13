@@ -159,6 +159,12 @@ Scale e, Z and D together when comparing with the original fixture equations, ra
 The active preview's key-light strength was its unchanged default zero; a separate renderer regression exercised a nonzero key light and ambient-occlusion rays.
 Do not describe that capture as a progressive path-tracing or nonzero-key-light proof.
 
+Source-audit distinction: hiding an environment backdrop does not disable image-based material lighting.
+MaterialCraft's `show_env` selects the miss image; its PBR shader still samples `Lighting::specular` with the reflected view direction.
+The current adapter retains a conservative infinity envelope for that renderer; its measured alpha/geometry fixture is not a maximum-disparity claim for every preview mode.
+Also read the camera constructor actually used by the preview: its FOV is 35 degrees even though the generic `OrbitCamera::default` uses 40.
+This distinction was found by following the caller into `preview::camera`, `Settings::default`, the miss selection and the specular lookup, rather than treating the shared type's defaults as the application's defaults.
+
 For an actual progressive tracer, separate immutable scene resources from mutable eye resources.
 Geometry, BVH, materials, textures, environment distributions and lights have one owner and one revision for a pair.
 Each eye owns its camera uniform, accumulation, sample counter, denoising buffers, temporal history and resolved image.

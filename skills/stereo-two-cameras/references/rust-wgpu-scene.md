@@ -152,8 +152,10 @@ Keep the existing sample positions, tone mapping, clipping and ordinary entry po
 Count actual completed primary rays and publish the pair only after both eyes finish; cancellation returns no pair.
 At 640 by 360 with four samples per pixel, each eye completes 921600 primary rays.
 The native proof checked those equal counts and a single immutable scene key before freezing the app and reading the declared buffer.
-At depths 4 and 6 with a target distance of 5, the tested 35 degree camera gave the same predicted +6 and −4 displayed pixels at 640 by 360 and 320 by 180 windows, with zero vertical shift.
+In original fixture units, at depths 4 and 6 with a target distance of 5, the tested 35 degree camera gave the same predicted +6 and −4 displayed pixels at 640 by 360 and 320 by 180 windows, with zero vertical shift.
 The smaller window retained 640 by 360 native samples per eye and measured +12 and −8 before the compositor's resize.
+The existing mesh importer first normalizes the fixture into a unit sphere; the camera distance setting and the baseline in native metadata are therefore in those app units.
+Scale e, Z and D together when comparing with the original fixture equations, rather than treating a metadata baseline as metres or as the original file's units.
 The active preview's key-light strength was its unchanged default zero; a separate renderer regression exercised a nonzero key light and ambient-occlusion rays.
 Do not describe that capture as a progressive path-tracing or nonzero-key-light proof.
 

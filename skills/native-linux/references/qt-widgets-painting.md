@@ -477,7 +477,7 @@ Record exact versions and build IDs.
 5. Record actual paint callbacks as well as requested inputs.
    Callgrind often slows execution about fifty times; these samples had about 25 to 146 times the native program CPU accounting.
    That ratio includes changed repaint work as well as instrumentation; it is not application speed.
-   Instrumentation changed coalescing: 12 animation inputs produced 65/71 paints, 12 text inputs produced one paint on either path, and 20 keys produced 25/21 paints.
+   Instrumentation changed coalescing: 12 animation inputs produced 65/71 paints, 12 text inputs produced 4/3 paints, and 20 keys produced 25/21 paints.
    Instructions per input are not instructions for an identical paint count.
    Neither GPU instructions nor kernel work inside driver ioctls is counted by Callgrind.
 6. Do not emulate a small CPU by relabelling the station.
@@ -489,7 +489,7 @@ Measured on the AMD station path, M user-space instructions per requested input,
 | Work | Processor painting | Batched | Observation |
 |---|---:|---:|---|
 | Terminal animation | 171.698 | 90.069 | raster/blending and memory fills fall; parser/model stays almost unchanged |
-| Terminal text | 8.088 | 7.508 | text shaping stays on the processor; text coalesced to one paint |
+| Terminal text | 16.685 | 15.053 | text shaping stays on the processor; 4/3 actual paints for 12 inputs |
 | Editor typing | 22.064 | 21.652 | completion and shaping remain; copies, submission and driver costs are added |
 
 For typing, `QTextEngine::shapeText` has 53.22/53.28 M inclusive instructions for the complete fixed work, while `paintAndFlush` falls from 131.93 to 104.67 M.
@@ -531,3 +531,9 @@ Keep both red cases.
 Qualify odd and even widths at 100, 125, 150 and 175 percent on both cards, both GPU engines, lifecycle and controls before removing the client-frame exception.
 The partial trial is not that qualification; its CSD patches stay out of the recipe.
 Both eyes from one recorded paint callback also remains unimplemented: shifted/clipped left-eye records cannot reconstruct right-eye-only coverage or style parts with their own depth.
+
+- Symptom: Callgrind records feed completion but the final terminal text is not the completed native text.
+  Cause: the feed has written all bytes, but the terminal still has queued input/painting; a first paint followed by 250 ms is not a drain under instrumentation.
+  Fix: wait for a bounded processor-idle interval after feed completion, then compare the final viewport with the native control.
+  The first one-paint text profiles were excluded; the corrected four/three-paint profiles match the native text viewport exactly.
+  Compare the text viewport separately from Konsole’s activity margin, which reflects different coalescing history.

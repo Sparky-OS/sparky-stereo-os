@@ -132,6 +132,19 @@ Three applications with every vendored crate (48,463 C-family and Rust files in 
 - **Vendored checksums:** 1,154 `.cargo-checksum.json` manifests were bound to the projection report before cargo ran, each changed entry proved by the report's hash before and after; the manifests are found at any depth, because the suite keeps one vendor folder per source.
 - **The time:** about 15 minutes of a 48-minute build on four CPUs, one check per file; the same projection alone on one CPU took 902 s.
 - **The programs' work:** the files the command-line programs write equal the static, authored build's, byte for byte.
+- **Four interleaved builds** of the three-app workspace (authored, lean, authored, lean; one cargo run each from an empty target, four CPUs, every round on a machine other work was loading, load average 6 to 29), `perf stat` user-space instructions:
+
+  | Round | Instructions | Wall | User CPU | Memory peak of the build |
+  | --- | --- | --- | --- | --- |
+  | authored 1 | 23,260,286,116,700 | 2,340 s | 7,629 s | 13.2 GB |
+  | lean 1 | 23,259,246,093,679 | 2,936 s | 8,470 s | 12.7 GB |
+  | authored 2 | 23,259,047,457,558 | 2,806 s | 8,502 s | 15.2 GB |
+  | lean 2 | 23,259,782,785,843 | 2,781 s | 8,602 s | 12.7 GB |
+
+  The first lean build ran 1,040 million instructions fewer than the authored one before it (0.0045 %), the second 735 million more than its pair (0.0032 %); the two authored builds differ by 1,239 million.
+  So on the whole suite the projection shows no difference in instructions: the means differ by 152 million (0.00065 %), less than two builds of one form differ.
+  Time and memory followed the machine's load, not the form.
+  Two authored builds gave byte-identical stripped files, two lean builds too; between the forms all ten files differ and every size is equal.
 
 Traps:
 

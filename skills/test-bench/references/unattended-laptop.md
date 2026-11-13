@@ -39,3 +39,8 @@ Rootful Podman and perf capabilities apply only inside that kit's isolated store
   Found by: an actual SIGKILL guard control and inspection of only the named container; no half-step result was accepted.
 
 The laptop kit's complete small container run exercised every step and kill/pause/resume path; its unit and actual-container fault controls are separate evidence. No laptop performance claim follows from that dry run.
+
+- Symptom: Podman refuses resume after a person reboots, although kit receipts remain.
+  Cause: a persistent custom runroot/tmpdir retains an alive file with the prior host boot ID.
+  Fix: record the host boot ID and, after a changed boot, retire only the kit’s runroot and engine temporary directory before engine initialization; keep its graph/image store and accepted results. Reject symlinked volatile roots.
+  Found by: Podman’s own checkBootID diagnostic and runtime refresh code, then simulated changed-boot and symlink controls. This is not an actual hardware reboot test.

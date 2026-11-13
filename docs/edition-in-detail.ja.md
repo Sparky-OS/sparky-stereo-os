@@ -70,9 +70,10 @@ Sparky Stereo OSはそれを3Dスクリーンに蘇らせます：3Dゲームで
 <a id="who-builds-it"></a>
 ## 制作している人
 
-ブラジリアのファヴェーラからDanielが制作し、これまでに二人の人間の貢献者が参加しています。
+ブラジリアのファヴェーラからDanielが制作し、これまでに三人の人間の貢献者が参加しています。
 Jeromy StreetsのPlasma向け動画壁紙（[org.kde.video](https://github.com/Sparky-OS/org.kde.video)）は、現在はSparky-OSに置かれ、本人がメンテナーを務めています。
 Eff (effcol)は、iZ3Dのコードを[wiz3D](https://github.com/Sparky-OS/wiz3D)として存続させ、ここで保守しています。
+Pedro F. Albanese (pedroalbanese)は、[Sparky CA](https://github.com/Sparky-OS/sparky-ca)が依拠するEd521署名ライブラリの作者で、ここでDanielとともにSparky CAを保守しています。
 Linuxのステレオ対応は何年もボランティアを待っていました。
 以前の取り組みはレビュー担当者に3Dディスプレイがなかったために停滞し、作業はカーネル、Mesa、KWin、FFmpeg、プレーヤー、ウェブ標準にまたがります。
 ほかにこの作業を引き受ける開発者が現れなかったため、ここで働くほかのパートナーはAIで、Danielが指示と検証を行い、[AIによる貢献の記録](ai-provenance.md)に名前を記しています。
@@ -326,6 +327,7 @@ Sparky Stereo OSは、Paweł "pavroo" PijanowskiによるSparkyLinuxを基に、
 | --- | --- |
 | <a href="https://github.com/effcol"><img src="https://github.com/effcol.png?size=96" width="72" alt="Eff"></a> | **Eff (effcol)**<br>[wiz3D](https://github.com/effcol/wiz3D)と、このエディション向けのパッケージ[Sparky-OS/wiz3D](https://github.com/Sparky-OS/wiz3D)を保守しています。wiz3DはiZ3Dを基にした、DirectX、OpenGL、AMD HD3D、NVIDIA 3D Vision向けの汎用ステレオスコピック3Dラッパーで、あらゆるシステムを対象とします。<br>[![Effをフォロー](https://img.shields.io/badge/Follow-effcol-2777AD?style=flat-square&logo=github)](https://github.com/effcol) |
 | <a href="https://github.com/halverneus"><img src="https://github.com/halverneus.png?size=96" width="72" alt="Jeromy Streets"></a> | **Jeromy Streets (halverneus)**<br>KDE Plasma向けの動画壁紙とロック画面、[org.kde.video](https://github.com/Sparky-OS/org.kde.video)を作成し、保守しています。<br>[![Jeromyをフォロー](https://img.shields.io/badge/Follow-halverneus-2777AD?style=flat-square&logo=github)](https://github.com/halverneus) |
+| <a href="https://github.com/pedroalbanese"><img src="https://github.com/pedroalbanese.png?size=96" width="72" alt="Pedro F. Albanese"></a> | **Pedro F. Albanese (pedroalbanese)**<br>Danielとともに[Sparky CA](https://github.com/Sparky-OS/sparky-ca)を保守しています。ブラジルのICP-Brasil証明書をインストールし、最新に保つツールです。ICP-Brasilのルート証明書の一つが使うEd521署名のライブラリ、[e521](https://github.com/pedroalbanese/e521)の作者です。<br>[![Pedroをフォロー](https://img.shields.io/badge/Follow-pedroalbanese-2777AD?style=flat-square&logo=github)](https://github.com/pedroalbanese) |
 
 **バージョン：** Sparky Stereo OS 9 "Mashtabba"。
 Debian 14 "Forky"を基にし、KDE Plasmaのみを使います。

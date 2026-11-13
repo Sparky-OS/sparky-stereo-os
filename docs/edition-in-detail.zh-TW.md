@@ -51,7 +51,7 @@ Sparky Stereo OS 讓它重新變成一個 3D 螢幕：玩 3D 遊戲、看 3D 電
 <a id="who-builds-it"></a>
 ## 誰在打造它
 
-Daniel，來自巴西利亞的貧民區，到目前為止有兩位人類貢獻者：Jeromy Streets，他的 Plasma 影片桌布（[org.kde.video](https://github.com/Sparky-OS/org.kde.video)）現在歸屬於 Sparky-OS，由他擔任維護者；以及 Eff (effcol)，他讓 iZ3D 的程式碼以 [wiz3D](https://github.com/Sparky-OS/wiz3D) 之名繼續活下去，並在此維護它。
+Daniel，來自巴西利亞的貧民區，到目前為止有三位人類貢獻者：Jeromy Streets，他的 Plasma 影片桌布（[org.kde.video](https://github.com/Sparky-OS/org.kde.video)）現在歸屬於 Sparky-OS，由他擔任維護者；以及 Eff (effcol)，他讓 iZ3D 的程式碼以 [wiz3D](https://github.com/Sparky-OS/wiz3D) 之名繼續活下去，並在此維護它；以及 Pedro F. Albanese (pedroalbanese)，他是 [Sparky CA](https://github.com/Sparky-OS/sparky-ca) 所依賴的 Ed521 簽章函式庫的作者，並在此與 Daniel 一起維護 Sparky CA。
 Linux 上的立體顯示苦等志願者多年：早期的嘗試之所以停滯，是因為審查者沒有 3D 顯示器，而這項工作橫跨核心、Mesa、KWin、FFmpeg、各家播放器與網路標準。
 沒有其他開發者站出來接手，所以在這裡工作的其他夥伴是 AI，由 Daniel 指揮並檢查，名字都列在 [AI 來源紀錄](ai-provenance.md)。
 如果你更希望看到它由人類親手打造，我們非常歡迎：每個分支都是公開的，每項任務都是開放的。
@@ -232,6 +232,7 @@ Sparky Stereo OS 是 Daniel Ramos (Capitain Jack) 的 SparkyLinux 版本（Spark
 | --- | --- |
 | <a href="https://github.com/effcol"><img src="https://github.com/effcol.png?size=96" width="72" alt="Eff"></a> | **Eff (effcol)**<br>維護 [wiz3D](https://github.com/effcol/wiz3D)，一套以 iZ3D 為基礎、通用於 DirectX、OpenGL、AMD HD3D 與 NVIDIA 3D Vision 的立體 3D wrapper，適用於每個系統，以及它在這裡的套件 [Sparky-OS/wiz3D](https://github.com/Sparky-OS/wiz3D)。<br>[![Follow Eff](https://img.shields.io/badge/Follow-effcol-2777AD?style=flat-square&logo=github)](https://github.com/effcol) |
 | <a href="https://github.com/halverneus"><img src="https://github.com/halverneus.png?size=96" width="72" alt="Jeromy Streets"></a> | **Jeromy Streets (halverneus)**<br>建立並維護 [org.kde.video](https://github.com/Sparky-OS/org.kde.video)，KDE Plasma 的影片桌布與鎖定畫面。<br>[![Follow Jeromy](https://img.shields.io/badge/Follow-halverneus-2777AD?style=flat-square&logo=github)](https://github.com/halverneus) |
+| <a href="https://github.com/pedroalbanese"><img src="https://github.com/pedroalbanese.png?size=96" width="72" alt="Pedro F. Albanese"></a> | **Pedro F. Albanese (pedroalbanese)**<br>與 Daniel 一起維護 [Sparky CA](https://github.com/Sparky-OS/sparky-ca)，這是安裝巴西 ICP-Brasil 憑證並讓它們保持最新的工具；他是 [e521](https://github.com/pedroalbanese/e521) 的作者，該函式庫實作了 ICP-Brasil 一個根憑證所用的 Ed521 簽章。<br>[![Follow Pedro](https://img.shields.io/badge/Follow-pedroalbanese-2777AD?style=flat-square&logo=github)](https://github.com/pedroalbanese) |
 
 **版本：**Sparky Stereo OS 9 "Mashtabba"，基於 Debian 14 "Forky"，僅有 KDE Plasma。
 

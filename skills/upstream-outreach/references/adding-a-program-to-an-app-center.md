@@ -160,3 +160,37 @@ The audit below was done on 2026-11-13; it is not a proof of a Resolve installat
 - A GitHub release lists each asset's SHA-256 (`digest`), so the author's checksum file can be compared with the forge's own record without downloading.
 - `--appimage-extract <path>` takes one file out of an AppImage without FUSE and without starting the program; `desktop-file-validate` then checks the author's own menu entry.
 - The app center's dependencies can already bring what an AppImage needs: on both Sparky images `fuse3` came with the tool's HTML window (`yad` depends on WebKitGTK, which recommends `xdg-desktop-portal-gtk`, whose portal depends on `fuse3`). That is a recommendation, so a system installed without recommended packages can lack it, and the entry checks.
+
+### Container-installer runtime lessons
+
+- **Symptom:** distrobox creates Ubuntu successfully, then `enter` says `rev: not found` and `exec: exec: not found`.
+  **Cause:** its entry script calls `rev`; an installation without recommended packages can omit the package that provides it.
+  **Fix:** bring `bsdextrautils` with `podman`, `distrobox` and `fuse3`, and check `rev` before placing the AppImage.
+  **How found:** the failing real `distrobox enter`, followed by installation of `bsdextrautils` and a successful repeat as the ordinary user.
+- **Symptom:** nested podman says `cannot clone: Operation not permitted`, or rootless `newuidmap` cannot write `uid_map`.
+  **Cause:** the outer Docker sandbox restricts the namespaces podman needs.
+  **Fix:** keep the error, then use an isolated VM or a deliberately scoped container rig whose namespace permissions allow the test.
+  An isolated Docker rig with `SYS_ADMIN`, unconfined seccomp/AppArmor and fresh `vfs` storage allowed the ordinary user's podman and distrobox to run here.
+  These are test-rig permissions, never instructions to change the person's host or make the installed application privileged.
+  **How found:** compare default, unconfined-only and namespace-capable runs, then actually pull the image, create and enter the container as the ordinary user.
+- **Symptom:** a static launcher audit predicts a missing NVIDIA exception, but the runtime CUDA/OpenGL probe passes.
+  **Cause:** distrobox filters inherited variable names beginning with an underscore, and the installer supplies NVIDIA's GLX vendor for its hybrid launch.
+  **Fix:** let runtime evidence decide whether to enable an exception.
+  A useful probe makes a physical NVIDIA EGL/OpenGL context current, creates a GL buffer, then requires both `cuGLGetDevices` and `cuGraphicsGLRegisterBuffer` to succeed inside the same distrobox launch environment.
+  Retain a negative control and reject a generic exception for every distrobox command.
+  **How found:** the probe passed both with and without the edition's inherited zink variables; forcing Mesa's vendor list inside the container failed EGL initialization.
+  A narrow candidate can match only `distrobox enter --name vinci-free` or `vinci-studio`, followed by `-- env` and `/opt/resolve/bin/resolve`.
+  That candidate is not a reason to enable it, and a desktop-only change would still miss the installer's Open button.
+- **Symptom:** the package terminal closes after apt fails, and an installer could continue if its tools were already present.
+  **Cause:** terminal exit status alone need not preserve the command's failure.
+  **Fix:** make a success marker only after apt succeeds, require it along with each executable, and reject installation without either condition.
+  **How found:** an apt stand-in returned 100 while the tools remained installed; the entry refused both installation and replacement.
+- **Symptom:** the check's selected AMD heading disagrees with its NVIDIA hybrid message.
+  **Cause:** a saved preference changes the selected GPU without changing the earlier hybrid finding.
+  **Fix:** update both in the report's owning method and add a test selecting the second GPU.
+  **How found:** the real AMD-preference window, source inspection, and a regression test that failed before the change and passed after it.
+  Keep the author-facing fix as a draft until reviewed; a core test does not claim that the rebuilt GUI or Resolve was tested.
+
+Keep three download boundaries visible: the app center's verified installer AppImage, the later container/package downloads, and the person's official Resolve ZIP.
+A measured absence of that ZIP stops the Resolve proof, while the entry, system check and container-runtime tests can still be completed.
+Do not replace the form with an unofficial download or describe media conversion as native codec support.

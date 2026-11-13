@@ -37,36 +37,46 @@ STATE = r'''(()=>{const w=document.querySelector('.depth-decoration');return {
   bounds:JSON.parse(JSON.stringify(w.getBoundingClientRect()))
 }})()'''
 
-def project(m, v):
-    return [sum(m[col*4+row]*v[col] for col in range(4)) for row in range(4)]
+def levels(matrices, scene, sunk=10.0, popped=4.0):
+    """Where the edition browser's second camera puts each plane, by its two rules for the screen plane.
 
-def geometry(matrices):
-    """Compare an off-axis camera translation with the independent pinhole rule."""
-    p=matrices['projectionMatrix']; view=matrices['modelViewMatrix']
-    assert abs(p[11]+1)<1e-8 and p[15]==0 and p[0]>0
-    separation=.06; plane=3.4; worst=vertical=0; signs=set(); count=0
-    for ix in range(-8,9):
-        for iy in range(-5,6):
-            for z in (-.65,0,.65):
-                eye=project(view,[ix*.1,iy*.1,z,1]); depth=-eye[2]
-                eyes=[]
-                for offset in (-separation/2,separation/2):
-                    shifted=eye.copy();shifted[0]-=offset
-                    projection=p.copy();projection[8]-=p[0]*offset/plane
-                    q=project(projection,shifted);eyes.append((q[0]/q[3],q[1]/q[3]))
-                disparity=eyes[0][0]-eyes[1][0]
-                expected=p[0]*separation*(1/depth-1/plane)
-                worst=max(worst,abs(disparity-expected));vertical=max(vertical,abs(eyes[0][1]-eyes[1][1]))
-                if depth<plane-.1: assert disparity>0; signs.add('near crossed')
-                if depth>plane+.1: assert disparity<0; signs.add('far uncrossed')
-                if abs(expected)>.001:
-                    assert abs(-disparity-expected)>.001 # swapped-eye control fails
-                    assert abs(0-expected)>.001 # flat-eye control fails
-                count+=1
-    assert worst<1e-12 and vertical==0 and len(signs)==2
-    return {'points':count,'maximum_ndc_error':worst,'vertical_disparity':vertical,
-            'controls':['swapped eyes rejected','flat eyes rejected'],
-            'scope':'matrix geometry, not a capture from the edition browser or physical display'}
+    The published browser takes five times the camera's near distance and 2 percent of the canvas's width; the
+    staged one takes the distance at which the nearest and the farthest part have equal and opposite parallax,
+    2nf / (n + f), no further than n (1 + popped / sunk), and the person's sunk limit as the parallax of infinity.
+    A point at distance z then has the parallax separation * (plane / z - 1), positive in front of the screen.
+    """
+    p = matrices['projectionMatrix']
+    assert abs(p[11] + 1) < 1e-8 and p[15] == 0 and p[0] > 0, 'not a perspective camera the browser recognises'
+    near = p[14] / (p[10] - 1)
+    distance = {x['name']: x['distance'] for x in scene['planes']}
+    first = 5 * near
+    balanced = 2 * distance['popped'] * distance['sunk'] / (distance['popped'] + distance['sunk'])
+    plane = min(balanced, distance['popped'] * (1 + popped / sunk))
+    result = {'near': near, 'plane_published': first, 'plane_from_scene': plane, 'limits': [sunk, popped], 'planes': {}}
+    for name, z in distance.items():
+        result['planes'][name] = {'distance': z, 'published_percent_of_canvas': round(2 * (first / z - 1), 4),
+                                  'px_at_1920_with_limits': round(sunk * (plane / z - 1), 4)}
+    for rule in ('published_percent_of_canvas', 'px_at_1920_with_limits'):
+        s, m, f = (result['planes'][n][rule] for n in ('sunk', 'screen', 'popped'))
+        assert s < -1e-6, (rule, 'the sunk plane is not behind the screen', s)
+        assert abs(m) < 1e-6, (rule, 'the window in use is not at the screen', m)
+        assert f > 1e-6, (rule, 'the popped plane is not in front of the screen', f)
+    assert result['planes']['popped']['px_at_1920_with_limits'] <= popped + 1e-6
+    assert result['planes']['sunk']['px_at_1920_with_limits'] >= -sunk - 1e-6
+    return result
+
+
+def levels_control():
+    """The drawing as first written (near 0.8, planes 4.05, 3.4 and 2.75 away) must fail the same check."""
+    near, far = .8, 12
+    old = {'projectionMatrix': [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, (far + near) / (near - far), -1, 0, 0, 2 * far * near / (near - far), 0]}
+    scene = {'planes': [{'name': 'sunk', 'distance': 4.05}, {'name': 'screen', 'distance': 3.4}, {'name': 'popped', 'distance': 2.75}]}
+    try:
+        levels(old, scene)
+    except AssertionError as error:
+        return 'rejected: ' + str(error.args[0][1] if error.args and isinstance(error.args[0], tuple) else error)
+    raise AssertionError('the control drawing passed; this check cannot fail')
+
 
 def run(endpoint,base,output):
     output.mkdir(parents=True,exist_ok=True);browser=CDP(endpoint);results=[];plain=None
@@ -97,7 +107,7 @@ def run(endpoint,base,output):
             else:
                 assert state['ready'] and state['draws']>0 and not state['fallback'],state
                 assert state['bounds']['bottom']<browser.evaluate('document.querySelector(".status").getBoundingClientRect().top',session)
-                state['geometry']=geometry(state['matrices'])
+                state['levels']=levels(state['matrices'],json.loads(browser.evaluate("document.querySelector('.depth-decoration canvas').dataset.scene",session)));state['levels']['control']=levels_control()
             if case!='context-loss':
                 shot=browser.call('Page.captureScreenshot',{'format':'png'},session)
                 (output/('decoration-'+case+'.png')).write_bytes(base64.b64decode(shot['data']))
@@ -133,7 +143,7 @@ def run(endpoint,base,output):
             print('PASS decoration:',case,flush=True)
         finally:browser.call('Target.disposeBrowserContext',{'browserContextId':context})
     (output/'decoration-checks.json').write_text(json.dumps(results,ensure_ascii=False,indent=2)+'\n')
-    print('PASS: decoration fallback, local-only resources, no cookies, idle, geometry and negative controls',flush=True)
+    print('PASS: decoration still form, local-only resources, no cookies, idle, the three levels by the browser\'s rules and their negative control',flush=True)
 
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)

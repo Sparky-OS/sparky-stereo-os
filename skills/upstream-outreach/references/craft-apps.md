@@ -279,3 +279,83 @@ A full `cargo clean` also resets the target and is the normal boundary between c
 For a baseline comparison, reset before building stock too, retain both compilation logs and use the identical temporary whole-UI test on each side.
 A runtime command-registry and session-inspection check can confirm that the candidate has the added API and pristine stock does not.
 Source cleanliness and a source hash alone do not prove which cached library was linked.
+
+### Local path libraries and frozen gate inputs
+
+Symptom: the full app gate reports that a renderer depends on an app or tooling when its new sibling dependency is a shared camera library.
+Cause: the local layer checker classifies every dependency with a path as a workspace member, although Cargo metadata distinguishes actual `workspace_members`.
+Fix: classify app workspace crates from the member set; keep the existing upward-layer and UI-toolkit prohibitions.
+How found: the complete MaterialCraft gate reached its layer stage and failed on `craft-stereo-camera`; the metadata regression failed before the one-line classifier change and all sixteen checker tests passed afterwards.
+The same fix already existed in the edition's TextureCraft branch, so check other accepted suite work as well as upstream before recreating a fix.
+A sibling path does not make a shared library part of the app workspace.
+
+Symptom: test commands pass, but the gate receipt refuses to bind them to the final source tree.
+Cause: a formatter was still changing a new test when the source guard recorded its inputs.
+Fix: wait for formatting and intentional lockfile resolution to finish before freezing source and harness hashes, then run the gate without source mutations.
+How found: the before/after receipt isolated the changed stock-control test hash; a fresh run on fixed sources passed both the checks and the unchanged-source guard.
+Keep the refused receipt as diagnostic evidence and use only the fixed-source run for acceptance.
+
+### A moving stable compiler and carried prerequisites
+
+When a workflow says `stable`, read the current signed Rust channel manifest before choosing the SDK; record the actual compiler version beside the gate result.
+A previously accepted image can cease to represent that workflow overnight.
+For standalone toolchains, verify the official signing certificate's pinned fingerprint, the manifest signature and each component hash before running an installer.
+
+Symptom: the same workspace passes its previous compiler but fails strict Clippy on the next stable compiler.
+Cause: the gate followed `stable` while the private SDK retained an older release.
+Fix: use the workflow's current compiler, search the affected upstream file and carry an existing baseline fix with its author's identity and date.
+How found: the official channel changed from Rust 1.99.1 to 1.100.0; the new Clippy diagnostic named `craft-cms::synth`, and upstream already had Dylan M. Taylor's baseline fix.
+Do not change an unrelated application's dependency pins merely because a library's workspace lint failed.
+
+Symptom: carrying an upstream baseline fix makes a plotter golden test expect `TB54,0,0`, but the branch's command encoder omits it.
+Cause: that fix assumed an earlier functional prerequisite from upstream main.
+Fix: carry the prerequisite with its author, rather than weakening the golden output back to the old encoder.
+How found: the failing expected command sequence, the upstream file log and the prerequisite's source diff; all 14 plotter goldens then passed.
+This is a byte-stream test, not a claim of testing a physical cutter.
+
+Symptom: an exact-carry audit rejects a correctly applied cherry-pick.
+Cause: raw Git diffs also contain blob hashes and hunk line numbers, and some files in the original commit may already be present from an earlier carry.
+Fix: compare author/date, the resulting affected file bytes where appropriate, and every changed hunk byte while excluding only Git's index hashes and hunk locations.
+Preserve whitespace; a stable patch-id alone is insufficient for a byte-for-byte claim.
+How found: the two already-carried KRA/ORA files matched upstream exactly, while the root Cargo manifest retained the branch's own stereo dependencies outside the imported hunk.
+
+Symptom: the whole gate passes tests, WASM and licenses, then cargo-deny fails resolving the RustSec database host in an isolated container.
+Cause: Cargo's `CARGO_NET_OFFLINE` does not set cargo-deny's separate global offline flag; its default check still fetches the advisory database.
+Fix: fetch public check data in a separate preparation step, then use `cargo deny --offline --log-level error check` in the isolated check environment.
+Keep advisory, bans, license and source checks enabled; offline mode still enforces the configured maximum database age.
+If the project's xtask hardcodes the command, keep its workflow and source unchanged and record any transparent tool wrapper as an explicit transport adjustment, including the database revision and real tool version.
+How found: the failed command named the absent RustSec clone; cargo-deny 0.20.2's global help and `check.rs` distinguish `Fetch::Disallow(maximum_db_staleness)` from its online fetch mode.
+The separately fetched database made all four offline checks pass; an empty database must remain a failure rather than a successful skip.
+
+Symptom: the whole app suite passes its new feature tests but fails `the_flatpak_manifests_pin_the_craft_i18n_rev`.
+Cause: the native catalog input was advanced while the two existing Flatpak source pins retained the old revision.
+Fix: update every existing catalog-pin consumer in the same feature change, retaining the equality regression and the upstream packaging design.
+How found: nextest named the one failed test; its definition reads both manifests and compares their source commits with `craft-i18n.rev`.
+This source consistency check does not establish that an unpublished catalog commit can already be fetched by a package builder; record local-only inputs and do not claim a Flatpak build.
+
+Symptom: `cargo xtask assets` succeeds but the whole CI fails `license-check` with `NOTICE: document hash mismatch`.
+Cause: the generated asset attribution and the audited source-document map are independent checks; adding a required copyright notice changes the latter input too.
+Fix: reread the relevant original license and notice, verify the font or asset digest, then update only the matching `LICENSES.toml` checksum and rerun the complete gate.
+How found: the full gate reached the source-document validator after all workspace tests and WASM checks passed; its exact diagnostic identified the stale document mapping.
+Do not refresh every hash automatically or remove the integrity guard.
+
+Symptom: the full CI passes required language and glyph checks, but the built GUI refuses Korean with `language must be one of auto, en`.
+Cause: the CI helper exports catalog and font inputs in a child shell; a later `cargo build` in its parent does not inherit those exports and produces the optional-input executable.
+Fix: put required-input exports around the entire gate and executable build, or explicitly wrap each command with the same environment helper.
+How found: a real native `ui.set language=ko` probe rejected the archived executable even though CI's required-input test body had run.
+Rebuild and repeat the native captures on the corrected executable; preserve the first binary and failed probe as diagnostics.
+Add a runtime non-English-language request to every capture so this build-input error cannot pass an English geometry proof again.
+
+Symptom: `git bundle verify` reports a complete history, but fetching it into a fresh bare repository fails to read a parent at an old shallow boundary.
+Cause: the source repository still records a shallow boundary from an earlier checkpoint; the bundle does not contain a traversable full ancestor graph.
+Fix: inspect `git rev-parse --is-shallow-repository`, restore ancestors from the validated public source with `git fetch --unshallow`, and compare every existing local branch head before and after.
+Then recreate the bundle and actually fetch it into a new database, compare its advertised heads and trees, and run `git fsck --full`.
+How found: the first fresh catalog restore reported the missing parent even though bundle verification had succeeded; the source's shallow flag confirmed the cause.
+If complete ancestors cannot be obtained, state the exact prerequisite or shallow boundary and do not claim full history.
+Never rewrite an author, parent or date to make a checkpoint appear complete.
+
+Symptom: a Python archive restore check rejects a source file although its extracted SHA-256 matches.
+Cause: `tarfile`'s secure `data` filter intentionally strips group-write permission, so a stored 0664 source file is extracted as 0644.
+Fix: retain original source modes in the manifest and write explicit safe 0644 or 0755 source-archive headers, while checking tested executable bytes and modes exactly.
+How found: compare source, stored member and extracted modes beside their matching hashes before changing the check.
+Keep the secure extraction filter; do not disable it to preserve an incidental group-write bit.

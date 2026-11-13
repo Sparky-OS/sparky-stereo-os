@@ -46,6 +46,20 @@ Pure projection tests establish the camera algebra; they do not establish GPU un
 
 ## Traps found while testing the camera core
 
+### Prepare sample rays once per eye
+
+For a CPU ray renderer, prepare the checked inverse eye view-projection once, then unproject its native pixel samples.
+`EyeCamera::rays()` returns a prepared `RayGrid`; `RayGrid::ray([x, y])` takes NDC with Y up and depth in 0..1.
+Its origin is on the near clipping plane, matching the existing OrbitCamera ray contract, rather than behind that plane at the physical eye.
+Retain the renderer's existing supersample positions and trace the original immutable world for every sample.
+
+Trap: unprojection can divide an infinite far point by zero.
+For homogeneous near and far points A and B, use origin `A.xyz/A.w` and normalize `B.xyz*A.w - A.xyz*B.w` for the direction.
+This also handles `B.w=0`, where B is a direction at infinity.
+Reject singular matrices before inverse, and reject nonfinite sample coordinates or directions explicitly.
+The cause was identified from the homogeneous far-plane calculation; new tests compare ray-plane intersections with independent perspective and orthographic equations, including an infinite-far projection and a singular matrix with `glam-assert` enabled.
+The first test run failed on the absent prepared-ray API; the implementation then passed the same tests.
+
 Symptom: a finite zero-scale affine view panics inside `glam::Mat4::inverse` when a consumer enables `glam-assert`.
 Cause: checking the inverse for finiteness comes after glam's singular-matrix assertion.
 Fix: check finite nonzero determinants before inversion, then validate inverse, product and resulting eye matrices.
@@ -127,3 +141,108 @@ The regression uses a second private software Vulkan device capped at 64 texels 
 It expects the existing UI report queue to contain texture set zero; the pre-fix callback leaves it empty.
 This is a deterministic validation rejection, not a reproduced driver out-of-memory event.
 Do not force memory exhaustion: automatic dimension downscaling can also invalidate an oversized-descriptor fixture, and destroying a wgpu device need not produce a scoped allocation error.
+
+## CPU previews and progressive tracers
+
+Check whether the renderer is actually progressive before introducing temporal state.
+MaterialCraft's preview performs finite supersampling: a settled frame uses a 2 by 2 grid, or four primary rays per pixel, and has no cross-frame accumulation.
+Its stereo entry point borrows one immutable mesh and BVH, material maps and environment/light set, prepares two `RayGrid` values, then invokes the existing sample loop for each eye.
+Compute a camera-relative key light once from the central camera, before the rows and eyes; deriving it from each off-axis centre ray changes the world.
+Keep the existing sample positions, tone mapping, clipping and ordinary entry point unchanged.
+Count actual completed primary rays and publish the pair only after both eyes finish; cancellation returns no pair.
+At 640 by 360 with four samples per pixel, each eye completes 921600 primary rays.
+The native proof checked those equal counts and a single immutable scene key before freezing the app and reading the declared buffer.
+In original fixture units, at depths 4 and 6 with a target distance of 5, the tested 35 degree camera gave the same predicted +6 and −4 displayed pixels at 640 by 360 and 320 by 180 windows, with zero vertical shift.
+The smaller window retained 640 by 360 native samples per eye and measured +12 and −8 before the compositor's resize.
+The existing mesh importer first normalizes the fixture into a unit sphere; the camera distance setting and the baseline in native metadata are therefore in those app units.
+Scale e, Z and D together when comparing with the original fixture equations, rather than treating a metadata baseline as metres or as the original file's units.
+The active preview's key-light strength was its unchanged default zero; a separate renderer regression exercised a nonzero key light and ambient-occlusion rays.
+Do not describe that capture as a progressive path-tracing or nonzero-key-light proof.
+
+Source-audit distinction: hiding an environment backdrop does not disable image-based material lighting.
+MaterialCraft's `show_env` selects the miss image; its PBR shader still samples `Lighting::specular` with the reflected view direction.
+The current adapter retains a conservative infinity envelope for that renderer; its measured alpha/geometry fixture is not a maximum-disparity claim for every preview mode.
+Also read the camera constructor actually used by the preview: its FOV is 35 degrees even though the generic `OrbitCamera::default` uses 40.
+This distinction was found by following the caller into `preview::camera`, `Settings::default`, the miss selection and the specular lookup, rather than treating the shared type's defaults as the application's defaults.
+
+For an actual progressive tracer, separate immutable scene resources from mutable eye resources.
+Geometry, BVH, materials, textures, environment distributions and lights have one owner and one revision for a pair.
+Each eye owns its camera uniform, accumulation, sample counter, denoising buffers, temporal history and resolved image.
+Advance both eyes to the same sample count under the same scene, time, camera, size and depth revision before presenting their pair.
+Discard an obsolete complete pair and invalidate both eye histories together when that revision changes.
+Record the completed sample count and scene revision with each capture; matching frame sizes alone does not establish convergence or identity.
+Check mono state restoration after tracing, and do not use a shifted flattened result for the other eye.
+
+Source-audit trap: a raster stereo entry point need not cover an application's Rendering mode.
+TextureCraft's model companion calls `Renderer::prepare_stereo`, while Rendering mode owns a separate `GpuTracer` and a separate CPU `Tracer`.
+The GPU tracer's `pass` documents one call per submission because `queue.write_buffer` rewrites its sole camera uniform.
+Two calls on that owner before one submission would not provide independent eye uniforms, accumulation or sample counts.
+The spare accumulation buffer is a previous-size allocation cache, not a second eye.
+The required fix belongs in that tracer's resource ownership and pair submission boundary, with the same coherent camera inputs, plus an equivalent CPU adapter.
+This was found by following `render_mode::TraceCallback::run` into `GpuTracer::pass` and inspecting its fields; the uniform overwrite has not been reproduced as a stereo runtime failure.
+Do not mark Rendering mode adapted merely because the raster companion opens beside it.
+
+A native host should retain at most one pending worker or GPU pair.
+When an immutable request becomes obsolete, cancel it and wait for acknowledgement before starting another worker, rather than accumulating cancelled workers during rapid edits.
+Only hand the native window one complete left-first picture, together with the sample and scene metadata belonging to that picture.
+Poll live compositor feedback after the scene settles because resizing changes the native disparity budget even when the chosen source resolution stays fixed.
+
+## Solid backgrounds and model units
+
+Pass the actual perspective environment's horizontal focal coefficient to `Camera::infinity_projection_x`.
+Use zero when the renderer paints only a solid background; a constant background is not a perspective plane at infinity.
+Budget the visible model depths against the existing target plane and the compositor's limits.
+When the entire model lies on that plane and no environment is drawn, keep the central camera with zero baseline.
+
+Symptom: a solid-background model cannot enter the shared camera core without pretending to draw an environment.
+Cause: the input validator required a strictly positive infinity coefficient and the baseline solver assumed a nonzero sunk constraint.
+Fix: accept a finite nonnegative coefficient, apply only nonzero disparity constraints, and keep zero baseline when neither side constrains depth.
+How found: a regression with no environment was rejected by the old validator; the same test now predicts +12 and -8 pixels at depths 4 and 6, checks the flat target-plane case, and still rejects negative/nonfinite environment inputs.
+The existing perspective-environment and orthographic tests retain their earlier predictions.
+
+For an f64 CAD or PRC rasterizer using an f32 camera core, express the shared camera in its local basis and measure distances in the existing positive eye-to-target distance.
+Keep original world vertices and the ordinary f64 raster projection.
+Apply the physical eye offset to camera-space x after the original central view transform and before clipping or perspective division, then apply the shared core's off-axis projection delta.
+Do not narrow a large world-space origin to f32 or point each eye at the unchanged world target.
+Expand normalized depth rounding outward, and include the near clipping plane when geometry crosses it, so the camera budget cannot miss newly clipped corners.
+Keep the headlight at the central camera while geometric eyes, visibility/depth targets and resolved images are private.
+These are renderer bridge requirements; each adapter must carry its own raster regressions and native capture, rather than borrowing a core-only result.
+
+Symptom: the orthographic camera's analytic baseline is correct, but the rendered disparities do not match it.
+Cause: the match arm shadows the render grid's pixel height with the world's orthographic height when restoring the projection coefficient.
+Fix: give the world height its own name and retain the original pixel aspect and focal scale.
+How found: render two colored finite-depth surfaces, compare their actual edge runs to +12 and −12 pixels, and check the baseline equation separately.
+
+Symptom: an orthographic model very close to the eye gets a zero baseline.
+Cause: its depth scan applies the perspective near-plane threshold even though the ordinary orthographic rasterizer does not clip there.
+Fix: admit representable positive orthographic depths while retaining perspective clipping and outward rounding.
+How found: put all vertices at a positive depth below the perspective threshold and require a finite positive baseline before checking the complete raster suite.
+
+Symptom: a stereo scene changes pixels when its world origin is moved far from zero, even though its represented relative geometry is unchanged.
+Cause: adding a small eye offset to an absolute f64 eye coordinate rounds the offset before vertices enter view space.
+Fix: implement the parallel view translation in local camera coordinates; keep the central eye for headlight shading.
+How found: a world at x=1e15 failed an all-pixel comparison with a rebased copy of those same represented vertices; the local translation restores equivalence.
+Build the reference from the already represented points, because adding the large origin may itself quantize the input geometry.
+
+Symptom: a complete pair reports an infinite physical baseline, or silently turns a nonzero normalized baseline into a flat pair.
+Cause: multiplying the normalized camera offset by an extreme f64 model scale can overflow or underflow even when both inputs are finite.
+Fix: refuse unrepresentable physical baselines and eye offsets before drawing or publishing the pair.
+How found: the overflow regression accepted an infinite baseline; a separate tiny-scale regression first proved the ordinary scene visible, then found that the stereo call accepted an underflowed baseline.
+Zero budget retains the exact ordinary path.
+
+## A finite f64 rasterizer at the native window
+
+For an embedded PRC model, retain a cheap immutable working-file snapshot keyed by document ID, edit generation and page.
+Parse the document, decompress its model stream and assemble the world on the worker, not during UI painting.
+Both geometric eyes borrow that same placed mesh set and central headlight; each owns its depth target and image.
+Publish a single complete picture and the metadata belonging to it, never a poster raster or two independent document reads.
+This renderer completes one raster pass per eye and has no temporal accumulation; record one and one, rather than inventing progressive sample counters.
+
+A measured original PRC fixture has camera depths 4 and 6, target distance 5 and vertical field of view 30 degrees.
+For its solid background use zero infinity coefficient; the popped budget of 12 native pixels gives e*f=240 and predicted disparities +12 and -8.
+The actual native application and compositor measured those values at a 640 by 360 window, with zero vertical shift and every native/display sample identical.
+At a 320 by 180 window the selected source grid stayed 640 by 360 per eye, the native budget doubled and the native disparities became +24 and -16, while the displayed values stayed +12 and -8.
+The identical block-matching oracle rejected reversed eyes, and the far-surface disocclusion remained visible.
+These are two measured features at two sizes, not a dense accuracy claim for every model.
+Keep the ordinary renderer entry point and headless tool defaults, including its per-eye grid and size bound, unless the person chooses another resolution.
+The capture must open the actual original PDF and parse its PRC annotation through the production loader; rendering only directly constructed test meshes does not verify that path.

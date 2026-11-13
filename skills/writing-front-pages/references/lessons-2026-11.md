@@ -26,3 +26,33 @@ A trap gives its symptom, its cause, its fix and how the cause was found; a reci
 - External link audit of 608 URLs: 592 OK, 10 HTTP_ERROR, 1 URLError; a 403, 418, 999, TLS error or timeout is an unverified destination, not proof a page is gone. Pre-existing: 26 of 178 fragment links point to missing headings in translated READMEs, with identical heading ids before and after. (lane hdmi-marks-357)
 - A creator-facing message in a non-English language needs a page in that language (every link in the draft was English); the programs page has no line on depth as a 3D source (libstereo-dibr, the FFmpeg `dibr` filter). Phone VR viewers cost R$ 28.79 to R$ 86.04 in a country-agnostic search, checked 2026-10-23. (lane friends-fabio-216)
 
+
+## A demo page with a control panel (ORDER 540, 13 November 2026)
+
+**Before:** the page asked someone to pick a connection speed and press Restart with these settings.
+At 1280 pixels the always-open measurements panel occupied about 38 percent of the content width; at 360 × 800 it began just below the viewport.
+Some controls changed the active run, some waited for restart, and changing language discarded pending fields.
+The scene's photograph count existed only in its screen-reader description.
+
+**After:** the scene has a visible state line and seven named surface states, speed choices replay immediately, and Play again stays in view.
+The full former panel remains in Details and measurements, closed initially, with a pending note next to each deferred setting.
+Three small pictures explain recipe, computed surface and photograph takeover; the longer About remains below.
+At the end, hold and split comparison use saved drawings while the procedure player remains stopped.
+These are presentation choices for showing the same process, not new claims about the rendering technique.
+
+**Recipe:** inventory controls by when they act; put the changing result before its instrument; move details as a whole; preserve pending state while translating and preserve the query when replaying.
+Measure which elements are initially visible as well as checking reflow, and give an independent reader only the resulting first-screen block.
+A source-aware self-review is not that reading.
+
+- Symptom: a control changes a number but the finished picture stays the same.
+  Cause: changing a limiter after download cannot repeat the event being demonstrated.
+  Fix: the main speed choice restarts the demonstration, with that behavior stated before use; detailed deferred settings explicitly say how to apply them.
+  Found by: the before-page control audit and unchanged firstFrame/timeOrigin after a speed change.
+- Symptom: the short lead passes a word count, but the first screen still reads like a technical instrument.
+  Cause: the adjacent panel dominates attention and repeats implementation detail before the person sees the outcome.
+  Fix: show the scene's changing state, retain each measurement behind one disclosure, and use three concrete illustrated steps.
+  Found by: inspecting the desktop and phone captures, not by counting the header alone.
+- Symptom: shrinking a demo removes its controls, diagnostics or credits.
+  Cause: treating simplification as deletion.
+  Fix: inventory first, move the whole panel and keep its fields, component bars, timeline/table, player figures, notices and camera control reachable.
+  Found by: comparing every old control and document link with the new DOM and preserved source.

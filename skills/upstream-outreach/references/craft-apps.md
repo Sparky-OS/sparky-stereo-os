@@ -446,3 +446,10 @@ Fix: map package names from the selected library's crate and vendor manifests to
 Keep build-input revision checks too; a matching revision file does not establish which source Cargo compiled.
 How found: changing only the resolved stereo-window manifest path in a saved graph made the old checker return success; the complete-owner checker rejected that control and accepted the unchanged actual graph.
 Run the receiving app's own full gate and bind its executable and fresh proofs to that same owner; a metadata check alone is not compilation or runtime evidence.
+
+Symptom: `windows_default_leaves_out_gl` fails at its assertion about eframe's default before testing the app's Windows policy.
+Cause: the private runner forced `WGPU_BACKEND=vulkan`; eframe's `WgpuSetupCreateNew` reads `Backends::from_env()` before its `PRIMARY | GL` default.
+Fix: preserve the app assertion and remove that override from the full-CI child, matching upstream's environment.
+Keep the software Vulkan ICD selected; explicit backend requirements belong in the targeted GPU checks rather than a suite that tests unmodified defaults.
+How found: the complete FilmCraft run passed5076tests and failed that one precondition; the same unchanged test passed after removing only `WGPU_BACKEND`.
+Rerun the whole gate after the controlled check; a one-test pass does not establish full CI success.

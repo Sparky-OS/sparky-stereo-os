@@ -121,7 +121,7 @@ def run(endpoint,base,output):
                         lang:document.documentElement.lang,background:getComputedStyle(document.body).backgroundColor,
                         rootBackground:getComputedStyle(document.documentElement).backgroundColor,
                         scripts:document.scripts.length,cookie:document.cookie,
-                        imageTop:document.querySelector('.depth-decoration').getBoundingClientRect().top,
+                        imageTop:document.querySelector('.hero img').getBoundingClientRect().top,
                         statusTop:document.querySelector('.status').getBoundingClientRect().top,
                         pageText:document.body.innerText,
                         menuCount:document.querySelectorAll('.lang li a').length,

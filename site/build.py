@@ -209,10 +209,10 @@ class Renderer:
                     active.append('<blockquote><p>' + self.inline(value,source) + '</p></blockquote>')
                 elif typ == 'paragraph':
                     if kind == 'home' and key == 'home.intro.paragraph03':
-                        image_tag = re.search(r'<img [^>]+>',value).group(0)
-                        parser = TagParser(); parser.feed(image_tag)
-                        fallback = self.asset(parser.attrs['src'],source)
-                        active.append('</div><div class="depth-decoration" aria-hidden="true"><img role="presentation" src="' + fallback + '" alt=""><canvas aria-hidden="true"></canvas></div></div>')
+                        # The drawing's place holds no picture of its own: where no drawing
+                        # can run, the stylesheet removes the place and the front page's own
+                        # picture, which follows, is the first thing after the opening.
+                        active.append('</div><div class="depth-decoration" aria-hidden="true"><canvas aria-hidden="true"></canvas></div></div>')
                     css = ''
                     if kind == 'home' and '.intro.paragraph' in key:
                         css = {'01':'lead intro-copy','02':'intro-copy','03':'hero','04':'gallery','05':'caption','06':'status','07':'next-step'}.get(key[-2:], '')

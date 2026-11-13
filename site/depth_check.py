@@ -31,7 +31,7 @@ api.drawArrays=function(...args){probe.draws++;return draw.apply(this,args)};
 STATE = r'''(()=>{const w=document.querySelector('.depth-decoration');return {
   ready:w.classList.contains('depth-ready'),draws:window.probe?.draws||0,
   contexts:window.probe?.contexts||0,pending:window.probe?.pending.size||0,
-  fallback:getComputedStyle(w.querySelector('img')).display!=='none',
+  fallback:getComputedStyle(w).display==='none' && (()=>{const r=document.querySelector('.hero img').getBoundingClientRect();return r.width>100 && r.top<innerHeight})(),
   hidden:document.hidden,cookie:document.cookie,text:document.body.innerText,
   matrices:window.probe?.matrices||{},
   bounds:JSON.parse(JSON.stringify(w.getBoundingClientRect()))

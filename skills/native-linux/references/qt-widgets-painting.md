@@ -3,6 +3,7 @@
 Written on 2026-11-11 from Qt 6.11.2 (the edition's qt6-base 6.11.2+dfsg-5+stereo3d15) and two prototypes measured on an AMD Renoir iGPU and an NVIDIA RTX 3060.
 Read it before changing how a QWidget window is painted, flushed or measured.
 Neither prototype is shipped: both live behind one environment variable in a lane's build, and the numbers below are what they measured.
+Added on 2026-11-13: the fixed-work measure, the person's choice on the Graphics page, the pair where the EGL has one view, and the cause of the 125 % offset.
 
 - `QT_WIDGETS_GPU_PAINT=1` (or `opengl`): the widgets painted by Qt's OpenGL paint engine. It takes more processor than CPU painting for a terminal (one draw call for each thing painted) and stays available as the person's choice.
 - `QT_WIDGETS_GPU_PAINT=batch`: the widgets' painting recorded and drawn in a few draw calls through the window's RHI. The picture is the CPU path's to a level or two of rounding, text included, at scales 1, 1.25 and 2.
@@ -129,6 +130,138 @@ Two traps from that run:
 - **Symptom:** the results' "igpu" and "dgpu" labels are the wrong way round. **Cause:** the kit named the cards by their order, not by what drew. **Fix:** name the card from the `GL_RENDERER` line of each run. **Found by:** reading the renderer line in each log beside its label.
 - **Symptom:** the summary script fails on the laptop and works on the station. **Cause:** the laptop's locale writes a decimal comma, and the script parsed a point. **Fix:** run the measuring tools under `LC_ALL=C` and accept both in the parser. **Found by:** the traceback's `could not convert string to float: '11,6'`.
 
+## The same work on every path: the fixed-work measure
+
+A path that draws more frames must not be charged for them, so the work is fixed by script and the cost is counted over one window of wall time.
+"The same work" is this page's reading of the aim (free the processor): a fixed script of frames at a fixed rate.
+
+**The work, 20 seconds each, the same bytes and the same steps on every path:**
+
+| Case | What is fixed |
+|---|---|
+| Terminal, colour animation | 300 recorded frames of a 160x48 fire animation, one every 1/15 s, each written whole to the terminal |
+| Terminal, text | 300 frames of 12 new lines each, 15 a second, so the terminal scrolls |
+| File manager | 1,200 scroll steps through 5,000 files, 60 a second, the place a function of the step number |
+| Editor, scrolling | 1,200 scroll steps through 60,000 lines, 60 a second |
+| Editor, typing | 200 key presses, 10 a second, a Return after every 60 |
+| Idle | one minute of each program, the terminal's cursor blinking |
+
+**The recipe** (the scripts are a lane's, described here so they can be written again):
+
+1. A feeder (C, about 60 lines) plays a file of frames to the terminal: frame `k` is due at `T0 + k / rate` on `CLOCK_MONOTONIC` (`clock_nanosleep(..., TIMER_ABSTIME, ...)`), a late frame is written at once and the next keeps its own time. The recording is made by a generator with its own arithmetic (no library's random numbers), and its SHA-256 is checked on every machine, so two machines get the same bytes.
+2. A preloaded driver (`Q_COREAPP_STARTUP_FUNCTION`) does the scroll steps and the keys on the same absolute schedule: each step through the event loop (`QTimer::singleShot(0, ...)`), so the paint it asked for happens before the next step. It prints how late the steps were and the program's own processor time (`getrusage`) at the first and the last step.
+3. One clock for everything: the session script takes `T0 = now + warm-up` once and hands it to the feeder, the driver and the counter.
+4. The counter reads, at `T0` and at `T0 + 20 s`: `/proc/PID/stat` user and system ticks of the program and of the compositor (all threads), `/proc/stat` for the whole machine, `/proc/PID/fdinfo/*` `drm-engine-*` (the GPU time the kernel counts for the program, by card), and between them every card's `gpu_busy_percent`, every hwmon `power*_input` by its name, `nvidia-smi`; memory from `smaps_rollup` at the end.
+5. The repaint manager prints one line for each frame handed to the compositor (`QT_WIDGETS_PAINT_STATS=3`); the frames inside the window are counted, so a path that paints fewer or more frames for the same work shows.
+6. Result for a run: processor milliseconds per frame asked for, the program and the compositor together, then each. For idle: per cent of one core.
+7. Rounds: every case on the three ways one after another, the order of the ways turned with the round (so none always runs first), one fresh compositor session per run, at least three rounds; the table shows the median with the smallest and the largest.
+
+**What a quiet run is.** Record with every run the load average before and after and the processors busy with other work over the window itself (`/proc/stat` minus the program, the compositor and the feeder).
+A run is marked CONTENDED when the load average is above the processor count, other work takes more than a quarter of the processors, or another program computes on the same GPU; it is repeated on a quieter machine and never averaged with quiet runs.
+On a shared machine wait before each run until fewer than about three processors are busy, for a bounded time, and take the run marked if the wait ends.
+Processor time for the same work rises under contention (shared caches, two threads of one core), so a contended table shows the order of the ways, not their sizes.
+
+**Naming the card.** Pin a card by its PCI ID (`DRI_PRIME=VENDOR:DEVICE!`) and name it from the run's own `GL_RENDERER` line.
+A pin that names no card Mesa has a driver for is not an error to Mesa: the program draws on its default card. So also check where the kernel counted the program's GPU time (`drm-pdev` in fdinfo) and refuse the run when it is another card.
+Painting on the processor does not use the pin: run it once a round and show its row with every card.
+
+**What it measured on the first machine (2026-11-13).**
+A Ryzen with a Renoir iGPU and an RTX 3060, the nested compositor on the same card as the program, 1920x1080; 172 runs over four hours on a machine other work kept loading (load average 1.8 to 33): 171 valid, 35 quiet, 137 CONTENDED.
+Processor milliseconds per frame asked for, the program and the compositor together; quiet runs where there were any (the median, their count), otherwise the median of the contended ones, marked.
+Contended runs cost about 1.4 to 1.7 times the quiet ones on every way, in the same order.
+
+| Case | The processor | Qt's OpenGL engine | Batched |
+|---|---|---|---|
+| Terminal, colour animation, Mesa | 14.8 (1 quiet) | 35.9 (1) | 8.6 (2) |
+| The same, NVIDIA | 14.3 (2) | 25.5 (2) | 9.5 (2) |
+| Terminal, text, Mesa | 6.9 (2) | 11.3 (2) | 5.3 (2) |
+| The same, NVIDIA | 7.6 (1) | 10.1 (2) | 6.0 (2) |
+| File manager scrolling, Mesa | 4.2 (1) | 5.2 (1) | 4.3 (2) |
+| The same, NVIDIA | 4.5 (1) | 5.2 (1) | 4.4 (1) |
+| Editor scrolling, Mesa, contended (4 each) | 4.6 | 5.5 | 4.9 |
+| The same, NVIDIA, contended | 4.5 | 6.2 | 4.2 |
+| Editor typing, Mesa, contended (4 each) | 11.7 | 17.1 | 13.7 |
+| The same, NVIDIA, contended (3 or 4) | 12.4 | 17.9 | 15.5 |
+| Terminal idle, cursor blinking, % of a core, Mesa, contended (3 each) | 0.43 | 0.62 | 0.60 |
+| File manager idle, % of a core, Mesa (1 quiet each) | 0.27 | 0.27 | 0.27 |
+| Editor "idle" (it repaints a small area 27 times a second), % of a core, Mesa, contended | 5.4 | 9.0 | 7.6 |
+
+What the numbers say:
+
+- A program that paints much each frame (a terminal) takes 20 to 40 % less processor for the same frames when batched, on both cards. Qt's OpenGL engine takes one and a half to two and a half times the processor's, and under load it could not finish 300 frames of the animation in their 20 seconds (one run invalid for that).
+- A program that paints little each frame (a file manager or an editor scrolling) takes the same on the processor and batched, within the spread of the runs. Typing into an editor and an editor that keeps repainting a small area took more when batched (about a sixth and about two fifths, both from contended runs only): a frame through the GPU has a fixed cost, and small frames pay it each time.
+- So the gain is the program's, not the kind's: a default by kind ("other programs") would move a terminal, a file manager and an editor together.
+- Idle costs the same within a quarter of a per cent of a core on every way.
+- Memory: 25 to 30 MB more a program with Mesa and 85 to 95 MB with NVIDIA's driver, on both GPU ways.
+- An editor that looks idle may not be: the frames inside the window are counted for that reason.
+
+## The choice a desktop gives the person, and how it reaches a program
+
+The three ways are one switch a program reads at its start, `QT_WIDGETS_GPU_PAINT` (nothing: the processor; `batch`; `opengl`), so a desktop can offer them without touching any program.
+The edition's Graphics page (`sparky-stereo-graphics`) has "Paint windows": Automatic, On the processor, On the graphics card (batched), On the graphics card, Qt's OpenGL engine, for each kind of program and for each program.
+
+- **Automatic is a measurement, not a guess:** the way measured for that kind of program on that machine or its model, kept in the machine's record beside the GPU measured best (`[MeasuredPaint]` in the system's `sparky-stereo-graphicsrc`, written by `sparky-stereo-gpu-record --set-paint KIND WAY` or shipped with a known model's record). Where nothing was measured it is the processor, which is how every Qt paints.
+- **The launcher hands it over.** The page's resolver (`sparky-stereo-gpu-env --app ID`) prints `QT_WIDGETS_GPU_PAINT=...` after the GPU's own variables, and Plasma's launcher (KIO) starts the program with every line it prints; `sparky-stereo-gpu-run` does the same for a program started by hand. Nothing is printed for the processor.
+- **A value set by hand in the session wins,** as a GPU variable set by hand does, and the page says so.
+- **A way chosen for a program is that program's alone.** A terminal or a file manager hands its environment to everything it starts, so a way chosen for it would paint its children too, against their own choices. The edition's Qt reads the variables when the application starts and, when they came with someone to tell (`QT_WIDGETS_GPU_PAINT_TELL`: the page's mark), takes them out of its environment. A value set by hand comes without that mark and is inherited as any variable is. Read it at application start, not at the first window: a terminal starts its shell before it paints. Proof: start a terminal both ways with a shell that writes `env` to a file.
+- **What cannot be had is told and kept, and the program still starts.** Before the start the resolver knows two cases: no graphics processor that can draw, and a Qt without the painting (it looks the switch's reader up in the installed Qt Gui: a Qt without it would ignore the variable without a word). After the start only the program knows (no OpenGL in the session, an OpenGL the processor draws, Qt OpenGL not loadable, a surface that cannot be made): the resolver also prints `QT_WIDGETS_GPU_PAINT_TELL=COMMAND`, and the edition's Qt runs `COMMAND --paint-failed PROGRAM CODE WORDS` once. The problem is kept by the desktop's one problems engine with "Paint on the processor" as the person's explicit choice. While a failure is kept the resolver adds `QT_WIDGETS_GPU_PAINT_TELL_OK=1`, and the first window that does paint on the GPU runs `COMMAND --paint-ok PROGRAM`, which ends it.
+- **Proof on installed packages:** install the page's package in a throwaway container, write the choice as the page writes it, start a program the way the menu does (`kioclient exec /usr/share/applications/ID.desktop`), then read `/proc/PID/environ` of the program, its `painting on "RENDERER"` line and its DRM client in `/proc/PID/fdinfo`; start it once with `LIBGL_ALWAYS_SOFTWARE=1` and read the kept problem; start it again and see the problem gone.
+
+Traps of this part:
+
+- **Symptom:** a program whose desktop entry sets `PrefersNonDefaultGPU` itself never gets the painting variable. **Cause:** KIO asks the page's resolver only for entries without that key. **Fix (work to do):** KIO asks for the painting's variables alone (`--print paint-env`) for those entries. **Found by:** reading the launcher's patch before choosing where the variable is printed.
+- **Symptom:** the kept problem names the renderer as `LLVM 21.1.8, 256 bits)`. **Cause:** the renderer's name has parentheses of its own, and the text after the last opening one was taken. **Fix:** take what follows the fixed words. **Found by:** the installed-package proof's one failing line.
+- **Symptom:** a message that should be in the person's language is English in a test container. **Cause:** `LANGUAGE=pt_BR` does nothing under the `C` locale, and the image had no `pt_BR.UTF-8`. **Fix:** `localedef -i pt_BR -f UTF-8 pt_BR.UTF-8` in the image and `LANG=pt_BR.UTF-8` in the test. **Found by:** the same message came out right through the problems engine's own catalogue.
+- **Symptom:** a D-Bus activatable program is now started by the launcher itself. **Cause:** the launcher starts such a program itself whenever the resolver's answer is not empty, and the painting variable makes it so. That is what carries the variable to the program; say it in the hand-back.
+
+## Qt's own frame at a fractional scale (the 125 % offset)
+
+**Symptom:** at 125 % a window flushed through the RHI (every GPU path, and stock Qt's `QT_WIDGETS_RHI=1`) lies one pixel left of the same window as a shared memory buffer, and one row is displaced part of the way down (291,114 of 2,250,000 pixels in a terminal).
+**Cause:** not the painting and not the RHI: Qt's own frame around the window. With a frame the client draws, the Wayland EGL context renders the content into a framebuffer and blits it with the frame (`DecorationsBlitter::blit()` in `qwaylandglcontext.cpp`); it passed products of logical sizes and the scale to `glViewport()`, which truncates them, while the surface's buffer and the content framebuffer are sized with `QSize * qreal` (rounded) and the shared memory store rounds the frame's margins. So the content was placed one pixel left and drawn one pixel smaller than its framebuffer.
+**Fix:** place the content from the buffer's top by the rounded margins and draw it at its framebuffer's size.
+Measured on a terminal at 125 %, nothing moved before comparing: 291,114 differing pixels before, 1,840 after, and 0 at scales 1 and 2 between the published plugin and the fixed one.
+What is left is one row at the content's lower edge: the shared memory store gives the content the buffer's rounded height less the rounded margins, the EGL window a framebuffer of the content's own rounded height, and the two differ by a row at some sizes. That is a disagreement between the two stores, which the open report below describes, not the blitter's offset.
+**Found by:** the same comparison with a window without a frame: 0 differing pixels between the shared memory window and the RHI one; then reading the three places that turn a logical size into pixels. A first fix that placed the content by the rounded bottom margin left it one row off everywhere: the store counts from the top.
+**Upstream:** Qt's dev branch no longer has this code (94f96210518d, David Edmundson, "wayland: move decoration into subsurfaces"); 6.11 and 6.12 do. [QTBUG-149635](https://bugreports.qt.io/browse/QTBUG-149635) (a one-pixel seam with client-side decorations at a fractional scale) is open and related.
+**Where it shows:** only where Qt draws its own frame (a compositor without server-side decorations, a test rig without a decoration plugin). Under KWin's own decoration there is no blitter and no offset.
+
+## The pair where the EGL has no surface with two views
+
+A window painted once per eye on the GPU needs somewhere to put the second eye.
+With `EGL_EXT_multiview_window` (the edition's Mesa) the window's surface has two views and each takes its half of the pair texture.
+NVIDIA's own EGL has no such surface, and the window was shown flat, which was said.
+The shared memory pair never needed EGL: its buffer is twice as wide, declared full side by side and as the desktop's own depth.
+The GPU pair now does the same:
+
+1. **Who decides:** the Wayland EGL window, when the wish changes (`_q_stereo_views` set by the widgets' repaint manager, with `_q_stereo_pair` saying that the engine composes the pair itself). Qt Quick's renderer draws into two views and never sets `_q_stereo_pair`, so it is not touched. The change is made on the GUI thread, in the property's own event, which the repaint manager sends before it flushes: the first pair frame already has the new width.
+2. **The buffer:** `ensureSize()` doubles the width; the `wl_egl_window` is resized; the surface's `wp_viewport` destination stays one view's size, which is what a compositor takes as the size of one view of a declared surface.
+3. **The declaration:** the same call the shared memory store makes (`QWaylandStereoDepth::setPair()`: `kde_stereo_content_v1.set_content(side_by_side_full)` and `kde_stereo_depth_v1.set_desktop_depth(1)`, with the next commit), made again for a new surface.
+4. **The swapchain:** the window says `_q_stereo_side_by_side_buffer`, and the OpenGL RHI swapchain's `surfacePixelSize()` doubles its width for it, so the compositor's size check before the frame resizes it.
+5. **The frame:** `QBackingStoreDefaultCompositor::flush()` draws the pair texture whole over the whole target (source rectangle twice as wide, one quad), and each render-to-texture child twice, by setting the viewport to each half: a child's quad is placed for one view, so its uniforms need no change.
+
+Proof on the NVIDIA card (the gallery window, frameless, a 3D mode of a nested Stereo KWin, both eyes captured), 2026-11-13:
+
+| Case | Shared memory pair (CPU) | Batched | OpenGL engine | The same window before (flat) |
+|---|---|---|---|---|
+| Parallaxes 2, -2, 1, -1, 4, -4 | as given | as given; each eye differs from the CPU pair in 613 of 1,310,720 pixels, none by more than 32 levels | as given | 0, 0, 0, 0, 0, 0 |
+| Parallaxes 0.5, -0.5, 1.5, -1.5, 0.25, 1 | 1, -1, 2, -2, 0, 1 (rounded) | 0.5, -0.5, 1.5, -1.5, 0.25, 1.0 | 0.5, -0.5, 1.5, -1.5, 0.263, 1.0 | |
+| The eyes exchanged (the control that must fail) | fails | fails | fails | |
+| A window with a render-to-texture widget | | per eye, as given | | |
+| No depth | eyes identical | eyes identical | | |
+| Stereo Union, ElementLimit 12 | | every box the CPU pair's disparity | | |
+| Text of a button at half a pixel (mean difference between neighbours; higher is sharper) | 18.2 in both eyes (whole pixels) | 19.4 in the eye with the half pixel, 18.2 in the other | 13.0 and 18.2 | |
+| A 2D output | | 0 pixels differ from the build before | | |
+| On the wire | | one `set_content(3)`, one `set_desktop_depth(1)`, no warning | | |
+
+A window with a frame the client draws stays flat on every path (work to do: the frame blitter drawing content and frame once into each half, or into each view).
+
+Traps of this part:
+
+- **Symptom:** after a rebuilt Wayland EGL plugin is put over the installed one, every window is black or painted on the processor, and the log says `Failed to load client buffer integration: "wayland-egl"`. **Cause:** the plugin calls a function the build newly exports from the Wayland client library, and the installed library has no such symbol. **Fix:** put the client library of the same build beside the plugin. **Found by:** a comparison in which the GPU path equalled CPU painting exactly, pixel for pixel, which a GPU path never does.
+- **Symptom:** on a 2D session of the test rig the client dies with `interface 'kde_stereo_depth_v1' has no event 1` as soon as a pair is forced. **Cause:** the rig's older compositor sends an event the client's protocol version does not have ([stereo-proof-rig](../../stereo-proof-rig/SKILL.md), versioned events), and the rig's stand-in for it was loaded only in 3D sessions. **Fix:** the 2D control is the window without depth, which is what a 2D output gets (no style shows depth there). **Found by:** a black capture and the client's last line.
+- **Symptom:** a helper written as a shell function does not run under `env VAR=value helper ...`, and every case that used it leaves no capture. **Cause:** `env` starts programs, not shell functions. **Fix:** export the variables in a subshell and call the function there. **Found by:** only the cases without the helper had results.
+- **Symptom:** a test commit of a source tree that tracks only the touched files suddenly holds 7,000 files. **Cause:** `git add -A DIR` adds every untracked file under it. **Fix:** add the changed files by name, or `git add -u`. **Found by:** `git diff --stat` of the series.
+
 ## What the first prototype measured (2026-11-11)
 
 One machine, a Ryzen with a Renoir iGPU (Mesa radeonsi) and an RTX 3060 (NVIDIA 615), nested Stereo KWin on the same GPU as the program, Qt's own window frame, 1920x1080, three rounds, CPU and GPU painting alternating.
@@ -198,7 +331,7 @@ What the numbers say:
 - **Symptom:** the Union widget style draws, but no element has depth, and the log says `union.general: Could not find a supported platform plugin for platform "wayland" and session names QList("")`. **Cause:** Union picks its platform plugin by the session's desktop name. **Fix:** start the program with `XDG_CURRENT_DESKTOP=KDE XDG_SESSION_DESKTOP=KDE KDE_FULL_SESSION=true KDE_SESSION_VERSION=6`. **Found by:** the log line; with the variables the eyes differ.
 - **Symptom:** a preload meant for the rig's KWin does nothing. **Cause:** `kwin_wayland` carries a file capability, and the loader ignores `LD_PRELOAD` for such a program. **Fix:** run a copy of the binary (a copy has no capability) with the preload. **Found by:** the client still died with the event the preload should have dropped.
 - **Symptom:** the first frame of a window painted once per eye on the GPU shows one eye, and a window that paints only once stays that way. **Cause:** the Wayland EGL window takes its second view at the start of the next frame, never inside one (`QWaylandEglWindow::beginFrameViews()`), so the frame that sets `_q_stereo_views` is flushed to a surface with one view. **Fix:** ask for another paint when the pair starts or ends. **Found by:** a warning placed where the compositor draws a pair into a swapchain without stereo fired once in every run and the capture was still right, because the gallery repainted.
-- **Symptom:** on NVIDIA's own driver a window painted once per eye on the GPU shows the left eye, flat, while the same window painted on the CPU has depth. **Cause:** the pair needs a surface with two views (`EGL_EXT_multiview_window`), which the edition's Mesa has and NVIDIA's EGL has not; the shared memory pair needs no EGL. **Fix (work to do):** hand the pair over as one surface holding its views side by side, as the edition's Qt already does for 3D content, marked as the desktop's depth. **Found by:** the same warning, and a capture with identical eyes.
+- **Symptom:** on NVIDIA's own driver a window painted once per eye on the GPU shows the left eye, flat, while the same window painted on the CPU has depth. **Cause:** the pair needs a surface with two views (`EGL_EXT_multiview_window`), which the edition's Mesa has and NVIDIA's EGL has not; the shared memory pair needs no EGL. **Fix:** one buffer twice as wide holding the eyes side by side, declared as the shared memory pair is ([above](#the-pair-where-the-egl-has-no-surface-with-two-views)). **Found by:** the same warning, and a capture with identical eyes.
 - **Symptom:** a window with Qt's own frame, painted once per eye on the GPU, shows the left eye only. **Cause:** not found; the decorated EGL window's content framebuffer has a slot per eye only for a window that asked for stereo when it was made. **Fix in the prototype:** such a window is painted once, as on the CPU. **Found by:** captures with identical eyes.
 - **Symptom:** an idle terminal reports about five paints per second on one path and none on the other. **Cause:** the only statistics line of the run was the start-up second, and the cursor never blinked: Konsole reads `BlinkingCursorEnabled` from the profile's `[Terminal Features]` group. **Fix:** the right group, and a summary that reports "no paints" when the run printed nothing after the warm-up. **Found by:** reading the run's log instead of its summary.
 - **Symptom:** numbers measured before a cut-off cannot be tied to the source tree found afterwards. **Cause:** the library was older than the last edits (`ninja -n` only says CMake must run again; `git stash` and `git stash pop` also give every changed file a new time). **Fix:** commit before every measuring round, and write the commit into the round's folder. **Found by:** rebuilding changed the library's size.

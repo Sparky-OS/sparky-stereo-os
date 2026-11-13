@@ -332,3 +332,9 @@ Cause: the native catalog input was advanced while the two existing Flatpak sour
 Fix: update every existing catalog-pin consumer in the same feature change, retaining the equality regression and the upstream packaging design.
 How found: nextest named the one failed test; its definition reads both manifests and compares their source commits with `craft-i18n.rev`.
 This source consistency check does not establish that an unpublished catalog commit can already be fetched by a package builder; record local-only inputs and do not claim a Flatpak build.
+
+Symptom: `cargo xtask assets` succeeds but the whole CI fails `license-check` with `NOTICE: document hash mismatch`.
+Cause: the generated asset attribution and the audited source-document map are independent checks; adding a required copyright notice changes the latter input too.
+Fix: reread the relevant original license and notice, verify the font or asset digest, then update only the matching `LICENSES.toml` checksum and rerun the complete gate.
+How found: the full gate reached the source-document validator after all workspace tests and WASM checks passed; its exact diagnostic identified the stale document mapping.
+Do not refresh every hash automatically or remove the integrity guard.

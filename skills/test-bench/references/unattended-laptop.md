@@ -25,4 +25,17 @@ Rootful Podman and perf capabilities apply only inside that kit's isolated store
   Fix: assert that pause precedes unpause while allowing the independent launch marker between them, then test real container controls in the full dry run.
   Found by: the retained failing action log `pause, run, unpause`; the corrected control checks the intended order.
 
-These controls have unit-test evidence. A completed container dry run and any actual bench results must be stated separately in the hand-back.
+- Symptom: a direct version probe names the intended compiler, but perf measures the seed.
+  Cause: file-capability perf crosses secure exec; its executable search and stripped library environment differ from the direct call.
+  Fix: resolve the intended executable before perf, explicitly re-establish the selected PATH/library path afterwards, and check the measured version output. Reject the earlier samples.
+  Found by: comparing the raw measured --version output with the direct probe, then a corrected full compiler/workload sample.
+- Symptom: a large stopped target prevents resume at the next-build free-space requirement.
+  Cause: checking capacity before reclaiming the disposable unfinished target counts space that resume will immediately retire.
+  Fix: after validating the payload under the exclusive worker lock, retire only runtime/work before checking next-build capacity; leave durable results alone and keep the continuous floor guard.
+  Found by: the resume-path audit and a control that checks target retirement precedes the space query while accepted results survive.
+- Symptom: killing the guard leaves its container running.
+  Cause: a detached client can outlive the process supervising it.
+  Fix: arrange parent-death termination for the client and a signal-aware container PID 1, forwarding signals so the owned container's descendants end too.
+  Found by: an actual SIGKILL guard control and inspection of only the named container; no half-step result was accepted.
+
+The laptop kit's complete small container run exercised every step and kill/pause/resume path; its unit and actual-container fault controls are separate evidence. No laptop performance claim follows from that dry run.

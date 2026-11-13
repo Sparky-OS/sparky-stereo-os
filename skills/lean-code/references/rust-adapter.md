@@ -153,6 +153,25 @@ See [a long unattended measurement on a laptop](../../test-bench/references/unat
   Fix: choose the documented plain perf summary for elapsed/user/system time, preserve its raw output and reject absent/zero elapsed time or instructions.
   Found by: an actual perf probe compared with the plain summary; the collector also accepts decimal commas and points and rejects ambiguous grouped numbers.
 
+The completed preparation qualification built C's first full compiler stage, standard library and every named tool with the edition recipe's environment. This establishes the prepared C exception list for that stage, not successful final stage-2 packages or laptop performance. The kit's small container dry run is a separate claim. Restore authored Cargo checksum manifests alongside authored rust-src; verify existing authored entries, and list Debian's removed/regenerated WIT artifacts separately rather than inventing replacement upstream digests.
+
+- Symptom: later C tools fail after the compiler itself built.
+  Cause: syn 3.0.3 also matches doc attributes; icu_properties 2.2.0's property macros require them.
+  Fix: restore the failing crates' exact B inputs and their bound checksum chain in a clean C tree.
+  Found by: actual rust-analyzer dependency errors (three syn macro failures) and Cargo's ICU dependency errors (70 macro failures); the complete stage-1 tool build then passed with 38 and 12 retained files respectively.
+- Symptom: direct bootstrap builds fail in libssh2-sys despite installed system libraries.
+  Cause: bypassing Debian's make target loses LIBSSH2_SYS_USE_PKG_CONFIG=1 and other recipe environment.
+  Fix: invoke the recipe's build target with a reviewed RUSTBUILD_FLAGS target list; retain the recipe environment for repeated stages too.
+  Found by: the explicit failure and comparison with debian/rules, followed by a successful complete stage-1 tool build.
+- Symptom: a sealed form changes when the recipe regenerates WIT Rust files.
+  Cause: Debian creates two Rust literals outside build/, after source preparation.
+  Fix: capture the original producer here, project and lexer-check its literals, bind form-specific assets and copy them only after verifying the original native regeneration. Restore their authored bytes in rust-src. Refuse any unexpected generator, version, path or output hash.
+  Found by: the recipe's actual generation, an independent rustc lexer comparison, and A/B/C regeneration/restoration controls. Native outputs remain the original recipe's outputs.
+- Symptom: the panic resolver refuses stdio.rs as an unknown interpreter.
+  Cause: generic consumer discovery reads its first-line Rust #![attribute] as a shebang.
+  Fix for the experiment: select the unchanged Rust lexer explicitly for the already manifest-bound .rs input, then use the existing content resolver. Do not change the shipped adapter implicitly.
+  Found by: an actual C std panic at lean line 1144; the explicit Rust selection resolves it to authored line 1168. The small fixture includes the same first-line syntax.
+
 ## Measured on a two-app workspace (rustc 1.99.1, release build, four CPUs, a busy machine)
 
 Counts over every Rust file of the 783 packages in the resolved graph (22,268 files, 367.8 MB, 9,787,209 lines), with [`scripts/rust-comment-census.py`](../scripts/rust-comment-census.py):

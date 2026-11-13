@@ -5,7 +5,7 @@ name: lean-code
 description: >-
   Lean Code on the edition: dpkg-stereo installs scripts, units, rules, QML and C headers without the comments the
   machine never reads, keeps the authored file as the authority, checks every format for equivalence (bash, Python,
-  JavaScript, C, YAML, Perl, Java, Kotlin), the lc1 marker, the HR companions, the link and start gate (bubblewrap in
+  JavaScript, C, YAML, Perl, Java, Kotlin, Rust), the lc1 marker, the HR companions, the link and start gate (bubblewrap in
   Docker, apt-cache show traps, strict pinning, foreign ELF files, the frozen universe), restore and resolve, conffiles
   on a lean system. Load it when dpkg --verify or debsums report changed files, dpkg-stereo --verify --deep exits 1 with
   OLDFORM rows, restore says original-mismatch, a fresh install shows a conffile such as gprofng.rc as changed by the
@@ -72,6 +72,7 @@ A file whose comments are smaller than that line stays as it is.
 | YAML, TOML | PyYAML composes the same node graph; tomllib reads the same document |
 | Perl | B::Deparse prints the same program |
 | Java | JDK compiler lexer checks tokens, retained notices/directives and boundaries; the qualified Android build uses JDK 17 |
+| Rust (build inputs only) | rustc's own lexer, through a procedural macro built with the installed rustc: the same tokens, doc attributes compared byte for byte; see [the Rust adapter](references/rust-adapter.md) |
 | Kotlin / Kotlin Gradle scripts | Pinned Kotlin compiler lexer checks tokens, significant whitespace and retained notices/directives; the qualified Android build uses Kotlin 2.4.0 |
 
 A failed check leaves the file as it is and records why; package assembly refuses to certify a failed transformation.
@@ -83,6 +84,11 @@ dpkg-stereo's own files are never projected: the tool that undoes projections st
 Generators, documentation tools and other preprocessors also read native sources and headers; a compiler check alone does not qualify them.
 The [native source consumers reference](references/native-source-consumers.md) (findings of 20 October 2026, toolkit 0.1.9 to 0.1.15) lists the known cases and the safeguards: `lean.debian_prepare --preserve-source`, GLSL, generated control files, kernel generator inputs, Wine's preprocessors, vendored Cargo checksums, and how to measure compiler-input savings.
 A route that rebuilds a published source must carry its `debian/sparky-lean-preserve.json`: `plain-from-lc.py --save-plan FILE` and `lean.debian_prepare --preserve-plan FILE` (it stops without one of the two choices); see "The preserve plan across routes" in that reference.
+
+### Rust build inputs
+
+Since toolkit 0.1.29 a source tree whose language plan names `rust` has its Rust files projected before compilation: non-doc comments go, doc comments stay because they are attributes, and line numbers in panic messages name lean lines.
+[The Rust adapter](references/rust-adapter.md) has the rule for each kind of comment that is data, the counts and measurements on a real workspace, the recipe and five traps.
 
 ### Reproducible sources
 

@@ -1,6 +1,6 @@
 # Try it on your Windows PC
 
-🇨🇦 [English](try-on-windows.en.md) · 🇩🇪 [Deutsch](try-on-windows.de.md) · 🇧🇷 [Português](try-on-windows.pt-BR.md)
+🇨🇦 [English](try-on-windows.en.md) · 🇩🇪 [Deutsch](try-on-windows.de.md) · 🇧🇷 [Português](try-on-windows.pt-BR.md) · 🇲🇽 [Español](try-on-windows.es.md)
 
 **For** anyone with a Windows PC and a USB stick: see the 3D desktop on your own screen in ten steps, without installing anything and without changing Windows.
 

@@ -3,7 +3,7 @@
 Learned on storytold's Craft suite in November 2026 (PhotoCraft 0.23.1 and LightCraft 0.21.1, Rust 1.99.1): about twenty Rust applications that share most of their dependencies and each ship as one or two statically linked programs.
 Daniel asked for the suite "the debian way - shared libraries", so the code the apps have in common is installed once.
 This page is the recipe that worked on two apps, with its numbers, and every trap met on the way.
-It is a proof on two apps, in test packages; the whole suite, the Lean Code gate and the edition's own Rust toolchain are still to do.
+It began as a proof on two apps in test packages; [the suite as a source package](#the-suite-as-a-source-package) is the real recipe on three apps, through the Lean Code gates, with the edition's own Rust toolchain.
 
 ## What Rust allows, in four facts
 
@@ -20,7 +20,7 @@ It is a proof on two apps, in test packages; the whole suite, the Lean Code gate
 
 ## Recipe
 
-The scripts are in this skill's [`scripts/`](../scripts) folder.
+The scripts of this first proof are in this skill's [`scripts/`](../scripts) folder; the generator the source package uses, which also pins sibling checkouts and closes the libraries' lists, is in the build tree's recipe ([the suite as a source package](#the-suite-as-a-source-package)).
 
 1. **Make one workspace out of the apps' checkouts**, without changing upstream's files:
    `scripts/rust-suite-tree.py tree OUT photocraft=SRC/photocraft:photocraft,photocraft-cli lightcraft=SRC/lightcraft:lightcraft,lightcraft-cli`.
@@ -160,7 +160,110 @@ The recipe is `sparky-os/packages/rustc` in the [build tree](https://github.com/
   Fix: mount the folder that holds the repository at its own path, and give the tests a short `HOME` and `TMPDIR`.
   Found by: the two commands in the failure output; both pass on a plain clone.
 
+## The suite as a source package
+
+Learned on 2026-11-13 on three apps of the suite at their stereo edition branches (PhotoCraft 0.20.1, LightCraft 0.21.0, FilmCraft 0.17.0), built by the edition's rustc 1.99.1.
+The recipe is `sparky-os/packages/craft-suite` in the [build tree](https://github.com/Sparky-OS/sparky-stereo-os-build); its scripts are named below.
+It is one source package, `craft-suite`, whose build has no network: every crate, font and catalogue is in the original archive.
+
+### Recipe
+
+1. **Pin everything in one file** (`suite.json`): each app's repository revision, version, programs, features, the revision of each sibling checkout it builds against, and the font and catalogue revisions its gates ran with; the compiler's package version and its runtime package; which apps are built and why the others wait.
+2. **Fetch and vendor, the only step with the network** (`fetch.sh OUT`): `git archive` of each pinned revision, the author names of each app's commits, then per app a copy with its sibling path dependencies rewritten to git dependencies on the pinned revision (`suite-source.py rewrite`, then `lock`), `cargo vendor --locked --versioned-dirs`, and `suite-source.py merge`, which sorts the vendored crates into `vendor/registry` and `vendor/git/<repository>-<revision>`, one folder per source.
+   Expect a line per folder; here 1,243 registry crates and 15 git folders, 1.5 GB, and the lock of each app unchanged by cargo after the rewrite.
+3. **Make the two source packages in the build container** (`build.sh WORK SOURCES SEED deps`): the original archive holds `apps/`, `vendor/`, `fonts/` and `i18n/`; `debian/` holds the generators, and `suite-generate.sh` is run once there with the build's compiler to learn the libraries' names, which go into `debian/control`, `debian/suite-sonames.txt` and the pinned `debian/suite-Cargo.lock`.
+   `lean.debian_prepare` then makes the `+lc1` source, with `["c", "rust"]` as its languages.
+4. **Build without network** (`build.sh WORK SOURCES SEED build`, or `all`): the rules project the tree, bind the vendored checksum manifests to the projection, generate the workspace, stop unless the libraries' names equal the source's, and build (`suite-build.sh`).
+   Expect `the libraries' names equal the source's: 4 libraries` and `the common library is the same file after every run`.
+5. **Stage each app with its own upstream packaging script** (`debian/suite-stage.sh`): `packaging/linux/package.sh --skip-build --formats tar` gives the desktop file, icons, MIME types, AppStream data, documents and font licences as upstream ships them, and runs upstream's own `--version` smoke test against the libraries under their final names.
+   The programs then move to `/usr/lib/craft-suite/` behind a launcher, and each library is installed under its SONAME.
+6. **Gates**: `lean.release check-debs` writes the build record; `lean.release check-link` runs on the finished packages with the archive, the runtime package of the standard library as a sibling and the recipe's `smoke.tsv`.
+7. **Prove it installed** as in the first recipe above, with the static build of the same sources as the reference for the files the command-line programs write.
+
+### Vendoring several revisions of one workspace
+
+- One vendor folder cannot hold two git revisions of a crate at one version, and here eleven revisions of one library repository are in use at once, so each git source is replaced by a folder of its own:
+  ```toml
+  [source."git+https://github.com/OWNER/REPO?rev=REV"]
+  git = "https://github.com/OWNER/REPO"
+  rev = "REV"
+  replace-with = "suite-git-REPO-REV8"
+
+  [source.suite-git-REPO-REV8]
+  directory = "/path/vendor/git/REPO-REV8"
+  ```
+  `suite-source.py config` writes it from the merge's `sources.json`.
+- A dependency on a sibling checkout (`path = "../craft-libs/crates/x"`) becomes `git = ..., rev = ...` in the generated copy, and the lock entries of those crates gain the matching `source` line: two path packages of one name and version cannot both be written to one lock, two git revisions can.
+- Vendor per app and merge by the lock's `source`, checking that the same crate from the same source is the same bytes in every app.
+
+### What the package is
+
+| Package | Holds |
+| --- | --- |
+| `craft-suite-common` (all) | `/usr/share/craft-suite/versions.json` |
+| `libcraft-suite-shared-0.ID` | the crates two or more apps link, and every crate those depend on |
+| one per app | the launchers, the programs in `/usr/lib/craft-suite/`, `libAPP-shared-0.ID.so`, desktop file, icons, MIME types, AppStream data, documents |
+
+Each app depends on exactly its common library, its compiler's `libstd-rust-HASH` and `craft-suite-common`, all written by `dh_makeshlibs -V"PACKAGE (= VERSION)"` and `dh_shlibdeps`.
+
+**The app's own updater.** Each app checks its project's releases at start and, in a `.deb` install, would download and install upstream's package over the edition's.
+The updater has its own switch for an app kept by something else: a version choices file, named by `CRAFT_VERSIONS_FILE`, in which an app pinned to a version "follows the launcher's choice" and neither asks a server nor offers anything.
+The package ships that file with each app pinned to its packaged version, and the launcher exports the variable unless the person set one.
+Check: with `RUST_LOG=info` the app logs `follows the launcher's choice (Managed(Pinned("0.20.1"))); no update offered here`.
+
+### Measured (three apps, six programs, stripped, x86-64, four CPUs, load average 4 to 10)
+
+- Static build of the same sources, upstream's profile, the same compiler and fonts: 718,388,976 bytes of programs.
+- The packages: 390,053,320 bytes of programs and libraries with the standard library, 45.7 % less; `Installed-Size` 382,036 KiB in all; the archives 147.2 MB; the original archive 310 MB.
+- The build: 6 min for the sources and build dependencies, 48 min for the build (about 15 min of projection, 31 min 46 s of cargo, then staging and the payload pass), a 7.7 GB tree.
+- The files the command-line programs write (a PSD, a JPEG, a PNG frame) have the same SHA-256 as the static build's.
+
+### Traps: the symptom, the cause, the fix, how it was found
+
+- Symptom: the common library is compiled again in a later `cargo build`, after programs were already linked to it.
+  Cause, first form: a crate inside the library that its list does not name (reached only through a unified feature, such as `rand` through `half`'s `rand_distr`, or `resvg` through `egui_extras`' `svg`) takes its features from the apps a cargo run selects.
+  Fix: close each library's list over its dependencies in the all-apps resolve (here 341 named crates and 45 more).
+  Cause, second form: the build side resolves per run too: a procedural macro's dependency (`serde_json` for `rmcp-macros`) had other features in another app's run, the macro was rebuilt, and with it a crate of the library.
+  Fix: every cargo run selects every program of every app with every feature, so there is one resolve; apps with the same pinned fonts and catalogues share one run, and an app with other inputs gets a run of its own from which only its files are taken.
+  The build script keeps the library's SHA-256 after the first run and stops when a later run changes it.
+  Found by: `Compiling craft-suite-shared` appearing twice in the log, then `cargo tree -f '{p}|{f}'` per selection compared with the all-apps listing.
+- Symptom: `error: failed to select a version for alsa-sys ... links to the native library alsa, but it conflicts with a previous package`.
+  Cause: two apps need two major versions of a crate that links one native library (`cpal` 0.16 and 0.18), and one resolve holds one crate per `links` key.
+  Fix: none in packaging; one app must move to the other's version, or it gets a workspace of its own and shares nothing.
+  Found by: cargo's message, which names both chains.
+- Symptom: `the source git+https://... requires a lock file to be present first before it can be used against vendored source code`.
+  Cause: upstream's `[patch]` table names crates no app uses (its lock lists them under `[[patch.unused]]`), and cargo cannot look an unlocked git patch up in a folder.
+  Fix: leave a git patch out of the generated root when no app's lock holds the crate; keep a patch on the app's own path crate, with an absolute path.
+  Found by: the message names the patched crate.
+- Symptom: `error: no source location specified for source.suite-git-winprint`.
+  Cause: a repository name with a dot split the table name.
+  Fix: write the replacement source's name with letters, digits and hyphens only.
+- Symptom: a vendored crate "is in no source of the app".
+  Cause: `cargo metadata` without `--all-features` leaves out optional dependencies that `cargo vendor` copies.
+  Fix: map vendored crates to their sources from `Cargo.lock`.
+- Symptom: a context patch for the generated copy applies to the authored tree and not to the projected one.
+  Cause: its context holds a plain comment, which the projection removed.
+  Fix: `suite-fixups.json` names the whole line to change and its replacement, and stops unless the line is there exactly once.
+- Symptom: `error[E0050]: method on_exit has 1 parameter` in a second app.
+  Cause and fix: the same unified `eframe` feature as in the two-app proof; every app without the feature gets the fixup.
+- Symptom: `dpkg-buildpackage -nc` on a tree that failed after its compile stops with `FileExistsError: .../suite`.
+  Cause: debhelper runs the configure override again.
+  Fix: build again from the source; a compiled tree is not continued.
+- Symptom: two source runs at two recipe commits give two original archives.
+  Cause: the archive was dated by the recipe.
+  Fix: date it by the release it names; `debian/` keeps the recipe's date.
+- Symptom: the build stops in `override_dh_builddeb` on the link gate.
+  Cause: the compile container has no network to resolve run-time dependencies.
+  Fix: as in the compiler's recipe, the gate runs on the finished packages.
+- Symptom: upstream's packaging script says an app's man pages and completions "are left out".
+  Cause: they are written by an example that needs the app's development dependencies, which the one workspace drops.
+  Fix: none yet; the recipe records it under `not_packaged`.
+
+### Not proven here
+
+The two other apps of the first five (one waits for the `links` conflict, one for its build and proofs), arm64, the suite on a quiet machine, lintian, and a publication with the generated pin against Debian's compiler.
+
 ## Not proven here
 
-The whole suite; the suite itself as a `+lc1` source package (the toolchain's packages passed `check-debs` and `check-link`, the suite's are still test packages); timing on a quiet machine; the compiler's own test suite, which the recipe does not run; the compiler's Rust sources through the Rust adapter; arm64.
+The whole suite (three of about twenty apps are packaged); timing on a quiet machine; the compiler's own test suite, which the compiler's recipe does not run; the compiler's Rust sources through the Rust adapter; arm64.
 Two builds of the same tree by the same compiler gave byte-identical programs and libraries.

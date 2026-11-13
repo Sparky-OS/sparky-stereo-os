@@ -89,6 +89,12 @@ When the front pages must name something the edition does not do yet, sentence o
 The detail page gets one paragraph under its own anchor, the credits page one row marked "Planned, not shipped yet", and the nine languages change together.
 The recipe, the checks and the traps: [Adding a planned capability to every front page](references/adding-a-planned-capability.md).
 
+## Adding a front-page language
+
+When a language joins after the others, translate from today's English page, settle the glossary before the first sentence, and put the language in the row where its group ends.
+Every anchor the English headings make must still resolve, the call for testers follows the English call as it stands, and a cold reader reads the first screen in that language.
+The recipe, the two scripts and the traps: [Adding a front-page language after the fact](references/adding-a-front-page-language.md).
+
 ## Keep every link that points in
 
 Before moving a heading, find who links to it: talk slides, forum posts, other lists, the issues.

@@ -2,6 +2,7 @@
 
 Measured on 2026-11-13 with the edition's build of KDAB's Stereo Demonstrator (`stereo3ddemo` 0.3.1+git20250303.4f99a5d+dfsg+stereo3d3), Debian testing's `libspnav0` 1.2-2 and `spacenavd` 1.3.1-1, under Stereo KWin in a container on an NVIDIA card and in a virtual machine started from the edition's live image.
 No real 3D mouse was connected at any point: everything below was proved with a simulated device, and the last section says what that leaves open.
+The fault it found was repaired the same day; [The fix as built](#the-fix-as-built) says how and how it was counted.
 
 ## The parts, and who wrote them
 
@@ -34,7 +35,7 @@ No real 3D mouse was connected at any point: everything below was proved with a 
   **Found by:** reading what `--device /dev/uinput` would hand over, before running it.
 - **Symptom:** the program closes by itself while the view moves under the 3D mouse, with `terminate called after throwing an instance of 'std::runtime_error'` and `Signal is already emitting, nested emits are not supported!`.
   **Cause:** the program polls `spnav_wait_event()` in a thread of its own and writes the camera's properties from that thread, while the window's thread is emitting on the same properties (autofocus answering the camera's move). KDBindings' signals refuse a second emit while one runs (`kdbindings/signal.h`).
-  **Fix:** deliver device events on the thread that owns the camera: watch `spnav_fd()` with the toolkit's own notifier (Qt: `QSocketNotifier`) and read with `spnav_poll_event()`, or post each event to that thread (`QMetaObject::invokeMethod` with a queued connection). No fix was built here.
+  **Fix:** deliver device events on the thread that owns the camera: watch `spnav_fd()` with the toolkit's own notifier (Qt: `QSocketNotifier`) and read with `spnav_poll_event()`, or post each event to that thread (`QMetaObject::invokeMethod` with a queued connection). Built and proved: see [The fix as built](#the-fix-as-built).
   **Found by:** the message, then the code of the poll thread; and by counting: with autofocus on the program ended in 2 of 4 runs, with autofocus off in 0 of 2, which is how a race looks. One clean run proves nothing about a thread fault: repeat, and vary what the other thread is doing.
 - **Symptom:** no 3D mouse is found, and the program says nothing at all.
   **Cause:** `spnav_open()` returned -1 (no daemon on the socket) and the program's only message was a commented-out debug line.
@@ -42,7 +43,7 @@ No real 3D mouse was connected at any point: everything below was proved with a 
   **Found by:** a run without the daemon and an empty log.
 - **Symptom:** the daemon is started (or installed) after the program, and the 3D mouse still does nothing.
   **Cause:** the program calls `spnav_open()` once, in a constructor at start.
-  **Fix:** start the program after the daemon, and in the program retry the connection or watch for the socket. Found by reading the constructor; not run as a case.
+  **Fix:** start the program after the daemon, and in the program retry the connection or watch for the socket. Found by reading the constructor. Built and proved since: a two-second retry while there is no service ([The fix as built](#the-fix-as-built)).
 - **Symptom:** a simulated move along one axis keeps moving after the script went on to the next axis; x still grows while only z is sent.
   **Cause:** the device was made with relative axes, the kernel drops a relative event whose value is 0, and spacenavd keeps each axis's last value and sends it again with every report. The script can never say "x is back at rest".
   **Fix:** one device per move (a new device starts at rest), or a device with absolute axes, which can report 0.
@@ -63,6 +64,38 @@ No real 3D mouse was connected at any point: everything below was proved with a 
   A saved "Flipped" (the program's own eye swap) changed nothing in the first picture of the Qt Quick 3D renderer, though the code reads it.
   **Fix:** remove the control in the edition's build (a program that renders its own scene offers no swap; the desktop swaps per output); do not spend a run on why it is dead.
 
+## The fix as built
+
+Built on 2026-11-13 on the fork's branch and proved with a private candidate package.
+
+- **Follow the author's own shape first.** The kit's route on the other systems was already single-threaded (the navigation model is constructed with `multiThreaded = false`), and KDBindings says in `signal.h` that "The Signal class itself is not thread-safe". So the Linux class lost its thread instead of gaining locks: it now offers `connect()`, `fd()`, `processEvents()` (a loop on `spnav_poll_event()`), `state()` and `deviceName()`, and never writes the camera on its own.
+- **The camera's thread does the reading.** The Qt application watches `fd()` with a `QSocketNotifier` and calls `processEvents()`; a `QTimer` calls `connect()` every two seconds while there is no service and installs the notifier when it succeeds.
+- **A service that goes away is noticed.** A socket that is readable with nothing to read has been closed: `recv(fd, &c, 1, MSG_PEEK | MSG_DONTWAIT) == 0` before polling. Without that check the notifier fires for ever on a dead descriptor.
+- **Say what the service answered.** `spnav_evmask(SPNAV_EVMASK_INPUT | SPNAV_EVMASK_DEV)` after connecting, `spnav_dev_name()` when `spnav_protocol() >= 1`, again on every `SPNAV_EVENT_DEV`. Three states reach the window: no service (a notice where everyone sees it, since the service is a dependency and its absence is a failure), no device, and the device's name (both under the navigation section).
+- **The daemon is a Depends.** A feature the package describes needs it; with it `apt install` on the live image adds one more package and upgrades nothing.
+- **Buttons.** The author's own code registers no command for the kit's buttons, so the Linux route gives them none either; say so instead of inventing one.
+
+How it was proved, red and green:
+
+1. **Count the race, do not sample it.** One script, twenty fresh sessions per build, autofocus on, the same four moves through the stand-in daemon ([`scripts/spnav-race-moves.sh`](../scripts/spnav-race-moves.sh) as the session's hook), one line per run: alive or gone, the exception's count, the moves delivered, the camera at the end. Published build: 18 of 20 ended by the exception. New build: 20 of 20 alive, and the camera ended at the same position to the last digit in every run.
+   The first milestone's "2 of 4" came from gentler moves; a race's rate depends on what the other thread is doing, so fix the moves before comparing two builds.
+2. **Geometry after motion, both cards.** The proof scene measured against the prediction after each move with the camera read from the log at that moment: within 0.13 px on the NVIDIA card; the still scene within 0.07 px on the NVIDIA and the AMD card.
+3. **The service, three ways.** No service at start: the notice is in the window. The stand-in started after the program: found within the retry, the notice gone, the move delivered. The stand-in killed: the notice back.
+4. **The real daemon, in a virtual machine.** `systemctl stop spacenavd`, start the program (the notice shows, in the session's language), `systemctl start spacenavd` (the notice goes), then the simulated kernel device and one move: the camera moved by the predicted amount and the program stayed alive.
+
+Traps of the fix itself:
+
+- **Symptom:** a catalogue file is empty after a script "updated" it.
+  **Cause:** `open(p, 'w').write(f(open(p).read()))` opens for writing, which truncates, before it reads.
+  **Fix:** read into a variable first. **Found by:** a search that no longer found a line it had found a minute earlier.
+- **Symptom:** every translation of one sentence tells the person to choose a list entry that does not exist.
+  **Cause:** the entry was renamed after the sentence was translated. **Fix:** when a label changes, search every catalogue for the old name inside other sentences. **Found by:** comparing each catalogue's sentence with its own label for the entry.
+- **Symptom:** CMake stops with `Imported target "Qt6::Quick3DPrivate" includes non-existent path .../QtQml/6.11.2`.
+  **Cause:** the private QML headers came only through a recommended package, and the build image was made without recommended packages. **Fix:** name `qt6-declarative-private-dev` in Build-Depends.
+- **Symptom:** restarting the compositor's user service in a live session to try a newer build ends the session at the login screen.
+  **Fix:** log in again (the live user's password is the user's name); the saved 3D mode is kept.
+- **A removed control's setting.** Removing the eye-swap box is not enough: a value saved by the older version would still swap silently; stop reading and writing the key as well.
+
 ## Perks
 
 - The program logs its camera on every change (`QT_LOGGING_RULES=stereo3ddemo.*=true`), so a move is checked to the last digit without reading a pixel.
@@ -74,7 +107,11 @@ No real 3D mouse was connected at any point: everything below was proved with a 
 - **Symptom:** the program's status line says its two eyes go out through the two-layer swapchain ("Quad buffer: the display stack packs the two eyes"), and both halves of a 3D mode's scanout are pixel-identical.
   Seen in a virtual machine without a graphics card, on a live image with KWin +stereo3d38; the same program on the software Vulkan driver under KWin +stereo3d46 measured right within 0.06 px, and bringing the image's Qt and Qt Quick to the published versions changed nothing.
   **What was proved:** Mesa's software Vulkan hands the compositor a buffer two eyes wide with the declaration, and the program's other route ("Two views side by side (declared)") shows two different eyes in the same session.
-  **Not found:** the cause; it is narrowed to that KWin on a real 3D output with the buffers the Vulkan route declares.
+  **The layer, found by measurement:** preload the proof rig's buffer recorder ([`wlrec.c`](../../stereo-proof-rig/scripts/wlrec.c)) into the program in that session and compare the two halves of the buffer it commits with the two halves of the 3D mode's scanout.
+  The committed buffer's halves differed by 34,959 pixels (the same count the working route shows on screen) while the scanout's halves were identical, with the image's compositor and again with the published one, and with the published Qt as well.
+  So the program, Qt and Mesa are right, and the compositor's real-output path shows one half twice for a surface that Mesa's Vulkan presentation declares; a capture through the compositor's screenshot interface on a virtual output does not show the fault, because it draws each eye itself.
+  On the wire the two routes differ only in who declares the surface (the toolkit's own queue for the route that works, Mesa's presentation queue for the other).
+  The fix belongs in the compositor; it is not built yet.
   **For the person:** choose the side-by-side route under Advanced. A status line that says 3D is not proof of two eyes: compare the halves.
 - **A scanout of a 3D mode is a pair too.** Keep it as a marked picture (PNG with `sTER`, `.pns`) like every other stereo capture, and count the pixels that differ between its halves before trusting any label.
 

@@ -9,6 +9,8 @@ compares their words and punctuation marks as two sequences.
 Two differences are expected and named: the language row, which the site shows as
 its menu, and the credit line added to the foot of a detail or guide page (it must
 be found, whole, in that language's own home page). Anything else fails.
+An element marked data-added is an addition the site makes on purpose (a trial
+figures row, a wordless strip): it is left out of the comparison and counted.
 """
 import argparse
 import difflib
@@ -73,7 +75,7 @@ class Built(HTMLParser):
     """The words a reader sees in main and footer; decoration marked aria-hidden is not text."""
     def __init__(self, text):
         super().__init__(convert_charrefs=True)
-        self.buffer, self.links, self.inside, self.skip, self.hidden, self.stack = [], 0, 0, 0, 0, []
+        self.buffer, self.links, self.inside, self.skip, self.hidden, self.stack, self.added = [], 0, 0, 0, 0, [], []
         self.feed(text)
         self.words = tokens(''.join(self.buffer))
 
@@ -81,7 +83,8 @@ class Built(HTMLParser):
         a = dict(attrs)
         if tag in ('main', 'footer'): self.inside += 1
         if tag in ('script', 'style'): self.skip += 1
-        hidden = a.get('aria-hidden') == 'true'
+        hidden = a.get('aria-hidden') == 'true' or 'data-added' in a  # a named addition is not the source's text
+        if 'data-added' in a: self.added.append(a['data-added'])
         if tag not in ('img', 'br', 'link', 'meta', 'source', 'input', 'hr'):
             self.stack.append(hidden); self.hidden += hidden
         if self.inside and not self.skip and not self.hidden:
@@ -121,22 +124,22 @@ def compare(kind, source_text, built_text, home_words):
         problems.append(f'{op}: source {" ".join(gone)[:160]!r} built {" ".join(new)[:160]!r}')
     if page.links != links - row_links:
         problems.append(f'links: source {links} with {row_links} in the language row, built {page.links}')
-    return problems, len(a), page.links
+    return problems, len(a), page.links, page.added
 
 
 def run(build):
-    failures, count, words, links = [], 0, 0, 0
+    failures, count, words, links, additions = [], 0, 0, 0, []
     for lang, kind, source, built in pages(build):
         if source.is_file() != built.is_file():
             failures.append(f'{lang} {kind}: source and page do not both exist'); continue
         if not source.is_file():
             continue
         home = ROOT / ('README.md' if lang == 'en' else f'README.{TAGS[lang]}.md')
-        problems, n, k = compare(kind, source.read_text(encoding='utf-8'), built.read_text(encoding='utf-8'),
+        problems, n, k, added = compare(kind, source.read_text(encoding='utf-8'), built.read_text(encoding='utf-8'),
                                  markdown_words(home.read_text(encoding='utf-8'))[0])
         failures += [f'{lang} {kind}: {p}' for p in problems]
-        count += 1; words += n; links += k
-    return failures, count, words, links
+        count += 1; words += n; links += k; additions += added
+    return failures, count, words, links, additions
 
 
 def control(build):
@@ -160,7 +163,7 @@ def main():
     parser.add_argument('--output', type=Path, default=ROOT / 'site/_build')
     parser.add_argument('--control', action='store_true', help='also show that a moved and a removed paragraph fail')
     args = parser.parse_args()
-    failures, count, words, links = run(args.output.resolve())
+    failures, count, words, links, additions = run(args.output.resolve())
     for failure in failures:
         print('FAIL:', failure)
     if args.control:
@@ -169,7 +172,8 @@ def main():
             if not caught: failures.append(name)
     if failures:
         print(f'RESULT: FAIL, {len(failures)} differences'); sys.exit(1)
-    print(f'RESULT: PASS, {count} pages, {words} words and marks in source order, {links} links')
+    named = ', '.join(f'{additions.count(n)} {n}' for n in sorted(set(additions))) or 'none'
+    print(f'RESULT: PASS, {count} pages, {words} words and marks in source order, {links} links; additions not in the sources: {named}')
 
 
 if __name__ == '__main__':

@@ -58,6 +58,31 @@ def picture_size(path):
     return None
 
 
+def counted_figures():
+    """Numbers for the trial figures row, each counted now from the repository's own record, never typed.
+
+    Returns (anchor of the home page's existing link that names the thing, count, record, counted unit).
+    """
+    merges = (ROOT/'docs/upstream-merges.md').read_text(encoding='utf-8').splitlines()
+    start, end = merges.index('**Merged:**'), merges.index('**In review:**')
+    programs = [l for l in (ROOT/'docs/programs.md').read_text(encoding='utf-8').splitlines()
+                if re.match(r'\*\*[^*]+\*\*(?:,| and| \()', l)]
+    branches = [l for l in (ROOT/'docs/kde-branches.md').read_text(encoding='utf-8').splitlines()
+                if l.startswith('| ') and not re.match(r'\| *(Project|-)', l)]
+    return [('programs-the-edition-changes-for-stereo-3d-and-deep-colour', len(programs), 'docs/programs.md',
+             'paragraphs that open with a program\'s name, none marked Coming or Planned'),
+            ('our-branches-on-kdes-gitlab', len(branches), 'docs/kde-branches.md', 'rows of the table'),
+            ('merged-outside-sparky-stereo', sum(l.startswith('- ') for l in merges[start:end]), 'docs/upstream-merges.md',
+             'entries between "Merged:" and "In review:"; one entry can hold several pull requests')]
+
+
+CHAIN = ('<div class="chain" data-added="chain" aria-hidden="true">'
+         '<span class="chain-program"><i>&nbsp;</i></span><b>→</b>'
+         '<span class="chain-pair"><i>&nbsp;</i><i>&nbsp;</i></span><b>→</b>'
+         '<span class="chain-desktop"><i>&nbsp;</i><i>&nbsp;</i><i>&nbsp;</i></span><b>→</b>'
+         '<span class="chain-screens"><i>&nbsp;</i><i>&nbsp;</i><i>&nbsp;</i></span></div>')
+
+
 class Renderer:
     def __init__(self, catalogs, cfg):
         self.catalogs = catalogs
@@ -185,6 +210,16 @@ class Renderer:
             parts.append(escape(unescape(value[i:end]))); i = end
         return ''.join(parts)
 
+    def figures(self, catalog, source):
+        """A trial row under the first screen: a counted number beside a label this language's page already has."""
+        items = []
+        for anchor, count, _, _ in counted_figures():
+            label = next(v for k, v in catalog['strings'].items()
+                         if k.startswith('home.more-about-the-edition.item') and f'<a id="{anchor}"></a>' in v)
+            link = self.inline(expand(label.replace(f'<a id="{anchor}"></a>', ''), catalog['strings']), source)
+            items.append(f'<li><strong>{count}</strong> {link}</li>')
+        return '<ul class="figures" data-added="figures">' + ''.join(items) + '</ul>'
+
     def content(self, catalog, kind):
         doc = catalog['pages'][kind]; source = doc['source']; strings = catalog['strings']
         # The home page's first screen is one group: the opening, then the drawing
@@ -257,11 +292,15 @@ class Renderer:
                         css = {'01':'lead intro-copy','02':'intro-copy','03':'hero','04':'gallery','05':'caption','06':'status','07':'next-step'}.get(key[-2:], '')
                     if '<img ' in value and not css: css = 'gallery' if value.count('<img ')>1 else 'hero'
                     rendered = self.inline(value,source)
+                    if kind == 'home' and key == 'home.how-it-works.paragraph01':
+                        active.append(CHAIN)  # a wordless strip over the section's own sentence
                     if kind == 'home' and key == 'home.intro.paragraph03':
                         rendered = rendered.replace(' loading="lazy"', '')  # the first screen's picture loads at once
                     active.append('<div class="'+css+'">' + rendered + '</div>' if css in ('hero','gallery') else '<p' + (f' class="{css}"' if css else '') + '>' + self.inline(value,source) + '</p>')
                     if kind == 'home' and key in ('home.intro.paragraph05', 'home.intro.paragraph07'):
                         active.append('</div>')  # the caption ends the pictures' column; the next step ends the first screen
+                    if kind == 'home' and key == 'home.intro.paragraph07':
+                        active.append(self.figures(catalog, source))
                 else: raise ValueError('Unsupported block: ' + typ)
         close_list()
         if kind != 'home':

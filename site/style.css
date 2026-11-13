@@ -162,3 +162,26 @@ main p, .site-footer p { text-wrap: pretty; }
 @media print {
   .depth-decoration { display: none; }
 }
+
+/* Trial, on its own commit: a row of counted figures under the first screen and
+ * a wordless strip over "How it works". Both wait for a cold reading. */
+.figures { display: flex; flex-wrap: wrap; gap: .75rem 2.5rem; list-style: none; margin: 1.6rem 0 .4rem; padding: 1rem 0; border-block: 1px solid var(--border); }
+.figures li { display: flex; align-items: baseline; gap: .6rem; margin: 0; flex: 1 1 14rem; max-inline-size: none; }
+.figures strong { font-size: 2rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.chain { display: flex; flex-wrap: wrap; align-items: center; gap: .7em; margin: 1em 0 .2em; color: var(--border); font-size: 1rem; }
+.chain b { font-weight: 400; font-size: 1.3em; }
+.chain span { position: relative; display: flex; align-items: center; justify-content: center; gap: .2em; width: 4.6em; height: 3em; }
+.chain i { display: block; font-size: 0; border: 2px solid var(--link); border-radius: 2px; }
+.chain-program i { width: 3.4em; height: 2.4em; border-top-width: .5em; }
+.chain-pair { border: 2px solid var(--border); border-radius: 3px; }
+.chain-pair i { width: 1.8em; height: 2em; }
+.chain-desktop i { position: absolute; width: 2.6em; height: 1.7em; background: var(--page); }
+.chain-desktop i:nth-child(1) { left: .2em; top: .2em; border-color: var(--border); }
+.chain-desktop i:nth-child(2) { left: .9em; top: .65em; }
+.chain-desktop i:nth-child(3) { left: 2.2em; top: 1.3em; width: 1.5em; height: 1.2em; border-color: var(--text); }
+.chain-screens i:nth-child(1) { width: 2.3em; height: 1.4em; }
+.chain-screens i:nth-child(2) { width: 1.5em; height: .8em; border-radius: .4em; }
+.chain-screens i:nth-child(3) { width: .7em; height: 1.3em; }
+@media (max-width: 40rem) {
+  .chain { font-size: .68rem; }
+}

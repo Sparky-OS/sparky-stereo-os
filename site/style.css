@@ -93,9 +93,12 @@ td img { max-width: 5rem; }
 /* The source opening stays whole; compact type brings its picture into view. */
 @media (max-width: 40rem) {
   :root { line-height: 1.5; }
+  html:root:lang(ja), html:root:lang(ko), html:root:lang(zh) { line-height: 1.6; } /* before the general rule below, so it names html to win */
+  .site-header { padding-block: .4rem; }
+  .home .opening-copy p { margin: .5rem 0; }
   .home .lead { font-size: 1rem; }
   .home .lead strong { font-size: 1.125rem; line-height: 1.35; }
-  .home h1 { font-size: 1.5rem; margin-bottom: .65rem; }
+  .home h1 { font-size: 1.5rem; margin-bottom: .4rem; }
   .home main { padding-top: .8rem; }
 }
 .maintainers { display: grid; grid-template-columns: 5rem 1fr; gap: 1.25rem; }

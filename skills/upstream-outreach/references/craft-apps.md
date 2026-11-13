@@ -423,3 +423,10 @@ Fix: read the shared format contract and search upstream before adding another p
 [PhotoCraft #13092](https://github.com/storytold/photocraft/pull/13092), by dotCooCoo, contains the exact pin-transition regression: a malformed path must return Corrupt naming the field, while a bundle without the optional member still opens.
 How found: the full receiving gate named the old assertion, and the PR’s original non-merge commit fb7368e5d explained the same transition.
 Carry the original author and date; when the edition’s common-source binding supersedes the PR’s Git pin and lock lines, identify that scope and verify the applicable test hunk instead of claiming whole-commit byte identity.
+
+Symptom: importing a local bundle prerequisite fails with `lazy fetching disabled` and `could not fetch ... from promisor remote`, although the source is not shallow.
+Cause: a partial clone knows the commit but lacks promised historical objects; upload-pack disables lazy fetching while serving that clone.
+Fix: fetch the exact accepted prerequisite from the verified public repository into the empty restore database, then import the incremental bundle and compare its head and tree before full fsck.
+Keep the prerequisite explicit; do not call an incremental bundle standalone or rewrite the source history to repair a transfer.
+How found: the shallow check returned false, the local transfer named the promisor restriction, and the public prerequisite allowed all four checkpoint head/tree restores and all three working-patch restores to pass.
+Untracked source files need their own saved bytes and hashes; a committed head restore alone does not preserve receiving work in progress.

@@ -98,6 +98,69 @@ Starting a program costs 4 to 6 ms static and 12 to 19 ms with the libraries (th
   The standard library's file name changes with the compiler, so the dependency itself forces the order.
 - **What upstream could change to make it cheaper** (a separate offer, never a condition of our build): one craft-libs revision for all apps of a release (here the two apps pinned five different revisions, so only one craft-libs crate was shared), features that only add, and the fonts and translations loaded from a shared folder (each program of upstream's PhotoCraft release is 46 to 53 MB larger than the same program built without them).
 
+## The edition's Rust toolchain
+
+Learned in November 2026 on rustc 1.98.1 and 1.99.1.
+Rust's dynamic libraries load only with the compiler that built them, so the suite needs one pinned compiler, and the edition builds it from source: Debian's `rustc` source package as Debian has it, plus one binary package, through Lean Code.
+The recipe is `sparky-os/packages/rustc` in the [build tree](https://github.com/Sparky-OS/sparky-stereo-os-build); its README has the commands.
+
+### Recipe
+
+1. **Look in Debian's archive first.** `https://api.ftp-master.debian.org/madison?package=rustc&f=json&a=source` lists every suite; on 2026-11-12 testing had 1.97.1, unstable 1.98.1 and experimental 1.99.1, so both links of the chain were Debian's own source packages, fetched with `apt-get source --download-only rustc=VERSION` (deb-src lines for unstable and experimental, apt checks them against the signed archive).
+2. **The chain, no downloaded compiler.** Debian's `README.source`: "The system rustc has to be either the previous or the same version as the rustc being built". The first link is built by Debian testing's compiler, the next by ours: `build.sh versions/1.98.1.env WORK SRC`, then `build.sh versions/1.99.1.env WORK2 SRC2 WORK/out`.
+   The versions file names the seed (`SEED_VERSION`), and the build stops when apt offers another compiler.
+   The dependencies are installed in one container with the network, the result is committed as an image, and the compile runs from that image with `--network none`.
+3. **The runtime package.** Debian's rules delete the standard library's shared object (`rm .../rustlib/$(DEB_HOST_RUST_TYPE)/lib/libstd-*.so`), and Debian's rustc then answers `-C prefer-dynamic` with a statically linked program and exit 0.
+   The recipe moves the file into the public library folder, in a package named `libstd-rust-HASH` after the 16 hex digits of the file's name (Debian Policy 8.1: "The run-time shared library must be placed in a package whose name changes whenever the SONAME of the shared library changes"), with a link left in the sysroot and a dependency from `libstd-rust-dev`.
+4. **The first build of a version finds the hash.** `STD_HASH=discover` compiles, stops at the install step with the library's real name, makes the source package again and packages the compiled tree with `dpkg-buildpackage -nc`; then record `STD_HASH=...` in the versions file.
+5. **Lean Code.** `lean.debian_prepare` with a preserve plan: only `compiler/rustc_llvm`'s seven C++ files are native inputs of the build; `rust-src` stays as authored in the package stage.
+6. **Gates and proof.** `lean.release check-debs` on the archives (it writes the build record), `check-link` on the finished packages, then in a clean container: `rustc -C prefer-dynamic` gives a program whose `NEEDED` names exactly `libstd-HASH.so`, it starts without `LD_LIBRARY_PATH`, `dpkg-shlibdeps` writes `libstd-rust-HASH (= VERSION)`, and with the package removed by force it exits 127 and names the file.
+
+### Measured (four CPUs, a busy machine)
+
+- rustc 1.98.1 built by Debian's 1.97.1: the compile 2 h 01 min with Debian's settings (stage 2, debug information level 2, documentation, the wasm32 and bpf standard libraries, tests not run); the dependencies step 4 min; one packaging pass 36 min.
+- rustc 1.99.1 built by our 1.98.1: the compile 1 h 54 min, the packaging pass 44 min, 2 h 42 min in all.
+- The build tree: 39 GB each; the 28 archives 966 MB and 887 MB, of which about 600 MB are debug symbols.
+- `libstd-rust-HASH`: 0.6 to 0.7 MB as an archive, 1,586 and 1,627 KiB installed; its symbols file lists 1,825 symbols and `dpkg-shlibdeps` prints no symbol warning.
+- The source packages: three runs under three clocks, zones, umasks and checkout times give the same sums, equal to the built source's, when `SOURCE_DATE_EPOCH` is the build's; recording the hash is a commit in the recipe's folder, so the recipe's own date moves after it.
+- A compiler update with apt: the new toolchain installs `libstd-rust-NEWHASH` beside the old one, the suite built by the old compiler keeps starting, `autoremove` does not take the old runtime package while the suite depends on it, and takes it (with the old suite library and `libstd-rust-1.98`) once the rebuilt suite is installed.
+
+### Traps: the symptom, the cause, the fix, how it was found
+
+- Symptom: `lean.debian_prepare` says "Not a conventional dh rules file; integrate its builder explicitly".
+  Cause: Debian's rules call `$(SYSTEM_WORKAROUNDS) dh $@`, and the check wanted `dh` first on its line.
+  Fix: since toolkit 0.1.29 the check accepts one make variable before `dh`.
+  Found by: the message, then the rules file's `%:` target.
+- Symptom: the build stops at once with "Source preservation pattern matches no eligible file: src/doc/*".
+  Cause: the preserve plan was written from a count with more extensions than the source walker reads.
+  Fix: list the files with the walker's own rule (`.h .hh .hpp .hxx .c .cc .cpp .cxx .inl .S .sx`, folders named `build` and `debian` skipped) before writing a pattern; here 172 files, 7 of them the compiler's.
+  Found by: the message names the pattern.
+- Symptom: a program's package has no dependency on the standard library's package, and `dpkg-shlibdeps` prints "cannot extract name and version from library name 'libstd-fee3606a4e1e729c.so'".
+  Cause: from a `shlibs` file dpkg reads a version out of a SONAME only as `NAME.so.VERSION` or `NAME-VERSION.so` with a digit first; a hash that starts with a letter gives a warning and no dependency.
+  Fix: a `symbols` file, which is matched by the SONAME as it is, with the exact dependency as its template; `dpkg-gensymbols` writes the symbol list, so no "found in none of the libraries" warning is left.
+  Found by: a toy library built twice, with a SONAME hash that starts with a letter and one that starts with a digit.
+- Symptom: the package stage stops with `lean.package.Invalid: /usr/src/rustc-1.98.1/src/tools/rustc-perf/.../bench-branches.py: check failed: the authored file does not parse: Missing parentheses in call to 'print'`.
+  Cause: `rust-src` ships the whole compiler source, benchmark inputs included, and one of them is a Python 2 script.
+  Fix: `rust-src` is source for other builds (cargo checks `library/vendor` against `.cargo-checksum.json`, rust-analyzer and `-Zbuild-std` read it), so its payload is kept byte for byte through the toolkit's preservation plan, with the reason in the lc1 manifest.
+  Found by: the message names the file.
+- Symptom: a second packaging pass stops with "already marked; use a fresh staging tree, never project MR again".
+  Cause: the first pass had sealed the staging trees of the packages it finished.
+  Fix: before `dpkg-buildpackage -nc`, remove every package's `debian/PACKAGE` and `debian/.debhelper/PACKAGE`, `debian/files`, `debian/tmp` and the install stamp; the compiled tree stays.
+  Found by: the message; 24 archives had been written before the first pass failed.
+- Symptom: the changelog of the same recipe commit names another seed compiler a week later.
+  Cause: the text came from `apt-cache policy rustc` in the build container.
+  Fix: the versions file names the seed, and the dependencies step checks apt against it.
+  Found by: reading the source step while preparing the reproducible-source proof.
+- Symptom: `cargo build` of the generated workspace says `failed to read .../suite-198/lightcraft/crates/catalog/Cargo.toml`.
+  Cause: the generated library crates name their member crates by the absolute path of the folder they were generated in, and the build mounted the tree at another path.
+  Fix: generate the tree at the path it is built at.
+  Found by: the path in the message is the generation folder.
+- Symptom: lean tests fail in a container with `git show ...` exit 128 and a failed `gpg --quick-generate-key`.
+  Cause: the tree was a git worktree whose repository was not mounted, and the scratch path made gpg-agent's socket longer than 108 bytes.
+  Fix: mount the folder that holds the repository at its own path, and give the tests a short `HOME` and `TMPDIR`.
+  Found by: the two commands in the failure output; both pass on a plain clone.
+
 ## Not proven here
 
-The whole suite; the Lean Code gate and the link and start gate on real `+lc1` packages; a second build giving the same library for the same id; timing on a quiet machine; the edition's Rust toolchain built from source.
+The whole suite; the suite itself as a `+lc1` source package (the toolchain's packages passed `check-debs` and `check-link`, the suite's are still test packages); timing on a quiet machine; the compiler's own test suite, which the recipe does not run; the compiler's Rust sources through the Rust adapter; arm64.
+Two builds of the same tree by the same compiler gave byte-identical programs and libraries.

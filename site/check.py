@@ -169,7 +169,7 @@ def check(output, report_dir=None, tidy=True):
     notes.append(f'English home: {home.stat().st_size} HTML bytes; {weight-script_bytes} bytes with script disabled; {weight} bytes with decoration script ({script_bytes} bytes); all images and CSS, uncompressed, cold cache')
     notes += [f'{len(paths)} HTML pages; {references} local references resolved; {resources} resource references all local',
               f'{len(anchor_rows)-1} original headings/explicit anchors retained; {len(source_rows)-1} source block mappings',
-              'Catalogues match original Markdown; missing keys enumerated; built text matches each language exactly',
+              'Catalogues match original Markdown; missing keys enumerated; each built page equals the rendering of its own catalogue (the words against the source: verify_text.py)',
               'Language menus, alternates, canonicals, heading order, link names and image alternatives checked']
     if report_dir:
         report_dir.mkdir(parents=True,exist_ok=True)

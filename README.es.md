@@ -2,7 +2,7 @@
 
 🇨🇦 [English](README.md) · 🇧🇷 [Português](README.pt-BR.md) · 🇵🇱 [Polski](README.pl.md) · 🇫🇷 [Français](README.fr.md) · 🇩🇪 [Deutsch](README.de.md) · 🇲🇽 [Español](README.es.md) · 🇯🇵 [日本語](README.ja.md) · 🇰🇷 [한국어](README.ko.md) · 🇨🇳 [简体中文](README.zh-CN.md) · 🇭🇰 [繁體中文](README.zh-TW.md)
 
-**Cree y explore en 3D en la pantalla que ya tiene: pinte, edite fotos y vídeo, estudie moléculas y globos terráqueos, y después vea películas y juegue.**
+**Crear y explorar en 3D en la pantalla que ya tiene: pintar, editar fotos y vídeo, estudiar moléculas y globos terráqueos, y después ver películas y jugar.**
 Está hecho para todo tipo de pantalla 3D: televisores y proyectores 3D, cascos de realidad virtual, pantallas 3D sin gafas y cualquier monitor con gafas rojo-cian.
 En un monitor 2D común, el mismo escritorio funciona sin ningún cambio.
 Sparky Stereo OS, la edición de Daniel Ramos de SparkyLinux (de Paweł "pavroo" Pijanowski), es un sistema Linux con un nuevo escritorio Stereo KDE Plasma.
@@ -22,7 +22,7 @@ Sparky Stereo OS, la edición de Daniel Ramos de SparkyLinux (de Paweł "pavroo"
 <br>Pida la descarga y cuéntenos qué equipo 3D tiene, en su idioma: [🇨🇦](https://github.com/Sparky-OS/sparky-stereo-os/issues/26) [🇧🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/25) [🇵🇱](https://github.com/Sparky-OS/sparky-stereo-os/issues/27) [🇫🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/80) [🇩🇪](https://github.com/Sparky-OS/sparky-stereo-os/issues/153) [🇲🇽](ISSUE-ES) [🇯🇵](https://github.com/Sparky-OS/sparky-stereo-os/issues/81) [🇰🇷](https://github.com/Sparky-OS/sparky-stereo-os/issues/83) [🇨🇳](https://github.com/Sparky-OS/sparky-stereo-os/issues/84) [🇭🇰](https://github.com/Sparky-OS/sparky-stereo-os/issues/85)
 
 - <a id="science-and-engineering"></a>**[Ciencia e ingeniería](docs/edition-in-detail.md#science-and-engineering):** el globo de Marble, las gráficas de KAlgebra y las moléculas de Kalzium en 3D; los modelos 3D y las placas de circuito están en desarrollo. El escaneo 3D está previsto: un vídeo de una pieza, de un sitio o de un espécimen se convierte en un modelo 3D.
-- <a id="create"></a>**[Crear](docs/edition-in-detail.md#create):** pinte en 3D y en color profundo (16 bits por color en lugar de 8), y edite fotos y vídeo en 3D. El escaneo 3D está previsto: un vídeo de un objeto o de un lugar se convierte en un modelo 3D que puede recorrer.
+- <a id="create"></a>**[Crear](docs/edition-in-detail.md#create):** pintar en 3D y en color profundo (16 bits por color en lugar de 8), y editar fotos y vídeo en 3D. El escaneo 3D está previsto: un vídeo de un objeto o de un lugar se convierte en un modelo 3D que puede recorrer.
 - <a id="watch-and-play"></a>**[Ver y jugar](docs/edition-in-detail.md#watch-and-play):** películas, fotos y juegos en 3D, en una ventana o a pantalla completa.
 - <a id="vr-is-also-a-stereo-monitor"></a>**[La realidad virtual también es un monitor estéreo](docs/edition-in-detail.md#vr-is-also-a-stereo-monitor):** un casco, o un teléfono en un visor, es también una pantalla 3D para este escritorio.
 - <a id="for-developers"></a>**[Desarrollar](docs/edition-in-detail.md#for-developers):** haga que su programa sea 3D una sola vez; el escritorio lo adapta a cada pantalla.

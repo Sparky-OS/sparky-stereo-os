@@ -167,7 +167,14 @@ class Renderer:
                 close_list()
                 active.append(''.join(anchor(x) for x in re.findall(r'(?:id|name)="([^"]+)"',b['raw'])))
                 continue
+            if b.get('within'): continue  # drawn inside its paragraph, at its source line
             key = b['key']; value = expand(strings[key], strings)
+            if b.get('inserts'):
+                # A later source addition keeps its own key and its place in the paragraph.
+                lines = value.split('\n')
+                for after, inserted in reversed(b['inserts']):
+                    lines.insert(after, expand(strings[inserted], strings))
+                value = '\n'.join(lines)
             if typ == 'heading':
                 close_list()
                 if kind == 'home' and '.credit.' in key: active = footer

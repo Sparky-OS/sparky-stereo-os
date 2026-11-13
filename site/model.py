@@ -202,10 +202,18 @@ def extract():
                     for offset, line in enumerate(b['raw'].splitlines()):
                         named = next((name for marker, name in additions if marker in line), None)
                         if named:
-                            added.append(dict(b, raw=line, semantic=named, line=b['line'] + offset))
+                            # 'after' is the number of the paragraph's own lines
+                            # that come before this one: the page puts it back there.
+                            added.append(dict(b, raw=line, semantic=named, line=b['line'] + offset, after=len(kept)))
                         else:
                             kept.append(line)
-                    if kept: expanded.append(dict(b, raw='\n'.join(kept)))
+                    if kept and added:
+                        expanded.append(dict(b, raw='\n'.join(kept), inserts=[[a['after'], a['semantic']] for a in added]))
+                    elif kept:
+                        expanded.append(dict(b, raw='\n'.join(kept)))
+                    if kept:
+                        for a in added: a['within'] = True
+                    for a in added: del a['after']
                     expanded.extend(added)
                 source_blocks = expanded
             for b in source_blocks:
@@ -220,6 +228,10 @@ def extract():
                     heading += 1; counts = Counter()
                 if 'semantic' in b:
                     key = f'{kind}.{section}.{b.pop("semantic")}'
+                elif b.get('inserts'):
+                    counts[b['type']] += 1
+                    key = f'{kind}.{section}.{b["type"]}{counts[b["type"]]:02}'
+                    b['inserts'] = [[after, f'{kind}.{section}.{name}'] for after, name in b['inserts']]
                 else:
                     counts[b['type']] += 1
                     key = f'{kind}.{section}.{b["type"]}{counts[b["type"]]:02}'

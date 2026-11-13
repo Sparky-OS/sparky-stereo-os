@@ -360,16 +360,28 @@
         {
           "type": "paragraph",
           "line": 61,
+          "inserts": [
+            [
+              4,
+              "detail.where-it-is-going.tpac-report"
+            ],
+            [
+              4,
+              "detail.where-it-is-going.after-tpac-report"
+            ]
+          ],
           "key": "detail.where-it-is-going.paragraph01"
         },
         {
           "type": "paragraph",
           "line": 65,
+          "within": true,
           "key": "detail.where-it-is-going.tpac-report"
         },
         {
           "type": "paragraph",
           "line": 66,
+          "within": true,
           "key": "detail.where-it-is-going.after-tpac-report"
         },
         {
@@ -774,11 +786,18 @@
         {
           "type": "paragraph",
           "line": 197,
+          "inserts": [
+            [
+              1,
+              "detail.documents.glossary"
+            ]
+          ],
           "key": "detail.documents.paragraph01"
         },
         {
           "type": "paragraph",
           "line": 198,
+          "within": true,
           "key": "detail.documents.glossary"
         },
         {

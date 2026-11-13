@@ -59,6 +59,7 @@ Esta es la beta 1: cualquiera puede probarla, y el enlace de descarga se entrega
 **Lo que acaba de hacer:** ejecutó un sistema completo desde la memoria USB.
 No se escribió nada en sus discos, y la memoria USB no recuerda nada de la sesión.
 
+<a id="when-you-want-more"></a>
 ## Cuando quiera más
 
 Una página cada vez, todas en [la guía larga, en inglés](beta1-install-classic-linux.en.md):
@@ -68,6 +69,7 @@ Una página cada vez, todas en [la guía larga, en inglés](beta1-install-classi
 - **Instalarlo junto a Windows:** [qué hacer primero en Windows](beta1-install-classic-linux.en.md#7-installing-beside-windows), y después el instalador.
 - **Lo que todavía no funciona:** [problemas conocidos de la beta 1](beta1-install-classic-linux.en.md#9-known-issues-of-beta-1).
 
+<a id="why-step-1-comes-first"></a>
 ## Por qué el paso 1 va primero
 
 El cifrado puede estar activado sin que nadie lo haya elegido: "Cifrado de dispositivo es una característica de Windows que habilita el cifrado de BitLocker automáticamente para unidades de sistema operativo y unidades fijas" ([Cifrado del dispositivo en Windows](https://support.microsoft.com/es-es/windows/device-encryption-in-windows-cf7e2b6f-3e70-4882-9532-18633605b7df)).

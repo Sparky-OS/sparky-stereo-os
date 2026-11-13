@@ -39,6 +39,7 @@ Sparky Stereo OS, la edición de Daniel Ramos de SparkyLinux (de Paweł "pavroo"
 <a id="why-one-format-full-side-by-side-at-any-resolution"></a>**Los programas describen cada imagen; el escritorio la adapta a cada pantalla.** Para el estéreo, las dos vistas viajan juntas en un único búfer lado a lado completo (full side by side). La extensión HDR propuesta conserva la descripción del color de la imagen y la información para reconstruirla mediante esa misma división del trabajo.
 [En detalle (en inglés)](docs/edition-in-detail.md#how-it-works)
 
+<a id="more-about-the-edition"></a>
 ## Más sobre la edición
 
 - <a id="who-builds-it"></a>[Quién la construye](docs/edition-in-detail.md#who-builds-it)

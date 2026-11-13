@@ -353,3 +353,9 @@ Then recreate the bundle and actually fetch it into a new database, compare its 
 How found: the first fresh catalog restore reported the missing parent even though bundle verification had succeeded; the source's shallow flag confirmed the cause.
 If complete ancestors cannot be obtained, state the exact prerequisite or shallow boundary and do not claim full history.
 Never rewrite an author, parent or date to make a checkpoint appear complete.
+
+Symptom: a Python archive restore check rejects a source file although its extracted SHA-256 matches.
+Cause: `tarfile`'s secure `data` filter intentionally strips group-write permission, so a stored 0664 source file is extracted as 0644.
+Fix: retain original source modes in the manifest and write explicit safe 0644 or 0755 source-archive headers, while checking tested executable bytes and modes exactly.
+How found: compare source, stored member and extracted modes beside their matching hashes before changing the check.
+Keep the secure extraction filter; do not disable it to preserve an incidental group-write bit.

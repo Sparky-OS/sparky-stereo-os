@@ -88,6 +88,9 @@ It also compiles a program in both forms and checks that `line!()` and the panic
 **Preparation status, 2026-11-13:** source preparation has compiler-backed controls; the compiler build and hardware timings are separate acceptance steps.
 This recipe accompanies `tools/rust-lean-experiment` in the distribution build tree; run its source-preparation driver with the pinned toolkit and compiler in a container.
 Its recipe is `prepare.py AUTHORED OUTPUT`, then `verify.py AUTHORED OUTPUT`.
+For Debian's pinned 1.99.1+dfsg1-1~exp1, pass `--checksum-baseline tools/rust-lean-experiment/debian-1.99.1-checksum-baseline.json` to preparation, as the driver's README specifies.
+The complete source pass inventoried 70,016 Rust files: 31,233 passed the compiler lexer checks, and 38,783 stayed authored for recorded consumers, fixtures or carriage returns.
+The independent verifier checked all file contents, modes and links against the manifests.
 It leaves the authored source intact and makes B with the existing renderer and C with comment-form documentation removed where the consumer scan permits it.
 The manifests bind file contents, modes and links; `source-report.json` names preserved inputs and C's crate exceptions.
 The preparation compiler checks B's complete token listing, and checks C after excluding doc attributes on both sides.

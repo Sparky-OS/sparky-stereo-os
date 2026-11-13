@@ -180,3 +180,23 @@ A native host should retain at most one pending worker or GPU pair.
 When an immutable request becomes obsolete, cancel it and wait for acknowledgement before starting another worker, rather than accumulating cancelled workers during rapid edits.
 Only hand the native window one complete left-first picture, together with the sample and scene metadata belonging to that picture.
 Poll live compositor feedback after the scene settles because resizing changes the native disparity budget even when the chosen source resolution stays fixed.
+
+## Solid backgrounds and model units
+
+Pass the actual perspective environment's horizontal focal coefficient to `Camera::infinity_projection_x`.
+Use zero when the renderer paints only a solid background; a constant background is not a perspective plane at infinity.
+Budget the visible model depths against the existing target plane and the compositor's limits.
+When the entire model lies on that plane and no environment is drawn, keep the central camera with zero baseline.
+
+Symptom: a solid-background model cannot enter the shared camera core without pretending to draw an environment.
+Cause: the input validator required a strictly positive infinity coefficient and the baseline solver assumed a nonzero sunk constraint.
+Fix: accept a finite nonnegative coefficient, apply only nonzero disparity constraints, and keep zero baseline when neither side constrains depth.
+How found: a regression with no environment was rejected by the old validator; the same test now predicts +12 and -8 pixels at depths 4 and 6, checks the flat target-plane case, and still rejects negative/nonfinite environment inputs.
+The existing perspective-environment and orthographic tests retain their earlier predictions.
+
+For an f64 CAD or PRC rasterizer using an f32 camera core, express the shared camera in its local basis and measure distances in the existing positive eye-to-target distance.
+Keep original world vertices and the ordinary f64 raster projection; restore physical eye offsets along the original right vector and apply the shared core's off-axis projection delta.
+Do not narrow a large world-space origin to f32 or point each eye at the unchanged world target.
+Expand normalized depth rounding outward, and include the near clipping plane when geometry crosses it, so the camera budget cannot miss newly clipped corners.
+Keep the headlight at the central camera while geometric eyes, visibility/depth targets and resolved images are private.
+These are renderer bridge requirements; the PRC adapter still needs its own tests and native capture before it can be called proved.

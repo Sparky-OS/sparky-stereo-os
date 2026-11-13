@@ -46,6 +46,7 @@ Core skills are `sparky-stereo`, `ai-partners`, `making-skills`, `development-ho
 | A bug in a program the edition did not write, before writing any fix | [search-upstream-first](search-upstream-first/SKILL.md) |
 | Forks, pushing, and checking that the work is online; releases and DOIs, the Sponsor button, our own libraries' repositories, where large files go | [forks-and-online](forks-and-online/SKILL.md) |
 | A maintainer message, contribution or follow-up | [upstream-outreach](upstream-outreach/SKILL.md) |
+| A program outside the archive added to a distribution's app center (an AppImage from its author's release, checked, installed for every user, removed cleanly) | [upstream-outreach](upstream-outreach/SKILL.md), [adding a program to an app center](upstream-outreach/references/adding-a-program-to-an-app-center.md) |
 | An FFmpeg pull request: series, trailers, FATE, the review bot (with upstream-outreach) | [contrib-ffmpeg](contrib-ffmpeg/SKILL.md) |
 | A HandBrake pull request (with upstream-outreach) | [contrib-handbrake](contrib-handbrake/SKILL.md) |
 | A Universal Media Server pull request (with upstream-outreach) | [contrib-ums](contrib-ums/SKILL.md) |

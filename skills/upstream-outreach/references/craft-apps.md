@@ -338,3 +338,10 @@ Cause: the generated asset attribution and the audited source-document map are i
 Fix: reread the relevant original license and notice, verify the font or asset digest, then update only the matching `LICENSES.toml` checksum and rerun the complete gate.
 How found: the full gate reached the source-document validator after all workspace tests and WASM checks passed; its exact diagnostic identified the stale document mapping.
 Do not refresh every hash automatically or remove the integrity guard.
+
+Symptom: the full CI passes required language and glyph checks, but the built GUI refuses Korean with `language must be one of auto, en`.
+Cause: the CI helper exports catalog and font inputs in a child shell; a later `cargo build` in its parent does not inherit those exports and produces the optional-input executable.
+Fix: put required-input exports around the entire gate and executable build, or explicitly wrap each command with the same environment helper.
+How found: a real native `ui.set language=ko` probe rejected the archived executable even though CI's required-input test body had run.
+Rebuild and repeat the native captures on the corrected executable; preserve the first binary and failed probe as diagnostics.
+Add a runtime non-English-language request to every capture so this build-input error cannot pass an English geometry proof again.

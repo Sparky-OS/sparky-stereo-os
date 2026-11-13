@@ -45,7 +45,6 @@ h3 { font-size: 1.2rem; margin-top: 1.8rem; }
 p { margin: .9rem 0; }
 .home .lead { font-size: 1.12rem; }
 .home .lead strong { display: block; font-size: clamp(1.2rem, 2.2vw, 1.45rem); line-height: 1.3; margin-bottom: .5rem; }
-.home .intro-copy { max-width: 64rem; }
 img { max-width: 100%; height: auto; }
 .screenshot { display: block; margin: .65rem auto; border-radius: .25rem; }
 .hero { margin: 1.2rem 0 .7rem; }
@@ -84,7 +83,7 @@ td img { max-width: 5rem; }
   .more-links { columns: 1; }
   .gallery { gap: .3rem; }
   .site-header { gap: .5rem; }
-  p, li { overflow-wrap: anywhere; }
+  p, li { overflow-wrap: anywhere; hyphens: auto; }
 }
 @media print {
   .lang, .skip { display: none; }
@@ -102,6 +101,31 @@ td img { max-width: 5rem; }
 .maintainers dt, .maintainers dd { margin: 0; }
 .maintainers dt img { width: 72px; }
 
+/* Type by script. Running text keeps a measure a reader can follow: under 80
+ * characters a line in the Latin-script languages (66ch, the zero being wider
+ * than the average letter) and 38 in Japanese, Chinese and Korean, whose
+ * characters are as wide as they are high (WCAG 2.2, 1.4.8 names 80 and 40).
+ * Pictures and lists of links keep the page's width. */
+main p, main li, main dd, main blockquote, .site-footer p { max-inline-size: 66ch; }
+.gallery, .hero, .doors, .doors li, .more-links, .more-links li, .maintainers dd { max-inline-size: none; }
+main p, .site-footer p { text-wrap: pretty; }
+/* Each language's own system fonts by name, so one page never shows another
+ * language's forms of the shared Han characters; none is fetched. */
+:lang(ja) { font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", Meiryo, "Noto Sans CJK JP", "Noto Sans JP", system-ui, sans-serif; }
+:lang(ko) { font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans CJK KR", "Noto Sans KR", system-ui, sans-serif; }
+:lang(zh-CN) { font-family: "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC", system-ui, sans-serif; }
+:lang(zh-TW) { font-family: "PingFang TC", "Microsoft JhengHei UI", "Microsoft JhengHei", "Noto Sans CJK TC", "Noto Sans TC", system-ui, sans-serif; }
+:root:lang(ja), :root:lang(ko), :root:lang(zh) { line-height: 1.8; }
+:root:lang(ja) main p, :root:lang(ja) main li, :root:lang(ja) main dd, :root:lang(ja) .site-footer p,
+:root:lang(ko) main p, :root:lang(ko) main li, :root:lang(ko) main dd, :root:lang(ko) .site-footer p,
+:root:lang(zh) main p, :root:lang(zh) main li, :root:lang(zh) main dd, :root:lang(zh) .site-footer p { max-inline-size: 38em; }
+:root:lang(ja) .doors li, :root:lang(ko) .doors li, :root:lang(zh) .doors li, :root:lang(ja) .more-links li, :root:lang(ko) .more-links li, :root:lang(zh) .more-links li { max-inline-size: none; }
+:root:lang(ja) :is(h1, h2, h3), :root:lang(ko) :is(h1, h2, h3), :root:lang(zh) :is(h1, h2, h3) { line-height: 1.4; }
+/* These scripts have no italic; a slanted character is a distortion. */
+:lang(ja) em, :lang(ko) em, :lang(zh) em { font-style: normal; }
+:root:lang(ja) { line-break: strict; }
+/* Korean breaks lines between words, not inside them. */
+:root:lang(ko) { word-break: keep-all; overflow-wrap: break-word; }
 /* The first screen. On a wide screen: what it is, its status and the next step
  * in one column, the drawing and the pictures beside them, so a visitor sees
  * all of it without scrolling. The fourth row takes the pictures' extra height. */

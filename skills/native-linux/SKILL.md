@@ -154,6 +154,8 @@ A compute or sparse-buffer program that draws nothing on the RTX through zink, w
 
 A browser canvas (WebGL, three.js, CesiumJS), video or image with `image-rendering: pixelated` that shows black, solid green or blurry on Stereo KWin: [references/browser-pixelated-canvas.md](references/browser-pixelated-canvas.md).
 
+A 3D mouse (six axes) in a stereo program: libspnav and spacenavd, a stand-in daemon and a simulated kernel device for a test, what a vendor kit does on other systems, a program that closes itself while the view moves (`Signal is already emitting`): [references/3d-mouse-libspnav.md](references/3d-mouse-libspnav.md).
+
 ## Lessons from the lanes, October to November 2026
 
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (10 entries).

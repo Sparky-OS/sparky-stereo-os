@@ -430,3 +430,12 @@ Fix: fetch the exact accepted prerequisite from the verified public repository i
 Keep the prerequisite explicit; do not call an incremental bundle standalone or rewrite the source history to repair a transfer.
 How found: the shallow check returned false, the local transfer named the promisor restriction, and the public prerequisite allowed all four checkpoint head/tree restores and all three working-patch restores to pass.
 Untracked source files need their own saved bytes and hashes; a committed head restore alone does not preserve receiving work in progress.
+
+## A common revision must retain every accepted subject
+
+Symptom: the common library passes its whole gate, but the first receiving app fails because `VideoParams.stereo_mode` is missing.
+Cause: the candidate composed current main and a recent camera branch without merging the accepted media branch; its own missing tests could not detect those omitted APIs.
+Fix: audit the ancestry and actual source of every previously received library revision, then compose the complete accepted subjects before qualifying consumers.
+Retain the newer window, protocol and camera paths while restoring container metadata, native sample grids and selected-item decoding in their shared owners.
+How found: FilmCraft's real receiving compile named the missing field; comparing its accepted library tree also found the stereo grid module and selected HEIF API absent.
+A successful library gate establishes the selected source's checks, not that the candidate contains every earlier edition feature.

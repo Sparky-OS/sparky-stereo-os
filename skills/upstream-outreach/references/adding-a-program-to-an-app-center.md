@@ -67,6 +67,52 @@ A red case changes one answer of the system and nothing in the scripts: a direct
 An AppImage has no FUSE device in a container: start it with `APPIMAGE_EXTRACT_AND_RUN=1`, and say so.
 Some programs have a mode without hardware (`kamlynk --demo`, a simulated camera): read the program's `main` for it and use it for the second user.
 
+## When the program installs another container
+
+Vinci 0.4.7, Dionatan Simioni's GPL-3.0-or-later installer for DaVinci Resolve, adds another boundary to this recipe.
+The audit below was done on 2026-11-13; it is not a proof of a Resolve installation or GPU rendering.
+
+1. Read the installer's own system checker and recipe before deciding the entry's dependencies.
+   Separate what the station has installed, what the distribution's published metapackages bring, and what the archive merely offers.
+   A pin for the NVIDIA container toolkit does not install it, and a distrobox recommendation does not guarantee podman.
+   Vinci uses a compatible host distrobox, otherwise downloads its own; its recipe accepts versions from 1.8.0 up to, but excluding, 2.0.0 and selects 1.8.2.5 when it needs a copy.
+   The entry must bring required tools or refuse with a useful message before placing the application.
+2. Record every download boundary separately: the installer AppImage, its container image, container packages and the person's proprietary installer ZIP.
+   Vinci's AppImage is 38,341,112 bytes and needs glibc 2.39 or newer.
+   Its release provides a GitHub asset SHA-256 and a zsync file containing SHA-1, but no standalone SHA-256 manifest or signature file.
+   Compare the downloaded bytes with that digest and pin it; say where the digest came from instead of inventing a `SHA256SUMS` file.
+   A container image such as `ubuntu:24.04` pins the release series, not immutable bytes; check whether the recipe also records a digest.
+   The AppImage's download size cannot stand for the later image, package and Resolve downloads.
+3. Follow the actual exported launcher across the boundary.
+   Vinci writes its own per-user desktop entry and its Open button uses the same command: an absolute distrobox path, `enter`, `env`, then `/opt/resolve/bin/resolve`.
+   A rule that matches the first executable named `resolve` misses that command, and a PATH wrapper cannot intercept its absolute Resolve path inside the container.
+   Check inherited GPU variables as well as those the installer adds.
+   Test the person's GPU choice and native OpenGL where CUDA shares images with it; an exception for every distrobox would also change unrelated containers.
+4. Prove the two execution layers separately.
+   Start the installer on a private display, then exercise its actual container runtime.
+   Giving a GPU to the outer test container does not prove that podman inside it can create a working container or pass that GPU through.
+   If nesting is refused, keep the exact error and test that part in an isolated virtual machine; do not call a simulated runtime a successful installation.
+   A virtual GPU cannot qualify the physical NVIDIA or AMD compute path either, so keep that gap explicit.
+5. Keep removal boundaries equally clear.
+   Removing the installer AppImage is separate from uninstalling the Resolve containers and the projects the person created.
+   Read the installer's own uninstall flow, and never remove projects or reach into home folders as part of the app center's removal action.
+
+### Audit traps
+
+- **Symptom:** the prerequisite audit cannot confirm a brief's installed podman.
+  **Cause:** archive availability does not establish installed state.
+  **Fix:** check both installed package state and the executable's location, then check the published metapackage dependencies separately.
+  **How found:** `dpkg-query` reported no installed podman or distrobox and `command -v` found neither, while the reference image's `apt-cache policy podman` offered 5.8.6.
+- **Symptom:** an existing native NVIDIA OpenGL exception does not apply to the exported Resolve entry.
+  **Cause:** the matcher sees distrobox as the executable; the actual Resolve executable is an argument inside the container.
+  **Fix:** reproduce the match against the published implementation, then qualify a scoped launcher integration with the real nested launch before changing it.
+  **How found:** the published matcher made one override for a native Resolve fixture and zero for Vinci's distrobox fixture.
+  This establishes the matching gap only; actual OpenGL rendering remains a separate check.
+- **Symptom:** a reference app-center recipe asks for the author's SHA-256 manifest, but none is published.
+  **Cause:** release formats differ; Vinci publishes four assets including a zsync file, but no `SHA256SUMS`.
+  **Fix:** record the release asset digest as its own source, compare the download, and never describe it as a separate signed or author-written checksum file.
+  **How found:** the release API asset list and body, followed by a local SHA-256 comparison of the downloaded file.
+
 ## Traps
 
 - **Symptom:** the image build stops with `dpkg (subprocess): cannot execute rm command for cleanup (rm): No such file or directory` and `Could not exec dpkg!` right after `Unpacking base-files (14.sparky9~0) over (14.2)`.

@@ -433,6 +433,10 @@ An additional logical-width-941 case at scale 1.25 fails on both cards: content 
 
 ### Traps found while packaging and profiling
 
+- **Symptom:** installed client processes and their hardware-renderer logs pass, but the screenshots are black.
+  **Cause found in the rig:** the vendor pin was applied to clients after the nested compositor had already chosen its EGL path.
+  **Fix:** pin the compositor before starting it too, reject blank pictures in the capture gate, and inspect a representative picture.
+  **Found by:** viewing the supposedly successful installed-page capture; moving the pin before KWin restored visible window content. The precise driver-side reason for the unpinned failure was not profiled.
 - **Symptom:** an AMD-pinned run says it rendered on NVIDIA but its summary says valid.
   **Cause:** glvnd tried NVIDIA first, while the placement check ran only if engine counters were present.
   **Fix:** name Mesa's EGL vendor for AMD pins and reject GPU placement as unverified when the kernel exposes no engine-time evidence.

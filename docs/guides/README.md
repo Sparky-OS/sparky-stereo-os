@@ -2,7 +2,7 @@
 
 Sparky Stereo OS 9 "Mashtabba" beta 1, from the same tested image, written for different readers.
 
-- **Start here:** [Try it on your Windows PC](try-on-windows.en.md), one page, ten steps, nothing installed ([Deutsch](try-on-windows.de.md), [Português](try-on-windows.pt-BR.md)).
+- **Start here:** [Try it on your Windows PC](try-on-windows.en.md), one page, ten steps, nothing installed ([Deutsch](try-on-windows.de.md), [Português](try-on-windows.pt-BR.md), [Español](try-on-windows.es.md)).
 - [Try it, then install it beside Windows](beta1-install-classic-linux.en.md), for people who know Linux the old way, one partition per system folder ([Deutsch](beta1-install-classic-linux.de.md)).
 - [Kit para experimentar e desenvolver em 3D](beta1-dev-kit.pt-BR.md), em português, para quem quer testar e criar programas em 3D.
 - [For designers and 3D artists](beta1-for-designers.en.md).

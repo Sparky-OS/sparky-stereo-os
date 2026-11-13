@@ -7,7 +7,7 @@ Since milestone 4 (the same day) it holds the editor's first light: a KDE progra
 Since milestone 5 (the same day) it holds building in the window: operators dragged onto the page with the core's connection rules shown while they are dragged, a preview that can be pinned and tiled, the two sides of a step side by side, a partner's change marked on the page, and a proof that sends real pointer and key events through the compositor.
 Since milestone 6 (the same day) it holds the stereo preview: the three kinds of stereo project and where their values live in the file, the two eyes drawn by the core with the stereo texture module's own mapping, the preview's 3D area in a Qt Widgets dock, a stereo photograph as a project's source with its per-file corrections, and the proofs read from the compositor's own picture of both eyes.
 Since milestone 7 (the same day) it holds the fitter as a tool in the window: the fitter behind one small program with five kinds of lines, its modern operators as classes of the core, a found procedure laid on a page, one fit for each eye of a stereo photograph, and the corrections to the stereo preview (3D from the start, no limit on a tool's depth, a picture with its depth map, JPS and MPO marks saved, a floated preview in 3D).
-The Text operator and new operators beyond the fitter's nine are not built yet.
+Since milestone 9 (12 November 2026) it holds the Text operator and fonts: FreeType and HarfBuzz compiled into a core that draws the same bytes on four targets, how a document names a font so that it draws on another machine, what the window says when a font is missing, glyphs as drawing seeds with a browser for them, and how an editor's own copy of a shared library's work is dropped for the library's call.
 Later milestones grow this page into the editor's contributor skill.
 
 **Check freshness first.**
@@ -470,6 +470,76 @@ What a later round adds comes in through what is already there: a new fitter thr
 - With 3D off the scene has one camera, in the middle, and both eyes of the screen are the same picture to the last pixel.
 - The program keeps its three 3D options. The view opens in 3D where the desktop takes the declaration; the pair goes to the same declared surface as every stereo picture of the program.
 
+## Text and fonts: working recipe
+
+Daniel's direction for this part: "letters are drawings with meanings, and when fonts are pure drawing, it's even better".
+A glyph is a small exact drawing that a procedure calls in a few bytes.
+The Text operator is a seed a person or the fitter places, never a way to describe a texture in words.
+
+### A font library in a same-bytes core on four targets
+
+- Compile the libraries from their sources with the core's own compiler, for each target, into one archive beside the core: FreeType, HarfBuzz, SheenBidi, plutovg and plutosvg, libpng, zlib, Brotli. A system's packaged library is another version on every machine, and the same bytes end there.
+- Give every library the flags the core's maths has: no fused multiply-add (`-ffp-contract=off`) and no `errno` from the maths. An outline filled with a fused multiply on one target and without on another differs in single coverage values.
+- Generate the small configuration headers (FreeType's module list and options, libpng's `pnglibconf.h`, the Unicode block tables) by a script in the tree, so that every target is built from the same choices.
+- WebAssembly needs three things the others do not: a stand-in for `setjmp.h`, which WASI's C library refuses without the exception-handling extension (here `setjmp` gives 0 and a `longjmp` says which library asked and stops the module, never a silent wrong picture; libpng jumps only on a broken file), WASI's emulation libraries for signals and process clocks, and a larger stack (16 MB here).
+- Keep the renderer's files that another program also compiles unchanged, and wrap them: a file of the core includes each and replaces what must be the core's (here `getenv`, so that the core names the font index and can reset it between documents).
+- Copy every library's licence text beside the build and install it with the program. FreeType's licence asks for its credit line in the documentation.
+- Check which licences meet in one binary. FreeType's own licence and Apache 2.0 do not go with version 2 of the GPL, so a program that also links a library under "GPL 2 or later" is distributed under version 3 or later.
+- Prove it per build, not per library: one font index written by each build, compared byte for byte, and a set of graphs that reach every path of the libraries (TrueType outlines, CFF from a collection, a variable CFF2 font and a variable TrueType font at chosen axis values, Type 1, WOFF, WOFF2, a colour bitmap font, shaped Arabic, Devanagari and Thai, mixed directions with numbers, a missing glyph), each drawn by every build and compared with the others and with a reference table.
+- Keep beside the reference table the SHA-256 of every font file it was drawn with. On a machine with another version of a font the comparison between builds still holds, and the comparison with the table says which font differs instead of failing without a reason.
+- What the machine's fonts cannot reach stays unproven and is said: here COLR layers and paint graphs, SVG glyphs and `sbix`.
+
+### One operator, with a version word
+
+- An operator that exists in the old program keeps its class and its old bytes. Its new form is the same class with more words, and a version word tells them apart: 0 is werkkzeug3's own Text (nine words, two 8-bit strings), 2 draws any font (twelve words and three strings: the text in UTF-8, the font's key, the variable axes).
+- A project that holds only the old form is saved to the old bytes, so werkkzeug3 still reads it.
+- The table's row for the operator is the old row with the new words after it, and the panel's new lines appear only for the new version.
+- Typed text and the packed form carry strings too: strings as quoted text in the typed form, a flag in the packed form's header that says strings and font records follow.
+- The coverage of a glyph has 256 levels in FreeType. A 16-bit document says so in the drawing's notes instead of implying sixteen bits of coverage.
+- Things a drawing has to say without failing (a stand-in for a Windows font name, a glyph the font does not have, another version of a font) go into notes that travel with the picture: from the drawing process to the window, the command line and the partners' answer.
+
+### Naming a font so a document draws elsewhere
+
+- A document names a font by family and style, which is what a person reads and what stays the same across versions of a font.
+- Beside the name it keeps a record: the PostScript name (name ID 6), the version, the file's SHA-256, the file's name, the designer (ID 9), the copyright (ID 0), the licence class and the licence address (IDs 13 and 14). The record is read from the font's own name table when the font is first used.
+- The records live in a part of the file after everything the old program reads, and are absent when no operator names a font.
+- Resolution in this order: the same key and the same file is drawn; the same family and style and the same file under another key is drawn; the same family and style from another file is drawn and said ("another version"), and the person can take this machine's font into the record; nothing is refused by name.
+- A font's licence class is read, never guessed: the class comes from the name table's licence text and address, and "not stated" is a class of its own.
+- Nothing is fetched. The record says where the font came from so that the person can get it.
+
+### The missing font, told in the window
+
+- The refusal names the font, its PostScript name, the file and its checksum, who made it and its licence class, in one message in the window, said once per state and not on every change.
+- The person's choices are buttons on that message: choose another font (journalled, so Undo brings the old name back), look for fonts again (after installing it), draw without the texts.
+- No other font is ever drawn in a missing font's place without the person choosing it.
+- The stand-ins for werkkzeug3's Windows font names (the machine's own font of that name, else fontconfig's metric-compatible font) are a designed route for old projects, and each use is said in the notes.
+- A chooser opened from a message must not block: open the dialog non-modally and act on its signal, so that previews and partners go on.
+- Prove it with a font folder of the proof's own (an environment variable names the folders the index reads): draw, remove the file, look again, read the message, take each choice by a real click, put the file back and compare the bytes with the first drawing, then append one byte to the file for "another version".
+
+### Glyphs as seeds, and the browser
+
+- A seed is two operators: a flat colour and one Text with one glyph, centred, at a fill of the canvas. Its words and strings are 67 to 85 bytes.
+- One function makes the seed for the command line, the window and the partners' tool, and the proof compares their bytes.
+- "Pure drawing" is measured per font from its character map: a font is a drawing font when more than half of its characters lie in Unicode's blocks of symbols, dingbats, ornaments, arrows, box and block elements, geometric shapes, emoji and the private use areas, or when its character map is a symbol map. The browser lists these first, and "Only drawings" is marked from the start.
+- The index of the machine's fonts is made by the core itself, in the cache folder, and made again on request. The window never reads font files on its own.
+- A glyph's picture in the grid is drawn by the core, so what the person sees is what the seed draws.
+- The partners get the same three steps as tools: list the fonts, list a font's glyphs, place a glyph as a seed in the open window as a suggestion or a step.
+- Every new sentence goes through the catalogue in the ten languages, and the panel is captured in each.
+
+### Dropping an editor copy for the shared library's call
+
+- Before removing a workaround, read which released version of the library does its work, in the library's own changelog and source. "Merged" and "published" are different states: here the published package was older than the merged fix, and the metadata-only save came two versions after the one the task named.
+- Raise the version the build asks for, so a machine with the older library fails at configure with a clear line and never at run time.
+- Write the proof for the property, not for the old implementation's bytes: "a save changes metadata only" is proved by splitting the JPEG at its first start-of-scan marker and comparing everything from there to the end before and after, and by finding every earlier segment again in its order.
+- Red before, green after: the old source under the new checks shows what the checks catch, then the new source passes them.
+- A stricter library can refuse what the editor's own code accepted. That is a finding about the fixture or the file, to be read in the library's source before anything is changed: here the proof's MPO lacked `BaseViewpointNum`, which a whole disparity pair carries, and the library was right.
+- Keep the refused case as a fixture of its own and prove the refusal: the file untouched, the reason said, nothing written by the editor.
+
+### The real fitter's counts in the window
+
+- The counts a stand-in proved (four, four by two, two by four, sixteen) are proved again with the real fitter by real clicks: the adapter's command line, the joining operator on the page, the number of procedures standing on it, one step of the person's, the window's longest pause.
+- Count the procedures by the Loads that stand over the joining operator's own width. A procedure's own stack can hold a Load in the same row.
+
 ## Werkkzeug4 itself on Linux: what a probe found
 
 Measured on 11 November 2026 in a Debian testing container, g++ 16.2.0, from `fr_public` at `8c8f82c`. Nothing of it is packaged.
@@ -868,6 +938,92 @@ So Werkkzeug4 does not run on Linux today, with or without the four pull request
   Fix: every sentence that changes while the person works keeps the room of its tallest text so far (after each `setText`, raise the label's least height to `heightForWidth(width())`, never lower it), aligned to the top.
   Found by: making the proof write, for a click that did not land, where every named part of the tool stood before and after; the two lists differed in two heights. Reruns alone (green three times, then red) had looked like the machine's load.
 
+## Traps found while building Text and fonts
+
+- Symptom: the build script stops with "Unterminated quoted string" sixty lines below the line that was changed.
+  Cause: an apostrophe inside the message of `${VAR:?message}` opens a quote for the shell.
+  Fix: test with `[ -n "$VAR" ] || { echo ...; exit 1; }`.
+  Found by: the shell's line number names where the quote would have ended; the apostrophe stood in the line changed last.
+- Symptom: the font index's file compiles for musl and fails for glibc with `nftw` and `FTW_PHYS` undeclared.
+  Cause: glibc declares them only with `_GNU_SOURCE`; musl always does. The file had only ever been built for musl.
+  Fix: `-D_GNU_SOURCE` for that file.
+  Found by: the first glibc build of a file carried from a program that was built static.
+- Symptom: a typed script that is correct is refused: "a text is not whole bytes in hexadecimal".
+  Cause: in Zig a structure made by `allocator.create` does not get its fields' default values, so a new length field held whatever the memory held.
+  Fix: set every field where the structure is filled.
+  Found by: reading where the refused length came from: a field with a default value that no line set.
+- Symptom: Zig refuses `_ = msg.oom()` with "error set is discarded", and a local function named like a parameter with "declaration shadows function parameter".
+  Cause: an error value cannot be dropped silently, and names are one scope.
+  Fix: call the function that sets the message without returning an error; rename.
+  Found by: the compiler's own lines.
+- Symptom: the C test fails to build with `-Werror=format-truncation`.
+  Cause: a fixed `char line[64]` and a format that can be longer.
+  Fix: a buffer as long as the longest line.
+  Found by: the compiler's line.
+- Symptom: the window shows no picture after the drawing process learned to send notes.
+  Cause: the reader checked the answer's exact size, and the notes come after the picture.
+  Fix: change the reader with the writer, with a marked block for what follows the picture.
+  Found by: reading the reader's size check after the writer had changed.
+- Symptom: a font fetched for a test is "not a font".
+  Cause: the address gave an HTML page, saved under the font's name.
+  Fix: check the first bytes of every download before using it, and say what could not be fetched.
+  Found by: the file's first bytes.
+- Symptom: a real click on a button of a message that has just appeared does nothing.
+  Cause: KMessageWidget slides in, and the button is not yet where the proof read it.
+  Fix: wait until `isShowAnimationRunning()` and `isHideAnimationRunning()` are false before aiming. A person waits for it too.
+  Found by: printing the fonts' count and the message's state after the lost click: the index had not been made again.
+- Symptom: a proof that clicks "Choose Another Font" never returns.
+  Cause: `QInputDialog::getItem` runs its own event loop inside the click's handling, and the proof's sender waits for the click to return.
+  Fix: open the dialog non-modally and act on `textValueSelected`. That is also right for the person.
+  Found by: the proof stood still with the dialog open, and the click's sender had not returned.
+- Symptom: the proof program ends with a segmentation fault where a list of placed operators is read.
+  Cause: `constFirst()` on an empty list, because the helper that looks for an operator by name read the first page only and a seed stands on a page of its own.
+  Fix: look on every page, and guard the empty list.
+  Found by: the proof's last line before the fault, then the helper that line had called.
+- Symptom: the message about a font is shown again after every change of the document.
+  Cause: the message was built again on every change of the document.
+  Fix: keep the state it was built for, and build it again only when the state changes.
+  Found by: reading the function that shows it, after the lost clicks above.
+- Symptom: after the editor's own MPO writer is replaced by the shared library's, saving into the proof's MPO is refused: "not a valid complete two-view disparity pair with matching base-viewpoint references".
+  Cause: the fixture's pictures carried `MPIndividualNum` (0xB101) and no `BaseViewpointNum` (0xB204); the library asks for both in each picture, with the same base in both.
+  Fix: the fixture writes both, and a second fixture without it is kept for the refusal.
+  Found by: reading the library's check for an MPO pair, then the fixture's writer.
+- Symptom: the proof of "sixteen procedures stand on the Grid" counts eighteen.
+  Cause: it counted every Load in the row above the Grid, and two procedures' own stacks have a Load in that row.
+  Fix: count the Loads over the Grid's own width.
+  Found by: the picture of the page.
+- Symptom: one of the 854 textures of `kkrieger.k` is drawn to another checksum on every run of the same build, once its Text operators are drawn. The same-bytes proof between the four builds was green.
+  Cause: two defects of the old operator code that meet. `Bump`'s specular add takes its factor 32768 as a signed 16-bit word, so the strongest highlight is subtracted and wraps to samples above 0x7fff, the top of an operator's range. `HSCB` looks every sample up in a table of 1025 entries for that range; in Werkkzeug4's portable copy the table lies on the stack, so a sample above the range read whatever the stack held behind it. Only a drawn text gave the normals that make such a highlight; every earlier reference handed Text on.
+  Fix: the operator code stays as published. The bridge bounds what goes into `HSCB` (a sample above the range reads the table's top), counts the samples and says the count in the drawing's notes. The 854 textures with every Text drawn are now drawn by each build, and by one build twice, in the same-bytes proof.
+  Found by: drawing the texture three times (three checksums); drawing each Text alone (stable); drawing the graph cut after each operator, three times each, until the first operator that was not stable; replacing the first Text by a flat grey (stable: no highlight); comparing two drawings (34 places, all where the picture before the `HSCB` was at full scale); then reading `HSCB`, its table and `Bump`'s add in the source.
+  The lesson for any proof of "the same bytes": compare a build with itself as well as with the others, and draw the references with every operator switched on. A table where an operator is handed on cannot reach what that operator's picture does to the operators after it.
+- Symptom: in nine languages the sentence about a missing font is translated and still holds English words: "licence class: not stated in the font", "by (not stated)".
+  Cause: the words are values the core puts into its sentence. A catalogue translates a sentence's frame, and every value was taken as a name.
+  Fix: the few values that are the core's own words (what a record does not state, a licence class that is words) are said with the window's catalogue entries where the sentence is filled; names, numbers, files and the licences' short names stay.
+  Found by: reading the "said:" lines the proof writes in every language, not only its count of green checks. A check now refuses the English words in every other language.
+- Symptom: after a new sentence is translated, the working proof still shows it in English and two checks are red, while the build is right.
+  Cause: the proof rig reads the compiled catalogues from an install folder, and the working build had not been installed into it.
+  Fix: install the working build into the rig's folder before a language run (`DESTDIR=... cmake --install`).
+  Found by: the same commit was green in the run that builds and installs from the commit.
+- Symptom: in the proof's own picture a panel's sentence is cut in the middle, and every check is green.
+  Cause: the dock is shorter than the panel's parts, and a word-wrapped label is squeezed below the height its words need.
+  Fix: the panel stands in a scroll area like the other tools; what the person needs to act comes first and is in view without scrolling; each changing sentence gets the height its words need at the panel's width. Two details of Qt decide whether that works: a scroll area that resizes its widget gives a layout with height-for-width its preferred height, so a list's 192-pixel hint must not be asked for (vertical policy Ignored, a least height of one row); and a label's height for a width is never less than its least height, so take the least height away before measuring, or one measurement at a narrow width stays for ever.
+  Found by: looking at the pictures the proof takes, in more than one language; then printing the label's height for three widths, its least height and its size hint in a check's detail (324 pixels for every width).
+  A check now asks that the parts that place a glyph are in view as the dock opens, and that both sentences are whole.
+- Symptom: after the panel got its scroll area, the same scenario is green in English and red in Polish, French and German: the panel's left edge is cut.
+  Cause: a dock widens to its panel's least width, and a scroll area does not; in those languages one button's words are wider than the dock as it opens, so the area scrolled sideways.
+  Fix: no sideways scroll bar, and the scroll area's least width is the panel's least width plus the upright bar's.
+  Found by: the check that asks whether the grid's corner is in view, which was written for the upright direction, and the picture in German.
+  Run a layout change in every language before the long run: the widest words decide.
+- Symptom: a message says "another version (7.3.0) than the one the project was made with (7.3.0)".
+  Cause: two files of one font can name the same version (a distribution's rebuild); the checksum is what tells them apart.
+  Fix: a sentence of its own for that case: both name the version, their checksums differ.
+  Found by: reading the proof's picture of the case made by appending one byte to the font file.
+- Symptom: a task says the shared library "has" a function, and the package on the machine does not.
+  Cause: the fix was merged and not yet published, and one of the two functions came two versions later.
+  Fix: read the library's changelog and the published package's version first; build against the source at the commit that has both, say which, and say that the published package is not proven.
+  Found by: `apt-cache policy` beside the library's `debian/changelog`.
+
 ## What the parts are good for
 
 - The `.ops` blocks are a table a program can read: generate the parameter panel and the partner's operator list from them, so the editor, the server and the documentation cannot drift apart.
@@ -905,6 +1061,13 @@ So Werkkzeug4 does not run on Linux today, with or without the four pull request
 - `tests/material-proof.py` is a closed-form check of two cameras that needs only the scene's published numbers and the drawn pair, with two wrong-camera controls.
 - `swz-fit --procedures` and `--layers` give any front end four, eight and sixteen procedures and layered results without a line of its own.
 
+- `wz fontindex` writes the machine's fonts as one table (key, file, face, family, style, version, format, outlines, colour, axes, glyphs, characters, the blocks its characters lie in, designer, copyright, licence); `wz fonts --drawings` lists the pure-drawing fonts, `wz glyphs KEY` a font's glyphs with their names, `wz seed KEY CHAR` a seed's typed text.
+- `tests/text/*.txt` is a set of graphs that reaches every path of the font libraries; with `tests/reference/text.tsv` and `text-fonts.tsv` it tells a library's difference from a font's difference.
+- `swz_seed_script` in the C interface is the one place a seed is made; the window, the command line and the partners' `place_glyph` call it.
+- `SWZ_FONT_DIRS` names the folders the index reads, which makes a "font removed" proof a matter of moving a file.
+- `editor/tests/fit-scenarios.inc` has `jpegParts`: a JPEG's segments before its first scan, and its scan data, for any "metadata only" proof.
+- `editor/tests/fixtures/make-photographs.py` writes an MPO that is a whole disparity pair, and one that is not.
+
 ## Credits
 
 Farbrausch and .theprodukkt, as the `fr_public` README names them: Fabian "ryg" Giesen, Sebastian "Wayfinder" Grillmaier, Tammo "kb" Hinrichs, Thomas "fiver2" Mahlke, Christoph "giZMo" Muetze, Dierk "Chaos" Ohlerich, Kai "cp" Poethkow, Ronny Pries, Dennis "Exoticorn" Ranke, Leonard "paniq" Ritter and Bastian "Tron" Zuehlke; 49Games GmbH in Altona's licence; Sean Barrett for the stb libraries inside Altona.
@@ -921,3 +1084,6 @@ The stereo photographs the Fit tool was tried on are by Robbie Sproule (Montreal
 WebAssembly builds ran in wasmtime (Bytecode Alliance).
 The people whose work this plan reads or builds on, by the names their own pages give: wxthss82, wzman, Gregor Riepl (onitake), Frantsishak (KkriegerNet), kznsq, Mason Liu (kkrieger-wasm), Alfredo (varrtto), Steven Schronk, Rodz Labs and the Material Maker contributors, Nicolas Brown and the TextureLab contributors, Cedric Guillemet (Imogen).
 The thirty bitmap operators carried from `fr_public` pull request #108 are the work of wangxin (wxthss82 on GitHub), under the tree's BSD 2-clause licence; the colour matrix is OpenKTG's, written by Fabian "ryg" Giesen in 2007 and placed in the public domain; the seam that keeps the detail's contrast follows Eric Heitz and Fabrice Neyret (2018); Blend's modes are those of W3C Compositing and Blending Level 1; the natural logarithm carried with the maths is musl's (Arm Limited); the sixteen-bit pictures follow the PNG specification, third edition (W3C), for `sBIT`.
+The Text operator draws with FreeType 2.14.3 (David Turner, Robert Wilhelm and Werner Lemberg; the FreeType Project licence), HarfBuzz 14.4.0 (Behdad Esfahbod and the authors its AUTHORS file names; the "Old MIT" licence), SheenBidi 3.0.0 (Muhammad Tayyab Akram; Apache 2.0), plutovg and plutosvg (Samuel Ugochukwu; MIT), libpng 1.6.59, zlib and Brotli, each compiled from Debian's source package; the renderer files and the font index are the edition's "procedures from pixels" work, carried unchanged.
+Portions of this software are copyright © 2026 The FreeType Project (https://freetype.org). All rights reserved.
+The metadata-only save of a stereo JPEG and the two eyes from a depth map are stereo-layer's (`Picture::saveCorrection`, `Picture::load`); `BaseViewpointNum` and `MPIndividualNum` are CIPA DC-007's.

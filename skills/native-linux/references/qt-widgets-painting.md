@@ -414,7 +414,7 @@ The Wayland EGL platform advertises this capability to Widgets; other platforms 
 The blitter draws the decoration with its full texture coordinates and then samples the left or right half of the content texture into that eye's content rectangle.
 This route also avoids changing a previously mono decoration context into a native two-view context.
 
-Measured in the rig on AMD and NVIDIA, scales 1 and 1.25, through a resize and hide/show:
+Measured in the rig on AMD and NVIDIA, scales 1 and 1.25, through an application-driven resize to logical width 940 and hide/show:
 
 | Check | Batched | Qt OpenGL engine |
 |---|---|---|
@@ -428,6 +428,8 @@ Measured in the rig on AMD and NVIDIA, scales 1 and 1.25, through a resize and h
 This still paints a window once per eye.
 It does not implement both eyes from one recorded paint callback and does not establish that pair's processor cost.
 The fractional-scale blitter fix and the one-row extent remainder remain separate: QTBUG-149635's attachment shows the same visible right/bottom seam class, not a proof that its dimensions reproduce our exact rounding disagreement.
+
+An additional logical-width-941 case at scale 1.25 fails on both cards: content splits across the eyes after either an application-driven or compositor-driven resize. The fixture logs depth/pair/SBS true and logical backing-store width 1882. The batched texture rounds `1882 * 1.25` to 2353, but the default compositor recognises a pair only when its texture width equals `2 * round(941 * 1.25)`, which is 2352. Its mono branch then maps the wrong content into the decorated pair. This remains open; the even-width lifecycle table does not qualify arbitrary fractional sizes. A fix needs a shared physical eye extent and eye origin across painting, texture selection and the EGL FBO; merely weakening the pair-width check does not prove alignment.
 
 ### Traps found while packaging and profiling
 

@@ -41,3 +41,32 @@ A trap gives its symptom, its cause, its fix and how the cause was found; a reci
   Fix: KImageFormats stereo3d6 writes the complete VRex descriptor, reports its fields, and refuses unsupported layouts before writing; the fixed comment is removed because it could contradict explicit layouts.
   Found by: parse JPEG segments independently and reopen every write; cover the four stereo layouts, both orders, mono display choices, half-size flags, separation, comments and unchanged device bytes on refusal.
   Exporting a new JPEG and changing only an existing JPEG's metadata are distinct operations: do not claim that an encoding writer preserves compressed bytes.
+
+## Per-file choices in the shared store (ORDER 512)
+
+- Symptom: after a file's choice goes back to Automatic, its context menu shows the 3D entry greyed out.
+  Cause: the action's state was computed on the selection change, when the new pair thumbnail had not arrived; the selection did not change afterwards.
+  Fix: the view emits a signal when an item's preview pixmaps change, and the actions are updated once after a burst of them.
+  Found by: a capture of the context menu after the second step of a three-step sequence (Not 3D, Automatic, Not 3D); a one-step test passes.
+- Symptom: "Save the correction into the file" on a PNG says "The JPEG segments or scan data are truncated or invalid".
+  Cause: the shared save parses every file as a JPEG.
+  Fix: the entry point for a stored choice checks the JPEG signature first and says which formats it can write.
+  Found by: reading the message bar in a capture; a test that only asserts "an error text exists" passes on the wrong text.
+- Symptom: a video's swap is kept, and its thumbnail does not change.
+  Cause: the video thumbnailer read the swap from the file's attribute, and the swap had moved to the store.
+  Fix: every reader of a per-file choice calls `Stereo::Picture::fileChoice()`; list the readers of the old place before moving a store (`grep -rn userSwapEyes` over the published patches of every package on the layer).
+  Found by: rereading the diff as a reviewer and searching the published sources for the old call.
+- Symptom: `cmake` configures a program without stereo and prints no error after the layer's required version was raised.
+  Cause: `find_package(StereoLayer N CONFIG)` is optional in these programs, so an older layer is "not found".
+  Fix: raise `libstereo-layer-dev (>= N)` in `Build-Depends` with the CMake version, and read the configure log's feature summary.
+- Symptom: `stereo_policy_file_choice stored;` does not compile in C++ ("expected ';' before 'stored'").
+  Cause: the struct and the function share a name, which C allows and C++ resolves to the function.
+  Fix: write `struct stereo_policy_file_choice stored;` in C++ callers.
+- Symptom: `cmake` fails with "Could not open file for write in copy operation .../.git/hooks/pre-commit.tmp".
+  Cause: ECM installs a git hook into a source tree that has a `.git`, and the tree was mounted read-only.
+  Fix: build from a copy without `.git` (`rsync -a --delete --exclude .git`, which keeps times so the build stays incremental).
+- Symptom: a measuring script reports one place with both eyes seeing both colours.
+  Cause: two thumbnails 23 px apart were merged by a 24 px gap rule.
+  Fix: a gap smaller than the grid's spacing; print each place's position and size and read them before the verdict.
+- Recipe: drive a context menu in the rig with KWin's fake input by clicking coordinates read from a capture, one capture per menu level; entries keep their offsets from the click, so later steps reuse them.
+- Measured: a two-monitor screenshot 3840x1080 set to Not 3D shows flat in the thumbnail and the information panel within 2 s; the same after a restart and after a new session with the thumbnail cache removed.

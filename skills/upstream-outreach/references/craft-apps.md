@@ -451,5 +451,7 @@ Symptom: `windows_default_leaves_out_gl` fails at its assertion about eframe's d
 Cause: the private runner forced `WGPU_BACKEND=vulkan`; eframe's `WgpuSetupCreateNew` reads `Backends::from_env()` before its `PRIMARY | GL` default.
 Fix: preserve the app assertion and remove that override from the full-CI child, matching upstream's environment.
 Keep the software Vulkan ICD selected; explicit backend requirements belong in the targeted GPU checks rather than a suite that tests unmodified defaults.
-How found: the complete FilmCraft run passed5076tests and failed that one precondition; the same unchanged test passed after removing only `WGPU_BACKEND`.
+How found: the complete FilmCraft run passed 5,076 tests and failed that one precondition; the same unchanged test passed after removing only `WGPU_BACKEND`.
 Rerun the whole gate after the controlled check; a one-test pass does not establish full CI success.
+
+The corrected full Linux gate then passed all 5,077 native tests and eight doctests, plus its layer, asset and WebAssembly checks, with production and test source unchanged.

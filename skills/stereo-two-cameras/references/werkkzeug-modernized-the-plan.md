@@ -8,6 +8,7 @@ Since milestone 5 (the same day) it holds building in the window: operators drag
 Since milestone 6 (the same day) it holds the stereo preview: the three kinds of stereo project and where their values live in the file, the two eyes drawn by the core with the stereo texture module's own mapping, the preview's 3D area in a Qt Widgets dock, a stereo photograph as a project's source with its per-file corrections, and the proofs read from the compositor's own picture of both eyes.
 Since milestone 7 (the same day) it holds the fitter as a tool in the window: the fitter behind one small program with five kinds of lines, its modern operators as classes of the core, a found procedure laid on a page, one fit for each eye of a stereo photograph, and the corrections to the stereo preview (3D from the start, no limit on a tool's depth, a picture with its depth map, JPS and MPO marks saved, a floated preview in 3D).
 Since milestone 9 (12 November 2026) it holds the Text operator and fonts: FreeType and HarfBuzz compiled into a core that draws the same bytes on four targets, how a document names a font so that it draws on another machine, what the window says when a font is missing, glyphs as drawing seeds with a browser for them, and how an editor's own copy of a shared library's work is dropped for the library's call.
+Since milestone 10 (13 November 2026) it holds the fitter placing glyph seeds by itself: a glyph chosen on the picture's pixels (which glyph, where, how large, turned how far, in which colour) inside the same counts of procedures, as the person's choice with the fit as it was kept as the default; the drawing's notes as numbers with values, said in the person's language by the window and to a partner; the colour glyph forms (COLR layers and paint graphs, SVG, sbix) drawn to the same bytes on four targets, with a rasteriser that left its bands by a long jump carried without one.
 Later milestones grow this page into the editor's contributor skill.
 
 **Check freshness first.**
@@ -540,6 +541,81 @@ The Text operator is a seed a person or the fitter places, never a way to descri
 - The counts a stand-in proved (four, four by two, two by four, sixteen) are proved again with the real fitter by real clicks: the adapter's command line, the joining operator on the page, the number of procedures standing on it, one step of the person's, the window's longest pause.
 - Count the procedures by the Loads that stand over the joining operator's own width. A procedure's own stack can hold a Load in the same row.
 
+## Glyph seeds the fitter places, notes without a language, colour glyphs: working recipe
+
+Daniel's direction for this part: the procedures come "from the hi res texture pixels, never from text", and "glyphs can be a source for graphic creations".
+So the fitter chooses a glyph because its drawing lies over the picture's ink, measured on the pixels.
+No name, caption or description of the picture is an input, and no work goes into telling a font from its look-alikes.
+
+### A fitter that finds a glyph on the pixels
+
+- Keep the shape of every glyph of every font once, small: here 16 by 16 bits of the glyph's ink stretched to its own box, with the box's proportions, for every character each font maps (the glyph index, made from the font index).
+  On a desktop with about 500 font faces that is 1.8 million glyphs, 85 MB and two minutes: say so to the person the first time, and keep the index beside the font index with that index's checksum, so that it is made again only when the fonts change.
+- Read the picture's two shades (Otsu's threshold) and take the smaller one as the ink.
+  Where the two cover about half each, read the other one as the ink too when the first gives nothing: medallions laid close cover more than their ground.
+- Read the ink where it is whole: the mean cell where the picture repeats, the tile's own pixels otherwise, and then each connected piece on its own.
+  A piece cut by the tile's edge is no glyph.
+- Compare in three steps, each cheaper than the next is exact: every glyph at the coarse size (a bit count, with both pictures grown by one cell so that thin strokes that run close still count), the best few hundred drawn from the font at 24 by 24 and compared after a blur (the soft likeness), the best twelve compared cell for cell at 48 by 48.
+- Find a turn by turning the piece back, never the glyphs: twenty-four steps of fifteen degrees at the coarse size, the three best exactly, then steps of two and a half degrees around the winner.
+  The picture shows a glyph turned by an angle when a point of the glyph lies at the centre plus that rotation of it; werkkzeug's Transform reads its source at the rotation of a point, so the angle written is the negative, in whole turns.
+- Let the machine ask for more than the eye was offered.
+  A person refuses a wrong glyph at a glance; a fitter alone needs thresholds that come from measurements: here a likeness of 0.80 (0.88 for a turned glyph, since a turn is twenty-four tries), the ink standing out from its ground by 0.70, a piece of 64 pixels or more on its longer side, and a glyph that draws the piece better than a box or a disc.
+  Pictures made from glyphs measured 0.97 to 0.99; a brick wall's mortar lay over an arrow at 0.73 and, turned, over a music sign at 0.84 to 0.93.
+- Compare a repeat's glyph with every cell of the picture, not only with their mean.
+  Four different glyphs in a grid are a repeat to a reader of periods, and their mean cell can resemble a fifth glyph.
+- Write what was found as the operators a person would place: a Text for the glyph, a Transform when it is turned, a Scatter that lays it at its place in its colour.
+  A phase is a place inside one cell: take whole cells off before writing it.
+
+### Inside the counts, as the person's choice
+
+- A glyph seed is one more kind of procedure a tile may get, never a pass of its own.
+  For the picture, or for each of its four, eight or sixteen tiles, the fitter fits the tile as always and, beside it, once more looking for seeds.
+  Where it finds none, that second fit ends at once and writes nothing.
+- The tile keeps the seeded procedure only when it draws closer to the tile's own pixels, by a quarter or more of the plain difference of a colour value.
+  A glyph over a texture's blobs often draws a little closer by that measure without being a better procedure; a picture made of glyphs draws closer by two thirds.
+- The choice is off by default: without it the fit is the same file, byte for byte, as before the choice existed.
+  Prove that, and prove that a picture without glyph-like ink gives the same file with the choice on.
+- The adapter says two more lines for front ends, beside its notes: that the glyph index is being made (how many fonts), and at the end in how many of the picture's procedures seeds were placed.
+  A front end says both in the person's language; the fitter's own notes stay the fitter's.
+- Without fonts the fit that was asked for is refused, by name, and nothing is fitted without the seeds instead.
+  The front end checks its own list of fonts first, so that the refusal is a sentence of its catalogue.
+- The partners' tool takes the same choice as one argument with the same two values.
+
+### Notes that travel as numbers
+
+- A note is what a drawing says beside its picture without failing: which font drew a text, a font that stood in for a name, a character without a glyph, the form a colour glyph was drawn in.
+- Give every fact its own sentence with values in its places.
+  A line put together from fragments ("3 from outline, 2 from COLR; axes wght=800") cannot be said in another language; "3 glyphs drawn from outlines" with the font and the number as values can.
+- Keep two things for each note: the English sentence, for a front end without a catalogue, and a record, the sentence's number in the catalogue and its values.
+  The number is the checksum of the template as the source writes it, the same in every build.
+- Carry the records wherever the notes go: out of the drawing's own process, through the C interface, after the picture in the drawing program's answer, and in the partners' answer.
+  A front end that draws a partner's picture itself hands the notes on as it says them, so that the partner is told what the person reads.
+- A part that is not written in the core's language says its notes through one function that takes a template and its values, and the core lists those templates, which is what puts them into the catalogue that is read out of the built program.
+  A sentence said without being listed is passed on as a plain line, and a test looks for plain lines.
+- Values stay as they are, except the few that are the program's own words (where a font was found: this machine).
+  The front end says those through its own catalogue.
+- The project's file holds no note: write it again after everything was said, in every language, and compare the checksums.
+
+### Colour glyph forms in a same-bytes core
+
+- OpenType has four colour forms beside plain outlines: layers of outlines in palette colours (COLR version 0), paint graphs with gradients and transformations (COLR version 1), SVG documents, and bitmaps (sbix and CBDT).
+  One free font family in each form is the test set: OpenMoji ships the same drawings as COLR 0, COLR 1, SVG and sbix files.
+- Name each file by the key the font index gives it and keep the files' checksums beside the reference table, since four files of one family and style differ only by a number after the key.
+- A rasteriser that leaves an overflow by a long jump does not run in WebAssembly without the exception proposal.
+  FreeType's own no longer jumps (cells that do not fit go to a last cell used as a dumpster); a copy of it inside another library may still.
+  Make the overflow a flag in a copy written at build time, by a script that stops when the source is not the one it knows, and build every target from that copy.
+- A colour glyph's own colours are 8 bits a channel by its format (palette entries, PNG, SVG colours).
+  In a picture of 16 bits the picture keeps its depth and the drawing says what the glyph has.
+
+### Proving it
+
+- Draw pictures from known glyphs with the core and let the fitter find them: the glyph against the graph that drew the picture, its place and size against the ink's box measured in the picture, its turn against the Transform that turned it, and the procedure it writes drawn by the core against the picture.
+- Use glyphs without a twin in their font for the proof of "the same glyph"; a twin found instead is right by the rule and wrong by the check.
+- Prove the counts with a picture that holds one glyph a tile and with one that holds several.
+- Prove the negative three ways: a noise, photographs of surfaces, and the red control with an empty font index.
+- Add the procedures the fitter wrote to the graphs every build must draw to the same bytes.
+- Read the proof's "said:" lines in each language, and look at a picture of each new sentence in the window.
+
 ## Werkkzeug4 itself on Linux: what a probe found
 
 Measured on 11 November 2026 in a Debian testing container, g++ 16.2.0, from `fr_public` at `8c8f82c`. Nothing of it is packaged.
@@ -1024,6 +1100,89 @@ So Werkkzeug4 does not run on Linux today, with or without the four pull request
   Fix: read the library's changelog and the published package's version first; build against the source at the commit that has both, say which, and say that the published package is not proven.
   Found by: `apt-cache policy` beside the library's `debian/changelog`.
 
+## Traps found while letting the fitter place glyph seeds
+
+- Symptom: a brick wall gets a glyph: an arrow over its mortar, then a music sign turned by 315 degrees over a quarter of it.
+  Cause: the seed reading was made to offer seeds to an eye, from a likeness of 0.70 on; the mortar of a small mean cell (51 by 37 pixels) is a simple shape that many glyphs resemble, and turning the piece gives twenty-four more chances.
+  Fix: thresholds of the machine's own, each from a measurement: likeness 0.80 (0.88 turned), the ink standing out by 0.70, a piece of 64 pixels or more, and the tile keeps the seeded procedure only when it draws closer by a quarter.
+  Found by: the fitter's own lines for that tile, which name the glyph, its likeness and the cell's size.
+- Symptom: two different glyphs in one picture come back as one Braille character of two dots.
+  Cause: all the ink was read as one glyph first, and two blobs lie over two dots by 0.75.
+  Fix: read the pieces as well and keep the reading under which more of the ink lies over its glyphs (the pieces' likeness weighted by their ink).
+  Found by: the picture was drawn from a graph that names its two glyphs.
+- Symptom: a round medallion of about 90 pixels gets no glyph, or a filled circle.
+  Cause: at that size its ink fills its disc to 97 %, cell for cell, even at 48 by 48: a disc draws it as well as its own glyph.
+  Fix: none is owed: the rule "better than a box or a disc" says so in the notes. Judge that rule by what each leaves unexplained (the glyph must leave at most half as many cells as the disc), not by a fixed margin.
+  Found by: printing the cell-for-cell likeness of the glyph and of the disc beside the soft one.
+- Symptom: a quarter that holds four different glyphs gets no seed, or one glyph repeated four times.
+  Cause: the picture reading takes a 2 by 2 arrangement for a repeat; the mean cell of four different glyphs is no glyph, or resembles a fifth one (a shield, at 0.93).
+  Fix: read the tile's own pixels piece by piece as well, measure a repeat's glyph against every cell of the picture, and keep the better reading.
+  Found by: the count of seeds in each tile's record, checked by the proof against the sixteen glyphs drawn.
+- Symptom: the same glyph is found under another character of the same font.
+  Cause: fonts hold twins: one drawing under two characters, or the same drawing in an older version of the font installed beside the newer.
+  Fix: none: a look-alike is as good a seed. The proof draws glyphs without a twin, and says so.
+  Found by: the proof compared characters and the pictures were the same.
+- Symptom: a picture of medallions laid close gets no seed, and the notes say the ink is the lighter shade.
+  Cause: the medallions cover more than half of their cell, so the smaller shade is the ground.
+  Fix: when the two shades are near half each and the ink as read gives nothing, read the other shade as the ink.
+  Found by: the share of the ink in the fitter's note (0.48) beside the picture.
+- Symptom: a fit with seeds is refused with "phase across 1.58 is outside -1..1"; with the phase wrapped into range, the glyphs stand in a grid that is shifted against the picture's.
+  Cause: the cell of a repeat is turned round so that its motif is not cut, by up to a cell, and the path made for seeds chosen by eye multiplied that turn by the number of repeats (right only where the cell was not turned).
+  Fix: the glyph's place in its cell is its place in the turned cell plus the turn, both in cells, less the half cell a phase counts from; then whole cells are taken off.
+  Found by: the operator's own refusal names the parameter and the value; the shift by a sheet of three pictures side by side: the source, the fit without seeds and the fit with them. The plain difference of colour values could not tell a shifted grid of the right glyph from a wrong texture (39.45 against 39.42); the eye could at once.
+- Symptom: leaves that are each turned in their cell come back as upright rugby balls.
+  Cause: an icon that is drawn tilted lies over the turned leaf by 0.83 as it stands, and the turned tries were skipped whenever the coarse comparison showed no gain from turning.
+  Fix: skip the turned tries only when the upright glyph is already at 0.90; the leaf itself then lies at 0.97, turned by 337.5 degrees where it was drawn at 338.4.
+  Found by: the same sheet of three pictures.
+- Symptom: a texture made by turning a whole grid of glyphs gets one seed where five glyphs show, and the tile keeps its ordinary procedure.
+  Cause: a Transform that turns the picture cuts the glyphs at the edges and ends the repeat; only whole pieces are laid over glyphs, and one glyph of five does not draw a quarter closer.
+  Fix: none in the fitter. Turn each glyph in its own cell and repeat the cell when the texture is meant to tile.
+  Found by: the fitter's note "it reaches the tile's edge" and the share of the ink its one piece holds (0.25).
+- Symptom: "the two procedures could not be compared", then "the top left procedure does not draw".
+  Cause: the runs that measure and join procedures draw their Text operators and were started without the font index.
+  Fix: every run that may draw a seeded procedure gets the font index; the runs without seeds keep an empty one, so that the default fit is what it was.
+  Found by: the joining run's own last line.
+- Symptom: a 3 by 3 repeat at 512 pixels is "no repeat".
+  Cause: its period is not a whole number of pixels, and the reader refuses a cell that does not predict the other repeats.
+  Fix: none in the reader: such a picture is read piece by piece.
+  Found by: the reader's line "its cell predicts -109 % of the other repeats".
+- Symptom: the catalogue read out of the built program lacks the new sentences.
+  Cause: a template that nothing reads is dropped by the linker; the note's template was only assigned and its reader's result thrown away.
+  Fix: an exported function returns the last note's template, as one does for the last refusal's.
+  Found by: counting the catalogue's lines before and after (451 where 477 were expected).
+- Symptom: the window shows no notes for a texture with a Text.
+  Cause: the view that shows the texture on an object, which is the default, never had the notes' line; only the flat view did.
+  Fix: the same line on both views.
+  Found by: the proof's picture of the window. The same picture showed that the proof had clicked the wrong operator of the page.
+- Symptom: every note in every language holds the English word "(machine)".
+  Cause: it is the font index's word for this machine's own fonts, inside the font's label, which is a value.
+  Fix: the front end says that word through its own catalogue.
+  Found by: reading the "said:" lines in Japanese.
+- Symptom: in Japanese six of nine sentences are skipped by a check that looks for the sentences in the saved file.
+  Cause: the check took sentences of twelve characters or more; a sentence in Chinese, Japanese or Korean is a few characters.
+  Fix: a threshold of six.
+  Found by: the check's own count in its failure line.
+- Symptom: a refusal reads "...fonts: No font was found... can be drawn.. Nothing was fitted."
+  Cause: a reason that is a whole sentence was put after a colon and before a full stop.
+  Fix: the reason stands as a sentence of its own in the template.
+  Found by: reading the "said:" line.
+- Symptom: a partner's call times out after 120 s while the window looks idle.
+  Cause: the proof waited for the partner's process with a blocking call in the window's own thread, so the window could not answer.
+  Fix: wait with the event loop running.
+  Found by: the partner's traceback names the call (the one after the fit), and the same call answers at once from the stand-alone server.
+- Symptom: SVG glyphs draw on glibc and musl and stop the WebAssembly module: "a library asked for a long jump".
+  Cause: plutovg's rasteriser leaves a band that does not fit its pool by a long jump, as ordinary control flow.
+  Fix: a copy of that file made at build time in which the overflow is a flag, FreeType's own way since it stopped jumping; every target is built from the copy.
+  Found by: the module's backtrace: abort, longjmp, gray_record_cell, plutovg_rasterize, plutosvg_ft_render.
+- Symptom: a removal in a scratch folder is refused by the tooling.
+  Cause: it was a relative glob after a change of folder.
+  Fix: literal absolute paths only, as the lane's rules already say.
+  Found by: the refusal's own text.
+- Symptom: a table of measurements has "?" in its error column.
+  Cause: the fitter prints its lines on the error stream, which the script threw away.
+  Fix: read both streams.
+  Found by: running the one command by hand.
+
 ## What the parts are good for
 
 - The `.ops` blocks are a table a program can read: generate the parameter panel and the partner's operator list from them, so the editor, the server and the documentation cannot drift apart.
@@ -1068,6 +1227,12 @@ So Werkkzeug4 does not run on Linux today, with or without the four pull request
 - `editor/tests/fit-scenarios.inc` has `jpegParts`: a JPEG's segments before its first scan, and its scan data, for any "metadata only" proof.
 - `editor/tests/fixtures/make-photographs.py` writes an MPO that is a whole disparity pair, and one that is not.
 
+- The glyph index (every glyph of every font as 16 by 16 bits with its proportions) answers "which glyph looks like this shape" for any tool, not only for the fitter: a search by drawing in the glyph browser could read the same file.
+- The notes' records let a test assert a number instead of a wording, and let any front end, in any language, say what a drawing said without the core knowing languages.
+- The fitter's plain measure (`err`: the mean difference of a colour value between a procedure's drawing and a picture) is a tool of its own for comparing any two procedures of one picture; it cannot tell a shifted pattern from a wrong one, so a sheet of the pictures side by side goes with it.
+- OpenMoji's font files are a ready test set for colour glyph forms: the same drawings as COLR layers, COLR paint graphs, SVG documents and sbix bitmaps.
+- A picture that is a figure on a ground costs fewer bytes with a glyph seed than without: the florettes of this page's proof are 318 bytes with their seed and 750 without, and an ornament photograph of snowflakes 493 against 852, each closer to its picture.
+
 ## Credits
 
 Farbrausch and .theprodukkt, as the `fr_public` README names them: Fabian "ryg" Giesen, Sebastian "Wayfinder" Grillmaier, Tammo "kb" Hinrichs, Thomas "fiver2" Mahlke, Christoph "giZMo" Muetze, Dierk "Chaos" Ohlerich, Kai "cp" Poethkow, Ronny Pries, Dennis "Exoticorn" Ranke, Leonard "paniq" Ritter and Bastian "Tron" Zuehlke; 49Games GmbH in Altona's licence; Sean Barrett for the stb libraries inside Altona.
@@ -1087,3 +1252,7 @@ The thirty bitmap operators carried from `fr_public` pull request #108 are the w
 The Text operator draws with FreeType 2.14.3 (David Turner, Robert Wilhelm and Werner Lemberg; the FreeType Project licence), HarfBuzz 14.4.0 (Behdad Esfahbod and the authors its AUTHORS file names; the "Old MIT" licence), SheenBidi 3.0.0 (Muhammad Tayyab Akram; Apache 2.0), plutovg and plutosvg (Samuel Ugochukwu; MIT), libpng 1.6.59, zlib and Brotli, each compiled from Debian's source package; the renderer files and the font index are the edition's "procedures from pixels" work, carried unchanged.
 Portions of this software are copyright © 2026 The FreeType Project (https://freetype.org). All rights reserved.
 The metadata-only save of a stereo JPEG and the two eyes from a depth map are stereo-layer's (`Picture::saveCorrection`, `Picture::load`); `BaseViewpointNum` and `MPIndividualNum` are CIPA DC-007's.
+The glyph seeds the fitter places are found with the edition's "procedures from pixels" fitter, its glyph index and its seed reading, which this milestone extends; the comparison of shapes after a blur and the split of a picture into two shades by Otsu's threshold are that reading's own.
+The colour glyph proofs draw OpenMoji 17.0 (Daniel Utz and Benedikt Groß with students of the HfG Schwäbisch Gmünd and other contributors, as the fonts' own records name them; CC BY-SA 4.0), in its COLR, SVG and sbix files from the project's release; the three procedures of the fitter's own page that call icon glyphs draw with tabler-icons 3.51.0 (Paweł Kuna; MIT), bootstrap-icons 1.13.2 (The Bootstrap Authors; MIT) and Material Design Icons 5 (the Pictogrammers Icon Group; the icons Apache 2.0, the font build MIT, Austin Andrews), the last as Debian packages it (Julian Gilbey).
+plutovg's rasteriser is carried without a long jump after FreeType's own (`src/smooth/ftgrays.c` of FreeType 2.14.3: a last cell "used as dumpster and limit"; David Turner, Robert Wilhelm and Werner Lemberg, as the file's own header names its authors); plutovg and plutosvg are Samuel Ugochukwu's.
+The thirteen pictures of the measured table are the fitter's own test set, credited on its page: Poly Haven's and ambientCG's CC0 textures.

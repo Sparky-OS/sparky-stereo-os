@@ -138,7 +138,9 @@ main p, .site-footer p { text-wrap: pretty; }
 .art .gallery { margin: 0; }
 .art .caption { margin: .5rem 0 0; }
 @media (min-width: 60.01rem) {
-  .first { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); grid-template-rows: auto auto auto 1fr; column-gap: 2.5rem; align-items: start; }
+  /* The pictures' column has a width in rem, a whole number of pixels at the
+   * usual text sizes: a canvas laid on a fraction of a pixel is resampled. */
+  .first { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 28.5rem); grid-template-rows: auto auto auto 1fr; column-gap: 2.5rem; align-items: start; }
   .first > .opening-copy { grid-column: 1; grid-row: 1; }
   .first > .art { grid-column: 2; grid-row: 1 / span 4; }
   .first > .status { grid-column: 1; grid-row: 2; }

@@ -25,7 +25,7 @@ class Page(HTMLParser):
         if 'id' in a: self.ids.append(a['id'])
         if tag == 'html': self.lang = a.get('lang')
         if re.fullmatch('h[1-6]',tag): self.headings.append(int(tag[1]))
-        if tag in ('script','iframe','object','embed','form','video','audio'): self.errors.append('unexpected active element '+tag)
+        if tag in ('iframe','object','embed','form','video','audio'): self.errors.append('unexpected active element '+tag)
         if any(k.startswith('on') or k == 'style' for k in a): self.errors.append('inline script/style')
         if tag == 'a' and 'href' in a:
             self.refs.append(a['href']); self.anchors.append({'attrs':a,'text':''})
@@ -33,8 +33,12 @@ class Page(HTMLParser):
             if 'hreflang' in a:
                 self.menu.append(a)
                 if a.get('lang') != a['hreflang']: self.errors.append('link language differs from hreflang')
+        if tag == 'script':
+            if not a.get('src','').endswith('/assets/depth.js') or 'defer' not in a: self.errors.append('unexpected script')
+            self.resources.append(a.get('src',''))
+        if tag == 'canvas' and a.get('aria-hidden') != 'true': self.errors.append('unlabelled canvas')
         if tag == 'img':
-            if not a.get('alt'): self.errors.append('image has no useful alternative')
+            if not a.get('alt') and a.get('role') != 'presentation': self.errors.append('image has no useful alternative')
             if self.stack: self.stack[-1]['text'] += a.get('alt','')
             self.resources.append(a.get('src',''))
         if 'srcset' in a: self.errors.append('unexpected srcset needs explicit resource audit')
@@ -160,7 +164,9 @@ def check(output, report_dir=None, tidy=True):
         local=local_target(ref,home,output,cfg)
         if local:home_files.add(local[0])
     weight=sum(p.stat().st_size for p in home_files)
-    notes.append(f'English home: {home.stat().st_size} HTML bytes; {weight} bytes including CSS and every referenced image (uncompressed, cold cache)')
+    script_bytes=(output/'assets/depth.js').stat().st_size
+    if script_bytes>100000: errors.append('decoration script exceeds 100 KB')
+    notes.append(f'English home: {home.stat().st_size} HTML bytes; {weight-script_bytes} bytes with script disabled; {weight} bytes with decoration script ({script_bytes} bytes); all images and CSS, uncompressed, cold cache')
     notes += [f'{len(paths)} HTML pages; {references} local references resolved; {resources} resource references all local',
               f'{len(anchor_rows)-1} original headings/explicit anchors retained; {len(source_rows)-1} source block mappings',
               'Catalogues match original Markdown; missing keys enumerated; built text matches each language exactly',

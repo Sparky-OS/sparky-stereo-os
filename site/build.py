@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate a static, script-free site from the imported source catalogues."""
+"""Generate a static site from the imported source catalogues."""
 import argparse
 from collections import Counter
 from html import escape, unescape
@@ -153,7 +153,7 @@ class Renderer:
 
     def content(self, catalog, kind):
         doc = catalog['pages'][kind]; source = doc['source']; strings = catalog['strings']
-        output = []; footer = []; active = output; list_type = None; used_ids = set()
+        output = ['<div class="opening"><div class="opening-copy">'] if kind == 'home' else []; footer = []; active = output; list_type = None; used_ids = set()
         def anchor(value):
             if value in used_ids: return ''
             used_ids.add(value)
@@ -201,6 +201,11 @@ class Renderer:
                 elif typ == 'quote':
                     active.append('<blockquote><p>' + self.inline(value,source) + '</p></blockquote>')
                 elif typ == 'paragraph':
+                    if kind == 'home' and key == 'home.intro.paragraph03':
+                        image_tag = re.search(r'<img [^>]+>',value).group(0)
+                        parser = TagParser(); parser.feed(image_tag)
+                        fallback = self.asset(parser.attrs['src'],source)
+                        active.append('</div><div class="depth-decoration" aria-hidden="true"><img role="presentation" src="' + fallback + '" alt=""><canvas aria-hidden="true"></canvas></div></div>')
                     css = ''
                     if kind == 'home' and '.intro.paragraph' in key:
                         css = {'01':'lead intro-copy','02':'intro-copy','03':'hero','04':'gallery','05':'caption','06':'status','07':'next-step'}.get(key[-2:], '')
@@ -244,7 +249,8 @@ class Renderer:
             lang=LANGUAGES[lang][0],title=escape(title),kind=kind,document=document,
             home=self.url(page_path(lang,'home')),wordmark=self.url(catalog['strings']['site.wordmark.image']),wordmark_alt=escape(catalog['strings']['site.wordmark.alt'],quote=True),
             stylesheet=self.url('assets/style.css'),canonical=self.canonical(lang,kind),
-            alternates='\n'.join(alternates),menu='\n'.join(menu))
+            alternates='\n'.join(alternates),menu='\n'.join(menu),
+            script=('<script defer src="' + self.url('assets/depth.js') + '"></script>') if kind == 'home' else '')
 
 
 class TagParser(HTMLParser):
@@ -266,7 +272,7 @@ def build(output, cfg):
         lang='en',title='404 · Sparky Stereo OS',kind='error',document=document,
         home=renderer.url('index.html'),wordmark=renderer.url(catalogs['en']['strings']['site.wordmark.image']),wordmark_alt=escape(catalogs['en']['strings']['site.wordmark.alt'],quote=True),
         stylesheet=renderer.url('assets/style.css'),canonical=cfg['origin']+renderer.url('404.html'),
-        alternates='',menu='')
+        alternates='',menu='',script='')
     if output.exists():
         if not (output/'.site-build.json').exists(): raise ValueError('Refusing to replace a folder not created by this generator')
         for child in output.iterdir():
@@ -277,6 +283,7 @@ def build(output, cfg):
         dest = output/path; dest.parent.mkdir(parents=True,exist_ok=True); dest.write_text(text,encoding='utf-8')
     renderer.assets['assets/wordmark.png'] = SITE/'assets/wordmark.png'
     renderer.assets['assets/style.css'] = SITE/'style.css'
+    renderer.assets['assets/depth.js'] = SITE/'depth.js'
     for path,src in renderer.assets.items():
         dest = output/path; dest.parent.mkdir(parents=True,exist_ok=True); shutil.copyfile(src,dest)
     sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'

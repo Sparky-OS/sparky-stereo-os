@@ -2,7 +2,7 @@
 """Capture the static preview with CDP. Run only against an isolated container browser.
 
 Uses only the Python standard library. JavaScript expressions below inspect the
-page through the debugger; the site itself contains no JavaScript.
+page through the debugger, independently of the optional local decoration script.
 """
 import argparse
 import base64
@@ -19,7 +19,14 @@ from urllib.request import urlopen
 
 class CDP:
     def __init__(self, endpoint):
-        with urlopen(endpoint+'/json/version',timeout=10) as r: info=json.load(r)
+        deadline=time.monotonic()+20
+        while True:
+            try:
+                with urlopen(endpoint+'/json/version',timeout=2) as r: info=json.load(r)
+                break
+            except OSError:
+                if time.monotonic()>=deadline:raise
+                time.sleep(.2)
         self.version=info['Browser']
         p=urlsplit(info['webSocketDebuggerUrl'])
         self.sock=socket.create_connection((p.hostname,p.port),10)
@@ -114,14 +121,14 @@ def run(endpoint,base,output):
                         lang:document.documentElement.lang,background:getComputedStyle(document.body).backgroundColor,
                         rootBackground:getComputedStyle(document.documentElement).backgroundColor,
                         scripts:document.scripts.length,cookie:document.cookie,
-                        imageTop:document.querySelector('.hero').getBoundingClientRect().top,
+                        imageTop:document.querySelector('.depth-decoration').getBoundingClientRect().top,
                         statusTop:document.querySelector('.status').getBoundingClientRect().top,
                         pageText:document.body.innerText,
                         menuCount:document.querySelectorAll('.lang li a').length,
                         failedImages:Array.from(document.images).filter(x=>!x.complete||!x.naturalWidth).map(x=>x.src)
                     }))''',session)
                     assert measure['scrollWidth']<=width,(lang,name,'overflow',measure)
-                    assert measure['scripts']==0 and measure['cookie']=='',(lang,'script/cookie')
+                    assert measure['scripts']==1 and measure['cookie']=='',(lang,'script/cookie')
                     assert measure['menuCount']==10,(lang,'missing language')
                     requests=[e['params']['request']['url'] for e in browser.events if e.get('method')=='Network.requestWillBeSent' and e.get('sessionId')==session]
                     assert all(urlsplit(u).netloc==urlsplit(base).netloc for u in requests),requests
@@ -162,7 +169,7 @@ def run(endpoint,base,output):
                     time.sleep(.2)
                     assert browser.evaluate('location.href',session)==focused['href']
                     # The same document with JavaScript enabled has identical
-                    # visible content and loads no script.
+                    # visible text; the separate decoration check executes the local script.
                     browser.call('Page.navigate',{'url':url},session)
                     time.sleep(.2)
                     browser.call('Emulation.setScriptExecutionDisabled',{'value':False},session)

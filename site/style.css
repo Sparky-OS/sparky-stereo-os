@@ -100,3 +100,22 @@ td img { max-width: 5rem; }
 .maintainers { display: grid; grid-template-columns: 5rem 1fr; gap: 1.25rem; }
 .maintainers dt, .maintainers dd { margin: 0; }
 .maintainers dt img { width: 72px; }
+
+.opening { display: grid; grid-template-columns: minmax(0, 1fr) minmax(16rem, 26rem); gap: 1.5rem; align-items: center; }
+.depth-decoration { position: relative; height: 20rem; border-radius: .5rem; overflow: hidden; background: radial-gradient(ellipse, #315876 0, #262423 75%); }
+.depth-decoration img { width: 100%; height: 100%; object-fit: cover; }
+.depth-decoration canvas { display: none; width: 100%; height: 100%; }
+.depth-ready img { display: none; }
+.depth-ready canvas { display: block; }
+@media (max-width: 60rem) {
+  .opening { display: flex; flex-direction: column; gap: .3rem; }
+  .depth-decoration { width: 100%; height: 10rem; }
+  .opening-copy { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .depth-decoration canvas { display: none; }
+  .depth-decoration img { display: block; }
+}
+@media print {
+  .depth-decoration { display: none; }
+}

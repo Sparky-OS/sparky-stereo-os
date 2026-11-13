@@ -2,7 +2,8 @@
 
 **For** maintainers of the edition's front pages: one layout for each kind of page, with the words taken from each existing Markdown translation.
 The Markdown remains the editorial source.
-The generator uses only Python's standard library, and the resulting pages use no JavaScript, outside resources or cookies.
+The generator uses only Python's standard library, and the resulting pages work with JavaScript disabled and use no outside resources or cookies.
+An optional local WebGL drawing changes decoration only; the text and navigation are identical.
 
 ## Build and check
 
@@ -78,7 +79,16 @@ python3 site/browser_check.py --endpoint http://127.0.0.1:9222 --base-url http:/
 
 It uses a fresh browser context for every capture: English, Portuguese, Japanese and Spanish, wide and phone widths, light and dark.
 It checks real keyboard events on the language disclosure with scripts disabled, navigation, local resource requests, absent cookies, identical visible content with scripts enabled, and reflow at 320 CSS pixels.
-It records measurements and captures; they belong outside the source repository.
+All 22 content pages are also checked with enlarged text spacing, and each capture has a full-page companion.
+`python3 site/depth_check.py --output CAPTURES` uses the same isolated browser to check the decoration with scripts off, reduced motion, missing WebGL and context loss, then checks animation idle behavior and camera geometry.
+It draws three window planes in one world, with separate perspective and model-view matrix uniforms recognized by the edition browser's 3D Canvas camera route.
+The browser provides the parallel eye cameras and the compositor owns display adaptation; the page makes no anaglyph and adds no depth preferences.
+The drawing stops after 4.8 seconds and while hidden or outside the viewport.
+The static checker reports the weight both without and with its small local script.
+The geometry test uses the actual uploaded matrices and an independent pinhole formula, including swapped-eye and flat-eye controls.
+It does not establish end-to-end stereo transport in the edition browser or on a physical display.
+
+These scripts record measurements and captures; they belong outside the source repository.
 These checks cover named accessibility criteria and are not a certificate of complete WCAG conformance or a substitute for assistive-technology review.
 
 ## Assets and credits

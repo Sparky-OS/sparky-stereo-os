@@ -279,3 +279,18 @@ A full `cargo clean` also resets the target and is the normal boundary between c
 For a baseline comparison, reset before building stock too, retain both compilation logs and use the identical temporary whole-UI test on each side.
 A runtime command-registry and session-inspection check can confirm that the candidate has the added API and pristine stock does not.
 Source cleanliness and a source hash alone do not prove which cached library was linked.
+
+### Local path libraries and frozen gate inputs
+
+Symptom: the full app gate reports that a renderer depends on an app or tooling when its new sibling dependency is a shared camera library.
+Cause: the local layer checker classifies every dependency with a path as a workspace member, although Cargo metadata distinguishes actual `workspace_members`.
+Fix: classify app workspace crates from the member set; keep the existing upward-layer and UI-toolkit prohibitions.
+How found: the complete MaterialCraft gate reached its layer stage and failed on `craft-stereo-camera`; the metadata regression failed before the one-line classifier change and all sixteen checker tests passed afterwards.
+The same fix already existed in the edition's TextureCraft branch, so check other accepted suite work as well as upstream before recreating a fix.
+A sibling path does not make a shared library part of the app workspace.
+
+Symptom: test commands pass, but the gate receipt refuses to bind them to the final source tree.
+Cause: a formatter was still changing a new test when the source guard recorded its inputs.
+Fix: wait for formatting and intentional lockfile resolution to finish before freezing source and harness hashes, then run the gate without source mutations.
+How found: the before/after receipt isolated the changed stock-control test hash; a fresh run on fixed sources passed both the checks and the unchanged-source guard.
+Keep the refused receipt as diagnostic evidence and use only the fixed-source run for acceptance.

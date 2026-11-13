@@ -141,3 +141,40 @@ The regression uses a second private software Vulkan device capped at 64 texels 
 It expects the existing UI report queue to contain texture set zero; the pre-fix callback leaves it empty.
 This is a deterministic validation rejection, not a reproduced driver out-of-memory event.
 Do not force memory exhaustion: automatic dimension downscaling can also invalidate an oversized-descriptor fixture, and destroying a wgpu device need not produce a scoped allocation error.
+
+## CPU previews and progressive tracers
+
+Check whether the renderer is actually progressive before introducing temporal state.
+MaterialCraft's preview performs finite supersampling: a settled frame uses a 2 by 2 grid, or four primary rays per pixel, and has no cross-frame accumulation.
+Its stereo entry point borrows one immutable mesh and BVH, material maps and environment/light set, prepares two `RayGrid` values, then invokes the existing sample loop for each eye.
+Compute a camera-relative key light once from the central camera, before the rows and eyes; deriving it from each off-axis centre ray changes the world.
+Keep the existing sample positions, tone mapping, clipping and ordinary entry point unchanged.
+Count actual completed primary rays and publish the pair only after both eyes finish; cancellation returns no pair.
+At 640 by 360 with four samples per pixel, each eye completes 921600 primary rays.
+The native proof checked those equal counts and a single immutable scene key before freezing the app and reading the declared buffer.
+At depths 4 and 6 with a target distance of 5, the tested 35 degree camera gave the same predicted +6 and −4 displayed pixels at 640 by 360 and 320 by 180 windows, with zero vertical shift.
+The smaller window retained 640 by 360 native samples per eye and measured +12 and −8 before the compositor's resize.
+The active preview's key-light strength was its unchanged default zero; a separate renderer regression exercised a nonzero key light and ambient-occlusion rays.
+Do not describe that capture as a progressive path-tracing or nonzero-key-light proof.
+
+For an actual progressive tracer, separate immutable scene resources from mutable eye resources.
+Geometry, BVH, materials, textures, environment distributions and lights have one owner and one revision for a pair.
+Each eye owns its camera uniform, accumulation, sample counter, denoising buffers, temporal history and resolved image.
+Advance both eyes to the same sample count under the same scene, time, camera, size and depth revision before presenting their pair.
+Discard an obsolete complete pair and invalidate both eye histories together when that revision changes.
+Record the completed sample count and scene revision with each capture; matching frame sizes alone does not establish convergence or identity.
+Check mono state restoration after tracing, and do not use a shifted flattened result for the other eye.
+
+Source-audit trap: a raster stereo entry point need not cover an application's Rendering mode.
+TextureCraft's model companion calls `Renderer::prepare_stereo`, while Rendering mode owns a separate `GpuTracer` and a separate CPU `Tracer`.
+The GPU tracer's `pass` documents one call per submission because `queue.write_buffer` rewrites its sole camera uniform.
+Two calls on that owner before one submission would not provide independent eye uniforms, accumulation or sample counts.
+The spare accumulation buffer is a previous-size allocation cache, not a second eye.
+The required fix belongs in that tracer's resource ownership and pair submission boundary, with the same coherent camera inputs, plus an equivalent CPU adapter.
+This was found by following `render_mode::TraceCallback::run` into `GpuTracer::pass` and inspecting its fields; the uniform overwrite has not been reproduced as a stereo runtime failure.
+Do not mark Rendering mode adapted merely because the raster companion opens beside it.
+
+A native host should retain at most one pending worker or GPU pair.
+When an immutable request becomes obsolete, cancel it and wait for acknowledgement before starting another worker, rather than accumulating cancelled workers during rapid edits.
+Only hand the native window one complete left-first picture, together with the sample and scene metadata belonging to that picture.
+Poll live compositor feedback after the scene settles because resizing changes the native disparity budget even when the chosen source resolution stays fixed.

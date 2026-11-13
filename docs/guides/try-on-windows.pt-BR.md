@@ -1,6 +1,6 @@
 # Experimente no seu PC com Windows
 
-🇨🇦 [English](try-on-windows.en.md) · 🇩🇪 [Deutsch](try-on-windows.de.md) · 🇧🇷 [Português](try-on-windows.pt-BR.md)
+🇨🇦 [English](try-on-windows.en.md) · 🇩🇪 [Deutsch](try-on-windows.de.md) · 🇧🇷 [Português](try-on-windows.pt-BR.md) · 🇲🇽 [Español](try-on-windows.es.md)
 
 **Para** quem tem um PC com Windows e um pendrive: veja o desktop 3D na sua própria tela em dez passos, sem instalar nada e sem mudar o Windows.
 

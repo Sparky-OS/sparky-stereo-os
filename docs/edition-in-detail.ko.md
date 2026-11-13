@@ -51,7 +51,7 @@ Sparky Stereo OS는 헤드셋을 다시 3D 화면으로 바꿔 줍니다: 3D 게
 <a id="who-builds-it"></a>
 ## 누가 만듭니다
 
-Brasília의 favela 출신 Daniel, 현재까지 두 명의 인간 기여자: Jeromy Streets는 Plasma용 비디오 배경화면([org.kde.video](https://github.com/Sparky-OS/org.kde.video))을 만들었고 이제 Sparky-OS에서 유지 관리자로 함께하며, Eff (effcol)는 iZ3D의 코드를 [wiz3D](https://github.com/Sparky-OS/wiz3D)로 살려내고 여기서 유지 관리합니다.
+Brasília의 favela 출신 Daniel, 현재까지 세 명의 인간 기여자: Jeromy Streets는 Plasma용 비디오 배경화면([org.kde.video](https://github.com/Sparky-OS/org.kde.video))을 만들었고 이제 Sparky-OS에서 유지 관리자로 함께하며, Eff (effcol)는 iZ3D의 코드를 [wiz3D](https://github.com/Sparky-OS/wiz3D)로 살려내고 여기서 유지 관리하며, Pedro F. Albanese (pedroalbanese)는 [Sparky CA](https://github.com/Sparky-OS/sparky-ca)가 의존하는 Ed521 서명 라이브러리의 저자로, 여기서 Daniel과 함께 Sparky CA를 유지 관리합니다.
 Linux의 스테레오는 수년간 자원봉사자를 기다렸습니다: 이전 시도는 리뷰어에게 3D 디스플레이가 없어서 중단되었고, 작업은 커널, Mesa, KWin, FFmpeg, 플레이어 및 웹 표준에 걸쳐 있습니다.
 이를 이어갈 다른 개발자가 나서지 않아, 여기서 함께 일하는 다른 파트너는 AI 파트너이며, Daniel이 지시하고 확인하며 [AI 출처](ai-provenance.md)에 명시되어 있습니다.
 인간의 손으로 만들어지는 것을 보고 싶다면 언제든 환영합니다: 모든 포크는 공개이고, 모든 작업은 열려 있습니다.
@@ -232,6 +232,7 @@ Sparky Stereo OS, Daniel Ramos (Capitain Jack)의 SparkyLinux 에디션 (Paweł 
 | --- | --- |
 | <a href="https://github.com/effcol"><img src="https://github.com/effcol.png?size=96" width="72" alt="Eff"></a> | **Eff (effcol)**<br>[wiz3D](https://github.com/effcol/wiz3D)를 유지 관리합니다: iZ3D를 기반으로 DirectX, OpenGL, AMD HD3D 및 NVIDIA 3D Vision을 위한 보편적인 스테레오스코픽 3D 래퍼이며, 모든 시스템을 위한 것입니다; 여기의 [Sparky-OS/wiz3D](https://github.com/Sparky-OS/wiz3D) 패키지도 유지 관리합니다.<br>[![Follow Eff](https://img.shields.io/badge/Follow-effcol-2777AD?style=flat-square&logo=github)](https://github.com/effcol) |
 | <a href="https://github.com/halverneus"><img src="https://github.com/halverneus.png?size=96" width="72" alt="Jeromy Streets"></a> | **Jeromy Streets (halverneus)**<br>KDE Plasma용 비디오 배경화면과 잠금 화면인 [org.kde.video](https://github.com/Sparky-OS/org.kde.video)를 만들고 유지 관리합니다.<br>[![Follow Jeromy](https://img.shields.io/badge/Follow-halverneus-2777AD?style=flat-square&logo=github)](https://github.com/halverneus) |
+| <a href="https://github.com/pedroalbanese"><img src="https://github.com/pedroalbanese.png?size=96" width="72" alt="Pedro F. Albanese"></a> | **Pedro F. Albanese (pedroalbanese)**<br>Daniel과 함께 [Sparky CA](https://github.com/Sparky-OS/sparky-ca)를 유지 관리합니다. 브라질 ICP-Brasil 인증서를 설치하고 최신 상태로 유지하는 도구입니다. ICP-Brasil 루트 인증서 하나가 사용하는 Ed521 서명 라이브러리 [e521](https://github.com/pedroalbanese/e521)의 저자입니다.<br>[![Follow Pedro](https://img.shields.io/badge/Follow-pedroalbanese-2777AD?style=flat-square&logo=github)](https://github.com/pedroalbanese) |
 
 **버전:** Sparky Stereo OS 9 "Mashtabba", Debian 14 "Forky" 기반이며 KDE Plasma만 사용합니다.
 

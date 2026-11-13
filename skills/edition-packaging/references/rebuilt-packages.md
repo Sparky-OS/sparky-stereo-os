@@ -21,6 +21,7 @@
   Our qt6-base runs `dh_auto_build -- sync_headers` before `docs`, and its `test.sh` compiles every public module header alone and together and resolves every include of every installed header, so the build stops on a bad header.
   Give every Qt module recipe built this way (qt6-3d, qt6-declarative, qt6-multimedia) the same test.
   Daniel reported the race to Qt as [QTBUG-151944](https://qt-project.atlassian.net/browse/QTBUG-151944).
+  For a Widgets painter, also check the source/resource wiring, baked shader payloads, preparation tools and settings-page dependency as [the Qt Widgets source recipe](qt-widgets-build.md) describes.
 - Root commands on a person's machine run only on that person's go. Tests never change a television's mode, and anything that will open on a television is announced first.
 
 ## What the repository carries

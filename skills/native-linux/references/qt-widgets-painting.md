@@ -356,3 +356,184 @@ What the numbers say:
 - **Symptom:** a frame with one thin vertical line uploads 7 MB. **Cause:** the raster-drawn parts are packed in rows across an image as wide as the window, and the whole rows were uploaded. **Fix:** upload the columns in use. **Found by:** `uploaded_kB` in the statistics of a terminal with a scroll bar.
 - **Symptom:** Konsole's "frames per second" in the DOOM fire benchmark follow the painting path only a little. **Cause:** Konsole repaints about 20 times a second whatever arrives, and the fire is 13,400 rectangles and no glyph (block characters are drawn as rectangles); the count measures how fast the terminal reads. Of an 8 ms paint pass the engine's own calls take about 1 ms and the draw 0.15 ms; the rest is the program's paint code and `QPainter`'s front end. **Found by:** the statistics' `rectangles`, `glyphs` and `engine_ms` (`QT_WIDGETS_PAINT_STATS=2`).
 - **Symptom:** a measuring matrix started with a shell tool's ten-minute limit is still wanted an hour later. **Fix:** start it detached, write a last line when it ends, and wait for that line in short waits; never replace the libraries a running matrix mounts.
+
+## Find where the processor time goes before choosing a default
+
+Added 2026-11-13 after the small-machine fixed-work run.
+A shorter paint pass is not evidence that the process uses less processor.
+The GUI-thread paint timer measures a wall-time interval; process accounting includes every thread, parsing, layout, driver work, flushes and work outside that interval.
+Waiting for a frame can lengthen a timer without consuming the same amount of processor.
+Only matched profiles can show which work replaced a saving.
+
+1. Keep the fixed workload, requested frames, actual paints, rate, geometry, source commit and loaded-library hashes identical.
+2. Inside the isolated rig, check `perf stat -e cpu-clock:u -- true` before a long run.
+   Missing perf and refused events are explicit unavailable results, not empty successful profiles.
+   [Kernel perf security](https://docs.kernel.org/admin-guide/perf-security.html) describes CAP_PERFMON; grant only a container-scoped capability when authorized, never change the person's host perf policy for a probe.
+3. Build the same Qt with matching debug information or frame pointers; preserve build IDs and the unstripped libraries used by the measured process.
+   A Release ELF's symbol table can name functions but is not line-level debug information.
+   Use `readelf -S` to check for `.debug_info` and `readelf -n` for the build ID.
+4. Record only the owned client and nested compositor, across the same work window:
+   `perf record -e cpu-clock:u -F 99 --call-graph dwarf,8192 -p CLIENT_PID,KWIN_PID -o perf.data -- sleep 20`.
+   Attach before the work begins or align the start to its absolute monotonic time; save the actual profile interval and reject a missed window.
+   Keep profiler overhead separate from the unprofiled load table.
+5. Read `perf report --stdio --no-children --sort comm,dso,symbol -i perf.data` and unresolved-symbol counts.
+   Separate the program, Qt text/layout, the paint engine, region/copy work, RHI flush and the GL driver, including its worker threads.
+   Do not add inclusive call-tree percentages: the caller and its descendants overlap.
+   Scale exclusive user samples by measured user CPU time, and leave system CPU time and unresolved samples as separate buckets.
+6. Limit only the experiment when comparing a small machine: record the container's CPU count/quota, cpuset, throttling, frequency and temperature alongside each row.
+   A quota changes available execution time; it does not make a newer processor the older architecture.
+   Accept a claimed calibration only after both processor-painting control rows and their spread match the reference closely enough, with the actual mismatch stated.
+   No small-machine calibration or function attribution was established in the first milestone 4 rig because perf access was refused.
+7. Measure each proposed engine change again at the same work, on both paths and cards, with a red control and a quiet three-round table.
+   Keep the three choices; a profile is a reason to test a change, not a reason to silently change Automatic.
+
+### The small machine changed the conclusion
+
+Processor milliseconds per requested frame, program and nested compositor together, median of three quiet runs on an AMD A10 with Carrizo and Hainan (118 valid runs in the complete matrix).
+The card names came from the run's renderer, not the order of the device nodes.
+
+| Work | Processor painting | Batched, Hainan | Batched, Carrizo |
+|---|---|---|---|
+| Terminal animation | 34.6 | 32.3 | 33.7 |
+| Terminal text | 30.7 | 28.8 | 30.8 |
+| File manager scrolling | 11.7 | 12.6 | 11.3 |
+| Editor scrolling | 9.9 | 9.9 | 10.7 |
+| Editor typing | 25.6 | 30.6 | 31.7 |
+
+Compare with the Ryzen/RTX station table above: its quiet terminal rows saved 20 to 40 percent, while this machine's terminal gain is 0 to 7 percent inside the spread.
+Editor typing costs 20 to 24 percent more batched on the small machine.
+The small machine's animation paint interval fell from 16.2 ms to 8.4 ms plus a 4.6 ms flush, while the program's processor time stayed about 30 ms per requested frame.
+That establishes the discrepancy, not its per-function cause.
+Permission-free station profiles below identify shared work and added driver costs; they do not allocate the small machine’s remaining milliseconds by function.
+Automatic stays processor painting; a measured rule per program is a proposal requiring a design decision, not a shipped default.
+
+### A decorated pair candidate on the GPU
+
+This candidate is excluded from the package after the fractional edge failures below; the existing client-frame exception stays.
+In its scoped successful rows, the client-side frame is identical in the two eyes, with the content in its own half of one double-width FBO.
+The Wayland EGL platform advertises this capability to Widgets; other platforms keep their existing frame exception.
+The blitter draws the decoration with its full texture coordinates and then samples the left or right half of the content texture into that eye's content rectangle.
+This route also avoids changing a previously mono decoration context into a native two-view context.
+
+Measured in the rig on AMD and NVIDIA, scales 1 and 1.25, through an application-driven resize to logical width 940 and hide/show:
+
+| Check | Batched | Qt OpenGL engine |
+|---|---|---|
+| Requested disparities 0.5, -0.5, 1.5, -1.5, 0.25, 1 | exact | known multisample grid error; 0.226 for 0.25 at scale 1.25 |
+| Vertical disparity | 0 | centroid residual at most 0.024 px |
+| Frame pixels differing between eyes | 0 | 0 |
+| A render-to-texture child inside the decorated window, scale 1.25 after resize/hide/show | exact element disparities; the child's 22,500 pixels identical between eyes, on both cards | |
+| Earlier build / flat-exception control | all disparities 0 | |
+| 2D new against earlier build | 0 differing pixels | |
+
+This still paints a window once per eye.
+It does not implement both eyes from one recorded paint callback and does not establish that pair's processor cost.
+The fractional-scale blitter fix and the one-row extent remainder remain separate: QTBUG-149635's attachment shows the same visible right/bottom seam class, not a proof that its dimensions reproduce our exact rounding disagreement.
+
+An additional logical-width-941 case at scale 1.25 fails on both cards: content splits across the eyes after either an application-driven or compositor-driven resize. The fixture logs depth/pair/SBS true and logical backing-store width 1882. The batched texture rounds `1882 * 1.25` to 2353, but the default compositor recognises a pair only when its texture width equals `2 * round(941 * 1.25)`, which is 2352. Its mono branch then maps the wrong content into the decorated pair. This remains open; the even-width lifecycle table does not qualify arbitrary fractional sizes. A fix needs a shared physical eye extent and eye origin across painting, texture selection and the EGL FBO; merely weakening the pair-width check does not prove alignment.
+
+### Traps found while packaging and profiling
+
+- **Symptom:** installed client processes and their hardware-renderer logs pass, but the screenshots are black.
+  **Cause found in the rig:** the vendor pin was applied to clients after the nested compositor had already chosen its EGL path.
+  **Fix:** pin the compositor before starting it too, reject blank pictures in the capture gate, and inspect a representative picture.
+  **Found by:** viewing the supposedly successful installed-page capture; moving the pin before KWin restored visible window content. The precise driver-side reason for the unpinned failure was not profiled.
+- **Symptom:** an AMD-pinned run says it rendered on NVIDIA but its summary says valid.
+  **Cause:** glvnd tried NVIDIA first, while the placement check ran only if engine counters were present.
+  **Fix:** name Mesa's EGL vendor for AMD pins and reject GPU placement as unverified when the kernel exposes no engine-time evidence.
+  **Found by:** a two-GPU dry run's renderer line, empty fdinfo counters and an old parser accepting the same input the corrected parser rejects.
+  A vendor string alone does not prove a physical GPU when two cards share that renderer family.
+- **Symptom:** the lane build works but the exported patch series cannot build the engine or embed its shaders.
+  **Cause:** a partial Git snapshot omitted the edited Gui CMake file; its build still read the untracked file.
+  **Fix:** compare every build input against the published source, capture the CMake diff and qualify the source package independently.
+  **Found by:** `git ls-files src/gui/CMakeLists.txt` returned nothing while the file contained the new source and resource entries.
+- **Symptom:** a Git patch containing baked shader binaries cannot be applied by quilt.
+  **Cause:** quilt applies text patches, not Git binary patch payloads.
+  **Fix:** carry the checked baked resources through source format 3.0's explicit `debian/source/include-binaries`, with text-only quilt patches.
+  **Found by:** auditing the `.qsb` entries before source preparation, then checking the repacked and re-extracted source.
+
+### When perf is refused: fixed-work Callgrind and native thread time
+
+Symptom: even `perf record -e cpu-clock:u` fails with permission denied in the isolated container, including with `CAP_PERFMON`.
+Cause found by the actual event-open failure and the kernel policy readout; container capabilities did not make this event available.
+Keep the host security policy unchanged.
+Use Debian's `valgrind` package, fetched through HTTPS apt in a separate tools image, and matching program/library debug packages.
+`valgrind-dbg` did not exist in the measured Debian archive; verify package candidates rather than inventing a debug package.
+The Qt build's own dbgsym packages resolve its inline and LTO functions; Konsole also needs its KPart debug package, and Kate needs KTextEditor debug symbols.
+Record exact versions and build IDs.
+
+1. Reuse the fixed-work kit's feed and typing driver, with a short fixed input count, after startup settles.
+   The measured continuation used the first 12 terminal animation/text records and 20 typing events, identical files, rates and sequence on both paths.
+2. Launch the client with `valgrind --tool=callgrind --instr-atstart=no --separate-threads=yes --trace-children=no --callgrind-out-file=callgrind.out.%p`.
+   Enable with `callgrind_control --instr=on PID`, zero before work, then dump the measured part after input completion and drain.
+   Keep all client thread files for that part, including driver workers; exclude the terminal feed child and later shutdown dumps.
+3. Read `callgrind_annotate --inclusive=yes --auto=no --threshold=100 FILE` for call roots, and group disjoint self costs for totals.
+   Inclusive callers and descendants overlap and must not be summed.
+   Keep generic memcpy/memset separate unless caller edges establish its purpose; not every copy is an atlas upload.
+4. Beside it, repeat natively and snapshot `/proc/PID/task/TID/{comm,stat,schedstat}` over the same input/completion window.
+   The first schedstat field is nanoseconds spent on the processor; retain user/system ticks too.
+   Sum every program thread, record the compositor separately, and name each driver thread.
+   A native driver worker has kernel and scheduling costs that user-space instruction counts cannot turn into milliseconds.
+5. Record actual paint callbacks as well as requested inputs.
+   Callgrind often slows execution about fifty times; these samples had about 25 to 146 times the native program CPU accounting.
+   That ratio includes changed repaint work as well as instrumentation; it is not application speed.
+   Instrumentation changed coalescing: 12 animation inputs produced 65/71 paints, 12 text inputs produced 4/3 paints, and 20 keys produced 25/21 paints.
+   Instructions per input are not instructions for an identical paint count.
+   Neither GPU instructions nor kernel work inside driver ioctls is counted by Callgrind.
+6. Do not emulate a small CPU by relabelling the station.
+   Here a four-CPU cgroup quota left native animation/text processor controls at 14.64/8.50 ms per requested input, far from the A10's 34.6/30.7 ms rows, with different windows and contention.
+   No architecture/frequency calibration was established and the small machine's exact attribution stays open.
+
+Measured on the AMD station path, M user-space instructions per requested input, with matching debug symbols:
+
+| Work | Processor painting | Batched | Observation |
+|---|---:|---:|---|
+| Terminal animation | 171.698 | 90.069 | raster/blending and memory fills fall; parser/model stays almost unchanged |
+| Terminal text | 16.685 | 15.053 | text shaping stays on the processor; 4/3 actual paints for 12 inputs |
+| Editor typing | 22.064 | 21.652 | completion and shaping remain; copies, submission and driver costs are added |
+
+For typing, `QTextEngine::shapeText` has 53.22/53.28 M inclusive instructions for the complete fixed work, while `paintAndFlush` falls from 131.93 to 104.67 M.
+Self raster/blending falls from 3.284 to 1.310 M instructions per key, but generic copies rise from 2.978 to 3.527 M and driver work appears at 0.334 M on the GUI thread plus 0.202 M on workers.
+Native typing totals were 279/334 ms in the first pair and 230/416 ms in bounded-shutdown repeats, all contended; these are diagnostic samples, not a quiet penalty percentage.
+The first batched run has 28.4 ms in the driver's `cs0` thread, absent on the processor path.
+This explains why a shorter paint alone cannot establish total offload: parsing, shaping and completion remain, with new copy/submission/driver work.
+It does not prove which group dominates the A10's remaining 30 ms.
+Candidates in Qt are fewer scratch clears/copies, dirty upload regions and a point/underline fast path; none has a measured saving or changes Automatic.
+
+Primary references: [Callgrind manual](https://valgrind.org/docs/manual/cl-manual.html), [cost and call-edge format](https://valgrind.org/docs/manual/cl-format.html), [kernel schedstat](https://www.kernel.org/doc/html/latest/scheduler/sched-stats.html).
+
+Additional traps found by the raw runs:
+
+- Symptom: a self-cost parser differs from Callgrind's header by a few instructions.
+  Cause: the optional header summary differs from the file's final totals in these measured files.
+  Fix: require the parsed disjoint self sum to equal the totals footer exactly, and retain both counters; skip call-arc costs when summing self instructions.
+  The format specification and footer comparison identified the right consistency check.
+- Symptom: a native terminal run times out although every input and resulting paint completed.
+  Cause: the final paint preceded the controller reading the feed completion file, and a nonblinking terminal has no later paint.
+  Fix: wait for a bounded quiet processor drain after feed completion; preserve the failed run.
+  The feed, paint timestamps and idle process identified this ordering error.
+- Symptom: a typing measurement finishes but the container waits indefinitely at shutdown.
+  Cause: the editor's unsaved-document shutdown did not end after TERM.
+  Fix: bound termination and kill only the owned PID before waiting; retain the completed measurement and label forced shutdown.
+- Symptom: a new compiler reports the vector-path conversion used but never defined.
+  Cause: the batched engine relied on an inline definition available through a previous compiler's PCH.
+  Fix: include `private/qpainterpath_p.h` explicitly; the nonmatching-PCH compilation exposed the missing direct include.
+
+### Equal eye extents are necessary but not sufficient
+
+The rejected CSD candidate rounded the complete double width, while the compositor recognized twice the rounded single-eye width.
+At width 941 and scale 1.25 these are 2353 and 2352 pixels, so its pair guard selected the mono mapping.
+A trial equalized extents and added the right-eye residual; width 941 then passed on AMD.
+But width 942 at 1.25 failed with 1926 unequal content-rim pixels, despite identical frame pixels.
+The residual was added after primitive pixel rounding, leaving different coverage at the two content edges.
+The next change must keep the depth shift separate from a local physical eye origin, apply origin/clip transforms consistently before rounding, and then place each eye at its equal integer boundary.
+Keep both red cases.
+Qualify odd and even widths at 100, 125, 150 and 175 percent on both cards, both GPU engines, lifecycle and controls before removing the client-frame exception.
+The partial trial is not that qualification; its CSD patches stay out of the recipe.
+Both eyes from one recorded paint callback also remains unimplemented: shifted/clipped left-eye records cannot reconstruct right-eye-only coverage or style parts with their own depth.
+
+- Symptom: Callgrind records feed completion but the final terminal text is not the completed native text.
+  Cause: the feed has written all bytes, but the terminal still has queued input/painting; a first paint followed by 250 ms is not a drain under instrumentation.
+  Fix: wait for a bounded processor-idle interval after feed completion, then compare the final viewport with the native control.
+  The first one-paint text profiles were excluded; the corrected four/three-paint profiles match the native text viewport exactly.
+  Compare the text viewport separately from Konsole’s activity margin, which reflects different coalescing history.

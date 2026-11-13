@@ -51,7 +51,7 @@ Sparky Stereo OS 能让它重新变成一块 3D 屏幕：玩 3D 游戏、看 3D 
 <a id="who-builds-it"></a>
 ## 谁在构建
 
-Daniel 来自巴西利亚的一个贫民区，目前有两位人类贡献者：Jeromy Streets，他的 Plasma 视频壁纸（[org.kde.video](https://github.com/Sparky-OS/org.kde.video)）现已进入 Sparky-OS，并由他维护；还有 Eff（effcol），他让 iZ3D 的代码以 [wiz3D](https://github.com/Sparky-OS/wiz3D) 的形式继续存在，并在这里维护它。
+Daniel 来自巴西利亚的一个贫民区，目前有三位人类贡献者：Jeromy Streets，他的 Plasma 视频壁纸（[org.kde.video](https://github.com/Sparky-OS/org.kde.video)）现已进入 Sparky-OS，并由他维护；还有 Eff（effcol），他让 iZ3D 的代码以 [wiz3D](https://github.com/Sparky-OS/wiz3D) 的形式继续存在，并在这里维护它；还有 Pedro F. Albanese（pedroalbanese），他是 [Sparky CA](https://github.com/Sparky-OS/sparky-ca) 所依赖的 Ed521 签名库的作者，并在这里与 Daniel 一起维护 Sparky CA。
 Linux 上的立体显示已经等待志愿者多年：早期尝试停滞，是因为评审者没有 3D 显示器，而这项工作横跨内核、Mesa、KWin、FFmpeg、播放器和网页标准。
 没有其他开发者站出来接手，所以这里其他的工作伙伴是 AI，由 Daniel 指挥和核对，并列入[AI 来源记录](ai-provenance.md)。
 如果你更希望它由人类亲手构建，我们非常欢迎：每个 fork 都公开，每个任务都开放。
@@ -232,6 +232,7 @@ Sparky Stereo OS，Daniel Ramos（Capitain Jack）的 SparkyLinux 发行版（Sp
 | --- | --- |
 | <a href="https://github.com/effcol"><img src="https://github.com/effcol.png?size=96" width="72" alt="Eff"></a> | **Eff (effcol)**<br>维护[wiz3D](https://github.com/effcol/wiz3D)，这是用于 DirectX、OpenGL、AMD HD3D 和 NVIDIA 3D Vision 的通用立体 3D 包装器，基于 iZ3D，面向所有系统，同时维护这里的软件包[Sparky-OS/wiz3D](https://github.com/Sparky-OS/wiz3D)。<br>[![Follow Eff](https://img.shields.io/badge/Follow-effcol-2777AD?style=flat-square&logo=github)](https://github.com/effcol) |
 | <a href="https://github.com/halverneus"><img src="https://github.com/halverneus.png?size=96" width="72" alt="Jeromy Streets"></a> | **Jeromy Streets (halverneus)**<br>创建并维护[org.kde.video](https://github.com/Sparky-OS/org.kde.video)，这是 KDE Plasma 的视频壁纸和锁屏。<br>[![Follow Jeromy](https://img.shields.io/badge/Follow-halverneus-2777AD?style=flat-square&logo=github)](https://github.com/halverneus) |
+| <a href="https://github.com/pedroalbanese"><img src="https://github.com/pedroalbanese.png?size=96" width="72" alt="Pedro F. Albanese"></a> | **Pedro F. Albanese (pedroalbanese)**<br>与 Daniel 一起维护 [Sparky CA](https://github.com/Sparky-OS/sparky-ca)，这是安装巴西 ICP-Brasil 证书并使其保持最新的工具；他是 [e521](https://github.com/pedroalbanese/e521) 的作者，该库实现了 ICP-Brasil 一个根证书所用的 Ed521 签名。<br>[![Follow Pedro](https://img.shields.io/badge/Follow-pedroalbanese-2777AD?style=flat-square&logo=github)](https://github.com/pedroalbanese) |
 
 **版本：**Sparky Stereo OS 9 "Mashtabba"，基于 Debian 14 "Forky"，仅使用 KDE Plasma。
 

@@ -1,0 +1,116 @@
+# Adding a program to a distribution's app center
+
+Written on 2026-11-13 by ORDER 547: KamLynk (by Dionatan Simioni, MIT, published only as an AppImage on its GitHub release page) as an entry in SparkyLinux's APTus AppCenter (by Paweł "pavroo" Pijanowski, [sparkylinux/sparky-aptus-appcenter](https://github.com/sparkylinux/sparky-aptus-appcenter)), prepared as a pull request.
+Load it with [upstream-outreach](../SKILL.md) when a program that is not in the distribution's archive should appear in its app center, and with [edition-packaging](../../edition-packaging/SKILL.md) for [Paweł's formula](../../edition-packaging/references/sparky-formula.md#aptus).
+Everything below ran on that day; what did not run is said under "What this recipe does not prove".
+
+## Recipe
+
+1. **Read the tool's own precedents before choosing anything.**
+   Clone the tool and read how one entry is made, end to end: the page, the handler, the script that builds the entry's page, the install, reinstall and remove scripts, the strings.
+   For APTus: an entry is one `<td>` in a page (`graphics-others.html`), an `aptus://<page key>_<name>` link, a branch in `bin/aptus-app` (architecture check, page text, installed or not), and branches in `bin/aptus-package-install`, `-reinstall` and `-remove` for anything that is not a plain `apt-get install`.
+   Then answer from the tree, with the file and line:
+   - which trees still get new entries (`git log --format='%h %ad %s' --date=short -- <tree>` and each tree's `CHANGELOG`): here 8 and 9 in 2026, 7 until August 2025, 6 until 2024;
+   - which trees the last accepted or open pull request touched, and what it left to the maintainer (here the `CHANGELOG` and the version);
+   - whether the files you will touch are the same in those trees (`cmp`), so one change serves both;
+   - whether any entry installs something that is not a package of the archive, and how it is removed; when the tool has none, read the maintainer's other installers (here `teamspeak-installer`: files in `/opt/<name>`, a launcher in `/usr/bin`, a menu entry in `/usr/share/applications`, a pinned version in the URL, removal by `rm`);
+   - which page holds the program's nearest neighbours, and how they are named, ordered and given an icon (most entries reuse an icon of the tool's own set).
+   Search the tool's issues and pull requests, open and closed, for the program's name and for the format (`gh search issues --repo OWNER/NAME "<word>" --include-prs`), and read the open pull requests whole with their review comments: what a reviewer asked last time is asked again.
+2. **The author's own channel, and the author's own checksum.**
+   Nothing of the program is copied, repackaged or mirrored: the entry fetches the author's release file from the author's address.
+   Read the author's page, README, licence and release yourself, and write down the date.
+   Take the SHA-256 from the author's checksum file, compare it with the forge's own record of the asset (`gh api repos/OWNER/NAME/releases --jq '.[].assets[] | {name,size,digest}'`) and with a download of your own, and write the version, the file name and the checksum as three variables beside the tool's other download addresses.
+   A pinned version with its checksum is what a reviewer can check; it also means each new release of the program needs a small change, and the pull request says so.
+3. **The size is said before the download starts, in the tool's own way.**
+   Find where the tool tells a person what an entry will fetch (APTus prints `apt show`'s `Version`, `Download-Size` and `Installed-Size` lines on the entry's page, above the Install button), and fill those same lines for a program apt has no record of.
+   Use the unit the neighbours use: apt counts in powers of ten (54.6 MB), an author's page may count in powers of two (52 MB) for the same 54,561,272 bytes.
+4. **Verify, then extract, then place; remove what was placed.**
+   - The download lands in the tool's work folder, not executable.
+   - The checksum is checked there; only a matching file is made executable.
+   - Everything the install needs from the file (an AppImage's own menu entry and icon: `FILE --appimage-extract <path inside>`, which needs no FUSE) is taken out in the work folder and checked to exist.
+   - Only then are the files placed, system-wide, so that every user can start the program: the file under `/opt/<name>` with a name that does not carry the version, a link in `/usr/bin` under the name the program's own menu entry runs, the menu entry in `/usr/share/applications`, the icon in `/usr/share/pixmaps`.
+   - A reinstall runs the same steps, so a refused download leaves the installed program as it was.
+   - Removal deletes exactly those files and any system file the program installs itself when asked (KamLynk's USB rule in `/etc/udev/rules.d`), shows each removal (`rm -rfv`), and never touches a home folder.
+   - The installed state is read from a file the install places last (`[ -f /usr/bin/<name> ]`, a link whose target must exist), since apt knows nothing about it.
+5. **Each failure says which one it is.**
+   An architecture the program has no build for, a C library older than it needs, no connection, a download that failed, a file that does not match, a missing piece the program needs to start: each ends with its own sentence and with nothing installed.
+   Use the tool's existing strings where one already says it (APTus has "The application is available for amd64 architecture only." and "Your version of operating system is too old to install the package."), so that no translation is added; put a new message where the tool's own messages appear (APTus: in its terminal window, in English, ending with `Press <ENTER> to exit...`).
+6. **Prove it in the distribution's own containers, through the tool's own windows.**
+   Build the image, install the tool from the branch with the tool's own `install.sh`, start it in a virtual display the way its menu entry does, and walk the entry as a person would ([the rig](#the-rig)).
+   Green: the page with the entry, the entry's page with the size, the install, the installed file's checksum, the menu entry (`desktop-file-validate`, `gtk-launch <name>` as an ordinary user), the first window, a second user, the reinstall, the removal and a search of the whole system for what is left.
+   Red, each in a fresh container with the scripts unchanged: a download with one byte changed, no network at all, the network lost after the page was shown, each architecture the program lacks, an old C library, the missing piece, and the reinstall with a changed download (the installed file's time stamp must not move).
+   Look at every capture before calling it proof.
+7. **One subject per pull request.**
+   The entry and nothing else: a wrong translation of an existing string, a page that prints `\n` as text, a crash of the tool's window in the container are each their own subject, listed in the hand-back.
+   Before the hand-back run `bash -n` on every changed script and `shellcheck` in a container, and read only the findings on the added lines: here 13, all of them the tree's own idiom (backticks, the page buttons' quoting, `cd` without a test) and none an error.
+   The text follows the maintainer's last accepted or open pull request: what it adds, where the file comes from and how it is checked, where it is placed and how it is removed, what was tested and on what, what was not, one line that credits the author, and what was left to the maintainer.
+
+## The rig
+
+A distribution without a public container image is built from its base: a Debian image pulled by digest, the distribution's keyring package checked against the `SHA256` its own `Packages` index gives, the two files its apt setup package ships (`sparky.sources` with the suites `core` and `tiamat` for Sparky 9 on Debian testing, `core` and `sisters` for Sparky 8 on Debian 13; `preferences.d/sparky` with priority 1001), then `apt-get install sparky-apt sparky-aptus-appcenter`.
+Add `xvfb`, `openbox`, `xdotool`, `imagemagick`, `dbus-x11`, `desktop-file-utils`, `libgl1`, `libegl1`, and two ordinary users.
+
+```sh
+# inside the container, as root: the tool from the branch, a display, the tool started as pkexec starts it
+cd /src/9 && sh install.sh
+Xvfb :99 -screen 0 1280x800x24 -nolisten tcp & sleep 2; DISPLAY=:99 openbox &
+env -i SHELL=/bin/bash LANG=en_US.UTF-8 TERM=xterm PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+  HOME=/root USER=root LOGNAME=root PKEXEC_UID=1000 DISPLAY=:99 /usr/bin/sparky-aptus-appcenter &
+# from outside: a capture, a click read from the capture, the Enter a person presses in the terminal
+docker exec -e DISPLAY=:99 C sh -c 'import -window root png:-' > page.png
+docker exec -e DISPLAY=:99 C xdotool mousemove 572 305 click 1
+docker exec -e DISPLAY=:99 C sh -c 'W=$(xdotool search --name SparkyTerminal | head -1); xdotool windowactivate $W; sleep 1; xdotool key Return'
+```
+
+The tool's yad window with its HTML pages, its terminal and the program's own Qt window all draw in that display with Mesa's software renderer; WebKit only warns that its sandbox helper does not work in the container.
+A red case changes one answer of the system and nothing in the scripts: a directory put first in `PATH` with a stand-in `uname` (`aarch64`), `getconf` (`glibc 2.31`), `wget` (the real download, then one byte changed with `dd conv=notrunc`) or `apt-get` (refusing one package); `setarch i686` in front of the tool for a 32-bit machine; `docker run --network none`, or `docker network disconnect bridge C` once the entry's page is up.
+An AppImage has no FUSE device in a container: start it with `APPIMAGE_EXTRACT_AND_RUN=1`, and say so.
+Some programs have a mode without hardware (`kamlynk --demo`, a simulated camera): read the program's `main` for it and use it for the second user.
+
+## Traps
+
+- **Symptom:** the image build stops with `dpkg (subprocess): cannot execute rm command for cleanup (rm): No such file or directory` and `Could not exec dpkg!` right after `Unpacking base-files (14.sparky9~0) over (14.2)`.
+  **Cause:** Sparky's `base-files` ships `/bin`, `/lib` and `/sbin` as directories and no `/lib64`, while Debian's owns them as the merged-usr links; the swap removes the loader's path in the middle of the unpack. An installed Sparky has those links from its installer.
+  **Fix:** keep Debian's `base-files` in the test image with a pin that sorts first (`Package: base-files`, `Pin: release o=Debian`, `Pin-Priority: 1002`); it satisfies `sparky-apt`'s dependency. Say in the report that this one package is Debian's.
+  **How found:** `dpkg-deb -c` of Sparky's package against `dpkg -L base-files` in the Debian image.
+- **Symptom:** in the test container the tool's first `apt-get update` prints `E: The repository '... Release' no longer has a Release file` for every source.
+  **Cause:** the image was built with an apt option naming a CA file that was mounted only during the build.
+  **Fix:** give every test container the same mount the build had.
+  **How found:** the tool's own log; `apt-get update` in a container started without the mount prints the same lines.
+- **Symptom:** the tool's terminal opens black and empty and the install never proceeds; its log has `VTE-CRITICAL ... vte_pty_spawn_with_fds_async ... assertion 'argv[0] != nullptr' failed`.
+  **Cause:** the tool was started without `SHELL`; `spterm -e` runs the command through it, and `pkexec`, which the menu entry uses, always sets it for root.
+  **Fix:** start the tool with the environment `pkexec` gives (the `env -i` line above).
+  **How found:** the log line, then `/proc/PID/fd` of the terminal showing no pty.
+- **Symptom:** a four-line change to a page shows as 152 changed lines in `git diff --stat`.
+  **Cause:** the page has CRLF line endings and a scripted edit in text mode wrote LF.
+  **Fix:** open with `newline=''` and insert lines with the file's own endings; check with `file` and `git diff --stat` before every commit.
+- **Symptom:** the terminal says the program was installed, and the icon is missing.
+  **Cause:** the AppImage's top-level icon is a link into `usr/share/icons/...`; `--appimage-extract <name>.svg` gave a dangling link, `cp` failed, and the script went on.
+  **Fix:** extract the icon by its real path, and check that every extracted file exists before anything is placed, with a message of its own when one is missing.
+  **How found:** the list of expected files after the green run, not the terminal's message; list what a step should leave and look for each file.
+- **Symptom:** after a later release the program is gone from one user's menu though it is installed.
+  **Cause:** some AppImages write their own per-user menu entry at first start (`~/.local/share/applications/<name>.desktop` with `TryExec=` the file's path); with the same file name as the system entry it wins, and a path that carried the version no longer exists.
+  **Fix:** install the file under a name without the version (`/opt/kamlynk/KamLynk.AppImage`). After a removal that per-user entry hides itself, since its `TryExec` target is gone (`gtk-launch` answers "no such application").
+  **How found:** reading the program's desktop integration source, then the file it wrote for the first user. Not run: the update itself.
+- **Symptom:** the capture taken after a fast step shows only the page, as if nothing had happened.
+  **Cause:** the tool shows the page again while the terminal opens, and the page's window lands on top.
+  **Fix:** raise the terminal (`xdotool windowactivate`) before the capture; a capture with exactly the page's byte size is the page.
+- **Symptom:** a 32-bit container still reports `x86_64`.
+  **Cause:** `uname -m` answers for the kernel.
+  **Fix:** `setarch i686` in front of the tool; for an architecture the host cannot emulate, a stand-in `uname`, named as a stand-in in the report.
+- **Symptom:** the status page the install script writes never appears.
+  **Cause:** in APTus the call that would show it is commented out; the terminal's last line is what a person sees.
+  **Fix:** put the entry's messages in the terminal, and keep the page's text right as well.
+  **How found:** reading `handler` and following the windows in the run.
+
+## What this recipe does not prove
+
+- The start through FUSE: the containers have no `/dev/fuse`. This AppImage's runtime is the static one (the string `type2-runtime` in the file), which needs only a `fusermount` program, from the `fuse3` package; the plain start in the container ends with `fuse: device not found, try 'modprobe fuse' first`.
+- The program with its hardware, and anything behind a password prompt (KamLynk's "Allow USB access" asks through `pkexec`).
+- A real session's menu: the entry was validated and started with `gtk-launch`, which reads it as a menu does.
+
+## Perks of this part
+
+- A GitHub release lists each asset's SHA-256 (`digest`), so the author's checksum file can be compared with the forge's own record without downloading.
+- `--appimage-extract <path>` takes one file out of an AppImage without FUSE and without starting the program; `desktop-file-validate` then checks the author's own menu entry.
+- The app center's dependencies can already bring what an AppImage needs: on both Sparky images `fuse3` came with the tool's HTML window (`yad` depends on WebKitGTK, which recommends `xdg-desktop-portal-gtk`, whose portal depends on `fuse3`). That is a recommendation, so a system installed without recommended packages can lack it, and the entry checks.

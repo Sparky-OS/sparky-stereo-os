@@ -82,6 +82,30 @@ A file manager shows a stereo file as a pair, never squeezed, through the shared
 **Proof for a file manager:** captures of both eyes on a stereo output (each stereo thumbnail, video thumbnail, icon, tooltip and panel preview: the left view in the left eye, matched against the source's views), everything else 0 differing pixels; the left eye equal to the flat view; the same window on a 2D output pixel-identical to the unmodified program with the plain theme; a scrolled view still aligned; the declarations counted in each case's Wayland log (none for Flat and on a 2D output).
 On a stereo pair of outputs even the unmodified program's tooltip, which declares nothing, differs between the eyes by a few pixels of position, so compare a Flat tooltip with the unmodified program's, not eye against eye.
 
+## Where per-file viewing choices live (2026-11-13, Dolphin)
+
+A person's choice for one file (the input packing chosen by hand, "Not 3D", "Swap left and right eyes") is never written into the file on the program's own initiative.
+For pictures and their thumbnails it lives in one store that every program on the shared layer reads, so the file manager, its thumbnailer, the information panel and a viewer show the file alike.
+
+- **The store:** `$XDG_STATE_HOME/stereo-policy/files` (`~/.local/state` when unset), one small text entry per file, named from the file's real path, written through a temporary file.
+  The [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/latest/) gives that place to "state data that should persist between (application) restarts", such as "current state of the application that can be reused on a restart".
+  It is state, not configuration and not cache: a cache may be emptied at any time, and a thumbnail cache entry would lose the choice with it.
+- **Why not the file manager's own configuration:** the thumbnail is made by another process (KIO's thumbnail worker), which shares no object with the file manager; and the choice should hold in a viewer too.
+  A store only one program can read gives a flat thumbnail beside a 3D preview.
+- **Why not an extended attribute:** it is a write to the person's file (its change time moves, backups and sync tools see a changed file), and it fails on file systems without attributes.
+- **The calls:** C programs use `stereo_policy_file_choice()` and `stereo_policy_set_file_choice()` in libstereo-policy; Qt programs use `Stereo::Picture::fileChoice()`, `setFileChoice()` and `saveFileChoice()`, or show `Stereo::FileChoiceMenu`, which is the whole menu with its words in the edition's languages.
+  `Picture::load()` and `loadPair()` apply the entry for every caller, so a thumbnailer needs no change.
+- **The order:** a packing kept for a file is the person's correction of that file and comes before the file's own mark, because a declaration can be wrong; with no entry the mark decides, and only an unmarked file reaches the shape rule.
+  The swap applies over whatever decided.
+  A packing a viewer chooses for its session wins over the stored one, and over a stored "Not 3D".
+- **Refresh at once:** `setFileChoice()` removes the file's cached thumbnails (every size folder, named by the MD5 of the file's URI as the [Thumbnail Managing Standard](https://specifications.freedesktop.org/thumbnail-spec/latest/) has it); the program then asks for the preview again and tells the other views (`KDirNotify::emitFilesChanged`).
+- **Saving into the file** happens only when the person chooses it: `saveFileChoice()` calls the shared save, clears the entry on success, and returns the reason on failure with the file and the entry as they were.
+- **An older attribute:** a swap an earlier version kept in `user.stereo-policy.swap-eyes` is still read; it moves into the store when the person next changes that file's choice, and the attribute is then removed. Only our own swap ever wrote that name, so removing it is undoing our own write.
+- **A file that is moved or renamed loses its entry,** as it loses a player's resume position: the entry is named from the path.
+- **Videos:** the video thumbnailer reads the same store through `Stereo::Picture::fileChoice()` and passes "Not 3D" to `Stereo::Video::layout()` as its force-mono argument.
+
+**Proof for a per-file choice:** an unmarked picture in the shape of a pair whose halves are plainly different (a two-monitor screenshot: one colour per monitor) beside a real pair and a marked pair; both eyes captured before and after; the file's SHA-256, modification time, change time and extended attributes before and after (the change time catches an attribute write that a hash misses); a restart; a new session with the thumbnail cache removed; the control on the build before the change.
+
 ## Preserving bytes and interpreting meaning are separate checks (2026-10-19)
 
 The PhotoCraft work exposed a reusable distinction: an exporter can preserve `sTER` while an API still names its modes incorrectly.

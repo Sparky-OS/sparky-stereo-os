@@ -421,6 +421,7 @@ Measured in the rig on AMD and NVIDIA, scales 1 and 1.25, through a resize and h
 | Requested disparities 0.5, -0.5, 1.5, -1.5, 0.25, 1 | exact | known multisample grid error; 0.226 for 0.25 at scale 1.25 |
 | Vertical disparity | 0 | centroid residual at most 0.024 px |
 | Frame pixels differing between eyes | 0 | 0 |
+| A render-to-texture child inside the decorated window, scale 1.25 after resize/hide/show | exact element disparities; the child's 22,500 pixels identical between eyes, on both cards | |
 | Earlier build / flat-exception control | all disparities 0 | |
 | 2D new against earlier build | 0 differing pixels | |
 

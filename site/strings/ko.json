@@ -1023,6 +1023,10 @@
     }
   },
   "strings": {
+    "site.language.name": "한국어",
+    "site.language.flag": "🇰🇷",
+    "site.wordmark.image": "assets/wordmark.png",
+    "site.wordmark.alt": "SPARKYOS / POWERED BY DEBIAN / STEREO 3D EDITION",
     "home.intro.heading01": "Sparky Stereo OS",
     "home.intro.paragraph01": "**이미 가지고 있는 화면에서 3D로 만들고 탐험하세요: 그림을 그리고, 사진과 비디오를 편집하고, 분자와 지구본을 연구한 다음, 영화를 보고 게임을 즐기세요.**\n3D TV와 3D 프로젝터, VR 헤드셋, 무안경 3D 디스플레이, 적청 안경을 쓴 모든 모니터 등 모든 종류의 3D 화면을 위해 만들어졌습니다.\n일반 2D 모니터에서는 같은 데스크톱이 아무 변경 없이 그대로 작동합니다.\nSparky Stereo OS는 Daniel Ramos의 SparkyLinux 에디션(Paweł \"pavroo\" Pijanowski 제작)으로, 새로운 Stereo KDE Plasma 데스크톱을 갖춘 Linux 시스템입니다.",
     "home.intro.paragraph02.link01": "docs/lean-code-packages.md#why-it-matters",

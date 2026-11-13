@@ -174,7 +174,14 @@ def extract():
         english_headings[kind] = [slug(b['raw']) for b in blocks((ROOT/source).read_text()) if b['type']=='heading']
     result = {}
     for lang, sources in SOURCE.items():
-        catalog = {'language': lang, 'pages': {}, 'strings': {}}
+        tag, flag, name = LANGUAGES[lang]
+        # These interface labels are the existing README row and the rendered
+        # wordmark, not new prose or independently translated UI strings.
+        catalog = {'language': lang, 'pages': {}, 'strings': {
+            'site.language.name': name, 'site.language.flag': flag,
+            'site.wordmark.image': 'assets/wordmark.png',
+            'site.wordmark.alt': 'SPARKYOS / POWERED BY DEBIAN / STEREO 3D EDITION',
+        }}
         for kind, source in sources.items():
             text = (ROOT/source).read_text(encoding='utf-8')
             doc = {'source': source, 'sha256': hashlib.sha256(text.encode()).hexdigest(), 'blocks': []}
@@ -239,7 +246,7 @@ def missing_report(catalogs):
     result = {}
     for lang, catalog in catalogs.items():
         missing_pages = sorted(set(KINDS) - set(catalog['pages']))
-        missing = sorted(k for k in source if k.split('.')[0] in catalog['pages'] and k not in catalog['strings'])
+        missing = sorted(k for k in source if (k.split('.')[0] in catalog['pages'] or k.startswith('site.')) and k not in catalog['strings'])
         extra = sorted(k for k in catalog['strings'] if k not in source)
         result[lang] = {'missing_pages': missing_pages, 'missing_keys': missing, 'additional_keys': extra}
     return result

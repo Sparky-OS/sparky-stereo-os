@@ -1159,6 +1159,10 @@
     }
   },
   "strings": {
+    "site.language.name": "Português",
+    "site.language.flag": "🇧🇷",
+    "site.wordmark.image": "assets/wordmark.png",
+    "site.wordmark.alt": "SPARKYOS / POWERED BY DEBIAN / STEREO 3D EDITION",
     "home.intro.heading01": "Sparky Stereo OS",
     "home.intro.paragraph01": "**Crie e explore em 3D na tela que você já tem: pinte, edite fotos e vídeos, estude moléculas e globos, depois assista a filmes e jogue.**\nEle é feito para todo tipo de tela 3D: TVs e projetores 3D, headsets de VR, telas 3D sem óculos e qualquer monitor com óculos vermelho e ciano.\nNum monitor 2D comum, a mesma área de trabalho funciona sem nenhuma mudança.\nSparky Stereo OS, a edição de Daniel Ramos do SparkyLinux (de Paweł \"pavroo\" Pijanowski), é um sistema Linux com uma nova área de trabalho Stereo KDE Plasma.",
     "home.intro.paragraph02.link01": "docs/lean-code-packages.md#why-it-matters",

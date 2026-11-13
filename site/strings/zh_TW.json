@@ -1023,6 +1023,10 @@
     }
   },
   "strings": {
+    "site.language.name": "繁體中文",
+    "site.language.flag": "🇭🇰",
+    "site.wordmark.image": "assets/wordmark.png",
+    "site.wordmark.alt": "SPARKYOS / POWERED BY DEBIAN / STEREO 3D EDITION",
     "home.intro.heading01": "Sparky Stereo OS",
     "home.intro.paragraph01": "**在你已有的螢幕上以 3D 進行創作與探索：繪畫、編輯照片與影片、研究分子和地球儀，然後看電影、玩遊戲。**\n它為各種 3D 螢幕而設計：3D 電視和 3D 投影機、VR 頭戴顯示器、裸眼 3D 顯示器，以及配上紅青眼鏡的任何螢幕。\n在一般的 2D 螢幕上，同一個桌面無需任何改動即可使用。\nSparky Stereo OS 是 Daniel Ramos 的 SparkyLinux 版本（SparkyLinux 由 Paweł \"pavroo\" Pijanowski 製作），是一套搭載全新立體 KDE Plasma 桌面的 Linux 系統。",
     "home.intro.paragraph02.link01": "docs/lean-code-packages.md#why-it-matters",

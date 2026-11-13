@@ -200,3 +200,13 @@ Do not narrow a large world-space origin to f32 or point each eye at the unchang
 Expand normalized depth rounding outward, and include the near clipping plane when geometry crosses it, so the camera budget cannot miss newly clipped corners.
 Keep the headlight at the central camera while geometric eyes, visibility/depth targets and resolved images are private.
 These are renderer bridge requirements; the PRC adapter still needs its own tests and native capture before it can be called proved.
+
+Symptom: the orthographic camera's analytic baseline is correct, but the rendered disparities do not match it.
+Cause: the match arm shadows the render grid's pixel height with the world's orthographic height when restoring the projection coefficient.
+Fix: give the world height its own name and retain the original pixel aspect and focal scale.
+How found: render two colored finite-depth surfaces, compare their actual edge runs to +12 and −12 pixels, and check the baseline equation separately.
+
+Symptom: an orthographic model very close to the eye gets a zero baseline.
+Cause: its depth scan applies the perspective near-plane threshold even though the ordinary orthographic rasterizer does not clip there.
+Fix: admit representable positive orthographic depths while retaining perspective clipping and outward rounding.
+How found: put all vertices at a positive depth below the perspective threshold and require a finite positive baseline before checking the complete raster suite.

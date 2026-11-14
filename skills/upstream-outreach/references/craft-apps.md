@@ -466,3 +466,11 @@ Fix: carry the existing upstream RAW comparison of `info.offsets.len()` against 
 Identify the applicable hunk and retain its author's date rather than importing unrelated gain-map and HEIF changes or padding the fixture to evade the descriptor cap.
 How found: the full receiving gate reached the unchanged RAW regression, inspection separated declared offsets from bounded descriptors, and the upstream search named the existing fix.
 All ten related tile tests passed with that original hunk and no assertion change; the whole receiving gate must also pass before closing the dependency step.
+
+Symptom: EffectCraft’s existing script-fallback regression reports the same family on both sides, yet the chosen face changes after earlier lookups.
+Print the face IDs and styles as well as the family before changing the environment or the assertion.
+The measured Hebrew lookup changed from Liberation Mono Regular to Bold after other searches loaded the bold face.
+Cause: the loaded-face path returned that face directly, while the exhaustive path resolved its family in the requested style.
+Fix: apply the same requested-style resolution to the loaded covering family, retaining the covering face when the resolved style lacks the character.
+How found: the unchanged assertion failed with the extra diagnostics, the two selection paths differed at the return, and the same focused regression passed after the correction with the font inputs unchanged.
+This establishes the measured style correction; unrelated fallback-family ordering and unavailable writing systems need their own controls.

@@ -632,3 +632,15 @@ Filter the page-owned box and the nearest inherited box separately; do not searc
 How found: the original text/raster control expected a 1200 by 1200 page with ink, but received a blank 612 by 792 page; the independent nearest-invalid-ancestor control already passed.
 All twelve area controls pass with the reviewed family, including both inheritance cases.
 A merge conflict that differs only by A4 versus the already-established Letter default keeps Letter; do not revert that default while carrying the repair.
+
+
+### A moved catalog can expose old UI test assumptions
+
+Symptom: a French hotbar test cannot find its button, a German prompt test expects a differently worded warning, and a primary-font test rejects a source-shared menu-path symbol after a catalog refresh.
+Cause: the tests still assume rows absent from their earlier catalog pin; the application already translates those controls.
+Fix: search the current app history again before writing a local substitute.
+FredApps's [original three-test correction](https://github.com/storytold/pdfcraft/commit/22be7fd9fb986d4d42d7f36b0502fdf048830b7a) reads the translated labels and password warning from the catalog, and still checks every letter while leaving symbols shared with the English source to that existing path.
+Carry its exact test patch with his author and date, retaining an edition's unrelated Korean glyph control; the independently qualified suite catalog pin is a separate change.
+How found: the public correction merged during the reconciliation, the French rows supplied both labels, and a character-map audit identified only the source's U+25B8 in the affected primary font.
+The real French, German, primary-letter and Korean controls all passed with the required catalog and font inputs.
+Do not describe that primary-letter result as proof that every English menu symbol renders, or change fonts and product defaults merely to match the old test.

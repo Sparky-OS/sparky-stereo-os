@@ -85,3 +85,7 @@ This changes the upstream archive as well as the recipe; the earlier same-source
   **Cause:** converting the RGB difference to luminance rounds the blue difference to zero.
   **Fix:** count pixels where any RGB channel differs, before any colour conversion, and keep a one-pixel blue-change control that must fail.
   **How found:** checking the copied comparison script against that control before accepting its 2D rows.
+- **Symptom:** upstream's signature is cryptographically good but GPG says Debian's bundled release key has expired.
+  **Cause:** the packaging contains an older copy of the release key's self-certifications.
+  **Fix:** refresh that public key using its full fingerprint, require the fingerprint to match the bundled key, and verify the release again in an isolated keyring.
+  **How found:** the old key emitted expiry status; the refreshed key for Olivier Fourdan's same fingerprint emitted `VALIDSIG` without an expiry status on the unchanged archive and signature.

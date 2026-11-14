@@ -123,3 +123,45 @@ Work that replaces a tool this way: record the old tool's answers as data first 
 - The engine's `DEBIAN/control` is written by hand, so it must say `Source: <source package>`: without it the build record is split by binary name and the engine's record lacks the `.buildinfo`. With it, `check-debs` writes ONE record named after the source (`sparky-stereo-skills_VERSION_amd64.sparky-build.json`) that lists every `.deb` (helper, engine, HR companion), the `.buildinfo`, the `.changes` and the `.dsc`. Check with `dpkg-deb -f ENGINE.deb Source` and by reading the record's `debs`, `files` and `unrecorded` (empty).
 - Date a native package's changelog entry in the past of the build. The Lean Code step clamps the files it writes to SOURCE_DATE_EPOCH only when they are newer than it; with an entry dated hours ahead of the clock their modification times are the build's own minute, and a rebuild from the `.dsc` differs from the first build in those times alone.
 - A second-model review of changed strings can be blocked outside the work ("Your workspace is out of credits."): keep the packet and the exact error, leave the strings marked for native review, and use no stand-in model.
+
+### Export every linked folder
+
+For a skills-package rebuild, the local links define what the snapshot must contain.
+Keep a reviewed archive list and let the unchanged snapshot validator prove it complete; a check of the full checkout alone proves nothing about an export.
+In an isolated build container with the recipe's dependencies and provenance arguments, run:
+
+```sh
+OUT="$OUT" SKILLS_SRC="$PUBLIC" SKILLS_COMMIT="$COMMIT" \
+    bash "$BUILD/sparky-os/packages/sparky-stereo-skills/build.sh"
+OUT="$OUT" bash "$BUILD/sparky-os/packages/sparky-stereo-skills/build-engine.sh"
+dpkg-source -x "$OUT/sparky-stereo-skills_${VERSION}.dsc" "$REBUILD/source"
+(cd "$REBUILD/source" && dpkg-buildpackage -us -uc -b -j4)
+```
+
+The helper build must print the skill check's PASS before assembling the package.
+The source carries that exact public snapshot, its `SOURCE` and `MANIFEST.sha256`, and the engine sources; rebuilding needs no public checkout.
+Compare every rebuilt `.deb` with its recipe-built counterpart using `cmp`; ORDER 566 measured byte identity for helper, engine and HR companion.
+Inspect the hooks and linked folders in the retained source and the archive: shebang programs have mode 0755, other files 0644, and each manifest entry hashes its authored bytes.
+The installed package renames that authored manifest to `SOURCE-MANIFEST.sha256`; the lc1 manifest binds the installed forms.
+Run the payload/HR, complete-record, link and publication gates, then the exact published-pair upgrade before offering a stage.
+A successful export or link check alone is not a publication qualification.
+
+- **Symptom:** the full checkout passes, but the exported snapshot reports `missing or escaping local link ../../../site/README.md` and `../../../site/browser_check.py`.
+  **Cause:** the archive list stopped at skills, hooks, tools and docs while the new front-page reference linked into site.
+  **Fix:** include the linked site sources, apply the existing shebang-mode normalization there too, and keep validation fatal before assembly.
+  Do not remove the links, weaken the validator or choose an older public snapshot.
+  **How found:** the unchanged recipe failed on public commit 05cf375; the repaired export passed on that same commit and both binaries rebuilt from its descriptor byte for byte.
+  ORDER 531 had the same failure with hooks; each new linked folder needs the exported-tree check again.
+- **Symptom:** installation carries hooks and site sources, but the helper's offline ZIP omits them.
+  **Cause:** the helper's `bundle` command had its own older top-level list.
+  **Fix:** include both folders there too and require the ZIP's complete file set to equal the independent authored snapshot manifest, plus that manifest's installed name.
+  **How found:** ORDER 566's installed check saw 687 bundled files before the repair and all 772 snapshot files after it; checking just one skill in the ZIP had missed the omission.
+- **Symptom:** the zram publication gate refuses the packaged `skills/power-idle/references/zram-gate.md` for the setup commands its table tells contributors to avoid.
+  **Cause:** source inspection showed the gate skips the usual documentation directories but scans Markdown under the installed skills tree as program text.
+  **Fix:** the gate now distinguishes unrun Markdown from code and configuration by content, extension, mode, location and consumer references, with the controls in [the gate reference](../../power-idle/references/zram-gate.md).
+  Keep the documentation intact and executable setup refused, including a document a unit or script consumes.
+  **How found:** running the gate on the built package named four lines of its own reference; the added documentation controls failed before and passed after the change.
+- **Symptom:** the language-registry test says `expected 9, found 10` after Spanish was added.
+  **Cause:** the generated registry used its files, but the test froze the earlier count.
+  **Fix:** scan the registry directory and compare every name with the generated registry, rather than adding another fixed count.
+  **How found:** ORDER 566 ran all twenty engine test executables, nineteen passing before this test repair and twenty after it; the historical find and context goldens ran unchanged.

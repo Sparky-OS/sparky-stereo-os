@@ -223,6 +223,8 @@ Extend the existing domain skill when a repeated failure teaches a reusable less
 Every brief names the skill to leave behind, and every hand-back has a "Skill changes" section: the branch and commit, and what each change saves the next worker.
 The skill is reviewed and merged with the work, in the same review.
 
+When packaging the skills, [export every linked folder](references/skills-over-mcp.md#export-every-linked-folder): derive the archive list from the local links and validate the exported tree, including hook and site programs, before assembly.
+
 How a skill is made, extended, checked and reviewed moved to its own skill on 2026-11-12: [making-skills](../making-skills/SKILL.md) has when to extend and when to start a new one, the header and its limits, what goes in each time, the lessons files, the review that walks each rule against the diff, the cold-reader test and the traps.
 
 ### The description routes, the body executes

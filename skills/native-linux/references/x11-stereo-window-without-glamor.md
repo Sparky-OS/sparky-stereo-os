@@ -266,7 +266,19 @@ The new-server pair and older-server left-view checks include one-frame programs
 The request-injected offset and wrong-size rows pass for EGL DRI3 and the NVIDIA layer; the baseline layer on the older server splits those same changed requests.
 A native Mesa WSI that already exposes two array layers bypasses the packed layer; the AMD DRI3 pair is a separate positive control, not evidence for a copied-present check in native WSI.
 
+For a multiarch installation, repeat the library's command route with real 32-bit clients, not an environment variable on a 64-bit executable.
+Build these same EGL and GLX probes with `cc -m32` and matching development libraries; verify `ELF32` with `readelf -h`.
+In an isolated Xvfb session use `ANNOUNCE_STEREO=5 COVER_AT=-1 READBACK=1 REPORT=1`, one EGL frame and eight GLX frames.
+Both must withdraw the declaration, read red/green/red across the complete left view and keep a problem under their own package.
+Trace `execve` to confirm the engine command when its private ELF64 library cannot load into the client.
+This passed from the matching +stereo3d23 amd64/i386 packages; the container has no system journal, so the engine record and command were checked, not journal or notification delivery.
+
 ### Traps found by these clients
+
+- **A package verifier rejects architecture-specific HR paths despite matching content hashes.**
+  Cause: Lean Code deliberately places the authored-text archive below `usr/share/dpkg-stereo/hr/PACKAGE/amd64/` or `i386/`.
+  Fix: compare every common file, then match the corresponding architecture-labeled HR paths and compare their mode and archive bytes too; retain each architecture's LC record under its own name.
+  How found: the first comparison stopped on equal-named content hashes under the two directories. The counterpart check found all three HR archives byte-identical; all 626 common files in the 25 package pairs matched. The existing amd64-only gfxstream ICD was checked against the earlier package rather than silently exempted.
 
 - **EGL reports an 800-pixel view, but the moving marker is 80 pixels wide and each view is clipped.**
   Cause: the DRI3 EGL size hook updated the EGL query width but left the loader's packed buffer only one window wide.

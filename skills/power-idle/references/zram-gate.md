@@ -20,6 +20,14 @@ So two things must both pass through it: nothing of ours sets zram up, and a pac
 
 ## What it refuses
 
+Unrun Markdown under a documentation or skills folder is noted as `documentation, not run`, rather than treated as a program.
+Both its extension (`.md` or `.markdown`) and its text must identify Markdown; executable bits, a shebang, a configuration location, or a consumer's reference keep it under the setup checks.
+This includes references from unit settings, maintainer scripts, generators, udev, modprobe, sysctl, tmpfiles, modules-load and other code, literal references in compiled programs, and aliases.
+The supplied cohort is checked together so a consumer in another package counts too.
+A matching filename is treated conservatively as a reference; this does not resolve paths assembled at runtime.
+Documentation notes are separate from the count of allowed teardown operations.
+An unreadable or over-limit Markdown file is refused rather than classified as unrun documentation.
+
 Each of these refuses wherever it is found: a package's files, its maintainer scripts, an image's trees, an ISO's boot menus.
 
 | Form | Source |
@@ -146,6 +154,11 @@ In the boot in which Debian's generator still ran, the zram module is loaded and
 
 ## Traps met
 
+- **Symptom:** the gate refuses its own Markdown table of forbidden setup examples after the skills package includes the new reference.
+  **Cause:** the file is under the installed skills tree, outside the usual documentation prefixes, so its fenced examples were scanned as commands.
+  **Fix:** classify unrun Markdown by content, extension, mode, location and consumer references, then note it; never exempt a package by name.
+  Shell scripts, executable or shebang Markdown, configuration paths, and documents referenced by units, scripts or another package remain refused when they contain setup commands.
+  **Found by:** ORDER 566's built skills package had four findings in this reference; the suite with nine new test methods failed before the change and passed after it, while all thirty-seven earlier tests kept their results and the real kernel settings kept thirteen teardown notes.
 - **Symptom:** the gate refuses a package whose units only retire zram, with `a zram unit` on each unit's name and `a zram device set up through sysfs` on a line that writes `1` to `reset`.
   **Cause:** before 2026-11-14 the gate judged a unit by `zram` in its file name, and took any write on a line that also named `disksize` for a write to it; the line read `disksize` and wrote `reset`.
   **Fix:** the gate reads what the unit and its script do, and a sysfs set-up is the attribute that is written.

@@ -644,3 +644,32 @@ Carry its exact test patch with his author and date, retaining an edition's unre
 How found: the public correction merged during the reconciliation, the French rows supplied both labels, and a character-map audit identified only the source's U+25B8 in the affected primary font.
 The real French, German, primary-letter and Korean controls all passed with the required catalog and font inputs.
 Do not describe that primary-letter result as proof that every English menu symbol renders, or change fonts and product defaults merely to match the old test.
+
+### Receiving tests must exercise the shared owner's actual bounds
+
+Symptom: a receiving parser test rejects the deepest expected value even though the common library's own bound tests pass.
+Cause: the receiving test assumes the former private backend's limit, such as 128 direct containers, while the shared owner admits 64.
+Fix: retain the common production limit and adapt the receiver's boundary fixture to test admission at 63 and 64, refusal at 65 and the older 128 and 129, sibling recovery after refusal, hostile nesting and a small-stack traversal.
+Keep the independent function-depth and node-budget tests; a direct-object parser cap may stop a nested function before its separate function guard is reached.
+How found: the unchanged renderer sweep reported a failed 128-level positive, the shared byte reader declared 64 and already tested both sides, and the adapted receiver passed its parser, 512 KiB stack and fourteen function-limit controls.
+Do not describe a receiver-test adaptation as a production parser repair or raise a common limit to satisfy its former private backend's fixture.
+
+### A glyph name can number usage order rather than a character
+
+Symptom: numbered glyph names produce plausible but incorrect letters even after a strict glyph-list text port.
+Cause: a subset names its first used glyph C1, its second C2 and so on; an apparent C65 at code 65 is not evidence that it means A.
+Fix: carry the font-wide consistency review and its later control-code-counter check with the original subject.
+Keep strict AGL text reading separate from the lenient name lookup used to find an outline.
+How found: the original numbered Type1 and Type3 receiver controls failed on a counter starting at code 1; the missing [review](https://github.com/storytold/pdfcraft/commit/8c892e65299473ce854d253d47ecf7d58c098dd2) rejects a numbered name below code 32 for the whole font.
+All thirteen selected glyph-name and symbolic-font controls then passed.
+
+### New byte loops must keep cancellation inside a wide row
+
+Symptom: a packed, odd-width PNG-predicted image is repaired by a byte-row port, but the new loops no longer pass through the common bit reader's cancellation checkpoints.
+Cause: the original app carried the image correction without the shared owner's per-open control object.
+Fix: thread that existing control through every new filter branch, checking within a wide row as well as between rows, without changing decode or allocation bounds.
+Keep the original predictor reference tests and the common cancellation tests in both default and unsafe builds.
+How found: the three-way conflict showed the old PredictorRun and checkpoints against the new byte loops; the odd-width four-bit RGB receiver and all eight predictor controls passed after the integration, including the existing wide-row cancellation control.
+Testing a patched dependency with cargo test -p can refuse because it is not a workspace member; testing its standalone manifest without the complete local patch set can instead select an uncached registry backend.
+Use the owner's standalone test recipe with a disposable manifest copy and every resolved local patch, leaving source manifests and locks unchanged.
+Compile the original new unit fixtures too: their parameter initializers may need the common-only control field even when the receiving application already compiles.

@@ -207,6 +207,25 @@ When an immutable request becomes obsolete, cancel it and wait for acknowledgeme
 Only hand the native window one complete left-first picture, together with the sample and scene metadata belonging to that picture.
 Poll live compositor feedback after the scene settles because resizing changes the native disparity budget even when the chosen source resolution stays fixed.
 
+A native progressive TextureCraft capture used the existing 40 degree camera, target distance 5 and model depths 4 and 6.
+Here d is the left image x coordinate minus the right image x coordinate.
+With a perspective environment and a 24/12 native-pixel budget, the infinity constraint gives e*f=120, so d(Z)=e*f*(1/Z-1/5) predicts +6 and -4 pixels.
+At a 320 by 180 window with the chosen 640 by 360 source grid retained, the 48/24 native budget gives e*f=240 and +12/-8 native pixels; one compositor resize restores +6/-4 displayed pixels.
+Both CPU and software GPU measured these values, zero vertical shift and zero differences outside the content, and the unchanged geometry oracle rejected reversed eyes.
+Each completed capture recorded four samples and 921600 primary rays per eye under one scene revision; the 640-window native and displayed pixels matched exactly.
+This is a two-feature, two-size perspective case, not dense accuracy evidence for every material or orthographic tracing.
+
+Symptom: replacing an environment image under the same resource name leaves the paired scene cached.
+Cause: an outer scene cache can stop before the ordinary renderer's decoded-image identity check is reached.
+Fix: retain the source image and compare its Arc identity as well as the ordinary composition key; give a replacement a new source generation and invalidate both histories.
+How found: replace red environment samples with blue under one name, remove only the image-identity guard, and observe the stale-scene assertion fail before restoring it.
+Holding the old source also prevents a later allocation from reusing its address; release it when the replacement is accepted.
+
+Do not let a control probe supply the wakeup it is meant to verify.
+For an idle resize witness, finish tracing, resize through the compositor, then freeze and capture both eyes before any new ui.inspect request.
+The tested CPU companion retains the existing 16ms native-feedback poll even after its worker completes; the GPU path keeps the same polling boundary.
+The 320-window CPU and GPU witnesses both consumed the new budget without a control request, then separately verified the four-sample metadata.
+
 ## Solid backgrounds and model units
 
 Pass the actual perspective environment's horizontal focal coefficient to `Camera::infinity_projection_x`.

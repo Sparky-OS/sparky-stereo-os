@@ -82,29 +82,72 @@ A file manager shows a stereo file as a pair, never squeezed, through the shared
 **Proof for a file manager:** captures of both eyes on a stereo output (each stereo thumbnail, video thumbnail, icon, tooltip and panel preview: the left view in the left eye, matched against the source's views), everything else 0 differing pixels; the left eye equal to the flat view; the same window on a 2D output pixel-identical to the unmodified program with the plain theme; a scrolled view still aligned; the declarations counted in each case's Wayland log (none for Flat and on a 2D output).
 On a stereo pair of outputs even the unmodified program's tooltip, which declares nothing, differs between the eyes by a few pixels of position, so compare a Flat tooltip with the unmodified program's, not eye against eye.
 
-## Where per-file viewing choices live (2026-11-13, Dolphin)
+## The per-file choice: one store, one menu
 
 A person's choice for one file (the input packing chosen by hand, "Not 3D", "Swap left and right eyes") is never written into the file on the program's own initiative.
-For pictures and their thumbnails it lives in one store that every program on the shared layer reads, so the file manager, its thumbnailer, the information panel and a viewer show the file alike.
+It lives in one store that every program on the shared layer reads, and is changed through one menu, so the file manager, its thumbnailers, the information panel and a viewer show the file alike (Dolphin and its video thumbnailer since 2026-11-13, Gwenview since 2026-11-14).
 
-- **The store:** `$XDG_STATE_HOME/stereo-policy/files` (`~/.local/state` when unset), one small text entry per file, named from the file's real path, written through a temporary file.
+### Recipe: put a viewer on the shared menu and store
+
+1. **Find what the program keeps today**: its 3D menu (the entries, their shortcuts), where its choices live (a session variable, a file of its own, an attribute on the person's file), and which call decodes the picture.
+   List them from the published package's own patches before changing anything.
+2. **Show the layer's menu.**
+   Make one `Stereo::FileChoiceMenu`, add its `menuAction()` to the program's action collection, and put that action where the program's own per-file entries were.
+   Give it the file with `setFiles()` whenever the current file changes; `setContent(Video)` for a video; `setShownAsPair(false)` while a picture is shown flat, so no swap is offered on it; `setShownAsOneView()` for packings the program cannot show in 3D where the menu is.
+   On `changed()`, decode the file again and tell the other views (`KDirNotify::emitFilesChanged`); on `failed()`, show the message where the program shows its errors.
+3. **Decode through the layer with the path.**
+   `Picture::load()` and `loadPair()` apply the stored choice by themselves.
+   A viewer that decodes a document already in memory calls `Picture::fromReader(path, ...)` or `Picture::fromImages(path, ...)`: the forms without a path know no file and ignore the store.
+4. **Keep what the session owns in the program**: which eye is shown (both, left only, right only) is a view of this session, not a correction of the file, and stays the program's own option.
+5. **Keep the shortcuts.**
+   The program's old actions that the layer's menu replaces leave the menu and stay in the action collection, added to the window (`QWidget::addAction()`), and act on the store (`Picture::fileChoice()`, change one field, `Picture::setFileChoice()`).
+6. **Carry the program's own per-file state once.**
+   For each file the program kept a swap for, call `Picture::adoptSwapEyes(path, swap)`: it writes the store so that the file shows as before, does not touch the file, and leaves a file that already has a stored choice alone.
+   Record that the carry was done in the program's own state and never read the old entries of local files again; on a failure keep them, tell the person, and try at the next start.
+7. **Follow renames and moves**: make one `Stereo::FileChoiceMoves` and keep it.
+   On `carried()`, show those files again.
+8. **Files the store cannot name** (a document that is not a local file) keep the program's former behaviour; say so in the changelog.
+9. **Make the build stop on an older layer**: raise `libstereo-layer-dev (>= N)` in `Build-Depends` and pass `-DCMAKE_REQUIRE_FIND_PACKAGE_StereoLayer=ON` in `debian/rules`.
+
+### How the store works
+
+- **The store:** `$XDG_STATE_HOME/stereo-policy/files` (`~/.local/state` when unset), small text entries named from a hash of the file's real path, written through a temporary file.
   The [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/latest/) gives that place to "state data that should persist between (application) restarts", such as "current state of the application that can be reused on a restart".
   It is state, not configuration and not cache: a cache may be emptied at any time, and a thumbnail cache entry would lose the choice with it.
-- **Why not the file manager's own configuration:** the thumbnail is made by another process (KIO's thumbnail worker), which shares no object with the file manager; and the choice should hold in a viewer too.
+- **Why not the program's own configuration:** the thumbnail is made by another process (KIO's thumbnail worker), which shares no object with the file manager; and the choice should hold in a viewer too.
   A store only one program can read gives a flat thumbnail beside a 3D preview.
 - **Why not an extended attribute:** it is a write to the person's file (its change time moves, backups and sync tools see a changed file), and it fails on file systems without attributes.
-- **The calls:** C programs use `stereo_policy_file_choice()` and `stereo_policy_set_file_choice()` in libstereo-policy; Qt programs use `Stereo::Picture::fileChoice()`, `setFileChoice()` and `saveFileChoice()`, or show `Stereo::FileChoiceMenu`, which is the whole menu with its words in the edition's languages.
-  `Picture::load()` and `loadPair()` apply the entry for every caller, so a thumbnailer needs no change.
+- **The calls:** C programs use `stereo_policy_file_choice()`, `stereo_policy_set_file_choice()` and `stereo_policy_move_file_choice()` in libstereo-policy; Qt programs use `Stereo::Picture::fileChoice()`, `setFileChoice()`, `moveFileChoice()` and `saveFileChoice()`, or show `Stereo::FileChoiceMenu`, which is the whole menu with its words in the edition's languages.
 - **The order:** a packing kept for a file is the person's correction of that file and comes before the file's own mark, because a declaration can be wrong; with no entry the mark decides, and only an unmarked file reaches the shape rule.
   The swap applies over whatever decided.
   A packing a viewer chooses for its session wins over the stored one, and over a stored "Not 3D".
-- **Refresh at once:** `setFileChoice()` removes the file's cached thumbnails (every size folder, named by the MD5 of the file's URI as the [Thumbnail Managing Standard](https://specifications.freedesktop.org/thumbnail-spec/latest/) has it); the program then asks for the preview again and tells the other views (`KDirNotify::emitFilesChanged`).
-- **Saving into the file** happens only when the person chooses it: `saveFileChoice()` calls the shared save, clears the entry on success, and returns the reason on failure with the file and the entry as they were.
+- **Refresh at once:** `setFileChoice()` removes the file's cached thumbnails (every size folder, named by the MD5 of the file's URI as the [Thumbnail Managing Standard](https://specifications.freedesktop.org/thumbnail-spec/latest/) has it); the program then asks for the preview again and tells the other views.
+- **Saving into the file** happens only when the person chooses it.
+  `Picture::saveCorrection()` saves the file as `load()` shows it, the stored choice together with the caller's own options, and clears the stored choice on success, for every program; a program that calls the shared save itself therefore leaves nothing behind that would be applied a second time.
+  On failure the file and the choice stay and the reason is returned.
+  A program that is not Qt and writes the file with the C codec clears the entry itself after its verified write (`stereo_policy_set_file_choice(path, NULL)`).
 - **An older attribute:** a swap an earlier version kept in `user.stereo-policy.swap-eyes` is still read; it moves into the store when the person next changes that file's choice, and the attribute is then removed. Only our own swap ever wrote that name, so removing it is undoing our own write.
-- **A file that is moved or renamed loses its entry,** as it loses a player's resume position: the entry is named from the path.
-- **Videos:** the video thumbnailer reads the same store through `Stereo::Picture::fileChoice()` and passes "Not 3D" to `Stereo::Video::layout()` as its force-mono argument.
+- **Two paths with one hash** keep a record each in the same entry file, and writers take a lock file in the store's folder, so two programs writing at once lose nothing; readers need no lock, since an entry file is replaced whole by a rename.
 
-**Proof for a per-file choice:** an unmarked picture in the shape of a pair whose halves are plainly different (a two-monitor screenshot: one colour per monitor) beside a real pair and a marked pair; both eyes captured before and after; the file's SHA-256, modification time, change time and extended attributes before and after (the change time catches an attribute write that a hash misses); a restart; a new session with the thumbnail cache removed; the control on the build before the change.
+### The carry on rename and move
+
+The entry is named from the path, so a file renamed behind the store's back loses its choice, as it loses a player's resume position.
+A program that renames or moves files tells the store: `stereo_policy_move_file_choice(from, to)` after the move carries the file's choice, and for a folder the choice of every file below it.
+`Stereo::FileChoiceMoves` does it for any program by hearing the desktop's file jobs on the session bus: KIO sends the signal `FileMoved` of `org.kde.KDirNotify` for a rename, for each file of a move across devices, once for a folder moved as a whole, and for their undo.
+
+- **Several programs may listen.** The call changes nothing the second time: each record keeps the device and inode of its file, so a record that was carried a moment ago by another program names this very file and stays, while a record of a file that was overwritten by the move names another inode and goes.
+- **A copy carries nothing**: the file is still at its old path.
+- **A move the desktop's file jobs did not do** (a command in a terminal) is not heard, and that file loses its choice.
+- **Thumbnails:** a thumbnail of the new path made before the choice arrived shows the file without it, so the carry drops the new path's cached thumbnails and sends `FilesChanged`.
+
+### The prune
+
+The store drops the choices of files that are gone where it is written: each write that keeps a choice, and each move, looks at up to 32 entry files, going round the store from where the last one stopped.
+Only paths the store holds are looked at, never a folder of the person's, so the cost of a write stays bounded whatever the size of the disk.
+A file counts as gone when nothing is at its path and the nearest folder that still exists is on the device the file was on: a drive that is not connected, or a share that is not mounted, shows another device there, and its files keep their choice.
+With more than 32 entries a deleted file's entry goes after a few writes, not after the next one.
+
+**Proof for a per-file choice:** an unmarked picture in the shape of a pair whose halves are plainly different (a two-monitor screenshot: one colour per monitor) beside a real pair and a marked pair; both eyes captured before and after; the file's SHA-256, modification time, change time and extended attributes before and after (the change time catches an attribute write that a hash misses); a restart; a new session with the thumbnail cache removed; the same file opened in the viewer after the choice was made in the file manager, and the other way round; a rename and a move through the file manager; the control on the build before the change.
 
 ## Preserving bytes and interpreting meaning are separate checks (2026-10-19)
 

@@ -70,3 +70,36 @@ A trap gives its symptom, its cause, its fix and how the cause was found; a reci
   Fix: a gap smaller than the grid's spacing; print each place's position and size and read them before the verdict.
 - Recipe: drive a context menu in the rig with KWin's fake input by clicking coordinates read from a capture, one capture per menu level; entries keep their offsets from the click, so later steps reuse them.
 - Measured: a two-monitor screenshot 3840x1080 set to Not 3D shows flat in the thumbnail and the information panel within 2 s; the same after a restart and after a new session with the thumbnail cache removed.
+
+## The per-file choice as packages, and a viewer on the shared menu (ORDER 551)
+
+- Symptom: a picture set to "Not 3D", or given a packing, in the file manager opens in the viewer as if nothing was chosen, while the file manager's thumbnail follows the choice.
+  Cause: the viewer decodes a document it already holds in memory through `Picture::fromReader()`, which knows no path; the store was applied only by `load()` and `loadPair()`.
+  Fix: `Picture::fromReader(path, ...)` and `Picture::fromImages(path, ...)` (stereo-layer 1.18.0), which apply the stored choice as `load()` does, a stored packing over the file's mark included.
+  Found by: listing every caller of the layer's decode functions in the viewer's adapter and comparing with the functions the store's change touched.
+- Symptom: in the viewer, choosing an input packing for a file that declares its layout does nothing, and only "Swap eyes" corrects it.
+  Cause: a caller's packing comes after the file's mark in `decide()`; only a packing kept for the file in the store comes before it.
+  Fix: the viewer's per-file entries write the store instead of a session variable.
+  Found by: a JPS whose descriptor says left eye first over pixels that are right eye first, opened in the published viewer with "Side by side, right eye first" chosen: the left eye still saw the right view.
+- Symptom: a new field would be handy in `Picture::Options` (say, "this packing overrides the mark").
+  Cause, and why not: programs built against the older header construct `Options` themselves and pass it by reference; a longer structure makes the library read past theirs.
+  Fix: a new function or overload, never a new field, while programs built against the older library are still installed (the thumbnail worker of an earlier round was).
+- Symptom: a shortcut of an entry that left the menu stops working.
+  Cause: a shortcut works on an action that a shown widget holds; an action that is only in the action collection and in no menu is held by none.
+  Fix: `window->addAction(action)` for each action that keeps its shortcut.
+- Symptom: a program's swap action, connected to `toggled`, writes the store again each time the program sets its mark from the store.
+  Fix: connect to `triggered`, which only the person causes; set marks under a `QSignalBlocker`.
+- Symptom: `cmake` stops with "static assertion failed: No Q_OBJECT in the class with the signal".
+  Cause: a signal was added to a `QObject` subclass that had no `Q_OBJECT` macro.
+  Fix: add the macro (the build's automoc picks the header up).
+- Symptom: two programs that both listen for renames would, with a plain "move the entry" call, lose it: the second finds nothing at the old path and clears the new one.
+  Fix: the store's move changes nothing the second time; it tells a record that was just carried (it names the device and inode of the file now at the path) from the record of a file that the move overwrote (another inode).
+  Found by: writing the test for "a second program saw the same rename" before the code.
+- Symptom: the test of the D-Bus follower fails at once with "Could not get password database information for UID of current process" and "dbus-run-session: EOF reading address from bus daemon".
+  Cause: the test container runs as a numeric user that has no line in `/etc/passwd`.
+  Fix: mount a passwd and a group file that name the user.
+- Symptom: `ctest -R 'policy|picturetest'` passed through an environment variable prints "No tests were found!!!".
+  Cause: the quotes arrive as part of the pattern.
+  Fix: pass the pattern without quotes.
+- Recipe, the red controls of the store kept in the suite or beside it: the collision and concurrent-writer test builds the store's source with a hash mask of 0 (every path in one entry file); the same test built without the lock is registered with `WILL_FAIL` (45 of 320 choices survived in one run); a prune and a move that do nothing fail 40 and 14 checks of `policytest`.
+- Measured: one writer's lock (`flock` on a file in the store's folder) with eight processes writing 80 choices each into one entry file: 5.4 s for the whole test on a busy station, every record kept.

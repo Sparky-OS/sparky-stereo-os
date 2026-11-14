@@ -45,7 +45,7 @@ Print the failure log before stopping.
 Keep the table and log with the round's evidence.
 
 The check reads every suite and architecture, including `binary-all`, taking the source name and optional source version from the binary's `Source` field.
-An omitted source name means the binary's own package name; an omitted source version means its binary version, as Debian Policy 5.6.1 specifies.
+An omitted source name means the binary's own package name; an omitted source version means its binary version, as [Debian Policy 5.6.1](https://www.debian.org/doc/debian-policy/ch-controlfields.html#source) specifies.
 An explicit source version takes precedence, including for a binary-only rebuild.
 The matching `Sources` record in that suite must name a real `.dsc` with the recorded SHA-256 and size, the right source name and version, and the same source components as the descriptor.
 Every component must exist with the recorded size.

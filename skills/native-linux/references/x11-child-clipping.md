@@ -92,6 +92,15 @@ Autotests: `testStereoChildWindowClip` and `testStereoChildWindowClipAncestor` i
 - **Two rows loops write into one evidence folder.** Cause: `docker kill` of the container does not stop the `for` loop around it (a backgrounded loop started the next row at once); the second loop then ran the same rows beside the first. Fix: stop a loop by its PID, and give every loop its own `TAG`.
 - **The XCB error `BadWindow ... SHAPE, minor code 6` in the autotest log is not new.** Cause: `unwatch()` of a child whose window is already destroyed (`xcb_shape_select_input` unchecked); the +stereo3d52 log of `testX11Window` has five of them. The new calls on covering windows are checked and discarded.
 
+## A declared child with a child of its own over it
+
+A cover inside the declared child is drawn into that child's backing pixmap, so it must be copied into both views rather than cut out of KWin's item as a sibling would be.
+On Xwayland 24.1.15 +stereo3d2 the two views and their moving markers were kept, but the cover's own picture was absent from both, even after repainting.
+The cause was Xwayland restoring a raw Present snapshot at each backing-buffer change; delayed redirection also needed to retain the cover already painted into the new pixmap.
+Xwayland +stereo3d3 restores once per new child surface and copies the covered region into both views when restoring.
+The recipe, the trace that found it, the remap control and the buffer-recycling suite are in [a declared child covered by a child of its own](x11-stereo-window-without-glamor.md#a-declared-child-covered-by-a-child-of-its-own).
+The final apt-installed Xwayland +stereo3d3 and Mesa +stereo3d23 packages repeat all 52 child and top-level rows on both cards with glamor on and off.
+
 ## Mesa +stereo3d19: EGL and Vulkan list their child
 
 One header, `src/util/u_x11_stereo_child.h`, holds the X side: the owning window (the window below the root on the way up, as GLX takes it), a server grab around the read and write of `_KDE_NET_WM_STEREO_CONTENT_CHILDREN`, windows that are gone dropped when a child is added, the child kept while its window lives, and `_KDE_NET_WM_STEREO_CONTENT_VERSION`.
@@ -102,7 +111,7 @@ Rows from the packages: see the hand-back of ORDER 160 milestone 2; the commands
 
 ### A dev build of Mesa for the rows (minutes, not an hour)
 
-`meson setup /b/o --prefix=/b/inst -Dgallium-drivers=llvmpipe,softpipe,zink -Dvulkan-drivers=swrast -Dvulkan-layers=stereo -Dllvm=enabled -Dplatforms=x11,wayland -Dglx=dri -Dglvnd=enabled ...` then `ninja -C /b/o install` in the Mesa build image; run a client with `LD_LIBRARY_PATH=/b/inst/lib/x86_64-linux-gnu LIBGL_DRIVERS_PATH=.../dri __EGL_VENDOR_LIBRARY_FILENAMES=/b/inst/share/glvnd/egl_vendor.d/50_mesa.json` (Vulkan: `VK_ADD_IMPLICIT_LAYER_PATH=/b/inst/share/vulkan/implicit_layer.d`, `MESA_VK_STEREO_LAYER=1`) while KWin stays the installed one.
+`meson setup /b/o --prefix=/b/inst -Dgallium-drivers=llvmpipe,softpipe,zink -Dvulkan-drivers=swrast -Dvulkan-layers=stereo -Dllvm=enabled -Dplatforms=x11,wayland -Dglx=dri -Dglvnd=enabled ...` then `ninja -C /b/o install` in the Mesa build image; run a client with `LD_LIBRARY_PATH=/b/inst/lib/x86_64-linux-gnu LIBGL_DRIVERS_PATH=.../dri __EGL_VENDOR_LIBRARY_FILENAMES=/b/inst/share/glvnd/egl_vendor.d/50_mesa.json` (Vulkan: `VK_ADD_IMPLICIT_LAYER_PATH=/b/inst/share/vulkan/implicit_layer.d`, with `DISABLE_LAYER_MESA_STEREO` unset) while KWin stays the installed one.
 Configure once with `-Dbuild-tests=true` before the recipe build: the layer's passthrough test compiles `stereo_layer.c` with its own include list.
 
 ### More traps
@@ -129,8 +138,10 @@ The EGL reproducer (`egl-remap-metrics.c`, `KIND=egl`) failed the same way on Me
   Cause: the proof-rig images carry neither `python3-gi` nor `python3-xlib`; a conda `python3` first in the path hides the system one.
   Fix: install both into a derived image (apt over https, `docker commit`), and call `/usr/bin/python3`.
 - **The Vulkan client asserts `maxImageArrayLayers == 1` or `== 2`.**
-  Cause: the stereo layer is a separate package (`mesa-vulkan-layer-stereo`), off until `MESA_VK_STEREO_LAYER=1`, and it reads the root's support version; Mesa's own test sets the version itself and would overwrite KWin's.
-  Fix: unpack the layer's `.deb`, `VK_ADD_IMPLICIT_LAYER_PATH` to its `implicit_layer.d`, `LD_LIBRARY_PATH` to its library folder, `MESA_VK_STEREO_LAYER=1`, and leave the root property alone.
+  Cause: the stereo layer is a separate package (`mesa-vulkan-layer-stereo`) and the test image may not contain it; Mesa's older test also overwrites the root's support version.
+  Fix: install the matching layer or unpack its `.deb` and set `VK_ADD_IMPLICIT_LAYER_PATH` to its `implicit_layer.d` and `LD_LIBRARY_PATH` to its library folder, then leave the root property alone.
+  The layer is enabled by default; unset `DISABLE_LAYER_MESA_STEREO`.
+  `MESA_VK_STEREO_LAYER` is not read by the current layer, as its manifest and `enabled()` show (checked on ORDER 561b).
 - **The EGL client gets NVIDIA's EGL and no second view.**
   Cause: CDI adds NVIDIA's vendor file first.
   Fix: `__EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/50_mesa.json`.
@@ -149,3 +160,24 @@ The EGL reproducer (`egl-remap-metrics.c`, `KIND=egl`) failed the same way on Me
 - **CloudCompare 2.13**: `ccGLWindow`, a Qt `QOpenGLWindow` placed in a widget (`QWidget::createWindowContainer`), so a native child; "Generic stereo display" asks the quad buffer.
 - **Sweet Home 3D 7.5**: Java 3D's `Canvas3D`, a heavyweight AWT child; `-Dj3d.stereo=REQUIRED` asks for a stereo visual.
 All four rely on the child being listed; the first row for each is: start with the stereo option on, read `_KDE_NET_WM_STEREO_CONTENT_CHILDREN` of the top-level, capture, and compare with the same program in 2D.
+
+
+## EGL and Vulkan copied-present controls
+
+The covered declared child must keep its cover whichever API supplied the pair.
+Use the declared-child recipe above for the server's clipping and snapshot lifetime, then test the API's top-level window separately: an older server can keep a declared child's pair while losing its cover, which is not proof that the library handles copied top-level presents.
+The [EGL and Vulkan clients and table](x11-stereo-window-without-glamor.md#egl-x11-and-the-vulkan-stereo-layer) exercise covered, offset and wrong-size requests and the left-view withdrawal route.
+For the Vulkan client `TOPLEVEL=1` selects that top-level control; without it the stereo window is a child inside a plain frame.
+`XLIB=1` selects a Vulkan Xlib surface; the default is XCB.
+
+**A Vulkan row says PAIR after an injected offset, but the old library says PAIR too.**
+Cause: the driver did not call the exported `xcb_present_pixmap` symbol that the first preload hook replaced.
+Fix: hook the XCB request boundary with `x11-present-inject.c` and require its `inject Present` line before classifying the capture.
+How found: the higher-level hook logged no injection on NVIDIA, while the request hook logged both copied requests and made the older server split the picture.
+The helper is a test fixture for an 800-pixel view; it leaves single-view requests alone.
+
+**The Vulkan client has no second view on Xwayland without DRI3.**
+On the NVIDIA one-layer WSI route measured on ORDER 561b, the older layer's packed transfer was clipped to one view and produced no completion on the observed window; the new check cannot wait for such a completion.
+The candidate refuses that two-view swapchain with `VK_ERROR_FEATURE_NOT_PRESENT` and says why.
+This is an unsupported route, not a pair and not the library's copied-present recovery.
+Native Mesa WSI that already advertises two array layers bypasses this layer and needs its own qualification.

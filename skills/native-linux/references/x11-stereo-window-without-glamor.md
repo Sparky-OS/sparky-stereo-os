@@ -162,9 +162,156 @@ When Xwayland then runs without glamor (it could not start its acceleration, or 
 From Mesa +stereo3d22 such a screen takes the software renderer, as with any other driver on that server, a quad buffer window included, and the person is told (`libglx-mesa0`, key `zink-without-dri3`, message `LOCAL4`, severity degraded); the next program that finds zink with DRI3 ends the problem.
 The row: the session's four variables on the card through CDI, `XWAYLAND_NO_GLAMOR=1` in KWin's environment, the renderer string (`llvmpipe`), and `sparky-stereo-problems list`.
 
+## A declared child covered by a child of its own
+
+Learned on ORDER 561b, on Xwayland 24.1.15 +stereo3d2 with Stereo KWin +stereo3d54 and Mesa +stereo3d22.
+This is different from a sibling covering the declared child: the cover draws into the declared child's backing pixmap and must appear at the same place in both views.
+
+### Recipe
+
+1. Run `x11-present-pair` in the fresh-session rig with `CHILD=1 COVER=1 FRAMES=100 HOLD_S=20` and capture after its last present.
+   Check with `check-pair-flat-split.py --child grey`: both eyes must contain the 60 by 60 cover, 30 pixels from their left edge.
+2. Add `COVER_PAINT_AT=50`, capture after present 50, and require `--child yellow`.
+   The moving white markers must still occupy the same place in both views.
+3. Run on each card with glamor on and with `XWAYLAND_NO_GLAMOR=1` in Xwayland's environment.
+   Without glamor the client draws in software even when KWin uses the card.
+4. In Xwayland's own suite, run `meson test -C BUILD --print-errorlogs 'stereo pair without glamor' 'stereo child cover with buffer recycling'`.
+   The second test consumes buffers and answers frame callbacks on role-less surfaces so the backing buffers actually rotate; the assertions read Xwayland's pixmap through Composite and GetImage.
+   It checks an initial grey cover, a repainted yellow cover, both before and after delayed redirection, and a remap without another present.
+5. Keep the original top-level covered, offset, wrong-size, repaint, undeclare and uncovered rows as controls.
+
+### Symptom, cause, fix, and how the cause was found
+
+**Symptom:** both views and the moving markers are correct, but the cover has zero pixels in either eye, even after repainting.
+A check that reads only the two background colours passes this fault.
+
+**Cause:** `xwl_window_set_window_pixmap()` queues `xwl_window_update_child_surface()` when a backing buffer changes as well as when the child first receives its surface.
+The work procedure restored the raw Present snapshot on every such change.
+That replaced the composed picture, including the cover's paint, with the client's pair.
+The snapshot saved before delayed redirection also lacked the cover already painted into the newly redirected window.
+
+**Fix in Xwayland +stereo3d3:** mark restoration pending when an independent child surface is created and consume that mark once.
+When restoring, copy `winSize - clipList` from the current window pixmap into the same place in both halves of the saved pair before replacing the pixmap.
+Normal buffer recycling keeps the composed picture; a new surface after a remap still restores the last pair.
+Nothing is resized.
+
+**How found:** an instrumented server showed that the cover and stereo child shared the same backing pixmap and the stereo child's clipping excluded the cover correctly.
+It then logged 70 snapshot restores during 70 presents.
+Gating restoration on damage registration fixed repainting but lost the last pair after a remap; the explicit per-surface mark passes that control.
+The buffer-recycling suite fails all four cover cases on +stereo3d2 and passes on +stereo3d3, including delayed redirection and remapping without another present.
+A headless Weston alone leaves the test's role-less surfaces unmapped and does not exercise repeated backing-buffer recycling.
+
+Measured again from the apt-installed Xwayland +stereo3d3 and Mesa +stereo3d23 packages, one fresh session per case:
+
+| Declared child case | AMD, glamor | AMD, shared memory | NVIDIA, glamor | NVIDIA, shared memory |
+|---|---|---|---|---|
+| Initial grey cover | 3,600 pixels per eye | 3,600 per eye | 3,600 per eye | 3,600 per eye |
+| Yellow repaint at present 50 | 3,600 pixels per eye | 3,600 per eye | 3,600 per eye | 3,600 per eye |
+
+The cover's bounding box and the moving marker's position match between views in all eight rows.
+The same repaint has zero yellow pixels in each view on +stereo3d2, on both cards with glamor on and off.
+The 44 top-level controls of ORDER 561 all retain their expected results: pairs while declared and a whole flat view after undeclaring.
+Without glamor OpenGL runs on the software renderer; with glamor the GLX clients identify radeonsi on AMD and zink on the NVIDIA card.
+
+The final installed packages repeat all 52 child and top-level rows with the same results; the source-only runs are kept separately.
+
+
+## EGL X11 and the Vulkan stereo layer
+
+Measured on ORDER 561b from the apt-installed Mesa +stereo3d23 and Xwayland +stereo3d3 packages; the older-server control uses the retained +stereo3d5 binary.
+The installed checks repeat 40 EGL transition rows, ten packed Vulkan transition rows, four injected requests per API, two exact one-frame Vulkan requests, and four Vulkan Xlib rows.
+Record the actual loaded libraries and their hashes; a prototype package version can be identical to the final version.
+The state transition rule is now one `u_stereo_pair` helper for GLX, EGL and the packed Vulkan layer: two copied pairs withdraw the declaration, three consecutive single-view flips allow a retry, and a successful pair clears the problem.
+A first copy alone is not a failure.
+Each library keeps its messages under its own package (`libglx-mesa0`, `libegl-mesa0`, `mesa-vulkan-layer-stereo`), with the same ten translations and the shared engine transport.
+
+### Recipe
+
+Run the following from the `native-linux` skill folder inside a fresh isolated proof-rig session, never on the person's display.
+The EGL client needs EGL, OpenGL and X11 development files; the Vulkan client needs the Vulkan, XCB and X11 development files and the matching installed stereo layer.
+The injection helper also needs the XCB Present development header.
+
+```sh
+cc -O1 -Wall -o /tmp/egl-covered scripts/egl-x11-covered.c -lEGL -lGL -lX11
+cc -O1 -Wall -o /tmp/vk-covered scripts/vk-x11-covered.c -lvulkan -lxcb -lX11
+cc -shared -fPIC -Wall -o /tmp/present-inject.so scripts/x11-present-inject.c -lxcb -ldl
+```
+
+1. With a window 800 by 600, draw 70 frames and hold the last (`FRAMES=70 HOLD_S=30`).
+   The EGL client has a plain child cover by default; `COVER_AT=-1` removes it.
+   For Vulkan use `TOPLEVEL=1` for the copied-present test and `UNCOVERED=1` for its uncovered control.
+   Record the renderer or Vulkan physical-device name; `VK_VENDOR=0x10de` explicitly selects NVIDIA.
+2. Capture both views and run `check-pair-flat-split.py --child grey` for a cover, `--child yellow` after `CHILD_PAINT_AT=50`, or `--child none` when uncovered.
+   A complete pair has red only in the left view, blue only in the right, centred green rectangles, equal 40-pixel moving markers and the 60 by 60 cover at the same place in both views.
+3. Repeat on the older server.
+   A covered pair becomes one complete left view and a kept problem in the library's package.
+   `UNCOVER_AT=40` must restore the pair and end that problem; `STILL_AT=2` checks a program that draws only once.
+   With EGL, `READBACK_GLFIRST=1` also checks that the first left and right GL buffers really contain red and blue before the swap.
+4. For offset and wrong-size controls, preload the helper into the uncovered client and set `X_OFF=40` or `SRC_W=700`.
+   Require `inject Present` in stderr, which proves a request was changed.
+   The helper modifies the packed request and leaves the single-view probe unchanged.
+   Use the classifier's `--loose` for these deliberately shifted or cropped frames; compare both eye positions and marker widths, not a centred-green prediction for an ordinary frame.
+5. In the Vulkan case repeat with `XLIB=1`; XCB and Xlib use the same completion rule.
+   Check the loaded layer in the process's maps, not just a package version or an advertised array-layer count.
+
+| Route | New Xwayland, covered | Older server, covered | Older server after uncovering |
+|---|---|---|---|
+| EGL DRI3, radeonsi | Pair, cover in both views | Left view, told | Pair, problem ended |
+| EGL DRI3, zink on NVIDIA | Pair, cover in both views | Left view, told | Pair, problem ended |
+| EGL software, with either card in the rig | Pair, cover in both views | Left view, told | Pair, problem ended |
+| Vulkan layer, NVIDIA with DRI3, XCB and Xlib | Pair, cover in both views | Left view, told | Pair, problem ended |
+| NVIDIA one-layer Vulkan WSI without DRI3 | No working pair in the baseline | No copied-present completion to check | Candidate refuses the two-view swapchain |
+
+The new-server pair and older-server left-view checks include one-frame programs.
+The request-injected offset and wrong-size rows pass for EGL DRI3 and the NVIDIA layer; the baseline layer on the older server splits those same changed requests.
+A native Mesa WSI that already exposes two array layers bypasses the packed layer; the AMD DRI3 pair is a separate positive control, not evidence for a copied-present check in native WSI.
+
+For a multiarch installation, repeat the library's command route with real 32-bit clients, not an environment variable on a 64-bit executable.
+Build these same EGL and GLX probes with `cc -m32` and matching development libraries; verify `ELF32` with `readelf -h`.
+In an isolated Xvfb session use `ANNOUNCE_STEREO=5 COVER_AT=-1 READBACK=1 REPORT=1`, one EGL frame and eight GLX frames.
+Both must withdraw the declaration, read red/green/red across the complete left view and keep a problem under their own package.
+Trace `execve` to confirm the engine command when its private ELF64 library cannot load into the client.
+This passed from the matching +stereo3d23 amd64/i386 packages; the container has no system journal, so the engine record and command were checked, not journal or notification delivery.
+
+### Traps found by these clients
+
+- **A package verifier rejects architecture-specific HR paths despite matching content hashes.**
+  Cause: Lean Code deliberately places the authored-text archive below `usr/share/dpkg-stereo/hr/PACKAGE/amd64/` or `i386/`.
+  Fix: compare every common file, then match the corresponding architecture-labeled HR paths and compare their mode and archive bytes too; retain each architecture's LC record under its own name.
+  How found: the first comparison stopped on equal-named content hashes under the two directories. The counterpart check found all three HR archives byte-identical; all 626 common files in the 25 package pairs matched. The existing amd64-only gfxstream ICD was checked against the earlier package rather than silently exempted.
+
+- **EGL reports an 800-pixel view, but the moving marker is 80 pixels wide and each view is clipped.**
+  Cause: the DRI3 EGL size hook updated the EGL query width but left the loader's packed buffer only one window wide.
+  Fix: retain the logical EGL width and allocate two view widths in the DRI3 loader, as GLX does.
+  How found: the queried 800 by 600 extent against the captured marker and green rectangle; the software route was a complete pair and exposed the difference.
+- **EGL receives copied completions but never withdraws its declaration.**
+  Cause: the DRI3 surface's common drawable XID was unset, so the completion handler queried geometry of XID zero.
+  Fix: initialize that drawable alongside the loader drawable.
+  How found: no transition despite a split capture; tracing the callback's geometry query found the missing XID.
+- **The first EGL software left view is black, with no OpenGL error; selecting the right draw buffer loses it.**
+  Cause: before stereo was active the eager two-view width helper halved the left view, then first activation resized and discarded it.
+  Fix: activate software stereo on demand as GLX does, keeping the view width unchanged while the first right buffer is added.
+  How found: `READBACK_GLFIRST=1` returned black then blue before the first swap; after the fix it returns red then blue, and the one-frame package test changes from red to green.
+- **EGL software stays flat after uncovering, while GLX restores the pair.**
+  Cause: an 800-pixel single view arrived in a padded 832-pixel software buffer; the actual Present pixmap retained the padding and could never flip.
+  Fix: clip the pixmap to the logical single-view width while flat, not merely to two view widths.
+  How found: logging the transfer width and stride next to the completion mode; an exact 800-pixel pixmap gets three flips and recovers.
+- **A Vulkan wrong-size request is told as flat but still shows blue pixels.**
+  Cause: the one-layer downstream buffer still held the right view after withdrawing the declaration.
+  Fix: while flat put only left-view pixels in both halves of that downstream buffer.
+  How found: the injected request copied the right view's leading pixels into the ordinary window; the same probe has no blue after the fix.
+
+
+- **A one-frame Vulkan wrong-size present withdraws its declaration but still contains right-view pixels.**
+  Cause: the ordinary X window already contains the copied mixture, so copying that window cannot recover its left view; repacking the next application frame does nothing for a program that stops drawing.
+  Fix: before `QueuePresent` returns, copy the retained left shadow image into a window-sized mono Present pixmap, without resizing it. Repeat this transfer only while flat. Keep the native swapchain handles and both shadow views.
+  How found: `FRAMES=1 SRC_W=700` through the wire injector left 58,400 blue pixels. The fixed view has exactly 358,400 red, 120,000 green and 1,600 white pixels, zero blue, and one 40 by 40 marker in an 800 by 600 window.
+  Prefer cached host memory for that transfer, and copy the uploaded pixels into the final pixmap before presenting; confirm three mono flips and recovery after uncovering. Honor the requested alpha mode on ARGB visuals: opaque stays opaque and post-multiplied colours are premultiplied for X11. Test alpha modes and 8-bit, 10-bit and half-float channel packing separately; the captured runtime row used an 8-bit X11 visual.
+
+
 ## What this does not cover
 
-- A declared **child** window with a child of its own over it keeps its pair (the white square is at the same place in both eyes), but the covering window's own picture shows in neither eye, also after that window paints itself again; the +stereo3d5 server shows the same, and the cause was not found (the snapshot that patch 0009 restores when the compositor redirects the child is the first place to look).
+- The covered declared child is fixed and repeated from the installed packages [above](#a-declared-child-covered-by-a-child-of-its-own). Native WSI that bypasses the packed layer has only the positive controls described above; its copied-present recovery is not qualified here.
 - A declared window that a compositor did not redirect and that is smaller than its surface (a stereo child the window does not list) is still copied into its parent's picture: it shows the left view, flat, and Mesa says so ([above](#when-the-pair-cannot-be-flipped)).
 - **The next Xwayland base.** Upstream's stable branch after 24.1.13 (24.1.14 and 24.1.15) adds a check to `xwl_present_check_flip()` that the flip pixmap has the size of the window's pixmap ("xwayland/present: Only flip if the window pixmap dimensions match", Michel Dänzer). A window that holds two eyes has a pixmap one eye wide before its first flip, so patch 0005's exception must cover that check too when the package moves base, or the pair is copied again, with glamor as well; the suite's test (0012) and the glamor control of step 1 show it. The extended check is carried by `2:24.1.15-1+stereo3d1+lc1` (ORDER 562); both height checks remain, and an unrelated backing width is rejected.
 - Each present of both eyes makes a new shared memory pool of that size (a new pixmap per swap is Mesa's software path); Xwayland's open files and memory stayed level over a fast run (11 to 12 files, about 75 MB), and 600 presents of a 1600x600 pair back to back took 10.0 s, the output's 60 a second, as with glamor.

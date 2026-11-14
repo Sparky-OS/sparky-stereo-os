@@ -261,6 +261,15 @@ Traps of this part:
 - **Symptom:** a test of "the record's way cannot start" passes although nothing was said. **Cause:** the expected sentence was copied from memory, not from the program. **Fix:** take the sentence from the program's own output once, then assert it. **Found by:** the first run of the test failed on the wording, which is how it showed it can fail.
 - **Symptom:** the page's package no longer compiles: "defaulted operator== only available with -std=c++20". **Cause:** the package builds as C++17. **Fix:** write the comparison out. **Found by:** the first build in the package's own container, not on a newer compiler.
 
+- **Symptom:** on the very machine a record was measured on, the boot step says `nothing-known` and Automatic stays on the processor, while every test passes. **Cause:** the processor's name was read from `/proc/cpuinfo` in a loop on `QFile::atEnd()`, and a file of `/proc` reports no size, so `atEnd()` is true before the first line; the tests' fixture is an ordinary file. **Fix:** read the file whole (`readAll()`), then split. **Found by:** the proof on installed packages, which runs the boot step on the real `/proc` and `/sys`: a fixture cannot stand for them.
+- **Symptom:** the proof that a choice reaches a program fails for every program with "did not start". **Cause:** the image under test had the page's package but not the launcher's command (`kioclient` is in `kde-cli-tools`) nor the settings shell (`kcmshell6`, in `libkf6kcmutils-bin`). **Fix:** install them by apt with the packages under test, and ask an image that has the command which package owns it (`dpkg -S`). **Found by:** the launch log's one line, "command not found".
+
+**The proof on installed packages, as it was run** (three routes: a Mesa card, NVIDIA's own EGL, zink over NVIDIA's Vulkan):
+1. Install the staged packages by apt over the published tree and the round's stage folders, by name, and keep the `Inst` lines: every line of the rebuilt sources must name the new version.
+2. Run the boot step once as root (`sparky-stereo-gpu-record --apply-known`) and read `--show`: the rows of this machine, origin shipped.
+3. For each program and each way, write the choice as the page writes it, start the program through the launcher (`kioclient exec /usr/share/applications/ID.desktop`), and compare three things: what the resolver says (`--print paint` and `--print paint-reason`), `QT_WIDGETS_GPU_PAINT` in the program's own `/proc/PID/environ`, and the renderer in its "painting on" line. With no choice written, the expectation is the record's.
+4. Start one program with an OpenGL the processor draws: it must run, painted by the processor, with the problem kept.
+
 ## Qt's own frame at a fractional scale (the 125 % offset)
 
 **Symptom:** at 125 % a window flushed through the RHI (every GPU path, and stock Qt's `QT_WIDGETS_RHI=1`) lies one pixel left of the same window as a shared memory buffer, and one row is displaced part of the way down (291,114 of 2,250,000 pixels in a terminal).
@@ -605,6 +614,11 @@ So nearly all of the second pass repeats the first.
 What stops a replay is not the engine: the style decides inside a paint callback which eye it draws a part for (it reads the window's eye), so one callback cannot yield both eyes, and a record without a twin is a part cut differently by a neighbour that moved.
 The boundary for the next step: (1) the style asks Qt for the eye through one function, which marks that widget's painting as different for each eye; (2) for the second eye the repaint manager calls the paint code only of widgets that were marked or that have a shift of their own, and the engine repeats the first eye's records of every other widget at the second eye's origin; (3) the proof is the pair pixel-equal to the two-pass pair, with a part visible in one eye only and a tab part deeper than its parent among the cases.
 Until then two passes stay.
+
+What the second pass costs, measured on installed packages with the compositor's own frame, Stereo Union at the shipped limit and the same scroll script (three runs each, every one on a loaded machine, so read the order, not the sizes): an editor scrolling took 19 to 28 % of a core for one picture on either way and 72 to 98 % as a pair on the processor, 77 to 90 % as a pair batched; a file manager 22 to 30 % for one picture, 59 to 70 % and 72 to 78 % as a pair.
+A pair repaints the whole window for each eye at every change, so it costs about three times one picture on both ways, and fewer frames are painted; that is the cost a replay would cut.
+
+**Open, measured: the pair through zink.** With Mesa's zink on NVIDIA's Vulkan driver the 2D window is right on both GPU ways, and in a 3D mode the window is shown at half its width with identical eyes (the fixture's discs are not found); the processor pair on the same route is right, and so is the pair on NVIDIA's own EGL. It is the same with the build before the per-eye origin, so it is older than it. Not found: the cause. First things to read: whether the surface zink gives has the second view its display lists, and what the client sent (`WAYLAND_DEBUG=client` showed one declaration and a viewport of one view's size).
 
 - Symptom: Callgrind records feed completion but the final terminal text is not the completed native text.
   Cause: the feed has written all bytes, but the terminal still has queued input/painting; a first paint followed by 250 ms is not a drain under instrumentation.

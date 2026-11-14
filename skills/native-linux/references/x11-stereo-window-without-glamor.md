@@ -162,9 +162,62 @@ When Xwayland then runs without glamor (it could not start its acceleration, or 
 From Mesa +stereo3d22 such a screen takes the software renderer, as with any other driver on that server, a quad buffer window included, and the person is told (`libglx-mesa0`, key `zink-without-dri3`, message `LOCAL4`, severity degraded); the next program that finds zink with DRI3 ends the problem.
 The row: the session's four variables on the card through CDI, `XWAYLAND_NO_GLAMOR=1` in KWin's environment, the renderer string (`llvmpipe`), and `sparky-stereo-problems list`.
 
+## A declared child covered by a child of its own
+
+Learned on ORDER 561b, on Xwayland 24.1.15 +stereo3d2 with Stereo KWin +stereo3d54 and Mesa +stereo3d22.
+This is different from a sibling covering the declared child: the cover draws into the declared child's backing pixmap and must appear at the same place in both views.
+
+### Recipe
+
+1. Run `x11-present-pair` in the fresh-session rig with `CHILD=1 COVER=1 FRAMES=100 HOLD_S=20` and capture after its last present.
+   Check with `check-pair-flat-split.py --child grey`: both eyes must contain the 60 by 60 cover, 30 pixels from their left edge.
+2. Add `COVER_PAINT_AT=50`, capture after present 50, and require `--child yellow`.
+   The moving white markers must still occupy the same place in both views.
+3. Run on each card with glamor on and with `XWAYLAND_NO_GLAMOR=1` in Xwayland's environment.
+   Without glamor the client draws in software even when KWin uses the card.
+4. In Xwayland's own suite, run `meson test -C BUILD --print-errorlogs 'stereo pair without glamor' 'stereo child cover with buffer recycling'`.
+   The second test consumes buffers and answers frame callbacks on role-less surfaces so the backing buffers actually rotate; the assertions read Xwayland's pixmap through Composite and GetImage.
+   It checks an initial grey cover, a repainted yellow cover, both before and after delayed redirection, and a remap without another present.
+5. Keep the original top-level covered, offset, wrong-size, repaint, undeclare and uncovered rows as controls.
+
+### Symptom, cause, fix, and how the cause was found
+
+**Symptom:** both views and the moving markers are correct, but the cover has zero pixels in either eye, even after repainting.
+A check that reads only the two background colours passes this fault.
+
+**Cause:** `xwl_window_set_window_pixmap()` queues `xwl_window_update_child_surface()` when a backing buffer changes as well as when the child first receives its surface.
+The work procedure restored the raw Present snapshot on every such change.
+That replaced the composed picture, including the cover's paint, with the client's pair.
+The snapshot saved before delayed redirection also lacked the cover already painted into the newly redirected window.
+
+**Fix in the source candidate:** mark restoration pending when an independent child surface is created and consume that mark once.
+When restoring, copy `winSize - clipList` from the current window pixmap into the same place in both halves of the saved pair before replacing the pixmap.
+Normal buffer recycling keeps the composed picture; a new surface after a remap still restores the last pair.
+Nothing is resized.
+
+**How found:** an instrumented server showed that the cover and stereo child shared the same backing pixmap and the stereo child's clipping excluded the cover correctly.
+It then logged 42 snapshot restores during 70 presents.
+Gating restoration on damage registration fixed repainting but lost the last pair after a remap; the explicit per-surface mark passes that control.
+The buffer-recycling suite fails all four cover cases on +stereo3d2 and passes on the candidate, including delayed redirection and remapping without another present.
+A headless Weston alone leaves the test's role-less surfaces unmapped and does not exercise repeated backing-buffer recycling.
+
+Measured with the source candidate over the installed rig, one fresh session per case:
+
+| Declared child case | AMD, glamor | AMD, shared memory | NVIDIA, glamor | NVIDIA, shared memory |
+|---|---|---|---|---|
+| Initial grey cover | 3,600 pixels per eye | 3,600 per eye | 3,600 per eye | 3,600 per eye |
+| Yellow repaint at present 50 | 3,600 pixels per eye | 3,600 per eye | 3,600 per eye | 3,600 per eye |
+
+The cover's bounding box and the moving marker's position match between views in all eight rows.
+The same repaint has zero yellow pixels in each view on +stereo3d2, on both cards with glamor on and off.
+The 44 top-level controls of ORDER 561 all retain their expected results: pairs while declared and a whole flat view after undeclaring.
+Without glamor OpenGL runs on the software renderer; with glamor the GLX clients identify radeonsi on AMD and zink on the NVIDIA card.
+
+This is source-build evidence; package and installed-package qualification are separate.
+
 ## What this does not cover
 
-- A declared **child** window with a child of its own over it keeps its pair (the white square is at the same place in both eyes), but the covering window's own picture shows in neither eye, also after that window paints itself again; the +stereo3d5 server shows the same, and the cause was not found (the snapshot that patch 0009 restores when the compositor redirects the child is the first place to look).
+- The covered declared child is fixed in the source candidate [above](#a-declared-child-covered-by-a-child-of-its-own); its packaged and installed qualification is still pending.
 - A declared window that a compositor did not redirect and that is smaller than its surface (a stereo child the window does not list) is still copied into its parent's picture: it shows the left view, flat, and Mesa says so ([above](#when-the-pair-cannot-be-flipped)).
 - **The next Xwayland base.** Upstream's stable branch after 24.1.13 (24.1.14 and 24.1.15) adds a check to `xwl_present_check_flip()` that the flip pixmap has the size of the window's pixmap ("xwayland/present: Only flip if the window pixmap dimensions match", Michel Dänzer). A window that holds two eyes has a pixmap one eye wide before its first flip, so patch 0005's exception must cover that check too when the package moves base, or the pair is copied again, with glamor as well; the suite's test (0012) and the glamor control of step 1 show it. The extended check is carried by `2:24.1.15-1+stereo3d1+lc1` (ORDER 562); both height checks remain, and an unrelated backing width is rejected.
 - Each present of both eyes makes a new shared memory pool of that size (a new pixmap per swap is Mesa's software path); Xwayland's open files and memory stayed level over a fast run (11 to 12 files, about 75 MB), and 600 presents of a 1600x600 pair back to back took 10.0 s, the output's 60 a second, as with glamor.

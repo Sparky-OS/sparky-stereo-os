@@ -92,6 +92,15 @@ Autotests: `testStereoChildWindowClip` and `testStereoChildWindowClipAncestor` i
 - **Two rows loops write into one evidence folder.** Cause: `docker kill` of the container does not stop the `for` loop around it (a backgrounded loop started the next row at once); the second loop then ran the same rows beside the first. Fix: stop a loop by its PID, and give every loop its own `TAG`.
 - **The XCB error `BadWindow ... SHAPE, minor code 6` in the autotest log is not new.** Cause: `unwatch()` of a child whose window is already destroyed (`xcb_shape_select_input` unchecked); the +stereo3d52 log of `testX11Window` has five of them. The new calls on covering windows are checked and discarded.
 
+## A declared child with a child of its own over it
+
+A cover inside the declared child is drawn into that child's backing pixmap, so it must be copied into both views rather than cut out of KWin's item as a sibling would be.
+On Xwayland 24.1.15 +stereo3d2 the two views and their moving markers were kept, but the cover's own picture was absent from both, even after repainting.
+The cause was Xwayland restoring a raw Present snapshot at each backing-buffer change; delayed redirection also needed to retain the cover already painted into the new pixmap.
+The source candidate restores once per new child surface and copies the covered region into both views when restoring.
+The recipe, the trace that found it, the remap control and the buffer-recycling suite are in [a declared child covered by a child of its own](x11-stereo-window-without-glamor.md#a-declared-child-covered-by-a-child-of-its-own).
+Package qualification remains a separate step.
+
 ## Mesa +stereo3d19: EGL and Vulkan list their child
 
 One header, `src/util/u_x11_stereo_child.h`, holds the X side: the owning window (the window below the root on the way up, as GLX takes it), a server grab around the read and write of `_KDE_NET_WM_STEREO_CONTENT_CHILDREN`, windows that are gone dropped when a child is added, the child kept while its window lives, and `_KDE_NET_WM_STEREO_CONTENT_VERSION`.

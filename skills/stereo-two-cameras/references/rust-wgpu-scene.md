@@ -195,6 +195,13 @@ Cause: counters advance only after a full pass, while row-sliced accumulation mu
 Fix: track the in-progress pair boundary as well as N and refuse publication while either next pass is incomplete.
 How found: after one complete pair, advance only three rows, require image publication to fail despite counters still reading one and one, then finish the pass and compare both complete images with the ordinary zero-budget render.
 
+Use stochastic lighting for a convergence witness, separately from the emissive geometry fixture that makes visibility and disparity easy to measure.
+Save each eye's linear estimator and completed N before tone mapping; compare it with that same eye and backend at a stated longer reference N.
+A finite reference is not ground truth, and CPU/GPU floating-point estimators need not match bit for bit.
+One measured procedural lit sphere at 64 by 48, three bounces and no denoising completed 1, 8, 32 and 256 samples in both eyes on CPU and software GPU.
+Each of its four backend/eye RMSE sequences decreased against its own 256-sample reference; the CPU left eye went from 0.3137 at one sample to 0.0647 at 32.
+Those renderer outputs establish this convergence case, not a native-window capture; the companion still needs its own source, sample metadata, geometry and stock controls.
+
 A native host should retain at most one pending worker or GPU pair.
 When an immutable request becomes obsolete, cancel it and wait for acknowledgement before starting another worker, rather than accumulating cancelled workers during rapid edits.
 Only hand the native window one complete left-first picture, together with the sample and scene metadata belonging to that picture.

@@ -196,7 +196,7 @@ Normal buffer recycling keeps the composed picture; a new surface after a remap 
 Nothing is resized.
 
 **How found:** an instrumented server showed that the cover and stereo child shared the same backing pixmap and the stereo child's clipping excluded the cover correctly.
-It then logged 42 snapshot restores during 70 presents.
+It then logged 70 snapshot restores during 70 presents.
 Gating restoration on damage registration fixed repainting but lost the last pair after a remap; the explicit per-surface mark passes that control.
 The buffer-recycling suite fails all four cover cases on +stereo3d2 and passes on the candidate, including delayed redirection and remapping without another present.
 A headless Weston alone leaves the test's role-less surfaces unmapped and does not exercise repeated backing-buffer recycling.

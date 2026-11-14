@@ -6,12 +6,11 @@ description: >-
   Stereo content in an ordinary Qt, KDE or GTK 4 window, and depth of the desktop's own elements: a declared
   subsurface under a hole in the window, Stereo Union's depth values, the levels sunk, screen and popped within the person's
   limits, menus, popups, tooltips, select lists, notifications and dialogs at depth (xdg_popup), the 10 px popup
-  border, KWin's effects with their own depth (Fall Apart, Sheet, Glide, Zoom, drag), and the boot splash at the
-  person's limits (popped= and sunk= on the kernel line, a Plymouth guest). Load it when a popup menu at the screen
-  edge looks cut or flat in 3D, a sub-menu sits behind its parent, a tooltip or select list is not popped, a dialog
-  collapses to its title bar, a hidden top level kills the native child, a whole window is declared instead of its 3D
-  area, two windows draw each other's depth, an element's parallax must stay in its rectangle, or the boot splash
-  ignores a lowered popped limit.
+  border, KWin's effects with their own depth, the boot splash at the person's limits, a 3D area at a fractional
+  scale. Load it when a popup menu at the screen edge looks cut or flat in 3D, a sub-menu sits behind its parent, a
+  tooltip or select list is not popped, a dialog collapses to its title bar, a hidden top level kills the native
+  child, a whole window is declared instead of its 3D area, an element's parallax must stay in its rectangle, the
+  boot splash ignores a lowered popped limit, or a 3D thumbnail shows the wallpaper or sits a pixel off at 125 %.
 ---
 
 # A 3D area inside an ordinary window
@@ -43,9 +42,10 @@ Stereo KWin composes the two in place: the 3D area gets each eye's view inside t
 
 1. **A subsurface below the window.** Create a `wl_subsurface` for the 3D area, placed *below* the window's own surface, positioned and sized with `wp_viewporter` to the area's rectangle in the window. Put both eyes side by side into it, each at its own resolution (a video's views as the stream carries them, a picture's as the file has them, a scene's at its render resolution), and declare it once as full side by side (`kde-stereo-content-v1` from our [plasma-wayland-protocols](https://invent.kde.org/danielcamposramos/plasma-wayland-protocols/-/tree/stereo3d-6.7), through the shared declaration library `libstereo-declare` in the edition).
 2. **A hole in the window.** The window surface must be transparent exactly over the 3D area, so the subsurface shows through. In Qt Widgets: make the top level translucent and paint its background yourself everywhere *except* the 3D area's rectangle, because Qt skips `autoFillBackground` and `PE_Widget` on translucent windows. A small event filter on the top level does it.
-3. **Follow the rectangle.** Move and resize the subsurface when the area moves (Kdenlive uses a 100 ms timer), and only while the area is visible and not covered: a document in another tab must not leave its layer on screen.
-4. **2D on top stays 2D.** Overlays drawn over the 3D area (a popup palette, a compass, subtitles) are drawn by the window, once, so they come out identical in both eyes.
-5. **A popup is an xdg_popup, never a subsurface.** Menus, tooltips, select lists and dialogs get their depth from KWin as popup surfaces of their own; a popup made as a subsurface stays at its parent window's level (the browser's case: [lessons-2026-11.md](references/lessons-2026-11.md)).
+3. **The same device pixels at every scale.** At 125 %, 150 % or 175 % the window, the compositor and Qt's image drawing each round differently, and the hole and the picture can be out of step by a pixel or by a fifth of their size: [A 3D area at a fractional scale](references/fractional-scale.md) has the rule, the recipe (`eyeCanvas()`, `setEyes()`), the traps and the rig command.
+4. **Follow the rectangle.** Move and resize the subsurface when the area moves (Kdenlive uses a 100 ms timer), and only while the area is visible and not covered: a document in another tab must not leave its layer on screen.
+5. **2D on top stays 2D.** Overlays drawn over the 3D area (a popup palette, a compass, subtitles) are drawn by the window, once, so they come out identical in both eyes.
+6. **A popup is an xdg_popup, never a subsurface.** Menus, tooltips, select lists and dialogs get their depth from KWin as popup surfaces of their own; a popup made as a subsurface stays at its parent window's level (the browser's case: [lessons-2026-11.md](references/lessons-2026-11.md)).
 
 Worked examples:
 - **Kdenlive's monitor**, the first one: [danielcamposramos/kdenlive `stereo3d-26.08`](https://invent.kde.org/danielcamposramos/kdenlive/-/tree/stereo3d-26.08).
@@ -122,6 +122,11 @@ As in the general skill, plus:
 - **no squeeze:** with stereo off the window has its normal size, and with stereo on the 3D area holds both eyes, neither squeezed nor stretched;
 - **overlays:** an overlay over the 3D area changes the same pixels in both eyes and none in one eye only;
 - **the 2D control:** stereo off against the distribution's build, 0 differing pixels.
+
+## A 3D area at a fractional scale
+
+The hole and the picture cover the same device pixels at every scale, or the area is flat: never a hole with the wallpaper under it.
+[The rule in device pixels, the recipe, each trap with its symptom, cause, fix and how it was found, and the rig command](references/fractional-scale.md) (ORDER 576, after a file manager's 3D thumbnails that showed the desktop through every cell at 125 %).
 
 ## A declared layer's state follows its declaration
 

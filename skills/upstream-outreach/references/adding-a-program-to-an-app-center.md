@@ -166,6 +166,7 @@ The audit below was done on 2026-11-13; it is not a proof of a Resolve installat
 - **Symptom:** distrobox creates Ubuntu successfully, then `enter` says `rev: not found` and `exec: exec: not found`.
   **Cause:** its entry script calls `rev`; an installation without recommended packages can omit the package that provides it.
   **Fix:** bring `bsdextrautils` with `podman`, `distrobox` and `fuse3`, and check `rev` before placing the AppImage.
+  The entry's own action brings them when the person installs the entry; they are never dependencies of the app center package ([an app center entry that needs tools](../../edition-packaging/references/app-center-entry-tools.md)).
   **How found:** the failing real `distrobox enter`, followed by installation of `bsdextrautils` and a successful repeat as the ordinary user.
 - **Symptom:** nested podman says `cannot clone: Operation not permitted`, or rootless `newuidmap` cannot write `uid_map`.
   **Cause:** the outer Docker sandbox restricts the namespaces podman needs.

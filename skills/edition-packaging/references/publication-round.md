@@ -86,11 +86,54 @@ Never relabel an unproved replacement as the source of a published binary.
 | `wiring: ... docker run lacks "${SPARKY_PROV_ARGS[@]}"` | a build driver does not pass the host's provenance facts | the file named on that line |
 | `BASE is not live` | the base copy's InRelease hash differs from the server's | someone published since the copy; start from the live tree |
 | `supplied input changed after its universe was frozen` | something touched a file of the base or destination pool while the link gate ran (a hard-link copy, a delete); the gate stamps inode, size and change times | never `cp -al`, delete or rename any tree sharing the pool during a run; reads are safe |
+| `zram/zswap gate: refused, N finding(s) and M unreadable in ...` | a selected package sets zram or zswap up, pulls a zram package in, keeps the person from one, or carries a zram unit the gate cannot read | each finding names the package, the file and the line; [the zram and zswap gate](#the-zram-and-zswap-gate-its-verdict-and-what-to-do-on-a-refusal) below |
 | `lc1: release blocked: (...): matching HR documentation package is missing` | a package with the lc1 mark went into the source forest without its `-lc-hr` companion | copy the companion from the same pool folder |
 | `name clash with different bytes` | two builds with one file name (a kernel rebuilt at the same upstream version) | the old-kernel block in `official-part1.sh` |
 | case e: `FAIL apt would install Debian's dpkg` | the pins of the tree under install are not in force, or the live set lost the edition's dpkg | `e1-sim-dpkg.txt` |
 | case e: `REMOVED, not allowed: X` | the new tree makes apt remove X | `e2-sim-dist.txt`, the `Remv` line, and the `Conflicts`/`Breaks` of the new package that causes it |
 | case e: `planted conffile edits were lost` | a maintainer script or the projection overwrote a person's edit | `e2-planted.tsv` lists path and package; read that package's postinst |
+
+## The zram and zswap gate: its verdict, and what to do on a refusal
+
+`publish-tree.sh` runs `iso-build/zram-check.py --debs-file` on every selected binary package right after the lc1 check, before the link gate and before anything is copied or signed.
+The edition never sets zram or zswap up and never caps the person's choice of it; the rules, form by form with their sources, and how to write a unit that retires zram so the gate can read it, are in [power-idle, the zram gate](../../power-idle/references/zram-gate.md).
+
+What the round's log shows:
+
+```
+zram/zswap gate: passed, nothing of zram or zswap of ours in N package(s), 0 refused (K -dbgsym and -lc-hr companions are checked through their packages) (the person's opt-in from Stereo APTus is allowed).
+zram/zswap gate: K tear-down(s) let through, each read to its end. A tear-down stops, resets or removes zram, or reports; it sets nothing up:
+  note: PACKAGE.deb: /usr/libexec/.../script:107: ... echo 1 >/sys/block/zram0/reset ... (a zram device reset, its memory freed: a tear-down)
+  note: PACKAGE.deb: /usr/lib/systemd/system/NAME.service: a zram unit that only stops, resets, removes or reports: runs /usr/libexec/.../script, read to the end; 3 tear-down line(s) in what it runs, no set-up
+```
+
+A `note:` line is the record of what was let through and why; a round is not held by notes.
+Read them once per round all the same: a note for a package that has no reason to touch zram is a question for its lane.
+On the published tree of 2026-11-07 (902 packages checked, 66 seconds on four threads) the gate prints six notes: one for the Stereo APTus action's `systemctl stop`, five for the kernel settings' retiring lines and drop-ins.
+
+```
+zram/zswap gate: refused, 5 finding(s) and 0 unreadable in 1 package(s), 1 refused (...):
+  PACKAGE.deb: /path:LINE: the line (what it is)
+```
+
+On a refusal:
+
+1. **Leave the package out of the round and go on**, or stop the round; never pass a flag, edit the selection by hand around the gate, or change the gate inside the round's frozen worktree.
+2. **Read the finding against the file** (`dpkg-deb --fsys-tarfile PACKAGE.deb | tar -xO ./path`): what does that line do when it runs, and can it make or grow a zram device or turn zswap on?
+3. **If it can, the package changes:** remove the set-up, rebuild at a new version, stage it again.
+4. **If it cannot** (the line only stops, resets, removes or reports) and the gate still refuses it, the gate is not exact for that form. That is a change to the gate in the build repository, tests first: a test that the form passes with its note, and tests that every set-up form is still refused beside it, in a unit and in the script the unit runs. A gate is never loosened to let one package through.
+5. **`cannot be read` and `nothing passes unread` are refusals on purpose:** a unit whose program the package does not ship, a compiled program, text made at run time, a zram device used in a way the gate does not know. Make the unit readable ([how](../../power-idle/references/zram-gate.md#a-retiring-unit-the-gate-can-read)).
+
+To see the step on its own, run the frozen worktree's `publish-tree.sh` on a throwaway tree: a source folder with the package and its `-lc-hr` companion, a destination that already holds the same files under `pool/main/<letter>/<source>/` (so the link and start gate has nothing new to qualify), a throwaway key, `SPARKY_APPSTREAM=0 SPARKY_INSTALLABLE=off`, in a container without network.
+A fixture package that must be refused has to reach the step first: seal it with the tree's own `python3 -m lean.standalone TREE OUT --authoring DIR`, or the lc1 check stops the run before the zram gate looks.
+
+Trap, found in ORDER 558:
+
+- **Symptom:** the round refused the edition's own kernel settings package, accepted and proved on hardware a week earlier, with five findings: three units and a link `a zram unit`, and one script line `a zram device set up through sysfs`. The published version of the same package, with the same script and two drop-ins for the same foreign zram units, had always passed.
+- **Cause:** the gate judged a unit by `zram` in its file name, so new units named after what they retire were refused and older drop-ins with neutral names in a zram folder were never read; and its sysfs rule took a line that reads `disksize` and writes `1` to `reset` for a write to `disksize`, because the write was looked for anywhere on the line.
+- **Fix:** the gate reads what a zram unit does (its `Exec` lines and the script they run, to the end) and where each write goes; a tear-down passes with a note, every set-up form stays refused, and what cannot be read is refused.
+- **How found:** the five findings were read one by one against the unpacked package (what runs, what it can do to a device), then the gate was run on the published version to see why it had passed: its file list showed the two drop-ins the name rule never matched.
+  Before accepting the changed gate it was run, old and new, over every package of the published tree: the same verdict for every package, six notes more.
 
 ## Traps met while building this (symptom, cause, how it was found)
 

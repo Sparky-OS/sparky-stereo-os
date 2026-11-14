@@ -35,6 +35,17 @@ A trap gives its symptom, its cause, its fix and how the cause was found; a reci
 - Symptom: the Lean link gate fails in Docker at namespace creation ("bwrap" cannot create namespaces; masked /proc). Cause: Docker's default seccomp, AppArmor and path masks. Fix: run with `--cap-add SYS_ADMIN --security-opt seccomp=unconfined --security-opt apparmor=unconfined --security-opt systempaths=unconfined`; the gate's own `--unshare-all` and `--cap-drop ALL` stay unchanged. Record the flags in every reproducer script. (lane zfs-restore-385)
 - Symptom: a repository holding a submodule gitlink cannot be a Lean Code `--authoring` root. Cause: the gitlink is not a tracked tree. Fix: keep a recipe's authoring folder small and tracked. Found by: the build refusing the root. (lane no-fallbacks-drivers-346f1)
 
+- Symptom: `publish-tree.sh` refuses a package the build's link gate passed: "link check failed: ... stereo imports lost: NAME (the previous build called them)".
+  Cause: a stereo call retired on purpose was declared only where the build could see it (the source tree), and the publisher has only the archives.
+  Fix: a stereo call retired on purpose is declared in `debian/sparky-lean-retired-stereo-imports` (symbol as `nm -D` prints it, white space, reason); `lean.debhelper` writes it into the lc1 manifest of every archive as `retired_stereo_imports`, bound by the control mark, and `linkcheck.compare()` reads it only from the archive, at the build and at publication alike: each recorded symbol becomes a note in the log, every other lost import still blocks.
+  A record with a row without a reason, or a name that is no stereo symbol, is refused wherever a manifest is loaded; a record edited after the build fails its mark. No environment variable opens the gate.
+  Found by: the publisher's own checks run on a throwaway-key copy of the live tree with the round's packages (skill edition-packaging, references/lessons-2026-11.md, "A stereo call retired on purpose").
+
+- Symptom: one test of the suite fails when the tree is mounted into a container, `test_appstream_off_publishes_what_main_published`: "Command '['git', 'show', '<commit>:sparky-os/repo/publish-tree.sh']' returned non-zero exit status 128", with "fatal: detected dubious ownership in repository at '/tree'" in the captured output.
+  Cause: the test reads an earlier `publish-tree.sh` from the repository's history, and git refuses a repository owned by another user (the container's root against the mount's owner).
+  Fix: mark the mount as safe for that container only, through its environment (`-e GIT_CONFIG_COUNT=1 -e GIT_CONFIG_KEY_0=safe.directory -e GIT_CONFIG_VALUE_0=/tree`); never change the host's git configuration for it.
+  Found by: running the one test again with its captured output shown; the summary line alone names neither git nor the ownership.
+
 ## Measured facts
 
 - dpkg facts: the status file is rewritten at every write run; a same-version reinstall leaves status bytes unchanged but changes the info directory; configure compares conffiles only from "unpacked"; remove and purge never compare; apt's `--no-triggers` leaves interested packages triggers-pending between runs. dpkg-stereo 0.1.28 and older lost records of packages left in those states (378 rows on one machine: systemd 313, udev 50) (lane dpkg-stereo-hook-cost-367)

@@ -8,7 +8,7 @@ description: >-
   disk (zram and zswap never ours, the person's opt-in from the Memory page), resume= and RESUME_OFFSET for hibernation,
   a user preference that appears ignored, a failed hibernation read from that attempt (the notice names the device, the share or the cause). Load it when the screen locks or sleeps against the person's setting, the lid
   closes and the TV goes dark, hibernate fails to resume, a zram package removes another package or an upgrade proposes
-  removing it, the Memory page needs a swap indicator, or a power profile is held by a program, or Hibernate fails and the Problems page only says the service failed.
+  removing it, the zram gate refuses a unit that only retires zram, the Memory page needs a swap indicator, a power profile is held by a program, or Hibernate fails and the Problems page only says the service failed.
 ---
 
 # Power and idle in KDE
@@ -110,6 +110,9 @@ Test the child's actual profile, argument boundaries, failure status, signals an
 The edition keeps pages in RAM (swappiness 1) and swaps to the Cushion Swap File on disk. zram and zswap are never set up by the edition and never on by default, on any machine: nothing for them is installed or configured, and there is no rule that turns them on by hardware. A person who wants zram opts in from Stereo APTus (or the Memory page's shortcut to the same action), which installs Debian's systemd-zram-generator; no edition package Conflicts with or Breaks a zram package, so that choice stays theirs. The publication and image gate (iso-build/zram-check.py in the build repository) refuses any package or image of ours that sets zram or zswap up.
 The user can switch it in System Settings, Memory.
 
+The gate judges a zram unit by what it and its script do, never by its name: a unit that only stops, resets, removes or reports passes with a note for each file and line, and one that also sets zram up, or that the gate cannot read to its end, is refused.
+What it refuses, what it lets through, how to write a retiring unit it can read, its verdict lines and the virtual machine proof are in [references/zram-gate.md](references/zram-gate.md).
+
 The swap is the Cushion Swap File, Daniel Ramos's design: the area stays off at rest, is switched on when available memory runs low or falls fast, and is switched off again only when the arithmetic shows that cannot itself run out of memory.
 It wakes through PSI where the kernel has it and polls otherwise.
 Measure before trusting PSI alone: with swap off it fires only at the very end, sometimes after the OOM kill, so keep a timed check beside it.
@@ -157,4 +160,5 @@ A corrected setting without reproduction of the overnight event is a configurati
 From the lanes of 25 October to 6 November 2026; add the next lesson here as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 
 - Memory page opt-in for zram: the Memory package Depends on Cushion Swap (not Recommends) so an install with `--no-install-recommends` still gets the service; verify with a red/green pair (0.1.7 lacks Cushion in Depends, exit 1; 0.1.8 requires it, exit 0) and an isolated apt solve without Recommends. Cushion zram accounting: 0.3.3 wrongly needed 29 GiB instead of 21 GiB for the same disk swap; 0.3.4 passes the 58-case suite. (lane zram-on-at-opt-in-360b)
+- Symptom: the zram gate refuses a package whose units only retire zram (`a zram unit` on each unit's name, `a zram device set up through sysfs` on a line that writes 1 to `reset`). Cause: the gate judged names and whole lines. Fix: since 2026-11-14 it reads the unit's commands and its script to the end; a tear-down passes with a note, every set-up form is still refused, and a unit it cannot read is refused. Write the retiring script so each act on zram is spelled on its own line in a file the package ships: [references/zram-gate.md](references/zram-gate.md). (lane zram-gate-and-cleanup-units-558)
 - Symptom: installing a zram package removes `kernel-settings` or a plain upgrade proposes `Remv systemd-zram-generator` with apt exit 0. Cause: package relations (Conflicts) and an auto-installed generator that apt considers unneeded; a dpkg-installed generator does not mean the person selected it. Fix: no Conflicts or Breaks against any zram package; installing through Stereo APTus marks the generator manual, which releases the guard and keeps it across autoremove; a leftover generator with an empty zram node (disksize 0) is not active swap. Proven with real zram activation only inside a nested QEMU guest (`-cpu max` for TCG). The skill covers the opt-in and "no Conflicts"; add the manual-mark and inherited-generator facts. (lane no-zram-kcm-360)

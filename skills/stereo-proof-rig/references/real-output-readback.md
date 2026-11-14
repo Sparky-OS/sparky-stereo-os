@@ -99,3 +99,7 @@ One flat sample in thirty is a thin red: on a window that repaints, the stress a
 - **Symptom:** `tst_qquickwindow` and `tst_scenegraph` are not among the build's targets.
   **Cause:** `tests/auto/quick/CMakeLists.txt` adds them under `QT_FEATURE_private_tests`, which needs a developer build of Qt.
   **Fix:** none on a distribution's Qt; `tst_qquickwindowstereo`, its contract twin and `tst_nodestest` build without it.
+- **Symptom:** in the close-during-expose case two of twenty closed windows stay on the screen, with the old and the new library alike.
+  **Cause:** the test client connected `visibleChanged` to `close()` after `show()` had already emitted it, so every second window was never asked to close; they vanished only when the client deleted older window objects, and two of the last three kept were of that kind.
+  **Fix:** close on the next turn of the event loop (`QTimer::singleShot(0, ...)`); `pairstress` does since ORDER 555's third milestone.
+  **How found:** one run with `WAYLAND_DEBUG=client`: 21 `get_toplevel`, 18 `xdg_toplevel.destroy`, the three left being the main window and the 19th and 21st made, the same three KWin's window list named. Count what the client asked for before blaming the toolkit or the compositor.

@@ -671,5 +671,5 @@ Fix: thread that existing control through every new filter branch, checking with
 Keep the original predictor reference tests and the common cancellation tests in both default and unsafe builds.
 How found: the three-way conflict showed the old PredictorRun and checkpoints against the new byte loops; the odd-width four-bit RGB receiver and all eight predictor controls passed after the integration, including the existing wide-row cancellation control.
 Testing a patched dependency with cargo test -p can refuse because it is not a workspace member; testing its standalone manifest without the complete local patch set can instead select an uncached registry backend.
-Use the owner's standalone test recipe with a disposable manifest copy and every resolved local patch, leaving source manifests and locks unchanged.
+Use the shared crate's standalone test recipe with a disposable manifest copy and every resolved local patch, leaving source manifests and locks unchanged.
 Compile the original new unit fixtures too: their parameter initializers may need the common-only control field even when the receiving application already compiles.

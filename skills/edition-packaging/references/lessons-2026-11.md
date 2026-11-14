@@ -166,3 +166,32 @@ Traps:
   Run test-wiring.sh with inherited grep functions unset, publish-check on every changed file including the baseline, then build through the tree route and rerun the installed proof and its failing control on that artifact.
   **How found:** the integration review failed test-wiring.sh and publish-check despite passing private-KWin tests; reading debian_prepare and plain-from-lc established the generated delta, and comparison with the earlier authoring tree confirmed the recovered baseline.
   Keep original copyright names when removing third-party contacts required by the public-text gate.
+
+## A successor source whose binary build is larger than the lane's scratch (ORDER 555, qt6-declarative +stereo3d3)
+
+Recipe, in order:
+1. **Measure before building.** The last build of the same source says how much room the next one needs: the lane that built it kept a disk log (free space and tree size every few seconds). qt6-declarative's +stereo3d2 peaked at 37,550 MB of build tree and took 5,075 s at four CPUs; +stereo3d3 peaked at 37,310 MB and took 105 minutes on a busier station. Where no log exists, build one small target of the same tree first (the `Quick` library alone: 1.6 GB without debug information, nine minutes) and scale by the step count (771 of 4,826 steps), knowing the package build adds debug information, documentation and every module.
+2. **Make the source where there is little room, the binaries where there is much.** The successor source (`next-source.sh`, `repo/lc-successor.py --in-place --overlay`) needs a few hundred megabytes; make it twice and compare the hashes. The binary build is `release/build-from-lc-dsc.sh DSC amd64 IMAGE REPO OUT` with OUT on the disk that has room: the build tree is OUT/build, and the script removes it and the gate's scratch itself when the build ends, leaving the .debs, .changes, .buildinfo, the build record and SHA256SUMS (609 MB for 125 packages).
+3. **Watch the disk from outside the container:** a loop beside the build that writes the free space and the tree's size every minute and stops the container under the floor the brief sets. Keep the file: its lowest free space and largest tree are the next lane's measurement.
+4. **Copy out, verify, then remove:** copy the .debs, the record, .buildinfo, .changes, SHA256SUMS and build-dep.log to the lane's own scratch, run `sha256sum -c` on the copies, read the record (`unrecorded` empty, `recipeCommit` the recipe branch's commit, `recipeDirty` false), and only then remove the build folder by its literal path. Show `df` before and after.
+5. **Read the gates in the build's own log:** `lc1: verified N packages, payload hashes and required HR companions`, `lc1: archive-qualified link check passed for N packages`, `lc1: build record NAME`. lintian is not part of that script: run it on the new and on the published binaries (dbgsym left out) and compare the sorted lines with the version replaced by one word.
+6. **No file gained or lost:** `dpkg-deb -c` of every package against its published one (version replaced by one word, the build-id files of dbgsym packages left out), and the `symbols` control file of every library. A fix inside one function changes neither.
+7. **Install by apt, restricted to the source:** a flat local repository (`dpkg-scanpackages -m . > Packages`, `deb [trusted=yes] file:/local ./`), pinned as high as the edition's (`Pin: origin ""`, 1001), and `apt-get install` of exactly the installed binary packages of that source (`dpkg-query -W -f '${source:Package} ${Package}\n'`). Keep the simulation's `Inst` and `Remv` lines; every `Inst` line must name the new version.
+8. **Prove from the installed packages:** the guest's root exported from the upgraded image, nothing replaced by hand; the program's own library path in `/proc/PID/maps` is the installed one. Measured: the stress table at 8.0 px in every case with 469 exposes, the two Qt tests 4 passed, lintian's 213 lines equal for the published and the new binaries.
+
+Traps:
+- **Symptom:** `apt-get upgrade` from the local repository exits 100 in a container without network, and its simulation lists packages that are not the new build's.
+  **Cause:** the image's other sources still have lists with newer versions of unrelated packages; `upgrade` wants them too and cannot fetch them.
+  **Fix:** step 7, install by name.
+  **How found:** counting the `Inst` lines that did not carry the new version (4 and 13 in two images).
+- **Symptom:** the watch's stop command would not have stopped the build.
+  **Cause:** the script names its container from the .dsc with every character outside letters, digits, `_`, `.` and `-` replaced by `-`, so `+lc1.dsc` plus `-amd64` gives a double dash; a name typed by hand had one.
+  **Fix:** read the name from `docker ps --filter name=PREFIX` once the build runs, never compose it.
+  **How found:** `docker ps` a minute into the build.
+- **Symptom:** the tree's size in the watch stays near 500 MB for twenty minutes while free space falls by gigabytes.
+  **Cause:** the build dependencies are installed into the container's own layer, on the Docker disk, before the tree grows.
+  **Fix:** watch free space, not only the tree; both disks if Docker's data is on another one.
+- **Symptom:** a recipe folder has no changelog file and no script for a published version (+stereo3d2 here).
+  **Cause:** that version was made by another lane's successor run with an overlay, and only its patch was added to the recipe.
+  **Fix:** find the run (the successor report beside its .dsc names mode and changed files), write the same route into the recipe as `next-source.sh`, and add the missing entry as the published changelog has it.
+  **How found:** the published source's changelog against the recipe folder.

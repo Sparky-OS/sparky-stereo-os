@@ -135,7 +135,8 @@ int main(int argc, char **argv)
             auto window = makeWindow(engine, "#00ff00", "#ff00ff", 600);
             QQuickWindow *raw = window.get();
             if (*count % 2)
-                QObject::connect(raw, &QWindow::visibleChanged, raw, [raw] { raw->close(); }, Qt::QueuedConnection);
+                // show() has already said the window is visible: close it on the next turn of the event loop
+                QTimer::singleShot(0, raw, [raw] { raw->close(); });
             else
                 QTimer::singleShot(30 + 10 * *count, raw, [raw] { raw->close(); });
             extra->push_back(std::move(window));

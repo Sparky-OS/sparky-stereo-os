@@ -79,6 +79,12 @@ An X11 window's buffer is its own pixmap, so an X11 program declares that size a
 A software-drawn X11 window is declared like any other (`stereo_declare_x11_format()` at support version 1 or more) and Stereo KWin shows each half to its eye; the program draws its picture at the X window's size, which KWin makes twice the created width, and takes that size from the X server's events, never from the synthetic one-view `ConfigureNotify`.
 The recipe, the per-eye proof with its negative controls and the traps are in [x11-software-drawn.md](references/x11-software-drawn.md).
 
+## A stereo window when Xwayland has no glamor
+
+On a machine or a virtual machine without 3D acceleration (or with `XWAYLAND_NO_GLAMOR=1`) Xwayland has no DRI3, every GL program draws on the software renderer, and Mesa presents a stereo window's two eyes as one pixmap twice the window's width.
+Up to Xwayland +stereo3d4 that pixmap was copied into the window instead of flipped, so each eye showed half of the left eye, and a stereo child window's right eye never changed; from +stereo3d5 both are pairs.
+How to tell which layer loses a pair (the GL library's requests, Xwayland's buffers, the present's completion, the scanned-out frame of a guest with no card), the fix, its test in Xwayland's own suite and the traps: [x11-stereo-window-without-glamor.md](references/x11-stereo-window-without-glamor.md).
+
 ## A GL child that is larger than its window, or under a sibling
 
 X clips a child to its window and a sibling stacked over it hides it; the redirected child's buffer is whole, so the scene must cut it the same way: Stereo KWin does from +stereo3d53 (`X11StereoChild::visible`, cut in the item's shapeForSourceBox, windows that appear later noticed through SubstructureNotify; ORDER 160).

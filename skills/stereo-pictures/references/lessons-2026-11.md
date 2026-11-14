@@ -122,7 +122,7 @@ The recipe, the proofs and the toolkit traps are in [a program joins the shared 
   Cause: the program renames with its own code, which the desktop's file jobs never announce, so the follower hears nothing.
   Fix: one call to `Stereo::Picture::moveFileChoice(from, to)` after each successful rename or move of a file or a folder, in the program's one rename function where it has one.
   Found by: searching the program for `rename(` after asking "which process announces this move".
-- Symptom: the same eleven sentences of a 3D menu are in seven languages and missing in two.
+- Symptom: the same twelve sentences of a 3D menu are in seven languages and missing in two.
   Cause: the menu's translation patch was written before those languages joined the required set, and nobody looked while the menu did not change.
   Fix: when per-file sentences leave a program for the layer's catalogue, list the sentences that stay and fill every required language for them in the same version.
 - Measured: with stereo-layer 1.19.0 the widgets' menu and the QML type list the same 27 entries and the swap, in one order, for a picture and for a video (`filechoiceqmltest`, `oneListInBothFaces`); a QML list made one packing short on purpose fails it, 26 against 28.

@@ -73,9 +73,45 @@ Trap, found in ORDER 557:
 A restoration must preserve its evidence too.
 Use the exact historical recipe and the published build records, not the current recipe with a new date.
 Two regenerated archives being equal proves repeatability; compare their hashes with the recorded source hashes separately.
-When a recorded hash differs, report both values and stop staging that replacement.
+For a byte-for-byte restoration, a different recorded hash stops staging that replacement.
+If the original archives are lost and corresponding-source regeneration is explicitly requested, follow the content proof below and preserve both sets of hashes.
 Where no record contains a source hash, label the next-best evidence explicitly, such as a matching retained Git tree, patch hashes, configuration and embedded recipe.
 Never relabel an unproved replacement as the source of a published binary.
+
+## A source restored after its archives were lost
+
+An original archive hash and the content needed to rebuild its binary answer different questions.
+When the original archives have been removed and cannot be recovered, say so; a regenerated archive never claims their hashes.
+For a requested corresponding-source restoration, keep this evidence beside the stage:
+
+1. Recover the historical recipe commit, upstream revision, patch list and patch hashes from the retained build records.
+   Reconstruct each flavour and compare its Git tree with the accepted tree; record an ISA-specific tree separately when it differs.
+2. Read the actual published packages.
+   Recover their changelog, copyright and final configuration verbatim, not a newly dated equivalent.
+   Retain compressed records as well as their decoded source inputs when compression is part of the file being compared.
+   Keep a file-by-file table with package name, installed/control path, corresponding source path, SHA-256 and comparison result.
+   Distinguish restored recipe inputs from retained binary packaging records; a captured control file is evidence of that binary's metadata, not a claim that a source control template has the same format.
+3. Preserve the historical build scripts and configuration fragments, and carry the exact published final configuration with them.
+   Stop an affected flavour on a content difference and retain its diff.
+   Do not rebuild or re-sign the kernel as part of a source-only restoration.
+4. Normalize the archive through the reproducible-source route: a fixed recipe epoch, sorted members, normalized times and modes, numeric root owners, and normalized `debian/` plus `include-binaries` inputs before `dpkg-source -b`.
+   Normalize the entire orig tree too, after applying patches: a restrictive umask can leave a patched file at 0600 while its Git identity still matches 100644.
+   Independently inspect the final archive's owners, times, modes and member order, and reconstruct its Git tree from the archived contents.
+   Keep captured installed symlink targets as plain byte records, with their type recorded in the comparison table: absolute installed links can escape a source root and `dpkg-source -x` correctly refuses them.
+   Extract every final `.dsc` with ordinary `dpkg-source -x` and repeat the file and link-target comparisons on that extracted source.
+   Run it twice from fresh disposable source trees with different zones and umasks; require the same three archive hashes per flavour.
+5. Write `REGENERATED.txt` in the stage with the regeneration date, historical recipe commit, accepted and reconstructed tree identities, file-comparison results, and both the original recorded and regenerated archive hashes.
+   Explain why the archives differ and where the originals were lost.
+   Keep `SHA256SUMS` and `.keep`, then run the all-binary source gate on the copied indexes plus every required stage.
+
+This proves the recorded source content and embedded packaging files, together with repeatable replacement archives.
+It does not prove the original archive bytes or a repeated binary build.
+A metadata fix to a carried binary must also provide its real source package; otherwise the repository gate correctly remains red.
+
+Trap: a historical source preparer used the clock for its changelog and packed incidental file metadata.
+Re-running its commit produced a correct accepted Git tree and different archive hashes.
+The binary's embedded changelog exposed the changed dates; restoring those bytes and normalizing the archive made the replacement repeatable without pretending it was the removed archive.
+The independent archive inspection also caught v3 patch outputs at 0600: two matching hashes alone did not prove normalized modes.
 
 ## Reading a failed round
 

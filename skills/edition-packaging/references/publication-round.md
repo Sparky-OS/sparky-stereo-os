@@ -97,6 +97,8 @@ For a requested corresponding-source restoration, keep this evidence beside the 
 4. Normalize the archive through the reproducible-source route: a fixed recipe epoch, sorted members, normalized times and modes, numeric root owners, and normalized `debian/` plus `include-binaries` inputs before `dpkg-source -b`.
    Normalize the entire orig tree too, after applying patches: a restrictive umask can leave a patched file at 0600 while its Git identity still matches 100644.
    Independently inspect the final archive's owners, times, modes and member order, and reconstruct its Git tree from the archived contents.
+   Keep captured installed symlink targets as plain byte records, with their type recorded in the comparison table: absolute installed links can escape a source root and `dpkg-source -x` correctly refuses them.
+   Extract every final `.dsc` with ordinary `dpkg-source -x` and repeat the file and link-target comparisons on that extracted source.
    Run it twice from fresh disposable source trees with different zones and umasks; require the same three archive hashes per flavour.
 5. Write `REGENERATED.txt` in the stage with the regeneration date, historical recipe commit, accepted and reconstructed tree identities, file-comparison results, and both the original recorded and regenerated archive hashes.
    Explain why the archives differ and where the originals were lost.

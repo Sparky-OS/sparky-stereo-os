@@ -94,7 +94,7 @@ One flat sample in thirty is a thin red: on a window that repaints, the stress a
   **Fix:** place them with a KWin script before the grab.
 - **Symptom:** Qt's stereo autotest never gets a pair with `QSG_RHI_BACKEND=vulkan`, on NVIDIA's driver and on software Vulkan alike, though a two-layer Vulkan swapchain works there.
   **Cause:** the edition's Qt gives a window its two views in the Wayland EGL window only; the Vulkan RHI draws such a window flat ([native-linux](../../native-linux/SKILL.md), the routes).
-  **Fix:** on NVIDIA run the test the way the edition runs Qt there, Mesa's GL on zink (`MESA_LOADER_DRIVER_OVERRIDE=zink`, Mesa's EGL vendor file first, NVIDIA's Vulkan ICD).
+  **Fix:** from qt6-base 6.11.2+dfsg-5+stereo3d21 the Vulkan RHI gets the two views and the test passes there ([native-linux, two views on Qt's Vulkan path](../../native-linux/references/qt-vulkan-two-views.md)); on an older Qt run the test on NVIDIA the way the edition runs Qt there, Mesa's GL on zink (`MESA_LOADER_DRIVER_OVERRIDE=zink`, Mesa's EGL vendor file first, NVIDIA's Vulkan ICD).
   **How found:** the same test on three backends, and the patch that asks for the views.
 - **Symptom:** `tst_qquickwindow` and `tst_scenegraph` are not among the build's targets.
   **Cause:** `tests/auto/quick/CMakeLists.txt` adds them under `QT_FEATURE_private_tests`, which needs a developer build of Qt.

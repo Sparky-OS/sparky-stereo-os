@@ -152,7 +152,16 @@ A successful export or link check alone is not a publication qualification.
   Do not remove the links, weaken the validator or choose an older public snapshot.
   **How found:** the unchanged recipe failed on public commit 05cf375; the repaired export passed on that same commit and both binaries rebuilt from its descriptor byte for byte.
   ORDER 531 had the same failure with hooks; each new linked folder needs the exported-tree check again.
+- **Symptom:** installation carries hooks and site sources, but the helper's offline ZIP omits them.
+  **Cause:** the helper's `bundle` command had its own older top-level list.
+  **Fix:** include both folders there too and require the ZIP's complete file set to equal the independent authored snapshot manifest, plus that manifest's installed name.
+  **How found:** ORDER 566's installed check saw 687 bundled files before the repair and all 772 snapshot files after it; checking just one skill in the ZIP had missed the omission.
 - **Symptom:** the zram publication gate refuses the packaged `skills/power-idle/references/zram-gate.md` for the setup commands its table tells contributors to avoid.
   **Cause:** source inspection showed the gate skips the usual documentation directories but scans Markdown under the installed skills tree as program text.
-  **Status:** unresolved in ORDER 566; retain the refusal and return it for gate review, keeping the documentation and the gate intact.
-  **How found:** running the gate on the built package named four lines of its own reference, while payload/HR and archive link checks passed.
+  **Fix:** the gate now distinguishes unrun Markdown from code and configuration by content, extension, mode, location and consumer references, with the controls in [the gate reference](../../power-idle/references/zram-gate.md).
+  Keep the documentation intact and executable setup refused, including a document a unit or script consumes.
+  **How found:** running the gate on the built package named four lines of its own reference; the added documentation controls failed before and passed after the change.
+- **Symptom:** the language-registry test says `expected 9, found 10` after Spanish was added.
+  **Cause:** the generated registry used its files, but the test froze the earlier count.
+  **Fix:** scan the registry directory and compare every name with the generated registry, rather than adding another fixed count.
+  **How found:** ORDER 566 ran all twenty engine test executables, nineteen passing before this test repair and twenty after it; the historical find and context goldens ran unchanged.

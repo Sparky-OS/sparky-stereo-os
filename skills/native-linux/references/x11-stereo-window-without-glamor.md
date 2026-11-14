@@ -190,7 +190,7 @@ The work procedure restored the raw Present snapshot on every such change.
 That replaced the composed picture, including the cover's paint, with the client's pair.
 The snapshot saved before delayed redirection also lacked the cover already painted into the newly redirected window.
 
-**Fix in the source candidate:** mark restoration pending when an independent child surface is created and consume that mark once.
+**Fix in Xwayland +stereo3d3:** mark restoration pending when an independent child surface is created and consume that mark once.
 When restoring, copy `winSize - clipList` from the current window pixmap into the same place in both halves of the saved pair before replacing the pixmap.
 Normal buffer recycling keeps the composed picture; a new surface after a remap still restores the last pair.
 Nothing is resized.
@@ -198,10 +198,10 @@ Nothing is resized.
 **How found:** an instrumented server showed that the cover and stereo child shared the same backing pixmap and the stereo child's clipping excluded the cover correctly.
 It then logged 70 snapshot restores during 70 presents.
 Gating restoration on damage registration fixed repainting but lost the last pair after a remap; the explicit per-surface mark passes that control.
-The buffer-recycling suite fails all four cover cases on +stereo3d2 and passes on the candidate, including delayed redirection and remapping without another present.
+The buffer-recycling suite fails all four cover cases on +stereo3d2 and passes on +stereo3d3, including delayed redirection and remapping without another present.
 A headless Weston alone leaves the test's role-less surfaces unmapped and does not exercise repeated backing-buffer recycling.
 
-Measured with the source candidate over the installed rig, one fresh session per case:
+Measured again from the apt-installed Xwayland +stereo3d3 and Mesa +stereo3d23 packages, one fresh session per case:
 
 | Declared child case | AMD, glamor | AMD, shared memory | NVIDIA, glamor | NVIDIA, shared memory |
 |---|---|---|---|---|
@@ -213,13 +213,14 @@ The same repaint has zero yellow pixels in each view on +stereo3d2, on both card
 The 44 top-level controls of ORDER 561 all retain their expected results: pairs while declared and a whole flat view after undeclaring.
 Without glamor OpenGL runs on the software renderer; with glamor the GLX clients identify radeonsi on AMD and zink on the NVIDIA card.
 
-This is source-build evidence; package and installed-package qualification are separate.
+The final installed packages repeat all 52 child and top-level rows with the same results; the source-only runs are kept separately.
 
 
 ## EGL X11 and the Vulkan stereo layer
 
-Measured on ORDER 561b with the source candidate for Mesa +stereo3d23 and Xwayland +stereo3d3; the older-server control uses the retained +stereo3d5 binary.
-Package and installed results are separate from these source runs.
+Measured on ORDER 561b from the apt-installed Mesa +stereo3d23 and Xwayland +stereo3d3 packages; the older-server control uses the retained +stereo3d5 binary.
+The installed checks repeat 40 EGL transition rows, ten packed Vulkan transition rows, four injected requests per API, two exact one-frame Vulkan requests, and four Vulkan Xlib rows.
+Record the actual loaded libraries and their hashes; a prototype package version can be identical to the final version.
 The state transition rule is now one `u_stereo_pair` helper for GLX, EGL and the packed Vulkan layer: two copied pairs withdraw the declaration, three consecutive single-view flips allow a retry, and a successful pair clears the problem.
 A first copy alone is not a failure.
 Each library keeps its messages under its own package (`libglx-mesa0`, `libegl-mesa0`, `mesa-vulkan-layer-stereo`), with the same ten translations and the shared engine transport.
@@ -298,7 +299,7 @@ A native Mesa WSI that already exposes two array layers bypasses the packed laye
 
 ## What this does not cover
 
-- The covered declared child is fixed in the source candidate [above](#a-declared-child-covered-by-a-child-of-its-own); its packaged and installed qualification is still pending.
+- The covered declared child is fixed and repeated from the installed packages [above](#a-declared-child-covered-by-a-child-of-its-own). Native WSI that bypasses the packed layer has only the positive controls described above; its copied-present recovery is not qualified here.
 - A declared window that a compositor did not redirect and that is smaller than its surface (a stereo child the window does not list) is still copied into its parent's picture: it shows the left view, flat, and Mesa says so ([above](#when-the-pair-cannot-be-flipped)).
 - **The next Xwayland base.** Upstream's stable branch after 24.1.13 (24.1.14 and 24.1.15) adds a check to `xwl_present_check_flip()` that the flip pixmap has the size of the window's pixmap ("xwayland/present: Only flip if the window pixmap dimensions match", Michel Dänzer). A window that holds two eyes has a pixmap one eye wide before its first flip, so patch 0005's exception must cover that check too when the package moves base, or the pair is copied again, with glamor as well; the suite's test (0012) and the glamor control of step 1 show it. The extended check is carried by `2:24.1.15-1+stereo3d1+lc1` (ORDER 562); both height checks remain, and an unrelated backing width is rejected.
 - Each present of both eyes makes a new shared memory pool of that size (a new pixmap per swap is Mesa's software path); Xwayland's open files and memory stayed level over a fast run (11 to 12 files, about 75 MB), and 600 presents of a 1600x600 pair back to back took 10.0 s, the output's 60 a second, as with glamor.

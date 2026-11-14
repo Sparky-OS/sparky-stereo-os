@@ -97,9 +97,9 @@ Autotests: `testStereoChildWindowClip` and `testStereoChildWindowClipAncestor` i
 A cover inside the declared child is drawn into that child's backing pixmap, so it must be copied into both views rather than cut out of KWin's item as a sibling would be.
 On Xwayland 24.1.15 +stereo3d2 the two views and their moving markers were kept, but the cover's own picture was absent from both, even after repainting.
 The cause was Xwayland restoring a raw Present snapshot at each backing-buffer change; delayed redirection also needed to retain the cover already painted into the new pixmap.
-The source candidate restores once per new child surface and copies the covered region into both views when restoring.
+Xwayland +stereo3d3 restores once per new child surface and copies the covered region into both views when restoring.
 The recipe, the trace that found it, the remap control and the buffer-recycling suite are in [a declared child covered by a child of its own](x11-stereo-window-without-glamor.md#a-declared-child-covered-by-a-child-of-its-own).
-Package qualification remains a separate step.
+The final apt-installed Xwayland +stereo3d3 and Mesa +stereo3d23 packages repeat all 52 child and top-level rows on both cards with glamor on and off.
 
 ## Mesa +stereo3d19: EGL and Vulkan list their child
 
@@ -111,7 +111,7 @@ Rows from the packages: see the hand-back of ORDER 160 milestone 2; the commands
 
 ### A dev build of Mesa for the rows (minutes, not an hour)
 
-`meson setup /b/o --prefix=/b/inst -Dgallium-drivers=llvmpipe,softpipe,zink -Dvulkan-drivers=swrast -Dvulkan-layers=stereo -Dllvm=enabled -Dplatforms=x11,wayland -Dglx=dri -Dglvnd=enabled ...` then `ninja -C /b/o install` in the Mesa build image; run a client with `LD_LIBRARY_PATH=/b/inst/lib/x86_64-linux-gnu LIBGL_DRIVERS_PATH=.../dri __EGL_VENDOR_LIBRARY_FILENAMES=/b/inst/share/glvnd/egl_vendor.d/50_mesa.json` (Vulkan: `VK_ADD_IMPLICIT_LAYER_PATH=/b/inst/share/vulkan/implicit_layer.d`, `MESA_VK_STEREO_LAYER=1`) while KWin stays the installed one.
+`meson setup /b/o --prefix=/b/inst -Dgallium-drivers=llvmpipe,softpipe,zink -Dvulkan-drivers=swrast -Dvulkan-layers=stereo -Dllvm=enabled -Dplatforms=x11,wayland -Dglx=dri -Dglvnd=enabled ...` then `ninja -C /b/o install` in the Mesa build image; run a client with `LD_LIBRARY_PATH=/b/inst/lib/x86_64-linux-gnu LIBGL_DRIVERS_PATH=.../dri __EGL_VENDOR_LIBRARY_FILENAMES=/b/inst/share/glvnd/egl_vendor.d/50_mesa.json` (Vulkan: `VK_ADD_IMPLICIT_LAYER_PATH=/b/inst/share/vulkan/implicit_layer.d`, with `DISABLE_LAYER_MESA_STEREO` unset) while KWin stays the installed one.
 Configure once with `-Dbuild-tests=true` before the recipe build: the layer's passthrough test compiles `stereo_layer.c` with its own include list.
 
 ### More traps

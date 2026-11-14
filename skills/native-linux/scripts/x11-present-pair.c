@@ -15,6 +15,7 @@
  *   X_OFF, Y_OFF  the offset of every present (a present with an offset cannot be flipped)
  *   SRC_W=N       one view of the pixmap is N wide, not W (a frame made for the size the window had before a resize)
  *   UNDECLARE_AT=N  before present N the declaration is deleted, and from then the pixmap holds the left view only, W wide
+ *   COVER_PAINT_AT=N  before present N the cover child is painted again, yellow, through the X server
  *   HOLD_S=N      stay N seconds after the last present
  *   EXPECT=flip|copy   exit 1 unless the last present completed that way
  * Build: cc -O1 -o x11-present-pair x11-present-pair.c -lxcb -lxcb-present -lxcb-composite
@@ -70,8 +71,9 @@ int main(void)
         if (child)
             cardinal(c, top, "_KDE_NET_WM_STEREO_CONTENT_CHILDREN", XCB_ATOM_WINDOW, win);
     }
+    xcb_window_t cover = XCB_WINDOW_NONE;
     if (getenv("COVER")) {   /* a small plain child window over the declared one: its pixmap can no longer be flipped */
-        xcb_window_t cover = xcb_generate_id(c);
+        cover = xcb_generate_id(c);
         uint32_t grey[] = { 0x808080 };
         xcb_create_window(c, XCB_COPY_FROM_PARENT, cover, win, 30, H / 2, 60, 60, 0, XCB_WINDOW_CLASS_INPUT_OUTPUT, s->root_visual,
                           XCB_CW_BACK_PIXEL, grey);
@@ -100,6 +102,11 @@ int main(void)
     if (getenv("SRC_W")) W = atoi(getenv("SRC_W"));
     for (int i = 1; i <= frames; i++) {
         xcb_pixmap_t p = xcb_generate_id(c);
+        if (cover && getenv("COVER_PAINT_AT") && i == atoi(getenv("COVER_PAINT_AT"))) {   /* the cover paints itself again, yellow */
+            uint32_t yellow[] = { 0xc0c000 };
+            xcb_change_window_attributes(c, cover, XCB_CW_BACK_PIXEL, yellow);
+            xcb_clear_area(c, 0, cover, 0, 0, 0, 0);
+        }
         if (i == undeclare) {
             xcb_delete_property(c, win, atom(c, "_KDE_NET_WM_STEREO_CONTENT"));
             xcb_delete_property(c, win, atom(c, "_KDE_NET_WM_STEREO_CONTENT_VERSION"));

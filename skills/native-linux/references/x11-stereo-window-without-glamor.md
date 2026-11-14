@@ -119,6 +119,22 @@ Where the pair still cannot be kept (an X server without patch 0013, a declared 
 4. The still program: `STILL_AT=2`; on a server without the patch the one frame must end FLAT, not SPLIT.
 5. In Xwayland's own suite the test reads the window's pixmap as a compositor's window manager can (`CompositeNameWindowPixmap` of the redirected window, then `GetImage`): twice the window wide, red at the left, blue at the right, the child's colour in both.
 
+Measured from the installed packages (Stereo KWin +stereo3d54, one fresh session per row, an AMD card and an RTX 3060, glamor on and off in every row):
+
+| Case | Xwayland +stereo3d5, Mesa +stereo3d21 | Xwayland 24.1.15 +stereo3d2, Mesa +stereo3d22 | Mesa +stereo3d22 on the +stereo3d5 server |
+|---|---|---|---|
+| Covered from the first swap (Present client and GLX twin) | split, 8 of 8, nothing told | a pair, the child in both eyes, 8 of 8, nothing told | flat and told, 4 of 4 |
+| Cover appears at swap 40 | not run | a pair, 4 of 4 | flat and told, 4 of 4 |
+| Cover goes at swap 40 | not run | a pair, 4 of 4 | flat for 40 swaps, three flips of the left view, then a pair; the problem ended, 4 of 4 |
+| A program that draws one frame, covered | not run | a pair, 4 of 4 | flat and told inside its one swap (two copies of both eyes), 4 of 4 |
+| Offset 40,30; a frame 700 wide for an 800 wide window | not run | a pair, 8 of 8 | not run |
+| The child painted by the server, the program still or drawing | not run | the new colour in both eyes, 8 of 8 | not run |
+| Declaration deleted at present 50 | not run | one flat picture, 8 of 8 | not run |
+| Uncovered | a pair | a pair, never told | a pair, never told (one first copy, then flips) |
+
+An animating stereo program swaps as fast as before: with the default interval 59.9 against 59.6 swaps a second on radeonsi and 59.8 against 59.9 on zink over the RTX 3060; with interval 0, 2565 against 2646 and 1006 against 1084; on the software renderer without glamor 176 against 199 (older stack first; [`scripts/glx-fps.c`](../scripts/glx-fps.c), 600 swaps of an 800x600 quad buffer window).
+The wait of a swap for its own completion therefore costs an animating program nothing that these rows can show.
+
 ### Traps of this part
 
 - **Symptom:** the suite's test never sees a second buffer attached for a covered window, though the present completed.
@@ -148,6 +164,7 @@ The row: the session's four variables on the card through CDI, `XWAYLAND_NO_GLAM
 
 ## What this does not cover
 
+- A declared **child** window with a child of its own over it keeps its pair (the white square is at the same place in both eyes), but the covering window's own picture shows in neither eye, also after that window paints itself again; the +stereo3d5 server shows the same, and the cause was not found (the snapshot that patch 0009 restores when the compositor redirects the child is the first place to look).
 - A declared window that a compositor did not redirect and that is smaller than its surface (a stereo child the window does not list) is still copied into its parent's picture: it shows the left view, flat, and Mesa says so ([above](#when-the-pair-cannot-be-flipped)).
 - **The next Xwayland base.** Upstream's stable branch after 24.1.13 (24.1.14 and 24.1.15) adds a check to `xwl_present_check_flip()` that the flip pixmap has the size of the window's pixmap ("xwayland/present: Only flip if the window pixmap dimensions match", Michel Dänzer). A window that holds two eyes has a pixmap one eye wide before its first flip, so patch 0005's exception must cover that check too when the package moves base, or the pair is copied again, with glamor as well; the suite's test (0012) and the glamor control of step 1 show it. The extended check is carried by `2:24.1.15-1+stereo3d1+lc1` (ORDER 562); both height checks remain, and an unrelated backing width is rejected.
 - Each present of both eyes makes a new shared memory pool of that size (a new pixmap per swap is Mesa's software path); Xwayland's open files and memory stayed level over a fast run (11 to 12 files, about 75 MB), and 600 presents of a 1600x600 pair back to back took 10.0 s, the output's 60 a second, as with glamor.

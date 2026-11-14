@@ -275,3 +275,49 @@ The trap this replaces:
 - A forged record (a manifest edited inside a built `.deb` to add a symbol) fails the lc1 mark before the link gate reads it; `lean/tests/test_linkcheck_inventory.py` holds the red, green, forged and reason-less cases.
 - A publication copy for this proof: the live pool is 15 GB, so the copy is a folder of symbolic links to the pool's files plus copied `dists/` (never hard links: a link changes the inode's change time and the gate then says "supplied input changed after its universe was frozen", for this run and for a publication round running beside it); only the gate results of such a copy are faithful, and AppStream and the installability pass are left to the real round.
 
+
+
+## A state tracker change in Mesa: the regression set
+
+Learned on ORDER 559 (November 2026): patch 0037 gives a fragment shader a variant while one `glDrawBuffer` constant names several buffers of a window (a quad buffer window under `GL_BACK`).
+A change in `src/mesa/state_tracker` is shared by every driver, so the reproducer alone is not the proof.
+
+Recipe:
+
+1. **One program, one line per case, read back, not captured.**
+   [`glx-draw-buffers.c`](../../native-linux/scripts/glx-draw-buffers.c) draws each case and reads the color buffers with `glReadPixels` before the swap (`glReadBuffer(GL_BACK_LEFT)`, then `GL_BACK_RIGHT`): the declared output, `gl_FragColor`, a scissored clear and fixed function under `GL_BACK`; a declared output under `GL_BACK_LEFT` and under `GL_BACK_RIGHT`; two outputs under `GL_BACK`; dual-source blending; two outputs into a framebuffer object with `glDrawBuffers`; a mono window; OpenGL ES 2 and 3 contexts.
+   Each line ends with the renderer string.
+2. **Two builds, every driver the station can run, the lines compared with `diff`.**
+   Run it in a Stereo KWin session on the old and the new Mesa on radeonsi, on zink over NVIDIA's Vulkan driver and on llvmpipe (`LIBGL_ALWAYS_SOFTWARE=1`).
+   Every line must be equal except the ones the change is meant to move, and those must move to what the specification says.
+   Here ten of twelve lines were equal on all three drivers and two changed: the declared output reached the right eye, and the second output of a two-output shader stopped landing in the right eye.
+3. **2D pixel identity of real programs,** captured on both builds per driver, 0 differing pixels: a Qt Quick window, a GTK 4 program on its GL renderer, and `glxgears` with a fixed clock (`LD_PRELOAD` of libfaketime with `FAKETIME="2026-01-01 00:00:00"`, which stops the gears).
+   Capture the same build twice first: a picture that differs from itself cannot judge a change.
+4. **The package's own test needs no compositor.**
+   With `ANNOUNCE_STEREO=1` the program sets the root window property a stereo compositor sets (`_KDE_NET_WM_STEREO_CONTENT_SUPPORTED`), so Mesa offers quad buffer configurations on a plain `Xvfb`, and the readback judges the case on the software renderer in any build container: exit 1 on the old Mesa, 0 on the new, 77 with "NOT RUN ... this is not a pass" where no such configuration exists.
+   It goes into `debian/tests` through `next-source.sh`, as the zink tests did.
+5. **The cost** is one more variant of each affected shader, compiled the first time it is drawn in that state; measure a frame time on one case on both builds and report it with its spread, as information.
+
+Traps:
+
+- **Symptom:** `xprop -root -f NAME 32c -set NAME 10` leaves "no such atom on any window" on Xvfb, and the test sees no stereo configuration.
+  **Cause:** not found; the property was not set.
+  **Fix:** set it from the test program with `XChangeProperty` before the first GLX call.
+  **How found:** `xprop -root NAME` right after the set.
+- **Symptom:** a shader with two outputs under `GL_BACK` shows its second output in the right eye on the old Mesa.
+  **Cause:** `_mesa_drawbuffers()` lists the right back buffer as color buffer 1, and output 1 is written there.
+  **Fix:** the variant drops the outputs above 0 in that state, whose draw buffers are `GL_NONE` by OpenGL 4.6 core 17.4.1.
+  **How found:** the readback line of that case, magenta in the right eye.
+- **Symptom:** dual-source blending under `GL_BACK` of a quad buffer window gives `GL_INVALID_OPERATION` and draws nothing, on both builds.
+  **Cause:** two buffers are bound and dual-source blending allows one (`GL_MAX_DUAL_SOURCE_DRAW_BUFFERS`).
+  **Fix:** none here; the variant leaves such shaders alone, and the line is equal on both builds.
+- **Symptom:** the Qt Quick capture of one build differs from itself in one row of text.
+  **Cause:** text rasterising was not the same in two runs.
+  **Fix:** a test scene without text; keep the text in the GTK program, which was stable.
+  **How found:** the same build captured twice.
+- **Symptom:** `next-source.sh` exits 1 and its log ends with `git status` lines.
+  **Cause:** the recipe dates the source from the recipe folder's last commit and refuses an uncommitted folder.
+  **Fix:** commit the recipe change first.
+- **Symptom:** the scratch disk loses several gigabytes while a package build runs.
+  **Cause:** a development build folder and an exported root from earlier steps were still there.
+  **Fix:** remove the development build before the package build and say what was removed; the regression runs that needed it must be done first.

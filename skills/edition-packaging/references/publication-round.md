@@ -95,6 +95,8 @@ For a requested corresponding-source restoration, keep this evidence beside the 
    Stop an affected flavour on a content difference and retain its diff.
    Do not rebuild or re-sign the kernel as part of a source-only restoration.
 4. Normalize the archive through the reproducible-source route: a fixed recipe epoch, sorted members, normalized times and modes, numeric root owners, and normalized `debian/` plus `include-binaries` inputs before `dpkg-source -b`.
+   Normalize the entire orig tree too, after applying patches: a restrictive umask can leave a patched file at 0600 while its Git identity still matches 100644.
+   Independently inspect the final archive's owners, times, modes and member order, and reconstruct its Git tree from the archived contents.
    Run it twice from fresh disposable source trees with different zones and umasks; require the same three archive hashes per flavour.
 5. Write `REGENERATED.txt` in the stage with the regeneration date, historical recipe commit, accepted and reconstructed tree identities, file-comparison results, and both the original recorded and regenerated archive hashes.
    Explain why the archives differ and where the originals were lost.
@@ -107,6 +109,7 @@ A metadata fix to a carried binary must also provide its real source package; ot
 Trap: a historical source preparer used the clock for its changelog and packed incidental file metadata.
 Re-running its commit produced a correct accepted Git tree and different archive hashes.
 The binary's embedded changelog exposed the changed dates; restoring those bytes and normalizing the archive made the replacement repeatable without pretending it was the removed archive.
+The independent archive inspection also caught v3 patch outputs at 0600: two matching hashes alone did not prove normalized modes.
 
 ## Reading a failed round
 

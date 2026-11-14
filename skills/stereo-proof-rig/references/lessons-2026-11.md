@@ -76,3 +76,24 @@ A trap gives its symptom, its cause, its fix and how the cause was found; a reci
 - Symptom: `LD_PRELOAD` has no effect on `kwin_wayland` (`ERROR: ld.so: object ... cannot be preloaded`), although it works for other programs. Cause: `kwin_wayland` carries a file capability (CAP_SYS_NICE), so it is a secure-execution program: ld.so ignores a preload with a slash, and takes a bare name only from a trusted directory and only if the library has the setuid bit. Fix, as root in the image build: copy the library into `/usr/lib/x86_64-linux-gnu`, `chmod 4755`, `ldconfig`, and set `LD_PRELOAD=name.so`. Pass it to KWin alone through a variable the session script expands (`env $KENV kwin_wayland`), never to the whole session.
 - Symptom: `kscreen-doctor --dpms off` (or `output.Virtual-0.disable`) in the virtual KWin changes nothing: the greeter's frame, commit and callback rates are the same before and after. Cause: the virtual backend keeps `dpmsMode` as state only, while `DrmOutput` makes its pipeline inactive and calls `m_renderLoop->inhibit()` (drm_output.cpp), so a real output that is off paints no frames and sends no frame callbacks. The rig's "output off" is therefore not the A10's: to stand in for it, wrap `wl_callback_send_done` in KWin's process and drop it while a flag file exists (the greeter then idles, 0 % of a core), or run KWin's DRM backend on VKMS in a virtual machine ([vkms-stereo](../../vkms-stereo/SKILL.md)).
 - Debugging a program the compositor starts, in a container with no gdb: copy `/usr/bin/gdb` and the libraries `ldd` lists from an image that has it into `/opt/gdb`, and replace the program with a wrapper script that `exec`s `env LD_LIBRARY_PATH=/opt/gdb/lib /opt/gdb/gdb -batch -ex 'unset environment LD_LIBRARY_PATH' -ex 'set sysroot /' -ex 'set startup-with-shell off' -ex 'set breakpoint pending on' -ex 'break FUNC' -ex run -ex bt --args /opt/real "$@"` into a file under the lane (the wrapper must be executable: a `COPY` of a non-executable file gives `Permission denied` and KWin only logs that the greeter exited). Without `set sysroot /` gdb prints `Error while mapping shared library sections: /proc/N/ns/mnt: Permission denied` for every library.
+
+## Driving a file manager and a viewer by fake input (ORDER 551)
+
+- Symptom: a click sent in a second call of the fake input tool lands nowhere, or a tooltip is gone from the capture.
+  Cause: KWin's fake input device, and with it the seat's pointer, lives only while the client is connected.
+  Fix: a click follows its move in the same call; for a tooltip, start the tool in the background with a long wait after the move and take the capture while it waits.
+- Symptom: the same offsets that opened "3D Input Format" in one image open "Open With…" in another, and a dialog appears.
+  Cause: the context menu gains an entry ("Open with <viewer>") when a program for that file type is installed, so every entry below it moves one row.
+  Fix: capture each kind of file's context menu once in the image under test and read the row from the picture; a video and a picture differ.
+- Symptom: a sub-menu's entries are not where the parent's offsets say.
+  Cause: a sub-menu that does not fit to the right of its parent opens to the left, over the first menu.
+  Fix: capture it open (leave the menus open: do not click the last entry) before clicking in it.
+- Symptom: after "menu keys" sent to a viewer whose menu bar is hidden, a picture has an extended attribute it never had (`user.baloo.rating`).
+  Cause: without a menu bar the keys go to the view, where a digit is a rating, and the viewer writes that into the file.
+  Fix: show the menu bar first (Ctrl+M in a KDE program with a hamburger button; the setting is not kept when the program is killed), and read the file's state after every step, so a stray key is caught by the proof itself.
+- Recipe, a file renamed through the file manager by keys: click the file, F2, type the new base name, Enter (evdev key codes: F2 60, Enter 28, Escape 1, Ctrl 29, Alt 56, Shift 42).
+- Recipe, which file is which without reading positions: give every view of every fixture its own flat colour and count colours per eye; a file shown in 3D gives its left colour to the left eye only, a flat one both colours to both eyes, and a selected (tinted) icon counts as neither, so deselect before the capture.
+- Symptom: a setting written into the test home's `.config` is ignored (tooltips stay off; a program's own state file is not read), with no error.
+  Cause: the rig's session sets `XDG_CONFIG_HOME` to a folder of its own, fresh for every session, so the programs never look in `$HOME/.config`.
+  Fix: write the file after the session is up, into `$XDG_CONFIG_HOME` as the session's environment names it.
+  Found by: a case that copies a program's old state and expects it to be taken over did nothing, while the same file placed by hand in the session's folder worked.

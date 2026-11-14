@@ -166,3 +166,53 @@ Traps:
   Run test-wiring.sh with inherited grep functions unset, publish-check on every changed file including the baseline, then build through the tree route and rerun the installed proof and its failing control on that artifact.
   **How found:** the integration review failed test-wiring.sh and publish-check despite passing private-KWin tests; reading debian_prepare and plain-from-lc established the generated delta, and comparison with the earlier authoring tree confirmed the recovered baseline.
   Keep original copyright names when removing third-party contacts required by the public-text gate.
+
+## Two packages that need each other, and other traps of a round built in order (ORDER 551)
+
+- Symptom: the link gate refuses a new library with "libstereo-layer-dev : Depends: libstereo-layer1 (= 1.18.0-1+lc1) but it is not going to be installed", and its lines about unrelated packages (two driver locks that conflict) only distract; every `.deb` of the build is removed.
+  Cause: the library depends on a plugin at a version that is built later in the same round, and the plugin is built against a small library of the same source: the gate installs each candidate from the edition's archive, so neither passes before the other exists.
+  Fix: find the binary package of the cycle that depends on neither (here the policy library and its development package), build the source once the plain way (`dpkg-buildpackage -b -Pnocheck`) and put only those two `.deb` files in the round's repository; build the plugin through the gate; take the bootstrap files out again; build the library through the gate with the plugin present.
+  The bootstrap files are never published.
+  Found by: reading the gate's own solver log line by line for the first package of ours that "is not going to be installed", then its `Depends` in `debian/control`.
+- Symptom: the link gate stops with "conflicting supplied package: kimageformat6-plugins; provide one authoritative edition snapshot".
+  Cause: the candidate side was given the published build of a package and the round's newer build of the same package.
+  Fix: every source built earlier in the round is named in `ROUND_SOURCES`, which takes its published files out of the candidate's siblings; when the order of a round changes, the lists change with it.
+- Symptom: `apt-get build-dep` of a source fails on a test-only dependency that the round has not built yet.
+  Fix: a build profile, when the control file marks the dependency `<!nocheck>`: `apt-get build-dep -P nocheck` and `dpkg-buildpackage -Pnocheck`.
+  `DEB_BUILD_OPTIONS=nocheck` alone skips the tests and still installs every build dependency.
+- Symptom: `cmake` configures a program without its stereo part and prints no error, with an older development package of the layer installed.
+  Cause: the program finds the layer with an optional `find_package(StereoLayer N CONFIG)` (so that it also builds where there is no layer), and a version that is too old is "not found".
+  Fix: both halves, in the edition's package: the version in `Build-Depends`, and `-DCMAKE_REQUIRE_FIND_PACKAGE_StereoLayer=ON` in `debian/rules`, CMake's own switch that turns that one call into a required one.
+  Configure then stops with "Could not find a configuration file for package "StereoLayer" that is compatible with requested version" and names the version it found.
+  Prove it once by building against the older development package: the build must stop there.
+- Symptom: a container that is handed its script on standard input (`bash -s <<'INNER'`) ends with status 0 and has done only the first lines.
+  Cause: `apt-get` (and `dpkg-buildpackage`) read standard input, which is the rest of the script.
+  Fix: `</dev/null` on every such command, or mount the script as a file.
+  Found by: the step's log held one line, and a three-line test script without `apt-get` ran whole.
+- Symptom: `docker run ... bash -s <<'INNER'` does nothing at all.
+  Cause: no `-i`: the container gets no standard input.
+- Symptom: `dpkg-buildpackage -S` in a bare container stops with "dh: error: unable to load addon kf6: Can't locate Debian/Debhelper/Sequence/kf6.pm".
+  Cause: `-S` runs `debian/rules clean`, which loads the package's debhelper sequences before any build dependency is installed.
+  Fix: `-nc` for a tree that was never built, or install the build dependencies first.
+- Symptom: `apt-get build-dep` stops with "Packages were downgraded and -y was used without --allow-downgrades".
+  Cause: a newer build of ours was put into the image with `dpkg -i`, and the edition's pin (1001) makes the published, older version the candidate.
+  Fix: give the newer build from a repository that carries the edition's `Origin` in its `Release` file, never by `dpkg -i`.
+- Symptom: `CMake Error ... Could not find DBUS_RUN_SESSION` in a package build that runs no tests.
+  Cause: the package configures its tests (`-DBUILD_TESTING=ON`) while the `nocheck` profile left the test's tool out.
+  Fix: a test tool is never `REQUIRED` at configure time; when it is missing, warn and register the test without it.
+- Recipe, the flat repository of a round without `apt-ftparchive`: a `Packages` file made from `dpkg-deb -f` of each file with `Filename`, `Size` and `SHA256` added, and a `Release` file with `Origin: Sparky Stereo OS` and the SHA256 of `Packages`; the build container's pin on that origin then prefers the round's packages to the published ones.
+- Symptom: the link gate stops with "stereo imports lost: _ZN6Stereo7Picture12userSwapEyesERK7QString ... (the previous build called them)" for a program whose stereo part is built and works.
+  Cause: the gate compares the stereo functions each file imports with the previous build's, because a stereo feature that an optional build dependency switched off links cleanly; a call that moved to another function by design is lost in the same way (here the per-file swap moved from the file attribute to the layer's store, and a thumbnailer went from a three-argument overload to the four-argument one).
+  Fix: the source declares each such symbol with its reason in `debian/sparky-lean-retired-stereo-imports` (one line: the name as `nm -D` prints it, white space, the reason); the gate then notes it in the build's log and still blocks every other lost import.
+  Never declare a symbol to get past the gate before reading why it is gone: the second symbol it named for the thumbnailer was a real change that nobody had listed.
+  Found by: the gate's own line names the file and the symbols; `c++filt` gives the function.
+- Symptom: the gate stops with "previous edition dependency qualification failed" and "supplied input changed after its universe was frozen" on the first package of the published tree, in a build that touched nothing there.
+  Cause: another process hard-linked the published tree's files during the build (`stat` shows two links and a change time inside the build), and a link moves the change time of the shared inode.
+  Fix: run the build again; never link a published or staged file (copy it).
+  Found by: `stat -c 'links=%h ctime=%z'` on the file the message names.
+- Symptom: a proof image's `apt-get dist-upgrade` wants to downgrade the compositor ("The following packages will be DOWNGRADED: kwin-wayland").
+  Cause: the image carries a newer build than the published repository, and the edition's pin makes the published one the candidate.
+  Fix: upgrade only the round's packages (`apt-get install --only-upgrade NAMES`, the names read from the round's `Packages` file and kept to those the image has installed), and read apt's `Inst` lines from the simulation of that same command.
+- Symptom: a script handed to a container as `-c '...'` does nothing, or stops with "unexpected end of file", after a comment was added.
+  Cause: an apostrophe in the comment ("the image's packages") ends the single-quoted script.
+  Fix: no apostrophes inside a single-quoted script, comments included; `bash -n` does not catch it, since the outer script still parses.

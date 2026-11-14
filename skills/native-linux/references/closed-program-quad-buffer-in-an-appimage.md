@@ -43,6 +43,7 @@ The result of the test: the program's quad buffer mode reaches Stereo KWin as tw
 - **Symptom:** in quad buffer mode the program's tool strip, panels and logo are in the left eye only, while the 3D scene is right in both eyes; the same on radeonsi and on zink.
   **Cause:** the program draws its 2D parts with `glDrawBuffer(GL_BACK)`, which OpenGL 4.6 core 17.4.1 defines as both back buffers of a stereo window ("zero, one, two, or four buffers ... to which fragment color zero is written"); Mesa's drivers write `gl_FragColor` to every color buffer but a shader's own output at location 0 only to the first, and a Qt Quick core profile context uses such shaders.
   **Fix:** in Mesa's state tracker, a fragment shader variant while one draw buffer constant names several buffers of the window's framebuffer (the edition's Mesa patch 0037, with the test `glx-back-both-eyes.c`); nothing in the program and nothing in its launcher.
+  The package that carries it is Mesa 26.1.6-1+stereo3d21; its own test `glx-back-both-eyes` (debian/tests) fails on +stereo3d20 and passes on +stereo3d21, and the regression set that goes with such a change is in [edition-packaging's lessons](../../edition-packaging/references/lessons-2026-11.md#a-state-tracker-change-in-mesa-the-regression-set).
   **How found:** the trace showed `GL_BACK` before the interface; the small client was red only in the variant with a declared output and green for `gl_FragColor`, a clear and fixed function.
 - **Symptom:** a double click or `./file.appimage` ends with `dlopen(): error loading libfuse.so.2` and "AppImages require FUSE to run".
   **Cause:** AppImages made before 2022 carry a runtime that loads the FUSE 2 library, which Debian testing no longer has (`apt-cache policy libfuse2t64` shows no candidate there; Debian 13 still has it).
@@ -71,6 +72,19 @@ The result of the test: the program's quad buffer mode reaches Stereo KWin as tw
 - **Symptom:** a `.pns` picture opened in a text viewer floods the screen.
   **Fix:** look at a copy named `.png`.
 
+## The frame a real output gets
+
+Read on 2026-11-14 with the real-output bench ([real-output-readback.md](../../stereo-proof-rig/references/real-output-readback.md)): a guest without a card, a VKMS output in the side by side (full) mode, KWin started with `--drm --xwayland`, the program on the software renderer.
+
+- The bench's session starts KWin without Xwayland; an X11 program needs `--xwayland` added and `/tmp/.X11-unix` made in the guest's `/tmp` (a fresh tmpfs has none, and KWin logs `/tmp/.X11-unix does not exist`).
+- The buffer recorder reads Wayland clients only. For an X11 program take a ScreenShot2 capture in the same guest session and compare it with the scanned-out frame pixel by pixel: here they were equal within 8 levels in all 4,147,200 pixels, so the output path draws what the capture draws.
+- `XGetImage` of a quad buffer window returns one view (the X window stays one eye wide and the presented buffer is twice as wide), so it is not the committed buffer.
+- **Symptom:** in that guest each eye shows half of one picture, stretched: the tool strip and the left of the model in the left eye, the right of the model in the right eye; a disparity search finds no block.
+  **Cause:** Xwayland without glamor (a machine or guest without any GPU). The same picture comes in a rig on a GPU with `XWAYLAND_NO_GLAMOR=1`, with the program on the GPU or on the software renderer, and with glamor the same software-rendered program is a correct pair; so it is neither the program, nor Mesa's software renderer, nor the output path.
+  **Fix:** not built yet; it belongs to the Xwayland path that takes a quad buffer window's wider buffer.
+  **How found:** one difference at a time: software renderer with glamor (a pair), glamor off (the split), then the capture against the scanout in the guest.
+  Until it is fixed, a quad buffer X11 program is not shown in stereo in a virtual machine without 3D acceleration.
+
 ## The 3D mouse
 
 A program that reads a 3D mouse on Windows may have no reader at all on Linux; the notes of this one say "on Windows".
@@ -79,6 +93,6 @@ The boundary is then a fact: such a program moves only by pointer and keyboard e
 
 ## What this recipe does not prove
 
-- The frame a real 3D output gets: the captures are ScreenShot2's on a virtual output ([real-output-readback.md](../../stereo-proof-rig/references/real-output-readback.md) is the next step and needs the VKMS bench).
+- The scanned-out frame of a correct pair: the bench's guest has no GPU, so its Xwayland has no glamor and the pair is lost before the compositor (above); what was shown is that the output path equals the capture.
 - An absolute disparity against a closed form: the camera's numbers are the program's.
 - The start through FUSE on a system that has the old library.

@@ -392,6 +392,8 @@ NVIDIA's container toolkit, published twice as different builds of the same vers
 Since 24.1.13-1+stereo3d5 (ORDER 560) a stereo window's two eyes also reach the compositor whole when Xwayland has no glamor, on a machine without 3D acceleration: on the shared memory backend the pixmap that holds both eyes gets a buffer, is flipped to the window's surface and has both eyes damaged, with a test in Xwayland's own suite.
 **Credit**: the X.Org Foundation and the Xwayland developers.
 The change of ORDER 560 stands on work the project's history names: **Michel Dänzer**'s Present support without glamor (commit abe3a082, 2024) and his script that tests Xwayland under a headless Weston (250db870, 2020), the Present code of **Roman Gilg** (2018), and the shared memory backend as **Olivier Fourdan** shaped it; the test runs under [Weston](https://gitlab.freedesktop.org/wayland/weston), by the Wayland developers.
+Since 24.1.15-1+stereo3d2 (ORDER 561) a stereo window keeps both eyes when its present cannot be flipped (a child window of its own over it, an offset, a frame of another size), and Mesa 26.1.6-1+stereo3d22 takes the declaration back, shows the left view and tells the person where an X server still copies the pair.
+That work stands on the Present extension and its DRI3 loader by **Keith Packard** (2013) and **Boyan Ding** (2015), the Xwayland Present code of **Roman Gilg** (2018) with **Michel Dänzer**'s later work on it, the window buffers of Xwayland (Red Hat, 2019), the software GLX path of **George Sapountzis** (2008, 2010), and **Mike Blumenkrantz**'s zink selection in GLX (Mesa merge request 25640, 2023).
 
 ### 2.5 KWin
 

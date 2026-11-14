@@ -2,7 +2,7 @@
 
 Learned on ORDER 560 (November 2026), on Stereo KWin +stereo3d54, Mesa +stereo3d21 and Xwayland 24.1.13 +stereo3d4 and +stereo3d5.
 Load it with [native-linux](../SKILL.md) when an X11 program's stereo window is not a pair on a machine or a virtual machine without 3D acceleration, or with `XWAYLAND_NO_GLAMOR=1`.
-The result first: from Xwayland `2:24.1.13-1+stereo3d5` such a window is a pair without glamor too, a top-level and a child window alike, and with glamor nothing changes.
+The result first: from Xwayland `2:24.1.13-1+stereo3d5` such a window is a pair without glamor too, a top-level and a child window alike, and with glamor nothing changes; from `2:24.1.15-1+stereo3d2` a pair that cannot be flipped is kept as well, and where it cannot be kept Mesa shows one flat picture and tells the person ([below](#when-the-pair-cannot-be-flipped)).
 
 ## What happens without glamor
 
@@ -50,7 +50,7 @@ Measured from the installed packages, published against new, on an AMD card and 
 | The same, glamor on (radeonsi, zink on NVIDIA) | 381 blocks, the same numbers | the same numbers |
 | Declared child window, moving content, glamor off | right eye frozen | the same frame in both eyes |
 | Six plain 2D X11 programs, glamor on and off (`xmessage`, `glxgears` with a fixed clock, a GTK 4 program, a Qt Quick scene, the Present client without a declaration, the CAD program with stereo off) | each equal to itself across two runs | 0 differing pixels against +stereo3d4 in all twelve rows |
-| The declared window partly covered by a child window of its own | not a pair, glamor on or off | not a pair, glamor on or off (below) |
+| The declared window partly covered by a child window of its own | not a pair, glamor on or off | not a pair, glamor on or off; a pair from `2:24.1.15-1+stereo3d2` ([below](#when-the-pair-cannot-be-flipped)) |
 
 ## Traps
 
@@ -76,7 +76,7 @@ Measured from the installed packages, published against new, on an AMD card and 
   **How found:** the test section of the build log.
 - **Symptom:** on an NVIDIA card with glamor off, a GLX client says `DRI3 not available` and gets no configuration, or the program says `Could not initialize GLX`.
   **Cause:** Mesa's zink was forced (`MESA_LOADER_DRIVER_OVERRIDE=zink`) and zink presents through DRI3, which Xwayland without glamor does not have.
-  **Fix:** in a test, leave the driver to Mesa (or `LIBGL_ALWAYS_SOFTWARE=1`) with `__GLX_VENDOR_LIBRARY_NAME=mesa`; with glamor on, zink as usual ([nvidia-opengl.md](nvidia-opengl.md)).
+  **Fix:** from Mesa +stereo3d22 the screen takes the software renderer and the person is told ([below](#the-session-that-sets-zink-for-every-program-with-xwayland-without-glamor)); on an older Mesa, in a test, leave the driver to Mesa (or `LIBGL_ALWAYS_SOFTWARE=1`) with `__GLX_VENDOR_LIBRARY_NAME=mesa`; with glamor on, zink as usual ([nvidia-opengl.md](nvidia-opengl.md)).
   **How found:** the client's own messages, equal on the old and the new Xwayland.
 - **Symptom:** a preloaded shim crashes the GL program at its first swap.
   **Cause:** libglvnd loads the vendor's GL library privately, so `dlsym(RTLD_NEXT, ...)` finds no `XShmPutImage` or `xcb_present_pixmap` and the shim calls a null pointer.
@@ -87,9 +87,68 @@ Measured from the installed packages, published against new, on an AMD card and 
 - **Symptom:** a closed program's picture differs from itself by some tens of pixels between two runs of one build on a card.
   **Fix:** capture the old build twice before comparing it with the new one; on the software renderer the same picture was equal pixel for pixel, also across two cards.
 
+## When the pair cannot be flipped
+
+Learned on ORDER 561 (November 2026), on Stereo KWin +stereo3d54, Xwayland `2:24.1.15-1+stereo3d1` and Mesa `26.1.6-1+stereo3d21`, fixed in Xwayland `2:24.1.15-1+stereo3d2` and Mesa `26.1.6-1+stereo3d22`.
+The X server can flip a presented pixmap only where it could flip any window's: not when a child window of the stereo window clips it (a tool bar, a button or a status field that a toolkit puts over its 3D area), not when the present has an offset or an update region, not for a frame made for the size the window had before a resize.
+Such a present was copied into the one eye wide window, which keeps the left eye, and Stereo KWin, told that the window holds two eyes, showed half of the left view to each eye, with glamor and without, and nothing told the person.
+
+**What is a pair now (Xwayland patch 0013).**
+A copy into a window that holds two eyes keeps both: the window's pixmap becomes twice the window wide (what it showed goes to both halves), the left eye is copied as for any window, the right eye goes to the same place in the right half, clipped as the left eye is, and what the child windows draw is copied to the right half before the pixmap goes to the compositor, because it is 2D.
+A frame of another size is cut or left short in both eyes alike, as a copy does to any window.
+The present completes as a flip: for a window that declares two eyes, `PresentCompleteNotify` says flip when both eyes reached the window's surface and copy when only the left one did.
+A window that stops declaring two eyes gets a buffer one window wide at once.
+
+**What is told (Mesa patch 0038).**
+Where the pair still cannot be kept (an X server without patch 0013, a declared window smaller than its surface that no compositor redirected, no memory for the wider pixmap), Mesa's GLX reads the completion, on DRI3 and on the software path:
+
+- two presents in a row of the window's own size that complete as copies take the declaration back: `_KDE_NET_WM_STEREO_CONTENT` and its version are deleted, the window leaves its owner's `_KDE_NET_WM_STEREO_CONTENT_CHILDREN`, and from the next frame the left view alone is presented at the window's size, while the program goes on drawing both;
+- one copy is not enough: the first present of a window often completes as a copy with nothing copied, because the window manager unmaps and maps the window while it takes it (measured on both Xwayland versions);
+- a swap waits for its own completion until one pair was flipped, and whenever the program's last swap is more than a tenth of a second old, and after a first copy it presents the same pair once more, so a program that draws one frame is taken back in that swap;
+- the person is told through `sparky-stereo-problems`: package `libglx-mesa0`, key `stereo-pair:PROGRAM` (the process name), message `LOCAL2` with the program's name and Mesa's own words last, in the ten languages; the record's English text is used where the catalog is missing;
+- while flat, three flips in a row of the left view bring the declaration back, and the next pair that is flipped ends the problem; when the pair is copied at once after two such returns, nothing more is tried at that size;
+- `LIBGL_DEBUG=verbose` prints every completion until a pair is flipped (`stereo pair: window 0x... 800x600: a 1600x600 buffer was copied (both eyes)`).
+
+**Recipe: tell which of the two you are looking at.**
+[`scripts/glx-covered.c`](../scripts/glx-covered.c) is the GLX twin of `x11-present-pair COVER=1`: a quad buffer window with a 60x60 child over it, which can appear, go and be painted at chosen swaps, and which prints the window's declaration at the swaps named in `REPORT`.
+[`scripts/check-pair-flat-split.py`](../scripts/check-pair-flat-split.py) reads a capture as PAIR (two eyes, the child at the same place in both), FLAT (the left view whole, one correct picture) or SPLIT (the wrong picture).
+
+1. One fresh session per case, the client covered from its first swap, captured: SPLIT with `declared 3` to the end is the fault; PAIR is patch 0013 at work; FLAT with `declared 0` is Mesa's take-back, and then `sparky-stereo-problems list` has the record.
+2. `x11-present-pair COVER=1` prints `completed as flip` on a server with patch 0013 and `completed as copy` without it; `X_OFF`, `Y_OFF` and `SRC_W` give the offset and the frame of another size.
+3. The cover that comes and goes: `COVER_AT=40` and `UNCOVER_AT=40` with `REPORT=39,41,45,50`; on a server without the patch the declaration goes within two swaps of the cover and returns three flips after it left.
+4. The still program: `STILL_AT=2`; on a server without the patch the one frame must end FLAT, not SPLIT.
+5. In Xwayland's own suite the test reads the window's pixmap as a compositor's window manager can (`CompositeNameWindowPixmap` of the redirected window, then `GetImage`): twice the window wide, red at the left, blue at the right, the child's colour in both.
+
+### Traps of this part
+
+- **Symptom:** the suite's test never sees a second buffer attached for a covered window, though the present completed.
+  **Cause:** no compositor maps a surface there (a rootless Xwayland under a headless Weston with no window manager), so no frame callback comes and Xwayland posts damage once; flips commit by themselves, copies do not.
+  **Fix:** read the window's pixmap through Composite instead of the Wayland requests.
+  **How found:** `WAYLAND_DEBUG=client` on Xwayland showed `create_buffer` for both sizes and one `attach`.
+- **Symptom:** every stereo program is taken back to flat at its first frame and returns three frames later.
+  **Cause:** the rule "one copied present is certain" met the frame the server drops while the window manager takes the window; it completes as a copy.
+  **Fix:** two in a row, and the same pair presented once more in a swap that waited.
+  **How found:** `LIBGL_DEBUG=verbose` in the uncovered control row.
+- **Symptom:** after a take-back the left view never flips and the declaration never returns (DRI3), or completions are never matched (software path).
+  **Cause:** the loader's `set_drawable_size` hook left the buffer two views wide; and the software path read completions after sending the next present, so the serial it waited for was already the next one.
+  **Fix:** the hook sets the width for the flat state too; completions are read before the next present, with the size of the present they belong to.
+  **How found:** the debug line showed `a 1600x600 buffer was copied (left view alone)`.
+- **Symptom:** `lc-successor.py --in-place --overlay` stops with `the new source differs beyond its changelog and toolkit: ['debian/lang']`.
+  **Cause:** the overlay brought a new folder and only its files were allowed.
+  **Fix:** the tool allows the folders of overlaid files.
+- **Symptom:** a library in a `Multi-Arch: same` package must tell the person and the engine exists for one architecture.
+  **Fix:** the catalogs and the dependency go into the amd64 package only (a file that one architecture alone ships is no conflict), the library opens the engine's private library at run time and never links it, and a process that cannot load it (a 32-bit program) runs `sparky-stereo-problems keep` with the same arguments; when neither is there the log says that the person cannot be told. See [a library that tells the person](../../system-housekeeping/references/problems-from-a-library.md).
+
+## The session that sets zink for every program, with Xwayland without glamor
+
+On a machine whose desktop runs on NVIDIA's driver the session sets `MESA_LOADER_DRIVER_OVERRIDE=zink` for every program ([nvidia-opengl.md](nvidia-opengl.md)).
+When Xwayland then runs without glamor (it could not start its acceleration, or `XWAYLAND_NO_GLAMOR=1`) there is no DRI3, and Mesa up to +stereo3d21 ended GLX with `DRI3 not available`: every OpenGL program of the session got no configuration and stopped, with no word to the person.
+From Mesa +stereo3d22 such a screen takes the software renderer, as with any other driver on that server, a quad buffer window included, and the person is told (`libglx-mesa0`, key `zink-without-dri3`, message `LOCAL4`, severity degraded); the next program that finds zink with DRI3 ends the problem.
+The row: the session's four variables on the card through CDI, `XWAYLAND_NO_GLAMOR=1` in KWin's environment, the renderer string (`llvmpipe`), and `sparky-stereo-problems list`.
+
 ## What this does not cover
 
-- **A present that cannot be flipped is still copied, with glamor and without.** A declared window partly covered by a child window of its own (`x11-present-pair COVER=1`: a 60x60 plain child) completes every present as a copy, and the capture is not a pair on +stereo3d4 and on +stereo3d5, on both backends: the copy keeps the left eye and the compositor shows its halves. The same holds for a present with an offset, and for the frames of a resize whose pixmap does not match the window yet (the GLX client came back to a pair after a resize, a hide and a show). A program whose 3D area has child windows over it belongs on the child-window route (the 3D area declared as a child of a 2D window); the copy case itself is open work: the program's GL library can see it (`PresentCompleteNotify` says copy) and must then take the declaration back and say so, never leave a split picture.
+- A declared window that a compositor did not redirect and that is smaller than its surface (a stereo child the window does not list) is still copied into its parent's picture: it shows the left view, flat, and Mesa says so ([above](#when-the-pair-cannot-be-flipped)).
 - **The next Xwayland base.** Upstream's stable branch after 24.1.13 (24.1.14 and 24.1.15) adds a check to `xwl_present_check_flip()` that the flip pixmap has the size of the window's pixmap ("xwayland/present: Only flip if the window pixmap dimensions match", Michel Dänzer). A window that holds two eyes has a pixmap one eye wide before its first flip, so patch 0005's exception must cover that check too when the package moves base, or the pair is copied again, with glamor as well; the suite's test (0012) and the glamor control of step 1 show it. The extended check is carried by `2:24.1.15-1+stereo3d1+lc1` (ORDER 562); both height checks remain, and an unrelated backing width is rejected.
 - Each present of both eyes makes a new shared memory pool of that size (a new pixmap per swap is Mesa's software path); Xwayland's open files and memory stayed level over a fast run (11 to 12 files, about 75 MB), and 600 presents of a 1600x600 pair back to back took 10.0 s, the output's 60 a second, as with glamor.
-- zink on NVIDIA with glamor off (above): the program has no GLX at all, on the old and the new package alike.
+- When Mesa takes a declaration back or brings it back, the compositor learns it from the X property and gets the new buffer through Wayland, in no fixed order: one frame between the two can show the old buffer under the new declaration.

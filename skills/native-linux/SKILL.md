@@ -84,6 +84,7 @@ The recipe, the per-eye proof with its negative controls and the traps are in [x
 On a machine or a virtual machine without 3D acceleration (or with `XWAYLAND_NO_GLAMOR=1`) Xwayland has no DRI3, every GL program draws on the software renderer, and Mesa presents a stereo window's two eyes as one pixmap twice the window's width.
 Up to Xwayland +stereo3d4 that pixmap was copied into the window instead of flipped, so each eye showed half of the left eye, and a stereo child window's right eye never changed; from +stereo3d5 both are pairs.
 How to tell which layer loses a pair (the GL library's requests, Xwayland's buffers, the present's completion, the scanned-out frame of a guest with no card), the fix, its test in Xwayland's own suite and the traps: [x11-stereo-window-without-glamor.md](references/x11-stereo-window-without-glamor.md).
+A stereo window whose presented pair cannot be flipped (a child window of its own over it, an offset, a frame of another size) keeps both eyes from Xwayland `2:24.1.15-1+stereo3d2`; where the X server still copies it, Mesa +stereo3d22 takes the declaration back, shows the left view and tells the person, and a session that sets zink without DRI3 draws on the software renderer and is told: the same page, [when the pair cannot be flipped](references/x11-stereo-window-without-glamor.md#when-the-pair-cannot-be-flipped).
 
 ## A GL child that is larger than its window, or under a sibling
 

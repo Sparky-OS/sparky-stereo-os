@@ -445,6 +445,8 @@ Cause: it rejected old Git sources and checked selected PDF backends, but did no
 Fix: map package names from the selected library's crate and vendor manifests to their canonical manifest paths, then compare the complete locked Cargo metadata graph, including helpers and web dependencies.
 Keep build-input revision checks too; a matching revision file does not establish which source Cargo compiled.
 How found: changing only the resolved stereo-window manifest path in a saved graph made the old checker return success; the complete-owner checker rejected that control and accepted the unchanged actual graph.
+The same complete check later caught PdfCraft's Windows-only `winprint` edge still on Git after its shared root dependencies had converged.
+Bind direct target-specific dependencies to the selected owner too; a successful Linux metadata check establishes their source identity, not Windows runtime behavior.
 Run the receiving app's own full gate and bind its executable and fresh proofs to that same owner; a metadata check alone is not compilation or runtime evidence.
 
 Symptom: `windows_default_leaves_out_gl` fails at its assertion about eframe's default before testing the app's Windows policy.

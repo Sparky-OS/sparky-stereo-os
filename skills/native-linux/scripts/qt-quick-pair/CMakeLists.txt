@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.16)
+project(qdiscs LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+find_package(Qt6 REQUIRED COMPONENTS Gui Qml Quick)
+add_executable(qdiscs qdiscs.cpp)
+target_link_libraries(qdiscs PRIVATE Qt6::Gui Qt6::Qml Qt6::Quick)

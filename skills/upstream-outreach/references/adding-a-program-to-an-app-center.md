@@ -8,7 +8,7 @@ Everything below ran on that day; what did not run is said under "What this reci
 
 1. **Read the tool's own precedents before choosing anything.**
    Clone the tool and read how one entry is made, end to end: the page, the handler, the script that builds the entry's page, the install, reinstall and remove scripts, the strings.
-   For APTus: an entry is one `<td>` in a page (`graphics-others.html`), an `aptus://<page key>_<name>` link, a branch in `bin/aptus-app` (architecture check, page text, installed or not), and branches in `bin/aptus-package-install`, `-reinstall` and `-remove` for anything that is not a plain `apt-get install`.
+   For APTus: an entry is one `<td>` in a page (`accessories-devices.html`), an `aptus://<page key>_<name>` link, a branch in `bin/aptus-app` (architecture check, page text, installed or not), and branches in `bin/aptus-package-install`, `-reinstall` and `-remove` for anything that is not a plain `apt-get install`.
    Then answer from the tree, with the file and line:
    - which trees still get new entries (`git log --format='%h %ad %s' --date=short -- <tree>` and each tree's `CHANGELOG`): here 8 and 9 in 2026, 7 until August 2025, 6 until 2024;
    - which trees the last accepted or open pull request touched, and what it left to the maintainer (here the `CHANGELOG` and the version);
@@ -194,3 +194,54 @@ The audit below was done on 2026-11-13; it is not a proof of a Resolve installat
 Keep three download boundaries visible: the app center's verified installer AppImage, the later container/package downloads, and the person's official Resolve ZIP.
 A measured absence of that ZIP stops the Resolve proof, while the entry, system check and container-runtime tests can still be completed.
 Do not replace the form with an unofficial download or describe media conversion as native codec support.
+
+## The same entry in both app centers
+
+An entry offered to SparkyLinux's main APTus also belongs in the edition's AppCenter, on the same page and with the same protocol key.
+Vinci belongs on Multimedia, Video tools, with Kdenlive; KamLynk belongs on Accessories, Devices, as `accdev_kamlynk`.
+The stereo tabs stay in the edition and never enter the pull request to main.
+The edition stays in step with main while retaining its own entries and stereo tabs.
+
+1. Fetch the upstream default branch and record its exact commit, the previous sync ancestor and all intervening commits by file.
+   Compare each page's protocol-key inventory as well as its text diff.
+   List removed upstream entries explicitly; do not silently delete an edition or stereo entry while resolving the sync.
+2. Inspect the published package's file list before choosing the integration point.
+   A dependency on main APTus does not mean the edition package ships its own copy of those pages.
+   If it only delegates to the installed original, include the maintained main tree in the edition's own package namespace and keep the original package's files untouched.
+3. Carry the accepted entry changes into the edition branch, keeping the settled page, identifier, publisher URL, size and checksum.
+   Keep the edition and upstream-offer branches separate.
+   On the edition, route both the page protocol and direct install/reinstall/remove backends through its shared verified action and metered-download reader.
+   Translate every new sentence and label in the required ten languages; keep vendor metadata outside the stereo catalogue.
+4. Relocate the copied main tree's absolute library, locale and launcher paths together.
+   Keep its relative resources, category links, handler dispatch and unrelated entries intact.
+   Test navigation through the installed package, not only a source `install.sh` or a file opened in isolation.
+5. Compare the installed main-page inventories against the fetched source and the edition additions.
+   Require every main key and both new keys to remain reachable on their intended pages.
+   Compare the stereo catalogue and an unchanged action file against the published package by file hash, then compare each rendered stereo section and one visible tab's pixels.
+   State the capture region: matching tab content does not claim an identical whole-window scrollbar.
+6. Rebuild through the package recipe and retained source, including the normal package checks and complete build record.
+   Require the seed and source-rebuilt binary hashes to match.
+   Capture the two real main entry pages, the metered notice, successful installation, a tampered-download refusal and removal, with state assertions alongside the pictures.
+
+### Sync and packaging traps
+
+- **Symptom:** an entry exists in the edition's source tree but never appears in the installed main page.
+  **Cause:** the package ships only the stereo front end and reads the original package's categories at runtime; its own maintained main tree is not packaged.
+  **Fix:** package the maintained tree under the edition namespace and point category navigation and dispatch there.
+  **How found:** the published package's file list, followed by comparison of its actual library paths with the tracked source tree.
+- **Symptom:** carrying a second entry conflicts in several shell scripts at the same `elif` boundary.
+  **Cause:** both commits insert their branches beside the same existing block, sometimes sharing the trailing `fi` context.
+  **Fix:** retain both complete branches, then check syntax and the before/after entry inventories.
+  **How found:** the cherry-pick conflict hunks, rather than treating either side as a replacement for the other.
+- **Symptom:** a copied category page opens correctly, but its next action returns to the original package or bypasses the edition's notice.
+  **Cause:** hard-coded launcher, library or locale paths, or a direct backend that still uses its old installer.
+  **Fix:** relocate the complete path set and adapt the canonical backends as well as the visible page handler.
+  **How found:** installed navigation and direct-backend tests, plus unchanged hashes of the original package's files.
+- **Symptom:** accented entry text appears as `Â`, or the program heading is nearly white on the page.
+  **Cause:** the original page was ASCII without a charset declaration, and its heading style was intended for a different location.
+  **Fix:** declare UTF-8 on the generated entry page and use the main entry's readable bold-paragraph heading.
+  **How found:** the actual installed entry capture; a successful JSON parse did not establish readable rendering.
+- **Symptom:** the first binary package and its source rebuild differ even though their extracted file contents match.
+  **Cause:** copying the main assets preserves older checkout mtimes, while source extraction normalizes them; SOURCE_DATE_EPOCH clamps newer times but does not raise older ones.
+  **Fix:** apply the build tree's shared reproducible timestamp normalizer to the authored staging tree before building the source and binary packages.
+  **How found:** raw extraction and content comparison of both packages, then `stat` on a copied stylesheet.

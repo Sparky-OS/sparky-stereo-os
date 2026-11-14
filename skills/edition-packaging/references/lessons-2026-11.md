@@ -5,6 +5,18 @@ A trap gives its symptom, its cause, its fix and how the cause was found; a reci
 
 ## Recipes that worked
 
+- A carried vendor binary needs the source of the carry at the carry's actual version in `Source`, not a vendor source/version absent from the archive.
+  Keep one source package with the recipe, exact origin URLs, input hashes, verification key, signed index and redistribution licence.
+  Read the licence in the shipped files and Debian's own non-free source packaging before deciding whether to retain vendor binaries as source-build inputs.
+  NVIDIA's unchanged package inputs may be retained with their licence; Debian's NVIDIA source also carries licensed binary components.
+  Keeping those exact inputs makes the binary target rebuild offline, without claiming the proprietary driver source is available.
+  Preserve every vendor payload and maintainer-script byte, and verify them against both the vendor inputs and the prior published carry.
+  Check existing `src:` pin selectors before choosing the carry source name, and keep the installed module provider's real version when only the carry packaging advances.
+  Prove the upgrade with apt's `Inst` lines and no removals, then require the all-binary source gate to report zero missing sources.
+  Found by reconciling `Packages` with `Sources`: 69 carried binaries named eight vendor sources that the repository never carried (ORDER 557, round 2).
+  Trap: `dpkg-source: error: building source for a binary-only release` came from copying the carry's former `binary-only=yes` marker into the new source release's changelog.
+  Give the new source release an ordinary changelog entry; keep the older entries as historical records, and retain failed build work until its measured cause is recorded.
+
 - Make a source package byte-reproducible from its recipe commit: take the recipe date from SOURCE_DATE_EPOCH, else the committer date of the last commit touching the recipe's own paths (clean tree only), else stop with the reason (no clock fallback). Write changelog dates in UTC (email.utils.format_datetime, TZ=UTC), export SOURCE_DATE_EPOCH (dpkg-source(1) 1.23.11: it clamps tar member mtimes), and normalize debian/ plus include-binaries files to mtime = recipe date and modes 0644/0755 before `dpkg-source -b`. Expect identical .dsc and .debian.tar.xz sha256 across three clocks, zones, umasks and checkout times. Test: build the same fixture under three zones/umasks, compare, plus a red self-check (a packer without normalization must differ): 12 ok (lane reproducible-sources-421)
 - Audit pattern for "every driver wires X": a wiring test that is red when a host driver reaches the gate with none of the init, the helper, the opt-out or the shared build script. Red on main: 12 FAIL lines; green on the branch: 28 wired build scripts checked, 85 files audited, ALL PASS. Red unit run was `Ran 8 tests, FAILED (failures=4, errors=1)`; green `Ran 18 tests OK` (lane provenance-stated-412)
 - Per-round supply-chain step: make-sbom (SPDX), check against the tree, make-provenance per stage folder (in-toto style statements), check again, SHA256SUMS, then a sync script that is a dry run by default, owns only its own sbom/ROUND and sbom/latest folders, and refuses `--go` without a verifying signature. Tools image installs its Python packages with `--require-hashes`, hashes checked against the index's JSON digests. Proof on a 2,188-link forest: SPDX 1,374 packages 0 problems, 195 statements 0 problems; 10 green and 8 red test cases (invalid licence expression, missing relationship id, sha256 differs, unknown predicate field, builder.id missing, cohort file changed) (lane sbom-provenance-394 / sbom-round-394b)

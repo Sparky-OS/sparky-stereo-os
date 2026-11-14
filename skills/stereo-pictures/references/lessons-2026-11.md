@@ -106,3 +106,25 @@ A trap gives its symptom, its cause, its fix and how the cause was found; a reci
 - Measured, not yet decided (ORDER 551, milestone 2): a file moved to the wastebin keeps its per-file choice only until the store's next write, since the write's prune finds nothing at the file's path; restored at once, or by the file manager's undo, it has its choice, restored after a write it has none. The file manager then still draws the thumbnail it cached with the choice, while a viewer shows the file without it. Three ways to carry it were listed, none built: the prune keeps a record while a wastebin's info file names its path (`Trash/info/*.trashinfo`, `Path=`); the move listener follows the two `FileMoved` signals of a trashing and an undo (a restore announces none, so this alone is not enough); the record's device and inode re-identify the file after a restore on the same file system. Whichever is built, the cached thumbnail needs its own answer.
 - Measured (same order): the file manager offers "3D Input Format" for a file with a pair preview or a stored choice only; an unmarked top and bottom picture or half side by side film is flat with no such entry. A viewer on the shared menu offers the list for any local picture, and a choice made there gives the file the entry in the file manager. No program gave an unmarked film a choice in that round.
 
+## Album programs on the shared per-file choice, and its QML form (ORDER 551b)
+
+The recipe, the proofs and the toolkit traps are in [a program joins the shared per-file choice](joining-the-per-file-choice.md); what follows is what the three programs themselves taught.
+
+- Symptom: in a QML viewer a swap chosen for one picture is still on for the next picture.
+  Cause: the page kept one object of 3D choices and gave it to every picture's delegate, so the packing and the swap were the view's, not the file's: a swap for everything the program shows, which belongs to the output.
+  Fix: the page keeps only which eye is shown; the rest is each file's choice in the store, through `Stereo.FileChoice`.
+  Found by: reading the published patch for where each choice was declared (`QtObject { id: stereoChoices }` at the page) before changing anything.
+- Symptom: a file set to "Not 3D" shows half of itself when the program's own view is "Left eye only".
+  Cause: the layer lets a field the caller sets win over the stored one, and a one-eye view is such a field.
+  Fix: the program passes `View::Stereo` for a file whose stored view is `View::Mono`.
+  Found by: reading how the layer merges the stored choice with the caller's options before writing the adapter.
+- Symptom: a photo manager renames a file and its choice is gone, while the same rename in the file manager keeps it.
+  Cause: the program renames with its own code, which the desktop's file jobs never announce, so the follower hears nothing.
+  Fix: one call to `Stereo::Picture::moveFileChoice(from, to)` after each successful rename or move of a file or a folder, in the program's one rename function where it has one.
+  Found by: searching the program for `rename(` after asking "which process announces this move".
+- Symptom: the same eleven sentences of a 3D menu are in seven languages and missing in two.
+  Cause: the menu's translation patch was written before those languages joined the required set, and nobody looked while the menu did not change.
+  Fix: when per-file sentences leave a program for the layer's catalogue, list the sentences that stay and fill every required language for them in the same version.
+- Measured: with stereo-layer 1.19.0 the widgets' menu and the QML type list the same 27 entries and the swap, in one order, for a picture and for a video (`filechoiceqmltest`, `oneListInBothFaces`); a QML list made one packing short on purpose fails it, 26 against 28.
+- Measured: none of Koko 26.04.0-1+stereo3d1, KPhotoAlbum 6.2.0-1+stereo3d1 and digiKam 9.1.0-1+stereo3d3 kept per-file 3D state: Koko and KPhotoAlbum kept their choices for the session, digiKam also its view for the whole program (`digikamrc`, `[Stereo 3D]`, `View`), which stays. Nothing was carried.
+

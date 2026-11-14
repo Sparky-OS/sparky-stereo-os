@@ -354,3 +354,21 @@ Traps:
 - The rest of this package's story (the layer, the fix, the proof): [native-linux, a stereo X11 window when Xwayland has no glamor](../../native-linux/references/x11-stereo-window-without-glamor.md).
 
 - Symptom: a 45 minute package build ends in `dh_install` with `cp: error copying ... No space left on device`, and other lanes' work on the same disk stops too. Cause: the build tree of a large package (Mesa: about 8 GB for one architecture) lives in the output folder given to `release/build-from-lc-dsc.sh`, the free space was checked once before the build, and another lane filled the disk meanwhile. Fix: remove the failed tree at once, and give the build an output folder on a disk that keeps the tree's size above its floor for the whole build (the lane's folder under `/var/tmp`, listed in `.artifacts`), then copy the packages to the stage; check the free space against the tree's size, not against a fixed number. Found by: the last lines of the build log and `df`. (lane stereo-x11-refused-flip-told-561)
+
+## A round that follows a staged round (ORDER 551b)
+
+- Symptom: the link gate stops a library's build at its last step with `previous edition dependency qualification failed; provide the matching previous sibling snapshot` and `conflicting supplied package: libstereo-av1; provide one authoritative edition snapshot`.
+  Cause: the round follows another round that is staged and not yet published, and the "previous build" handed to the gate was that staged build, while the previous edition's snapshot is the published tree, which still holds the older build of the same package: two versions of one supplied package.
+  Fix: the previous build is the published one, for every source. Compare the new build with the staged one by hand and put the result in the hand-back: `nm -D --defined-only` and `--undefined-only` of each library, old against new, exports lost and imports lost both 0.
+  Found by: the line above the conflict names the previous package that failed (`libstereo-av-dev_1.18.0-1+lc1_amd64.deb`).
+- Recipe, a round that needs packages of a staged round: copy that stage's `.deb` files into the round's flat repository before the first step (copied, never linked), leave out the source this round replaces, and name every source of that round in `ROUND_SOURCES`, so their published binaries leave the candidate's siblings.
+  No bootstrap is needed for a cycle the earlier round already broke.
+- Symptom: a step of a round "fails in the build" with `ls: cannot access '/src/*+lc1.dsc'`, and the real error is far above.
+  Cause: the step that makes the source joined its commands with `;` inside one `bash -c`, so the last command (a copy) decided the status, and the source script had failed (`Permission denied`: a script written without its executable bit).
+  Fix: `set -e` at the start of the `bash -c` text, the script run through `bash`, and `ls` of the `.dsc` as the step's last command.
+  Found by: reading the round's own log from the step's first line instead of the build's last.
+- Symptom: a throwaway development image stops with `Packages were downgraded and -y was used without --allow-downgrades` while installing build dependencies.
+  Cause: the base image carries a newer build of a package that an earlier lane installed with `dpkg -i`; the edition's pin makes the published one the candidate.
+  Fix: `--allow-downgrades` for a development image only; `apt-get -s build-dep` names the packages (here two).
+- Recipe, Lintian without touching a build image: a small image from the pinned Debian base with `lintian` (2.143.0 on 2026-11-14), each new `.deb` and its published one, the version replaced by one word (`sed -E "s/[0-9][0-9A-Za-z.:~+-]*\+lc1/VERSION/g"`), `comm -23` of the sorted lines.
+

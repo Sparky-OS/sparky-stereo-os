@@ -107,3 +107,17 @@ A trap gives its symptom, its cause, its fix and how the cause was found; a reci
 - A file manager's cached thumbnail carries the per-file choice that was in force when it was made (`~/.cache/thumbnails`, keyed by the file's address and date: `Thumb::URI`, `Thumb::MTime`; a stereo one carries `X-KDE::Stereo3DLayout`). A proof that changes the store behind the file manager's back (another program, a prune, a restore from the wastebin) must read the cache as well as the store, or it takes a stale thumbnail for the store's state: read the PNG text keys and the colour in each half.
 - The desktop's file signals for the wastebin, measured with `dbus-monitor --session "type='signal',interface='org.kde.KDirNotify'"`: a trashing announces `FileMoved file:///…/NAME → trash:/NAME`; the file manager's undo announces `FileMoved trash:/0-NAME → file:///…/NAME`; `ktrash6 --restore trash:/0-NAME` announces no `FileMoved` (only `FilesAdded` for the file and `FilesChanged trash:/`).
 
+## Driving album programs and a Qt Quick menu (ORDER 551b)
+
+- Symptom: the same three presses of Down choose different entries of one menu in two programs.
+  Cause: in a Qt Quick Controls menu a separator takes a key step; in a QMenu it takes none.
+  Fix: a row count per toolkit in the case, and the store read after every choice (`order=0` where `order=1` was meant showed it).
+- Symptom: Right does not open a sub-menu after a popup opened by its shortcut.
+  Cause: no row is highlighted yet.
+  Fix: Down first, then Right; in a QMenu and in a Qt Quick menu alike, the sub-menu then opens with its first entry highlighted.
+- Recipe, KPhotoAlbum on one file: it opens a database, not a file. Start it with `-c DIR/index.xml` in the fixtures' folder with `index.xml` and `.thumbnails` removed (the "Create database" dialog then always comes: Enter), click in the browser, End and Enter for the thumbnails, Home, Right as many times as the file's place in the order of the names, Enter for the viewer; Alt+Shift+3 opens the viewer's 3D menu.
+- Recipe, Showfoto and digiKam on one file: `showfoto FILE` opens the editor and `digikam FILE` its own preview window; a dialog about model files is on top at each start of Showfoto in an empty home (Escape), then click in the picture; Alt+V, Up, Right opens View, 3D.
+- Recipe, Koko on one file: `koko FILE` opens the image view; Alt+Shift+3 opens its 3D menu at the middle of the picture. One more Escape than the menus need leaves the image view, and every later capture shows the folder.
+- A Kirigami program logs many lines of its own at start (`Object or context destroyed during incubation`, `StackView has detected conflicting anchors`); search the program's log for the names of your own files, not for "error".
+- Recipe, one picture per case for a person to look at: crop the left eye of a capture to the window and keep it under 1100 pixels wide; a menu's rows can be read from it, and a check that only counts colours cannot tell which entry was highlighted.
+

@@ -195,6 +195,10 @@ Keep three download boundaries visible: the app center's verified installer AppI
 A measured absence of that ZIP stops the Resolve proof, while the entry, system check and container-runtime tests can still be completed.
 Do not replace the form with an unofficial download or describe media conversion as native codec support.
 
+## A closed vendor program
+
+For a closed program that its vendor offers free of charge (Open Cascade's CAD Assistant, ORDER 559), read the licence text inside the file before preparing the entry: the entry's page says in one sentence that installing accepts the vendor's agreement and where its text is kept, it names the vendor as author, and where the vendor publishes no checksum the pinned SHA-256 is said to be of the file as downloaded on a named day; an AppImage whose runtime needs the FUSE 2 library is unpacked once with its own `--appimage-extract` and started from the unpacked tree under the program's own name ([the recipe and its traps](../../native-linux/references/closed-program-quad-buffer-in-an-appimage.md)).
+
 ## The same entry in both app centers
 
 An entry offered to SparkyLinux's main APTus also belongs in the edition's AppCenter, on the same page and with the same protocol key.

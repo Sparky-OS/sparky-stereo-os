@@ -321,3 +321,22 @@ Traps:
 - **Symptom:** the scratch disk loses several gigabytes while a package build runs.
   **Cause:** a development build folder and an exported root from earlier steps were still there.
   **Fix:** remove the development build before the package build and say what was removed; the regression runs that needed it must be done first.
+
+## A test in the source's own suite that needs a compositor, run by the package build (ORDER 560, xwayland +stereo3d5)
+
+Recipe, in order:
+1. **Find the suite's own shape first.** Xwayland's `test/meson.build` already has a `xwayland` suite whose script starts the built server under a headless weston and exits 77 where weston is missing; a new test takes that shape (a script, a small client, `suite: 'xwayland'`), and goes in as a patch of its own after the fix.
+2. **Three trees, one build folder:** the published series plus the test (must fail), the first patch plus the test (must fail on what the second patch gives), the whole series (must pass). Switching the branch and running `ninja` again rebuilds two files.
+3. **The test's build dependencies go into `debian/control` through the successor's overlay** (`lc-successor.py --in-place --overlay`, a `control` file beside `patches/`), each with `<!nocheck>`, inserted before the published line that ends the field with the Lean Code build dependencies. A test whose dependencies are missing is not even defined, and the build then says nothing.
+4. **Read the test's line in the build log** (`stereo pair without glamor OK`), never the exit status alone: a `SKIP` is not a pass.
+5. **The link gate's folder can be made from public material:** the source list the build repository documents (`packages/wine-stereo/gate-sources.json`) cut to the archives the package's dependencies need, the edition's repository as `file:///repo`, and the keyrings from the build image and the repository's own public key (`gpg --dearmor`).
+
+Traps:
+- **Symptom:** the first package build stops in `dh_auto_test`: `sh: 1: /usr/bin/xkbcomp: not found`, `Failed to activate virtual core keyboard`, and upstream's `sync` test fails beside the new one.
+  **Cause:** an X server needs the keymap compiler and its data, and the xcb development packages the new test links also switch on upstream tests that were never defined in the published build.
+  **Fix:** `x11-xkb-utils <!nocheck>` and `xkb-data <!nocheck>`; read which tests the build defines now against the published build's log.
+  **How found:** the test section of the build log.
+- **Symptom:** a command of several steps reports exit 0 for a build that failed.
+  **Cause:** its last step was `tail` of the log.
+  **Fix:** write the build's own exit status into the log and return it.
+- The rest of this package's story (the layer, the fix, the proof): [native-linux, a stereo X11 window when Xwayland has no glamor](../../native-linux/references/x11-stereo-window-without-glamor.md).

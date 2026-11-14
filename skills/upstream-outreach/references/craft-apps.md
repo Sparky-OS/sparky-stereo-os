@@ -491,8 +491,11 @@ Keep the receiver's private backend out of the resolved graph.
 How found: the real PdfCraft compile named fifteen missing API uses; a subsequent backend compile found a cancellation regression still treating a new `(XRef, bool)` result as an `XRef`.
 The tuple consumer was updated without changing its cancellation assertion, and the standalone backend job passed1190 tests.
 Three identical raster regressions compiled against the pre-merge head and failed their pixel assertions, then passed on the reconciled source.
-The complete library gate later stopped at its disk floor after both strict Clippy configurations passed; receiver compatibility and the later added controls remain unverified.
-Keep the unfinished source as a hashed working patch and preserve the last qualified edition pins; do not label the interrupted gate green.
+The first complete library gate stopped at its disk floor after both strict Clippy configurations passed.
+Its source was kept as a hashed working patch; the stopped job was not relabeled green when space recovered.
+After explicit resumption, the same frozen source completed both native configurations, WebAssembly, release camera tests, the minimum-Rust check and standalone backends: 23,705 passed, zero failed and 113 ignored across 942 result groups.
+The standalone subset passed 1,193 tests, including the new marker/cancellation control in its feature variants.
+That qualifies the shared code tree, not the receiving apps; keep the last qualified edition pins until each receiving gate and its diagnostic mapping are checked.
 
 Symptom: a transferred source manifest's historical SHA-256 disagrees with the named revision, while its recorded Git blob agrees.
 Cause: the historical source-hash field is wrong; it is distinct from the local patched-file hash.
@@ -509,5 +512,6 @@ Symptom: a new repair regression calls a bounded decode successful and therefore
 Cause: RunLength deliberately returns its bounded prefix, rather than an error, at the limit.
 Fix: assert the actual lower byte bound and retain an ordinary full-length control; do not change the decoder policy to satisfy an assumed error result.
 How found: the first test received a successful decode, and reading RunLength showed that success can mean a bounded prefix.
-The corrected test expects16bytes under the lower limit and128in the ordinary control; those results are not yet measured for the repaired fixture.
-The corrected repair control was retained but not rerun before the complete gate stopped at its disk floor.
+The first disk-stopped gate never reached the corrected assertion.
+The resumed complete native gate measured 16 bytes under the lower limit and 128 in the ordinary control for both linked and repaired/unlinked updates.
+Record the successful runtime assertions against the exact source tree; the earlier source reading only justified correcting the oracle.

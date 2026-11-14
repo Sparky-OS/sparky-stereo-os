@@ -1,5 +1,24 @@
 # Craft Apps: contributions and review follow-through
 
+## Converge the actual dependency graph
+
+When a suite needs one shared-library revision, inspect every tracked Cargo manifest, including the web frontends and root patches.
+Record each consumer's old sources before changing an edition branch; keep a clean offer branch separate.
+After binding the new revision, inspect resolved package manifests and sources as well as the lockfile.
+Every package owned by craft-libs must come from the selected checkout or revision, including UI helpers, updater, codecs and vendored reader patches.
+Run each receiving app's complete gate and repeat proofs for the shared paths that changed.
+
+Source-audit trap: the stereo crate uses the new checkout, while the app still resolves helpers and web crates from several older craft-libs revisions.
+Cause: changing the visible stereo dependency does not change unrelated workspace entries or child manifests.
+Fix: converge the whole resolved graph and retain a before/after source inventory; a successful metadata command still does not establish compilation or native output.
+How found: an inventory of seven apps' root and web manifests showed local stereo crates beside independently pinned UI, updater, image and web helpers.
+
+Source-audit trap: a catalog revision file is present, but the executable still embeds its local translations.
+Cause: a revision file does not create a build-script input; pre-cutover apps can ignore CRAFT_I18N_DIR entirely.
+Fix: inspect the actual build and lookup paths, carry an existing upstream migration with its authorship when available, and verify required-input and ordinary-output controls before claiming a common catalog.
+How found: source inspection found three local-catalog consumers alongside four apps that already read the shared input.
+Do not describe an unused catalog pin as convergence or silently discard untranslated local rows during migration.
+
 Checked 2026-11-10 against [craft-contrib](https://github.com/storytold/craft-contrib), revision cb0d67e, and the app repositories' current rules.
 Read the receiving repository again before preparing a submission: the suite changes quickly.
 
@@ -359,3 +378,99 @@ Cause: `tarfile`'s secure `data` filter intentionally strips group-write permiss
 Fix: retain original source modes in the manifest and write explicit safe 0644 or 0755 source-archive headers, while checking tested executable bytes and modes exactly.
 How found: compare source, stored member and extracted modes beside their matching hashes before changing the check.
 Keep the secure extraction filter; do not disable it to preserve an incidental group-write bit.
+
+## A shared dependency fails a receiving app’s source guard
+
+Symptom: the shared library’s Linux gate passes, but an app refuses its lockfile because a transitive Windows-only Git dependency points outside Storytold.
+Cause: the shared library carries an open contributor fix through its author’s fork, while the receiving app deliberately restricts Git sources.
+Fix: retain the needed fix and its original author/date; use a documented permissive source snapshot in the shared owner when that fits the project’s rules.
+Keep the real source URL, revision, licence, original hashes and exact carried patch; never relabel a fork URL, add a hidden Cargo source replacement or weaken the receiving workflow.
+Then resolve the complete graph and rerun the unchanged receiving guard and gate.
+How found: PhotoCraft’s actual workflow check named the inherited winprint fork, and the shared print manifest named the pending driver-options fix it required.
+A Linux pass does not prove Windows printing.
+
+Symptom: vendoring a source package also imports document fixtures with embedded fonts of unestablished redistribution terms.
+Cause: a package’s source licence does not establish every embedded asset’s terms.
+Fix: preserve required source notices and replace those binary fixtures with original, attributed font-free patterns, with a sidecar and hash for every file.
+Keep the original test sources; compare the independently rasterized representations and state which platform renderer was not run.
+How found: the original print-test PDF’s FontFile2 objects named DengXian and MS-Gothic; the replacement PDFs listed zero fonts and rasterized exactly to their matching TIFFs.
+
+Symptom: `cargo fmt --all --check` rewrites vendored source under the containing workspace’s formatting choices.
+Cause: path dependencies are included in that check and can inherit the parent formatting file.
+Fix: preserve the dependency’s own formatting configuration and record any minimal formatting-only import adjustments separately from the credited upstream patch.
+Never call a modified full snapshot byte-identical; verify the carried fix’s affected file or changed hunk bytes independently.
+How found: the imported print wrapper had two layout-only differences under default rustfmt; its carried PrintTicket file still matched upstream exactly.
+
+## Complete catalog branches and format-pin prerequisites
+
+Symptom: an all-branches log shows accepted translations, but the selected catalog tree has no app files for them.
+Cause: the candidate was based on one app’s catalog topic; other accepted topics existed as refs without being merged into that tree.
+Fix: check each topic with `git merge-base --is-ancestor <accepted-topic> HEAD`, inspect `git ls-tree -r --name-only HEAD -- locales`, and verify the files the receiving app actually reads.
+Compose the topic histories, retain every attribution block, then run the data repository’s complete gate and the apps’ required-input checks.
+How found: the source audit found zero AniCraft and MaterialCraft catalogs in the candidate, despite their commits appearing in `git log --all`; merging their accepted history restored their exact file bytes.
+A matching revision file or an existing Git object does not establish catalog consumption.
+
+Symptom: a required catalog cutover cannot provide languages already offered by the app, or loses many existing translations.
+Cause: the shared checkout predates the app’s latest in-repository catalogs.
+Fix: read its recorded sync base in ATTRIBUTION.md and use the official `tools/sync_app.py` delta migration against the accepted app head.
+Preserve untouched shared corrections, check the round trip, credit the real source and rerun the data gate; do not silently embed English instead.
+How found: FilmCraft’s check reported four missing registered app catalogs and 20,136 missing or different rows; its delta migration reproduced all 55,697 eligible source rows without changing common.tsv.
+Prefetch the historical source blobs before running the migration offline; a partial clone can know a commit without holding its catalog contents.
+
+Symptom: a shared format upgrade makes the old app test fail with a corrupt-file error naming `full_composite`.
+Cause: the app’s last format pin skipped that optional member, while the new shared envelope deliberately validates it like the thumbnail and composite paths.
+Fix: read the shared format contract and search upstream before adding another parser API or relaxing its guard.
+[PhotoCraft #13092](https://github.com/storytold/photocraft/pull/13092), by dotCooCoo, contains the exact pin-transition regression: a malformed path must return Corrupt naming the field, while a bundle without the optional member still opens.
+How found: the full receiving gate named the old assertion, and the PR’s original non-merge commit fb7368e5d explained the same transition.
+Carry the original author and date; when the edition’s common-source binding supersedes the PR’s Git pin and lock lines, identify that scope and verify the applicable test hunk instead of claiming whole-commit byte identity.
+
+Symptom: importing a local bundle prerequisite fails with `lazy fetching disabled` and `could not fetch ... from promisor remote`, although the source is not shallow.
+Cause: a partial clone knows the commit but lacks promised historical objects; upload-pack disables lazy fetching while serving that clone.
+Fix: fetch the exact accepted prerequisite from the verified public repository into the empty restore database, then import the incremental bundle and compare its head and tree before full fsck.
+Keep the prerequisite explicit; do not call an incremental bundle standalone or rewrite the source history to repair a transfer.
+How found: the shallow check returned false, the local transfer named the promisor restriction, and the public prerequisite allowed all four checkpoint head/tree restores and all three working-patch restores to pass.
+Untracked source files need their own saved bytes and hashes; a committed head restore alone does not preserve receiving work in progress.
+
+## A common revision must retain every accepted subject
+
+Symptom: the common library passes its whole gate, but the first receiving app fails because `VideoParams.stereo_mode` is missing.
+Cause: the candidate composed current main and a recent camera branch without merging the accepted media branch; its own missing tests could not detect those omitted APIs.
+Fix: audit the ancestry and actual source of every previously received library revision, then compose the complete accepted subjects before qualifying consumers.
+Retain the newer window, protocol and camera paths while restoring container metadata, native sample grids and selected-item decoding in their shared owners.
+How found: FilmCraft's real receiving compile named the missing field; comparing its accepted library tree also found the stereo grid module and selected HEIF API absent.
+A successful library gate establishes the selected source's checks, not that the candidate contains every earlier edition feature.
+
+Symptom: a source-owner check passes even when a resolved shared crate points to an older sibling checkout.
+Cause: it rejected old Git sources and checked selected PDF backends, but did not compare every shared package's resolved manifest with its canonical owner.
+Fix: map package names from the selected library's crate and vendor manifests to their canonical manifest paths, then compare the complete locked Cargo metadata graph, including helpers and web dependencies.
+Keep build-input revision checks too; a matching revision file does not establish which source Cargo compiled.
+How found: changing only the resolved stereo-window manifest path in a saved graph made the old checker return success; the complete-owner checker rejected that control and accepted the unchanged actual graph.
+The same complete check later caught PdfCraft's Windows-only `winprint` edge still on Git after its shared root dependencies had converged.
+Bind direct target-specific dependencies to the selected owner too; a successful Linux metadata check establishes their source identity, not Windows runtime behavior.
+Run the receiving app's own full gate and bind its executable and fresh proofs to that same owner; a metadata check alone is not compilation or runtime evidence.
+
+Symptom: `windows_default_leaves_out_gl` fails at its assertion about eframe's default before testing the app's Windows policy.
+Cause: the private runner forced `WGPU_BACKEND=vulkan`; eframe's `WgpuSetupCreateNew` reads `Backends::from_env()` before its `PRIMARY | GL` default.
+Fix: preserve the app assertion and remove that override from the full-CI child, matching upstream's environment.
+Keep the software Vulkan ICD selected; explicit backend requirements belong in the targeted GPU checks rather than a suite that tests unmodified defaults.
+How found: the complete FilmCraft run passed 5,076 tests and failed that one precondition; the same unchanged test passed after removing only `WGPU_BACKEND`.
+Rerun the whole gate after the controlled check; a one-test pass does not establish full CI success.
+
+The corrected full Linux gate then passed all 5,077 native tests and eight doctests, plus its layer, asset and WebAssembly checks, with production and test source unchanged.
+
+Symptom: LightCraft's `tiles_sharing_one_payload_count_its_bytes_once` expects the distinct-byte refusal but receives `264 image data chunks, expected 65536` after a shared TIFF update.
+Cause: `ImageInfo::chunks` bounds allocated descriptors by file length; its returned length is no longer the declared offsets count.
+The fixture still declares all 65,536 offsets pointing to one 256-byte payload.
+Fix: carry the existing upstream RAW comparison of `info.offsets.len()` against the required grid count, preserving the later distinct-byte plausibility check and the unchanged regression.
+[LightCraft #4165](https://github.com/storytold/lightcraft/pull/4165), by Dylan M. Taylor, includes that exact hunk in e4dd081d; shared [craft-libs #1102](https://github.com/storytold/craft-libs/pull/1102) explains the same transition after the RAW migration.
+Identify the applicable hunk and retain its author's date rather than importing unrelated gain-map and HEIF changes or padding the fixture to evade the descriptor cap.
+How found: the full receiving gate reached the unchanged RAW regression, inspection separated declared offsets from bounded descriptors, and the upstream search named the existing fix.
+All ten related tile tests passed with that original hunk and no assertion change; the whole receiving gate must also pass before closing the dependency step.
+
+Symptom: EffectCraft’s existing script-fallback regression reports the same family on both sides, yet the chosen face changes after earlier lookups.
+Print the face IDs and styles as well as the family before changing the environment or the assertion.
+The measured Hebrew lookup changed from Liberation Mono Regular to Bold after other searches loaded the bold face.
+Cause: the loaded-face path returned that face directly, while the exhaustive path resolved its family in the requested style.
+Fix: apply the same requested-style resolution to the loaded covering family, retaining the covering face when the resolved style lacks the character.
+How found: the unchanged assertion failed with the extra diagnostics, the two selection paths differed at the return, and the same focused regression passed after the correction with the font inputs unchanged.
+This establishes the measured style correction; unrelated fallback-family ordering and unavailable writing systems need their own controls.

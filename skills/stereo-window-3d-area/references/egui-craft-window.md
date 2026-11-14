@@ -279,3 +279,30 @@ Do not write its words into another app's translation source.
 Retain the app's existing optional languages when adding the required ones.
 Check the font fallback's language mapping too; a translated non-Latin picker name can otherwise fail the app's existing script test.
 A shared Han font is not evidence of a dedicated Traditional Chinese typeface or native-speaker review.
+
+## Receiving media proof traps
+
+Symptom: a capture recipe fails before geometry because the proof image has no `gdbus` executable.
+Cause: the earlier recipe depended on a command-line wrapper absent from the newer image, although its Python Gio bindings were present.
+Fix: use Gio to make the same D-Bus call and retain the independent KWin client rectangle oracle; do not derive the rectangle from the tested image.
+How found: the failed command named the missing executable, and the equivalent Gio call recovered the expected rectangle and exact native sample checks.
+Keep capture and offline-analysis images explicit when the latter supplies tools such as FFmpeg that the former does not contain.
+
+Symptom: PhotoCraft exits before its X11 window opens, reporting missing `libXcursor.so.1`.
+Cause: a lean proof image omitted the X11 runtime library checked by the application's startup guard.
+Fix: install the candidate-checked Debian `libxcursor1` in the private image, verify it loads, and rerun fresh cases without bypassing the application's guard.
+How found: the application log named the library, the image's loader cache lacked it, and the complete Wayland and X11 proof set passed after adding it.
+
+Symptom: a software proof's media area is correct, but a CPU-compositor warning still covers the editor used by the ordinary control.
+Cause: the private software adapter intentionally triggered the application's existing fallback acknowledgement.
+Fix: acknowledge the visible Keep Using CPU button through the public UI input API, verify the notice clears, and apply the same action to candidate and stock controls.
+Disclose the software compositor and preserve the warning, chosen action and result in the proof record; do not change the product default or mask the dialog's pixels.
+How found: inspecting the captured interface exposed the modal; after acknowledgement the complete ordinary candidate and stock pictures were pixel-identical on both backends.
+
+Symptom: LightCraft's accepted ordinary-control oracle waits for its default GPU, but the copied media runner reports that the software adapter is skipped because the CPU pipeline is faster.
+Cause: a global `VK_DRIVER_FILES` override selected lavapipe for both the private compositor and the application, changing the control's required device environment.
+Fix: keep the compositor on lavapipe and remove that override only from the LightCraft child, matching the accepted default-device recipe for candidate and stock.
+Preserve the readiness requirement, production fallback policy and complete unmasked comparison; do not weaken the oracle to accept a different rendering path.
+Keep this in a separate Light helper so other applications' software proofs retain their original harness bytes.
+How found: the application explained its deliberate software refusal, the original recipe had no driver override, and the unchanged controls then used AMD RADV RENOIR and matched all 2,880,000 RGB pixels across Wayland and X11.
+Repeat the full native, lifecycle, HEIF and ordinary proof set after this controlled check; those focused ordinary comparisons alone do not close the receiving step.

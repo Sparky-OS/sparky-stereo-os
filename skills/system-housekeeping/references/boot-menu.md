@@ -5,7 +5,7 @@ Read the symptom first; the recipe and the rig command are at the end.
 
 ## The rules
 
-- **One system: the menu is hidden and nothing waits. Another system found: the menu is shown.**
+- **One system: the menu is hidden and nothing waits. Another system found: the menu is shown.** `sudo sparky-stereo-boot menu` shows a hidden menu once, at the next start.
   Daniel, 2026-10-07: "dual boot found at install: os-prober on and menu shown; single OS: os-prober off, menu hidden"; 2026-11-14: "hidden grub, specially when there's only us installed", "if it has windows ok".
   The installer's dual-boot step runs os-prober once and, when it finds Windows or another Linux, writes `/etc/default/grub.d/sparky-stereo-dual-boot.cfg` (`GRUB_DISABLE_OS_PROBER=false`).
   At every `update-grub`, `30-sparky-stereo-boot.cfg` sets `GRUB_TIMEOUT_STYLE` and `GRUB_TIMEOUT`: os-prober on and a system found gives `menu` and 5 seconds; anything else gives `hidden` and 0.
@@ -52,6 +52,17 @@ The kernel knows the same fault as a quirk (`EDID_QUIRK_DETAILED_USE_MAXIMUM_SIZ
   **Cause:** `GRUB_FONT` names a font file and GRUB runs under Secure Boot (or the file is gone).
   **Fix:** above.
   **Found by:** a screenshot of the menu through QMP, then `c` at the menu and `loadfont PATH`, `lsfonts`.
+- **Symptom:** on a Korean system that lists another system, `update-grub` stops with `/etc/grub.d/30_os-prober: 263: printf: %2$: invalid directive` and the menu is not written (a kernel update then fails too).
+  **Cause:** GRUB's shell scripts print their messages with the shell's `printf` (`gettext_printf` in `grub-mkconfig_lib`, under `/bin/sh`), which has no reordered arguments; the Korean translations of "Found %s on %s" use `%2$s`. Debian's own catalogue leaves the shell messages out, so only the edition's supplemental catalogue (`sparky-stereo-grub-l10n`) brought them in.
+  **Fix:** the supplemental catalogue leaves out a shell message whose translation reorders its arguments (`msggrep --invert-match --msgstr -e '%[0-9][0-9]*\$'`), and its build stops if one is left.
+  **Found by:** running `update-grub` in each of the ten languages on a guest beside Windows and reading the menu's `set lang=`: Korean still said Japanese, the language of the run before.
+- **Symptom:** the person holds Shift or presses Esc and the hidden menu does not open.
+  **Cause:** with `timeout=0` GRUB looks at the keyboard once. In QEMU, Shift held and Esc pressed through the start opened nothing under SeaBIOS and plain OVMF; only a run of Esc presses under Secure Boot (a slower start) landed.
+  **Fix:** never tell the person to use a key. `sudo sparky-stereo-boot menu` sets `sparky_menu_once` in GRUB's environment block and the next start shows the menu for 30 seconds; the boot sets it by itself when a Secure Boot key waits for its enrolment, and the menu is shown when shim refuses the newest kernel.
+- **Symptom:** beside Windows the menu stays hidden although the installer turned os-prober on.
+  **Cause:** `grub-mkconfig` sources `/etc/default/grub.d/*.cfg` in name order, and `sparky-stereo-dual-boot.cfg` comes after `30-sparky-stereo-boot.cfg`, which therefore still saw os-prober off.
+  **Fix:** the fragment reads the last `GRUB_DISABLE_OS_PROBER=` of the other files itself.
+  **Found by:** the rig's dual-boot rows failing while every fixture test passed; the installer's log said "shown" at `grub-install` and "hidden" at `grub-mkconfig`.
 - **Symptom:** a test of the hidden menu passes on a menu that waits.
   **Cause:** judging `grub.cfg` alone. `timeout_style=hidden` with a timeout above 0 still waits.
   **Fix:** judge the screen: one screenshot every half second from power-on, and count the frames that show the menu's box.

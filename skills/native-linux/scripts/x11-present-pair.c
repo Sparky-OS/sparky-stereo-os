@@ -12,6 +12,10 @@
  *                 what gives a top-level its surface on a rootless Xwayland; and redirect the declared child, as a
  *                 compositor does for a child a window lists
  *   COVER=1       a 60x60 plain child window over the declared one, so the server cannot flip (the case a copy still decides)
+ *   X_OFF, Y_OFF  the offset of every present (a present with an offset cannot be flipped)
+ *   SRC_W=N       one view of the pixmap is N wide, not W (a frame made for the size the window had before a resize)
+ *   UNDECLARE_AT=N  before present N the declaration is deleted, and from then the pixmap holds the left view only, W wide
+ *   COVER_PAINT_AT=N  before present N the cover child is painted again, yellow, through the X server
  *   HOLD_S=N      stay N seconds after the last present
  *   EXPECT=flip|copy   exit 1 unless the last present completed that way
  * Build: cc -O1 -o x11-present-pair x11-present-pair.c -lxcb -lxcb-present -lxcb-composite
@@ -67,8 +71,9 @@ int main(void)
         if (child)
             cardinal(c, top, "_KDE_NET_WM_STEREO_CONTENT_CHILDREN", XCB_ATOM_WINDOW, win);
     }
+    xcb_window_t cover = XCB_WINDOW_NONE;
     if (getenv("COVER")) {   /* a small plain child window over the declared one: its pixmap can no longer be flipped */
-        xcb_window_t cover = xcb_generate_id(c);
+        cover = xcb_generate_id(c);
         uint32_t grey[] = { 0x808080 };
         xcb_create_window(c, XCB_COPY_FROM_PARENT, cover, win, 30, H / 2, 60, 60, 0, XCB_WINDOW_CLASS_INPUT_OUTPUT, s->root_visual,
                           XCB_CW_BACK_PIXEL, grey);
@@ -92,9 +97,22 @@ int main(void)
     xcb_present_select_input(c, eid, win, XCB_PRESENT_EVENT_MASK_COMPLETE_NOTIFY);
     xcb_gcontext_t gc = xcb_generate_id(c);
     xcb_create_gc(c, gc, win, 0, NULL);
+    int xoff = getenv("X_OFF") ? atoi(getenv("X_OFF")) : 0, yoff = getenv("Y_OFF") ? atoi(getenv("Y_OFF")) : 0;
+    int undeclare = getenv("UNDECLARE_AT") ? atoi(getenv("UNDECLARE_AT")) : -1, WW = W;
+    if (getenv("SRC_W")) W = atoi(getenv("SRC_W"));
     for (int i = 1; i <= frames; i++) {
         xcb_pixmap_t p = xcb_generate_id(c);
-        xcb_create_pixmap(c, s->root_depth, p, win, 2 * W, H);
+        if (cover && getenv("COVER_PAINT_AT") && i == atoi(getenv("COVER_PAINT_AT"))) {   /* the cover paints itself again, yellow */
+            uint32_t yellow[] = { 0xc0c000 };
+            xcb_change_window_attributes(c, cover, XCB_CW_BACK_PIXEL, yellow);
+            xcb_clear_area(c, 0, cover, 0, 0, 0, 0);
+        }
+        if (i == undeclare) {
+            xcb_delete_property(c, win, atom(c, "_KDE_NET_WM_STEREO_CONTENT"));
+            xcb_delete_property(c, win, atom(c, "_KDE_NET_WM_STEREO_CONTENT_VERSION"));
+            printf("x11-present-pair: present %d: declaration deleted\n", i);
+        }
+        xcb_create_pixmap(c, s->root_depth, p, win, undeclare > 0 && i >= undeclare ? W : 2 * W, H);
         const uint32_t colour[] = { 0xff0000, 0x0000ff, 0x00ff00, 0xffffff };
         const int16_t mx = 20 + (i * 16) % (W - 80);
         const xcb_rectangle_t mark[] = { { mx, 20, 40, 40 }, { W + mx, 20, 40, 40 } };
@@ -104,7 +122,7 @@ int main(void)
         xcb_change_gc(c, gc, XCB_GC_FOREGROUND, &colour[1]); xcb_poly_fill_rectangle(c, p, gc, 1, &right);
         xcb_change_gc(c, gc, XCB_GC_FOREGROUND, &colour[2]); xcb_poly_fill_rectangle(c, p, gc, 2, mid);
         xcb_change_gc(c, gc, XCB_GC_FOREGROUND, &colour[3]); xcb_poly_fill_rectangle(c, p, gc, 2, mark);
-        xcb_present_pixmap(c, win, p, i, 0, 0, 0, 0, 0, 0, 0, XCB_PRESENT_OPTION_NONE, 0, 0, 0, 0, NULL);
+        xcb_present_pixmap(c, win, p, i, 0, 0, xoff, yoff, 0, 0, 0, XCB_PRESENT_OPTION_NONE, 0, 0, 0, 0, NULL);
         xcb_free_pixmap(c, p);
         xcb_flush(c);
         for (int done = 0; !done && (e = xcb_wait_for_event(c)); free(e)) {
@@ -119,16 +137,17 @@ int main(void)
             if (cn->mode == XCB_PRESENT_COMPLETE_MODE_FLIP) flips++;
             else if (cn->mode == XCB_PRESENT_COMPLETE_MODE_COPY) copies++;
             else others++;
-            if (i <= 3 || i == frames) { printf("x11-present-pair: present %d completed as %s\n", i, last); fflush(stdout); }
+            if (i <= 3 || i == frames || i == undeclare || i == undeclare + 1) { printf("x11-present-pair: present %d completed as %s\n", i, last); fflush(stdout); }
             done = 1;
         }
         if (xcb_connection_has_error(c)) { printf("x11-present-pair: CONNECTION-LOST after %d presents\n", i); return 3; }
         usleep(period);
     }
+    printf("x11-present-pair: %d flips, %d copies, %d other so far\n", flips, copies, others); fflush(stdout);
     if (getenv("HOLD_S"))   /* keep the last picture on the screen (a capture of a still window) */
         sleep(atoi(getenv("HOLD_S")));
     printf("x11-present-pair: %d presents of a %dx%d pixmap to a %dx%d window: %d flips, %d copies, %d other; last %s\n",
-           frames, 2 * W, H, W, H, flips, copies, others, last);
+           frames, 2 * W, H, WW, H, flips, copies, others, last);
     if (expect && strcmp(expect, last)) { printf("x11-present-pair: FAIL, the last present must complete as %s\n", expect); return 1; }
     return 0;
 }

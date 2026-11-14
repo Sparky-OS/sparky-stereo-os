@@ -352,3 +352,5 @@ Traps:
   **Cause:** its last step was `tail` of the log.
   **Fix:** write the build's own exit status into the log and return it.
 - The rest of this package's story (the layer, the fix, the proof): [native-linux, a stereo X11 window when Xwayland has no glamor](../../native-linux/references/x11-stereo-window-without-glamor.md).
+
+- Symptom: a 45 minute package build ends in `dh_install` with `cp: error copying ... No space left on device`, and other lanes' work on the same disk stops too. Cause: the build tree of a large package (Mesa: about 8 GB for one architecture) lives in the output folder given to `release/build-from-lc-dsc.sh`, the free space was checked once before the build, and another lane filled the disk meanwhile. Fix: remove the failed tree at once, and give the build an output folder on a disk that keeps the tree's size above its floor for the whole build (the lane's folder under `/var/tmp`, listed in `.artifacts`), then copy the packages to the stage; check the free space against the tree's size, not against a fixed number. Found by: the last lines of the build log and `df`. (lane stereo-x11-refused-flip-told-561)

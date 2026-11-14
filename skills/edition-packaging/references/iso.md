@@ -57,6 +57,25 @@ The chain under Secure Boot is Debian's Microsoft-signed shim, Debian's signed G
 - `installed.sh` and `disk-tool.sh`: an installed disk with a serial login (`getty`), its EFI files (`fallback`) and its kernels (`kernels`); `checks/installed.txt` on the serial line.
 - `bootmatrix.py` and `vmctl.py`: one boot with a key timeline, and single keys or screenshots for walking through MokManager.
 
+## What a fresh install must show at its first boot
+
+A checklist for the image check, from an install on a real notebook that booted with three faults (ORDER 572, 2026-11-14).
+Each line is judged on the installed system itself; the rig that rehearses the install without a window, and the command that repeats a row, are in [system-housekeeping, the boot menu](../../system-housekeeping/references/boot-menu.md).
+
+| At the first boot | How it is read | The fault it catches |
+| --- | --- | --- |
+| No menu and no wait when this is the only system | `grub.cfg` has `timeout_style=hidden` and `timeout=0`, and no screenshot of the first seconds shows the menu | the installer's `GRUB_TIMEOUT=5` with no hidden style |
+| The menu shown, with the other system in it, beside Windows or another Linux | `timeout_style=menu`, an os-prober entry, the menu in the screenshots | a hidden menu on a dual-boot machine |
+| The menu readable under Secure Boot | no `loadfont` of a font file in `grub.cfg`; the screenshot has no "?" boxes and is in the system's language | Debian's signed GRUB refusing the font ("prohibited by secure boot policy") |
+| No failed unit, the root file system writable | `systemctl --failed` is empty | a `tmpfs /tmp` line against the masked `tmp.mount` |
+| `/tmp` on the disk | `findmnt --target /tmp` names the root file system | the same |
+| No swap on, and Cushion Swap has its area | `/proc/swaps` is empty; `cushion-swap --status` says `STATE=off` and `PROTECTION=yes` | a swap line written with `defaults`: "no swap area is configured" |
+| No problem kept | `sparky-stereo-problems list` is empty | any of the above |
+| Hibernate offered | logind's `CanHibernate` answers `yes` (the swap area holds the RAM) | a swap area the daemon does not know |
+| The firmware can start the system with no boot entry | `EFI/BOOT` holds shim as `BOOTX64.EFI`, GRUB, MokManager, `grub.cfg` and the edition's certificate | firmware that drops or ignores the installer's entry |
+
+Run it under BIOS, UEFI and UEFI with Secure Boot, alone and beside a second system.
+
 ## From the running development VM
 
 SparkyLinux packs an image from the running, customised system, and the edition can pack its development VM the same way (`vm/sparky-vm.sh`, provisioned by `vm/provision.sh`).

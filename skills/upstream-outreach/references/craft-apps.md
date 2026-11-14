@@ -569,3 +569,23 @@ How found: the original multi-scale and nested-space controls lost Difference bl
 The corresponding upstream tests pass after their original fixes; the 256-level black sweep was already green on the imported Vello source and is not a newly reproduced defect.
 An RGB fill gains profile-derived CMYK tints in the later receiver, so its older no-tints control must follow that same original commit's RGB-image fixture.
 Keep the full library and every receiving application's whole gate as the qualification boundary; component controls alone do not qualify the suite revision.
+
+### Receiving a shared print API without changing printer choices
+
+Symptom: a receiving app fails with `missing field driver_settings in initializer of Job` after moving to the qualified shared library.
+Cause: the shared print job gained an optional Windows driver-dialog result, and two app constructors still used the older shape.
+Fix: search the app's current main and carry Dylan M. Taylor's original two `driver_settings: None` initializers, retaining his author and date and verifying both complete source postimages.
+How found: the whole PdfCraft gate stopped in compilation, the public file history identified the existing fix, and the common `Job` definition explicitly says CUPS ignores that Windows-only field.
+The original patch clears strict Clippy on the receiving revision; the complete receiving gate remains a separate qualification step.
+Do not remove the shared field, invent a Linux printer setting or describe the compiler error as a reproduced runtime printing failure.
+
+### Clear completed test artifacts at a verified phase boundary
+
+A single Cargo target can still fill the shared build disk when a whole library gate keeps default and all-feature native test executables before WASM, release and MSRV checks.
+Keep the disk guard active.
+After both native test commands complete, use the actual active Cargo command to verify a subsequent library-check or release-only phase.
+Inventory only executed native test paths from that run's log, verify that they are regular executable ELFs inside the owned debug target, and record their sizes and SHA-256 values before removing them.
+Refuse a changed or unknown phase before deleting anything; leave source, fixtures, production ELFs, build scripts and active compiler inputs alone.
+A guarded run removed 643 completed native test executables and recovered about 6.76 GB while the remaining common gate continued successfully.
+How found: the build disk approached its stop threshold, and the actual command transition established which test outputs were finished; the first cleanup attempt refused when the phase changed during hashing.
+The full gate still has to finish with unchanged source and harness, and its remaining target is removed after that app is finished.

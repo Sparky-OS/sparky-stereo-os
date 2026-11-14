@@ -179,8 +179,21 @@ The GPU tracer's `pass` documents one call per submission because `queue.write_b
 Two calls on that owner before one submission would not provide independent eye uniforms, accumulation or sample counts.
 The spare accumulation buffer is a previous-size allocation cache, not a second eye.
 The required fix belongs in that tracer's resource ownership and pair submission boundary, with the same coherent camera inputs, plus an equivalent CPU adapter.
-This was found by following `render_mode::TraceCallback::run` into `GpuTracer::pass` and inspecting its fields; the uniform overwrite has not been reproduced as a stereo runtime failure.
+The audit followed `render_mode::TraceCallback::run` into `GpuTracer::pass`; a subsequent real software-GPU diagnostic queued two different cameras on that owner before submitting and found that the first pass used the second camera and sample index.
+This reproduces misuse beyond the documented once-per-submission contract, not a failure of the original ordinary caller.
+Give each eye a private tracer uniform, then require a queued pair's raw accumulation and resolved denoised pixels to equal independently submitted eye controls.
 Do not mark Rendering mode adapted merely because the raster companion opens beside it.
+
+Symptom: a retained white scene turns black after a different view uploads a new black material at the same texture dimensions.
+Cause: an `Arc` shares the material wrapper, but a same-size reuse path still copies new pixels into its shared GPU textures.
+Fix: reuse those textures only when their material owner is unique; otherwise allocate a new immutable map set and share that set with the new pair.
+How found: retain the old scene, replace the active material, trace both, and check the old white scene's actual accumulation; removing only the ownership guard makes that regression fail.
+A pointer-sharing assertion alone cannot detect a texture's contents changing.
+
+Symptom: two CPU sample counters are equal, but the returned image already contains some rows from the next sample.
+Cause: counters advance only after a full pass, while row-sliced accumulation mutates pixels before then.
+Fix: track the in-progress pair boundary as well as N and refuse publication while either next pass is incomplete.
+How found: after one complete pair, advance only three rows, require image publication to fail despite counters still reading one and one, then finish the pass and compare both complete images with the ordinary zero-budget render.
 
 A native host should retain at most one pending worker or GPU pair.
 When an immutable request becomes obsolete, cancel it and wait for acknowledgement before starting another worker, rather than accumulating cancelled workers during rapid edits.

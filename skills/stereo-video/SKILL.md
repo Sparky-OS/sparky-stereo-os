@@ -104,6 +104,34 @@ x264 always writes content_interpretation_type 1, so a right-first SEI fixture i
 Add a flat 4:2:0 fixture (the first view gray 64, the second 192) for the luma, and for frame sequences a timed stream whose two views carry the pair's number.
 A timed stream that starts with a lone second view is the control: marked, it pairs right; in a container without marks, the same frames pair one picture off, so the check is shown to fail.
 
+## The video packing list in a file manager (2026-11-14, Dolphin)
+
+A file manager shows a video by one frame, and a person corrects its input there as in a player: the same per-file choice, kept in the layer's store ([stereo-pictures, the per-file choice](../stereo-pictures/SKILL.md#the-per-file-choice-one-store-one-menu)), read by the video thumbnailer and by every program on the layer.
+
+- **The list is the whole of what a stream or a container can declare**, each packing with both orders, in `Stereo::FileChoiceMenu` with `setContent(Video)`:
+
+  | Entry | The values it stands for |
+  |---|---|
+  | Side by side | frame_packing_arrangement_type 3 (H.264 D.2.26, H.265 D.3.16); StereoMode 1 and 11 ([RFC 9559](https://www.rfc-editor.org/rfc/rfc9559) 5.1.4.1.28.3); `st3d` stereo_mode 2 |
+  | Top and bottom | type 4; StereoMode 3 and 2; `st3d` stereo_mode 1 |
+  | Rows, columns, checkerboard | types 2, 1 and 0 (H.264 only); StereoMode 7 and 6, 9 and 8, 5 and 4 |
+  | Side by side quincunx | type 3 with quincunx_sampling_flag |
+  | Frames in turn | type 5, temporal interleaving |
+  | Both views in one block | StereoMode 13 and 14 |
+  | Anaglyph | StereoMode 10 (cyan and red) and 12 (green and magenta), and amber and blue |
+  | Picture and depth | the layer's picture-with-depth layouts |
+
+  A stream that carries its second view or its depth as a layer or a track of its own (MVC, MV-HEVC, an auxiliary depth stream) has nothing to choose by hand: the views are there or they are not.
+- **What one frame cannot show is still listed.**
+  A thumbnail is one frame, and one frame of a frame sequence, or of a track with both views in one block, holds one view.
+  The file manager tells the menu (`setShownAsOneView({FrameSequential, BlockLaced})`), the entries stay with "(one view shown here)" after their words, and the choice is kept for the players.
+  Leaving the entries out would hide a packing the specification lists and lose the choice for every other program.
+- **The thumbnailer reads the store with one call**, `Stereo::Picture::fileChoice(path)`, and hands the whole choice to `Stereo::Video::layout()`; "Not 3D" is its force-mono argument.
+  A hand-chosen anaglyph is not a packing of `Video::layout()`: take the two views out of the colours with `Picture::fromAnaglyph()`.
+- **The menu is offered for a video shown as a pair, or one that already has a choice** (a video set to "Not 3D", or to a frame sequence, shows no pair and must stay reachable).
+  Pictures and videos have different lists, so a mixed selection gets the list of the first file's kind, for the files of that kind.
+- **Proof:** an unmarked video in the shape of a pair (3840x1080: 3.56:1, over the 3:1 rule) with one flat colour per view; both eyes captured before and after each choice; "right eye first" must give the left eye the other colour; "Frames in turn" must give a flat thumbnail and the note in the menu; the file's hash, times and attributes before and after; a 2D video and a 16:9 half side by side video without marks get no menu.
+
 ## Quality
 
 In the edition: decode at the source's depth (10, 12, 16 bits), hand each eye at the resolution it has (a half-width or half-height eye is rearranged into full side by side, never scaled up in the program; Stereo KWin resizes once, into the window or the screen), pass the colour description on (BT.709 or BT.2020, PQ or HLG, range), and play audio at 24-bit 48 kHz or more wherever the hardware offers it, with float output and SoXR for any resampling.

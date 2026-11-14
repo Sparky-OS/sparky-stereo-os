@@ -613,3 +613,22 @@ Fix: preserve the recovery branch and wrap its value, keep repaired-generation m
 Keep bounded alias iteration, cancellation and the shared object-stream index cache; read the index dictionary without recursively parsing a stream's Length.
 How found: compilation named the unwrapped recovery return and then the helper's overly narrow ObjectLike bound; the Reader definition required only Readable.
 The complete Decode-array, Pattern-color and direct reference-alias controls passed after those integration corrections.
+
+
+### Sampling reviews have an ordered middle prerequisite
+
+Symptom: the original scan-shrink and enlargement controls pass, but a nearly one-to-one scan blurs; adding the sharpness review then breaks a smaller interpolated soft mask.
+Cause: the sampling family has three ordered subjects, not just the first change and its final review.
+Fix: carry kronbii's [area-average sampling](https://github.com/storytold/pdfcraft/commit/ff227b770ca6e436ee0853a2585739a8be9eb1e9), [interpolated-mask prerequisite](https://github.com/storytold/pdfcraft/commit/5ed2f4ba4f34d5eff689727d468186bc18b53350) and [bounded-row and sharpness review](https://github.com/storytold/pdfcraft/commit/c5065554a1946e4ca8895048d70095f68a4ecec5), in that order.
+Retain bounded row intermediates and the common decoder's independent allocation limits.
+How found: the unchanged controls first measured 580 blurred pixels near the source resolution, then an abrupt 0-to-255 mask edge where interpolation was expected.
+With the complete family, 23 shrink, enlargement, scan, minification and half-pixel controls pass.
+Keep every source origin and original date when committing a reviewed same-author family together; a focused green does not qualify the final shared revision.
+
+Symptom: a page-box port passes eleven area controls but loses text placed inside a usable inherited box beyond US Letter.
+Cause: filtering an unusable page-owned box after choosing it also discards the opportunity to use the nearest inherited box; the initial subject lacks its later review.
+Fix: carry the original page-box recovery and its inherited-box and diagnostic reviews, while retaining the shared owner's US Letter default.
+Filter the page-owned box and the nearest inherited box separately; do not search farther past an invalid nearest ancestor.
+How found: the original text/raster control expected a 1200 by 1200 page with ink, but received a blank 612 by 792 page; the independent nearest-invalid-ancestor control already passed.
+All twelve area controls pass with the reviewed family, including both inheritance cases.
+A merge conflict that differs only by A4 versus the already-established Letter default keeps Letter; do not revert that default while carrying the repair.

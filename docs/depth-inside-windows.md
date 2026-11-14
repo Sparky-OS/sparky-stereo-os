@@ -72,8 +72,10 @@ Five parts take part, each in the layer that owns its piece of the work.
 4. **Qt marks the pair as the desktop's own.**
    Qt Wayland makes the EGL surface again with two views (`EGL_EXT_multiview_window`, in the edition's Mesa) between two frames, never in the middle of a pair.
    Its first commit carries `set_desktop_depth`, so Stereo KWin draws the window per eye but does not count it as stereo content: for the automatic 3D mode switch, for stereo screenshots and for the depth estimator it is still the desktop.
+   With Qt Quick's Vulkan renderer (`QSG_RHI_BACKEND=vulkan`, from qt6-base 6.11.2+dfsg-5+stereo3d21) the window's swapchain is made again with two image layers at the start of a frame ([`VkSwapchainCreateInfoKHR::imageArrayLayers`](https://registry.khronos.org/vulkan/specs/latest/man/html/VkSwapchainCreateInfoKHR.html)), where the surface allows two ([`maxImageArrayLayers`](https://registry.khronos.org/vulkan/specs/latest/man/html/VkSurfaceCapabilitiesKHR.html)), and Qt marks the surface the same way; where the surface allows one, the window is drawn once and the program's log says why.
    A window drawn by Qt Widgets is painted once per eye by Qt's repaint manager into a buffer two views wide, with the same mark.
 5. **Mesa packs the two views full side by side and declares them,** as it does for any program that draws two views, and Stereo KWin shows each view to its eye.
+   Over a Vulkan driver outside Mesa, the edition's Vulkan stereo layer does the same.
 
 Without any of these parts nothing changes.
 A window of another style, on another compositor, on a 2D screen, asleep in the pile, or with depth switched off, is drawn once, exactly as before.
@@ -83,12 +85,6 @@ A window of another style, on another compositor, on a 2D screen, asleep in the 
 These ways of drawing a window show it flat, exactly as before, with no error.
 Each is a piece of work, written here with its owning place and its test.
 
-- **Qt Quick on the Vulkan renderer** (`QSG_RHI_BACKEND=vulkan`).
-  Qt's Vulkan renderer already makes a swapchain with two layers when its window's format asks for stereo and the surface allows it ([`maxImageArrayLayers`](https://registry.khronos.org/vulkan/specs/latest/man/html/VkSurfaceCapabilitiesKHR.html)).
-  The edition's Mesa allows two layers when Stereo KWin announces stereo, so what is missing is Qt's side.
-  In qtbase, `QWaylandVulkanWindow` follows the window's `_q_stereo_views` with a stereo format, and `QRhiVulkan::beginFrame` rebuilds the swapchain when that format changes, as the OpenGL swapchain already does.
-  Qt then marks the surface with `QWaylandStereoDepth::setDesktopDepth`, which takes effect with Mesa's next commit.
-  Measured on the rig at `ElementLimit` 12 on a 3D output: both eyes show the same picture, identical to the same window on a 2D output.
 - **Qt Quick's software renderer** (`QT_QUICK_BACKEND=software`).
   It paints into a backing store and has no swapchain, so it has no right buffer.
   In qtdeclarative, `qsgsoftwarerenderloop.cpp` and `qsgsoftwarethreadedrenderloop.cpp` paint the scene twice into a backing store two views wide while the window's `_q_stereo_depth` is set, with the same per eye matrices, and set the window's `_q_stereo_pair`.

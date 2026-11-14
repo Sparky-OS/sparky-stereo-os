@@ -289,6 +289,13 @@ A native Mesa WSI that already exposes two array layers bypasses the packed laye
   How found: the injected request copied the right view's leading pixels into the ordinary window; the same probe has no blue after the fix.
 
 
+- **A one-frame Vulkan wrong-size present withdraws its declaration but still contains right-view pixels.**
+  Cause: the ordinary X window already contains the copied mixture, so copying that window cannot recover its left view; repacking the next application frame does nothing for a program that stops drawing.
+  Fix: before `QueuePresent` returns, copy the retained left shadow image into a window-sized mono Present pixmap, without resizing it. Repeat this transfer only while flat. Keep the native swapchain handles and both shadow views.
+  How found: `FRAMES=1 SRC_W=700` through the wire injector left 58,400 blue pixels. The fixed view has exactly 358,400 red, 120,000 green and 1,600 white pixels, zero blue, and one 40 by 40 marker in an 800 by 600 window.
+  Prefer cached host memory for that transfer, and copy the uploaded pixels into the final pixmap before presenting; confirm three mono flips and recovery after uncovering. Honor the requested alpha mode on ARGB visuals: opaque stays opaque and post-multiplied colours are premultiplied for X11. Test alpha modes and 8-bit, 10-bit and half-float channel packing separately; the captured runtime row used an 8-bit X11 visual.
+
+
 ## What this does not cover
 
 - The covered declared child is fixed in the source candidate [above](#a-declared-child-covered-by-a-child-of-its-own); its packaged and installed qualification is still pending.

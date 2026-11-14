@@ -589,3 +589,27 @@ Refuse a changed or unknown phase before deleting anything; leave source, fixtur
 A guarded run removed 643 completed native test executables and recovered about 6.76 GB while the remaining common gate continued successfully.
 How found: the build disk approached its stop threshold, and the actual command transition established which test outputs were finished; the first cleanup attempt refused when the phase changed during hashing.
 The full gate still has to finish with unchanged source and harness, and its remaining target is removed after that app is finished.
+
+### A complete API surface can still receive older behavior
+
+Symptom: the shared library's whole gate and the receiver's strict compilation pass, yet the complete receiver suite fails on encrypted streams, annotation geometry and a cached color-space chain.
+Cause: checking public names and source ownership establishes neither the older behavioral patches nor the cache invariants the receiver relies on.
+Fix: use the receiver's unchanged behavioral failures as the red controls, trace each control to its original upstream subject, and carry that subject into the shared owner with its author's credit.
+Preserve shared decoder, allocation, cancellation and work limits rather than selecting the app's private backend again.
+How found: the complete PdfCraft run reached every workspace test and exposed failures that the public-name audit and the library's own tests did not cover.
+Test-introduction history narrows the search; read the production change and its prerequisites before treating that history as a diagnosis.
+The library and every receiver still need their complete gates again on the resulting common revision.
+
+Symptom: a page that selects an ICC alternate chain in reverse order overflows the stack despite a color-space depth limit.
+Cause: the profile cache retained its depth-dependent alternate fallback, allowing individually shallow reads to construct a much deeper cached graph.
+Fix: retain only the profile's own parse result and resolve its alternate at the depth where it is used, as in Grzegorz Martens's [original fix](https://github.com/storytold/pdfcraft/commit/4c815786c699f3ce745d2dc0a5cb0681fe0d2d76).
+Keep the shared owner's existing depth limit; a different limit in the old receiving backend is not authority to raise it.
+How found: the unchanged 20,000-link receiver control aborted before the port and completed normally afterwards; the code review located the fallback inside the cached closure.
+Also test the other direction, where a profile first encountered at the limit must still read its alternate when selected nearer the top.
+
+Symptom: a shared reference-alias port compiles its main path but fails in a common-only repaired-object branch.
+Cause: the new fetch result distinguishes a stored value from another reference, while that recovery branch still returns the old value type.
+Fix: preserve the recovery branch and wrap its value, keep repaired-generation matching, and use the reader trait the helper actually requires when reading a reference body.
+Keep bounded alias iteration, cancellation and the shared object-stream index cache; read the index dictionary without recursively parsing a stream's Length.
+How found: compilation named the unwrapped recovery return and then the helper's overly narrow ObjectLike bound; the Reader definition required only Readable.
+The complete Decode-array, Pattern-color and direct reference-alias controls passed after those integration corrections.

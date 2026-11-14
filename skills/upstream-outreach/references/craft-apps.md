@@ -508,5 +508,6 @@ How found: the broad read was interrupted; explicit pinned raw-file reads comple
 Symptom: a new repair regression calls a bounded decode successful and therefore assumes the document limit was bypassed.
 Cause: RunLength deliberately returns its bounded prefix, rather than an error, at the limit.
 Fix: assert the actual lower byte bound and retain an ordinary full-length control; do not change the decoder policy to satisfy an assumed error result.
-How found: the existing decoder stops at16bytes while the ordinary control expands128; the first new test incorrectly demanded an error.
+How found: the first test received a successful decode, and reading RunLength showed that success can mean a bounded prefix.
+The corrected test expects16bytes under the lower limit and128in the ordinary control; those results are not yet measured for the repaired fixture.
 The corrected repair control was retained but not rerun before the complete gate stopped at its disk floor.

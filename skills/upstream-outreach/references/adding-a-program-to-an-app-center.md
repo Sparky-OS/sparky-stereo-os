@@ -245,3 +245,18 @@ The edition stays in step with main while retaining its own entries and stereo t
   **Cause:** copying the main assets preserves older checkout mtimes, while source extraction normalizes them; SOURCE_DATE_EPOCH clamps newer times but does not raise older ones.
   **Fix:** apply the build tree's shared reproducible timestamp normalizer to the authored staging tree before building the source and binary packages.
   **How found:** raw extraction and content comparison of both packages, then `stat` on a copied stylesheet.
+- **Symptom:** an operation changes the installed state, but closing the URI window can also lose the refreshed entry window.
+  **Cause:** the next dialog still inherits the old callback's session or output channel and temporary-page lifetime.
+  **Fix:** start an independent entry process with the old YAD_PID removed, let that process own its temporary page until its dialog closes, and only then close the old page.
+  Keep machine-action output inside the shared action/error engine, not on the URI callback's output channel.
+  **How found:** compare the installed state with the live dialog process before and after the operation; require a new surviving dialog, not only a successful install exit code.
+- **Symptom:** the entry's own Spanish text is translated, but its metered warning is English.
+  **Cause:** the published shared reader's language directory has nine catalogues, although its maintained source already has Spanish.
+  **Fix:** check the installed reader's catalogue files and test the actual warning in every required locale.
+  Until the reader's next package includes that catalogue, an edition-owned locale overlay can link the existing nine files and provide the maintained Spanish data while using the same reader for detection, settings and formatting.
+  Respect the reader's explicit language-directory override.
+  **How found:** the published file list and reader language() result, followed by ten installed notice-rendering checks and a Spanish GUI capture.
+- **Symptom:** main's Applications link leaves the stereo tabs unreachable without restarting the program.
+  **Cause:** the copied main index has no edition tabs of its own.
+  **Fix:** keep the main category pages and their entries, but route the copied Home/index destination back to the edition dashboard that contains both its tabs and main's categories.
+  **How found:** follow the installed Applications link and require a new dashboard process with the unchanged stereo sections.

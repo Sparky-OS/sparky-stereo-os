@@ -31,6 +31,52 @@ The case's verdict is `OUT/e/verdict.txt` (`PASS (n checks)` or the first `FAIL 
 `proof-scripts/test-checks.sh` runs every check on planted logs, red and green, in a container: run it after changing `proof-checks.sh`.
 Environment for a small rehearsal: `E_PACKAGES` (default the user meta and both developer tasks), `E_I386=0`, `E_ALLOWED_REMV`, `RUN_PROOFS_MIN_MIB` (the disk floor for one case, default 28 GiB because a full case writes about 12 GiB under Docker's root), `PROOF_OUT`, `PROOF_SCRIPTS`.
 
+## Every binary keeps its source
+
+Run the build tree's `sparky-os/repo/check-binary-sources.py` on the finished repository immediately after `publish-tree.sh` succeeds, before the supply-chain step and before authorizing Part 2:
+
+```sh
+python3 "$BUILD/sparky-os/repo/check-binary-sources.py" "$DEST" \
+    --table "$ROUND_WORK/binary-sources.tsv" > "$ROUND_WORK/binary-sources.log" 2>&1
+```
+
+Propagate its exit status: 0 means every indexed binary has its matching source; 1 names every binary whose source is missing or incomplete; 2 means the gate could not check, and also refuses the round.
+Print the failure log before stopping.
+Keep the table and log with the round's evidence.
+
+The check reads every suite and architecture, including `binary-all`, taking the source name and optional source version from the binary's `Source` field.
+An omitted source name means the binary's own package name; an omitted source version means its binary version, as [Debian Policy 5.6.1](https://www.debian.org/doc/debian-policy/ch-controlfields.html#source) specifies.
+An explicit source version takes precedence, including for a binary-only rebuild.
+The matching `Sources` record in that suite must name a real `.dsc` with the recorded SHA-256 and size, the right source name and version, and the same source components as the descriptor.
+Every component must exist with the recorded size.
+This is a completeness check; it does not rehash the large component archives or establish that a replacement source produced an existing binary.
+
+Before accepting the gate, run it on a copy of the live indexes that lacks the affected sources and require exit 1 naming those binaries.
+After adding genuine, proved source packages and regenerating `Sources`, repeat on that tree and require exit 0.
+Keep independent positive and negative fixtures for an explicit source version, compressed-only indexes, a missing descriptor, a missing component and a corrupt descriptor.
+Other missing sources must keep the whole-tree verdict red; a kernel-only or synthetic green is labelled with its actual scope.
+
+Trap, found in ORDER 557:
+
+- **Symptom:** the repository retained kernel build 16 binaries but no longer offered their source through `deb-src`, and publication checks had passed.
+- **Cause:** the round retired builds 14, 14.2 and 15 with a pattern that also matched their shared `7.3.1.orig.tar.xz` filename.
+  A later round starting with build 16 matched that same filename and removed build 16's own orig archives.
+  Its descriptors then disappeared from the resulting source index and pool.
+- **Fix:** retire only explicit Debian build versions in `old_kernel()`; a filename shared by several builds is never a removal pattern.
+  Keep the shared orig while any retained descriptor needs it.
+  If an incoming orig has the same name with different bytes, stop on that collision and review the retained source closures before replacing anything.
+  Never leave a retained descriptor referring to another build's orig bytes.
+  Run the source gate on the completed tree so that this loss cannot pass silently again.
+- **How found:** reconcile `Packages` against `Sources` and the actual pool, then compare the round's `kernel-left-pool.txt` with `old_kernel()`.
+  The log named all three build-16 orig files even though the comment described only older builds.
+
+A restoration must preserve its evidence too.
+Use the exact historical recipe and the published build records, not the current recipe with a new date.
+Two regenerated archives being equal proves repeatability; compare their hashes with the recorded source hashes separately.
+When a recorded hash differs, report both values and stop staging that replacement.
+Where no record contains a source hash, label the next-best evidence explicitly, such as a matching retained Git tree, patch hashes, configuration and embedded recipe.
+Never relabel an unproved replacement as the source of a published binary.
+
 ## Reading a failed round
 
 | You see | It means | First look |

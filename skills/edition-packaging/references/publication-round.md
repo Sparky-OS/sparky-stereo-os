@@ -4,6 +4,69 @@
 The round's scripts take a build-repository commit, check it, build the new tree from the accepted packages, prove that an installed edition upgrades to it, and stop on the first failure.
 Written on 2026-11-06 from the rehearsal described under "Rehearse before the real round"; the machinery is the round folder's `official-part1.sh`, `pre-round-checks.sh`, `round-worktree.sh` and `run-proofs.sh` with its `proof-scripts/`.
 
+## Before a round: what the merged tree holds that no stage carries
+
+Start with a fetched, clean build-repository commit and the current cohort stage list.
+A merged recipe can be newer than every stage even when the publication gate is green: that gate checks the selected packages, not recipes that nobody selected.
+Keep one reconciliation table with package or source, published version, newest selected stage and its path, recipe version and source line, the change a person gets, and the action needed.
+
+1. Read the published `Packages` and `Sources` indexes, and every binary and descriptor in every stage the cohort names.
+   Read a Python cohort list with `ast.parse` and `ast.literal_eval` of its `STAGES` assignment; importing the module can write the shared cohort files.
+   Match the source through each binary's `Source` field, including an explicit source version, as Debian Policy 5.6.1 specifies; a recipe folder name is not necessarily its source name.
+2. Inventory the tracked producers, then read their version expressions without running them:
+
+   ```sh
+   git fetch origin +refs/heads/main:refs/remotes/origin/main
+   git status --porcelain
+   git ls-files sparky-os/packages sparky-os/upstream > recipe-files.txt
+   rg -n 'VERSION=|NEW_VERSION=|NEXT=|--next |--newversion|edition_version' \
+       sparky-os/packages sparky-os/upstream
+   ```
+
+   Check `CHANGELOG`, `debian/changelog`, version environment files, JSON suite manifests and the folders the producers name too.
+   Resolve a successor to its current source; an older producer retained in the tree is not the shipped recipe.
+   Parameterized producers need a row for each version that must be kept, including a compiler used to seed its successor.
+   Inspect missing or uninitialized source checkouts explicitly; an empty folder is not evidence that no recipe exists.
+3. Compare versions with dpkg, not string ordering or a version guessed from a filename:
+
+   ```sh
+   dpkg-deb -f "$DEB" Package Source Version Architecture
+   dpkg --compare-versions "$RECIPE_VERSION" gt "$PUBLISHED_VERSION"
+   dpkg --compare-versions "$RECIPE_VERSION" gt "$NEWEST_STAGE_VERSION"
+   find "$BUILD_SCRATCH" "$LANE_STORAGE" -maxdepth 5 -type f \
+       \( -name 'PACKAGE_*.dsc' -o -name 'PACKAGE_*.deb' \) -print
+   ```
+
+   A missing published package or stage is written as absent, not version zero.
+   Keep full epochs and Debian revisions; distinguish the pipeline's terminal `+lc1` packaging mark from a source recipe that has not added it yet.
+   A stage elsewhere is an **unlisted stage**, not an unbuilt package.
+   Verify its descriptor, exact binaries, source components, build record, checksums and acceptance before proposing it for the cohort.
+   A descriptor alone, or an unsealed candidate of the same upstream version, is not a publication stage.
+   Name unreadable directories and the depth bound; do not turn a bounded search into a claim about every disk.
+4. Build missing small packages from the merged commit with their own recipes and provenance init.
+   Give each recipe its own source date; unset an earlier recipe's `SOURCE_DATE_EPOCH` before the next init.
+   Retain the complete source package and rebuild its binaries from that descriptor so `.buildinfo` and `.changes` describe the staged files.
+   Compare payload, controls, permissions, ownership and links with the recipe output; describe archive timestamp differences separately.
+   Require complete clean build records, Lean Code and HR checks, lintian compared with the published lines, the zram gate with its notes read, and the archive link gate where applicable.
+   Supply unchanged edition dependencies on both the candidate and previous sides of that gate.
+   Prove the exact upgrade with apt's `Inst` lines and the actual installed version; no removals alone does not prove an upgrade happened.
+5. Hand back the stages, checksums and table, plus the larger builds and missing dependencies that remain.
+   Keep the round's current frozen inputs read only; copy, never hard-link, a stage or published archive.
+   Do not edit the coordinator's cohort list from a worker lane.
+
+Trap found while preparing a round:
+
+- **Symptom:** a package selected for a round was older than the accepted recipe, and other merged recipes had no selected stage at all.
+- **Cause:** the cohort was assembled from known stage folders; nobody compared all current recipe versions against both the published indexes and every selected stage.
+  An exact newer stage outside that list was missed too.
+- **Fix:** build this table before freezing the round, locate unlisted stages with a bounded search, build the missing small packages, and name the large work explicitly.
+- **How found:** the recipe's `VERSION` and changelog were read against the published control and the staged descriptor, then every listed stage was inventoried by binary/source identity.
+
+The pre-round checks also run `python3 iso-build/tests/test-zram-check.py`, in the same isolated container form as the other checks.
+Prove a new check twice on immutable copies: green on the merged tree, red after disabling one gate refusal deliberately.
+The red summary must name the failed check, end with the round-stop message, and return 1.
+A summary pipeline runs in a subshell; update the aggregate failure variable outside it, or a printed FAIL can still return success.
+
 ## The recipe
 
 1. **Freeze the build tree.** `round-worktree.sh WORKTREE [COMMIT]` makes (or reuses) a git worktree of the build repository at one commit; the default commit is `origin/main` as fetched now.
@@ -11,8 +74,8 @@ Written on 2026-11-06 from the rehearsal described under "Rehearse before the re
    It prints `round-commit <40 hex> <path>`; the round log, `round-commit.txt` and the supply-chain file `round-toolkit-ROUND.json` (listed in `SHA256SUMS`, so the detached signature covers it) name that commit.
    An existing worktree is reused only at exactly that commit and with nothing changed; any other state stops with the reason.
    Remove it when the round is published: `git worktree remove --force WORKTREE`.
-2. **Pass the pre-round checks.** `pre-round-checks.sh WORKTREE OUTDIR` runs, each in its own container (image `lc-linebreak-rebuilds-311-test:1`, `--ulimit core=0`, `--network none`, the three `--security-opt` options `seccomp=unconfined apparmor=unconfined systempaths=unconfined` that the link-gate tests need for bubblewrap), the whole lean suite (`python3 -m pytest lean/tests`: 461 passed, 30 skipped on 2026-11-06, 4 to 5 minutes), `tests/reproducible-sources/test.sh` and `tests/supply-chain/test-wiring.sh`.
-   It runs all three even after a failure, prints one PASS or FAIL line each, and exits 1 if any did not pass; `official-part1.sh` stops there, before it copies anything.
+2. **Pass the pre-round checks.** `pre-round-checks.sh WORKTREE OUTDIR` runs, each in its own container (image `lc-linebreak-rebuilds-311-test:1`, `--ulimit core=0`, `--network none`, the three `--security-opt` options `seccomp=unconfined apparmor=unconfined systempaths=unconfined` that the link-gate tests need for bubblewrap), the whole lean suite (`python3 -m pytest lean/tests`: 461 passed, 30 skipped on 2026-11-06, 4 to 5 minutes), `tests/reproducible-sources/test.sh` `tests/supply-chain/test-wiring.sh` and `iso-build/tests/test-zram-check.py`.
+   It runs all four even after a failure, prints one PASS or FAIL line each, and exits 1 if any did not pass; `official-part1.sh` stops there, before it copies anything.
 3. **Build the tree** (`official-part1.sh`: base check, source forest, destination with the pool hard-linked from the base, `publish-tree.sh`, supply chain). Nothing is signed with a key the script was not given, and nothing is sent.
 4. **Prove the upgrade on the edition's own dpkg.** `run-proofs.sh ROUND BASE DEST "a b e"`; case `e` installs the live set's `dpkg` and `dpkg-stereo` first, shows `dpkg --version` and `dpkg-query -W dpkg`, installs the package set under that dpkg, then runs `apt-get dist-upgrade` to the new tree and judges it on apt's own `Inst` and `Remv` lines (below).
    A stock-dpkg proof can pass where the edition's dpkg refuses (a shared Multi-Arch file that dpkg-stereo projected, ORDER 363).
@@ -118,7 +181,7 @@ The independent archive inspection also caught v3 patch outputs at 0600: two mat
 | You see | It means | First look |
 |---|---|---|
 | `round-worktree: ... is at X, the round's commit is Y` | the worktree of an earlier try is still there | remove it (`git worktree remove --force`) or name its commit |
-| `PRE-ROUND CHECKS FAILED` | one of the three checks | `OUTDIR/summary.txt` names it, `OUTDIR/<check>.log` has the output; the lean suite's first `FAILED` line names the test |
+| `PRE-ROUND CHECKS FAILED` | one of the four checks | `OUTDIR/summary.txt` names it, `OUTDIR/<check>.log` has the output; the lean suite's first `FAILED` line names the test |
 | `wiring: ... docker run lacks "${SPARKY_PROV_ARGS[@]}"` | a build driver does not pass the host's provenance facts | the file named on that line |
 | `BASE is not live` | the base copy's InRelease hash differs from the server's | someone published since the copy; start from the live tree |
 | `supplied input changed after its universe was frozen` | something touched a file of the base or destination pool while the link gate ran (a hard-link copy, a delete); the gate stamps inode, size and change times | never `cp -al`, delete or rename any tree sharing the pool during a run; reads are safe |

@@ -236,7 +236,7 @@ Source=fixed-work measure, 2026-11-13, quiet runs only
 - The program is its desktop entry's name, the card its PCI vendor and device numbers: the card the program is drawn on, which the GPU resolver already knows.
 - `Way` is `cpu` or `batch`. Qt's OpenGL engine took more processor in every measurement, so no row names it; it stays the person's choice.
 - `Load.WORK` holds the processor milliseconds for each frame asked, the program and the compositor together, on the processor, batched and with Qt's OpenGL engine; `Runs.WORK` the quiet runs behind each number; `Source` where they come from. The resolver needs only `Way` and the loads; the rest is for the person who reads the file.
-- **The rule a row follows:** `batch` only when every fixed work of that program on that card took at least a fifth less processor batched than on the processor, in quiet runs. The fifth is this page's choice: it is the smallest gain the first desktop showed and larger than the spread between quiet runs of one row on the small laptop (up to 16 %). The resolver checks the rule against the row's own numbers, so a row that says `batch` against its loads, or without loads, is not followed, and a test checks every shipped row both ways.
+- **The rule a row follows:** `batch` only when every fixed work of that program on that card took at least a fifth less processor batched than on the processor, in quiet runs. The fifth is this page's choice: it is the smallest gain the first desktop showed and larger than the spread between quiet runs of one row on the small laptop (up to about 17 %). The resolver checks the rule against the row's own numbers, so a row that says `batch` against its loads, or without loads, is not followed, and a test checks every shipped row both ways.
 
 **Which machine a record is for.** The records ship in the package, one file for each machine that was measured, each with a `[Match]` group: the firmware's vendor and product where they name a model (`Vendor`, `Product`, a laptop), the processor's model name as the kernel reports it where they do not (`Cpu`, a desktop whose firmware says "System Product Name"), and always the exact set of display controllers (`Gpus`).
 At boot the record tool copies the matching file's rows into the machine's record (`--apply-known`); a disk moved to another machine loses them at its next boot.
@@ -456,7 +456,7 @@ Automatic stays processor painting; a measured rule per program is a proposal re
 
 ### A decorated pair candidate on the GPU
 
-This candidate is excluded from the package after the fractional edge failures below; the existing client-frame exception stays.
+This candidate was kept out of the package while it failed at fractional widths; with [each eye painted from its own left edge](#the-pair-at-a-fractional-scale-each-eye-from-its-own-left-edge) it passes and ships.
 In its scoped successful rows, the client-side frame is identical in the two eyes, with the content in its own half of one double-width FBO.
 The Wayland EGL platform advertises this capability to Widgets; other platforms keep their existing frame exception.
 The blitter draws the decoration with its full texture coordinates and then samples the left or right half of the content texture into that eye's content rectangle.
@@ -566,18 +566,45 @@ Additional traps found by the raw runs:
   Cause: the batched engine relied on an inline definition available through a previous compiler's PCH.
   Fix: include `private/qpainterpath_p.h` explicitly; the nonmatching-PCH compilation exposed the missing direct include.
 
-### Equal eye extents are necessary but not sufficient
+### The pair at a fractional scale: each eye from its own left edge
 
-The rejected CSD candidate rounded the complete double width, while the compositor recognized twice the rounded single-eye width.
-At width 941 and scale 1.25 these are 2353 and 2352 pixels, so its pair guard selected the mono mapping.
-A trial equalized extents and added the right-eye residual; width 941 then passed on AMD.
-But width 942 at 1.25 failed with 1926 unequal content-rim pixels, despite identical frame pixels.
-The residual was added after primitive pixel rounding, leaving different coverage at the two content edges.
-The next change must keep the depth shift separate from a local physical eye origin, apply origin/clip transforms consistently before rounding, and then place each eye at its equal integer boundary.
-Keep both red cases.
-Qualify odd and even widths at 100, 125, 150 and 175 percent on both cards, both GPU engines, lifecycle and controls before removing the client-frame exception.
-The partial trial is not that qualification; its CSD patches stay out of the recipe.
-Both eyes from one recorded paint callback also remains unimplemented: shifted/clipped left-eye records cannot reconstruct right-eye-only coverage or style parts with their own depth.
+Settled on 2026-11-14; it replaces the candidate above, whose even-width failure is the red case.
+
+**Symptom:** at 125 % a window painted once per eye on the GPU is shown flat (0 differing pixels between the eyes, depth and pair both asked for) at every width that is not whole at that scale, under the compositor's own frame too; at 100 % it has its depth. A trial that made the two extents equal passed width 941 and failed width 942 with 1,926 unequal pixels at the content's rim.
+**Cause:** two things with one root. The store was twice the window's width in the window's own units, so its texture was `round(2 * W * ratio)` wide, while the compositor takes a pair by the width of one view, `2 * round(W * ratio)`: 2353 against 2352 at width 941, 2355 against 2356 at 942, equal only where `W * ratio` is whole. And the right eye was painted from the window's width in its own units, so it began a part of a pixel off its half and every edge in it rounded differently from the left eye's; adding the remainder after the rounding (the trial) moves already rounded edges and changes their coverage.
+**Fix:** a GPU store holds the pair as two eyes of one whole width in device pixels, and each eye is painted from its own left edge (the repaint manager paints both eyes with the same origin and tells the store which eye is next and how wide an eye is). The batched engine adds the eye's origin, whole pixels, to each record after it was rounded and cut. The OpenGL engine's store paints each eye into a framebuffer of the eye's own size and copies it into its half: a pair is always painted whole, so the framebuffer keeps nothing between the eyes. The element's own part of a pixel stays a separate shift, as before.
+**Found by:** the same fixture without any frame at 125 % and widths 941 and 942: flat on both GPU ways. That showed the fault was not the frame's; then reading the three places that turn a width into pixels.
+
+Measured in the rig, an AMD integrated card and an RTX 3060 on NVIDIA's own EGL, scales 100, 125, 150 and 175 %, widths 940 to 943, through an application's resize, a hide and a show:
+
+| Window | Batched | Qt's OpenGL engine |
+|---|---|---|
+| No frame (what a compositor's own decoration gives the client), 32 cases each | asked 0.5, -0.5, 1.5, -1.5, 0.25, 1: exact in all; the rim identical in both eyes | the same but the 0.25 disc, 0.226 to 0.275 (its sample grid); rim identical |
+| Qt's own frame, 32 cases each | exact in all; frame and rim identical in both eyes | as above |
+
+Before the fix, the same fixture without a frame at 125 %: flat at widths 941 and 942 on both GPU ways.
+So the client-drawn frame's exception is lifted on the GPU ways: the frame is drawn once and is the same in both eyes, the content has its pair.
+
+**Not fixed here, measured:** the processor-painted pair (a shared memory buffer twice as wide) has the same root at a fractional scale. At 125 % and width 941 the fixture's discs measured 1.925, -0.708, 2.906, -2.226, 0.139, 1.254 device pixels where whole steps of the window's own pixel give 1.25, -1.25, 2.5, -2.5, 0, 1.25; at width 942, 1.675, -0.959, 2.658, -2.477, -0.11, 1.006.
+The way to give it the same fix: the raster store hands the painter a view of the right half of its image (a `QImage` over the same bytes, starting whole pixels in) for the second eye, the buffer is two rounded eye widths wide, and the repaint manager paints both eyes from the same origin; the test is this matrix with the processor's whole-pixel expectations.
+
+### Both eyes from one paint pass: what was measured
+
+The window is still painted once per eye: every widget's paint code runs twice.
+With each eye painted from its own left edge the two record lists can be compared directly (the record dump, the right eye's records moved back by the eye's width):
+
+| Window (Stereo Union unless said) | Records per eye | The same in both eyes | Moved across only | Without a twin |
+|---|---|---|---|---|
+| The fixture with six discs at asked parallaxes (default style) | 1,730 | 1,686 (97.5 %) | 21 | 23 |
+| The fixture, ElementLimit 1 | 1,668 | 1,654 (99.2 %) | 9 | 5 |
+| File manager | 721 | 721 (100 %) | 0 | 0 |
+| Editor | 1,230 | 1,208 (98.2 %) | 22 | 0 |
+| Terminal | 104 | 103 | 0 | 1 |
+
+So nearly all of the second pass repeats the first.
+What stops a replay is not the engine: the style decides inside a paint callback which eye it draws a part for (it reads the window's eye), so one callback cannot yield both eyes, and a record without a twin is a part cut differently by a neighbour that moved.
+The boundary for the next step: (1) the style asks Qt for the eye through one function, which marks that widget's painting as different for each eye; (2) for the second eye the repaint manager calls the paint code only of widgets that were marked or that have a shift of their own, and the engine repeats the first eye's records of every other widget at the second eye's origin; (3) the proof is the pair pixel-equal to the two-pass pair, with a part visible in one eye only and a tab part deeper than its parent among the cases.
+Until then two passes stay.
 
 - Symptom: Callgrind records feed completion but the final terminal text is not the completed native text.
   Cause: the feed has written all bytes, but the terminal still has queued input/painting; a first paint followed by 250 ms is not a drain under instrumentation.

@@ -119,6 +119,4 @@ Traps:
   **Fix:** give it only the build and scratch folders.
 - **Symptom:** a message in `${VAR:?...}` with an apostrophe breaks every quote after it in the script.
   **Fix:** no apostrophe inside an unquoted `${...:?message}`; `bash -n` before running.
-- **Symptom:** two matrices running side by side lose cases with "container name already in use".
-  **Cause:** both name their containers after the case alone.
-  **Fix:** the matrix's own name goes into the container's name.
+- A caution, seen before it bit: two test matrices that run side by side and name their containers after the case alone would refuse each other's cases ("name already in use"). The matrix's own name goes into the container's name.

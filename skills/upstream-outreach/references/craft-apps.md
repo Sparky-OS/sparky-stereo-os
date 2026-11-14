@@ -544,3 +544,28 @@ Fix: carry the original bounded failure-cache entry and replay its warnings at e
 Retain every warning variant the shared owner already exposes.
 How found: the original JPX and JBIG2-stencil controls measured six decodes before and two after PdfCraft's `558ffd7f8a65708e292a558625a907cce8dd3e30`, while every failed draw still reported its failure.
 The ordinary picture decoded once and drew every time.
+
+### Image refusal metadata and independent decode budgets
+
+Symptom: a refused JBIG2 opacity mask leaves its picture visible in the RGB or plate raster, or still hands the picture to a raw-ink consumer.
+Cause: the shared owner's independent dimension and output clamps returned without the stream-refusal marker that the newer receiver uses; the raw-ink path only watched page work exhaustion.
+Fix: retain those bounds, mark their refusals, and use one warning/refusal watcher for the picture's RGB and ink consumers.
+How found: a synthetic 64 by 16 mask declared as 1 by 1 exceeded the image's size-derived budget; RGB and plate controls exposed the black picture instead of leaving the page white, and the raw-ink control counted one image callback instead of zero.
+After the fix, the picture stays hidden, the typed content-limit diagnostic remains visible, and the valid image still reaches the ink consumer once.
+Carry the original per-stream metadata subject with its author, preserving the common owner's cancellation and allocation checks.
+
+Symptom: a proposed document-stream-limit test expects a valid known-size image to fail, but the decoder draws it without a warning.
+Cause: the oracle conflates ordinary stream materialization with a separate, format-derived known-image budget.
+Fix: read the budget definition before changing policy; keep the valid ordinary-cap case as a positive control and exceed the actual declared-image bound in the refusal control.
+How found: `filter::decode_limit` derives the known-image allowance from declared dimensions, while `max_decoded_stream` governs ordinary materialization.
+The initial 64-byte refusal expectation was wrong and was superseded explicitly; no production limit was relaxed or tightened to satisfy it.
+
+### Receiver behavior needs the reviewed prerequisites too
+
+Symptom: all newly requested public names exist, but the receiver's rendered controls still fail on a wide CMYK group, a nested knockout or a preceding pattern.
+Cause: an API-name audit does not identify earlier behavioral review fixes in the receiving backend's history.
+Fix: carry the original wide-tile and nested-space, knockout-erase and paint-transform subjects independently, preserving authors and dates and the shared plate/ink paths.
+How found: the original multi-scale and nested-space controls lost Difference blending, the knockout control measured different RGB values, and the pattern control measured magenta where the unshifted group was cyan.
+The corresponding upstream tests pass after their original fixes; the 256-level black sweep was already green on the imported Vello source and is not a newly reproduced defect.
+An RGB fill gains profile-derived CMYK tints in the later receiver, so its older no-tints control must follow that same original commit's RGB-image fixture.
+Keep the full library and every receiving application's whole gate as the qualification boundary; component controls alone do not qualify the suite revision.

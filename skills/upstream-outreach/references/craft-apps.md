@@ -474,3 +474,30 @@ Cause: the loaded-face path returned that face directly, while the exhaustive pa
 Fix: apply the same requested-style resolution to the loaded covering family, retaining the covering face when the resolved style lacks the character.
 How found: the unchanged assertion failed with the extra diagnostics, the two selection paths differed at the return, and the same focused regression passed after the correction with the font inputs unchanged.
 This establishes the measured style correction; unrelated fallback-family ordering and unavailable writing systems need their own controls.
+
+## A receiver has newer APIs than its common backend
+
+Compare the receiver's real compile errors with the shared owner's public definitions before moving pins.
+Find each missing behavior's original upstream commit and its prerequisites.
+Port it into the common owner while retaining that owner's independent decoder bounds, cancellation and work limits.
+Keep original authors and dates on directly carried vendor subjects; identify partial ports rather than claiming whole-commit identity.
+Run the standalone backend contract job, the common library gate and every receiver's complete gate before calling a new suite revision green.
+A passing backend job alone does not establish receiver compatibility.
+
+Symptom: a PDF receiver names missing viewer-state, repaired-update and page-work APIs after its dependencies converge on one common checkout.
+Cause: the common snapshot and the receiver evolved independently; a broad three-way merge also includes rendering and hostile-input changes on both sides.
+Fix: reconcile the actual behavior in the common owner, including warning propagation and every budget consumer, before moving the suite's common pin.
+Keep the receiver's private backend out of the resolved graph.
+How found: the real PdfCraft compile named fifteen missing API uses; a subsequent backend compile found a cancellation regression still treating a new `(XRef, bool)` result as an `XRef`.
+That later integration remains unverified; fixing the tuple consumer must preserve its cancellation assertion and be followed by the complete gates.
+
+Symptom: a transferred source manifest's historical SHA-256 disagrees with the named revision, while its recorded Git blob agrees.
+Cause: the historical source-hash field is wrong; it is distinct from the local patched-file hash.
+Fix: fetch the exact named upstream path, verify both its Git blob and SHA-256, then correct only the wrong provenance field.
+How found: PdfCraft's `ec0a965074f376a5bf610435948e4e5184bf3299` JPX source hashes to `f0a2b01c692c086d30a26562d7548f9e837af166be737d2c543de7c886a45f82` and Git blob `74efd8b31e2b2935ff2bbceda2c1ffd36ea9c20d`; its separate local patched hash was already correct.
+Retain the fetched authority bytes and the before/after comparison.
+
+Symptom: a source inventory takes far longer and transfers more data than its selected paths suggest.
+Cause: a broad `git grep` over a partial clone hydrates promised blobs outside the intended code read.
+Fix: list paths from tree metadata, select the actual owner files, and fetch those bounded files at the recorded commit.
+How found: the broad read was interrupted; explicit pinned raw-file reads completed the twelve-app inventory without a repository-wide content search.

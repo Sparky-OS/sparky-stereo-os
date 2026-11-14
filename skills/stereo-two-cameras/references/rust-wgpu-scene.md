@@ -285,3 +285,47 @@ The identical block-matching oracle rejected reversed eyes, and the far-surface 
 These are two measured features at two sizes, not a dense accuracy claim for every model.
 Keep the ordinary renderer entry point and headless tool defaults, including its per-eye grid and size bound, unless the person chooses another resolution.
 The capture must open the actual original PDF and parse its PRC annotation through the production loader; rendering only directly constructed test meshes does not verify that path.
+
+## Orthographic trace backgrounds and hardware witnesses
+
+Derive the prediction from the actual render mode's background projection as well as its model camera.
+An orthographic path tracer has parallel miss rays; it does not inherit a painting renderer's perspective sky constraint.
+For orthographic geometry, use `disparity = focal * baseline * (1 - Z/C)`.
+Solve both compositor inequalities over the scene's near and far depths before making the capture.
+
+Symptom: an orthographic trace measures twice the disparity expected by a previously passing painting-view oracle.
+Cause: the oracle reused the painting view's perspective environment constraint, while `TracePairFrame::cameras` correctly supplies zero infinity coefficient for orthographic miss rays.
+Fix: keep the production camera unchanged and derive a fresh prediction from the trace mode's actual depth range and constraints.
+How found: both processor and GPU captures measured 12 pixels where the inherited oracle expected 6; reading the actual trace camera and the common solver explained the factor of two.
+Fresh captures, with the independent prediction recorded first, then measured +12 and -12 displayed pixels at depths 3.75 and 6.25 about target distance 5.
+At a 640 by 360 window the native grid measured the same values; at a 320 by 180 window the selected 640 by 360 grid measured +24 and -24 before compositor scaling.
+Both tracers completed four samples per eye, vertical disparity was zero, the reversed-eye control failed, and the eyes outside the stereo window were identical.
+These are two measured features, not a dense accuracy claim.
+
+For hardware proofs, restrict the client to the intended Vulkan ICD and check the actual client process's loaded driver and open device nodes.
+Retain the enumerated device information alongside the native pair and the completed sample counters.
+An available adapter alone does not establish which driver rendered the client.
+The processor and GPU trace witnesses at both window sizes also passed on AMD and NVIDIA hardware with their existing perspective +6/-4 displayed prediction.
+The hardware selection belongs to the private proof harness, not to the program's stereo controls.
+
+Symptom: the launcher cannot stat an authorized render node before starting its container.
+Cause: the tool's own device namespace does not expose the daemon host's render node.
+Fix: use the already authorized device and group, verify their identity inside the isolated container, and inspect the actual client descriptors there.
+How found: host-side stat failed before rendering; the in-container check succeeded and the actual client mapped the selected hardware ICD with the matching device open.
+Never replace that check by a software fallback and call it a hardware pass.
+
+## Root shutter samples through collapsed instances
+
+An evaluated composition camera needs the root frame's camera identity and the root shutter sample time as separate inputs.
+Carry that time explicitly through collapsed instances, retaining their instance transforms and property overrides.
+Map sample time down through stretch and remapping; do not recover root time by subtracting a nested time.
+Keep an uncollapsed composition's own camera boundary.
+Prepare the composition, lights and environment once for a sample, then make its two parallel eye views with private effects and histories.
+
+Symptom: a collapsed identity composition under a moving root camera renders like a held camera during motion blur.
+Cause: the Classic path's shutter-camera helper returns the cached `Collapse3d.cam` for every sample.
+Required fix, still unverified: evaluate the selected root camera at each explicit root shutter time and carry the corresponding placement through the complete collapsed-instance chain.
+How found: the retained monoscopic regression differs from the direct moving-camera world in 160 of 20,000 pixels, with maximum alpha difference about 0.361111; its held-camera control matches the collapsed frame exactly.
+This is a prerequisite failure, not a stereo proof.
+[EffectCraft #3623](https://github.com/storytold/effectcraft/pull/3623) fixes the distinct first-frame camera-identity problem; retain zorianflorian's original commit when it is needed, rather than freezing the animated camera to hide the collapsed-instance defect.
+The remaining repair needs direct, nested, remapped, mixed card/mesh and ordinary controls before a native stereo adapter can be qualified.

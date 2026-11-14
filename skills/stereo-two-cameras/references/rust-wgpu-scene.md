@@ -179,13 +179,52 @@ The GPU tracer's `pass` documents one call per submission because `queue.write_b
 Two calls on that owner before one submission would not provide independent eye uniforms, accumulation or sample counts.
 The spare accumulation buffer is a previous-size allocation cache, not a second eye.
 The required fix belongs in that tracer's resource ownership and pair submission boundary, with the same coherent camera inputs, plus an equivalent CPU adapter.
-This was found by following `render_mode::TraceCallback::run` into `GpuTracer::pass` and inspecting its fields; the uniform overwrite has not been reproduced as a stereo runtime failure.
+The audit followed `render_mode::TraceCallback::run` into `GpuTracer::pass`; a subsequent real software-GPU diagnostic queued two different cameras on that owner before submitting and found that the first pass used the second camera and sample index.
+This reproduces misuse beyond the documented once-per-submission contract, not a failure of the original ordinary caller.
+Give each eye a private tracer uniform, then require a queued pair's raw accumulation and resolved denoised pixels to equal independently submitted eye controls.
 Do not mark Rendering mode adapted merely because the raster companion opens beside it.
+
+Symptom: a retained white scene turns black after a different view uploads a new black material at the same texture dimensions.
+Cause: an `Arc` shares the material wrapper, but a same-size reuse path still copies new pixels into its shared GPU textures.
+Fix: reuse those textures only when their material owner is unique; otherwise allocate a new immutable map set and share that set with the new pair.
+How found: retain the old scene, replace the active material, trace both, and check the old white scene's actual accumulation; removing only the ownership guard makes that regression fail.
+A pointer-sharing assertion alone cannot detect a texture's contents changing.
+
+Symptom: two CPU sample counters are equal, but the returned image already contains some rows from the next sample.
+Cause: counters advance only after a full pass, while row-sliced accumulation mutates pixels before then.
+Fix: track the in-progress pair boundary as well as N and refuse publication while either next pass is incomplete.
+How found: after one complete pair, advance only three rows, require image publication to fail despite counters still reading one and one, then finish the pass and compare both complete images with the ordinary zero-budget render.
+
+Use stochastic lighting for a convergence witness, separately from the emissive geometry fixture that makes visibility and disparity easy to measure.
+Save each eye's linear estimator and completed N before tone mapping; compare it with that same eye and backend at a stated longer reference N.
+A finite reference is not ground truth, and CPU/GPU floating-point estimators need not match bit for bit.
+One measured procedural lit sphere at 64 by 48, three bounces and no denoising completed 1, 8, 32 and 256 samples in both eyes on CPU and software GPU.
+Each of its four backend/eye RMSE sequences decreased against its own 256-sample reference; the CPU left eye went from 0.3137 at one sample to 0.0647 at 32.
+Those renderer outputs establish this convergence case, not a native-window capture; the companion still needs its own source, sample metadata, geometry and stock controls.
 
 A native host should retain at most one pending worker or GPU pair.
 When an immutable request becomes obsolete, cancel it and wait for acknowledgement before starting another worker, rather than accumulating cancelled workers during rapid edits.
 Only hand the native window one complete left-first picture, together with the sample and scene metadata belonging to that picture.
 Poll live compositor feedback after the scene settles because resizing changes the native disparity budget even when the chosen source resolution stays fixed.
+
+A native progressive TextureCraft capture used the existing 40 degree camera, target distance 5 and model depths 4 and 6.
+Here d is the left image x coordinate minus the right image x coordinate.
+With a perspective environment and a 24/12 native-pixel budget, the infinity constraint gives e*f=120, so d(Z)=e*f*(1/Z-1/5) predicts +6 and -4 pixels.
+At a 320 by 180 window with the chosen 640 by 360 source grid retained, the 48/24 native budget gives e*f=240 and +12/-8 native pixels; one compositor resize restores +6/-4 displayed pixels.
+Both CPU and software GPU measured these values, zero vertical shift and zero differences outside the content, and the unchanged geometry oracle rejected reversed eyes.
+Each completed capture recorded four samples and 921600 primary rays per eye under one scene revision; the 640-window native and displayed pixels matched exactly.
+This is a two-feature, two-size perspective case, not dense accuracy evidence for every material or orthographic tracing.
+
+Symptom: replacing an environment image under the same resource name leaves the paired scene cached.
+Cause: an outer scene cache can stop before the ordinary renderer's decoded-image identity check is reached.
+Fix: retain the source image and compare its Arc identity as well as the ordinary composition key; give a replacement a new source generation and invalidate both histories.
+How found: replace red environment samples with blue under one name, remove only the image-identity guard, and observe the stale-scene assertion fail before restoring it.
+Holding the old source also prevents a later allocation from reusing its address; release it when the replacement is accepted.
+
+Do not let a control probe supply the wakeup it is meant to verify.
+For an idle resize witness, finish tracing, resize through the compositor, then freeze and capture both eyes before any new ui.inspect request.
+The tested CPU companion retains the existing 16ms native-feedback poll even after its worker completes; the GPU path keeps the same polling boundary.
+The 320-window CPU and GPU witnesses both consumed the new budget without a control request, then separately verified the four-sample metadata.
 
 ## Solid backgrounds and model units
 

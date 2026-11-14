@@ -32,7 +32,7 @@ What the edition does with that:
 - `update-grub` under Secure Boot (the firmware's `SecureBoot` variable) names no font file. When 16 pixels is already the menu's height on the screen (a 24 inch full HD monitor), nothing else changes. On a denser screen the menu is given the resolutions at which 16 pixels has that height, nearest first, of the screen's own shape, then 1024x768, then the firmware's own; `SPARKY_STEREO_SECUREBOOT_TEXT=native` keeps the screen's resolution and small text.
 - `/etc/grub.d/01_sparky_stereo_menu` adds, right after `00_header`: when `$shim_lock` is `y` or the font file is gone, `loadfont unicode`, that resolution, and the graphical terminal started again (`terminal_output console`, then `terminal_output gfxterm`); with no font at all, the firmware's text console. This is for Secure Boot switched on after the menu was written and for a person's own `GRUB_FONT`.
 - At boot, `sparky-stereo-boot-check.service` compares Secure Boot with what the last `update-grub` recorded (`SECUREBOOT=` in `/var/lib/sparky-stereo-boot/grub-display`) and writes the menu again when it changed.
-- Sized fonts under Secure Boot need a GRUB image that carries them, signed by a key shim trusts: the route GRUB's own commit names for vendors ("Vendors can always customize fonts because they have ability to pack fonts into their GRUB bundles", `kern/efi/sb: Enforce verification of font files`). That is the next piece, not a limit.
+- Sized fonts under Secure Boot need a GRUB image that carries them, signed by a key shim trusts: the route Debian itself uses for its one font (a memdisk inside the signed image). That is the next piece, not a limit.
 
 ## The screen's size: two EDID fields
 
@@ -84,7 +84,7 @@ The kernel knows the same fault as a quirk (`EDID_QUIRK_DETAILED_USE_MAXIMUM_SIZ
 
 ## Credits
 
-GRUB's font and Secure Boot code: Vladimir Serbinenko (the font engine and gfxterm), Zhang Boyang and Daniel Kiper (`kern/efi/sb: Enforce verification of font files`), Chris Coulson (`font: Try opening fonts from the bundled memdisk`), and the GRUB maintainers.
-Debian's GRUB packaging, which bundles the font in the signed image: the Debian GRUB maintainers (Colin Watson, Steve McIntyre, Julian Andres Klode, Mate Kukri, Felix Zielcke).
+GRUB's font engine, graphical terminal and Secure Boot verifier (`grub-core/font/font.c`, `grub-core/term/gfxterm.c`, `grub-core/kern/efi/sb.c`): the GNU GRUB authors, as GRUB's own history records each change.
+Debian's GRUB packaging, which bundles the font in the signed image (`debian/build-efi-images`): the Debian GRUB Maintainers; `debian/control` of 2.14-5 names Felix Zielcke, Jordi Mallach, Steve McIntyre, Julian Andres Klode and Mate Kukri.
 os-prober: the Debian Installer team.
 Calamares: Adriaan de Groot, Teo Mrnjavac and the Calamares contributors; the installer settings the edition builds on: Paweł "pavroo" Pijanowski.

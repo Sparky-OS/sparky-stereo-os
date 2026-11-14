@@ -200,7 +200,7 @@ What the numbers say:
 The three ways are one switch a program reads at its start, `QT_WIDGETS_GPU_PAINT` (nothing: the processor; `batch`; `opengl`), so a desktop can offer them without touching any program.
 The edition's Graphics page (`sparky-stereo-graphics`) has "Paint windows": Automatic, On the processor, On the graphics card (batched), On the graphics card, Qt's OpenGL engine, for each kind of program and for each program.
 
-- **Automatic is a measurement, not a guess:** the way measured for that kind of program on that machine or its model, kept in the machine's record beside the GPU measured best (`[MeasuredPaint]` in the system's `sparky-stereo-graphicsrc`, written by `sparky-stereo-gpu-record --set-paint KIND WAY` or shipped with a known model's record). Where nothing was measured it is the processor, which is how every Qt paints.
+- **Automatic is a measurement, not a guess, and it is each program's own:** the way measured for that program on the card it is drawn on, on that machine ([below](#automatic-for-each-program-from-a-measured-record)). Where the program or the machine was not measured it is the processor, which is how every Qt paints.
 - **The launcher hands it over.** The page's resolver (`sparky-stereo-gpu-env --app ID`) prints `QT_WIDGETS_GPU_PAINT=...` after the GPU's own variables, and Plasma's launcher (KIO) starts the program with every line it prints; `sparky-stereo-gpu-run` does the same for a program started by hand. Nothing is printed for the processor.
 - **A value set by hand in the session wins,** as a GPU variable set by hand does, and the page says so.
 - **A way chosen for a program is that program's alone.** A terminal or a file manager hands its environment to everything it starts, so a way chosen for it would paint its children too, against their own choices. The edition's Qt reads the variables when the application starts and, when they came with someone to tell (`QT_WIDGETS_GPU_PAINT_TELL`: the page's mark), takes them out of its environment. A value set by hand comes without that mark and is inherited as any variable is. Read it at application start, not at the first window: a terminal starts its shell before it paints. Proof: start a terminal both ways with a shell that writes `env` to a file.
@@ -213,6 +213,53 @@ Traps of this part:
 - **Symptom:** the kept problem names the renderer as `LLVM 21.1.8, 256 bits)`. **Cause:** the renderer's name has parentheses of its own, and the text after the last opening one was taken. **Fix:** take what follows the fixed words. **Found by:** the installed-package proof's one failing line.
 - **Symptom:** a message that should be in the person's language is English in a test container. **Cause:** `LANGUAGE=pt_BR` does nothing under the `C` locale, and the image had no `pt_BR.UTF-8`. **Fix:** `localedef -i pt_BR -f UTF-8 pt_BR.UTF-8` in the image and `LANG=pt_BR.UTF-8` in the test. **Found by:** the same message came out right through the problems engine's own catalogue.
 - **Symptom:** a D-Bus activatable program is now started by the launcher itself. **Cause:** the launcher starts such a program itself whenever the resolver's answer is not empty, and the painting variable makes it so. That is what carries the variable to the program; say it in the hand-back.
+
+## Automatic for each program, from a measured record
+
+Added 2026-11-14.
+The fixed-work tables above say that the gain is a program's and a machine's: a terminal took a fifth to two fifths less processor batched on one desktop and nothing less on a small laptop, a file manager the same on both, an editor more when typing.
+So Automatic is decided for each program, from what was measured on that hardware, and a program or a machine that was not measured stays on the processor.
+Nothing is measured on the person's machine and nothing is guessed for hardware nobody measured.
+
+**The record's form.** One group for each program and card, in the machine's record file (`/etc/xdg/sparky-stereo-graphicsrc`, the file the desktop's GPU record already uses, KConfig's nested groups):
+
+```
+[MeasuredPaintPrograms][org.kde.konsole.desktop][1002:1638]
+Way=batch
+Load.animation=14.8 8.6 35.9
+Runs.animation=1 2 1
+Load.text=6.9 5.3 11.3
+Runs.text=2 2 2
+Source=fixed-work measure, 2026-11-13, quiet runs only
+```
+
+- The program is its desktop entry's name, the card its PCI vendor and device numbers: the card the program is drawn on, which the GPU resolver already knows.
+- `Way` is `cpu` or `batch`. Qt's OpenGL engine took more processor in every measurement, so no row names it; it stays the person's choice.
+- `Load.WORK` holds the processor milliseconds for each frame asked, the program and the compositor together, on the processor, batched and with Qt's OpenGL engine; `Runs.WORK` the quiet runs behind each number; `Source` where they come from. The resolver needs only `Way` and the loads; the rest is for the person who reads the file.
+- **The rule a row follows:** `batch` only when every fixed work of that program on that card took at least a fifth less processor batched than on the processor, in quiet runs. The fifth is this page's choice: it is the smallest gain the first desktop showed and larger than the spread between quiet runs of one row on the small laptop (up to 16 %). The resolver checks the rule against the row's own numbers, so a row that says `batch` against its loads, or without loads, is not followed, and a test checks every shipped row both ways.
+
+**Which machine a record is for.** The records ship in the package, one file for each machine that was measured, each with a `[Match]` group: the firmware's vendor and product where they name a model (`Vendor`, `Product`, a laptop), the processor's model name as the kernel reports it where they do not (`Cpu`, a desktop whose firmware says "System Product Name"), and always the exact set of display controllers (`Gpus`).
+At boot the record tool copies the matching file's rows into the machine's record (`--apply-known`); a disk moved to another machine loses them at its next boot.
+The processor is part of the match because the load is the processor's: the same two cards beside another processor are another machine.
+
+**The resolver.** For a program, in this order: the program's own choice on the page, its kind's choice, then the row for that program and the card it is drawn on, then the processor.
+It says why, as a word a test can read (`--print paint-reason`: `program`, `choice`, `measured`, `measured-processor`, `unmeasured`, `session`), and the page turns the word into a sentence for each program: "Measured on this hardware: batched painting takes less processor.", "Measured on this hardware: batched painting takes no less processor.", "Not measured here: painted by the processor.".
+A kind alone (no program named) has no row, so it is the processor.
+A way the record names that cannot start is treated like a way the person chose: said, kept by the problems engine, and the program painted by the processor.
+
+**Adding a measurement.**
+1. Run the fixed-work measure above on the machine, three rounds, and keep only quiet runs; a row with no quiet run is not a row.
+2. For each program and card write the medians into a row and set `Way` by the rule; a program measured no better gets a `cpu` row, which the page then says as measured.
+3. For a machine to ship: a new file beside the others with its `[Match]`; the package's test reads every shipped file and fails on a row without loads, runs or source, or against the rule.
+4. For one machine only: `sparky-stereo-gpu-record --set-paint ID.desktop VENDOR:DEVICE cpu|batch|unset` as root writes the row's way, and the loads are added to that group by hand; a record made on the machine takes the shipped one's place, whole.
+
+Traps of this part:
+
+- **Symptom:** an earlier form of the record moved every program of a kind ("other programs") to batched painting from one terminal's measurement. **Cause:** the record was keyed by kind of program, and the measurement had shown the gain is a program's. **Fix:** rows by program and card, and no row by kind at all. **Found by:** the two machines' tables side by side: the file manager and the editor sit in the same kind as the terminal and do not gain.
+- **Symptom:** a desktop's record would match every self-built computer with the same two cards. **Cause:** its firmware names no model (`sys_vendor` "System manufacturer", `product_name` "System Product Name"), and the match had only vendor, product and cards. **Fix:** the processor's model name in the match. **Found by:** reading `/sys/class/dmi/id` on the measured machine before writing its file.
+- **Symptom:** a row with one quiet run on each side says the file manager is 2 % better batched (4.4 against 4.5 ms). **Cause:** a difference inside the spread of the runs. **Fix:** the rule's fifth; such a row is `cpu`. **Found by:** writing the rows from the table and reading them back against the spreads.
+- **Symptom:** a test of "the record's way cannot start" passes although nothing was said. **Cause:** the expected sentence was copied from memory, not from the program. **Fix:** take the sentence from the program's own output once, then assert it. **Found by:** the first run of the test failed on the wording, which is how it showed it can fail.
+- **Symptom:** the page's package no longer compiles: "defaulted operator== only available with -std=c++20". **Cause:** the package builds as C++17. **Fix:** write the comparison out. **Found by:** the first build in the package's own container, not on a newer compiler.
 
 ## Qt's own frame at a fractional scale (the 125 % offset)
 

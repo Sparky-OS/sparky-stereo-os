@@ -200,7 +200,7 @@ What the numbers say:
 The three ways are one switch a program reads at its start, `QT_WIDGETS_GPU_PAINT` (nothing: the processor; `batch`; `opengl`), so a desktop can offer them without touching any program.
 The edition's Graphics page (`sparky-stereo-graphics`) has "Paint windows": Automatic, On the processor, On the graphics card (batched), On the graphics card, Qt's OpenGL engine, for each kind of program and for each program.
 
-- **Automatic is a measurement, not a guess:** the way measured for that kind of program on that machine or its model, kept in the machine's record beside the GPU measured best (`[MeasuredPaint]` in the system's `sparky-stereo-graphicsrc`, written by `sparky-stereo-gpu-record --set-paint KIND WAY` or shipped with a known model's record). Where nothing was measured it is the processor, which is how every Qt paints.
+- **Automatic is a measurement, not a guess, and it is each program's own:** the way measured for that program on the card it is drawn on, on that machine ([below](#automatic-for-each-program-from-a-measured-record)). Where the program or the machine was not measured it is the processor, which is how every Qt paints.
 - **The launcher hands it over.** The page's resolver (`sparky-stereo-gpu-env --app ID`) prints `QT_WIDGETS_GPU_PAINT=...` after the GPU's own variables, and Plasma's launcher (KIO) starts the program with every line it prints; `sparky-stereo-gpu-run` does the same for a program started by hand. Nothing is printed for the processor.
 - **A value set by hand in the session wins,** as a GPU variable set by hand does, and the page says so.
 - **A way chosen for a program is that program's alone.** A terminal or a file manager hands its environment to everything it starts, so a way chosen for it would paint its children too, against their own choices. The edition's Qt reads the variables when the application starts and, when they came with someone to tell (`QT_WIDGETS_GPU_PAINT_TELL`: the page's mark), takes them out of its environment. A value set by hand comes without that mark and is inherited as any variable is. Read it at application start, not at the first window: a terminal starts its shell before it paints. Proof: start a terminal both ways with a shell that writes `env` to a file.
@@ -213,6 +213,62 @@ Traps of this part:
 - **Symptom:** the kept problem names the renderer as `LLVM 21.1.8, 256 bits)`. **Cause:** the renderer's name has parentheses of its own, and the text after the last opening one was taken. **Fix:** take what follows the fixed words. **Found by:** the installed-package proof's one failing line.
 - **Symptom:** a message that should be in the person's language is English in a test container. **Cause:** `LANGUAGE=pt_BR` does nothing under the `C` locale, and the image had no `pt_BR.UTF-8`. **Fix:** `localedef -i pt_BR -f UTF-8 pt_BR.UTF-8` in the image and `LANG=pt_BR.UTF-8` in the test. **Found by:** the same message came out right through the problems engine's own catalogue.
 - **Symptom:** a D-Bus activatable program is now started by the launcher itself. **Cause:** the launcher starts such a program itself whenever the resolver's answer is not empty, and the painting variable makes it so. That is what carries the variable to the program; say it in the hand-back.
+
+## Automatic for each program, from a measured record
+
+Added 2026-11-14.
+The fixed-work tables above say that the gain is a program's and a machine's: a terminal took a fifth to two fifths less processor batched on one desktop and nothing less on a small laptop, a file manager the same on both, an editor more when typing.
+So Automatic is decided for each program, from what was measured on that hardware, and a program or a machine that was not measured stays on the processor.
+Nothing is measured on the person's machine and nothing is guessed for hardware nobody measured.
+
+**The record's form.** One group for each program and card, in the machine's record file (`/etc/xdg/sparky-stereo-graphicsrc`, the file the desktop's GPU record already uses, KConfig's nested groups):
+
+```
+[MeasuredPaintPrograms][org.kde.konsole.desktop][1002:1638]
+Way=batch
+Load.animation=14.8 8.6 35.9
+Runs.animation=1 2 1
+Load.text=6.9 5.3 11.3
+Runs.text=2 2 2
+Source=fixed-work measure, 2026-11-13, quiet runs only
+```
+
+- The program is its desktop entry's name, the card its PCI vendor and device numbers: the card the program is drawn on, which the GPU resolver already knows.
+- `Way` is `cpu` or `batch`. Qt's OpenGL engine took more processor in every measurement, so no row names it; it stays the person's choice.
+- `Load.WORK` holds the processor milliseconds for each frame asked, the program and the compositor together, on the processor, batched and with Qt's OpenGL engine; `Runs.WORK` the quiet runs behind each number; `Source` where they come from. The resolver needs only `Way` and the loads; the rest is for the person who reads the file.
+- **The rule a row follows:** `batch` only when every fixed work of that program on that card took at least a fifth less processor batched than on the processor, in quiet runs. The fifth is this page's choice: it is the smallest gain the first desktop showed and larger than the spread between quiet runs of one row on the small laptop (up to about 17 %). The resolver checks the rule against the row's own numbers, so a row that says `batch` against its loads, or without loads, is not followed, and a test checks every shipped row both ways.
+
+**Which machine a record is for.** The records ship in the package, one file for each machine that was measured, each with a `[Match]` group: the firmware's vendor and product where they name a model (`Vendor`, `Product`, a laptop), the processor's model name as the kernel reports it where they do not (`Cpu`, a desktop whose firmware says "System Product Name"), and always the exact set of display controllers (`Gpus`).
+At boot the record tool copies the matching file's rows into the machine's record (`--apply-known`); a disk moved to another machine loses them at its next boot.
+The processor is part of the match because the load is the processor's: the same two cards beside another processor are another machine.
+
+**The resolver.** For a program, in this order: the program's own choice on the page, its kind's choice, then the row for that program and the card it is drawn on, then the processor.
+It says why, as a word a test can read (`--print paint-reason`: `program`, `choice`, `measured`, `measured-processor`, `unmeasured`, `session`), and the page turns the word into a sentence for each program: "Measured on this hardware: batched painting takes less processor.", "Measured on this hardware: batched painting takes no less processor.", "Not measured here: painted by the processor.".
+A kind alone (no program named) has no row, so it is the processor.
+A way the record names that cannot start is treated like a way the person chose: said, kept by the problems engine, and the program painted by the processor.
+
+**Adding a measurement.**
+1. Run the fixed-work measure above on the machine, three rounds, and keep only quiet runs; a row with no quiet run is not a row.
+2. For each program and card write the medians into a row and set `Way` by the rule; a program measured no better gets a `cpu` row, which the page then says as measured.
+3. For a machine to ship: a new file beside the others with its `[Match]`; the package's test reads every shipped file and fails on a row without loads, runs or source, or against the rule.
+4. For one machine only: `sparky-stereo-gpu-record --set-paint ID.desktop VENDOR:DEVICE cpu|batch|unset` as root writes the row's way, and the loads are added to that group by hand; a record made on the machine takes the shipped one's place, whole.
+
+Traps of this part:
+
+- **Symptom:** an earlier form of the record moved every program of a kind ("other programs") to batched painting from one terminal's measurement. **Cause:** the record was keyed by kind of program, and the measurement had shown the gain is a program's. **Fix:** rows by program and card, and no row by kind at all. **Found by:** the two machines' tables side by side: the file manager and the editor sit in the same kind as the terminal and do not gain.
+- **Symptom:** a desktop's record would match every self-built computer with the same two cards. **Cause:** its firmware names no model (`sys_vendor` "System manufacturer", `product_name` "System Product Name"), and the match had only vendor, product and cards. **Fix:** the processor's model name in the match. **Found by:** reading `/sys/class/dmi/id` on the measured machine before writing its file.
+- **Symptom:** a row with one quiet run on each side says the file manager is 2 % better batched (4.4 against 4.5 ms). **Cause:** a difference inside the spread of the runs. **Fix:** the rule's fifth; such a row is `cpu`. **Found by:** writing the rows from the table and reading them back against the spreads.
+- **Symptom:** a test of "the record's way cannot start" passes although nothing was said. **Cause:** the expected sentence was copied from memory, not from the program. **Fix:** take the sentence from the program's own output once, then assert it. **Found by:** the first run of the test failed on the wording, which is how it showed it can fail.
+- **Symptom:** the page's package no longer compiles: "defaulted operator== only available with -std=c++20". **Cause:** the package builds as C++17. **Fix:** write the comparison out. **Found by:** the first build in the package's own container, not on a newer compiler.
+
+- **Symptom:** on the very machine a record was measured on, the boot step says `nothing-known` and Automatic stays on the processor, while every test passes. **Cause:** the processor's name was read from `/proc/cpuinfo` in a loop on `QFile::atEnd()`, and a file of `/proc` reports no size, so `atEnd()` is true before the first line; the tests' fixture is an ordinary file. **Fix:** read the file whole (`readAll()`), then split. **Found by:** the proof on installed packages, which runs the boot step on the real `/proc` and `/sys`: a fixture cannot stand for them.
+- **Symptom:** the proof that a choice reaches a program fails for every program with "did not start". **Cause:** the image under test had the page's package but not the launcher's command (`kioclient` is in `kde-cli-tools`) nor the settings shell (`kcmshell6`, in `libkf6kcmutils-bin`). **Fix:** install them by apt with the packages under test, and ask an image that has the command which package owns it (`dpkg -S`). **Found by:** the launch log's one line, "command not found".
+
+**The proof on installed packages, as it was run** (three routes: a Mesa card, NVIDIA's own EGL, zink over NVIDIA's Vulkan):
+1. Install the staged packages by apt over the published tree and the round's stage folders, by name, and keep the `Inst` lines: every line of the rebuilt sources must name the new version.
+2. Run the boot step once as root (`sparky-stereo-gpu-record --apply-known`) and read `--show`: the rows of this machine, origin shipped.
+3. For each program and each way, write the choice as the page writes it, start the program through the launcher (`kioclient exec /usr/share/applications/ID.desktop`), and compare three things: what the resolver says (`--print paint` and `--print paint-reason`), `QT_WIDGETS_GPU_PAINT` in the program's own `/proc/PID/environ`, and the renderer in its "painting on" line. With no choice written, the expectation is the record's.
+4. Start one program with an OpenGL the processor draws: it must run, painted by the processor, with the problem kept.
 
 ## Qt's own frame at a fractional scale (the 125 % offset)
 
@@ -253,7 +309,7 @@ Proof on the NVIDIA card (the gallery window, frameless, a 3D mode of a nested S
 | A 2D output | | 0 pixels differ from the build before | | |
 | On the wire | | one `set_content(3)`, one `set_desktop_depth(1)`, no warning | | |
 
-A window with a frame the client draws stays flat on every path (work to do: the frame blitter drawing content and frame once into each half, or into each view).
+A window with a frame the client draws stayed flat on every path at that time; on the GPU ways it has its pair since 2026-11-14 ([below](#the-pair-at-a-fractional-scale-each-eye-from-its-own-left-edge)), and on the processor it is still painted once.
 
 Traps of this part:
 
@@ -409,7 +465,7 @@ Automatic stays processor painting; a measured rule per program is a proposal re
 
 ### A decorated pair candidate on the GPU
 
-This candidate is excluded from the package after the fractional edge failures below; the existing client-frame exception stays.
+This candidate was kept out of the package while it failed at fractional widths; with [each eye painted from its own left edge](#the-pair-at-a-fractional-scale-each-eye-from-its-own-left-edge) it passes and ships.
 In its scoped successful rows, the client-side frame is identical in the two eyes, with the content in its own half of one double-width FBO.
 The Wayland EGL platform advertises this capability to Widgets; other platforms keep their existing frame exception.
 The blitter draws the decoration with its full texture coordinates and then samples the left or right half of the content texture into that eye's content rectangle.
@@ -519,18 +575,52 @@ Additional traps found by the raw runs:
   Cause: the batched engine relied on an inline definition available through a previous compiler's PCH.
   Fix: include `private/qpainterpath_p.h` explicitly; the nonmatching-PCH compilation exposed the missing direct include.
 
-### Equal eye extents are necessary but not sufficient
+### The pair at a fractional scale: each eye from its own left edge
 
-The rejected CSD candidate rounded the complete double width, while the compositor recognized twice the rounded single-eye width.
-At width 941 and scale 1.25 these are 2353 and 2352 pixels, so its pair guard selected the mono mapping.
-A trial equalized extents and added the right-eye residual; width 941 then passed on AMD.
-But width 942 at 1.25 failed with 1926 unequal content-rim pixels, despite identical frame pixels.
-The residual was added after primitive pixel rounding, leaving different coverage at the two content edges.
-The next change must keep the depth shift separate from a local physical eye origin, apply origin/clip transforms consistently before rounding, and then place each eye at its equal integer boundary.
-Keep both red cases.
-Qualify odd and even widths at 100, 125, 150 and 175 percent on both cards, both GPU engines, lifecycle and controls before removing the client-frame exception.
-The partial trial is not that qualification; its CSD patches stay out of the recipe.
-Both eyes from one recorded paint callback also remains unimplemented: shifted/clipped left-eye records cannot reconstruct right-eye-only coverage or style parts with their own depth.
+Settled on 2026-11-14; it replaces the candidate above, whose even-width failure is the red case.
+
+**Symptom:** at 125 % a window painted once per eye on the GPU is shown flat (0 differing pixels between the eyes, depth and pair both asked for) at every width that is not whole at that scale, under the compositor's own frame too; at 100 % it has its depth. A trial that made the two extents equal passed width 941 and failed width 942 with 1,926 unequal pixels at the content's rim.
+**Cause:** two things with one root. The store was twice the window's width in the window's own units, so its texture was `round(2 * W * ratio)` wide, while the compositor takes a pair by the width of one view, `2 * round(W * ratio)`: 2353 against 2352 at width 941, 2355 against 2356 at 942, equal only where `W * ratio` is whole. And the right eye was painted from the window's width in its own units, so it began a part of a pixel off its half and every edge in it rounded differently from the left eye's; adding the remainder after the rounding (the trial) moves already rounded edges and changes their coverage.
+**Fix:** a GPU store holds the pair as two eyes of one whole width in device pixels, and each eye is painted from its own left edge (the repaint manager paints both eyes with the same origin and tells the store which eye is next and how wide an eye is). The batched engine adds the eye's origin, whole pixels, to each record after it was rounded and cut. The OpenGL engine's store paints each eye into a framebuffer of the eye's own size and copies it into its half: a pair is always painted whole, so the framebuffer keeps nothing between the eyes. The element's own part of a pixel stays a separate shift, as before.
+**Found by:** the same fixture without any frame at 125 % and widths 941 and 942: flat on both GPU ways. That showed the fault was not the frame's; then reading the three places that turn a width into pixels.
+
+Measured in the rig, an AMD integrated card and an RTX 3060 on NVIDIA's own EGL, scales 100, 125, 150 and 175 %, widths 940 to 943, through an application's resize, a hide and a show:
+
+| Window | Batched | Qt's OpenGL engine |
+|---|---|---|
+| No frame (what a compositor's own decoration gives the client), 32 cases each | asked 0.5, -0.5, 1.5, -1.5, 0.25, 1: exact in all; the rim identical in both eyes | the same but the 0.25 disc, 0.226 to 0.275 (its sample grid); rim identical |
+| Qt's own frame, 32 cases each | exact in all; frame and rim identical in both eyes | as above |
+
+Before the fix, the same fixture without a frame at 125 %: flat at widths 941 and 942 on both GPU ways.
+So the client-drawn frame's exception is lifted on the GPU ways: the frame is drawn once and is the same in both eyes, the content has its pair.
+
+**The processor-painted pair had the same root, and has the same fix.** At 125 % and width 941 the fixture's discs measured 1.925, -0.708, 2.906, -2.226, 0.139, 1.254 device pixels where whole steps of the window's own pixel give 1.25, -1.25, 2.5, -2.5, 0, 1.25; the pair was right only where the width is whole at the scale (8 of 16 cases at widths 940 to 943 and four scales).
+The shared memory store now takes the same call: its buffer is twice the rounded eye, and for each eye the painter gets a view of that eye's half over the buffer's own bytes (a `QImage` made over `bits()` plus the eye's offset, with the same bytes per line), so nothing is copied. After it: 32 of 32, on both cards' sessions; the shifts stay whole pixels of the window, as before (at 125 % the discs read 1.25, -1.25, 2.5, -2.5, 0, 1.25).
+Compare without any frame: under the compositor's own frame one or two pixels of the frame's rim differ between the eyes on every way of painting, which is the compositor's, not the window's.
+
+### Both eyes from one paint pass: what was measured
+
+The window is still painted once per eye: every widget's paint code runs twice.
+With each eye painted from its own left edge the two record lists can be compared directly (the record dump, the right eye's records moved back by the eye's width):
+
+| Window (Stereo Union unless said) | Records per eye | The same in both eyes | Moved across only | Without a twin |
+|---|---|---|---|---|
+| The fixture with six discs at asked parallaxes (default style) | 1,730 | 1,686 (97.5 %) | 21 | 23 |
+| The fixture, ElementLimit 1 | 1,668 | 1,654 (99.2 %) | 9 | 5 |
+| File manager | 721 | 721 (100 %) | 0 | 0 |
+| Editor | 1,230 | 1,208 (98.2 %) | 22 | 0 |
+| Terminal | 104 | 103 | 0 | 1 |
+
+So nearly all of the second pass repeats the first.
+What stops a replay is not the engine: the style decides inside a paint callback which eye it draws a part for (it reads the window's eye), so one callback cannot yield both eyes, and a record without a twin is a part cut differently by a neighbour that moved.
+The boundary for the next step: (1) the style asks Qt for the eye through one function, which marks that widget's painting as different for each eye; (2) for the second eye the repaint manager calls the paint code only of widgets that were marked or that have a shift of their own, and the engine repeats the first eye's records of every other widget at the second eye's origin; (3) the proof is the pair pixel-equal to the two-pass pair, with a part visible in one eye only and a tab part deeper than its parent among the cases.
+Until then two passes stay.
+
+What the second pass costs, measured on installed packages with the compositor's own frame, Stereo Union at the shipped limit and the same scroll script (three runs each, every one on a loaded machine, so read the order, not the sizes): an editor scrolling took 19 to 28 % of a core for one picture on either way and 72 to 98 % as a pair on the processor, 77 to 90 % as a pair batched; a file manager 22 to 30 % for one picture, 59 to 70 % and 72 to 78 % as a pair.
+A pair repaints the whole window for each eye at every change, so it costs about three times one picture on both ways, and fewer frames are painted; that is the cost a replay would cut.
+
+**The pair through zink: one view where two are listed.** Symptom: with Mesa's zink on NVIDIA's Vulkan driver a window painted on the GPU in a 3D mode is shown at half its width with identical eyes; 2D is right, the processor pair is right, NVIDIA's own EGL is right. Cause: zink's own swapchain path (kopper) lists `EGL_EXT_multiview_window`, answers two when the surface is asked for its view count, and presents one; the engine's pair drawn into "two views" lands whole in one. With `LIBGL_KOPPER_DISABLE=1` (Mesa's own presentation path, which the edition's NVIDIA session sets together with zink) both views are carried and the pair is exact. Fix in Qt: where zink is asked for by name (`MESA_LOADER_DRIVER_OVERRIDE=zink`) without that variable, the pair goes side by side into one buffer, declared, as on an EGL without two views; decided before the surface is made. Found by: the wire (`WAYLAND_DEBUG=client`: desktop depth declared, buffers of one view's size, no side-by-side declaration), then the same case with the variable set. Two things that did not work: asking the surface (`eglQuerySurface` says two), and changing the route after the first frame (the window stopped answering). Still open: a zink that is Mesa's default driver without the override, and the answer in Mesa itself (a surface that says how many views it presents).
+An acceptance that says "zink" must say which presentation path: test both.
 
 - Symptom: Callgrind records feed completion but the final terminal text is not the completed native text.
   Cause: the feed has written all bytes, but the terminal still has queued input/painting; a first paint followed by 250 ms is not a drain under instrumentation.

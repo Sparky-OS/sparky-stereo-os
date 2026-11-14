@@ -76,3 +76,47 @@ The corrected installed English page and all nine contextual translations remove
   Fix: inspect only the owned container before restarting work, reconnect `docker logs --follow`, and register `docker wait` before it exits.
   Retain the interrupted relay and direct container exit status separately.
   The measured build continued to exit 0 and passed its 33-package link and 64-package payload gates; a frozen relay alone was not a failed build.
+
+## The painter as a successor of the published source (2026-11-14)
+
+The route above built the painter on a plain source made back from the published one.
+Once the published source has itself been made by the successor tool, the recipe follows it: `next-source-N.sh` in the package's recipe folder, which runs `repo/lc-successor.py --in-place --overlay` on the published `+lc1` source.
+
+1. **Pick the number.** The recipe on the main branch names the last version made; candidates a lane built and never published keep their numbers too, so that one version names one set of bytes anywhere. Say which numbers were skipped and why in the script's header.
+2. **The overlay holds only what lies under `debian/`:** the new patches, the whole new `series`, and whatever else the source gains. `lc-successor.py` refuses any difference outside `debian/` but the changelog and its own toolkit.
+3. **Baked binaries go under `debian/` too.** A quilt patch cannot carry them and the in-place route cannot add them to the upstream tree, so the three baked shaders sit in `debian/painting-shaders`, listed in `debian/source/include-binaries`, and one more patch makes the build take them from there under the names the engine asks for:
+
+   ```cmake
+   set_source_files_properties("${QtBase_SOURCE_DIR}/debian/painting-shaders/batchpaint.vert.qsb"
+       PROPERTIES QT_RESOURCE_ALIAS "painting/shaders/batchpaint.vert.qsb")
+   qt_internal_add_resource(Gui "gui_batchpaint_shaders" PREFIX "/qt-project.org/gui" FILES ...)
+   ```
+
+   [`QT_RESOURCE_ALIAS`](https://doc.qt.io/qt-6/cmake-source-file-property-qt-resource-alias.html) "overrides the runtime path where the resource file is found".
+   Check it in a build tree before the package build: the generated `.qrc` under `src/gui/.qt/rcc/` must list each file with its alias, and the painting must start.
+   Mark the patch as packaging only (`Forwarded: not-needed`): a change offered to Qt adds the files beside its other baked shaders.
+4. **The patches that are ours** are named for the copyright file by `repo/provenance-files.py`; run it on a scratch folder that holds the new patches and put its `debian/sparky-provenance-files` in the overlay.
+5. **Commit the recipe, then make the source twice** into two folders and compare the `.dsc` and the Debian tarball: the date is the recipe folder's last commit, so any later commit there changes the bytes. Check that the published changelog is a byte-identical suffix of the new one (`tail -c SIZE new | cmp - old`).
+6. **Build the binaries from the `.dsc`** with `release/build-from-lc-dsc.sh`, the previous version's packages as `SPARKY_LC_PREVIOUS_DIR`, and a watch on the disk beside it.
+
+Traps:
+
+- **Symptom:** `lc-successor: the new source differs beyond its changelog and toolkit: ['debian/painting-shaders']`.
+  **Cause:** the tool's comparison names a folder that exists on one side only by the folder's own name, and its list of allowed paths held the overlay's files.
+  **Fix:** the tool now allows a folder the overlay brings whole; before that fix, put the files in a folder the published source already has.
+  **Found by:** the message names the folder, not a file.
+- **Symptom:** `dpkg-source: error: unexpected end of diff` for a patch written by hand.
+  **Cause:** hunk line counts that do not match the hunk.
+  **Fix:** make the change in a source tree and take the patch from `git diff`; `dpkg-source -b` is the check that every patch of the series applies.
+  **Found by:** the dry run of the source, minutes, not the package build, hours.
+- **Symptom:** a native package (`3.0 (native)`, built by its own `build.sh`) has a record that says `NOT complete, unrecorded: buildinfo`.
+  **Cause:** its `build.sh` assembles the packages itself, so no `dpkg-buildpackage` wrote a `.buildinfo`.
+  **Fix:** build the `.dsc` that `build.sh` made once more with a copy of `release/build-from-lc-dsc.sh` that reads the changelog from the one tarball (`tar -xJOf X.tar.xz --wildcards '*/debian/changelog'`), with the toolkit's `repo` and `lean` folders mounted where the source's rules look for them (two levels above the source tree).
+  The record then has `"unrecorded": []`; stage those packages, and keep the first run's `.dsc` and tarball, which are the same bytes on a second run.
+  **Found by:** the record's own line, and the published version's stage, which had a `.buildinfo`.
+- **Symptom:** `chown: changing ownership of '/work/lean': Read-only file system`, and the build stops before it starts.
+  **Cause:** the script gives the whole work folder to the build user, and read-only mounts sit inside it.
+  **Fix:** give it only the build and scratch folders.
+- **Symptom:** a message in `${VAR:?...}` with an apostrophe breaks every quote after it in the script.
+  **Fix:** no apostrophe inside an unquoted `${...:?message}`; `bash -n` before running.
+- A caution, seen before it bit: two test matrices that run side by side and name their containers after the case alone would refuse each other's cases ("name already in use"). The matrix's own name goes into the container's name.

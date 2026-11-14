@@ -370,5 +370,8 @@ Traps:
 - Symptom: a throwaway development image stops with `Packages were downgraded and -y was used without --allow-downgrades` while installing build dependencies.
   Cause: the base image carries a newer build of a package that an earlier lane installed with `dpkg -i`; the edition's pin makes the published one the candidate.
   Fix: `--allow-downgrades` for a development image only; `apt-get -s build-dep` names the packages (here two).
+- Symptom: after a build container was stopped by hand, its work folder cannot be removed (`Permission denied` on every file under `lc/source`).
+  Cause: the build runs as root inside the container and gives the files back to the lane's user in an exit trap, which a stopped container never reaches.
+  Fix: `docker run --rm --network none --mount type=bind,src=WORK,dst=/work IMAGE chown -R 1000:1000 /work`, then remove the folder by its literal path.
 - Recipe, Lintian without touching a build image: a small image from the pinned Debian base with `lintian` (2.143.0 on 2026-11-14), each new `.deb` and its published one, the version replaced by one word (`sed -E "s/[0-9][0-9A-Za-z.:~+-]*\+lc1/VERSION/g"`), `comm -23` of the sorted lines.
 

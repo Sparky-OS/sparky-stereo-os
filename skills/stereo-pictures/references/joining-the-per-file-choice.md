@@ -146,6 +146,17 @@ A proof that reads only the picture can pass on the wrong entry; a proof that re
   **Cause:** the "previous build" given to the gate was the build an earlier round staged, while the previous edition's snapshot is the published tree, which holds an older build of the same package.
   **Fix:** the previous build is the published one; compare the imports with the staged build by hand (`nm -D`) and say so.
   **Found by:** the line above the conflict names the previous package that failed.
+- **Symptom:** a long build ends at its last step with `stereo imports lost: _ZN6Stereo7Picture10fromImages... (the previous build called them)`.
+  **Cause:** moving a program onto the store retires calls by design (the pathless `fromImages()` or `fromReader()` of an editor, `userSwapEyes()` of a file manager), and the link gate blocks a lost stereo import unless the source declares it.
+  **Fix:** before the build, list the stereo imports of the **published** binaries and compare them with what the new code calls: `nm -D --undefined-only FILE | grep -E 'N6Stereo|stereo_'` on every library, plugin and program of the published packages; each one that will be gone goes into `debian/sparky-lean-retired-stereo-imports` with its reason ([a stereo call retired on purpose](../../edition-packaging/references/lessons-2026-11.md#a-stereo-call-retired-on-purpose-order-551-milestone-2)).
+  **Found by:** asking, with a three-hour build about to start, what the gate would compare.
+- **Symptom:** in a development image a program's core library fails to link with `undefined reference to Stereo::FileChoiceMenu::setFiles(...)` and every other function newer than the packaged layer, while two smaller programs linked in a sister image.
+  **Cause:** the image holds the packaged layer and a newer one installed over it with `cmake --install`; the CMake package then has two target files, `StereoLayerTargets-none.cmake` (the package's build type) and `StereoLayerTargets-relwithdebinfo.cmake` (the hand build's), and a program configured as `Release` takes the first, which names the old library file.
+  **Fix:** remove the stale target file in that throwaway container and configure again; or configure the program with the build type the newer layer was built with. A package build never meets this.
+  **Found by:** the undefined names were exactly the functions added since the packaged version.
+- **Symptom:** a proof says the program's own lasting setting was not kept (`[Stereo 3D]` `View` missing from its settings file, pictures stereo again after a restart).
+  **Cause:** the proof ended the program with a signal, and a KDE program writes its settings at a clean exit.
+  **Fix:** leave the program as a person does (Ctrl+Q) wherever the step is about what it remembers; end it by signal only where nothing must be remembered.
 - **Symptom:** making a development image stops with `Packages were downgraded and -y was used without --allow-downgrades`.
   **Cause:** the base image carries a newer build that an earlier lane installed by hand, and the edition's pin makes the published one the candidate.
   **Fix:** in a throwaway development image, `--allow-downgrades`; a proof image is upgraded by name from a repository instead.

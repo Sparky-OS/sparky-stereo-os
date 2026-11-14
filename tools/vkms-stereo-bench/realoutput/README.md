@@ -8,3 +8,6 @@ Layout they expect, in one folder `$BENCH`: `bin/` (`drm-grab` and `drm-planelog
 `cases/program.sh` runs any program of the root (`PROGRAM`, `APPENV`, `APPWAIT`, set in a case file that sources it).
 Afterwards, on the host: `python3 halves.py $BENCH/runs/NAME/app.ppm` for the output's frame and `python3 halves_raw.py $BENCH/runs/NAME/wl` for every committed buffer in order.
 A side by side (full) frame whose halves differ in 0 pixels under a stereo scene is one eye twice; the last committed buffer says whether the program or the compositor made it.
+
+`cases/stress.sh` runs `pairstress` (build `pairstress/` with CMake against Qt 6 for the root, put it in `EXTRA` with a `kwinrc` holding `[Desktops] Number=2`, and a file `lib` holding `fixed` plus the library under test as `libQt6Quick.so.6` to test a new Qt Quick) through the events that end in an expose; `python3 pairs.py $BENCH/runs/NAME/s-*.ppm` reads each window's disparity.
+`cases/plasma.sh` and `cases/plasma-sample.sh` read a Plasma window with Stereo Union's element depth (`EXTRA` holds `limits`, for example `10,4,12`).

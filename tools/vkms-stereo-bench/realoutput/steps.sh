@@ -2,6 +2,10 @@
 # Starts Stereo KWin on the DRM device, sets the output's mode, then runs /mnt/case.sh, which uses grab and setmode.
 log() { echo "STEREO|realoutput|$*"; }
 dpkg-query -W -f '${Package} ${Version}\n' kwin-wayland libkwin6 mesa-vulkan-drivers mesa-vulkan-layer-stereo libgl1-mesa-dri libstereo-declare1 libqt6gui6 libqt6waylandclient6 libqt6quick6 libqt6quick3d6 libqt6multimedia6 libstereo-policy1 stereo3ddemo libkscreen-bin 2>/dev/null > /mnt/versions.txt
+# the person's depth limits, as System Settings writes them (DEPTH_LIMITS in /mnt/limits: sunk,popped,element)
+[ -f /mnt/limits ] && { mkdir -p $HOME/.config; printf '[StereoDepth]\nSunkLimit=%s\nPoppedLimit=%s\nElementLimit=%s\n' $(tr ',' ' ' < /mnt/limits) > $HOME/.config/kwinrc; }
+# a whole kwinrc for the case (/mnt/kwinrc), when it needs more than the limits
+[ -f /mnt/kwinrc ] && { mkdir -p $HOME/.config; cp /mnt/kwinrc $HOME/.config/kwinrc; }
 kwin_wayland --drm --socket=wl-stereo --no-lockscreen --no-global-shortcuts --no-kactivities > /mnt/kwin.log 2>&1 &
 kp=$!
 i=0

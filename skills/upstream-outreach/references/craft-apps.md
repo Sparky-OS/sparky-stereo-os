@@ -515,3 +515,32 @@ How found: the first test received a successful decode, and reading RunLength sh
 The first disk-stopped gate never reached the corrected assertion.
 The resumed complete native gate measured 16 bytes under the lower limit and 128 in the ordinary control for both linked and repaired/unlinked updates.
 Record the successful runtime assertions against the exact source tree; the earlier source reading only justified correcting the oracle.
+
+Symptom: a receiver's strict Clippy rejects a formerly ordinary `RenderSettings` initializer, while the common owner's own complete gate passed.
+Cause: the receiver retained newer raster APIs and Vello 0.0.8 root patches; the common graph also legitimately used the registry's Vello 0.2 ABI through another engine.
+Fix: reconcile matching versions in the common owner and propagate its matching patches at the receiving root, where Cargo applies patches.
+Validate package name, version and resolved source together; permit a separate registry ABI only when the common lock declares that exact version/source.
+How found: PdfCraft first named `max_coverage`; the resolved graph then exposed the two Vello versions.
+Controls rejected a private 0.0.8 source, a private 0.2 source, an alternate shared API version and the old Git owner.
+The positive common graph retained its intentional registry ABI.
+A source-only API inventory also missed renderer and cache prerequisites, so follow each carried subject's actual preimage and tests.
+
+Symptom: the second render of a glyph procedure cut to 64 bytes no longer reports truncation.
+Cause: upstream's reviewed Type 3 cache checked the page's remaining content budget, while the shared parser additionally imposed a smaller document-local stream limit.
+The cached prefix bypassed that decoder and its warning on the next render.
+Fix: retain the original held-content and cache-overhead accounting from PdfCraft's `427c942aad3656dd3e01988f88d88a1c3bed4044`, and qualify caching against the stricter of page and filtered-stream limits.
+How found: the same synthetic compressed procedure drew its complete leading path in both renders, but the second render failed the warning assertion before that adaptation.
+Both renders then decoded and warned; the original 64 KiB, 32 MiB and font-identity cache controls passed too.
+A successful decoder result can be a bounded prefix; a cache must preserve that distinction.
+
+Symptom: a carried helper fails compilation as a duplicate definition.
+Cause: the receiver added a CMYK conversion helper where the shared owner already had one, with checked buffer-length arithmetic.
+Fix: use the existing shared conversion and preserve its bounds, rather than copying a second implementation into the receiver or deleting the checked one.
+How found: the duplicate-definition error led to comparing both bodies; the original isolated-CMYK colour control and existing separation controls passed after the shared helper was reused.
+
+Symptom: five draws of one damaged picture attempt six decodes including the ordinary control picture.
+Cause: an empty cache entry meant both a failed decode and a cache miss.
+Fix: carry the original bounded failure-cache entry and replay its warnings at every draw; do not cache a page-work refusal as a permanent image failure.
+Retain every warning variant the shared owner already exposes.
+How found: the original JPX and JBIG2-stencil controls measured six decodes before and two after PdfCraft's `558ffd7f8a65708e292a558625a907cce8dd3e30`, while every failed draw still reported its failure.
+The ordinary picture decoded once and drew every time.

@@ -389,7 +389,9 @@ NVIDIA's container toolkit, published twice as different builds of the same vers
 ### 2.4 Xwayland
 
 **Source**: [X.Org](https://www.x.org/) **License**: MIT **What we changed**: four patches give a redirected X11 child window a surface of its own, so a 3D area inside an X11 program can be its own stereo layer.
+Since 24.1.13-1+stereo3d5 (ORDER 560) a stereo window's two eyes also reach the compositor whole when Xwayland has no glamor, on a machine without 3D acceleration: on the shared memory backend the pixmap that holds both eyes gets a buffer, is flipped to the window's surface and has both eyes damaged, with a test in Xwayland's own suite.
 **Credit**: the X.Org Foundation and the Xwayland developers.
+The change of ORDER 560 stands on work the project's history names: **Michel Dänzer**'s Present support without glamor (commit abe3a082, 2024) and his script that tests Xwayland under a headless Weston (250db870, 2020), the Present code of **Roman Gilg** (2018), and the shared memory backend as **Olivier Fourdan** shaped it; the test runs under [Weston](https://gitlab.freedesktop.org/wayland/weston), by the Wayland developers.
 
 ### 2.5 KWin
 

@@ -34,3 +34,4 @@ Negative controls that must fail or differ:
 - **Symptom:** the picture is right only after a second or two. **Cause:** the doubling can arrive late when KWin's main thread is busy; a program that draws once never redraws. **Fix:** redraw on `ConfigureNotify` and `Expose`; capture only after the window has its doubled width.
 - A colour check passes on a window that is the right colour in the wrong place: check the rectangle from KWin's buffer geometry, not from where the program asked for the window.
 - Qt's xcb raster backing store and other toolkits that read their size from the last event are not covered by this recipe; check them with the same controls.
+- A window drawn by OpenGL on the software renderer because Xwayland has no glamor (a machine without 3D acceleration) is another route: Mesa presents a pixmap of both eyes to a window one eye wide. Its layer, fix and test are in [x11-stereo-window-without-glamor.md](x11-stereo-window-without-glamor.md).

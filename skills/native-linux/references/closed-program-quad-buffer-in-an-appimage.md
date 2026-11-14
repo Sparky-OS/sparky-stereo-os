@@ -81,9 +81,9 @@ Read on 2026-11-14 with the real-output bench ([real-output-readback.md](../../s
 - `XGetImage` of a quad buffer window returns one view (the X window stays one eye wide and the presented buffer is twice as wide), so it is not the committed buffer.
 - **Symptom:** in that guest each eye shows half of one picture, stretched: the tool strip and the left of the model in the left eye, the right of the model in the right eye; a disparity search finds no block.
   **Cause:** Xwayland without glamor (a machine or guest without any GPU). The same picture comes in a rig on a GPU with `XWAYLAND_NO_GLAMOR=1`, with the program on the GPU or on the software renderer, and with glamor the same software-rendered program is a correct pair; so it is neither the program, nor Mesa's software renderer, nor the output path.
-  **Fix:** not built yet; it belongs to the Xwayland path that takes a quad buffer window's wider buffer.
+  **Fix:** Xwayland 24.1.13 +stereo3d5 (patches 0010 and 0011): on the shared memory backend the pixmap that holds both eyes gets a `wl_buffer`, so Present flips it whole, and the flip damages both eyes; the layer, the recipe that found it and the test are in [x11-stereo-window-without-glamor.md](x11-stereo-window-without-glamor.md).
   **How found:** one difference at a time: software renderer with glamor (a pair), glamor off (the split), then the capture against the scanout in the guest.
-  Until it is fixed, a quad buffer X11 program is not shown in stereo in a virtual machine without 3D acceleration.
+  With +stereo3d5 the same guest scans out a pair: this program's 381 blocks at the disparities measured on a card (the nearest at −70.6 px, vertical 0).
 
 ## The 3D mouse
 
@@ -93,6 +93,6 @@ The boundary is then a fact: such a program moves only by pointer and keyboard e
 
 ## What this recipe does not prove
 
-- The scanned-out frame of a correct pair: the bench's guest has no GPU, so its Xwayland has no glamor and the pair is lost before the compositor (above); what was shown is that the output path equals the capture.
+- The scanned-out frame of a correct pair was not proved on the Xwayland this test ran with (+stereo3d4): the bench's guest has no GPU, so its Xwayland has no glamor and the pair was lost before the compositor (above). It is proved with +stereo3d5, in the same guest ([x11-stereo-window-without-glamor.md](x11-stereo-window-without-glamor.md)).
 - An absolute disparity against a closed form: the camera's numbers are the program's.
 - The start through FUSE on a system that has the old library.

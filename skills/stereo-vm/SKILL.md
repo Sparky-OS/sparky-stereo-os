@@ -46,6 +46,7 @@ The guide [A virtual machine with a 3D display](../../docs/stereo-vm.md) says ho
 - **WAYLAND_DEBUG prints `wl_pointer#12.enter`, not `@12`:** filters written for the old format match nothing.
 - **A resize test must put the window back:** the next steps are measured at its size.
 - **`pgrep -f` or `pkill -f` on a pattern in your own command line** matches itself.
+- **A guest without 3D acceleration runs Xwayland without glamor:** an X11 program's stereo window (OpenGL quad buffer, drawn on the software renderer) was not a pair there up to Xwayland +stereo3d4; the layer, the fix (+stereo3d5) and the test are in [native-linux, a stereo X11 window when Xwayland has no glamor](../native-linux/references/x11-stereo-window-without-glamor.md).
 
 ## Lessons from the lanes, October to November 2026
 

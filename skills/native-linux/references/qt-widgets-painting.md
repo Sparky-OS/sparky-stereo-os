@@ -300,7 +300,7 @@ Proof on the NVIDIA card (the gallery window, frameless, a 3D mode of a nested S
 | A 2D output | | 0 pixels differ from the build before | | |
 | On the wire | | one `set_content(3)`, one `set_desktop_depth(1)`, no warning | | |
 
-A window with a frame the client draws stays flat on every path (work to do: the frame blitter drawing content and frame once into each half, or into each view).
+A window with a frame the client draws stayed flat on every path at that time; on the GPU ways it has its pair since 2026-11-14 ([below](#the-pair-at-a-fractional-scale-each-eye-from-its-own-left-edge)), and on the processor it is still painted once.
 
 Traps of this part:
 

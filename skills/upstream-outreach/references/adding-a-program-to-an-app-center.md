@@ -8,7 +8,7 @@ Everything below ran on that day; what did not run is said under "What this reci
 
 1. **Read the tool's own precedents before choosing anything.**
    Clone the tool and read how one entry is made, end to end: the page, the handler, the script that builds the entry's page, the install, reinstall and remove scripts, the strings.
-   For APTus: an entry is one `<td>` in a page (`graphics-others.html`), an `aptus://<page key>_<name>` link, a branch in `bin/aptus-app` (architecture check, page text, installed or not), and branches in `bin/aptus-package-install`, `-reinstall` and `-remove` for anything that is not a plain `apt-get install`.
+   For APTus: an entry is one `<td>` in a page (`accessories-devices.html`), an `aptus://<page key>_<name>` link, a branch in `bin/aptus-app` (architecture check, page text, installed or not), and branches in `bin/aptus-package-install`, `-reinstall` and `-remove` for anything that is not a plain `apt-get install`.
    Then answer from the tree, with the file and line:
    - which trees still get new entries (`git log --format='%h %ad %s' --date=short -- <tree>` and each tree's `CHANGELOG`): here 8 and 9 in 2026, 7 until August 2025, 6 until 2024;
    - which trees the last accepted or open pull request touched, and what it left to the maintainer (here the `CHANGELOG` and the version);
@@ -67,6 +67,52 @@ A red case changes one answer of the system and nothing in the scripts: a direct
 An AppImage has no FUSE device in a container: start it with `APPIMAGE_EXTRACT_AND_RUN=1`, and say so.
 Some programs have a mode without hardware (`kamlynk --demo`, a simulated camera): read the program's `main` for it and use it for the second user.
 
+## When the program installs another container
+
+Vinci 0.4.7, Dionatan Simioni's GPL-3.0-or-later installer for DaVinci Resolve, adds another boundary to this recipe.
+The audit below was done on 2026-11-13; it is not a proof of a Resolve installation or GPU rendering.
+
+1. Read the installer's own system checker and recipe before deciding the entry's dependencies.
+   Separate what the station has installed, what the distribution's published metapackages bring, and what the archive merely offers.
+   A pin for the NVIDIA container toolkit does not install it, and a distrobox recommendation does not guarantee podman.
+   Vinci uses a compatible host distrobox, otherwise downloads its own; its recipe accepts versions from 1.8.0 up to, but excluding, 2.0.0 and selects 1.8.2.5 when it needs a copy.
+   The entry must bring required tools or refuse with a useful message before placing the application.
+2. Record every download boundary separately: the installer AppImage, its container image, container packages and the person's proprietary installer ZIP.
+   Vinci's AppImage is 38,341,112 bytes and needs glibc 2.39 or newer.
+   Its release provides a GitHub asset SHA-256 and a zsync file containing SHA-1, but no standalone SHA-256 manifest or signature file.
+   Compare the downloaded bytes with that digest and pin it; say where the digest came from instead of inventing a `SHA256SUMS` file.
+   A container image such as `ubuntu:24.04` pins the release series, not immutable bytes; check whether the recipe also records a digest.
+   The AppImage's download size cannot stand for the later image, package and Resolve downloads.
+3. Follow the actual exported launcher across the boundary.
+   Vinci writes its own per-user desktop entry and its Open button uses the same command: an absolute distrobox path, `enter`, `env`, then `/opt/resolve/bin/resolve`.
+   A rule that matches the first executable named `resolve` misses that command, and a PATH wrapper cannot intercept its absolute Resolve path inside the container.
+   Check inherited GPU variables as well as those the installer adds.
+   Test the person's GPU choice and native OpenGL where CUDA shares images with it; an exception for every distrobox would also change unrelated containers.
+4. Prove the two execution layers separately.
+   Start the installer on a private display, then exercise its actual container runtime.
+   Giving a GPU to the outer test container does not prove that podman inside it can create a working container or pass that GPU through.
+   If nesting is refused, keep the exact error and test that part in an isolated virtual machine; do not call a simulated runtime a successful installation.
+   A virtual GPU cannot qualify the physical NVIDIA or AMD compute path either, so keep that gap explicit.
+5. Keep removal boundaries equally clear.
+   Removing the installer AppImage is separate from uninstalling the Resolve containers and the projects the person created.
+   Read the installer's own uninstall flow, and never remove projects or reach into home folders as part of the app center's removal action.
+
+### Audit traps
+
+- **Symptom:** the prerequisite audit cannot confirm a brief's installed podman.
+  **Cause:** archive availability does not establish installed state.
+  **Fix:** check both installed package state and the executable's location, then check the published metapackage dependencies separately.
+  **How found:** `dpkg-query` reported no installed podman or distrobox and `command -v` found neither, while the reference image's `apt-cache policy podman` offered 5.8.6.
+- **Symptom:** an existing native NVIDIA OpenGL exception does not apply to the exported Resolve entry.
+  **Cause:** the matcher sees distrobox as the executable; the actual Resolve executable is an argument inside the container.
+  **Fix:** reproduce the match against the published implementation, then qualify a scoped launcher integration with the real nested launch before changing it.
+  **How found:** the published matcher made one override for a native Resolve fixture and zero for Vinci's distrobox fixture.
+  This establishes the matching gap only; actual OpenGL rendering remains a separate check.
+- **Symptom:** a reference app-center recipe asks for the author's SHA-256 manifest, but none is published.
+  **Cause:** release formats differ; Vinci publishes four assets including a zsync file, but no `SHA256SUMS`.
+  **Fix:** record the release asset digest as its own source, compare the download, and never describe it as a separate signed or author-written checksum file.
+  **How found:** the release API asset list and body, followed by a local SHA-256 comparison of the downloaded file.
+
 ## Traps
 
 - **Symptom:** the image build stops with `dpkg (subprocess): cannot execute rm command for cleanup (rm): No such file or directory` and `Could not exec dpkg!` right after `Unpacking base-files (14.sparky9~0) over (14.2)`.
@@ -114,3 +160,103 @@ Some programs have a mode without hardware (`kamlynk --demo`, a simulated camera
 - A GitHub release lists each asset's SHA-256 (`digest`), so the author's checksum file can be compared with the forge's own record without downloading.
 - `--appimage-extract <path>` takes one file out of an AppImage without FUSE and without starting the program; `desktop-file-validate` then checks the author's own menu entry.
 - The app center's dependencies can already bring what an AppImage needs: on both Sparky images `fuse3` came with the tool's HTML window (`yad` depends on WebKitGTK, which recommends `xdg-desktop-portal-gtk`, whose portal depends on `fuse3`). That is a recommendation, so a system installed without recommended packages can lack it, and the entry checks.
+
+### Container-installer runtime lessons
+
+- **Symptom:** distrobox creates Ubuntu successfully, then `enter` says `rev: not found` and `exec: exec: not found`.
+  **Cause:** its entry script calls `rev`; an installation without recommended packages can omit the package that provides it.
+  **Fix:** bring `bsdextrautils` with `podman`, `distrobox` and `fuse3`, and check `rev` before placing the AppImage.
+  **How found:** the failing real `distrobox enter`, followed by installation of `bsdextrautils` and a successful repeat as the ordinary user.
+- **Symptom:** nested podman says `cannot clone: Operation not permitted`, or rootless `newuidmap` cannot write `uid_map`.
+  **Cause:** the outer Docker sandbox restricts the namespaces podman needs.
+  **Fix:** keep the error, then use an isolated VM or a deliberately scoped container rig whose namespace permissions allow the test.
+  An isolated Docker rig with `SYS_ADMIN`, unconfined seccomp/AppArmor and fresh `vfs` storage allowed the ordinary user's podman and distrobox to run here.
+  These are test-rig permissions, never instructions to change the person's host or make the installed application privileged.
+  **How found:** compare default, unconfined-only and namespace-capable runs, then actually pull the image, create and enter the container as the ordinary user.
+- **Symptom:** a static launcher audit predicts a missing NVIDIA exception, but the runtime CUDA/OpenGL probe passes.
+  **Cause:** distrobox filters inherited variable names beginning with an underscore, and the installer supplies NVIDIA's GLX vendor for its hybrid launch.
+  **Fix:** let runtime evidence decide whether to enable an exception.
+  A useful probe makes a physical NVIDIA EGL/OpenGL context current, creates a GL buffer, then requires both `cuGLGetDevices` and `cuGraphicsGLRegisterBuffer` to succeed inside the same distrobox launch environment.
+  Retain a negative control and reject a generic exception for every distrobox command.
+  **How found:** the probe passed both with and without the edition's inherited zink variables; forcing Mesa's vendor list inside the container failed EGL initialization.
+  A narrow candidate can match only `distrobox enter --name vinci-free` or `vinci-studio`, followed by `-- env` and `/opt/resolve/bin/resolve`.
+  That candidate is not a reason to enable it, and a desktop-only change would still miss the installer's Open button.
+- **Symptom:** the package terminal closes after apt fails, and an installer could continue if its tools were already present.
+  **Cause:** terminal exit status alone need not preserve the command's failure.
+  **Fix:** make a success marker only after apt succeeds, require it along with each executable, and reject installation without either condition.
+  **How found:** an apt stand-in returned 100 while the tools remained installed; the entry refused both installation and replacement.
+- **Symptom:** the check's selected AMD heading disagrees with its NVIDIA hybrid message.
+  **Cause:** a saved preference changes the selected GPU without changing the earlier hybrid finding.
+  **Fix:** update both in the report's owning method and add a test selecting the second GPU.
+  **How found:** the real AMD-preference window, source inspection, and a regression test that failed before the change and passed after it.
+  Keep the author-facing fix as a draft until reviewed; a core test does not claim that the rebuilt GUI or Resolve was tested.
+
+Keep three download boundaries visible: the app center's verified installer AppImage, the later container/package downloads, and the person's official Resolve ZIP.
+A measured absence of that ZIP stops the Resolve proof, while the entry, system check and container-runtime tests can still be completed.
+Do not replace the form with an unofficial download or describe media conversion as native codec support.
+
+## The same entry in both app centers
+
+An entry offered to SparkyLinux's main APTus also belongs in the edition's AppCenter, on the same page and with the same protocol key.
+Vinci belongs on Multimedia, Video tools, with Kdenlive; KamLynk belongs on Accessories, Devices, as `accdev_kamlynk`.
+The stereo tabs stay in the edition and never enter the pull request to main.
+The edition stays in step with main while retaining its own entries and stereo tabs.
+
+1. Fetch the upstream default branch and record its exact commit, the previous sync ancestor and all intervening commits by file.
+   Compare each page's protocol-key inventory as well as its text diff.
+   List removed upstream entries explicitly; do not silently delete an edition or stereo entry while resolving the sync.
+2. Inspect the published package's file list before choosing the integration point.
+   A dependency on main APTus does not mean the edition package ships its own copy of those pages.
+   If it only delegates to the installed original, include the maintained main tree in the edition's own package namespace and keep the original package's files untouched.
+3. Carry the accepted entry changes into the edition branch, keeping the settled page, identifier, publisher URL, size and checksum.
+   Keep the edition and upstream-offer branches separate.
+   On the edition, route both the page protocol and direct install/reinstall/remove backends through its shared verified action and metered-download reader.
+   Translate every new sentence and label in the required ten languages; keep vendor metadata outside the stereo catalogue.
+4. Relocate the copied main tree's absolute library, locale and launcher paths together.
+   Keep its relative resources, category links, handler dispatch and unrelated entries intact.
+   Test navigation through the installed package, not only a source `install.sh` or a file opened in isolation.
+5. Compare the installed main-page inventories against the fetched source and the edition additions.
+   Require every main key and both new keys to remain reachable on their intended pages.
+   Compare the stereo catalogue and an unchanged action file against the published package by file hash, then compare each rendered stereo section and one visible tab's pixels.
+   State the capture region: matching tab content does not claim an identical whole-window scrollbar.
+6. Rebuild through the package recipe and retained source, including the normal package checks and complete build record.
+   Require the seed and source-rebuilt binary hashes to match.
+   Capture the two real main entry pages, the metered notice, successful installation, a tampered-download refusal and removal, with state assertions alongside the pictures.
+
+### Sync and packaging traps
+
+- **Symptom:** an entry exists in the edition's source tree but never appears in the installed main page.
+  **Cause:** the package ships only the stereo front end and reads the original package's categories at runtime; its own maintained main tree is not packaged.
+  **Fix:** package the maintained tree under the edition namespace and point category navigation and dispatch there.
+  **How found:** the published package's file list, followed by comparison of its actual library paths with the tracked source tree.
+- **Symptom:** carrying a second entry conflicts in several shell scripts at the same `elif` boundary.
+  **Cause:** both commits insert their branches beside the same existing block, sometimes sharing the trailing `fi` context.
+  **Fix:** retain both complete branches, then check syntax and the before/after entry inventories.
+  **How found:** the cherry-pick conflict hunks, rather than treating either side as a replacement for the other.
+- **Symptom:** a copied category page opens correctly, but its next action returns to the original package or bypasses the edition's notice.
+  **Cause:** hard-coded launcher, library or locale paths, or a direct backend that still uses its old installer.
+  **Fix:** relocate the complete path set and adapt the canonical backends as well as the visible page handler.
+  **How found:** installed navigation and direct-backend tests, plus unchanged hashes of the original package's files.
+- **Symptom:** accented entry text appears as `Â`, or the program heading is nearly white on the page.
+  **Cause:** the original page was ASCII without a charset declaration, and its heading style was intended for a different location.
+  **Fix:** declare UTF-8 on the generated entry page and use the main entry's readable bold-paragraph heading.
+  **How found:** the actual installed entry capture; a successful JSON parse did not establish readable rendering.
+- **Symptom:** the first binary package and its source rebuild differ even though their extracted file contents match.
+  **Cause:** copying the main assets preserves older checkout mtimes, while source extraction normalizes them; SOURCE_DATE_EPOCH clamps newer times but does not raise older ones.
+  **Fix:** apply the build tree's shared reproducible timestamp normalizer to the authored staging tree before building the source and binary packages.
+  **How found:** raw extraction and content comparison of both packages, then `stat` on a copied stylesheet.
+- **Symptom:** an operation changes the installed state, but closing the URI window can also lose the refreshed entry window.
+  **Cause:** the next dialog still inherits the old callback's session or output channel and temporary-page lifetime.
+  **Fix:** start an independent entry process with the old YAD_PID removed, let that process own its temporary page until its dialog closes, and only then close the old page.
+  Keep machine-action output inside the shared action/error engine, not on the URI callback's output channel.
+  **How found:** compare the installed state with the live dialog process before and after the operation; require a new surviving dialog, not only a successful install exit code.
+- **Symptom:** the entry's own Spanish text is translated, but its metered warning is English.
+  **Cause:** the published shared reader's language directory has nine catalogues, although its maintained source already has Spanish.
+  **Fix:** check the installed reader's catalogue files and test the actual warning in every required locale.
+  Until the reader's next package includes that catalogue, an edition-owned locale overlay can link the existing nine files and provide the maintained Spanish data while using the same reader for detection, settings and formatting.
+  Respect the reader's explicit language-directory override.
+  **How found:** the published file list and reader language() result, followed by ten installed notice-rendering checks and a Spanish GUI capture.
+- **Symptom:** main's Applications link leaves the stereo tabs unreachable without restarting the program.
+  **Cause:** the copied main index has no edition tabs of its own.
+  **Fix:** keep the main category pages and their entries, but route the copied Home/index destination back to the edition dashboard that contains both its tabs and main's categories.
+  **How found:** follow the installed Applications link and require a new dashboard process with the unchanged stereo sections.

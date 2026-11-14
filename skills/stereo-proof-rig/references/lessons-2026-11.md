@@ -97,3 +97,13 @@ A trap gives its symptom, its cause, its fix and how the cause was found; a reci
   Cause: the rig's session sets `XDG_CONFIG_HOME` to a folder of its own, fresh for every session, so the programs never look in `$HOME/.config`.
   Fix: write the file after the session is up, into `$XDG_CONFIG_HOME` as the session's environment names it.
   Found by: a case that copies a program's old state and expects it to be taken over did nothing, while the same file placed by hand in the session's folder worked.
+- Symptom: a proof that passed yesterday fails at its first menu step: the store stays empty, the eyes do not change, and the capture shows the menu of the wrong file.
+  Cause: the proof copies its fixture folder with a glob, and a fixture added for another case moved every icon after it in the view.
+  Fix: a case names the files it copies; fixtures of a new case get a folder of their own. Compare a rerun with the accepted proof's text (times and image id taken out): an identical text is the quickest proof that a rebuild changed nothing a person sees.
+  Found by: the capture taken at the failing step, which showed eight files where the proof expects six.
+- Symptom: with a CJK font installed, the offsets that open one sub-menu open the one above it.
+  Cause: the rows of a menu are taller in that font (about 25 px against 22 here).
+  Fix: read the row from a capture in that language; give the row offset as a variable of the case.
+- A file manager's cached thumbnail carries the per-file choice that was in force when it was made (`~/.cache/thumbnails`, keyed by the file's address and date: `Thumb::URI`, `Thumb::MTime`; a stereo one carries `X-KDE::Stereo3DLayout`). A proof that changes the store behind the file manager's back (another program, a prune, a restore from the wastebin) must read the cache as well as the store, or it takes a stale thumbnail for the store's state: read the PNG text keys and the colour in each half.
+- The desktop's file signals for the wastebin, measured with `dbus-monitor --session "type='signal',interface='org.kde.KDirNotify'"`: a trashing announces `FileMoved file:///…/NAME → trash:/NAME`; the file manager's undo announces `FileMoved trash:/0-NAME → file:///…/NAME`; `ktrash6 --restore trash:/0-NAME` announces no `FileMoved` (only `FilesAdded` for the file and `FilesChanged trash:/`).
+

@@ -232,7 +232,7 @@ Traps:
 - Recipe, the flat repository of a round without `apt-ftparchive`: a `Packages` file made from `dpkg-deb -f` of each file with `Filename`, `Size` and `SHA256` added, and a `Release` file with `Origin: Sparky Stereo OS` and the SHA256 of `Packages`; the build container's pin on that origin then prefers the round's packages to the published ones.
 - Symptom: the link gate stops with "stereo imports lost: _ZN6Stereo7Picture12userSwapEyesERK7QString ... (the previous build called them)" for a program whose stereo part is built and works.
   Cause: the gate compares the stereo functions each file imports with the previous build's, because a stereo feature that an optional build dependency switched off links cleanly; a call that moved to another function by design is lost in the same way (here the per-file swap moved from the file attribute to the layer's store, and a thumbnailer went from a three-argument overload to the four-argument one).
-  Fix: the source declares each such symbol with its reason in `debian/sparky-lean-retired-stereo-imports` (one line: the name as `nm -D` prints it, white space, the reason); the gate then notes it in the build's log and still blocks every other lost import.
+  Fix: the source declares each such symbol with its reason in `debian/sparky-lean-retired-stereo-imports` (one line: the name as `nm -D` prints it, white space, the reason); the declaration travels in each package's own lc1 record, so the build's gate and the publisher's read the same thing ("A stereo call retired on purpose", below).
   Never declare a symbol to get past the gate before reading why it is gone: the second symbol it named for the thumbnailer was a real change that nobody had listed.
   Found by: the gate's own line names the file and the symbols; `c++filt` gives the function.
 - Symptom: the gate stops with "previous edition dependency qualification failed" and "supplied input changed after its universe was frozen" on the first package of the published tree, in a build that touched nothing there.
@@ -245,3 +245,33 @@ Traps:
 - Symptom: a script handed to a container as `-c '...'` does nothing, or stops with "unexpected end of file", after a comment was added.
   Cause: an apostrophe in the comment ("the image's packages") ends the single-quoted script.
   Fix: no apostrophes inside a single-quoted script, comments included; `bash -n` does not catch it, since the outer script still parses.
+- Symptom: in a round built in one run, the changelog trailers of the later sources carry the date of the first source's recipe (here four programs dated 11 November by the JPS recipe's commit, three days before their own recipe existed), while the same sources built one at a time were dated correctly.
+  Cause: the round's script exported `SOURCE_DATE_EPOCH` for the first source, and `repo/reproducible.py epoch` returns the environment's date whenever there is one; the export stayed for every step after it.
+  Fix: each step starts without the previous step's date (`unset SOURCE_DATE_EPOCH`, or the caller's own date for the whole round put back); `env -u SOURCE_DATE_EPOCH python3 repo/reproducible.py epoch RECIPE_FOLDER` shows the date a recipe gives.
+  Found by: reading `sourceDateEpoch` and `recipeCommit` in every `.sparky-build.json` and the first ` -- ` line of each `debian/changelog` after the round, before staging: three sources had one date and their recipes had three.
+  Check a round the same way before it is staged: every record names the head (`recipeCommit`, `recipeDirty` false), and each source's date is its own recipe's.
+
+## A stereo call retired on purpose (ORDER 551, milestone 2)
+
+A program that stops calling a stereo function by design (the call moved to another function of the layer) is refused by the link gate, at the build and again at publication, until its package says so itself.
+
+- The declaration: `debian/sparky-lean-retired-stereo-imports` in the source, one line a symbol: the name exactly as `nm -D` prints it, white space, the reason (at least a few words; `#` starts a comment).
+  A recipe that makes the source keeps the file beside its patches and copies it into `debian/` before the build (`sparky-os/packages/per-file-choice-551/retired-stereo-imports/`).
+- Where it is recorded: `lean.debhelper` reads the file once and writes it into the lc1 manifest inside every `.deb` of the source, as `retired_stereo_imports` (a table of symbol and reason); the `Sparky-Lean-Code: lc1 <sha256>` field of the package's control binds the manifest, so a record edited after the build no longer matches its mark.
+  The manifest was chosen because it is the record the publisher already opens for every package (`check-debs`, `check-identity`); the build record `.sparky-build.json` lies beside the archives and `publish-tree.sh` never reads it.
+- How the publisher reads it: `publish-tree.sh` runs the same `lean.release check-link` as the build. For each file that lost a stereo import it asks the new archive for its record, writes one note for each recorded symbol ("stereo import NAME is no longer called, as the package's lc1 record declares: REASON") and blocks every lost import the record does not name.
+  The gate never reads the source's file and no environment variable opens it: what the build let through and what the publisher lets through are the same by construction.
+- Check a package by hand: `dpkg-deb --fsys-tarfile PKG.deb | tar -xO ./usr/share/dpkg-stereo/lc/PACKAGE/ARCH.json | python3 -m json.tool | grep -A4 retired_stereo_imports` (ARCH as in the file's name, `amd64` or `all`).
+
+The trap this replaces:
+
+- Symptom: packages that passed the build's link gate are refused by `publish-tree.sh` with "lc1: release blocked: dolphin_...deb: link check failed: ... stereo imports lost: ... (the previous build called them)", and the publisher stops at the first such package, so the others of the round are not named.
+  Cause: the first form of the declaration lived only in the source tree and reached the build's gate through the build's environment; the publisher has the archives, not the source, so it saw an undeclared loss.
+  Fix: rebuild with a toolkit that writes the record into the package (build main after ORDER 551 milestone 2); a package built before it has no record and must be rebuilt, never waved through.
+  Found by: running `publish-tree.sh` with a throwaway key on a copy of the live tree plus the round's packages before handing the stage over; the build's own gate cannot show this.
+- Symptom: the build stops with "retired stereo imports: NAME has no reason" or "... is not the name of a stereo symbol".
+  Cause: the declaration is a claim the gate will act on, so a line without its reason, a name that is no stereo symbol, a name given twice or an empty file is refused where the manifest is written and wherever it is read.
+  Fix: write the reason; a symbol that is not a stereo import needs no declaration.
+- A forged record (a manifest edited inside a built `.deb` to add a symbol) fails the lc1 mark before the link gate reads it; `lean/tests/test_linkcheck_inventory.py` holds the red, green, forged and reason-less cases.
+- A publication copy for this proof: the live pool is 15 GB, so the copy is a folder of symbolic links to the pool's files plus copied `dists/` (never hard links: a link changes the inode's change time and the gate then says "supplied input changed after its universe was frozen", for this run and for a publication round running beside it); only the gate results of such a copy are faithful, and AppStream and the installability pass are left to the real round.
+

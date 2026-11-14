@@ -673,3 +673,26 @@ How found: the three-way conflict showed the old PredictorRun and checkpoints ag
 Testing a patched dependency with cargo test -p can refuse because it is not a workspace member; testing its standalone manifest without the complete local patch set can instead select an uncached registry backend.
 Use the shared crate's standalone test recipe with a disposable manifest copy and every resolved local patch, leaving source manifests and locks unchanged.
 Compile the original new unit fixtures too: their parameter initializers may need the common-only control field even when the receiving application already compiles.
+
+### A parser guard can stop recursion before the renderer reports it
+
+Symptom: the original active-form guard fixes recursive copies in a resource-less form, but own-resource, pattern and Type3 recursion controls still miss the typed warning.
+Cause: the shared syntax reader refuses an ancestor reference before a second FormXObject reaches the render guard.
+Fix: retain the [original active-form subject](https://github.com/storytold/pdfcraft/commit/42b21e5362c99be04b3fd48c23ba58290a815987) with its author, then integrate the receiving parser separately.
+Check a raw resource reference against the existing active-form identity before resolving it, and report only a known active form.
+Keep parser cycle checks, complete resource-scope isolation and the existing per-page active set.
+How found: a new independent repeated-draw witness first painted an extra recursive blue square; the original subject removed it and still allowed a later independent invocation.
+The original warning controls then remained red although tracing showed only one form entry; the raw-reference integration made all twelve recursion, repeated-draw, pattern and default-color controls pass.
+An explicit malformed resource naming a Pages dictionary is a separate negative: isolation prevents it borrowing the page's form, so it never attempts that recursion.
+Do not label every unresolved object reference a recursion limit or undo resource isolation to reach a later guard.
+
+### A repaired update must keep authentication and cancellation
+
+Symptom: the shared reader opens an older valid xref while the editing model reads objects from a final cut-off update.
+Cause: a successful older table never reaches the ordinary fallback path, and the first private repair subject lacks later authentication and object-header reviews.
+Fix: carry the complete original recovery family, authenticate the named root first, require a rebuilt table's encryption state to match it, and accept recovered pages only when at least one is usable.
+Retain the common decoder limits, per-open control, existing unlinked-xref repair identity and controlled fallback; do not copy the private Pdf::load over those APIs.
+Reuse the controlled marker search and poll inside long digit, whitespace and junk runs in the new object-header detector.
+How found: a complete receiving sweep left exactly four cut-off/header failures; the reviewed controlled port made all 683 renderer-library tests pass, including existing encrypted/wrong-password and trailing-data controls.
+Default and unsafe common-unit runs also passed cancellation inside each long header run with uncancelled positive controls.
+That library sweep still does not qualify the complete application or the other shared-library receivers.

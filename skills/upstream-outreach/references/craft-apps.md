@@ -489,7 +489,10 @@ Cause: the common snapshot and the receiver evolved independently; a broad three
 Fix: reconcile the actual behavior in the common owner, including warning propagation and every budget consumer, before moving the suite's common pin.
 Keep the receiver's private backend out of the resolved graph.
 How found: the real PdfCraft compile named fifteen missing API uses; a subsequent backend compile found a cancellation regression still treating a new `(XRef, bool)` result as an `XRef`.
-That later integration remains unverified; fixing the tuple consumer must preserve its cancellation assertion and be followed by the complete gates.
+The tuple consumer was updated without changing its cancellation assertion, and the standalone backend job passed1190 tests.
+Three identical raster regressions compiled against the pre-merge head and failed their pixel assertions, then passed on the reconciled source.
+The complete library gate later stopped at its disk floor after both strict Clippy configurations passed; receiver compatibility and the later added controls remain unverified.
+Keep the unfinished source as a hashed working patch and preserve the last qualified edition pins; do not label the interrupted gate green.
 
 Symptom: a transferred source manifest's historical SHA-256 disagrees with the named revision, while its recorded Git blob agrees.
 Cause: the historical source-hash field is wrong; it is distinct from the local patched-file hash.
@@ -501,3 +504,9 @@ Symptom: a source inventory takes far longer and transfers more data than its se
 Cause: a broad `git grep` over a partial clone hydrates promised blobs outside the intended code read.
 Fix: list paths from tree metadata, select the actual owner files, and fetch those bounded files at the recorded commit.
 How found: the broad read was interrupted; explicit pinned raw-file reads completed the twelve-app inventory without a repository-wide content search.
+
+Symptom: a new repair regression calls a bounded decode successful and therefore assumes the document limit was bypassed.
+Cause: RunLength deliberately returns its bounded prefix, rather than an error, at the limit.
+Fix: assert the actual lower byte bound and retain an ordinary full-length control; do not change the decoder policy to satisfy an assumed error result.
+How found: the existing decoder stops at16bytes while the ordinary control expands128; the first new test incorrectly demanded an error.
+The corrected repair control was retained but not rerun before the complete gate stopped at its disk floor.

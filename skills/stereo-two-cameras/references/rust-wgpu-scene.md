@@ -329,3 +329,4 @@ How found: the retained monoscopic regression differs from the direct moving-cam
 This is a prerequisite failure, not a stereo proof.
 [EffectCraft #3623](https://github.com/storytold/effectcraft/pull/3623) fixes the distinct first-frame camera-identity problem; retain zorianflorian's original commit when it is needed, rather than freezing the animated camera to hide the collapsed-instance defect.
 The remaining repair needs direct, nested, remapped, mixed card/mesh and ordinary controls before a native stereo adapter can be qualified.
+

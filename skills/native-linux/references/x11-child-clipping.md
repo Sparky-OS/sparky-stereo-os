@@ -138,8 +138,10 @@ The EGL reproducer (`egl-remap-metrics.c`, `KIND=egl`) failed the same way on Me
   Cause: the proof-rig images carry neither `python3-gi` nor `python3-xlib`; a conda `python3` first in the path hides the system one.
   Fix: install both into a derived image (apt over https, `docker commit`), and call `/usr/bin/python3`.
 - **The Vulkan client asserts `maxImageArrayLayers == 1` or `== 2`.**
-  Cause: the stereo layer is a separate package (`mesa-vulkan-layer-stereo`), off until `MESA_VK_STEREO_LAYER=1`, and it reads the root's support version; Mesa's own test sets the version itself and would overwrite KWin's.
-  Fix: unpack the layer's `.deb`, `VK_ADD_IMPLICIT_LAYER_PATH` to its `implicit_layer.d`, `LD_LIBRARY_PATH` to its library folder, `MESA_VK_STEREO_LAYER=1`, and leave the root property alone.
+  Cause: the stereo layer is a separate package (`mesa-vulkan-layer-stereo`) and the test image may not contain it; Mesa's older test also overwrites the root's support version.
+  Fix: install the matching layer or unpack its `.deb` and set `VK_ADD_IMPLICIT_LAYER_PATH` to its `implicit_layer.d` and `LD_LIBRARY_PATH` to its library folder, then leave the root property alone.
+  The layer is enabled by default; unset `DISABLE_LAYER_MESA_STEREO`.
+  `MESA_VK_STEREO_LAYER` is not read by the current layer, as its manifest and `enabled()` show (checked on ORDER 561b).
 - **The EGL client gets NVIDIA's EGL and no second view.**
   Cause: CDI adds NVIDIA's vendor file first.
   Fix: `__EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/50_mesa.json`.
@@ -158,3 +160,24 @@ The EGL reproducer (`egl-remap-metrics.c`, `KIND=egl`) failed the same way on Me
 - **CloudCompare 2.13**: `ccGLWindow`, a Qt `QOpenGLWindow` placed in a widget (`QWidget::createWindowContainer`), so a native child; "Generic stereo display" asks the quad buffer.
 - **Sweet Home 3D 7.5**: Java 3D's `Canvas3D`, a heavyweight AWT child; `-Dj3d.stereo=REQUIRED` asks for a stereo visual.
 All four rely on the child being listed; the first row for each is: start with the stereo option on, read `_KDE_NET_WM_STEREO_CONTENT_CHILDREN` of the top-level, capture, and compare with the same program in 2D.
+
+
+## EGL and Vulkan copied-present controls
+
+The covered declared child must keep its cover whichever API supplied the pair.
+Use the declared-child recipe above for the server's clipping and snapshot lifetime, then test the API's top-level window separately: an older server can keep a declared child's pair while losing its cover, which is not proof that the library handles copied top-level presents.
+The [EGL and Vulkan clients and table](x11-stereo-window-without-glamor.md#egl-x11-and-the-vulkan-stereo-layer) exercise covered, offset and wrong-size requests and the left-view withdrawal route.
+For the Vulkan client `TOPLEVEL=1` selects that top-level control; without it the stereo window is a child inside a plain frame.
+`XLIB=1` selects a Vulkan Xlib surface; the default is XCB.
+
+**A Vulkan row says PAIR after an injected offset, but the old library says PAIR too.**
+Cause: the driver did not call the exported `xcb_present_pixmap` symbol that the first preload hook replaced.
+Fix: hook the XCB request boundary with `x11-present-inject.c` and require its `inject Present` line before classifying the capture.
+How found: the higher-level hook logged no injection on NVIDIA, while the request hook logged both copied requests and made the older server split the picture.
+The helper is a test fixture for an 800-pixel view; it leaves single-view requests alone.
+
+**The Vulkan client has no second view on Xwayland without DRI3.**
+On the NVIDIA one-layer WSI route measured on ORDER 561b, the older layer's packed transfer was clipped to one view and produced no completion on the observed window; the new check cannot wait for such a completion.
+The candidate refuses that two-view swapchain with `VK_ERROR_FEATURE_NOT_PRESENT` and says why.
+This is an unsupported route, not a pair and not the library's copied-present recovery.
+Native Mesa WSI that already advertises two array layers bypasses this layer and needs its own qualification.

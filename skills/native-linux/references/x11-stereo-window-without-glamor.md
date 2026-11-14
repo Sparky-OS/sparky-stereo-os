@@ -215,6 +215,80 @@ Without glamor OpenGL runs on the software renderer; with glamor the GLX clients
 
 This is source-build evidence; package and installed-package qualification are separate.
 
+
+## EGL X11 and the Vulkan stereo layer
+
+Measured on ORDER 561b with the source candidate for Mesa +stereo3d23 and Xwayland +stereo3d3; the older-server control uses the retained +stereo3d5 binary.
+Package and installed results are separate from these source runs.
+The state transition rule is now one `u_stereo_pair` helper for GLX, EGL and the packed Vulkan layer: two copied pairs withdraw the declaration, three consecutive single-view flips allow a retry, and a successful pair clears the problem.
+A first copy alone is not a failure.
+Each library keeps its messages under its own package (`libglx-mesa0`, `libegl-mesa0`, `mesa-vulkan-layer-stereo`), with the same ten translations and the shared engine transport.
+
+### Recipe
+
+Run the following from the `native-linux` skill folder inside a fresh isolated proof-rig session, never on the person's display.
+The EGL client needs EGL, OpenGL and X11 development files; the Vulkan client needs the Vulkan, XCB and X11 development files and the matching installed stereo layer.
+The injection helper also needs the XCB Present development header.
+
+```sh
+cc -O1 -Wall -o /tmp/egl-covered scripts/egl-x11-covered.c -lEGL -lGL -lX11
+cc -O1 -Wall -o /tmp/vk-covered scripts/vk-x11-covered.c -lvulkan -lxcb -lX11
+cc -shared -fPIC -Wall -o /tmp/present-inject.so scripts/x11-present-inject.c -lxcb -ldl
+```
+
+1. With a window 800 by 600, draw 70 frames and hold the last (`FRAMES=70 HOLD_S=30`).
+   The EGL client has a plain child cover by default; `COVER_AT=-1` removes it.
+   For Vulkan use `TOPLEVEL=1` for the copied-present test and `UNCOVERED=1` for its uncovered control.
+   Record the renderer or Vulkan physical-device name; `VK_VENDOR=0x10de` explicitly selects NVIDIA.
+2. Capture both views and run `check-pair-flat-split.py --child grey` for a cover, `--child yellow` after `CHILD_PAINT_AT=50`, or `--child none` when uncovered.
+   A complete pair has red only in the left view, blue only in the right, centred green rectangles, equal 40-pixel moving markers and the 60 by 60 cover at the same place in both views.
+3. Repeat on the older server.
+   A covered pair becomes one complete left view and a kept problem in the library's package.
+   `UNCOVER_AT=40` must restore the pair and end that problem; `STILL_AT=2` checks a program that draws only once.
+   With EGL, `READBACK_GLFIRST=1` also checks that the first left and right GL buffers really contain red and blue before the swap.
+4. For offset and wrong-size controls, preload the helper into the uncovered client and set `X_OFF=40` or `SRC_W=700`.
+   Require `inject Present` in stderr, which proves a request was changed.
+   The helper modifies the packed request and leaves the single-view probe unchanged.
+   Use the classifier's `--loose` for these deliberately shifted or cropped frames; compare both eye positions and marker widths, not a centred-green prediction for an ordinary frame.
+5. In the Vulkan case repeat with `XLIB=1`; XCB and Xlib use the same completion rule.
+   Check the loaded layer in the process's maps, not just a package version or an advertised array-layer count.
+
+| Route | New Xwayland, covered | Older server, covered | Older server after uncovering |
+|---|---|---|---|
+| EGL DRI3, radeonsi | Pair, cover in both views | Left view, told | Pair, problem ended |
+| EGL DRI3, zink on NVIDIA | Pair, cover in both views | Left view, told | Pair, problem ended |
+| EGL software, with either card in the rig | Pair, cover in both views | Left view, told | Pair, problem ended |
+| Vulkan layer, NVIDIA with DRI3, XCB and Xlib | Pair, cover in both views | Left view, told | Pair, problem ended |
+| NVIDIA one-layer Vulkan WSI without DRI3 | No working pair in the baseline | No copied-present completion to check | Candidate refuses the two-view swapchain |
+
+The new-server pair and older-server left-view checks include one-frame programs.
+The request-injected offset and wrong-size rows pass for EGL DRI3 and the NVIDIA layer; the baseline layer on the older server splits those same changed requests.
+A native Mesa WSI that already exposes two array layers bypasses the packed layer; the AMD DRI3 pair is a separate positive control, not evidence for a copied-present check in native WSI.
+
+### Traps found by these clients
+
+- **EGL reports an 800-pixel view, but the moving marker is 80 pixels wide and each view is clipped.**
+  Cause: the DRI3 EGL size hook updated the EGL query width but left the loader's packed buffer only one window wide.
+  Fix: retain the logical EGL width and allocate two view widths in the DRI3 loader, as GLX does.
+  How found: the queried 800 by 600 extent against the captured marker and green rectangle; the software route was a complete pair and exposed the difference.
+- **EGL receives copied completions but never withdraws its declaration.**
+  Cause: the DRI3 surface's common drawable XID was unset, so the completion handler queried geometry of XID zero.
+  Fix: initialize that drawable alongside the loader drawable.
+  How found: no transition despite a split capture; tracing the callback's geometry query found the missing XID.
+- **The first EGL software left view is black, with no OpenGL error; selecting the right draw buffer loses it.**
+  Cause: before stereo was active the eager two-view width helper halved the left view, then first activation resized and discarded it.
+  Fix: activate software stereo on demand as GLX does, keeping the view width unchanged while the first right buffer is added.
+  How found: `READBACK_GLFIRST=1` returned black then blue before the first swap; after the fix it returns red then blue, and the one-frame package test changes from red to green.
+- **EGL software stays flat after uncovering, while GLX restores the pair.**
+  Cause: an 800-pixel single view arrived in a padded 832-pixel software buffer; the actual Present pixmap retained the padding and could never flip.
+  Fix: clip the pixmap to the logical single-view width while flat, not merely to two view widths.
+  How found: logging the transfer width and stride next to the completion mode; an exact 800-pixel pixmap gets three flips and recovers.
+- **A Vulkan wrong-size request is told as flat but still shows blue pixels.**
+  Cause: the one-layer downstream buffer still held the right view after withdrawing the declaration.
+  Fix: while flat put only left-view pixels in both halves of that downstream buffer.
+  How found: the injected request copied the right view's leading pixels into the ordinary window; the same probe has no blue after the fix.
+
+
 ## What this does not cover
 
 - The covered declared child is fixed in the source candidate [above](#a-declared-child-covered-by-a-child-of-its-own); its packaged and installed qualification is still pending.

@@ -122,6 +122,12 @@ A trap gives its symptom, its cause, its fix and how the cause was found; a reci
   Cause: the image's environment sets `LC_ALL=C.UTF-8`, which overrides `LANG`; gettext translates nothing in the C locale, while a Qt catalogue (`.qm`, loaded by the user interface languages) follows `LANGUAGE`.
   Fix: set `LANG`, `LC_ALL` and `LANGUAGE` together in the session (`env | grep -E '^LC_|^LANG'` inside the container shows what the image brings).
   Found by: the program's own toolbar in the capture ("Favorite", "Share"), then reading the installed `.mo` with a second reader (`python3 -c "import gettext; ..."` prints "Favorisieren"), which cleared the catalogue.
+- Symptom: a proof says digiKam did not keep its lasting view, although the published build fails the same check.
+  Cause: the window `digikam FILE` opens is its own small preview window, which has no Ctrl+Q; the case then ended the program by a signal, and the setting is written when the window is closed.
+  Fix: Ctrl+Q, then Alt+F4 (evdev 56+62) when the program is still there, then read the settings file. Run a failing step on the published packages before blaming the change: the same failure there names the case.
+- Symptom: a menu opened by its mnemonic (Alt+V for View) does not open in another language.
+  Cause: the mnemonic is the translated menu's (Alt+A for "Ansicht").
+  Fix: open menus by a shortcut that does not change with the language, or give the case the mnemonic per language.
 - A Kirigami program logs many lines of its own at start (`Object or context destroyed during incubation`, `StackView has detected conflicting anchors`); search the program's log for the names of your own files, not for "error".
 - Recipe, one picture per case for a person to look at: crop the left eye of a capture to the window and keep it under 1100 pixels wide; a menu's rows can be read from it, and a check that only counts colours cannot tell which entry was highlighted.
 

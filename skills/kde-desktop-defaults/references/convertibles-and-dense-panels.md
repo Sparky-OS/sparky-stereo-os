@@ -9,8 +9,9 @@ The edition sets three defaults for these machines, each with the person's own c
 
 | Default | Where it is built | The person's choice |
 |---|---|---|
-| The first scale of a built-in panel comes from its real size, 125 % at least for a full HD panel of about 13 to 14 inches | KWin (`kwin` +stereo3d55, patches `s55-*`) | a saved scale is kept; Display Settings changes it |
-| A computer with a tablet mode gets Plasma Keyboard as its virtual keyboard, in the session's language | `sparky-stereo-hardware` 0.1.26 | System Settings, Virtual Keyboard: another keyboard or None, written to the person's own `kwinrc` |
+| The first scale of a built-in panel comes from its real size, 125 % at least for a full HD panel of about 13 to 14 inches | KWin (`kwin` +stereo3d55 and later, patches `s55-*`) | a saved scale is kept; Display Settings changes it |
+| A computer with a touch screen of its own gets Plasma Keyboard as its virtual keyboard, in the session's language | `sparky-stereo-hardware` 0.1.27 | System Settings, Virtual Keyboard: another keyboard or None, written to the person's own `kwinrc` |
+| The keyboard shows only in tablet mode | KWin (`kwin` +stereo3d57, upstream's open merge request 8592) | the same page, "Show automatically: Only when in Tablet Mode"; switched off, any touch shows it |
 | While in tablet mode every panel is on automatic hide, and goes back to its own setting afterwards | the shell (`plasma-workspace` +stereo3d8) and the switch in General Behavior (`plasma-desktop` +stereo3d4) | General Behavior, Touch, "In Tablet Mode: Hide panels automatically"; each panel's own visibility setting is never written |
 
 The recipes are in [the build tree](https://github.com/Sparky-OS/sparky-stereo-os-build): `sparky-os/packages/kwin/build-55.sh`, `sparky-os/packages/convertible-defaults-567` and `sparky-os/packages/sparky-stereo-hardware`.
@@ -54,14 +55,24 @@ Plasma Keyboard (`plasma-keyboard`, `/usr/share/applications/org.kde.plasma.keyb
 The default cannot be a file in `/etc/xdg` (every computer would get it) and it must not be a line written into the person's own `kwinrc` at the first login.
 KConfig writes a person's choice explicitly only when a system default exists; with none, a value set back to "nothing" is removed from the file (`KCoreConfigSkeleton::ItemString::writeConfig()`: `if ((mDefault == mReference) && !cg.hasDefault(mKey)) cg.revertToDefault(...)`), so a person who chose None would get the keyboard back at the next login.
 
-So it is a system default in a folder of its own, put in front of `XDG_CONFIG_DIRS` only on a computer with a tablet mode:
+So it is a system default in a folder of its own, put in front of `XDG_CONFIG_DIRS` only on a computer with a touch screen of its own:
 
-1. `/usr/lib/sparky-stereo-hardware/has-tablet-mode` reads sysfs: a touch screen (an input device with `INPUT_PROP_DIRECT`, absolute positions and no pen tool) and either a tablet-mode switch (`SW_TABLET_MODE` in `capabilities/sw`) or a chassis type of 30, 31 or 32 (tablet, convertible, detachable). `--why` prints what it found.
+1. `/usr/lib/sparky-stereo-hardware/has-tablet-mode` reads sysfs: a touch screen (an input device with `INPUT_PROP_DIRECT`, absolute positions and no pen tool) and a built-in panel (an eDP, LVDS or DSI connector of `/sys/class/drm` that is not disconnected). `--why` prints what it found, with the tablet-mode switch and the chassis type for the record only.
 2. `/etc/xdg/plasma-workspace/env/sparky-stereo-tablet-mode.sh`, which `startplasma` sources before it starts KWin, puts `/usr/share/sparky-stereo-hardware/tablet-mode/xdg` first in `XDG_CONFIG_DIRS` (XDG Base Directory Specification: the directories are in order of preference).
 3. That folder's `kwinrc` holds `[Wayland] InputMethod=/usr/share/applications/org.kde.plasma.keyboard.desktop`.
 4. The package depends on `plasma-keyboard`.
 
-The test: `tests/tablet-mode.sh` in the package builds a dozen machines as small sysfs trees and reads the result through `kreadconfig6` for a new person, for one who chose another keyboard and for one who chose None.
+The rule follows what KWin can do, not what the firmware says.
+KWin puts a computer in tablet mode by a tablet-mode switch, by itself when its touch screen is left without a mouse or touchpad (`TabletModeTouchpadRemovedSpy` in `src/tabletmodemanager.cpp`), or by the Touch Mode setting.
+A first rule asked for a switch or a tablet, convertible or detachable chassis, and failed on the machine the work was for: a slider convertible whose chassis type is 10 (notebook), with no tablet-mode switch and no lid switch, its only switches the sound card's jacks.
+
+### Only in tablet mode
+
+KWin 6.7.4 shows the keyboard for any touch on a text field, at the desk too.
+Upstream's open merge request 8592 (Luca Tramonti, "Option to limit Virtual Keyboard to Tablet Mode") adds `kwinrc`, `[Wayland] InputMethodTabletOnly`, true by default and honored only while tablet mode is available; the edition carries it adapted to 6.7.4 (`s57-0001`, a DEP-3 header that names it as an open merge request).
+On 6.7.4 the condition goes in front of the visibility modes of `InputMethod::shouldShowOnActive()`, and the check box goes in the page's footer.
+
+The test: `tests/tablet-mode.sh` in the package builds fourteen machines as small sysfs trees, the slider among them, and reads the result through `kreadconfig6` for a new person, for one who chose another keyboard and for one who chose None.
 
 ## Panels in tablet mode: nothing is written, so nothing is restored
 
@@ -85,6 +96,7 @@ busctl --user get-property org.kde.KWin /org/kde/KWin org.kde.KWin.TabletModeMan
 ```
 
 `auto` in a container is "not in tablet mode", which is also the control for a computer without one.
+A container has no touch screen either, so KWin says tablet mode is not available and "Only when in Tablet Mode" is not honored: `KWIN_VIRTUAL_TOUCH_SCREEN=1` in KWin's environment (kwin +stereo3d57) stands for a notebook with a built-in touch screen and a touchpad, tablet mode available and off.
 
 For a first-scale case, `kwin_wayland --virtual` takes an EDID and the built-in flag from the environment (kwin +stereo3d55):
 
@@ -102,6 +114,12 @@ The keyboard is a window of its own in KWin's list (`inputMethod` true), so the 
 For the panels, a real `plasmashell` ([Plasma in the rig](../../stereo-proof-rig/SKILL.md#plasma-in-the-rig-notifications-on-screen-displays-panels-popups)); what is read in each state: KWin's `workspace.clientArea(KWin.MaximizeArea, ...)` (the room a maximized window gets), each dock window's `hidden`, scripting's `panels()[i].hiding` (the person's own setting) and the `panelVisibility` entries of `plasmashellrc`.
 
 ## Traps
+
+- Symptom: the detection says no on the very machine the work was for. Cause: the rule was written from what such machines usually report (a tablet-mode switch, a convertible chassis type), and this one reports neither. Fix: read the real machine's sysfs before writing a hardware rule (`chassis_type`, each input device's `capabilities/sw` and `properties`), and make the rule follow what the compositor can do with the hardware. Found by: the review reading the machine.
+- Symptom: a new control of a settings page is not on the page, with no error. Cause one: it was an action of the page's header, and the tool bar drops what does not fit beside the page's own selector. Cause two: its `visible` was `Kirigami.Settings.tabletModeAvailable`, which answered false in `kcmshell6` while KWin's `tabletModeAvailable` property answered true. Fix: the page's `footer`, and the page's own class asking KWin over D-Bus. Found by: a capture of the page, then a three-line QML probe printing Kirigami's value beside `busctl get-property`. Check a page change by building only its module in the kept build tree (`make kcm_NAME`) and mounting the `.so` over the installed one in the rig, before a package build.
+- Symptom: the link gate says `conflicting supplied package: kwin-common; provide one authoritative edition snapshot` for a build on top of another lane's staged build. Cause: one side of the gate is given two versions, here the previous side (the published list with +54, and the staged +56 as predecessor). Fix: give each side one snapshot: the published list without the sources the staged round replaced, plus that round's packages. A filter by `/pool/main/?/SOURCE/` misses sources under four-letter folders (`libk/libkscreen`).
+- Symptom: after a failed gate, `dpkg-buildpackage -nc` stops with `already marked; use a fresh staging tree, never project MR again`. Cause: the staging trees under `debian/` were projected by the first run. Fix: remove the package staging folders, `debian/.debhelper`, `debian/files` and the substvars, keep the build folder, and run it again; the compile is not repeated.
+- Symptom: a shell script fails with "unexpected EOF while looking for matching `'`" at a line that has balanced quotes. Cause: an apostrophe inside the message of `"${VAR:?message}"` some lines above. Fix: no apostrophe in that message; `bash -n` before the first run.
 
 - Symptom: the shell never reacts to tablet mode, and its log says `qt.dbus.integration: Could not connect "org.kde.KWin.TabletModeManager" to setTabletMode(bool)`. Cause: the method was declared in a `private:` section, and a D-Bus signal connected by name needs a slot. Fix: declare it under `private Q_SLOTS:`. Found by: the shell's own log in the rig; the package had built and passed every gate.
 - Symptom: two captures of the same keyboard layout differ by a few thousand pixels in one run of ten. Cause: the capture caught the keyboard while a key's highlight was still fading. Fix: capture some seconds after the tap, and rerun a pair that differs before believing it; the pair that matters is "the session's language" against "that language ticked by hand", which must give 0.

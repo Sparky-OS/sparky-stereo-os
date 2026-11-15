@@ -35,7 +35,7 @@ systemd already knows how every program KIO started ended; the Graphics page kee
 
 ## Convertibles and small dense panels
 
-A notebook's built-in panel gets its first scale from its real size (125 % at least for a full HD panel of about 13 to 14 inches), a computer with a tablet mode gets Plasma Keyboard as its virtual keyboard in the session's language, and in tablet mode every panel hides by itself and goes back to its own setting afterwards.
+A notebook's built-in panel gets its first scale from its real size (125 % at least for a full HD panel of about 13 to 14 inches), a computer with a touch screen of its own gets Plasma Keyboard as its virtual keyboard in the session's language, shown only in tablet mode, and in tablet mode every panel hides by itself and goes back to its own setting afterwards.
 [Where KWin chooses the first scale and from which EDID field, why a default that only some computers get is a folder in front of `XDG_CONFIG_DIRS`, the shell's two visibility modes, tablet mode in the rig, and the traps](references/convertibles-and-dense-panels.md).
 
 ## The KDE splash

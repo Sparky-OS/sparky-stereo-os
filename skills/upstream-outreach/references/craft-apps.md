@@ -775,3 +775,12 @@ Fix: scan the complete accumulated log for failure records before describing pro
 When aggregating totals, count the Nextest summary once; its failure recap may repeat a test binary's libtest output.
 How found: Photo's full run reported 17,603 passes, one failure and 111 skips; the earlier failure was absent from the displayed tail but present in the saved log.
 The subsequent source repair and whole green rerun remain separate evidence; a corrected monitoring script does not turn the failed run green.
+
+### A shared lockfile is not every receiver's UI dependency inventory
+
+Symptom: the graph guard refuses AniCraft before compilation because its registry Vello 0.1 packages are absent from the common lock.
+Cause: the unchanged receiver's epaint 0.36.2 and glifo 0.2 already use that ABI; the common backend owns Vello 0.0.8 and its lock also records other versions.
+Fix: require every shared API and every matching vendored package version at its actual common owner path, then admit a different registry ABI only when present in the common lock or the receiver's committed lock.
+Do not change the receiver's UI ABI merely to make a private guard pass, and do not admit a new uncommitted ABI or a Git bypass.
+How found: both committed locks and the resolved parent edges showed the existing UI dependency; seven guard controls accepted both actual app graphs and rejected five bypasses, including the original common Vello 0.0.8 registry substitution.
+These are metadata controls, not application runtime or whole-gate results; retain the failed preflight and repeat the full receiver gate separately.

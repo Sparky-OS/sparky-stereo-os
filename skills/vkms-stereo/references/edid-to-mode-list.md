@@ -13,6 +13,46 @@ Every step has a check that fails by itself, so the step that loses the modes sh
 6. **The frame of each layout is composed and written back.** `stereo-wb-test` (the bench's) shows each listed mode with a known left and right eye and reads the writeback buffer back pixel by pixel; the KUnit suites `vkms-stereo`, `vkms-stereo-whole-spec` and `vkms-stereo-no-edid` check the frame sizes (`vkms_frame_size()`: vdisplay plus one vtotal for frame packing, three for L + depth + graphics + graphics-depth, twice the lines for line alternative, twice the width for side by side (full)) and a connector without an EDID.
 7. **Red and green.** The same guest, the same EDIDs, on the kernel without the change (24 modes rejected with `NO_STEREO` for the bench EDID) and with it (none rejected, every expected format listed, the 2D-only twin and the default device unchanged).
 
+## Interlaced modes: carried and marked
+
+An interlaced timing needs its scan type beside its dimensions, refresh rate and stereo structure.
+The notation is `1920x1080i`; a 60 Hz interlaced timing has 60 fields per second and 30 complete frames per second.
+Keep the scan type separate from the stereo packing: an interlaced timing may also carry frame packing.
+Check the applicable CTA timing and HDMI® structure clauses in the edition being used; a missing local clause is an explicit evidence gap, never a formula supplied from memory.
+
+Follow the flag through these boundaries before changing a label:
+
+1. Decode the EDID independently with `edid-decode`, preserving the `i` and the per-VIC stereo entries.
+   A television can declare frame packing on VIC 5 and VIC 20 without declaring 1080p60 frame packing.
+2. Compare the kernel's `drmModeModeInfo.flags` with KWin's `DrmConnectorMode::nativeMode()` and its `OutputModeline::flags()`.
+   In KWin 6.7.4 +stereo3d54, the native mode retains `DRM_MODE_FLAG_INTERLACE`, but `flagsForMode()` in `src/backends/drm/drm_connector.cpp` copies only the preferred and stereo flags into `OutputModeline`.
+   Its refresh calculation already doubles the frame rate for interlaced timings.
+3. Trace the output-device mode's flags through the protocol XML, KWin's `OutputDeviceModeV2InterfacePrivate::bindResource()`, libkscreen's `WaylandOutputDeviceMode` and `WaylandOutputDevice::updateKScreenModes()`.
+   Check both protocol version gates and the client's registry bind version.
+4. Preserve the flag in libkscreen's `Mode` clone, equality and config serializer, including its D-Bus deserializer.
+   Check `WaylandOutputDevice::modeName()` and `Doctor::outputs()`: they construct names independently.
+5. Include scan type in KScreen's `OutputModel` resolution identity, current index, refresh filtering and selected-mode matching.
+   Changing only the displayed string leaves progressive and interlaced modes of equal size and rate merged or selects the other one.
+6. Prove selection separately from naming: inspect the native mode and mode blob, the stereo frame geometry and a refused commit's visible failure.
+   Run the installed doctor and KCM, compare every row with the EDID-derived expectation, and retain a progressive-only control against the previous packages.
+
+Do not use the stock VKMS list as proof that a television declares no interlaced modes.
+VKMS rejects interlace with `NO_INTERLACE`; use an isolated mock DRM test for flag propagation, and a separately qualified guest path for installed compositor behavior.
+A mock passing a commit does not establish physical interlaced scanout.
+
+Traps:
+
+- **Symptom:** a 1080i 3D mode reads as 1080p.
+  **Cause:** the native DRM mode carries interlace, but the compositor's general mode object and its clients lose it; independent formatters then print only width and height.
+  **Fix:** carry scan type across every boundary above and mark the height with `i`, in 2D and 3D alike.
+  **Found by:** decoding the EDID first, then comparing `flagsForMode()` with the retained native mode and following each formatter.
+- **Symptom:** a proposed interlace test lists only progressive formats.
+  **Cause:** VKMS filtered interlaced timings before the compositor received them.
+  **Fix:** read the kernel's rejection status and choose the test layer explicitly.
+  **Found by:** the driver's interlace policy and the `NO_INTERLACE` probe status, rather than the displayed mode count.
+
+The trace above is source evidence for +stereo3d54; it is not a claim that later packages or a notebook's physical output have passed these checks.
+
 ## A writeback fence that never signals: missing connector or stuck job
 
 1. **A missing writeback connector** shows in the first lines of `stereo-wb-test`: `objects ... connector, writeback connector or properties missing`, or no `Writeback-N` entry under `/sys/class/drm/cardN-*`. In configfs the CRTC needs `writeback` set to 1 (`echo 1 > crtcs/crtc0/writeback`) before the device is enabled; the writeback connector, its encoder and its bind to that CRTC are made by `vkms_enable_writeback_connector()`, nothing else to link. A client has to set `DRM_CLIENT_CAP_WRITEBACK_CONNECTORS` to see it.

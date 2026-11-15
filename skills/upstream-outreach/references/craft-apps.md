@@ -709,3 +709,9 @@ Cause: the test module requires a feature absent from the focused command, even 
 Fix: inspect the module's feature guard, enable that feature and require the intended test names and a nonzero expected count in the receipt.
 How found: the common PDF raster target ran zero controls with default features; the same frozen source ran all 29 controls with all features enabled.
 Keep the first receipt as an unqualified attempt, and rerun the whole configured gate after the focused correction.
+
+Symptom: the original Type3 rendering-mode correction is present, yet a Type3 glyph in mode 7 hides a later page fill.
+Cause: the shared interpreter marks a text clip as shown before distinguishing outline glyphs from Type3 procedures, so ending the text object installs an empty outline clip.
+Fix: mark the clip only in the outline arm; keep the empty-outline clip for spaces and keep reporting the Type3 rendering mode to text extraction.
+How found: two shared-owner recording-device and pixel controls failed before the change, then passed beside fourteen existing interpretation controls; five receiving Type3 controls and strict selected Clippy also passed.
+These component results do not qualify the complete shared revision or its receiving suite.

@@ -96,6 +96,6 @@ The fixture executes scheduled copies and releases references without submitting
   Use the matching GCC for that module.
   Configure an independent reduced Clang KUnit tree for a second compiler; do not edit published-header flags and call that the target-header proof.
 
-Version 1.1's restricted quirk builds against 7.3.1-stereo3d16 headers and still needs a camera test.
-Only the generic reference has the measured YUYV hardware result at 640×480, 1280×720 and 1920×1080.
+Version 1.1's restricted quirk builds against 7.3.1-stereo3d16 headers and was then tested on the camera (2026-11-15): 20 whole YUYV frames at each of 640×480, 1280×720 and 1920×1080 with exact byte counts, MJPEG and the machine's second, isochronous camera unchanged, and the workaround notice once in the kernel log.
+The generic reference had given the same YUYV result on that camera before.
 Keep those claims separate.

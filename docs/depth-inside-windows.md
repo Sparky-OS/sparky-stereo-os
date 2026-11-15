@@ -63,6 +63,7 @@ Five parts take part, each in the layer that owns its piece of the work.
    It reads the user's limits and works out each element's depth from the theme, as above.
    It sets two values the toolkit reads: the window's `_q_stereo_depth`, and each element's `_q_stereo_parallax`, its shift between the eyes in device pixels.
    It hears from Stereo KWin through [libstereo-declare](https://github.com/Sparky-OS/libstereo-declare) 1.5.
+   A Qt Quick window that Stereo Union does not style, such as the desktop's loading screen, says it itself: `StereoDepth.depth` of `org.sparky.stereo` (stereo-layer 1.20.0) is a fraction of the person's limits for the window's output, and the layer sets the same two values while Stereo KWin says the surface is awake.
 3. **Qt Quick draws the window once per eye.**
    While a window's `_q_stereo_depth` is set, Qt Quick asks the platform for a surface with two views.
    Then, in both of its render loops, it polishes, synchronises and renders the left eye, and ends that frame without presenting it ([`QRhi::SkipPresent`](https://doc.qt.io/qt-6/qrhi.html#EndFrameFlag-enum)).

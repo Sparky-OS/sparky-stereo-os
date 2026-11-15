@@ -40,7 +40,8 @@ A notebook's built-in panel gets its first scale from its real size (125 % at le
 ## The Camera page
 
 System Settings has a Camera page (`sparky-stereo-camera`, under Multimedia beside Sound): the default camera is WirePlumber's `default.configured.video.source`, so every program that asks PipeWire for a camera follows it; the format, size, frame rate and the camera's own controls are set on the V4L2 device and applied again when the camera is plugged in; a preview comes from PipeWire, and a two-lens camera's pair is drawn as a declared full side by side picture.
-Kamoso, Qt Multimedia's camera and FFmpeg do not follow the default (measured).
+Kamoso (our build) and Qt Multimedia's camera (our build, ORDER 582) follow the default; FFmpeg's `-f v4l2` does not (measured).
+The Qt side: [the default camera in Qt programs](../contrib-qt/references/default-camera-in-qt-programs.md).
 [Where each setting lives, which programs follow, a virtual camera in the rig, and the traps with their symptoms](references/camera-page.md).
 
 ## A program that needs hardware: offered, not installed

@@ -1010,3 +1010,13 @@ The offer of DisplayCAL builds on other people's work, named from each project's
 - **SparkyLinux's APTus**: Paweł "pavroo" Pijanowski and Piotr "MoroS" Mrożek, whose app center the entry lives in; lane 565 wrote the one install-tools mechanism the sizes sentence reuses.
 These projects do not endorse the edition.
 
+## VLC Stereo's video on a surface of its own (ORDER 578, 2026-11-15)
+
+VLC Stereo closed with "invalid object" when Qt hid a window of its interface during playback; its video now lies on a Wayland surface the interface makes itself. It builds on other people's work, named from each project's own records:
+
+- **VLC 4's Wayland compositor for the Qt interface** ([code.videolan.org](https://code.videolan.org/videolan/vlc), `modules/gui/qt/maininterface/compositor_wayland_module.c` and `compositor_wayland.cpp`, "Copyright (C) 2023 VLC authors and VideoLAN"): Pierre Lamot wrote it (9dc025d0, "qt: add wayland support", 2023-12-11), Fatih Uzunoglu wrote most of its later changes, with François Cartegnie and Alexandre Janniaux. The fix takes its technique: the video surface is the player's own, a sub-surface of the interface's surface while the video is shown, with an empty input region.
+- **Fatih Uzunoglu's 84e7e017** ("qt: do not hide window on close on Wayland", 2025), which records that Qt before 6.9 destroys a QWindow's wl_surface when the window is hidden, and **Rémi Denis-Courmont's 04d8fcb9** ("qt: remove dysfunctional Wayland window", VLC 3.0.x, 2026-01-13): the same behaviour, met by VideoLAN on both branches.
+- **libwayland** ([wayland.freedesktop.org](https://wayland.freedesktop.org/); `wayland-server.c` "Copyright © 2008 Kristian Høgsberg", `wayland-client.c` also Intel Corporation): `wl_client_connection_data` sends "invalid object N" for a request on an id the client's map no longer holds, and the client sends requests on a proxy whatever its state; the two facts that name the side at fault.
+- **Qt Wayland** ([qt.io](https://www.qt.io/), "Copyright (C) 2016 The Qt Company Ltd."; KDE's kde/5.15 branch on invent.kde.org, which Debian's 5.15.19 follows): `QWaylandWindow::setVisible(false)` calls `reset()`, which destroys the window's sub-surface and surface.
+- **ORDER 265 and 441** (VLC Stereo's X11 rig and input delivery), whose fake input client, capture and window scripts these proofs reuse.
+These projects do not endorse the edition.

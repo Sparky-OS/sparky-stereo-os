@@ -9,8 +9,8 @@ description: >-
   WL_SURFACE_SERIAL in CI, wp_viewporter says the surface already has a viewport, a mono EGL window draws at half its
   width, a video crashes KWin switching between ARGB and NV12, a Vulkan swapchain errors with NATIVE_WINDOW_IN_USE, a
   toolkit lacks stereo, a canvas or video looks pixelated or black in the stereo browser, the browser's video is
-  green on NVIDIA, a gl-stereo layer change needs the saver receipts again, the saver list says "Not offered", or a QWidget
-  window's painting (CPU, GPU) must be measured.
+  green on NVIDIA, a gl-stereo layer change needs the saver receipts again, the saver list says "Not offered", QWidget
+  painting must be measured, or a program dies with "invalid object".
 ---
 
 # Native Linux programs
@@ -160,6 +160,9 @@ As in the general skill: both eyes captured, one declaration, the 2D control.
 For a route change (Mesa, Xwayland), also the programs that already worked, rerun.
 
 A client drawing on a GPU other than the compositor's (a dmabuf import failure, "importing the supplied dmabufs failed"): [references/two-gpu-dmabuf.md](references/two-gpu-dmabuf.md).
+
+A program that dies with `wl_display#1: error 0: invalid object N` (or another object's "no longer exists" error): read the client's `WAYLAND_DEBUG` trace back from the error to the object's creation and its `destroy`, and name the side from libwayland's rules (a request on an id the client itself destroyed is the client's fault).
+On Qt 5 a hidden window's `wl_surface` is destroyed, so a thread that draws on a Qt window's surface must draw on a surface of its own (VLC Stereo +stereo3d20, as VLC 4 does): [references/wayland-protocol-errors.md](references/wayland-protocol-errors.md), with the recipe, the forced trigger (`../stereo-proof-rig/scripts/qt5-hideshow.cpp`) and the traps.
 
 A compute or sparse-buffer program that draws nothing on the RTX through zink, with no GL error (64-bit atomics in another storage buffer, a sparse buffer's tail reading zero): [references/zink-storage-and-sparse.md](references/zink-storage-and-sparse.md).
 

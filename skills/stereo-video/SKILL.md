@@ -3,14 +3,14 @@ metadata:
   requires-packages: mkvtoolnix
 name: stereo-video
 description: >-
-  Stereo video: the marks (frame packing SEI, JP3D, st3d, sv3d, StereoMode), writers and readers (x264, x265,
-  mkvmerge, Kdenlive, UMS, FFmpeg, Qt Multimedia, mpv, VLC, Dragon), metadata precedence, unpacking by copying, 360
-  and VR180, depth video, the per-file eye swap. Load it when a 3D film plays flat, the mark is lost after a frame
-  or a transcode, the eyes are swapped, a half side-by-side file is pre-scaled, a server's 2D view of a 3D file
+  Stereo video: marks (frame packing SEI, JP3D, st3d, sv3d, StereoMode), writers and readers (x264, x265,
+  mkvmerge, Kdenlive, UMS, FFmpeg, Qt Multimedia, mpv, VLC, Dragon), metadata precedence, unpacking by copying, 360,
+  VR180, depth video, the per-file eye swap. Load it when a 3D film plays flat, the mark is lost after a frame
+  or transcode, the eyes are swapped, a half side-by-side file is pre-scaled, a server's 2D view of a 3D file
   is too wide or still marked 3D, mpv shows one view, a depth map does not rotate, a GPU encoder
-  writes no SEI, an FFmpeg hwaccel assertion fails in pthread_frame.c, VLC hangs after a minimize, a Qt Multimedia
-  player aborts at the next file ("QOpenGLContext current in a different thread"), logs "Handle type: NoHandle", or
-  copies 3D video into wl_shm buffers.
+  writes no SEI, an FFmpeg hwaccel assertion fails in pthread_frame.c, VLC hangs after a minimize or ends on "invalid object", a Qt Multimedia
+  player aborts at the next file ("QOpenGLContext current in a different thread"), logs "Handle type: NoHandle" or
+  copies 3D video into wl_shm.
 ---
 
 # Stereo video, end to end
@@ -150,6 +150,11 @@ These narrower topics have their own references:
 - [Android's media path](references/android-media-path.md) (checked 2026-10-07): Media3's `Format.stereoMode`, the MP4 frame packing SEI work in review, and no portable MediaCodec stereo side data.
 - [Screen-content codec comparisons](references/screen-content-codecs.md) (checked 2026-10-14): matched text quality, the controls, and x265 SCC that silently falls back to Main profile.
 - [Editing, playback and transport boundaries](references/editing-playback-transport.md) (2026-10-19): a reusable editing regression project, the per-file eye swap, and a slow phone stream measured stage by stage.
+
+## A player that dies of a Wayland protocol error
+
+A player that closes with `wl_display#1: error 0: invalid object N` used an object after it was destroyed; read the trace back to the object and to who destroyed it before blaming the compositor.
+VLC Stereo up to +stereo3d19 drew its video on a Qt window's surface, which Qt 5 destroys whenever it hides the window (Ctrl+L, the playlist); +stereo3d20 draws on a surface of its own: [native-linux, wayland-protocol-errors.md](../native-linux/references/wayland-protocol-errors.md).
 
 ## A player on the engine's video layer
 

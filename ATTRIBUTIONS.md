@@ -989,6 +989,7 @@ The Camera page of System Settings and its command build on other people's work,
 - **Kamoso** ([invent.kde.org/multimedia/kamoso](https://invent.kde.org/multimedia/kamoso), GPL 2.0 or later): Aleix Pol and Alex Fiestas, with the Kamoso contributors; read for how a KDE program lists a camera through GStreamer's device monitor, and measured not to follow the session's default. No code is copied.
 - **v4l-utils** (`v4l2-ctl`) and **cameractrls**: read for how a camera's controls are listed and which kinds exist. No code is copied.
 - **The edition's stereo layer** (`Stereo::FileChoiceList`): the packings of a two-lens camera, their ids and their translated names are the layer's; lane 569's known machines table is what the page reads to say that a camera has a kernel correction.
+These projects do not endorse the edition.
 
 ## Two views on Vulkan, followed and told (ORDER 573 and 574, 2026-11-15)
 

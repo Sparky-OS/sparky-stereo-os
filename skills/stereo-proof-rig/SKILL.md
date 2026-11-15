@@ -50,6 +50,11 @@ When the question needs a real machine, a cable or a 3D television, the rig is t
 One fresh session per case, a passwd entry for the user, a render node for KWin, the declarations read from the X window tree, and the stereo capture read per eye: [x11-session-rig.md](references/x11-session-rig.md), with its scripts (`x11_props.py`, `x11_propagation.py`, `eyes_share.py`, `kwin_script.py`, `vlc_mpris.py`, `support-shim.c`, `make-barcode-fixtures.sh`, `columns.py`).
 To prove what a player does when the compositor refuses its Wayland declaration, preload `scripts/refuse-shim.c` ([recipe](../stereo-window-3d-area/references/declared-layer-state.md)).
 
+## A Vulkan program that changes its number of views
+
+One window and one `VkSurfaceKHR`, swapchains of two image layers and of one in turn, on Wayland and on X11, read as PAIR, FLAT or HALVES per capture: [`scripts/vk-views`](scripts/vk-views/README.md), with a runner for several programs in one session (a problem told once, then ended).
+To prove a Vulkan layer or a Mesa driver from a development tree, mount the built library over the installed one in the rig container.
+
 ## A relaunch soak (a client killed and started, or its 3D area remade, many times)
 
 For a defect that shows only after many runs in one session: one compositor session, a player and a plain Wayland client of the same shape, each killed (SIGKILL and SIGTERM in turn) and started hundreds of times with a capture after each start, the 3D area also torn down and made again inside one client, and a `--no-declare` control that must come out flat.

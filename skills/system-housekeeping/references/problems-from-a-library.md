@@ -31,3 +31,16 @@ Both are the person's own (`--person`): the library runs as the person.
 - **Symptom:** `sparky-stereo-problems list` shows the title "a problem needs attention" and the English text in every language.
   **Cause:** the package's catalog is not installed (a development build of the library), so the record's `text_en` is shown.
   **Fix:** install the package that carries the catalogs before judging a translation.
+
+## Qt's Wayland client (ORDER 574)
+
+The same engine, from a library that is in every Qt program: `libqt6waylandclient6` tells the person when a window asked for two views of its surface and was given one (the window is shown flat).
+What differs from Mesa's GLX, and why:
+
+- **One key per driver, not per program.** A driver that cannot give a second view gives none to any program, so the problem is the machine's driver's: `one-view:vulkan:DEVICE`, `one-view:opengl:VENDOR`, `one-view:opengl:zink`.
+- **The first program is named, and kept so.** Before keeping, the library reads the package's problems (`ssp_list_json`); when the key is there it keeps nothing, so another program on the same driver does not make the problem new again (a keep with other arguments is a new generation, which shows again where the person dismissed it).
+- **It ends with a working pair** of the same driver (`ssp_clear`), once per process.
+- **The path comes from the build** (`-DQT_SPARKY_STEREO_PROBLEMS_LIBRARY=...`), opened with `QLibrary`; an upstream build without it keeps the old log line.
+- **Packaging:** the catalog (`debian/lang`, `--subject LOCAL1`) made in the amd64 build into `libqt6waylandclient6`, which depends on `sparky-stereo-problems (>= 0.1.2) [amd64]`; a postrm that ends the package's problems.
+
+The rows, the recipe and the traps are in native-linux's [two views asked, one given](../../native-linux/references/qt-vulkan-two-views.md#two-views-asked-one-given).

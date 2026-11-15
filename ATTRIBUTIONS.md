@@ -1010,3 +1010,7 @@ The offer of DisplayCAL builds on other people's work, named from each project's
 - **SparkyLinux's APTus**: Paweł "pavroo" Pijanowski and Piotr "MoroS" Mrożek, whose app center the entry lives in; lane 565 wrote the one install-tools mechanism the sizes sentence reuses.
 These projects do not endorse the edition.
 
+
+## A film without sound says so (ORDER 579)
+
+The players that now say "This film has no sound." stand on these authors' code, named as each project's files give them: Bino by Martin Lambers; Haruna by George Florea Bănuș (with Muhammet Sadık Uğursoy); sView by Kirill Gavrilov; Dragon Player by Harald Sitter (the volume button and controls bar) and the Dragon authors; Plank Player by Aditya Mehra; VLC by VideoLAN and the VLC team; Qt Multimedia's `hasAudio` and track lists by the Qt Company and the Qt Project. Kai Uwe Broulik's merged Dragon change "Disable volume controls when media has no audio" ([merge request 99](https://invent.kde.org/multimedia/dragon/-/merge_requests/99)) was searched first and not carried, because the edition keeps the volume control usable and says why; his reading of the same problem is the reason the sentence exists in Dragon.

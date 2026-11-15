@@ -749,3 +749,14 @@ Keep the receiver's ban and the shared crates' publication status unchanged.
 How found: the unchanged whole receiver gate named the offending public edges; adding those existing constraints made the focused ban check pass without a lockfile change.
 That focused result still needs complete shared-library and receiving gates on the resulting revision.
 The [cargo-deny exception](https://embarkstudios.github.io/cargo-deny/checks/bans/cfg.html#allow-wildcard-paths) and [Cargo's multiple locations](https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#multiple-locations) describe the policy and the source-plus-version form.
+
+
+### A receiver must carry the complete common backend patch set
+
+Symptom: the receiving Photo build cannot find `RenderContext::set_max_coverage` or `coverage_full`, although the same common revision passes its own gates and Pdf builds.
+Cause: the app copies the Hayro root patches but leaves Vello CPU and Common 0.0.8 on the registry; Cargo ignores a dependency workspace's patch table, and an identical package version does not establish identical source.
+Fix: derive the needed root patches from the selected common revision, matching both package name and version so an unrelated newer ABI remains separate.
+Check the locked resolved graph against every canonical common manifest before compiling, then run the app's original gate.
+How found: the compiler failed on the coverage API, and an independent metadata guard rejected exactly the two registry copies; adding those existing common paths changed only their lock source and checksum fields, with all names, versions and dependency lists unchanged.
+The corrected graph compiled the common backend and reached an actual importer warning regression; keep the earlier compilation attempt separate from that runtime red.
+No private backend pin or shared limit change is needed for this receiver binding.

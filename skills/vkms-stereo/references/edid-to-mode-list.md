@@ -75,6 +75,21 @@ The init script runs `insmod` in that order, mounts configfs, and prints one lin
 To test a patched VKMS against a published kernel without building the kernel, build the module against that kernel's `linux-headers` package (`make -C /usr/src/linux-headers-RELEASE M=$PWD/vkms CONFIG_DRM_VKMS=m modules`, with a `Kbuild` holding `obj-m += vkms.o` and the object list of the driver's Makefile) and put it in the initramfs in place of the kernel's own; the kernel has no `CONFIG_MODVERSIONS` and does not force signatures, so it loads (tainted).
 Build the unpatched source the same way too: if it is red like the published module, the build is not what changed the result.
 
+### Capturing the real KCM list without a physical display
+
+A Qt Quick KCM hosted by `kcmshell6` can live in a `QQuickWidget`. Its internal
+`QQuickWindow` is not a visible top-level window. For a headless software-rendered
+capture, inspect visible `QQuickWidget` instances, follow `quickWindow()` and the
+visual `childItems()` tree, and use the containing widget's `grab()` for the PNG.
+Read a ComboBox through its public `count` and `textAt(index)` API; its `model`
+variant need not be a string list. Open its `popup` before capture. A test observer
+can enumerate resolutions and each resolution's refresh entries by setting the
+ComboBox index and emitting `activated(index)`, without pressing Apply. Keep this
+observer outside the shipping package and compare its observations with the EDID
+expectations. This captures the rendered installed KCM, not DRM scanout or stereo
+eye delivery. A virtual-backend fixture likewise tests installed protocol/client
+presentation; it cannot establish physical kernel EDID enumeration or field timing.
+
 ### Further flag propagation traps
 
 - **Symptom:** a protocol configure check accepts an old XML file although mode flags lack interlace. **Cause:** the same XML already contains `ized3d_mode.interlaced`, an unrelated output format. **Fix:** inspect the mode `flags` enum or match the exact new entry and value; require it in edition builds. **Found by:** comparing the generated mode flag macro with the XML enum containing the earlier word match.

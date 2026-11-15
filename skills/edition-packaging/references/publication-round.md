@@ -118,6 +118,30 @@ Those are the inputs to the next meta build; this inspection alone proves neithe
 Compare every generated field with the published metas, explain each difference by its generating list or code line, then prove the transaction through apt's `Inst` lines, installed versions, no unexpected `Remv` and an empty audit.
 For hardware-dependent software offered only on request, check it is absent after installing the tasks with the edition's normal recommendation policy.
 
+Continuation lessons from ORDER 587:
+
+- **Symptom:** `lc-successor.py` refuses a staged application with `not a +lc1 source`.
+  **Cause:** a plain binary is not an earlier Lean Code source, and cannot supply that tool's retained toolkit or source-consumer plan.
+  **Fix:** recover the exact Debian source, apply the already accepted application patch, then use `lean.debian_prepare` and the conventional source build to make its first lc1 source.
+  Keep its complete build record and repeat the accepted behaviour test on the installed successor.
+  **How found:** Kamoso's stage had only its plain binary, changes and patch; the successor tool's guard and the source-preparation route identified the correct first migration.
+- **Symptom:** a standalone source rebuild produces different archive hashes although its installed contents are unchanged.
+  **Cause:** archive timestamps and compression belong to the assembly, and can differ between direct assembly and `dpkg-buildpackage`.
+  **Fix:** compare every payload and control member, including modes and links, then retain the actual source-built archives alongside the buildinfo and changes that name their hashes.
+  Never attach metadata for one archive to another archive with equal payload but different bytes.
+  **How found:** independent member maps and control comparisons showed identical look and HR contents; the source build's metadata identified which final archive bytes to keep.
+- **Symptom:** `dpkg-genchanges` cannot find the generated `.buildinfo`.
+  **Cause:** buildinfo was written directly into the final stage while genchanges still looked beside its binary inputs.
+  **Fix:** keep source, binaries and buildinfo in dpkg's output directory until changes is generated; retain all final files, then write the build record once.
+  `dpkg-genbuildinfo` uses `--build=binary`; do not assume every dpkg helper accepts `-b`.
+  **How found:** the graphics recipe's failing path named the expected parent directory; the conventional source build showed the working order.
+- **Symptom:** the meta link gate cannot resolve `sparky-aptus-appcenter`, and generation omits programs known by another archive.
+  **Cause:** the qualification and generator catalogues contained Debian, deb-multimedia and the edition, but omitted the underlying SparkyLinux archives.
+  **Fix:** mirror the edition's declared archives with their verified public keys before generating tasks or resolving their closures.
+  Inspect the first policy attempt when the last attempt merely reports two mutually exclusive driver locks.
+  **How found:** policy attempt zero traced the desktop through the memory page and Stereo AppCenter to the missing SparkyLinux package; its candidate appeared after the signed archive was added.
+  Compare all generated relations with the published controls; unavailable names already absent from the published controls are distinct from removed functionality.
+
 ## The recipe
 
 1. **Freeze the build tree.** `round-worktree.sh WORKTREE [COMMIT]` makes (or reuses) a git worktree of the build repository at one commit; the default commit is `origin/main` as fetched now.

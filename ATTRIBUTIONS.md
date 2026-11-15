@@ -978,3 +978,13 @@ The loading screen between the login and the desktop shows the boot splash's pic
 - **The person's limits at boot** (ORDER 481): sparky-stereo-boot 0.1.9 and Plymouth's `popped=` and `sunk=`, which the loading screen matches level for level.
 - **layer-shell-qt** ([invent.kde.org/plasma/layer-shell-qt](https://invent.kde.org/plasma/layer-shell-qt)), by Aleix Pol Gonzalez, gives KSplash its overlay surfaces on Wayland.
 These projects do not endorse the edition.
+
+## Two views on Vulkan, followed and told (ORDER 573 and 574, 2026-11-15)
+
+A Vulkan surface's declaration of a pair now follows the swapchain that is current on it, QVulkanWindow gives a window two views, and a window given one view where it asked for two is told to the person. It builds on other people's work, named from each project's own records:
+
+- **Mesa's Vulkan window-system integration** ([mesa3d.org](https://mesa3d.org/), `src/vulkan/wsi`; `wsi_common_wayland.c` and `wsi_common_x11.c` carry "Copyright © 2015 Intel Corporation"), maintained by the Mesa project's contributors. Its Wayland presentation already ended a swapchain's declaration with the swapchain, which is the rule the edition's Vulkan stereo layer and its X11 presentation now follow.
+- **The Khronos Group's Vulkan specification**: `VkSwapchainCreateInfoKHR` (`imageArrayLayers`, VUID-VkSwapchainCreateInfoKHR-imageArrayLayers-01275; a retired `oldSwapchain`) and VUID-vkDestroySurfaceKHR-surface-01266, the clauses the rule is tied to.
+- **Qt's QVulkanWindow and QRhi** ([qt.io](https://www.qt.io/), qtbase): Laszlo Agocs and The Qt Company wrote QVulkanWindow and the RHI's Vulkan backend; Ilya Doroshenko added stereo swapchains to the RHI's Vulkan and Direct3D 12 backends (qtbase 1eb15adee3, 2023), whose image view per eye QVulkanWindow's two views follow.
+- **ORDER 556** (the edition's Qt on its Vulkan path), whose rig, disc fixture and readers these proofs reuse.
+These projects do not endorse the edition.

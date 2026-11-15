@@ -93,7 +93,7 @@ Panel dimensions and Android decoder MIME/profile declarations are explicit devi
 The Flat Headset UMS profile requests full SBS and uses a bounded panel declaration from the HTTP identity or device description.
 H.264 compatibility must not bypass required stereo conversion.
 After FFmpeg stereo3d, materialize sample aspect into square pixels before fitting the panel.
-Matroska DisplayWidth/DisplayHeight describe one eye: Media3 must account for horizontal or vertical packing when deriving packed-frame pixel aspect.
+Matroska DisplayWidth/DisplayHeight describe one eye by RFC 9559 section 18.10, or the whole frame as mkvmerge writes them: Media3 must account for horizontal or vertical packing when deriving packed-frame pixel aspect, and the edition tells the two apart by [the rule of ORDER 577](../stereo-video/references/eye-shape-in-matroska.md).
 See the [Matroska stereo specification](https://www.matroska.org/technical/notes.html#multi-planar-and-3d-videos).
 
 Native full-SBS MP4, half-SBS Matroska and mono pass every pixel under stated H.264 error bounds, with zero wrong-eye pixels.

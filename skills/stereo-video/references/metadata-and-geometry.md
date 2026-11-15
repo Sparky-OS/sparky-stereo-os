@@ -32,11 +32,12 @@ For a square-pixel 1920×1080 picture per eye:
 This is a relationship, not a requirement that every source be 1080p or 16:9.
 Read the actual geometry, crop, sample aspect ratio and display units for the source.
 [RFC 9559 §18.10](https://www.rfc-editor.org/rfc/rfc9559.html#section-18.10) defines Matroska `PixelWidth`/`PixelHeight` as the stored combined picture and pixel-unit `DisplayWidth`/`DisplayHeight` as one plane's display size.
+The same elements default to the whole frame (5.1.4.1.28.12 and .13) and mkvmerge writes the whole frame, so the edition reads them as one plane only when a view of the frame as declared could not be a whole picture: [the shape of an eye in a Matroska pair](eye-shape-in-matroska.md) (ORDER 577).
 For codec signalling, interpret the frame-packing arrangement together with the stream's sample aspect and the applicable codec's aspect semantics; a layout enum alone is not a dimension field.
 See the frame-packing semantics in [ITU-T H.264](https://www.itu.int/rec/T-REC-H.264) and [ITU-T H.265](https://www.itu.int/rec/T-REC-H.265), naming the edition when citing a clause.
 
 A codec SAR and a container SAR mean different things for a packed frame: H.264 V16 D.2.26 NOTE 2 gives the packed frame's shape, which each upconverted view keeps, while Matroska's plane size (RFC 9559 §18.10) and ISO/IEC 14496-12 13.5.4.1's PixelAspectRatioBox give each view's.
-FFmpeg folds a stereo Matroska track's plane size into the stream SAR, so that SAR is per view; a half-format stretch applied to it doubles the view. Decide which one a stream has from its declaration (the container and its StereoMode), never from the frame's shape ([lessons](lessons-2026-11.md)).
+FFmpeg folds a stereo Matroska track's display size into the stream SAR (doubled along the stacked axis only when the size is one plane, in the edition's FFmpeg since +stereo3d14), so that SAR, applied to one view's samples, gives that view's shape; a half-format stretch applied to it doubles the view. Decide which one a stream has from its declaration (the container and its StereoMode), never from the frame's shape ([lessons](lessons-2026-11.md)).
 
 Use valid supplied geometry directly.
 Do not replace it with a guessed aspect threshold, and do not reject the ordinary metadata-driven path merely because unmarked files also exist.

@@ -165,7 +165,7 @@ Each row boots a copy-on-write disk (`qemu-img create -f qcow2 -b BASE -F raw`) 
 - A login screen that fails to start: a unit whose program does not exist, linked as `display-manager.service` and wanted by `multi-user.target`.
 - A plain reboot and a hibernation each need the same small disk for the guest's notes across both runs of the virtual machine.
 - Judge the screen as before: a screenshot every half second, and count the frames that show the menu's box.
-- The time GRUB takes: from QEMU's start to the kernel's first line on the serial port, ten starts each for the old and the new package.
+- The time GRUB takes: from QEMU's start to the kernel's first line on the serial port, ten starts each for the old and the new package, in turns (old, new, old, new) on two disks over the same base, and judged start by start. On a shared machine the same package's starts differ by a second and more, so ten starts of one and then ten of the other measure the machine's other work.
 
 ### Traps
 

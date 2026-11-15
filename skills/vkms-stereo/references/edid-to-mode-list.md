@@ -23,6 +23,8 @@ Check the applicable CTA timing and HDMI® structure clauses in the edition bein
 Follow the flag through these boundaries before changing a label:
 
 1. Decode the EDID independently with `edid-decode`, preserving the `i` and the per-VIC stereo entries.
+   Use `edid/expect-from-decode.py --include-interlaced DECODE.txt` for a bench that supports interlace.
+   Its default deliberately keeps only progressive formats for the ordinary VKMS bench.
    A television can declare frame packing on VIC 5 and VIC 20 without declaring 1080p60 frame packing.
 2. Compare the kernel's `drmModeModeInfo.flags` with KWin's `DrmConnectorMode::nativeMode()` and its `OutputModeline::flags()`.
    In KWin 6.7.4 +stereo3d54, the native mode retains `DRM_MODE_FLAG_INTERLACE`, but `flagsForMode()` in `src/backends/drm/drm_connector.cpp` copies only the preferred and stereo flags into `OutputModeline`.
@@ -47,9 +49,9 @@ Traps:
   **Fix:** carry scan type across every boundary above and mark the height with `i`, in 2D and 3D alike.
   **Found by:** decoding the EDID first, then comparing `flagsForMode()` with the retained native mode and following each formatter.
 - **Symptom:** a proposed interlace test lists only progressive formats.
-  **Cause:** VKMS filtered interlaced timings before the compositor received them.
-  **Fix:** read the kernel's rejection status and choose the test layer explicitly.
-  **Found by:** the driver's interlace policy and the `NO_INTERLACE` probe status, rather than the displayed mode count.
+  **Cause:** VKMS filters interlaced timings before the compositor receives them, and the ordinary EDID expectation script filters them too.
+  **Fix:** read the kernel's rejection status, choose the test layer explicitly and enable `--include-interlaced` for its expectation.
+  **Found by:** the driver's interlace policy, the `NO_INTERLACE` probe status and the expectation script's `add()` filter, rather than the displayed mode count.
 
 The trace above is source evidence for +stereo3d54; it is not a claim that later packages or a notebook's physical output have passed these checks.
 

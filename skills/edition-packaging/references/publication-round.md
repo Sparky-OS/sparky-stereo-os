@@ -109,6 +109,21 @@ Traps found by archive and source inspection in ORDER 587:
   **Fix:** compare every recorded binary and metadata hash with the actual staged file, and hold the affected source until its source and build evidence agree.
   **How found:** the graphics helper's record bound another `.dsc` hash in three successive stages; the source-component manifests themselves verified.
 
+### A stage accepted after the proof froze
+
+A passing transaction and link check qualify their recorded archive identities, not every package that later enters a stage folder.
+If a stage is accepted during that check, follow the coordinator's written instruction: rerun against the extended pool unless that instruction explicitly permits a separate hand-off for the round.
+With that permission, finish the frozen check, retain its pool hash, and supply a separate per-source reconciliation and exact add/leave-out filenames for the late stages.
+Name both scopes in the report; the person publishing still qualifies and rehearses the extended pool.
+A later successor replaces the old source family, including its companions and metadata; it is not added beside it.
+
+Trap:
+
+- **Symptom:** a green installed proof is cited for a cohort whose FFmpeg, player, stereo library or thumbnailer arrived after its inputs froze.
+- **Cause:** the accepted stage list advanced while the test was running, but the report treated that list and the frozen archive pool as the same thing.
+- **Fix:** retain the exact proved pool and, only with explicit permission, a separate late-stage add/leave-out list; otherwise repeat the proof with the new pool. Check each late descriptor, component hash, binary Source field and listed build-record hash in place. A descriptor stored in the source subfolder may be checksum-covered separately from an architecture's binary build record; state which record actually names it.
+- **How found:** compare the frozen index hash and transaction targets with the late binaries' Source versions and the time of the coordinator's exception. Resolve relocated source metadata only inside that stage's known source folder and require the exact recorded hash.
+
 ### Task metadata is generated after the cohort is known
 
 A task producer's caller-supplied version is not a fixed newer release in its historical changelog.

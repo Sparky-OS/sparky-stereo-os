@@ -108,6 +108,9 @@ Daniel, 2026-11-05: "that cleaning was due long ago".
 
 ## Services that only one vendor's hardware can run
 
+[A service that must not retry for ever](references/service-must-not-retry-forever.md) keeps the vendor's startup and hotplug support while stopping persistent startup failures.
+It gives the real systemd red/green proof and the shared problems-engine record, with DisplayLink's rejected evdi module as the example.
+
 Symptom: `systemctl --failed` lists a unit at every boot on one kind of machine and not on another (thermald on an AMD CPU: it prints "Unsupported cpu model or platform", leaves without taking its D-Bus name and its `Type=dbus` unit fails; nvidia-persistenced on a machine without the card; NVIDIA's IMEX daemon, which needs a multi-node NVLink domain).
 Debian's postinst enables such a unit wherever the package is installed, so the fix is to decide **who gets the package**, not to mask the unit.
 

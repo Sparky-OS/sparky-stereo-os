@@ -3,14 +3,15 @@ metadata:
   requires-packages: dkms | edid-decode
 name: drivers
 description: >-
-  Kernel and display-driver work for stereo and deep colour: the HDMI 3D modes an EDID declares and the kernel lists
+  Kernel/display drivers for stereo and deep colour: HDMI 3D modes declared by EDID
   (amdgpu, NVIDIA, nouveau, VC4), USB-C 3D glasses, the edition's kernel configuration (Secure Boot without lockdown,
   the real-time flavour), DKMS modules on a new kernel (NVIDIA, ZFS, openssl for signing, first-boot MOK enrolment,
   linux-headers without gcc), udev rules for wheels tested without hardware (umockdev), HDMI-CEC, VRAM protection,
   patches carried with provenance. Load it when a 3D mode is missing, the TV never switches to 3D, a DKMS build fails on
   a new kernel, dkms says openssl not found, modprobe says Key was rejected by service, ConditionFirstBoot never fires,
   nouveau reports firmware unavailable, amdgpu hangs with a page fault, ring timeout and a device coredump or repeats
-  an IP block soft reset with device wedged, virtio-gpu oopses with stereo on, or a udev chmod hides its failure.
+  an IP block soft reset with device wedged, virtio-gpu oopses with stereo on, a USB camera delivers no YUYV frames,
+  or a udev chmod hides its failure.
 ---
 
 # Drivers: 3D modes and deep colour in the kernel
@@ -20,6 +21,8 @@ description: >-
 1. Save the EDID, connector modes, kernel/driver revision and current 2D behavior before changing mode handling.
 2. Test mode construction and timing in VKMS first; use an authorized physical display for signaling and link qualification.
 3. Return mode/timing differences, InfoFrame or display evidence, 2D regressions and untested hardware. A virtual driver cannot prove a cable handshake.
+
+For [a USB camera that delivers nothing in one format](references/usb-camera-one-format.md), start with descriptors, probe values, usbmon and payload arithmetic; then test the actual decoder in KUnit before a person's camera comparison.
 
 **Check freshness first.**
 Written on 2026-10-07; the kernel configuration and its traps, the carried gamepad fix and the test without firmware added on 2026-11-02.

@@ -696,3 +696,11 @@ Reuse the controlled marker search and poll inside long digit, whitespace and ju
 How found: a complete receiving sweep left exactly four cut-off/header failures; the reviewed controlled port made all 683 renderer-library tests pass, including existing encrypted/wrong-password and trailing-data controls.
 Default and unsafe common-unit runs also passed cancellation inside each long header run with uncancelled positive controls.
 That library sweep still does not qualify the complete application or the other shared-library receivers.
+
+### A focused success can run no tests
+
+Symptom: a selected integration-test command exits successfully but reports zero tests.
+Cause: the test module requires a feature absent from the focused command, even though the whole all-feature gate includes it.
+Fix: inspect the module's feature guard, enable that feature and require the intended test names and a nonzero expected count in the receipt.
+How found: the common PDF raster target ran zero controls with default features; the same frozen source ran all 29 controls with all features enabled.
+Keep the first receipt as an unqualified attempt, and rerun the whole configured gate after the focused correction.

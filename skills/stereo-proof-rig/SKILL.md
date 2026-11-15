@@ -55,6 +55,12 @@ To prove what a player does when the compositor refuses its Wayland declaration,
 One window and one `VkSurfaceKHR`, swapchains of two image layers and of one in turn, on Wayland and on X11, read as PAIR, FLAT or HALVES per capture: [`scripts/vk-views`](scripts/vk-views/README.md), with a runner for several programs in one session (a problem told once, then ended).
 To prove a Vulkan layer or a Mesa driver from a development tree, mount the built library over the installed one in the rig container.
 
+## A client that dies of a Wayland protocol error
+
+Drive the program as a person does (fake input: moves, double clicks, keys, its own views and menus), keep `WAYLAND_DEBUG=client`, and read the error's object back to its creation and its `destroy`; a run left alone may never fail.
+To make a Qt 5 child window's lost surface certain, preload `scripts/qt5-hideshow.cpp`; the natural trigger then becomes the rig row.
+Recipe, rows and traps: [native-linux, wayland-protocol-errors.md](../native-linux/references/wayland-protocol-errors.md).
+
 ## A relaunch soak (a client killed and started, or its 3D area remade, many times)
 
 For a defect that shows only after many runs in one session: one compositor session, a player and a plain Wayland client of the same shape, each killed (SIGKILL and SIGTERM in turn) and started hundreds of times with a capture after each start, the 3D area also torn down and made again inside one client, and a `--no-declare` control that must come out flat.

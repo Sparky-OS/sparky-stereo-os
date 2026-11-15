@@ -1,0 +1,15 @@
+# ORDER 583: Qt's Wayland EGL client buffer plugin (src/plugins/platforms/wayland/plugins/hardwareintegration/
+# wayland-egl) built alone against the installed Qt and its private headers, so a change to it is proved without a
+# whole qtbase build. The unchanged source built the same way is the control of the method.
+cmake_minimum_required(VERSION 3.16)
+project(qt-plugin-wayland-egl LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_AUTOMOC ON)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui OpenGL WaylandClient)
+find_package(Qt6 REQUIRED COMPONENTS GuiPrivate OpenGLPrivate WaylandClientPrivate)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(WL REQUIRED IMPORTED_TARGET wayland-client wayland-egl egl)
+add_library(qt-plugin-wayland-egl MODULE main.cpp qwaylandeglclientbufferintegration.cpp qwaylandeglwindow.cpp qwaylandglcontext.cpp)
+target_compile_definitions(qt-plugin-wayland-egl PRIVATE QT_PLUGIN QT_NO_KEYWORDS QT_USE_QSTRINGBUILDER)
+target_link_libraries(qt-plugin-wayland-egl PRIVATE Qt6::GuiPrivate Qt6::OpenGLPrivate Qt6::WaylandClientPrivate PkgConfig::WL ${CMAKE_DL_LIBS})
+set_target_properties(qt-plugin-wayland-egl PROPERTIES PREFIX lib)

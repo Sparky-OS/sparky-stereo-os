@@ -199,6 +199,6 @@ Traps:
 ## Still to build
 
 - **Qt Widgets on the Vulkan RHI** (`QT_WIDGETS_GPU_PAINT=batch` with `QT_WIDGETS_RHI_BACKEND=vulkan`) asks for two views the same way and gets them from the same code: one row on NVIDIA's driver gave the pair of the OpenGL RHI pixel for pixel (flat before). The other drivers, scales and Qt's own frame around such a window were not measured.
-- **A window with Qt's own frame on OpenGL** (client-side decorations) asks for two views, gets them, and is drawn flat, and nothing tells it; the telling covers drivers that give one view, not this path of Qt.
-- **X11.** Qt asks for no second view on xcb, so a Qt Quick window with depth is flat there and not told; a QVulkanWindow asking with its format gets two layers wherever the X11 surface offers them (Mesa's X11 presentation, the layer), not measured.
-- **The layer on X11 without DRI3** refuses the two-view swapchain (`VK_ERROR_FEATURE_NOT_PRESENT`) and says so in the log only.
+- **A window with Qt's own frame on OpenGL** (client-side decorations) asked for two views, got them, and was drawn flat, and nothing told it: the cause in two places and the fix are in [qt-window-depth-flat.md](qt-window-depth-flat.md), with the plans for the two items below.
+- **X11.** Qt asks for no second view on xcb, so a Qt Quick window with depth is flat there and not told; a QVulkanWindow asking with its format gets two layers wherever the X11 surface offers them (Mesa's X11 presentation, the layer), not measured. Why, and the plan: [qt-window-depth-flat.md](qt-window-depth-flat.md#3-qt-on-xcb-planned).
+- **The layer on X11 without DRI3** refuses the two-view swapchain (`VK_ERROR_FEATURE_NOT_PRESENT`) and says so in the log only; the program stops. Measured with the other drivers and planned in [qt-window-depth-flat.md](qt-window-depth-flat.md#2-the-vulkan-stereo-layer-on-x11-without-dri3-planned).

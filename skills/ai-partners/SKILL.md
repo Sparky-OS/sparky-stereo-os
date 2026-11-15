@@ -197,6 +197,7 @@ Environment and commands:
 References consulted (collections, queries, used or missing):
 Expected / observed result, including control:
 Evidence paths and hashes:
+Shipped (stage with sums and .keep, verified bundles) and cleaned; Kept (path or name, size measured now, why); lane check output:
 Dependencies added or changed (name, source, version, how it was checked):
 Not tested / known limitations:
 Next action and any remaining authorization:
@@ -208,6 +209,7 @@ Private correspondence and personal details stay out of source branches and dist
 
 ## Shared resources
 
+Where things go, which disk takes the work and the order ship, then clean, then hand back are in [working-practices](../working-practices/SKILL.md); read it before the first clone.
 Use configured scratch paths and disk floors; historical values in a recipe are examples, not overrides of current storage policy.
 Release build locks and CI reservations when work stops.
 Keep test displays, PipeWire, D-Bus and credentials separate from a person's live session.

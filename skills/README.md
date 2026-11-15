@@ -4,10 +4,10 @@
 Humans can follow them directly. Local and hosted models can read the same files; no account or provider is required.
 These are edition-maintenance procedures, not a general application-development course.
 
-Start with [AGENTS.md](../AGENTS.md), the [edition contract](sparky-stereo/SKILL.md) and [working together](ai-partners/SKILL.md).
+Start with [AGENTS.md](../AGENTS.md), the [edition contract](sparky-stereo/SKILL.md), [working practices](working-practices/SKILL.md) (where things go, which disk, ship then clean then hand back) and [working together](ai-partners/SKILL.md).
 Then choose one task below. Each domain starts with a short working recipe; detailed sections retain the measurements and traps that motivated it.
 Historical versions and test results are evidence for their stated setup, not a guarantee about newer software.
-Core skills are `sparky-stereo`, `ai-partners`, `making-skills`, `development-hooks`, `search-upstream-first`, `upstream-outreach`, `edition-packaging` and `writing-front-pages`; they always link.
+Core skills are `sparky-stereo`, `working-practices`, `ai-partners`, `making-skills`, `development-hooks`, `search-upstream-first`, `upstream-outreach`, `edition-packaging` and `writing-front-pages`; they always link.
 
 | Your task | Read next |
 | --- | --- |
@@ -42,6 +42,7 @@ Core skills are `sparky-stereo`, `ai-partners`, `making-skills`, `development-ho
 | Android Qt test reproduction | [qt-android-ci](qt-android-ci/SKILL.md) |
 | Brazilian certificate sources and algorithms | [brazil-certificates](brazil-certificates/SKILL.md) |
 | Sparky CA trust-store implementation | [certificate-manager](certificate-manager/SKILL.md) |
+| Where clones, scratch, the stage and the evidence go; which disk takes the work or fills; ship, clean, hand back; the Kept section; leftovers a cleaner cannot find | [working-practices](working-practices/SKILL.md) |
 | A task brief, handoff or review for a person or an AI partner; an unattended runner that stops, loops or cannot write | [ai-partners](ai-partners/SKILL.md) |
 | A new skill or an extension of one: the header and its limits, the description as a trigger clause inside the index's window, lessons files, the review that walks each rule against the diff, the cold-reader test | [making-skills](making-skills/SKILL.md) |
 | Hooks: a rule an AI tool or git enforces by itself (the designs read after a compaction, briefs and hand-backs, the outreach guard, the publish check), the workspace layout they assume, a hook that refuses a tool call, adding one | [development-hooks](development-hooks/SKILL.md), with [`hooks/`](../hooks/README.md) |

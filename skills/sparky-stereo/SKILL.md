@@ -17,6 +17,8 @@ Its aim is a desktop where stereo 3D and deep colour (10, 12 and 16 bits per cha
 This skill holds what every piece of work on it must respect.
 The other skills in this folder hold the solved patterns for one kind of work each.
 
+**Load next: [`working-practices`](../working-practices/SKILL.md)**, before the first clone, build or download: where each kind of thing goes, which disk takes the work, the order ship, then clean, then hand back, and what to read before you ask. Every partner, person or AI, reads it right after this skill.
+
 **Check freshness first.**
 Written on 2026-10-07, updated through 2026-11-06 (the dated rules inside say when each was settled).
 If the [README](../../README.md) or the pages it links say something different, they win and this skill is history.
@@ -134,6 +136,7 @@ Load the one that matches the work; the [program list](../../docs/programs-in-de
 
 | Skill | For |
 |---|---|
+| [`working-practices`](../working-practices/SKILL.md) | Every task, first after this skill: where clones, scratch, the stage and the evidence go, which disk, ship then clean then hand back, the Kept section, the check before a hand-back |
 | [`stereo-proof-rig`](../stereo-proof-rig/SKILL.md) | How to produce the proof: a headless Stereo KWin, captures of both eyes, the checks, a showcase stereo screenshot |
 | [`stereo-window-3d-area`](../stereo-window-3d-area/SKILL.md) | A 3D viewport, canvas or video inside an ordinary window; KWin's effects with depth of their own |
 | [`stereo-two-cameras`](../stereo-two-cameras/SKILL.md) | Programs that draw a scene: the cameras, the maths, the proof |

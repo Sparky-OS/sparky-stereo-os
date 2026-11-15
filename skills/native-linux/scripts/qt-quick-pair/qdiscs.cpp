@@ -10,6 +10,8 @@
 //   QDISCS_LIFECYCLE=1                      resized at 2.5 s, hidden at 4 s, shown at 5 s
 //   QDISCS_TOGGLE=1                         depth off at 2.5 s and on again at 4 s (two views, one, two)
 //   QDISCS_OFF=1                            depth off at 2.5 s, for good (two views, then one)
+//   QDISCS_FLICK=1                          depth off and on again at 2.5 s in one turn of the event loop, no
+//                                           frame between the two (two views asked again at once)
 //   QDISCS_STRESS=1                         depth off and on every 100 ms from 0.5 s to 6.5 s (60 changes, ending
 //                                           on), the window hidden at 2 s, shown at 2.5 s and resized at 4 s
 // At 7 s it prints one STATE line and then stays still.
@@ -79,6 +81,12 @@ int main(int argc, char **argv)
     if (depth && qEnvironmentVariableIntValue("QDISCS_TOGGLE") == 1) {
         QTimer::singleShot(2500, w, [w] { w->setProperty("_q_stereo_depth", false); });
         QTimer::singleShot(4000, w, [w] { w->setProperty("_q_stereo_depth", true); });
+    }
+    if (depth && qEnvironmentVariableIntValue("QDISCS_FLICK") == 1) {
+        QTimer::singleShot(2500, w, [w] {
+            w->setProperty("_q_stereo_depth", false);
+            w->setProperty("_q_stereo_depth", true);
+        });
     }
     if (depth && qEnvironmentVariableIntValue("QDISCS_OFF") == 1)
         QTimer::singleShot(2500, w, [w] { w->setProperty("_q_stereo_depth", false); });

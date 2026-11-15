@@ -1026,3 +1026,11 @@ These projects do not endorse the edition.
 ## A film without sound says so (ORDER 579)
 
 The players that now say "This film has no sound." stand on these authors' code, named as each project's files give them: Bino by Martin Lambers; Haruna by George Florea Bănuș (with Muhammet Sadık Uğursoy); sView by Kirill Gavrilov; Dragon Player by Harald Sitter (the volume button and controls bar) and the Dragon authors; Plank Player by Aditya Mehra; VLC by VideoLAN and the VLC team; Qt Multimedia's `hasAudio` and track lists by the Qt Company and the Qt Project. Kai Uwe Broulik's merged Dragon change "Disable volume controls when media has no audio" ([merge request 99](https://invent.kde.org/multimedia/dragon/-/merge_requests/99)) was searched first and not carried, because the edition keeps the volume control usable and says why; his reading of the same problem is the reason the sentence exists in Dragon.
+
+## A Qt window with depth that stays flat (ORDER 583, 2026-11-15)
+
+- **Qt Wayland's EGL client buffer integration** ([qt.io](https://www.qt.io/), the files carry "Copyright (C) 2016 The Qt Company Ltd."): the content framebuffer and the decorations blitter that draw Qt's own frame around an OpenGL window, which the change makes blit each eye of an engine's pair.
+- **David Edmundson's "wayland: move decoration into subsurfaces"** (qtbase [94f96210518d](https://github.com/qt/qtbase/commit/94f96210518d), 2025-12-19, reviewed by Eskil Abrahamsen Blomfeldt), which removes that blitter from Qt 6.12; the page says what goes and what stays at that move.
+- **The Khronos Group:** the Vulkan clause on X11 surface extents quoted in the plan for the stereo layer.
+- **ORDER 573 and 574** for the three findings and the vk-views client, **ORDER 556** for the qdiscs fixture and its reader.
+These projects do not endorse the edition.

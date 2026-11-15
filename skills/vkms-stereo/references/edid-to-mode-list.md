@@ -53,19 +53,15 @@ Traps:
   **Fix:** read the kernel's rejection status, choose the test layer explicitly and enable `--include-interlaced` for its expectation.
   **Found by:** the driver's interlace policy, the `NO_INTERLACE` probe status and the expectation script's `add()` filter, rather than the displayed mode count.
 
-The +stereo3d54 trace was followed by installed candidate tests in an isolated
-virtual backend: all 41 EDID-derived logical timing rows matched doctor and the
-KCM, including ten interlaced rows. The progressive-only control retained the
-same 21 rows, labels and order. Selecting 1080i60 frame packing retained the
-interlaced frame-packing identity, and selecting progressive 2D remained possible.
-This qualifies the tested native-flag boundary and installed protocol/client
-presentation. It does not qualify a notebook's physical interlaced scanout,
-kernel-generated duplicate or fractional timings, or a physical DRM commit.
+The +stereo3d54 trace was followed by installed candidate tests in an isolated virtual backend: all 41 EDID-derived logical timing rows matched doctor and the KCM, including ten interlaced rows.
+The progressive-only control retained the same 21 rows, labels and order.
+Selecting 1080i60 frame packing retained the interlaced frame-packing identity, and selecting progressive 2D remained possible.
+This qualifies the tested native-flag boundary and installed protocol/client presentation.
+It does not qualify a notebook's physical interlaced scanout, kernel-generated duplicate or fractional timings, or a physical DRM commit.
 
 ### Capturing the real KCM list without a physical display
 
-Use [the test observer](../scripts/kcm-mode-list-observer.cpp) inside the isolated
-container, with the installed KCM and its own virtual compositor session:
+Use [the test observer](../scripts/kcm-mode-list-observer.cpp) inside the isolated container, with the installed KCM and its own virtual compositor session:
 
 ```sh
 ulimit -c 0
@@ -78,23 +74,21 @@ LANG=C.UTF-8 QT_QUICK_BACKEND=software \
 ```
 
 Expect `kcm-list.json`, `kcm-list-resolutions.png` and `kcm-list-refresh.png`.
-The JSON enumerates the real resolution and refresh controls; the images show their
-open lists. This observer stages resolution changes in the KCM and exits without
-pressing Apply. Use a disposable home and compositor, never a person's session.
-It expects the English `Hz` label. Inspect each PNG before counting it as a capture.
+The JSON enumerates the real resolution and refresh controls; the images show their open lists.
+This observer stages resolution changes in the KCM and exits without pressing Apply.
+Use a disposable home and compositor, never a person's session.
+It expects the English `Hz` label.
+Inspect each PNG before counting it as a capture.
 
-A Qt Quick KCM hosted by `kcmshell6` can live in a `QQuickWidget`. Its internal
-`QQuickWindow` is not a visible top-level window. For a headless software-rendered
-capture, inspect visible `QQuickWidget` instances, follow `quickWindow()` and the
-visual `childItems()` tree, and use the containing widget's `grab()` for the PNG.
-Read a ComboBox through its public `count` and `textAt(index)` API; its `model`
-variant need not be a string list. Open its `popup` before capture. A test observer
-can enumerate resolutions and each resolution's refresh entries by setting the
-ComboBox index and emitting `activated(index)`, without pressing Apply. Keep this
-observer outside the shipping package and compare its observations with the EDID
-expectations. This captures the rendered installed KCM, not DRM scanout or stereo
-eye delivery. A virtual-backend fixture likewise tests installed protocol/client
-presentation; it cannot establish physical kernel EDID enumeration or field timing.
+A Qt Quick KCM hosted by `kcmshell6` can live in a `QQuickWidget`.
+Its internal `QQuickWindow` is not a visible top-level window.
+For a headless software-rendered capture, inspect visible `QQuickWidget` instances, follow `quickWindow()` and the visual `childItems()` tree, and use the containing widget's `grab()` for the PNG.
+Read a ComboBox through its public `count` and `textAt(index)` API; its `model` variant need not be a string list.
+Open its `popup` before capture.
+A test observer can enumerate resolutions and each resolution's refresh entries by setting the ComboBox index and emitting `activated(index)`, without pressing Apply.
+Keep this observer outside the shipping package and compare its observations with the EDID expectations.
+This captures the rendered installed KCM, not DRM scanout or stereo eye delivery.
+A virtual-backend fixture likewise tests installed protocol/client presentation; it cannot establish physical kernel EDID enumeration or field timing.
 
 ### Further flag propagation traps
 

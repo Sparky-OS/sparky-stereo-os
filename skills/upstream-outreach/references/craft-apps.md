@@ -503,6 +503,11 @@ Fix: fetch the exact named upstream path, verify both its Git blob and SHA-256, 
 How found: PdfCraft's `ec0a965074f376a5bf610435948e4e5184bf3299` JPX source hashes to `f0a2b01c692c086d30a26562d7548f9e837af166be737d2c543de7c886a45f82` and Git blob `74efd8b31e2b2935ff2bbceda2c1ffd36ea9c20d`; its separate local patched hash was already correct.
 Retain the fetched authority bytes and the before/after comparison.
 
+Symptom: an origin audit reports newly carried files missing from the crate's named base revision.
+Cause: the audit ignores a file's more specific source revision.
+Fix: resolve the per-file origin before the crate default, then compare both the original Git blob and its SHA-256; keep the local patched hash separate.
+How found: the two CMYK modules were absent from the crate base but present at their recorded individual revisions; all 272 Git-origin records then matched without changing a source manifest.
+
 Symptom: a source inventory takes far longer and transfers more data than its selected paths suggest.
 Cause: a broad `git grep` over a partial clone hydrates promised blobs outside the intended code read.
 Fix: list paths from tree metadata, select the actual owner files, and fetch those bounded files at the recorded commit.

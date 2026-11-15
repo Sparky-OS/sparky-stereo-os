@@ -78,6 +78,10 @@ It replaces none of the tests on a real television: VKMS has no cable, so the HD
 
 ## A 3D mode of the EDID is missing from the connector's list
 
+| Symptom | Trace |
+|---|---|
+| a 1080i 3D mode reads as 1080p | [Interlaced modes: carried and marked](references/edid-to-mode-list.md#interlaced-modes-carried-and-marked) |
+
 Walk the EDID to the mode list one step at a time, each with a check that can fail: the EDID decodes with 3D, the expectation is made from `edid-decode` (never from the kernel), the connector's modes read with the stereo capability set, and, if they are missing, `drm.debug=0x4` names the status of every mode the probe helper drops (`NO_STEREO` means the connector lacks `stereo_allowed`).
 Then the frame of each layout, and the same guest on the kernel without the change.
 The steps, the guest for a published kernel, and the traps are in [references/edid-to-mode-list.md](references/edid-to-mode-list.md); the bench's `src/lsmodes.c` lists a connector's modes against an expectation and `edid/make-2d-edid.py` makes the 2D-only twin of an EDID.

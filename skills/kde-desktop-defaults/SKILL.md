@@ -3,15 +3,14 @@ metadata:
   requires-packages: plasma-desktop
 name: kde-desktop-defaults
 description: >-
-  The edition's Plasma defaults and small KDE patches: KRunner search order, the unit converter's currency rates, task
-  management, Ctrl+Alt+Del to System Monitor and Ctrl+Alt+Esc to log out, frozen-window recovery, formatting a removable
+  The edition's Plasma defaults and small KDE patches: KRunner search order, the unit converter's currency rates, tasks, Ctrl+Alt+Del to System Monitor and Ctrl+Alt+Esc to log out, frozen-window recovery, formatting a removable
   drive and running scripts from Dolphin, the look package (cursor theme names, wallpaper, lock screen, the video
-  wallpaper plugin), Discover and its AppStream cache, sparky-stereo-look and /etc/xdg files, the KScreen KCM, a
+  wallpaper plugin), Discover and its AppStream cache, sparky-stereo-look, /etc/xdg files, the KScreen KCM, a
   built-in panel's first scale from its EDID, tablet mode (on-screen keyboard, panels that hide). Load it when a default
   should be decided instead of left to the person, a shortcut clashes, a lock screen shows only its wallpaper, a cursor
-  theme name does not exist, a KCM page is out of order in another language, a widget shows zero instead of an error, a
+  theme name does not exist, a KCM page is out of order in another language, a widget shows zero not an error, a
   video wallpaper keeps the old clip, a notebook starts at 100 %, a convertible shows no on-screen
-  keyboard, a webcam has no page, a program ignores the default camera, or a KDE patch needs its CI.
+  keyboard, a webcam has no page, or a KDE patch needs its CI.
 ---
 
 # KDE desktop defaults

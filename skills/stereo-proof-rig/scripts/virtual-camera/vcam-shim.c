@@ -111,6 +111,14 @@ static int load_cfg(struct dev *d, const char *path)
             c->def = c->value = atoi(strtok(NULL, " "));
             if (c->type == V4L2_CTRL_TYPE_BUTTON) c->flags |= V4L2_CTRL_FLAG_WRITE_ONLY;
             c->id = V4L2_CID_BASE + 0x400 + d->nctrls;
+            // a control named like a standard one gets the kernel's own id, so a page can show the standard name
+            static const struct { const char *name; __u32 id; } standard[] = {
+                {"brightness", V4L2_CID_BRIGHTNESS}, {"contrast", V4L2_CID_CONTRAST}, {"auto_exposure", V4L2_CID_EXPOSURE_AUTO},
+                {"white_balance_automatic", V4L2_CID_AUTO_WHITE_BALANCE}, {"sharpness", V4L2_CID_SHARPNESS},
+                {"exposure_time_absolute", V4L2_CID_EXPOSURE_ABSOLUTE}, {"power_line_frequency", V4L2_CID_POWER_LINE_FREQUENCY},
+            };
+            for (unsigned k = 0; k < sizeof standard / sizeof *standard; k++)
+                if (!strcmp(c->name, standard[k].name)) c->id = standard[k].id;
             for (char *o; (o = strtok(NULL, " "));) {
                 if (!strcmp(o, "refuse")) c->refuse = 1;
                 else if (!strcmp(o, "inactive")) c->flags |= V4L2_CTRL_FLAG_INACTIVE;

@@ -5,7 +5,7 @@ description: >-
   assistance said once up front, one small ask, the project's rules and code of conduct first, which route (Debian, the
   edition's organization, any other upstream), the right person from the project's own records, prove an absence by
   running the program, the report carries the fix and the test, one finding at a time, a vulnerability through the
-  private route, facts without a severity, Discourse first-post holds, one knock, the one list of merges. Load it when a
+  private route, facts without a severity, Discourse first-post holds, one knock, the one list of merges. Load it when a workshop's call for participation asks for a position statement, when a
   maintainer answered with questions, a thread turned to the tool instead of the code, a pull request was closed with
   the change landed as the maintainer's own commit, a company has not answered, a report or a heads-up must be drafted,
   names from a transcript must be verified, a sent copy must be checked, or an AppImage must enter an app center.
@@ -162,6 +162,10 @@ Keep stereo validation and the limits of HDR validation explicit.
 After an authorized send, preserve the exact reviewed text, recipients and message identifier privately.
 Verify the sent copy before reporting success. If delivery is uncertain, search by that identifier before retrying to avoid duplicate mail.
 Record any promised next action and wait for a response; do not schedule reminders merely because no answer has arrived.
+
+## A position statement for a standards workshop
+
+When a workshop's call asks for a statement of one to two pages, build it from the call's own kinds, a threads map, a claims table and a one-page cut: [A position statement for a standards workshop](references/position-statement-for-a-standards-workshop.md).
 
 ## Lessons from the lanes, October to November 2026
 

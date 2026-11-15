@@ -791,3 +791,34 @@ Fix: require every shared API and every matching vendored package version at its
 Do not change the receiver's UI ABI merely to make a private guard pass, and do not admit a new uncommitted ABI or a Git bypass.
 How found: both committed locks and the resolved parent edges showed the existing UI dependency; seven guard controls accepted both actual app graphs and rejected five bypasses, including the original common Vello 0.0.8 registry substitution.
 These are metadata controls, not application runtime or whole-gate results; retain the failed preflight and repeat the full receiver gate separately.
+
+### A transitive sibling can reintroduce an older common owner
+
+Symptom: the app's own dependencies use the edition's shared source, but its resolved graph still contains an older Git copy of `craft-media`.
+Cause: EffectCraft's pinned FilmCraft codecs and interchange crates bring that copy through FilmCraft's bitstream, MP4 and Matroska packages.
+Fix: receive the already-qualified suite FilmCraft source as that sibling owner and record its revision separately, then inspect the complete graph again.
+Do not fix this by changing a cached Git checkout or adding a private decoder pin.
+Propagate only matching common backend versions; a different existing UI ABI retains its own qualified source.
+How found: reverse dependency edges in `cargo metadata` named the three transitive receivers; the next guard exposed a registry `linesweeper` 0.5 copy, which was replaced by its existing common vendor owner.
+That graph passed with one common source; the application's complete gate still has to qualify its API migration and behavior.
+
+### Missing media is not the origin of a guessed path
+
+Symptom: the existing EffectCraft EDL control probes four paths, including two outside its folder, instead of only the two permitted paths.
+Cause: FilmCraft's intentional [missing-media change](https://github.com/storytold/filmcraft/commit/351a713835e2fafeff17779c59cb9238d10bb398) stops marking guessed EDL media as explicitly offline, so EffectCraft's old offline-based classification loses its boundary.
+Fix: retain FilmCraft's relinking behavior and classify the freshly parsed EDL guesses by the actual parser output before probing or rebasing timecodes.
+In this reader the guessed branch records the reel as `Tape Name`, while the explicit `SOURCE FILE` branch returns before adding it.
+Keep the explicit-source path set authoritative when a guessed and a named item share one path.
+How found: the unchanged outside-folder test failed after the sibling update; the reader's commit and both source branches explained the different meaning of the offline flag.
+The corrected interchange suite also exercises the same-path named-source exception; neither the original assertion nor the upstream missing-media behavior was weakened.
+
+### A parser guard must bind source identity separately from feature policy
+
+Symptom: a receiver's PDF guard rejects the canonical edition path because it requires a literal older Git revision.
+Fix: retain the public Git default, and let the edition's recorded revision identify either its exact Git source or one clean local checkout at that revision.
+For local sources, verify the repository root and revision, reject uncommitted source changes, and compare every required parser manifest with its canonical path.
+Bound and validate the revision file before reading it; arbitrary sibling paths and mixed parser owners are not an allowed mode.
+Keep the original parser versions, read-only features and interpreter/CMap exclusions unchanged.
+How found: an actual path-bound graph failed the original guard; a focused positive then failed before the extension, while bypass, extra-feature and active-interpreter controls remained negative.
+The expanded controls also cover packaged Git sources, wrong revisions, modified source and malformed revision files.
+Focused guard success remains separate from the whole receiving application's gate.

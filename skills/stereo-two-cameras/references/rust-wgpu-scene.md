@@ -331,6 +331,8 @@ This is a prerequisite failure, not a stereo proof.
 The candidate passed 88 CPU controls including direct, nested, remapped, mixed card/mesh, held-view, blur-switch and uncollapsed-boundary cases.
 The corrected initial runtime test set had 21 passes and 47 failures before the repair.
 These component results do not establish the application's full gate or a native stereo adapter.
+The subsequent root-owner subject passed its complete nine-stage application gate: 6,677 test passes, 46 skipped or ignored, and 32 WASM crates checked.
+That checkpoint precedes its separate shared-revision receiver migration; it is still not a native stereo adapter proof.
 
 ### Shutter lights must reach the GPU with their geometry sample
 

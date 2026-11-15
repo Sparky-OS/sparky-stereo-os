@@ -990,3 +990,13 @@ The Camera page of System Settings and its command build on other people's work,
 - **v4l-utils** (`v4l2-ctl`) and **cameractrls**: read for how a camera's controls are listed and which kinds exist. No code is copied.
 - **The edition's stereo layer** (`Stereo::FileChoiceList`): the packings of a two-lens camera, their ids and their translated names are the layer's; lane 569's known machines table is what the page reads to say that a camera has a kernel correction.
 These projects do not endorse the edition.
+
+## DisplayCAL from the Info Centre page (ORDER 575, 2026-11-15)
+
+The offer of DisplayCAL builds on other people's work, named from each project's own records (Debian's `displaycal` 3.9.19-3 copyright file and `argyll` 3.5.0+repack-1):
+
+- **DisplayCAL** ([github.com/eoyilmaz/displaycal-py3](https://github.com/eoyilmaz/displaycal-py3), GPL 3): Florian Höch (2008 to 2018), who wrote it, Erkan Ozgur Yilmaz (2022 to 2026) and Patrick Zwerschke, who carry it to Python 3. This work installs Debian's package unchanged.
+- **ArgyllCMS** ([argyllcms.com](https://www.argyllcms.com/)): Graeme W. Gill, whose colour management system DisplayCAL drives and whose instrument support the hardware requirement rests on.
+- **SparkyLinux's APTus**: Paweł "pavroo" Pijanowski and Piotr "MoroS" Mrożek, whose app center the entry lives in; lane 565 wrote the one install-tools mechanism the sizes sentence reuses.
+These projects do not endorse the edition.
+

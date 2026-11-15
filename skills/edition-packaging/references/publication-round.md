@@ -152,8 +152,12 @@ Continuation lessons from ORDER 587:
   **How found:** the stopped container's status data contained no DisplayCAL installation while the checker used an unanchored grep.
 - **Symptom:** a link qualification stops with `Invalid cross-device link` when adding a verified archive to its SHA-256 cache.
   **Cause:** moving only the cache to another filesystem leaves its temporary downloads on the original one; the final rename cannot cross filesystems.
-  **Fix:** keep the whole qualification scratch tree on one filesystem. Stop the run before relocating it, verify the copied archive hashes, and restart the complete check; keep caches outside publication stages.
+  **Fix:** keep temporary downloads and the cache directory on one filesystem. Stop the run before relocating the scratch tree, verify the copied archive hashes, and restart the complete check; keep final publication stages free of caches.
   **How found:** the failing source and destination paths matched `download.part` and the relocated cache; `lean/archive.py` uses `temporary.rename(archive)` after checking the signed size and hash.
+- **Symptom:** a task meta's installed upgrade passes, but its archive link gate reaches the scratch allocation before its predecessor closure is unpacked.
+  **Cause:** the gate needs both complete dependency roots at once, besides the archive cache and diagnostics; the size of the meta archive does not predict that space.
+  **Fix:** budget both roots and the cache inside the brief's allocation. If they do not fit, retain the diagnostics and nonzero exit, stop the gate, and hold the unqualified source group out of the take list while finishing the other requested proofs.
+  **How found:** per-case disk measurements showed the completed current root beside the growing predecessor; moving verified cache files freed space but did not complete the paired-root check. The independently passing installed transaction remained a separate proof.
 
 ## The recipe
 

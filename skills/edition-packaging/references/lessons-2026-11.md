@@ -419,4 +419,18 @@ Traps:
   **Fix:** after generating and verifying the source once, use `dpkg-buildpackage -b` for the native build that also emits architecture-independent packages, retaining the supplied descriptor and tarballs.
   The merged round selects this through `SPARKY_BINARY_ONLY=1`; other depth-source callers keep their existing mode.
   **How found:** the descriptor diff named only the Debian tarball's hash; comparing its members found changes only to the timestamps of `debian/` and the embedded toolkit's `lean/` directory.
+- **Symptom:** three source generations match, but the claimed clocks, zones and umasks were never applied inside their containers.
+  **Cause:** setting a variable on a script which starts Docker does not forward it through the script's fixed `docker run` argument list.
+  **Fix:** inject the test environment into the container and print its actual clock, zone and umask beside each result.
+  Use `libfaketime` with `NO_FAKE_STAT=1` and `FAKETIME_DONT_RESET=1`, and set the umask in the container's shell.
+  **How found:** reading the source generator's `docker run` line; strict repetitions with three distinct in-container environments still matched the staged source.
+- **Symptom:** a successful package build is absent from the round's flat repository; the combined gate selects 16 runtime packages where 19 were expected.
+  **Cause:** the container finished after its host controller disconnected, so the controller's collect and index steps never ran.
+  **Fix:** verify the completed build's record and gate result, copy its archives into the round, regenerate the index, and start the installed proof again from the published image.
+  Keep an exact package/version assertion after apt, and never commit a proof image after that assertion fails.
+  **How found:** the selected-package count and the installed-version check both named the missing consumer; the build's own log and record were complete.
+- **Symptom:** a photo-album proof says a packing or swap was applied to the wrong fixture.
+  **Cause:** thumbnail navigation used filename order, while the album sorted by image time and then name; fixtures generated across a second boundary changed that order.
+  **Fix:** give the synthetic fixtures one fixed modification time before recording their initial state, and rerun both controls with that driver.
+  **How found:** the store named a different fixture, its captured colours agreed with that file, and `stat` showed the timestamp boundary.
 

@@ -715,3 +715,16 @@ Cause: the shared interpreter marks a text clip as shown before distinguishing o
 Fix: mark the clip only in the outline arm; keep the empty-outline clip for spaces and keep reporting the Type3 rendering mode to text extraction.
 How found: two shared-owner recording-device and pixel controls failed before the change, then passed beside fourteen existing interpretation controls; five receiving Type3 controls and strict selected Clippy also passed.
 These component results do not qualify the complete shared revision or its receiving suite.
+
+Symptom: a workspace gate passes while the changed PDF text control remains ignored.
+Cause: the PDF-specific workflow supplies a fixture configuration and licensed external fonts that the workspace command alone does not enable.
+Fix: read every workflow selected by the changed paths, provision its original hash-verified fixtures, use its configuration and runtime runner, and check actual executed totals before claiming coverage.
+How found: an initial owner selection exited successfully with zero executed controls and one ignored control; enabling `craft_pdf_unicode_fixtures` and the six pinned fixture files produced the expected runtime failure.
+A workspace result remains useful evidence for its recorded commands, but does not qualify an omitted dedicated workflow.
+
+Symptom: the original combined fill/stroke patch fixes paths while a shared text run still composites its stroke over its fill.
+Cause: the common interpreter's whole-run fill/stroke replay bypasses the imported per-glyph grouping branch.
+Fix: put the implicit group around the outline run's replay boundary, preserving event order, text advances and clipping; Type3 procedures remain single-paint operations outside this outline group.
+The reference must model one combined graphics object under ISO 32000-1/2 clause 11.7.4.4; two independent translucent graphics objects are a different operation.
+How found: the font-enabled explicit knockout-group reference failed before the integration, then all 44 selected owner controls and 26 receiving controls passed, with strict selected Clippy and formatting checks.
+These component results still require the full shared and receiving gates.

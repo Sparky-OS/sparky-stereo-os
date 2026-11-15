@@ -128,3 +128,23 @@ The recipe, the proofs and the toolkit traps are in [a program joins the shared 
 - Measured: with stereo-layer 1.19.0 the widgets' menu and the QML type list the same 27 entries and the swap, in one order, for a picture and for a video (`filechoiceqmltest`, `oneListInBothFaces`); a QML list made one packing short on purpose fails it, 26 against 28.
 - Measured: none of Koko 26.04.0-1+stereo3d1, KPhotoAlbum 6.2.0-1+stereo3d1 and digiKam 9.1.0-1+stereo3d3 kept per-file 3D state: Koko and KPhotoAlbum kept their choices for the session, digiKam also its view for the whole program (`digikamrc`, `[Stereo 3D]`, `View`), which stays. Nothing was carried.
 
+
+## The program's Enable 3D, digiKam's own moves, and a marked file set to Not 3D (ORDER 551c)
+
+The recipes are in [a program joins the shared per-file choice](joining-the-per-file-choice.md); what follows is what this order measured.
+
+- Symptom: "Not 3D" chosen for a marked `.pns` in Dolphin is kept in the store (`view=3`), and the file's thumbnail stays a pair, even freshly made with the thumbnail cache emptied.
+  Cause: the thumbnailer asks the layer first (`Picture::loadPair()`, which returns no pair for a stored "Not 3D", correctly) and then falls back to a plain `QImageReader` read; the edition's Qt reports the file's own `sTER` mark on that image as the text `Stereo3DLayout`, and KIO's thumbnail worker (`thumbnail.cpp`, `stereoLayout()`) sends any such text as `stereo3dLayout` and caches it as `X-KDE::Stereo3DLayout`, so the flat fallback is announced as a pair. The same holds for a JPS through the JPEG thumbnailer's fallback.
+  Fix (proposed, not built): the fallbacks of kio-extras' image and JPEG thumbnailers clear `Stereo3DLayout` on an image the layer did not make a pair; the layer is not the cause.
+  Found by: the cached thumbnail's text keys (`X-KDE::Stereo3DLayout='sideBySideLeftFirst'` with `view=3` in the store), what Qt's reader reports for the file (`Stereo3DLayout="sideBySideLeftFirst"` on the read image), and `loadPair()` on the same file before and after the choice (`isStereo` 1, then 0).
+- Symptom: two entries called "Not 3D" in one 3D menu (the album programs after ORDER 551b).
+  Cause: the program's switch for everything it shows and the file's input correction had one name.
+  Fix: the program's switch is the layer's "Enable 3D" (`Stereo::Enable3DAction`, `Enable3DAction` in QML), one wording, the one Haruna and sView ship; the file's "Not 3D" stays in the per-file menu.
+- Symptom: a 3D choice kept for a file digiKam itself renames or moves stays at the old path (published digiKam +stereo3d3), while a rename through the file manager carries it.
+  Fix: one call after each of digiKam's own renames and moves (551b's three hooks), and a fourth after a folder moved to another device by a copy and a removal (ORDER 551c). Measured in the rig with a collection: a file renamed (F2), a file moved to another device, a folder moved to another device, an album renamed (Shift+F2) and a folder moved on the same device each carried the choice to the new path, the store's record naming the file's new device and inode.
+- Symptom: with the per-file store read only, digiKam's own rename leaves the choice behind and says so only in its log.
+  Fix: the message goes from the worker thread to the main thread and is shown in one window per burst over the program's main window (joining-the-per-file-choice.md, "A message from a worker thread"); never through the job's error signal, which changes what digiKam does after a successful move.
+- Symptom: the first build of that message logged the failure and showed nothing.
+  Cause: the message box took `activeWindow()` as its parent, which was the renaming progress dialog; it closed and took the box with it.
+  Fix: the first visible main window as the parent.
+  Found by: two stand-ins of the exported function preloaded into the installed digiKam in the rig, the window list read from KWin after the rename (no window, then one titled "3D").

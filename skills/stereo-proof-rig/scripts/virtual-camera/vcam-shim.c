@@ -163,6 +163,7 @@ static int vopen(const char *path, int flags, int mode, int *handled)
         return -1;
     }
     *handled = 1;
+    if (getenv("VCAM_TRACE")) fprintf(stderr, "vcam: open %s\n", path);
     char cfg[512];
     snprintf(cfg, sizeof cfg, "%s/video%d.cfg", root, num);
     if (access(cfg, R_OK) != 0) {
@@ -219,6 +220,9 @@ int open(const char *path, int flags, ...)
     return real_open(path, flags, mode);
 }
 int open64(const char *path, int flags, ...) __attribute__((alias("open")));
+// A program built with _FORTIFY_SOURCE (Debian's hardening: Qt's V4L2 plugin) calls open(path, O_RDONLY) as __open_2
+int __open_2(const char *path, int flags) { return open(path, flags); }
+int __open64_2(const char *path, int flags) { return open(path, flags); }
 
 int close(int fd)
 {
@@ -239,11 +243,15 @@ static struct ctrl *byid(struct dev *d, __u32 id)
 int ioctl(int fd, unsigned long req, ...)
 {
     init();
+    // Qt declares the request as int (xioctl(int, int, void *)): the sign-extended 0x80685600 must still be VIDIOC_QUERYCAP
+    if (req > 0xffffffffUL && (req >> 32) == 0xffffffffUL)
+        req &= 0xffffffffUL;
     va_list ap;
     va_start(ap, req);
     void *arg = va_arg(ap, void *);
     va_end(ap);
     struct dev *d = find(fd);
+    if (getenv("VCAM_TRACE") && d) fprintf(stderr, "vcam: ioctl %lx\n", req);
     if (!d)
         return real_ioctl(fd, req, arg);
     switch (req) {

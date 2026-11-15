@@ -150,6 +150,10 @@ Continuation lessons from ORDER 587:
   **Cause:** a substring match for `installed` also matches dpkg-query's `not-installed` state.
   **Fix:** match the complete status value and retain the failed checker run; require the corrected overall rehearsal to exit zero.
   **How found:** the stopped container's status data contained no DisplayCAL installation while the checker used an unanchored grep.
+- **Symptom:** a link qualification stops with `Invalid cross-device link` when adding a verified archive to its SHA-256 cache.
+  **Cause:** moving only the cache to another filesystem leaves its temporary downloads on the original one; the final rename cannot cross filesystems.
+  **Fix:** keep the whole qualification scratch tree on one filesystem. Stop the run before relocating it, verify the copied archive hashes, and restart the complete check; keep caches outside publication stages.
+  **How found:** the failing source and destination paths matched `download.part` and the relocated cache; `lean/archive.py` uses `temporary.rename(archive)` after checking the signed size and hash.
 
 ## The recipe
 

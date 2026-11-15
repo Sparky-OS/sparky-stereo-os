@@ -162,6 +162,8 @@ Continuation lessons from ORDER 587:
 ## The recipe
 
 1. **Freeze the build tree.** `round-worktree.sh WORKTREE [COMMIT]` makes (or reuses) a git worktree of the build repository at one commit; the default commit is `origin/main` as fetched now.
+   Freeze the published archive inputs with verified independent read copies as well. A live archive can retain its SHA-256 while inode metadata changes, causing `supplied input changed after its universe was frozen`; keep that guard unchanged and follow [the frozen-input lesson](../../lean-code/references/lessons-2026-11.md). Check every copied hash and that source and destination have different device/inode identities; a symlink or hard link does not freeze the input.
+
    Every build-repository path of the round (`publish-tree.sh`, the lean toolkit, the supply-chain tools, the pre-round checks) points into that worktree, never into the shared checkout, because branches are merged into the shared checkout while a round runs for hours.
    It prints `round-commit <40 hex> <path>`; the round log, `round-commit.txt` and the supply-chain file `round-toolkit-ROUND.json` (listed in `SHA256SUMS`, so the detached signature covers it) name that commit.
    An existing worktree is reused only at exactly that commit and with nothing changed; any other state stops with the reason.

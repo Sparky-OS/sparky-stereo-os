@@ -107,3 +107,27 @@ A trap gives its symptom, its cause, its fix and how the cause was found; a reci
 - A file manager's cached thumbnail carries the per-file choice that was in force when it was made (`~/.cache/thumbnails`, keyed by the file's address and date: `Thumb::URI`, `Thumb::MTime`; a stereo one carries `X-KDE::Stereo3DLayout`). A proof that changes the store behind the file manager's back (another program, a prune, a restore from the wastebin) must read the cache as well as the store, or it takes a stale thumbnail for the store's state: read the PNG text keys and the colour in each half.
 - The desktop's file signals for the wastebin, measured with `dbus-monitor --session "type='signal',interface='org.kde.KDirNotify'"`: a trashing announces `FileMoved file:///…/NAME → trash:/NAME`; the file manager's undo announces `FileMoved trash:/0-NAME → file:///…/NAME`; `ktrash6 --restore trash:/0-NAME` announces no `FileMoved` (only `FilesAdded` for the file and `FilesChanged trash:/`).
 
+## Driving album programs and a Qt Quick menu (ORDER 551b)
+
+- Symptom: the same three presses of Down choose different entries of one menu in two programs.
+  Cause: in a Qt Quick Controls menu a separator takes a key step; in a QMenu it takes none.
+  Fix: a row count per toolkit in the case, and the store read after every choice (`order=0` where `order=1` was meant showed it).
+- Symptom: Right does not open a sub-menu after a popup opened by its shortcut.
+  Cause: no row is highlighted yet.
+  Fix: Down first, then Right; in a QMenu and in a Qt Quick menu alike, the sub-menu then opens with its first entry highlighted.
+- Recipe, KPhotoAlbum on one file: it opens a database, not a file. Start it with `-c DIR/index.xml` in the fixtures' folder with `index.xml` and `.thumbnails` removed (the "Create database" dialog then always comes: Enter), click in the browser, End and Enter for the thumbnails, Home, Right as many times as the file's place in the order of the names, Enter for the viewer; Alt+Shift+3 opens the viewer's 3D menu.
+- Recipe, Showfoto and digiKam on one file: `showfoto FILE` opens the editor and `digikam FILE` its own preview window; a dialog about model files is on top at each start of Showfoto in an empty home (Escape), then click in the picture; Alt+V, Up, Right opens View, 3D.
+- Recipe, Koko on one file: `koko FILE` opens the image view; Alt+Shift+3 opens its 3D menu at the middle of the picture. One more Escape than the menus need leaves the image view, and every later capture shows the folder.
+- Symptom: in a session started with `LANG=de_DE.UTF-8` and `LANGUAGE=de`, a Qt library's own sentences are German and the whole KDE program beside them is English, its new sentences included, although the installed catalogue holds them.
+  Cause: the image's environment sets `LC_ALL=C.UTF-8`, which overrides `LANG`; gettext translates nothing in the C locale, while a Qt catalogue (`.qm`, loaded by the user interface languages) follows `LANGUAGE`.
+  Fix: set `LANG`, `LC_ALL` and `LANGUAGE` together in the session (`env | grep -E '^LC_|^LANG'` inside the container shows what the image brings).
+  Found by: the program's own toolbar in the capture ("Favorite", "Share"), then reading the installed `.mo` with a second reader (`python3 -c "import gettext; ..."` prints "Favorisieren"), which cleared the catalogue.
+- Symptom: a proof says digiKam did not keep its lasting view, although the published build fails the same check.
+  Cause: the window `digikam FILE` opens is its own small preview window, which has no Ctrl+Q; the case then ended the program by a signal, and the setting is written when the window is closed.
+  Fix: Ctrl+Q, then Alt+F4 (evdev 56+62) when the program is still there, then read the settings file. Run a failing step on the published packages before blaming the change: the same failure there names the case.
+- Symptom: a menu opened by its mnemonic (Alt+V for View) does not open in another language.
+  Cause: the mnemonic is the translated menu's (Alt+A for "Ansicht").
+  Fix: open menus by a shortcut that does not change with the language, or give the case the mnemonic per language.
+- A Kirigami program logs many lines of its own at start (`Object or context destroyed during incubation`, `StackView has detected conflicting anchors`); search the program's log for the names of your own files, not for "error".
+- Recipe, one picture per case for a person to look at: crop the left eye of a capture to the window and keep it under 1100 pixels wide; a menu's rows can be read from it, and a check that only counts colours cannot tell which entry was highlighted.
+

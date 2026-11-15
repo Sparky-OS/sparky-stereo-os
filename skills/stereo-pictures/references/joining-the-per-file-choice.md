@@ -2,6 +2,7 @@
 
 **For whoever moves one more viewer, album or player onto the shared per-file 3D choice.**
 Written on 2026-11-14 from the work that moved Koko (QML), KPhotoAlbum and digiKam with Showfoto (QWidget) onto it, after Dolphin and Gwenview; stereo-layer 1.19.0.
+Extended on 2026-11-15 (stereo-layer 1.19.2): the program's own "Enable 3D" against the file's "Not 3D", a message from a worker thread, and driving digiKam with a collection in the proof rig.
 Read [the per-file choice: one store, one menu](../SKILL.md#the-per-file-choice-one-store-one-menu) first: it says what the store is, why it is not the program's own configuration and not an attribute of the file, and how the choice follows a rename.
 This page is the recipe for the program's side, for both toolkits, with the proofs and the traps.
 
@@ -59,7 +60,7 @@ That is the thing to look for in a QML program.
 3. **On `changed()`** decode the file again, and tell the other programs: `org::kde::KDirNotify::emitFilesChanged(urls)` where the program links KIO, or the same signal sent with Qt D-Bus where KIO is optional (`QDBusMessage::createSignal("/", "org.kde.KDirNotify", "FilesChanged")` with the list of URLs as text).
 4. **On `failed()`** show the message where the program shows its errors. The layer's message names the file and the reason; do not replace it.
 5. **Keep the shortcuts** of the entries that left the menu: an action with the old shortcut, added to the window (`window()->addAction(action)`; a shortcut works only on an action a shown widget holds), which triggers the layer's own action (`m_fileChoice->swapEyesAction()`) or writes the store (`Picture::fileChoice()`, change one field, `Picture::setFileChoice()`).
-6. **Keep what the program owns**: which eye is shown is a view, not a correction, and stays the program's; so does a lasting "show everything flat" (it is the program's "enable 3D").
+6. **Keep what the program owns**: which eye is shown is a view, not a correction, and stays the program's; so does the switch that shows everything flat, which is the program's "Enable 3D": the layer's `Stereo::Enable3DAction`, never an entry of the program's own (see [the program's Enable 3D](#the-programs-enable-3d-and-the-files-not-3d)).
 7. **Decode with the path.** `Picture::load(path, options, mode)` and `WidgetLayer::setSource(path, options)` apply the store. A document held in memory (an editor) uses `Picture::fromImages(path, image, ...)` or `fromReader(path, ...)`; the forms without a path ignore the store.
    Pass only the program's own view in `options`: a packing or a swap passed by the caller is a session choice over the file's.
 8. **Follow renames.** Make one `Stereo::FileChoiceMoves` and decode again on `carried()`. If the program renames or moves files with its own code (a photo manager does), call `Stereo::Picture::moveFileChoice(from, to)` after each successful rename, for a folder too: the desktop's file jobs never announce those.
@@ -91,6 +92,44 @@ Both are faces of the same list as the widgets' menu, so the entries and their w
 6. **Keep the stereo QML in files of their own**, loaded with `Loader.setSource(Qt.resolvedUrl(...))`, when the program must also build without the layer: a file that imports `org.sparky.stereo` does not load there.
 7. **Renames need no code**: a program with a `FileChoice` keeps every file's choice with it when the desktop's file jobs move it, and `changed()` says so for the file the object names.
 8. **Packaging**: the program needs the module at run time through `libstereo-layer1`, which depends on `qml6-module-qtquick-controls` and `qml6-module-qtqml-models`; a program with `dh_qmldeps` names the module in `debian/qmldeps.overrides` (`org.sparky.stereo libstereo-layer1`).
+
+## The program's Enable 3D and the file's Not 3D
+
+Two ideas, two names.
+"Not 3D" in the layer's per-file menu is an **input correction of one file**: this file is not a pair, kept in the shared store, for every program.
+A program's switch that shows **everything it shows** flat is the first of a program's 3D options in the edition's contract ("enable 3D, render resolution per eye, and a shortcut to Display Settings"), switched off.
+Before stereo-layer 1.19.2 the album programs called that switch a second "Not 3D", beside the file's; now it has one entry and one wording in the layer, the words Haruna and sView already ship for the same option ("Enable 3D", in the ten languages).
+
+- **Widgets:** `new Stereo::Enable3DAction(parent)` (in `filechoicemenu.h`): checkable, checked when made, its objectName `stereo_enable_3d`, its words and tooltip from the layer's catalogues. Put it at the top of the program's 3D menu, give it the program's shortcut (Alt+Shift+N in the album programs, where their "Not 3D" was), add it to the window (`window()->addAction()`), connect `triggered(bool)`.
+- **QML:** `Stereo.Enable3DAction { }` from `org.sparky.stereo`, a Qt Quick Controls `Action` with the same words (and a `toolTip` property); use it as a `MenuItem`'s `action`.
+- **Map it onto what the program already keeps.** The album programs kept one view value (Stereo, left eye, right eye, or 3 for every picture flat); keep that value and its lifetime (the session, or the program's settings), and make Enable 3D off write the flat value, Enable 3D on write back the eye view chosen last. Nothing downstream of the value changes, and a setting saved by the published version still reads the same.
+- **Choosing an eye view enables 3D again**, as choosing "Stereo" used to leave "Not 3D": the eye entries stay a group of their own below the switch.
+- **It writes nothing to the store**: the test toggles it and compares the store's listing before and after.
+- **The file's Not 3D still wins over a one-eye view**: with 3D enabled and the file's stored view Mono, pass `View::Stereo` (a caller's one-eye view would cut the file in half).
+
+Proof in the rig, per program: a marked pair in 3D; Alt+Shift+N: 0 pixels differ between the eyes and the store's records as before; the 3D menu captured with "Enable 3D" unchecked at its top and the file's "Not 3D" inside "3D Input Format" (with 3D off the swap and the save are greyed, as for any picture shown flat); Alt+Shift+N again: the pair; off, then a restart: off again only where the program keeps it in its settings (digiKam and Showfoto, `[Stereo 3D] View=3`).
+
+## A message from a worker thread
+
+A photo manager renames and moves files in jobs on worker threads, and a stored choice that cannot follow such a file (the store cannot be written) must reach the person, not only the log.
+
+- Build nothing of the window in the worker. Post to the main thread: `QMetaObject::invokeMethod(qApp, [error] { tell(error); }, Qt::QueuedConnection)` (Qt, "Synchronizing Threads": a queued call runs in the receiver's thread).
+- In the main thread, gather the messages and show them once the event loop runs again (`QTimer::singleShot(0, ...)`): a job that moves a hundred files gives one window, not a hundred.
+- **Give the message a window that stays: the program's main window** (the first visible `QMainWindow` among `QApplication::topLevelWidgets()`), never `activeWindow()`. When the queued call runs, the active window is the job's own progress dialog (digiKam's renaming), which closes at once and takes a child message box with it: nothing shows. Found in the rig by preloading two builds of the one exported function (`LD_PRELOAD` of a small library defining `Digikam::stereoFileMoved`, which calls from inside the program's library reach through the PLT): parented to the active window no window appeared; parented to the main window, digiKam's window titled "3D" did, the choice in both cases still at the old path. A stand-in like that tests a fix in minutes where the program's package takes an hour.
+- Wrap the layer's own message (`Picture::moveFileChoice()` returns it translated: which path, why) in one sentence of the program's that says what to do: "%1 Until its 3D choice is made again in the 3D menu, the file is shown as its own marks say."
+- **Do not report it through the job's error signal.** digiKam's `IOJob::signalError` feeds `DIO::slotResult()`, which skips the job's own bookkeeping (album dates, collection rescans) whenever a job has errors: a carry that failed would change what digiKam does with a move that succeeded.
+- A folder digiKam moves to another device is copied and removed (`QDir::rename` fails across devices): carry it after the removal succeeded; a file is moved with `QFile::rename`, which copies across devices itself and returns true, so the existing call after it carries.
+
+## Driving digiKam with a collection in the rig
+
+`digikam FILE` opens a preview window of its own; the album view, the light table, the slide show and digiKam's own file operations need a collection.
+
+1. **No first-run assistant:** `main.cpp` runs it when `digikamrc` has no `[Album Settings]` group or a `[General Settings] Version` starting with 0.5: write both into `$XDG_CONFIG_HOME/digikamrc` (the rig's session sets `XDG_CONFIG_HOME` to a folder of its own).
+2. **The database once:** `digikam --database-directory DB` makes `DB/digikam4.db`, then stops at its Collections page; end it by its PID.
+3. **The collection:** add it as digiKam itself does when Solid names no volume (`CollectionManager::addLocation`'s fall back, `CoreDB::addAlbumRoot`): `INSERT INTO AlbumRoots (type, label, status, identifier, specificPath, caseSensitivity) VALUES (1, LABEL, 0, 'volumeid:?path=FOLDER', '/', 0)`. A second collection on a tmpfs (`--mount type=tmpfs,dst=FOLDER,tmpfs-mode=1777`) is another device for a move across devices; without the mode the tmpfs is root's and digiKam's move fails with only a notification.
+4. **Start for the case** with `--database-directory DB`; Escape closes the model-files dialog; maximise the window with a KWin script so positions repeat.
+5. **Acts, by keys and the pointer:** F2 renames the selected picture (type the name, Enter); Shift+F2 renames the selected album; a drag (fake input `p:272`, a few `m:` steps, `r:272`) onto an album in the tree opens a drop menu whose "Move Here" is clicked (60 px right, 9 px up from the drop point); the toolbar's Light Table opens it with the selected picture; Slideshow starts at the album's first picture (Page Down steps on); Alt+Shift+3 opens the slide show's 3D menu; View, then Up (the last entry), then Right opens the preview's 3D menu.
+6. Read the store after every act (paths followed or not) and the files' bytes and times at the end.
 
 ## Rules that are easy to get wrong
 

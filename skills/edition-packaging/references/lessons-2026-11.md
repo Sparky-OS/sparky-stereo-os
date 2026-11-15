@@ -380,3 +380,17 @@ Traps:
   Fix: `LC_ALL=C sha256sum -c`.
 - Recipe, Lintian without touching a build image: a small image from the pinned Debian base with `lintian` (2.143.0 on 2026-11-14), each new `.deb` and its published one, the version replaced by one word (`sed -E "s/[0-9][0-9A-Za-z.:~+-]*\+lc1/VERSION/g"`), `comm -23` of the sorted lines.
 
+
+## A large source built across two disks (ORDER 551c)
+
+- Recipe: a package build has two parts that fill a disk, the container's own layer (its build dependencies, on Docker's data disk) and the work folder (the tree, the staging under `debian/`, the gate's scratch, the packages). Put the work folder on another disk: the album round's `round.sh` takes `BUILD_WORK=/mnt/build/LANE/build` and makes each source's folder there, while the packages are still collected in the round's own folder. Watch both disks; the floor is checked on each.
+- Measured, digiKam 4:9.1.0-1+stereo3d5 at four CPUs (2026-11-15, after the station's other builds): 1 h 20 min; free space on `/` fell from 51.6 GB to 42.7 GB at its lowest (the build dependencies, with other lanes moving the disk too), on `/mnt/build` from 27.6 GB to 16.4 GB (the work folder was 11 GB at its end). No floor was reached. ORDER 551b's figure, 33 GB on one disk, is the two together.
+- Stage each source as it passes and remove its work folder (copied, `cmp` against the round's repository first), so the large one has the room at its end.
+- Symptom: a removal of the work folders by a loop variable is refused by the assistant's own guard ("the target ... is a shell variable expansion").
+  Fix: name each folder by its literal path, or write `"${B:?}/${s:?}-work"`.
+- Symptom: Lintian's comparison with the published packages reports every line as new for a library or a `-data` package.
+  Cause: the published package was looked up in a pool folder named after the package; the pool's folder is the source's.
+  Fix: `pool/main/<first letter>/<source>/<package>_*`; print how many published packages were found before reading the result.
+- Symptom: `translations-shipped.py STAGE` says "no built package of source" for a source that is in the stage.
+  Cause: it reads the `.deb` files at the top of each folder it is given, not below.
+  Fix: give the source's own stage folder, with `--only PATCH`; the published folder of the same source is the red control (here 0 of 108 added strings against 108 of 108).

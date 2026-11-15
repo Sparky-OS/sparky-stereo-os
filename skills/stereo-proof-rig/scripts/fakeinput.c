@@ -9,6 +9,7 @@
  *   d:272       a double click: press, release, 90 ms, press, release (272 = BTN_LEFT)
  *   t:X,Y       a tap of one finger on a touch screen at X,Y (logical pixels): down, 80 ms, up (ORDER 567: KWin shows
  *               its on-screen keyboard only when the last input came from a touch screen or a pen)
+ *   p:272       press a pointer button and leave it down; r:272 releases it (a drag: p:, m: steps, r:; ORDER 551c)
  * fakeinput --serve IN ACK: stay connected (KWin's fake input device, and with it the seat's pointer, lives only
  * while the client is connected) and run each line read from IN as steps, writing "ok" to ACK after each line, or
  * "error" when a step is malformed (ORDER 441: a line that was one comma-joined token used to run only its first
@@ -113,6 +114,14 @@ static int step(struct wl_display *display, const char *a)
 		wl_display_flush(display);
 		wait_ms(30);
 		org_kde_kwin_fake_input_button(fake, b, WL_POINTER_BUTTON_STATE_RELEASED);
+	} else if (strncmp(a, "p:", 2) == 0 || strncmp(a, "r:", 2) == 0) {
+		/* p:BTN presses a pointer button and leaves it down, r:BTN releases it: a drag is p:, m: steps, r: (ORDER 551c) */
+		unsigned long b;
+		if (!number(a + 2, &b)) {
+			fprintf(stderr, "fakeinput: malformed step %s\n", a);
+			return 2;
+		}
+		org_kde_kwin_fake_input_button(fake, b, a[0] == 'p' ? WL_POINTER_BUTTON_STATE_PRESSED : WL_POINTER_BUTTON_STATE_RELEASED);
 	} else if (strncmp(a, "d:", 2) == 0) {
 		unsigned long b;
 		if (!number(a + 2, &b)) {

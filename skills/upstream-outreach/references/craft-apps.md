@@ -738,3 +738,14 @@ Fix: inspect the shipping dependency's actual features and `cargo tree --edges n
 When the codec is absent from that graph, cache the exact locked inputs separately, keep source and lock unchanged, then execute the original contract offline.
 How found: the four read-only controls passed natively and in the WASM runtime after caching, while their normal graph contained no interpreter, rasterizer, writer or image codec.
 Retain the failed attempt and bind a resumed workflow to the same frozen source and harness; a missing cache entry never qualifies skipped later jobs.
+
+
+### A receiver can reject versionless edges inside a public shared crate
+
+Symptom: the receiver's native and WASM checks pass, but cargo-deny rejects the common menu, UI and print crates for wildcard dependencies despite `allow-wildcard-paths = true`.
+Cause: that exception covers normal and build edges only in private crates; public shared crates still need version requirements on their path and Git dependencies.
+Fix: add the versions read from the existing package manifests and selected immutable Git lock entry in the shared owner, retaining every path, revision and feature.
+Keep the receiver's ban and the shared crates' publication status unchanged.
+How found: the unchanged whole receiver gate named the offending public edges; adding those existing constraints made the focused ban check pass without a lockfile change.
+That focused result still needs complete shared-library and receiving gates on the resulting revision.
+The [cargo-deny exception](https://embarkstudios.github.io/cargo-deny/checks/bans/cfg.html#allow-wildcard-paths) and [Cargo's multiple locations](https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#multiple-locations) describe the policy and the source-plus-version form.

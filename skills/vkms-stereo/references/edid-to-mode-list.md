@@ -16,7 +16,7 @@ Every step has a check that fails by itself, so the step that loses the modes sh
 ## Interlaced modes: carried and marked
 
 An interlaced timing needs its scan type beside its dimensions, refresh rate and stereo structure.
-The notation is `1920x1080i`; a 60 Hz interlaced timing has 60 fields per second and 30 complete frames per second.
+The notation is `1920x1080i`; a 60 Hz interlaced timing has 60 fields per second and 30 complete frames per second, as the kernel’s [DRM mode name and refresh helpers](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/drm_modes.c?h=v7.3) represent it.
 Keep the scan type separate from the stereo packing: an interlaced timing may also carry frame packing.
 Check the applicable CTA timing and HDMI® structure clauses in the edition being used; a missing local clause is an explicit evidence gap, never a formula supplied from memory.
 
@@ -53,27 +53,14 @@ Traps:
   **Fix:** read the kernel's rejection status, choose the test layer explicitly and enable `--include-interlaced` for its expectation.
   **Found by:** the driver's interlace policy, the `NO_INTERLACE` probe status and the expectation script's `add()` filter, rather than the displayed mode count.
 
-The trace above is source evidence for +stereo3d54; it is not a claim that later packages or a notebook's physical output have passed these checks.
-
-## A writeback fence that never signals: missing connector or stuck job
-
-1. **A missing writeback connector** shows in the first lines of `stereo-wb-test`: `objects ... connector, writeback connector or properties missing`, or no `Writeback-N` entry under `/sys/class/drm/cardN-*`. In configfs the CRTC needs `writeback` set to 1 (`echo 1 > crtcs/crtc0/writeback`) before the device is enabled; the writeback connector, its encoder and its bind to that CRTC are made by `vkms_enable_writeback_connector()`, nothing else to link. A client has to set `DRM_CLIENT_CAP_WRITEBACK_CONNECTORS` to see it.
-2. **A stuck job** has a connector (`Writeback-N`, status `connected` or `unknown`) and an atomic commit that returns 0, then the out fence stays unsignalled (`poll()` times out, `Connection timed out`). Read `drm.debug=0x3f` (add `log_buf_len=16M` to the guest's command line, or the default device's vblank lines push the commit out of the ring; BusyBox has no `awk` or `tail`, filter with `grep` and `sed`): an `-22` right after `Invalid framebuffer size` is the bench's negative test of a wrong buffer size and returns at once, it is not the timeout. A commit that completes with the CRTC enabling and no `enabling vblank on crtc` before the next commit is the vblank timer that never started; a `pr_info()` of the `drm_crtc_vblank_get()` result in the driver names it.
-3. **Make the CRTC state a variable.** The same device and mode, committed with the CRTC off at the start (as after `enabled`) and with the CRTC already on (a first commit without the writeback job): a job that completes only in the second case is this trap.
-
-## A CRC source set on a CRTC that is off: the unbalanced vblank put
-
-1. **The debugfs open cannot show it.** On these kernels (7.3 line), `crtc_crc_open()` in drivers/gpu/drm/drm_debugfs_crc.c returns `-EIO` when `!crtc->state->active`, and `set_crc_source` is gated the same way, so the driver's `set_crc_source` is never reached from an off CRTC through debugfs. An open of `crc/data` that fails with `EIO` on a configfs device whose CRTC is off (`/sys/kernel/debug/dri/N/state`: `enable=0 active=0`) is this gate, not the driver.
-2. **Reach the driver directly.** A KUnit test calls `vkms_set_crc_source("auto")` on a CRTC whose vblank is off: `vkms_set_composer(true)` then shows the defect, `drm_crtc_vblank_get()` returns `-EINVAL` (the CRTC is off) on a kernel without series 38/0012, the result is dropped, a composer user is counted, and the matching `vkms_set_composer(false)` puts a reference that was never taken: `drm_WARN_ON` in `drm_vblank_put()` (`refcount == 0`), an unbalanced `refcount_warn_saturate` report.
-3. **The fix** (series group 38, 0012): `vkms_set_composer()` returns the error of `drm_crtc_vblank_get()` and counts a composer user only after the reference is taken; the put happens only if the get counted. A source set on an off CRTC then fails with `-EINVAL` and nothing leaks. KUnit red and green cases are in the patches's own suite; the writeback twin of this defect is series 38/0011.
-
-## Guests for published kernels
-
-The bench's tiny kernel builds VKMS in; a published kernel has it as a module.
-Unpack its `linux-image` package with `dpkg-deb -x`, take `vmlinuz` from `boot/` and the modules `configfs`, `drm`, `drm_kms_helper`, `drm_shmem_helper`, `drm_client_lib`, `rc-core`, `cec`, `drm_display_helper` and `vkms` from `lib/modules/RELEASE/kernel/` (decompress them: BusyBox `insmod` does not read `.xz`), put them with a static BusyBox, the EDIDs, the expectation files and a static `lsmodes` in an initramfs, and boot it with QEMU (KVM, `-display none`, `-serial stdio`).
-The init script runs `insmod` in that order, mounts configfs, and prints one line per result.
-To test a patched VKMS against a published kernel without building the kernel, build the module against that kernel's `linux-headers` package (`make -C /usr/src/linux-headers-RELEASE M=$PWD/vkms CONFIG_DRM_VKMS=m modules`, with a `Kbuild` holding `obj-m += vkms.o` and the object list of the driver's Makefile) and put it in the initramfs in place of the kernel's own; the kernel has no `CONFIG_MODVERSIONS` and does not force signatures, so it loads (tainted).
-Build the unpatched source the same way too: if it is red like the published module, the build is not what changed the result.
+The +stereo3d54 trace was followed by installed candidate tests in an isolated
+virtual backend: all 41 EDID-derived logical timing rows matched doctor and the
+KCM, including ten interlaced rows. The progressive-only control retained the
+same 21 rows, labels and order. Selecting 1080i60 frame packing retained the
+interlaced frame-packing identity, and selecting progressive 2D remained possible.
+This qualifies the tested native-flag boundary and installed protocol/client
+presentation. It does not qualify a notebook's physical interlaced scanout,
+kernel-generated duplicate or fractional timings, or a physical DRM commit.
 
 ### Capturing the real KCM list without a physical display
 
@@ -117,6 +104,26 @@ presentation; it cannot establish physical kernel EDID enumeration or field timi
 
 - **Symptom:** a protocol configure check accepts an old XML file although mode flags lack interlace. **Cause:** the same XML already contains `ized3d_mode.interlaced`, an unrelated output format. **Fix:** inspect the mode `flags` enum or match the exact new entry and value; require it in edition builds. **Found by:** comparing the generated mode flag macro with the XML enum containing the earlier word match.
 - **Symptom:** an interlaced choice saved before the new flag falls back after an upgrade. **Cause:** modeline matching compares the complete flags, while the old saved mode omitted scan type. Virtual-mode restoration also treated the new bit as part of its packing. **Fix:** mark newly saved scan types as known; for legacy choices prefer the exact existing match, then recover the interlaced counterpart. Keep interlace out of the layout mask and retain it in base-mode matching. **Found by:** tracing saved-mode equality and running restart tests for 2D, frame packing and virtual anaglyph, with both legacy and new JSON.
+
+## A writeback fence that never signals: missing connector or stuck job
+
+1. **A missing writeback connector** shows in the first lines of `stereo-wb-test`: `objects ... connector, writeback connector or properties missing`, or no `Writeback-N` entry under `/sys/class/drm/cardN-*`. In configfs the CRTC needs `writeback` set to 1 (`echo 1 > crtcs/crtc0/writeback`) before the device is enabled; the writeback connector, its encoder and its bind to that CRTC are made by `vkms_enable_writeback_connector()`, nothing else to link. A client has to set `DRM_CLIENT_CAP_WRITEBACK_CONNECTORS` to see it.
+2. **A stuck job** has a connector (`Writeback-N`, status `connected` or `unknown`) and an atomic commit that returns 0, then the out fence stays unsignalled (`poll()` times out, `Connection timed out`). Read `drm.debug=0x3f` (add `log_buf_len=16M` to the guest's command line, or the default device's vblank lines push the commit out of the ring; BusyBox has no `awk` or `tail`, filter with `grep` and `sed`): an `-22` right after `Invalid framebuffer size` is the bench's negative test of a wrong buffer size and returns at once, it is not the timeout. A commit that completes with the CRTC enabling and no `enabling vblank on crtc` before the next commit is the vblank timer that never started; a `pr_info()` of the `drm_crtc_vblank_get()` result in the driver names it.
+3. **Make the CRTC state a variable.** The same device and mode, committed with the CRTC off at the start (as after `enabled`) and with the CRTC already on (a first commit without the writeback job): a job that completes only in the second case is this trap.
+
+## A CRC source set on a CRTC that is off: the unbalanced vblank put
+
+1. **The debugfs open cannot show it.** On these kernels (7.3 line), `crtc_crc_open()` in drivers/gpu/drm/drm_debugfs_crc.c returns `-EIO` when `!crtc->state->active`, and `set_crc_source` is gated the same way, so the driver's `set_crc_source` is never reached from an off CRTC through debugfs. An open of `crc/data` that fails with `EIO` on a configfs device whose CRTC is off (`/sys/kernel/debug/dri/N/state`: `enable=0 active=0`) is this gate, not the driver.
+2. **Reach the driver directly.** A KUnit test calls `vkms_set_crc_source("auto")` on a CRTC whose vblank is off: `vkms_set_composer(true)` then shows the defect, `drm_crtc_vblank_get()` returns `-EINVAL` (the CRTC is off) on a kernel without series 38/0012, the result is dropped, a composer user is counted, and the matching `vkms_set_composer(false)` puts a reference that was never taken: `drm_WARN_ON` in `drm_vblank_put()` (`refcount == 0`), an unbalanced `refcount_warn_saturate` report.
+3. **The fix** (series group 38, 0012): `vkms_set_composer()` returns the error of `drm_crtc_vblank_get()` and counts a composer user only after the reference is taken; the put happens only if the get counted. A source set on an off CRTC then fails with `-EINVAL` and nothing leaks. KUnit red and green cases are in the patches's own suite; the writeback twin of this defect is series 38/0011.
+
+## Guests for published kernels
+
+The bench's tiny kernel builds VKMS in; a published kernel has it as a module.
+Unpack its `linux-image` package with `dpkg-deb -x`, take `vmlinuz` from `boot/` and the modules `configfs`, `drm`, `drm_kms_helper`, `drm_shmem_helper`, `drm_client_lib`, `rc-core`, `cec`, `drm_display_helper` and `vkms` from `lib/modules/RELEASE/kernel/` (decompress them: BusyBox `insmod` does not read `.xz`), put them with a static BusyBox, the EDIDs, the expectation files and a static `lsmodes` in an initramfs, and boot it with QEMU (KVM, `-display none`, `-serial stdio`).
+The init script runs `insmod` in that order, mounts configfs, and prints one line per result.
+To test a patched VKMS against a published kernel without building the kernel, build the module against that kernel's `linux-headers` package (`make -C /usr/src/linux-headers-RELEASE M=$PWD/vkms CONFIG_DRM_VKMS=m modules`, with a `Kbuild` holding `obj-m += vkms.o` and the object list of the driver's Makefile) and put it in the initramfs in place of the kernel's own; the kernel has no `CONFIG_MODVERSIONS` and does not force signatures, so it loads (tainted).
+Build the unpatched source the same way too: if it is red like the published module, the build is not what changed the result.
 
 ## Traps met (symptom, cause, fix, how found)
 

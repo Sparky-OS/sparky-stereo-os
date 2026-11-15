@@ -73,7 +73,18 @@ Place the window with a KWin script (`workspace.stackingOrder`, `frameGeometry`)
 - **Trap of the rig:** without a decoration plugin KWin leaves the frame to Qt, and the window then has frame margins inside its surface; install the edition's decoration in the rig image and set it in `kwinrc` before KWin starts (`[org.kde.kdecoration2] library=`), or the row measures another case than the desktop's.
 - **Trap of the build:** ECM installs a git hook into a source tree that has `.git`; a development build from a read-only mount stops with "Could not open file for write in copy operation .../.git/hooks/pre-commit.tmp". Build from a copy without `.git`.
 
+- **Symptom:** a viewer's picture has a line of wallpaper one device pixel wide along its right or lower edge at some window sizes (a paint program at 125 %: 819 backdrop pixels in one of four window sizes one pixel apart).
+  **Cause:** fact 2: the compositor's surface was one device pixel shorter than the hole.
+  **Fix:** `Surface::covering()`, for every program on the layer.
+  **Found by:** four window sizes one pixel apart in one session, counting backdrop pixels in the 40 pixels around where the eyes differ.
+- **Trap of the measurement:** a viewer keeps its declared pair on the output's 2D mode (the output shows the left eye there), and the capture then still holds two eyes: the 2D mode is a flat reference only for a program that draws flat on a 2D screen, as the file manager does.
+- **Trap of the measurement:** a picture's body is searched near its place in the flat capture; with eight kinds of picture in a view eight columns wide the same picture stands straight above and below, and a wide search box reports the neighbour as an offset of 70 pixels. Keep the box to a dozen pixels.
+- **Trap of the measurement:** the status bar's free-space bar moves while other work fills the disk, between two captures of one step (77 to 147 pixels, the same in both eyes). Leave the status bar out of the comparison and say so.
+- **Trap of the rig:** a key sent through fake input goes to the focused widget, and after a window is placed by a script that may not be the view: Page Down did not scroll. Start the file manager with `--select FILE` on a file near the end of the folder for a scrolled view with a selected cell.
+
 ## What is not settled here
+
+- Measured at 125 %, the same before and after this work: an image editor's canvas (Showfoto) leaves one device row of its area clear at two of four window sizes, and a Qt Quick viewer (Koko) one device column beside its picture area at one of four. Neither is the surface's placement (painting the whole window background under the area changed nothing in the editor); each is in the program's own painting of its area and is the next thing to find.
 
 - The window and the surface are committed separately, so while a view scrolls the holes move one frame before the pictures under them, at every scale.
   A synchronised subsurface committed before the window's own commit would make the two one frame; it is not built.

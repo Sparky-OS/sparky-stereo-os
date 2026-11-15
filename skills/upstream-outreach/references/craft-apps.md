@@ -760,3 +760,9 @@ Check the locked resolved graph against every canonical common manifest before c
 How found: the compiler failed on the coverage API, and an independent metadata guard rejected exactly the two registry copies; adding those existing common paths changed only their lock source and checksum fields, with all names, versions and dependency lists unchanged.
 The corrected graph compiled the common backend and reached an actual importer warning regression; keep the earlier compilation attempt separate from that runtime red.
 No private backend pin or shared limit change is needed for this receiver binding.
+
+Symptom: the default focused import controls pass, but the whole workspace cannot compile the editable PDF warning match after the shared warning enum expands.
+Cause: Photo's CLI explicitly enables `pdf-editable`; the narrower IO and UI targets do not enable it by default.
+Fix: handle every new warning variant explicitly and retain the editable importer's existing unsupported-page policy; enable the optional feature in the focused control, then run the whole configured gate.
+How found: strict whole-workspace Clippy named the missing variants; actual imports with that feature then verified three recovery cases, visible rasterization, real raster layers and exact pixels against ordinary raster import.
+Those focused results do not replace the complete receiving gate or the release-profile corpus checks.

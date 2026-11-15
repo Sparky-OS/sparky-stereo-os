@@ -324,9 +324,30 @@ Prepare the composition, lights and environment once for a sample, then make its
 
 Symptom: a collapsed identity composition under a moving root camera renders like a held camera during motion blur.
 Cause: the Classic path's shutter-camera helper returns the cached `Collapse3d.cam` for every sample.
-Required fix, still unverified: evaluate the selected root camera at each explicit root shutter time and carry the corresponding placement through the complete collapsed-instance chain.
+Candidate repair: evaluate the selected root camera at each explicit root shutter time and carry the corresponding placement through the complete collapsed-instance chain.
 How found: the retained monoscopic regression differs from the direct moving-camera world in 160 of 20,000 pixels, with maximum alpha difference about 0.361111; its held-camera control matches the collapsed frame exactly.
 This is a prerequisite failure, not a stereo proof.
 [EffectCraft #3623](https://github.com/storytold/effectcraft/pull/3623) fixes the distinct first-frame camera-identity problem; retain zorianflorian's original commit when it is needed, rather than freezing the animated camera to hide the collapsed-instance defect.
-The remaining repair needs direct, nested, remapped, mixed card/mesh and ordinary controls before a native stereo adapter can be qualified.
+The candidate passed 88 CPU controls including direct, nested, remapped, mixed card/mesh, held-view, blur-switch and uncollapsed-boundary cases.
+The corrected initial runtime test set had 21 passes and 47 failures before the repair.
+These component results do not establish the application's full gate or a native stereo adapter.
+
+### Shutter lights must reach the GPU with their geometry sample
+
+Symptom: the CPU follows an animated root light during motion blur, while the Classic GPU keeps the frame-time brightness.
+Cause: a prepared run carried several geometry samples but exported only one frame-time light array to the shader.
+Candidate fix: retain one immutable light set per root sample and give every geometry record its light-range offset and count in one bounded storage pool.
+Keep held geometry on the original frame-time set.
+How found: a tent-shaped ambient-intensity curve inside the shutter separates a sampled average from the frame value; a symmetric linear curve would not.
+Three strict Vulkan controls, for direct and one/two-level collapsed scenes, failed before the change with 8,000 or 16,000 differing pixels and maximum channel difference 0.19047618, then all three passed.
+The changed CPU/GPU geometry layout must agree in stride and light-range fields; updating just the CPU record leaves a different shader ABI.
+Require the actual adapter and kernel for these controls, so a missing software Vulkan adapter cannot turn the test into a successful early return.
+
+### The root blur switch owns the sample count
+
+Symptom: turning off the root composition's motion blur still blurs a collapsed child's camera.
+Cause: choosing root shutter timing while retaining the child's enabled flag leaves multiple geometry samples active.
+Candidate fix: derive both the enabled flag and sample count from the root shutter owner, retaining the existing render switch and inherited layer limits.
+How found: render-off, root-off and uncollapsed controls expanded the CPU matrix to 88 cases; six root-off cases failed before the enabled flag was carried, then all 88 passed.
+Retain an observed negative in which enabling blur changes the picture, so equality is not explained by an invisible or stationary fixture.
 

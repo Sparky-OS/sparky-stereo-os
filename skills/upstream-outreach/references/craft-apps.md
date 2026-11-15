@@ -766,3 +766,12 @@ Cause: Photo's CLI explicitly enables `pdf-editable`; the narrower IO and UI tar
 Fix: handle every new warning variant explicitly and retain the editable importer's existing unsupported-page policy; enable the optional feature in the focused control, then run the whole configured gate.
 How found: strict whole-workspace Clippy named the missing variants; actual imports with that feature then verified three recovery cases, visible rasterization, real raster layers and exact pixels against ordinary raster import.
 Those focused results do not replace the complete receiving gate or the release-profile corpus checks.
+
+### A successful log tail can hide an earlier test failure
+
+Symptom: a progress update says no failure while the final Nextest summary reports one failed test.
+Cause: `--no-fail-fast` keeps running after a failure, and a tail-only check sees later passes instead of the earlier failure.
+Fix: scan the complete accumulated log for failure records before describing progress, then qualify the gate only from its exit status and final summary.
+When aggregating totals, count the Nextest summary once; its failure recap may repeat a test binary's libtest output.
+How found: Photo's full run reported 17,603 passes, one failure and 111 skips; the earlier failure was absent from the displayed tail but present in the saved log.
+The subsequent source repair and whole green rerun remain separate evidence; a corrected monitoring script does not turn the failed run green.

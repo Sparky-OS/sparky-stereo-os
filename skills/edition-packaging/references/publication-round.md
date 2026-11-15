@@ -141,6 +141,15 @@ Continuation lessons from ORDER 587:
   Inspect the first policy attempt when the last attempt merely reports two mutually exclusive driver locks.
   **How found:** policy attempt zero traced the desktop through the memory page and Stereo AppCenter to the missing SparkyLinux package; its candidate appeared after the signed archive was added.
   Compare all generated relations with the published controls; unavailable names already absent from the published controls are distinct from removed functionality.
+- **Symptom:** a full meta closure reports `symlink conflicts at ./etc/grub.d/10_linux`, although the boot package declares a literal diversion.
+  **Cause:** its preinst creates the destination parent with `mkdir -p` between two diversion commands, outside the extractor's recognized command grammar.
+  **Fix:** model only exact literal destination parents before use, with real dpkg-divert oracle tests and negative cases for unrelated directories, unsafe paths and shell operations; retain the collision refusal for every unmodeled script.
+  Carry the corrected toolkit in its next package and repeat qualification against the complete cohort; never use an older boot sibling to make the check green.
+  **How found:** the retained unmodeled-preinst report and the failing archive hash identified the accepted boot package; the oracle failed before the change and the 98 diversion tests passed after it.
+- **Symptom:** the installed-state check says DisplayCAL is installed although no transaction installed it.
+  **Cause:** a substring match for `installed` also matches dpkg-query's `not-installed` state.
+  **Fix:** match the complete status value and retain the failed checker run; require the corrected overall rehearsal to exit zero.
+  **How found:** the stopped container's status data contained no DisplayCAL installation while the checker used an unanchored grep.
 
 ## The recipe
 

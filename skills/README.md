@@ -23,6 +23,7 @@ Core skills are `sparky-stereo`, `ai-partners`, `making-skills`, `development-ho
 | A test on a real machine or 3D television: baselines, recovery with a person at the bench, power and UPS, unattended labs with LAVA or labgrid | [test-bench](test-bench/SKILL.md) |
 | Proving compositor/application stereo, or why the two eyes differ; a showcase stereo screenshot | [stereo-proof-rig](stereo-proof-rig/SKILL.md) |
 | Kernel/display driver or virtual display modes; the edition kernel's configuration, DKMS modules on a new kernel | [drivers](drivers/SKILL.md), [vkms-stereo](vkms-stereo/SKILL.md) |
+| A USB camera produces no YUYV frames, bulk payloads cross URB boundaries | [drivers](drivers/SKILL.md), its [camera diagnosis and KUnit reference](drivers/references/usb-camera-one-format.md) |
 | A QEMU or SPICE VM viewer and its pointer/mode changes | [stereo-vm](stereo-vm/SKILL.md) |
 | VR content on a TV or stereo spectator | [vr-to-3d](vr-to-3d/SKILL.md) |
 | A desktop or media stream on a phone/headset | [3d-to-vr](3d-to-vr/SKILL.md); select the relevant receiver/transport section |
@@ -34,6 +35,7 @@ Core skills are `sparky-stereo`, `ai-partners`, `making-skills`, `development-ho
 | Plasma search defaults, task manager, frozen windows and drive formatting | [kde-desktop-defaults](kde-desktop-defaults/SKILL.md) |
 | Unix groups for desktop users | [user-groups](user-groups/SKILL.md) |
 | Logs, retained kernels and cleanup | [system-housekeeping](system-housekeeping/SKILL.md) |
+| DisplayLink retries a failed modprobe forever, preserving later USB activation | [system-housekeeping](system-housekeeping/SKILL.md), its [service restart reference](system-housekeeping/references/service-must-not-retry-forever.md) |
 | Packages and their provenance, Paweł's formula, distro tasks and dependencies, apt pins and conffiles, the signed repository, the ISO | [edition-packaging](edition-packaging/SKILL.md) |
 | One more program's stereo integration: the list, the pack format, the missing program, the proof | [stereo-integrations](stereo-integrations/SKILL.md) |
 | Lean Code projection or resolving installed source | [lean-code](lean-code/SKILL.md) |

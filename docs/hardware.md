@@ -43,6 +43,46 @@ It runs the same edition, installed from the same packages as the desktop: our s
 On the KDL-46HX855 it runs the 3D desktop by itself, with its own screen off, in full HD for each eye (the TV's frame packing mode).
 Red-cyan 3D works on it too, tested by Daniel.
 
+## An older notebook, tested
+
+In November 2026 the edition was installed on a third machine: a Sony Vaio Duo 13 from 2013, a notebook whose screen slides down to make a tablet.
+
+| Part | Model |
+|---|---|
+| Notebook | Sony Vaio Duo 13 (SVD13217CBW), 2013 |
+| Processor | Intel Core i7-4500U, 2 cores and 4 threads |
+| Graphics | the processor's Intel HD Graphics 4400 |
+| Memory | 4 GB of DDR3 |
+| Screen | 13.3 inches, 1920x1080, touch and pen |
+| 3D screen | a Sony 3D TV on HDMI® |
+
+What worked, tested by Daniel on the machine:
+
+- The desktop on its own screen, using 1.6 GB of the 4 GB with the Info Centre and System Monitor open.
+- The touch screen, with pinch to zoom in the file manager.
+- Tablet mode, with the on-screen keyboard in Portuguese and the tablet's Windows key opening the launcher.
+- Both cameras in Kamoso.
+- The 3D desktop on the Sony TV, in the TV's frame packing mode.
+
+![The desktop on the notebook's own screen](images/hardware/vaio-duo-13-desktop.png)
+
+![Tablet mode, with the on-screen keyboard](images/hardware/vaio-duo-13-tablet-mode.png)
+
+What the TV showed, both eyes, as a marked stereo picture: [vaio-duo-13-tv-3d-desktop.pns](images/hardware/vaio-duo-13-tv-3d-desktop.pns).
+
+### The front camera
+
+The notebook's front camera (USB 0bda:5722) sends its pictures in a way the Linux camera driver does not expect, and Kamoso could not show it.
+The edition's kernel carries a correction for this camera and for one sibling model, with its test, following the patches of Julian Meyer and Muhammad Waleed Badar.
+Mainline Linux does not have this correction.
+With it, 640x480, 1280x720 and 1920x1080 all came through as whole frames on this notebook.
+
+### What the edition learned from it
+
+- A small dense screen like this one starts at 125 %, so the text is readable from the first minute.
+- On a machine with a touch screen, the on-screen keyboard appears by itself in tablet mode, and the panel hides there.
+- A machine with a known fault gets its known correction from the edition's hardware detection; this notebook is the first entry.
+
 ## What it costs on the laptop
 
 The laptop holds 24 fps in every desktop case, 2D and 3D; the numbers, the method and the scripts: [what stereo costs KWin on a 2016 laptop](measurements/kwin-stereo-cost-a10-2026-10-23.md).

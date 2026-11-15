@@ -135,7 +135,7 @@ The recipes are in [a program joins the shared per-file choice](joining-the-per-
 
 - Symptom: "Not 3D" chosen for a marked `.pns` in Dolphin is kept in the store (`view=3`), and the file's thumbnail stays a pair, even freshly made with the thumbnail cache emptied.
   Cause: the thumbnailer asks the layer first (`Picture::loadPair()`, which returns no pair for a stored "Not 3D", correctly) and then falls back to a plain `QImageReader` read; the edition's Qt reports the file's own `sTER` mark on that image as the text `Stereo3DLayout`, and KIO's thumbnail worker (`thumbnail.cpp`, `stereoLayout()`) sends any such text as `stereo3dLayout` and caches it as `X-KDE::Stereo3DLayout`, so the flat fallback is announced as a pair. The same holds for a JPS through the JPEG thumbnailer's fallback.
-  Fix (proposed, not built): the fallbacks of kio-extras' image and JPEG thumbnailers clear `Stereo3DLayout` on an image the layer did not make a pair; the layer is not the cause.
+  Fix (proposed, then built and corrected by ORDER 581, below): the image thumbnailer clears `Stereo3DLayout` on an image the layer did not make a pair; the JPEG thumbnailer needs no change; the layer is not the cause.
   Found by: the cached thumbnail's text keys (`X-KDE::Stereo3DLayout='sideBySideLeftFirst'` with `view=3` in the store), what Qt's reader reports for the file (`Stereo3DLayout="sideBySideLeftFirst"` on the read image), and `loadPair()` on the same file before and after the choice (`isStereo` 1, then 0).
 - Symptom: two entries called "Not 3D" in one 3D menu (the album programs after ORDER 551b).
   Cause: the program's switch for everything it shows and the file's input correction had one name.
@@ -148,3 +148,17 @@ The recipes are in [a program joins the shared per-file choice](joining-the-per-
   Cause: the message box took `activeWindow()` as its parent, which was the renaming progress dialog; it closed and took the box with it.
   Fix: the first visible main window as the parent.
   Found by: two stand-ins of the exported function preloaded into the installed digiKam in the rig, the window list read from KWin after the rename (no window, then one titled "3D").
+
+
+## A marked picture set to Not 3D gets a flat thumbnail (ORDER 581)
+
+- Recipe, a thumbnail creator without Dolphin: build `thumbcreate.cpp` (load one `kf6/thumbcreator` plugin with `KPluginFactory::instantiatePlugin<KIO::ThumbnailCreator>(KPluginMetaData(path))`, call `create(KIO::ThumbnailRequest(url, size, mime, 1.0, 0))`, print the image size and its `Stereo3DLayout` text, which is what the thumbnail worker reads) in a development image with KIO's headers (`-I/usr/include/KF6/KIOGui -I/usr/include/KF6/KIO`, the version header lives in `KIO/`), keep the file's choice with `stereo_policy_set_file_choice` (ctypes on `libstereo-policy.so.1`: layout, order, anaglyph, view, swap; Not 3D is `0 0 0 3 0`), and run it with `HOME` in a scratch folder and `QT_QPA_PLATFORM=offscreen`.
+  Seconds instead of a session, and a folder of built plugins can be mounted over the image's (`-v DIR:/plugins`) to try a build before the package exists.
+  Then prove the same files in Dolphin on a 3D output, one colour pair per file so a capture is read by counting: the left colour in the left eye only and the right colour in the right eye only is a pair; both colours in both eyes is one whole picture; the left colour in both eyes is a 2D output's left half.
+- Symptom: of a marked PNG, a marked JPS and a marked Matroska film, all set to Not 3D, only the PNG keeps a pair thumbnail in Dolphin (ORDER 551c's report said the JPS did too).
+  Cause: the layer declines all three; the image thumbnailer (`imagecreator.cpp`) falls back to a plain `QImageReader` read and the edition's Qt reports the PNG's sTER mark as the image text `Stereo3DLayout`, which the worker announces as a pair; the JPEG thumbnailer opens `QImageReader(path, "jpeg")`, the plain JPEG reader, which reports no text, so a JPS is flat there; the video thumbnailer passes the stored view to the layer's `Video::layout()` and is flat too.
+  Fix: `ImageCreator::create()` clears `Stereo3DLayout` on the image it read after the layer declined the file (kio-extras +stereo3d6); the JPEG hunk proposed by 551c is unreachable and was left out.
+  Found by: running each creator plugin on its own with the choice kept (the JPS gave `layout=""`, the PNG `sideBySideLeftFirst`), then reading why from the source: the forced `"jpeg"` format.
+  The same JPS opened by `imagethumbnail` (a user who switched the JPEG thumbnailer off) does announce a pair before the fix, so the fix stays in the image creator, which every reader that reports the text goes through.
+- Measured, the cache: a thumbnail already made by the build before the fix for a file set to Not 3D keeps its pair key after the upgrade (the thumbnailer's version did not change), until the file's choice changes (`Picture::setFileChoice()` removes the file's cached thumbnails) or the cache is emptied; a fresh thumbnail is flat. Bumping `ThumbnailerVersion` remakes every image thumbnail; no design records it, so it is Daniel's call.
+- Measured, a 2D output: before the fix a marked PNG set to Not 3D shows its left half (as an ordinary pair does); after it shows the whole picture, as a JPS or a film set to Not 3D does.

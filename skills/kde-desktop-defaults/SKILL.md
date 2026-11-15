@@ -3,15 +3,15 @@ metadata:
   requires-packages: plasma-desktop
 name: kde-desktop-defaults
 description: >-
-  The edition's Plasma defaults and small KDE patches, with native and packaged proof: KRunner search order, the unit
-  converter's currency rates, task management, Ctrl+Alt+Del to System Monitor and Ctrl+Alt+Esc to log out, frozen-window
-  recovery, formatting a removable drive and running scripts from Dolphin, the look package (cursor theme names,
-  wallpaper, lock screen, the video wallpaper plugin), Discover and its AppStream cache and memory, sparky-stereo-look
-  and /etc/xdg files, the KScreen KCM, widgets that must say when a service is unreachable. Load it when a default
+  The edition's Plasma defaults and small KDE patches: KRunner search order, the unit converter's currency rates, task
+  management, Ctrl+Alt+Del to System Monitor and Ctrl+Alt+Esc to log out, frozen-window recovery, formatting a removable
+  drive and running scripts from Dolphin, the look package (cursor theme names, wallpaper, lock screen, the video
+  wallpaper plugin), Discover and its AppStream cache, sparky-stereo-look and /etc/xdg files, the KScreen KCM, a
+  built-in panel's first scale from its EDID, tablet mode (on-screen keyboard, panels that hide). Load it when a default
   should be decided instead of left to the person, a shortcut clashes, a lock screen shows only its wallpaper, a cursor
   theme name does not exist, a KCM page is out of order in another language, a widget shows zero instead of an error, a
-  video wallpaper keeps the old clip, Discover's memory must be measured fairly, or a KDE patch needs its CI and package
-  gate.
+  video wallpaper keeps the old clip, a notebook starts at 100 %, a convertible shows no on-screen
+  keyboard, or a KDE patch needs its CI and package gate.
 ---
 
 # KDE desktop defaults
@@ -32,6 +32,11 @@ The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; pack
 A browser or player routed to another GPU can die in its first seconds with nothing on screen.
 systemd already knows how every program KIO started ended; the Graphics page keeps a death in the problems engine through a drop-in on the `app-` units, with "Use NAME" for the GPU the program's desktop entry can name, and never starts the program again.
 [The recipe, why this place and not the launcher or a wrapper, the window and the traps](references/program-died-at-start.md).
+
+## Convertibles and small dense panels
+
+A notebook's built-in panel gets its first scale from its real size (125 % at least for a full HD panel of about 13 to 14 inches), a computer with a tablet mode gets Plasma Keyboard as its virtual keyboard in the session's language, and in tablet mode every panel hides by itself and goes back to its own setting afterwards.
+[Where KWin chooses the first scale and from which EDID field, why a default that only some computers get is a folder in front of `XDG_CONFIG_DIRS`, the shell's two visibility modes, tablet mode in the rig, and the traps](references/convertibles-and-dense-panels.md).
 
 ## The KDE splash
 

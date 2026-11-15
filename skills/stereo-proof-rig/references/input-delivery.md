@@ -12,6 +12,7 @@ The loss was in the rig's own script, twice, and nothing in Stereo KWin was at f
    KWin's fake input device, and with it the seat's pointer, lives only while the client is connected.
 3. A line holds steps separated by white space; a comma belongs to a step and never separates steps:
    - `m:X,Y` move the pointer (logical pixels); `b:272` click; `d:272` double click; `k:57` press and release a key (evdev code, `k:29+35` is Ctrl+H); `s:MS` wait.
+   - `t:X,Y` a tap of one finger on a touch screen (logical pixels). KWin shows its on-screen keyboard on a text field only when the last input came from a touch screen or a pen, so a keyboard proof needs it. The seat gains its touch capability with the fake device's first touch, and a client that binds `wl_touch` then has missed that touch: tap the empty desktop first and the target a second later, in the same call (`t:1900,1060 s:1000 t:960,554 s:7000`).
    - Common evdev codes: 33 F, 1 Esc, 57 space, 272 BTN_LEFT.
 4. Move the pointer over the video first (`m:` the middle of the window's client area, read from KWin's window list), then send the key or the click.
    Keys go to the focused window; a click goes to the window under the pointer.

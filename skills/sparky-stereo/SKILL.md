@@ -145,7 +145,7 @@ Load the one that matches the work; the [program list](../../docs/programs-in-de
 | [`test-bench`](../test-bench/SKILL.md) | Real machines and 3D televisions: the person at the bench and the partner remote, baselines, recoverable changes, power and UPS, unattended labs |
 | [`vkms-stereo`](../vkms-stereo/SKILL.md) | Testing stereo without a 3D display: VKMS with a 3D EDID, the writeback bench, IGT and KWin in a VM |
 | [`stereo-vm`](../stereo-vm/SKILL.md) | A virtual machine's stereo display: QEMU's window, virt-viewer, virt-manager and Karton, the pointer in a 3D mode, the controls that must fail |
-| [`drivers`](../drivers/SKILL.md) | The kernel and GPU drivers: HDMI® 3D modes, deep colour, the edition kernel's configuration and its traps, and carrying patches until mainline takes them |
+| [`drivers`](../drivers/SKILL.md) | The kernel and GPU drivers: HDMI® 3D modes, deep colour, the edition kernel's configuration and its traps, USB cameras with empty frames, and carrying patches until mainline takes them |
 | [`native-linux`](../native-linux/SKILL.md) | OpenGL, EGL, Vulkan, Qt and X11 programs on Linux |
 | [`proton-wine`](../proton-wine/SKILL.md) | Windows programs through Wine, DXVK and gamescope; Steam's environment; Easy Anti-Cheat's Linux requirements |
 | [`gamecontroller`](../gamecontroller/SKILL.md) | KDE controller models and labels for flight and racing rigs, preserving every raw control and verifying upstream profiles |
@@ -156,7 +156,7 @@ Load the one that matches the work; the [program list](../../docs/programs-in-de
 | [`power-idle`](../power-idle/SKILL.md) | KDE idle, lock, laptop lids, power-profile holds, CEC ownership and console isolation proof |
 | [`kde-desktop-defaults`](../kde-desktop-defaults/SKILL.md) | Decided defaults out of the box: Plasma search, task management, frozen windows and drive formatting |
 | [`user-groups`](../user-groups/SKILL.md) | The groups every desktop user gets, never a root-equivalent one |
-| [`system-housekeeping`](../system-housekeeping/SKILL.md) | Self-pruning defaults (kernels, logs, crash dumps, GRUB) and cleaning a system safely |
+| [`system-housekeeping`](../system-housekeeping/SKILL.md) | Self-pruning defaults (kernels, logs, crash dumps, GRUB), service restart loops and cleaning a system safely |
 | [`ai-partners`](../ai-partners/SKILL.md) | AI assistants joining the work: roles, briefs, proof, review, upstream manners, provenance |
 | [`making-skills`](../making-skills/SKILL.md) | Writing a skill or extending one: the header and its limits, the description that routes, lessons files, the review, the cold-reader test |
 | [`development-hooks`](../development-hooks/SKILL.md) | The hooks an AI tool or git runs by itself during the work, the workspace layout they assume, and how to add one |

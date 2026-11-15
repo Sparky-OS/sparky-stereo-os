@@ -58,7 +58,7 @@ The kernel knows the same fault as a quirk (`EDID_QUIRK_DETAILED_USE_MAXIMUM_SIZ
   **Found by:** running `update-grub` in each of the ten languages on a guest beside Windows and reading the menu's `set lang=`: Korean still said Japanese, the language of the run before.
 - **Symptom:** the person holds Shift or presses Esc and the hidden menu does not open.
   **Cause:** with `timeout=0` GRUB looks at the keyboard once. In QEMU, Shift held and Esc pressed through the start opened nothing under SeaBIOS and plain OVMF; only a run of Esc presses under Secure Boot (a slower start) landed.
-  **Fix:** never tell the person to use a key. `sudo sparky-stereo-boot menu` sets `sparky_menu_once` in GRUB's environment block and the next start shows the menu for 30 seconds; the boot sets it by itself when a Secure Boot key waits for its enrolment, and the menu is shown when shim refuses the newest kernel.
+  **Fix:** never tell the person to use a key. `sudo sparky-stereo-boot menu` sets `sparky_menu_once` in GRUB's environment block and the next start shows the menu for 30 seconds; the boot sets it by itself when a Secure Boot key waits for its enrolment, the menu is shown when shim refuses the newest kernel, and it shows by itself after a start that did not finish (below).
 - **Symptom:** beside Windows the menu stays hidden although the installer turned os-prober on.
   **Cause:** `grub-mkconfig` sources `/etc/default/grub.d/*.cfg` in name order, and `sparky-stereo-dual-boot.cfg` comes after `30-sparky-stereo-boot.cfg`, which therefore still saw os-prober off.
   **Fix:** the fragment reads the last `GRUB_DISABLE_OS_PROBER=` of the other files itself.
@@ -86,6 +86,128 @@ The kernel knows the same fault as a quirk (`EDID_QUIRK_DETAILED_USE_MAXIMUM_SIZ
 - **Symptom:** Hibernate is not offered in the guest although the swap line is right.
   **Cause:** Cushion Swap's generator offers it only when the area holds the RAM. **Fix:** a swap partition larger than the guest's memory.
 
+## After a start that did not finish
+
+Written by ORDER 572b (2026-11-15).
+A hidden menu with no wait opens with no key, so a newest kernel that no longer starts left no way to the older one.
+Daniel, 2026-11-15: "I agree with your idea after a failed start, alongside the check filesystem".
+Now, after a start that did not finish, the menu shows by itself at the next start, the file systems are checked at that start, and the person is told at login; every start that follows a finished one stays hidden with no wait.
+
+### The mechanism is GRUB's own, and Debian carries it switched off
+
+Look before you build: `grep -n recordfail /etc/grub.d/* /boot/grub/grub.cfg` on any Debian system.
+
+- `00_header` writes `function recordfail { set recordfail=1; ... save_env recordfail ... }` and `10_linux` writes the call `recordfail` at the top of each entry, both only `if [ "$quick_boot" = 1 ]`.
+  `quick_boot="@QUICK_BOOT@"` is set when GRUB is configured (`debian/patches/quick-boot.patch`: `AC_ARG_ENABLE([quick-boot]`), and `debian/rules` passes `--enable-quick-boot` only inside `ifeq (yes,$(shell dpkg-vendor --derives-from Ubuntu && echo yes))`.
+  On Debian the three scripts say `quick_boot="0"`, and no setting reaches it.
+- What is there on Debian all the same: `00_header`'s `make_timeout` always writes `if [ "${recordfail}" = 1 ] ; then set timeout=${GRUB_RECORDFAIL_TIMEOUT:-30} else ...`, and `grub2-common.service` (enabled) runs `grub-editenv /boot/grub/grubenv unset recordfail` with `Requires=boot-complete.target`, `After=boot-complete.target` and the sleep targets.
+  So a generated `grub.cfg` has the test at its top and nothing that ever sets the flag.
+- With the flag set, the hidden style is not applied (it is in the `else` branch), and GRUB shows the menu: `grub-core/normal/menu.c`, `get_timeout_style()`: "If the variable "timeout_style" is not set or invalid, default to TIMEOUT_STYLE_MENU".
+
+What the edition adds (`sparky-stereo-boot` 0.1.11):
+
+- `/etc/grub.d/01_sparky_stereo_menu` writes the function, and while the flag is set: `timeout_style=menu`, the time, and `sparky_stereo_check="fsck.mode=force sparky_stereo.start=unfinished"`, which the kernel line of every Linux entry carries through `GRUB_CMDLINE_LINUX`.
+- `/etc/grub.d/10_linux` is a link to a program that runs Debian's `10_linux` and writes `recordfail` after each `menuentry ... {` of its output.
+  Debian's file is moved aside with `dpkg-divert` (to `/etc/sparky-stereo-boot/10_linux.debian`), the same shape as the diverted `update-initramfs.conf`: a link owned by the package, never a conffile at the diverted name.
+  Only the Linux entries record a start: an entry of another system (Windows, another Linux) must not, or every start of Windows would count as one of ours that did not finish.
+- `/etc/grub.d/90_sparky_stereo_start` adds the menu's last entry, there only while the flag is set, with the reason as its title in the system's language.
+  It is the last one so that no other entry changes its number (a person's `GRUB_DEFAULT=2` keeps meaning the same entry).
+- The time: the person's `GRUB_RECORDFAIL_TIMEOUT` when set; otherwise a menu that is shown anyway keeps its time, and a hidden one is shown for 30 seconds, GRUB's default for it.
+- `sparky-stereo-boot-finished.service` (after `boot-complete.target`, and after a resume) clears the flag wherever it is kept, and after an unfinished start reads what the check found and hands it to the problems engine for the login.
+- `SPARKY_STEREO_UNFINISHED_START=no` in `/etc/default/sparky-stereo-boot` turns all of it off.
+
+### What counts as not finished
+
+systemd.special(7), `boot-complete.target`: "Order units that are required to succeed for a boot process to be considered successful before this unit and add a Requires= dependency from the target unit to them."
+Debian's unit clears the flag after that target, which by itself needs only `sysinit.target`.
+The edition adds `sparky-stereo-boot-login.service`, `Before=boot-complete.target`, `After=display-manager.service`, required by the target: a start whose login screen's service failed to start has not finished.
+So a kernel panic, a boot image that cannot mount the root, the emergency shell, a hang before the basic system is up, a login screen that fails to start and a power cut on the way all show the menu at the next start.
+A login screen that runs and shows nothing counts as finished: nothing in the system can see that.
+A start into recovery mode never reaches the target either, so the start after it shows the menu.
+A plain reboot and a resume from hibernation do not count: the resumed system clears the flag (the unit is wanted by `hibernate.target`, as Debian's is).
+Never order that unit after a target: `multi-user.target` waits for `grub2-common.service`, which waits for `boot-complete.target`, so `After=multi-user.target` or `After=graphical.target` on a unit before `boot-complete.target` is an ordering cycle, and systemd drops a job to break it.
+Check a display manager's unit before trusting the order: sddm, plasmalogin, lightdm, gdm3, greetd and lxdm in Debian testing are ordered after `systemd-user-sessions.service`, a getty and Plymouth's quit, none after a target.
+
+### The check
+
+- `fsck.mode=force` on the kernel line (systemd-fsck@.service(8): "force unconditionally results in full file system checks").
+  initramfs-tools reads the same word (`init`: `forcefsck|fsck.mode=force`) and checks the root with `fsck -f -a` from the boot image; its log is `/run/initramfs/fsck.log`, written by `logsave`, which adds `fsck exited with status code N` for any status other than 0.
+  A root the boot image did not check (no `fsck` in it, another generator) is checked by `systemd-fsck-root.service`.
+  The other file systems of `/etc/fstab` with a pass number above 0 are checked by `systemd-fsck@NODE.service`, and NODE is the node systemd derives from the fstab field: `UUID=F1A5-69B3` is `/dev/disk/by-uuid/F1A5-69B3`, so the unit is `systemd-fsck@dev-disk-by\x2duuid-F1A5\x2d69B3.service` (`systemd-escape --path --template=systemd-fsck@.service NODE`), never the kernel's device name.
+  Its lines are in the journal of that unit.
+- fsck(8): exit status 1 is "Filesystem errors corrected", 4 "Filesystem errors left uncorrected".
+- btrfs and xfs have no check at boot: `fsck.btrfs` and `fsck.xfs` do nothing by design, the type checks itself when it is mounted. The message names them as such.
+- A resume from hibernation is safe: the boot image tries the resume before it checks or mounts the root.
+
+### Where GRUB cannot write the flag
+
+Debian's own rule, `check_writable` in `00_header`: the abstractions `diskfilter` and `lvm` (RAID, LVM) under `/boot/grub`, and the types `btrfs | cpiofs | newc | odc | romfs | squash4 | tarfs | zfs`.
+GRUB reads those and cannot write them, so `save_env` does nothing there.
+
+- On UEFI the flag goes to an environment block on the EFI system partition (`EFI/sparky-stereo-boot/grubenv`): FAT on a plain partition, which GRUB writes.
+  `update-grub` makes the block (`grub-editenv FILE create`) and says so; GRUB finds the partition by its UUID, `load_env -f` and `save_env -f`.
+- On a BIOS start there is no such place.
+  `update-grub` says that the menu cannot show by itself on this computer and names `SPARKY_STEREO_MENU=shown`; nothing is written into the entries.
+- Ubuntu's answer for that case (`quick-boot-lvm.patch`) is a menu shown for 30 seconds at every start on UEFI. The edition does not take it: nothing may add a wait to a normal start.
+
+### Breaking a start in the rig
+
+Each row boots a copy-on-write disk (`qemu-img create -f qcow2 -b BASE -F raw`) over one installed base per firmware, so a broken guest costs nothing.
+
+- A kernel that panics: overwrite the newest kernel's boot image with random bytes (keep a copy); the kernel stops with "VFS: Unable to mount root fs".
+- A start that hangs: a unit with `DefaultDependencies=no`, `Before=sysinit.target`, `Type=oneshot`, `TimeoutStartSec=infinity`, that removes its own link first and then sleeps for ever, so only one start hangs.
+- A power cut on the way: kill QEMU a moment after the kernel's first line on the serial port.
+  The kernel line needs `console=ttyS0 earlycon=uart8250,io,0x3f8,115200 ignore_loglevel`, or `quiet` keeps the first line off the port.
+- A damaged root that only a forced check finds: make a file, `sync`, `fsfreeze -f /; fsfreeze -u /` (the journal is written out to its final place), `echo 3 > /proc/sys/vm/drop_caches`, `debugfs -w -R "sif FILE links_count 5" DEVICE` on the mounted root, then the power cut.
+  Without the freeze the journal's replay at the next start puts the good inode back and the check finds nothing but the replay.
+- The older kernel from the menu: Down, Enter (the submenu), Down, Down, Enter.
+  Send the keys only once the menu is on the screen (two seconds of screenshots that show its box), and take a screenshot after each key: under Secure Boot the firmware takes 14 to 20 seconds on a busy machine, and a key sent by the clock lands on the wrong line.
+- A login screen that fails to start: a unit whose program does not exist, linked as `display-manager.service` and wanted by `multi-user.target`.
+- A plain reboot and a hibernation each need the same small disk for the guest's notes across both runs of the virtual machine.
+- Judge the screen as before: a screenshot every half second, and count the frames that show the menu's box.
+- The time GRUB takes: from QEMU's start to the kernel's first line on the serial port, ten starts each for the old and the new package.
+
+### Traps
+
+- **Symptom:** under Secure Boot, Enter on "Advanced options" starts the newest kernel, which stops in "VFS: Unable to mount root fs on unknown-block(0,0)"; the submenu never opens and the older kernel cannot be reached.
+  **Cause:** something loaded a kernel while GRUB read the menu (the edition's own check that asks shim about the newest kernel, `linux KERNEL` inside an `if`), and GRUB starts whatever is loaded when Enter is pressed on a submenu or on an entry that loads nothing: `grub-core/normal/menu.c`, `grub_menu_execute_entry`: "Implicit execution of boot, only if something is loaded" comes before `grub_show_menu` for the submenu. The kernel started that way has no boot image and no kernel line.
+  **Fix:** never leave a kernel loaded when the menu will be shown. GRUB has no command that unloads; its EFI loader calls `grub_loader_unset()` right after the file it is given opens (`grub-core/loader/efi/linux.c`), so `linux` on a file shim accepts that is no kernel (MokManager beside shim) unloads and then fails. The line that prints is gone when the menu is drawn, so do it only when the menu will be shown.
+  **Found by:** a screenshot after each key: the frame after Enter was black and the next one the kernel's panic, with the intact newest kernel. Then GRUB's source.
+- **Symptom:** the login note says "no trace of a check was found" although the journal has the check's lines.
+  **Cause:** the result was looked for in the boot image's log only, or under a unit named after the kernel's device name. A boot image without `fsck` leaves the root to `systemd-fsck-root.service`, and the other units are named after the fstab field's node.
+  **Fix:** the boot image's log, else `systemd-fsck-root.service`; the others by the node (above).
+  **Found by:** a fresh install in the rig, whose installer run leaves out the installer's boot image step: the journal of that start had both checks.
+- **Symptom:** a repaired root is reported as clean.
+  **Cause:** `logsave` of e2fsprogs 1.47 writes "fsck exited with status code 1"; older ones wrote "died with exit status".
+  **Fix:** read both.
+- **Symptom:** the older kernel, started from "Advanced options", gets no forced check, and a start from that submenu is not recorded.
+  **Cause:** `submenu` opens a new context that keeps only exported variables (`grub-core/normal/context.c`, `grub_env_new_context`: `if (var->global || export_all)`). `have_grubenv`, `boot_once` and any variable set in the header are gone inside it; functions stay.
+  **Fix:** `export` every variable an entry or the function reads.
+  **Found by:** reading `context.c` before the first rig run, then the kernel line of the older kernel in the guest.
+- **Symptom:** after one start of Windows the menu says our last start did not finish.
+  **Cause:** the flag set for every entry, or in the header.
+  **Fix:** only the Linux entries call `recordfail`.
+- **Symptom:** the start after the repaired one stops again in the same panic.
+  **Cause:** the rig started the older kernel and left the newest kernel's boot image broken.
+  **Fix:** the row's command on the older kernel puts the boot image back, as a person would.
+- **Symptom:** in a rig run the keys never reach the menu and it starts the default entry.
+  **Cause:** the rig's timeline runs its steps one after another, and a run of screenshots covered the seconds of the keys.
+  **Fix:** screenshots up to the keys, the keys, then screenshots again.
+- **Symptom:** two rows side by side fail at random ("the upgrade did not install").
+  **Cause:** helper containers with a fixed name; each row removed the other's.
+  **Fix:** the row's process number in every helper's name.
+- **Symptom:** the engine answers "called ... with arguments or details it cannot read" and the problem is not kept.
+  **Cause:** `repair=` takes a list of commands, each a list of words.
+- **Symptom:** `systemd-analyze blame` shows 0.9 s for a unit ordered before `boot-complete.target`.
+  **Cause:** it started Python to ask systemd one question; `multi-user.target` waits for it.
+  **Fix:** a shell program (`systemctl show -p LoadState -p ActiveState display-manager.service`).
+- **Symptom:** the installer stops at its `fstab` step on a btrfs root in the rig: `TypeError: 'NoneType' object is not iterable`.
+  **Cause:** the step reads `btrfsSubvolumes` from the installer's storage, which the mount step fills.
+  **Fix:** the rig makes the subvolume `@`, mounts the root from it and puts `[{"mountPoint": "/", "subvolume": "/@"}]` in the storage, as the installer's own mount step does.
+- **Symptom:** lintian prints `systemd-service-file-refers-to-unusual-wantedby-target` twenty times for one unit.
+  **Cause:** sleep targets in the unit's `[Install]` line, counted once per link.
+  **Fix:** the package ships the links in the targets' `.wants` folders; `[Install]` names `multi-user.target` only.
+
 ## Recipe: a fresh install in the rig, without a window
 
 1. Make the guest's root file system in an unprivileged container (`apt-get install` of the boot packages, the edition's kernel, Debian's signed shim and GRUB, `calamares` and the edition's installer settings), `docker export` it, drop `.dockerenv`, and turn the tar into a disk with `mke2fs -d root.tar` (needs libarchive).
@@ -99,3 +221,6 @@ GRUB's font engine, graphical terminal and Secure Boot verifier (`grub-core/font
 Debian's GRUB packaging, which bundles the font in the signed image (`debian/build-efi-images`): the Debian GRUB Maintainers; `debian/control` of 2.14-5 names Felix Zielcke, Jordi Mallach, Steve McIntyre, Julian Andres Klode and Mate Kukri.
 os-prober: the Debian Installer team.
 Calamares: Adriaan de Groot, Teo Mrnjavac and the Calamares contributors; the installer settings the edition builds on: Paweł "pavroo" Pijanowski.
+GRUB's recordfail ("If the previous boot failed ... then show the boot menu regardless", `debian/patches/quick-boot.patch` in Debian's grub2): Colin Watson, with Richard Laager and Robie Basak named as authors in the patch; the case where GRUB cannot write its environment block (`quick-boot-lvm.patch`): Steve Langasek.
+`boot-complete.target`, `systemd-fsck` and `fsck.mode=`: the systemd authors. The root check in the boot image: the Debian kernel team's initramfs-tools. `e2fsck` and `logsave`: Theodore Ts'o and the e2fsprogs contributors.
+The rig this section's rows run in: lane 572 of the edition.

@@ -8,7 +8,8 @@ description: >-
   every image, GRUB tested in a container, the journal as the one log, crash dumps capped, /etc/skel, system mail,
   BleachBit, safe scratch folders, cleaning a shared build machine, services failing on absent hardware. Load it when a disk fills with kernels or logs, a removal would take the running kernel, a cleaner would
   delete the evidence of a crash or shows Access denied on a mailbox, a tool exits 0 with no message on an unreadable
-  HOME, nvidia-persistenced or thermald fails on a machine without that hardware, a GRUB test in a container shows
+  HOME, nvidia-persistenced or thermald fails on a machine without that hardware, GRUB's menu never shows after a failed
+  start or Advanced options starts a kernel under Secure Boot, a GRUB test in a container shows
   English and an empty menu, or a build machine's disks fill with finished build trees, duplicates and Docker images.
 ---
 
@@ -82,11 +83,11 @@ Daniel, 2026-10-30: "all kernel purges must locate all that kernel parts and reg
 
 ## GRUB
 
-- **One system:** hidden menu, with Esc or Shift to open it.
+- **One system:** hidden menu, no wait. No key opens it (measured); `sudo sparky-stereo-boot menu` shows it once.
 - **Another system found at installation** (especially on UEFI): other systems listed (`GRUB_DISABLE_OS_PROBER=false`) and the menu shown.
 - **The rule as built, the font Debian's signed GRUB loads under Secure Boot, the screen's size from both EDID fields, and the rig that rehearses a fresh install:** [the boot menu: hidden, readable, under Secure Boot](references/boot-menu.md). Load it when the menu shows "?" boxes or tiny text, waits on a single-system machine, or stays hidden beside Windows.
 - **An error on the image or the menu:** [every message the edition's configuration can make GRUB print](references/grub-errors.md), booted in QEMU, with the recipe that reads them from the serial port.
-- **Proposal:** show the menu after a boot that did not finish, so the kept older kernel is reachable. GRUB cannot write its environment block on Btrfs, LVM, RAID or an encrypted `/boot`; use a short visible timeout there.
+- **After a start that did not finish** (a kernel that stops, a hang, a power cut on the way) the menu shows by itself at the next start, the file systems are checked and the person is told at login: GRUB's own recordfail, which Debian carries switched off. [The mechanism, what counts as not finished, where GRUB cannot write, how to break a start in the rig](references/boot-menu.md#after-a-start-that-did-not-finish). Load it when the menu never shows after a failed boot, shows at every start, or shows after a start of Windows.
 
 ## Keeping a user's settings
 

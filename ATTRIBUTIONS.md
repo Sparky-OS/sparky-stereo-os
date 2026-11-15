@@ -978,3 +978,15 @@ The loading screen between the login and the desktop shows the boot splash's pic
 - **The person's limits at boot** (ORDER 481): sparky-stereo-boot 0.1.9 and Plymouth's `popped=` and `sunk=`, which the loading screen matches level for level.
 - **layer-shell-qt** ([invent.kde.org/plasma/layer-shell-qt](https://invent.kde.org/plasma/layer-shell-qt)), by Aleix Pol Gonzalez, gives KSplash its overlay surfaces on Wayland.
 These projects do not endorse the edition.
+
+## The Camera page (ORDER 570, 2026-11-15)
+
+The Camera page of System Settings and its command build on other people's work, named from each project's own records:
+
+- **PipeWire** ([pipewire.org](https://pipewire.org), MIT): Wim Taymans and the PipeWire contributors wrote the graph, `pw-dump` and `pw-metadata` that list the cameras and set the default, and the stream the preview reads.
+- **WirePlumber** ([gitlab.freedesktop.org/pipewire/wireplumber](https://gitlab.freedesktop.org/pipewire/wireplumber), MIT): George Kiagiadakis and the WirePlumber contributors wrote the default-nodes policy that keeps `default.configured.video.source` and moves `default.video.source`; the page only sets that key and lets WirePlumber save it.
+- **The Linux kernel's V4L2 interface** (`linux/videodev2.h`, the Video4Linux documentation, GPL 2.0): the Linux media subsystem's contributors, named in the kernel's MAINTAINERS file (not looked up in this run); the formats, sizes and controls are read and set with its ioctls.
+- **Kamoso** ([invent.kde.org/multimedia/kamoso](https://invent.kde.org/multimedia/kamoso), GPL 2.0 or later): Aleix Pol and Alex Fiestas, with the Kamoso contributors; read for how a KDE program lists a camera through GStreamer's device monitor, and measured not to follow the session's default. No code is copied.
+- **v4l-utils** (`v4l2-ctl`) and **cameractrls**: read for how a camera's controls are listed and which kinds exist. No code is copied.
+- **The edition's stereo layer** (`Stereo::FileChoiceList`): the packings of a two-lens camera, their ids and their translated names are the layer's; lane 569's known machines table is what the page reads to say that a camera has a kernel correction.
+These projects do not endorse the edition.

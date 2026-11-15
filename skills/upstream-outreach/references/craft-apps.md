@@ -728,3 +728,13 @@ Fix: put the implicit group around the outline run's replay boundary, preserving
 The reference must model one combined graphics object under ISO 32000-1/2 clause 11.7.4.4; two independent translucent graphics objects are a different operation.
 How found: the font-enabled explicit knockout-group reference failed before the integration, then all 44 selected owner controls and 26 receiving controls passed, with strict selected Clippy and formatting checks.
 These component results still require the full shared and receiving gates.
+
+
+### A locked optional package is not the active feature graph
+
+Symptom: an isolated read-only contract stops offline on a missing image-codec package, although its README says image decoding is excluded.
+Cause: its separate lockfile records optional packages that Cargo still needs to resolve; it does not inherit the parent workspace's patch table.
+Fix: inspect the shipping dependency's actual features and `cargo tree --edges normal,features` before changing a manifest or attributing the failure to a backend bypass.
+When the codec is absent from that graph, cache the exact locked inputs separately, keep source and lock unchanged, then execute the original contract offline.
+How found: the four read-only controls passed natively and in the WASM runtime after caching, while their normal graph contained no interpreter, rasterizer, writer or image codec.
+Retain the failed attempt and bind a resumed workflow to the same frozen source and harness; a missing cache entry never qualifies skipped later jobs.

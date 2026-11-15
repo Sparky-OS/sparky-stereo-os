@@ -433,4 +433,13 @@ Traps:
   **Cause:** thumbnail navigation used filename order, while the album sorted by image time and then name; fixtures generated across a second boundary changed that order.
   **Fix:** give the synthetic fixtures one fixed modification time before recording their initial state, and rerun both controls with that driver.
   **How found:** the store named a different fixture, its captured colours agreed with that file, and `stat` showed the timestamp boundary.
+- **Symptom:** a whole-frame comparison after a mode switch fails on ten pixels in each eye, while every thumbnail is exact and its left view equals the flat reference.
+  **Cause:** the drive-capacity bar in the file manager's Places panel changed as other work filled the disk.
+  **Fix:** retain the whole-frame failure, locate and report the changing widget separately, and keep the required picture checks exact; do not add a pixel tolerance.
+  **How found:** the difference box was the blue bar's right tip in both eyes, with grey pixels becoming blue; it lay outside every thumbnail.
+- **Symptom:** a Lintian comparator treats the usual policy findings as a runtime failure, or accepts a real runtime failure as a clean comparison.
+  **Cause:** its exit-code assumptions were reversed.
+  **Fix:** read the installed tool's manual: Lintian 2.143.0 uses 0 for normal operation, 1 for a runtime error and 2 for the configured policy findings.
+  Compare the tags for 0 or 2 and refuse 1; use `--tag-display-limit 0` to avoid the deprecated spelling.
+  **How found:** the comparator stopped before its first row, and the installed `lintian(1)` EXIT STATUS section distinguished the cases.
 

@@ -443,3 +443,8 @@ Traps:
   Compare the tags for 0 or 2 and refuse 1; use `--tag-display-limit 0` to avoid the deprecated spelling.
   **How found:** the comparator stopped before its first row, and the installed `lintian(1)` EXIT STATUS section distinguished the cases.
 
+Measured in ORDER 580: stereo-layer 1.19.1 loses no export or import against either staged predecessor.
+The unchanged Koko +2, KPhotoAlbum +2, digiKam and Showfoto +4, Gwenview +10, ffmpegthumbs +5, kio-extras +5 and KImageFormats +7 qualified with it and the rebuilt Dolphin +8: all 19 runtime packages passed the archive-qualified link and start gate, and every application opened a fixture.
+No further dependant was rebuilt.
+The installed proofs retained both merged works: 626 thumbnail cell instances exact in both eyes across 100 and 125 percent, with no wallpaper or left/flat difference, and 30 checks each for Koko's QML menu and KPhotoAlbum's menu; the published controls failed.
+

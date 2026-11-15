@@ -162,6 +162,10 @@ A Qt Quick player (Dragon Player, Plank Player) keeps only its menu, its per-fil
 Which frames take the GPU route through the layer and which the wl_shm copy, how to see it (the presenter's route line, the CPU figure, the layer's dump) and the traps of the fix are in the same reference (ORDER 500).
 [What the player keeps, the refused declaration shown, the red and green recipe and its traps](references/a-player-on-the-video-layer.md) (ORDER 453, 453b and 453c), including the shipped recipes, Plank’s QSettings store, the actual menu-item visibility guard, the carried and local QML fixes with their control tests, why a player's video takes the memory route (`Handle type: NoHandle`, `createTexturesFromMemory`: Dragon's AMD texture hack, ORDER 497) and how to read the route from Qt's log.
 
+## A film without sound says so
+
+[The sentence, the rule, where each player learns its tracks and tells it, the fixtures and the traps](references/a-film-without-sound.md) (ORDER 579): a film with a picture and no audio track says "This film has no sound." in ten languages, beside a volume control that stays usable.
+
 ## Lessons from the lanes, October to November 2026
 
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (29 entries, the Jellyfin flattening traps of 11 November 2026 among them).

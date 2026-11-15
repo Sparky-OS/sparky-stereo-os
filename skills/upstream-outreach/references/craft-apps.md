@@ -373,6 +373,13 @@ How found: the first fresh catalog restore reported the missing parent even thou
 If complete ancestors cannot be obtained, state the exact prerequisite or shallow boundary and do not claim full history.
 Never rewrite an author, parent or date to make a checkpoint appear complete.
 
+Symptom: a non-shallow restored clone still cannot create a standalone source bundle with lazy fetching disabled.
+Cause: its partial-clone promisor metadata permits missing historical blobs even though every current source tree and local branch head exists.
+Fix: fetch the named public original base with `--refetch --no-filter --no-tags --no-write-fetch-head`, verify every local branch head is unchanged, then repeat the complete bundle and isolated restore.
+Keep `GIT_NO_LAZY_FETCH=1` during the bundle check so an unnoticed network fetch cannot stand in for offline completeness.
+How found: TextureCraft reported a missing promised object despite its non-shallow flag; the unfiltered original-base fetch preserved all seven local heads, and the resulting bundle restored them with matching trees and strict full fsck in an empty repository without alternates.
+This repairs source shipping evidence; it neither changes the tested app nor proves another runtime path.
+
 Symptom: a Python archive restore check rejects a source file although its extracted SHA-256 matches.
 Cause: `tarfile`'s secure `data` filter intentionally strips group-write permission, so a stored 0664 source file is extracted as 0644.
 Fix: retain original source modes in the manifest and write explicit safe 0644 or 0755 source-archive headers, while checking tested executable bytes and modes exactly.

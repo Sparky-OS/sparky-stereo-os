@@ -77,6 +77,25 @@ Build the unpatched source the same way too: if it is red like the published mod
 
 ### Capturing the real KCM list without a physical display
 
+Use [the test observer](../scripts/kcm-mode-list-observer.cpp) inside the isolated
+container, with the installed KCM and its own virtual compositor session:
+
+```sh
+ulimit -c 0
+c++ -std=c++23 -O2 -fPIC -shared kcm-mode-list-observer.cpp \
+  $(pkg-config --cflags --libs Qt6Core Qt6Gui Qt6Qml Qt6Quick Qt6Widgets Qt6QuickWidgets) \
+  -o "$scratch/kcm-mode-list-observer.so"
+LANG=C.UTF-8 QT_QUICK_BACKEND=software \
+  KSCREEN_MODE_CAPTURE_OUT="$scratch/kcm-list" \
+  LD_PRELOAD="$scratch/kcm-mode-list-observer.so" kcmshell6 kcm_kscreen
+```
+
+Expect `kcm-list.json`, `kcm-list-resolutions.png` and `kcm-list-refresh.png`.
+The JSON enumerates the real resolution and refresh controls; the images show their
+open lists. This observer stages resolution changes in the KCM and exits without
+pressing Apply. Use a disposable home and compositor, never a person's session.
+It expects the English `Hz` label. Inspect each PNG before counting it as a capture.
+
 A Qt Quick KCM hosted by `kcmshell6` can live in a `QQuickWidget`. Its internal
 `QQuickWindow` is not a visible top-level window. For a headless software-rendered
 capture, inspect visible `QQuickWidget` instances, follow `quickWindow()` and the

@@ -414,4 +414,9 @@ Traps:
   **Fix:** run the suite in a separate disposable environment carrying its declared test dependencies and the installed round.
   Do not change the running package builder or treat these failures as a library regression.
   **How found:** the source's `Build-Depends` marks those packages `<!nocheck>`, and the failed tests name the missing consumers.
+- **Symptom:** a source made identically three times has a different descriptor after its binary build, even though every source file still has the same bytes.
+  **Cause:** unrestricted `dpkg-buildpackage` makes the source package again; its clean step moves directory timestamps, and a later recipe date allows those timestamps into the Debian tarball.
+  **Fix:** after generating and verifying the source once, use `dpkg-buildpackage -b` for the native build that also emits architecture-independent packages, retaining the supplied descriptor and tarballs.
+  The merged round selects this through `SPARKY_BINARY_ONLY=1`; other depth-source callers keep their existing mode.
+  **How found:** the descriptor diff named only the Debian tarball's hash; comparing its members found changes only to the timestamps of `debian/` and the embedded toolkit's `lean/` directory.
 

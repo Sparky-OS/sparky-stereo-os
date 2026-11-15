@@ -9,7 +9,7 @@ At a scale that is not whole (125 %, 150 %, 175 %) three different roundings mee
 The hole and the picture cover the same device pixels at every scale.
 Where that cannot be had, the area is drawn flat by the program, never as a hole with something else under it.
 
-Three facts decide how:
+Four facts decide how:
 
 1. **A window paints an edge at the nearest whole device pixel, counted from the corner of its content.**
    A widget at `x` in the window's own pixels starts at `round(x * scale)`; with Qt the widget's own origin is not rounded first, so a rectangle at `r` inside a widget at `o` starts at `round((o + r) * scale)`, not `round(o * scale) + round(r * scale)`.
@@ -18,7 +18,11 @@ Three facts decide how:
    KWin 6.7 rounds a subsurface's corner from its parent's corner and its size on its own: the far edge is `round(p * scale) + round(w * scale)`.
    Other compositors round both edges from the parent: `round((p + w) * scale)`.
    The two differ by a device pixel whenever the two fractions add up past a half.
-3. **An image carries a device pixel ratio, and Qt draws by it.**
+3. **A rectangle's edge on exactly half a device pixel is taken by two rules.**
+   Qt Quick's scene graph draws on the GPU, whose rasteriser takes a pixel whose centre lies on a rectangle's left or top edge; a compositor's `round()` of the same edge takes the next one (KWin rounds 237.5 to 238).
+   A hole drawn by Qt Quick at a place that is a whole number of the window's pixels can still start a device pixel before the surface laid under it (190 at 125 % is 237.5).
+   QPainter's raster fill of a rectangle rounds both edges with `qRound()`, as `Surface::covering()` counts them.
+4. **An image carries a device pixel ratio, and Qt draws by it.**
    `QPainter::drawImage(point, image, sourceRect)` draws an image at its size divided by its ratio (QPainter, "Drawing High Resolution Versions of Pixmaps and Images").
    Code that copies samples must give the target rectangle too, or the copy is a resize.
 
@@ -82,9 +86,16 @@ Place the window with a KWin script (`workspace.stackingOrder`, `frameGeometry`)
 - **Trap of the measurement:** the status bar's free-space bar moves while other work fills the disk, between two captures of one step (77 to 147 pixels, the same in both eyes). Leave the status bar out of the comparison and say so.
 - **Trap of the rig:** a key sent through fake input goes to the focused widget, and after a window is placed by a script that may not be the view: Page Down did not scroll. Start the file manager with `--select FILE` on a file near the end of the folder for a scrolled view with a selected cell.
 
-## What is not settled here
+- **Symptom:** an image editor (Showfoto) leaves one device row of the desktop along the top or bottom edge of its picture at two window sizes of four at 125 %, in the 2D mode's capture too; painting the window's background under the area changes nothing.
+  **Cause:** the canvas item cleared its hole from its own rectangle (`drawRect`, the item's exposed rectangle aligned outward in its own coordinates), and the item lies on parts of a pixel there, while the layer lays the surface under the rectangle it shows the picture in.
+  **Fix:** clear the layer's own rectangle (the area's property `stereoLayerShown`, `WidgetLayer::shownRect()`) in the viewport's pixels: `painter->setWorldTransform(QTransform())`, then `fillRect(shown.intersected(exposed), Qt::transparent)`, as `WidgetLayer::paint()` does (digiKam's `GraphicsDImgItem::paintStereoPresentation()`, ORDER 551c). The item draws with no pixmap cache, so the painter's device is the viewport.
+  **Found by:** the rows' place in the capture: the top and bottom edges of the picture's area, grey (the program's parent widget) above and the picture's frame below.
+- **Symptom:** a Qt Quick viewer (Koko) shows the desktop in one device column at the left edge of its picture at one window size of four at 125 %; never in the 2D mode.
+  **Cause:** fact 3. The QML `StereoPicture` drew its hole at the item's own place and laid the surface under a rectangle rounded outward: the subsurface at 190 window pixels (device 237.5) was placed at device 238 by KWin, the hole began at 237. The outward rounding also made the compositor stretch the picture by up to a pixel on each side.
+  **Fix:** the surface's rectangle is the picture's own size at the nearest whole pixel of the window, and the hole is drawn on that rectangle's device pixels (each edge `qRound(edge * ratio) / ratio`, kept inside the item); stereo-layer 1.19.2.
+  **Found by:** `WAYLAND_DEBUG=client` on the program at the failing size (`wl_subsurface.set_position(190, 86)`, `wp_viewport.set_destination(512, 289)`) against the backdrop column's place in the capture (device 321 = window 84 + 237).
 
-- Measured at 125 %, the same before and after this work: an image editor's canvas (Showfoto) leaves one device row of its area clear at two of four window sizes, and a Qt Quick viewer (Koko) one device column beside its picture area at one of four. Neither is the surface's placement (painting the whole window background under the area changed nothing in the editor); each is in the program's own painting of its area and is the next thing to find.
+## What is not settled here
 
 - The window and the surface are committed separately, so while a view scrolls the holes move one frame before the pictures under them, at every scale.
   A synchronised subsurface committed before the window's own commit would make the two one frame; it is not built.

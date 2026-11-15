@@ -131,3 +131,24 @@ A trap gives its symptom, its cause, its fix and how the cause was found; a reci
 - A Kirigami program logs many lines of its own at start (`Object or context destroyed during incubation`, `StackView has detected conflicting anchors`); search the program's log for the names of your own files, not for "error".
 - Recipe, one picture per case for a person to look at: crop the left eye of a capture to the window and keep it under 1100 pixels wide; a menu's rows can be read from it, and a check that only counts colours cannot tell which entry was highlighted.
 
+
+## Menus, drags and a collection in the rig (ORDER 551c)
+
+- Symptom: keys sent after a menu opened by a click (a menu bar's menu, digiKam's drop menu) do nothing to the menu, and later keys land in the window under it (a preview steps to the next picture on Down).
+  Cause: not found; a menu opened by its mnemonic (Alt+V) or by a shortcut takes the keys.
+  Fix: open menus by keys, or click their entries where a capture shows them (a click follows its own move in the same call of the fake input tool).
+  Found by: a capture after each key: the menu still open with nothing highlighted, and the window's picture changed.
+- Symptom: Down, Down, Right from the top of a menu bar's menu opens the next menu bar menu.
+  Cause: a menu opened by its mnemonic starts with its first entry highlighted (Gwenview's View: Browse), so the count was one too many; End does not move in it either.
+  Fix: count from the highlighted first entry, or use Up, which wraps to the last entry (digiKam's and Showfoto's View, whose last entry is 3D).
+- Symptom: in Koko's Qt Quick 3D submenu a count of Down presses, or one Up, chooses "Not 3D" instead of the entry wanted.
+  Cause: in that submenu the separators take no step and key steps wrap around the whole list (the top menu's separator does take one).
+  Fix: click the entry where a capture of the open menu shows it; the popup opens at the middle of the maximised view.
+- Symptom: Gwenview's menus do not open by Alt+V, and Down steps through the folder's pictures.
+  Cause: Gwenview hides its menu bar behind a hamburger button; a `[MainWindow] MenuBar=Enabled` written into its settings did not show it.
+  Fix: Ctrl+M once after the first start of a fresh session.
+- Symptom: an Escape too many leaves the image view (Koko: the folder; Gwenview: Escape is its own Browse shortcut; digiKam: the album's thumbnails) and every later measurement reads the wrong view.
+  Fix: one Escape per open menu level, a menu bar's menu counted; where the count differs between builds, bring the view back by its own action (digiKam's toolbar Preview).
+- Recipe, a drag: the fake input tool's `p:BTN` presses a pointer button and leaves it down, `r:BTN` releases it (`scripts/fakeinput.c` since ORDER 551c); a drag is `p:272`, a few `m:` steps, `r:272`, all in one call.
+- Recipe, a second device in one session: `--mount type=tmpfs,dst=FOLDER,tmpfs-mode=1777` (without the mode the tmpfs is root's, and a program's move into it fails with only a notification).
+- Recipe, a window that stays on top (digiKam's light table, a slide show) is closed through KWin, as its close button does: a KWin script `for (const w of workspace.stackingOrder) if (w.caption.indexOf('Light Table') >= 0) w.closeWindow();`; Alt+F4 by fake input did not close it.

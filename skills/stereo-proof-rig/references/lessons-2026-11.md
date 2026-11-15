@@ -131,3 +131,15 @@ A trap gives its symptom, its cause, its fix and how the cause was found; a reci
 - A Kirigami program logs many lines of its own at start (`Object or context destroyed during incubation`, `StackView has detected conflicting anchors`); search the program's log for the names of your own files, not for "error".
 - Recipe, one picture per case for a person to look at: crop the left eye of a capture to the window and keep it under 1100 pixels wide; a menu's rows can be read from it, and a check that only counts colours cannot tell which entry was highlighted.
 
+
+## Tablet mode, the on-screen keyboard and a screen's EDID in the rig (ORDER 567)
+
+The recipes and their traps are in [convertibles and small dense panels](../../kde-desktop-defaults/references/convertibles-and-dense-panels.md#tablet-mode-in-the-rig): tablet mode switched through the setting KWin watches (`kwinrc`, `[Input] TabletMode`, written with `--notify`), a `--virtual` output that carries an EDID and is a built-in panel (`KWIN_VIRTUAL_OUTPUT_EDIDS`, `KWIN_VIRTUAL_OUTPUT_INTERNAL`), a machine given to the session's environment scripts as a small sysfs tree, the touch step of the fake input client, and the on-screen keyboard read as a window of KWin's list.
+
+- Symptom: a touch sent through fake input does nothing, and the client's `WAYLAND_DEBUG` log shows `wl_touch.up` without a `down`.
+  Cause: the seat announces its touch capability with the fake device's first touch, and the client binds `wl_touch` after that touch has begun.
+  Fix: one tap on the empty desktop first, the real one a second later, in the same fake input process.
+- Symptom: `docker run` answers `invalid mount config for type "bind": stat PATH: permission denied` for a path the user can read.
+  Cause: PATH is a symbolic link inside a sticky folder such as `/var/tmp`, owned by another user than the daemon, and the kernel does not let the daemon follow it (`fs.protected_symlinks`).
+  Fix: mount the target (`readlink -f PATH`).
+- A session bus of the rig's own that cannot start `kded6`, the baloo runner, `krunner` or KSplash: copy `/usr/share/dbus-1/session.conf`, replace `<standard_session_servicedirs/>` by one `<servicedir>` of links to every other service file, and start the session with `dbus-run-session --config-file=`.

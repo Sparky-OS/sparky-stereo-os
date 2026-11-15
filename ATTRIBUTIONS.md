@@ -1000,3 +1000,13 @@ A Vulkan surface's declaration of a pair now follows the swapchain that is curre
 - **Qt's QVulkanWindow and QRhi** ([qt.io](https://www.qt.io/), qtbase): Laszlo Agocs and The Qt Company wrote QVulkanWindow and the RHI's Vulkan backend; Ilya Doroshenko added stereo swapchains to the RHI's Vulkan and Direct3D 12 backends (qtbase 1eb15adee3, 2023), whose image view per eye QVulkanWindow's two views follow.
 - **ORDER 556** (the edition's Qt on its Vulkan path), whose rig, disc fixture and readers these proofs reuse.
 These projects do not endorse the edition.
+
+## DisplayCAL from the Info Centre page (ORDER 575, 2026-11-15)
+
+The offer of DisplayCAL builds on other people's work, named from each project's own records (Debian's `displaycal` 3.9.19-3 copyright file and `argyll` 3.5.0+repack-1):
+
+- **DisplayCAL** ([github.com/eoyilmaz/displaycal-py3](https://github.com/eoyilmaz/displaycal-py3), GPL 3): Florian Höch (2008 to 2018), who wrote it, Erkan Ozgur Yilmaz (2022 to 2026) and Patrick Zwerschke, who carry it to Python 3. This work installs Debian's package unchanged.
+- **ArgyllCMS** ([argyllcms.com](https://www.argyllcms.com/)): Graeme W. Gill, whose colour management system DisplayCAL drives and whose instrument support the hardware requirement rests on.
+- **SparkyLinux's APTus**: Paweł "pavroo" Pijanowski and Piotr "MoroS" Mrożek, whose app center the entry lives in; lane 565 wrote the one install-tools mechanism the sizes sentence reuses.
+These projects do not endorse the edition.
+

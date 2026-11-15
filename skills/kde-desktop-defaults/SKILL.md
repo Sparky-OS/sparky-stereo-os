@@ -43,6 +43,11 @@ System Settings has a Camera page (`sparky-stereo-camera`, under Multimedia besi
 Kamoso, Qt Multimedia's camera and FFmpeg do not follow the default (measured).
 [Where each setting lives, which programs follow, a virtual camera in the rig, and the traps with their symptoms](references/camera-page.md).
 
+## A program that needs hardware: offered, not installed
+
+DisplayCAL needs a colorimeter, so it stays off the image; the Info Centre's Stereo 3D and Deep Colour page says what it requires, shows apt's sizes and offers "Install DisplayCAL" through Stereo APTus' own entry action, and the roles only Suggest it.
+[The recipe, why a role must Suggest and not Recommend, the translation-domain trap and the rig traps](references/hardware-program-offered.md).
+
 ## The KDE splash
 
 KSplash takes `Breeze` when no `ksplashrc` names a theme (plasma-workspace `startkde/startplasma.cpp`, `readEntry("Theme", "Breeze")`), and a global theme's `defaults` file is only applied when the person applies that theme, so a fresh user of the edition saw KDE's splash although `org.sparkystereo.desktop` has its own.

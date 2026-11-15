@@ -63,6 +63,17 @@ For a declared scene that looks flat on a real 3D output, read three things in o
 The last committed buffer decides the layer: halves that differ there and not on the output name the compositor; equal halves there name the program, its toolkit or Mesa, and the plain two-layer Vulkan client `vk2layer` tells Mesa from the toolkit.
 The recipe, the tools (`tools/vkms-stereo-bench/realoutput`) and the traps: [real-output-readback.md](references/real-output-readback.md).
 
+## A virtual camera without a camera
+
+A page, a player or a portal that lists cameras is proved with no real camera and no kernel module in `scripts/virtual-camera/`:
+
+1. `session-start.sh` starts a private session bus, PipeWire and WirePlumber in the container (as the container's user, in its own `XDG_RUNTIME_DIR`, never the desktop's) and writes `$XDG_RUNTIME_DIR/env.sh` for the other scripts.
+2. `virtual-camera.sh a|b|sbs|held` makes a PipeWire `Video/Source` node with GStreamer's `pipewiresink mode=provide`: `a` offers several formats and sizes, `b` one mode, `sbs` a packed side by side picture (left red with LEFT, right blue with RIGHT), `held` a camera whose stream another program holds. Each node carries `api.v4l2.path=/dev/videoN`, the property PipeWire's V4L2 source gives a real camera. `pwcams.py` prints the nodes and the default video source; `who-is-linked.py` prints which camera each client was linked to.
+3. The V4L2 side is `vcam-shim.c`: `cc -shared -fPIC -o vcam-shim.so vcam-shim.c -ldl`, then `VCAM_ROOT=DIR LD_PRELOAD=vcam-shim.so` on the program under test. `DIR/videoN.cfg` (the files in `vcam/`) describes the camera, and `open("/dev/videoN")` answers with a fake descriptor whose V4L2 ioctls come back in the kernel's own structures (`QUERYCAP`, `ENUM_FMT`, `ENUM_FRAMESIZES`, `ENUM_FRAMEINTERVALS`, `G/S_FMT`, `G/S_PARM`, `QUERY_EXT_CTRL`, `QUERYMENU`, `G/S_EXT_CTRLS`). Removing the file is unplugging the camera; a plugged camera starts at its defaults; a control can be `refuse`, `inactive` or `readonly`, a camera `busy`. It does not stream (no `REQBUFS`): the picture comes from the PipeWire node. v4l2loopback on the host is the person's own camera feed (a meeting program may be using it) and is never touched.
+4. `kwin-session.sh` and `kwin-stereo-session.sh` start Stereo KWin on a virtual output (the second also in its side by side 3D twin) for the page's screenshots; the container needs `--cap-add SYS_NICE`, a render node and its group.
+
+The rows and the traps are in [the Camera page](../kde-desktop-defaults/references/camera-page.md#traps-symptom-cause-fix-how-found).
+
 ## Test material that a script can read
 
 - **Video:** two coloured sources, the left view red with "LEFT" and the right view blue with "RIGHT", both stamped with the same frame number, packed side by side or top and bottom, either eye first; marked with the frame packing SEI (x264's `--frame-packing`, also a clip whose SEI comes only on keyframes) or Matroska's `StereoMode`; plus a plain 2D clip and an undeclared 32:9 clip.

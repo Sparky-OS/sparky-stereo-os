@@ -968,3 +968,15 @@ The first scale of a built-in panel, the on-screen keyboard of a computer with a
 - **The edition's boot menu** (ORDER 572, sparky-stereo-boot 0.1.10): the rule itself, the screen size field decides and the timing's millimetres are used when they agree within a centimetre, was written there first.
 - **KConfig** (KDE Frameworks): its cascading configuration, a system default below the person's file, is what lets a default exist on some computers only.
 These projects do not endorse the edition.
+
+## The Camera page (ORDER 570, 2026-11-15)
+
+The Camera page of System Settings and its command build on other people's work, named from each project's own records:
+
+- **PipeWire** ([pipewire.org](https://pipewire.org), MIT): Wim Taymans and the PipeWire contributors wrote the graph, `pw-dump` and `pw-metadata` that list the cameras and set the default, and the stream the preview reads.
+- **WirePlumber** ([gitlab.freedesktop.org/pipewire/wireplumber](https://gitlab.freedesktop.org/pipewire/wireplumber), MIT): George Kiagiadakis and the WirePlumber contributors wrote the default-nodes policy that keeps `default.configured.video.source` and moves `default.video.source`; the page only sets that key and lets WirePlumber save it.
+- **The Linux kernel's V4L2 interface** (`linux/videodev2.h`, the Video4Linux documentation): Hans Verkuil, Mauro Carvalho Chehab, Laurent Pinchart and the media subsystem's contributors; the formats, sizes and controls are read and set with its ioctls.
+- **Kamoso** ([invent.kde.org/multimedia/kamoso](https://invent.kde.org/multimedia/kamoso), GPL 2.0 or later): Aleix Pol and Alex Fiestas, with the Kamoso contributors; read for how a KDE program lists a camera through GStreamer's device monitor, and measured not to follow the session's default. No code is copied.
+- **v4l-utils** (`v4l2-ctl`) and **cameractrls**: read for how a camera's controls are listed and which kinds exist. No code is copied.
+- **The edition's stereo layer** (`Stereo::FileChoiceList`): the packings of a two-lens camera, their ids and their translated names are the layer's; lane 569's known machines table is what the page reads to say that a camera has a kernel correction.
+These projects do not endorse the edition.

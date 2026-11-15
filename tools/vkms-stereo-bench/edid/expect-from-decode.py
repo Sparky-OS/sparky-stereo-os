@@ -13,7 +13,14 @@ Kept: progressive formats (the connector does not allow interlace) in the layout
 lists: frame packing, top-and-bottom, side by side (half, horizontal), side by side (full), line
 alternative, L + depth and L + depth + graphics + graphics-depth (HDMI 1.4a, Table H-2); the last
 three on progressive formats only (Figures H-3, H-5, H-6)."""
-import re, sys
+import argparse
+import re
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("decode", help="edid-decode text")
+parser.add_argument("--include-interlaced", action="store_true",
+                    help="include interlaced formats for a bench that supports them")
+args = parser.parse_args()
 
 names = {"frame packing": "fp", "frame-packing": "fp", "top-and-bottom": "tab",
          "side-by-side (half, horizontal)": "sbs-half", "side-by-side (full)": "sbs-full",
@@ -24,7 +31,7 @@ vic_re = re.compile(r"VIC\s+(\d+):\s+(\d+)x(\d+)(i?)\s+([\d.]+) Hz")
 mandatory = {(32, "fp"), (32, "tab"), (19, "fp"), (19, "tab"), (4, "fp"), (4, "tab"),
              (20, "sbs-half"), (5, "sbs-half")}
 
-text = open(sys.argv[1]).read().splitlines()
+text = open(args.decode).read().splitlines()
 vics, fmt = [], {}
 section = None
 all_structs, mask_vics, specific, present, all_vics = [], [], [], False, False
@@ -74,8 +81,8 @@ for line in text:
 out = set()
 def add(v, layout):
     w, h, inter, r = fmt[v]
-    if not inter and layout in names.values():
-        out.add("%dx%d@%d %s" % (w, h, r, layout))
+    if (not inter or args.include_interlaced) and layout in names.values():
+        out.add("%dx%d%s@%d %s" % (w, h, "i" if inter else "", r, layout))
 if present:
     for v in vics:
         for mv, layout in mandatory:

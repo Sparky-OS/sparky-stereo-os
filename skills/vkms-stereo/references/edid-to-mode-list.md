@@ -13,6 +13,92 @@ Every step has a check that fails by itself, so the step that loses the modes sh
 6. **The frame of each layout is composed and written back.** `stereo-wb-test` (the bench's) shows each listed mode with a known left and right eye and reads the writeback buffer back pixel by pixel; the KUnit suites `vkms-stereo`, `vkms-stereo-whole-spec` and `vkms-stereo-no-edid` check the frame sizes (`vkms_frame_size()`: vdisplay plus one vtotal for frame packing, three for L + depth + graphics + graphics-depth, twice the lines for line alternative, twice the width for side by side (full)) and a connector without an EDID.
 7. **Red and green.** The same guest, the same EDIDs, on the kernel without the change (24 modes rejected with `NO_STEREO` for the bench EDID) and with it (none rejected, every expected format listed, the 2D-only twin and the default device unchanged).
 
+## Interlaced modes: carried and marked
+
+An interlaced timing needs its scan type beside its dimensions, refresh rate and stereo structure.
+The notation is `1920x1080i`; a 60 Hz interlaced timing has 60 fields per second and 30 complete frames per second, as the kernel’s [DRM mode name and refresh helpers](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/gpu/drm/drm_modes.c?h=v7.3) represent it.
+Keep the scan type separate from the stereo packing: an interlaced timing may also carry frame packing.
+Check the applicable CTA timing and HDMI® structure clauses in the edition being used; a missing local clause is an explicit evidence gap, never a formula supplied from memory.
+
+Follow the flag through these boundaries before changing a label:
+
+1. Decode the EDID independently with `edid-decode`, preserving the `i` and the per-VIC stereo entries.
+   Use `edid/expect-from-decode.py --include-interlaced DECODE.txt` for a bench that supports interlace.
+   Its default deliberately keeps only progressive formats for the ordinary VKMS bench.
+   A television can declare frame packing on VIC 5 and VIC 20 without declaring 1080p60 frame packing.
+2. Compare the kernel's `drmModeModeInfo.flags` with KWin's `DrmConnectorMode::nativeMode()` and its `OutputModeline::flags()`.
+   In KWin 6.7.4 +stereo3d54, the native mode retains `DRM_MODE_FLAG_INTERLACE`, but `flagsForMode()` in `src/backends/drm/drm_connector.cpp` copies only the preferred and stereo flags into `OutputModeline`.
+   Its refresh calculation already doubles the frame rate for interlaced timings.
+3. Trace the output-device mode's flags through the protocol XML, KWin's `OutputDeviceModeV2InterfacePrivate::bindResource()`, libkscreen's `WaylandOutputDeviceMode` and `WaylandOutputDevice::updateKScreenModes()`.
+   Check both protocol version gates and the client's registry bind version.
+4. Preserve the flag in libkscreen's `Mode` clone, equality and config serializer, including its D-Bus deserializer.
+   Check `WaylandOutputDevice::modeName()` and `Doctor::outputs()`: they construct names independently.
+5. Include scan type in KScreen's `OutputModel` resolution identity, current index, refresh filtering and selected-mode matching.
+   Changing only the displayed string leaves progressive and interlaced modes of equal size and rate merged or selects the other one.
+6. Prove selection separately from naming: inspect the native mode and mode blob, the stereo frame geometry and a refused commit's visible failure.
+   Run the installed doctor and KCM, compare every row with the EDID-derived expectation, and retain a progressive-only control against the previous packages.
+
+Do not use the stock VKMS list as proof that a television declares no interlaced modes.
+VKMS rejects interlace with `NO_INTERLACE`; use an isolated mock DRM test for flag propagation, and a separately qualified guest path for installed compositor behavior.
+A mock passing a commit does not establish physical interlaced scanout.
+
+Traps:
+
+- **Symptom:** a 1080i 3D mode reads as 1080p.
+  **Cause:** the native DRM mode carries interlace, but the compositor's general mode object and its clients lose it; independent formatters then print only width and height.
+  **Fix:** carry scan type across every boundary above and mark the height with `i`, in 2D and 3D alike.
+  **Found by:** decoding the EDID first, then comparing `flagsForMode()` with the retained native mode and following each formatter.
+- **Symptom:** a proposed interlace test lists only progressive formats.
+  **Cause:** VKMS filters interlaced timings before the compositor receives them, and the ordinary EDID expectation script filters them too.
+  **Fix:** read the kernel's rejection status, choose the test layer explicitly and enable `--include-interlaced` for its expectation.
+  **Found by:** the driver's interlace policy, the `NO_INTERLACE` probe status and the expectation script's `add()` filter, rather than the displayed mode count.
+
+The +stereo3d54 trace was followed by installed candidate tests in an isolated virtual backend: all 41 EDID-derived logical timing rows matched doctor and the KCM, including ten interlaced rows.
+The progressive-only control retained the same 21 rows, labels and order.
+Selecting 1080i60 frame packing retained the interlaced frame-packing identity, and selecting progressive 2D remained possible.
+This qualifies the tested native-flag boundary and installed protocol/client presentation.
+It does not qualify a notebook's physical interlaced scanout, kernel-generated duplicate or fractional timings, or a physical DRM commit.
+
+### Capturing the real KCM list without a physical display
+
+Use [the test observer](../scripts/kcm-mode-list-observer.cpp) inside the isolated container, with the installed KCM and its own virtual compositor session:
+
+```sh
+ulimit -c 0
+c++ -std=c++23 -O2 -fPIC -shared kcm-mode-list-observer.cpp \
+  $(pkg-config --cflags --libs Qt6Core Qt6Gui Qt6Qml Qt6Quick Qt6Widgets Qt6QuickWidgets) \
+  -o "$scratch/kcm-mode-list-observer.so"
+LANG=C.UTF-8 QT_QUICK_BACKEND=software \
+  KSCREEN_MODE_CAPTURE_OUT="$scratch/kcm-list" \
+  LD_PRELOAD="$scratch/kcm-mode-list-observer.so" kcmshell6 kcm_kscreen
+```
+
+Expect `kcm-list.json`, `kcm-list-resolutions.png` and `kcm-list-refresh.png`.
+The JSON enumerates the real resolution and refresh controls; the images show their open lists.
+This observer stages resolution changes in the KCM and exits without pressing Apply.
+Use a disposable home and compositor, never a person's session.
+It expects the English `Hz` label.
+Inspect each PNG before counting it as a capture.
+
+A Qt Quick KCM hosted by `kcmshell6` can live in a `QQuickWidget`.
+Its internal `QQuickWindow` is not a visible top-level window.
+For a headless software-rendered capture, inspect visible `QQuickWidget` instances, follow `quickWindow()` and the visual `childItems()` tree, and use the containing widget's `grab()` for the PNG.
+Read a ComboBox through its public `count` and `textAt(index)` API; its `model` variant need not be a string list.
+Open its `popup` before capture.
+A test observer can enumerate resolutions and each resolution's refresh entries by setting the ComboBox index and emitting `activated(index)`, without pressing Apply.
+Keep this observer outside the shipping package and compare its observations with the EDID expectations.
+This captures the rendered installed KCM, not DRM scanout or stereo eye delivery.
+A virtual-backend fixture likewise tests installed protocol/client presentation; it cannot establish physical kernel EDID enumeration or field timing.
+
+### Further flag propagation traps
+
+- **Symptom:** a disconnected display loses its legacy interlaced choice after settings are merely loaded and saved. **Cause:** the writer stamps a previously unknown scan type as known progressive before the display can be matched. **Fix:** omit the new scan marker until scan type is known; test load/save without querying outputs, then reconnect and restore. **Found by:** restart cases that passed directly but failed after an intervening disconnected store.
+- **Symptom:** a legacy protocol test passes although no current-mode event is delivered after selecting an interlaced virtual mode. **Cause:** its cached mode already equals the expected fallback; a new scan flag also prevents the old-client base-mode search from matching. **Fix:** count current-mode events as well as checking their value; include scan type among non-layout flags and require the fallback base to have the same scan type. **Found by:** the event-count assertion fails for interlaced clients at versions 21 and 23 while progressive and newer clients pass.
+
+
+- **Symptom:** a protocol configure check accepts an old XML file although mode flags lack interlace. **Cause:** the same XML already contains `ized3d_mode.interlaced`, an unrelated output format. **Fix:** inspect the mode `flags` enum or match the exact new entry and value; require it in edition builds. **Found by:** comparing the generated mode flag macro with the XML enum containing the earlier word match.
+- **Symptom:** an interlaced choice saved before the new flag falls back after an upgrade. **Cause:** modeline matching compares the complete flags, while the old saved mode omitted scan type. Virtual-mode restoration also treated the new bit as part of its packing. **Fix:** mark newly saved scan types as known; for legacy choices prefer the exact existing match, then recover the interlaced counterpart. Keep interlace out of the layout mask and retain it in base-mode matching. **Found by:** tracing saved-mode equality and running restart tests for 2D, frame packing and virtual anaglyph, with both legacy and new JSON.
+
 ## A writeback fence that never signals: missing connector or stuck job
 
 1. **A missing writeback connector** shows in the first lines of `stereo-wb-test`: `objects ... connector, writeback connector or properties missing`, or no `Writeback-N` entry under `/sys/class/drm/cardN-*`. In configfs the CRTC needs `writeback` set to 1 (`echo 1 > crtcs/crtc0/writeback`) before the device is enabled; the writeback connector, its encoder and its bind to that CRTC are made by `vkms_enable_writeback_connector()`, nothing else to link. A client has to set `DRM_CLIENT_CAP_WRITEBACK_CONNECTORS` to see it.

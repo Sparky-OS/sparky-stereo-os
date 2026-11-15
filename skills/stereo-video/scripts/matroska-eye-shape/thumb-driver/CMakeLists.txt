@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.20)
+project(thumb-driver CXX)
+find_package(Qt6 REQUIRED COMPONENTS Gui)
+find_package(KF6KIO REQUIRED)
+find_package(KF6CoreAddons REQUIRED)
+add_executable(thumb-driver main.cpp)
+target_link_libraries(thumb-driver Qt6::Gui KF6::KIOGui KF6::CoreAddons)

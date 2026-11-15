@@ -450,8 +450,9 @@ Names come from each project's Debian copyright records.
 
 | Program | Licence | What we changed | Credit |
 |---|---|---|---|
-| [FFmpeg](https://ffmpeg.org/) | LGPL-2.1-or-later | The H.264, H.265 and VVC frame packing SEI kept for every frame, and the stream's own declaration first | Fabrice Bellard, who started FFmpeg in 2000, Michael Niedermayer and the FFmpeg developers |
-| [mpv](https://mpv.io/) | LGPL-2.1-or-later | Layout read from the stream, every packing unpacked, the video in its own layer | The mpv developers; our change was merged by **Kacper Michajłow** |
+| [FFmpeg](https://ffmpeg.org/) | LGPL-2.1-or-later | The H.264, H.265 and VVC frame packing SEI kept for every frame, and the stream's own declaration first; a Matroska pair's display size read as one plane only when a view of the frame as declared cannot be a whole picture | Fabrice Bellard, who started FFmpeg in 2000, Michael Niedermayer and the FFmpeg developers; the Matroska demuxer's stereo display multiplier by Aaron Colwell (2015, committed by wm4), the muxer's one-plane display size by Michael Niedermayer (2013) and James Almer (2016) |
+| [mpv](https://mpv.io/) | LGPL-2.1-or-later | Layout read from the stream, every packing unpacked, the video in its own layer; a Matroska pair's display size read as one plane only when it must be | The mpv developers; our change was merged by **Kacper Michajłow** |
+| [MKVToolNix](https://mkvtoolnix.download/) | GPL-2.0-or-later | Nothing changed for the display size; its `mkvmerge`, `mkvinfo` and `mkvpropedit` make and check the fixtures of the shape of an eye | Moritz Bunkus and the MKVToolNix contributors |
 | [MpvQt](https://invent.kde.org/libraries/mpvqt) | LGPL | A stereo video layer below the window | George Florea Bănuș |
 | [Haruna](https://invent.kde.org/multimedia/haruna) | GPL-3.0-or-later | 3D videos in the layer, controls identical in both eyes | George Florea Bănuș, Muhammet Sadık Uğursoy |
 | [VLC](https://www.videolan.org/) | GPL-2.0-or-later | VLC Stereo: the SEI and Matroska's StereoMode read, both views shown | VideoLAN and the VLC team, among them Jean-Baptiste Kempf and Rémi Denis-Courmont |
@@ -642,7 +643,7 @@ Our changes stay in our own trees, ready to go upstream on the day they are want
 |---|---|---|
 | H.264 and H.265, Annex D (frame packing SEI, Table D-8 in H.264 V15, 08/2024, D-9 in V16, 06/2026); H.265 Annexes F and G (multiview) | ITU-T and ISO/IEC | The stereo mark inside a video stream |
 | H.274 | ITU-T | Supplemental enhancement information for video |
-| [RFC 9559](https://www.rfc-editor.org/rfc/rfc9559) | IETF; Steve Lhomme, Moritz Bunkus, Dave Rice | Matroska and its `StereoMode` |
+| [RFC 9559](https://www.rfc-editor.org/rfc/rfc9559) | IETF; Steve Lhomme, Moritz Bunkus, Dave Rice | Matroska and its `StereoMode`, and the display size of one plane (section 18.10) |
 | HDMI® 1.4 3D, CTA-861, E-EDID | HDMI Licensing Administrator, Consumer Technology Association, VESA | 3D modes and deep colour on the wire |
 | OpenGL, EGL, Vulkan | Khronos Group | Quad buffer, multiview windows, multiview rendering |
 | Wayland protocols (subsurfaces, `wp_viewporter`, content type) | freedesktop.org | Surfaces, scaling and content hints |

@@ -26,7 +26,8 @@ Check freshness: re-read those documents in the current tree before every series
   It applies on the mailing lists and every kernel venue.
   Reports go to the Code of Conduct Committee (volunteers appointed by the Technical Advisory Board, with a professional mediator); its members are listed at kernel.org/code-of-conduct.html.
 - **Signed-off-by is human.** `coding-assistants.rst`: "AI agents MUST NOT add Signed-off-by tags. Only humans can legally certify the Developer Certificate of Origin". The human reviews everything, adds their own Signed-off-by and takes full responsibility.
-- **Say what the tool did.** `coding-assistants.rst` asks for `Assisted-by: LLM [TOOL1] [TOOL2]` (basic tools such as git, gcc or editors are not listed).
+- **Say what the tool did.** The published Linux 7.3.1 `coding-assistants.rst` asks for `Assisted-by: LLM [TOOL1] [TOOL2]` (basic tools such as git, gcc or editors are not listed).
+  Freshness check, 2026-11-14: media next at `3fc9303dba01676c2090768126e5327e341b7761` has removed the attribution section and the requirement in `submitting-patches.rst`; do not describe the tag as compulsory in that tree.
   `generated-content.rst` asks for transparency about tools, prompts and testing.
   It also gives maintainers full discretion: a maintainer may treat the patch like any other, review it more strictly, or reject it.
   The 2026 Maintainers Summit agreed to stop requiring the tag; the edition keeps it anyway (Daniel, 2026-10-16: "we'll change nothing - it's just not compulsory anymore - but we respect devs").

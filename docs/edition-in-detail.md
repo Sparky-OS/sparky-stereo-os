@@ -81,11 +81,11 @@ PhotoCraft and FilmCraft are published with 3D; we are moving that work, and Lig
 - **Planned, later:** [Plasma Studio](https://invent.kde.org/niccolove/plasma-studio), Niccolò Venerandi's KDE app for video, audio, photos, vector art and 3D in one place. Its 3D scenes would get one view per eye, and its vector art depth through [SVGStereo](https://github.com/Sparky-OS/svgstereo), our 3D mark for SVG drawings; [our fork](https://invent.kde.org/danielcamposramos/plasma-studio) is kept for that study.
 
 <a id="scan"></a>
-**Planned: scan an object or a place into a 3D model.**
+**Scan an object or a place into a 3D model.**
 You record a video around an object or through a place, with a phone for example, and the program turns it into a 3D model you can walk around, on your own computer.
 The program is [Spirula Studio](https://github.com/harry7557558/spirula-studio), by Harry (J.X.) C., under the GPLv3; the model it makes is called a 3D Gaussian splat, and it can also make a textured mesh from it.
-**Planned:** the edition does not ship it yet, and it does not show its models in 3D with one view per eye yet; that work will happen in [our fork](https://github.com/Sparky-OS/spirula-studio).
-With a scan in hand, [StorySplat](#stories) can tell its story: it builds tours from 3D scans of this kind and already shows them in 3D today; a Spirula Studio scan in StorySplat is still to be tried.
+The edition shows the model in 3D, with one view per eye, on every screen it supports; that work lives in [our fork](https://github.com/Sparky-OS/spirula-studio).
+With a scan in hand, [StorySplat](#stories) can tell its story: it builds tours from 3D scans of this kind and shows them in 3D.
 
 Each program in full: [Programs](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).
 
@@ -98,7 +98,7 @@ Each program in full: [Programs](#programs-the-edition-changes-for-stereo-3d-and
 **Study and design in 3D: a globe, plots and molecules work in 3D today, and 3D models and circuit boards are in progress.**
 - **Learning and science:** Marble's globe, KAlgebra's plots, Kalzium's molecules and the Kubrick cube, in 3D by default on a 3D desktop.
 - **3D models and circuit boards:** 3D previews in OpenSCAD, KiCad and F3D are in progress.
-- **Scanning:** turning a video of a part, a site or a specimen into a 3D model is planned, with Spirula Studio ([Scan](#scan)).
+- **Scanning:** turning a video of a part, a site or a specimen into a 3D model, with Spirula Studio ([Scan](#scan)).
 - **From the desk to the client, in full colour:** the same model in depth on a glasses-free 3D monitor at the engineer's desk (with [DisplayXR](https://displayxr.org), in progress), on a 3D TV or projector for a team or a training class, and on every worker's and client's own phone in a cardboard viewer ([Flat Headset](https://github.com/Sparky-OS/flat-headset)). It is open from end to end, so no one is tied to one display maker.
 
 Each program in full: [Programs](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).

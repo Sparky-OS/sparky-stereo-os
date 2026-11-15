@@ -83,11 +83,11 @@ PhotoCraft와 FilmCraft는 3D와 함께 게시되어 있습니다. 그 작업과
 - **계획 중, 나중에:** [Plasma Studio](https://invent.kde.org/niccolove/plasma-studio)는 Niccolò Venerandi가 만든, 비디오, 오디오, 사진, 벡터 아트와 3D를 한곳에 담은 KDE 앱입니다. 3D 장면은 눈마다 하나의 뷰를 갖고, 벡터 아트는 SVG 그림을 위한 우리의 3D 표시인 [SVGStereo](https://github.com/Sparky-OS/svgstereo)로 깊이를 갖게 하려는 구상입니다. [우리 포크](https://invent.kde.org/danielcamposramos/plasma-studio)는 그 연구를 위해 남겨 두었습니다.
 
 <a id="scan"></a>
-**계획 중: 물체나 장소를 스캔해 3D 모델로.**
+**물체나 장소를 스캔해 3D 모델로.**
 휴대폰 등으로 물체 주위를 돌면서 또는 장소 안을 걸으면서 비디오를 찍으면, 프로그램이 그 비디오를 둘러볼 수 있는 3D 모델로 바꿉니다. 모두 자신의 컴퓨터에서 처리합니다.
 프로그램은 Harry (J.X.) C.가 만든 [Spirula Studio](https://github.com/harry7557558/spirula-studio)이며 라이선스는 GPLv3입니다. 만들어지는 모델은 3D Gaussian splat이라고 부르고, 여기서 텍스처가 입혀진 메시도 만들 수 있습니다.
-**계획 중:** 이 에디션에는 아직 들어 있지 않고, 눈마다 다른 시점으로 모델을 3D로 보여 주는 기능도 아직 없습니다. 그 작업은 [우리 포크](https://github.com/Sparky-OS/spirula-studio)에서 진행할 예정입니다.
-스캔이 준비되면 [StorySplat](#stories)으로 그 이야기를 들려줄 수 있습니다. StorySplat은 이런 종류의 3D 스캔으로 투어를 만들고, 이미 3D로 보여 줍니다. Spirula Studio의 스캔을 StorySplat에서 써 보는 일은 아직 남아 있습니다.
+이 에디션은 지원하는 모든 화면에서 눈마다 다른 시점으로 모델을 3D로 보여 줍니다. 그 작업은 [우리 포크](https://github.com/Sparky-OS/spirula-studio)에 있습니다.
+스캔이 준비되면 [StorySplat](#stories)으로 그 이야기를 들려줄 수 있습니다. StorySplat은 이런 종류의 3D 스캔으로 투어를 만들고 3D로 보여 줍니다.
 
 각 프로그램 전체: [프로그램](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).
 
@@ -102,7 +102,7 @@ PhotoCraft와 FilmCraft는 3D와 함께 게시되어 있습니다. 그 작업과
 **3D로 연구하고 설계하세요: 지구본, 그래프, 분자가 오늘 3D로 작동하고, 3D 모델과 회로 기판은 진행 중입니다.**
 - **학습 및 과학:** Marble의 지구본, KAlgebra의 그래프, Kalzium의 분자와 Kubrick 큐브가 3D 데스크톱에서 기본적으로 3D로.
 - **3D 모델 및 회로 기판:** OpenSCAD, KiCad, F3D의 3D 미리보기가 진행 중입니다.
-- **스캔:** 부품, 현장, 표본을 찍은 비디오를 3D 모델로 바꾸는 기능을 Spirula Studio로 계획하고 있습니다 ([스캔](#scan)).
+- **스캔:** 부품, 현장, 표본을 찍은 비디오를 3D 모델로 바꿉니다. 프로그램은 Spirula Studio입니다 ([스캔](#scan)).
 - **책상에서 클라이언트까지, 풀 컬러로:** 엔지니어 책상의 무안경 3D 모니터에서 ([DisplayXR](https://displayxr.org)과 함께, 진행 중), 팀이나 교육 수업을 위한 3D TV나 프로젝터에서, 그리고 모든 직원과 클라이언트의 휴대폰에서 Cardboard 뷰어로 ([Flat Headset](https://github.com/Sparky-OS/flat-headset)) 같은 모델을 깊이 있게. 끝에서 끝까지 개방되어 있어 누구도 한 디스플레이 제조사에 묶이지 않습니다.
 
 각 프로그램 전체: [프로그램](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).

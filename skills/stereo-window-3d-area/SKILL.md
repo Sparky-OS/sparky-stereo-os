@@ -69,6 +69,7 @@ Worked examples:
 - **A GL widget in a dialog turns the parent stereo:** Qt recreates the dialog's parent top level as a GL window when a `QOpenGLWidget` appears, and under the stereo default format the parent is declared too.
 - Setting a stereo *default* surface format makes the whole top level stereo, against the separation rule: set the format on the 3D area's own window only.
 - Qt's client-side decorations once flattened stereo windows; our Qt gives the decorations' content framebuffer a slot per eye ([Sparky-OS/qtbase `stereo3d-csd`](https://github.com/Sparky-OS/qtbase/tree/stereo3d-csd)), or KWin decorates the stereo window with server-side decorations.
+  A window whose element depth Qt Quick draws as a pair inside Qt's own frame stayed flat until ORDER 583; that case, and Qt on xcb, are in [native-linux, a Qt window with depth that stays flat](../native-linux/references/qt-window-depth-flat.md).
 - Qt Widgets forced an 8-bit alpha on every translucent window, so a 2D part over a deeper 3D area was 8 bits; our Qt keeps the alpha and depth the window asks for (10/10/10/2 or 16/16/16/16), and a window that asks for nothing stays 8/8/8/8 ([Sparky-OS/qtbase `stereo3d-alpha`](https://github.com/Sparky-OS/qtbase/tree/stereo3d-alpha)). Deep content in its own layer, as Krita does, is still the pattern ([`deep-colour`](../deep-colour/SKILL.md)).
 
 ## GTK 4 (GtkGLArea, Wayland)

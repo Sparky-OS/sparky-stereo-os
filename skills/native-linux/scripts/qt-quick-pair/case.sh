@@ -6,9 +6,10 @@
 # environment: BACKEND=vulkan|opengl, ICD=lvp|radeon|nvidia (the Vulkan driver the client is given; lvp also makes
 # its OpenGL software), STEREO=1|0 (the output in its side-by-side 3D mode, or plain 2D), W H (the virtual output),
 # KSCALE (a fractional scale), WARM (seconds before the capture), CLIENT_ENV (more variables for the client, space
-# separated: QDISCS_FLAT=1, QDISCS_LIFECYCLE=1, QDISCS_TOGGLE=1, QDISCS_OFF=1, QDISCS_FRAMELESS=1, QDISCS_WIDTH=941,
+# separated: QDISCS_FLAT=1, QDISCS_LIFECYCLE=1, QDISCS_TOGGLE=1, QDISCS_OFF=1, QDISCS_FLICK=1, QDISCS_FRAMELESS=1,
+# QDISCS_WIDTH=941,
 # DISABLE_LAYER_MESA_STEREO=1), APP (the qdiscs binary), CAPTURE (stereo-proof-rig's scripts/capture.py),
-# KEEPWIRE=1 keeps the whole protocol log.
+# KEEPWIRE=1 keeps the whole protocol log, CSD=1 starts KWin without a decoration plugin so Qt draws its own frame.
 # Leaves in OUTDIR: shot.png (both eyes side by side in a 3D mode), client.out (the STATE line), wire.txt (the
 # stereo requests the client sent), qt.log (what Qt said, the device included), kwin.log.
 set -u
@@ -21,6 +22,7 @@ export LANG=C.UTF-8 QT_QPA_PLATFORM=wayland
 W=${W:-1920}; H=${H:-1080}
 printf '[KDE]\nCursorBlinkRate=0\nAnimationDurationFactor=0\n' > $XDG_CONFIG_HOME/kdeglobals
 : > $XDG_CONFIG_HOME/kwinrc
+[ "${CSD:-0}" = 1 ] && printf '[org.kde.kdecoration2]\nNoPlugin=true\n' >> $XDG_CONFIG_HOME/kwinrc
 if [ "${STEREO:-1}" = 1 ]; then
   export KWIN_VIRTUAL_STEREO_MODES=1
   printf '[StereoDepth]\nSunkLimit=10\nPoppedLimit=4\nElementLimit=%s\n' "${ELEMENT_LIMIT:-1}" >> $XDG_CONFIG_HOME/kwinrc

@@ -85,7 +85,9 @@ On a stereo pair of outputs even the unmodified program's tooltip, which declare
 ## The per-file choice: one store, one menu
 
 A person's choice for one file (the input packing chosen by hand, "Not 3D", "Swap left and right eyes") is never written into the file on the program's own initiative.
-It lives in one store that every program on the shared layer reads, and is changed through one menu, so the file manager, its thumbnailers, the information panel and a viewer show the file alike (Dolphin and its video thumbnailer since 2026-11-13, Gwenview since 2026-11-14).
+It lives in one store that every program on the shared layer reads, and is changed through one menu, so the file manager, its thumbnailers, the information panel and a viewer show the file alike (Dolphin and its video thumbnailer since 2026-11-13, Gwenview, Koko, KPhotoAlbum, digiKam and Showfoto since 2026-11-14).
+
+To move one more program onto it, QWidget or QML, follow [a program joins the shared per-file choice](references/joining-the-per-file-choice.md): what "joined" means, the recipe for each toolkit, the proofs and the traps (Koko, KPhotoAlbum, digiKam and Showfoto since 2026-11-14).
 
 ### Recipe: put a viewer on the shared menu and store
 
@@ -118,6 +120,7 @@ It lives in one store that every program on the shared layer reads, and is chang
   A store only one program can read gives a flat thumbnail beside a 3D preview.
 - **Why not an extended attribute:** it is a write to the person's file (its change time moves, backups and sync tools see a changed file), and it fails on file systems without attributes.
 - **The calls:** C programs use `stereo_policy_file_choice()`, `stereo_policy_set_file_choice()` and `stereo_policy_move_file_choice()` in libstereo-policy; Qt programs use `Stereo::Picture::fileChoice()`, `setFileChoice()`, `moveFileChoice()` and `saveFileChoice()`, or show `Stereo::FileChoiceMenu`, which is the whole menu with its words in the edition's languages.
+  QML programs use the types `FileChoice` and `FileChoiceMenu` of `org.sparky.stereo` (stereo-layer 1.19.0): the same list and words, since the widgets' menu and the QML type are two faces of one list inside the layer.
 - **The order:** a packing kept for a file is the person's correction of that file and comes before the file's own mark, because a declaration can be wrong; with no entry the mark decides, and only an unmarked file reaches the shape rule.
   The swap applies over whatever decided.
   A packing a viewer chooses for its session wins over the stored one, and over a stored "Not 3D".

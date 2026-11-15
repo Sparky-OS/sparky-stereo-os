@@ -380,3 +380,38 @@ Traps:
   Fix: `LC_ALL=C sha256sum -c`.
 - Recipe, Lintian without touching a build image: a small image from the pinned Debian base with `lintian` (2.143.0 on 2026-11-14), each new `.deb` and its published one, the version replaced by one word (`sed -E "s/[0-9][0-9A-Za-z.:~+-]*\+lc1/VERSION/g"`), `comm -23` of the sorted lines.
 
+## Two staged works on one library: the round builds it once
+
+Recipe:
+
+1. Read the merged library's revision and version, each stage's descriptor and build record, and the published index before building.
+   A higher version number alone does not show which work it contains: compare ancestry and exports.
+   In ORDER 580, staged 1.18.1 had the fractional-scale fix and staged 1.19.0 had the QML file-choice menu; merged main 1.19.1 contained both.
+2. Use the source generator on that exact merged revision once.
+   `depth-source/stereo-layer-source.sh` reads the version from the revision's changelog; it does not pin the version described in an older round's comments.
+   `thumbnails-576/merged-round.sh` composes the two rounds, copying the other staged packages and excluding their library and Dolphin.
+3. Keep the gate's previous side equal to the published snapshot.
+   Remove every seeded or rebuilt source from the candidate's published siblings, and supply its authoritative staged packages instead.
+   Never hard link a staged input.
+4. Rebuild the consumer of the new API against the merged library.
+   When the accepted consumer source is unchanged, copy its descriptor and tarballs and compare their hashes; generating a successor again can change dates or the bundled toolkit.
+   An unpublished binary version can be reused for this rebuild only after checking the published index.
+5. Compare every library's defined dynamic symbols against each staged predecessor separately, with `nm -D --defined-only`; retain the lists and require no export lost.
+   Install all the staged dependants with the merged library and rebuilt consumer through apt, retain the `Inst` lines and require no `Remv`.
+   Run the archive-qualified link and start gate on that set, then start each application and rerun the owning lanes' visible proofs.
+   A retained symbol is necessary evidence for reusing a dependant, but is not its runtime proof.
+6. Stage only the new builds with their sources, build records, hashes and a supersession list naming each replaced stage or source folder.
+   Keep the unchanged dependants in their authoritative stages.
+
+Traps:
+
+- **Symptom:** the numerically newer staged library satisfies a consumer's minimum dependency but lacks the consumer's new functions.
+  **Cause:** two lanes started from the same older revision and added different work.
+  **Fix:** build their merged revision once, then rebuild the consumer against it.
+  **How found:** ancestry and the accepted reports named the separate changes; Dolphin's `eyeCanvas` and `setEyes` were absent from the album-only 1.19.0.
+- **Symptom:** a library suite run manually in the package builder reports unsupported image formats and `ffmpeg: not found`.
+  **Cause:** the round selected the `nocheck` build profile, which deliberately omits the suite's image plugins and media tools.
+  **Fix:** run the suite in a separate disposable environment carrying its declared test dependencies and the installed round.
+  Do not change the running package builder or treat these failures as a library regression.
+  **How found:** the source's `Build-Depends` marks those packages `<!nocheck>`, and the failed tests name the missing consumers.
+

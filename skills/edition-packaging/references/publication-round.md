@@ -67,6 +67,57 @@ Prove a new check twice on immutable copies: green on the merged tree, red after
 The red summary must name the failed check, end with the round-stop message, and return 1.
 A summary pipeline runs in a subshell; update the aggregate failure variable outside it, or a printed FAIL can still return success.
 
+### A stage taken only in part
+
+Inventory the binaries before choosing folders:
+
+```sh
+dpkg-deb -f PACKAGE.deb Package Source Version Architecture Sparky-Lean-Code
+dpkg --compare-versions OLD_SOURCE_VERSION lt NEW_SOURCE_VERSION
+```
+
+Keep a take list and a leave-out list with each stage, exact relative filename, source, source version, binary name and architecture.
+Choose one authoritative source generation, including its HR and debug companions, then keep its descriptor, checksum-bound source components, buildinfo, changes and build record together.
+A parent stage can contain a superseded installer, hardware helper or compositor alongside packages still needed by the round.
+An input retained for another recipe is not a second candidate to publish.
+Never copy that parent wholesale into the cohort.
+Where a selected binary has the same version and architecture as a published binary, compare their SHA-256 too: equal bytes need no replacement, and different bytes at one published identity stop selection.
+
+Traps found by archive and source inspection in ORDER 587:
+
+- **Symptom:** the advertised supersession list leaves older packages beside their successors.
+  **Cause:** the review named the obvious shared library but missed another source in a partial stage.
+  **Fix:** compare every binary's source identity and version, then emit exact leave-out filenames for all older generations, not just the sources named in the brief.
+  **How found:** reading the controls exposed an older hardware helper, installer settings and compositor in otherwise useful stages; dpkg's version comparison selected their accepted successors.
+- **Symptom:** a working staged program has no publishable Lean Code source.
+  **Cause:** its application build is staged as one unqualified binary; the descriptor, HR companion and release build record were never made.
+  **Fix:** record a successor-build gap and keep that binary out of the take list until the tree's source preparation and release gates finish.
+  Do not infer qualification from a version suffix alone: inspect `Sparky-Lean-Code` and the source closure; some qualified packages have no `+lc1` in their version.
+  **How found:** Kamoso's staged control had no mark and its stage had no matching descriptor, unlike the qualified Camera page beside it.
+- **Symptom:** a large compiler or suite is reported unbuilt although exact accepted outputs exist.
+  **Cause:** the known stage list omitted outputs under another scratch root; the recipe keeps its result under `out`.
+  **Fix:** search for manifests and descriptors too, then check the binaries, source closure, clean complete records and acceptance before proposing the discovered output.
+  Keep an older compiler needed as the build seed separately from its successor's publication set; duplicate binary names cannot both be authoritative.
+  **How found:** the version environment files and suite manifest matched retained outputs whose SHA256SUMS and records verified.
+- **Symptom:** checksums and the lc1 control mark pass, but the build record says `unrecorded: ["buildinfo"]`.
+  **Cause:** the staged build has its source and binaries without the binary build's metadata.
+  **Fix:** retain this as a qualification gap; rebuild the small package through its recipe and source-build route before selecting it.
+  Never edit the old record to make it look complete.
+  **How found:** reading every selected source's record found this in the look package; its stage had no `.buildinfo` or `.changes`.
+- **Symptom:** a complete clean record names a descriptor hash different from the staged descriptor, although the stage's SHA256SUMS passes.
+  **Cause:** the manifest and record certify different descriptor bytes; checking each file against only one of them misses the disagreement.
+  **Fix:** compare every recorded binary and metadata hash with the actual staged file, and hold the affected source until its source and build evidence agree.
+  **How found:** the graphics helper's record bound another `.dsc` hash in three successive stages; the source-component manifests themselves verified.
+
+### Task metadata is generated after the cohort is known
+
+A task producer's caller-supplied version is not a fixed newer release in its historical changelog.
+Reconcile its generated relations separately from ordinary source versions.
+In ORDER 587, source inspection located the desktop's Camera dependency in `lists/make-meta.py` and DisplayCAL's two role suggestions in `lists/suggests.tsv`.
+Those are the inputs to the next meta build; this inspection alone proves neither a generated package nor an installed upgrade.
+Compare every generated field with the published metas, explain each difference by its generating list or code line, then prove the transaction through apt's `Inst` lines, installed versions, no unexpected `Remv` and an empty audit.
+For hardware-dependent software offered only on request, check it is absent after installing the tasks with the edition's normal recommendation policy.
+
 ## The recipe
 
 1. **Freeze the build tree.** `round-worktree.sh WORKTREE [COMMIT]` makes (or reuses) a git worktree of the build repository at one commit; the default commit is `origin/main` as fetched now.

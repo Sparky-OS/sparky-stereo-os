@@ -138,6 +138,12 @@ Never commit a buffer of two views to a surface the compositor has not taken as 
 The splash takes the main screen's limits, never numbers of its own: sparky-stereo-boot puts `popped=` and `sunk=` on each stereo output of `plymouth.stereo=` (the person's `kwinrc` `[StereoDepth]` limits times the display's factor, as KWin resolves them), Plymouth hands them to the theme (`Window.GetStereoPoppedLimit ()`, `Window.GetStereoSunkLimit ()`), the theme places its levels inside them, and what the person did not save is the display's default, said.
 [The chain, the guest rig that proves it (`scripts/plymouth-rig/`), the predicted and measured parallax, and the traps](references/boot-splash-depth.md) (ORDER 481).
 
+## Depth in a Qt Quick window that Stereo Union does not style
+
+A QML scene of its own (a splash, a layer-shell window, a program's own items) gives an item depth with `StereoDepth.depth` of `org.sparky.stereo` (stereo-layer 1.20.0): a fraction of the person's limits for the window's output, rounded to whole device pixels as Stereo KWin rounds its levels; the edition's Qt Quick then draws the window once per eye while Stereo KWin says its surface is awake.
+Plain QML cannot set `_q_stereo_depth` or `_q_stereo_parallax`, because Qt Quick hears only dynamic property changes.
+The desktop's loading screen is the first user: [kde-desktop-defaults, the loading screen](../kde-desktop-defaults/references/loading-screen.md).
+
 ## Lessons from the lanes, October to November 2026
 
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 11 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (21 entries; the last eight are a 3D area in a scroll area in a dock, from Stereo Werkkzeug's preview).

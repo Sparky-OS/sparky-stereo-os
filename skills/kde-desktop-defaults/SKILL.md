@@ -5,8 +5,8 @@ name: kde-desktop-defaults
 description: >-
   The edition's Plasma defaults and small KDE patches: KRunner search order, the unit converter's currency rates, task
   management, Ctrl+Alt+Del to System Monitor and Ctrl+Alt+Esc to log out, frozen-window recovery, formatting a removable
-  drive and running scripts from Dolphin, the look package (cursor theme names, wallpaper, lock screen, the video
-  wallpaper plugin), Discover and its AppStream cache, sparky-stereo-look and /etc/xdg files, the KScreen KCM, a
+  drive and running scripts from Dolphin, the look package (cursor names, wallpaper, lock screen, splash,
+  video wallpaper), Discover and its AppStream cache, sparky-stereo-look and /etc/xdg files, the KScreen KCM, a
   built-in panel's first scale from its EDID, tablet mode (on-screen keyboard, panels that hide). Load it when a default
   should be decided instead of left to the person, a shortcut clashes, a lock screen shows only its wallpaper, a cursor
   theme name does not exist, a KCM page is out of order in another language, a widget shows zero instead of an error, a
@@ -43,6 +43,10 @@ A notebook's built-in panel gets its first scale from its real size (125 % at le
 KSplash takes `Breeze` when no `ksplashrc` names a theme (plasma-workspace `startkde/startplasma.cpp`, `readEntry("Theme", "Breeze")`), and a global theme's `defaults` file is only applied when the person applies that theme, so a fresh user of the edition saw KDE's splash although `org.sparkystereo.desktop` has its own.
 `sparky-stereo-look` ships `/etc/xdg/ksplashrc` with `[KSplash] Engine=KSplashQML` and `Theme=org.sparkystereo.desktop`; KConfig reads it below the person's `~/.config/ksplashrc`, key by key, so a new user, an empty file and a file with no `Theme` key get ours and a `Theme` the person chose (another global theme, `None`) stays.
 Proof, in a container with `libkf6config-bin`: `tests/ksplashrc.sh` in the look package runs `kreadconfig6 --file ksplashrc --group KSplash --key Theme --default Breeze` for six states of the person's file (4 failing without the file, 0 with it).
+
+What the theme draws is ours too: the loading screen is the boot splash's picture, with depth on a screen in a 3D mode inside the person's limits (ORDER 571).
+Until then the theme's `contents/splash` was a copy of Oxygen's, KDE's 2014 splash with the KDE gear, so the setting was ours and the picture was not.
+[The loading screen](references/loading-screen.md) has how KSplash picks and draws a theme, the quiet fallback to the theme's `X-KDE-fallbackPackage`, the route for depth in a layer-shell QML window (`StereoDepth` of `org.sparky.stereo`, Stereo KWin `+stereo3d58`), how to capture it in a real login, and the traps.
 
 ## Decided defaults, out of the box
 

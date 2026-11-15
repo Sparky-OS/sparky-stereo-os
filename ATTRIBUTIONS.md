@@ -968,3 +968,13 @@ The first scale of a built-in panel, the on-screen keyboard of a computer with a
 - **The edition's boot menu** (ORDER 572, sparky-stereo-boot 0.1.10): the rule itself, the screen size field decides and the timing's millimetres are used when they agree within a centimetre, was written there first.
 - **KConfig** (KDE Frameworks): its cascading configuration, a system default below the person's file, is what lets a default exist on some computers only.
 These projects do not endorse the edition.
+
+## The desktop's loading screen (ORDER 571, 2026-11-15)
+
+The loading screen between the login and the desktop shows the boot splash's picture, with depth on a screen in a 3D mode. It builds on other people's work, named from each project's own records:
+
+- **KSplash** ([plasma-workspace](https://invent.kde.org/plasma/plasma-workspace), `ksplash/ksplashqml`): Ivan Čukić and Martin Klapetek wrote the program that shows a theme's splash on every screen and passes it the session's stages. The splash it showed until now was Marco Martin's 2014 KDE splash, which Oxygen's global theme carries; the edition's theme replaced it with its own.
+- **The boot splash's pictures**, as sparky-stereo-plymouth's copyright file names their authors: Juliette Taka Belin and Aurélien Couderc (Debian 8 "Jessie" lines theme), Alberto Milone for Canonical (lines.script), Charlie Brej (Plymouth's script plugin example), and Paweł "pavroo" Pijanowski and Daniel Ramos (sparky-lines, the Sparky black set). The SparkyOS wordmark is Daniel Ramos's; SparkyLinux and its marks are Paweł Pijanowski's.
+- **The person's limits at boot** (ORDER 481): sparky-stereo-boot 0.1.9 and Plymouth's `popped=` and `sunk=`, which the loading screen matches level for level.
+- **layer-shell-qt** ([invent.kde.org/plasma/layer-shell-qt](https://invent.kde.org/plasma/layer-shell-qt)), by Aleix Pol Gonzalez, gives KSplash its overlay surfaces on Wayland.
+These projects do not endorse the edition.

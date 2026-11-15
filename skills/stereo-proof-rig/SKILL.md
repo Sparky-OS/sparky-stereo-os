@@ -197,4 +197,6 @@ Read the traps before a change to this part, and add the next lesson there as yo
 
 [Desktop startup profiling on another machine](references/desktop-start-profiling.md) covers matched startup marks, profiling scope, package restoration, and the missing ScreenSaver service when the target is at its greeter.
 
+[A real login with the loading screen](references/login-splash.md) runs `startplasma-wayland` itself on virtual outputs in a 3D mode (a `kwin_wayland` shim in `PATH`, the twin saved with its "Other stereo formats" switch, the render node for ScreenShot2), captures KSplash's screen on each output while it is up, and measures each part's disparity against the person's limits; scripts in `scripts/login-splash/`.
+
 [A session's start order](references/session-start-order.md) shows how to replay a login in the real order (KWin with the person's saved screen order and focus settings, plasmashell with its desktop windows, then an autostart program before any pointer motion), how to log activations and the active output from KWin's first moment, and the trap where the first Plasma desktop window takes the active output from the main screen, so new windows and password prompts open on the wrong screen after a login.

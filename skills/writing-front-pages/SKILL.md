@@ -149,6 +149,8 @@ HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trad
 
 ## Explainers for a standards group, with respec-mcp (2026-11-06)
 
+A position statement for a workshop of standards bodies is the same craft at one to two pages: [the recipe is in upstream-outreach](../upstream-outreach/references/position-statement-for-a-standards-workshop.md).
+
 Written from ORDER 431, thirty-three explainers for the W3C PM-KR Community Group, one idea each.
 An explainer is a front page for one idea: the rules above apply, and the group's own form adds three things.
 

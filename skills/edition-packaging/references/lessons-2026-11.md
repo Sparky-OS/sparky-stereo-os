@@ -394,3 +394,72 @@ Traps:
 - Symptom: `translations-shipped.py STAGE` says "no built package of source" for a source that is in the stage.
   Cause: it reads the `.deb` files at the top of each folder it is given, not below.
   Fix: give the source's own stage folder, with `--only PATCH`; the published folder of the same source is the red control (here 0 of 108 added strings against 108 of 108).
+
+## Two staged works on one library: the round builds it once
+
+Recipe:
+
+1. Read the merged library's revision and version, each stage's descriptor and build record, and the published index before building.
+   A higher version number alone does not show which work it contains: compare ancestry and exports.
+   In ORDER 580, staged 1.18.1 had the fractional-scale fix and staged 1.19.0 had the QML file-choice menu; merged main 1.19.1 contained both.
+2. Use the source generator on that exact merged revision once.
+   `depth-source/stereo-layer-source.sh` reads the version from the revision's changelog; it does not pin the version described in an older round's comments.
+   `thumbnails-576/merged-round.sh` composes the two rounds, copying the other staged packages and excluding their library and Dolphin.
+3. Keep the gate's previous side equal to the published snapshot.
+   Remove every seeded or rebuilt source from the candidate's published siblings, and supply its authoritative staged packages instead.
+   Never hard link a staged input.
+4. Rebuild the consumer of the new API against the merged library.
+   When the accepted consumer source is unchanged, copy its descriptor and tarballs and compare their hashes; generating a successor again can change dates or the bundled toolkit.
+   An unpublished binary version can be reused for this rebuild only after checking the published index.
+5. Compare every library's defined dynamic symbols against each staged predecessor separately, with `nm -D --defined-only`; retain the lists and require no export lost.
+   Install all the staged dependants with the merged library and rebuilt consumer through apt, retain the `Inst` lines and require no `Remv`.
+   Run the archive-qualified link and start gate on that set, then start each application and rerun the owning lanes' visible proofs.
+   A retained symbol is necessary evidence for reusing a dependant, but is not its runtime proof.
+6. Stage only the new builds with their sources, build records, hashes and a supersession list naming each replaced stage or source folder.
+   Keep the unchanged dependants in their authoritative stages.
+
+Traps:
+
+- **Symptom:** the numerically newer staged library satisfies a consumer's minimum dependency but lacks the consumer's new functions.
+  **Cause:** two lanes started from the same older revision and added different work.
+  **Fix:** build their merged revision once, then rebuild the consumer against it.
+  **How found:** ancestry and the accepted reports named the separate changes; Dolphin's `eyeCanvas` and `setEyes` were absent from the album-only 1.19.0.
+- **Symptom:** a library suite run manually in the package builder reports unsupported image formats and `ffmpeg: not found`.
+  **Cause:** the round selected the `nocheck` build profile, which deliberately omits the suite's image plugins and media tools.
+  **Fix:** run the suite in a separate disposable environment carrying its declared test dependencies and the installed round.
+  Do not change the running package builder or treat these failures as a library regression.
+  **How found:** the source's `Build-Depends` marks those packages `<!nocheck>`, and the failed tests name the missing consumers.
+- **Symptom:** a source made identically three times has a different descriptor after its binary build, even though every source file still has the same bytes.
+  **Cause:** unrestricted `dpkg-buildpackage` makes the source package again; its clean step moves directory timestamps, and a later recipe date allows those timestamps into the Debian tarball.
+  **Fix:** after generating and verifying the source once, use `dpkg-buildpackage -b` for the native build that also emits architecture-independent packages, retaining the supplied descriptor and tarballs.
+  The merged round selects this through `SPARKY_BINARY_ONLY=1`; other depth-source callers keep their existing mode.
+  **How found:** the descriptor diff named only the Debian tarball's hash; comparing its members found changes only to the timestamps of `debian/` and the embedded toolkit's `lean/` directory.
+- **Symptom:** three source generations match, but the claimed clocks, zones and umasks were never applied inside their containers.
+  **Cause:** setting a variable on a script which starts Docker does not forward it through the script's fixed `docker run` argument list.
+  **Fix:** inject the test environment into the container and print its actual clock, zone and umask beside each result.
+  Use `libfaketime` with `NO_FAKE_STAT=1` and `FAKETIME_DONT_RESET=1`, and set the umask in the container's shell.
+  **How found:** reading the source generator's `docker run` line; strict repetitions with three distinct in-container environments still matched the staged source.
+- **Symptom:** a successful package build is absent from the round's flat repository; the combined gate selects 16 runtime packages where 19 were expected.
+  **Cause:** the container finished after its host controller disconnected, so the controller's collect and index steps never ran.
+  **Fix:** verify the completed build's record and gate result, copy its archives into the round, regenerate the index, and start the installed proof again from the published image.
+  Keep an exact package/version assertion after apt, and never commit a proof image after that assertion fails.
+  **How found:** the selected-package count and the installed-version check both named the missing consumer; the build's own log and record were complete.
+- **Symptom:** a photo-album proof says a packing or swap was applied to the wrong fixture.
+  **Cause:** thumbnail navigation used filename order, while the album sorted by image time and then name; fixtures generated across a second boundary changed that order.
+  **Fix:** give the synthetic fixtures one fixed modification time before recording their initial state, and rerun both controls with that driver.
+  **How found:** the store named a different fixture, its captured colours agreed with that file, and `stat` showed the timestamp boundary.
+- **Symptom:** a whole-frame comparison after a mode switch fails on ten pixels in each eye, while every thumbnail is exact and its left view equals the flat reference.
+  **Cause:** the drive-capacity bar in the file manager's Places panel changed as other work filled the disk.
+  **Fix:** retain the whole-frame failure, locate and report the changing widget separately, and keep the required picture checks exact; do not add a pixel tolerance.
+  **How found:** the difference box was the blue bar's right tip in both eyes, with grey pixels becoming blue; it lay outside every thumbnail.
+- **Symptom:** a Lintian comparator treats the usual policy findings as a runtime failure, or accepts a real runtime failure as a clean comparison.
+  **Cause:** its exit-code assumptions were reversed.
+  **Fix:** read the installed tool's manual: Lintian 2.143.0 uses 0 for normal operation, 1 for a runtime error and 2 for the configured policy findings.
+  Compare the tags for 0 or 2 and refuse 1; use `--tag-display-limit 0` to avoid the deprecated spelling.
+  **How found:** the comparator stopped before its first row, and the installed `lintian(1)` EXIT STATUS section distinguished the cases.
+
+Measured in ORDER 580: stereo-layer 1.19.1 loses no export or import against either staged predecessor.
+The unchanged Koko +2, KPhotoAlbum +2, digiKam and Showfoto +4, Gwenview +10, ffmpegthumbs +5, kio-extras +5 and KImageFormats +7 qualified with it and the rebuilt Dolphin +8: all 19 runtime packages passed the archive-qualified link and start gate, and every application opened a fixture.
+No further dependant was rebuilt.
+The installed proofs retained both merged works: 626 thumbnail cell instances exact in both eyes across 100 and 125 percent, with no wallpaper or left/flat difference, and 30 checks each for Koko's QML menu and KPhotoAlbum's menu; the published controls failed.
+

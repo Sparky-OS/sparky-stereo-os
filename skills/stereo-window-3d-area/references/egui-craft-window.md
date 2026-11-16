@@ -319,3 +319,77 @@ Cause: the existing assertion correctly assumes every previously offered languag
 Fix: retain exact equality for the original thirteen complete menu catalogs, assert the exact Korean 3D-only row, its own phrase coverage and its absence from that complete list; expose the new choice only on native targets.
 How found: the complete Effect gate reported 6,398 Nextest passes and one registry failure, rather than a renderer defect; the corrected registry check then passed in the fresh full run alongside the three actual Korean control-label tests.
 The earlier full run remains red; the passing individual check alone does not qualify the fresh complete run or a compositor capture.
+
+
+## A played reference film in an audio editor
+
+Retain the decoder's immutable native picture before the ordinary texture upload: samples, presentation index, time, exact sample aspect and the selected sample description's stereo mark travel together.
+Use the existing movie worker, clip offset and sync offset at the app's existing playhead; the native host receives a complete spatial pair and owns neither a decoder nor a clock.
+Share an `Arc<[u8]>` for an already left-first contiguous pair; rearrange other supported spatial grids through the common sample copier without resampling an eye.
+Closing, an offline source or an invalid interval releases the output; retain the person's enabled choice so correcting an offline source can resume it visibly.
+
+The transport position is in session samples; distinguish its session rate from the negotiated audio device rate when reporting or converting it.
+During playback the native Player is the clock; while paused this editor's existing playhead is its edit insertion.
+A private silent Player can exercise its real audio-render clock without a host audio socket, but it proves no audible device, negotiated hardware format or physical output.
+A `--no-audio` UI simulation is a different path and cannot establish that native Player claim.
+
+For media, the per-eye resolution is the source grid, shown as a readout with its reason; arbitrary resampling would violate the source-sample pact.
+Keep enable 3D and the Display Settings shortcut, plus per-file input packing and eye swap in the existing persistent session store.
+Offer the swap checkbox only for the matching movie actually presented as stereo, retaining a saved choice while it is hidden.
+A genuinely flat movie remains one undeclared native picture; never copy it into a fabricated eye.
+ScreenShot2 can correctly return a mono image for that scene, since its stereo answer follows the compositor's actual content predicate.
+Compare the flat picture's complete native and displayed samples and the ordinary editor and mixer against the independent stock executable.
+
+When a codec does not expose its stereo metadata, a container-only automatic reader cannot claim codec-first precedence.
+Refuse that automatic path visibly until the shared decoder owns the missing SEI state; an explicit spatial input choice is a separate, supported path.
+Keep marks on each presentation picture, since sample descriptions can change within one track.
+A required shared catalog reads the app's own namespace through the common bounded parser; keep existing complete local catalogs authoritative and label newly partial languages by their scope.
+
+Symptom: the retained native pair contains frame35, but the compositor capture contains frame34 in both eyes.
+Cause: stopping the private client can leave its latest Wayland commit pending in the independently running compositor.
+Fix: allow a fixed compositor settling interval after stopping the client, then require exact native-to-display samples from the same independently recovered frame; never search captures for one that happens to match.
+How found: whole-picture hashes identified35 in both retained eyes and34 in both captured eyes, while earlier samples matched; fresh settled played and seek cases matched every native and display pixel.
+
+Symptom: a seek's UI inspector reports picture74 while the native pair and the native audio clock both identify76.
+Cause: this app drains `ui.inspect` during logic before the next paint; its previous picture summary is not a presentation acknowledgement.
+Fix: recover each eye's frame identity independently from its pixels, compare it with the contemporaneous native Player clock under the stated frame budget, and retain the inspector summary as diagnostic data.
+Keep a wrong-eye control and exact ordinary controls; an inspector-only identity assertion is not a capture oracle.
+How found: the actual native eyes agreed with the audio clock, source inspection showed the control-before-paint order, and control replies measured43–66ms; client quick-ACK made no material improvement.
+In the paused swap case compare with the exact edit insertion rather than the stopped Player's unchanged position.
+
+
+Symptom: a movie with an explicit invalid `pasp` tuple reports square native samples instead of refusing the invalid shape.
+Cause: a convenience filter on a new exact-metadata field discarded declared zero values and then used the missing-value default.
+Fix: preserve the declared tuple on the presentation picture; the checked positive sample-aspect type refuses it visibly at stereo reconstruction.
+Use the square default only for absent metadata, and retain the existing ordinary float-aspect behavior separately.
+How found: an in-process MP4 with `pasp`0:1 reproduced1:1 in the new field; the regression then required0:1 retention and a visible invalid-aspect error, alongside the passing decoder tests.
+
+Symptom: a half-layout picture rejects a sample aspect whose normalized result fits the public integer type.
+Cause: multiplying before cancelling the opposing factor overflowed on `(u32::MAX,2)` even though doubling that ratio reduces to `(u32::MAX,1)`.
+Fix: cancel the factor of two in the opposite term before checked multiplication; preserve refusal for genuinely unrepresentable results.
+How found: the side-by-side edge case and the inverse top-and-bottom case failed before the change, then passed alongside the true-overflow refusal and native-sample preservation checks.
+
+Symptom: the native movie companion stops advancing when the editor is minimized even though its audio player keeps running.
+Cause: the companion update lived only in the editor's paint path; egui can run logic without painting a hidden viewport.
+Fix: update after the existing transport in the application's logic path, using its existing active-editor repaint interval while playback is enabled.
+Collect immutable decoded pictures there, keep at most one latest pending ordinary picture, and upload ordinary textures only when the editor paints; completed thumbnails stay in the existing bounded cache and upload on access.
+Do not add a second transport clock or accumulate one texture delta per hidden frame.
+How found: a logic-only regression reached no native frame after ten seconds before the change; after it the same test recovered successive source frames without any UI texture upload until an explicit paint.
+A runtime proof must also minimize only the private editor through the compositor and independently recover both played eyes while its companion remains visible.
+
+Symptom: a flat movie inherits a warning about a missing stereo desktop protocol, or a malformed explicit enable value changes the existing choice.
+Cause: a host transport notice was applied without checking whether the presented picture was stereo, and a failed bool conversion was treated as an absent toggle request.
+Fix: filter the transport notice by the actual picture's stereo flag, clear only the owned previous notice, and reject an invalid explicit value before mutating the enabled state.
+How found: a flat-picture host test and a malformed-value command test failed before the fixes; the corrected UI lifecycle tests passed alongside hidden playback and swap visibility.
+
+Symptom: the logic-only unit test advances a companion, but a real minimized capture still shows source frame 5 when the audio player is at frame 11.
+Cause: moving work out of `ui` fixes the application boundary, but eframe still waits 250 ms for the parent's withheld Wayland frame callback before calling logic again.
+Fix the scheduling bound in the framework owner, with an explicit app opt-in for a separate native companion; keep the original waits for callers that do not opt in.
+A zero redraw wait is not a new timer: the app's existing timed repaint requests still pace its logic, and a logic-only update must not paint its hidden parent.
+Restrict the opt-in to an enabled, completed companion picture during playback, so ordinary disabled output retains its original scheduling.
+Forward the bound in both native renderers, test default preservation and bounded opt-in behavior, and verify compiler, lint driver and WebAssembly toolchain identity before qualifying the consumer.
+How found: both independently recovered eyes agreed on frame 5 while the real audio clock was at11; the framework's missed-redraw constant accounted for the quarter-second delay.
+An open upstream change for immediate child viewports is related work, not proof that a separately hosted native companion is covered.
+The closing proof must minimize the real private editor, keep the companion visible, and repeat both-eye identity, clock-budget, seek, wrong-eye and exact stock controls; a passing helper test alone is insufficient.
+
+Fresh minimized H.264 and Motion JPEG captures subsequently advanced through three played positions and both seeks within the unchanged minus-one to two-frame audio-clock budget, with exact native/display samples and a failing wrong-eye control.

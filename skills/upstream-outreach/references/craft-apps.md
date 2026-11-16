@@ -868,3 +868,10 @@ Keep the uneven-channel and shortest-source checks, then test the actual legacy 
 How found: SoundCraft's whole gate reached 518 passes and failed during that fixture construction; source inspection located `SampleRate`'s `try_from` and the session's `sample_rate_or_default` hook, and all six focused health tests passed after the test migration.
 Do not weaken the common type or introduce an unsafe constructor to keep an obsolete fixture constructible.
 The focused health result still needs a fresh complete receiver gate.
+
+Symptom: a strict lint run reports a new lint in unchanged code, then the nominally older compiler run fails `E0514` with a Clippy driver expecting the newer compiler's metadata.
+Cause: the project's CI pinned Rust 1.95, but the private SDK only installed its minimal compiler and Cargo; `cargo clippy` found a 1.100 driver later on PATH.
+Fix: select the project's CI compiler and its matching Clippy component together, verify their release manifest and component hash, and discard the mixed-version target before the fresh run.
+Do not rewrite unrelated code merely to satisfy lints from a compiler the project did not select.
+How found: the exact gate shell printed Rust 1.95 while the incompatible-metadata diagnostic named Rust 1.100; adding the signed matching component made both version commands report the same release.
+Keep the failed runs distinct from the fresh qualification, and record compiler, Cargo, Clippy and formatter versions inside the exact command shell.

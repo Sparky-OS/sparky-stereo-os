@@ -4,12 +4,25 @@ Use this when a numbered queue has grown for weeks, status words inside it contr
 
 ## Recipe
 
-1. Freeze the numbering. List every id the queue file uses: entries that start a line, ids named in dated notes ("ORDER 311", "item 15"), and lettered sub-items. The total is the checksum; the final list must contain each id once.
-2. Read the sources in this order of trust: (a) merges in the build repository's main branch (`git log --grep`), (b) packages in the published repository index, (c) branches on the forks (`git ls-remote`, `gh api`, read only), (d) sent messages in the promises ledger, (e) the first line of each lane's report, (f) the dated notes, (g) the status words in the entry itself. A lower source never overrides a higher one.
+1. Freeze the sources and the numbering. Save the queue, its previous reconciliation, the source revision and package indexes with their capture time and hashes. List every task id, including lettered sub-items; do not turn a count, line number or hash into a task. Compare the body with its stated range and counts. The total is the checksum; the final list must contain each base id once, with sub-items retained beneath it.
+2. Check implementation against merges in the build repository's main branch, packages in the published repository index, branches on the forks, sent messages in the promises ledger and coordinator acceptances. Use status words as leads. Check the actual scope: a merge proves its change, a package index its version, a sent message its delivery. None proves that every part of the original request is finished. The person's latest decision governs intent and can reopen accepted work.
 3. Make a dossier per id with a script: its entry, the newest dated note that names it, the lane folders that end in the id, the report status line, the number of matching commits. Read the dossiers in batches and decide each id.
 4. Sort into: in flight, open (in the the project lead's order), parked (with the quoted reason and what unparks it), waiting on the project lead (only the questions no recorded decision answers), done (with the evidence), merged into another id (naming it).
 5. Items with no lane folder, no commit and no package are open, even when the entry says "queued" long ago. Check the upstream forks for the same: a fork that holds only upstream branches proves the work never started.
 6. Count each bucket and compare the sum with the checksum from step 1.
+
+## Keep the list true between reconciliations
+
+Update the canonical record whenever work is accepted, rather than waiting for the next audit.
+
+1. Find the parent request and every affected follow-up before closing a lane. Preserve the date of the person's original request and a short exact quote with its source. A filing date or a later restatement never makes old work newer. If the original words or date are missing, record the gap rather than inventing either.
+2. Record the accepted scope, the accepting reviewer, the time and the evidence: source revision, fork branch, package version and artifact location as applicable. Separate accepted, staged and published. A staged successor does not change the published version; update that field only after publication is verified.
+3. Compare the acceptance with the request clause by clause. Write what remains, what it needs and which item owns it. An accepted study closes the study, while implementation stays open. A configuration-only part can ship separately from its larger settings interface. Keep the parent's remaining clauses visible when creating that child.
+4. Change the lane's report status and the queue record in the same acceptance step. Regenerate the open-design view and counts, then check that every id still occurs exactly once. Preserve the previous snapshot so that a later reader can tell what changed. A renamed or merged item keeps its number and the destination that now owns its work.
+5. Show the person's open design requests first, ordered by the date of their words, across technical tiers. At the next free lane, take the oldest eligible design request. Only breakage, security or a running publication's blocker jumps ahead; record which exception applies and why. Keep explicit parks and dependencies visible, and do not interrupt running work.
+6. At publication, reconcile the accepted versions against the published index, update the delivery state and remove superseded stages from the next cohort. At the next dispatch, check this record again. Progress among recent numbers is not evidence that early requests were delivered.
+
+When handing back an intermediate audit, name the range actually adjudicated. Keep the other numbers as pending verification with their source pointers. Never present inherited status words or a script's matches as a definitive reconciliation.
 
 ## Traps
 
@@ -20,6 +33,10 @@ Use this when a numbered queue has grown for weeks, status words inside it contr
 - Symptom: a first reconciliation exists only as a brief. Cause: the lane's hand-back was a message that was never saved. Fix: renumber it into the new reconciliation, do not close it.
 - Symptom: a grep over the queue file fails with a complexity error. Cause: very long lines and a wide context pattern. Fix: read the file with a script and slice around the match.
 - Symptom: an item looks unstarted but its work lives elsewhere. Cause: the evidence is in a repository you did not search (a skills repository, a documentation fork). Fix: list the ids you could not decide, with what is missing, instead of guessing.
+- Symptom: a reconciliation claims one id range but contains later entries and revised statuses. Cause: the old deliverable became a working list without updating its date, counts or change record. Fix: freeze its actual contents, compare body ids with the declared range and describe it as a mutable baseline. How found: the saved list contained nine additional base ids despite retaining its original total.
+- Symptom: a first pass calls old work never started, while an accepted implementation exists in another lane. Cause: it inspected the original brief's folder and skipped the earlier reconciliation. Fix: follow the previous list's evidence to the implementation lane, source merge and published version; preserve any remaining kernel or outreach work. How found: an original brief-only folder coexisted with accepted library and compatibility-layer builds in a numbered lane.
+- Symptom: an accepted cleanup job seems to close a request for a desktop cleanup page. Cause: the same short name hides different outcomes. Fix: compare the original requested interface with the delivered maintenance operation; keep the interface open until it has its own evidence. How found: the early request specified a settings page and preview, while the later report measured recovered disk space.
+- Symptom: completed high-number follow-ups coexist with an early audio design that never shipped. Cause: each fresh finding took a free lane, and no acceptance refreshed an oldest-first design register. Fix: maintain that register at every acceptance and dispatch; split already-designed defaults from the larger interface. How found: the original request specified hardware-based rates, while the later installed-state check still showed stock defaults.
 
 ## Rules
 

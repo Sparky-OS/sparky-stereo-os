@@ -875,3 +875,17 @@ Fix: select the project's CI compiler and its matching Clippy component together
 Do not rewrite unrelated code merely to satisfy lints from a compiler the project did not select.
 How found: the exact gate shell printed Rust 1.95 while the incompatible-metadata diagnostic named Rust 1.100; adding the signed matching component made both version commands report the same release.
 Keep the failed runs distinct from the fresh qualification, and record compiler, Cargo, Clippy and formatter versions inside the exact command shell.
+
+
+Symptom: a receiver's whole gate fails its catalog-pin check after a shared revision update, although its rendering tests pass.
+Cause: the revision file moved but the two existing Flatpak manifests still name the previous catalog commit.
+Fix: update those source commit fields in the same receiver step, preserving manifest line endings, build commands and runtime permissions.
+Search every receiver's tracked files for the old common and catalog hashes before starting the serial gates; distinguish historical records from active source declarations.
+How found: the app's existing manifest-consistency test compared the old manifest SHA with the new revision file and failed; the equivalent PdfCraft declarations were found by the same bounded source search.
+A metadata consistency check is not an actual Flatpak build; report that distinction.
+
+Symptom: a live gate's tail shows passing tests, but its final summary reports a failure from much earlier.
+Cause: Nextest continued after a failure, so a short tail hid its structured failure record.
+Fix: scan the whole bounded owned log for structured FAIL, TIMEOUT and abort records before claiming no failures, then report the final exit status separately.
+Use the highest completed test position, not the last repeated position in the failure summary.
+How found: the manifest check failed near test 267, while later tail snapshots showed thousands of passes; the complete log retained the earlier failure.

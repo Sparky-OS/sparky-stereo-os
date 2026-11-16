@@ -21,7 +21,7 @@
   "stale_hours": 12,
   "running_marker": ".active",
   "lanes_exempt": true,
-  "launch_patterns": ["launch-lane\\.sh\\s+(?:queue/)?([A-Za-z0-9._-]+)"],
+  "launch_patterns": ["launch-lane\\.sh\\s+(?:queue/)?(\\S+)"],
   "brief_pattern": "(?:BRIEF[^/\\s\"'`]*|AGENTS)\\.md",
   "lane_id_pattern": "-([A-Za-z]?\\d+[a-z]*\\d*[a-z]*)$",
   "match_lane_by_id": true,

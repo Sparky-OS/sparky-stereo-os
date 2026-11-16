@@ -381,10 +381,15 @@ class Queue:
 
 # -------------------------------------------------------------------- the hook
 
+LANE_SHAPE = re.compile(r'[A-Za-z0-9][A-Za-z0-9._-]*')
+
+
 def dispatch_lanes(event, q):
-    """The lane folders a dispatch names (a brief path under the lanes folder) or a launch command line starts."""
+    """(the lane folders a dispatch names or a launch command line starts, the lane names it cannot read). A brief
+    path under the lanes folder names a lane; a launch pattern's group is the folder, and a group that is not a
+    plain folder name (a shell variable, a substitution) cannot be judged."""
     kit = q.kit
-    found = []
+    found, unreadable = [], []
     if event.tool == 'dispatch':
         base = re.escape(q.lanes)
         rel = r'(?<![\w/.-])' + re.escape(os.path.basename(q.lanes))
@@ -405,8 +410,10 @@ def dispatch_lanes(event, q):
                 candidates.append(' '.join(head))
         for pattern in opt(kit, 'launch_patterns'):
             for candidate in candidates:
-                found += [m if isinstance(m, str) else m[0] for m in re.findall(pattern, candidate)]
-    return sorted(set(found))
+                for m in re.findall(pattern, candidate):
+                    lane = (m if isinstance(m, str) else m[0]).rstrip(';&|)"\'`')
+                    (found if LANE_SHAPE.fullmatch(lane) else unreadable).append(lane)
+    return sorted(set(found)), sorted(set(unreadable))
 
 
 def journal_text(event, q):
@@ -465,11 +472,16 @@ def handle(event, kit):
     if event.kind == 'before-tool':
         if not kit.on('gate'):
             return None
-        lanes = dispatch_lanes(event, q)
+        lanes, unreadable = dispatch_lanes(event, q)
+        if unreadable:
+            kit.log('refused.log', f'launch names its lane through {unreadable}')
+            return kit.deny('QUEUE GATE. This launch names its lane through a shell variable or a substitution '
+                            f'({", ".join(unreadable)}), which the gate cannot read, so it cannot be checked against the queue. '
+                            'Name the lane in the command itself, one launch per line, and send it again.')
         return gate_answer(event, q, kit, lanes) if lanes else None
 
     if event.kind == 'after-tool':
-        lanes = dispatch_lanes(event, q) if kit.on('mark_in_flight') else []
+        lanes = dispatch_lanes(event, q)[0] if kit.on('mark_in_flight') else []
         text = journal_text(event, q) if kit.on('journal') else None
         if not lanes and text is None:
             return None

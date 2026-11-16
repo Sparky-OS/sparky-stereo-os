@@ -96,4 +96,10 @@ The traps about writing a hook are in [the skill itself](../SKILL.md#traps).
   **Fix:** an owed acceptance clears when the row's status, time or evidence differs from what was recorded, and settling a false hit sets the same status again with the reason in the evidence.
   **How found:** by reasoning about the comparison before writing it, then `test_the_same_status_again_with_a_reason_settles_a_journal_line_that_was_not_an_acceptance`.
   (ORDER 633)
+- **A lane named through a shell variable passes a gate that matches the lane's name.**
+  **Symptom:** `launch-lane.sh queue/$LANE` was not gated: the launch went ahead with no row looked at.
+  **Cause:** the launch pattern's group was a plain folder name, so a `$` left the pattern with no match, and no match meant no lane to judge.
+  **Fix:** the group takes any non-space word (`(\S+)`), and a captured name that is not a plain folder name is refused as unreadable with the way out (name the lane in the command, one launch per line); a line that cannot be read as shell is searched as text, with trailing shell punctuation taken off.
+  **How found:** the first launch that used a variable, in the working version; the same gap was closed there and the test written here (`test_a_launch_that_names_its_lane_through_a_variable_is_refused_as_unreadable`).
+  (ORDER 633)
 

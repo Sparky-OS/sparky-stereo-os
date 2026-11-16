@@ -39,7 +39,7 @@ A dispatch or launch of lane `L` passes when every line holds; the first that do
 
 1. **The state is readable.** A missing file, an unreadable one or another header is refused with the way to rebuild it (`on_missing_state: refuse`, the default) or told while the dispatch goes ahead (`tell`). It is never passed silently.
 2. **No acceptance is owed** in this session (`owed_acceptance`: `refuse` as shipped, `tell`, or `off`).
-3. **`L` has a row.** The folder is a row's `name` or `NAME-ID`, else a row named in `lane_rows`, else the row whose id the folder name ends in (`match_lane_by_id`). The name is tried first, so a lane called `kernel-build-17` is not item 17. Nothing runs outside the queue.
+3. **`L` has a row.** The folder is a row's `name` or `NAME-ID`, else a row named in `lane_rows`, else the row whose id the folder name ends in (`match_lane_by_id`). The name is tried first, so a lane called `kernel-build-17` is not item 17. Nothing runs outside the queue. A launch command that names its lane through a shell variable or a substitution (`queue/$LANE`) cannot be read, so it is refused before any row is looked up, with the way out: name the lane in the command, one launch per line.
 4. **The row's origin is one the schema knows.**
 5. **The item is not finished** (`closed_statuses`). New work on a finished item gets its own row.
 6. **`security`, `breakage` and `round` go ahead** (`jump_origins`) and the gate says so, so the report to the requester names the exception.
@@ -72,7 +72,7 @@ The requester decides what jumps: `ahead` records the words, and the gate then s
 | `handbacks_waiting` | `tell` | `tell`, `refuse` or `off`, for a dispatch while reviews are owed |
 | `stale_hours`, `running_marker` | `12`, `.active` | What counts as a running lane |
 | `lanes_exempt` | `true` | Calls made inside a lane (the event has an agent id) are not judged |
-| `launch_patterns` | one example | Regular expressions with one group, the lane folder, matched on the words of a shell command up to its first quoted text, so `echo "launch-lane.sh queue/x"` is no launch |
+| `launch_patterns` | one example | Regular expressions with one group, the lane folder, matched on the words of a shell command up to its first quoted text, so `echo "launch-lane.sh queue/x"` is no launch. Use `(\S+)` for the group: a lane named through a shell variable or a substitution (`queue/$LANE`) cannot be read, and that launch is refused with the way out (name the lane literally, one launch per line) |
 | `brief_pattern` | `BRIEF*.md`, `AGENTS.md` | The file names a dispatch names |
 | `lane_id_pattern`, `match_lane_by_id`, `lane_rows` | see the example | How a folder finds its row; `lane_rows` maps a folder to a row id by hand |
 | `acceptance_patterns` | three | Regular expressions with a group `id`: `ORDER 5 accepted`, `5 accepted`, `accepted: 5` |

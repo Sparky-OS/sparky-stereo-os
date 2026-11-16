@@ -37,7 +37,7 @@ class QueueCase(testkit.HookCase):
         self.state = os.path.join(self.queue, 'QUEUE.tsv')
         self.journal = os.path.join(self.queue, 'ORDER.md')
         shutil.rmtree(os.path.join(self.queue, 'demo-lane'))
-        self.configure(launch_patterns=[r'launch-lane\.sh\s+(?:queue/)?([A-Za-z0-9._-]+)'])
+        self.configure(launch_patterns=[r'launch-lane\.sh\s+(?:queue/)?(\S+)'])
 
     # making the queue
     def put(self, *rows):
@@ -176,10 +176,10 @@ class Gate(QueueCase):
         self.refused(self.run_hook(self.dispatch('follow-9')), "origin 'whim' is not one of")
 
     def test_the_owner_s_origin_name_is_configurable(self):
-        self.configure(owner_origin='daniel', owner_name='Daniel', origins=['daniel', 'follow-up', 'security', 'breakage', 'round'])
-        self.put(*[row(r['id'], r['name'], 'daniel' if r['origin'] == 'owner' else r['origin'], r['asked'], r['tier'], r['status'])
+        self.configure(owner_origin='asker', owner_name='Alex', origins=['asker', 'follow-up', 'security', 'breakage', 'round'])
+        self.put(*[row(r['id'], r['name'], 'asker' if r['origin'] == 'owner' else r['origin'], r['asked'], r['tier'], r['status'])
                    for r in self.table().values()])
-        reason = self.refused(self.run_hook(self.dispatch('follow-9')), "6 of Daniel's own requests")
+        reason = self.refused(self.run_hook(self.dispatch('follow-9')), "6 of Alex's own requests")
         self.assertNotIn('the requester', reason)
 
     def test_a_lane_folder_finds_its_row_by_name_first(self):
@@ -218,6 +218,29 @@ class Gate(QueueCase):
     def test_a_launch_command_passes_the_same_gate(self):
         self.refused(self.run_hook(self.launch('nothing-here-99')), 'no row in')
         self.passed(self.run_hook(self.launch('old-one-1')))
+
+    def test_a_launch_that_names_its_lane_through_a_variable_is_refused_as_unreadable(self):
+        lines = ['sh partners/launch-lane.sh queue/$LANE',
+                 'LANE=old-one-1; sh partners/launch-lane.sh queue/"$LANE"',
+                 'sh partners/launch-lane.sh "queue/$(cat next-lane.txt)"',
+                 'for l in old-one-1 old-two-2; do sh partners/launch-lane.sh queue/${l}; done',
+                 'sh partners/launch-lane.sh queue/`pick`',
+                 'echo "unbalanced; sh partners/launch-lane.sh queue/$LANE']          # cannot be read as shell: searched as text
+        for line in lines:
+            with self.subTest(line):
+                self.refused(self.run_hook(self.bash(line)), 'names its lane through a shell variable or a substitution',
+                             'Name the lane in the command itself, one launch per line')
+        self.assertIn('launch names its lane through', self.log('refused.log'))
+
+    def test_a_literal_lane_in_quotes_or_after_other_words_is_judged_not_refused_as_unreadable(self):
+        for line in ('sh partners/launch-lane.sh "queue/old-one-1"', "sh partners/launch-lane.sh 'queue/old-one-1' ; echo $HOME",
+                     'cd partners && sh launch-lane.sh queue/old-one-1 && echo started', 'sh partners/launch-lane.sh old-one-1',
+                     'timeout 5 sh partners/launch-lane.sh queue/old-one-1 >/dev/null 2>&1'):
+            with self.subTest(line):
+                self.assertIn('old-one', self.passed(self.run_hook(self.bash(line))))
+
+    def test_a_post_event_of_an_unreadable_launch_marks_nothing(self):
+        self.assertIsNone(self.run_hook(self.bash('sh partners/launch-lane.sh queue/$LANE', phase='PostToolUse')))
 
     def test_a_command_that_only_mentions_a_launch_is_not_a_launch(self):
         self.assertIsNone(self.run_hook(self.bash('echo "run launch-lane.sh queue/nothing-here-99 later"  # launch-lane.sh queue/x')))

@@ -160,7 +160,7 @@ Extend the hook that already stands at that moment (another pattern, another che
   A hook reads the command it is shown; a script file, an alias or a program that starts another are not seen.
   Codex's page says it for every tool: "Treat tool hooks as a useful guardrail, not a complete enforcement boundary."
   Keep the rule written in the skill and the house rules as well.
-- **Traps of the kit itself** are in [the lessons of the reviews](references/lessons-2026-11.md), fourteen of them: a workspace name that broke setup, a settings backup lost to a second write, a failed media read reported clean, a hook that a tool lists and never ran, a log that cannot replay the command it names, a hook's command-line mode that waited for an event, one folder read for a whole line with several `cd`, and the queue keeper's seven (a gate that fails open, a row marked before the tool ran, a here-document body that is the text written, an echo of a launch line, an option after a subcommand, a test workspace's own lane, a minute-grained time).
+- **Traps of the kit itself** are in [the lessons of the reviews](references/lessons-2026-11.md), fifteen of them: a workspace name that broke setup, a settings backup lost to a second write, a failed media read reported clean, a hook that a tool lists and never ran, a log that cannot replay the command it names, a hook's command-line mode that waited for an event, one folder read for a whole line with several `cd`, and the queue keeper's eight (a lane named through a shell variable, a gate that fails open, a row marked before the tool ran, a here-document body that is the text written, an echo of a launch line, an option after a subcommand, a test workspace's own lane, a minute-grained time).
 
 ## Perks
 

@@ -11,8 +11,8 @@ description: >-
   a new kernel, dkms says openssl not found, modprobe says Key was rejected by service, ConditionFirstBoot never fires,
   nouveau reports firmware unavailable, amdgpu hangs with a page fault, ring timeout and a device coredump or repeats
   an IP block soft reset with device wedged, virtio-gpu oopses with stereo on, a USB camera delivers no YUYV frames,
-  a Broadcom Wi-Fi card (BCM4360, wl, broadcom-sta-dkms) has no driver or a closed vendor driver must come from the ISO
-  with its licence shown, or a udev chmod hides its failure.
+  a Broadcom Wi-Fi card (BCM4360, wl) has no driver and a closed one must come from the ISO, or a udev chmod hides
+  its failure.
 ---
 
 # Drivers: 3D modes and deep colour in the kernel

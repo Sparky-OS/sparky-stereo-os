@@ -75,7 +75,7 @@ Read the traps before a change to this part, and add the next lesson there as yo
 
 ## The default camera in Qt programs
 
-[The default camera in Qt programs](references/default-camera-in-qt-programs.md): how Qt Multimedia lists V4L2 cameras and marks one default, where the session's default camera lives (WirePlumber's `default.configured.video.source`), how a node maps to `/dev/videoN`, the rig with user-space cameras, and the traps met (ORDER 582).
+[The default camera in Qt programs](references/default-camera-in-qt-programs.md): how Qt Multimedia lists V4L2 cameras and marks one default, where the session's default camera lives (WirePlumber's `default.video.source` and `default.configured.video.source`), how a node maps to `/dev/videoN`, the rig with user-space cameras, and the traps met (ORDER 582); how the PipeWire camera backend follows the session's default on its own registry (the metadata listener mirrored from the audio side, node names instead of device paths, a moved default that `QCameraDevice::operator==` cannot see), the test rows, the measurements, and the lesson of Gerrit 789011: read which layer the maintainer is building before choosing where a change goes (ORDER 625).
 
 ## Preparing a change on Qt's dev from a fix made on our release
 

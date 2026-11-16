@@ -61,7 +61,8 @@ class Install(unittest.TestCase):
         self.assertEqual(r.returncode, 0, r.stderr)
         for folder in ('memory', 'repos', 'partners/queue', 'private/drafts', 'private/hooks', 'state/hooks'):
             self.assertTrue(os.path.isdir(os.path.join(self.ws, folder)), folder)
-        for starter in ('memory/MEMORY.md', 'partners/HOUSE-RULES.md', 'private/README.md', 'private/ledger.md', 'private/branches.tsv'):
+        for starter in ('memory/MEMORY.md', 'partners/HOUSE-RULES.md', 'private/README.md', 'private/ledger.md', 'private/branches.tsv',
+                        'private/clones.tsv'):
             self.assertTrue(os.path.isfile(os.path.join(self.ws, starter)), starter)
         self.assertEqual(os.stat(os.path.join(self.ws, 'private')).st_mode & 0o777, 0o700)
         for name in ALL:

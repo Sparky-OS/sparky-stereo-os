@@ -7,7 +7,8 @@ description: >-
   spice-gtk, logical input coordinates in a 3D mode, resize and mode transitions, the controls that must fail, isolated
   guests and negative controls. Load it when a guest's 3D desktop is squeezed or stretched in the viewer, the pointer
   lands off by half, a resize leaves the window wrong, a libvirt monitor socket path is too long, Debian's spice-gtk
-  wins over ours, or a guest's L + depth mode shows its depth map as an eye.
+  wins over ours, a guest's L + depth mode shows its depth map as an eye, or the next qemu-stereo package must carry
+  commits of the Sparky-OS/qemu fork.
 ---
 
 # A virtual machine in stereo
@@ -222,7 +223,9 @@ HDMI® 1.4a's "L + depth" and "L + depth + graphics + graphics-depth" are 3D str
 - **Symptom:** `qemu-system-x86_64: failed to find romfile "efi-e1000e.rom"`. **Cause:** the default NIC. **Fix:** `-nic none`.
 - **Symptom:** a test pixel compare never finds the red block in the viewer's buffer. **Cause:** the buffer is x8r8g8b8 and its alpha byte is 0, the picture's is 0xff. **Fix:** compare `& 0xffffff`.
 - **Reading we chose and did not verify:** the depth is read as nearness (larger nearer), as 2D-plus-depth and MPEG-C Part 3 depth maps are; ISO/IEC 23002-3 is not freely available, so the polarity of a real HDMI source is unverified. A graphics depth of 0 holds no graphics (Appendix H gives the graphics no other transparency).
-- **Symptom:** the viewer is refused its declaration and still attaches the full side by side buffer, shown flat and squeezed. **Cause:** `wayland-stereo.c` ignores the return value of `stereo_declare_wayland()` and marks the surface declared. **Found by:** the refuse-shim control above (existing behaviour, not changed in ORDER 156).
+- **Symptom:** the viewer is refused its declaration and still attaches the full side by side buffer, shown flat and squeezed. **Cause:** `wayland-stereo.c` ignores the return value of `stereo_declare_wayland()` and marks the surface declared. **Found by:** the refuse-shim control above. **Fix:** Sparky-OS/qemu `713846b` (the review of ORDER 156) says it once and hides the stereo surface; packaged as patch `0021` in `qemu 1:11.1.2+ds-3+stereo3d8+lc1`.
 - `edid-decode --check` fails QEMU's generated EDID before and after this change (EDID 1.4 where the HDMI vendor block wants 1.3, and no VCDB): not caused by the depth structures.
 
-**Not in this recipe yet:** the library's depth controls in a QEMU option; a GPU path (the viewer's drawing is the library's CPU path, about 130 ms for a 1080p frame on one core in the library's own measurement).
+**Packaged:** the depth work and the five fork commits under it are patches `0012` to `0021` of `qemu 1:11.1.2+ds-3+stereo3d8+lc1` (ORDER 156b); how the package was made, its red and green on the installed packages and its traps are in [the next qemu-stereo package](references/qemu-stereo-package.md).
+
+**Not in this recipe yet:** line alternative and field alternative in the EDID (the 1080p60 list has frame packing, side by side full and half, top-and-bottom and the two depth structures; the viewer already copies line-alternative rows); the library's depth controls in a QEMU option; a GPU path (the viewer's drawing is the library's CPU path, about 130 ms for a 1080p frame on one core in the library's own measurement).

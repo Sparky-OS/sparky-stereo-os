@@ -353,3 +353,35 @@ Candidate fix: derive both the enabled flag and sample count from the root shutt
 How found: render-off, root-off and uncollapsed controls expanded the CPU matrix to 88 cases; six root-off cases failed before the enabled flag was carried, then all 88 passed.
 Retain an observed negative in which enabling blur changes the picture, so equality is not explained by an invisible or stationary fixture.
 
+
+## Composition identity owns the stereo camera boundary
+
+Carry the selected root composition identity alongside its sample clock.
+Evaluate the root camera at each shutter sample, gather actual world-plane and mesh bounds before culling, and derive parallel views from the complete envelope.
+Keep an authored uncollapsed precomposition flat under its own camera, including any collapsed worlds inside that boundary.
+Use a point of interest only while that camera actually uses it; a one-node camera retains its image plane.
+Sort sample receipts by their exact time before comparing complete eye identities.
+
+Symptom: an inactive Point of Interest property changes a one-node camera's stereo zero plane while ordinary pixels stay unchanged.
+Cause: testing whether the property exists does not establish that the camera uses it.
+Fix: reuse the camera engine's two-node predicate; retain the image plane otherwise.
+How found: two cameras with identical ordinary projections and different inactive target values produced different stereo pixels; the regression failed before the predicate was applied and passed afterwards.
+
+Symptom: an authored flat precomposition changes the root near-depth ratio from 0.8 to 0.25 and gains unintended internal disparity.
+Cause: recursion depth and the mere presence of a collapsed instance cannot distinguish the root world from a collapsed world behind an uncollapsed boundary.
+Fix: key eye projection, geometry observations, infinity and camera-space effect handling by root composition identity.
+How found: a blue internal world inside a collapsed instance, itself behind an ordinary flat precomposition, contaminated the observed root envelope; the corrected control retains the 0.8/1.2 root range and identical blue positions in both eyes.
+These two runtime regressions failed together, then the expanded renderer library passed 517 tests with one ignored and strict Clippy passed.
+Native presentation remains a separate proof.
+
+Symptom: a finite singular or sheared composition view is accepted by an adapter that canonicalizes only its camera-relative ratios.
+Cause: canonicalization hides the malformed original world-to-camera basis from the shared solver.
+Fix: validate the original finite rigid basis, handedness, affine row and physical eye consistency before making either view.
+How found: independent projection/disparity, zero-budget, invalid-depth and infinity tests passed while the finite-malformed-view regression failed; validating the original basis made all five pass.
+
+Symptom: a camera-aware effect returns a plausible flat picture even though its internal 3D geometry never reached the pair depth envelope.
+Cause: an effect-host API may expose only a projection and light while the effect privately rasterizes its own geometry.
+Fix: refuse that stereo result explicitly until the owning effect engine exports its geometry envelope and consumes the evaluated eye projection, with private history.
+Keep ordinary rendering available and respect authored flat precomposition boundaries.
+How found: a Card Dance Comp Camera fixture produced ordinary pixels and the first pair API incorrectly returned success; a negative control failed before the refusal and passed afterwards.
+A refusal is not evidence that the effect's stereo renderer has been implemented.

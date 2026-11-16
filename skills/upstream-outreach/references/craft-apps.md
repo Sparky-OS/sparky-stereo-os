@@ -822,3 +822,14 @@ Keep the original parser versions, read-only features and interpreter/CMap exclu
 How found: an actual path-bound graph failed the original guard; a focused positive then failed before the extension, while bypass, extra-feature and active-interpreter controls remained negative.
 The expanded controls also cover packaged Git sources, wrong revisions, modified source and malformed revision files.
 Focused guard success remains separate from the whole receiving application's gate.
+
+
+### A conditional font test is not a readable-language proof
+
+Symptom: Korean control strings and automation tests pass, but the captured native dialog shows missing-glyph boxes.
+Cause: the private runtime image has no Hangul face; the app's existing system-font loader is correct, and its conditional Hangul test returns early when none is installed.
+Fix: install the permitted system font in the private rig, retain its package version, font hash and licence, and repeat the real dialog with the unchanged executable.
+How found: visual inspection of the first capture disagreed with its control-label result; `fc-list :lang=ko` was empty and the font package was absent.
+Adding Debian's OFL-licensed Noto CJK faces made the same Korean title, explanation and resolution controls readable, without copying font assets into the app or altering its source.
+Keep the failed visual witness and the corrected capture separate, and tell the packaging owner that the language feature needs that runtime dependency.
+Do not describe a readable partial catalog as a complete translated interface or native-speaker review.

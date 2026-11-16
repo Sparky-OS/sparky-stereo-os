@@ -420,3 +420,20 @@ Fix: pass the immutable document background through the native packer to both co
 How found: a runtime test against the actual ordinary session exporter failed with black versus RGB128/80/32; after using the same background, all nine focused native-control tests passed.
 Use the engine's actual clamped dimensions in that reference; the first attempted assertion also assumed a smaller stage than the document permits.
 This focused result precedes the full application gate and compositor proofs.
+
+
+## Native composition shutter witness
+
+For Effect's composition-pixel camera, predict `d = b * f * (1/Z - 1/C)` with `f = zoom * native_eye_width / composition_width`.
+Read the actual compositor budget and choose the common baseline before reading captured pixels.
+A 200 by 100 authored composition, 50mm camera with C=200*50/36, native640 by320 eyes and cards at0.8C/1.2C measured+12/-8pixels in a640 by320 window.
+After resizing the client to320 by160, the native grid stayed640 by320 and measured+24/-16; the compositor scaled once.
+Classic and Advanced mixed mesh/card worlds passed, including two collapsed instance levels; a separate pixel count establishes that the blue real mesh is actually visible in each eye.
+Those are two geometric features and a mesh-presence control, not a dense shading or depth-accuracy claim.
+
+Decode the timeline identity from each eye's camera-dependent feature positions, independently of the UI frame selector.
+Frames13,15and17 matched in both eyes; all seven root shutter times had distinct central camera positions and matching eye sample records.
+Disable root blur through the existing command and require a new one-sample pair whose actual pixels differ in both eyes; matching seven-sample metadata alone cannot prove visible blur.
+The six native witnesses had zero vertical disparity, failing reversed-eye controls and zero differences outside the declared area.
+Four full-size native/display comparisons covered1,638,400pixels with zero differences; the six native readbacks contained2,457,600pixels, which is a different scope.
+The authored flat control matched ordinary output in40,000native pixels; an independent stock comparison is still a separate requirement.

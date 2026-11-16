@@ -4,7 +4,7 @@ metadata:
 name: drivers
 description: >-
   Kernel/display drivers for stereo and deep colour: HDMI 3D modes declared by EDID
-  (amdgpu, NVIDIA, nouveau, VC4), USB-C 3D glasses, the edition's kernel configuration, DKMS modules on a new kernel (NVIDIA, ZFS, signing, first-boot MOK enrolment), udev rules for wheels (umockdev), HDMI-CEC, VRAM protection, an Intel Mac, patches carried with provenance. Load it when a 3D mode is missing, the TV never switches to 3D, a DKMS build fails on a new kernel,
+  (amdgpu, NVIDIA, nouveau, VC4), USB-C 3D glasses, the edition's kernel configuration, DKMS modules on a new kernel (NVIDIA, ZFS, signing, first-boot MOK enrolment), udev rules for wheels (umockdev), HDMI-CEC, VRAM protection, an Intel Mac, carried patches, kernel CVE builds. Load it when a 3D mode is missing, the TV never switches to 3D, a DKMS build fails on a new kernel,
   dkms says openssl not found, modprobe says Key was rejected by service, ConditionFirstBoot never fires, nouveau
   reports firmware unavailable, amdgpu hangs with a page fault, ring timeout and a device coredump or repeats an IP
   block soft reset with device wedged, virtio-gpu oopses with stereo on, a USB camera delivers no YUYV frames, a
@@ -97,6 +97,11 @@ Plan for it:
   Mainline's `hid-betopff.c` still returns the error (checked 2026-11-02).
   The fix stays a patch apart from the stereo work, so it can go to the input subsystem's maintainers on its own.
 
+### A security build
+
+When a CVE in the kernel is the reason for a build, the order is: prove the gap in the published source, find the fix in the form stable carries it (and what stable took after the base release that names a CVE), sort the fixes by what they need, write one series group in stable's form, apply it strictly and compile what it touches, then build all three flavours and prove them.
+The recipe, with build 17's measurements and its traps, is in [a security build of the edition's kernel](references/kernel-security-build.md).
+
 ## Proof for this kind of work
 
 - The connector's mode list before and after, from `stereo-kms-probe` or the compositor (KScreen labels 3D modes "(3D …)").
@@ -109,7 +114,7 @@ Plan for it:
 
 ## Lessons from the lanes, October to November 2026
 
-[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 11 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (54 entries).
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 11 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (58 entries).
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

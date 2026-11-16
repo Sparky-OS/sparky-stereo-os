@@ -1042,3 +1042,11 @@ The players that now say "This film has no sound." stand on these authors' code,
 - **ORDER 573 and 574** for the three findings and the vk-views client, **ORDER 556** for the qdiscs fixture and its reader.
 - **The packages (2026-11-16):** Qt Quick's own autotest `tst_qquickwindowstereo` (the edition's file in qtdeclarative) gains the framed row; the Graphics page's build and separate link check follow the routes of **ORDER 556 and 573**; Debian's **debhelper** (dh_prep, dh_strip's automatic debug packages) and **apt**, whose behaviour the packaging lessons describe; the **deb-multimedia** archive (Christian Marillat) in the link gate's list.
 These projects do not endorse the edition.
+
+## VLC Stereo says when a film has no sound, reads its own catalogues and survives a volume key on a silent film (ORDER 592, 2026-11-16)
+
+VLC Stereo +stereo3d21 builds on other people's work, named from each project's own records:
+
+- **Thomas Guillem's 30fbe5f3f6** ([VLC master](https://github.com/videolan/vlc/commit/30fbe5f3f6be7d0d066c861c6d051d8ccdef5048), "pipewire: initialize stream variable", 2025-07-15, Fixes VLC issue 29211): the one-line fix of the segmentation fault when the volume or the mute of the audio output is set before it starts. The PipeWire output itself is **Rémi Denis-Courmont's** module (Debian's vlc-plugin-pipewire), with Thomas Guillem's later work, "Copyright (C) 2024 VLC authors and VideoLAN".
+- **VLC's input and Qt interface** ("VLC authors and VideoLAN"): the elementary streams' variables (`video-es`, `audio-es`), the subpicture channels (`vout_RegisterSubpictureChannel`, `vout_OSDText`) and the data directory lookup (`src/linux/dirs.c`, `src/modules/textdomain.c`) that the patches read and use.
+- The sentence in nine languages was written for ORDER 579 and is the stereo layer's (see that entry); this order only carries it.

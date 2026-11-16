@@ -164,7 +164,7 @@ Which frames take the GPU route through the layer and which the wl_shm copy, how
 
 ## A film without sound says so
 
-[The sentence, the rule, where each player learns its tracks and tells it, the fixtures and the traps](references/a-film-without-sound.md) (ORDER 579): a film with a picture and no audio track says "This film has no sound." in ten languages, beside a volume control that stays usable.
+[The sentence, the rule, where each player learns its tracks and tells it, the fixtures and the traps](references/a-film-without-sound.md) (ORDER 579): a film with a picture and no audio track says "This film has no sound." in ten languages, beside a volume control that stays usable. VLC Stereo's own part (+stereo3d21, ORDER 592): where the rule lives, the build's time and disk, the rows that show the sentence in each language at 100 % and 125 %, and the two faults found on the way (its catalogues were never read; a volume key on a silent film ended the player).
 
 ## Lessons from the lanes, October to November 2026
 

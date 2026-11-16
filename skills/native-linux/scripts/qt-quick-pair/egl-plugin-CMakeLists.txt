@@ -1,4 +1,4 @@
-# ORDER 583: Qt's Wayland EGL client buffer plugin (src/plugins/platforms/wayland/plugins/hardwareintegration/
+# Qt's Wayland EGL client buffer plugin (src/plugins/platforms/wayland/plugins/hardwareintegration/
 # wayland-egl) built alone against the installed Qt and its private headers, so a change to it is proved without a
 # whole qtbase build. The unchanged source built the same way is the control of the method.
 cmake_minimum_required(VERSION 3.16)
@@ -10,6 +10,11 @@ find_package(Qt6 REQUIRED COMPONENTS GuiPrivate OpenGLPrivate WaylandClientPriva
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(WL REQUIRED IMPORTED_TARGET wayland-client wayland-egl egl)
 add_library(qt-plugin-wayland-egl MODULE main.cpp qwaylandeglclientbufferintegration.cpp qwaylandeglwindow.cpp qwaylandglcontext.cpp)
-target_compile_definitions(qt-plugin-wayland-egl PRIVATE QT_PLUGIN QT_NO_KEYWORDS QT_USE_QSTRINGBUILDER)
+# the defines Qt's own build gives this target (read from its compile line): no QT_NO_KEYWORDS, so a variable named
+# like a Qt keyword (slots, signals, emit) fails here as it fails there
+target_compile_definitions(qt-plugin-wayland-egl PRIVATE QT_PLUGIN QT_USE_QSTRINGBUILDER QT_DEPRECATED_WARNINGS
+    QT_EXPLICIT_QFILE_CONSTRUCTION_FROM_PATH QT_LEAN_HEADERS=1 QT_NO_EXCEPTIONS QT_NO_FOREACH QT_NO_JAVA_STYLE_ITERATORS
+    QT_NO_NARROWING_CONVERSIONS_IN_CONNECT QT_NO_QASCONST QT_NO_QEXCHANGE QT_NO_QSNPRINTF
+    QT_NO_SINGLE_ARGUMENT_QHASH_OVERLOAD=1 QT_NO_STD_FORMAT_SUPPORT)
 target_link_libraries(qt-plugin-wayland-egl PRIVATE Qt6::GuiPrivate Qt6::OpenGLPrivate Qt6::WaylandClientPrivate PkgConfig::WL ${CMAKE_DL_LIBS})
 set_target_properties(qt-plugin-wayland-egl PROPERTIES PREFIX lib)

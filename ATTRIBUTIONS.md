@@ -1034,4 +1034,5 @@ The players that now say "This film has no sound." stand on these authors' code,
 - **David Edmundson's "wayland: move decoration into subsurfaces"** (qtbase [94f96210518d](https://github.com/qt/qtbase/commit/94f96210518d), 2025-12-19, reviewed by Eskil Abrahamsen Blomfeldt), which removes that blitter from Qt 6.12; the page says what goes and what stays at that move.
 - **The Khronos Group:** the Vulkan clause on X11 surface extents quoted in the plan for the stereo layer.
 - **ORDER 573 and 574** for the three findings and the vk-views client, **ORDER 556** for the qdiscs fixture and its reader.
+- **The packages (2026-11-16):** Qt Quick's own autotest `tst_qquickwindowstereo` (the edition's file in qtdeclarative) gains the framed row; the Graphics page's build and separate link check follow the routes of **ORDER 556 and 573**; Debian's **debhelper** (dh_prep, dh_strip's automatic debug packages) and **apt**, whose behaviour the packaging lessons describe; the **deb-multimedia** archive (Christian Marillat) in the link gate's list.
 These projects do not endorse the edition.

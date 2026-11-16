@@ -20,6 +20,32 @@ The edition's level is x86-64-v3, chosen by the machine and never by a question;
 
 A variant build is `NAME_VERSION_amd64v3.deb`, control `Architecture: amd64` plus `Architecture-Variant: amd64v3`. `publish-tree.sh` selects it under the variant's own name, leaves it out of `binary-amd64`, Contents and the link gate, and writes `binary-amd64v3/Packages` as every baseline `amd64` record with the variant builds in place of theirs, and `amd64v3` in Release `Architectures:`. A tree with no variant build is byte-identical to before. Test: `sparky-os/repo/tests/variants/run.sh` (throwaway tree and key; the Lean Code gates are stubbed in the test's copy only).
 
+## The round's other tools on a tree with an amd64v3 index (milestone 3)
+
+Each was run on the throwaway tree of `sparky-os/repo/tests/variants` (the real `publish-tree.sh`, Lean Code gates stubbed in the test's copy), red against main's tool, green with the change:
+
+| Tool | What it did with `binary-amd64v3` | The change |
+| --- | --- | --- |
+| `repo/check-installable.py` | read it as an architecture of its own (both the unsigned glob and the signed Release rows) | skip `binary-*v[2-4]`: the baseline index is the complete one with the same dependencies |
+| `release/check-repository-dependencies.py` | a staged `_amd64v3.deb` replaced the baseline build of the same name in its rehearsal index | skip rows and archives named `_amd64v3.deb` |
+| `release/make-sbom.py` | one purl for two builds | `arch=` is the variant for a variant |
+| `release/supply_chain.py`, `verify-online-repository.py` | keyed by Filename, rows read from Release | none (the Release loop proven offline) |
+| `release/stage-final-repository.py` | "Conflicting binary identity" for a variant | the variant is the architecture of the identity (not run: the tool needs the round's notes) |
+| `lean.release check-debs` / `check-repo` | "duplicate package identity" for a variant and its baseline twin | the key is (package, version, architecture:variant) and the `-lc-hr` companion must carry the same variant (`tests/cpu-level/pairing.sh`) |
+
+Cost of the pairing: a variant build of a package with a companion needs both archives marked, and a variant set can be checked alone or with its baseline.
+
+## Writing the variant at build time
+
+`XB-Architecture-Variant: amd64v3` in each binary stanza of `debian/control` reaches the control file of every package through `dpkg-gencontrol` (checked: both `libstereo-av1` and `libstereo-av-dev`), with `debian/rules` untouched. But **the Lean Code link and start gate then fails with "archive attempted to substitute supplied NAME"**: its local index lists the supplied package with the field and apt ignores a variant that its Release does not declare, so the solver takes the published baseline build. Until `lean/archive.py` leaves the field out of that index (a toolkit release: the code hash and the version table change), the field is added after the gate by a repack of the control file, as the milestone 2 test does.
+
+## Building a native script package the way a round accepts it
+
+1. `build.sh` of the recipe (lean.standalone) makes the retained source package (`.dsc`, `.tar.xz`); then `dpkg-source -x`, `apt-get build-dep` and `dpkg-buildpackage -us -uc -b` build it again; then `python3 -m lean.release check-debs` writes the record.
+2. The record needs the host's facts: on the host `. repo/build-provenance.sh; sparky_provenance_init IMAGE RECIPE_DIR` and the container gets `"${SPARKY_PROV_ARGS[@]}"`. Without them check-debs stops: "the build script did not call sparky_provenance_init". Commit everything first: the record says `recipeDirty` otherwise.
+3. For the archive link and start gate (`SPARKY_LC_ARCHIVE_CONFIG` and `SPARKY_LC_SCRATCH`, bubblewrap, the three `--security-opt` flags, `ca-certificates` installed in the container) the sources must be the ones the package's dependencies live in: Debian `main non-free non-free-firmware`, deb-multimedia, **SparkyLinux's core and tiamat** (sparky-remsu, sparky-xterm), and the published tree as a `file:` archive. A missing one shows as "none of the choices are installable"; a container without `ca-certificates` shows as "certificate verify failed" inside the gate's isolated apt.
+4. The upgrade proof reads apt's lines: install the published version, then `apt-get -s install ./NEW.deb` and count `Remv`.
+
 ## What forky does today (measured 2026-11-16, `debian:testing` of 2026-10-27)
 
 | Fact | Result |

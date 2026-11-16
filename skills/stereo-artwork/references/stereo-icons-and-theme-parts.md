@@ -151,6 +151,8 @@ The editor's saved scheme name can produce a different filename: read the native
 Keep the imported colour changes in memory until the person saves the project.
 Refuse a conflicting project operation while the child is open, and report launch, read and child-exit failures.
 
+Before handing a theme to an external editor, materialize links within the selected theme as independent writable files, and visibly reject outside, dangling or cyclic links.
+A preserved alias must never let the editor write back into the source theme or another user file.
 For plasmathemeexplorer, copy the complete source theme under the private data directory's plasma/desktoptheme/ID, preserve the metadata identifier, and pass --theme ID.
 Prove that the explorer used this copy, rather than a system fallback.
 On successful return, compare the private theme tree with the source and retain changed files as a project working copy, preserving valid group depth choices.
@@ -220,6 +222,10 @@ Native project tests should also reject invalid inputs and verify that the sourc
   **Fix:** inspect the image architecture, pin its verified ID and assert `dpkg --print-architecture` before querying packages.
   **How found:** compare the runtime architecture and archive metadata, with identical apt source overrides for update and policy.
 
+- **Symptom:** an external editor can write through a working-copy alias into the original theme.
+  **Cause:** the copy preserved symlinks rather than separating their file contents.
+  **Fix:** materialize internal targets, refuse targets outside the selected theme and detect directory cycles before launching the native tool.
+  **How found:** review the copy options, then use a real filesystem alias in the subprocess handoff row and require the original target and outside file to remain unchanged.
 - **Symptom:** selecting a small SVG group leaves its thumbnail apparently blank.
   **Cause:** the whole atlas was reduced to thumbnail size.
   **Fix:** crop the isolated group's painted alpha bounds before scaling the thumbnail; keep the full canvas for the stereo preview.

@@ -385,3 +385,24 @@ Fix: refuse that stereo result explicitly until the owning effect engine exports
 Keep ordinary rendering available and respect authored flat precomposition boundaries.
 How found: a Card Dance Comp Camera fixture produced ordinary pixels and the first pair API incorrectly returned success; a negative control failed before the refusal and passed afterwards.
 A refusal is not evidence that the effect's stereo renderer has been implemented.
+
+
+## Freeze decoded resources for the complete pair
+
+An immutable project is not sufficient when a footage source decodes or replaces its resources on demand.
+For one pair, memoize decoded float/byte frames, vector rasters, models, auxiliary channels and audio by the complete query identity, then reuse those immutable values during preparation and both eye renders.
+Include the footage descriptor, proxy interpretation, exact time, dimensions and curve in keys where those affect decoding.
+Keep processed effects, accumulations and histories private to each eye; discard the query snapshot after the complete pair.
+Forward cancellation and refuse a missing required frame or model, while retaining optional negative-query results.
+
+Symptom: the same project and exact timeline time produce red content in one eye and blue content in the other.
+Cause: a decoded-resource provider returns a different frame on successive identical queries; an immutable project borrow does not freeze that provider.
+Fix: cache the original immutable decoded result once per complete query across both eye renderers and the bounds preparation.
+How found: an alternating source made the independent two-eye equality test fail; the frozen-source implementation passed with exactly one original frame read.
+
+Symptom: an unavailable required image returns a successful blank stereo pair.
+Cause: memoizing `None` preserves query identity but leaves the renderer's lenient missing-resource behavior unchanged.
+Fix: retain the original source problem or report the required input as unavailable before publishing either eye.
+How found: a separate negative regression required an error and failed before the explicit check; the corrected renderer library passed 523 tests with one ignored and strict Clippy.
+The complete application gate then passed 6,705 tests, with 46 skipped or ignored and 32 WASM crates checked.
+Those are source-gate results; they do not establish native presentation, and query counters are not scene hashes or path-tracing sample counters.

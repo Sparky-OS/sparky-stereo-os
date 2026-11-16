@@ -61,3 +61,37 @@ The general rules are in [writing front pages](../SKILL.md); the multilingual ca
 ## Perks
 
 The release notes are often the best source for install steps and sizes; the README's tables are the best source for measured facts, each with its commit; a status table of "not yet measured" rows is a feature of the page, not a hole in it.
+
+## The visuals
+
+When the page's words have already been reviewed, freeze the exact source revision before changing the look.
+A picture states a fact that the page already has; it does not introduce a new performance claim.
+Keep the difference between a measured value and a bound: “under” and “more than” are not exact bar endpoints.
+Use the existing sentence for its alternative text and keep the source and caveat beside the picture.
+A decorative mark does not replace a picture of the result.
+
+Use the brand folder's approved files as they are, with their original proportions.
+Check the copied files byte for byte against that folder; do not redraw, recolour or crop a mark.
+If a folder says nothing about clear space or backgrounds, record the placement choice and its reason rather than inventing a brand rule.
+Padding outside the artwork and a light tile in both themes can preserve the approved appearance.
+Keep the brand's credits as its own records give them.
+
+Assign colours by role in each theme: paper, surface, text, secondary text, link, focus, meaningful graphic and decoration.
+A palette value that passes on a dark surface may fail on a light one.
+Measure the actual adjacent pairs, including code, status labels and focus outlines, against WCAG 2.2 SC 1.4.3 and 1.4.11.
+Use `prefers-color-scheme` for the reader's setting and respect `prefers-reduced-motion` if anything moves.
+Keep typography and spacing in a small shared system; let prose have a readable measure while a table uses the available width.
+
+The proofs travel with the change:
+- Serve the base and changed files over HTTP inside an isolated container with core dumps disabled.
+- Use a fresh headless browser profile for every page, size and theme; save both viewport and full-page captures at desktop and phone dimensions.
+- Verify the viewport size and the computed theme, image loading, document overflow, and keyboard access to the skip link.
+- Look at the captures, including the lower parts of long pages, before calling them proof.
+- Compare text, numbers, URLs and anchors against the frozen base; when the change is CSS only, require every HTML file to remain byte-identical.
+- Check local files, fragments, CSS image URLs and external links; record blocked or failed external requests as unverified.
+- Search SVG source, filenames and decoded image metadata for forbidden words; compressed pixel bytes are not text.
+
+Traps met during a visual-system pass:
+- **Headless Chromium exits with `chrome_crashpad_handler: --database is required`.** A non-root container process had no writable configuration directory. Give each fresh profile its own `XDG_CONFIG_HOME` and `XDG_CACHE_HOME`; retain the failing log and rerun without a desktop connection.
+- **A forbidden-word scan flags an approved PNG.** A case-insensitive search matched random compressed pixel bytes. Inspect the PNG chunk table and any `tEXt`, `zTXt` or `iTXt` payloads, scan text sources separately, and verify approved asset identity by hash. Do not edit a logo to remove a random binary match.
+- **A phone page has a horizontal scrollbar although the text fits.** Long unbroken links or fixed-width artwork can exceed the available inline size. Inspect which element exceeds the document client width; allow long links to wrap and constrain the outer tile as well as its proportional image. Compare document scroll width with client width, not `innerWidth`, because the latter includes the scrollbar.

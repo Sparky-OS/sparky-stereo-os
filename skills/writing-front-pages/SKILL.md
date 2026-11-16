@@ -99,6 +99,8 @@ The recipe, the two scripts and the traps: [Adding a front-page language after t
 
 For a website made from the existing front pages, use [The front pages as a site](references/front-pages-as-a-site.md): keyed strings from each language's own source, shared templates, a native language menu, preserved fragments, offline checks and a local preview before any publishing switch.
 
+For a project's repository turned into a few plain pages with a brand folder's logo and colours, use [A project's repository as a small website](references/a-repository-as-a-small-website.md): the claims table first, plain files, the proofs and the traps.
+
 Before moving a heading, find who links to it: talk slides, forum posts, other lists, the issues.
 - Keep each linked heading, or leave `<a id="old-anchor"></a>` where its content now starts.
 - Check every relative link and anchor in the changed files before handing back.

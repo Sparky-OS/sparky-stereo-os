@@ -23,6 +23,7 @@ description: >-
 3. Return mode/timing differences, InfoFrame or display evidence, 2D regressions and untested hardware. A virtual driver cannot prove a cable handshake.
 
 For [a USB camera that delivers nothing in one format](references/usb-camera-one-format.md), start with descriptors, probe values, usbmon and payload arithmetic; then test the actual decoder in KUnit before a person's camera comparison.
+For [an Intel Mac on the bench](references/intel-mac-on-the-bench.md), start with the stick's layout against Apple's firmware, then the devices that need more than the kernel (Broadcom wl for the Wi-Fi chip, with its licence), the read-only readings in order and the traps; nothing in it was run on the machine.
 
 **Check freshness first.**
 Written on 2026-10-07; the kernel configuration and its traps, the carried gamepad fix and the test without firmware added on 2026-11-02.

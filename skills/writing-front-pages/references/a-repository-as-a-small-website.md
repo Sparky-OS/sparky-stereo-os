@@ -61,3 +61,61 @@ The general rules are in [writing front pages](../SKILL.md); the multilingual ca
 ## Perks
 
 The release notes are often the best source for install steps and sizes; the README's tables are the best source for measured facts, each with its commit; a status table of "not yet measured" rows is a feature of the page, not a hole in it.
+
+## The visuals
+
+When the page's words have already been reviewed, freeze the exact source revision before changing the look.
+A picture states a fact that the page already has; it does not introduce a new performance claim.
+Keep the difference between a measured value and a bound: “under” and “more than” are not exact bar endpoints.
+Use the existing sentence for its alternative text and keep the source and caveat beside the picture.
+A decorative mark does not replace a picture of the result.
+
+Use the brand folder's approved files as they are, with their original proportions.
+Check the copied files byte for byte against that folder; do not redraw, recolour or crop a mark.
+If a folder says nothing about clear space or backgrounds, record the placement choice and its reason rather than inventing a brand rule.
+Padding outside the artwork and a light tile in both themes can preserve the approved appearance.
+Keep the brand's credits as its own records give them.
+
+Assign colours by role in each theme: paper, surface, text, secondary text, link, focus, meaningful graphic and decoration.
+A palette value that passes on a dark surface may fail on a light one.
+Measure the actual adjacent pairs, including code, status labels and focus outlines, against WCAG 2.2 SC 1.4.3 and 1.4.11.
+Use `prefers-color-scheme` for the reader's setting and respect `prefers-reduced-motion` if anything moves.
+Keep typography and spacing in a small shared system; let prose have a readable measure while a table uses the available width.
+
+The proofs travel with the change:
+- Serve the base and changed files over HTTP inside an isolated container with core dumps disabled.
+- Use a fresh headless browser profile for every page, size and theme; save both viewport and full-page captures at desktop and phone dimensions.
+- Verify the viewport size and the computed theme, image loading, document overflow, and keyboard access to the skip link.
+- Look at the captures, including the lower parts of long pages, before calling them proof.
+- Compare text, numbers, URLs and anchors against the frozen base; when the change is CSS only, require every HTML file to remain byte-identical.
+- Check local files, fragments, CSS image URLs and external links; record blocked or failed external requests as unverified.
+- Search SVG source, filenames and decoded image metadata for forbidden words; compressed pixel bytes are not text.
+
+Traps met during a visual-system pass:
+- **Headless Chromium exits with `chrome_crashpad_handler: --database is required`.** A non-root container process had no writable configuration directory. Give each fresh profile its own `XDG_CONFIG_HOME` and `XDG_CACHE_HOME`; retain the failing log and rerun without a desktop connection.
+- **A forbidden-word scan flags an approved PNG.** A case-insensitive search matched random compressed pixel bytes. Inspect the PNG chunk table and any `tEXt`, `zTXt` or `iTXt` payloads, scan text sources separately, and verify approved asset identity by hash. Do not edit a logo to remove a random binary match.
+- **A phone page has a horizontal scrollbar although the text fits.** Long unbroken links or fixed-width artwork can exceed the available inline size. Inspect which element exceeds the document client width; allow long links to wrap and constrain the outer tile as well as its proportional image. Compare document scroll width with client width, not `innerWidth`, because the latter includes the scrollbar.
+
+
+For a figure pass after the visual system:
+- Keep the original HTML text, links and anchors as a separate comparison stream, excluding only the new SVG subtrees and comments.
+  Require each new SVG text element, title and description to be a verbatim excerpt from that page's frozen text.
+  Prove the guard fails by changing one body number and by inserting an invented graphic label, then restore the source.
+- Put the fact picture immediately after the opening text in document order and use a grid to place it beside that text on desktop.
+  Measure the picture's bottom against the phone viewport; merely having a hero class does not put it on the first screen.
+- Draw bounds as bounds: an open endpoint and an arrow toward earlier values for “under”, a continuation past the shared axis endpoint for “more than”.
+  Verify the positions against the stated time ratio; retain the original caveat and source beside the chart.
+- Measure computed body text and the content width, not just the root variable or outer box.
+  Padding comes out of a border-box width; a nominal 1200 px wrapper with gutters has less room for its figures.
+- Reserve future content with a named `figure[data-extra]` and a short comment describing its data.
+  Hide it while it has no content element, including when it contains only a comment or template; insert a temporary SVG in the browser and verify it becomes visible, then remove it and verify it hides again.
+- Render the social PNG from its SVG in the isolated browser, at the actual target dimensions.
+  A relative link to an approved local logo keeps its original bytes and makes the source easier to inspect than a large encoded payload.
+  Check both the SVG labels and the PNG's dimensions and metadata.
+- Read a diagram for meaning after the word check passes.
+  A label can occur verbatim on the page yet imply the wrong relationship when put after an arrow.
+  In a worker/partition diagram, an option that moves workers must point to workers, not to the partition count it leaves unchanged.
+
+An SVG label fitting inside its viewBox may still cross its node's border.
+Inspect the actual figure at phone size, shorten the label using another existing excerpt, and recapture it.
+Use element-focused captures for this inspection: a scaled contact sheet of a very tall page cannot prove small labels are legible.

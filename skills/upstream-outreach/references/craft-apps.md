@@ -373,6 +373,13 @@ How found: the first fresh catalog restore reported the missing parent even thou
 If complete ancestors cannot be obtained, state the exact prerequisite or shallow boundary and do not claim full history.
 Never rewrite an author, parent or date to make a checkpoint appear complete.
 
+Symptom: a non-shallow restored clone still cannot create a standalone source bundle with lazy fetching disabled.
+Cause: its partial-clone promisor metadata permits missing historical blobs even though every current source tree and local branch head exists.
+Fix: fetch the named public original base with `--refetch --no-filter --no-tags --no-write-fetch-head`, verify every local branch head is unchanged, then repeat the complete bundle and isolated restore.
+Keep `GIT_NO_LAZY_FETCH=1` during the bundle check so an unnoticed network fetch cannot stand in for offline completeness.
+How found: TextureCraft reported a missing promised object despite its non-shallow flag; the unfiltered original-base fetch preserved all seven local heads, and the resulting bundle restored them with matching trees and strict full fsck in an empty repository without alternates.
+This repairs source shipping evidence; it neither changes the tested app nor proves another runtime path.
+
 Symptom: a Python archive restore check rejects a source file although its extracted SHA-256 matches.
 Cause: `tarfile`'s secure `data` filter intentionally strips group-write permission, so a stored 0664 source file is extracted as 0644.
 Fix: retain original source modes in the manifest and write explicit safe 0644 or 0755 source-archive headers, while checking tested executable bytes and modes exactly.
@@ -474,3 +481,366 @@ Cause: the loaded-face path returned that face directly, while the exhaustive pa
 Fix: apply the same requested-style resolution to the loaded covering family, retaining the covering face when the resolved style lacks the character.
 How found: the unchanged assertion failed with the extra diagnostics, the two selection paths differed at the return, and the same focused regression passed after the correction with the font inputs unchanged.
 This establishes the measured style correction; unrelated fallback-family ordering and unavailable writing systems need their own controls.
+
+## A receiver has newer APIs than its common backend
+
+Compare the receiver's real compile errors with the shared owner's public definitions before moving pins.
+Find each missing behavior's original upstream commit and its prerequisites.
+Port it into the common owner while retaining that owner's independent decoder bounds, cancellation and work limits.
+Keep original authors and dates on directly carried vendor subjects; identify partial ports rather than claiming whole-commit identity.
+Run the standalone backend contract job, the common library gate and every receiver's complete gate before calling a new suite revision green.
+A passing backend job alone does not establish receiver compatibility.
+
+Symptom: a PDF receiver names missing viewer-state, repaired-update and page-work APIs after its dependencies converge on one common checkout.
+Cause: the common snapshot and the receiver evolved independently; a broad three-way merge also includes rendering and hostile-input changes on both sides.
+Fix: reconcile the actual behavior in the common owner, including warning propagation and every budget consumer, before moving the suite's common pin.
+Keep the receiver's private backend out of the resolved graph.
+How found: the real PdfCraft compile named fifteen missing API uses; a subsequent backend compile found a cancellation regression still treating a new `(XRef, bool)` result as an `XRef`.
+The tuple consumer was updated without changing its cancellation assertion, and the standalone backend job passed1190 tests.
+Three identical raster regressions compiled against the pre-merge head and failed their pixel assertions, then passed on the reconciled source.
+The first complete library gate stopped at its disk floor after both strict Clippy configurations passed.
+Its source was kept as a hashed working patch; the stopped job was not relabeled green when space recovered.
+After explicit resumption, the same frozen source completed both native configurations, WebAssembly, release camera tests, the minimum-Rust check and standalone backends: 23,705 passed, zero failed and 113 ignored across 942 result groups.
+The standalone subset passed 1,193 tests, including the new marker/cancellation control in its feature variants.
+That qualifies the shared code tree, not the receiving apps; keep the last qualified edition pins until each receiving gate and its diagnostic mapping are checked.
+
+Symptom: a transferred source manifest's historical SHA-256 disagrees with the named revision, while its recorded Git blob agrees.
+Cause: the historical source-hash field is wrong; it is distinct from the local patched-file hash.
+Fix: fetch the exact named upstream path, verify both its Git blob and SHA-256, then correct only the wrong provenance field.
+How found: PdfCraft's `ec0a965074f376a5bf610435948e4e5184bf3299` JPX source hashes to `f0a2b01c692c086d30a26562d7548f9e837af166be737d2c543de7c886a45f82` and Git blob `74efd8b31e2b2935ff2bbceda2c1ffd36ea9c20d`; its separate local patched hash was already correct.
+Retain the fetched authority bytes and the before/after comparison.
+
+Symptom: an origin audit reports newly carried files missing from the crate's named base revision.
+Cause: the audit ignores a file's more specific source revision.
+Fix: resolve the per-file origin before the crate default, then compare both the original Git blob and its SHA-256; keep the local patched hash separate.
+How found: the two CMYK modules were absent from the crate base but present at their recorded individual revisions; all 272 Git-origin records then matched without changing a source manifest.
+
+Symptom: a source inventory takes far longer and transfers more data than its selected paths suggest.
+Cause: a broad `git grep` over a partial clone hydrates promised blobs outside the intended code read.
+Fix: list paths from tree metadata, select the actual owner files, and fetch those bounded files at the recorded commit.
+How found: the broad read was interrupted; explicit pinned raw-file reads completed the twelve-app inventory without a repository-wide content search.
+
+Symptom: a new repair regression calls a bounded decode successful and therefore assumes the document limit was bypassed.
+Cause: RunLength deliberately returns its bounded prefix, rather than an error, at the limit.
+Fix: assert the actual lower byte bound and retain an ordinary full-length control; do not change the decoder policy to satisfy an assumed error result.
+How found: the first test received a successful decode, and reading RunLength showed that success can mean a bounded prefix.
+The first disk-stopped gate never reached the corrected assertion.
+The resumed complete native gate measured 16 bytes under the lower limit and 128 in the ordinary control for both linked and repaired/unlinked updates.
+Record the successful runtime assertions against the exact source tree; the earlier source reading only justified correcting the oracle.
+
+Symptom: a receiver's strict Clippy rejects a formerly ordinary `RenderSettings` initializer, while the common owner's own complete gate passed.
+Cause: the receiver retained newer raster APIs and Vello 0.0.8 root patches; the common graph also legitimately used the registry's Vello 0.2 ABI through another engine.
+Fix: reconcile matching versions in the common owner and propagate its matching patches at the receiving root, where Cargo applies patches.
+Validate package name, version and resolved source together; permit a separate registry ABI only when the common lock declares that exact version/source.
+How found: PdfCraft first named `max_coverage`; the resolved graph then exposed the two Vello versions.
+Controls rejected a private 0.0.8 source, a private 0.2 source, an alternate shared API version and the old Git owner.
+The positive common graph retained its intentional registry ABI.
+A source-only API inventory also missed renderer and cache prerequisites, so follow each carried subject's actual preimage and tests.
+
+Symptom: the second render of a glyph procedure cut to 64 bytes no longer reports truncation.
+Cause: upstream's reviewed Type 3 cache checked the page's remaining content budget, while the shared parser additionally imposed a smaller document-local stream limit.
+The cached prefix bypassed that decoder and its warning on the next render.
+Fix: retain the original held-content and cache-overhead accounting from PdfCraft's `427c942aad3656dd3e01988f88d88a1c3bed4044`, and qualify caching against the stricter of page and filtered-stream limits.
+How found: the same synthetic compressed procedure drew its complete leading path in both renders, but the second render failed the warning assertion before that adaptation.
+Both renders then decoded and warned; the original 64 KiB, 32 MiB and font-identity cache controls passed too.
+A successful decoder result can be a bounded prefix; a cache must preserve that distinction.
+
+Symptom: a carried helper fails compilation as a duplicate definition.
+Cause: the receiver added a CMYK conversion helper where the shared owner already had one, with checked buffer-length arithmetic.
+Fix: use the existing shared conversion and preserve its bounds, rather than copying a second implementation into the receiver or deleting the checked one.
+How found: the duplicate-definition error led to comparing both bodies; the original isolated-CMYK colour control and existing separation controls passed after the shared helper was reused.
+
+Symptom: five draws of one damaged picture attempt six decodes including the ordinary control picture.
+Cause: an empty cache entry meant both a failed decode and a cache miss.
+Fix: carry the original bounded failure-cache entry and replay its warnings at every draw; do not cache a page-work refusal as a permanent image failure.
+Retain every warning variant the shared owner already exposes.
+How found: the original JPX and JBIG2-stencil controls measured six decodes before and two after PdfCraft's `558ffd7f8a65708e292a558625a907cce8dd3e30`, while every failed draw still reported its failure.
+The ordinary picture decoded once and drew every time.
+
+### Image refusal metadata and independent decode budgets
+
+Symptom: a refused JBIG2 opacity mask leaves its picture visible in the RGB or plate raster, or still hands the picture to a raw-ink consumer.
+Cause: the shared owner's independent dimension and output clamps returned without the stream-refusal marker that the newer receiver uses; the raw-ink path only watched page work exhaustion.
+Fix: retain those bounds, mark their refusals, and use one warning/refusal watcher for the picture's RGB and ink consumers.
+How found: a synthetic 64 by 16 mask declared as 1 by 1 exceeded the image's size-derived budget; RGB and plate controls exposed the black picture instead of leaving the page white, and the raw-ink control counted one image callback instead of zero.
+After the fix, the picture stays hidden, the typed content-limit diagnostic remains visible, and the valid image still reaches the ink consumer once.
+Carry the original per-stream metadata subject with its author, preserving the common owner's cancellation and allocation checks.
+
+Symptom: a proposed document-stream-limit test expects a valid known-size image to fail, but the decoder draws it without a warning.
+Cause: the oracle conflates ordinary stream materialization with a separate, format-derived known-image budget.
+Fix: read the budget definition before changing policy; keep the valid ordinary-cap case as a positive control and exceed the actual declared-image bound in the refusal control.
+How found: `filter::decode_limit` derives the known-image allowance from declared dimensions, while `max_decoded_stream` governs ordinary materialization.
+The initial 64-byte refusal expectation was wrong and was superseded explicitly; no production limit was relaxed or tightened to satisfy it.
+
+### Receiver behavior needs the reviewed prerequisites too
+
+Symptom: all newly requested public names exist, but the receiver's rendered controls still fail on a wide CMYK group, a nested knockout or a preceding pattern.
+Cause: an API-name audit does not identify earlier behavioral review fixes in the receiving backend's history.
+Fix: carry the original wide-tile and nested-space, knockout-erase and paint-transform subjects independently, preserving authors and dates and the shared plate/ink paths.
+How found: the original multi-scale and nested-space controls lost Difference blending, the knockout control measured different RGB values, and the pattern control measured magenta where the unshifted group was cyan.
+The corresponding upstream tests pass after their original fixes; the 256-level black sweep was already green on the imported Vello source and is not a newly reproduced defect.
+An RGB fill gains profile-derived CMYK tints in the later receiver, so its older no-tints control must follow that same original commit's RGB-image fixture.
+Keep the full library and every receiving application's whole gate as the qualification boundary; component controls alone do not qualify the suite revision.
+
+### Receiving a shared print API without changing printer choices
+
+Symptom: a receiving app fails with `missing field driver_settings in initializer of Job` after moving to the qualified shared library.
+Cause: the shared print job gained an optional Windows driver-dialog result, and two app constructors still used the older shape.
+Fix: search the app's current main and carry Dylan M. Taylor's original two `driver_settings: None` initializers, retaining his author and date and verifying both complete source postimages.
+How found: the whole PdfCraft gate stopped in compilation, the public file history identified the existing fix, and the common `Job` definition explicitly says CUPS ignores that Windows-only field.
+The original patch clears strict Clippy on the receiving revision; the complete receiving gate remains a separate qualification step.
+Do not remove the shared field, invent a Linux printer setting or describe the compiler error as a reproduced runtime printing failure.
+
+### Clear completed test artifacts at a verified phase boundary
+
+A single Cargo target can still fill the shared build disk when a whole library gate keeps default and all-feature native test executables before WASM, release and MSRV checks.
+Keep the disk guard active.
+After both native test commands complete, use the actual active Cargo command to verify a subsequent library-check or release-only phase.
+Inventory only executed native test paths from that run's log, verify that they are regular executable ELFs inside the owned debug target, and record their sizes and SHA-256 values before removing them.
+Refuse a changed or unknown phase before deleting anything; leave source, fixtures, production ELFs, build scripts and active compiler inputs alone.
+A guarded run removed 643 completed native test executables and recovered about 6.76 GB while the remaining common gate continued successfully.
+How found: the build disk approached its stop threshold, and the actual command transition established which test outputs were finished; the first cleanup attempt refused when the phase changed during hashing.
+The full gate still has to finish with unchanged source and harness, and its remaining target is removed after that app is finished.
+
+### A complete API surface can still receive older behavior
+
+Symptom: the shared library's whole gate and the receiver's strict compilation pass, yet the complete receiver suite fails on encrypted streams, annotation geometry and a cached color-space chain.
+Cause: checking public names and source ownership establishes neither the older behavioral patches nor the cache invariants the receiver relies on.
+Fix: use the receiver's unchanged behavioral failures as the red controls, trace each control to its original upstream subject, and carry that subject into the shared owner with its author's credit.
+Preserve shared decoder, allocation, cancellation and work limits rather than selecting the app's private backend again.
+How found: the complete PdfCraft run reached every workspace test and exposed failures that the public-name audit and the library's own tests did not cover.
+Test-introduction history narrows the search; read the production change and its prerequisites before treating that history as a diagnosis.
+The library and every receiver still need their complete gates again on the resulting common revision.
+
+Symptom: a page that selects an ICC alternate chain in reverse order overflows the stack despite a color-space depth limit.
+Cause: the profile cache retained its depth-dependent alternate fallback, allowing individually shallow reads to construct a much deeper cached graph.
+Fix: retain only the profile's own parse result and resolve its alternate at the depth where it is used, as in Grzegorz Martens's [original fix](https://github.com/storytold/pdfcraft/commit/4c815786c699f3ce745d2dc0a5cb0681fe0d2d76).
+Keep the shared owner's existing depth limit; a different limit in the old receiving backend is not authority to raise it.
+How found: the unchanged 20,000-link receiver control aborted before the port and completed normally afterwards; the code review located the fallback inside the cached closure.
+Also test the other direction, where a profile first encountered at the limit must still read its alternate when selected nearer the top.
+
+Symptom: a shared reference-alias port compiles its main path but fails in a common-only repaired-object branch.
+Cause: the new fetch result distinguishes a stored value from another reference, while that recovery branch still returns the old value type.
+Fix: preserve the recovery branch and wrap its value, keep repaired-generation matching, and use the reader trait the helper actually requires when reading a reference body.
+Keep bounded alias iteration, cancellation and the shared object-stream index cache; read the index dictionary without recursively parsing a stream's Length.
+How found: compilation named the unwrapped recovery return and then the helper's overly narrow ObjectLike bound; the Reader definition required only Readable.
+The complete Decode-array, Pattern-color and direct reference-alias controls passed after those integration corrections.
+
+
+### Sampling reviews have an ordered middle prerequisite
+
+Symptom: the original scan-shrink and enlargement controls pass, but a nearly one-to-one scan blurs; adding the sharpness review then breaks a smaller interpolated soft mask.
+Cause: the sampling family has three ordered subjects, not just the first change and its final review.
+Fix: carry kronbii's [area-average sampling](https://github.com/storytold/pdfcraft/commit/ff227b770ca6e436ee0853a2585739a8be9eb1e9), [interpolated-mask prerequisite](https://github.com/storytold/pdfcraft/commit/5ed2f4ba4f34d5eff689727d468186bc18b53350) and [bounded-row and sharpness review](https://github.com/storytold/pdfcraft/commit/c5065554a1946e4ca8895048d70095f68a4ecec5), in that order.
+Retain bounded row intermediates and the common decoder's independent allocation limits.
+How found: the unchanged controls first measured 580 blurred pixels near the source resolution, then an abrupt 0-to-255 mask edge where interpolation was expected.
+With the complete family, 23 shrink, enlargement, scan, minification and half-pixel controls pass.
+Keep every source origin and original date when committing a reviewed same-author family together; a focused green does not qualify the final shared revision.
+
+Symptom: a page-box port passes eleven area controls but loses text placed inside a usable inherited box beyond US Letter.
+Cause: filtering an unusable page-owned box after choosing it also discards the opportunity to use the nearest inherited box; the initial subject lacks its later review.
+Fix: carry the original page-box recovery and its inherited-box and diagnostic reviews, while retaining the shared owner's US Letter default.
+Filter the page-owned box and the nearest inherited box separately; do not search farther past an invalid nearest ancestor.
+How found: the original text/raster control expected a 1200 by 1200 page with ink, but received a blank 612 by 792 page; the independent nearest-invalid-ancestor control already passed.
+All twelve area controls pass with the reviewed family, including both inheritance cases.
+A merge conflict that differs only by A4 versus the already-established Letter default keeps Letter; do not revert that default while carrying the repair.
+
+
+### A moved catalog can expose old UI test assumptions
+
+Symptom: a French hotbar test cannot find its button, a German prompt test expects a differently worded warning, and a primary-font test rejects a source-shared menu-path symbol after a catalog refresh.
+Cause: the tests still assume rows absent from their earlier catalog pin; the application already translates those controls.
+Fix: search the current app history again before writing a local substitute.
+FredApps's [original three-test correction](https://github.com/storytold/pdfcraft/commit/22be7fd9fb986d4d42d7f36b0502fdf048830b7a) reads the translated labels and password warning from the catalog, and still checks every letter while leaving symbols shared with the English source to that existing path.
+Carry its exact test patch with his author and date, retaining an edition's unrelated Korean glyph control; the independently qualified suite catalog pin is a separate change.
+How found: the public correction merged during the reconciliation, the French rows supplied both labels, and a character-map audit identified only the source's U+25B8 in the affected primary font.
+The real French, German, primary-letter and Korean controls all passed with the required catalog and font inputs.
+Do not describe that primary-letter result as proof that every English menu symbol renders, or change fonts and product defaults merely to match the old test.
+
+### Receiving tests must exercise the shared owner's actual bounds
+
+Symptom: a receiving parser test rejects the deepest expected value even though the common library's own bound tests pass.
+Cause: the receiving test assumes the former private backend's limit, such as 128 direct containers, while the shared owner admits 64.
+Fix: retain the common production limit and adapt the receiver's boundary fixture to test admission at 63 and 64, refusal at 65 and the older 128 and 129, sibling recovery after refusal, hostile nesting and a small-stack traversal.
+Keep the independent function-depth and node-budget tests; a direct-object parser cap may stop a nested function before its separate function guard is reached.
+How found: the unchanged renderer sweep reported a failed 128-level positive, the shared byte reader declared 64 and already tested both sides, and the adapted receiver passed its parser, 512 KiB stack and fourteen function-limit controls.
+Do not describe a receiver-test adaptation as a production parser repair or raise a common limit to satisfy its former private backend's fixture.
+
+### A glyph name can number usage order rather than a character
+
+Symptom: numbered glyph names produce plausible but incorrect letters even after a strict glyph-list text port.
+Cause: a subset names its first used glyph C1, its second C2 and so on; an apparent C65 at code 65 is not evidence that it means A.
+Fix: carry the font-wide consistency review and its later control-code-counter check with the original subject.
+Keep strict AGL text reading separate from the lenient name lookup used to find an outline.
+How found: the original numbered Type1 and Type3 receiver controls failed on a counter starting at code 1; the missing [review](https://github.com/storytold/pdfcraft/commit/8c892e65299473ce854d253d47ecf7d58c098dd2) rejects a numbered name below code 32 for the whole font.
+All thirteen selected glyph-name and symbolic-font controls then passed.
+
+### New byte loops must keep cancellation inside a wide row
+
+Symptom: a packed, odd-width PNG-predicted image is repaired by a byte-row port, but the new loops no longer pass through the common bit reader's cancellation checkpoints.
+Cause: the original app carried the image correction without the shared owner's per-open control object.
+Fix: thread that existing control through every new filter branch, checking within a wide row as well as between rows, without changing decode or allocation bounds.
+Keep the original predictor reference tests and the common cancellation tests in both default and unsafe builds.
+How found: the three-way conflict showed the old PredictorRun and checkpoints against the new byte loops; the odd-width four-bit RGB receiver and all eight predictor controls passed after the integration, including the existing wide-row cancellation control.
+Testing a patched dependency with cargo test -p can refuse because it is not a workspace member; testing its standalone manifest without the complete local patch set can instead select an uncached registry backend.
+Use the shared crate's standalone test recipe with a disposable manifest copy and every resolved local patch, leaving source manifests and locks unchanged.
+Compile the original new unit fixtures too: their parameter initializers may need the common-only control field even when the receiving application already compiles.
+
+### A parser guard can stop recursion before the renderer reports it
+
+Symptom: the original active-form guard fixes recursive copies in a resource-less form, but own-resource, pattern and Type3 recursion controls still miss the typed warning.
+Cause: the shared syntax reader refuses an ancestor reference before a second FormXObject reaches the render guard.
+Fix: retain the [original active-form subject](https://github.com/storytold/pdfcraft/commit/42b21e5362c99be04b3fd48c23ba58290a815987) with its author, then integrate the receiving parser separately.
+Check a raw resource reference against the existing active-form identity before resolving it, and report only a known active form.
+Keep parser cycle checks, complete resource-scope isolation and the existing per-page active set.
+How found: a new independent repeated-draw witness first painted an extra recursive blue square; the original subject removed it and still allowed a later independent invocation.
+The original warning controls then remained red although tracing showed only one form entry; the raw-reference integration made all twelve recursion, repeated-draw, pattern and default-color controls pass.
+An explicit malformed resource naming a Pages dictionary is a separate negative: isolation prevents it borrowing the page's form, so it never attempts that recursion.
+Do not label every unresolved object reference a recursion limit or undo resource isolation to reach a later guard.
+
+### A repaired update must keep authentication and cancellation
+
+Symptom: the shared reader opens an older valid xref while the editing model reads objects from a final cut-off update.
+Cause: a successful older table never reaches the ordinary fallback path, and the first private repair subject lacks later authentication and object-header reviews.
+Fix: carry the complete original recovery family, authenticate the named root first, require a rebuilt table's encryption state to match it, and accept recovered pages only when at least one is usable.
+Retain the common decoder limits, per-open control, existing unlinked-xref repair identity and controlled fallback; do not copy the private Pdf::load over those APIs.
+Reuse the controlled marker search and poll inside long digit, whitespace and junk runs in the new object-header detector.
+How found: a complete receiving sweep left exactly four cut-off/header failures; the reviewed controlled port made all 683 renderer-library tests pass, including existing encrypted/wrong-password and trailing-data controls.
+Default and unsafe common-unit runs also passed cancellation inside each long header run with uncancelled positive controls.
+That library sweep still does not qualify the complete application or the other shared-library receivers.
+
+### A focused success can run no tests
+
+Symptom: a selected integration-test command exits successfully but reports zero tests.
+Cause: the test module requires a feature absent from the focused command, even though the whole all-feature gate includes it.
+Fix: inspect the module's feature guard, enable that feature and require the intended test names and a nonzero expected count in the receipt.
+How found: the common PDF raster target ran zero controls with default features; the same frozen source ran all 29 controls with all features enabled.
+Keep the first receipt as an unqualified attempt, and rerun the whole configured gate after the focused correction.
+
+Symptom: the original Type3 rendering-mode correction is present, yet a Type3 glyph in mode 7 hides a later page fill.
+Cause: the shared interpreter marks a text clip as shown before distinguishing outline glyphs from Type3 procedures, so ending the text object installs an empty outline clip.
+Fix: mark the clip only in the outline arm; keep the empty-outline clip for spaces and keep reporting the Type3 rendering mode to text extraction.
+How found: two shared-owner recording-device and pixel controls failed before the change, then passed beside fourteen existing interpretation controls; five receiving Type3 controls and strict selected Clippy also passed.
+These component results do not qualify the complete shared revision or its receiving suite.
+
+Symptom: a workspace gate passes while the changed PDF text control remains ignored.
+Cause: the PDF-specific workflow supplies a fixture configuration and licensed external fonts that the workspace command alone does not enable.
+Fix: read every workflow selected by the changed paths, provision its original hash-verified fixtures, use its configuration and runtime runner, and check actual executed totals before claiming coverage.
+How found: an initial owner selection exited successfully with zero executed controls and one ignored control; enabling `craft_pdf_unicode_fixtures` and the six pinned fixture files produced the expected runtime failure.
+A workspace result remains useful evidence for its recorded commands, but does not qualify an omitted dedicated workflow.
+
+Symptom: the original combined fill/stroke patch fixes paths while a shared text run still composites its stroke over its fill.
+Cause: the common interpreter's whole-run fill/stroke replay bypasses the imported per-glyph grouping branch.
+Fix: put the implicit group around the outline run's replay boundary, preserving event order, text advances and clipping; Type3 procedures remain single-paint operations outside this outline group.
+The reference must model one combined graphics object under ISO 32000-1/2 clause 11.7.4.4; two independent translucent graphics objects are a different operation.
+How found: the font-enabled explicit knockout-group reference failed before the integration, then all 44 selected owner controls and 26 receiving controls passed, with strict selected Clippy and formatting checks.
+These component results still require the full shared and receiving gates.
+
+
+### A locked optional package is not the active feature graph
+
+Symptom: an isolated read-only contract stops offline on a missing image-codec package, although its README says image decoding is excluded.
+Cause: its separate lockfile records optional packages that Cargo still needs to resolve; it does not inherit the parent workspace's patch table.
+Fix: inspect the shipping dependency's actual features and `cargo tree --edges normal,features` before changing a manifest or attributing the failure to a backend bypass.
+When the codec is absent from that graph, cache the exact locked inputs separately, keep source and lock unchanged, then execute the original contract offline.
+How found: the four read-only controls passed natively and in the WASM runtime after caching, while their normal graph contained no interpreter, rasterizer, writer or image codec.
+Retain the failed attempt and bind a resumed workflow to the same frozen source and harness; a missing cache entry never qualifies skipped later jobs.
+
+
+### A receiver can reject versionless edges inside a public shared crate
+
+Symptom: the receiver's native and WASM checks pass, but cargo-deny rejects the common menu, UI and print crates for wildcard dependencies despite `allow-wildcard-paths = true`.
+Cause: that exception covers normal and build edges only in private crates; public shared crates still need version requirements on their path and Git dependencies.
+Fix: add the versions read from the existing package manifests and selected immutable Git lock entry in the shared owner, retaining every path, revision and feature.
+Keep the receiver's ban and the shared crates' publication status unchanged.
+How found: the unchanged whole receiver gate named the offending public edges; adding those existing constraints made the focused ban check pass without a lockfile change.
+That focused result still needs complete shared-library and receiving gates on the resulting revision.
+The [cargo-deny exception](https://embarkstudios.github.io/cargo-deny/checks/bans/cfg.html#allow-wildcard-paths) and [Cargo's multiple locations](https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#multiple-locations) describe the policy and the source-plus-version form.
+
+
+### A receiver must carry the complete common backend patch set
+
+Symptom: the receiving Photo build cannot find `RenderContext::set_max_coverage` or `coverage_full`, although the same common revision passes its own gates and Pdf builds.
+Cause: the app copies the Hayro root patches but leaves Vello CPU and Common 0.0.8 on the registry; Cargo ignores a dependency workspace's patch table, and an identical package version does not establish identical source.
+Fix: derive the needed root patches from the selected common revision, matching both package name and version so an unrelated newer ABI remains separate.
+Check the locked resolved graph against every canonical common manifest before compiling, then run the app's original gate.
+How found: the compiler failed on the coverage API, and an independent metadata guard rejected exactly the two registry copies; adding those existing common paths changed only their lock source and checksum fields, with all names, versions and dependency lists unchanged.
+The corrected graph compiled the common backend and reached an actual importer warning regression; keep the earlier compilation attempt separate from that runtime red.
+No private backend pin or shared limit change is needed for this receiver binding.
+
+Symptom: the default focused import controls pass, but the whole workspace cannot compile the editable PDF warning match after the shared warning enum expands.
+Cause: Photo's CLI explicitly enables `pdf-editable`; the narrower IO and UI targets do not enable it by default.
+Fix: handle every new warning variant explicitly and retain the editable importer's existing unsupported-page policy; enable the optional feature in the focused control, then run the whole configured gate.
+How found: strict whole-workspace Clippy named the missing variants; actual imports with that feature then verified three recovery cases, visible rasterization, real raster layers and exact pixels against ordinary raster import.
+Those focused results do not replace the complete receiving gate or the release-profile corpus checks.
+
+### A successful log tail can hide an earlier test failure
+
+Symptom: a progress update says no failure while the final Nextest summary reports one failed test.
+Cause: `--no-fail-fast` keeps running after a failure, and a tail-only check sees later passes instead of the earlier failure.
+Fix: scan the complete accumulated log for failure records before describing progress, then qualify the gate only from its exit status and final summary.
+When aggregating totals, count the Nextest summary once; its failure recap may repeat a test binary's libtest output.
+How found: Photo's full run reported 17,603 passes, one failure and 111 skips; the earlier failure was absent from the displayed tail but present in the saved log.
+The subsequent source repair and whole green rerun remain separate evidence; a corrected monitoring script does not turn the failed run green.
+
+### A shared lockfile is not every receiver's UI dependency inventory
+
+Symptom: the graph guard refuses AniCraft before compilation because its registry Vello 0.1 packages are absent from the common lock.
+Cause: the unchanged receiver's epaint 0.36.2 and glifo 0.2 already use that ABI; the common backend owns Vello 0.0.8 and its lock also records other versions.
+Fix: require every shared API and every matching vendored package version at its actual common owner path, then admit a different registry ABI only when present in the common lock or the receiver's committed lock.
+Do not change the receiver's UI ABI merely to make a private guard pass, and do not admit a new uncommitted ABI or a Git bypass.
+How found: both committed locks and the resolved parent edges showed the existing UI dependency; seven guard controls accepted both actual app graphs and rejected five bypasses, including the original common Vello 0.0.8 registry substitution.
+These are metadata controls, not application runtime or whole-gate results; retain the failed preflight and repeat the full receiver gate separately.
+
+### A transitive sibling can reintroduce an older common owner
+
+Symptom: the app's own dependencies use the edition's shared source, but its resolved graph still contains an older Git copy of `craft-media`.
+Cause: EffectCraft's pinned FilmCraft codecs and interchange crates bring that copy through FilmCraft's bitstream, MP4 and Matroska packages.
+Fix: receive the already-qualified suite FilmCraft source as that sibling owner and record its revision separately, then inspect the complete graph again.
+Do not fix this by changing a cached Git checkout or adding a private decoder pin.
+Propagate only matching common backend versions; a different existing UI ABI retains its own qualified source.
+How found: reverse dependency edges in `cargo metadata` named the three transitive receivers; the next guard exposed a registry `linesweeper` 0.5 copy, which was replaced by its existing common vendor owner.
+That graph passed with one common source; the application's complete gate still has to qualify its API migration and behavior.
+
+### Missing media is not the origin of a guessed path
+
+Symptom: the existing EffectCraft EDL control probes four paths, including two outside its folder, instead of only the two permitted paths.
+Cause: FilmCraft's intentional [missing-media change](https://github.com/storytold/filmcraft/commit/351a713835e2fafeff17779c59cb9238d10bb398) stops marking guessed EDL media as explicitly offline, so EffectCraft's old offline-based classification loses its boundary.
+Fix: retain FilmCraft's relinking behavior and classify the freshly parsed EDL guesses by the actual parser output before probing or rebasing timecodes.
+In this reader the guessed branch records the reel as `Tape Name`, while the explicit `SOURCE FILE` branch returns before adding it.
+Keep the explicit-source path set authoritative when a guessed and a named item share one path.
+How found: the unchanged outside-folder test failed after the sibling update; the reader's commit and both source branches explained the different meaning of the offline flag.
+The corrected interchange suite also exercises the same-path named-source exception; neither the original assertion nor the upstream missing-media behavior was weakened.
+
+### A parser guard must bind source identity separately from feature policy
+
+Symptom: a receiver's PDF guard rejects the canonical edition path because it requires a literal older Git revision.
+Fix: retain the public Git default, and let the edition's recorded revision identify either its exact Git source or one clean local checkout at that revision.
+For local sources, verify the repository root and revision, reject uncommitted source changes, and compare every required parser manifest with its canonical path.
+Bound and validate the revision file before reading it; arbitrary sibling paths and mixed parser owners are not an allowed mode.
+Keep the original parser versions, read-only features and interpreter/CMap exclusions unchanged.
+How found: an actual path-bound graph failed the original guard; a focused positive then failed before the extension, while bypass, extra-feature and active-interpreter controls remained negative.
+The expanded controls also cover packaged Git sources, wrong revisions, modified source and malformed revision files.
+Focused guard success remains separate from the whole receiving application's gate.
+
+
+### A conditional font test is not a readable-language proof
+
+Symptom: Korean control strings and automation tests pass, but the captured native dialog shows missing-glyph boxes.
+Cause: the private runtime image has no Hangul face; the app's existing system-font loader is correct, and its conditional Hangul test returns early when none is installed.
+Fix: install the permitted system font in the private rig, retain its package version, font hash and licence, and repeat the real dialog with the unchanged executable.
+How found: visual inspection of the first capture disagreed with its control-label result; `fc-list :lang=ko` was empty and the font package was absent.
+Adding Debian's OFL-licensed Noto CJK faces made the same Korean title, explanation and resolution controls readable, without copying font assets into the app or altering its source.
+Keep the failed visual witness and the corrected capture separate, and tell the packaging owner that the language feature needs that runtime dependency.
+Do not describe a readable partial catalog as a complete translated interface or native-speaker review.
+
+
+### Hold ordinary cache state through an exact UI comparison
+
+Symptom: same-input ordinary exports match, but full native UI/output differs in176flat-case pixels and458direct-camera pixels.
+Cause: idle preview caching advances the timeline's thin cache bars and related progress state independently in the two fresh processes; its default is enabled.
+Fix for the proof: use the app's existing visible Cache Frames When Idle command to turn that work off in both runs before constructing the fixture, retaining the normal content and every captured pixel.
+How found: the flat difference occupied only two cache-bar rows; source inspection identified `cache_bars` and `playback.cacheWhenIdle`, and fresh controlled flat/direct runs then matched every exported, client and output pixel.
+Keep the product default unchanged and record this explicit test input rather than masking bars, changing source telemetry or calling the uncontrolled captures exact.
+The two controls compared40,000exported RGBA pixels and2,304,000complete client/output pixels without differences.
+The independent Effect baseline is the named upstream main plus the separately credited font and first-frame prerequisites, before the new shutter/common/stereo work; do not relabel that source as untouched current main.

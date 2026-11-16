@@ -285,3 +285,155 @@ The identical block-matching oracle rejected reversed eyes, and the far-surface 
 These are two measured features at two sizes, not a dense accuracy claim for every model.
 Keep the ordinary renderer entry point and headless tool defaults, including its per-eye grid and size bound, unless the person chooses another resolution.
 The capture must open the actual original PDF and parse its PRC annotation through the production loader; rendering only directly constructed test meshes does not verify that path.
+
+## Orthographic trace backgrounds and hardware witnesses
+
+Derive the prediction from the actual render mode's background projection as well as its model camera.
+An orthographic path tracer has parallel miss rays; it does not inherit a painting renderer's perspective sky constraint.
+For orthographic geometry, use `disparity = focal * baseline * (1 - Z/C)`.
+Solve both compositor inequalities over the scene's near and far depths before making the capture.
+
+Symptom: an orthographic trace measures twice the disparity expected by a previously passing painting-view oracle.
+Cause: the oracle reused the painting view's perspective environment constraint, while `TracePairFrame::cameras` correctly supplies zero infinity coefficient for orthographic miss rays.
+Fix: keep the production camera unchanged and derive a fresh prediction from the trace mode's actual depth range and constraints.
+How found: both processor and GPU captures measured 12 pixels where the inherited oracle expected 6; reading the actual trace camera and the common solver explained the factor of two.
+Fresh captures, with the independent prediction recorded first, then measured +12 and -12 displayed pixels at depths 3.75 and 6.25 about target distance 5.
+At a 640 by 360 window the native grid measured the same values; at a 320 by 180 window the selected 640 by 360 grid measured +24 and -24 before compositor scaling.
+Both tracers completed four samples per eye, vertical disparity was zero, the reversed-eye control failed, and the eyes outside the stereo window were identical.
+These are two measured features, not a dense accuracy claim.
+
+For hardware proofs, restrict the client to the intended Vulkan ICD and check the actual client process's loaded driver and open device nodes.
+Retain the enumerated device information alongside the native pair and the completed sample counters.
+An available adapter alone does not establish which driver rendered the client.
+The processor and GPU trace witnesses at both window sizes also passed on AMD and NVIDIA hardware with their existing perspective +6/-4 displayed prediction.
+The hardware selection belongs to the private proof harness, not to the program's stereo controls.
+
+Symptom: the launcher cannot stat an authorized render node before starting its container.
+Cause: the tool's own device namespace does not expose the daemon host's render node.
+Fix: use the already authorized device and group, verify their identity inside the isolated container, and inspect the actual client descriptors there.
+How found: host-side stat failed before rendering; the in-container check succeeded and the actual client mapped the selected hardware ICD with the matching device open.
+Never replace that check by a software fallback and call it a hardware pass.
+
+## Root shutter samples through collapsed instances
+
+An evaluated composition camera needs the root frame's camera identity and the root shutter sample time as separate inputs.
+Carry that time explicitly through collapsed instances, retaining their instance transforms and property overrides.
+Map sample time down through stretch and remapping; do not recover root time by subtracting a nested time.
+Keep an uncollapsed composition's own camera boundary.
+Prepare the composition, lights and environment once for a sample, then make its two parallel eye views with private effects and histories.
+
+Symptom: a collapsed identity composition under a moving root camera renders like a held camera during motion blur.
+Cause: the Classic path's shutter-camera helper returns the cached `Collapse3d.cam` for every sample.
+Candidate repair: evaluate the selected root camera at each explicit root shutter time and carry the corresponding placement through the complete collapsed-instance chain.
+How found: the retained monoscopic regression differs from the direct moving-camera world in 160 of 20,000 pixels, with maximum alpha difference about 0.361111; its held-camera control matches the collapsed frame exactly.
+This is a prerequisite failure, not a stereo proof.
+[EffectCraft #3623](https://github.com/storytold/effectcraft/pull/3623) fixes the distinct first-frame camera-identity problem; retain zorianflorian's original commit when it is needed, rather than freezing the animated camera to hide the collapsed-instance defect.
+The candidate passed 88 CPU controls including direct, nested, remapped, mixed card/mesh, held-view, blur-switch and uncollapsed-boundary cases.
+The corrected initial runtime test set had 21 passes and 47 failures before the repair.
+These component results do not establish the application's full gate or a native stereo adapter.
+The subsequent root-owner subject passed its complete nine-stage application gate: 6,677 test passes, 46 skipped or ignored, and 32 WASM crates checked.
+That checkpoint precedes its separate shared-revision receiver migration; it is still not a native stereo adapter proof.
+
+### Shutter lights must reach the GPU with their geometry sample
+
+Symptom: the CPU follows an animated root light during motion blur, while the Classic GPU keeps the frame-time brightness.
+Cause: a prepared run carried several geometry samples but exported only one frame-time light array to the shader.
+Candidate fix: retain one immutable light set per root sample and give every geometry record its light-range offset and count in one bounded storage pool.
+Keep held geometry on the original frame-time set.
+How found: a tent-shaped ambient-intensity curve inside the shutter separates a sampled average from the frame value; a symmetric linear curve would not.
+Three strict Vulkan controls, for direct and one/two-level collapsed scenes, failed before the change with 8,000 or 16,000 differing pixels and maximum channel difference 0.19047618, then all three passed.
+The changed CPU/GPU geometry layout must agree in stride and light-range fields; updating just the CPU record leaves a different shader ABI.
+Require the actual adapter and kernel for these controls, so a missing software Vulkan adapter cannot turn the test into a successful early return.
+
+### The root blur switch owns the sample count
+
+Symptom: turning off the root composition's motion blur still blurs a collapsed child's camera.
+Cause: choosing root shutter timing while retaining the child's enabled flag leaves multiple geometry samples active.
+Candidate fix: derive both the enabled flag and sample count from the root shutter owner, retaining the existing render switch and inherited layer limits.
+How found: render-off, root-off and uncollapsed controls expanded the CPU matrix to 88 cases; six root-off cases failed before the enabled flag was carried, then all 88 passed.
+Retain an observed negative in which enabling blur changes the picture, so equality is not explained by an invisible or stationary fixture.
+
+
+## Composition identity owns the stereo camera boundary
+
+Carry the selected root composition identity alongside its sample clock.
+Evaluate the root camera at each shutter sample, gather actual world-plane and mesh bounds before culling, and derive parallel views from the complete envelope.
+Keep an authored uncollapsed precomposition flat under its own camera, including any collapsed worlds inside that boundary.
+Use a point of interest only while that camera actually uses it; a one-node camera retains its image plane.
+Sort sample receipts by their exact time before comparing complete eye identities.
+
+Symptom: an inactive Point of Interest property changes a one-node camera's stereo zero plane while ordinary pixels stay unchanged.
+Cause: testing whether the property exists does not establish that the camera uses it.
+Fix: reuse the camera engine's two-node predicate; retain the image plane otherwise.
+How found: two cameras with identical ordinary projections and different inactive target values produced different stereo pixels; the regression failed before the predicate was applied and passed afterwards.
+
+Symptom: an authored flat precomposition changes the root near-depth ratio from 0.8 to 0.25 and gains unintended internal disparity.
+Cause: recursion depth and the mere presence of a collapsed instance cannot distinguish the root world from a collapsed world behind an uncollapsed boundary.
+Fix: key eye projection, geometry observations, infinity and camera-space effect handling by root composition identity.
+How found: a blue internal world inside a collapsed instance, itself behind an ordinary flat precomposition, contaminated the observed root envelope; the corrected control retains the 0.8/1.2 root range and identical blue positions in both eyes.
+These two runtime regressions failed together, then the expanded renderer library passed 517 tests with one ignored and strict Clippy passed.
+Native presentation remains a separate proof.
+
+Symptom: a finite singular or sheared composition view is accepted by an adapter that canonicalizes only its camera-relative ratios.
+Cause: canonicalization hides the malformed original world-to-camera basis from the shared solver.
+Fix: validate the original finite rigid basis, handedness, affine row and physical eye consistency before making either view.
+How found: independent projection/disparity, zero-budget, invalid-depth and infinity tests passed while the finite-malformed-view regression failed; validating the original basis made all five pass.
+
+Symptom: a camera-aware effect returns a plausible flat picture even though its internal 3D geometry never reached the pair depth envelope.
+Cause: an effect-host API may expose only a projection and light while the effect privately rasterizes its own geometry.
+Fix: refuse that stereo result explicitly until the owning effect engine exports its geometry envelope and consumes the evaluated eye projection, with private history.
+Keep ordinary rendering available and respect authored flat precomposition boundaries.
+How found: a Card Dance Comp Camera fixture produced ordinary pixels and the first pair API incorrectly returned success; a negative control failed before the refusal and passed afterwards.
+A refusal is not evidence that the effect's stereo renderer has been implemented.
+
+
+## Freeze decoded resources for the complete pair
+
+An immutable project is not sufficient when a footage source decodes or replaces its resources on demand.
+For one pair, memoize decoded float/byte frames, vector rasters, models, auxiliary channels and audio by the complete query identity, then reuse those immutable values during preparation and both eye renders.
+Include the footage descriptor, proxy interpretation, exact time, dimensions and curve in keys where those affect decoding.
+Keep processed effects, accumulations and histories private to each eye; discard the query snapshot after the complete pair.
+Forward cancellation and refuse a missing required frame or model, while retaining optional negative-query results.
+
+Symptom: the same project and exact timeline time produce red content in one eye and blue content in the other.
+Cause: a decoded-resource provider returns a different frame on successive identical queries; an immutable project borrow does not freeze that provider.
+Fix: cache the original immutable decoded result once per complete query across both eye renderers and the bounds preparation.
+How found: an alternating source made the independent two-eye equality test fail; the frozen-source implementation passed with exactly one original frame read.
+
+Symptom: an unavailable required image returns a successful blank stereo pair.
+Cause: memoizing `None` preserves query identity but leaves the renderer's lenient missing-resource behavior unchanged.
+Fix: retain the original source problem or report the required input as unavailable before publishing either eye.
+How found: a separate negative regression required an error and failed before the explicit check; the corrected renderer library passed 523 tests with one ignored and strict Clippy.
+The complete application gate then passed 6,705 tests, with 46 skipped or ignored and 32 WASM crates checked.
+Those are source-gate results; they do not establish native presentation, and query counters are not scene hashes or path-tracing sample counters.
+
+
+### Preserve the ordinary background at the native pair boundary
+
+A transparent composition frame is not yet the ordinary opaque output.
+Reuse the document's existing background conversion separately on each real eye, then pack its rows without resampling.
+Capture the background in the same immutable world snapshot and include document edits in stale-work identity.
+
+Symptom: flat content in the native pair is black where ordinary output has the authored non-black background.
+Cause: the new companion calls `to_rgba8_over([0; 3])`, while the existing ordinary exporter composites over `comp.background`.
+Fix: pass the immutable document background through the native packer to both conversions.
+How found: a runtime test against the actual ordinary session exporter failed with black versus RGB128/80/32; after using the same background, all nine focused native-control tests passed.
+Use the engine's actual clamped dimensions in that reference; the first attempted assertion also assumed a smaller stage than the document permits.
+This focused result precedes the full application gate and compositor proofs.
+
+
+## Native composition shutter witness
+
+For Effect's composition-pixel camera, predict `d = b * f * (1/Z - 1/C)` with `f = zoom * native_eye_width / composition_width`.
+Read the actual compositor budget and choose the common baseline before reading captured pixels.
+A 200 by 100 authored composition, 50mm camera with C=200*50/36, native640 by320 eyes and cards at0.8C/1.2C measured+12/-8pixels in a640 by320 window.
+After resizing the client to320 by160, the native grid stayed640 by320 and measured+24/-16; the compositor scaled once.
+Classic and Advanced mixed mesh/card worlds passed, including two collapsed instance levels; a separate pixel count establishes that the blue real mesh is actually visible in each eye.
+Those are two geometric features and a mesh-presence control, not a dense shading or depth-accuracy claim.
+
+Decode the timeline identity from each eye's camera-dependent feature positions, independently of the UI frame selector.
+Frames13,15and17 matched in both eyes; all seven root shutter times had distinct central camera positions and matching eye sample records.
+Disable root blur through the existing command and require a new one-sample pair whose actual pixels differ in both eyes; matching seven-sample metadata alone cannot prove visible blur.
+The six native witnesses had zero vertical disparity, failing reversed-eye controls and zero differences outside the declared area.
+Four full-size native/display comparisons covered1,638,400pixels with zero differences; the six native readbacks contained2,457,600pixels, which is a different scope.
+The authored flat control matched ordinary output in40,000native pixels; an independent stock comparison is still a separate requirement.

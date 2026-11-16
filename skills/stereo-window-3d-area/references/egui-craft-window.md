@@ -393,3 +393,13 @@ An open upstream change for immediate child viewports is related work, not proof
 The closing proof must minimize the real private editor, keep the companion visible, and repeat both-eye identity, clock-budget, seek, wrong-eye and exact stock controls; a passing helper test alone is insufficient.
 
 Fresh minimized H.264 and Motion JPEG captures subsequently advanced through three played positions and both seeks within the unchanged minus-one to two-frame audio-clock budget, with exact native/display samples and a failing wrong-eye control.
+
+
+Symptom: interleaved stereo samples and frame identity are correct, but the native picture is twice too wide or too narrow.
+Cause: the adapter corrects raw encoded-picture sample aspect for half side-by-side and top-and-bottom input, but omits the stride of compacted alternate rows, columns or checkerboard samples.
+Fix the format-to-view interpretation before calling the shared copy primitive: rows halve the raw aspect, columns and horizontally compacted checkerboard samples double it, with factor cancellation before checked multiplication.
+Keep the copier format-neutral and do not resample an eye.
+Distinguish this raw MP4 pasp or H.264 VUI boundary from an aspect already interpreted for a compacted eye, such as some Matroska/FFmpeg paths; correcting that value again stretches it twice.
+How found: a 56-case matrix covered seven spatial layouts, two eye orders, two swap choices and two raw sample aspects; the original adapter failed all 24 interleaved shape cases while exact samples and presentation identity passed.
+The corrected decoder library passed all 25 tests, including that matrix.
+For a compositor witness, use distinct uniform grayscale eyes in independently decoded interleaved inputs and check native bytes, declared sample aspect and the resulting logical view size; this tests sample shape, not camera disparity.

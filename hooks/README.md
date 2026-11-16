@@ -44,6 +44,7 @@ WORKSPACE/                    one folder for all the work; not a repository itse
 │   ├── drafts/               texts before the person approves them
 │   ├── ledger.md             what was sent, to whom, when
 │   ├── branches.tsv          why each branch outside main stays: kept or superseded, with the reason
+│   ├── clones.tsv            the clones a trace proved can go: folder, verdict, proof, date
 │   └── hooks/                each hook's real configuration: NAME.json
 └── state/
     └── hooks/NAME/           each hook's state per session, and its logs

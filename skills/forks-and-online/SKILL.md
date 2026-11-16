@@ -81,8 +81,12 @@ Those 294 were deleted, the three repositories were set to delete a merged pull 
    Kept says what it is kept for; superseded says what replaces it.
    A squash or rebase merge is never inside main by ancestry, so its branch gets `superseded`, "squash-merged as COMMIT", before it is deleted.
 5. **Nothing is removed before it is somewhere else.** Before a clone, a worktree, a branch or a stash goes: its commits on our fork or in a bundle in the lane folder, its uncommitted files committed on a branch ([uncommitted work](#uncommitted-work)), its stashes made branches (`git stash branch NAME stash@{0}`), its linked worktrees removed first.
+6. **A clone traced piece by piece goes with a row.** When an audit proved that every local commit and every uncommitted file of a clone is in main by content, delivered another way, superseded or scratch ([the trace](references/lessons-2026-11.md#tracing-work-left-in-a-build-folder-order-617-2026-11-16)), write one row for the clone's own folder in the clones register, the second private file: full path, verdict, proof, and the date and time of the trace (`2026-11-16T03:43Z`), separated by tabs.
+   The row lets that clone go and no other (not the clones inside a folder it names), and stops counting when anything in the clone is newer than its date: trace again, write again.
+7. **A remote branch in main by content goes without a row,** as a local one does: `git cherry origin/main origin/BRANCH` with only `-` lines. A `kept` row still stops it.
 
 The hook [branch-keeper](../../hooks/branch-keeper/README.md) stands at each of these moments: at session start it says, per repository, the branches outside main with their reasons and the work on no remote; it refuses `rm -r` of a clone or a worktree, `git branch -D`, the deletion of a remote branch and `git stash drop` or `clear` when they would lose work that exists nowhere else; it shows a new branch every branch with its number; it reminds a merge that the branch goes, and clears the register row of a branch once it is inside main.
+It reads each command of a line in the folder that line's own `cd` gives it, so one line may visit several clones; a folder or a branch written as a shell variable (`git -C $R`, `for r in ...; do git -C /X/$r ...`) is refused for a deletion and said for anything else: write deletions with literal folders and names, one command per repository.
 
 ### The audit of branches
 
@@ -90,8 +94,8 @@ The hook [branch-keeper](../../hooks/branch-keeper/README.md) stands at each of 
 python3 hooks/branch-keeper/hook.py audit [--fetch] [--config FILE] [REPOSITORY...]
 ```
 
-It prints, per repository, every branch outside main (where it is, how many commits main lacks, its last date, its reason or NO REASON RECORDED), the branches inside main that still exist, the branches with commits on no remote, the stashes and the uncommitted files.
-Exit status 0: nothing owed; 1: a branch outside main without a reason, or work on no remote; 2: something could not be read.
+It prints, per repository, every branch outside main (where it is, how many commits main lacks, its last date, its reason or NO REASON RECORDED), the branches inside main that still exist, the branches with commits on no remote, the stashes and the uncommitted files; then each row of the clones register with `counts`, `DOES NOT COUNT`, `NO LONGER COUNTS` (what changed since the trace) or `folder gone`.
+Exit status 0: nothing owed; 1: a branch outside main without a reason, work on no remote, or a clones row that does not count; 2: something could not be read.
 `--fetch` is its only network use; without it the answer is as of each clone's last fetch, which it states.
 
 The same questions by hand, after `git fetch --prune`:
@@ -135,7 +139,9 @@ git stash list
   **Fix:** count only remotes with a network address; the hook does (`online_remotes`).
   **How found:** the online audits of lane clones (ORDER 351b) found work counted online whose only remote was another lane's folder.
 
-**In main by content.** `git cherry origin/main BRANCH` with no `+` line means each of its commits has an equivalent change in main; the branch can go although its hashes are in no remote. The hook reads this itself. On 2026-11-16 that settled 36 old local branches of one clone in one command.
+**In main by content.** `git cherry origin/main BRANCH` with no `+` line means each of its commits has an equivalent change in main; the branch can go although its hashes are in no remote. The hook reads this itself, for a local branch and for a remote one. On 2026-11-16 that settled 36 old local branches of one clone in one command.
+
+The four traps of the hook's first day (a remote branch in main by content refused, a traced clone that could not go, a long line read in the wrong folder, a shell variable in a path) are in [the lessons](references/lessons-2026-11.md#the-branch-hooks-first-day-order-612c-2026-11-16).
 
 ## The audit
 

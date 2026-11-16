@@ -6,7 +6,7 @@ Load it with [native-linux](../SKILL.md) when a Qt window whose style shows the 
 The result first.
 Three routes left such a window flat with nothing said.
 The first, Qt's own frame on the OpenGL path, gets its pair from two small changes, packaged as qt6-base 6.11.2+dfsg-5+stereo3d23 and Qt Quick (qt6-declarative) 6.11.2+dfsg-3+stereo3d4, with sparky-stereo-graphics 0.2.13 for its exact Qt pin; where the frame cannot be drawn into both pictures, the person is told.
-The other two are planned: the Vulkan stereo layer on an X server without DRI3, and Qt on xcb.
+The second, the Vulkan stereo layer on an X server without DRI3, gets its pair from Mesa 26.1.6-1+stereo3d25 ([the route](x11-stereo-window-without-glamor.md#a-vulkan-pair-without-dri3-the-layer-and-lavapipe)); the third, Qt on xcb, is planned.
 
 ## Tell the three apart, one command each
 
@@ -15,7 +15,7 @@ Run the program in the rig (the [qdiscs fixture](../scripts/qt-quick-pair) print
 1. **Qt's own frame, OpenGL.** The client's protocol log has the frame on the client's side and the mark of depth, but no declaration of a pair.
    `WAYLAND_DEBUG=client PROGRAM 2>&1 | grep -E 'toplevel_decoration_v1#[0-9]+\.configure|set_desktop_depth|set_content'` shows `configure(1)` (client side), `set_desktop_depth(1)` and no `set_content(3)`; qdiscs says `stereo-format 1 views-asked 2 pair 0`.
    Under KWin's own decoration the same window shows `configure(2)` and `set_content(3)`, and pairs.
-2. **The Vulkan stereo layer on X11 without DRI3.** `xdpyinfo | grep DRI3` prints nothing and the program's error output has `Mesa stereo layer: this X11 server has no DRI3; the one-layer WSI cannot present a complete pair. The two-view swapchain request was refused.`, then `vkCreateSwapchainKHR` fails with `VK_ERROR_FEATURE_NOT_PRESENT` (-8).
+2. **The Vulkan stereo layer on X11 without DRI3** (up to Mesa +stereo3d24). `xdpyinfo | grep DRI3` prints nothing and the program's error output has `Mesa stereo layer: this X11 server has no DRI3; the one-layer WSI cannot present a complete pair. The two-view swapchain request was refused.`, then `vkCreateSwapchainKHR` fails with `VK_ERROR_FEATURE_NOT_PRESENT` (-8).
 3. **Qt on xcb.** The program runs with `-platform xcb` or `QT_QPA_PLATFORM=xcb` (`tr '\0' ' ' < /proc/PID/cmdline`, `/proc/PID/environ`), and its X11 window carries no declaration: `xprop -id WINDOW _KDE_NET_WM_STEREO_CONTENT` says `not found`; qdiscs says `stereo-format 0 views-asked 2 pair 0`.
 
 ## 1. Qt's own frame on the OpenGL path (fixed)
@@ -45,7 +45,9 @@ Qt Quick's autotest has the framed row (`drawsAFramedWindowAsAPair` in `tst_qqui
 
 Upstream Qt moved the frame into subsurfaces on its dev branch (94f96210518d, David Edmundson, "wayland: move decoration into subsurfaces", Qt 6.12), which removes the blitter: at the move to 6.12 the plugin's part goes and Qt Quick's part stays.
 
-## 2. The Vulkan stereo layer on X11 without DRI3 (planned)
+## 2. The Vulkan stereo layer on X11 without DRI3 (built in Mesa +stereo3d25)
+
+The route as built, its proof and its traps: [a Vulkan pair without DRI3](x11-stereo-window-without-glamor.md#a-vulkan-pair-without-dri3-the-layer-and-lavapipe). What was measured before it:
 
 Xwayland has no DRI3 when glamor cannot start (no 3D acceleration) or `XWAYLAND_NO_GLAMOR=1` is set.
 Measured with the vk-views client ([stereo-proof-rig/scripts/vk-views](../../stereo-proof-rig/scripts/vk-views)):

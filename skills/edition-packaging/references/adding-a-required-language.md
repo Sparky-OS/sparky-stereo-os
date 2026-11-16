@@ -62,3 +62,52 @@ grep -rn -B1 -E 'msgstr "Ativar o 3D"' published-src/*/po/pt_BR/*.po
 ```
 
 A hit with an old form (`Ativar o 3D` was the drift ORDER 586 fixed in Dragon and Haruna) must be changed to the table's line, never to a new wording; the reverse check that every shipped pt_BR catalogue names the expected form is `grep -rn -A1 'msgid "Enable 3D"' */po/pt_BR/*.po`: every `msgstr` must read `Ativar 3D`, and a recipe patch that adds or fixes the string is proven in place: `patch -p1` it onto the pristine unpacked source in a container, then `msgfmt -c -o /dev/null` the changed catalogue.
+
+## Traps met in ORDER 507b (Spanish leftovers)
+
+- **Symptom:** a catalogue reads fluently and names another thing: the Spanish installer slides said "auriculares de RV" for "VR headsets" and "sin necesidad de auriculares" for "no headset needed", while a third slide used "auriculares" for "headphones". **Cause:** "headset" was taken for "headphones"; the two English words had become one Spanish word in one catalogue. **Fix:** take every new term from the language's published glossary (the front pages' glossary row for "VR headset" is "casco de realidad virtual") and write that word in the catalogue and the JSON table that generates it (`slides-*.json` and `calamares-sparky_es.ts` together: `tools/fill-ts.py` run into a scratch copy must reproduce the `.ts` byte for byte). **Found by:** reading the glossary's row against the catalogue, then this check, which lists every translation of a string holding "headset" or "headphone": the two words must not share a translation in one catalogue.
+
+  ```python
+  import sys, collections
+  import xml.etree.ElementTree as ET
+  by = collections.defaultdict(list)
+  for m in ET.parse(sys.argv[1]).iter('message'):
+      for w in ('headset', 'headphone'):
+          if w in m.find('source').text.lower():
+              by[w].append((m.find('source').text[:50], m.find('translation').text))
+  for w, rows in by.items():
+      print(w); [print('  ', r) for r in rows]
+  ```
+
+  Run it on each language: German "Headset", French "casque" (also the French word for headphones; the neighbouring slide says "casques de réalité virtuelle"), Polish "gogle" and Portuguese "óculos VR" keep the two ideas apart; Japanese "ヘッドセット" and "ヘッドホン", Korean "헤드셋" and "헤드폰", Chinese "头显" and "耳机" do too.
+- **Symptom:** the tree has a catalogue for the new language and the installed system shows English. **Cause:** no built package carries it: the last published version of the package predates the catalogue (the Spanish installer slides were committed on 10 November, the published `sparky-stereo-calamares-branding` was built on 2 November and holds nine `.qm` files). **Fix:** a new version of the package; the proof is its `lang/` folder (`dpkg-deb -x` and list `calamares-sparky_es.qm`). **Found by:** listing the published package's files instead of trusting the commit log.
+- **Symptom:** an audit of the tree says a string has no translation in any language, and the published package shows eight of them. **Cause:** the build tree no longer holds the patch that gave them; the published source's own `debian/patches` still carries it (kscreen's `kscreen-stereo.po.patch`, named in the series of every successor). **Fix:** ask the published binary: read its `.mo` with Python's `gettext.GNUTranslations` for each language and msgid and print "UNTRANSLATED" where the answer equals the key (no program of the package runs; the C locale problem above does not apply to reading a `.mo`). Then add only what is missing.
+
+  ```python
+  import gettext, sys
+  root, domain, *ids = sys.argv[1:]
+  for l in ['de','es','fr','pl','pt_BR','ja','ko','zh_CN','zh_TW']:
+      t = gettext.GNUTranslations(open(f'{root}/usr/share/locale/{l}/LC_MESSAGES/{domain}.mo', 'rb'))
+      for i in ids:
+          r = t.gettext(i)
+          print(l, i[:30], 'UNTRANSLATED' if r == i else r[:70])
+  ```
+- **Where a KDE program's added strings get their translations in the build tree:** KDE's own catalogues come from the release tarball (`po/<lang>/<domain>.po`); the strings the edition adds are carried as `sparky-os/translations/<program>-<feature>.po.patch`, a unified diff that appends to those files, named last in the package's `debian/patches/series` through the recipe's overlay folder (`overlay-stereo3dN/patches/series` for a Lean Code successor, `lc-successor.py --in-place --overlay`). A language the tarball already has (Spanish has `po/es/kcm_kscreen.po`) takes an appended hunk; a language it lacks needs the whole file in the patch. Check the hunk with `patch -p1 --dry-run` on the unpacked staged source and `msgfmt -c --check-format` on the result, add the patch to `SOURCES` in `tests/translations-shipped.py`, and give the README a line. The QML `i18n("...")` text is its msgid, with no context.
+- **A successor of a source that depends on staged packages** (kscreen +stereo3d13 needs libkscreen +stereo3d12, which only a staged folder holds) builds with the staged `.deb` files as a second flat repository (`file:/repo2 ./` with the edition's origin so the 1001 pin applies) and the same files listed in `SPARKY_LC_SIBLINGS_FILE`, or the link and start gate in `override_dh_builddeb` stops with "kscreen Depends libkf6screen8 (>= ...) but none of the choices are installable". The gate's `sources.json` names the published tree as `file:/repo` (suite `mashtabba`, the repository key dearmored).
+- **A standalone script package** (`sparky-stereo-calamares-branding`) builds with `bash build.sh`, which needs `lrelease` (`qt6-l10n-tools`) and for its JavaScript and QML files `nodejs` with `node-acorn` ("check failed: no independent tokenizer (node with acorn) available" otherwise); `lean.release check-debs` stops "release blocked: the build script did not call sparky_provenance_init" until the driver sources `sparky-os/repo/build-provenance.sh` and passes `"${SPARKY_PROV_ARGS[@]}"`. Its build record says "unrecorded: buildinfo", as the published one's does.
+
+## Finding our strings in every published source, and what a language lacks (ORDER 507b, round 2)
+
+The edition's added strings are carried as `*.po.patch` files in each source package's `debian/patches/`, some of which the build tree no longer holds. To know what a language lacks, ask the published sources and the built catalogues, not the tree:
+
+1. List every source whose newest `debian.tar.xz` (the pool's, or a stage folder's when newer) has a member ending in `.po.patch`; also grep the other patches for `+++ b/po/` and `lang/` (Dolphin, Haruna, Koko, KPhotoAlbum, VLC and others add strings in ordinary patches).
+2. Read the msgids each patch adds (any language's hunk: the first language to appear fixes the msgid and its context). A patch may be in git form (`diff --git a/po/xx/dom.po`), plain (`+++ b/po/xx/dom.po`) or `Index:` form (`+++ name/po/xx/dom.po`); a script that knows one form counts zero for a package that uses another (dragon, krdc, kdeconnect did).
+3. Read the language's `usr/share/locale/LL/LC_MESSAGES/DOMAIN.mo` out of the source's newest built `.deb` files and test each msgid (with its `msgctxt`, joined by `\x04`). A string whose translation equals the English on purpose (`%1 cm`, `Horizontal`, `X:`) is answered, so count presence, not difference.
+4. Split the missing ones: written in a patch of the build tree for that language (a rebuild is all it needs) or written nowhere.
+
+[`stereo-strings-table.py`](stereo-strings-table.py) does steps 1 to 4 for one language: `stereo-strings-table.py es --pool POOL --stage STAGE ... --tree sparky-os/translations`. The first run on the round of 16 November 2026 found, for Spanish: kscreen 100 added strings and all 100 missing (63 written nowhere, 37 only in the tree), kwin 37 and 35, dragon 71 of 71 (written in the tree, not built), and 2 to 7 in a dozen smaller sources.
+
+Traps met doing it:
+- **Symptom:** a Spanish hunk in the tree cannot apply to the published source. **Cause:** it appends to `po/es/DOMAIN.po`, a catalogue the tarball lacks and no published patch creates (kwin's `kwin-wallpaper-cost.po.patch` appends to `kcm_kwinstereodepth.po` for `es`, whose creating patch has no Spanish). **Fix:** write the patch that creates the file and put it before the appending one in the series. **Found by:** for every tree hunk with `--- a/po/es/...`, check the name in `tar -t` of the orig tarball; one `False` in 22.
+- **Symptom:** the same Spanish string appears twice and `msgfmt` refuses the catalogue. **Cause:** a new patch copied the Spanish hunks of three tree patches whose published copies have none, and a later build applied the tree copies as well. **Fix:** say in the recipe's README which patch holds which strings (kscreen's README does) and apply one of the two.
+- **Symptom:** a term the eight languages translate is English in the Spanish slides ("Throw y Catch"). **Cause:** the installer slides kept the names; the program catalogues translate them. **Fix:** decide once (this lane wrote "lanzar" and "recibir" in the unbuilt patches and listed the choice for Daniel); never leave two Spanish names for one idea.

@@ -8,7 +8,7 @@ IMG=$1 TAG=$2 EV=$3; shift 3
 HERE=$(cd "$(dirname "$0")" && pwd)
 # HW: an unpacked sparky-stereo-hardware package's usr/share/wireplumber (the headset hook, scenario hook)
 HW=${HW:?set HW to the unpacked package's usr/share/wireplumber}
-ALL="matrix pulse bluetooth dither24 dither16 person apply weakcpu hook"
+ALL="matrix pulse bluetooth dither24 dither16 person apply weakcpu hook wuh"
 SCEN=${*:-$ALL}
 run() { # NAME ROOT_PREP COMMAND... : root prepares, then the session runs as the unprivileged user "rig"
 	local name=$1 prep=$2; shift 2
@@ -43,6 +43,8 @@ chown -R 1001:1001 /home/rig/.config' "python3 -I /src/proof.py apply" | grep '^
 			"python3 -I /src/proof.py rows --devices dac --rates 44100,192000" | grep '^{' >"$out" ;;
 	hook) # the headset hook of sparky-stereo-hardware (the published file)
 		run hook : "python3 -I /src/proof.py hook" | grep '^{' >"$out" ;;
+	wuh) # the What U Hear bridge (a pw-loopback client from a user unit): one sink's monitor played to another
+		run wuh : "python3 -I /src/proof.py wuh" | grep '^{' >"$out" ;;
 	esac
 	echo "$s: $(wc -l <"$out") lines"
 done

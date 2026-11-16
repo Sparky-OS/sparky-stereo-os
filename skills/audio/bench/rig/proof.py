@@ -242,6 +242,42 @@ def hook_row():
     print(json.dumps(row_))
 
 
+def wuh_row():
+    """The What U Hear bridge: a pw-loopback client (as the bridge's user unit runs it) captures the monitor of one sink and
+    plays it to another, which is not allowed to fall back to the first. A 96 kHz file goes to the first sink; the second
+    device must receive the same audio."""
+    wav = '/tmp/sa631-wuh.wav'
+    mkwav.main(wav, 96000, 4)
+    for suffix in ('.raw', '.raw.params'):
+        for d in ('dac', 'hdmi'):
+            try:
+                os.remove(f'{OUTDIR}/{d}{suffix}')
+            except FileNotFoundError:
+                pass
+    loop = subprocess.Popen(['pw-loopback', '-n', 'what-u-hear-bridge', '-C', DEV['dac'], '-i', 'stream.capture.sink=true',
+                             '-P', DEV['hdmi'], '-o', 'node.dont-fallback=true node.virtual=false'],
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    time.sleep(2)
+    p = subprocess.Popen(['pw-cat', '-p', '--target', DEV['dac'], wav], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    time.sleep(1.8)
+    objs = dump()
+    p.wait(timeout=20)
+    time.sleep(0.5)
+    loop.terminate(); loop.wait(timeout=5)
+    res = {}
+    for d in ('dac', 'hdmi'):
+        try:
+            par = json.load(open(f'{OUTDIR}/{d}.raw.params'))
+            nfr, val, n = frames_of(f'{OUTDIR}/{d}.raw', par['format'])
+            nz = sum(1 for i in range(0, min(nfr, par['rate'] * 3), 7) if val(i * n * 2) != 0)
+            res[d] = {'rate': par['rate'], 'format': par['format'], 'frames': nfr, 'nonzero_samples_of_every_7th': nz}
+        except (OSError, ValueError, KeyError) as e:
+            res[d] = {'error': str(e)}
+    print(json.dumps({'bridge_nodes': sorted(o['info']['props'].get('node.name', '') for o in objs
+                                            if o.get('type') == 'PipeWire:Interface:Node' and 'bridge' in o['info']['props'].get('node.name', '')),
+                      'devices': res}))
+
+
 def liveapply_row(a):
     """A device plugged in during the session: the list the session follows, before and after `sparky-stereo-audio apply`,
     and a 96 kHz file played to the new device and to the DAC."""
@@ -260,7 +296,7 @@ def liveapply_row(a):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('cmd', choices=['rows', 'dither', 'apply', 'hook', 'liveapply'])
+    ap.add_argument('cmd', choices=['rows', 'dither', 'apply', 'hook', 'liveapply', 'wuh'])
     ap.add_argument('--player', default='pw-cat')
     ap.add_argument('--source16', action='store_true')
     ap.add_argument('--rates', default='44100,48000,88200,96000,192000')
@@ -273,6 +309,8 @@ def main():
         return apply_row(a)
     if a.cmd == 'hook':
         return hook_row()
+    if a.cmd == 'wuh':
+        return wuh_row()
     if a.cmd == 'liveapply':
         return liveapply_row(a)
     for dev in a.devices.split(','):

@@ -57,6 +57,26 @@ The chain under Secure Boot is Debian's Microsoft-signed shim, Debian's signed G
 - `installed.sh` and `disk-tool.sh`: an installed disk with a serial login (`getty`), its EFI files (`fallback`) and its kernels (`kernels`); `checks/installed.txt` on the serial line.
 - `bootmatrix.py` and `vmctl.py`: one boot with a key timeline, and single keys or screenshots for walking through MokManager.
 
+## The stick's layout, checked on every ISO
+
+`iso-build/check-layout.sh ISO` (called by `check-iso.sh`) reads `xorriso -indev ISO -report_system_area plain` and fails, with what is missing and what to do, when the ISO lacks any of: an isohybrid MBR (`System area summary: MBR isohybrid ...`), a GPT, the Apple partition map (`APM partition type : 1 Apple_HFS` whose path is the EFI image), an active MBR partition 1 at LBA 64, and an MBR partition of type 0xef that is `/boot/grub/efi.img`.
+Why: Apple's firmware reads the Apple partition map to list a stick, a packer that loses `-isohybrid-apm-hfsplus` gives an ISO that boots on PCs and is invisible to a Mac, and Apple's firmware is not in the boot matrix, so nothing else catches it.
+The packer's own options (sparkybackup, `-isohybrid-mbr isohdpfx.bin -partition_offset 16 ... -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot -isohybrid-gpt-basdat -isohybrid-apm-hfsplus`) are the green case.
+`iso-build/tests/test-check-layout.sh` makes four small ISOs with those options (whole, without the Apple map, without the GPT, with neither), a file that is not an ISO and a saved report with an inactive partition 1: the whole command passes and each missing option fails naming itself.
+
+Traps:
+
+- **Symptom: `check-layout.sh` on a file that is not an ISO fails with the isohybrid line, not with "cannot read".** Cause: xorriso reads any file without error and reports no boot structure; the failing check is right.
+- **Symptom: `sgdisk -v` on the ISO says the MBR partitions overlap.** Cause: by design, xorriso marks the EFI image inside the ISO partition (`-isohybrid-gpt-basdat`); do not repair it ([the Intel Mac note](../../drivers/references/intel-mac-on-the-bench.md)).
+- Reading the report needs xorriso in the build image (it has it) and no mount; run it on the ISO file before the stick is written.
+
+## The driver pool (ORDER 614)
+
+The packer carries Debian's own `broadcom-sta-dkms`, `dkms` and the headers of every kernel in the image as unmodified .deb files in `/usr/share/sparky-stereo/driver-debs` with a `Packages` index (`lists/driver-pool.list`, the block "the driver pool" of `pack.sh`; tests `U08` of `iso-build/tests/no-silent-failures.py`).
+`apt-get download` is used and not `--download-only`, which leaves the files of a flat `file:` repository where they are; a package missing from the index stops the packer.
+The installer's offline folder is another folder: `offline-packages off` deletes it after the installation.
+How the pool is used, and the licence: [a closed Wi-Fi driver from the ISO](../../drivers/references/closed-wifi-driver-from-the-iso.md).
+
 ## What a fresh install must show at its first boot
 
 A checklist for the image check, from an install on a real notebook that booted with three faults (ORDER 572, 2026-11-14).

@@ -11,7 +11,8 @@ description: >-
   a new kernel, dkms says openssl not found, modprobe says Key was rejected by service, ConditionFirstBoot never fires,
   nouveau reports firmware unavailable, amdgpu hangs with a page fault, ring timeout and a device coredump or repeats
   an IP block soft reset with device wedged, virtio-gpu oopses with stereo on, a USB camera delivers no YUYV frames,
-  or a udev chmod hides its failure.
+  a Broadcom Wi-Fi card (BCM4360, wl, broadcom-sta-dkms) has no driver or a closed vendor driver must come from the ISO
+  with its licence shown, or a udev chmod hides its failure.
 ---
 
 # Drivers: 3D modes and deep colour in the kernel
@@ -23,6 +24,7 @@ description: >-
 3. Return mode/timing differences, InfoFrame or display evidence, 2D regressions and untested hardware. A virtual driver cannot prove a cable handshake.
 
 For [a USB camera that delivers nothing in one format](references/usb-camera-one-format.md), start with descriptors, probe values, usbmon and payload arithmetic; then test the actual decoder in KUnit before a person's camera comparison.
+For [a closed Wi-Fi driver from the ISO](references/closed-wifi-driver-from-the-iso.md) (Broadcom's `wl`: the licence shown from the package file, the disk's driver pool, DKMS on the edition's kernel with signing, each step verified and each failure kept), start with the recipe and the table of failures.
 For [an Intel Mac on the bench](references/intel-mac-on-the-bench.md), start with the stick's layout against Apple's firmware, then the devices that need more than the kernel (Broadcom wl for the Wi-Fi chip, with its licence), the read-only readings in order and the traps; nothing in it was run on the machine.
 
 **Check freshness first.**

@@ -1,0 +1,51 @@
+{
+  "enabled": true,
+  "workspace": "/path/to/your/workspace",
+  "paths": {
+    "queue": "partners/queue",
+    "state": "state/hooks"
+  },
+  "state_file": "queue:QUEUE.tsv",
+  "journal": "queue:ORDER.md",
+  "owner_origin": "owner",
+  "owner_name": "the requester",
+  "origins": ["owner", "follow-up", "finding", "security", "breakage", "round", "outreach", "machinery"],
+  "jump_origins": ["security", "breakage", "round"],
+  "tiers": ["foundation", "upstream", "own", "later", "-"],
+  "statuses": ["open", "in-flight", "review", "staged", "published", "done", "parked", "waiting-owner", "merged", "superseded", "unknown"],
+  "closed_statuses": ["published", "done", "merged", "superseded"],
+  "slots": 4,
+  "on_missing_state": "refuse",
+  "owed_acceptance": "refuse",
+  "handbacks_waiting": "tell",
+  "stale_hours": 12,
+  "running_marker": ".active",
+  "lanes_exempt": true,
+  "launch_patterns": ["launch-lane\\.sh\\s+(?:queue/)?(\\S+)"],
+  "brief_pattern": "(?:BRIEF[^/\\s\"'`]*|AGENTS)\\.md",
+  "lane_id_pattern": "-([A-Za-z]?\\d+[a-z]*\\d*[a-z]*)$",
+  "match_lane_by_id": true,
+  "lane_rows": {},
+  "id_pattern": "^[A-Za-z]?\\d+[a-z]*\\d*[a-z]*$",
+  "acceptance_patterns": [
+    "(?i)\\b(?:ORDER|item)\\s+#?(?P<id>[A-Za-z]?\\d+[a-z]*\\d*)\\b[^\\n]{0,60}?\\b(?:accepted|merged|published|staged|closed)\\b",
+    "(?i)(?<![\\w:.-])(?P<id>[A-Za-z]?\\d+[a-z]*\\d*)\\s+(?:milestone\\s+\\w+\\s+)?(?:accepted|merged|published|staged|closed)\\b",
+    "(?i)\\b(?:accepted|merged|published|staged|closed)\\s*(?:\\([^)]*\\))?:?\\s*(?:ORDER|item)?\\s*#?(?P<id>[A-Za-z]?\\d+[a-z]*\\d*)\\b"
+  ],
+  "report_handed_back": "^STATUS: (review|blocked)",
+  "report_working": "^STATUS: working",
+  "report_accepted": "^STATUS: (accepted|done)",
+  "journal_scan_chars": 6000,
+  "context_open_listed": 8,
+  "max_listed": 12,
+  "audit_folders": "briefed",
+  "audit_ignore": [],
+  "on": {
+    "session_start": true,
+    "prompt": true,
+    "gate": true,
+    "mark_in_flight": true,
+    "journal": true
+  },
+  "state_keep_days": 30
+}

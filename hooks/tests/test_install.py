@@ -17,7 +17,7 @@ sys.path.insert(0, HOOKS)
 sys.path.insert(0, os.path.join(HOOKS, 'lib'))
 import install  # noqa: E402
 
-ALL = ['branch-keeper', 'brief-and-handback', 'container-guard', 'design-reading', 'disk-floors', 'outreach-guard', 'publish-check', 'stereo-contract-guard']
+ALL = ['branch-keeper', 'brief-and-handback', 'container-guard', 'design-reading', 'disk-floors', 'outreach-guard', 'publish-check', 'queue-keeper', 'stereo-contract-guard']
 
 
 def run(*args):
@@ -62,7 +62,7 @@ class Install(unittest.TestCase):
         for folder in ('memory', 'repos', 'partners/queue', 'private/drafts', 'private/hooks', 'state/hooks'):
             self.assertTrue(os.path.isdir(os.path.join(self.ws, folder)), folder)
         for starter in ('memory/MEMORY.md', 'partners/HOUSE-RULES.md', 'private/README.md', 'private/ledger.md', 'private/branches.tsv',
-                        'private/clones.tsv'):
+                        'private/clones.tsv', 'partners/queue/QUEUE.tsv'):
             self.assertTrue(os.path.isfile(os.path.join(self.ws, starter)), starter)
         self.assertEqual(os.stat(os.path.join(self.ws, 'private')).st_mode & 0o777, 0o700)
         for name in ALL:
@@ -158,7 +158,7 @@ class Install(unittest.TestCase):
         hooks = json.loads(r.stdout)['hooks']
         self.assertEqual(sorted(hooks), ['PostToolUse', 'PreToolUse', 'SessionStart', 'UserPromptSubmit'])
         by_matcher = {g.get('matcher'): [h['command'] for h in g['hooks']] for g in hooks['PreToolUse']}
-        self.assertEqual(sorted(by_matcher), ['*', 'Agent|Task|SubagentHandback', 'Bash', 'Edit|Write'])
+        self.assertEqual(sorted(by_matcher), ['*', 'Agent|Task|Bash', 'Agent|Task|SubagentHandback', 'Bash', 'Edit|Write'])
         bash = ' '.join(by_matcher['Bash'])
         for name in ('branch-keeper', 'container-guard', 'disk-floors', 'outreach-guard', 'publish-check', 'stereo-contract-guard'):
             self.assertIn(f'/{name}/hook.py', bash)
@@ -167,7 +167,10 @@ class Install(unittest.TestCase):
         self.assertEqual(command, f"python3 {HOOKS}/design-reading/hook.py --config '{self.ws}/private/hooks/design-reading.json'")
         self.assertNotIn('matcher', hooks['UserPromptSubmit'][0])
         post = {g['matcher'] for g in hooks['PostToolUse']}
-        self.assertEqual(post, {'Bash', 'Read', 'mcp__reference__consult_knowledge'})
+        self.assertEqual(post, {'Agent|Task|Bash|Write|Edit', 'Bash', 'Read', 'mcp__reference__consult_knowledge'})
+        queue = [h['command'] for g in hooks['PreToolUse'] if g['matcher'] == 'Agent|Task|Bash' for h in g['hooks']]
+        self.assertEqual(len(queue), 1)
+        self.assertIn('/queue-keeper/hook.py', queue[0])
         starts = [h['command'] for g in hooks['SessionStart'] for h in g['hooks']]
         self.assertTrue(any('/branch-keeper/hook.py' in c for c in starts))
         self.assertTrue(all(h['type'] == 'command' and h['timeout'] > 0 for g in hooks['PreToolUse'] for h in g['hooks']))
@@ -231,12 +234,12 @@ class Install(unittest.TestCase):
         commands = [h['command'] for g in merged['hooks']['PreToolUse'] for h in g['hooks']]
         self.assertIn('python3 /somewhere/else/guard.py', commands)
         ours = [c for c in commands if HOOKS in c]
-        self.assertEqual(len(ours), 10)
+        self.assertEqual(len(ours), 11)
         # writing again replaces our entries instead of adding them twice
         run('wire', 'claude', self.ws, '--write', settings)
         with open(settings) as f:
             again = json.load(f)
-        self.assertEqual(len([h for g in again['hooks']['PreToolUse'] for h in g['hooks'] if HOOKS in h['command']]), 10)
+        self.assertEqual(len([h for g in again['hooks']['PreToolUse'] for h in g['hooks'] if HOOKS in h['command']]), 11)
         r = run('unwire', settings)
         self.assertIn('handler(s) of', r.stdout)
         with open(settings) as f:

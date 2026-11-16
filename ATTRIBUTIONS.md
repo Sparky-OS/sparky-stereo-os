@@ -1050,3 +1050,9 @@ VLC Stereo +stereo3d21 builds on other people's work, named from each project's 
 - **Thomas Guillem's 30fbe5f3f6** ([VLC master](https://github.com/videolan/vlc/commit/30fbe5f3f6be7d0d066c861c6d051d8ccdef5048), "pipewire: initialize stream variable", 2025-07-15, Fixes VLC issue 29211): the one-line fix of the segmentation fault when the volume or the mute of the audio output is set before it starts. The PipeWire output itself is **Rémi Denis-Courmont's** module (Debian's vlc-plugin-pipewire), with Thomas Guillem's later work, "Copyright (C) 2024 VLC authors and VideoLAN".
 - **VLC's input and Qt interface** ("VLC authors and VideoLAN"): the elementary streams' variables (`video-es`, `audio-es`), the subpicture channels (`vout_RegisterSubpictureChannel`, `vout_OSDText`) and the data directory lookup (`src/linux/dirs.c`, `src/modules/textdomain.c`) that the patches read and use.
 - The sentence in nine languages was written for ORDER 579 and is the stereo layer's (see that entry); this order only carries it.
+
+## KDE's virtual audio streams
+
+The Sound page and volume widget build on [plasma-pa](https://invent.kde.org/plasma/plasma-pa) and [pulseaudio-qt](https://invent.kde.org/libraries/pulseaudio-qt).
+Their own histories credit **Yoann Laissus** for the original virtual-stream classification and filtering, **Nicolas Fella** for the library's stream implementation, **Ismael Asensio** for the shared role filters, **Noah Davis** for the applet's stream models, **Arjen Hiemstra** and **Alexandre Pereira** for optional virtual-device visibility, and **Bharadwaj Raju** for the global configuration used by the page.
+The edition's candidate extends these existing controls to client-less loopbacks and filters; it has not been packaged yet.

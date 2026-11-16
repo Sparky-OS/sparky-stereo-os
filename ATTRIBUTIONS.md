@@ -1051,4 +1051,10 @@ VLC Stereo +stereo3d21 builds on other people's work, named from each project's 
 - **VLC's input and Qt interface** ("VLC authors and VideoLAN"): the elementary streams' variables (`video-es`, `audio-es`), the subpicture channels (`vout_RegisterSubpictureChannel`, `vout_OSDText`) and the data directory lookup (`src/linux/dirs.c`, `src/modules/textdomain.c`) that the patches read and use.
 - The sentence in nine languages was written for ORDER 579 and is the stereo layer's (see that entry); this order only carries it.
 
+## KDE's virtual audio streams
+
+The Sound page and volume widget build on [plasma-pa](https://invent.kde.org/plasma/plasma-pa) and [pulseaudio-qt](https://invent.kde.org/libraries/pulseaudio-qt).
+Their own histories credit **Yoann Laissus** for the original virtual-stream classification and filtering, **Nicolas Fella** for the library's stream implementation, **Ismael Asensio** for the shared role filters, **Noah Davis** for the applet's stream models, **Arjen Hiemstra** and **Alexandre Pereira** for optional virtual-device visibility, and **Bharadwaj Raju** for the global configuration used by the page.
+The edition's candidate extends these existing controls to client-less loopbacks and filters; it has not been packaged yet.
+
 The x86-64-v3 packages reference (ORDER 108) builds on the APT team's architecture variants (apt 3.1.10 and later, table format and the amd64v3 row of test/integration/varianttable), Canonical's amd64v3 of Ubuntu 25.10, openSUSE's glibc-hwcaps pattern packages, CachyOS's cachyos-repo.sh and PikaOS's rebuilds of Debian sources at x86-64-v3, named from each project's own pages.

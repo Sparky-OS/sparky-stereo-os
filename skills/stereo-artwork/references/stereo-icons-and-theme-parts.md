@@ -121,10 +121,52 @@ The authoring control must share those operations, not duplicate their arithmeti
 
 The first helper slice generates an adapter from the exact published source functions, enum, reference width and KConfig defaults and records their SHA-256 hashes.
 Read the desktop settings once for both eyes and all sizes in an export.
-Integer disparity is a visible limitation at small icon sizes: with the inspected defaults, the sunk and popped presets both round to zero through 64 pixels per view.
-At 128 the sunk preset is minus one pixel and popped is zero; at 256 they are minus one and plus one.
+Integer disparity is a visible limitation at small icon sizes: with the inspected defaults, the full sunk and popped limits both round to zero through 64 pixels per view.
+At 128 full sunk is minus one pixel and full popped is zero; at 256 they are minus one and plus one.
 Report those measured results rather than calling every exported size visibly stereo.
-This does not replace the recorded unrestricted authoring-depth design with a comfort clamp.
+Daniel’s 16 November 2026 continuation keeps the person’s desktop limits until he settles a distinct icon authoring range.
+A wider range would make small icons separate visibly but could exceed those limits; that choice belongs to Daniel.
+
+## A continuous control and useful selection
+
+Sunk, screen and popped name places, not three fixed depth presets.
+Use one signed continuous value per part, with zero on the screen and both ends derived from the person's desktop limits.
+Read KWin's source defaults and the person's configuration; use the same source-derived operation for preview, export and the per-size disparity table.
+Show zero explicitly when a nonzero authoring value rounds to no disparity at an icon size.
+A selected SVG group needs a visible highlight in both previews and a thumbnail cropped to its painted bounds; IDs alone are insufficient.
+Keep highlighting out of exported artwork.
+Test fractional edits, actual keyboard delivery, Undo, Redo, and rejection of a parent and child both receiving depth.
+Read every message back from all ten compiled catalogues, including country-specific locales falling back to bare French and Spanish.
+
+## One project and KDE tool round trips
+
+Keep the ordinary copied icon theme, colour schemes and complete copied Plasma theme in one project, alongside the selected drawings, depth choices and separate paired exports.
+Do not overwrite ordinary Plasma element IDs with eye-prefixed authored pairs before the consumer understands them.
+A Plasma atlas can be rectangular: preserve its source view box, derive the per-view height from its width, and compare its zero-depth pixels with KDE's original drawing.
+Validate each vector pair against independent renders of both views, including non-square sources and translated parents.
+
+KDE's native colour editor can be used without applying a desktop colour scheme.
+Give the child a private XDG_DATA_HOME, XDG_CONFIG_HOME and XDG_CACHE_HOME, put the working .colors file under color-schemes, and pass its file stem to kcolorschemeeditor with --overwrite.
+The editor's saved scheme name can produce a different filename: read the native tool's returned stem, validate it stays inside the private colour-schemes directory, and import those bytes when the child closes successfully.
+Keep the imported colour changes in memory until the person saves the project.
+Refuse a conflicting project operation while the child is open, and report launch, read and child-exit failures.
+
+For plasmathemeexplorer, copy the complete source theme under the private data directory's plasma/desktoptheme/ID, preserve the metadata identifier, and pass --theme ID.
+Prove that the explorer used this copy, rather than a system fallback.
+On successful return, compare the private theme tree with the source and retain changed files as a project working copy, preserving valid group depth choices.
+A changed source must be revalidated before replacing the current drawing.
+The explorer's ordinary preview and the author's paired SVG preview are separate acceptance rows.
+A screenshot of the explorer alone does not prove that Plasma draws the paired parts per eye.
+
+## Package and installed acceptance
+
+Build a native package from a committed recipe with ten compiled catalogues, then run the edition's source and payload Lean Code checks, archive-backed link/start gate, complete build record and lintian.
+The build record must have no unrecorded inputs and identify a clean recipe commit.
+Install the actual candidate in the lane's own rig image, with its required runtime tools, and capture the editor at 100 percent and 125 percent.
+Record the active output mode separately from the screenshot's stereo flag.
+Check both eyes, the ordinary output, an undeclared flat reference, selected-part alignment and the surrounding screen-plane controls.
+Drive the native colour tool through real input, save and close it, then save and reopen the shared project and compare the imported bytes.
+Native project tests should also reject invalid inputs and verify that the source themes stay unchanged.
 
 ## Traps
 
@@ -177,6 +219,23 @@ This does not replace the recorded unrestricted authoring-depth design with a co
   **Cause:** a cached image tag points to another architecture despite the run's platform request.
   **Fix:** inspect the image architecture, pin its verified ID and assert `dpkg --print-architecture` before querying packages.
   **How found:** compare the runtime architecture and archive metadata, with identical apt source overrides for update and policy.
+
+- **Symptom:** selecting a small SVG group leaves its thumbnail apparently blank.
+  **Cause:** the whole atlas was reduced to thumbnail size.
+  **Fix:** crop the isolated group's painted alpha bounds before scaling the thumbnail; keep the full canvas for the stereo preview.
+  **How found:** inspect the real television group list at fractional display scale.
+- **Symptom:** a Plasma disparity check has the right magnitude and the wrong sign.
+  **Cause:** the measurement subtracted left from right while KWin's signed disparity is left minus right.
+  **Fix:** keep the measured coordinate convention explicit and compare it with the source operation.
+  **How found:** the real south-center group moved from x=30 in the left view to x=31 in the right for predicted disparity minus one.
+- **Symptom:** source preparation loses its working directory after dch.
+  **Cause:** dch renamed the version-named source directory when the Lean Code version gained +lc1.
+  **Fix:** create the source in its final version directory before preparation.
+  **How found:** the shared preparation traceback still named the old directory.
+- **Symptom:** lintian rejects a valid Lean Code debug archive for non-debug files.
+  **Cause:** the required independent payload manifest is installed beside the debug objects.
+  **Fix:** document an override limited to that package's manifest directory and the override metadata itself; still run the manifest and identity validators.
+  **How found:** the final payload checks pass and lintian identifies only those exact metadata paths.
 
 The probe builds on KDE's KIconThemes API and the edition's stereo extension by Daniel Campos Ramos.
 No external artwork or model is included.

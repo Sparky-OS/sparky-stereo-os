@@ -213,11 +213,14 @@ Its command and library copyright records name Andreas Dilger, Andries Brouwer, 
 
 The unbranded editor slice and its study build on Qt Widgets, Qt SVG, KConfig, KIconThemes and Stereo KWin.
 The helper moves chosen SVG groups in two views and keeps the original drawing in its project copy.
-It is an unpackaged prototype, not a completed desktop theme editor.
+The first packaged authoring slice adds continuous depth with undo, ten catalogues, colour schemes and Plasma SVG parts in one copied project.
+KDE's colour editor and Plasma explorer work on private project copies; model, animation and texture helpers remain later work.
 
 - [Oxygen Icons](https://invent.kde.org/frameworks/oxygen-icons), whose `scalable/devices/video-television.svgz` from release 6.28.0 is the proof drawing: **Nuno F. Pinheiro, David Vignoni, Jakob Petsovits, David J. Miller, Johann Ollivier Lapeyre, Kenneth Wimer and Riccardo Iaconelli**, named in that release's `AUTHORS`.
   The project copy retains its original drawing, `AUTHORS` and `COPYING`; the artwork is LGPL-3.0-or-later with Oxygen's artwork clarification.
 - [Plasma SDK](https://invent.kde.org/plasma/plasma-sdk), whose explorer sources inform the integration design: **Sebastian Kügler** for IconExplorer and its KTextEditor picker, **Marco Martin** for the theme explorer, and **Carl Schwan** for the look-and-feel explorer's current build integration.
+- **The Oxygen Project, Daniel Ramos and EchoSystems AI studios**, from Sparky Stereo Oxygen's own metadata and notice, for the real Plasma panel SVG and colour scheme used to verify shared projects.
+  The colour source header credits **Benoit Marchand** for the Oxygen Dark title-text contrast change.
 - [KColorSchemeEditor](https://invent.kde.org/plasma/plasma-workspace/-/tree/master/kcms/colors/editor): **Olivier Churlaud, Jeremy Whiting and Matthew Woehlke**, named by its application author list.
 - [KIconEdit 4.4.0](https://download.kde.org/Attic/extragear/kiconedit-4.4.0.tar.bz2), inspected as the earlier KDE icon editor: **Thomas Tanghus, John Califf and Laurent Montel**, from `AUTHORS`.
 - [Glaxnimate](https://invent.kde.org/graphics/glaxnimate), studied for the later animation helper: **Mattia Basaglia**, from its project copyright and maintainer record.

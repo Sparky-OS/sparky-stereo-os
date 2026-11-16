@@ -76,3 +76,7 @@ Read the traps before a change to this part, and add the next lesson there as yo
 ## The default camera in Qt programs
 
 [The default camera in Qt programs](references/default-camera-in-qt-programs.md): how Qt Multimedia lists V4L2 cameras and marks one default, where the session's default camera lives (WirePlumber's `default.configured.video.source`), how a node maps to `/dev/videoN`, the rig with user-space cameras, and the traps met (ORDER 582).
+
+## Preparing a change on Qt's dev from a fix made on our release
+
+[Preparing a change on Qt's dev](references/preparing-a-change-on-dev.md): building qtbase, qtshadertools and qtmultimedia `dev` here, the red and green runs from one commit, the control, the commit message in Qt's form, reviewers from the history, and the traps met (ORDER 603).

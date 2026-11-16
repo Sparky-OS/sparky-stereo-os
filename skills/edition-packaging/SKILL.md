@@ -4,13 +4,13 @@ description: >-
   Build, sign and ship the edition's packages: provenance, rebuilt upstream packages (+stereo3dN, i386 twins),
   dependency policy, apt pins (:any, Signed-By), conffiles, the signed repository, a publication round, DEP-11 and
   Contents, the ISO, reproducible sources (SOURCE_DATE_EPOCH), the build record and the Lean Code gate,
-  installed-package proof, ten languages. Load it when a package will not install (Breaks, Multi-Arch:
+  installed-package proof, languages. Load it when a package will not install (Breaks, Multi-Arch:
   same), apt picks Debian's build or a dummy at dist-upgrade, two builds of one source differ,
   apt-get update exits 0 on a failed fetch, lc1 says the build record is not complete, a Qt header is missing after a
   qt6-base update, a pin leaves a binding or development package uninstallable, a systemd unit's proof shows none
   of its journal lines, a preinst prompt stops a non-interactive install, a language probe shows
   English, a CMake consumer misses an imported library, a Rust suite shares its crates as dylibs,
-  or an index must be regenerated.
+  or an amd64v3 index leaves apt on the baseline.
 ---
 
 # Packaging the edition
@@ -231,6 +231,10 @@ A program with no Debian package (DisplayXR's OpenXR runtime, ORDER 58) is built
 A part Debian cannot build (a .NET program) is carried from upstream's release, checked by SHA-256, in a package of its own; `debian/copyright` comes from the tree's SPDX tags (`reuse lint --json`, [`scripts/reuse2dep5.py`](scripts/reuse2dep5.py)) plus the files REUSE cannot see.
 An OpenXR runtime joins the `openxr1-active-runtime` alternatives group Debian's Monado uses, never writing the loader's link itself; the edition builds its simulated display with one output, full side by side.
 The recipe, the coexistence rules with their specification clauses, the proof and the traps: [packaging an OpenXR runtime](references/openxr-runtime-package.md).
+
+## Packages for the processor's level
+
+[x86-64-v3 packages](references/cpu-level-packages.md): apt architecture variants with our own table, what forky's apt and dpkg do today, the complete-index rule, glibc-hwcaps and the v3 kernel, each trap with symptom, cause and fix.
 
 ## Lessons from the lanes, October to November 2026
 

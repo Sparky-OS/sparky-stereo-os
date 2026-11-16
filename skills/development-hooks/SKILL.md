@@ -4,11 +4,11 @@ description: >-
   Hooks of the edition's development cycle: small programs an AI tool or git runs by itself, in the repository's
   hooks folder (design-reading after a compaction or a long gap, brief-and-handback before a lane is dispatched or
   reports, outreach-guard before a pull request, comment, mail or push to a fork, publish-check, stereo-contract-guard,
-  disk-floors, container-guard, branch-keeper), the default workspace layout (memory, partners queue, private, state), install.py
+  disk-floors, container-guard, branch-keeper, queue-keeper), the default workspace layout (memory, partners queue, private, state), install.py
   init, check, wire and unwire for Claude Code and Codex, and how to add a hook: fail open and say so, state per
   session, a refusal that says what to do next, patterns that pass reads and our own repositories, tests that pipe an
   event in. Load it when a hook refuses a tool call (PreToolUse hook error, Required reading, Outreach guard, Lane brief
-  not ready, Hand-back not ready), a hook error notice appears, a guard stops a harmless command, a hook stopped
+  not ready, Hand-back not ready, QUEUE GATE), a hook error notice appears, a guard stops a harmless command, a hook stopped
   firing, or a rule written in a skill keeps being broken.
 ---
 
@@ -45,7 +45,7 @@ Run every command from the top folder of this repository's checkout; they need `
 5. **Watch the first run.** A hook whose path is wrong does not stop anything: the tool shows a "hook error" notice and carries on. In Claude Code, `/hooks` lists what is wired.
    In Codex, open `/hooks`, review the commands and configuration paths, and trust the entries you intend to run.
    Check the expected refusal or context on an event the hook covers; an enabled entry alone proves only that the settings were loaded.
-   Seven of the eight hooks' pages have a "Try it by hand" line that pipes one event in and prints the answer, without sending, deleting or publishing anything.
+   Eight of the nine hooks' pages have a "Try it by hand" line that pipes one event in and prints the answer, without sending, deleting or publishing anything.
 6. **Run the tests after any change:** `python3 hooks/tests/run.py` ends with `N test files, N tests: all passed`; `sh hooks/tests/clean-machine.sh` runs the whole proof on a machine that has only this repository and ends with `clean-machine proof: every step passed`.
    Both need `python3`, `python3-yaml` and `git` only; the proof works in a temporary folder and removes it.
 7. **To leave:** `python3 hooks/install.py unwire FILE` takes these hooks out of a settings file and leaves every other entry as it was.
@@ -63,6 +63,7 @@ Run every command from the top folder of this repository's checkout; they need `
 | disk-floors | Before a command that fills a disk; while a floor is crossed | Free space in GiB against each folder's floor | [disk-floors](../../hooks/disk-floors/README.md) |
 | container-guard | Before a command that stops or removes containers | Refused when it would act on every container of a shared daemon, or on a protected service | [container-guard](../../hooks/container-guard/README.md) |
 | branch-keeper | Session start and after a compaction; before a removal, a new branch or a merge; after a merge | The branches outside main with their reasons and the work on no remote; a removal that would lose the only copy of work is refused; a new branch sees the branches with its number; `hook.py audit` prints the whole table | [branch-keeper](../../hooks/branch-keeper/README.md) |
+| queue-keeper | Session start and every prompt; before a dispatch or a launch command; after a dispatch; after a write to the journal | The requester's open requests oldest first, hand-backs waiting for a review and stale items in flight; a lane with no row, a finished item or a request that jumps its elders is refused; a started lane is marked in flight; an acceptance stays owed until its row changed | [queue-keeper](../../hooks/queue-keeper/README.md), practice in [keeping a work queue](../ai-partners/references/keeping-a-queue.md) |
 
 Every one ships switched on, as the edition uses them; `disk-floors` only tells, also under a floor, unless `below_floor` says `ask` or `deny`, and one part of `container-guard` (refusing a prune of everything) ships off.
 Each hook's page lists the default of every part.
@@ -159,14 +160,14 @@ Extend the hook that already stands at that moment (another pattern, another che
   A hook reads the command it is shown; a script file, an alias or a program that starts another are not seen.
   Codex's page says it for every tool: "Treat tool hooks as a useful guardrail, not a complete enforcement boundary."
   Keep the rule written in the skill and the house rules as well.
-- **Traps of the kit itself** are in [the lessons of the reviews](references/lessons-2026-11.md), seven of them: a workspace name that broke setup, a settings backup lost to a second write, a failed media read reported clean, a hook that a tool lists and never ran, a log that cannot replay the command it names, a hook's command-line mode that waited for an event, and one folder read for a whole line with several `cd`.
+- **Traps of the kit itself** are in [the lessons of the reviews](references/lessons-2026-11.md), fifteen of them: a workspace name that broke setup, a settings backup lost to a second write, a failed media read reported clean, a hook that a tool lists and never ran, a log that cannot replay the command it names, a hook's command-line mode that waited for an event, one folder read for a whole line with several `cd`, and the queue keeper's eight (a lane named through a shell variable, a gate that fails open, a row marked before the tool ran, a here-document body that is the text written, an echo of a launch line, an option after a subcommand, a test workspace's own lane, a minute-grained time).
 
 ## Perks
 
 - `python3 hooks/lib/design_lookup.py --memory WORKSPACE/memory WORD...` finds a recorded design by the content of the memory files, for a person as well as for the hook that uses it.
 - `hooks/publish-check/publish_check.py` is a command of its own: `--files`, `--text` on stdin, a repository's unpushed commits, `--audit N`.
 - `hooks/branch-keeper/hook.py audit` is one too: the table of every configured repository's branches, exit 1 while a branch outside main has no reason or work is on no remote, so a lane check or a publication round can call it.
-- A hook can be tried by hand with one `printf` piped into it; seven of the eight pages have the lines, and the contract guard's events are in its tests, because its page cannot print a sentence that the guard would stop.
+- A hook can be tried by hand with one `printf` piped into it; eight of the nine pages have the lines, and the contract guard's events are in its tests, because its page cannot print a sentence that the guard would stop.
 - The logs in `state/hooks/NAME/` (`refused.log`, `passed.log`, `errors.log`) are the record of what the hooks did, for a review; a log over 1 MiB is moved aside as `NAME.log.1`, a session's state is dropped after `state_keep_days` (30), and a full event kept to reproduce a decision goes under `private/`.
 
 ## Not proved yet

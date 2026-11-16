@@ -5,9 +5,10 @@ name: audio
 description: >-
   PipeWire, WirePlumber and KDE's Sound page in the edition: the audio house format (24-bit 48 kHz or more, float,
   SoXR), routing the streams KDE hides (node.virtual, node.linger, pw-loopback), sample rates and allowed-rates,
-  passthrough (AC-3, DTS, bitstream over HDMI), virtual surround filter chains, RNNoise, MIDI and emulators. Load it
-  when a stream is missing from the Sound page, a loopback or virtual sink disappears, the rate is stuck, passthrough
-  fails, VLC's PipeWire output plays silence until a seek, a game or emulator has no MIDI, or a player resamples.
+  passthrough (AC-3, DTS, bitstream over HDMI), virtual surround filter chains, RNNoise, MIDI and emulators, and the
+  sound defaults package (rates from the devices, resampler quality, dither). Load it when a stream is missing from the
+  Sound page, a loopback or virtual sink disappears, the rate is stuck at 48000, passthrough fails, VLC's PipeWire
+  output plays silence until a seek, a game or emulator has no MIDI, or a player or the sound system resamples.
 ---
 
 # Audio on Sparky Stereo OS
@@ -27,8 +28,18 @@ Written on 2026-10-10 from measurements on the development machine; the parts ma
 ## The house format for audio
 
 PCM at the source's own rate, never reduced in the middle; the edition's floor is 24 bit at 48 kHz ([house formats](../../docs/house-formats.md)).
-The sound server follows the source's rate instead of resampling: PipeWire's `default.clock.allowed-rates` set to `[ 44100 48000 88200 96000 176400 192000 ]`, with the default rate the device's best (96 kHz on the development machine's Sound Blaster).
+The sound server follows the source's rate instead of resampling, and a file whose rate the device cannot take is converted once, at the highest quality the processor carries.
+Since ORDER 631 the package `sparky-stereo-audio` ships this as system defaults: [what it sets, where each value comes from, the traps and the proof rows](references/system-defaults.md).
 Conversions happen at the edges only: the decoder on the way in, the device's format on the way out.
+
+## System defaults (sparky-stereo-audio), in one screen
+
+- Read a machine: `pw-metadata -n settings`, `pw-top -b -n 2`, `pw-dump`, and the kernel's `/proc/asound/cardN/{codec#M,eld#C.D,stream0}`; the package's own readout, in the person's language, is `sparky-stereo-audio show`.
+- Rates: 44100 and 48000 Hz always (the audio CD; AES5's 48 kHz), plus every rate the computer's own devices take. PipeWire then follows the source and never picks a rate a sink cannot open.
+- Quality: `resample.quality` 14 where one conversion of the heaviest kind (192000 to 48000 Hz) takes at most 20 percent of one core, measured at install; lower on a processor that cannot, never below PipeWire's 4.
+- Format: PipeWire already opens a device in its best format (24 or 32 bit where there is); a 16 bit-only device gets triangular dither.
+- A person's files win: the package's are `00-sparky-stereo-audio.conf`; `~/.config` and any later name in `/etc` override them.
+- Proof: `bench/rig` plays five rates to four fake devices with the published set (4 of 20 rows right) and with the package (20 of 20).
 
 ## Why KDE hides some streams, and how to make them routable
 
@@ -36,7 +47,9 @@ Conversions happen at the edges only: the decoder on the way in, the device's fo
 - A loopback or filter loaded as a module in `pipewire.conf.d` has no client, so it never appears, and its output cannot be chosen in KDE (pavucontrol lists it).
 - Running it as a client program (`pw-loopback` from a systemd user service) gives it a client; pipewire-pulse still reports no client while the node carries `node.virtual = true` (the loopback's default), so set `node.virtual = false` in both stream property sets.
 - With a client program, do **not** set `node.linger = true`: the nodes would outlive each restart and multiply. Keep `node.dont-fallback = true` on a stream that must never fall back to another device (to avoid feeding a card its own output), and let systemd restart the client (`Restart=always`) when WirePlumber removes the stream because its target is gone.
-- **Being built:** a "Show virtual streams" option on KDE's Sound page, "Listen to this device" for any input, and a combined recording source (the output mix plus a microphone).
+- The edition's candidate virtual-stream switch extends the applet's existing device option and adds an independent Sound-page option, both off by default; it is tested from the Plasma 6.7.4 source, not packaged yet.
+- How the models, stream routes, isolated null-device rig and controls fit together: [KDE virtual streams](references/kde-virtual-streams.md).
+- **Being built:** "Listen to this device" for any input and a combined recording source (the output mix plus a microphone).
 
 ## What PipeWire already ships
 
@@ -63,11 +76,13 @@ The commands, the two-machine test (a disposable gateway VM with the adapter, a 
 
 ## Standards
 
-AES5 (preferred sampling frequencies; 48 kHz for professional use); the CD Red Book (44.1 kHz, 16 bit); IEC 60958 and IEC 61937 (PCM and encoded audio over S/PDIF and HDMI®); CTA-861 (audio data blocks in the EDID); ITU-R BS.775 (multichannel speaker layouts); AES69 (SOFA files for head-related transfer functions).
+AES5 (preferred sampling frequencies; its 2018 abstract: "A sampling frequency of 48 kHz is recommended for the origination, processing, and interchange of audio programs employing pulse-code modulation", with recognition of 44.1 kHz for consumer applications, 32 kHz for transmission and 96 kHz for higher bandwidth; read from the Wayback Machine, the standard itself is paid); the CD Red Book (44.1 kHz, 16 bit); IEC 60958 and IEC 61937 (PCM and encoded audio over S/PDIF and HDMI®); CTA-861 (audio data blocks in the EDID); ITU-R BS.775 (multichannel speaker layouts); AES69 (SOFA files for head-related transfer functions).
 
 ## Lessons from the lanes, October to November 2026
 
-From the lanes of 25 October to 6 November 2026; add the next lesson here as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
+From the lanes of 25 October to 16 November 2026; add the next lesson here as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
+
+- The edition shipped Debian's PipeWire settings (48000 only, quality 4) until ORDER 631; before saying what a machine's graph does, read it (`pw-metadata -n settings`), never assume the defaults are ours. The traps of building the defaults and their rig (a container masks `/proc/asound`, an ALSA plugin needs `-DPIC`, nodes made from a WirePlumber script need a global table, dither on a 16 bit device costs bit perfection, a row that fails only in the green image) are in [system-defaults](references/system-defaults.md#traps-symptom-cause-fix-how-found). (lane system-audio-defaults-631)
 
 - Result of the VLC PipeWire fix: MOV004.mp4 20 s three times, +stereo3d8 no sound and 44 to 50 flushes, +stereo3d9 sound at the track's first sound (1.08 s) with 0 flushes and 0 silences; after four seeks sound at every target; drift view +0.6 ms (MOV004) and +3.3 ms (48 kHz stereo). With 24 kHz audio resampled to 96 kHz VLC's own drift view reads -21 ms (old) and -27 ms (fixed) because the SoX resampler latency is not counted; VLC corrects only above 40 ms. (lane players-shared-layer)
 

@@ -19,6 +19,7 @@ These hooks are how that is kept without anyone having to ask.
 | [disk-floors](disk-floors/README.md) | Before a command that fills a disk, and while a floor is crossed | Free space in GiB against each folder's floor | on, telling only |
 | [container-guard](container-guard/README.md) | Before a command that stops or removes containers | Refused when it would act on every container of a shared daemon or on a protected service | on |
 | [branch-keeper](branch-keeper/README.md) | At session start and after a compaction; before a command that removes a clone, a worktree, a branch or a stash, makes a branch or merges one; after a merge | The branches outside main with their recorded reasons and the work on no remote; a removal that would lose work that exists nowhere else is refused; a new branch is shown the branches with its number; a merge is reminded that the branch goes | on |
+| [queue-keeper](queue-keeper/README.md) | At session start and every prompt; before a dispatch or a launch command; after a dispatch; after a write to the journal | The requester's open requests oldest first, the hand-backs waiting for a review and the stale items in flight; a lane with no row, a finished item or a request that jumps its elders is refused; a started lane is marked in flight; an acceptance written to the journal stays owed until the row changed | on |
 
 Every hook folder has the same five things: `hook.py` (the logic), `config.example.json` (every key, with the edition's defaults), `wiring.json` (the events it wants, per tool), `tests/` and a `README.md` that says what it runs on, what it refuses or adds, why, and how it fails.
 
@@ -34,7 +35,7 @@ WORKSPACE/                    one folder for all the work; not a repository itse
 │   └── MEMORY.md             their index, one line per file
 ├── partners/
 │   ├── HOUSE-RULES.md        the rules every partner reads first
-│   └── queue/                one folder per lane
+│   └── queue/                the work queue: QUEUE.tsv (its state, one row per item), ORDER.md (its journal), one folder per lane
 │       └── LANE/
 │           ├── BRIEF.md      the task, with its Design section
 │           ├── REPORT.md     the hand-back; its first line is the status

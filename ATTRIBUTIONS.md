@@ -209,6 +209,22 @@ Names come from their source copyright headers and Debian copyright records.
 The independent filesystem checks use `blkid` from [util-linux](https://github.com/util-linux/util-linux).
 Its command and library copyright records name Andreas Dilger, Andries Brouwer, Theodore Ts'o, Kay Sievers, Karel Zak, Bastian Friedrich, Corentin Chary, Mike Hommey, Andrew Nayenko, Jeroen Oortwijn, Jiro SEKIBA, Philipp Marek, Milan Broz, Alejandro Martinez Ruiz, Eric Sandeen, Rolf Fokkens and Zeeshan Ali (Khattak), alongside Red Hat and the util-linux contributors.
 
+### 0.3.2 Stereo icon authoring study and first helper
+
+The unbranded editor slice and its study build on Qt Widgets, Qt SVG, KConfig, KIconThemes and Stereo KWin.
+The helper moves chosen SVG groups in two views and keeps the original drawing in its project copy.
+It is an unpackaged prototype, not a completed desktop theme editor.
+
+- [Oxygen Icons](https://invent.kde.org/frameworks/oxygen-icons), whose `scalable/devices/video-television.svgz` from release 6.28.0 is the proof drawing: **Nuno F. Pinheiro, David Vignoni, Jakob Petsovits, David J. Miller, Johann Ollivier Lapeyre, Kenneth Wimer and Riccardo Iaconelli**, named in that release's `AUTHORS`.
+  The project copy retains its original drawing, `AUTHORS` and `COPYING`; the artwork is LGPL-3.0-or-later with Oxygen's artwork clarification.
+- [Plasma SDK](https://invent.kde.org/plasma/plasma-sdk), whose explorer sources inform the integration design: **Sebastian Kügler** for IconExplorer and its KTextEditor picker, **Marco Martin** for the theme explorer, and **Carl Schwan** for the look-and-feel explorer's current build integration.
+- [KColorSchemeEditor](https://invent.kde.org/plasma/plasma-workspace/-/tree/master/kcms/colors/editor): **Olivier Churlaud, Jeremy Whiting and Matthew Woehlke**, named by its application author list.
+- [KIconEdit 4.4.0](https://download.kde.org/Attic/extragear/kiconedit-4.4.0.tar.bz2), inspected as the earlier KDE icon editor: **Thomas Tanghus, John Califf and Laurent Montel**, from `AUTHORS`.
+- [Glaxnimate](https://invent.kde.org/graphics/glaxnimate), studied for the later animation helper: **Mattia Basaglia**, from its project copyright and maintainer record.
+
+No 3D model is included in this slice.
+These names credit the records inspected, rather than replacing each project's complete contributor list.
+
 ### 0.4 Conectiva and its programmers
 
 **Source**: [Conectiva on Wikipedia (in Portuguese)](https://pt.wikipedia.org/wiki/Conectiva), [APT-RPM](https://en.wikipedia.org/wiki/APT-RPM), [Synaptic](https://en.wikipedia.org/wiki/Synaptic_(software)), [Exame on Conectiva's history](https://exame.com/tecnologia/conectiva-linux-sistema-operacional-do-parana-que-quase-venceu-o-windows-no-brasil-dos-anos-2000/)
@@ -1050,5 +1066,11 @@ VLC Stereo +stereo3d21 builds on other people's work, named from each project's 
 - **Thomas Guillem's 30fbe5f3f6** ([VLC master](https://github.com/videolan/vlc/commit/30fbe5f3f6be7d0d066c861c6d051d8ccdef5048), "pipewire: initialize stream variable", 2025-07-15, Fixes VLC issue 29211): the one-line fix of the segmentation fault when the volume or the mute of the audio output is set before it starts. The PipeWire output itself is **Rémi Denis-Courmont's** module (Debian's vlc-plugin-pipewire), with Thomas Guillem's later work, "Copyright (C) 2024 VLC authors and VideoLAN".
 - **VLC's input and Qt interface** ("VLC authors and VideoLAN"): the elementary streams' variables (`video-es`, `audio-es`), the subpicture channels (`vout_RegisterSubpictureChannel`, `vout_OSDText`) and the data directory lookup (`src/linux/dirs.c`, `src/modules/textdomain.c`) that the patches read and use.
 - The sentence in nine languages was written for ORDER 579 and is the stereo layer's (see that entry); this order only carries it.
+
+## KDE's virtual audio streams
+
+The Sound page and volume widget build on [plasma-pa](https://invent.kde.org/plasma/plasma-pa) and [pulseaudio-qt](https://invent.kde.org/libraries/pulseaudio-qt).
+Their own histories credit **Yoann Laissus** for the original virtual-stream classification and filtering, **Nicolas Fella** for the library's stream implementation, **Ismael Asensio** for the shared role filters, **Noah Davis** for the applet's stream models, **Arjen Hiemstra** and **Alexandre Pereira** for optional virtual-device visibility, and **Bharadwaj Raju** for the global configuration used by the page.
+The edition's candidate extends these existing controls to client-less loopbacks and filters; it has not been packaged yet.
 
 The x86-64-v3 packages reference (ORDER 108) builds on the APT team's architecture variants (apt 3.1.10 and later, table format and the amd64v3 row of test/integration/varianttable), Canonical's amd64v3 of Ubuntu 25.10, openSUSE's glibc-hwcaps pattern packages, CachyOS's cachyos-repo.sh and PikaOS's rebuilds of Debian sources at x86-64-v3, named from each project's own pages.

@@ -420,6 +420,12 @@ Their living successors, which we make stereo: the QML Flip Switch and Cover Swi
 Qt SVG's colour work builds on its developers' own, most of all **Hatem ElKharashy** and **Robert Löhning**, whose `resolveColor()` test our change extends.
 Our first Qt change was reviewed within hours by **Tim Blechmann**, with **Artem Dyomin, Nils Petter Skålerud and Jøger Hansegård** as reviewers.
 
+### 2.8a The browser: Waterfox and Mozilla's Gecko
+
+**Source**: [Waterfox](https://github.com/BrowserWorks/Waterfox), our fork [Sparky-OS/waterfox](https://github.com/Sparky-OS/waterfox); Mozilla's Gecko and WebRender, under the Mozilla Public License 2.0 **What we changed**: WebXR's flat display and the camera hack, both handed to KWin as one declared full side-by-side surface, video marks, CSS depth; with the browser's own compositor in software (software WebRender), the pair keeps its stereo mark through the buffer read back for the compositor, so it is declared on that route too (ORDER 616).
+**Credit**: BrowserWorks Ltd and **Alex Kontos**, who makes Waterfox; Mozilla and Firefox's contributors for Gecko and WebRender.
+The software route rests on the Wayland native compositor for software WebRender that **Robert Mader** added to Firefox (Mozilla bug 1711224, 2021: the native surfaces in shared memory buffers that the edition's declaration now reaches).
+
 ### 2.9 The stereo virtual machine
 
 [A virtual machine with a 3D display](docs/stereo-vm.md) builds on these projects.
@@ -614,6 +620,7 @@ The profiles add names and provenance; they do not replace the raw controls.
 - **[OpenTrack](https://github.com/opentrack/opentrack/tree/opentrack-2026.1.0):** Stanisław Halik, Chris Thompson, Donovan Baarda, Xavier Hallade, Michael Welter, Attila Csipa, Wei Shuai and Stéphane Lenclud, from its AUTHORS file. Its README also credits Wim Vriend and FaceTrackNoIR, Patrick Ruoff, furax49, Alexander Orokhovatskiy, Eike “e4z9”, GO63-samara, Davide Mameli, Khoa Nguyen, uglyDwarf and linuxtrack, Andrzej Czarnowski, Ryan Spicer, Ries van Twisk, Mathijs Groothuis and the IL-2 Sturmovik community. Enabled modules also name Tom Brazier. The core and many modules use ISC terms; individual source files and third-party notices retain their own licences.
 - **[PS3EYEDriver](https://github.com/opentrack/PS3EYEDriver/tree/9c03882ce0de4124856d5c1ec08ca947456599b0):** Eugene Zatepyakin and the Linux ov534 work by Antonio Ospite, Jim Paris, Jean-Francois Moine, Mark Ferrell, Richard Kaswy and Max Thrun, as recorded in its licence. New code uses MIT terms, and Linux-derived code retains GPLv2 terms.
 - **Native tracking and package dependencies:** Qt, OpenCV, libusb and libevdev and their contributors, with their notices preserved in the package and distribution libraries. DKMS and Debian's debhelper/dh-dkms provide the module lifecycle; the common DKMS helper credits Flavio Stanchina, Aric Cyr, Mario Limonciello and Alberto Milone. pahole generates the module BTF required by the edition's kernel.
+- **Broadcom's Wi-Fi driver, `wl` (ORDER 614):** Broadcom Corporation wrote the driver, which Debian ships in non-free as `broadcom-sta-dkms`; the edition carries Debian's package unmodified and installs it only for a Broadcom 802.11ac card that no kernel driver drives, after showing its licence. The Debian packaging is by Cyril Lacoux, Daniel Baumann, Eduard Bloch and Roger Shimizu, as the package's copyright file gives it. The chip list follows Debian's README of the package and the `broadcom-wl` profile of CachyOS's chwd (GPL-3.0); the detection patch comes from an AI partner's desk study of an iMac 21.5-inch Late 2013.
 
 ---
 
@@ -1033,4 +1040,13 @@ The players that now say "This film has no sound." stand on these authors' code,
 - **David Edmundson's "wayland: move decoration into subsurfaces"** (qtbase [94f96210518d](https://github.com/qt/qtbase/commit/94f96210518d), 2025-12-19, reviewed by Eskil Abrahamsen Blomfeldt), which removes that blitter from Qt 6.12; the page says what goes and what stays at that move.
 - **The Khronos Group:** the Vulkan clause on X11 surface extents quoted in the plan for the stereo layer.
 - **ORDER 573 and 574** for the three findings and the vk-views client, **ORDER 556** for the qdiscs fixture and its reader.
+- **The packages (2026-11-16):** Qt Quick's own autotest `tst_qquickwindowstereo` (the edition's file in qtdeclarative) gains the framed row; the Graphics page's build and separate link check follow the routes of **ORDER 556 and 573**; Debian's **debhelper** (dh_prep, dh_strip's automatic debug packages) and **apt**, whose behaviour the packaging lessons describe; the **deb-multimedia** archive (Christian Marillat) in the link gate's list.
 These projects do not endorse the edition.
+
+## VLC Stereo says when a film has no sound, reads its own catalogues and survives a volume key on a silent film (ORDER 592, 2026-11-16)
+
+VLC Stereo +stereo3d21 builds on other people's work, named from each project's own records:
+
+- **Thomas Guillem's 30fbe5f3f6** ([VLC master](https://github.com/videolan/vlc/commit/30fbe5f3f6be7d0d066c861c6d051d8ccdef5048), "pipewire: initialize stream variable", 2025-07-15, Fixes VLC issue 29211): the one-line fix of the segmentation fault when the volume or the mute of the audio output is set before it starts. The PipeWire output itself is **Rémi Denis-Courmont's** module (Debian's vlc-plugin-pipewire), with Thomas Guillem's later work, "Copyright (C) 2024 VLC authors and VideoLAN".
+- **VLC's input and Qt interface** ("VLC authors and VideoLAN"): the elementary streams' variables (`video-es`, `audio-es`), the subpicture channels (`vout_RegisterSubpictureChannel`, `vout_OSDText`) and the data directory lookup (`src/linux/dirs.c`, `src/modules/textdomain.c`) that the patches read and use.
+- The sentence in nine languages was written for ORDER 579 and is the stereo layer's (see that entry); this order only carries it.

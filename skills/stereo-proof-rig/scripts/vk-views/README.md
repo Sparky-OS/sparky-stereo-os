@@ -23,3 +23,5 @@ What `views.py` prints for each capture: `PAIR` (left eye red, right eye blue), 
 A right run reads `PAIR FLAT PAIR FLAT`, and on X11 the declaration follows: `3`, `0`, `3`, `0`.
 
 `seq-session.sh OUTDIR` runs several programs one after the other in one fresh Stereo KWin session (`SEQ="APP|VAR=V;APP|..."`, each for `RUN` seconds, from a folder mounted at `/bin-fx`) and lists the person's kept problems after each: the way to prove that a problem is told once for several programs and ends when a pair works.
+
+`seq-x11.sh OUTDIR` is the same on X11 through Xwayland (`NOGLAMOR=1` for Xwayland without glamor, so without DRI3), with each step's window size and declaration kept, and `LANGS="pt_BR de_DE ja_JP"` to list the kept problems in those languages too: the way to prove that a program refused two views on an X server without DRI3 is told, and that a pair of the same device ends it ([native-linux, a Vulkan pair without DRI3](../../../native-linux/references/x11-stereo-window-without-glamor.md#a-vulkan-pair-without-dri3-the-layer-and-lavapipe)).

@@ -27,9 +27,13 @@ It continues [x3d-in-the-browser.md](x3d-in-the-browser.md) and [web3d-engines-i
 | +9, +12, +14 | either | software | none | both eyes identical; the marker twice in each eye, 16 px wide where it is 31; `present two eyes` logged; notification bars empty |
 
 So on a GPU a control needs nothing: draw one camera for the plain page and the session's views under WebXR, and the browser declares the pair.
-In software the browser still drew two views and nothing carried the declaration, because the declaration travels on a layer of the browser's compositor and software WebRender makes no such layer.
+In software the browser still drew two views and nothing carried the declaration.
+That first reading, "software WebRender makes no such layer", was wrong: measured in ORDER 616, software WebRender still gives the canvas a surface of its own (shared memory buffers of the pair's size); only the pair's stereo mark was lost on the way, and browser +stereo3d15 carries it, so the pair is declared on every route.
+The cause, the fix and the proof are in [native-linux, browser-software-webrender-pair.md](../../native-linux/references/browser-software-webrender-pair.md).
 
-## The fix, and how it was proved without a compile
+## The first answer, superseded: 3D off and a notice (ORDER 546, never built)
+
+It is kept for its overlay technique; the browser does not turn 3D off.
 
 Where a window's `windowUtils.layerManagerType` names a software compositor, the browser sets `webgl.stereo-camera.enabled` and `dom.vr.flat.enabled` false on the default branch and locks them for the session, and appends one notification to the window's bar with the compositor's name and the last log entry of the `WEBRENDER` feature of `nsIGfxInfo.getFeatureLog()` (its failure id and message, `FEATURE_FAILURE_SOFTWARE_GL, Blocklisted by gfxInfo` on llvmpipe).
 The page then draws its own one picture, `isSessionSupported('immersive-vr')` answers false so a control hides its 3D button, and the person reads what failed and why.

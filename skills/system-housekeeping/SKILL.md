@@ -123,6 +123,10 @@ Debian's postinst enables such a unit wherever the package is installed, so the 
 
 ## Cleaning a system safely
 
+For loose files beside already-audited clones in a finished lane, use [Loose files outside a finished lane's clones](references/loose-files-in-finished-lanes.md).
+It distinguishes authored work from reproducible output, requires independent retained copies, and gives the review-only literal removal script form.
+A reviewer's lesson from its first use (ORDER 617c): build outputs of delivered work (old packages, debug APKs, libraries, logs) are not "found" work, and a root-level empty `.git` folder or a bare mirror without a remote makes the removal guard stop until each is settled.
+
 1. **Diagnose before deleting.** Group crash dumps by where they ran: containers, the user's session, system services. Read the stack traces of the real desktop crashes. On 2026-10-07 this found the VA-API to VDPAU bridge (`vdpau-va-driver`) segfaulting any VA-API probe on a DRM display; the NVDEC-based `nvidia-vaapi-driver` replaced it. Count journal lines per unit and priority to find what fills the log.
 2. **Dry-run every removal** (`apt-get -s`). Read what else it would install, upgrade or remove. A per-version companion package that installed tools still depend on must stay, or apt upgrades those tools behind your back.
 3. **Look at each folder before removing it:** owner (`dpkg -S`; on merged-usr, check both `/lib` and `/usr/lib` paths), whether a matching package is installed, what is inside.

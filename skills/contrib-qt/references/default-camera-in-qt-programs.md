@@ -1,4 +1,4 @@
-# The default camera in Qt programs (ORDER 582, 2026-11-15)
+# The default camera in Qt programs (ORDER 582, 2026-11-15; ORDER 625, 2026-11-16)
 
 A Qt program that asks for "the default camera" (`QMediaDevices::defaultVideoInput()`, QML `MediaDevices.defaultVideoInput`, a `QCamera` made without a device) got the first camera of the kernel's list, whatever camera the person chose on the Camera page.
 Check freshness first: written on 2026-11-15 from Qt Multimedia 6.11.2 (`qt6-multimedia 6.11.2-3+stereo3d16+lc1`), Qt's `dev` branch of 2026-11-13, PipeWire 1.6.9 and WirePlumber 0.5.18.
@@ -41,5 +41,75 @@ Check freshness first: written on 2026-11-15 from Qt Multimedia 6.11.2 (`qt6-mul
 ## Perks
 
 - A program's own choice is never touched: `QCamera(device)` keeps its device (the probe's OWN line).
-- `dev` has a PipeWire camera backend (`qpipewire_camera*`, opt-in with `QT_CAMERA_BACKEND=pipewire`, by Tim Blechmann, October and November 2026) whose device monitor says "PipeWire has no notion of a default video source, so the first camera in a stable order it is"; WirePlumber does have one. The same monitor class can feed that backend's `isDefault` too (not done).
+- `dev` has a PipeWire camera backend (`qpipewire_camera*`, opt-in with `QT_CAMERA_BACKEND=pipewire`, by Tim Blechmann, October and November 2026) whose device monitor said "PipeWire has no notion of a default video source, so the first camera in a stable order it is"; WirePlumber does have one. That backend is where Qt follows the session's default: the next section (ORDER 625).
 - The edition's Camera page and Kamoso set and follow the same key; the page's `sparky-stereo-camera default` prints it.
+
+## The PipeWire camera backend follows the session's default (ORDER 625, 2026-11-16)
+
+Written from qtmultimedia `dev` 5d5bb219c3, qtbase `dev` 49df9da9, PipeWire 1.6.9 and WirePlumber 0.5.19; the change is commit f22e69f8ca on a branch, not on Gerrit when this was written.
+Check freshness first: the PipeWire camera files change every week; search Gerrit before anything else (step 1).
+
+### Where the change goes: the lesson of Gerrit 789011
+
+The first offer (789011, ORDER 603) put the session's default into the V4L2 camera layer, with its own `pw_thread_loop`, core and registry, and found the V4L2 device from a node's `v4l2:` path.
+Tim Blechmann gave it -2 and closed QTBUG-152302: "the v4l2 camera layer should be independent from pipewire"; "do we really want to have a separate event loop?"; "you'd only want to have a single registry for all devices"; "this logic will break when pipewire camera's use libcamera instead of raw v4l2"; and on the report, "feel free to reopen, if the pipewire camera layer does not follow pipewire's selected default".
+This skill already said that `dev` had his PipeWire camera backend with a "no default" comment, and the change still went to the V4L2 layer.
+So: before choosing where a Qt change goes, read which layer the maintainer is building (`git log --format='%an %s' -- the neighbouring folder` for the last two months), put the change there, and use that layer's own registry, loop and names.
+
+### Recipe
+
+1. **Search first.** Gerrit's REST API with the account's token: `q=project:qt/qtmultimedia dir:src/multimedia/pipewire after:2026-10-01` lists every change on the folder (the form `path:^src/.*` answers an error page, not JSON), then `status:open` with the subject words, then `message:QTBUG-N`. Jira answers anonymously (see above).
+2. **Mirror the audio side**, which already follows `default.audio.source` and `default.audio.sink`:
+   - `QCameraContextManager::objectAdded()` sends a `Metadata` global named `default` to `startListenDefaultMetadataObject()`: `bindMetadata()` on the existing registry and `pw_metadata_add_listener()`, the same names as `QAudioContextManager`; no second loop, no second registry.
+   - `handleDefaultMetadataObjectEvent()` takes subject `PW_ID_CORE`, key `default.video.source`, type `Spa:String:JSON`, reads the name with the module's own `jsonParseObjectName()`, and calls `QCameraDeviceMonitor::setDefaultVideoSource(name)` (or `NoDefaultDevice` for a cleared key), which emits `camerasChanged()`.
+   - When that metadata global is removed (WirePlumber stops or restarts), the listener goes, the default becomes `NoDefaultDevice`, and the next `default` global is followed again.
+   - `cameraDevices()` calls `syncRegistry()` twice: the first roundtrip brings the globals, the second the first values of the metadata bound while they arrived (the audio monitor's `getDeviceLists()` syncs twice too). Then it builds the list and marks `defaultCameraIndex(ids)`.
+   - `defaultCameraIndex()` matches the camera node whose `node.name` is the session's name, so V4L2 and libcamera nodes are the same case; no device paths.
+   - `QCameraDevice::operator==` compares ids only, and `QPlatformVideoDevices::updateVideoInputsCache()` uses it, so a default that moved alone was dropped and the stale `isDefault` stayed in the cache. `QtPipeWire::QCameraDevices::updateVideoInputs()` compares id and `isDefault` (the audio monitor's comparison) and calls the base class's `onVideoInputsChanged()` when they differ.
+   - When the session names no default, or a node that is not a listed camera, the first camera stays and `qt.multimedia.pipewire.camera.devicemonitor` says why at info level, once per reason (again after the default was followed and lost again).
+3. **Which key.** `default.video.source` is WirePlumber's live pick, as `default.audio.source` is for audio; it follows `default.configured.video.source` (the person's own choice) whenever that camera is present, and moves to another camera while it is away.
+4. **"Connect without a target" cannot be reached from this layer.** `QCamera(QObject *)` is `QCamera(QMediaDevices::defaultVideoInput())` and `QCameraPrivate::init()` replaces a null device with the same call (`src/multimedia/camera/qcamera.cpp`), so the platform camera always gets a device; `QPipeWireCamera::startStream()` connects with `target.object` set to that node's serial. What the session would link a target-less stream to was measured anyway (rig case 9): WirePlumber links a stream with `media.type=Video`, `media.category=Capture`, `media.role=Camera` and no target to `default.video.source`, the same camera the layer now reports.
+5. **Red and green from one commit.** Export the commit twice with `git archive COMMIT | tar -x -C DIR` (no extra worktrees in a shared clone), disable the matching line in one copy with `sed`, check with `diff -r` that it is the only difference, and run the same test in both builds; read the exit codes directly.
+
+### The test rows (`tst_qpipewire_cameradevicemonitor`, in its own style)
+
+Registry events go in as in the existing rows (`objectAdded()` with a property fixture), plus `setDefaultVideoSource()`; three cameras, `cam_a` and `cam_c` through V4L2 and `cam_b` through libcamera.
+- `defaultCameraIndex_isDefaultVideoSource_matchedByNodeName`: the libcamera node named as default is index 1.
+- `setDefaultVideoSource_change_movesDefaultCameraAndEmitsCamerasChanged`: two changes, two signals; the same name again is no change.
+- `defaultCameraIndex_isFirst_withoutDefaultVideoSource` and `..._whenDefaultVideoSourceIsNoListedCamera`: index 0 and the log line (`QTest::ignoreMessage`).
+- `defaultCameraIndex_saysOnceWhyItKeepsTheFirst`: a counting message handler chained to Qt Test's.
+
+Measured on 2026-11-16: with the matching line disabled the test exits 3 (3 of 20 fail: the first, the second and the last row); with the change it exits 0 (20 passed). The keep-the-first rows pass on both, as they assert the old behaviour plus the line.
+
+### The rig
+
+`stereo-proof-rig/scripts/virtual-camera/qt-pipewire/`: `entry.sh` (root: a passwd entry for uid 1000, then the scenario as that uid), `scenario.sh` (cases 1 to 9), `replug.sh` (case 10: a streaming program through its camera's unplug and plug), `probe.cpp` (the default by `defaultVideoInput()` and by `QCamera()`, a program's own choice with `--own ID`, `--start` to stream into a `QVideoSink`, `--watch`), `links.py` (the metadata's video keys, the Video/Source nodes, and which process each camera link feeds).
+Run it in a throwaway container with the Qt build mounted read-only, a private PipeWire and WirePlumber, and GStreamer `pipewiresink mode=provide` nodes as cameras; environment `QT_CAMERA_BACKEND=pipewire QT_MEDIA_BACKEND=ffmpeg QT_QPA_PLATFORM=offscreen`.
+Run it once on the unmodified build and once on the branch, each in a fresh container.
+
+### Measured (2026-11-16, three cameras, cam-b chosen unless said)
+
+| Case | dev 5d5bb219c3 | with the change |
+| --- | --- | --- |
+| Chosen cam-b, `defaultVideoInput()` and `QCamera()` | cam-a (the first) | cam-b |
+| Three changes while running | no `videoInputsChanged` | three, each with the new default |
+| A camera that sorts first is plugged in | it becomes the default (cam-0) | cam-b stays |
+| cam-b unplugged, then plugged in again, program running | cam-a throughout | cam-a while away, cam-b again |
+| WirePlumber stopped, then back | cam-a, nothing said | cam-a with one line, then cam-b |
+| Default names a screen-share node, not a camera | cam-a, nothing said | cam-a with one line |
+| Program's own `QCamera(cam-c)`, hotplug, refresh, restart | cam-c kept | cam-c kept |
+| A program streaming the default camera; cam-b unplugged, plugged in again (case 10) | opens cam-a; WirePlumber moves the stream to cam-b when it returns, `QCamera` still says cam-a | opens cam-b; the stream runs from cam-a while cam-b is away and from cam-b again, frames never stop, the default shown follows |
+
+WirePlumber's side, measured the same day: unplugging the chosen camera moves `default.video.source` to another camera and keeps `default.configured.video.source`; plugging it in again makes it the default again.
+A `QCamera` that is already open keeps its device through every change (Qt's API); only the default and the list move.
+A running stream is the session's to move: WirePlumber relinked the Qt stream to the default camera while its own camera was away, and on `dev` moved a stream opened on another camera to the returning default (why WirePlumber moved a stream with a present target was not examined); `QCamera::cameraDevice()` keeps naming the camera it opened.
+
+The module's tests as `ctest -j4 --timeout 120` runs them, offscreen, without a display or a camera: the same six tests fail on `dev` and with the change (`module_includes`, `tst_qcamerabackend`, `tst_qcudatextureconverter`, `tst_qmediaformatbackend`, `tst_qmediarecorderbackend`, `tst_qvideoframebackend`); `tst_qmediaframeinputsbackend` failed once in the change's full run and passed once in `dev`'s, and run alone through ctest it fails five times out of five on both (its `mediaRecorderWritesVideo_withSingleFrame` row), so it is a recorder test that depends on the run, not the camera layer.
+
+### Traps (symptom, cause, fix, how found)
+
+- **The PipeWire backend lists no camera although `pw-cli ls Node` shows them.** A registry client sees only some properties of a node: `object.serial`, `factory.id`, `client.id`, `node.description`, `node.name`, `media.class`, `media.role` (and `object.path` when set); `device.api` never arrives, so `isCameraNode()` accepts a camera by `media.role = Camera`, which SPA's V4L2 source sets. Give the rig's nodes `media.role=Camera`. Found with `QT_LOGGING_RULES="qt.multimedia.pipewire*=true"`: the metadata lines appeared and no "camera node added", then `pw-cli ls Node` printed the global's properties.
+- **Default changes while running give no `videoInputsChanged`.** `QCameraDevice::operator==` compares ids only (`qcameradevice.cpp`), and the base cache's `update()` uses it. Found by the rig: node changes gave events, metadata changes none.
+- **`QT_CAMERA_BACKEND=pipewire` needs the FFmpeg plugin built** (`FEATURE_ffmpeg=ON`): the backend is chosen in `qffmpegmediaintegration.cpp`. The build stops with `X11/Xlib.h: No such file` when the prefix's QtGui has `xlib` (see `mkspecs/modules/qt_lib_gui_private.pri`): install `libx11-dev libxrandr-dev libxext-dev`.
+- **An integration test run by hand says `isMediaBackendPluginLoaded() returned FALSE`** while ctest runs it fine: ctest gives the test the build's plugin path. Rerun a single test with `ctest -R '^NAME$' --output-on-failure` in the build folder, not the binary alone.
+- **`qsb: error while loading shared libraries: libpcre2-16.so.0`** in a fresh image: the prefix's tools need what the image that built them had. Run `ldd` over the prefix's `bin`, `lib` and `plugins` once and install every "not found" (here `libpcre2-16-0 libinput10 libmtdev1 libwayland-client0 libwayland-cursor0`; `apt-cache policy libmtdev1` shows no candidate and apt installs `libmtdev1t64`, which provides it).

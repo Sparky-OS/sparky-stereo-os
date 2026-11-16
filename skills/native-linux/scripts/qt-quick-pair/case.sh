@@ -9,7 +9,9 @@
 # separated: QDISCS_FLAT=1, QDISCS_LIFECYCLE=1, QDISCS_TOGGLE=1, QDISCS_OFF=1, QDISCS_FLICK=1, QDISCS_FRAMELESS=1,
 # QDISCS_WIDTH=941,
 # DISABLE_LAYER_MESA_STEREO=1), APP (the qdiscs binary), CAPTURE (stereo-proof-rig's scripts/capture.py),
-# KEEPWIRE=1 keeps the whole protocol log, CSD=1 starts KWin without a decoration plugin so Qt draws its own frame.
+# KEEPWIRE=1 keeps the whole protocol log, CSD=1 starts KWin without a decoration plugin so Qt draws its own frame,
+# WAIT_CLIENT=1 runs a client that ends by itself (an autotest such as tst_qquickwindowstereo, or seq-frame.sh): it is
+# waited for, at most 180 s, its exit status goes to client.rc and no capture is taken.
 # Leaves in OUTDIR: shot.png (both eyes side by side in a 3D mode), client.out (the STATE line), wire.txt (the
 # stereo requests the client sent), qt.log (what Qt said, the device included), kwin.log.
 set -u
@@ -51,8 +53,13 @@ kd -o 2>/dev/null | sed 's/\x1b\[[0-9;]*m//g' | grep -i 'scale\|Geometry\|\*' > 
 IFS=' ' read -r -a CE <<< "${CLIENT_ENV:-}"
 env WAYLAND_DISPLAY=sub WAYLAND_DEBUG=client QSG_INFO=1 QSG_RHI_BACKEND=${BACKEND:-vulkan} "${CE[@]}" ${APP:-qdiscs} > $out/client.out 2> $out/client.err &
 cpid=$!
-sleep ${WARM:-9}
-python3 ${CAPTURE:-capture.py} $out/shot.png > $out/capture.json 2> $out/capture.err || cat $out/capture.err
+if [ "${WAIT_CLIENT:-0}" = 1 ]; then
+  for n in $(seq 1800); do kill -0 $cpid 2>/dev/null || break; sleep 0.1; done
+  kill -0 $cpid 2>/dev/null && { echo "still running after 180 s" > $out/client.rc; kill -9 $cpid; } || { wait $cpid; echo "exit $?" > $out/client.rc; }
+else
+  sleep ${WARM:-9}
+  python3 ${CAPTURE:-capture.py} $out/shot.png > $out/capture.json 2> $out/capture.err || cat $out/capture.err
+fi
 kill -0 $cpid 2>/dev/null && echo alive > $out/client.alive || echo gone > $out/client.alive
 kill $cpid 2>/dev/null; sleep 0.5; kill -9 $cpid 2>/dev/null
 kill $kwin 2>/dev/null; wait $kwin 2>/dev/null

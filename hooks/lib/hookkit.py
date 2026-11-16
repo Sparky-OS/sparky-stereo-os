@@ -13,6 +13,7 @@ This module does the rest:
 A hook's own file is small: it defines handle(event, kit) and calls main("its-name", handle).
 """
 import fcntl
+import glob
 import hashlib
 import json
 import os
@@ -33,6 +34,7 @@ LAYOUT = {
     'private': 'private',
     'drafts': 'private/drafts',
     'register': 'private/branches.tsv',
+    'clones': 'private/clones.tsv',
     'state': 'state/hooks',
 }
 
@@ -73,6 +75,9 @@ PIPES = {'|', '|&'}
 SHELL_COMMAND_OPTION = re.compile(r'-[A-Za-z]*c[A-Za-z]*')  # -c, -lc, -ec
 HEREDOC = re.compile(r'<<-?[ \t]*(?:\'([\w.-]+)\'|"([\w.-]+)"|\\?([\w.-]+))([^\n]*)\n')
 ASSIGNMENT = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*=')
+UNEXPANDED = re.compile(r'\$|`')   # a word the shell would still expand: a variable, a substitution
+FOLDER_BUILTINS = {'cd', 'pushd', 'popd'}
+GIT_VALUE_OPTIONS = ('-C', '-c', '--git-dir', '--work-tree', '--namespace', '--exec-path')
 
 
 class Unreadable(Exception):
@@ -263,45 +268,137 @@ def _runs_a_shell(words):
     return bool(words) and (os.path.basename(words[0]) == 'ssh' or any(os.path.basename(w) in SHELLS for w in words))
 
 
-def _commands(lexer, tokens, depth):
-    """The simple commands of a token list, in order, each as its words: wrappers and the shell's own keywords taken
-    off, the text given to `sh -c` read too; after each, the commands of its substitutions, and after each pipeline
-    the commands of the here-documents a shell of that pipeline reads. The here-documents no shell reads are added
+class _Where:
+    """The folder a shell is in at one point of a line: a path, or None with the reason it cannot be told from the
+    line; with the folder before the last cd (for `cd -`) and the stack of pushd."""
+
+    def __init__(self, folder, why='', previous=None, stack=()):
+        self.folder, self.why, self.previous, self.stack = folder, why, previous, list(stack)
+
+    def copy(self):
+        return _Where(self.folder, self.why, self.previous, self.stack)
+
+    def take(self, other):
+        self.folder, self.why, self.previous, self.stack = other.folder, other.why, other.previous, list(other.stack)
+
+    def here(self):
+        return self.folder, self.why
+
+    def go(self, place):
+        self.previous = self.here()
+        self.folder, self.why = place
+
+    def resolve(self, word, verb):
+        """(folder, why) of a cd's operand, from this folder; glob characters are matched against the disk."""
+        if UNEXPANDED.search(word):
+            return None, f'`{verb} {word}` names its folder with a shell variable or a substitution, which a reader of the line cannot expand'
+        path = os.path.expanduser(word)
+        if not os.path.isabs(path):
+            if self.folder is None:
+                return None, self.why
+            path = os.path.join(self.folder, path)
+        if any(c in word for c in '*?['):
+            matches = [m for m in glob.glob(path) if os.path.isdir(m)]
+            if len(matches) != 1:
+                return None, f'`{verb} {word}` matches {len(matches)} folders on this disk, so its folder cannot be told'
+            path = matches[0]
+        return os.path.normpath(path), ''
+
+    def change(self, words):
+        """Apply a cd, pushd or popd that the shell itself runs (its options -L, -P, -e, -@ and -- left out)."""
+        name, operands, ended = words[0], [], False
+        for word in words[1:]:
+            if not ended and word == '--':
+                ended = True
+            elif not ended and len(word) > 1 and word[0] in '-+' and not (name == 'cd' and word == '-'):
+                if name != 'cd' and (word[1:].isdigit() or word == '-n'):
+                    if word == '-n':
+                        return  # pushd -n and popd -n change only the stack
+                    self.go((None, f'`{name} {word}` turns the stack of folders, which a reader of the line does not follow'))
+                    return
+            else:
+                operands.append(word)
+        if name == 'popd':
+            if self.stack:
+                self.go(self.stack.pop())
+            return
+        if name == 'pushd':
+            if not operands:
+                if self.stack:
+                    top = self.stack.pop()
+                    self.stack.append(self.here())
+                    self.go(top)
+                return
+            target = self.resolve(operands[0], name)
+            self.stack.append(self.here())
+            self.go(target)
+            return
+        if not operands:
+            self.go((os.path.expanduser('~'), ''))
+        elif operands[0] == '-':
+            self.go(self.previous or (None, '`cd -` goes back to a folder that this line does not name'))
+        else:
+            self.go(self.resolve(operands[0], name))
+
+
+def _folder_builtin(words):
+    """The words of a cd, pushd or popd that the shell itself runs (after assignments, keywords, `command` or
+    `builtin`); None for any other command, and for one started through another program: `timeout 5 cd X` runs no
+    shell's builtin and changes nothing."""
+    i = 0
+    while i < len(words) and (ASSIGNMENT.match(words[i]) or words[i] in KEYWORDS):
+        i += 1
+    while i < len(words) and words[i] in ('command', 'builtin'):
+        i += 1
+    return words[i:] if i < len(words) and words[i] in FOLDER_BUILTINS else None
+
+
+def _commands(lexer, tokens, depth, where):
+    """The simple commands of a token list, in order, each as (words, folder, why): wrappers and the shell's own
+    keywords taken off, the text given to `sh -c` read too; after each, the commands of its substitutions, and after
+    each pipeline the commands of the here-documents a shell of that pipeline reads. The folder is where the command
+    runs, from `where` and the cd, pushd and popd before it, scoped as the shell scopes them: a subshell's, a
+    pipeline's and a background job's cd ends with them, a substitution and a shell started with -c begin in the
+    folder of the command and keep their cd to themselves, eval keeps it. The here-documents no shell reads are added
     to the lexer's drops. None when a text handed to a shell cannot be read."""
-    out, pipeline = [], []
+    out, pipeline, scopes = [], [], []
     current, subs, heredocs, skip = [], [], [], False
 
-    def end_command():
+    def end_command(ending):
         nonlocal current, subs, heredocs
         words = _unwrap(current)
-        pipeline.append((words, heredocs))
-        found = [words] if words else []
+        in_pipeline = bool(pipeline) or ending in PIPES
+        pipeline.append((words, heredocs, where.copy()))
+        found = [(words, *where.here())] if words else []
         if words:
             name = os.path.basename(words[0])
-            inner = None
+            inner, own = None, False
             if name in SHELLS:
                 at = next((i for i, w in enumerate(words[1:], 1) if SHELL_COMMAND_OPTION.fullmatch(w)), None)
                 if at is not None and at + 1 < len(words):
                     inner = words[at + 1]
             elif name == 'eval':
-                inner = ' '.join(words[1:])
+                inner, own = ' '.join(words[1:]), True
             if inner is not None and depth < 3:
-                found = shell_commands(inner, depth + 1)
+                found = _read_in(inner, depth + 1, where if own else where.copy())
         for inner_tokens in subs:
-            more = _commands(lexer, inner_tokens, depth)
+            more = _commands(lexer, inner_tokens, depth, where.copy())
             found = None if found is None or more is None else found + more
+        change = _folder_builtin(current)
+        if change and not in_pipeline and ending != '&':
+            where.change(change)
         current, subs, heredocs = [], [], []
         return found
 
     def end_pipeline():
         found = []
-        for i, (_, docs) in enumerate(pipeline):
-            shell_reads = any(_runs_a_shell(w) for w, _ in pipeline[i:])
+        for i, (_, docs, there) in enumerate(pipeline):
+            shell_reads = any(_runs_a_shell(w) for w, _, _ in pipeline[i:])
             for _, start, stop in docs:
                 if start is None:
                     continue
                 if shell_reads:
-                    more = _commands(lexer, lexer.lex(start, None, stop)[0], depth)
+                    more = _commands(lexer, lexer.lex(start, None, stop)[0], depth, there.copy())
                     found = None if found is None or more is None else found + more
                 else:
                     lexer.drops.append((start, stop))
@@ -326,20 +423,32 @@ def _commands(lexer, tokens, depth):
             if current and current[-1].isdigit():
                 current.pop()  # the descriptor number of 2>&1
             continue
-        found = end_command()
-        if found is not None and not (kind == 'op' and token[1] in PIPES):
+        ending = token[1] if kind == 'op' else '\n'
+        found = end_command(ending)
+        if found is not None and ending not in PIPES:
             more = end_pipeline()
             found = None if more is None else found + more
         if found is None:
             return None
         out += found
+        if ending == '(':
+            scopes.append(where.copy())  # a subshell: what it changes ends at its `)`
+        elif ending == ')' and scopes:
+            where.take(scopes.pop())
     return out
 
 
-def _read(command):
+def _read(command, where=None, depth=0):
     lexer = _Lexer(command)
-    commands = _commands(lexer, lexer.lex(0)[0], 0)
+    commands = _commands(lexer, lexer.lex(0)[0], depth, where or _Where(None))
     return commands, lexer.drops
+
+
+def _read_in(command, depth, where):
+    try:
+        return _read(command, where, depth)[0]
+    except Unreadable:
+        return None
 
 
 def _acting_text_by_pattern(command):
@@ -385,10 +494,16 @@ def shell_commands(command, depth=0):
     the text given to `sh -c`, a command substitution (also inside double quotes) and a here-document a shell reads.
     None when the line cannot be read as shell (the caller then searches the text instead). A guard built on this
     is a guard rail, not a wall: a program can still hide a command where no reader of shell text finds it."""
-    try:
-        return _read(command)[0]
-    except Unreadable:
-        return None
+    found = _read_in(command, depth, _Where(None))
+    return None if found is None else [words for words, _, _ in found]
+
+
+def commands_in_folders(command, cwd):
+    """shell_commands with the folder each command runs in: [(words, folder, why)]. The folder starts at cwd and
+    follows the line's own cd, pushd and popd; it is None, with why saying which word made it so, after a cd whose
+    folder holds a shell variable or a substitution, or a `cd -` to a folder the line does not name. None when the
+    line cannot be read as shell. The text inside quotes is never taken for a cd."""
+    return _read_in(command, 0, _Where(cwd))
 
 
 def _unwrap(words):
@@ -416,8 +531,18 @@ def git_subcommand(words):
         return None, []
     i = 1
     while i < len(words) and words[i].startswith('-'):
-        i += 2 if words[i] in ('-C', '-c', '--git-dir', '--work-tree', '--namespace', '--exec-path') else 1
+        i += 2 if words[i] in GIT_VALUE_OPTIONS else 1
     return (words[i], words[i + 1:]) if i < len(words) else (None, [])
+
+
+def _git_dash_c(words):
+    """The values of git's own -C options, in order; an option of the subcommand (git switch -C NAME) is not one."""
+    values, i = [], 1
+    while i < len(words) and words[i].startswith('-'):
+        if words[i] == '-C' and i + 1 < len(words):
+            values.append(words[i + 1])
+        i += 2 if words[i] in GIT_VALUE_OPTIONS else 1
+    return values
 
 
 def push_places(rest):
@@ -435,12 +560,31 @@ def push_places(rest):
 
 
 def git_folder(words, cwd):
-    """The folder a git command line acts in: its -C option, else cwd."""
-    for i, word in enumerate(words[:-1]):
-        if word == '-C':
-            path = os.path.expanduser(words[i + 1])
-            return path if os.path.isabs(path) else os.path.join(cwd, path)
-    return cwd
+    """The folder a git command line acts in: its -C options, else cwd. Each -C that is not absolute counts from the
+    one before it, as git(1) says of several -C options."""
+    folder = cwd
+    for value in _git_dash_c(words):
+        if value:  # -C "" leaves the folder as it is (git(1))
+            path = os.path.expanduser(value)
+            folder = path if os.path.isabs(path) else os.path.join(folder, path)
+    return folder
+
+
+def git_place(words, folder, why=''):
+    """(folder, why) a git command line acts in, from the folder its shell is in (None, with why, when that cannot be
+    told): each -C of git's own options, in order. (None, why) when a -C holds a shell variable or a substitution, or
+    is relative to a folder that cannot be told."""
+    for value in _git_dash_c(words):
+        if not value:
+            continue
+        if UNEXPANDED.search(value):
+            return None, f'`-C {value}` names the folder with a shell variable or a substitution, which a reader of the line cannot expand'
+        path = os.path.expanduser(value)
+        if os.path.isabs(path):
+            folder, why = os.path.normpath(path), ''
+        elif folder is not None:
+            folder = os.path.normpath(os.path.join(folder, path))
+    return folder, why
 
 
 class HookError(Exception):
@@ -502,8 +646,13 @@ class Event:
         """The simple commands the shell line runs (see shell_commands); None when it cannot be read as shell."""
         return shell_commands(self.command)
 
+    def commands_in_folders(self):
+        """The simple commands the shell line runs, each with the folder it runs in (see commands_in_folders)."""
+        return commands_in_folders(self.command, self.cwd)
+
     def working_folder(self, words=None):
-        """Where a simple command of this line runs: the folder of a `cd DIR &&` before it, else the event's cwd."""
+        """One folder for the whole line: the folder of the first `cd DIR &&` found in its text, else the event's cwd.
+        A line with several cd, or a cd written another way, needs commands_in_folders() instead."""
         m = re.search(r'(?:^|[;&|\n])\s*cd\s+("[^"]+"|\'[^\']+\'|\S+)\s*(?:&&|;|\n)', self.acting_command())
         if not m:
             return self.cwd

@@ -39,6 +39,8 @@ STARTERS = {
     'private/ledger.md': '# Ledger\n\nWhat was sent, to whom, when, and what is owed after it.\n',
     'private/branches.tsv': '# Why each branch that is not inside its main branch stays: one row per branch, fields separated by tabs.\n'
                             '# repository\tbranch\tkept or superseded\treason\tdate\n',
+    'private/clones.tsv': '# Clones whose work a trace proved to be elsewhere, so they can be removed: one row per clone, fields separated by tabs.\n'
+                          '# folder (full path)\tin main by content, delivered another way, superseded or scratch\tproof\tdate of the trace (YYYY-MM-DDTHH:MMZ)\n',
 }
 FOLDERS = ['memory', 'repos', 'partners/queue', 'private/drafts', 'private/hooks', 'state/hooks']
 

@@ -31,7 +31,7 @@ Run every command from the top folder of this repository's checkout; they need `
 `WORKSPACE` is a folder of yours for the work, new or existing; the checkout may stay where it is, because `init` writes its place into the configurations.
 
 1. **Make the workspace:** `python3 hooks/install.py init WORKSPACE` makes [the default layout](#the-default-layout) and one configuration per hook in `WORKSPACE/private/hooks/`. It prints `wrote` for each file it makes and `kept` for each that exists; it overwrites nothing.
-   It also makes five starter files for you to fill in: `memory/MEMORY.md`, `partners/HOUSE-RULES.md`, `private/README.md`, `private/ledger.md`, the list of what was sent, to whom and when, and `private/branches.tsv`, the register of why each branch outside main stays.
+   It also makes six starter files for you to fill in: `memory/MEMORY.md`, `partners/HOUSE-RULES.md`, `private/README.md`, `private/ledger.md`, the list of what was sent, to whom and when, `private/branches.tsv`, the register of why each branch outside main stays, and `private/clones.tsv`, the clones a trace proved can be removed.
 2. **Put your own values in:** the memory files every session reads (`design-reading.json`, `core`), your accounts and projects (`outreach-guard.json`, `own_owners` and `own_repos`), your identities and the names you never publish (`publish-check.json`), your floors (`disk-floors.json`), the repositories whose branches are watched (`branch-keeper.json`, `repositories`). Switch off what you do not want: every hook has `enabled`, every part its own switch.
    Each hook's page has the table of its keys with their defaults; the values to replace are the placeholders: `your-github-user`, `you@example.org`, the two memory names under `core`.
 3. **Check:** `python3 hooks/install.py check WORKSPACE` reads every configuration the way the hooks do and names each file a configuration points to that does not exist. It ends with "Every configuration reads, and every file it names exists." and exit 0, or with the count of things to fix and exit 1.
@@ -96,6 +96,7 @@ Extend the hook that already stands at that moment (another pattern, another che
 3. **Write the logic on the plain event.** `hook.py` defines `handle(event, kit)` and calls `hookkit.main('<name>', handle)`; it never names a tool's own word such as `Bash`, it asks for the plain one (`event.tool == 'shell'`).
    The event gives `kind` (`session-start`, `prompt`, `before-tool`, `after-tool`), `tool` (`shell`, `read`, `write`, `edit`, `dispatch`, `handback`, or the tool's own name), `command`, `path`, `text`, `agent`, and `reads()` (the files this event read in full).
    For a shell line use `event.commands()`, the simple commands the line runs, not a search of its text.
+   When the folder matters (a git command, a relative path), use `event.commands_in_folders()`: each command with the folder its own line gives it (`cd`, `pushd`, `popd`, scoped as the shell scopes them), or None with the reason when the line names it with a shell variable; then `hookkit.git_place(words, folder, why)` adds git's `-C`. `event.working_folder()` is one folder for the whole line and is wrong as soon as a line has two `cd` ([the trap](references/lessons-2026-11.md)).
    The reader knows `sh`, `bash`, `dash`, `zsh` and `ksh` with three levels of `-c`, and wrappers such as `env`, `sudo`, `timeout`, `nice` and `xargs`.
    The kit's words: the plain event is a tool's event under the kit's own names, a dialect is the table that turns one tool's names into them, and the reference index is whatever local search of reference documents your tools offer, named under `consult_tools`.
 4. **Answer with** `kit.deny(reason)`, `kit.ask(reason)`, `kit.context(text)` or nothing. A refusal says what was refused, why, what to do next and when the same call will pass.
@@ -158,7 +159,7 @@ Extend the hook that already stands at that moment (another pattern, another che
   A hook reads the command it is shown; a script file, an alias or a program that starts another are not seen.
   Codex's page says it for every tool: "Treat tool hooks as a useful guardrail, not a complete enforcement boundary."
   Keep the rule written in the skill and the house rules as well.
-- **Traps of the kit itself** are in [the lessons of the reviews](references/lessons-2026-11.md), six of them: a workspace name that broke setup, a settings backup lost to a second write, a failed media read reported clean, a hook that a tool lists and never ran, a log that cannot replay the command it names, and a hook's command-line mode that waited for an event.
+- **Traps of the kit itself** are in [the lessons of the reviews](references/lessons-2026-11.md), seven of them: a workspace name that broke setup, a settings backup lost to a second write, a failed media read reported clean, a hook that a tool lists and never ran, a log that cannot replay the command it names, a hook's command-line mode that waited for an event, and one folder read for a whole line with several `cd`.
 
 ## Perks
 

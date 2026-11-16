@@ -50,7 +50,7 @@ The program switch "Enable 3D" (`Stereo::Enable3DAction`) keeps one name per lan
 | zh_CN | 启用 3D |
 | zh_TW | 啟用 3D |
 
-pt (Portugal) is a different language: the switch has no `pt` translation (Dragon's `po/pt` carries none and there is no `pt` hunk in the patches), so there is nothing to change there; do not let an `es` form leak into a `pt_BR` catalogue — `Activar 3D` is the Spanish label, and the identical spelling is a trap.
+pt (Portugal) is a different language: the switch has no `pt` translation (Dragon's `po/pt` carries none and there is no `pt` hunk in the patches), so there is nothing to change there; do not let an `es` form leak into a `pt_BR` catalogue: `Activar 3D` is the Spanish label, and the identical spelling is a trap.
 
 Where it lives: the stereo layer's `po/pt_BR/stereo-layer_qt.po`, sView's `lang/portuguesebr/*.lng` (`1461=Ativar 3D`), the gl-stereo launcher's `launcher-strings.json` (`"pt_BR": "Ativar 3D"`), and the `.po.patch` hunks the recipes add to Dragon Player, Haruna and the depth-source patches under `sparky-os/translations/`.
 
@@ -61,4 +61,4 @@ git grep -n -E 'msgstr "(Ativar o|Habilitar|Ligar|Instalar|Energizar) 3D"' -- '*
 grep -rn -B1 -E 'msgstr "Ativar o 3D"' published-src/*/po/pt_BR/*.po
 ```
 
-A hit with an old form (`Ativar o 3D` was the drift ORDER 586 fixed in Dragon and Haruna) must be changed to the table's line, never to a new wording; the reverse check that every shipped pt_BR catalogue names the expected form is `grep -rn -A1 'msgid "Enable 3D"' */po/pt_BR/*.po` — every `msgstr` must read `Ativar 3D`, and a recipe patch that adds or fixes the string is proven in place: `patch -p1` it onto the pristine unpacked source in a container, then `msgfmt -c -o /dev/null` the changed catalogue.
+A hit with an old form (`Ativar o 3D` was the drift ORDER 586 fixed in Dragon and Haruna) must be changed to the table's line, never to a new wording; the reverse check that every shipped pt_BR catalogue names the expected form is `grep -rn -A1 'msgid "Enable 3D"' */po/pt_BR/*.po`: every `msgstr` must read `Ativar 3D`, and a recipe patch that adds or fixes the string is proven in place: `patch -p1` it onto the pristine unpacked source in a container, then `msgfmt -c -o /dev/null` the changed catalogue.

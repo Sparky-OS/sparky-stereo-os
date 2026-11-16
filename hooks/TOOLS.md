@@ -29,6 +29,8 @@ What the dialect uses, with the reference's words:
 - **Lanes:** "Hooks from settings files ... also run inside subagents", and the input then carries `agent_id`, which is how each lane gets a state of its own.
 - **Telling the person:** `systemMessage`, the "Warning message shown to the user", which is how a hook that failed says so.
 
+The queue keeper uses the dispatch tool (`Agent`, or `Task` in older versions) before and after it runs, and `Write`, `Edit` and `Bash` after they run; a lane started by a shell script is gated through `launch_patterns`.
+
 Two things to know:
 - **A hook that cannot start does not stop anything.** "On most events, when a hook fails or times out, Claude Code still carries out the action. A policy hook with a wrong path or a crashing script then lets everything through." The watch for it is the `<hook name> hook error` notice on the first run.
   Claude Code v2.1.295 and later take `"onFailure": "block"` on a handler; `install.py wire claude WORKSPACE --on-failure block` writes it for a workspace that prefers a refused call to an unchecked one.
@@ -61,6 +63,7 @@ What differs, and what the dialect does about it:
 - **Edits are patches.** File edits go through `apply_patch`, which a matcher can also name `Edit` or `Write`, and "hook input still reports `tool_name: "apply_patch"`" with the patch in `tool_input.command`. The dialect takes the paths from the patch's `*** Add File:` and `*** Update File:` lines, and the patch text as the text written.
 - **Hosted tools are not seen.** Its coverage table has "Hosted tools, such as `WebSearch`" with "No" for both events.
 - **No hand-back tool.** The hand-back check runs on a final `REPORT.md` written whole; a report written through a patch is not checked.
+- **The queue keeper wants three events.** A dispatch before it runs (`spawn_agent`, as brief-and-handback), the same tool after it succeeded (to mark the lane in flight), and a patch to the journal after it ran (`apply_patch`). Their wiring is written from the same matcher names and was piped in the tests; event delivery for these three is not proved under Codex, so watch the first dispatch: the row must become `in-flight`.
 
 Its own page says what a contributor should expect: "Treat tool hooks as a useful guardrail, not a complete enforcement boundary."
 

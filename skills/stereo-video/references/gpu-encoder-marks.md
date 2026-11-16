@@ -56,6 +56,22 @@ The master-based GCC build passed 6,158 standard FATE tests. A separate hardware
 | A mantissa test passes on master but the packaged decoder exports zero in the new fields | The package uses a split common SEI-export helper instead of master's function | Trace the package's actual decoder call path and populate both its existing exact-value representation and the added syntax fields; do not replace the existing representation |
 | A carried FATE test cannot open its input | Its external sample was never included in the available suite | Record the exact missing name and check the official sample location; obtain the original fixture before qualifying the test. Do not invent a substitute and bless its checksum |
 
+## When a held recipe is overtaken by the next version
+
+**Symptom:** a writer passed its installed GPU proof, but the next published FFmpeg still has no marks.
+The accepted encoder branch and a held package recipe are separate artifacts; acceptance of one does not put the other into the release.
+In this case +stereo3d13 held the writer, while +stereo3d14 was prepared from +12 to deliver the Matroska eye-shape correction.
+Comparing the current recipe series, the staged source descriptor and both fork branches exposed the missing writer.
+
+Prepare the successor from the newer source: +15 keeps all of +14 and appends the accepted GPU and ORDER 174 patches.
+Compare diff bodies against the accepted port, retain the newer regression test, and repeat installed stream checks on the resulting package version.
+For carried patches, retain author names and an Origin link to the full upstream record; sanitize inherited patch headers during source preparation too.
+A clean recipe directory alone does not clean patches supplied by its input source.
+Build every architecture from the same descriptor, keep the source commit reachable, and read apt's actual `Inst` lines in an upgrade simulation from the outgoing package set.
+Freeze the launched shell scripts before a long build.
+Editing a bind-mounted script while Bash is waiting for a child can move its read offset and produce an unexpected EOF after a successful package build.
+The build log separated the successful compiler/link gate from the failed finishing shell; copying the driver and FATE script into the job directory prevents later recipe edits from changing that running job.
+
 ## Find the boundary before changing the driver
 
 1. Record the render node, PCI identity, `vainfo` driver string, Mesa/libva/client versions and negotiated packed-header attributes.

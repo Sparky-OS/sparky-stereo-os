@@ -2,7 +2,7 @@
 
 Learned on ORDER 560 (November 2026), on Stereo KWin +stereo3d54, Mesa +stereo3d21 and Xwayland 24.1.13 +stereo3d4 and +stereo3d5.
 Load it with [native-linux](../SKILL.md) when an X11 program's stereo window is not a pair on a machine or a virtual machine without 3D acceleration, or with `XWAYLAND_NO_GLAMOR=1`.
-The result first: from Xwayland `2:24.1.13-1+stereo3d5` such a window is a pair without glamor too, a top-level and a child window alike, and with glamor nothing changes; from `2:24.1.15-1+stereo3d2` a pair that cannot be flipped is kept as well, and where it cannot be kept Mesa shows one flat picture and tells the person ([below](#when-the-pair-cannot-be-flipped)).
+The result first: from Xwayland `2:24.1.13-1+stereo3d5` such a window is a pair without glamor too, a top-level and a child window alike, and with glamor nothing changes; a Vulkan program's own top-level window is a pair there from Mesa `+stereo3d25` ([below](#a-vulkan-pair-without-dri3-the-layer-and-lavapipe)); from `2:24.1.15-1+stereo3d2` a pair that cannot be flipped is kept as well, and where it cannot be kept Mesa shows one flat picture and tells the person ([below](#when-the-pair-cannot-be-flipped)).
 
 ## What happens without glamor
 
@@ -260,7 +260,7 @@ cc -shared -fPIC -Wall -o /tmp/present-inject.so scripts/x11-present-inject.c -l
 | EGL DRI3, zink on NVIDIA | Pair, cover in both views | Left view, told | Pair, problem ended |
 | EGL software, with either card in the rig | Pair, cover in both views | Left view, told | Pair, problem ended |
 | Vulkan layer, NVIDIA with DRI3, XCB and Xlib | Pair, cover in both views | Left view, told | Pair, problem ended |
-| NVIDIA one-layer Vulkan WSI without DRI3 | No working pair in the baseline | No copied-present completion to check | Candidate refuses the two-view swapchain |
+| NVIDIA one-layer Vulkan WSI without DRI3 | No working pair in the baseline | No copied-present completion to check | Refused up to +stereo3d24; a pair from +stereo3d25 ([below](#a-vulkan-pair-without-dri3-the-layer-and-lavapipe)) |
 
 The new-server pair and older-server left-view checks include one-frame programs.
 The request-injected offset and wrong-size rows pass for EGL DRI3 and the NVIDIA layer; the baseline layer on the older server splits those same changed requests.
@@ -308,6 +308,69 @@ This passed from the matching +stereo3d23 amd64/i386 packages; the container has
   How found: `FRAMES=1 SRC_W=700` through the wire injector left 58,400 blue pixels. The fixed view has exactly 358,400 red, 120,000 green and 1,600 white pixels, zero blue, and one 40 by 40 marker in an 800 by 600 window.
   Prefer cached host memory for that transfer, and copy the uploaded pixels into the final pixmap before presenting; confirm three mono flips and recovery after uncovering. Honor the requested alpha mode on ARGB visuals: opaque stays opaque and post-multiplied colours are premultiplied for X11. Test alpha modes and 8-bit, 10-bit and half-float channel packing separately; the captured runtime row used an 8-bit X11 visual.
 
+
+## A Vulkan pair without DRI3 (the layer and lavapipe)
+
+Learned on ORDER 623 (November 2026), on Stereo KWin +stereo3d54, Xwayland 24.1.15 +stereo3d3 and Mesa `26.1.6-1+stereo3d24` and `+stereo3d25`.
+The result first: from Mesa `+stereo3d25` a Vulkan program that asks for two image layers in its own X11 window gets its pair on an X server without DRI3, through the Vulkan stereo layer on NVIDIA's driver and through Mesa's own presentation on lavapipe.
+Up to `+stereo3d24` the layer refused the swapchain (`VK_ERROR_FEATURE_NOT_PRESENT`, the program ended) and lavapipe's first present returned `VK_ERROR_OUT_OF_DATE_KHR` (the program ended), and nothing told the person.
+radv cannot present on such a server at all ("No DRI3 support detected - required for presentation"), one layer or two: not a stereo loss, unchanged.
+
+### What the drivers do without DRI3 (measured)
+
+| Driver | How the picture reaches the window | A swapchain of another size than the window | The window resized after the swapchain was made |
+| --- | --- | --- | --- |
+| NVIDIA's (615.71.09) | one core `PutImage` of the whole swapchain image into the window per present, a `GetGeometry` each present; no MIT-SHM, no Present, so no completion to read | accepted, every present `VK_SUCCESS`; the window keeps what fits | `VK_ERROR_OUT_OF_DATE_KHR` at the first present after the change |
+| lavapipe (Mesa's `x11_present_to_x11_sw`; MIT-SHM is used only with DRI3) | `PutImage` of the swapchain image into the window | `VK_ERROR_OUT_OF_DATE_KHR` at every present: the extent is compared with the window | the same |
+| radv | none | | |
+
+So a picture of both views is whole only in a window two views wide.
+A declaration of version 4 keeps the window one view wide (the route of the DRI3 path, where a pixmap twice as wide is presented and flipped), so neither driver could carry a pair there.
+
+### The route as built (Mesa patch 0041)
+
+- Stereo KWin makes a top-level window it manages, declared full side by side without `_KDE_NET_WM_STEREO_CONTENT_VERSION` 4 (version 3, the default), twice as wide, and sends the program a synthetic `ConfigureNotify` of one view (KWin's `testStereoContentDeclarationOneEyeWide`: 100 wide becomes 200).
+- Without DRI3 the layer and Mesa's X11 presentation declare the window that way and make the driver's swapchain of both views once the X server reports the window two views wide: "With Xcb, minImageExtent, maxImageExtent, and currentExtent must always equal the window size" (Vulkan, `VK_KHR_xcb_surface`).
+  They wait only for a mapped window, at most `MESA_STEREO_DOUBLING_WAIT_MS` (1000 by default, 0 for not at all), polling the geometry every 10 ms, as the gl-stereo layer waits (`GL_STEREO_DOUBLING_WAIT_MS`).
+- The program keeps working in one view's size: the surface's extents are halved while the window is two views wide, the size the compositor's synthetic `ConfigureNotify` gives.
+- A doubling that comes later (KWin busy, or a window not mapped yet) makes the driver's swapchain out of date once, as any resize of an X11 window does; the next swapchain has the width. A resize by the person does the same.
+- A swapchain of one view after a pair withdraws the declaration, waits for the window to be one view wide again, then is made at that size: vk-views' two, one, two, one never sees `VK_ERROR_OUT_OF_DATE_KHR`.
+- A child window, an override-redirect window, or any window under a compositor that announces less than 3, is not made wider. There the layer offers `maxImageArrayLayers` 1 (the driver's), and a program that asks for two anyway is refused with `VK_ERROR_FEATURE_NOT_PRESENT` and the person is told: package `mesa-vulkan-layer-stereo`, key `one-view:vulkan:DEVICE` (the device's name with every character outside letters, digits and `_@+-.` made `_`), message `LOCAL4` with the program, the device and Mesa's own words (title `LOCAL3`), in the ten languages; a pair of that device shown later, on any route, ends it. lavapipe offers one layer there too and has no message of its own.
+- The helpers are `src/util/u_x11_stereo_doubled.h` (has DRI3, why a window is not doubled, declare for doubling, the wait), shared by `stereo_layer.c` and `wsi_common_x11.c`; the problem transport gained `u_stereo_problem_keep_args()` for a message of three or four arguments.
+- Credits, from Mesa's own records: lavapipe's software presentation is Dave Airlie's ("vulkan/wsi: add sw support", 8004fa9c, 2020) and its out-of-date answer to a resize Hans-Kristian Arntzen's (merge request 28413, 2024); the route was planned by lane 583 from lane 573's findings.
+- No Present completion exists on this route, so the copied-pair rule (`u_stereo_pair`, patches 0038 and 0039) does not run there; the window's own pixmap holds both halves and Xwayland +stereo3d5 hands it over whole.
+
+### Recipe: the rows as scripts
+
+All rows run in the fresh-session rig of [stereo-proof-rig](../../stereo-proof-rig/SKILL.md) with `XWAYLAND_NO_GLAMOR=1` in KWin's environment and the output in its side-by-side 3D mode; a development build of `libVkLayer_MESA_stereo.so` and `libvulkan_lvp.so` is mounted over the installed ones to prove a change before a package build (the two targets of a Mesa tree configured with `-Dvulkan-drivers=swrast -Dgallium-drivers=llvmpipe -Dvulkan-layers=stereo -Dglx=disabled -Degl=disabled -Dgbm=disabled`, about ten minutes at six processors from cold, seconds after a change).
+
+1. **What the driver sends:** [`scripts/vk-extent-probe.c`](../scripts/vk-extent-probe.c) under `xtrace -n -d $DISPLAY -D :9 -o trace.txt --` (Debian's `xtrace`), with `EXT_W=1600` on an 800 wide window and with `RESIZE_AT=30 RESIZE_W=1600`; count the requests with `grep -o 'Request([0-9]*): [A-Za-z]*' trace.txt | sort | uniq -c`.
+2. **The pair and the sequence:** [`vk-views`](../../stereo-proof-rig/scripts/vk-views/README.md) with `X11=1 PHASES="2:4,1:4,2:4,1:0"`, `OLD=1` and `OLD=0`, captures at 3, 7, 11 and 15 s: `PAIR FLAT PAIR FLAT`, declarations `3 0 3 0`, the program alive at the end.
+3. **The geometry and every frame:** [`scripts/vk-x11-covered.c`](../scripts/vk-x11-covered.c) with `TOPLEVEL=1 UNCOVERED=1` (and `XLIB=1`), captures at 3, 4, 5 and 6 s, read by [`scripts/pair-geometry.py`](../scripts/pair-geometry.py): each eye one 800x600 window at the same place, red left and blue right with no colour of the other view, the green rectangle centred, the 40 px marker at the same place in both eyes and at another place in each capture.
+4. **Told, then ended:** [`seq-x11.sh`](../../stereo-proof-rig/scripts/vk-views/seq-x11.sh) with `NOGLAMOR=1 SEQ="vk-extent-probe|CHILD=1 LAYERS=2;vk-x11-covered|TOPLEVEL=1 UNCOVERED=1;vk-extent-probe|CHILD=1 LAYERS=2"` and `LANGS="pt_BR de ja"`: the problem kept, gone, kept again; a second refusal by the same program leaves it at generation 1.
+5. **What must not change:** lane 573's vk-views rows with glamor on radv, NVIDIA and lavapipe, Wayland and X11, both orders, compared pixel for pixel between the old and the new build; a one-layer vk-views without DRI3 the same; vkcube resized twice from outside (`x11-resize`-style `ConfigureWindow` on its window) with and without DRI3; radv without DRI3 as before.
+
+### Traps
+
+- **Symptom:** NVIDIA's rows on Wayland end at once with `vkCreateInstance ... failed: -9` while its X11 rows pass.
+  **Cause:** the client's EGL vendor list named Mesa's only; NVIDIA's Vulkan driver does not start without its own EGL vendor (on X11 it starts through GLX).
+  **Fix:** give NVIDIA's client its own EGL vendor (`__EGL_VENDOR_LIBRARY_FILENAMES` with `10_nvidia.json`).
+  **How found:** the same rows by protocol: X11 passed, Wayland failed at instance creation, and this skill's rig page already said it.
+- **Symptom:** `check-pair-flat-split.py --child none` says SPLIT for a correct top-level pair.
+  **Cause:** KWin's title bar icon has grey pixels, which the classifier counts as a child window.
+  **Fix:** for a top-level, check the window against a prediction (`pair-geometry.py`); look at one capture before trusting any label.
+- **Symptom:** a refusal row never refuses: the client asserts `maxImageArrayLayers == 2` and stops before asking.
+  **Cause:** where the layer cannot give two it now offers one, and `vk-x11-covered` asserts on the capability.
+  **Fix:** `vk-extent-probe CHILD=1 LAYERS=2` asks for two whatever the capability says, as a program that asks anyway does.
+- **Symptom (the old note):** "lavapipe returns `VK_ERROR_OUT_OF_DATE_KHR` once Stereo KWin doubles the declared window".
+  **Cause, measured:** lavapipe's first present is already out of date: its extent is two views wide and a version-4 window stays one view wide, and the software path compares the two at every present.
+  **How found:** reading `x11_present_to_x11_sw()` and the red row's first present.
+- **Symptom (the old refusal's reason):** "the one-layer WSI's packed buffer is clipped to the left view".
+  **Cause, measured:** the clip is the window's width: NVIDIA's `PutImage` carries the whole image, and the window was one view wide because the declaration kept it so.
+  **Fix:** the window's width (version 3), not a refusal.
+- **Symptom:** `apt-get update` in an image made from an older rig stops at `sqv ... Missing key A401FF99368FA1F98152DE755C808C2B65558117` for deb-multimedia.
+  **Cause:** the image's keyring predates deb-multimedia's current signing key.
+  **Fix:** set that source aside for a step that needs nothing from it, or install the current `deb-multimedia-keyring`; never sign with a key you did not check.
 
 ## What this does not cover
 

@@ -178,6 +178,6 @@ The helper is a test fixture for an 800-pixel view; it leaves single-view reques
 
 **The Vulkan client has no second view on Xwayland without DRI3.**
 On the NVIDIA one-layer WSI route measured on ORDER 561b, the older layer's packed transfer was clipped to one view and produced no completion on the observed window; the new check cannot wait for such a completion.
-The candidate refuses that two-view swapchain with `VK_ERROR_FEATURE_NOT_PRESENT` and says why.
-This is an unsupported route, not a pair and not the library's copied-present recovery.
+Up to Mesa +stereo3d24 the layer refused that two-view swapchain with `VK_ERROR_FEATURE_NOT_PRESENT` and said why only in the log.
+From +stereo3d25 a top-level window gets its pair there (Stereo KWin makes it two views wide); a child window is not made wider, so the layer offers one image layer for it and tells the person when a program asks for two anyway ([a Vulkan pair without DRI3](x11-stereo-window-without-glamor.md#a-vulkan-pair-without-dri3-the-layer-and-lavapipe)).
 Native Mesa WSI that already advertises two array layers bypasses this layer and needs its own qualification.

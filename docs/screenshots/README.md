@@ -5,6 +5,16 @@ Each one is shown as a red-cyan anaglyph, so red-cyan glasses show it in 3D on a
 Its MPO file holds both eyes as taken; GitHub cannot show an MPO, so the link downloads it, and it opens in 3D in the edition's photo programs on any of the registered outputs.
 Measurements are the distance between the eyes in pixels: positive pops in front of the screen, negative sinks behind it.
 
+## Stereo Desktop, the Info Centre and the menu (17 October 2026)
+
+<img src="stereo-info-translucent-anaglyph.jpg" width="99%" alt="The Stereo Desktop in 3D with translucent windows: the application menu and its Multimedia list in front, the Info Centre behind, the weather and system monitor widgets and the Audio Volume pop-up over the Earth wallpaper (red-cyan anaglyph)">
+
+[Download the MPO (both eyes)](https://raw.githubusercontent.com/Sparky-OS/sparky-stereo-os/main/docs/screenshots/stereo-info-translucent.mpo)
+
+The application menu's column +5 px, its list of programs 0 px; the Audio Volume pop-up +3 px; the panel 0 px, at the screen.
+The Info Centre window, the weather and system monitor widgets and the wallpaper -10 px.
+The weather widget's city and the UPS widget's source name are blurred in both eyes.
+
 ## Stereo Desktop, translucent (15 October 2026)
 
 <img src="translucent-stereo-desktop-anaglyph.jpg" width="99%" alt="The Stereo Desktop in 3D with translucent windows: Dolphin's Settings menu and its colour-scheme list in front, the glass windows behind stepping back, the system monitor and the wallpaper deepest (red-cyan anaglyph)">

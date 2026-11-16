@@ -2,14 +2,15 @@
 name: writing-front-pages
 description: >-
   Write the first text a stranger meets: README openings, profiles, calls for testers, list and page openings, About
-  lines within 350 characters, a document's bold lead, README translations, a one-page quick start for a reader coming
-  from Windows, a glossary entry, a new term checked against other projects' names before it is used: person first,
-  show before telling, short, no jargon up front, honest status, one next step, doors per reader, offer and never ask,
+  lines within 350 characters, a document's bold lead, README translations, a one-page quick start for a Windows
+  reader, a glossary entry, a new term checked against other projects' names before it is used: person first, show
+  before telling, short, no jargon up front, honest status, one next step, doors per reader, offer and never ask,
   value with evidence, every stereo display, move never drop, keep every link and anchor that points in, the
   cold-reader test. Load it when a newcomer cannot tell what the project is for, a long README must shrink without
   losing a fact, a tester lost Windows to a BitLocker recovery prompt, a term needs its number or a name may already
   be another project's, a status line confuses, a translated heading's anchor no longer resolves, a check says a
-  link was split, or the front pages must name a planned program or capability the edition does not ship yet.
+  link was split, the front pages must name a planned capability, or an organisation page shows several products as
+  cards.
 ---
 
 # Writing front pages
@@ -94,6 +95,12 @@ The recipe, the checks and the traps: [Adding a planned capability to every fron
 When a language joins after the others, translate from today's English page, settle the glossary before the first sentence, and put the language in the row where its group ends.
 Every anchor the English headings make must still resolve, the call for testers follows the English call as it stands, and a cold reader reads the first screen in that language.
 The recipe, the two scripts and the traps: [Adding a front-page language after the fact](references/adding-a-front-page-language.md).
+
+## An organisation's front page for several products
+
+When one GitHub organisation page presents several products, some of them another maker's, give each a card: an SVG per product, language and theme, generated from one strings table with its words drawn as glyph outlines, shown through `<picture>` with `prefers-color-scheme` and with `<a>` alone on the line before it.
+The language files come from the same generator with the English anchors kept, the proofs go through GitHub's markdown API, and another maker's mark is used unmodified, on its own ground, linked to its home, with a courtesy list for its maker.
+The recipe, the checks and the traps: [An organisation's front page for several products](references/an-organisation-front-page-for-several-products.md).
 
 ## Keep every link that points in
 

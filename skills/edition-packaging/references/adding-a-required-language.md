@@ -32,3 +32,33 @@
 - **Browser locale lists** (`./mach package-multi-locale --locales ...`) take Mozilla's own codes, and Mozilla has no bare `es`: `es-ES`, `es-AR`, `es-CL` and `es-MX` are separate locales. Name the choice in the report instead of inventing one; the edition's one `es` catalogue is for the strings the edition adds.
 - **A Dolphin pack generator** (`gen.py`) writes `pack.json` and `lang/<code>` into the OUT-DIR you give it and no checked-in output, so the proof is: run it before and after into scratch and diff; the other languages' files must be identical and the new one must pass `bash -n`.
 - **Test rig:** a Debian testing container with python3, gettext, locales, libxml2-utils, desktop-file-utils, python3-tk, dpkg-dev, libkf6config-bin, gcc and the ten locales generated with `localedef -i es_ES -f UTF-8 es_ES.UTF-8` (and the others) ran the pure-Python checks (saver receipts, integrations, check-translations, generators) as uid 1000 with the network off.
+
+## The 3D switch's label: one name in the ten languages (ORDER 586)
+
+The program switch "Enable 3D" (`Stereo::Enable3DAction`) keeps one name per language in every program the edition ships (same-ideas-same-names-everywhere). As shipped after ORDER 586 (2026-11-15):
+
+| Language | Label of "Enable 3D" |
+|---|---|
+| en (source) | Enable 3D |
+| de | 3D aktivieren |
+| es | Activar 3D |
+| fr | Activer la 3D |
+| ja | 3D を有効にする |
+| ko | 3D 사용 |
+| pl | Włącz 3D |
+| pt_BR | Ativar 3D |
+| zh_CN | 启用 3D |
+| zh_TW | 啟用 3D |
+
+pt (Portugal) is a different language: the switch has no `pt` translation (Dragon's `po/pt` carries none and there is no `pt` hunk in the patches), so there is nothing to change there; do not let an `es` form leak into a `pt_BR` catalogue — `Activar 3D` is the Spanish label, and the identical spelling is a trap.
+
+Where it lives: the stereo layer's `po/pt_BR/stereo-layer_qt.po`, sView's `lang/portuguesebr/*.lng` (`1461=Ativar 3D`), the gl-stereo launcher's `launcher-strings.json` (`"pt_BR": "Ativar 3D"`), and the `.po.patch` hunks the recipes add to Dragon Player, Haruna and the depth-source patches under `sparky-os/translations/`.
+
+The grep that finds a drifting pt_BR form (run in the build tree; patch files match too because their hunks are the future language lines):
+
+```sh
+git grep -n -E 'msgstr "(Ativar o|Habilitar|Ligar|Instalar|Energizar) 3D"' -- '*.po' '*.po.patch' || echo "no drift"
+grep -rn -B1 -E 'msgstr "Ativar o 3D"' published-src/*/po/pt_BR/*.po
+```
+
+A hit with an old form (`Ativar o 3D` was the drift ORDER 586 fixed in Dragon and Haruna) must be changed to the table's line, never to a new wording; the reverse check that every shipped pt_BR catalogue names the expected form is `grep -rn -A1 'msgid "Enable 3D"' */po/pt_BR/*.po` — every `msgstr` must read `Ativar 3D`, and a recipe patch that adds or fixes the string is proven in place: `patch -p1` it onto the pristine unpacked source in a container, then `msgfmt -c -o /dev/null` the changed catalogue.

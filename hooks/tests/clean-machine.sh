@@ -60,7 +60,7 @@ run "hooks/tests/run.py" 1 python3 hooks/tests/run.py
 
 step "4. a toy workspace in the default layout, each configuration from its example"
 python3 hooks/install.py init "$W" >"$WORK/init.out" || fail "install.py init"
-expect "configurations written" 7 "$(grep -c '^wrote' "$WORK/init.out")"
+expect "configurations written" 8 "$(grep -c '^wrote' "$WORK/init.out")"
 for name in check-every-default one-format-inside how-we-write-upstream; do printf 'A fact of the toy workspace.\n' >"$W/memory/$name.md"; done
 run "install.py check" 1 python3 hooks/install.py check "$W"
 ( cd "$W" && find . -maxdepth 3 | sort | sed 's/^/    /' )

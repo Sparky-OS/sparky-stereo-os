@@ -18,6 +18,7 @@ These hooks are how that is kept without anyone having to ask.
 | [stereo-contract-guard](stereo-contract-guard/README.md) | Before a brief or a draft is written, before publishing, before a push | A sentence or a code line that breaks the stereo contract asks the person, with its rule and its fix | on |
 | [disk-floors](disk-floors/README.md) | Before a command that fills a disk, and while a floor is crossed | Free space in GiB against each folder's floor | on, telling only |
 | [container-guard](container-guard/README.md) | Before a command that stops or removes containers | Refused when it would act on every container of a shared daemon or on a protected service | on |
+| [branch-keeper](branch-keeper/README.md) | At session start and after a compaction; before a command that removes a clone, a worktree, a branch or a stash, makes a branch or merges one; after a merge | The branches outside main with their recorded reasons and the work on no remote; a removal that would lose work that exists nowhere else is refused; a new branch is shown the branches with its number; a merge is reminded that the branch goes | on |
 
 Every hook folder has the same five things: `hook.py` (the logic), `config.example.json` (every key, with the edition's defaults), `wiring.json` (the events it wants, per tool), `tests/` and a `README.md` that says what it runs on, what it refuses or adds, why, and how it fails.
 
@@ -42,6 +43,7 @@ WORKSPACE/                    one folder for all the work; not a repository itse
 ├── private/                  never inside a repository that has a remote
 │   ├── drafts/               texts before the person approves them
 │   ├── ledger.md             what was sent, to whom, when
+│   ├── branches.tsv          why each branch outside main stays: kept or superseded, with the reason
 │   └── hooks/                each hook's real configuration: NAME.json
 └── state/
     └── hooks/NAME/           each hook's state per session, and its logs

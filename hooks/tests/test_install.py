@@ -17,7 +17,7 @@ sys.path.insert(0, HOOKS)
 sys.path.insert(0, os.path.join(HOOKS, 'lib'))
 import install  # noqa: E402
 
-ALL = ['brief-and-handback', 'container-guard', 'design-reading', 'disk-floors', 'outreach-guard', 'publish-check', 'stereo-contract-guard']
+ALL = ['branch-keeper', 'brief-and-handback', 'container-guard', 'design-reading', 'disk-floors', 'outreach-guard', 'publish-check', 'stereo-contract-guard']
 
 
 def run(*args):
@@ -61,7 +61,7 @@ class Install(unittest.TestCase):
         self.assertEqual(r.returncode, 0, r.stderr)
         for folder in ('memory', 'repos', 'partners/queue', 'private/drafts', 'private/hooks', 'state/hooks'):
             self.assertTrue(os.path.isdir(os.path.join(self.ws, folder)), folder)
-        for starter in ('memory/MEMORY.md', 'partners/HOUSE-RULES.md', 'private/README.md', 'private/ledger.md'):
+        for starter in ('memory/MEMORY.md', 'partners/HOUSE-RULES.md', 'private/README.md', 'private/ledger.md', 'private/branches.tsv'):
             self.assertTrue(os.path.isfile(os.path.join(self.ws, starter)), starter)
         self.assertEqual(os.stat(os.path.join(self.ws, 'private')).st_mode & 0o777, 0o700)
         for name in ALL:
@@ -72,6 +72,8 @@ class Install(unittest.TestCase):
         # this checkout is not under WORKSPACE/repos, so the configurations name where its skills are
         self.assertEqual(self.config('outreach-guard')['paths']['skills'], os.path.join(os.path.dirname(HOOKS), 'skills'))
         self.assertEqual(sorted(self.config('disk-floors')['floors_gib']), sorted(['/', self.ws]))
+        # the same for the repository branch-keeper reads: this checkout
+        self.assertEqual(self.config('branch-keeper')['repositories'][0]['path'], os.path.dirname(HOOKS))
 
     def test_init_keeps_what_exists(self):
         run('init', self.ws)
@@ -157,14 +159,16 @@ class Install(unittest.TestCase):
         by_matcher = {g.get('matcher'): [h['command'] for h in g['hooks']] for g in hooks['PreToolUse']}
         self.assertEqual(sorted(by_matcher), ['*', 'Agent|Task|SubagentHandback', 'Bash', 'Edit|Write'])
         bash = ' '.join(by_matcher['Bash'])
-        for name in ('container-guard', 'disk-floors', 'outreach-guard', 'publish-check', 'stereo-contract-guard'):
+        for name in ('branch-keeper', 'container-guard', 'disk-floors', 'outreach-guard', 'publish-check', 'stereo-contract-guard'):
             self.assertIn(f'/{name}/hook.py', bash)
         self.assertNotIn('design-reading', bash)       # it is wired once, on every tool
         command = by_matcher['*'][0]
         self.assertEqual(command, f"python3 {HOOKS}/design-reading/hook.py --config '{self.ws}/private/hooks/design-reading.json'")
         self.assertNotIn('matcher', hooks['UserPromptSubmit'][0])
         post = {g['matcher'] for g in hooks['PostToolUse']}
-        self.assertEqual(post, {'Read', 'mcp__reference__consult_knowledge'})
+        self.assertEqual(post, {'Bash', 'Read', 'mcp__reference__consult_knowledge'})
+        starts = [h['command'] for g in hooks['SessionStart'] for h in g['hooks']]
+        self.assertTrue(any('/branch-keeper/hook.py' in c for c in starts))
         self.assertTrue(all(h['type'] == 'command' and h['timeout'] > 0 for g in hooks['PreToolUse'] for h in g['hooks']))
 
     def test_the_wiring_runs(self):
@@ -226,12 +230,12 @@ class Install(unittest.TestCase):
         commands = [h['command'] for g in merged['hooks']['PreToolUse'] for h in g['hooks']]
         self.assertIn('python3 /somewhere/else/guard.py', commands)
         ours = [c for c in commands if HOOKS in c]
-        self.assertEqual(len(ours), 9)
+        self.assertEqual(len(ours), 10)
         # writing again replaces our entries instead of adding them twice
         run('wire', 'claude', self.ws, '--write', settings)
         with open(settings) as f:
             again = json.load(f)
-        self.assertEqual(len([h for g in again['hooks']['PreToolUse'] for h in g['hooks'] if HOOKS in h['command']]), 9)
+        self.assertEqual(len([h for g in again['hooks']['PreToolUse'] for h in g['hooks'] if HOOKS in h['command']]), 10)
         r = run('unwire', settings)
         self.assertIn('handler(s) of', r.stdout)
         with open(settings) as f:

@@ -1,0 +1,12 @@
+{
+  "claude": [
+    {"event": "SessionStart", "matcher": "startup|resume|clear|compact", "timeout": 30},
+    {"event": "PreToolUse", "matcher": "Bash", "timeout": 30},
+    {"event": "PostToolUse", "matcher": "Bash", "timeout": 30}
+  ],
+  "codex": [
+    {"event": "SessionStart", "matcher": "startup|resume|clear|compact", "timeout": 30},
+    {"event": "PreToolUse", "matcher": "Bash", "timeout": 30},
+    {"event": "PostToolUse", "matcher": "Bash", "timeout": 30}
+  ]
+}

@@ -68,6 +68,9 @@ Compare diff bodies against the accepted port, retain the newer regression test,
 For carried patches, retain author names and an Origin link to the full upstream record; sanitize inherited patch headers during source preparation too.
 A clean recipe directory alone does not clean patches supplied by its input source.
 Build every architecture from the same descriptor, keep the source commit reachable, and read apt's actual `Inst` lines in an upgrade simulation from the outgoing package set.
+Freeze the launched shell scripts before a long build.
+Editing a bind-mounted script while Bash is waiting for a child can move its read offset and produce an unexpected EOF after a successful package build.
+The build log separated the successful compiler/link gate from the failed finishing shell; copying the driver and FATE script into the job directory prevents later recipe edits from changing that running job.
 
 ## Find the boundary before changing the driver
 

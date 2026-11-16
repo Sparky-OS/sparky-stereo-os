@@ -833,3 +833,14 @@ How found: visual inspection of the first capture disagreed with its control-lab
 Adding Debian's OFL-licensed Noto CJK faces made the same Korean title, explanation and resolution controls readable, without copying font assets into the app or altering its source.
 Keep the failed visual witness and the corrected capture separate, and tell the packaging owner that the language feature needs that runtime dependency.
 Do not describe a readable partial catalog as a complete translated interface or native-speaker review.
+
+
+### Hold ordinary cache state through an exact UI comparison
+
+Symptom: same-input ordinary exports match, but full native UI/output differs in176flat-case pixels and458direct-camera pixels.
+Cause: idle preview caching advances the timeline's thin cache bars and related progress state independently in the two fresh processes; its default is enabled.
+Fix for the proof: use the app's existing visible Cache Frames When Idle command to turn that work off in both runs before constructing the fixture, retaining the normal content and every captured pixel.
+How found: the flat difference occupied only two cache-bar rows; source inspection identified `cache_bars` and `playback.cacheWhenIdle`, and fresh controlled flat/direct runs then matched every exported, client and output pixel.
+Keep the product default unchanged and record this explicit test input rather than masking bars, changing source telemetry or calling the uncontrolled captures exact.
+The two controls compared40,000exported RGBA pixels and2,304,000complete client/output pixels without differences.
+The independent Effect baseline is the named upstream main plus the separately credited font and first-frame prerequisites, before the new shutter/common/stereo work; do not relabel that source as untouched current main.

@@ -169,6 +169,8 @@ A compute or sparse-buffer program that draws nothing on the RTX through zink, w
 
 A browser canvas (WebGL, three.js, CesiumJS), video or image with `image-rendering: pixelated` that shows black, solid green or blurry on Stereo KWin: [references/browser-pixelated-canvas.md](references/browser-pixelated-canvas.md).
 
+The browser's camera hack or flat WebXR display shown squeezed side by side, the same in each eye, where the browser draws without the graphics card (its own compositor in software, `WebRender (Software)`; not Stereo KWin's): where the pair lost its mark, the fix, the rig cases with a forced software route and with no device at all: [references/browser-software-webrender-pair.md](references/browser-software-webrender-pair.md).
+
 A closed program we cannot rebuild, with a quad buffer mode, shipped as an AppImage (what it bundles, which configuration it is offered, the program's fault told from the stack's with a small client, `GL_BACK` reaching one eye only, the FUSE 2 runtime, the settings file named after the start name, the 3D mouse boundary): [references/closed-program-quad-buffer-in-an-appimage.md](references/closed-program-quad-buffer-in-an-appimage.md).
 
 A 3D mouse (six axes) in a stereo program: libspnav and spacenavd, a stand-in daemon and a simulated kernel device for a test, what a vendor kit does on other systems, a program that closes itself while the view moves (`Signal is already emitting`): [references/3d-mouse-libspnav.md](references/3d-mouse-libspnav.md).

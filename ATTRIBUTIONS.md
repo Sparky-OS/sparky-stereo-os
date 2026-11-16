@@ -420,6 +420,12 @@ Their living successors, which we make stereo: the QML Flip Switch and Cover Swi
 Qt SVG's colour work builds on its developers' own, most of all **Hatem ElKharashy** and **Robert Löhning**, whose `resolveColor()` test our change extends.
 Our first Qt change was reviewed within hours by **Tim Blechmann**, with **Artem Dyomin, Nils Petter Skålerud and Jøger Hansegård** as reviewers.
 
+### 2.8a The browser: Waterfox and Mozilla's Gecko
+
+**Source**: [Waterfox](https://github.com/BrowserWorks/Waterfox), our fork [Sparky-OS/waterfox](https://github.com/Sparky-OS/waterfox); Mozilla's Gecko and WebRender, under the Mozilla Public License 2.0 **What we changed**: WebXR's flat display and the camera hack, both handed to KWin as one declared full side-by-side surface, video marks, CSS depth; with the browser's own compositor in software (software WebRender), the pair keeps its stereo mark through the buffer read back for the compositor, so it is declared on that route too (ORDER 616).
+**Credit**: BrowserWorks Ltd and **Alex Kontos**, who makes Waterfox; Mozilla and Firefox's contributors for Gecko and WebRender.
+The software route rests on the Wayland native compositor for software WebRender that **Robert Mader** added to Firefox (Mozilla bug 1711224, 2021: the native surfaces in shared memory buffers that the edition's declaration now reaches).
+
 ### 2.9 The stereo virtual machine
 
 [A virtual machine with a 3D display](docs/stereo-vm.md) builds on these projects.

@@ -47,7 +47,7 @@ Conversions happen at the edges only: the decoder on the way in, the device's fo
 - A loopback or filter loaded as a module in `pipewire.conf.d` has no client, so it never appears, and its output cannot be chosen in KDE (pavucontrol lists it).
 - Running it as a client program (`pw-loopback` from a systemd user service) gives it a client; pipewire-pulse still reports no client while the node carries `node.virtual = true` (the loopback's default), so set `node.virtual = false` in both stream property sets.
 - With a client program, do **not** set `node.linger = true`: the nodes would outlive each restart and multiply. Keep `node.dont-fallback = true` on a stream that must never fall back to another device (to avoid feeding a card its own output), and let systemd restart the client (`Restart=always`) when WirePlumber removes the stream because its target is gone.
-- The edition's candidate virtual-stream switch extends the applet's existing device option and adds an independent Sound-page option, both off by default; it is tested from the Plasma 6.7.4 source, not packaged yet.
+- The edition's plasma-pa 4:6.7.4-1+stereo3d1+lc1 extends the applet's existing virtual-device option to streams and adds an independent Sound-page option, both off by default; both are proved from the installed package.
 - How the models, stream routes, isolated null-device rig and controls fit together: [KDE virtual streams](references/kde-virtual-streams.md).
 - **Being built:** "Listen to this device" for any input and a combined recording source (the output mix plus a microphone).
 

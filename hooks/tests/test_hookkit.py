@@ -132,6 +132,69 @@ class ReadingShell(unittest.TestCase):
         self.assertEqual(hookkit.git_folder(['git', 'push'], '/work'), '/work')
 
 
+class FoldersOfCommands(unittest.TestCase):
+    """Each simple command is read in the folder that the line's own cd, pushd and popd give it, scoped as the shell
+    scopes them (a subshell, a pipeline, a background job, a shell started with -c)."""
+
+    def git_folders(self, line, cwd='/w'):
+        return [(' '.join(words[1:3]), folder) for words, folder, _ in hookkit.commands_in_folders(line, cwd) if words[0] == 'git']
+
+    def test_a_cd_counts_from_where_it_stands_to_the_next_cd(self):
+        home = os.path.expanduser('~')
+        cases = {
+            'cd /a/repo && git push o; cd /a && git status': [('push o', '/a/repo'), ('status', '/a')],
+            'cd /a/repo || exit 1; git push o; cd /a && ls': [('push o', '/a/repo')],
+            'cd /a/repo 2>/dev/null && git push o; cd /a': [('push o', '/a/repo')],
+            'cd -- /a/repo && git push o; cd /a': [('push o', '/a/repo')],
+            'cd -P /a/repo && git push o; cd /a': [('push o', '/a/repo')],
+            'if cd /a/repo; then git push o; fi; cd /a': [('push o', '/a/repo')],
+            '{ cd /a/repo; } && git push o; cd /a': [('push o', '/a/repo')],
+            'pushd /a/repo >/dev/null && git push o; cd /a': [('push o', '/a/repo')],
+            'cd /a && cd repo && git push o': [('push o', '/a/repo')],
+            'cd repo && git push o': [('push o', '/w/repo')],
+            'git status; cd /a/repo && git push o\ncd /b && git branch -D x': [('status', '/w'), ('push o', '/a/repo'), ('branch -D', '/b')],
+            '(cd /a && git push o); git status': [('push o', '/a'), ('status', '/w')],
+            'cd /a | cat; git status': [('status', '/w')],
+            'cd /a & git status': [('status', '/w')],
+            "bash -c 'cd /a && git push o'; git status": [('push o', '/a'), ('status', '/w')],
+            'echo $(cd /a && git rev-parse HEAD); git status': [('rev-parse HEAD', '/a'), ('status', '/w')],
+            'pushd /a; git push o; popd; git status': [('push o', '/a'), ('status', '/w')],
+            'cd /a; cd /b; cd -; git status': [('status', '/a')],
+            'cd; git status': [('status', home)],
+            'timeout 5 cd /a; git status': [('status', '/w')],
+            'command cd /a; git status': [('status', '/a')],
+            'cd /a/repo && gh pr merge 5 --body "TEXT WITH \\"QUOTES\\"\ncd /x && make\n" && git push o; git status':
+                [('push o', '/a/repo'), ('status', '/a/repo')],
+        }
+        for line, want in cases.items():
+            with self.subTest(line):
+                self.assertEqual(self.git_folders(line), want)
+
+    def test_a_folder_the_line_does_not_name_is_unknown_and_says_why(self):
+        for line, words in (('cd $R && git push o', '$R'), ('for r in a b; do cd /x/$r && git push o; done', '/x/$r'),
+                            ('cd "$R"/sub && git status', '$R/sub'), ('cd -; git status', 'cd -'),
+                            ('cd $(cat f) && git status', '$(...)')):
+            with self.subTest(line):
+                (_, folder, why), = [c for c in hookkit.commands_in_folders(line, '/w') if c[0][0] == 'git']
+                self.assertIsNone(folder)
+                self.assertIn(words, why)
+        self.assertEqual(self.git_folders('cd /x/$r; cd /abs && git status'), [('status', '/abs')])
+        self.assertIsNone(hookkit.commands_in_folders('echo "unbalanced', '/w'))
+
+    def test_git_s_own_dash_c_gives_the_folder(self):
+        self.assertEqual(hookkit.git_place(['git', '-C', 'sub', 'push'], '/w', ''), ('/w/sub', ''))
+        self.assertEqual(hookkit.git_place(['git', '-C', '/abs', 'push'], None, 'after cd $R'), ('/abs', ''))
+        self.assertEqual(hookkit.git_place(['git', '-C', 'sub', 'push'], None, 'after cd $R'), (None, 'after cd $R'))
+        self.assertEqual(hookkit.git_place(['git', '-C', 'a', '-C', 'b', 'status'], '/w', ''), ('/w/a/b', ''))
+        self.assertEqual(hookkit.git_place(['git', 'switch', '-C', 'order1-x'], '/w', ''), ('/w', ''))
+        self.assertEqual(hookkit.git_place(['git', 'branch', '-C', 'old', 'new'], '/w', ''), ('/w', ''))
+        self.assertEqual(hookkit.git_folder(['git', 'switch', '-C', 'order1-x'], '/w'), '/w')
+        folder, why = hookkit.git_place(['git', '-C', '/x/$r', 'push'], '/w', '')
+        self.assertIsNone(folder)
+        self.assertIn('/x/$r', why)
+        self.assertIn('shell variable', why)
+
+
 class Events(unittest.TestCase):
     def event(self, dialect='claude', **payload):
         payload.setdefault('cwd', '/work')

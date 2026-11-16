@@ -95,3 +95,27 @@ Traps met during a visual-system pass:
 - **Headless Chromium exits with `chrome_crashpad_handler: --database is required`.** A non-root container process had no writable configuration directory. Give each fresh profile its own `XDG_CONFIG_HOME` and `XDG_CACHE_HOME`; retain the failing log and rerun without a desktop connection.
 - **A forbidden-word scan flags an approved PNG.** A case-insensitive search matched random compressed pixel bytes. Inspect the PNG chunk table and any `tEXt`, `zTXt` or `iTXt` payloads, scan text sources separately, and verify approved asset identity by hash. Do not edit a logo to remove a random binary match.
 - **A phone page has a horizontal scrollbar although the text fits.** Long unbroken links or fixed-width artwork can exceed the available inline size. Inspect which element exceeds the document client width; allow long links to wrap and constrain the outer tile as well as its proportional image. Compare document scroll width with client width, not `innerWidth`, because the latter includes the scrollbar.
+
+
+For a figure pass after the visual system:
+- Keep the original HTML text, links and anchors as a separate comparison stream, excluding only the new SVG subtrees and comments.
+  Require each new SVG text element, title and description to be a verbatim excerpt from that page's frozen text.
+  Prove the guard fails by changing one body number and by inserting an invented graphic label, then restore the source.
+- Put the fact picture immediately after the opening text in document order and use a grid to place it beside that text on desktop.
+  Measure the picture's bottom against the phone viewport; merely having a hero class does not put it on the first screen.
+- Draw bounds as bounds: an open endpoint and an arrow toward earlier values for “under”, a continuation past the shared axis endpoint for “more than”.
+  Verify the positions against the stated time ratio; retain the original caveat and source beside the chart.
+- Measure computed body text and the content width, not just the root variable or outer box.
+  Padding comes out of a border-box width; a nominal 1200 px wrapper with gutters has less room for its figures.
+- Reserve future content with a named `figure[data-extra]` and a short comment describing its data.
+  Hide it while it has no content element, including when it contains only a comment or template; insert a temporary SVG in the browser and verify it becomes visible, then remove it and verify it hides again.
+- Render the social PNG from its SVG in the isolated browser, at the actual target dimensions.
+  A relative link to an approved local logo keeps its original bytes and makes the source easier to inspect than a large encoded payload.
+  Check both the SVG labels and the PNG's dimensions and metadata.
+- Read a diagram for meaning after the word check passes.
+  A label can occur verbatim on the page yet imply the wrong relationship when put after an arrow.
+  In a worker/partition diagram, an option that moves workers must point to workers, not to the partition count it leaves unchanged.
+
+An SVG label fitting inside its viewBox may still cross its node's border.
+Inspect the actual figure at phone size, shorten the label using another existing excerpt, and recapture it.
+Use element-focused captures for this inspection: a scaled contact sheet of a very tall page cannot prove small labels are legible.

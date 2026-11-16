@@ -10,6 +10,7 @@
 #include <KIconLoader>
 #include <KIconTheme>
 #include <iostream>
+#include <filesystem>
 #include <stdexcept>
 
 static void require(bool ok, const char *message)
@@ -64,6 +65,22 @@ int main(int argc, char **argv)
         std::cout << "PASS: missing pair refused\n";
         if (argc > 1 && QByteArray(argv[1]) == "--expect-ordinary-left") {
             require(plain.toImage().pixelColor(16, 16) == QColor(Qt::red), "Negative control: ordinary request is not the pair's left view");
+        }
+        if (argc == 4 && QByteArray(argv[1]) == "--theme-pair") {
+            const auto themePath = QFileInfo(QString::fromLocal8Bit(argv[2])).canonicalFilePath();
+            require(!themePath.isEmpty(), "The authored theme folder does not exist");
+            std::filesystem::create_directory_symlink(themePath.toStdString(), (icons + "authored").toStdString());
+            KIconTheme::forceThemeForTests("authored");
+            loader->reconfigure({});
+            for (int n : {8, 16, 22, 24, 32, 48, 64, 128, 256}) {
+                require(loader->loadStereoIcon("video-television", QSize(n, n), 1, &left, &right), "The authored pair did not load");
+                const QImage expectedLeft(QString::fromLocal8Bit(argv[3]) + QString("/left-%1.png").arg(n));
+                const QImage expectedRight(QString::fromLocal8Bit(argv[3]) + QString("/right-%1.png").arg(n));
+                require(!expectedLeft.isNull() && !expectedRight.isNull(), "Missing independent eye reference");
+                require(left.toImage().convertToFormat(QImage::Format_RGBA8888) == expectedLeft.convertToFormat(QImage::Format_RGBA8888), "Authored left view differs");
+                require(right.toImage().convertToFormat(QImage::Format_RGBA8888) == expectedRight.convertToFormat(QImage::Format_RGBA8888), "Authored right view differs");
+            }
+            std::cout << "PASS: authored Oxygen SVG pair loaded at all nine theme sizes, each eye exact\n";
         }
         return 0;
     } catch (const std::exception &e) {

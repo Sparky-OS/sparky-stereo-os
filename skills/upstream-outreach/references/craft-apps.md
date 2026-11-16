@@ -856,3 +856,15 @@ How found: the actual SoundCraft workspace compiler named the missing field; the
 The complete common gate passed after carrying the unchanged patch.
 That does not qualify the receiving apps: run their own whole gates before committing their shared-revision updates.
 Do not remove the importer's bound check or give this app a private copy of the shared crate to evade the mismatch.
+
+
+### A receiver test can bypass a shared type's old invariant
+
+Symptom: a health-report test panics while deserializing zero into `SampleRate`, before it calls the report it intends to test.
+Cause: the newer shared time crate validates direct scalar deserialization, while the shared session reader deliberately repairs legacy in-range invalid rates to the existing 48 kHz default.
+The old test constructed an invalid typed session through the scalar's formerly unchecked serde path.
+Fix: retain strict scalar validation and the production health checks.
+Keep the uneven-channel and shortest-source checks, then test the actual legacy boundary: reject a direct zero scalar, read zero from a serialized session, require its existing default repair and retain the tracks.
+How found: SoundCraft's whole gate reached 518 passes and failed during that fixture construction; source inspection located `SampleRate`'s `try_from` and the session's `sample_rate_or_default` hook, and all six focused health tests passed after the test migration.
+Do not weaken the common type or introduce an unsafe constructor to keep an obsolete fixture constructible.
+The focused health result still needs a fresh complete receiver gate.

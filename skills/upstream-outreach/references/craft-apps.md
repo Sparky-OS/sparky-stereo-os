@@ -844,3 +844,48 @@ How found: the flat difference occupied only two cache-bar rows; source inspecti
 Keep the product default unchanged and record this explicit test input rather than masking bars, changing source telemetry or calling the uncontrolled captures exact.
 The two controls compared40,000exported RGBA pixels and2,304,000complete client/output pixels without differences.
 The independent Effect baseline is the named upstream main plus the separately credited font and first-frame prerequisites, before the new shutter/common/stereo work; do not relabel that source as untouched current main.
+
+
+### A newer receiver needs an additive shared API
+
+Symptom: a newly included app fails to compile because its MIDI importer reads `LenientRead::over_limit`, absent from the suite's accepted common revision.
+Cause: the receiver already uses a later upstream API that distinguishes a saturated warning list from an import that reached the work limit.
+Fix: carry the exact upstream change in the common owner with its original author and date, preserving the receiver's bound check and the one shared revision.
+Zinadin Zidan's [change 45a8e166](https://github.com/storytold/craft-libs/commit/45a8e16669e70dadb780dfbc759c882dd5b7ea1c) supplies that field and its warning-saturation regression.
+How found: the actual SoundCraft workspace compiler named the missing field; the selected common source lacked it, while the receiver's original upstream pin contained it.
+The complete common gate passed after carrying the unchanged patch.
+That does not qualify the receiving apps: run their own whole gates before committing their shared-revision updates.
+Do not remove the importer's bound check or give this app a private copy of the shared crate to evade the mismatch.
+
+
+### A receiver test can bypass a shared type's old invariant
+
+Symptom: a health-report test panics while deserializing zero into `SampleRate`, before it calls the report it intends to test.
+Cause: the newer shared time crate validates direct scalar deserialization, while the shared session reader deliberately repairs legacy in-range invalid rates to the existing 48 kHz default.
+The old test constructed an invalid typed session through the scalar's formerly unchecked serde path.
+Fix: retain strict scalar validation and the production health checks.
+Keep the uneven-channel and shortest-source checks, then test the actual legacy boundary: reject a direct zero scalar, read zero from a serialized session, require its existing default repair and retain the tracks.
+How found: SoundCraft's whole gate reached 518 passes and failed during that fixture construction; source inspection located `SampleRate`'s `try_from` and the session's `sample_rate_or_default` hook, and all six focused health tests passed after the test migration.
+Do not weaken the common type or introduce an unsafe constructor to keep an obsolete fixture constructible.
+The focused health result still needs a fresh complete receiver gate.
+
+Symptom: a strict lint run reports a new lint in unchanged code, then the nominally older compiler run fails `E0514` with a Clippy driver expecting the newer compiler's metadata.
+Cause: the project's CI pinned Rust 1.95, but the private SDK only installed its minimal compiler and Cargo; `cargo clippy` found a 1.100 driver later on PATH.
+Fix: select the project's CI compiler and its matching Clippy component together, verify their release manifest and component hash, and discard the mixed-version target before the fresh run.
+Do not rewrite unrelated code merely to satisfy lints from a compiler the project did not select.
+How found: the exact gate shell printed Rust 1.95 while the incompatible-metadata diagnostic named Rust 1.100; adding the signed matching component made both version commands report the same release.
+Keep the failed runs distinct from the fresh qualification, and record compiler, Cargo, Clippy and formatter versions inside the exact command shell.
+
+
+Symptom: a receiver's whole gate fails its catalog-pin check after a shared revision update, although its rendering tests pass.
+Cause: the revision file moved but the two existing Flatpak manifests still name the previous catalog commit.
+Fix: update those source commit fields in the same receiver step, preserving manifest line endings, build commands and runtime permissions.
+Search every receiver's tracked files for the old common and catalog hashes before starting the serial gates; distinguish historical records from active source declarations.
+How found: the app's existing manifest-consistency test compared the old manifest SHA with the new revision file and failed; the equivalent PdfCraft declarations were found by the same bounded source search.
+A metadata consistency check is not an actual Flatpak build; report that distinction.
+
+Symptom: a live gate's tail shows passing tests, but its final summary reports a failure from much earlier.
+Cause: Nextest continued after a failure, so a short tail hid its structured failure record.
+Fix: scan the whole bounded owned log for structured FAIL, TIMEOUT and abort records before claiming no failures, then report the final exit status separately.
+Use the highest completed test position, not the last repeated position in the failure summary.
+How found: the manifest check failed near test 267, while later tail snapshots showed thousands of passes; the complete log retained the earlier failure.

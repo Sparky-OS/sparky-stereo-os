@@ -1,0 +1,10 @@
+# Qt Quick's tst_qquickwindowstereo built alone against the installed Qt (qt6-declarative-private-dev), so
+# the same binary runs on the installed Qt Quick of each image: +stereo3d3 (red) and +stereo3d4 (green).
+cmake_minimum_required(VERSION 3.16)
+project(tst_qquickwindowstereo LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_AUTOMOC ON)
+find_package(Qt6 REQUIRED COMPONENTS Gui Qml Quick Test)
+find_package(Qt6 REQUIRED COMPONENTS GuiPrivate QuickPrivate)
+add_executable(tst_qquickwindowstereo tst_qquickwindowstereo.cpp)
+target_link_libraries(tst_qquickwindowstereo PRIVATE Qt6::Gui Qt6::GuiPrivate Qt6::Qml Qt6::QuickPrivate Qt6::Test)

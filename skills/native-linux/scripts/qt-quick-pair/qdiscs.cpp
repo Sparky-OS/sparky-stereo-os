@@ -10,6 +10,7 @@
 //   QDISCS_LIFECYCLE=1                      resized at 2.5 s, hidden at 4 s, shown at 5 s
 //   QDISCS_TOGGLE=1                         depth off at 2.5 s and on again at 4 s (two views, one, two)
 //   QDISCS_OFF=1                            depth off at 2.5 s, for good (two views, then one)
+//   QDISCS_GLES=1                           an OpenGL ES context (the default format's renderable type)
 //   QDISCS_FLICK=1                          depth off and on again at 2.5 s in one turn of the event loop, no
 //                                           frame between the two (two views asked again at once)
 //   QDISCS_STRESS=1                         depth off and on every 100 ms from 0.5 s to 6.5 s (60 changes, ending
@@ -20,6 +21,7 @@
 #include <QQmlEngine>
 #include <QQuickItem>
 #include <QQuickWindow>
+#include <QSurfaceFormat>
 #include <QSGRendererInterface>
 #include <QTimer>
 #include <atomic>
@@ -42,6 +44,11 @@ Window {
 
 int main(int argc, char **argv)
 {
+    if (qEnvironmentVariableIntValue("QDISCS_GLES") == 1) {
+        QSurfaceFormat format = QSurfaceFormat::defaultFormat();
+        format.setRenderableType(QSurfaceFormat::OpenGLES);
+        QSurfaceFormat::setDefaultFormat(format);
+    }
     QGuiApplication app(argc, argv);
     QQmlEngine engine;
     QQmlComponent component(&engine);

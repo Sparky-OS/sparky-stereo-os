@@ -463,3 +463,32 @@ The unchanged Koko +2, KPhotoAlbum +2, digiKam and Showfoto +4, Gwenview +10, ff
 No further dependant was rebuilt.
 The installed proofs retained both merged works: 626 thumbnail cell instances exact in both eyes across 100 and 125 percent, with no wallpaper or left/flat difference, and 30 checks each for Koko's QML menu and KPhotoAlbum's menu; the published controls failed.
 
+
+Learned on ORDER 583 (qt6-base +stereo3d23 and qt6-declarative +stereo3d4, November 2026):
+
+- **Symptom:** the first build of a successor source stops at once with `dpkg-source: error: cannot fstat file /src/PACKAGE_VERSION.orig.tar.xz`.
+  **Cause:** `lc-successor.py --in-place --overlay` writes only the new `.dsc` and `debian.tar.xz`; the upstream tarball stays beside the published source.
+  **Fix:** copy the `.orig.tar.xz` (and its signature, if any) next to the new `.dsc` before the build.
+  **How found:** the message names the file; the successor's output folder held two files.
+- **Symptom:** the link gate refuses a package that reaches GTK (here `qt6-gtk-platformtheme`) with `Reached two conflicting assignments`, `cdebconf ... is selected for install` and `debconf:amd64 is not selected for install`, though debconf has no dependencies and is in the archive.
+  **Cause:** the gate list had Debian and the edition's repository only; the edition's `librsvg2-2` (2.63.3+dfsg-1+stereo3d1+lc1) depends on `libdav1d7 (>= 1:1.5.4)`, an epoch only deb-multimedia carries, and apt 3.3's solver reports the dead end through debconf's alternative.
+  **Fix:** add deb-multimedia to the gate's `sources.json` (`https://www.deb-multimedia.org`, `forky`, `main` and `non-free`, its keyring), as `packages/gtk4/archive-sources.json` has it.
+  A Debian snapshot in place of live Debian changes nothing here.
+  **How found:** the same refusal on live Debian and on a snapshot; the archive data were sound; the edition's own `librsvg2-2` stanza in the gate's index named the epoch, as a lesson in stereo-two-cameras (`webgl-control-on-a-gpu-and-without.md`) had it; with deb-multimedia added the gate passed for all 33 packages.
+- **Symptom:** a build resumed with `dpkg-buildpackage -b -nc` after a gate refusal stops in `override_dh_builddeb` with "already marked; use a fresh staging tree, never project MR again", although dh_prep ran.
+  **Cause:** dh_prep empties `debian/PACKAGE`, but the debug-symbol roots `debian/.debhelper/PACKAGE/dbgsym-root` keep the first run's Lean Code manifest (`usr/share/dpkg-stereo/lc/...`), and dh_strip fills them again around it.
+  **Fix:** remove `debian/.debhelper/*/dbgsym-root` before the resume; not `dh_clean`, which also removes `debian/debhelper-build-stamp`, so dh would configure and build again.
+  Remove any `.deb` of the failed attempt from the parent folder too: Lean Code counts as built only the names that were not there before (`lean/debhelper.py`, `build()`), so an old file of the same name would leave that package out of the gate.
+  **How found:** the manifests were present under all 26 dbgsym roots and under no package folder; the second point was read in the code, not met.
+  The general form (remove the staging folders, `debian/files`, `debian/tmp`) is in [rust-suite-shared-libraries.md](rust-suite-shared-libraries.md).
+- A recipe whose new Depends names a build of ours that is staged, not published (qt6-declarative +4 on qt6-base +23), gets that build through a flat lane archive, as lane dkms-unsigned-370's lesson above has it: the staged packages without debug symbols, `apt-ftparchive packages` and `release`, signed by a throwaway key kept in the lane's scratch and deleted with it.
+- A publication round uses scratch on /mnt/build while it runs (about 6 GB); a long build started there at the same time loses its room.
+  Measure every solid-state disk before the build and choose the one with the build's peak plus 6 GB free.
+  On / the Lean Code gate also needs 12 GiB free at the end.
+- **Every qt6-base build comes with a sparky-stereo-graphics build.**
+  The Graphics page asks for the Qt that carries the painting by its exact version: five `(= VERSION)` Depends (libqt6gui6, libqt6widgets6, libqt6opengl6, qt6-qpa-plugins, libqt6waylandclient6), written twice in `packages/sparky-stereo-graphics/build.sh`.
+  A new qt6-base staged alone cannot be published beside it: measured on ORDER 583, a published system with the page, offered qt6-base +23 with Graphics 0.2.12 (pinned to +22), upgrades Qt and keeps the page back at its published 0.2.7 without a word ("1 not upgraded").
+  So the qt6-base lane moves the pin, adds a changelog entry and builds Graphics too (0.2.10 for +20, 0.2.11 for +21, 0.2.12 for +22, 0.2.13 for +23).
+  Build it in an image that holds the new Qt and the recipe's Build-Depends, twice from the recipe (the `.dsc` and tarball must come out the same bytes), then rebuild the binaries from that `.dsc` (dpkg-buildpackage on the native source) so `.buildinfo` and `.changes` describe them and the record has nothing unrecorded; its `build.sh` runs no link gate, so run `lean.release check-link` on its own with the new Qt as siblings.
+  In that image the new Qt must come from a source ranked above the edition's pin (1001), or `apt-get install` of the Build-Depends downgrades every qt6-base package to the published build.
+  A Provides instead of the exact pin is still open (ORDER 554).

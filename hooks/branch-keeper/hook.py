@@ -7,8 +7,10 @@ branches not inside main with the reason the register records for each, branches
 local commits that no remote holds, stashes, uncommitted files, and how old the last fetch is.
 Before a shell command that removes a place where work lives (rm -r of a clone or a worktree, git worktree remove,
 git branch -D, a deletion of a remote branch, git stash drop or clear): refused when it would lose commits that are on
-no remote, uncommitted or untracked files, or stashes; a remote branch not inside main goes only when the register
-marks it superseded with a reason.
+no remote, uncommitted or untracked files, or stashes; a remote branch not inside main goes when its work is in main
+by content or when the register marks it superseded with a reason; a clone goes when the clones register has a row for
+it that a trace wrote and that nothing in the clone is newer than. Each command is judged in the folder its own line
+gives it (cd, pushd, popd, git -C); a folder or a name the line holds as a shell variable is said as such.
 Before a command that makes a branch: the name rule and every branch, local or online, that carries the same number.
 Before a merge into main: the branch goes, online and locally; after it, a register row whose branch is now inside
 main is cleared.
@@ -17,6 +19,7 @@ The hook deletes, pushes and fetches nothing; only `audit --fetch` fetches. READ
 configuration and the reasons.
 """
 import argparse
+import calendar
 import glob
 import os
 import re
@@ -33,6 +36,8 @@ NAME = 'branch-keeper'
 NAME_PATTERNS = [r'^order[0-9]+[a-z0-9]*(-[a-z0-9][a-z0-9._-]*)?$', r'^wip/', r'^lane/']
 NUMBER_PATTERN = r'order([0-9]+)'
 REASONED = ('kept', 'superseded')
+VERDICTS = ('in main by content', 'delivered another way', 'superseded', 'scratch')
+FUTURE_SKEW = 60  # seconds a row's date may lie ahead of this machine's clock
 NETWORK_URL = re.compile(r'^(?:https?|ssh|git|git\+ssh|ssh\+git)://|^[\w.-]+@[\w.-]+:')
 # what git would read instead of the folder it is pointed at
 DROP_ENV = ('GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR', 'GIT_OBJECT_DIRECTORY',
@@ -103,6 +108,23 @@ def inside(path, top):
 
 def today():
     return time.strftime('%Y-%m-%d', time.gmtime())
+
+
+def moment(text):
+    """Seconds since 1970 (UTC) of YYYY-MM-DD (the start of that day), YYYY-MM-DDTHH:MM or YYYY-MM-DDTHH:MM:SS, with
+    or without a final Z; None for anything else."""
+    text = text.strip().replace(' ', 'T')
+    text = text[:-1] if text.endswith('Z') else text
+    for fmt in ('%Y-%m-%d', '%Y-%m-%dT%H:%M', '%Y-%m-%dT%H:%M:%S'):
+        try:
+            return calendar.timegm(time.strptime(text, fmt))
+        except ValueError:
+            continue
+    return None
+
+
+def stamp(seconds):
+    return time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime(float(seconds)))
 
 
 class Repo:
@@ -421,6 +443,130 @@ class Register:
         return keys
 
 
+class Clones:
+    """The private file that lets a clone go whose work a trace proved to be elsewhere: folder (a full path), verdict
+    (one of VERDICTS), proof, date, separated by tabs; lines starting with # are comments; the last row of a folder
+    counts. A row covers the clone at that folder alone, never a clone inside a folder it names."""
+
+    def __init__(self, path):
+        self.path = path
+        self.rows = {}
+        self.problem = ''
+        self.notes = []
+        self.missing = False
+        published = repository_with_remote(os.path.dirname(path))
+        if published:
+            self.problem = (f'the clones register {path} lies inside a repository with a remote ({published}); it is private, so no '
+                            'row was read from it: move it out (the default place is private/clones.tsv of the workspace)')
+            return
+        try:
+            with open(path, encoding='utf-8') as f:
+                text = f.read()
+        except FileNotFoundError:
+            self.missing = True
+            return
+        except (OSError, UnicodeDecodeError) as e:
+            self.problem = f'the clones register {path} cannot be read ({getattr(e, "strerror", None) or e}); no row was read from it'
+            return
+        for n, line in enumerate(text.splitlines(), 1):
+            if not line.strip() or line.lstrip().startswith('#'):
+                continue
+            fields = [x.strip() for x in line.split('\t')]
+            folder = os.path.expanduser(fields[0])
+            if len(fields) < 4 or not os.path.isabs(folder):
+                self.notes.append(f'line {n} of {path} is not "folder (a full path), verdict, proof, date" separated by tabs: {line[:80]}')
+                continue
+            self.rows[os.path.normpath(folder)] = {'folder': fields[0], 'verdict': fields[1], 'proof': fields[2], 'date': fields[3]}
+
+    def row(self, folder):
+        folder = os.path.normpath(folder)
+        if folder in self.rows:
+            return self.rows[folder]
+        real = os.path.realpath(folder)
+        return next((row for key, row in self.rows.items() if os.path.realpath(key) == real), None)
+
+    def around(self, folder):
+        """The folders with a row that hold this one."""
+        folder = os.path.normpath(folder)
+        return sorted(key for key in self.rows if key != folder and inside(folder, key))
+
+    @staticmethod
+    def quote(row):
+        return ' | '.join((row['folder'], row['verdict'], row['proof'], row['date']))
+
+
+def changes_after(repo, since, ctx, limit=5):
+    """What in this repository is newer than since (seconds, UTC): a commit only this clone holds (on no online remote
+    and in no bundle), a stash, a local branch or HEAD or their logs written, an uncommitted or untracked file changed.
+    At most limit of them; raises GitError when the repository cannot be read."""
+    found = []
+    held = repo.online_shas() | ctx.held_by_bundles(repo)
+    tips = [(f'branch {short(r)}', s) for r, (s, _, sym) in sorted(repo.refs.items()) if r.startswith('refs/heads/') and not sym]
+    if repo.head_sha and not repo.head_ref:
+        tips.append(('the detached HEAD', repo.head_sha))
+    for name, tip in tips:
+        if tip in held:
+            continue
+        out = repo.git('log', '--format=%ct %h', '--stdin', stdin=tip + '\n' + ''.join(f'^{s}\n' for s in sorted(held)))
+        newest = max((line.split() for line in out.splitlines() if line), key=lambda x: int(x[0]), default=None)
+        if newest and int(newest[0]) > since:
+            found.append(f'{name} has a commit of {stamp(newest[0])} ({newest[1]}) that only this clone holds')
+    if not repo.bare:
+        for line in repo.git('stash', 'list', '--format=%ct %gd').splitlines():
+            when, _, name = line.partition(' ')
+            if when.isdigit() and int(when) > since:
+                found.append(f'{name} of {stamp(when)}')
+    for base in sorted({repo.git_dir, repo.common_dir}):
+        for rel in ('HEAD', 'refs/heads', 'refs/stash', 'logs/HEAD', 'logs/refs/heads', 'logs/refs/stash'):
+            top = os.path.join(base, rel)
+            files = [top] if os.path.isfile(top) else [os.path.join(r, f) for r, _, fs in os.walk(top) for f in fs]
+            for path in files:
+                try:
+                    when = os.lstat(path).st_mtime
+                except OSError:
+                    continue
+                if when > since:
+                    found.append(f'{os.path.relpath(path, os.path.dirname(base))} written {stamp(when)}')
+            if len(found) >= limit:
+                return found[:limit]
+    if not repo.bare:
+        parts = repo.git('status', '--porcelain=v1', '-z', '--untracked-files=all', '--ignore-submodules=none').split('\0')
+        i = 0
+        while i < len(parts) and len(found) < limit:
+            entry = parts[i]
+            i += 1
+            if len(entry) <= 3:
+                continue
+            if entry[0] in 'RC':
+                i += 1
+            try:
+                when = os.lstat(os.path.join(repo.top, entry[3:])).st_mtime
+            except OSError:
+                continue  # a deleted file adds no work
+            if when > since:
+                found.append(f'the file {entry[3:]}, changed {stamp(when)}')
+    return found[:limit]
+
+
+def row_problem(row, repo, ctx):
+    """('', '') when the clones register's row lets this repository go now; else ('invalid', why) for a row that never
+    counts as written, or ('stale', why) for a folder that changed after the row's date."""
+    if row['verdict'] not in VERDICTS:
+        return 'invalid', f'"{row["verdict"]}" is not one of the verdicts: {", ".join(VERDICTS)}'
+    if not row['proof']:
+        return 'invalid', 'it has no proof: name what showed the verdict (a patch-id in main, a pushed branch, a package, a bundle)'
+    since = moment(row['date'])
+    if since is None:
+        return 'invalid', f'its date "{row["date"]}" is not a date: write YYYY-MM-DD, or YYYY-MM-DDTHH:MMZ for the minute of the trace'
+    if since > ctx.kit.now + FUTURE_SKEW:
+        return 'invalid', f'its date {row["date"]} lies in the future'
+    changed = changes_after(repo, since, ctx)
+    if changed:
+        return 'stale', (f'changed after {row["date"]}: ' + '; '.join(changed)
+                         + '. Trace it again, then write its row anew with the date and time of the trace')
+    return '', ''
+
+
 def repository_with_remote(folder):
     """The top of the repository that holds folder when that repository has a remote; '' otherwise."""
     while folder and not os.path.isdir(folder):
@@ -462,6 +608,7 @@ class Context:
         self.kit = kit
         self.cfg = kit.cfg
         self._register = None
+        self._clones = None
         self._bundled = None
 
     @property
@@ -469,6 +616,12 @@ class Context:
         if self._register is None:
             self._register = Register(self.kit.path('register'))
         return self._register
+
+    @property
+    def clones(self):
+        if self._clones is None:
+            self._clones = Clones(self.kit.path('clones'))
+        return self._clones
 
     def bundled(self):
         if self._bundled is None:
@@ -687,26 +840,56 @@ class Findings:
             {'deny': self.deny, 'ask': self.ask, 'context': self.context}[kind].append(text)
 
 
-def repo_or_finding(ctx, folder, findings, kind, what):
+def unknown_folder(findings, kind, original, why):
+    """A command whose folder the line does not name (a cd or a -C with a shell variable): refused for a deletion,
+    said for anything else; never passed as checked."""
+    if kind == 'deny':
+        findings.add('deny', f'Refused: `{original}`: {why}, so branch-keeper cannot tell which repository it acts on and did not '
+                             'check it. Nothing is passed unchecked: name the folder literally (git -C /full/path/to/the/clone ...), '
+                             'one command per repository (a loop over clones becomes one line for each), then send it again.')
+    else:
+        findings.add(kind, f'branch-keeper did not check `{original}`: {why}. To have it checked, name the folder literally '
+                           '(git -C /full/path/to/the/clone ...).')
+
+
+def repo_or_finding(ctx, folder, why, findings, kind, original):
+    if folder is None:
+        unknown_folder(findings, kind, original, why)
+        return None
     try:
         return ctx.repo(folder)
     except GitError as e:
-        findings.add(kind, f'{what}: the repository at {folder} could not be read ({e}), so it was not checked. '
-                           'Nothing is passed unchecked: make it readable, or the person runs the command.')
+        findings.add(kind, f'{"Refused: " if kind == "deny" else ""}`{original}`: the repository at {folder} could not be read ({e}), '
+                           'so it was not checked. Nothing is passed unchecked: make it readable, or the person runs the command.')
         return None
 
 
+class Loss:
+    """What removing one repository found inside a removed folder would lose: the clone's own work (parts), which a
+    row of the clones register can cover, and what lies beyond the clone (beyond), which no row covers."""
+
+    def __init__(self, label, path):
+        self.label, self.path = label, path
+        self.repo, self.kind, self.unreadable = None, '', ''
+        self.parts, self.beyond = [], []
+
+    def line(self):
+        return f'{self.label} ({self.kind}): ' + '; '.join(self.parts + self.beyond)
+
+
 def lost_by_removal(path, top, ctx):
-    """(lines, unreadable) for one repository found at path inside the folder top being removed."""
+    """The Loss of one repository found at path inside the folder top being removed."""
     database = os.path.basename(path) == '.git' and os.path.isdir(path)
-    target = os.path.dirname(path) if database else path
+    loss = Loss(path, os.path.dirname(path) if database else path)
     try:
-        repo = ctx.repo(target, exact=True)
+        repo = ctx.repo(loss.path, exact=True)
     except GitError as e:
-        return [f'{path}: could not be read ({e})'], True
-    kind = ('the repository database of ' + repo.top if database else 'bare repository' if repo.bare
-            else f'worktree of {repo.main_tree}' if repo.linked else 'clone')
-    parts = []
+        loss.unreadable = f'{path}: could not be read ({e})'
+        return loss
+    loss.repo = repo
+    loss.kind = kind = ('the repository database of ' + repo.top if database else 'bare repository' if repo.bare
+                        else f'worktree of {repo.main_tree}' if repo.linked else 'clone')
+    parts, beyond = loss.parts, loss.beyond
     try:
         bundled = ctx.held_by_bundles(repo)
         if not repo.linked:
@@ -721,16 +904,17 @@ def lost_by_removal(path, top, ctx):
                 if wt.get('prunable') or not where:
                     continue
                 if database or not inside(where, top):
-                    parts.append(f'its linked worktree {where} would be left without its repository')
+                    beyond.append(f'its linked worktree {where} would be left without its repository')
                     continue
                 if repo.bare or not inside(where, repo.top):
                     continue  # the search of the folder finds it and checks it on its own
                 try:
                     dirty = Repo(where, None, ctx.cfg).dirty()
                 except GitError as e:
-                    return [f'{where} (worktree of {repo.top}): could not be read ({e})'], True
+                    loss.unreadable = f'{where} (worktree of {repo.top}): could not be read ({e})'
+                    return loss
                 if dirty:
-                    parts.append(f'its worktree {where}: {len(dirty)} uncommitted or untracked: ' + ', '.join(cut(dirty, 5)))
+                    beyond.append(f'its worktree {where}: {len(dirty)} uncommitted or untracked: ' + ', '.join(cut(dirty, 5)))
         detached = repo.detached_commits(bundled)
         if detached:
             parts.append(f'a detached HEAD with {detached} commit(s) in no branch')
@@ -739,8 +923,33 @@ def lost_by_removal(path, top, ctx):
             if dirty:
                 parts.append(f'{len(dirty)} uncommitted or untracked: ' + ', '.join(cut(dirty, 5)))
     except GitError as e:
-        return [f'{path} ({kind}): could not be read ({e})'], True
-    return ([f'{path} ({kind}): ' + '; '.join(parts)] if parts else []), False
+        loss.unreadable = f'{path} ({kind}): could not be read ({e})'
+    return loss
+
+
+def clone_row(loss, ctx):
+    """(the clones register's row that lets this clone go, or None; the words the refusal adds when there is none)."""
+    if not ctx.kit.on('clone_rows'):
+        return None, ''
+    clones = ctx.clones
+    if clones.problem:
+        return None, f' (the clones register was not read: {clones.problem})'
+    row = clones.row(loss.path)
+    if row is None:
+        around = clones.around(loss.path)
+        return None, (f' (the clones register has a row for {around[0]}, a folder around this clone; a row covers only the '
+                      'folder it names)' if around else '')
+    try:
+        kind, why = row_problem(row, loss.repo, ctx)
+    except GitError as e:
+        return None, f' (its row in the clones register could not be checked: {e})'
+    if kind == 'invalid':
+        return None, f' (its row in the clones register does not count: {why})'
+    if kind == 'stale':
+        return None, f' (its row in the clones register no longer counts: {loss.path} {why})'
+    if loss.beyond:
+        return None, ' (its row in the clones register covers the clone\'s own work, not what lies beyond it)'
+    return row, ''
 
 
 def is_git_dir(path):
@@ -791,17 +1000,27 @@ def what_to_do(ctx):
     return WHAT_TO_DO.format(bundles=shown)
 
 
-def check_rm(words, folder, ctx, findings, original):
+def unresolved_target(word, folder, why):
+    """Why the path word cannot be seen from this folder, or '' when it can."""
+    if UNRESOLVED.search(word):
+        return 'a shell variable or a substitution'
+    if folder is None and not os.path.isabs(os.path.expanduser(word)):
+        return why or 'the folder it counts from is not named by the line'
+    return ''
+
+
+def check_rm(words, folder, why, ctx, findings, original):
     options, targets = options_and_words(words[1:])
     recursive = any(o == '--recursive' or (not o.startswith('--') and ('r' in o or 'R' in o)) for o in options)
     if not recursive or not ctx.kit.on('removal'):
         return
     places, lost, unreadable = [], [], []
     for word in targets:
-        if UNRESOLVED.search(word):
+        unseen = unresolved_target(word, folder, why)
+        if unseen:
             findings.add(choice(ctx.cfg, 'on_unresolved_path'),
-                         f'branch-keeper could not see what "{word}" in `{original}` names, so it did not look inside it: if it '
-                         'is or holds a clone or a worktree, check it first (hook.py audit PATH) or name the folder plainly.')
+                         f'branch-keeper could not see what "{word}" in `{original}` names ({unseen}), so it did not look inside '
+                         'it: if it is or holds a clone or a worktree, check it first (hook.py audit PATH) or name the folder plainly.')
             continue
         path = os.path.expanduser(word)
         path = path if os.path.isabs(path) else os.path.join(folder, path)
@@ -822,19 +1041,40 @@ def check_rm(words, folder, ctx, findings, original):
                                  f'scan_depth {ctx.cfg.get("scan_depth", 12)}), so it cannot say that no work is lost. Remove it in '
                                  f'parts, check it with hook.py audit, or raise the limits in {ctx.kit.config_path}.')
         for repo_path in repos:
-            lines, bad = lost_by_removal(repo_path, top, ctx)
-            (unreadable if bad else lost).extend(lines)
+            loss = lost_by_removal(repo_path, top, ctx)
+            if loss.unreadable:
+                unreadable.append(loss.unreadable)
+                continue
+            if not loss.parts and not loss.beyond:
+                continue
+            row, note = clone_row(loss, ctx)
+            if row:
+                findings.add('context', f'{loss.label} goes with work that exists only there ({"; ".join(loss.parts)}); its row in '
+                                        f'the clones register ({ctx.clones.path}) lets it go: "{Clones.quote(row)}".')
+                continue
+            lost.append(loss.line() + note)
     if lost or unreadable:
         text = f'Refused: `{original}` would remove work that exists nowhere else, or that could not be read:\n'
         text += '\n'.join('- ' + line for line in lost + unreadable)
         if unreadable:
             text += '\nA repository that cannot be read is not removed by a command the hook cannot check: make it readable, or the person removes it.'
-        findings.add('deny', text + '\n' + what_to_do(ctx))
+        text += '\n' + what_to_do(ctx)
+        if ctx.kit.on('clone_rows'):
+            text += (f' A clone whose every piece of work a trace proved to be in main by content, delivered another way, superseded '
+                     f'or scratch goes with a row for its own folder in {ctx.kit.path("clones")}: "FOLDER<tab>VERDICT<tab>PROOF<tab>'
+                     'DATE", the date and time of the trace (YYYY-MM-DDTHH:MMZ).')
+        findings.add('deny', text)
 
 
-def check_worktree_remove(rest, folder, ctx, findings, original):
+def check_worktree_remove(rest, folder, why, ctx, findings, original):
     _, words = options_and_words(rest)
     if not words or not ctx.kit.on('removal'):
+        return
+    unseen = unresolved_target(words[0], folder, why)
+    if unseen:
+        findings.add(choice(ctx.cfg, 'on_unresolved_path'),
+                     f'branch-keeper could not see what "{words[0]}" in `{original}` names ({unseen}), so it did not look inside '
+                     'it: check the worktree first (hook.py audit PATH) or name it plainly.')
         return
     path = os.path.expanduser(words[0])
     path = os.path.normpath(path if os.path.isabs(path) else os.path.join(folder, path))
@@ -862,7 +1102,7 @@ def check_worktree_remove(rest, folder, ctx, findings, original):
                                 f'{local[0][2]} commit(s) on no remote: push it to our fork or bundle it before the clone goes.')
 
 
-def check_branch(rest, folder, ctx, findings, original):
+def check_branch(rest, folder, why, ctx, findings, original):
     options, words = options_and_words(rest, {'-u', '--set-upstream-to', '--contains', '--no-contains', '--merged',
                                               '--no-merged', '--points-at', '--sort', '--format', '--column'})
     flags = ''.join(o[1:] for o in options if not o.startswith('--'))
@@ -871,10 +1111,10 @@ def check_branch(rest, folder, ctx, findings, original):
     force = 'D' in flags or 'f' in flags or '--force' in longs
     if delete:
         if force and 'r' not in flags and '--remotes' not in longs and ctx.kit.on('removal'):
-            repo = repo_or_finding(ctx, folder, findings, 'deny', f'Refused: `{original}`')
+            repo = repo_or_finding(ctx, folder, why, findings, 'deny', original)
             if repo:
                 for name in words:
-                    check_local_deletion(repo, name, ctx, findings)
+                    check_local_deletion(repo, name, ctx, findings, original)
         return
     listing = set('lamMcCvra') & set(flags) or longs & {'--list', '--all', '--move', '--copy', '--verbose', '--remotes',
                                                          '--show-current', '--edit-description', '--unset-upstream',
@@ -884,7 +1124,16 @@ def check_branch(rest, folder, ctx, findings, original):
         creation(words[0], folder, ctx, findings)
 
 
-def check_local_deletion(repo, name, ctx, findings):
+def unexpanded_name(findings, original, what, word):
+    findings.add('deny', f'Refused: `{original}`: {what} "{word}" holds a shell variable or a substitution, which a reader of the '
+                         'line cannot expand, so branch-keeper cannot tell what goes and did not check it. Name each one '
+                         'literally, then send it again.')
+
+
+def check_local_deletion(repo, name, ctx, findings, original):
+    if UNRESOLVED.search(name):
+        unexpanded_name(findings, original, f'the branch of {repo.name}', name)
+        return
     ref = f'refs/heads/{name}'
     if ref not in repo.refs:
         return
@@ -925,6 +1174,9 @@ def check_remote_deletion(repo, remote, branch, ctx, findings, how):
     if not ctx.kit.on('remote_deletion'):
         return
     branch = branch[len('refs/heads/'):] if branch.startswith('refs/heads/') else branch
+    if UNRESOLVED.search(branch):
+        unexpanded_name(findings, how.strip('`'), f'the branch on {remote} of {repo.name}', branch)
+        return
     ref = f'refs/remotes/{remote}/{branch}'
     if ref not in repo.refs:
         findings.add('deny', f'Refused: {how} deletes {remote}/{branch} of {repo.name}, which is not among the local '
@@ -945,13 +1197,17 @@ def check_remote_deletion(repo, remote, branch, ctx, findings, how):
         findings.add('deny', f'Refused: {remote}/{branch} is not inside main and the register cannot be read: {register.problem}.')
         return
     row = register.row(repo.name, branch)
-    if row and row['state'] == 'superseded' and row['reason']:
-        findings.add('context', f'{repo.name}: {remote}/{branch} is not inside {short(main)} ({ahead} commit(s) it lacks); '
-                                f'the register marks it superseded: {row["reason"]}.')
-        return
     if row and row['state'] == 'kept' and row['reason']:
         findings.add('deny', f'Refused: {how} deletes {remote}/{branch} of {repo.name}, which the register keeps: '
                              f'{row["reason"]}. Change that row to superseded, with the reason, if the work is no longer needed.')
+        return
+    if repo.content_in_main(sha):
+        findings.add('context', f'{repo.name}: deleting {remote}/{branch} of {repo.name} loses no work: each commit it has outside '
+                                f'{short(main)} is in main by content (git cherry shows no + line), so it needs no register row.')
+        return
+    if row and row['state'] == 'superseded' and row['reason']:
+        findings.add('context', f'{repo.name}: {remote}/{branch} is not inside {short(main)} ({ahead} commit(s) it lacks); '
+                                f'the register marks it superseded: {row["reason"]}.')
         return
     findings.add('deny', f'Refused: {how} deletes {remote}/{branch} of {repo.name}, which is not inside {short(main)} '
                          f'({ahead} commit(s) main lacks, last {repo.refs[ref][1]}) and has no superseded row in the register '
@@ -960,7 +1216,7 @@ def check_remote_deletion(repo, remote, branch, ctx, findings, how):
                          'then send the same command again.')
 
 
-def check_push(rest, folder, ctx, findings, original):
+def check_push(rest, folder, why, ctx, findings, original):
     options, words = options_and_words(rest, GIT_PUSH_VALUE_FLAGS)
     flags = ''.join(o[1:] for o in options if not o.startswith('--'))
     longs = set(o.split('=', 1)[0] for o in options if o.startswith('--'))
@@ -969,10 +1225,17 @@ def check_push(rest, folder, ctx, findings, original):
     deleting = delete or mirror or any(w.lstrip('+').startswith(':') for w in words[1:])
     if not deleting and not ctx.kit.on('branch_creation'):
         return
-    repo = repo_or_finding(ctx, folder, findings, 'deny' if deleting else 'context', f'`{original}`')
+    repo = repo_or_finding(ctx, folder, why, findings, 'deny' if deleting else 'context', original)
     if not repo:
         return
     address = words[0] if words else repo.remote
+    if UNRESOLVED.search(address):
+        if deleting:
+            unexpanded_name(findings, original, f'the remote of {repo.name}', address)
+        else:
+            findings.add('context', f'branch-keeper did not check `{original}`: the remote "{address}" holds a shell variable or a '
+                                    'substitution, which a reader of the line cannot expand.')
+        return
     remote = repo.remote_for(address)
     if remote is None:
         if deleting:
@@ -1008,10 +1271,10 @@ def check_push(rest, folder, ctx, findings, original):
             creation(name, folder, ctx, findings, first_push=True)
 
 
-def check_stash(rest, folder, ctx, findings, original):
+def check_stash(rest, folder, why, ctx, findings, original):
     if not rest or rest[0] not in ('drop', 'clear') or not ctx.kit.on('stash'):
         return
-    repo = repo_or_finding(ctx, folder, findings, 'deny', f'Refused: `{original}`')
+    repo = repo_or_finding(ctx, folder, why, findings, 'deny', original)
     if not repo:
         return
     try:
@@ -1024,6 +1287,9 @@ def check_stash(rest, folder, ctx, findings, original):
     if rest[0] == 'drop':
         _, words = options_and_words(rest[1:])
         want = words[0] if words else 'stash@{0}'
+        if UNRESOLVED.search(want):
+            unexpanded_name(findings, original, f'the stash of {repo.name} (it has {", ".join(cut(stashes, 3))})', want)
+            return
         want = f'stash@{{{want}}}' if want.isdigit() else want.replace('refs/stash@{', 'stash@{')
         stashes = [s for s in stashes if s.split(' ', 1)[0] == want]
         if not stashes:
@@ -1037,6 +1303,10 @@ def check_stash(rest, folder, ctx, findings, original):
 def creation(name, folder, ctx, findings, first_push=False):
     if not ctx.kit.on('branch_creation'):
         return
+    if UNRESOLVED.search(name):
+        findings.add('context', f'branch-keeper could not see the name of the new branch "{name}" (a shell variable or a '
+                                'substitution), so it did not look for the branches that carry its number.')
+        return
     patterns = ctx.cfg.get('name_patterns', NAME_PATTERNS)
     m = re.search(ctx.cfg.get('number_pattern', NUMBER_PATTERN), name)
     lines = [f'{"First push of the new branch" if first_push else "New branch"} {name}. The rule: one branch per piece of work, '
@@ -1045,7 +1315,7 @@ def creation(name, folder, ctx, findings, first_push=False):
     if m:
         number = m.group(1)
         same, unread = [], []
-        seen_paths, paths = set(), [spec['path'] for spec in ctx.specs()] + [folder]
+        seen_paths, paths = set(), [spec['path'] for spec in ctx.specs()] + ([folder] if folder else [])
         for path in paths:
             try:
                 repo = ctx.repo(path)
@@ -1105,7 +1375,7 @@ def merge_reminder(repo, branch, ctx, findings, squash=False, deletes=False, lab
 
 def check_merge(rest, folder, ctx, findings, original):
     options, words = options_and_words(rest, GIT_MERGE_VALUE_FLAGS)
-    if any(o in ('--abort', '--continue', '--quit', '--skip') for o in options) or not words:
+    if any(o in ('--abort', '--continue', '--quit', '--skip') for o in options) or not words or folder is None:
         return
     try:
         repo = ctx.repo(folder)
@@ -1124,7 +1394,7 @@ def repo_for_slug(ctx, folder, slug):
     """The repository and remote that OWNER/NAME is: the working folder's own when no slug is given (as gh does),
     else the first of the working folder and the configured repositories with such a remote."""
     owner, _, name = slug.partition('/')
-    for path in [folder] + ([spec['path'] for spec in ctx.specs()] if slug else []):
+    for path in ([folder] if folder else []) + ([spec['path'] for spec in ctx.specs()] if slug else []):
         try:
             repo = ctx.repo(path)
         except GitError:
@@ -1135,15 +1405,16 @@ def repo_for_slug(ctx, folder, slug):
     return None, None
 
 
-def check_gh(words, folder, ctx, findings, original):
+def check_gh(words, folder, why, ctx, findings, original):
     if words[1:3] == ['pr', 'merge']:
         options, rest = options_and_words(words[3:], GH_MERGE_VALUE_FLAGS)
         slug = next((words[i + 1] for i, w in enumerate(words[:-1]) if w in ('-R', '--repo')), '')
         slug = slug or next((o.split('=', 1)[1] for o in options if o.startswith('--repo=')), '')
         repo, _ = repo_for_slug(ctx, folder, slug)
         if repo is None:
+            where = slug or (f'of {folder}' if folder else f'of the folder it runs in: {why}')
             findings.add('context', f'After this merge, the branch goes, online and locally (branch-keeper could not find the '
-                                    f'repository {slug or "of " + folder} here to say more).')
+                                    f'repository {where} here to say more).')
             return
         selector = rest[0] if rest else ''
         branch = '' if re.fullmatch(r'#?[0-9]+|https?://\S+', selector) else selector
@@ -1167,7 +1438,13 @@ def check_gh(words, folder, ctx, findings, original):
         if method.upper() != 'DELETE' or not m:
             return
         owner, name, branch = m.groups()
+        if UNRESOLVED.search(owner + name):
+            unexpanded_name(findings, original, 'the repository', f'{owner}/{name}')
+            return
         slug = '' if owner in ('{owner}', ':owner') else f'{owner}/{name}'
+        if not slug and folder is None:
+            unknown_folder(findings, 'deny', original, why)
+            return
         repo, remote = repo_for_slug(ctx, folder, slug)
         if repo is None or remote is None:
             findings.add('deny', f'Refused: `{original}` deletes the branch {branch} of {owner}/{name}, and no repository here has '
@@ -1178,22 +1455,22 @@ def check_gh(words, folder, ctx, findings, original):
 
 
 def before(event, ctx, commands):
+    """The findings for every simple command of the line, each judged in the folder the line gives it."""
     findings = Findings()
-    working = event.working_folder()
-    for words in commands:
+    for words, working, why in commands:
         if not words:
             continue
         program = os.path.basename(words[0])
         original = ' '.join(words)
         if program == 'rm':
-            check_rm(words, working, ctx, findings, original)
+            check_rm(words, working, why, ctx, findings, original)
         elif program == 'gh':
-            check_gh(words, working, ctx, findings, original)
+            check_gh(words, working, why, ctx, findings, original)
         elif program == 'git':
             sub, rest = hookkit.git_subcommand(words)
-            folder = hookkit.git_folder(words, working)
+            folder, why = hookkit.git_place(words, working, why)
             if sub == 'branch':
-                check_branch(rest, folder, ctx, findings, original)
+                check_branch(rest, folder, why, ctx, findings, original)
             elif sub in ('switch', 'checkout'):
                 names = {'switch': ('-c', '-C', '--create', '--force-create'), 'checkout': ('-b', '-B', '--orphan')}[sub]
                 for i, w in enumerate(rest):
@@ -1202,15 +1479,15 @@ def before(event, ctx, commands):
                     elif w.startswith(tuple(n + '=' for n in names if n.startswith('--'))):
                         creation(w.split('=', 1)[1], folder, ctx, findings)
             elif sub == 'worktree' and rest[:1] == ['remove']:
-                check_worktree_remove(rest[1:], folder, ctx, findings, original)
+                check_worktree_remove(rest[1:], folder, why, ctx, findings, original)
             elif sub == 'worktree' and rest[:1] == ['add']:
                 for i, w in enumerate(rest):
                     if w in ('-b', '-B') and i + 1 < len(rest):
                         creation(rest[i + 1], folder, ctx, findings)
             elif sub == 'push':
-                check_push(rest, folder, ctx, findings, original)
+                check_push(rest, folder, why, ctx, findings, original)
             elif sub == 'stash':
-                check_stash(rest, folder, ctx, findings, original)
+                check_stash(rest, folder, why, ctx, findings, original)
             elif sub == 'merge':
                 check_merge(rest, folder, ctx, findings, original)
     return findings
@@ -1220,8 +1497,8 @@ def after(event, ctx, commands):
     """After a merge or a deletion, clear the register rows that are now settled."""
     if not ctx.kit.on('clear_settled_rows'):
         return None
-    working, folders = event.working_folder(), []
-    for words in commands:
+    folders = []
+    for words, working, why in commands:
         if not words:
             continue
         program = os.path.basename(words[0])
@@ -1229,9 +1506,9 @@ def after(event, ctx, commands):
         if program == 'gh' and words[1:3] == ['pr', 'merge']:
             folders.append(working)
         elif sub in ('merge', 'push', 'branch', 'fetch', 'pull'):
-            folders.append(hookkit.git_folder(words, working))
+            folders.append(hookkit.git_place(words, working, why)[0])
     out, seen = [], set()
-    for folder in folders:
+    for folder in (f for f in folders if f):
         try:
             repo = ctx.repo(folder)
         except GitError:
@@ -1255,7 +1532,7 @@ def handle(event, kit):
         return None
     if not TRIGGERS.search(event.acting_command()):
         return None
-    commands = event.commands()
+    commands = event.commands_in_folders()
     if commands is None:
         if event.kind == 'before-tool':
             return kit.context('branch-keeper could not read this command as shell (a quote or a substitution left open), so it '
@@ -1365,11 +1642,40 @@ def audit(argv):
         local_only += len(state['local_only']) + bool(state['detached'])
         stashes += len(state['stashes'])
         dirty += len(state['dirty'] or [])
-    status = 2 if unreadable else 1 if (no_reason or local_only or stashes or dirty or gone) else 0
+    stale = 0
+    if kit.on('clone_rows'):
+        clones = ctx.clones
+        print(f'\nclones register: {clones.path}' + (' (none yet)' if clones.missing else ''))
+        if clones.problem:
+            print(f'CLONES REGISTER NOT READ: {clones.problem}')
+            unreadable += 1
+        for note in clones.notes:
+            print(f'CLONES REGISTER: {note}')
+            unreadable += 1
+        for key, row in sorted(clones.rows.items()):
+            status = clone_row_status(key, row, ctx)
+            stale += not status.startswith(('counts', 'folder gone'))
+            print(f'  {row["folder"]:<44} {row["verdict"]:<22} {row["date"]:<12} {status}')
+    status = 2 if unreadable else 1 if (no_reason or local_only or stashes or dirty or gone or stale) else 0
     print(f'\naudit: {len(specs)} repositories, {unreadable} thing(s) not read; {notin} branch(es) not in main, {no_reason} with '
           f'no reason recorded; {local_only} with commits on no remote; {stashes} stash(es); {dirty} uncommitted or untracked; '
-          f'{gone} register row(s) whose branch is gone; exit {status}')
+          f'{gone} register row(s) whose branch is gone; {stale} clones register row(s) that no longer count; exit {status}')
     return status
+
+
+def clone_row_status(key, row, ctx):
+    """counts, folder gone, DOES NOT COUNT: why, or NO LONGER COUNTS: what changed, for one row of the clones register."""
+    if not os.path.lexists(key):
+        return 'folder gone: the row did its work and can be taken out'
+    try:
+        repo = ctx.repo(key, exact=True)
+    except GitError as e:
+        return f'DOES NOT COUNT: no clone can be read at this folder ({e}); a row covers only a clone\'s own top folder'
+    try:
+        kind, why = row_problem(row, repo, ctx)
+    except GitError as e:
+        return f'DOES NOT COUNT: it could not be checked ({e})'
+    return {'invalid': f'DOES NOT COUNT: {why}', 'stale': f'NO LONGER COUNTS: {why}'}.get(kind, 'counts')
 
 
 if __name__ == '__main__':

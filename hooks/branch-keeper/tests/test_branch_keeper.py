@@ -7,10 +7,13 @@ worktrees, stashes and bundles are made with git itself. No test reads or change
 The bare remotes live on disk, so most tests count every remote as online ("online_remotes": "any"); one test proves
 the default, where only a network address counts.
 """
+import calendar
 import json
 import os
+import re
 import subprocess
 import sys
+import time
 import unittest
 
 sys.dont_write_bytecode = True
@@ -20,6 +23,7 @@ import testkit  # noqa: E402
 GIT_ENV = {'GIT_CONFIG_GLOBAL': os.devnull, 'GIT_CONFIG_NOSYSTEM': '1', 'GIT_AUTHOR_NAME': 'Test',
            'GIT_AUTHOR_EMAIL': 'test@example.org', 'GIT_COMMITTER_NAME': 'Test', 'GIT_COMMITTER_EMAIL': 'test@example.org'}
 HOOK = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'hook.py')
+OLD_DATE = '2026-01-01T00:00:00Z'   # the work of a traced clone is dated before its row
 
 
 class BranchKeeper(testkit.HookCase):
@@ -35,6 +39,7 @@ class BranchKeeper(testkit.HookCase):
         self.configure(repositories=[{'path': self.clone, 'name': 'proj', 'main': 'main', 'deletes_merged_head': True}],
                        online_remotes='any')
         self.register = os.path.join(self.ws, 'private', 'branches.tsv')
+        self.clones = os.path.join(self.ws, 'private', 'clones.tsv')
 
     # making repositories
     def git(self, folder, *args):
@@ -362,6 +367,119 @@ class BranchKeeper(testkit.HookCase):
         self.refused('rm -rf mirror.git', f'- {bare} (bare repository): branch main: 1 commit(s) on no remote')
         self.refused('rm -rf repos/proj/.git', 'the repository database of', 'branch order7-x')
 
+    # 2. a clone proved by a trace: the clones register
+    def traced_clone(self, name='traced'):
+        """A clone with a commit on no remote and an untracked file, all dated 1 January 2026."""
+        clone = self.clone_of(self.remote, os.path.join(self.ws, 'repos', name))
+        self.git(clone, 'switch', '-q', '-c', 'order40-old')
+        testkit.write(os.path.join(clone, 'old.txt'), 'old work\n')
+        self.git(clone, 'add', 'old.txt')
+        subprocess.run(['git', '-C', clone, 'commit', '-q', '-m', 'old work'], check=True, capture_output=True,
+                       env={**os.environ, **GIT_ENV, 'GIT_AUTHOR_DATE': OLD_DATE, 'GIT_COMMITTER_DATE': OLD_DATE})
+        testkit.write(os.path.join(clone, 'notes', 'draft.txt'), 'untracked\n')
+        self.backdate(clone)
+        return clone
+
+    def backdate(self, folder):
+        when = calendar.timegm(time.strptime(OLD_DATE, '%Y-%m-%dT%H:%M:%SZ'))
+        for root, dirs, files in os.walk(folder):
+            for name in dirs + files:
+                os.utime(os.path.join(root, name), (when, when), follow_symlinks=False)
+
+    def clone_rows(self, *lines):
+        with open(self.clones, 'a', encoding='utf-8') as f:
+            for line in lines:
+                f.write('\t'.join(line) + '\n')
+
+    def test_a_clone_with_a_row_in_the_clones_register_goes_and_the_row_is_quoted(self):
+        clone = self.traced_clone()
+        self.refused('rm -rf repos/traced', 'branch order40-old: 1 commit(s) on no remote', '1 uncommitted or untracked: notes/')
+        self.clone_rows((clone, 'in main by content', 'patch-id of the old work found in main', '2026-01-02'))
+        text = self.told('rm -rf repos/traced', f'{clone} goes', 'the clones register',
+                         f'"{clone} | in main by content | patch-id of the old work found in main | 2026-01-02"')
+        self.assertIn('branch order40-old: 1 commit(s) on no remote', text)
+        self.configure(on={'clone_rows': False})
+        self.refused('rm -rf repos/traced', 'branch order40-old')
+
+    def test_a_row_counts_only_for_the_folder_it_names_with_a_verdict_and_a_proof(self):
+        clone = self.traced_clone()
+        self.clone_rows((os.path.join(self.ws, 'repos'), 'scratch', 'the folder of the clones', '2026-01-02'))
+        self.refused('rm -rf repos', f'- {clone} (clone)', 'a row covers only the folder it names')
+        with open(self.clones, 'w') as f:
+            f.write(f'{clone}\tlooks fine\ttraced by hand\t2026-01-02\n')
+        self.refused('rm -rf repos/traced', 'its row in the clones register does not count', '"looks fine" is not one of')
+        with open(self.clones, 'w') as f:
+            f.write(f'{clone}\tscratch\t\t2026-01-02\n')
+        self.refused('rm -rf repos/traced', 'its row in the clones register does not count', 'no proof')
+        with open(self.clones, 'w') as f:
+            f.write(f'{clone}\tscratch\tbuild leftovers only\tlast week\n')
+        self.refused('rm -rf repos/traced', 'its row in the clones register does not count', 'date')
+
+    def test_a_row_no_longer_counts_once_the_folder_changed_after_its_date(self):
+        clone = self.traced_clone()
+        self.clone_rows((clone, 'superseded', 'replaced by order41, the newer generation', '2026-01-02'))
+        self.told('rm -rf repos/traced', 'the clones register')
+        testkit.write(os.path.join(clone, 'notes', 'new.txt'), 'written after the trace\n')
+        self.refused('rm -rf repos/traced', 'no longer counts', 'changed after 2026-01-02', 'notes/new.txt')
+        os.unlink(os.path.join(clone, 'notes', 'new.txt'))
+        self.backdate(clone)
+        self.told('rm -rf repos/traced', 'the clones register')
+        self.git(clone, 'branch', 'order42-copy', 'order40-old')    # a ref written now, at an old commit
+        self.refused('rm -rf repos/traced', 'no longer counts', '.git/refs/heads/order42-copy written')
+        self.git(clone, 'branch', '-D', 'order42-copy')
+        self.backdate(clone)
+        self.told('rm -rf repos/traced', 'the clones register')
+        self.commit(clone, 'newer.txt')
+        self.refused('rm -rf repos/traced', 'no longer counts', 'changed after 2026-01-02',
+                     'branch order40-old has a commit of')
+        self.clone_rows((clone, 'superseded', 'a row dated ahead counts nothing', '2099-01-01'))
+        self.refused('rm -rf repos/traced', 'does not count', 'lies in the future')
+        later = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(time.time() + 1))   # the trace, after the commit
+        self.clone_rows((clone, 'superseded', 'traced again after the new commit', later))
+        self.told('rm -rf repos/traced', 'traced again after the new commit')
+
+    def test_a_row_does_not_cover_what_lies_outside_the_clone_or_cannot_be_read(self):
+        clone = self.traced_clone()
+        self.clone_rows((clone, 'scratch', 'build leftovers only', '2026-01-02'))
+        outside = os.path.join(self.tmp, 'wt-outside')
+        self.git(clone, 'worktree', 'add', '-q', outside, 'main')
+        self.backdate(clone)
+        self.refused('rm -rf repos/traced', f'its linked worktree {outside} would be left without its repository')
+        self.git(clone, 'worktree', 'remove', outside)
+        self.backdate(clone)
+        self.told('rm -rf repos/traced', 'build leftovers only')
+        self.unreadable(os.path.join(clone, '.git'))
+        self.refused('rm -rf repos/traced', 'could not be read')
+
+    def test_the_clones_register_inside_a_repository_with_a_remote_is_not_read(self):
+        clone = self.traced_clone()
+        inside = os.path.join(self.clone, 'clones.tsv')
+        testkit.write(inside, f'{clone}\tscratch\tbuild leftovers only\t2026-01-02\n')
+        self.configure(paths={'clones': inside})
+        self.refused('rm -rf repos/traced', 'the clones register', 'lies inside a repository with a remote')
+
+    def test_the_audit_lists_the_clones_rows_and_says_which_no_longer_count(self):
+        clone = self.traced_clone()
+        other = self.traced_clone('other')
+        self.clone_rows((clone, 'in main by content', 'patch-id found in main', '2026-01-02'),
+                        (other, 'scratch', 'build leftovers only', '2026-01-02'),
+                        (os.path.join(self.ws, 'gone'), 'scratch', 'removed since', '2026-01-02'))
+        r = self.audit()
+        self.assertIn(f'clones register: {self.clones}', r.stdout)
+        self.assertRegex(r.stdout, re.escape(clone) + r' +in main by content +2026-01-02 +counts')
+        self.assertIn(os.path.join(self.ws, 'gone') + ' ', r.stdout)
+        self.assertIn('folder gone', r.stdout)
+        self.assertEqual(r.returncode, 0, r.stdout)
+        testkit.write(os.path.join(other, 'later.txt'), 'new\n')
+        r = self.audit()
+        self.assertRegex(r.stdout, re.escape(other) + r' +scratch +2026-01-02 +NO LONGER COUNTS: changed after 2026-01-02')
+        self.assertIn('1 clones register row(s) that no longer count', r.stdout)
+        self.assertEqual(r.returncode, 1, r.stdout)
+        self.clone_rows(('not a row',))
+        r = self.audit()
+        self.assertIn('CLONES REGISTER: line 6 of', r.stdout)
+        self.assertEqual(r.returncode, 2, r.stdout)
+
     # 2. git worktree remove
     def test_worktree_remove(self):
         self.branch_with_commit('order7-x')
@@ -413,6 +531,32 @@ class BranchKeeper(testkit.HookCase):
             f.write('proj\torder8-y\tsuperseded\treplaced by order9\t2026-11-16\n')
         self.told('git -C repos/proj push origin --delete order8-y', 'the register marks it superseded: replaced by order9')
 
+    def test_a_remote_branch_in_main_by_content_goes_without_a_row(self):
+        self.branch_with_commit('order8-picked', push=True)
+        self.commit(self.clone, 'later.txt')
+        self.git(self.clone, 'cherry-pick', 'order8-picked')
+        self.git(self.clone, 'push', '-q', 'origin', 'main')
+        self.git(self.clone, 'fetch', '-q', 'origin')
+        for command in ('git -C repos/proj push origin --delete order8-picked', 'git -C repos/proj push origin :order8-picked',
+                        'gh api -X DELETE repos/o/proj/git/refs/heads/order8-picked'):
+            with self.subTest(command):
+                cwd = self.clone if command.startswith('gh') else None
+                self.told(command, 'deleting origin/order8-picked of proj loses no work', 'in main by content', cwd=cwd)
+        self.rows(('proj', 'order8-picked', 'kept', 'the record of the first draft', '2026-11-16'))
+        self.refused('git -C repos/proj push origin --delete order8-picked', 'which the register keeps: the record of the first draft')
+
+    def test_a_remote_branch_with_one_change_main_lacks_still_needs_its_row(self):
+        self.branch_with_commit('order8-half')
+        self.git(self.clone, 'switch', '-q', 'order8-half')
+        self.commit(self.clone, 'second.txt')
+        self.git(self.clone, 'push', '-q', 'origin', 'order8-half')
+        self.git(self.clone, 'switch', '-q', 'main')
+        self.git(self.clone, 'cherry-pick', 'order8-half~1')
+        self.git(self.clone, 'push', '-q', 'origin', 'main')
+        self.git(self.clone, 'fetch', '-q', 'origin')
+        reason = self.refused('git -C repos/proj push origin --delete order8-half', 'has no superseded row', 'proj\torder8-half\tsuperseded\t')
+        self.assertNotIn('in main by content', reason)
+
     def test_a_remote_branch_inside_main_goes_without_a_word(self):
         self.branch_with_commit('order9-z', push=True)
         self.git(self.clone, 'merge', '-q', '--no-edit', 'order9-z')
@@ -454,6 +598,59 @@ class BranchKeeper(testkit.HookCase):
         self.passes('git -C repos/proj stash drop stash@{7}')
         self.passes('git -C repos/proj stash list')
         self.passes('git -C repos/proj stash pop')
+
+    # the folder each command of a line runs in
+    def test_a_long_line_with_several_cd_is_read_command_by_command(self):
+        self.branch_with_commit('order7-x', push=True)
+        body = 'TEXT WITH \\"QUOTES\\"\nAND NEWLINES\ncd / && make'
+        for first in ('cd repos/proj && ', 'cd repos/proj || exit 1; ', 'cd repos/proj 2>/dev/null && ', 'cd -- repos/proj && ',
+                      'if cd repos/proj; then true; fi; ', '{ cd repos/proj; } && ', 'pushd repos/proj >/dev/null && '):
+            line = (f'{first}git push -q origin order7-x 2>&1 | tail -1; git switch -q order7-x && python3 -c "print(1)" | cut -c1-30 '
+                    f'&& echo ok; git switch -q main; gh pr merge 5 --squash --body "{body}" | tail -1; git pull -q; '
+                    f'git branch -q -D order7-x; cd {self.ws} && timeout 280 true 2>&1 | tail -1; cd /; ls')
+            with self.subTest(first):
+                text = self.told(line, 'After this merge, the branch of pull request 5 goes')
+                self.assertNotIn('could not be read', text)
+
+    def test_a_later_cd_into_another_clone_is_followed(self):
+        other = self.clone_of(self.remote, os.path.join(self.ws, 'repos', 'other'))
+        self.branch_with_commit('order9-only', folder=other)
+        self.refused(f'cd repos/proj && git status; cd {other} && git branch -D order9-only',
+                     'deleting the branch order9-only of other loses 1 commit(s)')
+        self.refused(f'cd {other}; (cd {self.clone} && git status); git branch -D order9-only', 'order9-only of other loses 1')
+        self.passes(f'(cd {other} && git status); git -C {self.clone} branch -D order9-only')
+
+    # a shell variable in a path or a name
+    def test_a_variable_in_the_folder_is_said_plainly(self):
+        self.branch_with_commit('order7-x')
+        self.branch_with_commit('order8-y', push=True)
+        for command in (f'git -C $R branch -D order7-x', 'cd $R && git branch -D order7-x', 'git -C "$R" push origin --delete order8-y',
+                        f'for r in proj; do git -C {self.ws}/repos/$r branch -D order7-x; done', 'git -C $R stash drop'):
+            with self.subTest(command):
+                reason = self.refused(command, 'shell variable', 'name the folder literally')
+                self.assertNotIn('no such folder', reason)
+        self.git(self.clone, 'switch', '-q', '-c', 'order11-new')
+        for command in (f'for r in proj; do git -C {self.ws}/repos/$r push -u origin order11-new; done',
+                        'cd $R && git push -u origin order11-new'):
+            with self.subTest(command):
+                text = self.told(command, 'shell variable')
+                self.assertNotIn('could not be read', text)
+                self.assertNotIn('Refused', text)
+        self.told('cd $R && rm -rf proj', 'could not see what "proj"', '`cd $R`')
+        self.refused(f'cd $R && rm -rf {self.clone}', 'branch order7-x: 1 commit(s) on no remote')   # a full path needs no folder
+
+    def test_a_variable_in_a_branch_or_stash_name_is_never_passed_unchecked(self):
+        self.branch_with_commit('order7-x')
+        testkit.write(os.path.join(self.clone, 'a.txt'), 'draft\n')
+        self.git(self.clone, 'stash', '-q')
+        for command in ('git -C repos/proj branch -D $B', 'git -C repos/proj push origin --delete $B', 'git -C repos/proj push origin :$B',
+                        'gh api -X DELETE repos/o/proj/git/refs/heads/$B', 'git -C repos/proj stash drop $S',
+                        'git -C repos/proj push $REMOTE --delete order7-x'):
+            with self.subTest(command):
+                cwd = self.clone if command.startswith('gh') else None
+                reason = self.refused(command, 'shell variable', cwd=cwd)
+                self.assertNotIn('Fetch first', reason)
+        self.told('git -C repos/proj worktree remove $WT', 'could not see what "$WT"')
 
     # 3. a new branch
     def test_a_new_branch_is_told_the_rule_and_every_branch_with_its_number(self):
@@ -587,6 +784,8 @@ class BranchKeeper(testkit.HookCase):
             cfg = json.load(f)
         self.assertEqual(cfg['paths']['register'], 'private/branches.tsv')
         self.assertTrue(os.path.isfile(self.register))
+        self.assertEqual(cfg['paths']['clones'], 'private/clones.tsv')
+        self.assertTrue(os.path.isfile(self.clones))
 
 
 if __name__ == '__main__':

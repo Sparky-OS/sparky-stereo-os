@@ -3,6 +3,7 @@
   "workspace": "/path/to/your/workspace",
   "paths": {
     "register": "private/branches.tsv",
+    "clones": "private/clones.tsv",
     "queue": "partners/queue",
     "state": "state/hooks"
   },
@@ -12,6 +13,7 @@
   "on": {
     "session_start": true,
     "removal": true,
+    "clone_rows": true,
     "remote_deletion": true,
     "stash": true,
     "branch_creation": true,

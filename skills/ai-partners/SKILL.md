@@ -198,10 +198,13 @@ References consulted (collections, queries, used or missing):
 Expected / observed result, including control:
 Evidence paths and hashes:
 Shipped (stage with sums and .keep, verified bundles) and cleaned; Kept (path or name, size measured now, why); lane check output:
+Branches (each one by name and commit, pushed or bundled; each one not in main: to merge, superseded by what, or kept for what):
 Dependencies added or changed (name, source, version, how it was checked):
 Not tested / known limitations:
 Next action and any remaining authorization:
 ```
+
+The Branches line is what lets the coordinator merge each branch and delete it at the merge, so that no branch stays outside main without a reason ([forks-and-online, branches](../forks-and-online/SKILL.md#branches)).
 
 Use [upstream-outreach](../upstream-outreach/SKILL.md): credit the owners, follow their style and current policy, make one concrete ask and disclose assistance honestly.
 Name the actual contributing model in the project's required provenance trailer when known; do not invent a model identity.

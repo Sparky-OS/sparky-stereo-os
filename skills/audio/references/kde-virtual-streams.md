@@ -61,8 +61,11 @@ Compare the installed page's off state to the published control at both scales w
 
 Debian's source disables build-time tests.
 The edition recipe prints that fact and the missing Appium prerequisites, runs the native validator separately, and requires the installed page and widget proofs.
-The upstream `applettest` additionally needs `selenium-webdriver-at-spi-run`, its AT-SPI driver, Appium, the Python Appium/Selenium client, GTK introspection, KWin, a private accessibility/session bus and PipeWire's PulseAudio server.
+The upstream `applettest` additionally needs `selenium-webdriver-at-spi-run`, its AT-SPI driver, Appium, the Python Appium/Selenium client, GTK introspection, a private compositor and accessibility/session bus, and PipeWire's PulseAudio server.
 KDE's own CI runtime dependencies provide these; a build-only Debian container does not.
+Selenium normally launches KWin; its supported external-compositor mode also runs this two-dimensional test on Weston headless with Pixman, software Qt Quick and the optional video recorder disabled.
+The build recipe's `ci-headless.sh` and `ci-app-launch.sh` provide that device-free session; every applet assertion and `QT_FATAL_WARNINGS=1` remain enabled.
+This is no proof of KWin-specific protocols or hardware rendering.
 
 ## Traps
 
@@ -104,6 +107,14 @@ KDE's own CI runtime dependencies provide these; a build-only Debian container d
   Fix: compare the cached and registry image digests and select a current pinned image with `--job-image JOB=IMAGE`, or add the missing runtime package from the image's signed distribution repository and record that exact test prerequisite.
   Found by `ldd`, the image's creation date and RPM database, then the repository's signed `libplist-2_0-12` package metadata.
   Run the real test after correcting the environment; installing a dependency alone is not a passing test.
+- **The current CI runtime cannot start a device-free KWin or an X11 widget.**
+  Cause: Selenium's transitive master KWin/workspace artifacts can override a direct Plasma/6.7 runtime requirement; that workspace requires Wayland, while the measured KWin virtual backend still needs a render device and rejects QPainter.
+  Fix for this two-dimensional widget test: use Selenium's external-compositor mode with private Weston headless/Pixman and software Qt Quick. Disable only the optional video recorder, preserving every assertion.
+  Found by the artifact dependency metadata, missing-render-device and failed-X11 launch logs, then all three upstream CTest entries passing with both inner applet tests.
+- **The app starts loading but never reaches the accessibility bus.**
+  Cause in the measured CI session: desktop-service activation races portal startup under `QT_FATAL_WARNINGS=1`; the artifacts also retain their builders' absolute D-Bus service Exec paths.
+  Fix: on Selenium's own private bus, start the services at the actual test prefix and warm the portal before execing the original app command. Keep fatal warnings on the app; background services get their normal environment.
+  Found by the Qt D-Bus owner-change warning, service Exec files and a successful unchanged test after orderly startup.
 
 ## What CA0132 source can establish
 

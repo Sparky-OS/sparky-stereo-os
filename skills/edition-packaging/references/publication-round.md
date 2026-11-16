@@ -67,9 +67,118 @@ Prove a new check twice on immutable copies: green on the merged tree, red after
 The red summary must name the failed check, end with the round-stop message, and return 1.
 A summary pipeline runs in a subshell; update the aggregate failure variable outside it, or a printed FAIL can still return success.
 
+### A stage taken only in part
+
+Inventory the binaries before choosing folders:
+
+```sh
+dpkg-deb -f PACKAGE.deb Package Source Version Architecture Sparky-Lean-Code
+dpkg --compare-versions OLD_SOURCE_VERSION lt NEW_SOURCE_VERSION
+```
+
+Keep a take list and a leave-out list with each stage, exact relative filename, source, source version, binary name and architecture.
+Choose one authoritative source generation, including its HR and debug companions, then keep its descriptor, checksum-bound source components, buildinfo, changes and build record together.
+A parent stage can contain a superseded installer, hardware helper or compositor alongside packages still needed by the round.
+An input retained for another recipe is not a second candidate to publish.
+Never copy that parent wholesale into the cohort.
+Where a selected binary has the same version and architecture as a published binary, compare their SHA-256 too: equal bytes need no replacement, and different bytes at one published identity stop selection.
+
+Traps found by archive and source inspection in ORDER 587:
+
+- **Symptom:** the advertised supersession list leaves older packages beside their successors.
+  **Cause:** the review named the obvious shared library but missed another source in a partial stage.
+  **Fix:** compare every binary's source identity and version, then emit exact leave-out filenames for all older generations, not just the sources named in the brief.
+  **How found:** reading the controls exposed an older hardware helper, installer settings and compositor in otherwise useful stages; dpkg's version comparison selected their accepted successors.
+- **Symptom:** a working staged program has no publishable Lean Code source.
+  **Cause:** its application build is staged as one unqualified binary; the descriptor, HR companion and release build record were never made.
+  **Fix:** record a successor-build gap and keep that binary out of the take list until the tree's source preparation and release gates finish.
+  Do not infer qualification from a version suffix alone: inspect `Sparky-Lean-Code` and the source closure; some qualified packages have no `+lc1` in their version.
+  **How found:** Kamoso's staged control had no mark and its stage had no matching descriptor, unlike the qualified Camera page beside it.
+- **Symptom:** a large compiler or suite is reported unbuilt although exact accepted outputs exist.
+  **Cause:** the known stage list omitted outputs under another scratch root; the recipe keeps its result under `out`.
+  **Fix:** search for manifests and descriptors too, then check the binaries, source closure, clean complete records and acceptance before proposing the discovered output.
+  Keep an older compiler needed as the build seed separately from its successor's publication set; duplicate binary names cannot both be authoritative.
+  **How found:** the version environment files and suite manifest matched retained outputs whose SHA256SUMS and records verified.
+- **Symptom:** checksums and the lc1 control mark pass, but the build record says `unrecorded: ["buildinfo"]`.
+  **Cause:** the staged build has its source and binaries without the binary build's metadata.
+  **Fix:** retain this as a qualification gap; rebuild the small package through its recipe and source-build route before selecting it.
+  Never edit the old record to make it look complete.
+  **How found:** reading every selected source's record found this in the look package; its stage had no `.buildinfo` or `.changes`.
+- **Symptom:** a complete clean record names a descriptor hash different from the staged descriptor, although the stage's SHA256SUMS passes.
+  **Cause:** the manifest and record certify different descriptor bytes; checking each file against only one of them misses the disagreement.
+  **Fix:** compare every recorded binary and metadata hash with the actual staged file, and hold the affected source until its source and build evidence agree.
+  **How found:** the graphics helper's record bound another `.dsc` hash in three successive stages; the source-component manifests themselves verified.
+
+### A stage accepted after the proof froze
+
+A passing transaction and link check qualify their recorded archive identities, not every package that later enters a stage folder.
+If a stage is accepted during that check, follow the coordinator's written instruction: rerun against the extended pool unless that instruction explicitly permits a separate hand-off for the round.
+With that permission, finish the frozen check, retain its pool hash, and supply a separate per-source reconciliation and exact add/leave-out filenames for the late stages.
+Name both scopes in the report; the person publishing still qualifies and rehearses the extended pool.
+A later successor replaces the old source family, including its companions and metadata; it is not added beside it.
+
+Trap:
+
+- **Symptom:** a green installed proof is cited for a cohort whose FFmpeg, player, stereo library or thumbnailer arrived after its inputs froze.
+- **Cause:** the accepted stage list advanced while the test was running, but the report treated that list and the frozen archive pool as the same thing.
+- **Fix:** retain the exact proved pool and, only with explicit permission, a separate late-stage add/leave-out list; otherwise repeat the proof with the new pool. Check each late descriptor, component hash, binary Source field and listed build-record hash in place. A descriptor stored in the source subfolder may be checksum-covered separately from an architecture's binary build record; state which record actually names it.
+- **How found:** compare the frozen index hash and transaction targets with the late binaries' Source versions and the time of the coordinator's exception. Resolve relocated source metadata only inside that stage's known source folder and require the exact recorded hash.
+
+### Task metadata is generated after the cohort is known
+
+A task producer's caller-supplied version is not a fixed newer release in its historical changelog.
+Reconcile its generated relations separately from ordinary source versions.
+In ORDER 587, source inspection located the desktop's Camera dependency in `lists/make-meta.py` and DisplayCAL's two role suggestions in `lists/suggests.tsv`.
+Those are the inputs to the next meta build; this inspection alone proves neither a generated package nor an installed upgrade.
+Compare every generated field with the published metas, explain each difference by its generating list or code line, then prove the transaction through apt's `Inst` lines, installed versions, no unexpected `Remv` and an empty audit.
+For hardware-dependent software offered only on request, check it is absent after installing the tasks with the edition's normal recommendation policy.
+
+Continuation lessons from ORDER 587:
+
+- **Symptom:** `lc-successor.py` refuses a staged application with `not a +lc1 source`.
+  **Cause:** a plain binary is not an earlier Lean Code source, and cannot supply that tool's retained toolkit or source-consumer plan.
+  **Fix:** recover the exact Debian source, apply the already accepted application patch, then use `lean.debian_prepare` and the conventional source build to make its first lc1 source.
+  Keep its complete build record and repeat the accepted behaviour test on the installed successor.
+  **How found:** Kamoso's stage had only its plain binary, changes and patch; the successor tool's guard and the source-preparation route identified the correct first migration.
+- **Symptom:** a standalone source rebuild produces different archive hashes although its installed contents are unchanged.
+  **Cause:** archive timestamps and compression belong to the assembly, and can differ between direct assembly and `dpkg-buildpackage`.
+  **Fix:** compare every payload and control member, including modes and links, then retain the actual source-built archives alongside the buildinfo and changes that name their hashes.
+  Never attach metadata for one archive to another archive with equal payload but different bytes.
+  **How found:** independent member maps and control comparisons showed identical look and HR contents; the source build's metadata identified which final archive bytes to keep.
+- **Symptom:** `dpkg-genchanges` cannot find the generated `.buildinfo`.
+  **Cause:** buildinfo was written directly into the final stage while genchanges still looked beside its binary inputs.
+  **Fix:** keep source, binaries and buildinfo in dpkg's output directory until changes is generated; retain all final files, then write the build record once.
+  `dpkg-genbuildinfo` uses `--build=binary`; do not assume every dpkg helper accepts `-b`.
+  **How found:** the graphics recipe's failing path named the expected parent directory; the conventional source build showed the working order.
+- **Symptom:** the meta link gate cannot resolve `sparky-aptus-appcenter`, and generation omits programs known by another archive.
+  **Cause:** the qualification and generator catalogues contained Debian, deb-multimedia and the edition, but omitted the underlying SparkyLinux archives.
+  **Fix:** mirror the edition's declared archives with their verified public keys before generating tasks or resolving their closures.
+  Inspect the first policy attempt when the last attempt merely reports two mutually exclusive driver locks.
+  **How found:** policy attempt zero traced the desktop through the memory page and Stereo AppCenter to the missing SparkyLinux package; its candidate appeared after the signed archive was added.
+  Compare all generated relations with the published controls; unavailable names already absent from the published controls are distinct from removed functionality.
+- **Symptom:** a full meta closure reports `symlink conflicts at ./etc/grub.d/10_linux`, although the boot package declares a literal diversion.
+  **Cause:** its preinst creates the destination parent with `mkdir -p` between two diversion commands, outside the extractor's recognized command grammar.
+  **Fix:** model only exact literal destination parents before use, with real dpkg-divert oracle tests and negative cases for unrelated directories, unsafe paths and shell operations; retain the collision refusal for every unmodeled script.
+  Carry the corrected toolkit in its next package and repeat qualification against the complete cohort; never use an older boot sibling to make the check green.
+  **How found:** the retained unmodeled-preinst report and the failing archive hash identified the accepted boot package; the oracle failed before the change and the 98 diversion tests passed after it.
+- **Symptom:** the installed-state check says DisplayCAL is installed although no transaction installed it.
+  **Cause:** a substring match for `installed` also matches dpkg-query's `not-installed` state.
+  **Fix:** match the complete status value and retain the failed checker run; require the corrected overall rehearsal to exit zero.
+  **How found:** the stopped container's status data contained no DisplayCAL installation while the checker used an unanchored grep.
+- **Symptom:** a link qualification stops with `Invalid cross-device link` when adding a verified archive to its SHA-256 cache.
+  **Cause:** moving only the cache to another filesystem leaves its temporary downloads on the original one; the final rename cannot cross filesystems.
+  **Fix:** keep temporary downloads and the cache directory on one filesystem. Stop the run before relocating the scratch tree, verify the copied archive hashes, and restart the complete check; keep final publication stages free of caches.
+  **How found:** the failing source and destination paths matched `download.part` and the relocated cache; `lean/archive.py` uses `temporary.rename(archive)` after checking the signed size and hash.
+- **Symptom:** a task meta's installed upgrade passes, but its archive link gate reaches the scratch allocation before its predecessor closure is unpacked.
+  **Cause:** the gate needs both complete dependency roots at once, besides the archive cache and diagnostics; the size of the meta archive does not predict that space.
+  **Fix:** budget both roots and the cache inside the brief's allocation. If they do not fit, retain the diagnostics and nonzero exit, stop the gate, and hold the unqualified source group out of the take list while finishing the other requested proofs.
+  **How found:** per-case disk measurements showed the completed current root beside the growing predecessor; moving verified cache files freed space but did not complete the paired-root check. The independently passing installed transaction remained a separate proof.
+
 ## The recipe
 
 1. **Freeze the build tree.** `round-worktree.sh WORKTREE [COMMIT]` makes (or reuses) a git worktree of the build repository at one commit; the default commit is `origin/main` as fetched now.
+   Freeze the published archive inputs with verified independent read copies as well. A live archive can retain its SHA-256 while inode metadata changes, causing `supplied input changed after its universe was frozen`; keep that guard unchanged and follow [the frozen-input lesson](../../lean-code/references/lessons-2026-11.md). Check every copied hash and that source and destination have different device/inode identities; a symlink or hard link does not freeze the input.
+
    Every build-repository path of the round (`publish-tree.sh`, the lean toolkit, the supply-chain tools, the pre-round checks) points into that worktree, never into the shared checkout, because branches are merged into the shared checkout while a round runs for hours.
    It prints `round-commit <40 hex> <path>`; the round log, `round-commit.txt` and the supply-chain file `round-toolkit-ROUND.json` (listed in `SHA256SUMS`, so the detached signature covers it) name that commit.
    An existing worktree is reused only at exactly that commit and with nothing changed; any other state stops with the reason.

@@ -37,6 +37,8 @@ The current website uses system font stacks (`Verdana, Geneva, "DejaVu Sans", sa
 
 ## From 2D art to a stereo pair
 
+For icon themes and SVG group authoring, start with [stereo icons and theme parts](references/stereo-icons-and-theme-parts.md): the published loader's separate APIs, a runnable probe and negative control, the required helper rig rows, and the later no-added-scale ruling.
+
 - **The background stays identical in both eyes**, at the screen plane (disparity 0). Foreground elements shift by +d/2 in the left eye and −d/2 in the right: crossed disparity, in front of the screen.
 - **Take d from a measured reference**, not a guess. One way: a professionally mastered 3D clip. Block-match a face against its background in a few frames, and use the face's separation from the background as a fraction of the eye width. In a half side-by-side source with a 2:1 sample aspect, one coded pixel is two display pixels. The SparkyOS screen uses 0.473% of the eye width (9.08 px at 1920 per eye, each eye shifted by half of it).
 - **Verify on the result:** block-match each element in the pair you made. The foreground must measure d and the background exactly 0.

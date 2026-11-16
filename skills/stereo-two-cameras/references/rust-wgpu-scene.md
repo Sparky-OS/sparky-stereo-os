@@ -406,3 +406,17 @@ Fix: retain the original source problem or report the required input as unavaila
 How found: a separate negative regression required an error and failed before the explicit check; the corrected renderer library passed 523 tests with one ignored and strict Clippy.
 The complete application gate then passed 6,705 tests, with 46 skipped or ignored and 32 WASM crates checked.
 Those are source-gate results; they do not establish native presentation, and query counters are not scene hashes or path-tracing sample counters.
+
+
+### Preserve the ordinary background at the native pair boundary
+
+A transparent composition frame is not yet the ordinary opaque output.
+Reuse the document's existing background conversion separately on each real eye, then pack its rows without resampling.
+Capture the background in the same immutable world snapshot and include document edits in stale-work identity.
+
+Symptom: flat content in the native pair is black where ordinary output has the authored non-black background.
+Cause: the new companion calls `to_rgba8_over([0; 3])`, while the existing ordinary exporter composites over `comp.background`.
+Fix: pass the immutable document background through the native packer to both conversions.
+How found: a runtime test against the actual ordinary session exporter failed with black versus RGB128/80/32; after using the same background, all nine focused native-control tests passed.
+Use the engine's actual clamped dimensions in that reference; the first attempted assertion also assumed a smaller stage than the document permits.
+This focused result precedes the full application gate and compositor proofs.

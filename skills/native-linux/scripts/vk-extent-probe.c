@@ -9,6 +9,9 @@
  * Build: cc -O1 -Wall -o vk-extent-probe vk-extent-probe.c -lvulkan -lxcb
  * LAYERS=2 asks for a swapchain of two image layers whatever maxImageArrayLayers says (a program that asks anyway);
  * CHILD=1 puts the window inside a 1000x700 top-level, 100,50 from its corner.
+ * With LAYERS=2 layer 0 is red and layer 1 blue, each with the moving square at the same place.
+ * RECREATE=1 makes the swapchain again (from the surface's capabilities) when a present or an acquire returns
+ * VK_ERROR_OUT_OF_DATE_KHR, as a program that follows its window does, and prints each time.
  * Environment: WIN_W WIN_H EXT_W EXT_H FRAMES RESIZE_AT RESIZE_W HOLD_S LAYERS CHILD
  *   VK_VENDOR (0x10de NVIDIA, 0x1002 AMD, 0x10005 lavapipe) */
 #define VK_USE_PLATFORM_XCB_KHR
@@ -99,6 +102,7 @@ int main(void)
       .imageSharingMode = VK_SHARING_MODE_EXCLUSIVE, .preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR,
       .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR, .presentMode = VK_PRESENT_MODE_FIFO_KHR, .clipped = VK_TRUE,
    };
+   const uint32_t layers = ci.imageArrayLayers;
    VkSwapchainKHR swapchain;
    VkResult made = vkCreateSwapchainKHR(device, &ci, NULL, &swapchain);
    printf("create %ux%u layers %d on window %dx%d: %d\n", ew, eh, env("LAYERS", 1), win_w, win_h, made);
@@ -107,7 +111,7 @@ int main(void)
    VkImage images[8];
    count = 8;
    CHECK(vkGetSwapchainImagesKHR(device, swapchain, &count, images));
-   VkBufferCreateInfo bci = { .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO, .size = (VkDeviceSize)ew * eh * 4,
+   VkBufferCreateInfo bci = { .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO, .size = (VkDeviceSize)ew * eh * 4 * 2,
                               .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT };
    VkBuffer upload;
    CHECK(vkCreateBuffer(device, &bci, NULL, &upload));
@@ -152,16 +156,22 @@ int main(void)
          usleep(200000);
       }
       const uint32_t mark = 20 + (frame * 16) % (ew / 2 - 80);
-      for (uint32_t y = 0; y < eh; y++)
-         for (uint32_t x = 0; x < ew; x++) {
-            uint32_t c = x < ew / 2 ? 0xffff0000 : 0xff0000ff;
-            uint32_t lx = x < ew / 2 ? x : x - ew / 2;
-            if (lx >= mark && lx < mark + 40 && y >= 20 && y < 60)
-               c = 0xffffffff;
-            pixels[y * ew + x] = c;
-         }
+      for (uint32_t l = 0; l < layers; l++)
+         for (uint32_t y = 0; y < ci.imageExtent.height; y++)
+            for (uint32_t x = 0; x < ci.imageExtent.width; x++) {
+               const uint32_t w = ci.imageExtent.width;
+               uint32_t c = layers == 2 ? (l ? 0xff0000ff : 0xffff0000) : x < w / 2 ? 0xffff0000 : 0xff0000ff;
+               uint32_t lx = layers == 2 || x < w / 2 ? x : x - w / 2;
+               if (lx >= mark && lx < mark + 40 && y >= 20 && y < 60)
+                  c = 0xffffffff;
+               pixels[(l * ci.imageExtent.height + y) * w + x] = c;
+            }
       uint32_t index;
       VkResult r = vkAcquireNextImageKHR(device, swapchain, UINT64_MAX, acquired, VK_NULL_HANDLE, &index);
+      if (r == VK_ERROR_OUT_OF_DATE_KHR && env("RECREATE", 0)) {
+         printf("frame %d acquire out of date\n", frame);
+         goto recreate;
+      }
       if (r != VK_SUCCESS && r != VK_SUBOPTIMAL_KHR) { printf("frame %d acquire %d\n", frame, r); break; }
       VkCommandBufferBeginInfo begin = { .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO };
       CHECK(vkResetCommandBuffer(command, 0));
@@ -169,10 +179,14 @@ int main(void)
       VkImageMemoryBarrier b = { .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER, .dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
          .oldLayout = VK_IMAGE_LAYOUT_UNDEFINED, .newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
          .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED, .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-         .image = images[index], .subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 } };
+         .image = images[index], .subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, layers } };
       vkCmdPipelineBarrier(command, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, NULL, 0, NULL, 1, &b);
-      VkBufferImageCopy copy = { .imageSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 }, .imageExtent = { ew, eh, 1 } };
-      vkCmdCopyBufferToImage(command, upload, images[index], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copy);
+      VkBufferImageCopy copies[2];
+      for (uint32_t l = 0; l < layers; l++)
+         copies[l] = (VkBufferImageCopy){ .bufferOffset = (VkDeviceSize)l * ci.imageExtent.width * ci.imageExtent.height * 4,
+                                          .imageSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, l, 1 },
+                                          .imageExtent = { ci.imageExtent.width, ci.imageExtent.height, 1 } };
+      vkCmdCopyBufferToImage(command, upload, images[index], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, layers, copies);
       b.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
       b.dstAccessMask = 0;
       b.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
@@ -194,6 +208,30 @@ int main(void)
       if (frame <= 3 || r != VK_SUCCESS || frame == resize_at || frame == resize_at + 1 || frame % 30 == 0)
          printf("frame %d present %d window %ux%u\n", frame, r, g ? g->width : 0, g ? g->height : 0);
       free(g);
+      if (r == VK_ERROR_OUT_OF_DATE_KHR && env("RECREATE", 0)) {
+recreate:
+         vkDeviceWaitIdle(device);
+         CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical, surface, &caps));
+         if (caps.currentExtent.width * caps.currentExtent.height > ew * eh) {
+            fprintf(stderr, "the window grew beyond the first extent\n");
+            break;
+         }
+         ci.imageExtent = caps.currentExtent;
+         ci.oldSwapchain = swapchain;
+         VkSwapchainKHR next;
+         VkResult again = vkCreateSwapchainKHR(device, &ci, NULL, &next);
+         vkDestroySwapchainKHR(device, swapchain, NULL);
+         printf("frame %d out of date: swapchain made again at %ux%u layers %u: %d\n", frame,
+                ci.imageExtent.width, ci.imageExtent.height, layers, again);
+         if (again != VK_SUCCESS) break;
+         swapchain = next;
+         count = 8;
+         CHECK(vkGetSwapchainImagesKHR(device, swapchain, &count, images));
+         VkSemaphoreCreateInfo again_semi = { .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
+         vkDestroySemaphore(device, acquired, NULL);
+         CHECK(vkCreateSemaphore(device, &again_semi, NULL, &acquired));
+         continue;
+      }
       if (r != VK_SUCCESS && r != VK_SUBOPTIMAL_KHR) break;
       usleep(16000);
    }

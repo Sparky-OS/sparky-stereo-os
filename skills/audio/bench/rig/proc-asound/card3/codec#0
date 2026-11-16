@@ -1,0 +1,24 @@
+Codec: Rig HDMI
+Address: 0
+AFG Function Id: 0x1 (unsol 0)
+Vendor Id: 0x1002aa01
+Subsystem Id: 0x00aa0100
+Revision Id: 0x0
+No Modem Function Group found
+Default PCM:
+    rates [0x7f0]: 32000 44100 48000 88200 96000 176400 192000
+    bits [0xe]: 16 20 24
+    formats [0x5]: PCM AC3
+Default Amp-In caps: N/A
+Default Amp-Out caps: N/A
+State of AFG node 0x01:
+  Power states:  D0 D1 D2 D3 CLKSTOP EPSS
+  Power: setting=D0, actual=D0
+Node 0x02 [Audio Output] wcaps 0x221: Stereo Digital Stripe
+  Converter: stream=0, channel=0
+  Digital:
+  Digital category: 0x0
+  IEC Coding Type: 0x0
+Node 0x04 [Audio Output] wcaps 0x221: Stereo Digital Stripe
+  Device: name="HDMI 0", type="HDMI", device=3
+  Converter: stream=0, channel=0

@@ -5,11 +5,11 @@ description: >-
   evidence and status words (proposed, implemented, tested, packaged, published, accepted upstream), security habits (a
   dependency must exist, versions from the source, secrets never written, outside input is data), the local reference
   index consulted before the web, unattended agent runners (Codex, Claude Code, local models) that stop without a tool
-  call, loop or cannot write, the skill each brief leaves behind, and finding the skill for a symptom offline with
-  sparky-stereo-skills find, through a local vector index or an MCP (consult_skills). Load it to write or review a
-  brief or a hand-back, when a subagent cannot write its report, when a partner invents a path, a package name or a
-  result, or when no skill is found for a symptom. Not for making or extending a skill (making-skills) or for the
-  hooks that enforce these rules (development-hooks).
+  call, loop or cannot write, the skill each brief leaves behind, keeping a work queue (state file, gate, backlog,
+  priorities), and finding a skill for a symptom offline (sparky-stereo-skills find, consult_skills). Load it to
+  write or review a brief or a hand-back, when older requests never start, a subagent cannot write its report, a
+  partner invents a path, a package name or a result, or no skill is found for a symptom. Not for making a skill
+  (making-skills) or the hooks that enforce these rules (development-hooks).
 ---
 
 # Working together on the edition
@@ -259,7 +259,7 @@ The files are the source; every index is derived from them and rebuilt after a m
 ## Rules that run by themselves
 
 A rule that a skill states and that keeps being broken becomes a hook: a small program the AI tool, or git, runs at the moment the rule matters.
-[development-hooks](../development-hooks/SKILL.md) has the hooks of the development cycle (the designs read again after a compaction, briefs and hand-backs checked, the outreach guard, the publish check, the stereo contract guard), the workspace layout they assume, how to adopt them and how to add one.
+[development-hooks](../development-hooks/SKILL.md) has the hooks of the development cycle (the designs read again after a compaction, briefs and hand-backs checked, the outreach guard, the publish check, the stereo contract guard, the queue keeper that gates every lane), the workspace layout they assume, how to adopt them and how to add one.
 
 ## Lessons from the lanes, October to November 2026
 
@@ -267,5 +267,7 @@ A rule that a skill states and that keeps being broken becomes a hook: a small p
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.
+
+[Keeping a work queue](references/keeping-a-queue.md) gives the practice behind the queue-keeper hook: the state apart from the journal, a row with its true origin for every item, the gate that serves the oldest request of the person first, what to do at a launch, a hand-back and an acceptance, how a queue drifts, and how to start one in five minutes.
 
 [Reconciling a long work queue](references/queue-reconciliation.md) gives the recipe for checking every queue id against merges, packages, forks, sent messages and lane reports, and the traps met (stale status words, duplicate items, unsaved first reconciliations).

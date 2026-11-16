@@ -844,3 +844,15 @@ How found: the flat difference occupied only two cache-bar rows; source inspecti
 Keep the product default unchanged and record this explicit test input rather than masking bars, changing source telemetry or calling the uncontrolled captures exact.
 The two controls compared40,000exported RGBA pixels and2,304,000complete client/output pixels without differences.
 The independent Effect baseline is the named upstream main plus the separately credited font and first-frame prerequisites, before the new shutter/common/stereo work; do not relabel that source as untouched current main.
+
+
+### A newer receiver needs an additive shared API
+
+Symptom: a newly included app fails to compile because its MIDI importer reads `LenientRead::over_limit`, absent from the suite's accepted common revision.
+Cause: the receiver already uses a later upstream API that distinguishes a saturated warning list from an import that reached the work limit.
+Fix: carry the exact upstream change in the common owner with its original author and date, preserving the receiver's bound check and the one shared revision.
+Zinadin Zidan's [change 45a8e166](https://github.com/storytold/craft-libs/commit/45a8e16669e70dadb780dfbc759c882dd5b7ea1c) supplies that field and its warning-saturation regression.
+How found: the actual SoundCraft workspace compiler named the missing field; the selected common source lacked it, while the receiver's original upstream pin contained it.
+The complete common gate passed after carrying the unchanged patch.
+That does not qualify the receiving apps: run their own whole gates before committing their shared-revision updates.
+Do not remove the importer's bound check or give this app a private copy of the shared crate to evade the mismatch.

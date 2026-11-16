@@ -209,6 +209,22 @@ Names come from their source copyright headers and Debian copyright records.
 The independent filesystem checks use `blkid` from [util-linux](https://github.com/util-linux/util-linux).
 Its command and library copyright records name Andreas Dilger, Andries Brouwer, Theodore Ts'o, Kay Sievers, Karel Zak, Bastian Friedrich, Corentin Chary, Mike Hommey, Andrew Nayenko, Jeroen Oortwijn, Jiro SEKIBA, Philipp Marek, Milan Broz, Alejandro Martinez Ruiz, Eric Sandeen, Rolf Fokkens and Zeeshan Ali (Khattak), alongside Red Hat and the util-linux contributors.
 
+### 0.3.2 Stereo icon authoring study and first helper
+
+The unbranded editor slice and its study build on Qt Widgets, Qt SVG, KConfig, KIconThemes and Stereo KWin.
+The helper moves chosen SVG groups in two views and keeps the original drawing in its project copy.
+It is an unpackaged prototype, not a completed desktop theme editor.
+
+- [Oxygen Icons](https://invent.kde.org/frameworks/oxygen-icons), whose `scalable/devices/video-television.svgz` from release 6.28.0 is the proof drawing: **Nuno F. Pinheiro, David Vignoni, Jakob Petsovits, David J. Miller, Johann Ollivier Lapeyre, Kenneth Wimer and Riccardo Iaconelli**, named in that release's `AUTHORS`.
+  The project copy retains its original drawing, `AUTHORS` and `COPYING`; the artwork is LGPL-3.0-or-later with Oxygen's artwork clarification.
+- [Plasma SDK](https://invent.kde.org/plasma/plasma-sdk), whose explorer sources inform the integration design: **Sebastian Kügler** for IconExplorer and its KTextEditor picker, **Marco Martin** for the theme explorer, and **Carl Schwan** for the look-and-feel explorer's current build integration.
+- [KColorSchemeEditor](https://invent.kde.org/plasma/plasma-workspace/-/tree/master/kcms/colors/editor): **Olivier Churlaud, Jeremy Whiting and Matthew Woehlke**, named by its application author list.
+- [KIconEdit 4.4.0](https://download.kde.org/Attic/extragear/kiconedit-4.4.0.tar.bz2), inspected as the earlier KDE icon editor: **Thomas Tanghus, John Califf and Laurent Montel**, from `AUTHORS`.
+- [Glaxnimate](https://invent.kde.org/graphics/glaxnimate), studied for the later animation helper: **Mattia Basaglia**, from its project copyright and maintainer record.
+
+No 3D model is included in this slice.
+These names credit the records inspected, rather than replacing each project's complete contributor list.
+
 ### 0.4 Conectiva and its programmers
 
 **Source**: [Conectiva on Wikipedia (in Portuguese)](https://pt.wikipedia.org/wiki/Conectiva), [APT-RPM](https://en.wikipedia.org/wiki/APT-RPM), [Synaptic](https://en.wikipedia.org/wiki/Synaptic_(software)), [Exame on Conectiva's history](https://exame.com/tecnologia/conectiva-linux-sistema-operacional-do-parana-que-quase-venceu-o-windows-no-brasil-dos-anos-2000/)

@@ -1,0 +1,33 @@
+{
+  "enabled": true,
+  "workspace": "/path/to/your/workspace",
+  "paths": {
+    "register": "private/branches.tsv",
+    "queue": "partners/queue",
+    "state": "state/hooks"
+  },
+  "repositories": [
+    {"path": "repos/sparky-stereo-os", "remote": "origin", "main": "main", "deletes_merged_head": true}
+  ],
+  "on": {
+    "session_start": true,
+    "removal": true,
+    "remote_deletion": true,
+    "stash": true,
+    "branch_creation": true,
+    "merge_reminder": true,
+    "clear_settled_rows": true
+  },
+  "online_remotes": "network",
+  "name_patterns": ["^order[0-9]+[a-z0-9]*(-[a-z0-9][a-z0-9._-]*)?$", "^wip/", "^lane/"],
+  "number_pattern": "order([0-9]+)",
+  "name_rule_outside": "context",
+  "on_unresolved_path": "context",
+  "max_names": 10,
+  "scan_limit": 100000,
+  "scan_seconds": 10,
+  "scan_depth": 12,
+  "bundle_depth": 3,
+  "git_timeout_seconds": 15,
+  "state_keep_days": 30
+}

@@ -32,6 +32,7 @@ LAYOUT = {
     'queue': 'partners/queue',
     'private': 'private',
     'drafts': 'private/drafts',
+    'register': 'private/branches.tsv',
     'state': 'state/hooks',
 }
 

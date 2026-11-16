@@ -42,3 +42,9 @@ The traps about writing a hook are in [the skill itself](../SKILL.md#traps).
   **How found:** a replay of saved entries on 2026-11-12 reproduced one false refusal of quoted text, but most entries ended at the 200-character limit and could not be judged; complete synthetic commands, kept apart and labelled, exercised each gate instead.
   A cut line is still worth reading: one of them, which the guard could not read as shell and let through, led to [the reader's trap](../SKILL.md#traps).
   (ORDER 531, stages 2 and 3)
+- **A hook's command-line mode waits for ever.**
+  **Symptom:** `python3 hooks/branch-keeper/hook.py --config FILE audit` prints nothing and never ends; the same with `audit` first works.
+  **Cause:** the script looked for its subcommand only as the first word, so with `--config` first it took the hook's path and waited for an event on standard input, which a terminal never closes.
+  **Fix:** a hook that is also a command finds its subcommand anywhere among its words, and its test runs the command with the options first and standard input closed (`test_the_audit_finds_its_configuration_after_its_options_too`).
+  **How found:** a smoke run of the new hook on 2026-11-16 that had to be stopped by its process number.
+  (ORDER 612)

@@ -37,6 +37,8 @@ STARTERS = {
     'private/README.md': '# Private record\n\nDrafts, the ledger of what was sent and the hooks\' own configuration.\n'
                          'Nothing here goes into a repository that has a remote.\n',
     'private/ledger.md': '# Ledger\n\nWhat was sent, to whom, when, and what is owed after it.\n',
+    'private/branches.tsv': '# Why each branch that is not inside its main branch stays: one row per branch, fields separated by tabs.\n'
+                            '# repository\tbranch\tkept or superseded\treason\tdate\n',
 }
 FOLDERS = ['memory', 'repos', 'partners/queue', 'private/drafts', 'private/hooks', 'state/hooks']
 
@@ -65,8 +67,10 @@ def init_workspace(workspace, scratch=None, say=print):
                 f.write(text)
             made.append(path)
     os.chmod(os.path.join(workspace, 'private'), 0o700)
-    checkout_skills = os.path.join(os.path.dirname(HOOKS), 'skills')
+    checkout = os.path.dirname(HOOKS)
+    checkout_skills = os.path.join(checkout, 'skills')
     default_skills = os.path.join(workspace, hookkit.LAYOUT['skills'])
+    default_checkout = os.path.dirname(hookkit.LAYOUT['skills'])
     for name in hook_names():
         target = config_path(workspace, name)
         if os.path.exists(target):
@@ -83,6 +87,10 @@ def init_workspace(workspace, scratch=None, say=print):
             cfg['floors_gib'] = {k: v for k, v in floors.items() if not k.startswith('/path/to/your/')}
         if 'skills' in (cfg.get('paths') or {}) and not os.path.isdir(default_skills) and os.path.isdir(checkout_skills):
             cfg['paths']['skills'] = checkout_skills  # this checkout is not under WORKSPACE/repos: name where it is
+        for entry in cfg.get('repositories') or []:
+            if isinstance(entry, dict) and entry.get('path') == default_checkout \
+                    and not os.path.isdir(os.path.join(workspace, default_checkout)):
+                entry['path'] = checkout  # the same, for a hook that reads this repository
         with open(target, 'w', encoding='utf-8') as f:
             json.dump(cfg, f, indent=2)
             f.write('\n')
@@ -112,6 +120,10 @@ def check_workspace(workspace, say=print):
         for key in (cfg.get('paths') or {}):
             if key not in ('state',) and not os.path.exists(kit.path(key)):
                 notes.append(f'"{key}" does not exist: {kit.path(key)}')
+        for entry in cfg.get('repositories') or []:
+            path = kit.resolve(entry.get('path', '') if isinstance(entry, dict) else entry)
+            if not os.path.isdir(path):
+                notes.append(f'repository folder not found: {path}')
         memory = kit.path('memory')
         for core in cfg.get('core') or []:
             if not os.path.exists(os.path.join(memory, core)):

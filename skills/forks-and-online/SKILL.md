@@ -2,12 +2,12 @@
 name: forks-and-online
 description: >-
   Record failures that cannot be filed upstream; push edition work only to the edition's forks (Sparky-OS, danielcamposramos), never to the upstream project; keep
-  every branch online the same day; audit clones for work that exists only locally ([gone] branches, ahead and behind,
+  every branch online the same day and gone at the merge, each branch outside main with a reason (branch-keeper); audit clones for work that exists only locally ([gone] branches, ahead and behind,
   commits in no branch, worktrees, partial clones, uncommitted files, git rev-list --not --remotes with patch-id) and
   tell merged, superseded, missing and uncommitted work apart; cut releases that Zenodo keeps for good, the Sponsor
   button, our own libraries' repositories, where large files go. Load it when a report says done but nothing is online,
   origin points at upstream, a released upstream fix may retire a carried patch or local tree, a push is refused by branch protection or a public-surface rule, KDE Invent runs CI on a
-  push, a release or DOI is needed, or an audit of many clones is due.
+  push, a release or DOI is needed, an audit of many clones is due, branches pile up, or branch-keeper refuses a removal.
 ---
 
 # Forks and keeping the work online
@@ -63,6 +63,77 @@ Daniel, 2026-10-23, on a plan that called the edition's forks "awaiting upstream
 - Never write "awaiting upstream", "not yet upstream" or "pending acceptance" as a judgement on the work.
   Those words adopt a measure where work counts only once a gatekeeper accepts it.
 - Where projects judged the work on its merits, it merged: those merges are the record of its quality, kept in one list as [`upstream-outreach`](../upstream-outreach/SKILL.md) says.
+
+## Branches
+
+Daniel, 2026-11-16: "why do we have so many brenches? consolidation is due, that also explain lost progress and rework, like the kernel source lost".
+That day the edition's three repositories had 81, 219 and 9 branches online, and 71, 215 and 8 of them were already inside main.
+Those 294 were deleted, the three repositories were set to delete a merged pull request's branch by themselves, and 15 branches stayed with work outside main and no recorded reason.
+
+### Recipe
+
+1. **One branch per piece of work, named by its number first:** `order612-branch-keeper`.
+   Before making it, look for every branch that carries the same number, in every repository, local and online, and build on what exists instead of starting over:
+   `git for-each-ref --format='%(refname:short)' refs/heads refs/remotes | grep -E '(^|[^0-9])612([^0-9]|$)'`.
+2. **Pushed to our fork the same day**, as the [working recipe](#working-recipe) says. A branch that lives in one clone only is not done.
+3. **Gone at the merge, online and locally.** The edition's repositories delete a merged pull request's branch by themselves; a branch merged with `git merge` is deleted with `git push REMOTE --delete BRANCH` once main is pushed; every clone deletes its copy with `git branch -d BRANCH` after `git fetch --prune`.
+4. **Every branch outside main has a reason.** It is merged, or it has a row in the register: one private file, never in a repository that has a remote, with repository, branch, `kept` or `superseded`, the reason and the date, separated by tabs.
+   Kept says what it is kept for; superseded says what replaces it.
+   A squash or rebase merge is never inside main by ancestry, so its branch gets `superseded`, "squash-merged as COMMIT", before it is deleted.
+5. **Nothing is removed before it is somewhere else.** Before a clone, a worktree, a branch or a stash goes: its commits on our fork or in a bundle in the lane folder, its uncommitted files committed on a branch ([uncommitted work](#uncommitted-work)), its stashes made branches (`git stash branch NAME stash@{0}`), its linked worktrees removed first.
+
+The hook [branch-keeper](../../hooks/branch-keeper/README.md) stands at each of these moments: at session start it says, per repository, the branches outside main with their reasons and the work on no remote; it refuses `rm -r` of a clone or a worktree, `git branch -D`, the deletion of a remote branch and `git stash drop` or `clear` when they would lose work that exists nowhere else; it shows a new branch every branch with its number; it reminds a merge that the branch goes, and clears the register row of a branch once it is inside main.
+
+### The audit of branches
+
+```sh
+python3 hooks/branch-keeper/hook.py audit [--fetch] [--config FILE] [REPOSITORY...]
+```
+
+It prints, per repository, every branch outside main (where it is, how many commits main lacks, its last date, its reason or NO REASON RECORDED), the branches inside main that still exist, the branches with commits on no remote, the stashes and the uncommitted files.
+Exit status 0: nothing owed; 1: a branch outside main without a reason, or work on no remote; 2: something could not be read.
+`--fetch` is its only network use; without it the answer is as of each clone's last fetch, which it states.
+
+The same questions by hand, after `git fetch --prune`:
+
+```sh
+git for-each-ref --no-merged=origin/main --format='%(refname:short) %(ahead-behind:origin/main) %(committerdate:short)' refs/heads refs/remotes/origin
+git for-each-ref --merged=origin/main --format='%(refname:short)' refs/heads refs/remotes/origin   # inside main: they can go
+git rev-list --branches --not --remotes --oneline                                                 # on no remote
+git stash list
+```
+
+`--remotes` counts every remote, including a folder on the same machine; only a network remote is online, which the hook checks and this line does not.
+
+### Traps of 2026-11-16
+
+- **Symptom:** hundreds of branches online, most of them already inside main (215 of 219 in this repository).
+  **Cause:** nothing deleted a branch at its merge, online or locally.
+  **Fix:** the repositories delete a merged pull request's branch; the hook's reminder at the merge; `git branch -d` in each clone after `git fetch --prune`.
+  **How found:** `git for-each-ref --merged=origin/main` counted against all the remote branches, repository by repository.
+- **Symptom:** work redone, or lost, after a cleanup ("lost progress and rework, like the kernel source lost").
+  **Cause:** the losses seen so far came from work outside git or in one local clone only, so removing the folder removed the only copy.
+  **Fix:** push or bundle first; the hook refuses `rm -r` of a clone whose work is on no remote; the audit of clones and stages is part of consolidation.
+  **How found:** the consolidation of 2026-11-16, which traced the losses to their places.
+- **Symptom:** fifteen branches outside main that nobody could explain.
+  **Cause:** no place recorded why a branch stays.
+  **Fix:** the register; the audit exits 1 while a branch outside main has no row.
+  **How found:** `--no-merged` after the merged branches were deleted.
+- **Symptom:** after a pull request merged, its branch is still outside main and `git branch -d` refuses it.
+  **Cause:** a squash or rebase merge makes new commits, so the branch's own commits never become part of main; git deletes with `-d` only a branch that "must be fully merged in its upstream branch, or in HEAD if no upstream branch was set" (git-branch(1)).
+  **Fix:** a `superseded` row naming the squash commit; then `git branch -D` and the remote deletion pass the hook.
+- **Symptom:** `rm -r link/` leaves the link and empties the folder it points to.
+  **Cause:** GNU rm resolves a symbolic link named with a trailing slash.
+  **Fix:** name a link without the slash; the hook looks inside the target in that one case and never follows a link inside a folder.
+  **How found:** measured in a scratch folder on 2026-11-16: "cannot remove 'link/': Not a directory", and the file inside the target was gone.
+- **Symptom:** a check of a clone finds nothing to lose although the clone has local commits.
+  **Cause:** its `.git` could not be read, so git looked upwards and answered for the repository around it.
+  **Fix:** compare `git rev-parse --show-toplevel` with the folder asked about; the hook refuses when they differ.
+  **How found:** a test with an unreadable clone inside another repository.
+- **Symptom:** commits count as online that no hosting service holds.
+  **Cause:** `--remotes` counts a remote that is a folder on the same machine (a test remote, another lane's clone) and a remote-tracking ref of a remote that was removed.
+  **Fix:** count only remotes with a network address; the hook does (`online_remotes`).
+  **How found:** the online audits of lane clones (ORDER 351b) found work counted online whose only remote was another lane's folder.
 
 ## The audit
 

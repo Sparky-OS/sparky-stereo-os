@@ -53,6 +53,8 @@ Conversions happen at the edges only: the decoder on the way in, the device's fo
 
 ## What PipeWire already ships
 
+For the optional Listen and combined-source implementation and its content tests, see [KDE audio routes](references/kde-audio-routes.md).
+
 `/usr/share/pipewire/filter-chain/` holds ready filter graphs: binaural 5.1 for headphones with the MIT KEMAR recordings through libmysofa (`sink-virtual-surround-5.1-kemar.conf`), 7.1 with HeSuVi head responses (`sink-virtual-surround-7.1-hesuvi.conf`), matrix surround decoders (`sink-dolby-surround.conf`, `sink-dolby-pro-logic-ii.conf`), upmixing (`sink-upmix-5.1-filter.conf`), a subwoofer channel (`sink-make-LFE.conf`) and microphone noise removal (`source-rnnoise.conf`).
 **Being built:** switching them on by themselves (headphones plus multichannel content), and a speaker setup page per multichannel device (levels in dB, test signal, distance as delay, bass management).
 

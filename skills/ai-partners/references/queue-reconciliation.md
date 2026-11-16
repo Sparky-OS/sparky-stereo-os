@@ -1,6 +1,7 @@
 # Reconciling a long work queue against evidence
 
 Use this when a numbered queue has grown for weeks, status words inside it contradict each other, and someone must say what is really open.
+To keep a queue from drifting in the first place, and to start one, see [keeping a work queue](keeping-a-queue.md).
 
 ## Recipe
 

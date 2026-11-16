@@ -135,6 +135,8 @@ git stash list
   **Fix:** count only remotes with a network address; the hook does (`online_remotes`).
   **How found:** the online audits of lane clones (ORDER 351b) found work counted online whose only remote was another lane's folder.
 
+**In main by content.** `git cherry origin/main BRANCH` with no `+` line means each of its commits has an equivalent change in main; the branch can go although its hashes are in no remote. The hook reads this itself. On 2026-11-16 that settled 36 old local branches of one clone in one command.
+
 ## The audit
 
 Fetch first, so the answer is about today's remotes:

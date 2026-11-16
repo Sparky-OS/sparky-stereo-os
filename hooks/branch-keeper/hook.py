@@ -208,6 +208,22 @@ class Repo:
     def is_ancestor(self, sha, of):
         return self.status('merge-base', '--is-ancestor', sha, of) == 0
 
+    def content_in_main(self, sha):
+        """True when every commit of sha that main lacks has an equivalent change in main (git cherry shows no + line):
+        a branch merged by a squash of one commit, a rebase or a cherry-pick. Its commits differ, its work is in main.
+        A branch whose several commits were squashed into one is not recognised this way: it needs its register row."""
+        if not self.main_ref:
+            return False
+        for main in self.main_shas():
+            try:
+                out = self.git('cherry', main, sha)
+            except GitError:
+                continue
+            marks = [line[:1] for line in out.splitlines() if line]
+            if marks and '+' not in marks:
+                return True
+        return False
+
     def local_only(self, extra=()):
         """[(branch, tip, commits)] for each local branch with commits no online remote-tracking ref holds; the commits
         in extra (bundled ones) count as held."""
@@ -522,7 +538,10 @@ def read_state(repo, register, ctx):
         state['dirty'] = repo.dirty()
     except GitError as e:
         state['dirty_problem'] = str(e)
-    state['no_reason'] = sorted(b for b in state['not_in_main'] if not register.recorded(repo.name, b))
+    state['by_content'] = sorted(b for b, row in state['not_in_main'].items()
+                                 if all(repo.content_in_main(repo.refs[r][0]) for r in row['refs']))
+    state['no_reason'] = sorted(b for b in state['not_in_main']
+                                if b not in state['by_content'] and not register.recorded(repo.name, b))
     return state
 
 
@@ -583,8 +602,11 @@ def describe_state(state, register, limit):
     head = (f'{repo.name} ({short(repo.need_main())} is main): ' + ', '.join(counts)
             + f'; last fetch {age(state["last_fetch"])}' + ('; shallow clone' if repo.shallow else '') + '.')
     lines = [head]
-    order = sorted(nim, key=lambda b: (register.recorded(repo.name, b), b))
-    if nim:
+    by_content = state.get('by_content', [])
+    if by_content:
+        lines.append(f'  In main by content, {len(by_content)} (git cherry shows no + line; they can go): ' + '; '.join(cut(by_content, limit)))
+    order = sorted((b for b in nim if b not in by_content), key=lambda b: (register.recorded(repo.name, b), b))
+    if order:
         lines.append('  Not in main: ' + '; '.join(cut(
             (f'{b} ({nim[b]["where"]}, {nim[b]["ahead"]} commit(s) main lacks, last {nim[b]["date"]}): {register.describe(repo.name, b)}'
              for b in order), limit)))
@@ -873,6 +895,10 @@ def check_local_deletion(repo, name, ctx, findings):
         return
     others = {s for r, (s, _, sym) in repo.refs.items() if r != ref and not sym and not r.startswith('refs/remotes/')}
     lost = repo.count_not_in(sha, repo.online_shas() | bundled | others)
+    if lost and repo.content_in_main(sha):
+        findings.add('context', f'{repo.name}: deleting {name} loses no work: each commit it has outside main is in main by content '
+                                '(git cherry shows no + line).')
+        return
     if not lost:
         holders = [short(r) for r, (s, _, _) in repo.refs.items() if r != ref and r.startswith(('refs/heads/', 'refs/tags/'))
                    and repo.is_ancestor(sha, s)]

@@ -60,6 +60,28 @@ class BranchKeeper(testkit.HookCase):
         self.git(folder, 'commit', '-q', '-m', name)
         return self.git(folder, 'rev-parse', 'HEAD').strip()
 
+    # a branch whose commits are in main by content (a rebase, a cherry-pick, a squash of one commit)
+    def test_a_branch_in_main_by_content_goes_and_is_not_owed_a_reason(self):
+        self.branch_with_commit('order8-picked')
+        self.commit(self.clone, 'later.txt')
+        self.git(self.clone, 'cherry-pick', 'order8-picked')
+        self.git(self.clone, 'push', '-q', 'origin', 'main')
+        self.git(self.clone, 'fetch', '-q', 'origin')
+        self.told(f'git -C {self.clone} branch -D order8-picked', 'in main by content')
+        text = self.session_start()
+        self.assertIn('In main by content, 1', text)
+        self.assertIn('0 with no reason recorded', text)
+
+    def test_a_branch_with_one_change_main_lacks_is_still_refused(self):
+        self.branch_with_commit('order8-half')
+        self.git(self.clone, 'switch', '-q', 'order8-half')
+        self.commit(self.clone, 'second.txt')
+        self.git(self.clone, 'switch', '-q', 'main')
+        self.git(self.clone, 'cherry-pick', 'order8-half~1')
+        self.git(self.clone, 'push', '-q', 'origin', 'main')
+        self.git(self.clone, 'fetch', '-q', 'origin')
+        self.refused(f'git -C {self.clone} branch -D order8-half', 'order8-half')
+
     def branch_with_commit(self, name, push=False, folder=None):
         folder = folder or self.clone
         self.git(folder, 'switch', '-q', '-c', name)

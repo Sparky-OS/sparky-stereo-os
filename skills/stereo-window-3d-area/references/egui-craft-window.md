@@ -306,3 +306,16 @@ Preserve the readiness requirement, production fallback policy and complete unma
 Keep this in a separate Light helper so other applications' software proofs retain their original harness bytes.
 How found: the application explained its deliberate software refusal, the original recipe had no driver override, and the unchanged controls then used AMD RADV RENOIR and matched all 2,880,000 RGB pixels across Wayland and X11.
 Repeat the full native, lifecycle, HEIF and ordinary proof set after this controlled check; those focused ordinary comparisons alone do not close the receiving step.
+
+
+## A scoped catalog is not a complete interface language
+
+When adding a language only for a native 3D companion, label that scope in its own app's language choice.
+Keep the existing complete menu-catalog list unchanged and test the partial catalog separately, including its actual new control labels.
+Do not add another project's translation files or expose a native-only font/companion choice to a web target that cannot draw it.
+
+Symptom: the full application gate fails its menu-language registry equality after adding Korean 3D phrases.
+Cause: the existing assertion correctly assumes every previously offered language owns a complete menu catalog; the new row has a narrower declared scope.
+Fix: retain exact equality for the original thirteen complete menu catalogs, assert the exact Korean 3D-only row, its own phrase coverage and its absence from that complete list; expose the new choice only on native targets.
+How found: the complete Effect gate reported 6,398 Nextest passes and one registry failure, rather than a renderer defect; the corrected registry check then passed in the fresh full run alongside the three actual Korean control-label tests.
+The earlier full run remains red; the passing individual check alone does not qualify the fresh complete run or a compositor capture.

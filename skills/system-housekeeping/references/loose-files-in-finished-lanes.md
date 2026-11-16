@@ -97,3 +97,53 @@ comment must name the verified-copy manifest and the completed hash check.
 The first slice established archive equality for two unpacked trees and retained
 uncertain loose files with verified hashes. It did not establish that every build
 directory, cache or protected file in the held roots was removable.
+
+## Completing mixed build, cache and stage trees
+
+- Read a CMake build's `CMAKE_HOME_DIRECTORY`, source recipe and target/dependency
+  manifests, or Meson's `build.ninja` and `meson-info`, before naming its
+  regeneration command. Generated-header tags, ELF/object formats and declared
+  output locations support a generated verdict. Preserve unmatched scripts,
+  patches, source inputs and useful logs rather than classifying everything below
+  the build directory by its name. An install manifest identifies an installed
+  prefix; compare installed bytes with build outputs and source archive members
+  where available.
+- A Gradle user-home cache is identified by its actual `wrapper/dists`,
+  `caches/modules-2`, transforms, journals, native helpers and daemon state.
+  Name the Gradle version and dependency-resolution/build recipe that recreates
+  those outputs. An `init.d` script or other unexpected authored input needs a
+  separate verdict. For ccache, inspect `CACHEDIR.TAG` and its cache-directory
+  signature along with the result/manifest layout. Do not read a protected user
+  home merely to establish a cache verdict for its neighbour.
+- A staged APK's release metadata can name its source commit, build helper and
+  expected hash. Verify that hash before calling it that build's output, and
+  preserve the release metadata if no retained copy exists. This identifies the
+  artifact and its recipe; it does not prove a fresh build is byte-reproducible or
+  repeat the original runtime qualification. Never open a signing key to do it.
+- Check staged packages against independent published pool files by full hash,
+  not directory names containing `published`. Unmatched packages or source
+  tarballs remain held when the available evidence does not settle their
+  provenance. Source copies already present in a lane or an already-audited clone
+  can be compared by content without fetching or repeating its branch audit.
+- **Symptom:** retained content fits a byte cap but `du` exceeds it.
+  **Cause:** many small files consume whole filesystem blocks and directories
+  consume additional space. **Fix:** budget allocated space as well as content
+  bytes before each new copy. If adjusting a newly-created duplicate, verify the
+  unchanged original before removing only the duplicate, record it as uncopied,
+  and hold its containing source entry. **Found by:** a preservation pass remained
+  below 300 MB of content while its allocated footprint exceeded that cap.
+- **Symptom:** final manifest assembly stalls after file comparisons finish.
+  **Cause:** testing every file against every top-level entry with repeated path
+  parent construction. **Fix:** group rows by root/entry while scanning, or use
+  normalized path prefixes; checkpoint the per-file results before copying and
+  aggregation. **Found by:** the file comparisons completed before the final
+  grouping step; replacing repeated parent construction removed that delay.
+
+Keep explicit metadata-only rows for protected files and excluded repositories.
+A copied subset never authorizes removing their enclosing directory. If the
+preservation cap prevents keeping every uncertain file, list each uncopied path,
+size and available hash, mark the whole top-level entry held, and still report
+the completed verdicts for the other entries. A review-only removal script can
+include a found-bearing entry only when the brief permits it and every found
+file has an independent verified copy, with no protected, uncopied or unexamined
+boundary inside that entry.

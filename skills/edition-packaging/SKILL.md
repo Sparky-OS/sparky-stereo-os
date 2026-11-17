@@ -3,14 +3,13 @@ name: edition-packaging
 description: >-
   Build, sign and ship the edition's packages: provenance, rebuilt upstream packages (+stereo3dN, i386 twins),
   dependency policy, apt pins (:any, Signed-By), conffiles, the signed repository, a publication round, DEP-11 and
-  Contents, the ISO, reproducible sources (SOURCE_DATE_EPOCH), the build record and the Lean Code gate,
+  Contents, the ISO, reproducible sources (SOURCE_DATE_EPOCH), the build record, the Lean Code gate,
   installed-package proof, languages. Load it when a package will not install (Breaks, Multi-Arch:
   same), apt picks Debian's build or a dummy at dist-upgrade, two builds of one source differ,
-  apt-get update exits 0 on a failed fetch, lc1 says the build record is not complete, a Qt header is missing after a
-  qt6-base update, a pin leaves a binding or development package uninstallable, a systemd unit's proof shows none
-  of its journal lines, a preinst prompt stops a non-interactive install, a language probe shows
-  English, a CMake consumer misses an imported library, a Rust suite shares its crates as dylibs,
-  or an amd64v3 index leaves apt on the baseline.
+  apt-get update exits 0 on a failed fetch, lc1 says the build record is incomplete, a Qt header is missing after
+  qt6-base updates, a pin leaves a binding or development package uninstallable, a systemd unit's proof shows none
+  of its journal lines, a preinst prompt stops an install, a language probe shows English, a CMake consumer misses an imported library, a Rust suite shares crates as dylibs,
+  an amd64v3 index leaves apt on baseline, or Illegal instruction on older CPUs.
 ---
 
 # Packaging the edition
@@ -35,6 +34,8 @@ description: >-
 **Check freshness first.**
 Written on 2026-10-07; the developer tasks and the skills package on 2026-10-16; provenance, Paweł's formula, rebuilt packages, the repository and the ISO on 2026-10-23, from rules dated 2026-10-02 to 2026-10-22; pins by architecture and the packages that are not ours on 2026-10-31; the i386 blocks, the order of pin files and the conversion to conffiles on 2026-11-01.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
+
+For a package that disappeared from testing, read [carried from Debian unstable](references/carried-from-debian-unstable.md): removal records, suites, RC bugs, fixes, versions, retirement and the installed proof.
 
 ## Provenance (Daniel, 2026-10-02): always
 
@@ -101,6 +102,9 @@ It links every skill into the folders where the assistants read skills, and noth
 - **It never replaces a person's own skill** of the same name, removes only its own links, and after an upgrade the next login links new skills and drops removed ones.
 - **Local models:** `ollama launch` starts Claude Code, Codex or OpenCode on a local or cloud Ollama model ([Ollama's CLI](https://docs.ollama.com/cli)), and those read the same folders. **Open WebUI** imports skills from a ZIP of skill folders (Workspace, Skills, Import; [its documentation](https://docs.openwebui.com/features/workspace/skills)): `sparky-stereo-skills export skills.zip` makes it.
 - **Proof:** link, then have each tool read the skills back: a command that lists them (`gemini skills list`, `goose skills list`), or the tool's request to its model captured at a local endpoint, where every skill's name must appear.
+
+For per-language tasks, the comparison with Debian, the installer and an upgrade from old Debian task wrappers, follow [language tasks](references/language-tasks.md).
+The chosen language task owns its required payload through Depends; an image installs the complete language-task manifest explicitly.
 
 ## tasksel lists only ours
 
@@ -235,9 +239,11 @@ The recipe, the coexistence rules with their specification clauses, the proof an
 
 ## Packages for the processor's level
 
-[x86-64-v3 packages](references/cpu-level-packages.md): apt architecture variants with our own table, what forky's apt and dpkg do today, the complete-index rule, glibc-hwcaps and the v3 kernel, each trap with symptom, cause and fix.
+[x86-64-v3 packages](references/cpu-level-packages.md): apt architecture variants with our own table, what forky's apt and dpkg do today, the complete-index rule, glibc-hwcaps and the v3 kernel, each trap with symptom, cause and fix; a baseline package built for the build machine's processor (Illegal instruction, status 132, on an older one) and the check that refuses it.
 
 [ananicy-cpp, its rules and the sched_ext schedulers](references/scheduling-daemons.md): defaults read at CachyOS and Bazzite, the BPF listener's cost, the systemd proof, the vendored Rust source, the traps.
+
+[Lights and peripherals by detection](references/lights-and-peripherals.md): what Bazzite, CachyOS, Nobara and PikaOS ship, the table made from each tool's own device list, OpenRGB with the session, one owner per device (the iCUE LINK clash), the proof with recorded devices, the traps.
 
 ## Lessons from the lanes, October to November 2026
 

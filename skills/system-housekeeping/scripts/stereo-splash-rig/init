@@ -1,0 +1,110 @@
+#!/bin/busybox sh
+# The boot-splash rig's PID 1 (ORDER 639): a laptop panel (eDP-1, 1366x768) and a 3D television (HDMI-A-1, the
+# Sony KDL-46HX855's EDID) on one VKMS device, Plymouth started as initramfs-tools starts it (plymouthd, then
+# plymouth --show-splash), the frame of every lit screen saved to the host's share, then power off.
+# Kernel line, besides Plymouth's own (plymouth.stereo=, plymouth.debug=):
+#   rig.tag=NAME       file names in the share
+#   rig.screens=both|panel|tv
+#   rig.drm=N          seconds after the splash was asked for before the GPU's driver appears (0: before plymouthd,
+#                      as on a machine whose DRM driver is up when the splash starts); with N > 0 the splash starts
+#                      on the firmware's framebuffer when there is one (efifb under OVMF), as on a two-GPU AMD laptop
+#   rig.unbindfb=1     the driver takes the firmware framebuffer away when it appears, as amdgpu does
+#   rig.mode=boot|reboot|shutdown   plymouthd's mode
+#   rig.wait=N         seconds after the last screen appeared before the frames are read
+#   rig.grabs=N        frames read N times, 1 s apart
+#   rig.tvlate=N       the television is connected N seconds after the splash was asked for (a hotplug)
+/bin/busybox mkdir -p /proc /sys /dev /run /tmp /out
+/bin/busybox mount -t proc proc /proc
+/bin/busybox mount -t sysfs sys /sys
+/bin/busybox mount -t devtmpfs dev /dev
+/bin/busybox mount -t tmpfs tmpfs /run
+/bin/busybox mkdir -p /dev/pts
+/bin/busybox mount -t devpts devpts /dev/pts
+export PATH=/usr/sbin:/usr/bin:/sbin:/bin
+exec >/dev/ttyS0 2>&1
+tag=case screens=both drm=0 unbindfb=0 mode=boot wait=4 grabs=1 tvlate=0
+for a in $(cat /proc/cmdline); do
+	case "$a" in
+	rig.tag=*) tag=${a#*=} ;; rig.screens=*) screens=${a#*=} ;; rig.drm=*) drm=${a#*=} ;;
+	rig.unbindfb=*) unbindfb=${a#*=} ;; rig.mode=*) mode=${a#*=} ;; rig.wait=*) wait=${a#*=} ;; rig.grabs=*) grabs=${a#*=} ;; rig.tvlate=*) tvlate=${a#*=} ;;
+	esac
+done
+echo "RIG: kernel line: $(cat /proc/cmdline)"
+modprobe configfs; mount -t configfs configfs /sys/kernel/config
+mount -t debugfs debugfs /sys/kernel/debug
+modprobe 9pnet_virtio; modprobe 9p
+mount -t 9p -o trans=virtio,version=9p2000.L out /out || echo "RIG: no share"
+ls /dev/fb* 2>/dev/null | sed 's/^/RIG: firmware framebuffer /'
+cat /sys/class/graphics/fb0/virtual_size 2>/dev/null | sed 's/^/RIG: fb0 size /'
+
+mkdev() {
+	modprobe vkms create_default_dev=0
+	d=/sys/kernel/config/vkms/a10
+	mkdir $d
+	n=0
+	for s in panel tv; do
+		case "$screens" in both|$s) ;; *) continue ;; esac
+		mkdir $d/crtcs/crtc$n $d/planes/primary$n $d/encoders/encoder$n $d/connectors/$s
+		echo 1 > $d/planes/primary$n/type
+		ln -s $d/crtcs/crtc$n $d/planes/primary$n/possible_crtcs/crtc$n
+		ln -s $d/crtcs/crtc$n $d/encoders/encoder$n/possible_crtcs/crtc$n
+		if [ $s = panel ]; then echo 14 > $d/connectors/$s/type; cat /edid/panel-1366.bin > $d/connectors/$s/edid
+		else echo 11 > $d/connectors/$s/type; cat /edid/hx855.bin > $d/connectors/$s/edid; fi
+		echo 1 > $d/connectors/$s/edid_enabled
+		[ $s = tv ] && [ "$tvlate" != 0 ] && echo 2 > $d/connectors/$s/status
+		ln -s $d/encoders/encoder$n $d/connectors/$s/possible_encoders/encoder$n
+		n=$((n + 1))
+	done
+	echo 1 > $d/enabled
+	echo "RIG: DRM-UP $(cut -d' ' -f1 /proc/uptime)"
+}
+
+/usr/lib/systemd/systemd-udevd --daemon --resolve-names=never
+udevadm trigger --type=subsystems --action=add
+udevadm trigger --type=devices --action=add
+udevadm settle --timeout=20
+[ "$drm" = 0 ] && { mkdev; udevadm settle --timeout=20; }
+mkdir -m 0755 -p /run/plymouth
+plymouthd --mode=$mode --attach-to-session --pid-file=/run/plymouth/pid
+plymouth --show-splash
+echo "RIG: SPLASH-UP $(cut -d' ' -f1 /proc/uptime)"
+if [ "$drm" != 0 ]; then
+	sleep "$drm"
+	echo "RIG: FB-PHASE-END"
+	sleep 1
+	if [ "$unbindfb" = 1 ]; then
+		for f in /sys/bus/platform/drivers/efi-framebuffer/efi-framebuffer.*; do
+			[ -e "$f" ] && echo "${f##*/}" > /sys/bus/platform/drivers/efi-framebuffer/unbind && echo "RIG: efifb unbound"
+		done
+	fi
+	mkdev
+	udevadm settle --timeout=20
+fi
+if [ "$tvlate" != 0 ]; then
+	sleep "$tvlate"
+	echo 1 > /sys/kernel/config/vkms/a10/connectors/tv/status
+	for c in /sys/class/drm/card0-HDMI-A-*; do echo detect > $c/status; done
+	echo "RIG: TV-CONNECTED $(cut -d' ' -f1 /proc/uptime) $(cat /sys/class/drm/card0-HDMI-A-1/status)"
+fi
+sleep "$wait"
+i=1
+while [ $i -le "$grabs" ]; do
+	echo "RIG: ---- frames $i"
+	CRTC_GRAB_MODES=$([ $i = 1 ] && echo 1) /usr/local/bin/crtc-grab /dev/dri/card0 /out/$tag-$i > /out/$tag-$i-grab.txt
+	grep -v ' mode [0-9]*:' /out/$tag-$i-grab.txt
+	sleep 1
+	i=$((i + 1))
+done
+cat /sys/kernel/debug/dri/*/state > /out/$tag-state.txt 2>/dev/null
+dmesg > /out/$tag-dmesg.txt
+for c in /sys/class/drm/card0-*; do echo "${c##*/}"; cat $c/modes; done > /out/$tag-modes.txt
+plymouth quit
+sleep 1
+cp /run/ply.log /out/$tag-ply.log 2>/dev/null
+echo "RIG: ---- plymouth said"
+grep -E "Stereo output|stereo head|theme draws|takes one picture|left eye|not converted|cannot show|depth limit|no depth|Found mode|No mode for|Creating [0-9]+x[0-9]+ renderer head|frame buffer|found DRM device|found frame buffer|Timeout elapsed|loading splash|attaching to splash" /run/ply.log | sed "s/^[0-9:.]* [^ ]*: *//" | cut -c1-200
+echo "RIG: DONE"
+sync
+umount /out
+echo o > /proc/sysrq-trigger
+sleep 5

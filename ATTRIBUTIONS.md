@@ -211,7 +211,7 @@ Its command and library copyright records name Andreas Dilger, Andries Brouwer, 
 
 ### 0.3.2 Stereo icon authoring study and first helper
 
-The unbranded editor slice and its study build on Qt Widgets, Qt SVG, KConfig, KIconThemes and Stereo KWin.
+Sparky Stereo Plasma Theme Studio and its authoring study build on Qt Widgets, Qt SVG, KConfig, KIconThemes and Stereo KWin.
 The helper moves chosen SVG groups in two views and keeps the original drawing in its project copy.
 The first packaged authoring slice adds continuous depth with undo, ten catalogues, colour schemes and Plasma SVG parts in one copied project.
 KDE's colour editor and Plasma explorer work on private project copies; model, animation and texture helpers remain later work.

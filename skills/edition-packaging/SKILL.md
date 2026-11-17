@@ -36,6 +36,8 @@ description: >-
 Written on 2026-10-07; the developer tasks and the skills package on 2026-10-16; provenance, Paweł's formula, rebuilt packages, the repository and the ISO on 2026-10-23, from rules dated 2026-10-02 to 2026-10-22; pins by architecture and the packages that are not ours on 2026-10-31; the i386 blocks, the order of pin files and the conversion to conffiles on 2026-11-01.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
 
+For a package that disappeared from testing, read [carried from Debian unstable](references/carried-from-debian-unstable.md): removal records, suites, RC bugs, fixes, versions, retirement and the installed proof.
+
 ## Provenance (Daniel, 2026-10-02): always
 
 Every package of ours says who made it, the Sparky way, and [`provenance.sh`](https://github.com/Sparky-OS/sparky-stereo-os-build/blob/main/sparky-os/repo/provenance.sh) in the build tree writes it.

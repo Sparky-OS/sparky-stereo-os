@@ -1090,3 +1090,15 @@ The processor-governance packages (ORDER 108) build on other people's work, name
 - **cachyos-ananicy-rules** (GPL-3.0, the repository's LICENSE): the CachyOS team and the contributors of github.com/CachyOS/ananicy-rules, among the most active lukaogadze, Aarrayy, ptr1337 (Peter Jung), NIICKTCHUNS, Senyov, revumber, hzmaya, NotMephisto, Dk000t, Insprill, Ave356 and SoongVilda (names as GitHub lists them); the package follows CachyOS's cachyos-ananicy-rules PKGBUILD (Peter Jung, Piotr Gorski, Aarrayy).
 - **scx-scheds** (GPL-2.0-only): the sched-ext project, github.com/sched-ext/scx, with Tejun Heo (who signed the release tag), David Vernet, Andrea Righi, Changwoo Min, Jake Hillion, Ryan Newton and its contributors; **scx-tools** (scx_loader, GPL-2.0-only): Vladislav Nepogodin, Piotr Gorski and the scx-loader contributors. The build follows the CachyOS packages of both (Peter Jung, Piotr Gorski).
 - **Defaults and values**: the services' default state and the sysctl, udev and tmpfiles values of sparky-stereo-kernel-settings are read from CachyOS-Settings (Peter Jung, Vladislav Nepogodin, Vasiliy Stelmachenok and contributors), CachyOS-PKGBUILDS, the CachyOS/linux kernel and Bazzite (Universal Blue and the Bazzite contributors), each file named in the package.
+
+## HP printing and the virtual-machine Xorg drivers
+
+HPLIP's copyright and source headers credit HP Development Company, Naga Samrat Chowdary Narla, Sarbeswar Meher, Sanjay Kumar, Amarnath Chitumalla and Goutam Kodu.
+Its Debian copyright credits Didier Raboud, Julian Andres Klode, Till Kamppeter, Henrique de Moraes Holschuh and Torsten Landschoff; the 3.26.4 changelog also records Thorsten Alteholz's maintenance.
+The security remediation discussed in the packaging reference is HP's 3.26.6 work, not the edition's discovery.
+
+QXL's Debian copyright credits Red Hat, CodeWeavers, Andrew Eikum, Jeremy White, Keith Packard, Eric Anholt and Zack Rusin, and identifies Austin Appleby as MurmurHash3's author.
+Frank Heckenbach supplied the Xspice option-default patch in Debian bug 1137518.
+VMware's driver copyright credits VMware; its source history credits Thomas Hellstrom, Jakob Bornecrantz and Zack Rusin.
+Timo Aaltonen's Debian changelog records the VMware packaging change, and Ian Forbes supplied the open upstream deprecation proposal.
+These credits describe the inspected sources and proposed carried fixes; they do not assert that new edition packages have shipped.

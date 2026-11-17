@@ -178,6 +178,8 @@ Read the traps before a change to this part, and add the next lesson there as yo
 
 [A series of small patches to one maintainer's Go library](references/small-patch-series-to-a-go-library.md): the recipe for sending fixes and tests one subject at a time after a maintainer said yes (fresh upstream first, a straight line of branches, red and green shown, his commit style), and the independent-vector method with its traps (e521, ORDER 493).
 
+[Sample files for another project's test repository](references/sample-files-for-another-projects-test-repository.md): the recipe for a pull request that adds real, freely redistributable files in several formats to a small public repository of test files (where to find them, the licence evidence that counts and the kinds that do not, the headless probes, the person-free check), with eleven traps (ORDER 644).
+
 [Adding a program to a distribution's app center](references/adding-a-program-to-an-app-center.md): the recipe for an entry that fetches a program from its author's own release (the tool's precedents first, the author's checksum pinned, the size said before the download, verify then extract then place, each failure with its own message, the proof through the tool's own windows in the distribution's containers, one subject per pull request), with nine traps (KamLynk in SparkyLinux's APTus AppCenter, ORDER 547).
 
 For the Craft Apps' shared rules, bots, and response clock, read [Craft contribution practice](references/craft-apps.md).

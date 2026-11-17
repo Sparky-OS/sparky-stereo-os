@@ -92,5 +92,10 @@ A deliberate removal retires the corresponding unused task before purging its pa
   **Fix:** point Python's SSL_CERT_FILE at the same mounted CA bundle; keep certificate verification enabled.
   **Found by:** the certificate-verification exception and the helper's apt-specific configuration.
 
+- **Symptom:** applying an old-version solver plan to a status fixture fails with a missing `name=version` record.
+  **Cause:** `apt-cache dumpavail` did not retain the explicitly selected archived version.
+  **Fix:** merge the exact archived binary controls and proposal records into the metadata map before applying `Inst` lines.
+  **Found by:** the seed selected tasksel-data 3.91 while the dump held its current version.
+
 This reference describes the reconciliation method and proposal requirements.
 Resolver simulations do not establish that new packages, the installer integration or the migration helper have been built or shipped.

@@ -156,6 +156,10 @@ English needs a task too. Debian's task-english brings locales, ibritish and iam
 
 ## Qualification traps
 
+- **Symptom:** installed-machine tests pass, but an explicit archive smoke entry says `bwrap: execvp ...: No such file or directory` for an existing script.
+  **Cause:** the archive gate resolves from an empty status database. The Locale script's Bash and the installer/selector's /bin/sh interpreter came from the installed machine's Essential baseline, not the declared closure; the merged-/usr aliases come from base-files.
+  **Fix:** declare Bash for the Locale CLI and dash/base-files for the language runtime and shell helpers. Add the new entrypoints to the default lean/smoke.tsv so later publication rounds keep exercising them. Use the documented bubblewrap container flags without changing the gate's own namespace or capability isolation.
+  **Found by:** the failing execution.jsonl rows, signed resolution records (no Bash in the Locale case and no dash in the installer case), then the exact interpreter and base-files symlink tar members. Runtime list and the selector input guard then start in the qualified root.
 - **Symptom:** a missing dictionary makes the worker run apt repeatedly, while polling Result often shows success.
   **Cause:** PathExists remains true, and each failed five-second attempt starts again; the default start-rate limit never catches it, and Result resets during the next activation.
   **Fix:** use StartLimitIntervalSec=infinity and StartLimitBurst=1 for the service, and reset the path and service only when the next apt transaction retries pending work.

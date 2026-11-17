@@ -1,0 +1,47 @@
+# Lights and peripherals by detection, and one owner per device
+
+ORDER 108 milestone 6, `sparky-stereo-hardware` 0.1.30. Part of the [`edition-packaging`](../SKILL.md) skill; the processor-level work is in
+[cpu-level-packages.md](cpu-level-packages.md) and the daemons in [scheduling-daemons.md](scheduling-daemons.md).
+
+## What the four distributions ship (read 2026-11-17 at their own files)
+
+| Distribution | Lights and peripherals | Where it was read |
+| --- | --- | --- |
+| Bazzite | `openrgb-udev-rules` (the udev rules only, no program), `i2c-tools`, `input-remapper` (service enabled), `game-devices-udev`; the OpenRazer and xone kernel modules are built into the image; nothing is installed by detection | `build_files/bazzite/07-install-packages.sh` lines 44 to 79, `03-install-kernel-akmods.sh` lines 66 to 72, `12-finalize.sh` line 163 (ublue-os/bazzite, tree of the day) |
+| CachyOS | none by default: the installer's package list (`netinstall.yaml`, 841 lines), the live image's `packages_desktop.x86_64` (202 lines) and the two gaming metas name no RGB or peripheral tool; `coolercontrol` is packaged; `chwd` has USB profiles only for fingerprint readers | CachyOS/cachyos-calamares, CachyOS-Live-ISO, CachyOS-PKGBUILDS (`cachyos-gaming-meta`, `cachyos-gaming-applications`, `coolercontrol`), CachyOS/chwd `profiles/usb/fprint` |
+| Nobara | builds `openrgb`, `openrazer`, `steam-devices`, `xone`, `xpad-noone`; whether the image installs them was not read | Nobara-Project/rpm-sources `baseos/` |
+| PikaOS | builds `openrgb`, `ckb-next`, `headsetcontrol`, `goxlr-utility`, `legion-kb-rgb`, `asusctl`, `linuwu-sense`, `omen-fan-control`, `inputplumber`, `xone`, `xpad-noone`, `xpadneo`; its hardware database `cfhdb` matches by USB id (Xbox controllers, GoXLR) and by DMI (laptop vendors' tools) and offers the package | git.pika-os.com device-packages and gaming-packages, `cfhdb/profiles/usb.json` and `dmi.json` |
+
+So no distribution installs RGB or peripheral tools by device detection except PikaOS's `cfhdb` (controllers, GoXLR, laptop makers); the edition's table goes further, by the tools' own device lists.
+
+## Where each tool is (Debian testing of 2026-11-17, our pool, SparkyLinux)
+
+In testing: openrgb (our rebuild is the one on the image), i2c-tools, input-remapper, openrazer-daemon and openrazer-driver-dkms, piper, ratbagd, solaar, liquidctl, ckb-next, g810-led, xone-dkms, xpadneo-dkms, steam-devices, corectrl, gamemode.
+Not in testing: coolercontrol, polychromatic, razergenie, headsetcontrol, rogauracore, asusctl, goxlr-utility, openlinkhub, lact, game-devices-udev, xpad-noone. **Read why before calling any of them gone** (memory missing-from-debian-ask-why, Daniel 2026-11-17): for every one of these `https://sources.debian.org/api/src/NAME/` answers "no source package" and `https://ftp-master.debian.org/removals*.txt` (2018 to 2026, parsed block by block: a package line `NAME |` in a block, its Reason) has no record, so they were **never packaged**, not removed: no Debian reason against them. SparkyLinux's `core` and `tiamat` do not carry them either (`apt-cache policy` with both added). The rule says we carry them when they are worth it; this milestone carries none (see the hand-back for which, and why OpenLinkHub, a Go program that expects its own working folder, is the first).
+
+## The table
+
+`share/peripherals/*.ids` is made by `tools/make-peripheral-ids.py` from each tool's own device list, so every id has a source and a regeneration shows what changed: OpenRGB's `60-openrgb.rules` (1,178 devices, game controllers left out: Sony's DualSense is the controller flow's), Solaar's receiver table `base_usb.py` (22), libratbag's `*.device` files (147 gaming mice, with Piper), liquidctl's `71-liquidctl.rules` (99), g810-led (13), OpenRazer's `99-razer.rules` (267) and OpenLinkHub's own `99-openlinkhub.rules` (193, upstream commit 4b59c5a2, 0.9.4). `lib/detect.py` reads `lsusb` and emits `found`, `fact peripheral TOOL IDS`, `package` and `action` lines; the setup installs the packages without a question. ckb-next has no id list outside its compiled sources and is left out of the table.
+A desktop board of a maker OpenRGB's detectors name gets `i2c-tools`, `i2c-dev` and the chipset's driver (`i2c-i801` Intel, `i2c-piix4` AMD), the steps of OpenRGB's own `SMBusAccess.md` (it ships in the openrgb package under /usr/share/doc/openrgb), because the board and memory lights sit on the SMBus and no USB id shows them.
+OpenRGB starts with the session minimized (`/etc/xdg/autostart/sparky-stereo-openrgb.desktop` runs `openrgb-session`, which looks for the mark the setup writes and leaves a person's own autostart entry alone).
+
+## One owner per device
+
+OpenLinkHub and OpenRGB (or liquidctl) both open 99 Corsair devices; the measured case is an iCUE LINK System Hub (1b1c:0c3f) on which a power supply read about 1,800 W. The owner is OpenLinkHub when it is installed, OpenRGB when it is not. Three parts: the plan names the owner and does not install the other tool for that device; `62-sparky-stereo-peripheral-owner.rules` takes OpenRGB's `uaccess` tag away from the owned devices when OpenLinkHub is there (`TEST==` on its unit file or `/opt/OpenLinkHub`); `sparky-stereo-peripheral-owner` tells the person once per device through the problems engine. A shipped setting the person can change: an empty file of the same name in `/etc/udev/rules.d` gives the devices back. Not touched: the person's `~/.config/OpenRGB/OpenRGB.json` (never edit a file the program rewrites on exit).
+
+## The proof with recorded devices (no device needed)
+
+`tests/peripherals-owner.sh`: umockdev with a recorded USB device and its hidraw child (`tests/peripherals/hub.umockdev`), `umockdev-run -d FILE -- udevadm test --action=add SYSPATH`, and read `CURRENT_TAGS=` and the owner property. Red: with OpenLinkHub installed and only OpenRGB's rules the hub still carries `uaccess` (the clash); green: with the owner rule it does not; without OpenLinkHub it does; a device only OpenRGB drives keeps it; the override file gives it back. `tests/peripherals.py` runs the plan on recorded `lsusb` listings through `sparky-stereo-hardware --auto --dry-run --fixture`.
+
+## Traps
+
+- **udev's `TAGS=` keeps a tag that `TAG-=` removed; `CURRENT_TAGS=` does not.** Symptom: the green case "still has uaccess". Cause: the first property is the history, and the `uaccess` builtin reads the current tags. Found by printing both from `udevadm test`.
+- **Rules that name a device by `ATTRS{}` need the parent chain in the recording.** The hidraw node alone has no vendor: record the USB device and the hidraw under it (`P:` paths nested), or the rule never matches.
+- **A tool's id list can include devices another flow owns.** OpenRGB's rules list Sony's DualSense; without an exclusion a gamepad would make the machine start OpenRGB and the existing controller test (`steam-devices`) gained `openrgb`. The generator names the vendors it leaves out in the file's header.
+- **Existing fixtures with a peripheral change their expected plan.** Four fixtures carry a Corsair K70 or a Razer keyboard; the old tests' package sets and "nothing else" action checks had to say so. A new action kind needs the old tests' filters updated in the same change.
+- **`deb-systemd-helper`-style states are not the only "told once".** The telling keeps one mark per device in `/var/lib/sparky-stereo-hardware/owner-told` and forgets it when the device or the owner goes, so a later return is told again.
+- **A Razer device is in OpenRGB's list and in OpenRazer's.** Both are installed (Bazzite ships both); whether they fight over one Razer device is not measured here.
+
+## Credits
+
+The OpenRGB project and its contributors (Adam Honse and others: device lists, udev rules, SMBusAccess.md); Solaar (Daniel Pavel and contributors); libratbag and Piper (Jonas Ådahl, Benjamin Tissoires, Red Hat, David Herrmann and contributors); liquidctl (Jonas Malaco and contributors); g810-led (MatMoul); OpenRazer (Terry Cain, Tim Theede, Gabriele Musco and contributors); OpenLinkHub and its contributors (GPL-3.0); the Debian maintainers of those packages; Bazzite (Universal Blue), CachyOS, Nobara and PikaOS for the lists read.

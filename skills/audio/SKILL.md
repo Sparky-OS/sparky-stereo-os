@@ -49,7 +49,7 @@ Conversions happen at the edges only: the decoder on the way in, the device's fo
 - With a client program, do **not** set `node.linger = true`: the nodes would outlive each restart and multiply. Keep `node.dont-fallback = true` on a stream that must never fall back to another device (to avoid feeding a card its own output), and let systemd restart the client (`Restart=always`) when WirePlumber removes the stream because its target is gone.
 - The edition's plasma-pa 4:6.7.4-1+stereo3d1+lc1 extends the applet's existing virtual-device option to streams and adds an independent Sound-page option, both off by default; both are proved from the installed package.
 - How the models, stream routes, isolated null-device rig and controls fit together: [KDE virtual streams](references/kde-virtual-streams.md).
-- **Being built:** "Listen to this device" for any input and a combined recording source (the output mix plus a microphone).
+- The staged +stereo3d2 successor adds optional "Listen to this device" and a combined recording source (output mix plus microphone); its rebuild uses a self-contained wired recipe, and both interfaces name owned streams in the person’s language.
 
 ## What PipeWire already ships
 

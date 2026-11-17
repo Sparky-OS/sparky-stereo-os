@@ -8,6 +8,10 @@ Our contribution lies in making stereo 3D and deep colour a property of the open
 Names are given as each project gives them: in its about box, its copyright file or its Debian packaging, and for the people who reviewed our patches, as their public profiles show them.
 Contact details are left out on purpose.
 
+## polkit
+
+David Zeuthen.
+
 ---
 
 ## In memoriam: Luis Carlos de Alencar, "Cau"

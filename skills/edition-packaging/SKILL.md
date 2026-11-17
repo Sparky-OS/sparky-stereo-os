@@ -31,6 +31,9 @@ description: >-
 12. An app center entry whose program needs packages to run (container tools, FUSE, Flatpak) declares them and installs them itself when the person installs the entry; the app center package never depends on them: [an app center entry that needs tools](references/app-center-entry-tools.md) has the recipe, the proofs, the traps and the review rule (read the upgrade proof's `Inst` lines for packages only an entry needs); it also holds the recipe to bump a pinned entry and build the next app center, and the causes of the seven failing cases of the app center's source tests.
 13. A package that makes apt remove Debian packages (Conflicts, Replaces, a Provides of their names) is read before it ships, on the apt plan's `Remv` lines and the removed packages' file lists, in a container that has the old machine's state: [a package that replaces Debian's packages](references/a-package-that-replaces-debians-packages.md) has the recipe, the rig, the order apt really takes and the traps (ORDER 645: a symbolic link out of a Debian package's tree and the time zone files of the system).
 
+14. An action with retained administrator authorization names a separate privileged entry point, as [privileged entry points](references/privileged-entry-points.md) explains.
+    A program never restricts itself because a parent left an environment variable behind.
+
 **Check freshness first.**
 Written on 2026-10-07; the developer tasks and the skills package on 2026-10-16; provenance, Paweł's formula, rebuilt packages, the repository and the ISO on 2026-10-23, from rules dated 2026-10-02 to 2026-10-22; pins by architecture and the packages that are not ours on 2026-10-31; the i386 blocks, the order of pin files and the conversion to conffiles on 2026-11-01.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.

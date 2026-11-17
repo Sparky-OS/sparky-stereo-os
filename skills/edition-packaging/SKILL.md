@@ -3,14 +3,14 @@ name: edition-packaging
 description: >-
   Build, sign and ship the edition's packages: provenance, rebuilt upstream packages (+stereo3dN, i386 twins),
   dependency policy, apt pins (:any, Signed-By), conffiles, the signed repository, a publication round, DEP-11 and
-  Contents, the ISO, reproducible sources (SOURCE_DATE_EPOCH), the build record and the Lean Code gate,
+  Contents, the ISO, reproducible sources (SOURCE_DATE_EPOCH), the build record, the Lean Code gate,
   installed-package proof, languages. Load it when a package will not install (Breaks, Multi-Arch:
   same), apt picks Debian's build or a dummy at dist-upgrade, two builds of one source differ,
-  apt-get update exits 0 on a failed fetch, lc1 says the build record is not complete, a Qt header is missing after a
-  qt6-base update, a pin leaves a binding or development package uninstallable, a systemd unit's proof shows none
-  of its journal lines, a preinst prompt stops a non-interactive install, a language probe shows
+  apt-get update exits 0 on a failed fetch, lc1 says the build record is not complete, a Qt header is missing after
+  qt6-base updates, a pin leaves a binding or development package uninstallable, a systemd unit's proof shows none
+  of its journal lines, a preinst prompt stops an install, a language probe shows
   English, a CMake consumer misses an imported library, a Rust suite shares its crates as dylibs,
-  an amd64v3 index leaves apt on the baseline, or a program dies with Illegal instruction on an older processor.
+  an amd64v3 index leaves apt on baseline, or Illegal instruction on an older CPU.
 ---
 
 # Packaging the edition

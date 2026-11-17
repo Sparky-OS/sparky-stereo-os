@@ -56,6 +56,7 @@ try:
     qmp('qmp_capabilities')
     t0 = time.time()
     shot = False
+    endshot = False
     while time.time() - t0 < 150 and vm.poll() is None:
         text = open(serial, errors='replace').read() if os.path.exists(serial) else ''
         if fw and not shot and 'FB-PHASE-END' in text:
@@ -63,6 +64,13 @@ try:
             if 'error' in r:
                 print(r)
             shot = True
+        # the firmware's framebuffer again when the frames are read: a frame-buffer display still there beside the
+        # GPU's screens (rig.unbindfb=0) shows what the splash draws on it then
+        if fw and not endshot and 'RIG: ---- frames 1' in text:
+            r = qmp('screendump', filename=os.path.join(out, '%s-fbend.png' % tag), format='png')
+            if 'error' in r:
+                print(r)
+            endshot = True
         if 'RIG: DONE' in text:
             break
         time.sleep(0.2)

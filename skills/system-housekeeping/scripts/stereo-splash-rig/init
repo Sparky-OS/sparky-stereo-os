@@ -95,6 +95,14 @@ while [ $i -le "$grabs" ]; do
 	sleep 1
 	i=$((i + 1))
 done
+# what the frame-buffer renderer drew into /dev/fb0 (the framebuffer there at the end: VKMS's own fbdev once the
+# firmware's is gone): its size, stride and the bytes
+if [ -e /dev/fb0 ]; then
+	printf '%s %s %s %s %s\n' "$(cat /sys/class/graphics/fb0/name)" "$(head -n1 /sys/class/graphics/fb0/modes)" \
+		"$(cat /sys/class/graphics/fb0/virtual_size)" \
+		"$(cat /sys/class/graphics/fb0/stride)" "$(cat /sys/class/graphics/fb0/bits_per_pixel)" > /out/$tag-fb0.info
+	dd if=/dev/fb0 of=/out/$tag-fb0.raw bs=1M 2>/dev/null
+fi
 cat /sys/kernel/debug/dri/*/state > /out/$tag-state.txt 2>/dev/null
 dmesg > /out/$tag-dmesg.txt
 for c in /sys/class/drm/card0-*; do echo "${c##*/}"; cat $c/modes; done > /out/$tag-modes.txt

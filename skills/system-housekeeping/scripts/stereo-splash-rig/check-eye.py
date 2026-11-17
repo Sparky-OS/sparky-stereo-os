@@ -2,7 +2,8 @@
 # check-eye.py EYE.ppm FRAME.ppm LABEL: is FRAME one eye, EYE, centred, and only background beside it? EYE is the main
 # screen's left eye as the splash lays it out (the main screen alone, or the left eye of its frame-packing frame:
 # rows 0 to 1079 of a 1920x2205 frame). FRAME is a screen that is not converted: larger than EYE, it must hold EYE at its
-# middle and plain background around it (each row of the border one colour, the gradient); smaller, it must equal the
+# middle and, around it, the eye's own edge continued (each border pixel equal to the nearest pixel of the eye in the
+# same capture: no frame of another colour); smaller, it must equal the
 # middle of EYE. The electrons move between frames: at most 2 % of the compared pixels may differ by more than 48.
 import sys
 import numpy as np
@@ -26,11 +27,15 @@ if w >= ew and h >= eh:
     mask = np.ones((h, w), bool)
     mask[y0:y0 + eh, x0:x0 + ew] = False
     if mask.any():
-        # the border: every row one colour (the background gradient runs from top to bottom)
-        rows = [img[r][mask[r]] for r in range(h) if mask[r].any()]
-        spread = max(int((r.max(axis=0) - r.min(axis=0)).max()) for r in rows)
-        notes.append('border rows vary by at most %d' % spread)
-        ok &= spread <= 3
+        # the border must continue the eye's own edge: each border pixel equal to the nearest pixel of the eye as it
+        # is in this capture (no frame of another colour, nothing of the other eye)
+        ys = np.clip(np.arange(h), y0, y0 + eh - 1)
+        xs = np.clip(np.arange(w), x0, x0 + ew - 1)
+        edge = img[ys][:, xs]
+        d = np.abs(img - edge).max(axis=2)[mask]
+        notes.append('border against the eye\'s edge continued: largest difference %d, %.2f %% of border pixels off by more than 3'
+                     % (int(d.max()), (d > 3).mean() * 100))
+        ok &= int(d.max()) <= 3
 else:
     x0, y0 = (ew - w) // 2, (eh - h) // 2
     part = eye[y0:y0 + h, x0:x0 + w]

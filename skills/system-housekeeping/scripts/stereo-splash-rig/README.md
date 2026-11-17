@@ -26,10 +26,12 @@ python3 with-init.py out/initrd-new.img out/run-new.img     # the current init (
 
 # the batches (they expect out/run-SET.img)
 ./batch.sh runs new; ./batch-late.sh runs new; ./batch-more.sh runs
+./batch-edge.sh runs new; ./batch-fbkept.sh runs new     # beyond the eye: the edge continued; the kept framebuffer
+./fb0-png.py runs/new-fbdev-panelline-fb0.info runs/new-fbdev-panelline-fb0.raw runs/fb0.ppm   # /dev/fb0 at its visible mode
 ./compare.py runs/new-tv-tvline-1-HDMI-A-1.ppm runs/new-both-tvline-1-HDMI-A-1.ppm
 ./check-eye.py runs/new-tv-tvline-1-HDMI-A-1.ppm runs/new-both-tvline-1-eDP-1.ppm 'panel beside a main television'
 ./verdict.sh runs new old    # all twelve checks of one set against another set's single screens; exit 0 only when all pass
 ```
 
-`--fw` boots OVMF with a 1024x768 firmware framebuffer and reads it through QMP just before the DRM driver comes (`rig.drm=12 rig.unbindfb=1`).
+`--fw` boots OVMF with a 1024x768 firmware framebuffer (`--fw=WxH` another size) and reads it through QMP just before the DRM driver comes (`rig.drm=12 rig.unbindfb=1`) and again when the frames are read (`TAG-fbend.png`; with `rig.unbindfb=0` the framebuffer stays a frame-buffer display beside the GPU's screens).
 The guest needs a kernel with VKMS's configfs connector attributes (`type`, `edid`, `edid_enabled`, `status`), configfs and 9p as modules, and KVM.

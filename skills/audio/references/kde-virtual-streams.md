@@ -30,7 +30,7 @@ Keep this classification; choose visibility in KDE instead of changing every Pul
 Use a throwaway container with its own D-Bus, Xvfb, PipeWire, pipewire-pulse and WirePlumber.
 Give it no sound device, host runtime socket, host display or host home.
 Run the fixture processes as an ordinary user, with core dumps disabled.
-The reproducible scripts live in [the build repository's plasma-pa recipe](https://github.com/Sparky-OS/sparky-stereo-os-build/tree/main/upstream/plasma-pa); they are staged work until the corresponding branch is integrated.
+The reproducible scripts live in [the build repository's plasma-pa recipe](https://github.com/Sparky-OS/sparky-stereo-os-build/tree/main/sparky-os/upstream/plasma-pa); they are staged work until the corresponding branch is integrated.
 
 1. Install the published release, build the candidate into a separate prefix, and record actual package versions.
 2. Create two null sinks with `pactl load-module module-null-sink`, and two sources with `pw-cli create-node adapter` using `factory.name=support.null-audio-sink`, `media.class=Audio/Source` and `object.linger=true`.

@@ -4,7 +4,7 @@ metadata:
 name: stereo-artwork
 description: >-
   Create and verify stereo artwork and themes: copy a style exactly, identify a typeface by measurement, build a stereo
-  pair from 2D art with a measured disparity, animate both eyes in step, keep format marks (.pns with sTER, .ora), the
+  pair from 2D art with a measured disparity, render models into stereo icons with camera proof, animate both eyes in step, keep format marks (.pns with sTER, .ora), the
   edition's looks (Oxygen, the classic glass look, KWin's Translucency), wallpaper and lock-screen plugins and their QML
   tests, a missing licence as a question. Load it for a boot screen, wallpaper, icon theme, Plasma theme or
   look-and-feel, when a wallpaper silently falls back to the default, a theme script claims an effect KWin refused, a
@@ -37,7 +37,7 @@ The current website uses system font stacks (`Verdana, Geneva, "DejaVu Sans", sa
 
 ## From 2D art to a stereo pair
 
-For icon themes and SVG group authoring, start with [stereo icons and theme parts](references/stereo-icons-and-theme-parts.md): the published loader's separate APIs, a runnable probe and negative control, the required helper rig rows, and the later no-added-scale ruling.
+For icon themes and SVG group authoring, start with [stereo icons and theme parts](references/stereo-icons-and-theme-parts.md): the published loader's separate APIs, a runnable probe and negative control, the required helper rig rows, the later no-added-scale ruling, and the model helper’s two-camera recipe and native pixel proof.
 
 - **The background stays identical in both eyes**, at the screen plane (disparity 0). Foreground elements shift by +d/2 in the left eye and −d/2 in the right: crossed disparity, in front of the screen.
 - **Take d from a measured reference**, not a guess. One way: a professionally mastered 3D clip. Block-match a face against its background in a few frames, and use the face's separation from the background as a fraction of the eye width. In a half side-by-side source with a 2:1 sample aspect, one coded pixel is two display pixels. The SparkyOS screen uses 0.473% of the eye width (9.08 px at 1920 per eye, each eye shifted by half of it).

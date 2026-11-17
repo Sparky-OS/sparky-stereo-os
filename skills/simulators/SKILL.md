@@ -145,8 +145,11 @@ The independent stereo-off comparison must remain exactly identical to the prist
 
 ## Per-view depth defaults
 
+For the implementation and measuring recipe, see [a screen plane for each camera mode](references/screen-plane-per-camera.md).
+
 Use camera separation 0.065 m, with a separate screen plane for cockpit and chase.
-The measured candidates use FlightGear cockpit 1.2 m, TORCS driver 1.8 m, Speed Dreams cockpit 0.7 m, and chase 2 m for all three.
+The historical candidates used FlightGear cockpit 1.2 m, TORCS driver 1.8 m, Speed Dreams cockpit 0.7 m, and chase 2 m.
+The newer TORCS and Speed Dreams measurements and per-view separation profiles are in [a screen plane for each camera mode](references/screen-plane-per-camera.md); FlightGear stays unchanged.
 These are model-dependent proposed defaults, not a guarantee of human comfort on a particular screen.
 At 800 pixels per eye FlightGear's diagnostic panel median is -16.635 px and yoke -25.199 px, with the largest sampled pop -58.921 px (7.365%).
 At 640 pixels per eye TORCS' native dashboard median is -10.222 px and the sampled whole-scene pop bound -39.983 px (6.247%).

@@ -101,6 +101,9 @@ It links every skill into the folders where the assistants read skills, and noth
 - **Local models:** `ollama launch` starts Claude Code, Codex or OpenCode on a local or cloud Ollama model ([Ollama's CLI](https://docs.ollama.com/cli)), and those read the same folders. **Open WebUI** imports skills from a ZIP of skill folders (Workspace, Skills, Import; [its documentation](https://docs.openwebui.com/features/workspace/skills)): `sparky-stereo-skills export skills.zip` makes it.
 - **Proof:** link, then have each tool read the skills back: a command that lists them (`gemini skills list`, `goose skills list`), or the tool's request to its model captured at a local endpoint, where every skill's name must appear.
 
+For per-language tasks, the comparison with Debian, the installer and an upgrade from old Debian task wrappers, follow [language tasks](references/language-tasks.md).
+The chosen language task owns its required payload through Depends; an image installs the complete language-task manifest explicitly.
+
 ## tasksel lists only ours
 
 A small package ships `/usr/share/tasksel/descs/sparky-stereo.desc` (a parent task `sparky-stereo`, then one stanza per task with `Parent`, `Key`, `Section: user`).

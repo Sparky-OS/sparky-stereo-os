@@ -527,7 +527,7 @@ Existing KWin, libkscreen, Qt and FFmpeg credits above also apply.
 | [Netgen](https://ngsolve.org/) | LGPL-2.0-or-later | `-stereo` that does what it says | Joachim Schöberl |
 | [Blender](https://www.blender.org/) | GPL-2.0-or-later | Every window a quad-buffer (Time Sequential) window, so a scene's stereoscopy shows at once; GHOST's EGL keeps the stereo request with two views on Wayland; a mono context instead of an exit when GLX has no stereo; the right eye follows mono frames after stereo stops | The Blender Foundation and the Blender developers, from Ton Roosendaal's first Blender on; Debian's packaging by the Debian Multimedia Maintainers and Matteo F. Vescovi |
 | [GNU Octave](https://octave.org/) | GPL-3.0-or-later | `stereo` figure properties | John W. Eaton and the Octave developers |
-| [GRASS GIS](https://grass.osgeo.org/), [KiCad](https://www.kicad.org/), [OpenSCAD](https://openscad.org/), [F3D](https://f3d.app/) | GPL family, BSD-3-Clause (F3D) | Stereo views, in progress | The GRASS Development Team; Jean-Pierre Charras and the KiCad developers; Marius Kintel and the OpenSCAD developers; Mathieu Westphal, Michael Migliore and the F3D team |
+| [GRASS GIS](https://grass.osgeo.org/), [KiCad](https://www.kicad.org/), [OpenSCAD](https://openscad.org/), [F3D](https://f3d.app/) | GPL family, BSD-3-Clause (F3D) | Stereo views; for F3D: libf3d as shared packages, the window as one declared stereo surface, a pair thumbnail for every model | The GRASS Development Team; Jean-Pierre Charras and the KiCad developers; Marius Kintel and the OpenSCAD developers; Mathieu Westphal, Michael Migliore, Kitware and the F3D-APP Foundation (F3D's LICENSE.md); Francois Mazen, who maintains F3D in Debian (its changelog), on whose source package ours is built |
 | [Spirula Studio](https://github.com/harry7557558/spirula-studio) | GPLv3 | Planned, not shipped yet: scanning, a video of an object or a place turned into a 3D model, shown in stereo; the work will happen in [our fork](https://github.com/Sparky-OS/spirula-studio) | Harry (J.X.) C. and the Spirula Studio contributors. The models and code it builds on keep their own licences, as its LICENSES folder names them: BiRefNet (MIT, ZhengPeng), FlexGlue (MIT, Computer Vision and Geometry Lab), RoMaV2 (MIT, Johan Edstedt), GroundingDINO, SAM2 and GoPro Labs (Apache-2.0), DINOv3 and SAM3 (Meta's own licences) |
 
 ---
@@ -677,7 +677,7 @@ Our changes stay in our own trees, ready to go upstream on the day they are want
 | HDMI® 1.4 3D, CTA-861, E-EDID | HDMI Licensing Administrator, Consumer Technology Association, VESA | 3D modes and deep colour on the wire |
 | OpenGL, EGL, Vulkan | Khronos Group | Quad buffer, multiview windows, multiview rendering |
 | Wayland protocols (subsurfaces, `wp_viewporter`, content type) | freedesktop.org | Surfaces, scaling and content hints |
-| shared-mime-info, the thumbnail specification | freedesktop.org | File types and thumbnails |
+| shared-mime-info, the thumbnail specification | freedesktop.org | File types and thumbnails; the STEP definition our model types carry is Bastien Nocera's (merge request 208) |
 | PNG `sTER` | PNG Development Group | A stereo mark in PNG |
 | JPS | VRex, Inc. | Stereo JPEG |
 | MPO, CIPA DC-007 | Camera & Imaging Products Association | Multi-picture stereo photos |

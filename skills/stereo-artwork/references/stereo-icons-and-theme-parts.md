@@ -1,5 +1,8 @@
 # Stereo icons and theme parts
 
+Sparky Stereo Plasma Theme Studio is the authoring program; its package and recipe folder are sparky-stereo-plasma-theme-studio.
+Its product and edition identities are data in one identity.json, used to generate the C++ identity, desktop entry, About data and the untranslated product-name entry in every compiled catalogue.
+
 ## Reconcile before authoring
 
 1. Read the published KIconThemes source and run [the loader probe](icon-loader-probe.cpp) against that package.
@@ -124,8 +127,13 @@ Read the desktop settings once for both eyes and all sizes in an export.
 Integer disparity is a visible limitation at small icon sizes: with the inspected defaults, the full sunk and popped limits both round to zero through 64 pixels per view.
 At 128 full sunk is minus one pixel and full popped is zero; at 256 they are minus one and plus one.
 Report those measured results rather than calling every exported size visibly stereo.
-Daniel’s 16 November 2026 continuation keeps the person’s desktop limits until he settles a distinct icon authoring range.
-A wider range would make small icons separate visibly but could exceed those limits; that choice belongs to Daniel.
+Daniel settled the icon rule on 16 November 2026: no wider authoring range, and a nonzero part receives the smallest visible step where the desktop budget allows it.
+Compute the rounded full-limit capacity with the source-derived KWin operation at each size.
+Keep zero at the screen; if capacity is zero, report that one pixel has no room; otherwise clamp the requested magnitude between one raster pixel and that capacity, with its sign.
+Do not ceil the capacity or add a separate icon range.
+At the inspected defaults, both signs have zero capacity through 64 pixels, popped has none at 128, sunk permits one at 128, and both signs permit one at 256.
+This is an honest no-room result for more sizes than the original 8/16 examples.
+Measure fractional choices as well as full-limit presets: a ten-percent sunk choice at 128 is the red control on the earlier 0.1.3 slice.
 
 ## A continuous control and useful selection
 
@@ -137,6 +145,29 @@ A selected SVG group needs a visible highlight in both previews and a thumbnail 
 Keep highlighting out of exported artwork.
 Test fractional edits, actual keyboard delivery, Undo, Redo, and rejection of a parent and child both receiving depth.
 Read every message back from all ten compiled catalogues, including country-specific locales falling back to bare French and Spanish.
+
+## Build the core without stereo
+
+Configure Sparky Stereo Plasma Theme Studio with -DSTUDIO_STEREO=OFF.
+The core uses Qt Widgets/Xml/Svg/DBus and KDE Config; it does not find or link stereo-layer, generate KWin geometry, render the second view, declare a stereo surface or export paired assets.
+The depth provider has a small interface with an all-zero ordinary implementation.
+The depth, preview and pair-export implementations live in the stereo folder; the ordinary preview/provider live in plain.
+Prove the resulting installed tree in an image with no stereo-layer package: start, open an icon theme, change and save a scheme through KDE's native colour editor, then save the project with no pair exports.
+Record actual package absence and ELF dependencies; hiding a checkbox on a stereo-linked binary is insufficient.
+Changing identity.json can rebrand the application and generated metadata without rewriting the core.
+This keeps an option open; it is no offer or promise to another project.
+
+## Select a painted part
+
+Draw each part alone over a readable neutral checker; a small context inset can locate thin outlines without deforming the isolated drawing.
+Use the source element's title or label, with its ID as fallback.
+SVGs may paint loose paths and rectangles beside groups, as Oxygen's television does.
+Expose those as neutral authoring groups in the working DOM, retaining original source bytes and IDs; zero-depth pixels must still match the original.
+Use the same rendered alpha and transforms for hit testing that the preview uses for painting.
+Search in reverse document paint order, and repeat a click through the overlapping stack.
+The real television's bottom screen area selects studio-part-rect3370, then studio-part-rect3335 underneath; these are working wrappers of the original rectangle IDs.
+Prove that with real fake input and read the selected ID back, then compare the selected highlight in both captured views.
+On Wayland the client does not know its global window origin: read KWin's client geometry for the rig, then add the preview's client-local position.
 
 ## One project and KDE tool round trips
 
@@ -171,6 +202,19 @@ Drive the native colour tool through real input, save and close it, then save an
 Native project tests should also reject invalid inputs and verify that the source themes stay unchanged.
 
 ## Traps
+
+- **Symptom:** a click intended for the preview selects nothing while Wayland logs show a real button event.
+  **Cause:** the client-local preview coordinates were used as global pointer coordinates; a Wayland client does not know its compositor placement.
+  **Fix:** in the rig, add KWin's actual client origin before sending fake input, and compare the selected ID before and after.
+  **How found:** the pointer event landed above the canvas, and KWin's window script supplied the missing origin.
+- **Symptom:** clicking a visible screen selects only the icon's entire root group.
+  **Cause:** that screen is a loose SVG rectangle rather than a named group.
+  **Fix:** put loose painted siblings in neutral working-DOM groups, preserving original bytes and IDs, then alpha-test the paint stack.
+  **How found:** inspect Oxygen's rect3370 and validate the original pixels plus the real first and second click results.
+- **Symptom:** lintian rejects a package description containing only the newly chosen product name.
+  **Cause:** description-is-pkg-name requires the package's function, too.
+  **Fix:** keep the central identity placeholder and describe icon/theme authoring around it.
+  **How found:** the final native package reached lintian after all Lean and link checks, then that exact tag went red.
 
 - **Symptom:** the package's stereo API passes, so every icon is reported stereo.
   **Cause:** the probe never checked ordinary lookup.

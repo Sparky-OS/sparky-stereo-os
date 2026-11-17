@@ -1091,3 +1091,20 @@ The processor-governance packages (ORDER 108) build on other people's work, name
 - **scx-scheds** (GPL-2.0-only): the sched-ext project, github.com/sched-ext/scx, with Tejun Heo (who signed the release tag), David Vernet, Andrea Righi, Changwoo Min, Jake Hillion, Ryan Newton and its contributors; **scx-tools** (scx_loader, GPL-2.0-only): Vladislav Nepogodin, Piotr Gorski and the scx-loader contributors. The build follows the CachyOS packages of both (Peter Jung, Piotr Gorski).
 - **The first processor-level builds (ORDER 108, milestone 5)**: Mesa (mesa.freedesktop.org, the Mesa developers; Debian's packaging by the Debian X Strike Force, uploader Andreas Boll) built at x86-64-v3 from the edition's own source; the study's reconciled list of what CachyOS builds at v3 is read from the package listing of its `cachyos-v3`, `cachyos-core-v3` and `cachyos-extra-v3` repositories (mirror.cachyos.org, read 2026-11-17: Mesa, lib32-mesa, gamescope, glibc, gcc, llvm among the 272 of `cachyos-v3`) and PikaOS's `gfx-packages/mesa` repository (git.pika-os.com); DXVK (Philip Rebohle, github.com/doitsujin/dxvk; Debian packaging by Marc Dequenes, Duck), whose `src/util/util_bit.h` states that AVX-enabled builds are not supported, is therefore not built at v3.
 - **Defaults and values**: the services' default state and the sysctl, udev and tmpfiles values of sparky-stereo-kernel-settings are read from CachyOS-Settings (Peter Jung, Vladislav Nepogodin, Vasiliy Stelmachenok and contributors), CachyOS-PKGBUILDS, the CachyOS/linux kernel and Bazzite (Universal Blue and the Bazzite contributors), each file named in the package.
+
+## HP printing and the virtual-machine Xorg drivers
+
+HPLIP's copyright and source headers credit HP Development Company, Naga Samrat Chowdary Narla, Sarbeswar Meher, Sanjay Kumar, Amarnath Chitumalla and Goutam Kodu.
+Its Debian copyright credits Didier Raboud, Julian Andres Klode, Till Kamppeter, Henrique de Moraes Holschuh and Torsten Landschoff; the 3.26.4 changelog also records Thorsten Alteholz's maintenance.
+The security remediation discussed in the packaging reference is HP's 3.26.6 work, not the edition's discovery.
+
+QXL's Debian copyright credits Red Hat, CodeWeavers, Andrew Eikum, Jeremy White, Keith Packard, Eric Anholt and Zack Rusin, and identifies Austin Appleby as MurmurHash3's author.
+Frank Heckenbach supplied the Xspice option-default patch in Debian bug 1137518.
+VMware's driver copyright credits VMware; its source history credits Thomas Hellstrom, Jakob Bornecrantz and Zack Rusin.
+Timo Aaltonen's Debian changelog records the VMware packaging change, and Ian Forbes supplied the open upstream deprecation proposal.
+These credits describe the inspected sources and proposed carried fixes; they do not assert that new edition packages have shipped.
+
+
+The carried printing-metas source credits **Didier Raboud** in its copyright and changelog and the **Debian Printing Team** as maintainer.
+The revived apt-xapian-index source credits **Enrico Zini**, **Matteo Zandi**, **Daniel Brumbaugh Keeney** and **Daniel Gröber** in its copyright; its changelog records **Ilu**, **Olly Betts** and **Alexandre Detiste** for reintroduction, Xapian compatibility and maintenance.
+**Santiago Vila** supplied the test-discovery patch in Debian bug 1145121; **Daniel Campos Ramos** completed the checked fixture/assertion updates carried by the edition.

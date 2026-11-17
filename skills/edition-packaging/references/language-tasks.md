@@ -118,6 +118,7 @@ If the person adds or removes a language before the worker runs, update the queu
 Resolve dictionary virtual names to installed providers when removing payload, rather than leaving the provider behind.
 Write both the queue and its protection atomically, and retain every installed provider, not just the first matching alternative.
 Keep a dpkg post-invoke hook that only starts the queued unit when work remains: it must reset a failed path or service after an ordinary later update, without running apt in the hook.
+Bound activation of a persistent PathExists queue: a failed oneshot otherwise restarts while the file remains. One start per infinite start-limit interval, reset by the pending-work hook, leaves failure pending until a new transaction or boot. Prove that lifecycle, not just the successful worker.
 
 Prove old wrappers, a trimmed system and an all-language image against the actual signed edition, Debian and deb-multimedia indexes with the generated edition policy.
 Retain Inst and Remv lines, the post-package/pre-worker autoremove plan, configured closure checks and the built catalogues in all ten languages.
@@ -155,6 +156,10 @@ English needs a task too. Debian's task-english brings locales, ibritish and iam
 
 ## Qualification traps
 
+- **Symptom:** a missing dictionary makes the worker run apt repeatedly, while polling Result often shows success.
+  **Cause:** PathExists remains true, and each failed five-second attempt starts again; the default start-rate limit never catches it, and Result resets during the next activation.
+  **Fix:** use StartLimitIntervalSec=infinity and StartLimitBurst=1 for the service, and reset the path and service only when the next apt transaction retries pending work.
+  **Found by:** the installed negative-pinned-dictionary test and repeated failed/starting entries in the real unit journal. The same test then stops with the queue and protection present and succeeds after an unrelated dictionaries-common reinstall.
 - **Symptom:** the archive gate refuses different payloads at a debian-tasks.mo path although the package has a diversion.
   **Cause:** both binary tar members still claim the same pathname; a maintainer script does not change the frozen payload comparison.
   **Fix:** ship the merged catalogue at a unique path and manage the diverted-domain link during configuration and removal.

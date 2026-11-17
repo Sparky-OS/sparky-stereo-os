@@ -10,7 +10,7 @@ description: >-
   qt6-base update, a pin leaves a binding or development package uninstallable, a systemd unit's proof shows none
   of its journal lines, a preinst prompt stops a non-interactive install, a language probe shows
   English, a CMake consumer misses an imported library, a Rust suite shares its crates as dylibs,
-  an amd64v3 index leaves apt on the baseline, or apt removes a Debian package (Remv).
+  or an amd64v3 index leaves apt on the baseline.
 ---
 
 # Packaging the edition

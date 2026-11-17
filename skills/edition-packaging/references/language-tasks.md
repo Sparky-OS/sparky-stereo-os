@@ -33,7 +33,7 @@ Protect the realized payload roots, including an installed alternative that the 
 Conflicts on replacement tasks may identify the corresponding Debian wrappers, never their dictionaries or other payload.
 Do not add Replaces unless files actually overlap.
 Do not run apt recursively from a maintainer script.
-The migration belongs in an explicit upgrade operation, with a saved plan, a removal allowlist limited to the old wrappers, and failure before mutation if anything else would leave.
+The queued worker performs the migration after an ordinary update, with a saved plan, a removal allowlist limited to the old wrappers, and failure before mutation if anything else would leave.
 A surviving unsupported Debian language task must be reported as a remaining lock, not ignored.
 After the transaction, simulate autoremove with the old payload marked automatic except the protected roots and verify that none of the payload appears in `Remv`.
 
@@ -97,8 +97,7 @@ A deliberate removal retires the corresponding unused task before purging its pa
   **Fix:** merge the exact archived binary controls and proposal records into the metadata map before applying `Inst` lines.
   **Found by:** the seed selected tasksel-data 3.91 while the dump held its current version.
 
-This reference describes the reconciliation method and proposal requirements.
-Resolver simulations do not establish that new packages, the installer integration or the migration helper have been built or shipped.
+Resolver simulations establish the dependency plan, not installed maintainer scripts, installer behavior or a published package.
 
 ## Ordinary updates and the pending interval
 
@@ -117,6 +116,8 @@ Selection must honor the Locale tool's saved retained set.
 For an older installation without that set, a shared regional package alone must not select a removed language: identify each language by its unique installed packs, plus the system language and English.
 If the person adds or removes a language before the worker runs, update the queued selection too.
 Resolve dictionary virtual names to installed providers when removing payload, rather than leaving the provider behind.
+Write both the queue and its protection atomically, and retain every installed provider, not just the first matching alternative.
+Keep a dpkg post-invoke hook that only starts the queued unit when work remains: it must reset a failed path or service after an ordinary later update, without running apt in the hook.
 
 Prove old wrappers, a trimmed system and an all-language image against the actual signed edition, Debian and deb-multimedia indexes with the generated edition policy.
 Retain Inst and Remv lines, the post-package/pre-worker autoremove plan, configured closure checks and the built catalogues in all ten languages.
@@ -142,4 +143,39 @@ A successful source build or a minimal resolver fixture is not that proof.
   Never weaken an unrelated designed dependency to turn the gate green.
   **Found by:** the gate's solver log, then apt-cache policy against the same signed sources and pins.
 
-The deferred migration and task-aware Locale integration remain candidate implementation until their real installed-machine and complete package gates pass.
+## tasksel selection and catalogues
+
+Read the reference source's README and tests/lang: tasksel calls a Test-NAME program in /usr/lib/tasksel/tests with the task name and field arguments. Exit 0 selects a hidden task; exit 1 hides it without selecting it. A language descriptor without such a test does not automatically follow the install locale.
+Use the same canonical locale mapping in tasksel and the installer. The stock base-language comparison can match both a generic language and its regional variant; test Portuguese, Spanish, Chinese and Norwegian aliases explicitly. Select only on NEW_INSTALL, preserving existing machines' choices. Require the runtime version that supplies the test program.
+
+tasksel reads the debian-tasks gettext domain. Merge upstream's credited catalogue with the edition's messages, but put that merged payload under the edition runtime's own directory. Divert the original tasksel-data catalogue, then create a managed link in postinst; remove only that exact managed link before undoing the diversion. A preinst diversion alone does not make two different tar payloads at the same pathname acceptable to the archive gate.
+Read every new title, description, installer sentence and problems-engine notice from all ten built catalogues, including the registered systemd catalogues. Exercise the real installer shell step against the target root: an intact offline image succeeds, and a negative-pinned mandatory dictionary fails with a translated explanation, the language, the missing package and a retry instruction.
+
+English needs a task too. Debian's task-english brings locales, ibritish and iamerican; checking only application translation packs misses them. A blocked non-language base task such as task-laptop is a separate audit: compare its payload with the base selection before proposing another task.
+
+## Qualification traps
+
+- **Symptom:** the archive gate refuses different payloads at a debian-tasks.mo path although the package has a diversion.
+  **Cause:** both binary tar members still claim the same pathname; a maintainer script does not change the frozen payload comparison.
+  **Fix:** ship the merged catalogue at a unique path and manage the diverted-domain link during configuration and removal.
+  **Found by:** the archive gate's two payload owners, followed by the binary file lists.
+- **Symptom:** the queued upgrade selects Thai on a machine whose owner retained only English and Brazilian Portuguese.
+  **Cause:** a shared font survived the old Locale tool's cleanup and was treated as evidence of an installed language choice.
+  **Fix:** use unique non-font language packs as legacy selection evidence; retain the surviving font without using it to select a task.
+  **Found by:** the old tool's installed removal plan and the queued selection on the trimmed baseline.
+- **Symptom:** work stays pending after a temporary failure and a later update does not retry it.
+  **Cause:** the package has not changed, so its postinst does not run again, and the path unit can be rate limited.
+  **Fix:** a dpkg post-invoke hook resets and starts only the pending path/service; the service performs apt after the locks are free.
+  **Found by:** following the service failure and retry lifecycle separately from package configuration.
+- **Symptom:** apt update leaves a test repository's old package versions selected after its Packages file changes.
+  **Cause:** a hashless Release file stayed byte-identical; apt reused the old index.
+  **Fix:** regenerate Release with the Packages size and SHA256 and a valid Date whenever the local cohort changes.
+  **Found by:** apt's missing-hash warning, unchanged Release and old filenames in Inst lines; this was a test repository defect.
+- **Symptom:** a source rebuild fails before running debian/rules despite its explicit Build-Depends being installed.
+  **Cause:** dpkg-buildpackage also requires the implicit build-essential set.
+  **Fix:** use a complete build environment, then rebuild the finished source and check the resulting .buildinfo, .changes and build record for unrecorded fields.
+  **Found by:** dpkg-checkbuilddeps and the build container's installed package set.
+- **Symptom:** a systemd test container exits before the migration can be tested.
+  **Cause:** its private cgroup tree is read-only.
+  **Fix:** use the systemd rig in [shadowed-by-another-archive.md](shadowed-by-another-archive.md), with private writable cgroups, /run tmpfs and no added capability. Mask periodic apt jobs in the rig, not in the package. Prove lock waiting with a real fcntl dpkg frontend lock and capture the unit's finished journal entry.
+  **Found by:** systemd's startup diagnostic and the mount options; hand-running the worker would miss hook and unit failures.

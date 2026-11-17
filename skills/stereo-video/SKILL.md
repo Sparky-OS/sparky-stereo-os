@@ -166,6 +166,10 @@ Which frames take the GPU route through the layer and which the wl_shm copy, how
 
 [The sentence, the rule, where each player learns its tracks and tells it, the fixtures and the traps](references/a-film-without-sound.md) (ORDER 579): a film with a picture and no audio track says "This film has no sound." in ten languages, beside a volume control that stays usable. VLC Stereo's own part (+stereo3d21, ORDER 592): where the rule lives, the build's time and disk, the rows that show the sentence in each language at 100 % and 125 %, and the two faults found on the way (its catalogues were never read; a volume key on a silent film ended the player).
 
+## Writing and checking the marks of a sample film (ORDER 644)
+
+`scripts/stereo-marks/mp4_st3d.py` adds and verifies the MP4 `st3d` box (before `pasp`, offsets shifted when `moov` comes first), `ebml_probe.py` reads DocType, `StereoMode` and the display size of a Matroska or WebM file, and [stereo files that open anywhere](../stereo-pictures/references/stereo-files-that-open-anywhere.md) has the whole recipe (H.264 `frame-packing=3`, `mkvmerge --stereo-mode`, `--webm`, the read-back commands).
+
 ## Lessons from the lanes, October to November 2026
 
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (29 entries, the Jellyfin flattening traps of 11 November 2026 among them).

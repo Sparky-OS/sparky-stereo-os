@@ -1,5 +1,8 @@
 # Stereo icons and theme parts
 
+Sparky Stereo Plasma Theme Studio is the authoring program; its package and recipe folder are sparky-stereo-plasma-theme-studio.
+Its product and edition identities are data in one identity.json, used to generate the C++ identity, desktop entry, About data and the untranslated product-name entry in every compiled catalogue.
+
 ## Reconcile before authoring
 
 1. Read the published KIconThemes source and run [the loader probe](icon-loader-probe.cpp) against that package.
@@ -120,23 +123,54 @@ In the inspected KWin `6.7.4-2+stereo3d54+lc1` source, `StereoDepth::parallax()`
 The authoring control must share those operations, not duplicate their arithmetic by hand.
 
 The first helper slice generates an adapter from the exact published source functions, enum, reference width and KConfig defaults and records their SHA-256 hashes.
-Read the desktop settings once for both eyes and all sizes in an export.
-Integer disparity is a visible limitation at small icon sizes: with the inspected defaults, the full sunk and popped limits both round to zero through 64 pixels per view.
-At 128 full sunk is minus one pixel and full popped is zero; at 256 they are minus one and plus one.
-Report those measured results rather than calling every exported size visibly stereo.
-Daniel’s 16 November 2026 continuation keeps the person’s desktop limits until he settles a distinct icon authoring range.
-A wider range would make small icons separate visibly but could exceed those limits; that choice belongs to Daniel.
+Desktop element limits are screen pixels scaled with the OUTPUT width, never the icon canvas width.
+The old 0.2.0 implementation used an N-pixel output for an N-pixel icon and incorrectly erased depth at the common sizes; Daniel confirmed the corrected rule on 17 November 2026.
+For every nonzero authored value, use its sign, map its percentage onto the sign's output-pixel range with KWin's extracted operation, and lift a rounded zero to one pixel.
+Keep screen exactly zero.
+The upper limit is KWin's result at the real output width (default 10 sunk / 4 popped at the extracted reference width of 1920).
+Exceptions are explicit: the desktop's limit is zero on that output, or the part has no physical room in that drawing at that size.
+Measure the part's own zero-depth raster bounds; check both asymmetric eye shifts against the left/right canvas margins.
+Drawing room may restrict motion; it is not another depth budget scaled to the icon size.
+Keep different authored depths in order. Report distinct values that round to the same pixel; refuse a pair if unequal physical margins would reverse their order rather than silently exporting inverted depth.
 
-## A continuous control and useful selection
+Export stereo icons once at the common default limits and reference output width, independently of the author's private desktop settings.
+Preview using the person's limits and the actual output width. Account for the preview area's physical pixel width separately from render resolution, so reducing render resolution cannot amplify a one-pixel output shift.
+Label common export and personal preview numbers separately in the per-size table.
+Prove default exports identical under private zero limits, zero-limit and physical-room notices, signed minimum separation at all nine sizes with real Oxygen parts that have room, rounded ties, output-width changes, and order refusal.
+Measure both exported images and the compositor's two views; changing a unit calculation alone is insufficient.
+Probe shipped KIconThemes and Stereo Union separately to establish what smaller desktop limits do to a baked pair: an icon lookup is not a live depth remapper.
+Measured with KIconThemes 6.30.0-1+stereo3d2+lc1 and Stereo Union 6.8.80~git20261022.2163195c-0+stereo3d1+lc1: explicit stereo lookup returns the exact common-default eyes at all nine sizes under both 10/4 and private 1/1 settings; Union's supplied-pixmap painting and ordinary icon/button pixels are unchanged by those settings in the offscreen style probe.
+This does not prove every desktop consumer paints per eye, and it supplies no automatic clamp of baked internal disparities to a smaller limit.
+The offscreen Union probe uses its fallback platform; do not turn it into a claim of full-session theme integration.
+Keep one continuous signed authoring value per part. The per-size table reports default export numbers and the person's preview numbers separately.
 
-Sunk, screen and popped name places, not three fixed depth presets.
-Use one signed continuous value per part, with zero on the screen and both ends derived from the person's desktop limits.
-Read KWin's source defaults and the person's configuration; use the same source-derived operation for preview, export and the per-size disparity table.
-Show zero explicitly when a nonzero authoring value rounds to no disparity at an icon size.
 A selected SVG group needs a visible highlight in both previews and a thumbnail cropped to its painted bounds; IDs alone are insufficient.
 Keep highlighting out of exported artwork.
 Test fractional edits, actual keyboard delivery, Undo, Redo, and rejection of a parent and child both receiving depth.
 Read every message back from all ten compiled catalogues, including country-specific locales falling back to bare French and Spanish.
+
+## Build the core without stereo
+
+Configure Sparky Stereo Plasma Theme Studio with -DSTUDIO_STEREO=OFF.
+The core uses Qt Widgets/Xml/Svg/DBus and KDE Config; it does not find or link stereo-layer, generate KWin geometry, render the second view, declare a stereo surface or export paired assets.
+The depth provider has a small interface with an all-zero ordinary implementation.
+The depth, preview and pair-export implementations live in the stereo folder; the ordinary preview/provider live in plain.
+Prove the resulting installed tree in an image with no stereo-layer package: start, open an icon theme, change and save a scheme through KDE's native colour editor, then save the project with no pair exports.
+Record actual package absence and ELF dependencies; hiding a checkbox on a stereo-linked binary is insufficient.
+Changing identity.json can rebrand the application and generated metadata without rewriting the core.
+This keeps an option open; it is no offer or promise to another project.
+
+## Select a painted part
+
+Draw each part alone over a readable neutral checker; a small context inset can locate thin outlines without deforming the isolated drawing.
+Use the source element's title or label, with its ID as fallback.
+SVGs may paint loose paths and rectangles beside groups, as Oxygen's television does.
+Expose those as neutral authoring groups in the working DOM, retaining original source bytes and IDs; zero-depth pixels must still match the original.
+Use the same rendered alpha and transforms for hit testing that the preview uses for painting.
+Search in reverse document paint order, and repeat a click through the overlapping stack.
+The real television's bottom screen area selects studio-part-rect3370, then studio-part-rect3335 underneath; these are working wrappers of the original rectangle IDs.
+Prove that with real fake input and read the selected ID back, then compare the selected highlight in both captured views.
+On Wayland the client does not know its global window origin: read KWin's client geometry for the rig, then add the preview's client-local position.
 
 ## One project and KDE tool round trips
 
@@ -171,6 +205,19 @@ Drive the native colour tool through real input, save and close it, then save an
 Native project tests should also reject invalid inputs and verify that the source themes stay unchanged.
 
 ## Traps
+
+- **Symptom:** a click intended for the preview selects nothing while Wayland logs show a real button event.
+  **Cause:** the client-local preview coordinates were used as global pointer coordinates; a Wayland client does not know its compositor placement.
+  **Fix:** in the rig, add KWin's actual client origin before sending fake input, and compare the selected ID before and after.
+  **How found:** the pointer event landed above the canvas, and KWin's window script supplied the missing origin.
+- **Symptom:** clicking a visible screen selects only the icon's entire root group.
+  **Cause:** that screen is a loose SVG rectangle rather than a named group.
+  **Fix:** put loose painted siblings in neutral working-DOM groups, preserving original bytes and IDs, then alpha-test the paint stack.
+  **How found:** inspect Oxygen's rect3370 and validate the original pixels plus the real first and second click results.
+- **Symptom:** lintian rejects a package description containing only the newly chosen product name.
+  **Cause:** description-is-pkg-name requires the package's function, too.
+  **Fix:** keep the central identity placeholder and describe icon/theme authoring around it.
+  **How found:** the final native package reached lintian after all Lean and link checks, then that exact tag went red.
 
 - **Symptom:** the package's stereo API passes, so every icon is reported stereo.
   **Cause:** the probe never checked ordinary lookup.
@@ -245,3 +292,16 @@ Native project tests should also reject invalid inputs and verify that the sourc
 
 The probe builds on KDE's KIconThemes API and the edition's stereo extension by Daniel Campos Ramos.
 No external artwork or model is included.
+
+- **Symptom:** all common icon sizes show zero despite a nonzero depth, and the table calls it a lack of capacity.
+  **Cause:** the icon canvas width was passed as though it were the output width to KWin's operation.
+  **Fix:** use the output's physical width for the screen-pixel bound, common defaults at the reference width for export, and separate raster bounds for room. Show collapsed values and refuse depth inversions.
+  **How found:** the corrected design identifies a one-pixel shift of a 16-pixel icon as inside the four-pixel screen limit; a 0.2.0 red build and native plus compositor measurements of 18 exported pairs pin the distinction.
+- **Symptom:** changing render resolution amplifies the preview's depth when the image is enlarged.
+  **Cause:** an output-pixel shift was interpreted as a low-resolution texture-pixel shift.
+  **Fix:** keep output pixels and presentation pixels separate, converting the shift into render pixels before rendering; exports remain at native pixel size.
+  **How found:** compare the actual two-eye output against independently rendered references at 100 and 125 percent while keeping the output width fixed.
+- **Symptom:** a 125-percent preview or its reference uses a 2560-pixel output although the rig output is physically 1600 wide.
+  **Cause:** Wayland QScreen reports the rounded buffer scale of 2; the window's preferred fractional ratio is 1.25 for its 1280 logical pixels.
+  **Fix:** use QWindow::devicePixelRatio for output and presentation pixel calculations and refresh on DevicePixelRatioChange and output geometry changes. Keep the reference's known physical fixture width independent of that API.
+  **How found:** the native-reference mismatch and session metrics distinguished screen ratio 2 from window/widget ratio 1.25; the existing stereo-window-3d-area lesson describes the same trap.

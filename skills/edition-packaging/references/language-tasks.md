@@ -146,6 +146,14 @@ A successful source build or a minimal resolver fixture is not that proof.
 
 ## tasksel selection and catalogues
 
+Keep upstream PO copies out of the Git tree: their headers can contain contacts that the edition does not republish.
+Pin Debian's tasksel descriptor and archive by SHA256 and size, verify the archive against its descriptor too, and consume those exact PO members at build time.
+Retain the unmodified descriptor and archive as inputs in the generated source package, with their original translator credits, so the binary rebuild can verify them and compile all ten catalogues without network.
+Declare gettext in Build-Depends when the source build recompiles catalogues.
+The standalone adapter normally rebuilds a resolved staging tree; retaining upstream inputs alone does not make it recompile a cached MO file.
+Add a package-local catalogue build step and prove it regenerates deliberately corrupted cached MO files in an offline build.
+Run publish-check on the final changed files before handing back; names stay credited and contacts stay in Debian's original source inputs.
+
 Read the reference source's README and tests/lang: tasksel calls a Test-NAME program in /usr/lib/tasksel/tests with the task name and field arguments. Exit 0 selects a hidden task; exit 1 hides it without selecting it. A language descriptor without such a test does not automatically follow the install locale.
 Use the same canonical locale mapping in tasksel and the installer. The stock base-language comparison can match both a generic language and its regional variant; test Portuguese, Spanish, Chinese and Norwegian aliases explicitly. Select only on NEW_INSTALL, preserving existing machines' choices. Require the runtime version that supplies the test program.
 
@@ -156,6 +164,18 @@ English needs a task too. Debian's task-english brings locales, ibritish and iam
 
 ## Qualification traps
 
+- **Symptom:** an otherwise qualified language task branch is refused by the publication check for translator contacts in nine copied PO headers.
+  **Cause:** preserved upstream credits were copied into files in our Git tree, where the edition permits names but not another person's contacts.
+  **Fix:** consume checksum-pinned Debian source during preparation and retain it in the generated source package for offline catalogue compilation; remove the PO copies from Git.
+  **Found by:** the changed-files publication check and a byte comparison of the old PO copies with the exact Debian archive members.
+- **Symptom:** a package rebuild passes while retaining a stale compiled catalogue.
+  **Cause:** the standalone source adapter copies its resolved tree without re-running the original generator.
+  **Fix:** regenerate catalogues from retained, verified source inputs in the binary build and test with corrupted cached MO bytes; a missing or changed source archive must fail before compilation.
+  **Found by:** reading the generated build.py and running the offline source-build control.
+- **Symptom:** a replacement package silently loses files or adds unrelated payload.
+  **Cause:** only its version and final success status were compared with the stage it replaces.
+  **Fix:** preserve both dpkg-deb -c listings, compare every path's type, owner, mode, size, timestamp, target and content, and explain each changed listing line; separate source-date-only changes from actual content changes and control metadata.
+  **Found by:** a file-by-file comparison against the previous qualified stage, required for every rebuilt package.
 - **Symptom:** installed-machine tests pass, but an explicit archive smoke entry says `bwrap: execvp ...: No such file or directory` for an existing script.
   **Cause:** the archive gate resolves from an empty status database. The Locale script's Bash and the installer/selector's /bin/sh interpreter came from the installed machine's Essential baseline, not the declared closure; the merged-/usr aliases come from base-files.
   **Fix:** declare Bash for the Locale CLI and dash/base-files for the language runtime and shell helpers. Add the new entrypoints to the default lean/smoke.tsv so later publication rounds keep exercising them. Use the documented bubblewrap container flags without changing the gate's own namespace or capability isolation.

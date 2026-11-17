@@ -243,6 +243,8 @@ The recipe, the coexistence rules with their specification clauses, the proof an
 
 [ananicy-cpp, its rules and the sched_ext schedulers](references/scheduling-daemons.md): defaults read at CachyOS and Bazzite, the BPF listener's cost, the systemd proof, the vendored Rust source, the traps.
 
+[Lights and peripherals by detection](references/lights-and-peripherals.md): what Bazzite, CachyOS, Nobara and PikaOS ship, the table made from each tool's own device list, OpenRGB with the session, one owner per device (the iCUE LINK clash), the proof with recorded devices, the traps.
+
 ## Lessons from the lanes, October to November 2026
 
 [Adding a required language to the whole edition](references/adding-a-required-language.md): the audit, where language lists hide, the generator and test traps.

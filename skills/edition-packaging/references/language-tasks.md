@@ -67,8 +67,13 @@ A deliberate removal retires the corresponding unused task before purging its pa
   **Found by:** reading `plan_install` and its `have` test.
 - **Symptom:** a Czech dependency has no candidate although the task resolves.
   **Cause:** `myspell-cs-cz` is provided by `myspell-cs`.
-  **Fix:** inspect `apt-cache showpkg` and prove the full dependency with apt instead of dropping the virtual name.
-  **Found by:** the candidate report and its Reverse Provides section.
+  **Fix:** inspect `apt-cache showpkg` and the provider's Conflicts, then prove the full dependency with apt instead of dropping the feature.
+  **Found by:** the candidate report, its Reverse Provides section and the failing resolver plan.
+- **Symptom:** making every reference dictionary mandatory makes Czech, Spanish, Norwegian or Ukrainian uninstallable.
+  **Cause:** the MySpell dictionary in Debian's recommendation conflicts with the Hunspell dictionary the edition already ships.
+  **Fix:** prefer Hunspell on a new image and allow the reference MySpell dictionary as an alternative on an existing machine; for Norwegian preserve both Bokmål and Nynorsk when using MySpell.
+  Protect installed roots explicitly during migration and refuse a plan that removes any payload.
+  **Found by:** a literal-union Czech simulation, then both dictionaries' Conflicts and Provides fields.
 - **Symptom:** preserving every Debian desktop recommendation brings IBus back beside Fcitx 5.
   **Cause:** the reference package set was copied without the edition's input-method design.
   **Fix:** keep Debian's recommendations in the evidence table and map the four IBus language-engine entries to the edition's corresponding Fcitx 5 engines in the proposal.
@@ -80,3 +85,12 @@ A deliberate removal retires the corresponding unused task before purging its pa
 
 This reference describes the reconciliation method and proposal requirements.
 Resolver simulations do not establish that new packages, the installer integration or the migration helper have been built or shipped.
+
+- **Symptom:** a simulated install of an archived wrapper says "Can't find a source to download version".
+  **Cause:** its copied binary control lacks the repository Filename and Size fields.
+  **Fix:** retain the archive's real Filename and measured Size in the temporary Packages record, then refresh apt indexes.
+  **Found by:** the old-task seed simulation; binary control fields alone are not a complete apt index.
+- **Symptom:** Python HTTPS downloads fail after apt HTTPS setup succeeds.
+  **Cause:** the apt helper configures apt's CA path; Python does not inherit that setting.
+  **Fix:** point Python's SSL_CERT_FILE at the same mounted CA bundle; keep certificate verification enabled.
+  **Found by:** the certificate-verification exception and the helper's apt-specific configuration.

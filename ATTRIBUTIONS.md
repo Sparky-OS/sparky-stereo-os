@@ -1078,6 +1078,8 @@ VLC Stereo +stereo3d21 builds on other people's work, named from each project's 
 
 The Sound page and volume widget build on [plasma-pa](https://invent.kde.org/plasma/plasma-pa) and [pulseaudio-qt](https://invent.kde.org/libraries/pulseaudio-qt).
 Their own histories credit **Yoann Laissus** for the original virtual-stream classification and filtering, **Nicolas Fella** for the library's stream implementation, **Ismael Asensio** for the shared role filters, **Noah Davis** for the applet's stream models, **Arjen Hiemstra** and **Alexandre Pereira** for optional virtual-device visibility, and **Bharadwaj Raju** for the global configuration used by the page.
-The edition's candidate extends these existing controls to client-less loopbacks and filters; it has not been packaged yet.
+The edition's plasma-pa 4:6.7.4-1+stereo3d1+lc1 extends these existing controls to client-less loopbacks and filters, with optional visibility on the Sound page and volume widget, null-client handling and a repaired recording-device selector.
+The +stereo3d2 successor, staged for review, adds explicit input monitoring and combined recording in the Sound page and KDED service.
+Its device rows, stream selectors, plugin and widget menus also build on work by **Harald Sitter**, **David Rosca**, **Sefa Eyeoglu**, **David Redondo**, **Kai Uwe Broulik**, **ivan (@ratijas) tkachenko** and **Bharadwaj Raju**, named from plasma-pa's headers and history.
 
 The x86-64-v3 packages reference (ORDER 108) builds on the APT team's architecture variants (apt 3.1.10 and later, table format and the amd64v3 row of test/integration/varianttable), Canonical's amd64v3 of Ubuntu 25.10, openSUSE's glibc-hwcaps pattern packages, CachyOS's cachyos-repo.sh and PikaOS's rebuilds of Debian sources at x86-64-v3, named from each project's own pages.

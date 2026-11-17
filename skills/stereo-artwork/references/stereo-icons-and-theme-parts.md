@@ -123,24 +123,27 @@ In the inspected KWin `6.7.4-2+stereo3d54+lc1` source, `StereoDepth::parallax()`
 The authoring control must share those operations, not duplicate their arithmetic by hand.
 
 The first helper slice generates an adapter from the exact published source functions, enum, reference width and KConfig defaults and records their SHA-256 hashes.
-Read the desktop settings once for both eyes and all sizes in an export.
-Integer disparity is a visible limitation at small icon sizes: with the inspected defaults, the full sunk and popped limits both round to zero through 64 pixels per view.
-At 128 full sunk is minus one pixel and full popped is zero; at 256 they are minus one and plus one.
-Report those measured results rather than calling every exported size visibly stereo.
-Daniel settled the icon rule on 16 November 2026: no wider authoring range, and a nonzero part receives the smallest visible step where the desktop budget allows it.
-Compute the rounded full-limit capacity with the source-derived KWin operation at each size.
-Keep zero at the screen; if capacity is zero, report that one pixel has no room; otherwise clamp the requested magnitude between one raster pixel and that capacity, with its sign.
-Do not ceil the capacity or add a separate icon range.
-At the inspected defaults, both signs have zero capacity through 64 pixels, popped has none at 128, sunk permits one at 128, and both signs permit one at 256.
-This is an honest no-room result for more sizes than the original 8/16 examples.
-Measure fractional choices as well as full-limit presets: a ten-percent sunk choice at 128 is the red control on the earlier 0.1.3 slice.
+Desktop element limits are screen pixels scaled with the OUTPUT width, never the icon canvas width.
+The old 0.2.0 implementation used an N-pixel output for an N-pixel icon and incorrectly erased depth at the common sizes; Daniel confirmed the corrected rule on 17 November 2026.
+For every nonzero authored value, use its sign, map its percentage onto the sign's output-pixel range with KWin's extracted operation, and lift a rounded zero to one pixel.
+Keep screen exactly zero.
+The upper limit is KWin's result at the real output width (default 10 sunk / 4 popped at the extracted reference width of 1920).
+Exceptions are explicit: the desktop's limit is zero on that output, or the part has no physical room in that drawing at that size.
+Measure the part's own zero-depth raster bounds; check both asymmetric eye shifts against the left/right canvas margins.
+Drawing room may restrict motion; it is not another depth budget scaled to the icon size.
+Keep different authored depths in order. Report distinct values that round to the same pixel; refuse a pair if unequal physical margins would reverse their order rather than silently exporting inverted depth.
 
-## A continuous control and useful selection
+Export stereo icons once at the common default limits and reference output width, independently of the author's private desktop settings.
+Preview using the person's limits and the actual output width. Account for the preview area's physical pixel width separately from render resolution, so reducing render resolution cannot amplify a one-pixel output shift.
+Label common export and personal preview numbers separately in the per-size table.
+Prove default exports identical under private zero limits, zero-limit and physical-room notices, signed minimum separation at all nine sizes with real Oxygen parts that have room, rounded ties, output-width changes, and order refusal.
+Measure both exported images and the compositor's two views; changing a unit calculation alone is insufficient.
+Probe shipped KIconThemes and Stereo Union separately to establish what smaller desktop limits do to a baked pair: an icon lookup is not a live depth remapper.
+Measured with KIconThemes 6.30.0-1+stereo3d2+lc1 and Stereo Union 6.8.80~git20261022.2163195c-0+stereo3d1+lc1: explicit stereo lookup returns the exact common-default eyes at all nine sizes under both 10/4 and private 1/1 settings; Union's supplied-pixmap painting and ordinary icon/button pixels are unchanged by those settings in the offscreen style probe.
+This does not prove every desktop consumer paints per eye, and it supplies no automatic clamp of baked internal disparities to a smaller limit.
+The offscreen Union probe uses its fallback platform; do not turn it into a claim of full-session theme integration.
+Keep one continuous signed authoring value per part. The per-size table reports default export numbers and the person's preview numbers separately.
 
-Sunk, screen and popped name places, not three fixed depth presets.
-Use one signed continuous value per part, with zero on the screen and both ends derived from the person's desktop limits.
-Read KWin's source defaults and the person's configuration; use the same source-derived operation for preview, export and the per-size disparity table.
-Show zero explicitly when a nonzero authoring value rounds to no disparity at an icon size.
 A selected SVG group needs a visible highlight in both previews and a thumbnail cropped to its painted bounds; IDs alone are insufficient.
 Keep highlighting out of exported artwork.
 Test fractional edits, actual keyboard delivery, Undo, Redo, and rejection of a parent and child both receiving depth.
@@ -289,3 +292,16 @@ Native project tests should also reject invalid inputs and verify that the sourc
 
 The probe builds on KDE's KIconThemes API and the edition's stereo extension by Daniel Campos Ramos.
 No external artwork or model is included.
+
+- **Symptom:** all common icon sizes show zero despite a nonzero depth, and the table calls it a lack of capacity.
+  **Cause:** the icon canvas width was passed as though it were the output width to KWin's operation.
+  **Fix:** use the output's physical width for the screen-pixel bound, common defaults at the reference width for export, and separate raster bounds for room. Show collapsed values and refuse depth inversions.
+  **How found:** the corrected design identifies a one-pixel shift of a 16-pixel icon as inside the four-pixel screen limit; a 0.2.0 red build and native plus compositor measurements of 18 exported pairs pin the distinction.
+- **Symptom:** changing render resolution amplifies the preview's depth when the image is enlarged.
+  **Cause:** an output-pixel shift was interpreted as a low-resolution texture-pixel shift.
+  **Fix:** keep output pixels and presentation pixels separate, converting the shift into render pixels before rendering; exports remain at native pixel size.
+  **How found:** compare the actual two-eye output against independently rendered references at 100 and 125 percent while keeping the output width fixed.
+- **Symptom:** a 125-percent preview or its reference uses a 2560-pixel output although the rig output is physically 1600 wide.
+  **Cause:** Wayland QScreen reports the rounded buffer scale of 2; the window's preferred fractional ratio is 1.25 for its 1280 logical pixels.
+  **Fix:** use QWindow::devicePixelRatio for output and presentation pixel calculations and refresh on DevicePixelRatioChange and output geometry changes. Keep the reference's known physical fixture width independent of that API.
+  **How found:** the native-reference mismatch and session metrics distinguished screen ratio 2 from window/widget ratio 1.25; the existing stereo-window-3d-area lesson describes the same trap.

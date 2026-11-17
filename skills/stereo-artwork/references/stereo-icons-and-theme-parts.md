@@ -203,6 +203,19 @@ Native project tests should also reject invalid inputs and verify that the sourc
 
 ## Traps
 
+- **Symptom:** a click intended for the preview selects nothing while Wayland logs show a real button event.
+  **Cause:** the client-local preview coordinates were used as global pointer coordinates; a Wayland client does not know its compositor placement.
+  **Fix:** in the rig, add KWin's actual client origin before sending fake input, and compare the selected ID before and after.
+  **How found:** the pointer event landed above the canvas, and KWin's window script supplied the missing origin.
+- **Symptom:** clicking a visible screen selects only the icon's entire root group.
+  **Cause:** that screen is a loose SVG rectangle rather than a named group.
+  **Fix:** put loose painted siblings in neutral working-DOM groups, preserving original bytes and IDs, then alpha-test the paint stack.
+  **How found:** inspect Oxygen's rect3370 and validate the original pixels plus the real first and second click results.
+- **Symptom:** lintian rejects a package description containing only the newly chosen product name.
+  **Cause:** description-is-pkg-name requires the package's function, too.
+  **Fix:** keep the central identity placeholder and describe icon/theme authoring around it.
+  **How found:** the final native package reached lintian after all Lean and link checks, then that exact tag went red.
+
 - **Symptom:** the package's stereo API passes, so every icon is reported stereo.
   **Cause:** the probe never checked ordinary lookup.
   **Fix:** give the inherited plain icon a third colour and test both APIs.

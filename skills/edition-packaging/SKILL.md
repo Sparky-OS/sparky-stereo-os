@@ -237,6 +237,8 @@ The recipe, the coexistence rules with their specification clauses, the proof an
 
 [x86-64-v3 packages](references/cpu-level-packages.md): apt architecture variants with our own table, what forky's apt and dpkg do today, the complete-index rule, glibc-hwcaps and the v3 kernel, each trap with symptom, cause and fix.
 
+[ananicy-cpp, its rules and the sched_ext schedulers](references/scheduling-daemons.md): defaults read at CachyOS and Bazzite, the BPF listener's cost, the systemd proof, the vendored Rust source, the traps.
+
 ## Lessons from the lanes, October to November 2026
 
 [Adding a required language to the whole edition](references/adding-a-required-language.md): the audit, where language lists hide, the generator and test traps.

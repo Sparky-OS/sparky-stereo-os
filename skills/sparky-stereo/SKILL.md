@@ -142,6 +142,7 @@ Load the one that matches the work; the [program list](../../docs/programs-in-de
 | [`stereo-two-cameras`](../stereo-two-cameras/SKILL.md) | Programs that draw a scene: the cameras, the maths, the proof |
 | [`stereo-video`](../stereo-video/SKILL.md) | Players, encoders, containers and servers |
 | [`stereo-pictures`](../stereo-pictures/SKILL.md) | Stereo photographs: JPS, MPO, viewers, screenshots |
+| [`3d-models`](../3d-models/SKILL.md) | 3D models, point clouds and splats: Dolphin's thumbnails, F3D, CloudCompare, the slicers |
 | [`deep-colour`](../deep-colour/SKILL.md) | 10, 12 and 16 bits from the driver to the canvas |
 | [`vr-to-3d`](../vr-to-3d/SKILL.md) | A program's VR path shown on a 3D display |
 | [`3d-to-vr`](../3d-to-vr/SKILL.md) | Stereo content and the desktop in a headset |

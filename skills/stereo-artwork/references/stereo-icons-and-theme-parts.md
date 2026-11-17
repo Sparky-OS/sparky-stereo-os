@@ -301,3 +301,7 @@ No external artwork or model is included.
   **Cause:** an output-pixel shift was interpreted as a low-resolution texture-pixel shift.
   **Fix:** keep output pixels and presentation pixels separate, converting the shift into render pixels before rendering; exports remain at native pixel size.
   **How found:** compare the actual two-eye output against independently rendered references at 100 and 125 percent while keeping the output width fixed.
+- **Symptom:** a 125-percent preview or its reference uses a 2560-pixel output although the rig output is physically 1600 wide.
+  **Cause:** Wayland QScreen reports the rounded buffer scale of 2; the window's preferred fractional ratio is 1.25 for its 1280 logical pixels.
+  **Fix:** use QWindow::devicePixelRatio for output and presentation pixel calculations and refresh on DevicePixelRatioChange and output geometry changes. Keep the reference's known physical fixture width independent of that API.
+  **How found:** the native-reference mismatch and session metrics distinguished screen ratio 2 from window/widget ratio 1.25; the existing stereo-window-3d-area lesson describes the same trap.

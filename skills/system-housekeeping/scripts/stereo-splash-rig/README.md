@@ -28,6 +28,7 @@ python3 with-init.py out/initrd-new.img out/run-new.img     # the current init (
 ./batch.sh runs new; ./batch-late.sh runs new; ./batch-more.sh runs
 ./compare.py runs/new-tv-tvline-1-HDMI-A-1.ppm runs/new-both-tvline-1-HDMI-A-1.ppm
 ./check-eye.py runs/new-tv-tvline-1-HDMI-A-1.ppm runs/new-both-tvline-1-eDP-1.ppm 'panel beside a main television'
+./verdict.sh runs new old    # all twelve checks of one set against another set's single screens; exit 0 only when all pass
 ```
 
 `--fw` boots OVMF with a 1024x768 firmware framebuffer and reads it through QMP just before the DRM driver comes (`rig.drm=12 rig.unbindfb=1`).

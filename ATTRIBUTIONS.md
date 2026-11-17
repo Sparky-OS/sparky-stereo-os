@@ -1102,3 +1102,8 @@ Frank Heckenbach supplied the Xspice option-default patch in Debian bug 1137518.
 VMware's driver copyright credits VMware; its source history credits Thomas Hellstrom, Jakob Bornecrantz and Zack Rusin.
 Timo Aaltonen's Debian changelog records the VMware packaging change, and Ian Forbes supplied the open upstream deprecation proposal.
 These credits describe the inspected sources and proposed carried fixes; they do not assert that new edition packages have shipped.
+
+
+The carried printing-metas source credits **Didier Raboud** in its copyright and changelog and the **Debian Printing Team** as maintainer.
+The revived apt-xapian-index source credits **Enrico Zini**, **Matteo Zandi**, **Daniel Brumbaugh Keeney** and **Daniel Gröber** in its copyright; its changelog records **Ilu**, **Olly Betts** and **Alexandre Detiste** for reintroduction, Xapian compatibility and maintenance.
+**Santiago Vila** supplied the test-discovery patch in Debian bug 1145121; **Daniel Campos Ramos** completed the checked fixture/assertion updates carried by the edition.

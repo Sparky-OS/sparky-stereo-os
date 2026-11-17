@@ -11,6 +11,7 @@ Absence from testing does not by itself decide what the edition ships.
    Preserve the source name, date, bug number and complete Reason field.
    The current year is in removals.txt; its separate year file may not exist yet.
    No entry in this log does not establish that a testing auto-removal had no cause.
+   An older removal can also have been superseded: read the latest changelog and signed source index before carrying its old reason forward.
 3. Read the source's [suite history](https://sources.debian.org/api/) and [britney's migration excuses](https://release.debian.org/britney/update_excuses.html).
    Britney names the bugs currently preventing migration.
    Debian's [Developer's Reference, release-critical bugs](https://www.debian.org/doc/manuals/developers-reference/developer-duties.html#manage-release-critical-bugs) explains why serious, grave and critical bugs can block a package.
@@ -38,9 +39,19 @@ Absence from testing does not by itself decide what the edition ships.
    Build every architecture from the one prepared `.dsc`.
    `lean.release check-debs` must write a complete build record after `.buildinfo` and `.changes` exist.
    The archive-backed link/start gate and the installed proof below are separate requirements.
+   If a metapackage depends on another carried source, supply its already qualified runtime archives through `SPARKY_LC_SIBLINGS_FILE`.
+   Record the explicit sibling paths, copy without hard links, and let the gate hash/resolve that cohort against the published archive.
+   Missing published dependencies do not justify dropping an enforcing metapackage or enabling sid binaries.
 9. Stage the exact qualified binaries, source, HR companions and records with SHA256SUMS and a `.keep` explaining what awaits publication.
    A source input or a patch that applies is not a qualified package.
    Keep its base-gone row until publication; name the rows the publisher should then remove.
+10. Compare every staged binary with the last published version, or Debian's matching original when the edition never shipped it.
+    Save `dpkg-deb -c` of both and account for every removed entry, including directories, services, helpers, manuals and debug members.
+    New HR companions have no Debian predecessor; keep their complete candidate lists and state that fact.
+    A passing model-count check alone can conceal a missing helper or model family.
+    For build-ID debug paths, map each removed ID to the original ELF and its replacement ID with `readelf -n`; do not call them harmless without checking the replacement exists.
+    For generated CUPS driver archives, run both `list` outputs inside containers and compare complete archive identities, retaining their numeric member indices.
+    A helper alias and reported driver-version text may change; record that normalization explicitly.
 
 ## Versions and retirement
 
@@ -48,6 +59,12 @@ For a backport on Debian revision `3.26.4+dfsg0-4`, use the established rebuild 
 Check with `dpkg --compare-versions` in the build container that it is above the unchanged Debian revision and below `3.26.4+dfsg0-5`.
 An upstream update packaged for the first time follows [Paweł's formula](sparky-formula.md); choose its revision below Debian's first packaging of that upstream version.
 An invented higher epoch would prevent retirement and is not a solution.
+
+Debian-native sources need a separate check: their next upload can be `BASE+nmu1`, not a hyphenated Debian revision.
+The ordinary `BASE+stereo3d1+lc1` sorts above that native NMU.
+For the checked native carries use `BASE+0stereo3d1+lc1`: it exceeds BASE while sorting below `BASE+nmu1` and the next maintainer version.
+Measure both comparisons with dpkg; do not assume that passing the next-main-version comparison covers an NMU.
+See Debian's [native NMU version rules](https://www.debian.org/doc/manuals/developers-reference/pkgs.html).
 
 The version comparison alone does not retire ours.
 The edition normally pins its origin at 1001 and blocks other builds at -1.
@@ -93,7 +110,26 @@ HPLIP was also built through Lean Code: 11 runtime packages passed the archive-b
 A fresh testing container installed the complete 11-package family without removals; CUPS listed 5,732 HP models, backend discovery and hp-info help ran, and cupsext/hpmudext imported.
 This does not establish physical printing, scanning, plugin installation, or GUI behavior.
 The unchanged Debian source and candidate emitted the same 53 dat2drv diagnostics, so those diagnostics alone are not evidence of a newly introduced projection defect.
-VMware remains a source/configure finding, not a qualified edition package.
+VMware stays excluded for that measured loss of its required component; no edition VMware package or retired XA stack is built.
+Its kernel vmwgfx DRM/KMS driver can serve KWin directly on Wayland and Xorg's modesetting driver on X11.
+That source-based path is distinct from a VMware guest/hardware test; issue 12 also reports autofit limitations, so no equivalence claim follows from choosing modesetting.
+
+printing-metas `0.20210903` remains in sid and its migration is invalidated by HPLIP; its only open source bug, [1126396](https://bugs.debian.org/1126396), is normal.
+Both native metapackages were carried with their unchanged dependency list; a fresh testing container installed all twenty recommended driver packages through the enforcing sibling, with no removals.
+apt-xapian-index was reintroduced in 0.57, despite the older removal reason that called it obsolete.
+Its 0.59 source is blocked by serious open [1145121](https://bugs.debian.org/1145121).
+Santiago Vila's patch corrects test discovery; the complete checked fix also replaces removed unittest aliases and the removed libept-dev fixture with dpkg.
+All four rebuild/incremental tests pass; the installed indexer builds an index and finds dpkg in a fresh testing container.
+These are staged/installed proofs, not publication claims.
+
+## Keep exclusions under observation
+
+The ISO build's `iso-build/check-base-gone-sources.py` reports source presence for every excluded binary using an explicit historical binary/source registry and the Debian Sources API.
+Run it before the base build and before a separately resumed package step, alongside the existing binary candidate gate.
+It highlights sources alive only in sid; a source present in testing may instead have renamed binaries or retired transitions.
+Network failures and unknown mappings fail, and are printed as unknown rather than absence.
+Retain a dated response snapshot and test both a source returning to sid and lookup/coverage failures.
+The first audit found the reintroduced apt-xapian-index, so its stale 2025 exclusion was corrected before hand-back.
 
 ## Traps
 
@@ -122,3 +158,24 @@ VMware remains a source/configure finding, not a qualified edition package.
   **Cause:** the security-fixed upstream removed the privileged plugin service, while the older Debian install manifest still required it.
   **Fix:** remove only the install entries and manual-page entry for the retired service and its now-empty directories.
   **Found by:** the binary build reaching dh_install after compilation, then checking the upstream removals against the manifest.
+
+- **Symptom:** a native carry passes the next-maintainer-version check but exceeds Debian's next native NMU.
+  **Cause:** +stereo3d sorts above +nmu; there is no Debian revision field in a native version.
+  **Fix:** use the measured +0stereo3d carry suffix and test both +nmu1 and the next maintainer version.
+  **Found by:** dpkg comparisons for printing-metas and apt-xapian-index.
+- **Symptom:** an enforcing printer metapackage fails the archive gate although HPLIP was already qualified.
+  **Cause:** the published snapshot does not yet contain the other staged source.
+  **Fix:** pass the exact qualified HPLIP archives as explicit gate siblings, retaining the dependency set.
+  **Found by:** reading the gate's apt solve, then rerunning with the existing sibling mechanism.
+- **Symptom:** an exclusion still says orphaned/obsolete although unstable has a current source.
+  **Cause:** a historical removal was kept after Debian reintroduced the package.
+  **Fix:** read the new changelog and current migration blocker, carry the existing fix and qualify the revived source.
+  **Found by:** the all-row source audit exposed apt-xapian-index 0.59 and its 0.57 reintroduction.
+- **Symptom:** nose2 runs Python's own standard-library tests, then the corrected discovery exposes missing assert_ and libept-dev.
+  **Cause:** ambiguous test-module discovery, removed unittest aliases and an obsolete package fixture.
+  **Fix:** Santiago Vila's `-s test` discovery fix, current assertTrue calls, and dpkg as the replacement fixture; retain all four tests.
+  **Found by:** unchanged source failed, the bug's partial patch exposed the remaining errors, and the complete patched suite passed in testing.
+- **Symptom:** a CUPS catalog comparison reports too few unique entries.
+  **Cause:** normalizing away the archive's numeric member index collapses different entries with the same PPD path.
+  **Fix:** compare the full numbered URI and normalize only the known helper alias and driver-version text.
+  **Found by:** 2,746 listed HPLIP archive entries collapsed to 892 paths; the corrected full catalog comparison retains all entries.

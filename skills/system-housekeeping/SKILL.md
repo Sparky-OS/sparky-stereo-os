@@ -10,7 +10,7 @@ description: >-
   delete the evidence of a crash or shows Access denied on a mailbox, a tool exits 0 with no message on an unreadable
   HOME, nvidia-persistenced or thermald fails on a machine without that hardware, GRUB's menu never shows after a failed
   start or Advanced options starts a kernel under Secure Boot, a GRUB test in a container shows
-  English and an empty menu, or a build machine's disks fill with finished build trees, duplicates and Docker images.
+  English and an empty menu, the boot splash shows a flat pair, or a build machine's disks fill with finished build trees, duplicates and Docker images.
 ---
 
 # System housekeeping
@@ -73,6 +73,7 @@ Daniel, 2026-10-30: "all kernel purges must locate all that kernel parts and reg
 - **No speed trade-off** (Daniel, the same evening: "the user already chooses when to update, so, why bother so much with speed at this time? ... it's better for us to do all things here - and for themes is the only way to update the boot image").
 - **A package that changes the boot image** activates the `update-initramfs` trigger; one that changes what GRUB's menu says (background, theme, translations) runs `update-grub`.
 - **Proof:** after a theme change and `update-initramfs -u`, `lsinitramfs` of every kept kernel's boot image lists the theme.
+- **The stereo boot splash** (Plymouth with `plymouth.stereo=`, ORDER 639): how the main screen's choice reaches it at the start and at a restart, which renderer converts the two eyes and which shows one, the rule that a screen not converted shows one eye and never the pair, the mode it sets against the EDID, a QEMU rig with a panel and a 3D television, and the traps: [references/stereo-boot-splash.md](references/stereo-boot-splash.md).
 
 ## Logs and crash dumps
 

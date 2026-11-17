@@ -7,7 +7,7 @@
 2. Obtain the exact Debian tasksel source version used as reference.
    Check its archive hash against its `.dsc` and read both `debian/control` and `tasks/`.
    For every supported language, tabulate the base, desktop and KDE tasks' Depends and Recommends, the edition's existing packages, and the difference.
-   Keep absent tasks explicit: Malay is not Malayalam; Latin American Spanish shares Debian's Spanish tasks; English includes regional desktop variants.
+   Keep absent tasks explicit: Malay is not Malayalam; Latin American Spanish shares generic Spanish application data and Debian's Spanish tasks; English includes regional desktop variants.
 3. Resolve `${misc:Depends}` from the corresponding binary control or the debhelper integration, rather than omitting it.
    The tasksel 3.92 language binaries depend on `tasksel (= 3.92)`.
    Preserve alternatives and virtual providers when comparing names; a missing candidate for a virtual name does not establish an unavailable feature.
@@ -71,9 +71,9 @@ A deliberate removal retires the corresponding unused task before purging its pa
   **Found by:** the candidate report, its Reverse Provides section and the failing resolver plan.
 - **Symptom:** making every reference dictionary mandatory makes Czech, Spanish, Norwegian or Ukrainian uninstallable.
   **Cause:** the MySpell dictionary in Debian's recommendation conflicts with the Hunspell dictionary the edition already ships.
-  **Fix:** prefer Hunspell on a new image and allow the reference MySpell dictionary as an alternative on an existing machine; for Norwegian preserve both Bokmål and Nynorsk when using MySpell.
+  **Fix:** prefer Hunspell on a new image and allow the reference MySpell dictionary as an alternative on an existing machine; for Norwegian preserve both Bokmål and Nynorsk when using MySpell, including their hyphenation files.
   Protect installed roots explicitly during migration and refuse a plan that removes any payload.
-  **Found by:** a literal-union Czech simulation, then both dictionaries' Conflicts and Provides fields.
+  **Found by:** a literal-union Czech simulation, then both dictionaries' Conflicts and Provides fields; a Norwegian retention probe also found hyphen-no conflicts with both MySpell packages, whose archives carry the hyph_nb_NO and hyph_nn_NO files.
 - **Symptom:** preserving every Debian desktop recommendation brings IBus back beside Fcitx 5.
   **Cause:** the reference package set was copied without the edition's input-method design.
   **Fix:** keep Debian's recommendations in the evidence table and map the four IBus language-engine entries to the edition's corresponding Fcitx 5 engines in the proposal.
@@ -83,9 +83,6 @@ A deliberate removal retires the corresponding unused task before purging its pa
   **Fix:** explicitly install image tasks and let the Locale tool retire unused task roots; keep hard dependencies inside each language task.
   **Found by:** following the top metapackage's dependency graph against the existing language-removal design.
 
-This reference describes the reconciliation method and proposal requirements.
-Resolver simulations do not establish that new packages, the installer integration or the migration helper have been built or shipped.
-
 - **Symptom:** a simulated install of an archived wrapper says "Can't find a source to download version".
   **Cause:** its copied binary control lacks the repository Filename and Size fields.
   **Fix:** retain the archive's real Filename and measured Size in the temporary Packages record, then refresh apt indexes.
@@ -94,3 +91,6 @@ Resolver simulations do not establish that new packages, the installer integrati
   **Cause:** the apt helper configures apt's CA path; Python does not inherit that setting.
   **Fix:** point Python's SSL_CERT_FILE at the same mounted CA bundle; keep certificate verification enabled.
   **Found by:** the certificate-verification exception and the helper's apt-specific configuration.
+
+This reference describes the reconciliation method and proposal requirements.
+Resolver simulations do not establish that new packages, the installer integration or the migration helper have been built or shipped.

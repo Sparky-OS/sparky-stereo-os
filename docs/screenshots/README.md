@@ -17,19 +17,18 @@ Gwenview -2 px, the Info Centre -5 px, the file manager -7 px; the widgets and t
 Inside Gwenview the picture keeps its own depth: the car -2 px, the road ahead -6 px, the stands and the sky -12 px.
 An e-mail address, the personal folders in the file manager's side list, the weather widget's city and the UPS widget's source name are blurred in both eyes.
 
-## Speed Dreams, from the driver's seat and from behind the car (in development)
+## Speed Dreams, from the driver's seat and from behind the car
 
 <img src="speed-dreams-driver-view-anaglyph.jpg" width="49%" alt="Speed Dreams in 3D from the driver's seat: the steering wheel and the panel in front of the screen, the track and the scenery behind it (red-cyan anaglyph)"> <img src="speed-dreams-chase-view-anaglyph.jpg" width="49%" alt="Speed Dreams in 3D from behind the car: the car, the road and the stands all behind the screen, stepping back (red-cyan anaglyph)">
 
 Download the MPO (both eyes): [the driver's seat](https://raw.githubusercontent.com/Sparky-OS/sparky-stereo-os/main/docs/screenshots/speed-dreams-driver-view.mpo), [behind the car](https://raw.githubusercontent.com/Sparky-OS/sparky-stereo-os/main/docs/screenshots/speed-dreams-chase-view.mpo)
 
-Speed Dreams, the free racing simulator, drawn by two cameras through its own renderer in our test rig.
-In development: it is not in the edition's repository yet.
+Speed Dreams, the free racing simulator, drawn by two cameras through its own renderer.
 Each view has its own screen plane.
 From the driver's seat the panel and the steering wheel come in front of the screen and the track sinks behind it; from behind the car everything sinks, with more depth.
 Measured at 800 px per eye, from the driver's seat: the panel +9 px, the steering wheel about +49 px, the far scenery -39 px.
 From behind the car: the car -13 px, the road -10 px, the far scenery -22 px.
-These two were captured from the desktop's compositor in the rig, not with Spectacle.
+These two were captured from the desktop's compositor, not with Spectacle.
 [Speed Dreams](https://www.speed-dreams.net/) is the work of the Speed Dreams team: its code under the GPL, version 2 or later, and its artwork under the Free Art License by default.
 
 ## Stereo Desktop, the Info Centre and the menu (17 October 2026)

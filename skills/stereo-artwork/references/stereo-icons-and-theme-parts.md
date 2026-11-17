@@ -123,24 +123,27 @@ In the inspected KWin `6.7.4-2+stereo3d54+lc1` source, `StereoDepth::parallax()`
 The authoring control must share those operations, not duplicate their arithmetic by hand.
 
 The first helper slice generates an adapter from the exact published source functions, enum, reference width and KConfig defaults and records their SHA-256 hashes.
-Read the desktop settings once for both eyes and all sizes in an export.
-Integer disparity is a visible limitation at small icon sizes: with the inspected defaults, the full sunk and popped limits both round to zero through 64 pixels per view.
-At 128 full sunk is minus one pixel and full popped is zero; at 256 they are minus one and plus one.
-Report those measured results rather than calling every exported size visibly stereo.
-Daniel settled the icon rule on 16 November 2026: no wider authoring range, and a nonzero part receives the smallest visible step where the desktop budget allows it.
-Compute the rounded full-limit capacity with the source-derived KWin operation at each size.
-Keep zero at the screen; if capacity is zero, report that one pixel has no room; otherwise clamp the requested magnitude between one raster pixel and that capacity, with its sign.
-Do not ceil the capacity or add a separate icon range.
-At the inspected defaults, both signs have zero capacity through 64 pixels, popped has none at 128, sunk permits one at 128, and both signs permit one at 256.
-This is an honest no-room result for more sizes than the original 8/16 examples.
-Measure fractional choices as well as full-limit presets: a ten-percent sunk choice at 128 is the red control on the earlier 0.1.3 slice.
+Desktop element limits are screen pixels scaled with the OUTPUT width, never the icon canvas width.
+The old 0.2.0 implementation used an N-pixel output for an N-pixel icon and incorrectly erased depth at the common sizes; Daniel confirmed the corrected rule on 17 November 2026.
+For every nonzero authored value, use its sign, map its percentage onto the sign's output-pixel range with KWin's extracted operation, and lift a rounded zero to one pixel.
+Keep screen exactly zero.
+The upper limit is KWin's result at the real output width (default 10 sunk / 4 popped at the extracted reference width of 1920).
+Exceptions are explicit: the desktop's limit is zero on that output, or the part has no physical room in that drawing at that size.
+Measure the part's own zero-depth raster bounds; check both asymmetric eye shifts against the left/right canvas margins.
+Drawing room may restrict motion; it is not another depth budget scaled to the icon size.
+Keep different authored depths in order. Report distinct values that round to the same pixel; refuse a pair if unequal physical margins would reverse their order rather than silently exporting inverted depth.
 
-## A continuous control and useful selection
+Export stereo icons once at the common default limits and reference output width, independently of the author's private desktop settings.
+Preview using the person's limits and the actual output width. Account for the preview area's physical pixel width separately from render resolution, so reducing render resolution cannot amplify a one-pixel output shift.
+Label common export and personal preview numbers separately in the per-size table.
+Prove default exports identical under private zero limits, zero-limit and physical-room notices, signed minimum separation at all nine sizes with real Oxygen parts that have room, rounded ties, output-width changes, and order refusal.
+Measure both exported images and the compositor's two views; changing a unit calculation alone is insufficient.
+Probe shipped KIconThemes and Stereo Union separately to establish what smaller desktop limits do to a baked pair: an icon lookup is not a live depth remapper.
+Measured with KIconThemes 6.30.0-1+stereo3d2+lc1 and Stereo Union 6.8.80~git20261022.2163195c-0+stereo3d1+lc1: explicit stereo lookup returns the exact common-default eyes at all nine sizes under both 10/4 and private 1/1 settings; Union's supplied-pixmap painting and ordinary icon/button pixels are unchanged by those settings in the offscreen style probe.
+This does not prove every desktop consumer paints per eye, and it supplies no automatic clamp of baked internal disparities to a smaller limit.
+The offscreen Union probe uses its fallback platform; do not turn it into a claim of full-session theme integration.
+Keep one continuous signed authoring value per part. The per-size table reports default export numbers and the person's preview numbers separately.
 
-Sunk, screen and popped name places, not three fixed depth presets.
-Use one signed continuous value per part, with zero on the screen and both ends derived from the person's desktop limits.
-Read KWin's source defaults and the person's configuration; use the same source-derived operation for preview, export and the per-size disparity table.
-Show zero explicitly when a nonzero authoring value rounds to no disparity at an icon size.
 A selected SVG group needs a visible highlight in both previews and a thumbnail cropped to its painted bounds; IDs alone are insufficient.
 Keep highlighting out of exported artwork.
 Test fractional edits, actual keyboard delivery, Undo, Redo, and rejection of a parent and child both receiving depth.
@@ -289,3 +292,99 @@ Native project tests should also reject invalid inputs and verify that the sourc
 
 The probe builds on KDE's KIconThemes API and the edition's stereo extension by Daniel Campos Ramos.
 No external artwork or model is included.
+
+- **Symptom:** all common icon sizes show zero despite a nonzero depth, and the table calls it a lack of capacity.
+  **Cause:** the icon canvas width was passed as though it were the output width to KWin's operation.
+  **Fix:** use the output's physical width for the screen-pixel bound, common defaults at the reference width for export, and separate raster bounds for room. Show collapsed values and refuse depth inversions.
+  **How found:** the corrected design identifies a one-pixel shift of a 16-pixel icon as inside the four-pixel screen limit; a 0.2.0 red build and native plus compositor measurements of 18 exported pairs pin the distinction.
+- **Symptom:** changing render resolution amplifies the preview's depth when the image is enlarged.
+  **Cause:** an output-pixel shift was interpreted as a low-resolution texture-pixel shift.
+  **Fix:** keep output pixels and presentation pixels separate, converting the shift into render pixels before rendering; exports remain at native pixel size.
+  **How found:** compare the actual two-eye output against independently rendered references at 100 and 125 percent while keeping the output width fixed.
+- **Symptom:** a 125-percent preview or its reference uses a 2560-pixel output although the rig output is physically 1600 wide.
+  **Cause:** Wayland QScreen reports the rounded buffer scale of 2; the window's preferred fractional ratio is 1.25 for its 1280 logical pixels.
+  **Fix:** use QWindow::devicePixelRatio for output and presentation pixel calculations and refresh on DevicePixelRatioChange and output geometry changes. Keep the reference's known physical fixture width independent of that API.
+  **How found:** the native-reference mismatch and session metrics distinguished screen ratio 2 from window/widget ratio 1.25; the existing stereo-window-3d-area lesson describes the same trap.
+
+## Icons from a model
+
+Helper 2 imports one glTF 2.0 or GLB scene through VTK 9.6 and renders it with two parallel off-axis cameras.
+It uses the established importer and EGL renderer, not a rasterizer in the editor.
+The model's source transforms, materials and lights belong to one scene; camera-dependent views are drawn separately.
+The model's Z placement moves it across the icon plane with one signed depth control.
+A source without lights receives one fixed scene light; supplied lights move with the model.
+The ordinary core builds with both STUDIO_MODELS and STUDIO_STEREO disabled and links to Qt and KDE Frameworks without VTK or the stereo layer.
+
+For model depth z, translation t, camera distance D, focal length F in render pixels and baseline e, left-minus-right disparity is `d(z) = F e [1/(D-z-t) - 1/D]`.
+Cameras at x = -e/2 and +e/2 have focal points displaced by the same x, a shared up vector and equal vertical projection.
+VTK's window centres are `-2 F x / (N D)`.
+A point on the icon plane has z+t=0 and zero disparity; positive disparity pops and negative disparity sinks.
+Never turn the cameras inward.
+The [camera API](https://vtk.org/doc/nightly/html/classvtkCamera.html) supplies those transforms; the [importer](https://vtk.org/doc/nightly/html/classvtkGLTFImporter.html) supplies the scene.
+
+Fit the separation against both signed depth limits and the projected drawing margins, testing the near and far bounds.
+Limits come from the shared source-derived desktop operation at the output's physical width, never from an icon treated as a small output.
+Export at the common reference/defaults; preview at the person's own limits and actual presentation width.
+The initial Studio framing leaves margins and uses a compensated signed translation when a nonzero placement's centre would round flat.
+The table shows actual fitted far/near pixels per size and names zero limits separately from insufficient room.
+Disparity is monotone in z, so its rounding cannot reverse depth order.
+These fitted camera numbers are not additional output preferences.
+The scene preview still offers only Enable 3D, pixels per view and Display Settings, and no eye swap.
+Disabled 3D uses the central camera; export keeps the common authored pair.
+
+The model helper is a process boundary and is installed under the package's libexec directory.
+The editor reports a missing helper or unreadable model through its ten compiled catalogues.
+A saved project carries independent model/resource files, marked native PNS pairs, ordinary icons and paired SVG wrappers that use the existing layout mark.
+Generated ordinary icons use a fresh directory just as paired derivatives do, so saving cannot write through an alias copied from the source theme.
+Source/resource fingerprints prevent a cached view from being saved alongside files changed by another program; reopen the model to adopt changes.
+No model file is modified in place.
+
+### Reproduce the camera proof
+
+Use the build recipe's CC0 three-face fixture in `testdata/models/fixture.gltf`, derived from Marco Hutter's indexed Triangle in Khronos glTF Sample Assets.
+It is test geometry, not installed artwork or a replacement for a product's missing model.
+Keep its source credit and licence with it.
+The far and near faces have known z=-0.5 and z=+0.5, making an independent projection check possible.
+The unmodified Cube by Norbert Nopper / UX3D is a separate CC0 import witness.
+A model's licence is checked in its own records before it becomes a fixture.
+
+Build and run the program's native project tests in an isolated container first.
+Then run [model-icon-proof.py](model-icon-proof.py) inside that container, with a fresh output folder:
+
+```sh
+python3 model-icon-proof.py --renderer BUILD/studio-model-renderer \
+  --fixture SOURCE/testdata/models/fixture.gltf --output RESULTS/software \
+  --expect-renderer llvmpipe
+```
+
+Repeat in a fresh container on the chosen render node with the actual renderer required, for example `--expect-renderer radeonsi`.
+Set LIBGL_ALWAYS_SOFTWARE=1 only for the software case and verify the reported OpenGL renderer; giving KWin a render node does not itself prove llvmpipe.
+The script renders all nine sizes at screen, sunk and popped placements plus a one-camera control, parses every PNS sTER/CRC/alignment field, and compares measured face boundaries to the independent equation.
+It checks the one-camera views are equal, then applies the stereo prediction to that control and requires exit 1 with a structured failed measurement.
+An unrelated exception is not a successful negative control.
+The native fixture measurements on llvmpipe and AMD had maximum horizontal error 0.57 px, zero vertical edge shifts and all points inside the default limits.
+
+Present the exported pairs at their native view sizes in a Stereo KWin rig and capture both eyes.
+Measure each known face again, retain the 2D control and verify zero differing UI pixels outside declared cells.
+The first Studio rig covered 27 pairs and 54 face measurements per rendering path, including the 22 px PNS padding case.
+Also drive the depth control through real input, save/reopen the project, compare embedded theme views with native eyes, test private/zero limits, and verify the build without either layer in a rig without their packages.
+A ScreenShot2 capture proves the declared eye composition, not physical scanout or comfort on a television.
+
+### Model traps
+
+- **Symptom:** a valid JSON-only GLB with external buffers says “Error loading binary data”.
+  **Cause:** VTK's file-loading path assumes a BIN chunk, which [glTF 2.0](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html) makes optional.
+  **Fix:** feed the unchanged JSON chunk to VTK's public memory-stream importer with its URI loader rooted at the original filename; keep ordinary embedded GLB on the binary path.
+  **How found:** the external-buffer control failed, the importer source showed the assumption, and the stream/URI API passed the same model and saved-project round trip.
+- **Symptom:** a face's mask centroid appears vertically displaced despite parallel cameras.
+  **Cause:** view-dependent occlusion changes which pixels contribute to the centroid.
+  **Fix:** measure the known face's top/bottom edges and horizontal boundaries, retaining centroid data as a diagnostic.
+  **How found:** a 0.0833 px centroid difference coexisted with aligned geometric edges.
+- **Symptom:** model export overwrites a file outside the new project.
+  **Cause:** writing an ordinary icon over a copied theme alias follows its target.
+  **Fix:** write all generated model icons under a fresh, non-alias directory and add it to the copied index.
+  **How found:** an outside sentinel behind a copied icon alias must stay unchanged after the real save.
+- **Symptom:** a saved model no longer matches its cached icons after an external edit.
+  **Cause:** caching only by view parameters does not identify changed source/resource bytes.
+  **Fix:** retain fingerprints, validate them before accepting a render, and require copied inputs to match them before committing the project.
+  **How found:** changing an independent source copy before Save must refuse the operation and leave no project folder.

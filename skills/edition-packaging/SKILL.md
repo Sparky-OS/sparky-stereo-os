@@ -30,6 +30,7 @@ description: >-
 11. A vendor's closed program tested on the edition for its vendor (their terms first, the Linux route to its end, a sample of theirs, timing on two kernel flavours, the whole-desktop screenshot, the link-only app center entry, two lists): [trying a vendor's closed program](references/trying-a-vendors-closed-program.md) has the recipe and the traps.
 11. For a Go release, [reconcile the tagged source and modules](references/go-release-packaging.md) before choosing Debian dependencies or vendoring.
 12. An app center entry whose program needs packages to run (container tools, FUSE, Flatpak) declares them and installs them itself when the person installs the entry; the app center package never depends on them: [an app center entry that needs tools](references/app-center-entry-tools.md) has the recipe, the proofs, the traps and the review rule (read the upgrade proof's `Inst` lines for packages only an entry needs); it also holds the recipe to bump a pinned entry and build the next app center, and the causes of the seven failing cases of the app center's source tests.
+13. A package that makes apt remove Debian packages (Conflicts, Replaces, a Provides of their names) is read before it ships, on the apt plan's `Remv` lines and the removed packages' file lists, in a container that has the old machine's state: [a package that replaces Debian's packages](references/a-package-that-replaces-debians-packages.md) has the recipe, the rig, the order apt really takes and the traps (ORDER 645: a symbolic link out of a Debian package's tree and the time zone files of the system).
 
 **Check freshness first.**
 Written on 2026-10-07; the developer tasks and the skills package on 2026-10-16; provenance, Paweł's formula, rebuilt packages, the repository and the ISO on 2026-10-23, from rules dated 2026-10-02 to 2026-10-22; pins by architecture and the packages that are not ours on 2026-10-31; the i386 blocks, the order of pin files and the conversion to conffiles on 2026-11-01.
@@ -238,6 +239,8 @@ The recipe, the coexistence rules with their specification clauses, the proof an
 ## Packages for the processor's level
 
 [x86-64-v3 packages](references/cpu-level-packages.md): apt architecture variants with our own table, what forky's apt and dpkg do today, the complete-index rule, glibc-hwcaps and the v3 kernel, each trap with symptom, cause and fix.
+
+[ananicy-cpp, its rules and the sched_ext schedulers](references/scheduling-daemons.md): defaults read at CachyOS and Bazzite, the BPF listener's cost, the systemd proof, the vendored Rust source, the traps.
 
 ## Lessons from the lanes, October to November 2026
 

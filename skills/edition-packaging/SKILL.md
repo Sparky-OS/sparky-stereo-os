@@ -10,7 +10,7 @@ description: >-
   qt6-base update, a pin leaves a binding or development package uninstallable, a systemd unit's proof shows none
   of its journal lines, a preinst prompt stops a non-interactive install, a language probe shows
   English, a CMake consumer misses an imported library, a Rust suite shares its crates as dylibs,
-  or an amd64v3 index leaves apt on the baseline.
+  an amd64v3 index leaves apt on the baseline, or a program dies with Illegal instruction on an older processor.
 ---
 
 # Packaging the edition
@@ -238,7 +238,7 @@ The recipe, the coexistence rules with their specification clauses, the proof an
 
 ## Packages for the processor's level
 
-[x86-64-v3 packages](references/cpu-level-packages.md): apt architecture variants with our own table, what forky's apt and dpkg do today, the complete-index rule, glibc-hwcaps and the v3 kernel, each trap with symptom, cause and fix.
+[x86-64-v3 packages](references/cpu-level-packages.md): apt architecture variants with our own table, what forky's apt and dpkg do today, the complete-index rule, glibc-hwcaps and the v3 kernel, each trap with symptom, cause and fix; a baseline package built for the build machine's processor (Illegal instruction, status 132, on an older one) and the check that refuses it.
 
 [ananicy-cpp, its rules and the sched_ext schedulers](references/scheduling-daemons.md): defaults read at CachyOS and Bazzite, the BPF listener's cost, the systemd proof, the vendored Rust source, the traps.
 

@@ -93,3 +93,12 @@ Cost of the pairing: a variant build of a package with a companion needs both ar
 ## Credits
 
 The APT team (architecture variants, the table format); Canonical (amd64v3 in Ubuntu 25.10); openSUSE (glibc-hwcaps pattern packages); CachyOS (`cachyos-repo.sh`'s level detection, the levelled repositories); PikaOS (Debian sources rebuilt at x86-64-v3). Names from each project's own pages.
+
+## Trap: a baseline package built for the build machine's processor (ORDER 658)
+
+- **Symptom.** On an older processor a program dies with "Illegal instruction" (exit status 132), and the kernel log says `traps: NAME trap invalid opcode ... in FILE`. When FILE is a library, every program that loads it dies the same way. Found on a MacBookPro9,2 (i7-3520M, Ivy Bridge: AVX, no AVX2, BMI or FMA): the problems engine's library died, so the graphics chooser failed and nothing started from the desktop.
+- **Cause.** A compiler that is not told its target builds for the processor it runs on. Zig does this by default: `zig build-exe` and `zig build-lib` with no `-mcpu`, and `zig build` when `build.zig` uses `standardTargetOptions(.{})` with no default target. GCC and Clang do it only when a recipe passes `-march=native`.
+- **Fix.** `-mcpu=baseline` on `zig build-exe` and `zig build-lib`, `-Dcpu=baseline` on `zig build`, or a named default target in `build.zig` (the skills engine names x86_64-linux-musl, cgm-zig's own compiler is configured with `-DZIG_TARGET_MCPU=baseline`).
+- **The check.** `python3 sparky-os/repo/cpu-baseline.py FILE...` exits 1 when a program or library holds an instruction above the amd64 baseline and lists the first of each kind. A recipe that drives such a compiler runs it on what it built. `tzcnt` passes: it is `rep bsf`, which a processor without BMI runs as `bsf`, and compilers emit it for the baseline on purpose.
+- **How the cause was found.** The machines at hand (a Ryzen, an AMD A10 Carrizo, a Haswell) all have AVX2 and BMI, so none showed it. On the failing machine: `echo $?` after the program (132), `dmesg | grep 'invalid opcode'` for the file, `grep -o -w -E 'avx2|bmi2|fma' /proc/cpuinfo | sort -u` for what the processor lacks, then `objdump -d FILE | grep -c -w -E 'andn|shlx|vpbroadcastb'` on the file against the same file built with `-mcpu=baseline`.
+- **A level above the baseline** is never a compiler default: it is a v3 build delivered as an apt variant, as this page describes.

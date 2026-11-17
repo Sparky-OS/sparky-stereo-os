@@ -99,3 +99,47 @@ A deliberate removal retires the corresponding unused task before purging its pa
 
 This reference describes the reconciliation method and proposal requirements.
 Resolver simulations do not establish that new packages, the installer integration or the migration helper have been built or shipped.
+
+## Ordinary updates and the pending interval
+
+A migration that needs a command from the person does not cover ordinary package updates.
+Keep the aggregate's existing recommendation set stable so that upgrading a machine with removed languages does not add new task recommendations for those languages.
+Make the language runtime a dependency and queue the work from its postinst, independently of the frontend.
+Use the existing deferred-work pattern: a queue file, a path unit and a oneshot which waits for apt/dpkg locks before starting a new apt transaction.
+Enable the units for the next boot even when building an image without a running systemd.
+
+Before the original apt operation ends, capture installed language payload roots and their installed dependency closure and write temporary APT::NeverAutoRemove protection.
+Changing apt marks inside a maintainer script is insufficient: the outer apt operation may rewrite its extended state when it ends.
+After the locks are released, make the realized roots manual, install the retained language tasks and current tasksel/data, allow only the old wrappers in Remv, then check autoremove before removing the temporary protection.
+Keep the queue and protection if the transaction fails, with a translated problems-engine notice.
+
+Selection must honor the Locale tool's saved retained set.
+For an older installation without that set, a shared regional package alone must not select a removed language: identify each language by its unique installed packs, plus the system language and English.
+If the person adds or removes a language before the worker runs, update the queued selection too.
+Resolve dictionary virtual names to installed providers when removing payload, rather than leaving the provider behind.
+
+Prove old wrappers, a trimmed system and an all-language image against the actual signed edition, Debian and deb-multimedia indexes with the generated edition policy.
+Retain Inst and Remv lines, the post-package/pre-worker autoremove plan, configured closure checks and the built catalogues in all ten languages.
+A successful source build or a minimal resolver fixture is not that proof.
+
+## Traps during implementation
+
+- **Symptom:** a language-only meta build fails looking up an unrelated OS-developer package.
+  **Cause:** the generator eagerly resolves every role's dependencies before honoring the selected output set.
+  **Fix:** defer unrelated development-only resolution for an explicitly selected build.
+  **Found by:** the missing plasma-wayland-protocols key while building only language tasks against the published index.
+- **Symptom:** the meta generator rejects libreoffice-l10n-ar as a versioned library.
+  **Cause:** its broad library-name expression matches the digits in l10n.
+  **Fix:** distinguish LibreOffice data and named language plugins from ABI library packages.
+  **Found by:** the language control generation error and the package's actual role.
+- **Symptom:** a new container cannot reach the edition repository although its parent container could.
+  **Cause:** Docker-managed hosts-file entries are not retained by docker commit.
+  **Fix:** pass the required repository host mapping to each test/build container.
+  **Found by:** failed edition downloads after successful Debian downloads and the new container's name resolution.
+- **Symptom:** the installer package builds and the real archive link gate refuses it.
+  **Cause:** the current recipe already requires package versions newer than the published universe, and another required package has no published candidate.
+  **Fix:** retain the gate failure and required-versus-published versions and stop qualification until those dependencies are published or explicitly supplied as an authorized coherent cohort.
+  Never weaken an unrelated designed dependency to turn the gate green.
+  **Found by:** the gate's solver log, then apt-cache policy against the same signed sources and pins.
+
+The deferred migration and task-aware Locale integration remain candidate implementation until their real installed-machine and complete package gates pass.

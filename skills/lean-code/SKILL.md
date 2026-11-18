@@ -125,5 +125,5 @@ The [reproducible sources reference](references/reproducible-sources.md) has the
 
 ## Lessons from the lanes, October to November 2026
 
-[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part, and ORDER 638's per-file steps on every processor (17 November): the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (45 entries).
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part, and ORDER 638's per-file steps on every processor (17 November): the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (47 entries).
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).

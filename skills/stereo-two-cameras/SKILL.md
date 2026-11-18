@@ -47,7 +47,12 @@ Wrappers that inject stereo into programs follow the same rule and move the came
 | **Perspective, any OpenGL scene** | The standard asymmetric frustum: each eye's camera translated by plus or minus half the eye separation, its near-plane window shifted by `(e/2)·near/C` for a zero-parallax distance `C`; screen disparity is proportional to `e·(1/C − 1/Z)` | [KAlgebra](https://invent.kde.org/danielcamposramos/kalgebra/-/tree/stereo3d) and [Analitza](https://invent.kde.org/danielcamposramos/analitza/-/tree/stereo3d), [Kalzium](https://invent.kde.org/danielcamposramos/kalzium/-/tree/stereo3d) with [Avogadro](https://github.com/Sparky-OS/avogadrolibs/tree/stereo3d), [Kubrick](https://invent.kde.org/danielcamposramos/kubrick/-/tree/stereo3d), GRASS GIS (in the edition) |
 | **VTK programs** | VTK's own projection shear for stereo, set by the program itself when its render passes never set the camera's stereo flag | F3D (in the edition) |
 
-Keep the program's existing separation setting when it has one, and say how its value maps to the new cameras: Marble's 0.5 to 10 degrees kept their meaning in both of its views, so no saved setting changed.
+In the edition, derive the cameras from the person's limits delivered by Stereo KWin through `libstereo-declare`, and expose no separation setting, including through generic option editors, command lines or saved configurations.
+When the limits are not offered or not delivered, draw identical eyes and tell the person why.
+An upstream offer is a separate branch and follows that project's interface rules.
+Marble's earlier 0.5 to 10 degree controls are historical evidence, superseded for the edition by Daniel's 2026-11-10 rule.
+
+[Gaussian splats in stereo](references/gaussian-splats.md) traces projection, visibility ordering, shared engine state and the native viewport surface in a splat trainer.
 
 ## The OpenGL routes
 

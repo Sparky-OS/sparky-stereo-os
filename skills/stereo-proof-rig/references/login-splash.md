@@ -53,3 +53,18 @@ The capture JSON's `stereo` field identifies a pair; a wide aspect ratio alone i
 
 `CONFIG_SEED` names a mounted home tree to copy before setup for a saved-choice or package-upgrade case.
 Keep the seed read-only, use a fresh case directory, and compare package-upgrade configuration hashes separately from changes Plasma itself saves during login.
+
+`LOGIN_LANG` selects the private login locale, defaulting to C.UTF-8 as before.
+Generate the locale in the image and use one fresh login per language when probing a localized page or a locale-derived default.
+
+`EXTRA_PACKAGES` adds verified packages to mkrig's baseline, such as Sonnet's backend and dictionaries, the KCM launcher and the notifications applet's plasma-pa dependency.
+`USER_SETUP` names a mounted script run after the private home and LANG are set, before the setup compositor and Plasma start.
+Use it to reproduce a Desktop created before KIO, or an existing account copied by CONFIG_SEED; do not overwrite the saved settings being tested.
+The lifecycle logger includes each window's internal ID so a popup can be distinguished from the desktop and panel.
+Start Plasma through setsid to keep teardown signals inside its session; a German probe completed its assertions but its shared process-group teardown returned 143, while the isolated Spanish case returned 0.
+Do not turn a teardown status into a successful assertion; retain the phase logs and repeat the affected case with the corrected fixture.
+
+A rig bootstrap can create a preference or source file without installing its owning apt package.
+Installing that package later with confold correctly preserves the local file, which can hide a new distributor default from the test.
+For an upgrade proof install the actual published predecessor first, check that its shipped pin is unmodified, then upgrade it.
+Keep the local frozen source separate or use apt's Dir::Etc::sourceparts override for an isolated policy query.

@@ -17,7 +17,7 @@ docker run --name "$NAME" --ulimit core=0 --platform linux/amd64 --cpus 4 \
 	--mount type=bind,src=/etc/ssl/certs/ca-certificates.crt,dst=/run/host-ca.crt,readonly \
 	--mount "type=bind,src=$HTTPS_ONLY_APT,dst=/run/https-only-apt.sh,readonly" \
 	--mount "type=bind,src=$REPO,dst=/repo,readonly" --mount "type=bind,src=$CONF,dst=/aptconf,readonly" "${extra[@]}" \
-	--mount "type=bind,src=$LOGS,dst=/logs" "$BASE_IMAGE" sh -c '
+	--mount "type=bind,src=$LOGS,dst=/logs" -e "EXTRA_PACKAGES=${EXTRA_PACKAGES:-}" "$BASE_IMAGE" sh -c '
 set -e; ulimit -c 0; export DEBIAN_FRONTEND=noninteractive
 sh /run/https-only-apt.sh
 apt-get -y update > /logs/update0.txt 2>&1
@@ -31,7 +31,7 @@ cp /aptconf/sparky-stereo /aptconf/sparky-stereo-only-ours /etc/apt/preferences.
 cp /aptconf/sparky-stereo-deb-multimedia.sources /etc/apt/sources.list.d/
 sh /run/https-only-apt.sh
 apt-get -y update > /logs/update2.txt 2>&1
-PKGS="kwin-wayland plasma-workspace plasma-desktop kactivitymanagerd sparky-stereo-look plasma-theme-oxygen libkf6config-bin libkscreen-bin qdbus-qt6 dbus-bin dbus-daemon dbus-x11 python3-gi gir1.2-glib-2.0 python3-numpy python3-pil wayland-utils xwayland libstereo-declare1 qml6-module-qtquick fonts-dejavu-core locales"
+PKGS="kwin-wayland plasma-workspace plasma-desktop kactivitymanagerd sparky-stereo-look plasma-theme-oxygen libkf6config-bin libkscreen-bin qdbus-qt6 dbus-bin dbus-daemon dbus-x11 python3-gi gir1.2-glib-2.0 python3-numpy python3-pil wayland-utils xwayland libstereo-declare1 qml6-module-qtquick fonts-dejavu-core locales ${EXTRA_PACKAGES:-}"
 apt-get -y -o Acquire::Retries=5 dist-upgrade > /logs/dist-upgrade.txt 2>&1
 apt-get -y -o Acquire::Retries=5 --no-install-recommends install $PKGS > /logs/install.txt 2>&1 || { tail -30 /logs/install.txt; exit 1; }
 if [ -d /extra ]; then apt-get -s --no-install-recommends install /extra/*.deb > /logs/extra-simulate.txt 2>&1; apt-get -y --no-install-recommends install /extra/*.deb > /logs/extra.txt 2>&1 || { tail -30 /logs/extra.txt; exit 1; }; fi

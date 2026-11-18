@@ -41,6 +41,8 @@ The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
 
 For a package that disappeared from testing, read [carried from Debian unstable](references/carried-from-debian-unstable.md): removal records, suites, RC bugs, fixes, versions, retirement and the installed proof.
 
+For a recorded decision authorizing a stereo version of a SparkyLinux tool, use [the pinned carry recipe](references/carried-sparkylinux-tool.md); it preserves the published base and checks every payload file before the narrow change.
+
 ## Provenance (Daniel, 2026-10-02): always
 
 Every package of ours says who made it, the Sparky way, and [`provenance.sh`](https://github.com/Sparky-OS/sparky-stereo-os-build/blob/main/sparky-os/repo/provenance.sh) in the build tree writes it.

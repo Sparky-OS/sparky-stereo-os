@@ -134,6 +134,21 @@ If the build record names another descriptor, search only the authorized bounded
 - **Fix:** rebuild the retained descriptor, admit complete genuine receipts only after all-member equality, and hold a differing source with its required family. For this cohort the coordinator required Graphics and both Qt sources to travel together, so all three stayed out while the remaining cohort continued.
 - **How found:** Calamares branding's two archives matched and its repaired receipts passed the source audit; Graphics' streamed payload/control maps exposed five differing installed files and two control members. The original recorded descriptor was absent from the bounded search, so its origin was not inferred.
 
+### A clean successor when the accepted descriptor cannot reproduce its binary
+
+An exact receipt repair and a new source-built successor are different operations.
+When the available descriptor does not reproduce the accepted binary and the recorded descriptor is unavailable, keep that failed repair and obtain an explicit successor ruling.
+Build the new version from the authorized recipe, retain its real source-build receipts, and compare the result with the accepted installed package.
+Compare every member's path, type, mode, owner and link; restore script/data files through their verified HR blobs before comparing authored bytes.
+For compiled files retain exported dynamic symbols, NEEDED entries and complete string-table dumps, with only the authorized version/build-identifier differences normalized.
+Report compiler and Lean toolkit versions independently; projected bytes from different toolkit versions need not be identical when the authored bytes are.
+Keep short binary-section fragments separately from actual strings, rather than silently removing them from the evidence.
+
+- **Symptom:** the Graphics receipt repair changed installed files even though its HR companion matched; the recorded descriptor was no longer available.
+- **Cause:** the retained descriptor was not sufficient evidence for the accepted compiled archive, and a later Lean renderer also changed projected script bytes.
+- **Fix:** preserve the failed repair, build an explicitly authorized version-only successor with genuine receipts, then compare restored authored files and compiled interfaces against the accepted archive. Keep its exactly pinned Qt family together. Never weaken the all-member equality required for an ordinary receipt repair.
+- **How found:** streamed member comparisons separated the source mismatch from projection differences; verified HR restoration matched authored files, while ELF exports, NEEDED libraries and string dumps established the successor comparison. Its actual source build and all 14 package tests were retained separately.
+
 ### Discovery depth and processor variants
 
 State the directory-discovery bound separately from the depth used to inventory a discovered stage.
@@ -217,6 +232,17 @@ Stop only the owned task named by that monitor and retain its diagnostic before 
 A live held stage can also change after initial discovery.
 Retain disappeared paths as observations, inspect the newly seen descriptor/binaries within that named root, and report a newer unlisted generation without adding it to the frozen pool.
 The pool's accepted copies and checksum identity stay independent of that live folder.
+
+### A clean simulation can still select the old edition
+
+The flat candidate index must carry the same Release Origin used by the edition's preferences.
+Before the real transaction, require an exact-version Inst line for every installed package selected for replacement in the frozen pool.
+Retain a target table derived from the audited controls and reject a check that exercises no installed replacement.
+
+- **Symptom:** the simulation returned zero removals and nothing kept back, but offered only unrelated Debian updates while selected Qt and edition successors stayed old.
+- **Cause:** a regenerated flat Release omitted Origin, so the edition's origin pin continued to prefer the published packages over the newer local candidates.
+- **Fix:** restore the declared Origin/Label in the local index, seal the corrected index, and restart the actual proof from the untouched published baseline. Keep the invalid attempt separate and check exact selected versions before installing.
+- **How found:** the Inst lines had none of the expected successors; the before snapshot still held published versions, and the Release metadata explained the preference mismatch. The corrected simulation offered 250 Inst and all 164 installed selected replacement targets; negative checker fixtures refuse missing or wrong-version Inst lines.
 
 ### A clean simulation does not run maintainer scripts
 

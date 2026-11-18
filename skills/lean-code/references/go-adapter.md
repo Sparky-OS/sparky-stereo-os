@@ -1,33 +1,68 @@
-# The Go adapter: the plan, with the measurement that grounds it (not built yet)
+# The Go adapter: what is projected, what is data, how to check a tree
 
-**For** whoever builds the Go adapter for Lean Code or reviews a Go program built through it. Part of the [`lean-code`](../SKILL.md) skill.
-Written on 2026-11-18 for toolkit 0.1.29 after OpenLinkHub 0.9.4 was carried (its Go files are left authored, named in the record). Status: **planned**; the rules are decided (the main session, milestone 7: doc comments go from the build input, directives and the cgo preamble stay, vendor trees are preserved as authored, no switch), the code is not written.
+**For** whoever builds a Go program through Lean Code or reviews such a build: the rule for each kind of comment, the counts that ground it, the commands, and the traps met while writing it.
+Part of the [`lean-code`](../SKILL.md) skill.
+Written on 2026-11-18 for toolkit 0.1.30 (`lean/lang_go.py`), measured on OpenLinkHub 0.9.4, the first program built through it (package `openlinkhub` 0.9.4-2).
+The adapter acts on build inputs only, in a source tree whose language plan names `go`; an installed Go file stays authored.
 
-## How the Rust adapter was added (the pattern to follow)
+## The rule, tied to the Go specification
 
-`lean/lang_rust.py` (396 lines) holds the lexer, the rule per kind of comment and the reader checks; `consumers.py` names its extensions and the consumers that keep a file whole; `project.py` dispatches `render_text` by language and runs the check; `source_tree.py` adds the extension to `EXTENSIONS`, primes the batch check and reads the language plan (`debian/sparky-lean-languages.json` names `rust`); `lean/tests/test_rust.py` (382 lines) has one red case for each kind of data. The gate checks each file before it is written: the compiler's own lexer gives the authored and the lean text the same tokens, and a file the lexer refuses stays authored with the reason.
+- [Comments](https://go.dev/ref/spec#Comments): "A general comment containing no newlines acts like a space. Any other comment acts like a newline."
+- [Semicolons](https://go.dev/ref/spec#Semicolons): a semicolon is inserted after a line's final token when it is an identifier, a literal, `break`, `continue`, `fallthrough`, `return`, `++`, `--`, `)`, `]` or `}`. A comment that acts like a newline takes part in that.
 
-## The rules, one line for each kind of comment
+So the adapter differs from the C and Rust forms in one thing: **no line goes**.
 
 | In the source | Rule |
 | --- | --- |
-| `// text` alone on its line | goes (the line stays empty: the position of every later line is kept) |
+| `// text` alone on its line | goes; the line stays, empty |
 | `// text` after code | goes with the blanks before it |
-| `/* */` without a newline | one space (a general comment acts like a space) |
-| `/* */` with newlines | the same number of newlines (the Go spec: such a comment acts like a newline, so it takes part in automatic semicolon insertion) |
-| doc comments (the group before a declaration) | go from the build input; the HR text keeps every one (option B) |
+| `/* */` without a newline | one space |
+| `/* */` over several lines | goes line by line; its newlines stay, so the semicolon lands where it did |
+| doc comments (the group before a declaration) | go from the build input; the HR text keeps every one (option B, decided in milestone 7) |
 | `//go:build`, `// +build`, `//go:generate`, `//go:embed`, `//go:linkname`, `//go:noinline` and the other `//go:` pragmas, `//export NAME`, `//line`, `/*line */` | stay: the compiler, cgo or `go generate` reads them |
-| the comment group directly before `import "C"` (the cgo preamble) | stays: it is C source for the C compiler (a later step may hand it to the C adapter) |
-| `// Code generated ... DO NOT EDIT.`, copyright and SPDX lines | stay (tools read the marker; the licence obligation) |
-| `// Output:` in an Example function of a `_test.go` file | stays: `go test` compares it; test files are left whole |
-| a file with a `//go:generate` that reads source text (stringer and the like), an `embed`ded file, a file with a carriage return or a byte-order mark | left as authored, with the reason |
-| strings, raw strings, runes, struct tags | data, never edited (`go/scanner` tells them apart) |
+| the comment group directly before `import "C"` (no blank line between) | stays: it is C source for the C compiler |
+| `// Code generated ... DO NOT EDIT.`, copyright, licence and SPDX lines | stay |
+| strings, raw strings, rune literals (struct tags are strings) | data, never edited |
+| a `_test.go` file | left whole: `go test` compares the `// Output:` comment of an Example |
+| a file under `testdata/` | left: the input of a test |
+| a file with a `//go:generate` line | left: a generator may read this file as text |
+| a byte-order mark, a carriage return, binary data, a file go/scanner or go/parser refuses | left, with the reason |
+| `vendor/*` | preserved through `debian/sparky-lean-preserve.json`, as for edgetk |
 
-## How equivalence is proved
+No pointer line is written (`MARKER` is empty): a pointer line would move every position. `core.render` takes a handler whose `keep_empty_after` has the attribute `keep_all`, which keeps every emptied line, the first one included; `project.render_text` calls it with `collapse_blank=False`.
 
-1. Before a file is written, a helper (a small Go program using `go/scanner`, built once with the installed `go`, one start for a batch of files) scans the authored and the lean text and compares the token streams, **including the semicolons the scanner inserts**; `go/parser` must still parse the lean text. A mismatch stops the projection; a file the scanner refuses stays authored.
-2. After the build, `go build -trimpath` of the authored tree and of the projected tree give the same program. Measured with a throwaway projector that follows the table above: OpenLinkHub's 224 Go files outside `vendor/`, 10.37 MB (398,653 lines), hold 23,559 comments: 11,252 doc comments (647 KB), 12,296 other line comments (265 KB), 11 block comments (3 KB); 915,476 bytes (8.8 %) go, one comment group (the cgo preamble) stays, no file is refused, the token streams of all 224 are equal, `go vet ./...` is clean, and the two binaries (41,222,872 and 41,222,864 bytes) have byte-identical `.text`, `.rodata` and `.gopclntab`. They are identical because comment-only lines become empty lines; removing the lines would move later positions (panic traces, `log.Lshortfile`) and the report would list them as `position_lines` does for Rust.
+## Recipe
 
-## What it costs
+Run it where the build's own `go` is installed: the check uses that toolchain's scanner and parser.
 
-About 250 lines of Python for the adapter, 120 of Go for the helper, a few lines in `consumers.py`, `project.py` and `source_tree.py`, and tests of about 300 lines (one red case per row of the table: a `//go:build` file that drops out of the build, a cgo preamble that no longer compiles, an Example whose output check is lost, a semicolon that disappears with a block comment). The projection of OpenLinkHub's 224 files took under five seconds including the helper's compile. Every package built through the toolkit has to be rebuilt after the toolkit changes (the embedded toolkit copies hold the whole `lean/`).
+1. Opt the source tree in: `echo '["c", "go"]' > debian/sparky-lean-languages.json` (`c` only when the tree has C files; a tree without the file is projected as C and C++ only).
+2. Preserve what stays authored: `debian/sparky-lean-preserve.json` with `vendor/*` and its reason, in the form `lean.debian_prepare` writes.
+3. Project: `PYTHONPATH=TOOLKIT python3 -m lean.source_tree project TREE` prints `Build-input Lean Code: N/M files projected` and writes `TREE/.sparky-lc/source.json`; the authored copies are under `.sparky-lc/authored/`. In a Debian build the toolkit does this before compilation (`stage: before compilation` in the record); `golang-go` must be a build dependency, because the helper is built with it (`apt-get build-dep` runs before `dpkg-buildpackage`).
+4. Read the record: `languages`, each file's `status` (`projected`, `unchanged` or `left`) and `reason`, the `check` text.
+5. Build; compare. `python3 -m lean.source_tree restore TREE` puts every authored file back and checks each hash.
+
+## How a projection is checked
+
+Each file is checked before it is written: a helper (a Go program built once per process with the installed `go`, `-buildvcs=false`, `GOFLAGS` emptied so a recipe's `-mod=vendor` does not reach it) scans both texts with `go/scanner` and prints the token stream, **the automatic semicolons included**, and `go/parser` must accept the text; the streams must be equal, and the number of lines too. A whole tree is read ahead in batches of 400 files, one helper start per batch. An authored file the scanner or parser refuses stays authored with that reason; a lean file that reads differently fails the projection, and the build stops.
+
+## Measured on OpenLinkHub 0.9.4 (a08204cf), 2026-11-18
+
+- The tree: 713 files the plan makes eligible; 224 Go files outside `vendor/` (10.37 MB, 398,653 lines) and one C header projected, 487 vendor files left as authored (preserved), none refused. The record: `Build-input Lean Code: 225/713 files projected in 13 s on 4 processors`.
+- 23,263 comments go from the 224 Go files (959,620 bytes with the C header's); the cgo preamble in `src/audio` stays.
+- The program built from the projected tree and the one built from the authored tree: every section is byte-identical (`.text` 18,570,332 bytes, `.rodata`, `.gopclntab` 9,027,055, `.data`, `.noptrdata`, `.go.buildinfo`) except the two build-id notes (`.note.go.buildid`, `.note.gnu.build-id`); 116 bytes of 33,425,136 differ, all in them. A panic names the same file and line in both, which `tests/test_go.py` shows on a small program.
+- Same program in the systemd container and on `qemu64` as before.
+
+## What a toolkit change obliges
+
+A new toolkit version needs its row in `lean/identities.py` (the digest of the renderer files and every `lang_*.py` moves with the new module). Old rows stay valid, so no package is obliged to rebuild for the new label; a package rebuilds to gain the adapter (OpenLinkHub, edgetk when it is packaged). A package built under the new toolkit differs from one built under the old only in the renderer identity of its `lc1` manifest and what that moves (measured on sparky-stereo-hardware 0.1.32 and sparky-stereo-kernel-settings 20261116.2: rebuilt under 0.1.30, every file equal to the 0.1.29 build's but the one manifest, `usr/share/dpkg-stereo/lc/PACKAGE/all.json`, whose `renderer.identity` and `renderer.sha256` are the only fields that differ).
+
+## Traps met
+
+- **A `go.mod` of the recipe reaches the helper.** *Symptom:* `go build` of the helper fails with `-mod=vendor` or "cannot find main module". *Cause:* the recipe exports `GOFLAGS=-mod=vendor` and the helper's folder has no vendor tree. *Fix:* the helper's environment empties `GOFLAGS`, sets `GOPROXY=off`, `GOTOOLCHAIN=local`, its own `GOCACHE` and `GOPATH`.
+- **`go build` outside a work tree asks for `-buildvcs=false`** (*Symptom:* "Use -buildvcs=false to disable VCS stamping" in a temporary folder inside a repository's reach). *Fix:* the helper is built with it.
+- **A multi-line `/* */` replaced by one space changes the program.** *Symptom:* the scanner reads `a y` where it read `a ; y` and go/parser refuses the lean text. *Cause:* such a comment acts like a newline. *Fix:* a removable comment over lines becomes one span for each of its lines, so the newlines between them stay.
+- **The first line of a file.** *Symptom:* a file that begins with a doc comment lost its first line, and every position moved by one. *Cause:* `core.render` kept an emptied line only after a line that continues (a backslash), and never at offset 0. *Fix:* the handler's `keep_empty_after.keep_all`.
+- **`+ 1` on its own line is a statement.** *Symptom:* a test text with `x := a /* over\n two */ + 1` stops compiling with "+1 is not used", authored and lean alike. *Cause:* the comment's newline inserts a semicolon after `a`. *Fix:* test with the comment after an operator.
+- **`textStart` is not in the file.** A comment about the neighbouring tool: `repo/cpu-baseline.py` reads the Go function names from `.gopclntab`, whose `textStart` is zero in the file; see cpu-level-packages.md.
+- **An Example needs a name that exists.** *Symptom:* `ExampleA refers to unknown identifier: A` in a test of the `// Output:` rule. *Fix:* the test tree declares `func A()`.
+- **Where cgo cannot build, say so.** On the workstation `runtime/cgo` failed to build (a MIPS assembler file reached gcc); the cgo case of `lean/tests/test_go.py` probes a trivial cgo build first and skips with that reason, and passes in the build container (go and gcc installed there): all 20 cases of `lean/tests/test_go.py` ran green in `gr108-base`.

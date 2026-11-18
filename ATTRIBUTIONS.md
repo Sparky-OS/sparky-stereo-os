@@ -1157,3 +1157,8 @@ The program's bundled Java is **Azul Zulu 8** (Azul Systems; OpenJDK, GPL-2.0 wi
 The tray is a KStatusNotifierItem and the settings page a KCMUtils module, from **KDE Frameworks** (the contributors named in their sources).
 The `Sparky-Install-Download-Size` declaration and its reader are the edition's own (sparky-stereo-apt); the app center's entry mechanism is **Paweł "pavroo" Pijanowski's** APTus.
 OpenSC, pcsc-lite, SoftHSM, OpenSSL and the X11 test tools (Xvfb, xdotool, ImageMagick) are the test dependencies, credited above and in their own records.
+
+### The store-link entry kind (ORDER 10)
+
+**CODESYS GmbH** makes CODESYS 4 and runs the CODESYS Store, and its team agreed in October 2026 that the edition lists CODESYS 4 in its app center as a link to that store, where people register and download under CODESYS's own licence agreement; the facts about the program come from the pages of the store itself.
+The app center's entry mechanism is **Paweł "pavroo" Pijanowski's** APTus.

@@ -2,6 +2,7 @@
 
 ORDER 481.
 The boot splash follows the depth limits of the main screen's saved choice, the way every other surface that shows depth does: the person's limits, built on the display, never numbers of its own.
+What a theme itself must declare and draw (`Stereo=`, `Window.GetStereo ()`, no constants): [boot-splash-theme-contract.md](boot-splash-theme-contract.md) (ORDER 715).
 Which screens show two eyes, which show one, the restart splash and the rig with a panel beside a television: [the stereo boot splash](../../system-housekeeping/references/stereo-boot-splash.md) (ORDER 639).
 The rule (Daniel, 2026-11-05): "read the depth config by, and in this order of importance: 1 - User choice (but based on 2); 2 - Current display".
 The splash had levels fixed at the desktop's default limits, so a person who lowered PoppedLimit still saw the default depth at boot.

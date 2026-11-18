@@ -139,6 +139,8 @@ Never commit a buffer of two views to a surface the compositor has not taken as 
 
 The splash takes the main screen's limits, never numbers of its own: sparky-stereo-boot puts `popped=` and `sunk=` on each stereo output of `plymouth.stereo=` (the person's `kwinrc` `[StereoDepth]` limits times the display's factor, as KWin resolves them), Plymouth hands them to the theme (`Window.GetStereoPoppedLimit ()`, `Window.GetStereoSunkLimit ()`), the theme places its levels inside them, and what the person did not save is the display's default, said.
 [The chain, the guest rig that proves it (`scripts/plymouth-rig/`), the predicted and measured parallax, and the traps](references/boot-splash-depth.md) (ORDER 481).
+A boot theme declares `Stereo=full-side-by-side`, draws each eye at full size when `Window.GetStereo ()` is true and one picture when it is false, and places every level from the two limits; a theme that packs its own pair shows a flat squeezed pair on every screen.
+[What a theme must declare and draw, the symptom, which theme a machine boots with, the guest proof, reading a real machine's panel](references/boot-splash-theme-contract.md) (ORDER 715).
 
 ## Depth in a Qt Quick window that Stereo Union does not style
 

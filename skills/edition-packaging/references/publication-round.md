@@ -221,6 +221,23 @@ Trap:
 - **Fix:** the qualified closure's identity overrides the initial inventory owner; correct the two report rows without changing any archive or pool manifest.
 - **How found:** a copied-pool metadata audit grouped those two paths separately; a fixture with held and accepted descriptors sharing one orig archive failed before the correction and passed after it.
 
+### Resume an unchanged pool after a capacity ruling
+
+A written increase in scratch allowance changes the resource envelope, not the frozen cohort.
+Remove the incomplete roots and data no completed check needs before restarting the whole failed target scope.
+Verify the pool manifest and every listed checksum, and keep annotations unchanged too when the ruling says no pool file changes.
+Apply the new free-space floors to both the outer monitor and archive qualifier.
+Retain sampled usage, maximum observed allocation, sampling interval and disk free-space values; a sampled maximum is not a continuous high-water mark.
+Worker count can change within the measured paired-root budget while the validator files and target set stay unchanged.
+
+Trap:
+
+- **Symptom:** the installed proof and native archive checks pass, but the required meta source remains unqualified after a capacity stop.
+- **Cause:** the previous allocation cannot hold the paired dependency roots, verified cache and stop margin together.
+- **Fix:** obtain the coordinator's written resource ruling, clear incomplete scratch, verify the unchanged pool and rerun the complete failed scope with explicit limits and retained peak samples.
+  Late accepted work still follows its own cohort ruling; a capacity increase does not admit it.
+- **How found:** the old 9.6 GiB guard stopped with one complete top-meta root and an incomplete predecessor; Continuation4 authorized16 GiB and a12 GiB root free-space floor, so the same60 targets could be retried without regenerating packages or lists.
+
 ### Public indexes between bounded invocations
 
 One copied pool can need separate complete native and meta invocations to stay inside its scratch allocation.

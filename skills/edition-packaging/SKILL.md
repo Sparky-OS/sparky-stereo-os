@@ -1,15 +1,15 @@
 ---
 name: edition-packaging
 description: >-
-  Build, sign and ship the edition's packages: provenance, rebuilt upstream packages (+stereo3dN, i386 twins),
-  dependency policy, apt pins (:any, Signed-By), conffiles, the signed repository, a publication round, DEP-11 and
-  Contents, the ISO, reproducible sources (SOURCE_DATE_EPOCH), the build record, the Lean Code gate,
-  installed-package proof, languages. Load it when a package will not install (Breaks, Multi-Arch:
-  same), apt picks Debian's build or a dummy at dist-upgrade, two builds of one source differ,
-  apt-get update exits 0 on a failed fetch, lc1 says the build record is incomplete, a Qt header is missing after
-  qt6-base updates, a pin leaves a binding or development package uninstallable, a systemd unit's proof shows none
-  of its journal lines, a preinst prompt stops an install, a language probe shows English, a CMake consumer misses an imported library, a Rust suite shares crates as dylibs,
-  an amd64v3 index leaves apt on baseline, or Illegal instruction on older CPUs.
+  Build, sign and ship edition packages: vendor-signed app center downloads (minisign), provenance,
+  stereo rebuilds and i386 twins, dependencies, apt pins (:any, Signed-By), conffiles, signed repository,
+  publication rounds, DEP-11, Contents, ISO, reproducible sources (SOURCE_DATE_EPOCH), build records,
+  Lean Code, installed proof and languages. Load it when a package fails to install (Breaks, Multi-Arch:
+  same), apt picks Debian's build or a dummy at dist-upgrade, source rebuilds differ, apt-get update exits 0
+  on a failed fetch, lc1 reports an incomplete build record, a Qt header disappears after qt6-base updates,
+  pins make bindings/development packages uninstallable, a systemd proof has no journal lines, preinst prompts
+  block installation, a language probe shows English, CMake misses an imported library, Rust tests share dylib crates,
+  amd64v3 indexes leave apt on baseline, or older CPUs report Illegal instruction.
 ---
 
 # Packaging the edition

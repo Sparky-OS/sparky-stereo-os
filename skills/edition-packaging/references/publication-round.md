@@ -132,6 +132,26 @@ Traps found during bounded discovery in ORDER 701:
   **Fix:** retain both fields and keep variants outside the candidate set until their own acceptance is recorded.
   **How found:** controls of staged stereo-library variants said `Architecture: amd64` while their filenames named `amd64v3`; reading the additional control field distinguished them.
 
+### Compare installed paths as well as archive listing lines
+
+Keep the complete `dpkg-deb -c` diff, then map every removed line to the archive member it describes.
+Normalize only the presentation of directory paths (`./usr/` and tar's `./usr` name the same directory); retain file names, modes, ownership, links, sizes and content hashes separately.
+A timestamp change is a changed listing line, not a removed installed file.
+Keep reviewed explanations keyed by binary and installed path beside the raw comparisons, and refuse an unreadable listing line.
+For an HR blob, follow the old manifest to its installed file and verify the replacement blob against the successor manifest after decompression.
+A content-addressed blob's name changing alone does not show loss of the authored file.
+
+Traps found while qualifying a round:
+
+- **Symptom:** the comparison reported thousands of unresolved directory listing lines although their contents remained.
+  **Cause:** `dpkg-deb -c` prints trailing directory slashes that the tar member names can omit; the archive root may be `.` rather than an empty path.
+  **Fix:** normalize those directory presentations before matching, keep all metadata changes visible, and test root, ordinary directory, symlink, hardlink, names containing spaces and malformed input separately.
+  **How found:** the unresolved lines were compared with the independently streamed tar member map; rerunning against the same immutable inputs resolved the false entries without dropping a diff line.
+- **Symptom:** fresh generated kernel metas would stay at the published version while the other task metas upgraded.
+  **Cause:** their versions derive from the kernel recipe independently of the meta source version, and a version without the published terminal `+lc1` sorts below that published version.
+  **Fix:** use the generator's supported kernel-meta suffix for the round, including the terminal mark, compare every generated binary version with dpkg, and retain the actual source-built generation. Do not repair the control files after building.
+  **How found:** a per-binary generated-versus-published control table exposed the ordering before the pool froze; `dpkg --compare-versions` confirmed it and the regenerated versions sorted above every published kernel meta.
+
 ### A stage accepted after the proof froze
 
 A passing transaction and link check qualify their recorded archive identities, not every package that later enters a stage folder.

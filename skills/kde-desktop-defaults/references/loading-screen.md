@@ -64,3 +64,31 @@ Each with its symptom, its cause, its fix and how the cause was found.
 - **Symptom:** the splash is up for about a second and a half in the rig, too short to capture at chosen moments. **Cause:** a container's Plasma is ready fast. **Fix:** for capture cases only, the person's autostart folder holds an `org.kde.plasmashell.desktop` whose `Exec` sleeps a few seconds first (the person's folder overrides the system's entry of the same name); timing cases run without it. **Found by:** KWin's `REMOVED ksplashqml` line 1.4 s after `ADDED`.
 - **Symptom:** waiting for `ksplashqml` to leave the process list waited 70 seconds once. **Cause:** in that run (a container without the render node) the session bus logged "Activating service name='org.kde.KSplash' requested by ... plasmashell" after the splash had quit, so a second `ksplashqml` was started by D-Bus activation; with the render node it was not seen again. **Fix:** take the splash's moments from KWin's own log (`ADDED` and `REMOVED ksplashqml`), never from the process list.
 - **Symptom:** at 125 % the splash's levels were 1.5 times too deep (wordmark 6 px apart, swirl 3, where 4 and 2 are due). **Cause:** `StereoDepth` took the output's width in device pixels from the screen's ratio, which on Wayland is the whole `wl_output` scale (2), not the window's fractional 1.25. **Fix:** the window's own `devicePixelRatio()`; the case is kept in the proofs (`SCALE=1.25`). **Found by:** the 125 % login measured 6 and 3, which is `round(4 x 1536 x 2 / 1920)` and half of it.
+
+## A loading screen with parts at depth, and a second kept selectable
+
+Prerequisite audit for ORDER 672, 2026-11-18; the replacement and its rendering proof are pending.
+The ORDER 571 measurements above describe that splash, not every later loading-screen design.
+
+1. Read the requested levels and the published layer's implementation before replacing the pictures.
+   `StereoDepth` levels are absolute from the screen plane; nesting a logo inside a popped box does not add the box's depth to the logo's declared depth.
+   In stereo-layer 1.21.1, both `DepthAttached::setDepth()` and `Depth::parallaxFor()` clamp to `[-1, 1]`.
+   Its `autotests/stereodepthtest.cpp` explicitly checks that depth 2 with a popped limit of 4 gives 4.
+   A design requiring a logo at twice that limit needs support in the shared layer before its QML can express the requested result.
+   Keep the requested design and report the missing primitive; do not call `StereoDepth.depth: 2` a working exception.
+2. Preserve a former splash under another look-and-feel package identifier.
+   Plasma Desktop 6.7.4's `kcms/ksplash/kcm.cpp`, `availablePackages()`, enumerates `plasma/look-and-feel` directories, clears each package's fallback and requires its own `splashmainscript`.
+   `load()` requests that component and adds None itself.
+   A second entry therefore needs its own metadata and `contents/splash/Splash.qml`, its pictures and a splash preview; it does not need another copy of the desktop defaults.
+   Put both entries in the existing look binary package and name the retained entry in the required languages.
+3. Change the system's default splash content while preserving its identifier and the person's own `ksplashrc`.
+   Check Breeze, None and the retained entry from the actual chooser, then perform the upgrade from the published package.
+4. Use a fresh login for each limit/output case and measure both eyes against the prediction.
+   A compiled arithmetic helper is a source-level prerequisite check, not an installed-package test or a stereo rendering proof.
+
+**Trap: the logo remains at the box's depth when its declaration is doubled.**
+Cause: the published layer clamps in the setter and again in the arithmetic helper, so changing only the QML or only one clamp is insufficient.
+Required repair: an explicit exception in the shared layer for the specially designed item, preserving ordinary bounds and the zero/2D/software behavior, followed by installed-library and real-login checks.
+The repair was not implemented in this audit.
+Found by reading the published 1.21.1 source and compiling its `parallaxFor()` body unchanged: at 1920 wide, depth 2 returned 4 for limits 4/10 (expected 8) and 8 for 8/20 (expected 16); background, box and zero-limit controls passed.
+The source check is `tests/splash-depth-contract.py` in the look recipe and takes the layer's `src/quick/stereodepth.cpp` as its argument.

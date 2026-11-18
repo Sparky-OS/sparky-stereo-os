@@ -14,6 +14,14 @@ David Zeuthen.
 
 ---
 
+## OpenGL quad-buffer programs, swept in ORDER 26
+
+OpenSceneGraph, whose project lead is Robert Osfield.
+`glxgears`, ported to GLX by Brian Paul and carried by the Mesa demos.
+The programs the sweep tried (Blender, ParaView, FreeCAD, Jmol, RasMol, Gwyddion, MeshLab) belong to their own projects and are credited on their pages.
+
+---
+
 ## In memoriam: Luis Carlos de Alencar, "Cau"
 
 **Luis Carlos de Alencar**, "Cau", was Daniel's master on Linux.

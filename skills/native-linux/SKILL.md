@@ -175,6 +175,8 @@ The browser's camera hack or flat WebXR display shown squeezed side by side, the
 
 A closed program we cannot rebuild, with a quad buffer mode, shipped as an AppImage (what it bundles, which configuration it is offered, the program's fault told from the stack's with a small client, `GL_BACK` reaching one eye only, the FUSE 2 runtime, the settings file named after the start name, the 3D mouse boundary): [references/closed-program-quad-buffer-in-an-appimage.md](references/closed-program-quad-buffer-in-an-appimage.md).
 
+Every program that already draws OpenGL quad-buffer stereo, which switch and route each has, the capture recipe with eye tags and the traps (FreeCAD never asks for a stereo surface, ParaView's child pair is taken back, Debian's Blender 5.2.2 aborts in Time Sequential, the NVIDIA session environment in a virtual KWin): [references/quad-buffer-programs.md](references/quad-buffer-programs.md).
+
 A 3D mouse (six axes) in a stereo program: libspnav and spacenavd, a stand-in daemon and a simulated kernel device for a test, what a vendor kit does on other systems, a program that closes itself while the view moves (`Signal is already emitting`): [references/3d-mouse-libspnav.md](references/3d-mouse-libspnav.md).
 
 ## Lessons from the lanes, October to November 2026

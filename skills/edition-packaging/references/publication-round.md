@@ -207,6 +207,20 @@ Trap:
 - **Fix:** retain the exact proved pool and, only with explicit permission, a separate late-stage add/leave-out list; otherwise repeat the proof with the new pool. Check each late descriptor, component hash, binary Source field and listed build-record hash in place. A descriptor stored in the source subfolder may be checksum-covered separately from an architecture's binary build record; state which record actually names it.
 - **How found:** compare the frozen index hash and transaction targets with the late binaries' Source versions and the time of the coordinator's exception. Resolve relocated source metadata only inside that stage's known source folder and require the exact recorded hash.
 
+### Reused source components keep the selected generation's identity
+
+An upstream orig archive can be shared by an old held descriptor and its accepted successor.
+The archive's basename and first inventory owner do not decide which source generation takes it.
+When admitting an exact metadata-qualified path, copy its source name and source version from that qualified closure as well as its hash and size.
+Audit the independently copied pool again so a stale table label cannot create a descriptorless source group.
+
+Trap:
+
+- **Symptom:** auditing the copied pool creates a source group without a descriptor, although every copied hash agrees.
+- **Cause:** Plasma PA's reused orig archive and detached signature inherited the first descriptor's +stereo3d1 label while the qualified closure was +stereo3d2.
+- **Fix:** the qualified closure's identity overrides the initial inventory owner; correct the two report rows without changing any archive or pool manifest.
+- **How found:** a copied-pool metadata audit grouped those two paths separately; a fixture with held and accepted descriptors sharing one orig archive failed before the correction and passed after it.
+
 ### Public indexes between bounded invocations
 
 One copied pool can need separate complete native and meta invocations to stay inside its scratch allocation.
@@ -358,6 +372,10 @@ Continuation lessons from ORDER 587:
   **Cause:** the gate needs both complete dependency roots at once, besides the archive cache and diagnostics; the size of the meta archive does not predict that space.
   **Fix:** budget both roots and the cache inside the brief's allocation. If they do not fit, retain the diagnostics and nonzero exit, stop the gate, and hold the unqualified source group out of the take list while finishing the other requested proofs.
   **How found:** per-case disk measurements showed the completed current root beside the growing predecessor; moving verified cache files freed space but did not complete the paired-root check. The independently passing installed transaction remained a separate proof.
+  A fresh-cache targeted retry distinguishes accumulated cache from a pair that cannot finish with the required stop margin.
+  Record the complete root, incomplete predecessor, verified cache, sampled allocation and allocation after the stop; an incomplete predecessor does not establish an exact minimum.
+  If that unqualified source supplies the required edition metas, hand back blocked with the unchanged pool identity; the passing installed transaction does not replace archive qualification.
+
 
 ## The recipe
 

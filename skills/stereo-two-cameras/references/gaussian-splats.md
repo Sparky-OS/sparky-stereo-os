@@ -427,3 +427,11 @@ Retain the full route, limit, scale, moving-camera and live-training matrix befo
   **Fix:** reuse the candidate RGB vectors while retaining the worker-owned request, dimensions, revision and picking result.
   **How found:** the normal finite-scene worker test failed before the fix and passed on AMD and NVIDIA afterwards, with explicit dimensions/storage and centre-pick checks plus independently rendered eye comparisons.
   Exercise the shipping path without trace capture as well as the diagnostic projection path.
+
+The installed edition package passed 48 stationary captures: 32 Vulkan cases over both GPUs and 16 CUDA cases on NVIDIA, with two generated scenes, two budgets, Wayland/Xwayland and 100/125 percent scale.
+The independent contribution raster and actual compositor-filter audit found zero pixel means outside a limit in all 48.
+Moving-camera and live-training tests added 18 captured states across both backends and budgets, also with zero pixel means outside.
+The audit records individual-layer tails separately; those tails are permitted by Daniel’s pixel-mean rule.
+At 1024 by 491 per eye, ordinary installed Vulkan captures without projection tracing cost 46.2–47.0 ms for the two warm AMD fit samples and 14.0 ms for one warm NVIDIA fit sample.
+These samples measure the fit, not whole-application frame rate; GPU, concurrent load and first-use shader compilation affect the result.
+Both ordinary captures had more than 340,000 differing scene pixels and zero differing interface pixels.

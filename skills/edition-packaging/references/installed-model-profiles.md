@@ -85,3 +85,17 @@ It extracted features from two generated pictures on each Graphics-selected PCI 
 A separate application-purge test verified receipt-based cleanup after the profile declarations had already been removed.
 The actual apt-driven SAM3 questions in English and Brazilian Portuguese stopped at default No, with no owner model body transferred.
 The model owner’s legal text remains unmodified; the question, metered warning and purge notice have ten translations.
+
+## A long-running lane joins newer mains
+
+- **Symptom:** a proposed AppCenter successor is older than master, conflicts in shared dispatch/language files, and would replace entries added while the lane was building.
+  **Cause:** its version and source pointer were chosen from an earlier base; a coincidentally equal package version does not mean equal functionality.
+  **Fix:** join the current mains before acceptance, preserve both catalogues and every language key/value, inspect every staged gitlink, and state the merged source pointer in the successor changelog.
+  When existing build records name earlier commits, merge rather than rebase so those records remain reachable.
+  Compare the actual successor payload against the current staged predecessor, explain every differing file and refuse unexplained removals.
+  **How found:** the Spirula review compared the lane’s 0.1.13 branch with AppCenter 0.1.16, finding four newer entries and six newer application commits; both merges and a two-sided dictionary/catalogue audit preserved them in 0.1.17.
+- **Symptom:** a missing model opens no profile page even though apt says the application’s dependency is satisfied.
+  **Cause:** its minimum AppCenter version names a number used by another branch before the profile route existed.
+  **Fix:** depend on the first integrated version that actually supplies the route, here 0.1.17, and prove apt rejects the predecessor when it is the only candidate.
+  Keep entry-specific URI and consent-renderer tools on the application entry, so AppCenter’s own dependency fields stay equal to its predecessor.
+  **How found:** the actual store/dependency test and 0.1.16 payload comparison exposed the version collision and two added AppCenter helper dependencies; moving those helpers to Spirula preserved the agreed entry-owned policy.

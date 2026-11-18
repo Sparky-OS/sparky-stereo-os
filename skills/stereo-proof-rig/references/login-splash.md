@@ -53,3 +53,6 @@ The capture JSON's `stereo` field identifies a pair; a wide aspect ratio alone i
 
 `CONFIG_SEED` names a mounted home tree to copy before setup for a saved-choice or package-upgrade case.
 Keep the seed read-only, use a fresh case directory, and compare package-upgrade configuration hashes separately from changes Plasma itself saves during login.
+
+`LOGIN_LANG` selects the private login locale, defaulting to C.UTF-8 as before.
+Generate the locale in the image and use one fresh login per language when probing a localized page or a locale-derived default.

@@ -75,6 +75,11 @@ Newcomers in Linus Tech Tips' Linux challenge and in Diolinux's videos struggled
 [ORDER 668](references/session-menu-battery-defaults.md) records each reader, first-account delivery, saved-choice preservation, installed fresh-login recipe and traps.
 Use its predecessor red, successor green and saved-panel upgrade cases when extending these defaults.
 
+## Spell checking
+
+[Inspect the native page and dictionary inventory](references/spellchecking.md) before changing spelling defaults.
+The recipe separates a configured locale, a selected dictionary and a valid checker, and retains the Japanese-to-English fallback that can otherwise mask missing support.
+
 ## Defaults before code
 
 - Ship KDE system configuration under `/etc/xdg`. The look package (`sparky-os/packages/sparky-stereo-look` in [the build tree](https://github.com/Sparky-OS/sparky-stereo-os-build)) carries `krunnerrc` there, as a conffile, beside the desktop's other defaults.

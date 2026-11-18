@@ -221,6 +221,8 @@ Read the traps before a change to this part, and add the next lesson there as yo
 
 [A real login with the loading screen](references/login-splash.md) runs `startplasma-wayland` itself on virtual outputs in a 3D mode (a `kwin_wayland` shim in `PATH`, the twin saved with its "Other stereo formats" switch, the render node for ScreenShot2), captures KSplash's screen on each output while it is up, and measures each part's disparity against the person's limits; scripts in `scripts/login-splash/`.
 
+[A guest on the host's own kernel](scripts/kernel-guest/README.md) (QEMU with KVM, the rig image as its root, an overlay per run, ssh by stdin) is for a proof that needs a real kernel under the session: uhid and hid-input, udev, UPower and PowerDevil beside a plasmashell, as in the headset's battery proof (ORDER 700); nothing of the station's `/sys` or devices is touched.
+
 [A session's start order](references/session-start-order.md) shows how to replay a login in the real order (KWin with the person's saved screen order and focus settings, plasmashell with its desktop windows, then an autostart program before any pointer motion), how to log activations and the active output from KWin's first moment, and the trap where the first Plasma desktop window takes the active output from the main screen, so new windows and password prompts open on the wrong screen after a login.
 
 [A panel applet's pop-up over the panel](references/panel-applet-popup.md) opens the volume applet's pop-up by fake input in a real plasmashell with PipeWire's null sink inside the container, pins it, and measures its disparity, its border from the output's edges and its overlap with the panel in both eyes against a pop-up-only reference made with opacity.

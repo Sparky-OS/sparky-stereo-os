@@ -233,6 +233,11 @@ A live held stage can also change after initial discovery.
 Retain disappeared paths as observations, inspect the newly seen descriptor/binaries within that named root, and report a newer unlisted generation without adding it to the frozen pool.
 The pool's accepted copies and checksum identity stay independent of that live folder.
 
+- **Symptom:** a whole-pool lintian scan had produced no verdict while its pre-extraction scratch passed 4 GiB beside active archive-link roots.
+- **Cause:** submitting every binary together retained many extracted source groups before finishing the scan; compressed pool size did not predict its peak allocation.
+- **Fix:** stop that incomplete invocation without counting it, then scan complete source families one at a time, keeping both architectures and companions together. Pair each family with every corresponding published binary, retain return codes and raw tags, and assert full current/published coverage before calculating the delta.
+- **How found:** measured scratch separated lintian's growing extraction tree from link roots; the replacement driver emitted each completed family with its binary counts and diagnostics while staying inside the shared lane budget.
+
 ### A clean simulation can still select the old edition
 
 The flat candidate index must carry the same Release Origin used by the edition's preferences.

@@ -1194,3 +1194,11 @@ The DroidCam OBS plugin is **Dev47Apps'** (the repository's own record lists the
 **Frank Denis, Corey Edwards and Maciej Soltysiak** wrote [minisign](https://github.com/jedisct1/minisign); **Hans-Christoph Steiner and Josenilson Ferreira da Silva** are named in its Debian packaging copyright record.
 **The Linux HID contributors** supply the Logitech IDs and HID++ report descriptor, and **Martin Pitt and the umockdev contributors** supply the private device testbed. The app center is **Paweł "pavroo" Pijanowski's** APTus.
 These credits record the studied software and test dependencies; the edition's entry downloads the vendor's own signed release rather than repackaging it.
+
+## The Sound page's format and rate controls (ORDER 20)
+
+- **plasma-pa** (KDE, GPL-2.0-only or GPL-3.0-only): Harald Sitter, David Rosca, Nicolas Fella, Ismael Asensio, Sefa Eyeoglu and the other authors of the Sound page; the device rename page (Harald Sitter, 2024) is the pattern for writing a person's WirePlumber drop-in in their own folder and restarting the audio services, which the Sound Quality page follows.
+- **PipeWire and WirePlumber** (MIT): Wim Taymans, George Kiagiadakis and their contributors wrote `pw-dump`, `pw-metadata`, `pw-cat`, `spa-json-dump`, the node properties `audio.rate`, `audio.format`, `audio.allowed-rates`, `dither.method` and `resample.quality`, and the monitor rules the page writes.
+- **KAuth and Polkit** (KDE Frameworks, LGPL-2.1-or-later; polkit, LGPL-2.0-or-later): the authors of KAuth and of polkit, whose action policy carries the every-account change.
+- **AES5-2018 (r2023)**: the Audio Engineering Society; its published abstract is quoted on the page's line about sampling frequencies.
+- **The Linux kernel's HDA and DRM code** (GPL-2.0): the authors of the ELD files in `/proc/asound` and of `drm_edid_to_sad()` and `include/linux/hdmi.h`, which carry a display's CTA-861 audio data blocks to the page.

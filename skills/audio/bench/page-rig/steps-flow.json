@@ -1,0 +1,97 @@
+[
+ {
+  "op": "dump",
+  "name": "0-start"
+ },
+ {
+  "op": "apply",
+  "state": {
+   "graph": {
+    "rate": 96000,
+    "allowedRates": [
+     44100,
+     48000,
+     96000
+    ]
+   }
+  },
+  "what": "graph"
+ },
+ {
+  "op": "apply",
+  "state": {
+   "graph": {
+    "rate": 96000,
+    "allowedRates": [
+     44100,
+     48000,
+     96000
+    ]
+   },
+   "quality": 8
+  },
+  "what": "quality"
+ },
+ {
+  "op": "apply",
+  "state": {
+   "graph": {
+    "rate": 96000,
+    "allowedRates": [
+     44100,
+     48000,
+     96000
+    ]
+   },
+   "quality": 8,
+   "devices": {
+    "alsa_output.rig_dac": {
+     "format": "S24LE",
+     "rate": 96000
+    }
+   }
+  },
+  "what": "device:alsa_output.rig_dac"
+ },
+ {
+  "op": "dump",
+  "name": "1-after-choices"
+ },
+ {
+  "op": "apply",
+  "state": {
+   "graph": {
+    "rate": 96000,
+    "allowedRates": [
+     44100,
+     48000,
+     96000
+    ]
+   },
+   "quality": 8,
+   "devices": {
+    "alsa_output.rig_dac": {
+     "format": "S24LE",
+     "rate": 96000
+    },
+    "alsa_output.rig_only48": {
+     "rate": 96000
+    }
+   }
+  },
+  "what": "device:alsa_output.rig_only48"
+ },
+ {
+  "op": "dump",
+  "name": "2-after-refusal"
+ },
+ {
+  "op": "apply",
+  "state": {},
+  "what": "graph"
+ },
+ {
+  "op": "dump",
+  "name": "3-back-to-automatic"
+ }
+]

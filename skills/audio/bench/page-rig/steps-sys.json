@@ -1,0 +1,50 @@
+[
+ {
+  "op": "apply",
+  "system": true,
+  "state": {
+   "graph": {
+    "rate": 44100,
+    "allowedRates": [
+     44100,
+     48000
+    ]
+   },
+   "quality": 10
+  },
+  "what": "graph"
+ },
+ {
+  "op": "dump",
+  "name": "sys1"
+ },
+ {
+  "op": "apply",
+  "system": false,
+  "state": {
+   "graph": {
+    "rate": 96000,
+    "allowedRates": [
+     44100,
+     48000,
+     96000
+    ]
+   }
+  },
+  "what": "graph"
+ },
+ {
+  "op": "dump",
+  "name": "user-over-system"
+ },
+ {
+  "op": "apply",
+  "system": true,
+  "state": {},
+  "what": "graph"
+ },
+ {
+  "op": "dump",
+  "name": "sys-back-to-automatic"
+ }
+]

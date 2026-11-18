@@ -1,0 +1,8 @@
+--- a/hw/xwayland/xwayland-present.c
++++ b/hw/xwayland/xwayland-present.c
+@@ in xwl_present_flip_notify_vblank, before present_vblank_notify() @@
++    if (window->parent && window->parent != window->drawable.pScreen->root)
++        ErrorF("K3VDBG flip_notify child 0x%x: mode %d (1 flip 3 suboptimal copy) reason %d\n",
++               (unsigned) window->drawable.id, mode, vblank->reason);
+@@ in xwl_present_check_flip, each "return FALSE" becomes @@
++    return xwl_dbgflip(N, present_window, FALSE);   /* N = 1 the window has no surface of its own ... 12 */

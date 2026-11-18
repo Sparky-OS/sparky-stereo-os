@@ -92,7 +92,8 @@ At the pinned source, `GuiMain` clears with alpha 1 and does not request a trans
   **Cause:** readiness and screen-state fields do not prove GL pixels reached the compositor; on a measured NVIDIA/Linux Vulkan native Wayland case, opening a model triggered ImGui shader failures or a frozen prior frame.
   **Fix:** inspect actual compositor captures and retain the failure; compare the unchanged Xwayland path before attributing it to the renderer.
   **How found:** the native direct-open log repeated shader compile failures, a deferred-open capture stayed on welcome while state said viewer, and the same PLY rendered correctly through Xwayland.
-  The native-path cause and source fix remain unresolved; selecting only NVIDIA's EGL vendor did not remove the direct-open failure.
+  At the study checkpoint the native-path cause and source fix were unresolved; selecting only NVIDIA's EGL vendor did not remove the direct-open failure.
+  The implementation checkpoint below records the later cause and fix.
   The CUDA backend displayed its trained PLY through native Wayland on the same driver, providing a narrower control.
 
 ## Measurements and limits
@@ -123,7 +124,9 @@ No stereo image or second-eye geometry is claimed here.
 ORDER 501's implementation work uses the same RenderWorker for CUDA and Vulkan.
 Its atomic request holds one engine mutex over both forward passes and copies the left RGB result before the singleton forward storage is reused.
 The regression compares each packed half against an independent camera render and places a waiting trainer between the two render callbacks.
-That GPU regression was written but had not completed the rebuild at this checkpoint; do not describe the splat pair as verified yet.
+The GPU regression passes on RADV and NVIDIA Vulkan.
+The rebuilt application also displays its trained PLY on NVIDIA native Wayland with the actual source context-restoration helper and no preload.
+CUDA parity after the affine shader changes remains pending.
 
 The native adapter was built separately against GLFW 3.4 and libstereo-declare 1.10.
 A synchronized Wayland subsurface is below the alpha-capable parent, has an empty input region, and carries one XRGB8888 full side-by-side SHM buffer.
@@ -163,3 +166,28 @@ Do not feed an affine shear through that pose and claim the view-dependent colou
 Keep the pose separate from the projection or add an explicitly tested affine-camera path in the shared engine.
 Wide-angle projections also require rectification analysis before claiming zero vertical disparity.
 The end-to-end splat geometry, preview paths and real atomic-pair timing remain unverified at this checkpoint.
+
+## Captured point and mesh geometry
+
+The preview uses the same compositor-limit fitter as the splat worker.
+Preserve the first eye's FBO pixels before rendering the next eye.
+A native pair uses two complete eye rasters; the logical canvas stays independent of the render width.
+The point/mesh regression measures coloured markers at camera depths 1.5, 3 and 6 with a zero-parallax distance of 3.
+It passes perspective and orthographic projections, widths 960 and 1200, and normalized limits (10,4) and (24,9.5) on AMD and NVIDIA through Wayland and Xwayland.
+Absent and zero limits reproduce the mono pixels exactly in this renderer test; swapping the captured halves fails.
+These measurements are FBO reads in private compositor sessions, not the complete application/output-scale acceptance matrix.
+
+- **Symptom:** the mesh has twice the predicted perspective disparity while the point preview is correct.
+  **Cause:** the mesh's optimized clip-space branch bypasses the common nonlinear projection helper.
+  **Fix:** add the principal-point displacement multiplied by clip w to that branch, and the orthographic shear to its separate branch.
+  **How found:** measure marker centroids against the camera prediction; the mesh measured -4 where the prediction was -2, on both GPUs.
+- **Symptom:** a finite centre-projected Gaussian makes the fitted pair identical because its cutoff sphere crosses the camera plane.
+  **Cause:** a physical solid's singular perspective bound was applied to the linearized 3DGS/Mip projection.
+  **Fix:** bound inverse-depth parallax using the linearized Gaussian reach and the renderer's clamped Jacobian; keep the physical bound for ray-traced 3DGUT.
+  **How found:** the first native application capture reported no finite support; source inspection showed centre-only culling and covariance projection, and the expanded CPU regression covers large/off-axis Gaussians.
+  The full trained-splat capture after this correction remains pending.
+- **Symptom:** orthographic disparity maths is right but view-dependent colour follows the wrong eye position.
+  **Cause:** using a transposed affine matrix as its inverse moves the recovered camera origin.
+  **Fix:** preserve the rigid arithmetic for ordinary rotations and use a true inverse for oblique cameras, in shared Slang with regenerated CUDA headers.
+  **How found:** a first-band spherical-harmonic fixture at the zero plane gives 0.347021 rather than the physical-eye prediction 0.359601.
+  The activated regression has a verified red; the shared shader's GPU green and parity are still being built.

@@ -128,7 +128,7 @@ The file callback contains leaf and test root; SoftHSM returns only the imported
 **Symptom:** a valid generic test certificate does not appear in the application's chooser.
 Cause: PjeCertificateListAcessor requires digitalSignature and a recognized PF or PJ otherName.
 The cause was found by inspecting that unchanged predicate and OIDReader, then adding a synthetic all-zero PF field to the generated leaf.
-The fixture's SAN uses `otherName:2.16.76.1.3.1;UTF8:` followed by 49 zeros.
+The fixture's SAN uses `otherName:2.16.76.1.3.1;UTF8:` followed by 51 zeros.
 This makes an accepted test identity, not a government-issued or legally valid ICP-Brasil certificate.
 Do not disable the application's filter to make a fixture pass.
 
@@ -146,7 +146,10 @@ The application saves the installed multiarch path automatically and loads it su
 The raw slotListIndex exception came from the separate provider-constructor probe; the actual application shows an empty chooser with disabled OK and a configuration link.
 Physical-card signing through OpenSC is not proven.
 Debian's vsmartcard-vpcd and python3-virtualsmartcard 3.3+dfsg-2 were tried as a bounded fixture lead.
-The Python library needed an explicit PYTHONPATH and then failed importing Crypto, followed by its obsolete sha fallback; no card containing a signing key was established.
+The normal vicc CLI is in the separate vsmartcard-vpicc package.
+Its --help works, but actual cryptoflex startup fails to find virtualsmartcard.
+With the installed library directory in PYTHONPATH it fails importing Crypto, followed by its obsolete sha fallback.
+No card containing a signing key was established; the library-only first attempt was not the final feasibility result.
 
 **Symptom:** Sparky CA's roots appear in Debian Java but do not update the application's HTTPS trust.
 Cause: PjeWebGlobal.HTTPS_CODEC loads /pjeoffice.jks directly from the application resource.
@@ -167,3 +170,13 @@ Use C.UTF-8 for disposable fixtures; preserve the person's UTF-8 locale in the p
 Cause: the application separates remote requests from local file operations.
 The supported ShellExtension entry point writes the normal watched local request instead and succeeds.
 Do not bypass that boundary or expose local-file tasks over HTTP.
+
+**Symptom:** the bundled JavaFX cannot load any of testing's codec libraries.
+The loader trace and a successful private ABI-59 control established the cause.
+Build private shared libraries from the signed FFmpeg 5.1.10 source, using the build repository's build-media-compat.sh fixture, and scope LD_LIBRARY_PATH to that application's process.
+This supplies libavcodec.so.59/libavformat.so.59 and their private matching dependencies without replacing the system ABI 63 libraries or executable.
+With that fixture, MediaProbe reports READY and 8000 ms; the actual cutter displays decoded video, accepts its normal cut events for 1–4 seconds and saves a 3.08-second H.264/AAC MP4 through system FFmpeg.
+The output passes an independent full decode.
+The fixture's mark events were posted through the existing public event classes; the visible save button and folder dialog were operated normally.
+The null ALSA PCM is only for the isolated container's lack of an audio device; no host audio connection was used and physical audio output was not tested.
+A later compatibility package needs normal source/licence/provenance and update maintenance; the scratch library build is not a shipped package.

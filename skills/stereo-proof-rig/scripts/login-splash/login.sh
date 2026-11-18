@@ -77,10 +77,20 @@ set -u
 T0=$(date +%s.%N); echo "login $T0" > "$CASE/marks.txt"
 startplasma-wayland > "$CASE/session.log" 2>&1 & sp=$!
 first=""
+if [ "${EXPECT_NO_SPLASH:-0}" = 1 ]; then
+    sleep 4
+    if grep -q 'SPLASHLOG.*ADDED ksplashqml' "$CASE/session.log"; then
+        echo "FAIL: splash mapped with None selected" > "$CASE/no-splash.txt"
+        kill -TERM $sp
+        exit 1
+    fi
+    echo "PASS: no splash mapped with None selected" > "$CASE/no-splash.txt"
+else
 for i in $(seq 600); do
 	if [ -z "$first" ] && grep -q 'SPLASHLOG.*ADDED ksplashqml' "$CASE/session.log" 2>/dev/null; then first=$(date +%s.%N); echo "splash-mapped $first" >> "$CASE/marks.txt"; break; fi
 	sleep 0.05
 done
+fi
 kp=$(pgrep kwin_wayland | tail -1); [ -n "$kp" ] && tr '\0' '\n' < /proc/$kp/environ | grep -E '^KWIN_' > "$CASE/kwin-env.txt"
 WAYLAND_DISPLAY=wayland-0 kscreen-doctor -o 2>/dev/null | sed "s/\x1b\[[0-9;]*m//g" | grep -E "Output:|Modes|Scale" > "$CASE/outputs-login.txt"
 if [ -n "$first" ] && [ -z "${NOSHOT:-}" ]; then
@@ -89,14 +99,26 @@ if [ -n "$first" ] && [ -z "${NOSHOT:-}" ]; then
 		for o in $(seq 0 $((N - 1))); do python3 "$HERE/shot.py" Virtual-$o "$CASE/shot-${s}s-Virtual-$o.png" >> "$CASE/shots.jsonl" 2>>"$CASE/shot-errors.txt"; done
 	done
 fi
+if [ "${EXPECT_NO_SPLASH:-0}" != 1 ]; then
 for i in $(seq 1200); do grep -q 'SPLASHLOG.*REMOVED ksplashqml' "$CASE/session.log" && break; sleep 0.05; done
+fi
 echo "splash-gone $(date +%s.%N)" >> "$CASE/marks.txt"
 sleep "${SETTLE:-3}"
 for o in $(seq 0 $((N - 1))); do [ -z "${NOSHOT:-}" ] && python3 "$HERE/shot.py" Virtual-$o "$CASE/desktop-Virtual-$o.png" >> "$CASE/shots.jsonl" 2>>"$CASE/shot-errors.txt"; done
+if [ -n "${DESKTOP_PROBE:-}" ]; then
+    bash "$DESKTOP_PROBE"
+    probe_status=$?
+    if [ "$probe_status" != 0 ]; then
+        kill -TERM $sp
+        exit "$probe_status"
+    fi
+fi
 kill -TERM $sp; sleep 2
 IN
 export HOLD="${HOLD:-}" CASE N SHOTS="${SHOTS:-1.5 4}" SETTLE="${SETTLE:-3}" NOSHOT="${NOSHOT:-}"
-dbus-run-session -- bash "$XDG_RUNTIME_DIR/inner.sh"
+login_status=0
+dbus-run-session -- bash "$XDG_RUNTIME_DIR/inner.sh" || login_status=$?
 grep -E 'SPLASHLOG|ksplashqml|org.sparky.stereo|stereo' "$CASE/session.log" | grep -v '^$' > "$CASE/splash-lines.txt" || true
 cp "$HOME/.config/kwinoutputconfig.json" "$CASE/" 2>/dev/null
 rm -rf "$XDG_RUNTIME_DIR"
+exit "$login_status"

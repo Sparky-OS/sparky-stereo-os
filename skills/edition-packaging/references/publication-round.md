@@ -109,6 +109,29 @@ Traps found by archive and source inspection in ORDER 587:
   **Fix:** compare every recorded binary and metadata hash with the actual staged file, and hold the affected source until its source and build evidence agree.
   **How found:** the graphics helper's record bound another `.dsc` hash in three successive stages; the source-component manifests themselves verified.
 
+### Discovery depth and processor variants
+
+State the directory-discovery bound separately from the depth used to inventory a discovered stage.
+Inspect a brief's named subfolders explicitly, retaining the same read-only rules and recording unreadable paths.
+A file search bounded from the storage root can omit an accepted generation inside `stage/superseded/SOURCE-VERSION/` even though it found the stage itself.
+Record which files were inspected; directory discovery alone is not source-closure verification.
+
+Read `Architecture-Variant` beside `Architecture` when inventorying processor-specific archives ([processor-level packages](cpu-level-packages.md)).
+An archive named with `amd64v3` can still say `Architecture: amd64`; keep its variant in the identity used to compare it with published binaries.
+A shared native architecture and version does not make a variant an in-place replacement for the baseline.
+Neither its filename nor its control field establishes publication acceptance.
+
+Traps found during bounded discovery in ORDER 701:
+
+- **Symptom:** the requested hardware helper generation was missing from the initial file inventory, while newer held generations were present.
+  **Cause:** the four-level file search from the build-storage root stopped above the accepted files inside the named superseded subfolder.
+  **Fix:** keep directory discovery bounded, then inventory the discovered stages and explicitly named subfolders with a separately stated depth.
+  **How found:** a direct read-only search of the brief's named superseded folder located the exact descriptor and both binary companions.
+- **Symptom:** baseline and processor-specific binaries appeared to share the same package/version/native-architecture identity.
+  **Cause:** the first inventory kept `Architecture` but omitted `Architecture-Variant`.
+  **Fix:** retain both fields and keep variants outside the candidate set until their own acceptance is recorded.
+  **How found:** controls of staged stereo-library variants said `Architecture: amd64` while their filenames named `amd64v3`; reading the additional control field distinguished them.
+
 ### A stage accepted after the proof froze
 
 A passing transaction and link check qualify their recorded archive identities, not every package that later enters a stage folder.

@@ -1,0 +1,12 @@
+# A guest on the host's own kernel, made from the rig image (ORDER 108 milestone 14)
+
+For a proof that needs a real kernel: hid-input and uhid, udev events, UPower, PowerDevil and a Plasma session together, without touching the station's `/sys` or any device (a virtual device made in the guest exists in the guest's kernel only).
+Check freshness first: written on 2026-11-18 with QEMU 11.1.2, KVM, the edition's kernel 7.3.4-stereo3d18 and Debian's UPower 1.91.5.
+
+1. `mkroot.sh`, inside the Plasma rig image as root, with `/vm` a scratch folder holding `id_ed25519.pub` and `vm-net.service`, `/hostmods` the host's `/lib/modules/KERNEL` read only and the apt helper and CA mounted as in the other rigs: installs systemd, udev, D-Bus, UPower, PowerDevil, Info Centre, openssh and umockdev, copies the kernel's modules, and writes `/vm/root.img` (ext4, 6 GB sparse). Run it from a script file (`docker run ... bash /vm/mkroot.sh`): the sandbox's removal check refuses `rm` inside `bash -c`.
+2. `qemu-img create -f qcow2 -b root.img -F raw base.qcow2`, boot it with `boot.sh base.qcow2 PORT`, put in what every run needs (the staged desktop packages, the stand-ins, the login scripts), power it off, and never boot `base.qcow2` again: every run is `qemu-img create -f qcow2 -b base.qcow2 -F qcow2 run.qcow2`.
+3. `boot.sh` starts QEMU with the host's own kernel and initrd (`-kernel /boot/vmlinuz-KERNEL -initrd /boot/initrd.img-KERNEL`, the root disk `/dev/vda`, user networking with ssh on `127.0.0.1:PORT`, no display). `vmroot.sh PORT 'script'` and `vmrig.sh PORT 'script'` send a script on standard input over ssh (as root, or as the session user with the Plasma session's environment); `vmget.sh` and `vmput.sh` copy files. A guest ends with `systemctl poweroff` (then the pidfile's process is gone).
+4. `dongle.py` is a stand-in for a dongle's hidraw node: a uhid device with a vendor-defined descriptor and the dongle's numbers, alive while the script runs; a udev rule that matches its HID parent (`KERNELS=="0003:VID:PID.*"`) starts a unit the way the real rule does.
+
+Traps: [power-idle, a peripheral's battery in Plasma](../../../power-idle/references/peripheral-battery-in-plasma.md) (the NIC is `ens3`, the serial console is not a place to type a proof, `pkill -f` over ssh, `policy-rc.d` in the image).
+`/dev/kvm` needs the user in the `kvm` group; the guest has 6 GB of memory and 4 CPUs by default (`MEM`, `SMP`).

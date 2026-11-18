@@ -5,10 +5,11 @@ name: power-idle
 description: >-
   KDE power, locking, idle, lid, CEC, swap and hibernate policy in the edition: powerdevilrc and kscreenlockerrc
   defaults, HoldProfile and powerprofilesctl, CEC ownership, text consoles and system power, the Cushion Swap file on
-  disk (zram and zswap never ours, the person's opt-in from the Memory page), resume= and RESUME_OFFSET for hibernation,
-  a user preference that appears ignored, a failed hibernation read from that attempt (the notice names the device, the share or the cause). Load it when the screen locks or sleeps against the person's setting, the lid
-  closes and the TV goes dark, hibernate fails to resume, a zram package removes another package or an upgrade proposes
-  removing it, the zram gate refuses a unit that only retires zram, the Memory page needs a swap indicator, a power profile is held by a program, or Hibernate fails and the Problems page only says the service failed.
+  disk (zram and zswap never ours), resume= and RESUME_OFFSET for hibernation, a failed hibernation read from that
+  attempt, a peripheral's battery in Plasma's list (UPower, uhid, PowerDevil's notice). Load it when the screen locks or sleeps against the person's setting, the lid
+  closes and the TV goes dark, hibernate fails to resume, a zram package removes another package, the zram gate refuses a
+  unit, the Memory page needs a swap indicator, a power profile is held by a program, Hibernate fails and the Problems
+  page only says the service failed, or a headset or mouse is missing from Power & Battery or the Info Centre's Energy page.
 ---
 
 # Power and idle in KDE
@@ -145,6 +146,7 @@ The recipe, the edition's own path (partition, swap file with `RESUME_OFFSET`, P
 ## A failed hibernation says why (2026-11-09)
 
 The engine reads a failed `systemd-hibernate`, `systemd-suspend-then-hibernate` or `systemd-hybrid-sleep` from that attempt's journal (systemd-sleep's `SLEEP_STOP` line with `ERRNO=`, the kernel's `PM: failed to freeze async: error -95` with its `_KERNEL_DEVICE`) and names the device and what to do; a virtio-fs share, a locked-down kernel and a missing swap area get no retry, because the cause stays.
+A headset's (or any peripheral's) battery in Power & Battery, the Energy page and PowerDevil's low-battery notice: who reads what, the routes measured (the kernel's own driver, a uhid device made by a root service), where a user-space device can enter and each trap: [references/peripheral-battery-in-plasma.md](references/peripheral-battery-in-plasma.md).
 The kinds with their source lines, the fixture method (`systemd-journal-remote`), the real virtio-fs run and the traps are in [references/failed-hibernation.md](references/failed-hibernation.md); how any package says a cause instead of "Repair starts it again" is in [system-housekeeping](../system-housekeeping/references/problems-cause-not-retry.md).
 
 ## When a user preference appears ignored (2026-10-19)

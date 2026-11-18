@@ -1,0 +1,9 @@
+[Unit]
+Description=guest network (QEMU user networking)
+Before=network.target ssh.service
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c "I=$(ls /sys/class/net | grep -v lo | head -1); ip link set lo up; ip link set $I up; ip addr add 10.0.2.15/24 dev $I; ip route add default via 10.0.2.2; echo nameserver 10.0.2.3 >/etc/resolv.conf"
+[Install]
+WantedBy=multi-user.target

@@ -3,6 +3,7 @@
 # Inside the rig image, as the person: a real startplasma-wayland login on virtual outputs, with the loading screen captured.
 # Env: CASE (folder for the results), OUTPUTS (count, default 1), MODES ("3d 2d": per output, 3d = the side by side 3D twin, 2d = the plain mode),
 #      SCALE (output scale, default 1), POPPED, SUNK (the person's kwinrc [StereoDepth] limits, unset = not saved),
+#      LOGIN_LANG (session locale, default C.UTF-8; must be generated in the image),
 #      CONFIG_SEED (home tree to copy before setup, for a saved-choice or upgrade login),
 #      KSPLASHRC (the person's own ~/.config/ksplashrc, unset = none), SHOTS ("1.5 4": seconds after the first splash window to capture),
 #      W, H (output size), SETTLE (seconds after the splash ends), NOSHOT (timing run only).
@@ -15,7 +16,7 @@ if [ -n "${CONFIG_SEED:-}" ]; then
 	cp -r "$CONFIG_SEED"/. "$HOME"/
 fi
 export XDG_RUNTIME_DIR=/tmp/r$$; mkdir -p "$XDG_RUNTIME_DIR"; chmod 700 "$XDG_RUNTIME_DIR"
-export LANG=C.UTF-8
+export LANG=${LOGIN_LANG:-C.UTF-8}
 N=${OUTPUTS:-1}; W=${W:-1920}; H=${H:-1080}
 read -r -a MODEA <<< "${MODES:-3d}"
 # 1. the person's saved screens, made the way Display Settings makes them

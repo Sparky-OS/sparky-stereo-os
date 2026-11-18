@@ -4,13 +4,14 @@
 # the edition (dists/mashtabba, pool) mounted at /repo. APT_CONF_DIR holds sparky-stereo-apt's pin files (sparky-stereo,
 # sparky-stereo-only-ours) and its deb-multimedia source, taken from that package (it needs Sparky's own repository to install).
 # The .deb files of EXTRA_DEB_DIR are installed over the tree with apt: their Inst lines are the upgrade's (extra.txt).
-# Environment: DOCKER_HOST, BASE_IMAGE (debian:testing@sha256:...), HTTPS_ONLY_APT (the build tree's tools/https-only-apt.sh),
+# Environment: DOCKER_HOST, BASE_IMAGE (debian:testing@sha256:...), HTTPS_ONLY_APT (the build tree helper tools/https-only-apt.sh),
 # NAME_PREFIX, LOGS (a folder for the logs; default ./rig-build-TAG).
 set -euo pipefail
 TAG=${1:?tag}; REPO=$(cd "${2:?repo tree}" && pwd); CONF=$(cd "${3:?apt configuration}" && pwd); EXTRA=${4:-}
-: "${BASE_IMAGE:?debian:testing@sha256:... (pin it by digest)}" "${HTTPS_ONLY_APT:?the build tree's tools/https-only-apt.sh}"
+: "${BASE_IMAGE:?debian:testing@sha256:... (pin it by digest)}" "${HTTPS_ONLY_APT:?the build tree helper tools/https-only-apt.sh}"
 NAME=${NAME_PREFIX:-splash-rig}-mk-$$
-LOGS=${LOGS:-$PWD/rig-build-${TAG//[:\/]/-}}; mkdir -p "$LOGS"
+SAFE_TAG=${TAG//:/-}; SAFE_TAG=${SAFE_TAG//\//-}
+LOGS=${LOGS:-$PWD/rig-build-$SAFE_TAG}; mkdir -p "$LOGS"
 extra=(); [ -n "$EXTRA" ] && extra=(--mount "type=bind,src=$(cd "$EXTRA" && pwd),dst=/extra,readonly")
 docker run --name "$NAME" --ulimit core=0 --platform linux/amd64 --cpus 4 \
 	--mount type=bind,src=/etc/ssl/certs/ca-certificates.crt,dst=/run/host-ca.crt,readonly \

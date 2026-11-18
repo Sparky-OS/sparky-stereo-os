@@ -6,7 +6,7 @@ This is a source study and monoscopic baseline, not an implemented stereo render
 ## Working recipe
 
 1. Pin the source and read its build and contribution rules.
-   Spirula's `build_develop.bash -DSS_BACKEND=vulkan` builds a native application without CUDA or model weights.
+   Spirula's `build_develop.bash -DSS_BACKEND=vulkan -DCMAKE_BUILD_TYPE=Release` builds a native application without CUDA or model weights.
    Capture the dev script's effective job count as well as its container's CPU quota.
    At this revision the default Linux link failed; see the duplicate-symbol trap below before spending a cold build on that configuration.
 2. Follow the viewport to the screen instead of inferring the toolkit from the compute backend.
@@ -80,8 +80,7 @@ At the pinned source, `GuiMain` clears with alpha 1 and does not request a trans
 - **Symptom:** Linux's final `spirula` link fails with multiple definitions of `gui::ProcessPipe`, `ProcessReader` and `ProcessDuplex` from `Subprocess.cpp` and `libss_inference_worker.a`.
   **Cause:** the file is built in the executable and the archive; the archive lacks the target's `-O3`, and GNU ld extracts that unoptimized member for a weak `std::string::append` reference from `FrameMaskSvg.cpp`, bringing the strong process definitions too.
   **Fix:** do not suppress duplicate-symbol errors or remove the file from just one target without checking its other consumers.
-  A standard CMake Release configuration linked the unchanged Vulkan executable successfully; record that explicit configuration rather than claiming the empty-build-type script passed.
-  Complete build/test results still need their own check.
+  A standard CMake Release configuration completed both unchanged dev builds; record that explicit configuration rather than claiming the empty-build-type Vulkan script passed.
   **How found:** the link map's archive-inclusion table names `std::string::append` as the trigger, and [upstream issue 339](https://github.com/harry7557558/spirula-studio/issues/339) reports the same Linux failure.
   The reported one-target removal in that issue explicitly leaves other targets broken, so it was not applied.
 
@@ -90,10 +89,11 @@ At the pinned source, `GuiMain` clears with alpha 1 and does not request a trans
   **Fix:** keep its output as a separate parser check and unset it for the training measurement.
   **How found:** `src/app/cli/main.cpp` returns immediately after `dump_cameras_json`; the output file list was empty.
 - **Symptom:** automation reports a ready viewer but its capture is black or remains on the welcome screen.
-  **Cause:** readiness and screen-state fields do not prove GL pixels reached the compositor; on a measured NVIDIA/Linux native Wayland case, opening a model triggered ImGui shader failures or a frozen prior frame.
+  **Cause:** readiness and screen-state fields do not prove GL pixels reached the compositor; on a measured NVIDIA/Linux Vulkan native Wayland case, opening a model triggered ImGui shader failures or a frozen prior frame.
   **Fix:** inspect actual compositor captures and retain the failure; compare the unchanged Xwayland path before attributing it to the renderer.
   **How found:** the native direct-open log repeated shader compile failures, a deferred-open capture stayed on welcome while state said viewer, and the same PLY rendered correctly through Xwayland.
   The native-path cause and source fix remain unresolved; selecting only NVIDIA's EGL vendor did not remove the direct-open failure.
+  The CUDA backend displayed its trained PLY through native Wayland on the same driver, providing a narrower control.
 
 ## Measurements and limits
 
@@ -101,14 +101,16 @@ The initial fixture is twelve calibrated 192 by 144 frames of three spheres over
 The baseline compositor capture is a 1280 by 900 monoscopic virtual output, with desktop depth disabled.
 A 300-step Vulkan training run used 19.81 seconds / 278,960 KiB peak process RSS on a RADV integrated GPU, and 37.73 seconds / 561,160 KiB on an RTX 3060.
 Reported tensor-pool high-water capacities were 4.97 and 4.98 MiB respectively; they are not whole-driver allocation or total machine usage.
-These are small cold-start runs with shader initialization, checkpoint writing and concurrent compiler activity, not a general GPU ranking.
+CUDA on the same RTX 3060 took 0.76 seconds / 326,136 KiB peak RSS with a reported 5.00 MiB tensor pool.
+These are small profiled cold starts with shader initialization/checkpoint writing; Vulkan overlapped compiler activity while CUDA ran after the main builds, so they are not a controlled API comparison or a GPU ranking.
 
 At 400 by 300 pixels, ordinary HTTP requests after five warmup rounds and 25 measured rounds gave:
 
-| Vulkan device | One camera median | Two sequential cameras median | Ratio |
+| Backend/device | One camera median | Two sequential cameras median | Ratio |
 | --- | ---: | ---: | ---: |
 | RADV integrated | 9.684 ms | 20.073 ms | 2.073 |
-| RTX 3060 | 4.176 ms | 8.376 ms | 2.006 |
+| Vulkan RTX 3060 | 4.176 ms | 8.376 ms | 2.006 |
+| CUDA RTX 3060 | 1.598 ms | 3.098 ms | 1.939 |
 
 The timings include HTTP, render, readback and JPEG encoding.
 They measure two separate ordinary views, not atomic stereo presentation or a simultaneous two-eye memory high-water mark.

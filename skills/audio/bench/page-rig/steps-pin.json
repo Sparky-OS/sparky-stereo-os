@@ -1,0 +1,1 @@
+[{"op": "apply", "state": {"graph": {"rate": 48000, "allowedRates": [48000, 96000]}}, "what": "graph"}, {"op": "dump", "name": "after-pin"}]

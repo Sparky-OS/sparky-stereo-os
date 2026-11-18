@@ -1143,3 +1143,4 @@ The OpenSC Project, pcsc-lite and SoftHSM contributors supply the software-token
 These credits record research and test dependencies; they do not claim the community packages or driver have shipped in the edition.
 
 The bounded virtualsmartcard test fixture builds on Frank Morgner and Dominik Oepen, named in the VirtualSmartcard.py copyright header.
+The FFmpeg developers supply the signed 5.1.10 source used for the private JavaFX ABI-59 media fixture; its inspected LICENSE.md records LGPL-2.1-or-later for this configuration.

@@ -15,7 +15,7 @@ if (r == -ENOTSUP) { /* this compositor does not send them: say so, draw flat */
 r = stereo_depth_wayland_get_limits(surface, &limits);                /* 0, -ENODATA until the first event, -ENOTSUP */
 ```
 
-X11 and Xwayland (`_KDE_NET_WM_STEREO_CONTENT_SUPPORTED` 10 or later, on a window that declares stereo content):
+X11 and Xwayland (`_KDE_NET_WM_STEREO_CONTENT_SUPPORTED` 10 or later, on a window that declares stereo content; 11 or later on a declared child window, which is where a toolkit's 3D area is: see [x11-declared-child-limits-and-first-pair.md](x11-declared-child-limits-and-first-pair.md)):
 
 ```c
 stereo_declare_x11(display, window, STEREO_SBS_FULL, STEREO_CLASS_GAME, STEREO_GAME_3D);

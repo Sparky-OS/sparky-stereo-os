@@ -64,3 +64,18 @@
   **Cause:** that detail renderer did not read the existing saved-problems entry.
   **Fix:** use the same problem text helper as the other AppCenter pages.
   **How found:** a saved-error fixture reaches the native profile page and must retain the failure text before its install action.
+- **Symptom:** an installed NVIDIA entry exits before opening its window, although the same launcher starts on AMD.
+  **Cause:** an uppercase-only environment-name validator rejects Graphics’ valid `__VK_LAYER_NV_optimus` key.
+  **Fix:** accept valid environment identifiers, including lowercase letters, from the trusted Graphics helper while preserving its same stable GPU identity.
+  Continue to reject malformed names and remove inherited device-selection overrides.
+  **How found:** the installed menu launch reports the exact key; a three-control launcher regression is red before the fix and green after it.
+- **Symptom:** the model-installation page opens a status-read error only when reached through polkit; the same problems command succeeds directly.
+  **Cause:** the published problems engine rejects an inherited `PKEXEC_UID`, treating the fixed-purpose package caller as a direct privileged engine invocation.
+  **Fix:** use the same authorized caller environment as AppCenter’s existing entry actions, clearing the inherited marker for the fixed read-only query.
+  Reuse that reader for the detail page and the post-install failure path.
+  **How found:** the deployed 0.2.1 engine is red with the inherited marker and green through the corrected caller; the owning engine’s later source already records its own general fix.
+- **Symptom:** an incremental native package rebuild refuses an already marked staging tree.
+  **Cause:** ordinary preparation cleared the runtime staging directories but retained a previously processed automatic dbgsym root under `debian/.debhelper`.
+  **Fix:** recreate generated staging before the normal archive step; reuse compiler products only after comparing their consumed source bytes with the newly extracted authored source.
+  Keep the binary output directory empty before a helper that identifies new archives by their filenames, and use a new frozen gate workspace when candidate hashes change.
+  **How found:** the second archive attempt failed before its first debug package; fresh generated staging removes the stale marker without bypassing projection or release checks.

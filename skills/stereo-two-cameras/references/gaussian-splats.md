@@ -49,6 +49,9 @@ The engine is a process-global singleton and each `forward_3dgs` replaces its fo
 Hold a single scene revision across the pair and copy or consume the first result before the next forward overwrites it.
 Two ordinary `submit` calls are insufficient: the worker has one replaceable pending request and one result slot.
 The training loop must not update the scene between eyes.
+`render_raw` retains `raw_rgb` and `raw_ts` capacities; the ordinary worker also reuses device upload/output buffers, and the viewport retains its last pose, step, pending ID and displayed texture.
+Those capacities can be reused sequentially, but each camera's pixel contents and result identity must be preserved.
+`PreviewRenderer::ensure_fbo` owns one colour/depth target, so points and meshes need the same first-result preservation even though their world VBOs can be shared.
 
 ## The route to the window
 

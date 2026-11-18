@@ -8,6 +8,7 @@ This is a source study and monoscopic baseline, not an implemented stereo render
 1. Pin the source and read its build and contribution rules.
    Spirula's `build_develop.bash -DSS_BACKEND=vulkan` builds a native application without CUDA or model weights.
    Capture the dev script's effective job count as well as its container's CPU quota.
+   At this revision the default Linux link failed; see the duplicate-symbol trap below before spending a cold build on that configuration.
 2. Follow the viewport to the screen instead of inferring the toolkit from the compute backend.
    Spirula's Dear ImGui GUI uses GLFW and OpenGL; Vulkan computes splats and returns RGB bytes for a GL texture.
 3. Generate calibrated turntable frames of simple shapes, with no outside media, and retain the generator.
@@ -72,6 +73,12 @@ The ordinary 2D viewport remains the comparison control.
   **Cause:** a quota alone does not necessarily change `nproc`, which the upstream script uses.
   **Fix:** verify the printed job count; with GNU `nproc`, `OMP_NUM_THREADS=4` made this dev script report four CPUs and four jobs.
   **How found:** the actual build log's `CPU cores` and `Using jobs` lines.
+- **Symptom:** Linux's final `spirula` link fails with multiple definitions of `gui::ProcessPipe`, `ProcessReader` and `ProcessDuplex` from `Subprocess.cpp` and `libss_inference_worker.a`.
+  **Cause:** the file is built in the executable and the archive; the archive lacks the target's `-O3`, and GNU ld extracts that unoptimized member for a weak `std::string::append` reference from `FrameMaskSvg.cpp`, bringing the strong process definitions too.
+  **Fix:** do not suppress duplicate-symbol errors or remove the file from just one target without checking its other consumers.
+  A standard CMake Release configuration is being checked as a source-preserving baseline; an owning-target correction needs a separate source-fix task if it is still required.
+  **How found:** the link map's archive-inclusion table names `std::string::append` as the trigger, and [upstream issue 339](https://github.com/harry7557558/spirula-studio/issues/339) reports the same Linux failure.
+  The reported one-target removal in that issue explicitly leaves other targets broken, so it was not applied.
 
 ## Measurements and limits
 

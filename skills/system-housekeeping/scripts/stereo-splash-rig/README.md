@@ -35,3 +35,11 @@ python3 with-init.py out/initrd-new.img out/run-new.img     # the current init (
 
 `--fw` boots OVMF with a 1024x768 firmware framebuffer (`--fw=WxH` another size) and reads it through QMP just before the DRM driver comes (`rig.drm=12 rig.unbindfb=1`) and again when the frames are read (`TAG-fbend.png`; with `rig.unbindfb=0` the framebuffer stays a frame-buffer display beside the GPU's screens).
 The guest needs a kernel with VKMS's configfs connector attributes (`type`, `edid`, `edid_enabled`, `status`), configfs and 9p as modules, and KVM.
+
+## Proving a theme (ORDER 715)
+
+`batch-theme.sh OUT SET THEME...` runs the theme cases on the image `run-SET.img`: the panel alone as the left eye, the right eye and anaglyph, the television alone in frame packing, both screens with either as the main one, and a 2D boot, at the limits D (popped 4, sunk 10), L (8 and 20), Z (0 and 0) and R (3.25 and 8.13); `rig.theme=NAME` on the kernel line names the theme in `plymouthd.conf`.
+`batch-theme-fb.sh OUT SET THEME...` adds the frame-buffer renderer (the guest's fbdev, the firmware's 1920x1080 and 1024x768 framebuffers kept).
+`verdict-theme.py RUNS SET THEME [LIMITS]` predicts the shifts from the limits and checks each capture (`measure.py` matches the foreground of one eye against the other over -24 to +24 px); `verdict-theme-fb.sh` and `verdict-theme-2d.sh` do the frame-buffer and the 2D checks.
+`upgrade-test.sh NEW_DEBS PLYMOUTH_DEBS [THEME]` is the apt proof of a successor package over the published one (`CONTROL=1` reinstalls the published package to show what the existing default rule does).
+What a theme declares and draws, and the traps of this proof: [boot-splash-theme-contract.md](../../../stereo-window-3d-area/references/boot-splash-theme-contract.md).

@@ -97,3 +97,12 @@ The main session's measured method (2026-11-18, on a laptop that took the new sp
 ## Credits
 
 The theme's script is `lines.script` of the Lines Plymouth theme of Debian 8 "Jessie" (artwork by Juliette Taka Belin, scripting with Aurélien Couderc; Alberto Milone and Canonical for the script), made from the script plugin example of Charlie Brej, edited by Daniel Ramos for Sparky; Plymouth is the work of Ray Strode and its contributors; ORDER 639's rig is the method this proof follows.
+
+## A theme choice that is not stored (found on the bench laptop, 2026-11-18)
+
+- **Symptom:** `plymouth-set-default-theme THEME` exits 0, and the next start still shows the edition's default theme. `plymouth-set-default-theme` with no argument still names the default.
+- **Cause:** Plymouth 26.134.222's own script inserts the `Theme=` line before the line after the `[Daemon]` header. When `/etc/plymouth/plymouthd.conf` holds only that header, or is empty, there is no such line and `sed` inserts nothing. The edition's default applies by removing the `Theme=` line, so a machine on the default has exactly that header-only file.
+- **How found:** a job on the bench laptop chose the older theme with that command and its state line read back the default; a throwaway container with a stand-in `plymouth` reproduced it for five shapes of the file (header only and empty file store nothing; a header followed by any line, or no file, store the choice).
+- **Upstream:** Plymouth's main branch stores the choice for the header-only file; the empty file still stores nothing there. Carry upstream's change in the edition's Plymouth (ORDER 718).
+- **Until then, for a proof:** write the two lines `[Daemon]` and `Theme=NAME` into the file yourself, then rebuild the boot image.
+- **The real-panel result of that proof:** on the 1366x768 panel set to anaglyph, the published `sparkyos-stereo` showed the two eyes side by side, each squeezed to half width; the 9~20261118 theme shows one full-size picture with red 2 px from cyan (the limit of 3.25 px for a view 1920 wide is 2.3 px there), and Plymouth's log has `the theme draws both eyes side by side`.

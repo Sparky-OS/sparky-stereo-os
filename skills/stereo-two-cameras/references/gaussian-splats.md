@@ -116,3 +116,50 @@ The timings include HTTP, render, readback and JPEG encoding.
 They measure two separate ordinary views, not atomic stereo presentation or a simultaneous two-eye memory high-water mark.
 The input and camera count are small; larger splat counts, overlap and lens variants need fresh measurements in the implementation milestone.
 No stereo image or second-eye geometry is claimed here.
+
+
+## Implementation checkpoint: native pair transport
+
+ORDER 501's implementation work uses the same RenderWorker for CUDA and Vulkan.
+Its atomic request holds one engine mutex over both forward passes and copies the left RGB result before the singleton forward storage is reused.
+The regression compares each packed half against an independent camera render and places a waiting trainer between the two render callbacks.
+That GPU regression was written but had not completed the rebuild at this checkpoint; do not describe the splat pair as verified yet.
+
+The native adapter was built separately against GLFW 3.4 and libstereo-declare 1.10.
+A synchronized Wayland subsurface is below the alpha-capable parent, has an empty input region, and carries one XRGB8888 full side-by-side SHM buffer.
+The viewport destination is independent of the eye raster; the compositor performs the resize.
+Released SHM buffers may be reused; busy buffers are retained until release, with a bounded allocation count.
+The Xwayland child uses the declaration library's child membership, one-view size and below-parent placement.
+A transport harness with distinct patterns per eye was captured on RADV and NVIDIA through native Wayland and Xwayland.
+These patterns prove eye transport and flat-parent composition, not 3D scene geometry or pair cost.
+
+- **Symptom:** opening a Vulkan-backed model on NVIDIA native Wayland leaves a black or frozen UI and repeated ImGui shader failures.
+  **Cause:** on driver 615.71.09, destroying a Vulkan probe instance clears the calling thread's current EGL context.
+  **Fix:** preserve the current EGL display, context, read/draw surfaces and client API across instance destruction, restoring them when the context changes and reporting restoration failure.
+  **How found:** trace the EGL state before and after each Vulkan call; only vkDestroyInstance clears it.
+  A standalone Wayland EGL/Vulkan test loses its context unguarded and passes four iterations with the source helper; probing on another thread also preserves the UI thread's context.
+  A shim using restoration makes the original application's native Wayland capture work.
+  The closed driver's internal teardown mechanism was not established.
+  An EGL_EXT_platform_device pbuffer reproducer cannot restore its context, so the Wayland result does not establish a fix for that separate route.
+- **Symptom:** an X11 child is declared correctly but its first image stays black.
+  **Cause:** mapping the child after XPutImage clears the pixels with the window's background.
+  **Fix:** map before uploading the first image.
+  **How found:** retain the black capture and repeat the same child declaration and placement with the map ordered first.
+- **Symptom:** the Xwayland child is visible but the flat GLFW parent disappears.
+  **Cause:** the measured GLX parent path does not retain its flat surface across child redirection.
+  The lower-level GLX mechanism remains unestablished.
+  **Fix:** use an alpha-capable EGL parent on both Linux window systems and verify the ordinary 2D control independently.
+  **How found:** change only GLFW's context creation API in the same harness; the parent and both child eyes then appear together.
+- **Symptom:** libstereo-declare 1.10 reports no delivered depth limits for a listed stereo Xwayland child, while native Wayland receives them.
+  **Cause:** KWin +stereo3d58 writes the property only to a managed top-level that declares stereo content; the ordinary parent is deliberately undeclared and the child is not a managed top-level.
+  **Fix:** the compositor writes the owner's output limits on each listed declared child, follows stereoChildrenChanged, and withdraws the property when the declaration or membership goes.
+  **How found:** the same extended testStereoDepthLimits binary fails at the child's missing property against the published library in normal and scaled2x rows, and both rows pass with the local compositor patch.
+  The SDK harness then receives 10 and 4 on both GPUs through Xwayland.
+  This fix was built and tested privately; no package or publication is claimed.
+
+Orthographic shear still needs care beyond the scalar disparity equation.
+The splat engine's SH and ray helpers recover a camera origin using a transposed rotation, which assumes a rigid view matrix.
+Do not feed an affine shear through that pose and claim the view-dependent colour and ray state remain correct.
+Keep the pose separate from the projection or add an explicitly tested affine-camera path in the shared engine.
+Wide-angle projections also require rectification analysis before claiming zero vertical disparity.
+The end-to-end splat geometry, preview paths and real atomic-pair timing remain unverified at this checkpoint.

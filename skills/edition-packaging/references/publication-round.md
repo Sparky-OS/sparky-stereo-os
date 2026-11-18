@@ -203,6 +203,21 @@ Keep the designed dependency and obtain the coordinator's source-generation deci
   **Fix:** report the exact kept package and missing dependency, confirm its journal acceptance with the coordinator, qualify the retained source through a genuine rebuild, and repeat the combined proof on one extended pool. Never equate zero removals with a successful uplift.
   **How found:** an exact-version install simulation named the unsatisfied Depends; the bounded stage table located its archives, the receipt audit found `unrecorded: ["buildinfo"]` and no matching changes, and the coordinator supplied the missing journal acceptance.
 
+### A verification monitor must be able to measure its scratch
+
+Run archive qualification as the lane UID with an explicit writable HOME and private HTTPS APT configuration.
+A scratch measurement that fails is a refusal, not a size of zero or permission to continue without the monitor.
+Stop only the owned task named by that monitor and retain its diagnostic before retrying.
+
+- **Symptom:** `du` reported permission denied on an archive context and the budget monitor exited while its child task still existed.
+- **Cause:** a root verification invocation created a private mode-0700 directory that the lane UID could not inspect; the monitor did not handle a failed measurement.
+- **Fix:** use the lane UID for the archive gate, repair ownership only inside the lane's scratch, and make measurement failure stop the literal named task. Exercise that refusal with an unreadable-measurement fixture.
+- **How found:** the monitor's traceback and directory owner/mode identified the failure; its fixture then proved the exact stop command and refusal exit.
+
+A live held stage can also change after initial discovery.
+Retain disappeared paths as observations, inspect the newly seen descriptor/binaries within that named root, and report a newer unlisted generation without adding it to the frozen pool.
+The pool's accepted copies and checksum identity stay independent of that live folder.
+
 ### Keep the verification image's bootstrap explicit
 
 A minimal no-Recommends bootstrap is not the full image package list.

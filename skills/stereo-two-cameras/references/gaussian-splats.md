@@ -271,3 +271,19 @@ The same open window survives a 100-to-125-percent output-scale change, zero lim
   **Fix:** letterbox the capped preview at its rendered aspect, like the engine viewport, without resizing the eye internally.
   **How found:** review the preview and engine placement paths, then capture the same markers in a 400-by-850 window at a requested 4,096-pixel eye width.
   Both tested GPUs retain square geometry; maximum horizontal prediction error is 0.097 pixels.
+
+## Checking that a proof picture actually has two eyes
+
+Decode the PNG and compare the RGB planes of its two halves as well as checking its left-first sTER chunk and CRCs.
+A marked pair with equal eyes is a flat control, never proof of a real scene in depth.
+Keep deliberate absent-limit and zero-limit pairs, labelled with that reason, and make the proof checker refuse them if offered as a proof.
+The same refusal applies to a .pns file: its extension and mark do not prove depth.
+
+- **Symptom:** a complete real-scene pair is reported identical while the renderer and a fresh capture show different eyes.
+  **Cause:** an RGBA difference's alpha plane is zero when both inputs are opaque; an alpha-only bounding-box check then returns no box even when RGB differs.
+  **Fix:** compare decoded RGB arrays or explicitly include the RGB bands in the difference criterion.
+  **How found:** the same two retained pictures returned no box as RGBA differences but 134,976 and 67,707 differing RGB pixels, confined to their native viewports.
+- **Symptom:** a static model has only one completed native presentation and the rig waits for a second forever.
+  **Cause:** loading and resize events can coalesce into one valid final image; readiness is not a frame-count promise.
+  **Fix:** require a completed native presentation and a semantic scene witness, then check the decoded proof's unequal eyes and geometry.
+  **How found:** an unmodified program presented the trained spheres once, with a valid camera offset and unequal submitted RGB eyes, while the old two-presentation wait timed out.

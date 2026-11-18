@@ -337,7 +337,8 @@ For live training, keep two coherent presented pairs with strictly increasing tr
 
 ## Choosing which visible depth receives the budget
 
-Daniel decides the support policy; the accepted conservative fitter remains the production default until that decision.
+The study originally kept the conservative fitter as the default pending Daniel’s decision.
+Daniel subsequently chose the pixel-mean rule below for the package; the percentile variant remains a study-only executable.
 A renderer can place most visible texture almost at screen depth while its covariance envelope consumes the person's popped limit.
 Measure the picture before treating that result as a failed two-camera implementation.
 
@@ -375,3 +376,48 @@ Their display controls are not imported into the edition's program.
   **Cause:** algebraically equal double-precision endpoints differ by one unit in their last place.
   **Fix:** declare a tiny numerical boundary tolerance, keep it separate from the capture error allowance and still report the actual excursion size.
   **How found:** a nominal endpoint of -6.269010416666666 pixels became -6.269010416666667 in the equivalent disparity expression; a 1e-7-pixel roundoff tolerance removed this false tail without hiding real multi-pixel excursions.
+
+
+## Pixel-mean rule chosen by Daniel
+
+Daniel’s November 2026 decision fits every contribution-weighted pixel mean inside the compositor’s limits.
+An individual faint layer may exceed a limit; its mixture with the other layers in that pixel may not.
+The camera offset is returned by one `camera_offset(limits, scene)` function shared by both backends.
+It introduces no setting, preset, environment default, output mode or separation field.
+Keep the original conservative object picture alongside the new marked pair at the same camera and limits.
+
+For pinhole 3DGS/Mip rendering, prepare one inverse axial depth per splat under the same engine lock that freezes the world for the two eyes.
+Arm an explicit one-shot viewer coefficient map, then use the existing `SplatScoreRender` contribution blender in `EngineForward`.
+It follows the same tile list, order, Gaussian footprint, alpha threshold and transmittance termination as the RGB image.
+Normalize its accumulated inverse depth by accumulated opacity.
+Do not leave the map armed for a subsequent training forward.
+The worker owns the coefficient and output buffers; do not reuse learned score tensors as scratch.
+
+Measure the centre, derive the candidate offset, then evaluate both displaced eyes.
+Reduce the offset when either eye’s extrema require it, with a declared numerical guard.
+The final RGB candidate images are reused as the displayed pair.
+Recompute for the actual camera, geometry, limits and output; never reuse a fit across training revisions merely because the viewport size stayed the same.
+Native pixel extrema bound any positive-weight output-filter mixture, so this avoids a CPU sort and guarantees a safe output-filter bound.
+Keep a conservative geometric bound for unsupported projections and auxiliary geometry.
+This bound may leave more budget unused; measure it rather than claiming an exact filtered maximum.
+
+The runtime implementation reads back a float plane and performs a linear extrema scan.
+It is not the study’s CPU projection, per-pixel sorting or histogram calculation.
+In the initial large-raster object probe, five eye evaluations cost approximately 151–159 ms on AMD and 48 ms on NVIDIA after warmup.
+The first NVIDIA call additionally incurred shader compilation.
+Those are fit timings at a 1920 by 921 renderer raster, not a whole-application frame-rate claim.
+An independent CPU contribution raster followed by the actual compositor filter found zero pixel-mean weight outside the limits in that probe.
+Retain the full route, limit, scale, moving-camera and live-training matrix before accepting a package.
+
+- **Symptom:** a fit calculated from the centre view exceeds the budget after the cameras move apart.
+  **Cause:** Gaussian footprints and their contribution mixtures change with each camera.
+  **Fix:** validate both actual candidate eyes and shrink until both bounds pass, preserving the final images and one frozen world revision.
+  **How found:** the depth study distinguishes a centre histogram from the two captured per-eye projection traces; the independent audit evaluates both displaced images.
+- **Symptom:** the new fit spends an extra GPU raster and readback per trial despite using the renderer’s existing score output.
+  **Cause:** an initial implementation rendered a separate coefficient image after RGB.
+  **Fix:** arm the coefficient map for the same forward and reuse the final candidate RGB pair.
+  **How found:** timed fit logs separated evaluations, readback/scan time and total time; the same exact contribution audit checks the fused result.
+- **Symptom:** a package log still suggests hundreds of excluded splats.
+  **Cause:** the old diagnostic label concealed that its value was an index.
+  **Fix:** name it `first_unbounded_index` and test that interpretation independently of the chosen fit policy.
+  **How found:** source inspection and the retained study’s finite-contribution audit.

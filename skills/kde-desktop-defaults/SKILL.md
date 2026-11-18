@@ -40,7 +40,7 @@ A notebook's built-in panel gets its first scale from its real size (125 % at le
 ## Account defaults and displayed release name
 
 - [Spell checking](references/spellchecking.md): native QSettings fallback, the two recorded nondefault keys, seven dictionaries and the three entries without word-list data.
-- [Desktop shortcuts](references/desktop-shortcuts.md): KDE's Trash and catalogue-derived Home, account state, existing accounts and preserved removals.
+- [Desktop shortcuts](references/desktop-shortcuts.md): KDE's Trash and the classic Microsoft My Documents label for the home folder, account state, existing accounts and preserved removals.
 - [Copy notifications](references/copy-notifications.md): the owning package, running-job popup timing, tray retention and personal overrides.
 - [Displayed release name](references/display-release-name.md): display-only os-release reading and the pinned SparkyLinux tools.
 

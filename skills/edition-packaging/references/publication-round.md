@@ -238,6 +238,11 @@ The pool's accepted copies and checksum identity stay independent of that live f
 - **Fix:** stop that incomplete invocation without counting it, then scan complete source families one at a time, keeping both architectures and companions together. Pair each family with every corresponding published binary, retain return codes and raw tags, and assert full current/published coverage before calculating the delta.
 - **How found:** measured scratch separated lintian's growing extraction tree from link roots; the replacement driver emitted each completed family with its binary counts and diagnostics while staying inside the shared lane budget.
 
+- **Symptom:** a real `init.d-script-missing-lsb-section` warning remained in the raw diagnostic list instead of the tag totals.
+- **Cause:** the tag parser allowed letters and hyphens but not the dot in this valid tag name.
+- **Fix:** retain raw output, parse dotted names too, and explicitly reclassify the previously retained line when rebuilding the delta; do not rescan or alter package archives for a reporting-only correction.
+- **How found:** the final QEMU family had the same warning on both sides. Reparsing added exactly one tag to each total, preserved every raw log hash, and left the complete delta unchanged.
+
 - **Symptom:** the 9 GiB guard stopped concurrent archive qualification and lintian below the brief's 10 GiB allocation, after hundreds of dependency cases had resolved.
 - **Cause:** four paired Qt dependency roots, their verified archive cache and another check's extraction tree share one allocation; bounding each check independently does not bound their sum.
 - **Fix:** retain the interrupted contexts as incomplete evidence, remove their unpacked roots, verify every reused cache object's content hash, and repeat the complete archive gate with fewer workers under the combined guard. Use one worker when one paired case approaches the allocation. Reuse only completed paired lintian families against the same sealed pool, validating coverage and retained raw diagnostics; an interrupted family is rerun. Never infer an archive pass from resolved cases alone.

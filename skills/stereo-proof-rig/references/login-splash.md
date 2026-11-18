@@ -50,3 +50,6 @@ An isolated `bash -n` probe reproduced the failure for that error word and passe
 The message is now plain, and tag sanitization is also split into two simple substitutions.
 Mark every stereo capture with PNG's sTER chunk, mode 1 for left-first, and keep it as .pns.
 The capture JSON's `stereo` field identifies a pair; a wide aspect ratio alone is not a general stereo detector.
+
+`CONFIG_SEED` names a mounted home tree to copy before setup for a saved-choice or package-upgrade case.
+Keep the seed read-only, use a fresh case directory, and compare package-upgrade configuration hashes separately from changes Plasma itself saves during login.

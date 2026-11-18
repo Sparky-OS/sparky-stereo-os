@@ -1,7 +1,8 @@
 # PJeOffice Pro runtime boundaries
 
 Measured on 2026-11-18 with the unchanged CNJ Linux x64 2.5.16u ZIP.
-These are startup and component probes, not a completed court login or a signed PDF qualification.
+Synthetic PDF and login tasks were run through the actual application on bundled Java 8 with a file identity, SoftHSM and a local callback server.
+No court login or physical-card signing was performed.
 
 ## Recipe
 
@@ -38,7 +39,13 @@ OpenJFX was Debian 21.0.12+3-3.
 The full module set was `javafx.controls,javafx.swing,javafx.web,javafx.media,javafx.fxml`, with `--module-path /usr/share/openjfx/lib`.
 OpenJFX 21 on Java 28 reports `java.lang.module.FindException: Module jdk.jsobject not found, required by javafx.web`.
 This is a module-set failure, not proof that every application path fails on Java 28.
-The JavaFX cutter was not qualified.
+The cutter opens on bundled Java 8 and Debian Java 21, but both reject the synthetic H.264/AAC MP4.
+The shared JavaFX media API fails with MediaException, caused by com.sun.media.jfxmedia.MediaException: Could not create player!
+Its DEBUG output reports ERROR_MEDIA_AUDIO_FORMAT_UNSUPPORTED, including on a video-only control.
+A native-loader trace tries libavcodec majors up to 59 on bundled Java and 60 on Debian OpenJFX, while testing supplies major 63.
+This is separate from the external FFmpeg executable.
+The unchanged jar’s video-slice handler successfully cuts 1–4 seconds with bundled FFmpeg 5.1.1 and system FFmpeg 9.0.2; both outputs contain H.264/AAC and have duration 3.08 seconds.
+Set ffmpeg_home to a directory containing the literal filename ffmpeg.exe; the system test used a symlink to /usr/bin/ffmpeg.
 
 ## Traps
 
@@ -46,7 +53,9 @@ The JavaFX cutter was not qualified.
 Cause: `com.github.signer4j.provider.SunPKCS11Creator` reflects on `sun.security.pkcs11.SunPKCS11`; the cryptoki module does not export that package.
 The cause was found by running the jar's constructor with the generated SoftHSM fixture and reading its nested `IllegalAccessException`.
 With `--add-exports=jdk.crypto.cryptoki/sun.security.pkcs11=ALL-UNNAMED`, the same constructor and independently verified challenge succeed on the measured Java 21, 25 and 28.
-This launcher argument requires full application signing qualification before becoming a shipping choice.
+Full task enumeration additionally needs `--add-exports=jdk.crypto.cryptoki/sun.security.pkcs11.wrapper=ALL-UNNAMED`.
+Without it, PKCS11Driver raises IllegalAccessError for CK_C_INITIALIZE_ARGS, and the UI says the operation was cancelled.
+Even with both exports, the actual task still fails the certificate filter described below; component success does not qualify system Java.
 
 **Symptom:** a plain GET to localhost receives HTTP 403 although startup opened the listener.
 Cause: the application's secure request filter expects its documented preflight-compatible request shape.
@@ -75,7 +84,12 @@ This does not prove PJeOffice validates every signing chain through that manager
 Cause: `Updater.checkWritingPermission()` tries to create and remove `write.test` inside `pjeoffice_home`.
 The unchanged method returned false with `AccessDeniedException` in a root-owned folder and true in a user-owned folder.
 With the original update properties, `isDisabled()` returned false in both; with `update.url=disabled`, it returned true.
-No patch was applied, so later patcher failure handling and atomic replacement remain unqualified.
+The official patcher was subsequently run through download, SHA-1 verification, extraction and file replacement, as an ordinary user.
+A complete user-owned installation was patched and restarted, and the restarted signer answered its localhost ping.
+Every installed patch file matched the official update ZIP bytes.
+The root-owned target displayed the administration-permission error and retained its original files.
+The installed-version property was a synthetic 2.5.15 trigger because the older official archive URL returned 403; this measures the full patch path, not a genuine old-binary version upgrade.
+Power-loss rollback and atomicity were not fault-tested.
 `HttpVersionChecker` fetches `update.properties`; the live file reported app.version 2.5.16.
 A distribution-managed root-owned installation needs its own update transaction and the upstream updater explicitly disabled.
 
@@ -93,3 +107,63 @@ The first fixture had no DISPLAY and raised HeadlessException; assuming `:0` wit
 Reading only those three variables from the container's own plasmashell process corrected the fixture.
 Reading KWin's environment can be refused because its executable has capabilities.
 No environment or socket from the host session is needed.
+
+## Full task recipe and additional traps
+
+The build repository's `tools/pjeoffice-audit/README.md` carries the full fixture recipe.
+For the file case use the application's list.a1 setting; for the software token use list.a3 with the installed SoftHSM module.
+The application also accepts p11-kit-proxy.so, with SoftHSM registered in the private test user's p11-kit module directory; its login challenge verifies too.
+The uninitialized spare SoftHSM slot logs CKR_TOKEN_NOT_RECOGNIZED but the initialized token remains usable.
+A generated PIN is entered only into the application dialog; no real identity or PIN is needed.
+
+PDF signing uses the official ShellExtension local action, cnj.assinador with samefolder, DEFINIDO, CADES, ATTACHED and SHA256withRSA.
+The result is an attached CAdES `.pdf.p7s` sidecar.
+OpenSSL independently verifies the generated chain and signature, and the extracted content equals the original PDF bytes.
+The CMS includes contentType, signingTime, messageDigest and CMSAlgorithmProtection.
+Overriding the content with altered bytes fails verification for both file and SoftHSM cases.
+The login callback contains a raw SHA256withRSA signature and a DER PkiPath certificate sequence, not PKCS#7.
+It has no CMS signed attributes by format.
+The file callback contains leaf and test root; SoftHSM returns only the imported leaf, whose chain verifies against the separately generated test root.
+
+**Symptom:** a valid generic test certificate does not appear in the application's chooser.
+Cause: PjeCertificateListAcessor requires digitalSignature and a recognized PF or PJ otherName.
+The cause was found by inspecting that unchanged predicate and OIDReader, then adding a synthetic all-zero PF field to the generated leaf.
+The fixture's SAN uses `otherName:2.16.76.1.3.1;UTF8:` followed by 49 zeros.
+This makes an accepted test identity, not a government-issued or legally valid ICP-Brasil certificate.
+Do not disable the application's filter to make a fixture pass.
+
+**Symptom:** on Java 21 the same certificate is filtered out even after both token exports are supplied.
+Cause: OIDReader requires each SAN entry's size to equal two; the JDK SUN provider returns four elements for this otherName on Java 21, versus two on bundled Java 8.
+The cause was found by a same-certificate SanShape comparison and the actual task's warning, “Subject alternative list must have at least 2 entries (keystore bug?)”.
+The Java 21 [X509Certificate API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/security/cert/X509Certificate.html) explicitly permits the third and fourth elements.
+The observed fix requires the owning application's compatible certificate reader; it was not applied to the official jar.
+Retain bundled Java as the measured signing control until a supported current runtime passes full tasks.
+
+**Symptom:** OpenSC loads but the application's certificate chooser is empty without a card.
+Cause: there are no PC/SC slots, not a missing SoftHSM installation.
+A file-system trace records probes of /usr/lib/opensc-pkcs11.so, /usr/local/lib/opensc-pkcs11.so, /usr/lib/x86_64-linux-gnu/opensc-pkcs11.so and its pkcs11 subdirectory alias.
+The application saves the installed multiarch path automatically and loads it successfully.
+The raw slotListIndex exception came from the separate provider-constructor probe; the actual application shows an empty chooser with disabled OK and a configuration link.
+Physical-card signing through OpenSC is not proven.
+Debian's vsmartcard-vpcd and python3-virtualsmartcard 3.3+dfsg-2 were tried as a bounded fixture lead.
+The Python library needed an explicit PYTHONPATH and then failed importing Crypto, followed by its obsolete sha fallback; no card containing a signing key was established.
+
+**Symptom:** Sparky CA's roots appear in Debian Java but do not update the application's HTTPS trust.
+Cause: PjeWebGlobal.HTTPS_CODEC loads /pjeoffice.jks directly from the application resource.
+The actual store contains 168 trusted certificates, 80 ICP-Brasil subjects and one self-signed ICP root, v5; it has no key entries.
+Its HTTPS codec rejects a generated local TLS chain even when javax.net.ssl.trustStore points at a store containing that generated root.
+A private classpath resource union, containing every original certificate plus the generated root, is accepted by that same unchanged HTTPS codec.
+All 168 original certificate encodings were compared and preserved.
+This demonstrates an additive local resource bridge; it does not implement a product trust updater or prove Ed521 support.
+A later integration must preserve original anchors and the person's selected system TLS trust, regenerate the union when either input changes, and report failures.
+Document-signature policy remains a separate concern.
+
+**Symptom:** startup or video output fails with InvalidPathException in a minimal container.
+Cause: the C locale cannot encode non-ASCII characters in the built-in driver paths or output filenames.
+The cause was found from the rejected path and a same-command UTF-8-locale rerun.
+Use C.UTF-8 for disposable fixtures; preserve the person's UTF-8 locale in the product launcher.
+
+**Symptom:** an HTTP request for a local PDF task is refused as an internal-only task.
+Cause: the application separates remote requests from local file operations.
+The supported ShellExtension entry point writes the normal watched local request instead and succeeds.
+Do not bypass that boundary or expose local-file tasks over HTTP.

@@ -1141,3 +1141,5 @@ The community projects read for the integration and credited by their own record
 
 The OpenSC Project, pcsc-lite and SoftHSM contributors supply the software-token test tools and interfaces, as credited in the certificate-manager section above.
 These credits record research and test dependencies; they do not claim the community packages or driver have shipped in the edition.
+
+The bounded virtualsmartcard test fixture builds on Frank Morgner and Dominik Oepen, named in the VirtualSmartcard.py copyright header.

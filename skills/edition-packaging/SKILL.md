@@ -9,8 +9,7 @@ description: >-
   apt-get update exits 0 on a failed fetch, lc1 says the build record is incomplete, a Qt header is missing after
   qt6-base updates, a pin leaves a binding or development package uninstallable, a systemd unit's proof shows none
   of its journal lines, a preinst prompt stops an install, a language probe shows English, a CMake consumer misses an imported library, a Rust suite shares crates as dylibs,
-  an amd64v3 index leaves apt on baseline, Illegal instruction on older CPUs, a page of the app center takes minutes to open, or a vendor's program
-  that may not be redistributed must be fetched on the person's machine and kept current by a reviewed hash.
+  an amd64v3 index leaves apt on baseline, or Illegal instruction on older CPUs.
 ---
 
 # Packaging the edition

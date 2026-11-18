@@ -152,3 +152,8 @@ The desktop's loading screen is the first user: [kde-desktop-defaults, the loadi
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 
 For a shared native child next to an egui editing window, read [the Craft window recipe](references/egui-craft-window.md).
+
+## A native GLX child in an xcb Qt Quick window (ORDER 17, milestone 7)
+
+General rules found building the model viewer (details in skill 3d-models): popups drawn inside the window are hidden under the native child (use `popupType: Popup.Window`); an XDND drop over the child needs `XdndProxy` to the Qt window and no `XdndAware` on the child, or the child's own toolkit takes the file; a declared stereo child is one eye wide with declaration version 4, so resize it plainly (the drawable follows the X width; measured green); a rig shim that hides the support property from every caller makes Mesa use its legacy twice-as-wide rule and looks like a resize fault, so hide it only from the program's own library.
+

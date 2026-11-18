@@ -25,3 +25,31 @@ A run: `run-case.sh IMAGE OUTDIR MODES="3d 2d" OUTPUTS=2 HOLD=6 SHOTS="1 3" POPP
 - **Symptom:** the splash is gone before the first capture. **Cause:** a container's Plasma is ready in about two seconds. **Fix:** in capture cases only, the person's autostart folder holds `org.kde.plasmashell.desktop` with `Exec=sh -c 'sleep N; exec /usr/bin/plasmashell'` (`HOLD=N`); never in timing cases. **Found by:** KWin's `REMOVED ksplashqml` 1.4 s after `ADDED`.
 - **Symptom:** waiting for the `ksplashqml` process to end took over a minute, once. **Cause:** in that run (without the render node) plasmashell's call to set the "desktop" stage D-Bus-activated `org.kde.KSplash` again after the splash had quit. **Fix:** the splash's moments come from KWin's log, not from the process list.
 - **Symptom:** a part's measured disparity is 1 where 4 is predicted, or 0 where 2 is. **Cause:** masks made from a picture's alpha and placed by the layout's sums miss Qt's own scaling by a pixel, and the wordmark is drawn with alpha 101 at most, over a background that does not move: the background dominated. **Fix:** a part's pixels are the brightest 15 % of the plain picture inside its box; the match then follows the part (error 1.2 against 12 for the next shift). **Found by:** measuring the same part on hand-picked boxes of its letters.
+
+## Extending the login cases (ORDER 672)
+
+An isolated tool environment may not expose the host's render-node path to `stat` even though Docker can pass that node to a container.
+Set `RENDER_GROUP` to the group measured inside a preflight container; `run-case.sh` uses it instead of probing the hidden host path.
+Keep the render node and group explicit, and keep `--ulimit core=0`.
+
+`DESKTOP_PROBE` names a mounted script to run in the same private session bus after the desktop capture, for example a real Splash Screen KCM opened with `kcmshell6`.
+A failing desktop probe propagates its status through the session and container.
+`EXPECT_NO_SPLASH=1` checks a login with None selected: no splash window may map, and the desktop is still captured.
+For fake pointer clicks on a newly created device, allow the device to settle and wait after moving before pressing; the first immediate move/click sequence saved nothing, while the delayed sequence saved the selected entry.
+Log `workspace.cursorPos` when distinguishing an input problem from the page's behavior.
+
+`measure-regions.py PAIR PLAIN REGIONS.json` measures both horizontal and vertical offsets against a separate plain login.
+Ordinary regions use boundary-weighted colour matching, optionally with `normalize_mean` for a periodic background.
+For translucent artwork, use `method: boundary`, `x_edge` and `y_edge` rectangles: it measures the strongest visible edge rather than matching the changing colour behind it.
+Report the right-minus-left disparity, both per-eye positions, the mean centre shift and the vertical difference beside the prediction.
+The original `measure.py` uses left minus right; state which convention a table uses.
+
+Before running a saved rig recipe, run `bash -n` on it.
+The image builder's required-variable error word contained an apostrophe that left a quote unmatched inside the parameter expansion.
+An isolated `bash -n` probe reproduced the failure for that error word and passed with the plain wording; the tag substitution was not the cause.
+The message is now plain, and tag sanitization is also split into two simple substitutions.
+Mark every stereo capture with PNG's sTER chunk, mode 1 for left-first, and keep it as .pns.
+The capture JSON's `stereo` field identifies a pair; a wide aspect ratio alone is not a general stereo detector.
+
+`CONFIG_SEED` names a mounted home tree to copy before setup for a saved-choice or package-upgrade case.
+Keep the seed read-only, use a fresh case directory, and compare package-upgrade configuration hashes separately from changes Plasma itself saves during login.

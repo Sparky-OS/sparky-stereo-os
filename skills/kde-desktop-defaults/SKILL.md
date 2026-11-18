@@ -70,6 +70,11 @@ Newcomers in Linus Tech Tips' Linux challenge and in Diolinux's videos struggled
 - KConfig reads the system's files before the person's own, so a value in the person's configuration wins over one under `/etc/xdg` ([KConfig's entry options](https://invent.kde.org/frameworks/kconfig/-/blob/master/docs/options.md): "Typically, the system administrator might set global defaults, and a user might override them in their local configuration files").
   The tests below check both cases.
 
+## Session, menu, sound and battery defaults
+
+[ORDER 668](references/session-menu-battery-defaults.md) records each reader, first-account delivery, saved-choice preservation, installed fresh-login recipe and traps.
+Use its predecessor red, successor green and saved-panel upgrade cases when extending these defaults.
+
 ## Defaults before code
 
 - Ship KDE system configuration under `/etc/xdg`. The look package (`sparky-os/packages/sparky-stereo-look` in [the build tree](https://github.com/Sparky-OS/sparky-stereo-os-build)) carries `krunnerrc` there, as a conffile, beside the desktop's other defaults.

@@ -3,6 +3,7 @@
 # Inside the rig image, as the person: a real startplasma-wayland login on virtual outputs, with the loading screen captured.
 # Env: CASE (folder for the results), OUTPUTS (count, default 1), MODES ("3d 2d": per output, 3d = the side by side 3D twin, 2d = the plain mode),
 #      SCALE (output scale, default 1), POPPED, SUNK (the person's kwinrc [StereoDepth] limits, unset = not saved),
+#      CONFIG_SEED (home tree to copy before setup, for a saved-choice or upgrade login),
 #      KSPLASHRC (the person's own ~/.config/ksplashrc, unset = none), SHOTS ("1.5 4": seconds after the first splash window to capture),
 #      W, H (output size), SETTLE (seconds after the splash ends), NOSHOT (timing run only).
 set -uo pipefail
@@ -10,6 +11,9 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 export HERE
 CASE=${CASE:?}; mkdir -p "$CASE"
 export HOME=$CASE/home; rm -rf "$HOME"; mkdir -p "$HOME/.config" "$HOME/.local/share/kwin/scripts"
+if [ -n "${CONFIG_SEED:-}" ]; then
+	cp -r "$CONFIG_SEED"/. "$HOME"/
+fi
 export XDG_RUNTIME_DIR=/tmp/r$$; mkdir -p "$XDG_RUNTIME_DIR"; chmod 700 "$XDG_RUNTIME_DIR"
 export LANG=C.UTF-8
 N=${OUTPUTS:-1}; W=${W:-1920}; H=${H:-1080}
@@ -77,10 +81,20 @@ set -u
 T0=$(date +%s.%N); echo "login $T0" > "$CASE/marks.txt"
 startplasma-wayland > "$CASE/session.log" 2>&1 & sp=$!
 first=""
+if [ "${EXPECT_NO_SPLASH:-0}" = 1 ]; then
+    sleep 4
+    if grep -q 'SPLASHLOG.*ADDED ksplashqml' "$CASE/session.log"; then
+        echo "FAIL: splash mapped with None selected" > "$CASE/no-splash.txt"
+        kill -TERM $sp
+        exit 1
+    fi
+    echo "PASS: no splash mapped with None selected" > "$CASE/no-splash.txt"
+else
 for i in $(seq 600); do
 	if [ -z "$first" ] && grep -q 'SPLASHLOG.*ADDED ksplashqml' "$CASE/session.log" 2>/dev/null; then first=$(date +%s.%N); echo "splash-mapped $first" >> "$CASE/marks.txt"; break; fi
 	sleep 0.05
 done
+fi
 kp=$(pgrep kwin_wayland | tail -1); [ -n "$kp" ] && tr '\0' '\n' < /proc/$kp/environ | grep -E '^KWIN_' > "$CASE/kwin-env.txt"
 WAYLAND_DISPLAY=wayland-0 kscreen-doctor -o 2>/dev/null | sed "s/\x1b\[[0-9;]*m//g" | grep -E "Output:|Modes|Scale" > "$CASE/outputs-login.txt"
 if [ -n "$first" ] && [ -z "${NOSHOT:-}" ]; then
@@ -89,14 +103,26 @@ if [ -n "$first" ] && [ -z "${NOSHOT:-}" ]; then
 		for o in $(seq 0 $((N - 1))); do python3 "$HERE/shot.py" Virtual-$o "$CASE/shot-${s}s-Virtual-$o.png" >> "$CASE/shots.jsonl" 2>>"$CASE/shot-errors.txt"; done
 	done
 fi
+if [ "${EXPECT_NO_SPLASH:-0}" != 1 ]; then
 for i in $(seq 1200); do grep -q 'SPLASHLOG.*REMOVED ksplashqml' "$CASE/session.log" && break; sleep 0.05; done
+fi
 echo "splash-gone $(date +%s.%N)" >> "$CASE/marks.txt"
 sleep "${SETTLE:-3}"
 for o in $(seq 0 $((N - 1))); do [ -z "${NOSHOT:-}" ] && python3 "$HERE/shot.py" Virtual-$o "$CASE/desktop-Virtual-$o.png" >> "$CASE/shots.jsonl" 2>>"$CASE/shot-errors.txt"; done
+if [ -n "${DESKTOP_PROBE:-}" ]; then
+    bash "$DESKTOP_PROBE"
+    probe_status=$?
+    if [ "$probe_status" != 0 ]; then
+        kill -TERM $sp
+        exit "$probe_status"
+    fi
+fi
 kill -TERM $sp; sleep 2
 IN
 export HOLD="${HOLD:-}" CASE N SHOTS="${SHOTS:-1.5 4}" SETTLE="${SETTLE:-3}" NOSHOT="${NOSHOT:-}"
-dbus-run-session -- bash "$XDG_RUNTIME_DIR/inner.sh"
+login_status=0
+dbus-run-session -- bash "$XDG_RUNTIME_DIR/inner.sh" || login_status=$?
 grep -E 'SPLASHLOG|ksplashqml|org.sparky.stereo|stereo' "$CASE/session.log" | grep -v '^$' > "$CASE/splash-lines.txt" || true
 cp "$HOME/.config/kwinoutputconfig.json" "$CASE/" 2>/dev/null
 rm -rf "$XDG_RUNTIME_DIR"
+exit "$login_status"

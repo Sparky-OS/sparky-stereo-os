@@ -37,6 +37,13 @@ systemd already knows how every program KIO started ended; the Graphics page kee
 A notebook's built-in panel gets its first scale from its real size (125 % at least for a full HD panel of about 13 to 14 inches), a computer with a touch screen of its own gets Plasma Keyboard as its virtual keyboard in the session's language, shown only in tablet mode, and in tablet mode every panel hides by itself and goes back to its own setting afterwards.
 [Where KWin chooses the first scale and from which EDID field, why a default that only some computers get is a folder in front of `XDG_CONFIG_DIRS`, the shell's two visibility modes, tablet mode in the rig, and the traps](references/convertibles-and-dense-panels.md).
 
+## Account defaults and displayed release name
+
+- [Spell checking](references/spellchecking.md): native QSettings fallback, the two recorded nondefault keys, seven dictionaries and the three entries without word-list data.
+- [Desktop shortcuts](references/desktop-shortcuts.md): KDE's Trash and catalogue-derived Home, account state, existing accounts and preserved removals.
+- [Copy notifications](references/copy-notifications.md): the owning package, running-job popup timing, tray retention and personal overrides.
+- [Displayed release name](references/display-release-name.md): display-only os-release reading and the pinned SparkyLinux tools.
+
 ## The Camera page
 
 System Settings has a Camera page (`sparky-stereo-camera`, under Multimedia beside Sound): the default camera is WirePlumber's `default.configured.video.source`, so every program that asks PipeWire for a camera follows it; the format, size, frame rate and the camera's own controls are set on the V4L2 device and applied again when the camera is plugged in; a preview comes from PipeWire, and a two-lens camera's pair is drawn as a declared full side by side picture.

@@ -88,7 +88,7 @@ A route that rebuilds a published source must carry its `debian/sparky-lean-pres
 ### Rust build inputs
 
 Since toolkit 0.1.29 a source tree whose language plan names `rust` has its Rust files projected before compilation: non-doc comments go, doc comments stay because they are attributes, and line numbers in panic messages name lean lines.
-[The Rust adapter](references/rust-adapter.md) has the rule for each kind of comment that is data, the counts and measurements on a real workspace, the source and offline compiler-kit recipes, coverage limits and observed traps.
+[The Go adapter plan](references/go-adapter.md) has the rule for each kind of Go comment and the measurement on OpenLinkHub (planned, not built). [The Rust adapter](references/rust-adapter.md) has the rule for each kind of comment that is data, the counts and measurements on a real workspace, the source and offline compiler-kit recipes, coverage limits and observed traps.
 
 ### Reproducible sources
 

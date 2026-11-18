@@ -184,9 +184,9 @@ If only an unlisted stage provides a dependency, name it as such and check its s
 Keep the designed dependency and obtain the coordinator's source-generation decision rather than deleting it to make APT pass.
 
 - **Symptom:** a simulated dist-upgrade offered 111 upgrades and zero removals but kept the desktop meta back.
-  **Cause:** the generated meta required the sound-defaults package, absent from the published tree and selected pool; its only discovered stage was outside the accepted list and lacked binary buildinfo and changes.
-  **Fix:** report the exact kept package and missing dependency, qualify the retained source through a genuine rebuild, and extend the pool only after its acceptance; repeat the combined proof. Never equate zero removals with a successful uplift.
-  **How found:** an exact-version install simulation named the unsatisfied Depends; the bounded stage table located its archives, and the receipt audit found `unrecorded: ["buildinfo"]` and no matching changes.
+  **Cause:** the generated meta required the sound-defaults package, absent from the published tree and selected pool; the journal had accepted it but the take list omitted its stage, which also lacked binary buildinfo and changes.
+  **Fix:** report the exact kept package and missing dependency, confirm its journal acceptance with the coordinator, qualify the retained source through a genuine rebuild, and repeat the combined proof on one extended pool. Never equate zero removals with a successful uplift.
+  **How found:** an exact-version install simulation named the unsatisfied Depends; the bounded stage table located its archives, the receipt audit found `unrecorded: ["buildinfo"]` and no matching changes, and the coordinator supplied the missing journal acceptance.
 
 ### Keep the verification image's bootstrap explicit
 

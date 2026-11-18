@@ -248,6 +248,12 @@ The pool's accepted copies and checksum identity stay independent of that live f
 - **Fix:** retain the interrupted contexts as incomplete evidence, remove their unpacked roots, verify every reused cache object's content hash, and repeat the complete archive gate with fewer workers under the combined guard. Use one worker when one paired case approaches the allocation. Reuse only completed paired lintian families against the same sealed pool, validating coverage and retained raw diagnostics; an interrupted family is rerun. Never infer an archive pass from resolved cases alone.
 - **How found:** the guard recorded exact scratch/free-space bytes and stopped only named owned containers; per-directory measurements identified the overlapping roots, and the bounded invocation uses fresh contexts with the unchanged frozen binary inputs.
 
+Worker count and the CPU quota available inside one check are separate controls.
+Two simultaneous large theme closures can still exceed the allocation; one Python worker leaves room for their paired roots.
+The build repository's `tools/publication-reconcile/archive-one-worker.py` configures the toolkit's worker-count provider while native subprocesses retain the container's four-CPU quota.
+Keep every validator file identical to the frozen tree and retain its hash comparison; test complete ordered item coverage, refusal propagation and the release command's return/exit status before using the adapter.
+This configures scheduling only; a partial run is still incomplete and every selected package is checked again.
+
 ### A clean simulation can still select the old edition
 
 The flat candidate index must carry the same Release Origin used by the edition's preferences.

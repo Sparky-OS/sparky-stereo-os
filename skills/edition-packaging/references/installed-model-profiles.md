@@ -37,10 +37,13 @@
 
 ## Traps
 
-- **Symptom:** debconf treats lines of a model licence as commands.
-  **Cause:** a multiline terms body was sent through `db_subst` without the escape capability.
-  **Fix:** request `db_capb escape`, collect the helper’s successful output first, then pass it through `debconf-escape -e` before substitution.
-  **How found:** the real frontend protocol rejected the first unescaped licence line; the corrected protocol presents the unchanged legal body.
+- **Symptom:** debconf rejects a maintainer-script notice as an unsupported command, or a translated graphical question loses its large licence note.
+  **Cause:** notices printed before confmodule initialization are replayed as protocol commands after debconf re-executes the script; dynamically substituting a large multiline terms body also proved unreliable in the translated frontend.
+  **Fix:** initialize confmodule before any human output, print notices to stderr and generate immutable per-profile note/consent templates from the pinned legal texts.
+  Source the shared maintainer script from each profile wrapper so debconf loads that real package’s templates and purge clears the same package’s records.
+  Keep every consent question default No and show the original terms with the ten translated questions.
+  **How found:** a real-debconf re-execution regression failed before the ordering fix and passed after it; English and Portuguese private-session screenshots distinguish the dynamic-note failure from the working static templates.
+  The KDE CAPB diagnostic was incidental and needed no library patch.
 - **Symptom:** choosing an application feature opens nothing although its AppCenter link works inside AppCenter.
   **Cause:** the `aptus://` scheme had only an HTML-view callback, without a desktop MIME registration.
   **Fix:** register a hidden scheme-handler desktop entry, strictly validate the package URI and reuse the existing administrator authorization and package-detail page.
@@ -57,3 +60,7 @@
   **Cause:** running the inner source builder directly omitted the host provenance wrapper and public archive gate inputs.
   **Fix:** initialize `build-provenance.sh` on the host, pass its Docker arguments, require the signed archive configuration and run `lean.release check-debs` after ordinary `.buildinfo` and `.changes` exist.
   **How found:** comparison with the native packaging recipe and the gate’s required environment; the partial compilation is not a qualified binary package.
+- **Symptom:** a failed native profile install returns to a package page without its reason.
+  **Cause:** that detail renderer did not read the existing saved-problems entry.
+  **Fix:** use the same problem text helper as the other AppCenter pages.
+  **How found:** a saved-error fixture reaches the native profile page and must retain the failure text before its install action.

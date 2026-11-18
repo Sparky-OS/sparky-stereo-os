@@ -421,3 +421,9 @@ Retain the full route, limit, scale, moving-camera and live-training matrix befo
   **Cause:** the old diagnostic label concealed that its value was an index.
   **Fix:** name it `first_unbounded_index` and test that interpretation independently of the chosen fit policy.
   **How found:** source inspection and the retained study’s finite-contribution audit.
+
+- **Symptom:** trace captures have correct depth but the ordinary cached-image path reports an empty or flat pair.
+  **Cause:** copying the candidate-eye result over the worker’s result discards dimensions and the centre-camera pick; candidate rendering only fills render outputs.
+  **Fix:** reuse the candidate RGB vectors while retaining the worker-owned request, dimensions, revision and picking result.
+  **How found:** the normal finite-scene worker test failed before the fix and passed on AMD and NVIDIA afterwards, with explicit dimensions/storage and centre-pick checks plus independently rendered eye comparisons.
+  Exercise the shipping path without trace capture as well as the diagnostic projection path.

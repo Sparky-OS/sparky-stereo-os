@@ -1163,3 +1163,11 @@ OpenSC, pcsc-lite, SoftHSM, OpenSSL and the X11 test tools (Xvfb, xdotool, Image
 
 **CODESYS GmbH** makes CODESYS 4 and runs the CODESYS Store, and its team agreed in October 2026 that the edition lists CODESYS 4 in its app center as a link to that store, where people register and download under CODESYS's own licence agreement; the facts about the program come from the pages of the store itself.
 The app center's entry mechanism is **Paweł "pavroo" Pijanowski's** APTus.
+
+### A phone as the computer's camera (ORDER 25)
+
+**Dev47Apps** makes DroidCam; its Linux client (GPL-2.0) is written by aramg with Keno Hassler, Ritsj, Mateusz Gozdek, ilya guterman and others, as the repository's own record shows, and the phone app is Dev47Apps' own, installed from the phone's store.
+**The v4l2loopback authors**, IOhannes m zmölnig first among them with Vasily Levin, Gorinich Zmey, Scott Maines, Stefan Diewald and the other holders in the project's copyright file, wrote the virtual camera both programs write to.
+**Genymobile and Romain Vimont** make scrcpy (Apache-2.0), whose camera mode and V4L2 sink are the fully open way.
+The app center's entry mechanism is **Paweł "pavroo" Pijanowski's** APTus.
+**The KDE Connect authors**, among them Aleix Pol i Gonzalez who wrote its virtual monitor plugin, made what the plan for "Use as webcam" builds on.

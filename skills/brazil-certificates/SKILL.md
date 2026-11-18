@@ -7,8 +7,8 @@ description: >-
   lists), which root versions are valid, revoked or expired, the v7 root signed with EdDSA over E-521 (SigEd521) and
   what OpenSSL, NSS, Java and GnuTLS accept, browsers and NSS databases (certutil, ~/.pki/nssdb), smart-card tokens
   (pcscd, libccid, opensc) and PJeOffice Pro. Load it for a question about a Brazilian government certificate, an e-CPF
-  or e-CNPJ token, a site shown as untrusted under an ICP-Brasil root, or Ed521 support; trust-store changes go to
-  certificate-manager.
+  or e-CNPJ token, a site shown as untrusted under an ICP-Brasil root, Ed521 support, PJeOffice Pro that will not start, sign or
+  see the system's certificates, or its tray, settings page and Dolphin action; trust-store changes go to certificate-manager.
 ---
 
 # ICP-Brasil certificates on Linux
@@ -46,7 +46,7 @@ v1 and v2 expired; v3, v8 and v9 revoked (ITI's root page); v4 to v7 and v10 to 
 
 - Firefox and Waterfox keep certificates in each profile's NSS database (`certutil`, or the `Certificates.Install` policy); Chromium in `~/.local/share/pki/nssdb`, with an existing `~/.pki/nssdb` taking priority. Debian's system store is `/usr/local/share/ca-certificates/` plus `update-ca-certificates`.
 - A3 tokens and smart cards: `pcscd`, `libccid` and `opensc`, the PKCS#11 module registered in each NSS database (`modutil`). Proprietary middleware (SafeSign, SafeNet) is fetched on the user's machine, never mirrored; a community OpenSC driver for the G&D StarSign token exists ([starsign-driver](https://github.com/DiegoRibeirodeSouza/starsign-driver), LGPL-2.1).
-- **PJeOffice Pro** (CNJ, built by TRF3; 2.5.16u on 2026-10-10): a ZIP with its own Java (Azul Zulu 8u382), a self-patching updater writing into its own folder, and no published checksum. A distribution fetches it on the user's machine and checks it against a pinned hash.
+- **PJeOffice Pro** (CNJ, built by TRF3; 2.5.16u): a ZIP with its own Java (Azul Zulu 8u382), a self-patching updater writing into its own folder, and no checksum file (CNJ's server keeps the SHA-256 in the object's metadata header `x-amz-meta-sha256`, equal to the file's). The edition's `sparky-pjeoffice` fetches it on the person's machine, checks it against a reviewed hash and integrates it into KDE: [PJeOffice Pro as the edition installs it](references/pjeoffice-installed.md).
 
 ## PJeOffice Pro archive check, 2026-11-18
 
@@ -61,5 +61,5 @@ For an archive comparison, fetch twice into separate empty directories, compare 
 Equal whole-archive digests settle whether the launcher, updater settings or bundled Java changed; a version label alone does not.
 Keep CNJ binaries out of distribution repositories and packages without an explicit redistribution grant.
 
-[Runtime boundaries and the generated-fixture recipe](references/pjeoffice-runtime.md) record startup on Debian Java 21/25, the Java 28/OpenJFX module failure, the PKCS#11 export requirement, the private trust store and the updater permission check.
+[The installed integration, its proofs and traps](references/pjeoffice-installed.md); [runtime boundaries and the generated-fixture recipe](references/pjeoffice-runtime.md) record startup on Debian Java 21/25, the Java 28/OpenJFX module failure, the PKCS#11 export requirement, the private trust store and the updater permission check.
 Component challenge verification is separate from a PJeOffice PDF or login-task qualification.

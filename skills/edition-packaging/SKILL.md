@@ -9,7 +9,8 @@ description: >-
   apt-get update exits 0 on a failed fetch, lc1 says the build record is incomplete, a Qt header is missing after
   qt6-base updates, a pin leaves a binding or development package uninstallable, a systemd unit's proof shows none
   of its journal lines, a preinst prompt stops an install, a language probe shows English, a CMake consumer misses an imported library, a Rust suite shares crates as dylibs,
-  an amd64v3 index leaves apt on baseline, or Illegal instruction on older CPUs.
+  an amd64v3 index leaves apt on baseline, Illegal instruction on older CPUs, a page of the app center takes minutes to open, or a vendor's program
+  that may not be redistributed must be fetched on the person's machine and kept current by a reviewed hash.
 ---
 
 # Packaging the edition
@@ -34,6 +35,7 @@ description: >-
 An app center row for a program the edition ships, its test, the package version, the comparison with the previous one and the rig proof (page in two languages, the click's command, apt's simulation): [app-center-entry-for-a-shipped-program.md](references/app-center-entry-for-a-shipped-program.md).
 13. A package that makes apt remove Debian packages (Conflicts, Replaces, a Provides of their names) is read before it ships, on the apt plan's `Remv` lines and the removed packages' file lists, in a container that has the old machine's state: [a package that replaces Debian's packages](references/a-package-that-replaces-debians-packages.md) has the recipe, the rig, the order apt really takes and the traps (ORDER 645: a symbolic link out of a Debian package's tree and the time zone files of the system).
 
+15. A program the edition may not redistribute but may install (CNJ's PJeOffice Pro): the package holds the installer and the integration, the vendor's file is fetched on the person's machine and checked against a reviewed size and SHA-256 before anything is replaced, the last usable version stays, every failure is kept by the engine, a watcher notices a new version without approving it, and the entry is the first package entry of a main page: [a program fetched on the person's machine](references/a-program-fetched-on-the-persons-machine.md) has the recipe, the proofs and the traps.
 14. An action with retained administrator authorization names a separate privileged entry point, as [privileged entry points](references/privileged-entry-points.md) explains.
     A program never restricts itself because a parent left an environment variable behind.
 

@@ -47,3 +47,16 @@ v1 and v2 expired; v3, v8 and v9 revoked (ITI's root page); v4 to v7 and v10 to 
 - Firefox and Waterfox keep certificates in each profile's NSS database (`certutil`, or the `Certificates.Install` policy); Chromium in `~/.local/share/pki/nssdb`, with an existing `~/.pki/nssdb` taking priority. Debian's system store is `/usr/local/share/ca-certificates/` plus `update-ca-certificates`.
 - A3 tokens and smart cards: `pcscd`, `libccid` and `opensc`, the PKCS#11 module registered in each NSS database (`modutil`). Proprietary middleware (SafeSign, SafeNet) is fetched on the user's machine, never mirrored; a community OpenSC driver for the G&D StarSign token exists ([starsign-driver](https://github.com/DiegoRibeirodeSouza/starsign-driver), LGPL-2.1).
 - **PJeOffice Pro** (CNJ, built by TRF3; 2.5.16u on 2026-10-10): a ZIP with its own Java (Azul Zulu 8u382), a self-patching updater writing into its own folder, and no published checksum. A distribution fetches it on the user's machine and checks it against a pinned hash.
+
+## PJeOffice Pro archive check, 2026-11-18
+
+The [TRF3 user guide](https://pjeoffice.trf3.jus.br/pjeoffice-pro/docs/userguide.html) still linked Linux x64 version 2.5.16u.
+Two independent HTTPS downloads from CNJ were byte-identical, 167505940 bytes, SHA-256 `6087391759c7cba11fb5ef815fe8be91713b46a8607c12eb664a9d9a6882c4c7`.
+This is the same whole-archive digest measured on 2026-10-10, so there is no archive change to report between these checks.
+The bundled `jre/release` identifies Azul Zulu 8.72.0.17, Java 1.8.0_382.
+This locally calculated digest is an observation, not a checksum published by CNJ.
+A future release must be fetched and checked again.
+
+For an archive comparison, fetch twice into separate empty directories, compare the complete files and record each SHA-256 before extraction.
+Equal whole-archive digests settle whether the launcher, updater settings or bundled Java changed; a version label alone does not.
+Keep CNJ binaries out of distribution repositories and packages without an explicit redistribution grant.

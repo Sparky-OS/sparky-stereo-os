@@ -60,3 +60,6 @@ A future release must be fetched and checked again.
 For an archive comparison, fetch twice into separate empty directories, compare the complete files and record each SHA-256 before extraction.
 Equal whole-archive digests settle whether the launcher, updater settings or bundled Java changed; a version label alone does not.
 Keep CNJ binaries out of distribution repositories and packages without an explicit redistribution grant.
+
+[Runtime boundaries and the generated-fixture recipe](references/pjeoffice-runtime.md) record startup on Debian Java 21/25, the Java 28/OpenJFX module failure, the PKCS#11 export requirement, the private trust store and the updater permission check.
+Component challenge verification is separate from a PJeOffice PDF or login-task qualification.

@@ -1,7 +1,8 @@
 # Gaussian splats in stereo: what is view-dependent, what a second camera costs, the route to a declared pair
 
 Started in ORDER 501, November 2026, from unchanged Spirula Studio master `b8e15cb8d7f8a2f45ca9b4fea3fa331181433caa`.
-This is a source study and monoscopic baseline, not an implemented stereo renderer.
+The reference now includes the built ORDER 501 pair, its independent pixel checks and the original monoscopic baseline.
+The implementation is tested privately on the edition fork; it is not a package or an upstream acceptance claim.
 
 ## Working recipe
 
@@ -72,7 +73,7 @@ At the pinned source, `GuiMain` clears with alpha 1 and does not request a trans
   **Cause:** the singleton forward buffers and worker's single pending/result slots are reused between requests.
   **Fix:** submit an atomic pair over one frozen scene revision, serializing forward passes and preserving each finished image.
   **How found:** `RenderWorker::submit` overwrites `pending`, and `forward_3dgs` replaces `engine().fwd`.
-  This fix is proposed; it was not implemented in the baseline milestone.
+  The atomic implementation and its deliberately blocked trainer test now pass on both backends.
 - **Symptom:** a build runs more compiler jobs than its CPU quota.
   **Cause:** a quota alone does not necessarily change `nproc`, which the upstream script uses.
   **Fix:** verify the printed job count; with GNU `nproc`, `OMP_NUM_THREADS=4` made this dev script report four CPUs and four jobs.
@@ -92,7 +93,8 @@ At the pinned source, `GuiMain` clears with alpha 1 and does not request a trans
   **Cause:** readiness and screen-state fields do not prove GL pixels reached the compositor; on a measured NVIDIA/Linux Vulkan native Wayland case, opening a model triggered ImGui shader failures or a frozen prior frame.
   **Fix:** inspect actual compositor captures and retain the failure; compare the unchanged Xwayland path before attributing it to the renderer.
   **How found:** the native direct-open log repeated shader compile failures, a deferred-open capture stayed on welcome while state said viewer, and the same PLY rendered correctly through Xwayland.
-  The native-path cause and source fix remain unresolved; selecting only NVIDIA's EGL vendor did not remove the direct-open failure.
+  At the study checkpoint the native-path cause and source fix were unresolved; selecting only NVIDIA's EGL vendor did not remove the direct-open failure.
+  The implementation checkpoint below records the later cause and fix.
   The CUDA backend displayed its trained PLY through native Wayland on the same driver, providing a narrower control.
 
 ## Measurements and limits
@@ -116,3 +118,218 @@ The timings include HTTP, render, readback and JPEG encoding.
 They measure two separate ordinary views, not atomic stereo presentation or a simultaneous two-eye memory high-water mark.
 The input and camera count are small; larger splat counts, overlap and lens variants need fresh measurements in the implementation milestone.
 No stereo image or second-eye geometry is claimed here.
+
+
+## Implementation checkpoint: native pair transport
+
+ORDER 501's implementation work uses the same RenderWorker for CUDA and Vulkan.
+Its atomic request holds one engine mutex over both forward passes and copies the left RGB result before the singleton forward storage is reused.
+The regression compares each packed half against an independent camera render and places a waiting trainer between the two render callbacks.
+The GPU regression passes on RADV Vulkan, NVIDIA Vulkan and NVIDIA CUDA.
+The rebuilt application also displays its trained PLY on NVIDIA native Wayland with the actual source context-restoration helper and no preload.
+CUDA parity has zero tolerance violations and byte-identical reference blits after the affine shader change.
+Both Vulkan GPUs pass the same accepted parity gate as the monoscopic baseline.
+
+The native adapter was built separately against GLFW 3.4 and libstereo-declare 1.10.
+A synchronized Wayland subsurface is below the alpha-capable parent, has an empty input region, and carries one XRGB8888 full side-by-side SHM buffer.
+The viewport destination is independent of the eye raster; the compositor performs the resize.
+Released SHM buffers may be reused; busy buffers are retained until release, with a bounded allocation count.
+The Xwayland child uses the declaration library's child membership, one-view size and below-parent placement.
+A transport harness with distinct patterns per eye was captured on RADV and NVIDIA through native Wayland and Xwayland.
+These patterns prove eye transport and flat-parent composition, not 3D scene geometry or pair cost.
+
+- **Symptom:** opening a Vulkan-backed model on NVIDIA native Wayland leaves a black or frozen UI and repeated ImGui shader failures.
+  **Cause:** on driver 615.71.09, destroying a Vulkan probe instance clears the calling thread's current EGL context.
+  **Fix:** preserve the current EGL display, context, read/draw surfaces and client API across instance destruction, restoring them when the context changes and reporting restoration failure.
+  **How found:** trace the EGL state before and after each Vulkan call; only vkDestroyInstance clears it.
+  A standalone Wayland EGL/Vulkan test loses its context unguarded and passes four iterations with the source helper; probing on another thread also preserves the UI thread's context.
+  A shim using restoration makes the original application's native Wayland capture work.
+  The closed driver's internal teardown mechanism was not established.
+  An EGL_EXT_platform_device pbuffer reproducer cannot restore its context, so the Wayland result does not establish a fix for that separate route.
+- **Symptom:** an X11 child is declared correctly but its first image stays black.
+  **Cause:** mapping the child after XPutImage clears the pixels with the window's background.
+  **Fix:** map before uploading the first image.
+  **How found:** retain the black capture and repeat the same child declaration and placement with the map ordered first.
+- **Symptom:** the Xwayland child is visible but the flat GLFW parent disappears.
+  **Cause:** the measured GLX parent path does not retain its flat surface across child redirection.
+  The lower-level GLX mechanism remains unestablished.
+  **Fix:** use an alpha-capable EGL parent on both Linux window systems and verify the ordinary 2D control independently.
+  **How found:** change only GLFW's context creation API in the same harness; the parent and both child eyes then appear together.
+- **Symptom:** libstereo-declare 1.10 reports no delivered depth limits for a listed stereo Xwayland child, while native Wayland receives them.
+  **Cause:** KWin +stereo3d58 writes the property only to a managed top-level that declares stereo content; the ordinary parent is deliberately undeclared and the child is not a managed top-level.
+  **Fix:** the compositor writes the parent window's output limits on each listed declared child, follows stereoChildrenChanged, and withdraws the property when the declaration or membership goes.
+  **How found:** the same extended testStereoDepthLimits binary fails at the child's missing property against the published library in normal and scaled2x rows, and both rows pass with the local compositor patch.
+  The SDK harness then receives 10 and 4 on both GPUs through Xwayland.
+  This fix was built and tested privately; no package or publication is claimed.
+
+Orthographic shear still needs care beyond the scalar disparity equation.
+The splat engine's SH and ray helpers recover a camera origin using a transposed rotation, which assumes a rigid view matrix.
+Do not feed an affine shear through that pose and claim the view-dependent colour and ray state remain correct.
+Keep the pose separate from the projection or add an explicitly tested affine-camera path in the shared engine.
+Wide-angle projections also require rectification analysis before claiming zero vertical disparity.
+The later whole-window measurements below complete the splat, preview and pair-cost checks.
+
+## Captured point and mesh geometry
+
+The preview uses the same compositor-limit fitter as the splat worker.
+Preserve the first eye's FBO pixels before rendering the next eye.
+A native pair uses two complete eye rasters; the logical canvas stays independent of the render width.
+The point/mesh regression measures coloured markers at camera depths 1.5, 3 and 6 with a zero-parallax distance of 3.
+It passes perspective and orthographic projections, widths 960 and 1200, and normalized limits (10,4) and (24,9.5) on AMD and NVIDIA through Wayland and Xwayland.
+Absent and zero limits reproduce the mono pixels exactly in this renderer test; swapping the captured halves fails.
+These measurements are FBO reads in private compositor sessions, not the complete application/output-scale acceptance matrix.
+
+- **Symptom:** the mesh has twice the predicted perspective disparity while the point preview is correct.
+  **Cause:** the mesh's optimized clip-space branch bypasses the common nonlinear projection helper.
+  **Fix:** add the principal-point displacement multiplied by clip w to that branch, and the orthographic shear to its separate branch.
+  **How found:** measure marker centroids against the camera prediction; the mesh measured -4 where the prediction was -2, on both GPUs.
+- **Symptom:** a finite centre-projected Gaussian makes the fitted pair identical because its cutoff sphere crosses the camera plane.
+  **Cause:** a physical solid's singular perspective bound was applied to the linearized 3DGS/Mip projection.
+  **Fix:** bound inverse-depth parallax using the linearized Gaussian reach and the renderer's clamped Jacobian; keep the physical bound for ray-traced 3DGUT.
+  **How found:** the first native application capture reported no finite support; source inspection showed centre-only culling and covariance projection, and the expanded CPU regression covers large/off-axis Gaussians.
+  The real trained-splat viewer now presents a valid declared pair on both GPUs.
+- **Symptom:** orthographic disparity maths is right but view-dependent colour follows the wrong eye position.
+  **Cause:** using a transposed affine matrix as its inverse moves the recovered camera origin.
+  **Fix:** preserve the rigid arithmetic for ordinary rotations and use a true inverse for oblique cameras, in shared Slang with regenerated CUDA headers.
+  **How found:** a first-band spherical-harmonic fixture at the zero plane gives 0.347021 rather than the physical-eye prediction 0.359601.
+  The activated regression has a verified red and matches the physical-eye colour prediction with the shared shader on RADV and NVIDIA Vulkan.
+  The same physical-eye colour test also passes on CUDA, with the ordinary rigid-camera reference unchanged.
+
+The preview PNG checker independently decodes all 64 retained pairs and checks their chunk CRCs and left-first sTER mark.
+Its 192 marker measurements have a maximum horizontal error of 0.96875 pixels and zero vertical error.
+Swapping the decoded halves fails the checker.
+
+
+## Built pair and whole-window proof
+
+The shared camera fitter takes only the compositor's normalized sunk and popped limits, visible scene support and the current navigation camera.
+No setting, environment reader, CLI field or generic configuration schema can write a separation, swap or output mode.
+The only persisted stereo keys are enable and per-eye width; the remaining control opens Display Settings.
+For perspective, the predicted right-minus-left disparity is `f b (1/C - 1/Z)`.
+For orthographic views it is `2 f a (Z-C)`, with parallel physical origins at `-a C` and `+a C` and opposite projection shears.
+The Gaussian support uses the actual linearized covariance/Jacobian reach, including its off-axis clamp; 3DGUT retains the physical ray support.
+Grid, cameras, visible mesh triangles and ROI geometry contribute to the same conservative fit.
+Linked comparison wipes merge support in shared world units and compose corresponding integer regions of each eye only after both image epochs and cameras agree.
+
+The complete application was captured as 108 marked pairs: 96 cases cover splats, points and meshes, perspective/orthographic, two limit settings, 100/125 percent output scale, two GPUs and both window systems.
+Another twelve cover the three wide lenses rectified to a real perspective view.
+An independent checker measures 324 near/screen/far markers; maximum horizontal error is 0.676 pixels and vertical error 0.373 pixels, within the one-pixel sampling allowance.
+The earlier 64 FBO pairs remain the separate renderer control; exchanging their decoded halves fails the prediction checker.
+The complete ordinary 2D client above its log equals the accepted baseline pixels on all four GPU/window-system routes.
+No-limits and zero-limits source eyes are exact copies and say so visibly; after the compositor filter correction below, their complete captured eye images are also byte-identical.
+Resize, hide/show, close/reopen, grid overlays and a near-marker double-click are exercised through ordinary UI/window actions.
+Live training captures use the same pair worker and record one engine step for both images.
+
+Wide fisheye/equisolid/panorama views are explicitly rectified when 3D receives nonzero valid limits.
+The selected lens and horizontal centre magnification are retained; a panorama uses square-pixel perspective sampling.
+The resulting field is narrower than the original panorama, and the person can turn to see its other directions.
+A translated notice explains the changed projection.
+Ordinary 2D and absent/zero limits keep the original lens; there is no additional stereo control.
+
+At 400 by 300 pixels per eye, a real atomic request over the loaded 3,395-splat scene gave these medians after five warm-ups and 25 interleaved samples:
+
+| Backend/device | One camera | Atomic pair | Ratio |
+| --- | ---: | ---: | ---: |
+| RADV integrated | 1.863 ms | 3.964 ms | 2.128 |
+| Vulkan RTX 3060 | 0.787 ms | 1.972 ms | 2.506 |
+| CUDA RTX 3060 | 0.398 ms | 1.030 ms | 2.585 |
+
+These include the fitter, engine lock, render, readback and packing, excluding HTTP/JPEG and GUI presentation.
+The engine pool plus scratch capacity remained 4,134,023 bytes on Vulkan and 3,663,750 bytes on CUDA for either request; these are not total driver allocations.
+This is a small scene and camera, not a GPU ranking or a large-scene throughput guarantee.
+
+- **Symptom:** a successful capture process saves Rendering instead of the model.
+  **Cause:** GUI readiness precedes the asynchronous worker's completed image.
+  **Fix:** wait for a completed native pair and a semantic scene witness, not a fixed sleep alone.
+  **How found:** inspect the rejected full-window picture and its worker revision log.
+- **Symptom:** a fractional-scale capture misses markers below or beside the screen.
+  **Cause:** the initial GLFW window's pixel-sized work area can exceed the compositor's logical output.
+  **Fix:** maximize the private test window through KWin's ordinary window API before measuring it.
+  This is a rig operation, not a claimed application startup-size fix.
+  **How found:** compare the application's display/framebuffer sizes with the output's scale and logical geometry.
+- **Symptom:** tiny antialiased point clusters appear to have vertical disparity in a thresholded centroid.
+  **Cause:** the binary threshold discards different edge pixels after a horizontal subpixel shift and output resize.
+  **Fix:** use each pure primary marker's intensity centroid, preserving all its filtered sample weights and the same one-pixel tolerance.
+  **How found:** retain the threshold-check failure and compare its discarded pixels against the renderer FBO's zero vertical error.
+- **Symptom:** identical RGB eyes differ by one code value after the output resize.
+  **Cause:** interpolating atlas coordinates before subtracting an eye offset changes floating-point filter weights; normalized hardware bilinear sampling adds another offset-dependent rounding.
+  **Fix:** interpolate eye-local texel coordinates, compute the area weights there and fetch RGB texels explicitly for bilinear interpolation.
+  **How found:** the same standalone KWin texture test fails on both GPUs before the filter change and passes afterward, along with its existing address/downscale rows.
+  The complete no/zero-limit captures then have exactly identical halves.
+  This correction is in the compositor; the program does not pre-resize an eye.
+  Legacy GLSL and multiplanar/external texture paths keep their existing sampling, and are not claimed by this RGB regression.
+- **Symptom:** fractional-scale Xwayland picking misses while native Wayland succeeds.
+  **Cause:** the test converted screenshot pixels using output scale even though the Xwayland client's coordinate space was already in pixels.
+  **Fix:** derive pixels per client coordinate from the captured eye width and the application's reported display width.
+  **How found:** the injected click left the camera pivot at depth 3; the corrected mapping picks the near marker at depth 1.5.
+
+Live limit changes from (10,4) to (24,9.5) change the fitted camera offset by the predicted 2.375 ratio without reopening the view.
+The same open window survives a 100-to-125-percent output-scale change, zero limits, and restored limits on native Wayland and Xwayland.
+
+- **Symptom:** a tall point/mesh canvas stretches the scene when the eye raster reaches its height cap.
+  **Cause:** the preview used the whole canvas after independently capping render height.
+  **Fix:** letterbox the capped preview at its rendered aspect, like the engine viewport, without resizing the eye internally.
+  **How found:** review the preview and engine placement paths, then capture the same markers in a 400-by-850 window at a requested 4,096-pixel eye width.
+  Both tested GPUs retain square geometry; maximum horizontal prediction error is 0.097 pixels.
+
+## Checking that a proof picture actually has two eyes
+
+Decode the PNG and compare the RGB planes of its two halves as well as checking its left-first sTER chunk and CRCs.
+A marked pair with equal eyes is a flat control, never proof of a real scene in depth.
+Keep deliberate absent-limit and zero-limit pairs, labelled with that reason, and make the proof checker refuse them if offered as a proof.
+The same refusal applies to a .pns file: its extension and mark do not prove depth.
+
+- **Symptom:** a complete real-scene pair is reported identical while the renderer and a fresh capture show different eyes.
+  **Cause:** an RGBA difference's alpha plane is zero when both inputs are opaque; an alpha-only bounding-box check then returns no box even when RGB differs.
+  **Fix:** compare decoded RGB arrays or explicitly include the RGB bands in the difference criterion.
+  **How found:** the same two retained pictures returned no box as RGBA differences but 134,976 and 67,707 differing RGB pixels, confined to their native viewports.
+- **Symptom:** a static model has only one completed native presentation and the rig waits for a second forever.
+  **Cause:** loading and resize events can coalesce into one valid final image; readiness is not a frame-count promise.
+  **Fix:** require a completed native presentation and a semantic scene witness, then check the decoded proof's unequal eyes and geometry.
+  **How found:** an unmodified program presented the trained spheres once, with a valid camera offset and unequal submitted RGB eyes, while the old two-presentation wait timed out.
+
+
+## Real Gaussian scenes measured in compositor captures
+
+For a real trained scene, trace a completed atomic pair while holding the engine lock.
+Record its request id, training step, cameras, native RGB eyes and the GPU's projected Gaussian ids, world centres, conics, opacity and colour for centre, left and right cameras.
+First independently project every in-viewport world centre and compare it with the GPU coordinates.
+The common ids must still have bit-identical world centres in all three projections.
+For near, navigation-target-plane and far witnesses, require actual front-to-back contribution above the raster cutoff in both eyes, rather than choosing invisible points from the model's bounding box.
+Register each native eye to its compositor screenshot with the compositor's actual area filter and a two-axis textured patch.
+Transfer the selected Gaussian centre through that measured registration to obtain its captured position.
+State the raster and displayed size, candidate depth range, contribution, image residual and horizontal/vertical error.
+These are contributing Gaussian-centre correspondences, not a claim that an alpha-blended pixel has one opaque surface depth.
+A 48-case real-scene matrix on both tested GPU families and both native window routes, including CUDA, used 1,920-pixel-wide eye rasters at two limit settings and 100/125 percent output scale.
+Its 144 visible-centre measurements had maximum horizontal prediction error 0.069733 displayed pixels and vertical residual 0.044086, below the fixed 0.15-pixel gates.
+Independent GPU-coordinate prediction error stayed below 0.000196 native pixels and the largest native/captured patch residual was 0.307 RGB codes.
+The navigation target has an analytic zero disparity; distinguish that prediction from the measured visible Gaussian nearest its plane.
+
+A three-pixel-displaced eye is not proved by an RGB inequality check alone.
+Keep a swapped-eye geometry negative that fails the same fixed measurement tolerances.
+A separate analytic translation calibration should include a nonzero vertical shift and fractional native-to-display transforms.
+
+An instrumented pair costs an extra centre render and GPU readbacks.
+Never report its frame time as the ordinary pair cost given above.
+Keep the trace ring bounded and preserve only the request actually found in the screenshot.
+For live training, keep two coherent presented pairs with strictly increasing training steps, without pausing training or disabling Live.
+
+- **Symptom:** deprojected Gaussian depth predicts the wrong disparity despite correct camera matrices.
+  **Cause:** this renderer stores each Gaussian's centre distance, `length(mean_c)`, then alpha-composites it; that value at a pixel is not the depth of an opaque surface.
+  **Fix:** measure actual projected contributing Gaussian centres, independently check their world-to-camera projection and register their native raster to the captured output.
+  **How found:** the rejected blended-depth probe predicted +0.041 pixels for a patch whose registered displacement was +0.163 pixels; reading the projection and raster code exposed the mixed-distance definition.
+- **Symptom:** the log says a pair was uploaded, but registration matches an older live-training image.
+  **Cause:** upload completion precedes compositor presentation.
+  **Fix:** under explicit test automation only, encode the request and step with a checksum in identical monochrome cells in both eyes; select the trace by decoding the screenshot.
+  Check witnesses at opposite ends of each eye raster, not only one corner.
+  **How found:** one-corner registration at fractional scale selected a new request while the bottom of the captured native image belonged to its predecessor.
+- **Symptom:** one Xwayland capture contains two training steps even though the shared worker produced a coherent pair.
+  **Cause:** a large `XPutImage` to a visible child is split into protocol chunks that the compositor can observe separately.
+  **Fix:** upload the complete pair into a cached offscreen X11 pixmap and issue one `XCopyArea` to the declared child; replace/free the pixmap on resize and destruction.
+  No extra stereo declaration, camera implementation or user option is needed.
+  **How found:** a test interposer deliberately split the image upload with a half-second delay; opposite-end CRC witnesses read requests 3 and 2 before the fix, and two coherent advancing training frames after it.
+  Native Wayland keeps its immutable shared-memory buffer commits.
+- **Symptom:** point-sampling a native raster produces a large image residual after a fractional compositor resize.
+  **Cause:** the compositor uses an area filter, so point samples are a different reference image.
+  **Fix:** integrate the same source texel boxes and fit translation at the screenshot's integer pixel centres.
+  **How found:** an independent analytic fractional-transform calibration and the compositor's filter source separated interpolation error from camera error.

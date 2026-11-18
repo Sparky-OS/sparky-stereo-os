@@ -88,6 +88,9 @@ The family retains its authored source, HR companions and original copyright rec
 - **Symptom:** an upgrade proof passes while testing the build-tree dpkg rather than the installed one.
   **Fix:** use the recipe's installed-test script, which clears the two build-tree variables, fixes PATH and records installed binary hashes and versions.
   Check those records before reading the verdict.
+- **Symptom:** the verifier is refused ("the verifier is missing or its executable or library is not trusted", exit 14) on an upgraded machine although the verifier is fine.
+  **Cause:** a folder on its path, or a file under `lean/`, can be written by its group or by others; an early dpkg-stereo shipped its folders 0775 and dpkg keeps the mode of an existing folder.
+  **Fix:** dpkg-stereo 0.1.42 sets its own tree right (preinst, postinst, `--repair`); the check stays strict. Find the step with `stat -c '%a %U %n' / /usr /usr/lib /usr/lib/dpkg-stereo /usr/lib/dpkg-stereo/conffile-verify` and `find /usr/lib/dpkg-stereo/lean ! -user root -o -perm /022`; the 0.1.42 refusal names it. See the lessons file, ORDER 707.
 - **Symptom:** an edited file is accepted as unmodified because its hash was copied into a record.
   **Cause:** trusting the record alone.
   **Fix:** retain the forged-projection and untrusted-verifier controls; the independently rendered genuine original is required too.

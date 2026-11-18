@@ -4,7 +4,7 @@ ORDER 639.
 The boot splash (Plymouth) shows the main screen as the person set it in the display settings, from the start to the login screen and again at a restart or a shutdown.
 Daniel's rule (2026-11-17): "if it's saved mode is 2D, then it should display only one eye".
 A screen the splash does not turn into its 3D format shows ONE eye, never the two pictures side by side.
-The depth limits of the splash are in [boot-splash-depth.md](../../stereo-window-3d-area/references/boot-splash-depth.md).
+The depth limits of the splash are in [boot-splash-depth.md](../../stereo-window-3d-area/references/boot-splash-depth.md); what a theme must declare and draw, and the theme cases of the rig, in [boot-splash-theme-contract.md](../../stereo-window-3d-area/references/boot-splash-theme-contract.md).
 
 ## How the choice reaches Plymouth
 

@@ -4,6 +4,7 @@
 # plymouth --show-splash), the frame of every lit screen saved to the host's share, then power off.
 # Kernel line, besides Plymouth's own (plymouth.stereo=, plymouth.debug=):
 #   rig.tag=NAME       file names in the share
+#   rig.theme=NAME     the theme plymouthd.conf names (default sparky-stereo-lines)
 #   rig.screens=both|panel|tv
 #   rig.drm=N          seconds after the splash was asked for before the GPU's driver appears (0: before plymouthd,
 #                      as on a machine whose DRM driver is up when the splash starts); with N > 0 the splash starts
@@ -22,11 +23,11 @@
 /bin/busybox mount -t devpts devpts /dev/pts
 export PATH=/usr/sbin:/usr/bin:/sbin:/bin
 exec >/dev/ttyS0 2>&1
-tag=case screens=both drm=0 unbindfb=0 mode=boot wait=4 grabs=1 tvlate=0
+tag=case screens=both drm=0 unbindfb=0 mode=boot wait=4 grabs=1 tvlate=0 theme=sparky-stereo-lines
 for a in $(cat /proc/cmdline); do
 	case "$a" in
 	rig.tag=*) tag=${a#*=} ;; rig.screens=*) screens=${a#*=} ;; rig.drm=*) drm=${a#*=} ;;
-	rig.unbindfb=*) unbindfb=${a#*=} ;; rig.mode=*) mode=${a#*=} ;; rig.wait=*) wait=${a#*=} ;; rig.grabs=*) grabs=${a#*=} ;; rig.tvlate=*) tvlate=${a#*=} ;;
+	rig.unbindfb=*) unbindfb=${a#*=} ;; rig.mode=*) mode=${a#*=} ;; rig.wait=*) wait=${a#*=} ;; rig.grabs=*) grabs=${a#*=} ;; rig.tvlate=*) tvlate=${a#*=} ;; rig.theme=*) theme=${a#*=} ;;
 	esac
 done
 echo "RIG: kernel line: $(cat /proc/cmdline)"
@@ -64,6 +65,7 @@ udevadm trigger --type=subsystems --action=add
 udevadm trigger --type=devices --action=add
 udevadm settle --timeout=20
 [ "$drm" = 0 ] && { mkdev; udevadm settle --timeout=20; }
+printf '[Daemon]\nTheme=%s\nShowDelay=0\nDeviceTimeout=8\n' "$theme" > /etc/plymouth/plymouthd.conf
 mkdir -m 0755 -p /run/plymouth
 plymouthd --mode=$mode --attach-to-session --pid-file=/run/plymouth/pid
 plymouth --show-splash

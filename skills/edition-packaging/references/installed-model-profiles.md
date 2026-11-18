@@ -79,3 +79,9 @@
   **Fix:** recreate generated staging before the normal archive step; reuse compiler products only after comparing their consumed source bytes with the newly extracted authored source.
   Keep the binary output directory empty before a helper that identifies new archives by their filenames, and use a new frozen gate workspace when candidate hashes change.
   **How found:** the second archive attempt failed before its first debug package; fresh generated staging removes the stale marker without bypassing projection or release checks.
+
+The installed Spirula profile proof used only ALIKED n16rot, a 2,997,054-byte owner download under BSD-3-Clause, without an account or separate consent act.
+It extracted features from two generated pictures on each Graphics-selected PCI device, failed visibly before profile installation and on an invalid PCI identity, retained data on removal, and removed only owned data on purge.
+A separate application-purge test verified receipt-based cleanup after the profile declarations had already been removed.
+The actual apt-driven SAM3 questions in English and Brazilian Portuguese stopped at default No, with no owner model body transferred.
+The model owner’s legal text remains unmodified; the question, metered warning and purge notice have ten translations.

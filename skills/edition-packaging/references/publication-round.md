@@ -109,6 +109,89 @@ Traps found by archive and source inspection in ORDER 587:
   **Fix:** compare every recorded binary and metadata hash with the actual staged file, and hold the affected source until its source and build evidence agree.
   **How found:** the graphics helper's record bound another `.dsc` hash in three successive stages; the source-component manifests themselves verified.
 
+A source-closure take list is an exact set of paths, not just source/version pairs.
+Cross-check the ancillary expansion against the successfully qualified artifacts and the copied pool manifest in both directions.
+A shared orig tar may be referenced by both excluded and selected descriptors; a duplicate recipe build may have the same version with different receipts.
+Only the exact qualified closure decides which of those paths is taken.
+
+- **Symptom:** the expanded take list had the expected file count but selected three receipts of a discarded duplicate build and omitted a relocated record and two shared source components.
+  **Cause:** ancillary ownership was inferred from source/version and the first descriptor encountered, without comparing the complete path sets.
+  **Fix:** bind selection to the exact successfully qualified artifact manifest, retain all other paths with their leave-out reasons, and assert set equality with the copied pool, rather than comparing counts.
+  **How found:** a two-way path-set comparison exposed three extras and three omissions despite equal totals; after correction all paths matched, with the discarded receipts still explicit in the leave-out list.
+
+### Repair a receipt gap without choosing a different accepted binary
+
+A missing or disagreeing build receipt is repaired by rebuilding the exact retained descriptor in the lane's own builder.
+Compare every payload and control member, including modes, ownership and links, with the accepted archives before admitting genuine rebuilt receipts.
+Keep both the initial failure and the member comparison.
+A matching HR companion alone does not establish equality of the primary archive.
+When a member differs, hold the source and its required companions; continue the remaining freeze if its dependencies permit, following the coordinator's cohort ruling.
+Do not substitute the rebuilt binary or attach its receipts to the accepted archive without equality.
+If the build record names another descriptor, search only the authorized bounded inputs and say which descriptor was actually rebuilt; an unavailable recorded descriptor leaves the original source identity unproved.
+
+- **Symptom:** the replacement freeze stopped twice for receipt-only gaps, then a Graphics rebuild produced seven different payload/control members although its HR archive matched.
+- **Cause:** the accepted cohort contained missing binary receipts and a descriptor hash disagreement; neither the manifest nor matching companion bytes certified the primary binary's relationship to the available descriptor.
+- **Fix:** rebuild the retained descriptor, admit complete genuine receipts only after all-member equality, and hold a differing source with its required family. For this cohort the coordinator required Graphics and both Qt sources to travel together, so all three stayed out while the remaining cohort continued.
+- **How found:** Calamares branding's two archives matched and its repaired receipts passed the source audit; Graphics' streamed payload/control maps exposed five differing installed files and two control members. The original recorded descriptor was absent from the bounded search, so its origin was not inferred.
+
+### A clean successor when the accepted descriptor cannot reproduce its binary
+
+An exact receipt repair and a new source-built successor are different operations.
+When the available descriptor does not reproduce the accepted binary and the recorded descriptor is unavailable, keep that failed repair and obtain an explicit successor ruling.
+Build the new version from the authorized recipe, retain its real source-build receipts, and compare the result with the accepted installed package.
+Compare every member's path, type, mode, owner and link; restore script/data files through their verified HR blobs before comparing authored bytes.
+For compiled files retain exported dynamic symbols, NEEDED entries and complete string-table dumps, with only the authorized version/build-identifier differences normalized.
+Report compiler and Lean toolkit versions independently; projected bytes from different toolkit versions need not be identical when the authored bytes are.
+Keep short binary-section fragments separately from actual strings, rather than silently removing them from the evidence.
+
+- **Symptom:** the Graphics receipt repair changed installed files even though its HR companion matched; the recorded descriptor was no longer available.
+- **Cause:** the retained descriptor was not sufficient evidence for the accepted compiled archive, and a later Lean renderer also changed projected script bytes.
+- **Fix:** preserve the failed repair, build an explicitly authorized version-only successor with genuine receipts, then compare restored authored files and compiled interfaces against the accepted archive. Keep its exactly pinned Qt family together. Never weaken the all-member equality required for an ordinary receipt repair.
+- **How found:** streamed member comparisons separated the source mismatch from projection differences; verified HR restoration matched authored files, while ELF exports, NEEDED libraries and string dumps established the successor comparison. Its actual source build and all 14 package tests were retained separately.
+
+### Discovery depth and processor variants
+
+State the directory-discovery bound separately from the depth used to inventory a discovered stage.
+Inspect a brief's named subfolders explicitly, retaining the same read-only rules and recording unreadable paths.
+A file search bounded from the storage root can omit an accepted generation inside `stage/superseded/SOURCE-VERSION/` even though it found the stage itself.
+Record which files were inspected; directory discovery alone is not source-closure verification.
+
+Read `Architecture-Variant` beside `Architecture` when inventorying processor-specific archives ([processor-level packages](cpu-level-packages.md)).
+An archive named with `amd64v3` can still say `Architecture: amd64`; keep its variant in the identity used to compare it with published binaries.
+A shared native architecture and version does not make a variant an in-place replacement for the baseline.
+Neither its filename nor its control field establishes publication acceptance.
+
+Traps found during bounded discovery in ORDER 701:
+
+- **Symptom:** the requested hardware helper generation was missing from the initial file inventory, while newer held generations were present.
+  **Cause:** the four-level file search from the build-storage root stopped above the accepted files inside the named superseded subfolder.
+  **Fix:** keep directory discovery bounded, then inventory the discovered stages and explicitly named subfolders with a separately stated depth.
+  **How found:** a direct read-only search of the brief's named superseded folder located the exact descriptor and both binary companions.
+- **Symptom:** baseline and processor-specific binaries appeared to share the same package/version/native-architecture identity.
+  **Cause:** the first inventory kept `Architecture` but omitted `Architecture-Variant`.
+  **Fix:** retain both fields and keep variants outside the candidate set until their own acceptance is recorded.
+  **How found:** controls of staged stereo-library variants said `Architecture: amd64` while their filenames named `amd64v3`; reading the additional control field distinguished them.
+
+### Compare installed paths as well as archive listing lines
+
+Keep the complete `dpkg-deb -c` diff, then map every removed line to the archive member it describes.
+Normalize only the presentation of directory paths (`./usr/` and tar's `./usr` name the same directory); retain file names, modes, ownership, links, sizes and content hashes separately.
+A timestamp change is a changed listing line, not a removed installed file.
+Keep reviewed explanations keyed by binary and installed path beside the raw comparisons, and refuse an unreadable listing line.
+For an HR blob, follow the old manifest to its installed file and verify the replacement blob against the successor manifest after decompression.
+A content-addressed blob's name changing alone does not show loss of the authored file.
+
+Traps found while qualifying a round:
+
+- **Symptom:** the comparison reported thousands of unresolved directory listing lines although their contents remained.
+  **Cause:** `dpkg-deb -c` prints trailing directory slashes that the tar member names can omit; the archive root may be `.` rather than an empty path.
+  **Fix:** normalize those directory presentations before matching, keep all metadata changes visible, and test root, ordinary directory, symlink, hardlink, names containing spaces and malformed input separately.
+  **How found:** the unresolved lines were compared with the independently streamed tar member map; rerunning against the same immutable inputs resolved the false entries without dropping a diff line.
+- **Symptom:** fresh generated kernel metas would stay at the published version while the other task metas upgraded.
+  **Cause:** their versions derive from the kernel recipe independently of the meta source version, and a version without the published terminal `+lc1` sorts below that published version.
+  **Fix:** use the generator's supported kernel-meta suffix for the round, including the terminal mark, compare every generated binary version with dpkg, and retain the actual source-built generation. Do not repair the control files after building.
+  **How found:** a per-binary generated-versus-published control table exposed the ordering before the pool froze; `dpkg --compare-versions` confirmed it and the regenerated versions sorted above every published kernel meta.
+
 ### A stage accepted after the proof froze
 
 A passing transaction and link check qualify their recorded archive identities, not every package that later enters a stage folder.
@@ -123,6 +206,139 @@ Trap:
 - **Cause:** the accepted stage list advanced while the test was running, but the report treated that list and the frozen archive pool as the same thing.
 - **Fix:** retain the exact proved pool and, only with explicit permission, a separate late-stage add/leave-out list; otherwise repeat the proof with the new pool. Check each late descriptor, component hash, binary Source field and listed build-record hash in place. A descriptor stored in the source subfolder may be checksum-covered separately from an architecture's binary build record; state which record actually names it.
 - **How found:** compare the frozen index hash and transaction targets with the late binaries' Source versions and the time of the coordinator's exception. Resolve relocated source metadata only inside that stage's known source folder and require the exact recorded hash.
+
+### Reused source components keep the selected generation's identity
+
+An upstream orig archive can be shared by an old held descriptor and its accepted successor.
+The archive's basename and first inventory owner do not decide which source generation takes it.
+When admitting an exact metadata-qualified path, copy its source name and source version from that qualified closure as well as its hash and size.
+Audit the independently copied pool again so a stale table label cannot create a descriptorless source group.
+
+Trap:
+
+- **Symptom:** auditing the copied pool creates a source group without a descriptor, although every copied hash agrees.
+- **Cause:** Plasma PA's reused orig archive and detached signature inherited the first descriptor's +stereo3d1 label while the qualified closure was +stereo3d2.
+- **Fix:** the qualified closure's identity overrides the initial inventory owner; correct the two report rows without changing any archive or pool manifest.
+- **How found:** a copied-pool metadata audit grouped those two paths separately; a fixture with held and accepted descriptors sharing one orig archive failed before the correction and passed after it.
+
+### Resume an unchanged pool after a capacity ruling
+
+A written increase in scratch allowance changes the resource envelope, not the frozen cohort.
+Remove the incomplete roots and data no completed check needs before restarting the whole failed target scope.
+Verify the pool manifest and every listed checksum, and keep annotations unchanged too when the ruling says no pool file changes.
+Apply the new free-space floors to both the outer monitor and archive qualifier.
+Retain sampled usage, maximum observed allocation, sampling interval and disk free-space values; a sampled maximum is not a continuous high-water mark.
+Worker count can change within the measured paired-root budget while the validator files and target set stay unchanged.
+
+Trap:
+
+- **Symptom:** the installed proof and native archive checks pass, but the required meta source remains unqualified after a capacity stop.
+- **Cause:** the previous allocation cannot hold the paired dependency roots, verified cache and stop margin together.
+- **Fix:** obtain the coordinator's written resource ruling, clear incomplete scratch, verify the unchanged pool and rerun the complete failed scope with explicit limits and retained peak samples.
+  Late accepted work still follows its own cohort ruling; a capacity increase does not admit it.
+- **How found:** the old 9.6 GiB guard stopped with one complete top-meta root and an incomplete predecessor; Continuation4 authorized16 GiB and a12 GiB root free-space floor, so the same60 targets could be retried without regenerating packages or lists.
+
+### Public indexes between bounded invocations
+
+One copied pool can need separate complete native and meta invocations to stay inside its scratch allocation.
+Each invocation still compares old and new against one frozen signed public snapshot.
+Record every invocation's metadata hashes; do not infer that a later invocation read identical public indexes.
+If an external index refreshed, retain the record diff and check every selected resolution identity on both sides.
+A changed selected input needs fresh qualification under the intended snapshot; an unused index record is reported without pretending that its program was tested.
+
+Trap:
+
+- **Symptom:** native and meta qualification metadata name different public index hashes although the pool manifest did not change.
+- **Cause:** Sparky's tiamat archive refreshed five upstream programs between two bounded invocations.
+- **Fix:** require parent and private worker metadata to agree inside each invocation, retain both signed snapshots, diff the changed records and audit all selected identities against those changes.
+  Keep the local pool identity and the external snapshot identities distinct in the hand-back.
+- **How found:** comparing all 15 metadata entries located tiamat's InRelease and Packages changes; the record diff identified code, librewolf, meru, nuclear and opera-stable with unchanged relationship fields, then resolution package identities showed whether they entered any qualified root.
+
+### A required package outside the accepted cohort
+
+Resolve generated hard dependencies against the selected pool, published indexes and the edition's declared signed archives before freezing.
+If only an unlisted stage provides a dependency, name it as such and check its source receipts; its presence is not publication acceptance.
+Keep the designed dependency and obtain the coordinator's source-generation decision rather than deleting it to make APT pass.
+
+- **Symptom:** a simulated dist-upgrade offered 111 upgrades and zero removals but kept the desktop meta back.
+  **Cause:** the generated meta required the sound-defaults package, absent from the published tree and selected pool; the journal had accepted it but the take list omitted its stage, which also lacked binary buildinfo and changes.
+  **Fix:** report the exact kept package and missing dependency, confirm its journal acceptance with the coordinator, qualify the retained source through a genuine rebuild, and repeat the combined proof on one extended pool. Never equate zero removals with a successful uplift.
+  **How found:** an exact-version install simulation named the unsatisfied Depends; the bounded stage table located its archives, the receipt audit found `unrecorded: ["buildinfo"]` and no matching changes, and the coordinator supplied the missing journal acceptance.
+
+### A verification monitor must be able to measure its scratch
+
+Run archive qualification as the lane UID with an explicit writable HOME and private HTTPS APT configuration.
+A scratch measurement that fails is a refusal, not a size of zero or permission to continue without the monitor.
+Stop only the owned task named by that monitor and retain its diagnostic before retrying.
+
+- **Symptom:** `du` reported permission denied on an archive context and the budget monitor exited while its child task still existed.
+- **Cause:** a root verification invocation created a private mode-0700 directory that the lane UID could not inspect; the monitor did not handle a failed measurement.
+- **Fix:** use the lane UID for the archive gate, repair ownership only inside the lane's scratch, and make measurement failure stop the literal named task. Exercise that refusal with an unreadable-measurement fixture.
+- **How found:** the monitor's traceback and directory owner/mode identified the failure; its fixture then proved the exact stop command and refusal exit.
+
+A live held stage can also change after initial discovery.
+Retain disappeared paths as observations, inspect the newly seen descriptor/binaries within that named root, and report a newer unlisted generation without adding it to the frozen pool.
+The pool's accepted copies and checksum identity stay independent of that live folder.
+
+- **Symptom:** a whole-pool lintian scan had produced no verdict while its pre-extraction scratch passed 4 GiB beside active archive-link roots.
+- **Cause:** submitting every binary together retained many extracted source groups before finishing the scan; compressed pool size did not predict its peak allocation.
+- **Fix:** stop that incomplete invocation without counting it, then scan complete source families one at a time, keeping both architectures and companions together. Pair each family with every corresponding published binary, retain return codes and raw tags, and assert full current/published coverage before calculating the delta.
+- **How found:** measured scratch separated lintian's growing extraction tree from link roots; the replacement driver emitted each completed family with its binary counts and diagnostics while staying inside the shared lane budget.
+
+- **Symptom:** a real `init.d-script-missing-lsb-section` warning remained in the raw diagnostic list instead of the tag totals.
+- **Cause:** the tag parser allowed letters and hyphens but not the dot in this valid tag name.
+- **Fix:** retain raw output, parse dotted names too, and explicitly reclassify the previously retained line when rebuilding the delta; do not rescan or alter package archives for a reporting-only correction.
+- **How found:** the final QEMU family had the same warning on both sides. Reparsing added exactly one tag to each total, preserved every raw log hash, and left the complete delta unchanged.
+
+- **Symptom:** the 9 GiB guard stopped concurrent archive qualification and lintian below the brief's 10 GiB allocation, after hundreds of dependency cases had resolved.
+- **Cause:** four paired Qt dependency roots, their verified archive cache and another check's extraction tree share one allocation; bounding each check independently does not bound their sum.
+- **Fix:** retain the interrupted contexts as incomplete evidence, remove their unpacked roots, verify every reused cache object's content hash, and repeat the complete archive gate with fewer workers under the combined guard. Use one worker when one paired case approaches the allocation. Reuse only completed paired lintian families against the same sealed pool, validating coverage and retained raw diagnostics; an interrupted family is rerun. Never infer an archive pass from resolved cases alone.
+- **How found:** the guard recorded exact scratch/free-space bytes and stopped only named owned containers; per-directory measurements identified the overlapping roots, and the bounded invocation uses fresh contexts with the unchanged frozen binary inputs.
+
+Worker count and the CPU quota available inside one check are separate controls.
+Two simultaneous large theme closures can still exceed the allocation; one Python worker leaves room for their paired roots.
+The build repository's `tools/publication-reconcile/archive-one-worker.py` configures the toolkit's worker-count provider while native subprocesses retain the container's four-CPU quota.
+Keep every validator file identical to the frozen tree and retain its hash comparison; test complete ordered item coverage, refusal propagation and the release command's return/exit status before using the adapter.
+This configures scheduling only; a partial run is still incomplete and every selected package is checked again.
+
+### A clean simulation can still select the old edition
+
+The flat candidate index must carry the same Release Origin used by the edition's preferences.
+Before the real transaction, require an exact-version Inst line for every installed package selected for replacement in the frozen pool.
+Retain a target table derived from the audited controls and reject a check that exercises no installed replacement.
+
+- **Symptom:** the simulation returned zero removals and nothing kept back, but offered only unrelated Debian updates while selected Qt and edition successors stayed old.
+- **Cause:** a regenerated flat Release omitted Origin, so the edition's origin pin continued to prefer the published packages over the newer local candidates.
+- **Fix:** restore the declared Origin/Label in the local index, seal the corrected index, and restart the actual proof from the untouched published baseline. Keep the invalid attempt separate and check exact selected versions before installing.
+- **How found:** the Inst lines had none of the expected successors; the before snapshot still held published versions, and the Release metadata explained the preference mismatch. The corrected simulation offered 250 Inst and all 164 installed selected replacement targets; negative checker fixtures refuse missing or wrong-version Inst lines.
+
+### A clean simulation does not run maintainer scripts
+
+After a required package's configuration fails, preserve the complete transaction, installed statuses and `dpkg --audit` before changing anything.
+A source needed by the edition metas cannot simply be removed from the cohort.
+Do not turn that failed transaction into a pass by deleting its hook or silently replacing the configuration that triggered it.
+Supply a focused reproducer and a proposed source fix separately; the successor and the combined transaction still need qualification.
+
+- **Symptom:** a simulation offered 170 Inst, zero Remv and no kept packages; the real upgrade returned 100 and left the top edition and language meta unpacked.
+- **Cause:** the new language task's postinst called its queue helper, which rejected the baseline's comment-only generated locale file because no `LANG=` assignment existed. The helper handled an absent file differently from an existing file without that assignment.
+- **Fix:** hold the required transaction and report the exact dependency chain. Propose treating an unset assignment consistently with the existing absent-file rule while preserving rejection of unsupported explicit locales, then rebuild an accepted successor and repeat the frozen proof.
+- **How found:** the real log named the postinst, baseline and failed-image locale bytes matched, the status readback showed the helper half configured and both required metas unpacked, and isolated function fixtures reproduced the refusal and exercised the proposed change.
+
+### Keep the verification image's bootstrap explicit
+
+A minimal no-Recommends bootstrap is not the full image package list.
+Supply the tools its kernel hooks and language fixtures actually require and record that test scope.
+
+- **Symptom:** the baseline package transaction and audit passed while its initramfs log reported a missing cpio and failed microcode prepend; a Lean fixture separately failed with a missing Go executable.
+  **Cause:** the minimal builder omitted tools normally supplied by image/developer recommendations; the initramfs hook's diagnostic did not make the package transaction fail.
+  **Fix:** install the bootstrap tools before using the baseline, regenerate its initramfs, and run the real compiler-backed fixtures in a declared verification image. Keep the initial logs and the repaired baseline readback; an empty audit cannot certify a boot image.
+  **How found:** the complete install log named cpio, and the fixture traceback passed a missing executable to subprocess; adding the declared tools let those actual operations run.
+
+When immutable offered inputs move to different paths, use a fresh archive invocation context.
+A content-addressed local universe may retain symlinks and provenance to its original source paths even when the archive hashes are identical.
+Reuse only the independently verified data cache, not that old universe metadata.
+Reading the published tree read-only and letting the gate copy only selected archives avoids a redundant copy of the entire offered universe.
+This does not permit changing or deleting an input while an invocation still uses it.
 
 ### Task metadata is generated after the cohort is known
 
@@ -173,6 +389,10 @@ Continuation lessons from ORDER 587:
   **Cause:** the gate needs both complete dependency roots at once, besides the archive cache and diagnostics; the size of the meta archive does not predict that space.
   **Fix:** budget both roots and the cache inside the brief's allocation. If they do not fit, retain the diagnostics and nonzero exit, stop the gate, and hold the unqualified source group out of the take list while finishing the other requested proofs.
   **How found:** per-case disk measurements showed the completed current root beside the growing predecessor; moving verified cache files freed space but did not complete the paired-root check. The independently passing installed transaction remained a separate proof.
+  A fresh-cache targeted retry distinguishes accumulated cache from a pair that cannot finish with the required stop margin.
+  Record the complete root, incomplete predecessor, verified cache, sampled allocation and allocation after the stop; an incomplete predecessor does not establish an exact minimum.
+  If that unqualified source supplies the required edition metas, hand back blocked with the unchanged pool identity; the passing installed transaction does not replace archive qualification.
+
 
 ## The recipe
 

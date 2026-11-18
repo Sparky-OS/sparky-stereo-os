@@ -109,6 +109,16 @@ Traps found by archive and source inspection in ORDER 587:
   **Fix:** compare every recorded binary and metadata hash with the actual staged file, and hold the affected source until its source and build evidence agree.
   **How found:** the graphics helper's record bound another `.dsc` hash in three successive stages; the source-component manifests themselves verified.
 
+A source-closure take list is an exact set of paths, not just source/version pairs.
+Cross-check the ancillary expansion against the successfully qualified artifacts and the copied pool manifest in both directions.
+A shared orig tar may be referenced by both excluded and selected descriptors; a duplicate recipe build may have the same version with different receipts.
+Only the exact qualified closure decides which of those paths is taken.
+
+- **Symptom:** the expanded take list had the expected file count but selected three receipts of a discarded duplicate build and omitted a relocated record and two shared source components.
+  **Cause:** ancillary ownership was inferred from source/version and the first descriptor encountered, without comparing the complete path sets.
+  **Fix:** bind selection to the exact successfully qualified artifact manifest, retain all other paths with their leave-out reasons, and assert set equality with the copied pool, rather than comparing counts.
+  **How found:** a two-way path-set comparison exposed three extras and three omissions despite equal totals; after correction all paths matched, with the discarded receipts still explicit in the leave-out list.
+
 ### Discovery depth and processor variants
 
 State the directory-discovery bound separately from the depth used to inventory a discovered stage.

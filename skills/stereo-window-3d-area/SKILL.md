@@ -152,3 +152,8 @@ The desktop's loading screen is the first user: [kde-desktop-defaults, the loadi
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 
 For a shared native child next to an egui editing window, read [the Craft window recipe](references/egui-craft-window.md).
+
+## A native GLX child in an xcb Qt Quick window (ORDER 17, milestone 7)
+
+General rules found building the model viewer (details in skill 3d-models): popups drawn inside the window are hidden under the native child (use `popupType: Popup.Window`); an XDND drop over the child needs `XdndProxy` to the Qt window and no `XdndAware` on the child, or the child's own toolkit takes the file; with declaration version 4 the drawable width of a stereo child is the X width at creation and half of it after a later resize, so size by measuring, not by arithmetic.
+

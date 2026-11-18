@@ -1160,5 +1160,5 @@ OpenSC, pcsc-lite, SoftHSM, OpenSSL and the X11 test tools (Xvfb, xdotool, Image
 
 ### The store-link entry kind (ORDER 10)
 
-**CODESYS GmbH** makes CODESYS 4 and runs the CODESYS Store, and allowed the edition to list CODESYS 4 in its app center as a link to that store and nothing more; the facts about the program come from the pages of the store itself.
+**CODESYS GmbH** makes CODESYS 4 and runs the CODESYS Store, and its team agreed in October 2026 that the edition lists CODESYS 4 in its app center as a link to that store, where people register and download under CODESYS's own licence agreement; the facts about the program come from the pages of the store itself.
 The app center's entry mechanism is **Paweł "pavroo" Pijanowski's** APTus.

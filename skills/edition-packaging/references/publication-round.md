@@ -119,6 +119,21 @@ Only the exact qualified closure decides which of those paths is taken.
   **Fix:** bind selection to the exact successfully qualified artifact manifest, retain all other paths with their leave-out reasons, and assert set equality with the copied pool, rather than comparing counts.
   **How found:** a two-way path-set comparison exposed three extras and three omissions despite equal totals; after correction all paths matched, with the discarded receipts still explicit in the leave-out list.
 
+### Repair a receipt gap without choosing a different accepted binary
+
+A missing or disagreeing build receipt is repaired by rebuilding the exact retained descriptor in the lane's own builder.
+Compare every payload and control member, including modes, ownership and links, with the accepted archives before admitting genuine rebuilt receipts.
+Keep both the initial failure and the member comparison.
+A matching HR companion alone does not establish equality of the primary archive.
+When a member differs, hold the source and its required companions; continue the remaining freeze if its dependencies permit, following the coordinator's cohort ruling.
+Do not substitute the rebuilt binary or attach its receipts to the accepted archive without equality.
+If the build record names another descriptor, search only the authorized bounded inputs and say which descriptor was actually rebuilt; an unavailable recorded descriptor leaves the original source identity unproved.
+
+- **Symptom:** the replacement freeze stopped twice for receipt-only gaps, then a Graphics rebuild produced seven different payload/control members although its HR archive matched.
+- **Cause:** the accepted cohort contained missing binary receipts and a descriptor hash disagreement; neither the manifest nor matching companion bytes certified the primary binary's relationship to the available descriptor.
+- **Fix:** rebuild the retained descriptor, admit complete genuine receipts only after all-member equality, and hold a differing source with its required family. For this cohort the coordinator required Graphics and both Qt sources to travel together, so all three stayed out while the remaining cohort continued.
+- **How found:** Calamares branding's two archives matched and its repaired receipts passed the source audit; Graphics' streamed payload/control maps exposed five differing installed files and two control members. The original recorded descriptor was absent from the bounded search, so its origin was not inferred.
+
 ### Discovery depth and processor variants
 
 State the directory-discovery bound separately from the depth used to inventory a discovered stage.

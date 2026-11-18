@@ -31,6 +31,8 @@ Every integration obeys these rules, and each has a mechanism behind it:
 | 2D stays exactly as it was | the integration adds stereo paths and never changes a 2D default; the proof includes the 2D control |
 | Full side by side, declared once | a program's 3D area is its own surface declared through `libstereo-declare1`; every input packing is converted to full side by side before it |
 
+A device's own tool (a headset's HeadsetControl) is joined the other way: a page in System Settings, an entry in the system tray and a user service, not a pack; the recipe is in [`kde-desktop-defaults`](../kde-desktop-defaults/references/device-tool-in-kde.md), beside the Camera page it follows.
+
 ## The one list
 
 `sparky-os/lists/integrations.tsv`, tab separated: the Debian package of the program, the pack, its kind, a note.

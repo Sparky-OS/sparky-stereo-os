@@ -1,7 +1,9 @@
 # The loading screen
 
 Between the login and the desktop, KSplash shows the splash of a global theme on every screen.
-On the edition it is the boot splash's picture, so the screen is one picture from power-on to the desktop, and on a screen in a 3D mode each part stands at the boot splash's depth inside the person's own limits (ORDER 571, 2026-11-15).
+The default is Daniel Campos Ramos's original Sparky Black design: its background sunk, box and progress bar at the person's popped limit, and original logo at twice that limit, horizontally centred (ORDER 672, 2026-11-18).
+The boot-picture loading screen of ORDER 571 remains installed as a separate choice, with its original pictures and levels.
+This is KSplash inside Stereo KWin after login; a Plymouth measurement does not qualify its depth.
 Daniel asked for it twice: "on KDE - splash screen is not ours" (2026-11-08) and "one more detail, kde loading is the deault KDE one, not ours, why?" (2026-11-14).
 
 ## How KSplash picks and draws a theme
@@ -13,7 +15,7 @@ Daniel asked for it twice: "on KDE - splash screen is not ours" (2026-11-08) and
 - **Its windows.** One layer-shell surface per screen, scope `ksplashqml`, layer overlay, anchored to every edge with exclusive zone -1, keyboard interactivity exclusive, so each takes the focus as it maps and only the last one mapped keeps it (`ksplash/ksplashqml/splashwindow.cpp`).
 - **A quiet fallback to watch for.** When `Splash.qml` fails to load (a missing QML module, a syntax error), KSplash loads the splash of the package the theme names in `metadata.json` as `X-KDE-fallbackPackage`, logging only a warning. The edition's theme falls back to `org.kde.oxygen`, whose splash is KDE's 2014 one with the KDE gear: a broken splash would look exactly like the defect this page fixes. So the look package `Depends` on everything its splash imports (`libstereo-layer1 (>= 1.20.0)`, `qml6-module-qtquick`), and a proof reads the session log for "Failed loading" and checks the picture, never only the setting.
 
-## What the edition's splash is
+## The retained boot-picture splash (ORDER 571)
 
 - **The picture:** `sparky-stereo-look`'s `default/splash/Splash.qml` with the four pictures of sparky-stereo-plymouth's `sparky-stereo-lines` theme (background, the swirl with its orbit lines, an electron, the SparkyOS wordmark), placed with the sums `gen-theme.py` writes into the boot splash's script: the background covering the screen, the swirl 0.7 of the shorter side high at the top, 0.092 of its width right of centre, the wordmark 0.7 of the swirl's width, 0.092 of the height above the bottom, three electrons with their trails riding the orbits, restarted every 2.5 seconds.
   `tests/splash-pictures.sh` in the look recipe fails when a picture differs from the boot splash's by a byte or a placement factor is missing from either side.
@@ -64,3 +66,92 @@ Each with its symptom, its cause, its fix and how the cause was found.
 - **Symptom:** the splash is up for about a second and a half in the rig, too short to capture at chosen moments. **Cause:** a container's Plasma is ready fast. **Fix:** for capture cases only, the person's autostart folder holds an `org.kde.plasmashell.desktop` whose `Exec` sleeps a few seconds first (the person's folder overrides the system's entry of the same name); timing cases run without it. **Found by:** KWin's `REMOVED ksplashqml` line 1.4 s after `ADDED`.
 - **Symptom:** waiting for `ksplashqml` to leave the process list waited 70 seconds once. **Cause:** in that run (a container without the render node) the session bus logged "Activating service name='org.kde.KSplash' requested by ... plasmashell" after the splash had quit, so a second `ksplashqml` was started by D-Bus activation; with the render node it was not seen again. **Fix:** take the splash's moments from KWin's own log (`ADDED` and `REMOVED ksplashqml`), never from the process list.
 - **Symptom:** at 125 % the splash's levels were 1.5 times too deep (wordmark 6 px apart, swirl 3, where 4 and 2 are due). **Cause:** `StereoDepth` took the output's width in device pixels from the screen's ratio, which on Wayland is the whole `wl_output` scale (2), not the window's fractional 1.25. **Fix:** the window's own `devicePixelRatio()`; the case is kept in the proofs (`SCALE=1.25`). **Found by:** the 125 % login measured 6 and 3, which is `round(4 x 1536 x 2 / 1920)` and half of it.
+
+## A loading screen with parts at depth, and a second kept selectable
+
+ORDER 672, 2026-11-18: the prerequisite audit below found the clamp in the published 1.21.1 layer; stereo-layer 1.22.0 adds the explicit exception and the replacement has been measured in real logins.
+The ORDER 571 measurements above describe that splash, not every later loading-screen design.
+
+1. Read the requested levels and the published layer's implementation before replacing the pictures.
+   `StereoDepth` levels are absolute from the screen plane; nesting a logo inside a popped box does not add the box's depth to the logo's declared depth.
+   In stereo-layer 1.21.1, both `DepthAttached::setDepth()` and `Depth::parallaxFor()` clamp to `[-1, 1]`.
+   Its `autotests/stereodepthtest.cpp` explicitly checks that depth 2 with a popped limit of 4 gives 4.
+   A design requiring a logo at twice that limit needs the explicit artwork multiple of stereo-layer 1.22.0 before its QML can express the requested result.
+   Keep the requested design and report the missing primitive; do not call `StereoDepth.depth: 2` a working exception.
+2. Preserve a former splash under another look-and-feel package identifier.
+   Plasma Desktop 6.7.4's `kcms/ksplash/kcm.cpp`, `availablePackages()`, enumerates `plasma/look-and-feel` directories, clears each package's fallback and requires its own `splashmainscript`.
+   `load()` requests that component and adds None itself.
+   A second entry therefore needs its own metadata and `contents/splash/Splash.qml`, its pictures and a splash preview; it does not need another copy of the desktop defaults.
+   Put both entries in the existing look binary package and name the retained entry in the required languages.
+3. Change the system's default splash content while preserving its identifier and the person's own `ksplashrc`.
+   Check Breeze, None and the retained entry from the actual chooser, then perform the upgrade from the published package.
+4. Use a fresh login for each limit/output case and measure both eyes against the prediction.
+   A compiled arithmetic helper is a source-level prerequisite check, not an installed-package test or a stereo rendering proof.
+
+**Trap: the logo remains at the box's depth when its declaration is doubled.**
+Cause: the published layer clamps in the setter and again in the arithmetic helper, so changing only the QML or only one clamp is insufficient.
+Required repair: an explicit exception in the shared layer for the specially designed item, preserving ordinary bounds and the zero/2D/software behavior, followed by installed-library and real-login checks.
+The repair is in stereo-layer 1.22.0: `StereoDepth.artworkDepthMultiple`, default 1.
+A larger `depth` alone remains clamped.
+Found by reading the published 1.21.1 source and compiling its `parallaxFor()` body unchanged: at 1920 wide, depth 2 returned 4 for limits 4/10 (expected 8) and 8 for 8/20 (expected 16); background, box and zero-limit controls passed.
+The source check is `tests/splash-depth-contract.py` in the look recipe and takes the layer's `src/quick/stereodepth.cpp` as its argument.
+
+## An item that must stand past the person's limit
+
+The exception belongs in the shared layer, not in a second rendering route.
+The edition's own loading-screen artwork declares it explicitly on one item:
+
+```qml
+Image {
+    source: "images/kde.png"
+    StereoDepth.depth: StereoDepth.Popped
+    StereoDepth.artworkDepthMultiple: 2
+}
+```
+
+`depth` remains a bounded fraction, `[-1, 1]`; the authored multiple is finite and at least 1, with 1 meaning ordinary behavior.
+The multiple is never derived from media metadata and is not a setting for a person.
+It is applied before rounding into device pixels, not to an already rounded parallax.
+C++ uses `DepthAttached::setArtworkDepthMultiple()` and the five-argument `Depth::parallaxFor()`; the original four-argument helper stays bounded.
+The attached property has no effect on a sleeping or 2D surface or with both limits zero.
+Qt Quick's software renderer keeps the existing flat picture and one explanatory log line per window.
+
+The default look depends on libstereo-layer1 >= 1.22.0.
+The retained entry is `org.sparkystereo.boot-picture`, shipped with its own metadata, splash, pictures and preview in the same look package, with its name in all ten required languages.
+It has no desktop defaults to apply.
+The Sparky Black look's separate splash is unchanged.
+
+Measured in fresh 1920x1080 logins on Stereo KWin +stereo3d58 with stereo-layer 1.22.0:
+
+| Case | Background | Box and progress | Original logo |
+|---|---|---|---|
+| Sunk 10, popped 4 | +10 | -4 | -8 |
+| Sunk 20, popped 8 | +20 | -8 | -16 |
+| 125% output scale | +10 | -4 | -8 |
+| Each of two 3D outputs | +10 | -4 | -8 |
+
+Numbers are right minus left in device pixels; each part remains centred and the vertical difference is zero.
+With limits zero or Qt Quick's software renderer, the two views are identical; the software case logs once.
+A 2D output beside the 3D output is pixel-identical to the plain reference.
+The actual Splash Screen page saved the retained entry, Breeze and None, and each saved choice was tested in another fresh login.
+An upgrade from the published look preserves Breeze and None byte for byte in the person's configuration.
+
+### Traps found during qualification
+
+- **Symptom:** the translucent box measures 3 px where its edge should be 4 px apart, or its progress border follows the background in the matcher.
+  **Cause:** the original box's alpha is at most 84/255; raw colour matching includes the differently shifted background behind it.
+  **Fix:** measure the sharp border's position in each eye, using the derivative peak of an averaged edge profile, and use a separate top edge for vertical displacement.
+  **Found by:** source alpha inspection and the edge profiles: the reference border was at x=751, the left at 753 and the right at 749, giving -4 and mean centre shift zero.
+  `measure-regions.py` in the login rig supports boundary regions for this case.
+- **Symptom:** a periodic background matches a different repetition when another output is present.
+  **Cause:** a small mean-colour difference across captures biases raw matching of a dark repeating texture.
+  **Fix:** remove each candidate region's mean before measuring its translation; retain the raw-colour result as diagnostic evidence.
+  **Found by:** the correct -5/+5 offsets became the unique best match after mean removal, with both still fitting the broad background shape.
+- **Symptom:** a QML test says `parallaxFor ... is not a function`.
+  **Cause:** `StereoDepth` resolves to the attached object in that context; a static method on the type is not an attached method.
+  **Fix:** test the attached property from QML and both arithmetic overloads from C++.
+  **Found by:** the QML test's actual TypeError; no callable QML helper is claimed.
+
+The native suite passes 31 tests.
+The library retains all 419 previous dynamic symbols and adds four, while the exported attached object's size remains 64 bytes on amd64.
+The version-pinned consumers outside the layer cohort use minimum versions and need no rebuild for this addition; the layer's exact internal cohort is rebuilt together.

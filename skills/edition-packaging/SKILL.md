@@ -23,11 +23,13 @@ description: >-
 5. A fix that upstream made on its stable branch after the release a patched package was built on is carried as upstream's own commit, as [carrying a stable-branch fix](references/carrying-upstream-stable-fixes.md) says.
 6. A staged recipe that waited while a shared tool moved is redone on the new main as [rebasing a staged recipe](references/rebasing-a-staged-recipe.md) says.
 7. A package that downloads licensed data during installation follows [licensed data at install time](references/licensed-data-at-install.md): inspect consent, declare the download once, keep the data off the ISO and test refusal and retry.
+8. Our Plasma workspace takes one more patch from the staged predecessor, with the file-by-file comparison: [one patch on a staged workspace](references/one-patch-successor-of-a-staged-workspace.md).
 8. A development package must install every payload its CMake export needs; use [CMake development dependencies](references/cmake-development-dependencies.md) to check sibling packages with a clean installed consumer.
 9. A family of Rust programs that share their crates is built in one workspace and ships the shared crates once, as Rust dynamic libraries whose names carry their ABI: [a Rust suite as shared libraries](references/rust-suite-shared-libraries.md) has the recipe, the measured sizes and the traps.
 10. A program the edition may not publish, handed to one tester as a local `.deb` with one page of steps: [a private package for one tester](references/private-package-for-one-tester.md) has the recipe (a version that cannot collide, installing a single `.deb` in a live session, the proof in a virtual machine, what the page must carry) and the traps.
 11. A vendor's closed program tested on the edition for its vendor (their terms first, the Linux route to its end, a sample of theirs, timing on two kernel flavours, the whole-desktop screenshot, the link-only app center entry, two lists): [trying a vendor's closed program](references/trying-a-vendors-closed-program.md) has the recipe and the traps.
 11. For a Go release, [reconcile the tagged source and modules](references/go-release-packaging.md) before choosing Debian dependencies or vendoring.
+    For a program whose interface is built with npm, [take the inventory and find the native binaries first](references/npm-vendored-packaging.md): a prebuilt binary in the build path is a stop (CoolerControl 5.1.2 met one).
 12. An app center entry whose program needs packages to run (container tools, FUSE, Flatpak) declares them and installs them itself when the person installs the entry; the app center package never depends on them: [an app center entry that needs tools](references/app-center-entry-tools.md) has the recipe, the proofs, the traps and the review rule (read the upgrade proof's `Inst` lines for packages only an entry needs); it also holds the recipe to bump a pinned entry and build the next app center, and the causes of the seven failing cases of the app center's source tests.
 13. A package that makes apt remove Debian packages (Conflicts, Replaces, a Provides of their names) is read before it ships, on the apt plan's `Remv` lines and the removed packages' file lists, in a container that has the old machine's state: [a package that replaces Debian's packages](references/a-package-that-replaces-debians-packages.md) has the recipe, the rig, the order apt really takes and the traps (ORDER 645: a symbolic link out of a Debian package's tree and the time zone files of the system).
 
@@ -39,6 +41,8 @@ Written on 2026-10-07; the developer tasks and the skills package on 2026-10-16;
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
 
 For a package that disappeared from testing, read [carried from Debian unstable](references/carried-from-debian-unstable.md): removal records, suites, RC bugs, fixes, versions, retirement and the installed proof.
+
+For a recorded decision authorizing a stereo version of a SparkyLinux tool, use [the pinned carry recipe](references/carried-sparkylinux-tool.md); it preserves the published base and checks every payload file before the narrow change.
 
 ## Provenance (Daniel, 2026-10-02): always
 

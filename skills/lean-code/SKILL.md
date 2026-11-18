@@ -73,6 +73,7 @@ A file whose comments are smaller than that line stays as it is.
 | Perl | B::Deparse prints the same program |
 | Java | JDK compiler lexer checks tokens, retained notices/directives and boundaries; the qualified Android build uses JDK 17 |
 | Rust (build inputs only) | rustc's own lexer, through a procedural macro built with the installed rustc: the same tokens, doc attributes compared byte for byte; see [the Rust adapter](references/rust-adapter.md) |
+| Go (build inputs only) | go/scanner's token stream through a helper built with the installed go, semicolons included, and go/parser must accept the text; no line goes, so no position moves; see [the Go adapter](references/go-adapter.md) |
 | Kotlin / Kotlin Gradle scripts | Pinned Kotlin compiler lexer checks tokens, significant whitespace and retained notices/directives; the qualified Android build uses Kotlin 2.4.0 |
 
 A failed check leaves the file as it is and records why; package assembly refuses to certify a failed transformation.
@@ -88,7 +89,7 @@ A route that rebuilds a published source must carry its `debian/sparky-lean-pres
 ### Rust build inputs
 
 Since toolkit 0.1.29 a source tree whose language plan names `rust` has its Rust files projected before compilation: non-doc comments go, doc comments stay because they are attributes, and line numbers in panic messages name lean lines.
-[The Rust adapter](references/rust-adapter.md) has the rule for each kind of comment that is data, the counts and measurements on a real workspace, the source and offline compiler-kit recipes, coverage limits and observed traps.
+[The Go adapter](references/go-adapter.md) has the rule for each kind of Go comment (no line goes), the check by go/scanner and the measurement on OpenLinkHub. [The Rust adapter](references/rust-adapter.md) has the rule for each kind of comment that is data, the counts and measurements on a real workspace, the source and offline compiler-kit recipes, coverage limits and observed traps.
 
 ### Reproducible sources
 

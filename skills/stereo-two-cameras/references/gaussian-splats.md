@@ -190,4 +190,9 @@ These measurements are FBO reads in private compositor sessions, not the complet
   **Cause:** using a transposed affine matrix as its inverse moves the recovered camera origin.
   **Fix:** preserve the rigid arithmetic for ordinary rotations and use a true inverse for oblique cameras, in shared Slang with regenerated CUDA headers.
   **How found:** a first-band spherical-harmonic fixture at the zero plane gives 0.347021 rather than the physical-eye prediction 0.359601.
-  The activated regression has a verified red; the shared shader's GPU green and parity are still being built.
+  The activated regression has a verified red and matches the physical-eye colour prediction with the shared shader on RADV and NVIDIA Vulkan.
+  CUDA green and final parity remain pending.
+
+The preview PNG checker independently decodes all 64 retained pairs and checks their chunk CRCs and left-first sTER mark.
+Its 192 marker measurements have a maximum horizontal error of 0.96875 pixels and zero vertical error.
+Swapping the decoded halves fails the checker.

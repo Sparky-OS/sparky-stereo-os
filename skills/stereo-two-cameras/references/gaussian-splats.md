@@ -215,7 +215,7 @@ The complete application was captured as 108 marked pairs: 96 cases cover splats
 Another twelve cover the three wide lenses rectified to a real perspective view.
 An independent checker measures 324 near/screen/far markers; maximum horizontal error is 0.676 pixels and vertical error 0.373 pixels, within the one-pixel sampling allowance.
 The earlier 64 FBO pairs remain the separate renderer control; exchanging their decoded halves fails the prediction checker.
-The ordinary 2D scene crop equals the accepted baseline pixels on all four GPU/window-system routes.
+The complete ordinary 2D client above its log equals the accepted baseline pixels on all four GPU/window-system routes.
 No-limits and zero-limits source eyes are exact copies and say so visibly; after the compositor filter correction below, their complete captured eye images are also byte-identical.
 Resize, hide/show, close/reopen, grid overlays and a near-marker double-click are exercised through ordinary UI/window actions.
 Live training captures use the same pair worker and record one engine step for both images.
@@ -262,3 +262,12 @@ This is a small scene and camera, not a GPU ranking or a large-scene throughput 
   **Cause:** the test converted screenshot pixels using output scale even though the Xwayland client's coordinate space was already in pixels.
   **Fix:** derive pixels per client coordinate from the captured eye width and the application's reported display width.
   **How found:** the injected click left the camera pivot at depth 3; the corrected mapping picks the near marker at depth 1.5.
+
+Live limit changes from (10,4) to (24,9.5) change the fitted camera offset by the predicted 2.375 ratio without reopening the view.
+The same open window survives a 100-to-125-percent output-scale change, zero limits, and restored limits on native Wayland and Xwayland.
+
+- **Symptom:** a tall point/mesh canvas stretches the scene when the eye raster reaches its height cap.
+  **Cause:** the preview used the whole canvas after independently capping render height.
+  **Fix:** letterbox the capped preview at its rendered aspect, like the engine viewport, without resizing the eye internally.
+  **How found:** review the preview and engine placement paths, then capture the same markers in a 400-by-850 window at a requested 4,096-pixel eye width.
+  Both tested GPUs retain square geometry; maximum horizontal prediction error is 0.097 pixels.

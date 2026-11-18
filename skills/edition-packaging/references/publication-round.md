@@ -177,6 +177,33 @@ Trap:
 - **Fix:** retain the exact proved pool and, only with explicit permission, a separate late-stage add/leave-out list; otherwise repeat the proof with the new pool. Check each late descriptor, component hash, binary Source field and listed build-record hash in place. A descriptor stored in the source subfolder may be checksum-covered separately from an architecture's binary build record; state which record actually names it.
 - **How found:** compare the frozen index hash and transaction targets with the late binaries' Source versions and the time of the coordinator's exception. Resolve relocated source metadata only inside that stage's known source folder and require the exact recorded hash.
 
+### A required package outside the accepted cohort
+
+Resolve generated hard dependencies against the selected pool, published indexes and the edition's declared signed archives before freezing.
+If only an unlisted stage provides a dependency, name it as such and check its source receipts; its presence is not publication acceptance.
+Keep the designed dependency and obtain the coordinator's source-generation decision rather than deleting it to make APT pass.
+
+- **Symptom:** a simulated dist-upgrade offered 111 upgrades and zero removals but kept the desktop meta back.
+  **Cause:** the generated meta required the sound-defaults package, absent from the published tree and selected pool; its only discovered stage was outside the accepted list and lacked binary buildinfo and changes.
+  **Fix:** report the exact kept package and missing dependency, qualify the retained source through a genuine rebuild, and extend the pool only after its acceptance; repeat the combined proof. Never equate zero removals with a successful uplift.
+  **How found:** an exact-version install simulation named the unsatisfied Depends; the bounded stage table located its archives, and the receipt audit found `unrecorded: ["buildinfo"]` and no matching changes.
+
+### Keep the verification image's bootstrap explicit
+
+A minimal no-Recommends bootstrap is not the full image package list.
+Supply the tools its kernel hooks and language fixtures actually require and record that test scope.
+
+- **Symptom:** the baseline package transaction and audit passed while its initramfs log reported a missing cpio and failed microcode prepend; a Lean fixture separately failed with a missing Go executable.
+  **Cause:** the minimal builder omitted tools normally supplied by image/developer recommendations; the initramfs hook's diagnostic did not make the package transaction fail.
+  **Fix:** install the bootstrap tools before using the baseline, regenerate its initramfs, and run the real compiler-backed fixtures in a declared verification image. Keep the initial logs and the repaired baseline readback; an empty audit cannot certify a boot image.
+  **How found:** the complete install log named cpio, and the fixture traceback passed a missing executable to subprocess; adding the declared tools let those actual operations run.
+
+When immutable offered inputs move to different paths, use a fresh archive invocation context.
+A content-addressed local universe may retain symlinks and provenance to its original source paths even when the archive hashes are identical.
+Reuse only the independently verified data cache, not that old universe metadata.
+Reading the published tree read-only and letting the gate copy only selected archives avoids a redundant copy of the entire offered universe.
+This does not permit changing or deleting an input while an invocation still uses it.
+
 ### Task metadata is generated after the cohort is known
 
 A task producer's caller-supplied version is not a fixed newer release in its historical changelog.

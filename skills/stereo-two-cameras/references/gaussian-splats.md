@@ -333,3 +333,45 @@ For live training, keep two coherent presented pairs with strictly increasing tr
   **Cause:** the compositor uses an area filter, so point samples are a different reference image.
   **Fix:** integrate the same source texel boxes and fit translation at the screenshot's integer pixel centres.
   **How found:** an independent analytic fractional-transform calibration and the compositor's filter source separated interpolation error from camera error.
+
+
+## Choosing which visible depth receives the budget
+
+Daniel decides the support policy; the accepted conservative fitter remains the production default until that decision.
+A renderer can place most visible texture almost at screen depth while its covariance envelope consumes the person's popped limit.
+Measure the picture before treating that result as a failed two-camera implementation.
+
+For a translucent Gaussian image, distinguish each contributing Gaussian's centre depth from a pixel's mixture of depths.
+With axial depths `Z_i` and the renderer's front-to-back weights `w_ip = alpha_ip T_before`, accumulate `A_p = sum_i w_ip` and `R_p = sum_i w_ip / Z_i`.
+The contribution-weighted pixel disparity is `f b (1/C - R_p/A_p)`.
+Use `A_p` as the histogram weight and `A_p/R_p` as the effective depth; this is an inverse-depth statistic, not an opaque surface reconstructed by deprojecting blended ray distances.
+A dedicated study build fits only its weighted 1st and 99th percentiles, keeping the navigation target fixed.
+The ordinary executable contains neither this fitter nor a runtime route to it.
+A build switch defaults off, requires the test targets and gives the experimental executable a distinct name.
+
+Keep both kinds of tail measurement.
+The weighted pixel mean can lie inside a limit while one of its visible translucent layers lies outside it.
+Report the mean's out-of-budget pixel area and weight, the individual-layer out-of-budget weight and area, the largest excursions and their locations, and the fraction in a specified edge band.
+Content outside the chosen percentile range remains rendered with its original geometry and opacity in this experiment.
+A percentile rule is not a hard guarantee for all visible content and cannot silently replace a hard-bound contract.
+For on-screen statistics, filter opacity and disparity-times-opacity with the compositor's actual filter before dividing, sorting and counting pixels.
+Keep the renderer-native distribution separately, because nonlinear histogram operations do not commute with the output resize.
+
+In one generated object study, the conservative fit put all contribution-weighted pixel means within half a displayed pixel at the default limits.
+The percentile experiment gave stronger depth and also retained out-of-budget layers; use the paired pictures and full tail table to decide the policy rather than reporting only its central 98 percent.
+The working comparison keeps both GPUs, exact centre-camera/world/RGB controls, GPU-transmittance checks and captured projection correspondences.
+It adds no program setting or separation control.
+
+Established alternatives differ.
+[OSCAM](https://studios.disneyresearch.com/wp-content/uploads/2019/03/OSCAM-Optimized-Stereoscopic-Camera-Control-for-Interactive-3D-1.pdf), section 5, takes a min/max reduction of the visible depth buffer and controls convergence as well as baseline.
+[Blender's stereoscopy manual](https://docs.blender.org/manual/en/latest/render/output/properties/stereoscopy/usage.html) exposes interocular distance and convergence rather than automatically selecting a contribution percentile.
+Their display controls are not imported into the edition's program.
+
+- **Symptom:** a log value is read as hundreds of omitted Gaussians.
+  **Cause:** the field printed as `unbounded` is the first offending Gaussian index, not a count; its finite positive-centre projection can still constrain the fit.
+  **Fix:** inspect the variable and measure the actual contributing set before changing the explanation or dropping points.
+  **How found:** `unbounded=463` identified an index; the fixture had seven spherical envelopes crossing the camera plane and retained all 3,395 candidates in the projected-support loop.
+- **Symptom:** a tail report suddenly assigns several percent of the weight just beyond the limit although the endpoint equals it.
+  **Cause:** algebraically equal double-precision endpoints differ by one unit in their last place.
+  **Fix:** declare a tiny numerical boundary tolerance, keep it separate from the capture error allowance and still report the actual excursion size.
+  **How found:** a nominal endpoint of -6.269010416666666 pixels became -6.269010416666667 in the equivalent disparity expression; a 1e-7-pixel roundoff tolerance removed this false tail without hiding real multi-pixel excursions.

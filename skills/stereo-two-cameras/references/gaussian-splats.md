@@ -60,6 +60,7 @@ In this application an image-layer count on a top-level Vulkan swapchain would n
 A native viewport adapter must expose a Wayland subsurface or X11 child, with the pair declared through the shared declaration library and a transparent viewport hole in the parent.
 Keep flat overlays above that surface, coordinates logical, and the eye raster independent from the displayed rectangle.
 The ordinary 2D viewport remains the comparison control.
+At the pinned source, `GuiMain` clears with alpha 1 and does not request a transparent GLFW framebuffer; the implementation needs an alpha-capable parent and an accurate opaque region, with the canvas cleared before flat overlays are drawn.
 
 ## Traps, symptom first
 

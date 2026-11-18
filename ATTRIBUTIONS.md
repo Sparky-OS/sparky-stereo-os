@@ -1148,3 +1148,12 @@ These credits record research and test dependencies; they do not claim the commu
 
 The bounded virtualsmartcard test fixture builds on Frank Morgner and Dominik Oepen, named in the VirtualSmartcard.py copyright header.
 The FFmpeg developers supply the signed 5.1.10 source used for the private JavaFX ABI-59 media fixture; its inspected LICENSE.md records LGPL-2.1-or-later for this configuration.
+
+### PJeOffice Pro on the edition (ORDER 18, milestone 2)
+
+The installer (`sparky-pjeoffice`) fetches CNJ's own ZIP on the person's machine and ships nothing of CNJ's: **CNJ and the TRF3-coordinated PJeOffice team** made the program, **Leonardo de Lima Oliveira** its signing libraries (MIT).
+The program's bundled Java is **Azul Zulu 8** (Azul Systems; OpenJDK, GPL-2.0 with the Classpath exception); the installer's certificate merge runs in its Nashorn script engine (`jjs`) through the standard `java.security.KeyStore` API, and `keytool` of the same JRE reads the result in the tests.
+`sparky-pjeoffice-codec` is **FFmpeg 5.1.10**, unmodified, from the project's signed release (the FFmpeg developers; Fabrice Bellard, Michael Niedermayer and contributors; LGPL-2.1-or-later with no `--enable-gpl`); the build checks the release key `FCF986EA15E6E293A5644F10B4322F04D67658D8`.
+The tray is a KStatusNotifierItem and the settings page a KCMUtils module, from **KDE Frameworks** (the contributors named in their sources).
+The `Sparky-Install-Download-Size` declaration and its reader are the edition's own (sparky-stereo-apt); the app center's entry mechanism is **Paweł "pavroo" Pijanowski's** APTus.
+OpenSC, pcsc-lite, SoftHSM, OpenSSL and the X11 test tools (Xvfb, xdotool, ImageMagick) are the test dependencies, credited above and in their own records.

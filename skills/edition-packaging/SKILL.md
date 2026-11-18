@@ -225,6 +225,8 @@ That digest is v5.6.0 (the registry `gcr.io/openssf/scorecard`, which older inst
 A score is a measurement of the repository, not a gate: some checks (required reviews, signed releases, branch protection) change how people work, and those are Daniel's to switch on.
 On a fork, Scorecard mostly measures upstream's code and settings, so a fork's low score is not ours to fix.
 
+For an unmodified vendor release with minisign signatures, [vendor-signed download entries](references/vendor-signed-download-entry.md) records the pinned key, release verification, refusal requirements and the stale local-branch trap.
+
 ## Proof before shipping
 
 For a QML application that fails before opening its window, check [required QML modules and selected styles](references/required-qml-modules.md).

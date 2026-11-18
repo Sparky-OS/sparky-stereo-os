@@ -50,6 +50,7 @@ System Settings has a Camera page (`sparky-stereo-camera`, under Multimedia besi
 Kamoso (our build) and Qt Multimedia's camera (our build, ORDER 582) follow the default; FFmpeg's `-f v4l2` does not (measured).
 The Qt side: [the default camera in Qt programs](../contrib-qt/references/default-camera-in-qt-programs.md).
 [Where each setting lives, which programs follow, a virtual camera in the rig, and the traps with their symptoms](references/camera-page.md).
+A device's command-line tool (a headset's HeadsetControl) joined to System Settings, the system tray and a user service, with its proof in a Plasma login: [the recipe and the traps](references/device-tool-in-kde.md).
 
 ## A program that needs hardware: offered, not installed
 

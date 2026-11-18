@@ -287,3 +287,46 @@ The same refusal applies to a .pns file: its extension and mark do not prove dep
   **Cause:** loading and resize events can coalesce into one valid final image; readiness is not a frame-count promise.
   **Fix:** require a completed native presentation and a semantic scene witness, then check the decoded proof's unequal eyes and geometry.
   **How found:** an unmodified program presented the trained spheres once, with a valid camera offset and unequal submitted RGB eyes, while the old two-presentation wait timed out.
+
+
+## Real Gaussian scenes measured in compositor captures
+
+For a real trained scene, trace a completed atomic pair while holding the engine lock.
+Record its request id, training step, cameras, native RGB eyes and the GPU's projected Gaussian ids, world centres, conics, opacity and colour for centre, left and right cameras.
+First independently project every in-viewport world centre and compare it with the GPU coordinates.
+The common ids must still have bit-identical world centres in all three projections.
+For near, navigation-target-plane and far witnesses, require actual front-to-back contribution above the raster cutoff in both eyes, rather than choosing invisible points from the model's bounding box.
+Register each native eye to its compositor screenshot with the compositor's actual area filter and a two-axis textured patch.
+Transfer the selected Gaussian centre through that measured registration to obtain its captured position.
+State the raster and displayed size, candidate depth range, contribution, image residual and horizontal/vertical error.
+These are contributing Gaussian-centre correspondences, not a claim that an alpha-blended pixel has one opaque surface depth.
+The navigation target has an analytic zero disparity; distinguish that prediction from the measured visible Gaussian nearest its plane.
+
+A three-pixel-displaced eye is not proved by an RGB inequality check alone.
+Keep a swapped-eye geometry negative that fails the same fixed measurement tolerances.
+A separate analytic translation calibration should include a nonzero vertical shift and fractional native-to-display transforms.
+
+An instrumented pair costs an extra centre render and GPU readbacks.
+Never report its frame time as the ordinary pair cost given above.
+Keep the trace ring bounded and preserve only the request actually found in the screenshot.
+For live training, keep two coherent presented pairs with strictly increasing training steps, without pausing training or disabling Live.
+
+- **Symptom:** deprojected Gaussian depth predicts the wrong disparity despite correct camera matrices.
+  **Cause:** this renderer stores each Gaussian's centre distance, `length(mean_c)`, then alpha-composites it; that value at a pixel is not the depth of an opaque surface.
+  **Fix:** measure actual projected contributing Gaussian centres, independently check their world-to-camera projection and register their native raster to the captured output.
+  **How found:** the rejected blended-depth probe predicted +0.041 pixels for a patch whose registered displacement was +0.163 pixels; reading the projection and raster code exposed the mixed-distance definition.
+- **Symptom:** the log says a pair was uploaded, but registration matches an older live-training image.
+  **Cause:** upload completion precedes compositor presentation.
+  **Fix:** under explicit test automation only, encode the request and step with a checksum in identical monochrome cells in both eyes; select the trace by decoding the screenshot.
+  Check witnesses at opposite ends of each eye raster, not only one corner.
+  **How found:** one-corner registration at fractional scale selected a new request while the bottom of the captured native image belonged to its predecessor.
+- **Symptom:** one Xwayland capture contains two training steps even though the shared worker produced a coherent pair.
+  **Cause:** a large `XPutImage` to a visible child is split into protocol chunks that the compositor can observe separately.
+  **Fix:** upload the complete pair into a cached offscreen X11 pixmap and issue one `XCopyArea` to the declared child; replace/free the pixmap on resize and destruction.
+  No extra stereo declaration, camera implementation or user option is needed.
+  **How found:** a test interposer deliberately split the image upload with a half-second delay; opposite-end CRC witnesses read requests 3 and 2 before the fix, and two coherent advancing training frames after it.
+  Native Wayland keeps its immutable shared-memory buffer commits.
+- **Symptom:** point-sampling a native raster produces a large image residual after a fractional compositor resize.
+  **Cause:** the compositor uses an area filter, so point samples are a different reference image.
+  **Fix:** integrate the same source texel boxes and fit translation at the screenshot's integer pixel centres.
+  **How found:** an independent analytic fractional-transform calibration and the compositor's filter source separated interpolation error from camera error.

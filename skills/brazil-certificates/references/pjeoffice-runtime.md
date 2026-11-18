@@ -30,7 +30,7 @@ These component probes do not execute a PJeOffice signing task.
 
 | Java | Observation |
 | --- | --- |
-| Bundled Azul Zulu 8.72.0.17, Java 1.8.0_382 | Application startup and localhost ping pass; generated file and SoftHSM challenge probes pass |
+| Bundled Azul Zulu 8.72.0.17, Java 1.8.0_382 | Application startup/ping and full synthetic file/SoftHSM tasks pass; cutter works with private ABI-59 libraries |
 | Debian OpenJDK 21.0.13.0.3+1-1 | Startup with OpenJFX 21 passes; file challenge passes; upstream PKCS#11 constructor fails without the export below and passes with it |
 | Debian OpenJDK 25.0.5+8-1 | Same component results as 21 |
 | Debian OpenJDK 28~18ea-1 | Full OpenJFX 21 module set fails before main; file and PKCS#11 component results match 21 when JavaFX is not loaded |

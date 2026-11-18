@@ -4,11 +4,11 @@ metadata:
 name: drivers
 description: >-
   Kernel/display drivers for stereo and deep colour: HDMI 3D modes declared by EDID
-  (amdgpu, NVIDIA, nouveau, VC4), USB-C 3D glasses, the edition's kernel configuration, DKMS modules on a new kernel (NVIDIA, ZFS, signing, first-boot MOK enrolment), udev rules for wheels (umockdev), HDMI-CEC, VRAM protection, an Intel Mac, carried patches, kernel CVE builds. Load it when a 3D mode is missing, the TV never switches to 3D, a DKMS build fails on a new kernel,
+  (amdgpu, NVIDIA, nouveau, VC4), USB-C 3D glasses, the edition's kernel configuration, DKMS (NVIDIA, ZFS, signing, MOK enrolment), udev rules for wheels (umockdev), HDMI-CEC, VRAM protection, Intel Macs, kernel patches/CVEs. Load it when a 3D mode is missing, the TV never switches to 3D, a DKMS build fails on a new kernel,
   dkms says openssl not found, modprobe says Key was rejected by service, ConditionFirstBoot never fires, nouveau
   reports firmware unavailable, amdgpu hangs with a page fault, ring timeout and a device coredump or repeats an IP
-  block soft reset with device wedged, virtio-gpu oopses with stereo on, a USB camera delivers no YUYV frames, a
-  Broadcom Wi-Fi card (BCM4360, wl) has no driver, or a udev chmod hides its failure.
+  block soft reset, virtio-gpu stereo oopses, USB camera YUYV fails, a
+  Broadcom Wi-Fi card (BCM4360, wl) has no driver, or a udev chmod hides its failure. Also for Logitech HID++/UVC/Litra OpenLogi offers.
 ---
 
 # Drivers: 3D modes and deep colour in the kernel
@@ -22,6 +22,8 @@ description: >-
 For [a USB camera that delivers nothing in one format](references/usb-camera-one-format.md), start with descriptors, probe values, usbmon and payload arithmetic; then test the actual decoder in KUnit before a person's camera comparison.
 For [a closed Wi-Fi driver from the ISO](references/closed-wifi-driver-from-the-iso.md) (Broadcom's `wl`: the licence shown from the package file, the disk's driver pool, DKMS on the edition's kernel with signing, each step verified and each failure kept), start with the recipe and the table of failures.
 For [an Intel Mac on the bench](references/intel-mac-on-the-bench.md), start with the stick's layout against Apple's firmware, then the devices that need more than the kernel (Broadcom wl for the Wi-Fi chip, with its licence), the read-only readings in order and the traps; nothing in it was run on the machine.
+
+For [Logitech HID++ receivers/devices, UVC cameras and Litra lights](references/logitech-detection.md), use sourced identifiers and an explicit app center offer; the table and tests distinguish metadata, simulated protocol and physical-device proof.
 
 **Check freshness first.**
 Written on 2026-10-07; the kernel configuration and its traps, the carried gamepad fix and the test without firmware added on 2026-11-02.

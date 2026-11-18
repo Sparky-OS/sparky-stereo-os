@@ -1171,3 +1171,9 @@ The app center's entry mechanism is **Paweł "pavroo" Pijanowski's** APTus.
 **Genymobile and Romain Vimont** make scrcpy (Apache-2.0), whose camera mode and V4L2 sink are the fully open way.
 The app center's entry mechanism is **Paweł "pavroo" Pijanowski's** APTus.
 **The KDE Connect authors**, among them Aleix Pol i Gonzalez who wrote its virtual monitor plugin, made what the plan for "Use as webcam" builds on.
+
+### A theme choice that is stored or refused (ORDER 718)
+
+**n3rdopolis** wrote Plymouth's merge request !488 (commit 3ada7716), which the edition's Plymouth carries as `stereo3d-0005`, and the bash ini parser of `plymouth-set-default-theme` before it (!300); **antohami** reported the failure it fixes (issue #348).
+**Ray Strode** and **Plymouth's contributors** wrote the script and its test (!441), whose TAP form the edition's test follows.
+**Harald Sitter**, **Marco Martin** and **Luca Montecchiani** are the holders named in the file header of the Boot Splash page's helper (plymouth-kcm), read to learn that it writes the file itself.

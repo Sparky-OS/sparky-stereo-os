@@ -207,6 +207,22 @@ Trap:
 - **Fix:** retain the exact proved pool and, only with explicit permission, a separate late-stage add/leave-out list; otherwise repeat the proof with the new pool. Check each late descriptor, component hash, binary Source field and listed build-record hash in place. A descriptor stored in the source subfolder may be checksum-covered separately from an architecture's binary build record; state which record actually names it.
 - **How found:** compare the frozen index hash and transaction targets with the late binaries' Source versions and the time of the coordinator's exception. Resolve relocated source metadata only inside that stage's known source folder and require the exact recorded hash.
 
+### Public indexes between bounded invocations
+
+One copied pool can need separate complete native and meta invocations to stay inside its scratch allocation.
+Each invocation still compares old and new against one frozen signed public snapshot.
+Record every invocation's metadata hashes; do not infer that a later invocation read identical public indexes.
+If an external index refreshed, retain the record diff and check every selected resolution identity on both sides.
+A changed selected input needs fresh qualification under the intended snapshot; an unused index record is reported without pretending that its program was tested.
+
+Trap:
+
+- **Symptom:** native and meta qualification metadata name different public index hashes although the pool manifest did not change.
+- **Cause:** Sparky's tiamat archive refreshed five upstream programs between two bounded invocations.
+- **Fix:** require parent and private worker metadata to agree inside each invocation, retain both signed snapshots, diff the changed records and audit all selected identities against those changes.
+  Keep the local pool identity and the external snapshot identities distinct in the hand-back.
+- **How found:** comparing all 15 metadata entries located tiamat's InRelease and Packages changes; the record diff identified code, librewolf, meru, nuclear and opera-stable with unchanged relationship fields, then resolution package identities showed whether they entered any qualified root.
+
 ### A required package outside the accepted cohort
 
 Resolve generated hard dependencies against the selected pool, published indexes and the edition's declared signed archives before freezing.

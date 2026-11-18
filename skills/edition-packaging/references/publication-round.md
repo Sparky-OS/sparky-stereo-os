@@ -240,8 +240,8 @@ The pool's accepted copies and checksum identity stay independent of that live f
 
 - **Symptom:** the 9 GiB guard stopped concurrent archive qualification and lintian below the brief's 10 GiB allocation, after hundreds of dependency cases had resolved.
 - **Cause:** four paired Qt dependency roots, their verified archive cache and another check's extraction tree share one allocation; bounding each check independently does not bound their sum.
-- **Fix:** retain the interrupted contexts as incomplete evidence, remove their unpacked roots, verify every reused cache object's content hash, and repeat the complete archive gate with one worker. Reuse only completed paired lintian families against the same sealed pool, validating coverage and retained raw diagnostics; an interrupted family is rerun. Never infer an archive pass from resolved cases alone.
-- **How found:** the guard recorded exact scratch/free-space bytes and stopped only named owned containers; per-directory measurements identified the overlapping roots, and the serial invocation uses fresh contexts with the unchanged frozen binary inputs.
+- **Fix:** retain the interrupted contexts as incomplete evidence, remove their unpacked roots, verify every reused cache object's content hash, and repeat the complete archive gate with fewer workers under the combined guard. Use one worker when one paired case approaches the allocation. Reuse only completed paired lintian families against the same sealed pool, validating coverage and retained raw diagnostics; an interrupted family is rerun. Never infer an archive pass from resolved cases alone.
+- **How found:** the guard recorded exact scratch/free-space bytes and stopped only named owned containers; per-directory measurements identified the overlapping roots, and the bounded invocation uses fresh contexts with the unchanged frozen binary inputs.
 
 ### A clean simulation can still select the old edition
 

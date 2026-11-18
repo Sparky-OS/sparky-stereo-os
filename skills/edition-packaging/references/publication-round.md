@@ -218,6 +218,18 @@ A live held stage can also change after initial discovery.
 Retain disappeared paths as observations, inspect the newly seen descriptor/binaries within that named root, and report a newer unlisted generation without adding it to the frozen pool.
 The pool's accepted copies and checksum identity stay independent of that live folder.
 
+### A clean simulation does not run maintainer scripts
+
+After a required package's configuration fails, preserve the complete transaction, installed statuses and `dpkg --audit` before changing anything.
+A source needed by the edition metas cannot simply be removed from the cohort.
+Do not turn that failed transaction into a pass by deleting its hook or silently replacing the configuration that triggered it.
+Supply a focused reproducer and a proposed source fix separately; the successor and the combined transaction still need qualification.
+
+- **Symptom:** a simulation offered 170 Inst, zero Remv and no kept packages; the real upgrade returned 100 and left the top edition and language meta unpacked.
+- **Cause:** the new language task's postinst called its queue helper, which rejected the baseline's comment-only generated locale file because no `LANG=` assignment existed. The helper handled an absent file differently from an existing file without that assignment.
+- **Fix:** hold the required transaction and report the exact dependency chain. Propose treating an unset assignment consistently with the existing absent-file rule while preserving rejection of unsupported explicit locales, then rebuild an accepted successor and repeat the frozen proof.
+- **How found:** the real log named the postinst, baseline and failed-image locale bytes matched, the status readback showed the helper half configured and both required metas unpacked, and isolated function fixtures reproduced the refusal and exercised the proposed change.
+
 ### Keep the verification image's bootstrap explicit
 
 A minimal no-Recommends bootstrap is not the full image package list.

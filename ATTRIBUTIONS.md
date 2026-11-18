@@ -1185,3 +1185,11 @@ The app center's entry mechanism is **Paweł "pavroo" Pijanowski's** APTus.
 **n3rdopolis** wrote Plymouth's merge request !488 (commit 3ada7716), which the edition's Plymouth carries as `stereo3d-0005`, and the bash ini parser of `plymouth-set-default-theme` before it (!300); **antohami** reported the failure it fixes (issue #348).
 **Ray Strode** and **Plymouth's contributors** wrote the script and its test (!441), whose TAP form the edition's test follows.
 **Harald Sitter**, **Marco Martin** and **Luca Montecchiani** are the holders named in the file header of the Boot Splash page's helper (plymouth-kcm), read to learn that it writes the file itself.
+
+### Logitech hardware and signed vendor entries (ORDER 27)
+
+**AprilNEA and the OpenLogi contributors** make [OpenLogi](https://github.com/AprilNEA/OpenLogi/tree/a5b507ec8802e0ecb7ef3de61ce7868609c9b533), under MIT OR Apache-2.0; its own licence and git records name AprilNEA. Its release fixtures supplied the external HID++ test exchanges.
+**Daniel Pavel, Peter F. Patel-Schneider and the Solaar contributors** make [Solaar](https://github.com/pwr-Solaar/Solaar); **Stephen Kitt** maintains its Debian packaging, as the package's copyright record states.
+**Frank Denis, Corey Edwards and Maciej Soltysiak** wrote [minisign](https://github.com/jedisct1/minisign); **Hans-Christoph Steiner and Josenilson Ferreira da Silva** are named in its Debian packaging copyright record.
+**The Linux HID contributors** supply the Logitech IDs and HID++ report descriptor, and **Martin Pitt and the umockdev contributors** supply the private device testbed. The app center is **Paweł "pavroo" Pijanowski's** APTus.
+These credits record the studied software and test dependencies; the edition's entry downloads the vendor's own signed release rather than repackaging it.

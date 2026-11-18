@@ -133,6 +133,23 @@ cloudcompare 2.13.2+git20240821+ds-7+stereo3d1+lc1, Debian's own Qt 5 source in 
 3. Measured: the anaglyph modes draw one flat picture (the capture is one output wide, no declaration), which the edition's single-output rule removes from our build. NVidia Vision answers `Quad Buffered Stereo not supported` and goes to exclusive full screen, although the same stack runs `glxgears -stereo` as a pair (capture two outputs wide, left and right differing, `_KDE_NET_WM_STEREO_CONTENT` 3).
 4. Lead, not proven: Qt's own example says `QSurfaceFormat::StereoBuffers` must be set on the default format, "just doing it on the widget is not enough"; Qt's GLX log (`QT_LOGGING_RULES="qt.qpa.gl=true"`) showed no stereo option in either requested format.
 
+## A Qt Quick window on libf3d with a declared stereo area (ORDER 17, milestone 7)
+
+The recipe (sparky-stereo-model-viewer in the build tree, sparky-os/packages):
+- Qt6 and Kirigami on xcb (Xwayland): `QT_QPA_PLATFORM=xcb` when the person set none. libf3d's GLX window is made a child of the Qt window's X window (`f3d::window::setParentWindowId(id)`, our patch 0010 of the libf3d recipe, with `getNativeWindowId()`), so Mesa lists it in `_KDE_NET_WM_STEREO_CONTENT_CHILDREN` and Stereo KWin writes the person's `_KDE_NET_WM_STEREO_DEPTH_LIMITS` on it: libf3d's `pollStereoDepth` then separates the eyes by the limits and the viewer repeats nothing.
+- libf3d lives in one worker thread (engine, window, `interactor.start(1/30, callback)`); the GUI thread posts commands (place, load, reset, play, stereo) that the callback drains. The QML item only reports its rectangle (`mapToItem(null)`, device pixels); the worker moves and sizes the child. The child is declared one view of the rectangle's size with `_KDE_NET_WM_STEREO_CONTENT_ONE_VIEW_SIZE` (CARDINAL/32 w,h), so a render resolution per eye other than the area's is scaled once, by KWin.
+- Controls outside the rectangle stay flat (same pixels in both eyes: measure the strip above the area). Depth: three squares at known offsets (a mesh as PLY, a point cloud as PLY, a splat, a STEP of three plates) and the closed form of stereo-two-cameras; all four kinds matched within 1 px at limits 10/4 and live 20/8.
+- Dialogs are windows already; every in-window popup (QQC2.Menu, a Kirigami action's sub-menu) needs `popupType: Popup.Window` or it is hidden under the native child. A Kirigami.Action with child actions cannot take it: use `displayComponent` with a ToolButton and your own Menu.
+
+### Traps met in milestone 7
+- A resized child showed the scene stretched twice as wide (symptom: squares 2:1). Cause: the GLX drawable's width reports the X width right after the window is made, and half of it after a resize once the compositor has taken the window; libf3d's `Start()` copies that width into VTK. Fix: after every placement draw again until `window.getWidth()` equals the eye width wanted, and when it does not set the X width to `ratio * eye` with ratio measured as X width over `getWidth()` (1 or 2). Found by logging `getWidth()` and `XGetWindowAttributes` after each render.
+- Dropping a file on the 3D area added it to the scene by libf3d's own XDND handling, without the program knowing (title, recent files, errors unchanged). Fix: delete `XdndAware` on the child, set `XdndProxy` on the child to the Qt window and on the Qt window to itself; one `DropArea` over the whole window then takes every drop. Found with `tools/xdnd.py`, a drag source of pure X messages (a QML drag with xdotool never started in the rig).
+- The first click of an xdotool session in the virtual KWin is lost: click twice before judging a button.
+- Concurrent rig runs sharing one HOME overwrite each other's config (Enable3D, Resolution): one HOME per case.
+- `LC_ALL=C.UTF-8` in the rig image makes gettext ignore LANGUAGE: set `LC_ALL=pt_BR.UTF-8` and generate the locale. Japanese shows boxes without a CJK font.
+- KDECompilerSettings builds without exceptions: `kde_target_enable_exceptions(target PRIVATE)` for libf3d's throws; `KF6::I18nQml` is a target of KF6I18n, not a find_package component.
+- libf3d's reason for a failed load is English: say the sentence in the person's language and log the reason.
+
 ## Slicers, Qt Quick 3D
 
 - PrusaSlicer 2.9.6, Cura 5.0.0 and MeshLab 2025.07 are in Debian testing; a string scan of their packages finds no GL_STEREO, quad buffer, anaglyph or stereo mode. OrcaSlicer and Bambu Studio are not in Debian.

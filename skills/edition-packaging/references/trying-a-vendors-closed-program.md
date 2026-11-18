@@ -1,6 +1,6 @@
 # Trying a vendor's closed program on the edition
 
-**For** a maintainer who was asked to test a closed program on the edition and report back to its vendor: the program stays the vendor's, the edition only links to it, and the result is a step list a person can follow plus two lists, what we do on our side and what we would suggest to them.
+**For** a maintainer who was asked to test a closed program on the edition and report back to its vendor: the program stays the vendor's, the edition only links to it (the app center entry for that link: [a link to the vendor's store page](app-center-store-link-entry.md)), and the result is a step list a person can follow plus two lists, what we do on our side and what we would suggest to them.
 
 Written on 2026-11-13 from one such test: an industrial automation runtime with a web client, whose engineering tools run on Windows and whose runtime runs on Linux and in containers.
 Nothing of the vendor's is packaged, mirrored, modified or decompiled; the edition's repository hosts only what the edition changes, so an unmodified program is a link in the app center.

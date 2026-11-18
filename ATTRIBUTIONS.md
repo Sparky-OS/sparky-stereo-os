@@ -1115,3 +1115,32 @@ These credits describe the inspected sources and proposed carried fixes; they do
 The carried printing-metas source credits **Didier Raboud** in its copyright and changelog and the **Debian Printing Team** as maintainer.
 The revived apt-xapian-index source credits **Enrico Zini**, **Matteo Zandi**, **Daniel Brumbaugh Keeney** and **Daniel Gröber** in its copyright; its changelog records **Ilu**, **Olly Betts** and **Alexandre Detiste** for reintroduction, Xapian compatibility and maintenance.
 **Santiago Vila** supplied the test-discovery patch in Debian bug 1145121; **Daniel Campos Ramos** completed the checked fixture/assertion updates carried by the edition.
+
+## PJeOffice integration research
+
+[CNJ and the TRF3-coordinated PJeOffice team](https://pjeoffice.trf3.jus.br/pjeoffice-pro/docs/userguide.html) maintain the official signer examined for this integration.
+This credit does not grant redistribution rights to the CNJ ZIP.
+[Leonardo de Lima Oliveira](https://github.com/l3onardo-oliv3ira/signer4j/blob/main/LICENSE) authored signer4j and its MIT libraries; the [older signer4j-pje source](https://github.com/tomvieira/signer4j-pje/blob/main/LICENSE) carries his 2022 MIT copyright too.
+That older source has not been established as the source of the current official binary.
+
+The community projects read for the integration and credited by their own records are:
+
+| Person or credited handle | Work and record |
+| --- | --- |
+| Leonardo Lucas de Castro Filho; Luka Kuuhaku as credited in the respective commit records | [LLawli/flatpak-adv-br](https://github.com/LLawli/flatpak-adv-br) and [LLawli/PjeOffice-flatpak](https://github.com/LLawli/PjeOffice-flatpak), browser and token integration and local Flatpak builds |
+| Diego Ribeiro; project published under DiegoRibeirodeSouza | [StarSign OpenSC driver](https://github.com/DiegoRibeirodeSouza/starsign-driver), LGPL-2.1 driver and investigation |
+| Pedro Henrique Quitete Barreto | [pje-office-debian](https://github.com/pedrohqb/pje-office-debian), CC0 installer script and desktop integration |
+| psygreg | [pje-installer](https://github.com/psygreg/pje-installer), official-source download installer |
+| JMGK | [PJELINUX](https://github.com/jmgk77/PJELINUX), Linux installer |
+| Renato Ramalho | [pjeoffice-pro](https://github.com/BassHero/pjeoffice-pro), Ubuntu installation script |
+| Hudson Albuquerque | [Instalador-safesing-pjeoffice-pro](https://github.com/hudsonalbuquerque97-sys/Instalador-safesing-pjeoffice-pro), signer and middleware installation |
+| Matheus Munhoz | [pje_headless](https://github.com/MrSchrodingers/pje_headless), separate authentication implementation |
+| Andre Cardoso | [omarchy-pjeoffice](https://github.com/andrecards/omarchy-pjeoffice), installation and desktop integration |
+| geyslan and pedrohqb | [AUR pje-office](https://aur.archlinux.org/packages/pje-office), package maintainers named by AUR |
+| Marcelo de Campos | [pjecnj/PJeOffice](https://github.com/pjecnj/PJeOffice), the older project's 2019 commit record |
+
+The OpenSC Project, pcsc-lite and SoftHSM contributors supply the software-token test tools and interfaces, as credited in the certificate-manager section above.
+These credits record research and test dependencies; they do not claim the community packages or driver have shipped in the edition.
+
+The bounded virtualsmartcard test fixture builds on Frank Morgner and Dominik Oepen, named in the VirtualSmartcard.py copyright header.
+The FFmpeg developers supply the signed 5.1.10 source used for the private JavaFX ABI-59 media fixture; its inspected LICENSE.md records LGPL-2.1-or-later for this configuration.

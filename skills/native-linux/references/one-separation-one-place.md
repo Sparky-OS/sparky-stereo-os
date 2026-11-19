@@ -15,8 +15,9 @@ Established programs have no formula tying separation to a window or screen size
 
 ## How a place gets the value
 
-The programs of this lane each convert in one place and hand the result to the camera fit.
-The engine function that would replace the five copies does not exist yet (what it needs is in the table below); until then the conversion sits where the limits are read: Spirula `buffer_limits()` in `CameraPair.h`, F3D `vtkF3DGLXRenderWindow::UpdateStereoDepthLimits`, CloudCompare `ccDepthLimits::screenWidthX11`, Fraqtive `MeshView::eyeOffset`, the browser's `ReadStereoLimits` (it already did this: `sunk / 1920 * outputWidth / canvasWidth`).
+One function in the layer: libstereo-declare 1.11 `stereo_depth_limits_for_buffer(screen_limits, output_width, buffer_width, shown_width, out)`, with `stereo_depth_x11_get_buffer_limits` (the output is the RandR monitor the window overlaps most, Xwayland's outputs included) and `stereo_depth_wayland_get_buffer_limits` (the only `wl_output`; with several it answers `-ENOTUNIQ` and a Qt program gives `QWindow::screen()`'s width to the pure function).
+The unit test (`tests/test-buffer-limits.c`) runs two RandR monitors, 1920 and 3840 wide, with windows of different sizes on each: 10 and 4 on the first, 20 and 8 on the second, whatever the window's size, and half of that again for a buffer rendered at half the size it is shown.
+Programs call it and keep no conversion of their own: Spirula `NativeViewport::buffer_limits`, F3D `vtkF3DGLXRenderWindow::UpdateStereoDepthLimits`, CloudCompare `ccDepthLimits::readX11`, Fraqtive `MeshView::eyeOffset`; the browser's `ReadStereoLimits` already converted correctly (`sunk / 1920 * outputWidth / canvasWidth`) in its own language.
 
 ## The proof: a large and a small element on one screen
 
@@ -32,6 +33,4 @@ Render resolution is the other row: a buffer rendered at half the size it is sho
 - **Symptom:** WebXR flat mode, a window narrower than the screen, less separation than the screen's limit. **Cause:** `sunk / 1920 * windowWidth` made the window a view of its own. **Fix:** times the screen's width over the window's, so the window's share is the screen's limit.
 - What other programs of the kind do when their window is resized, read at their source on 2026-11-19: see the lane's REPORT (upstream F3D's `render.stereo_eye_angle`, CloudCompare's `eyeSeparation_mm * scale` with scale from the convergence distance, neither reads the window's size).
 
-## Needs of the layer (written, not built: lane A's files)
-
-A function in libstereo-declare or libstereo-policy that returns the limits already in the pixels of a given buffer: `stereo_depth_limits_for_buffer(window or surface, buffer_width, shown_width, &sunk_px, &popped_px)`, reading the output the surface is on, so no program asks the X screen or a monitor list for the width (Xwayland's root is the whole layout, GLFW has no window position on Wayland).
+Wayland: the library cannot tell which output a toolkit surface entered; Stereo KWin sending the output width with `depth_limits` (a protocol 6 field) would remove the last special case.

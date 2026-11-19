@@ -62,6 +62,7 @@ For the optional Listen and combined-source implementation and its content tests
 
 PipeWire supplies convolution, SOFA spatialization, PSD upmix, LFE and noise-removal examples. Its named KEMAR example uses an external WAV file; Debian's libmysofa separately ships MIT KEMAR SOFA. Its two named matrix-surround examples are encoders, not decoders.
 The ORDER 21 engine candidate adds automatic per-stream headphone insertion, optional passive matrix decoding and upmix, and per-output codec controls through the existing ELD and route state. [The commands, fake-device proof, licence boundaries and traps](references/surround-and-passthrough.md) distinguish what is implemented from what is accepted and published.
+**Built since ORDER 23 (plasma-pa +stereo3d4):** a Speaker Setup page for every playback device whose current profile has more than two channels (the room at ITU-R BS.775-4's angles, a level in dB, a distance applied as a delay, bass management with a crossover, a pink noise test signal), nothing in the signal path while every speaker is at its defaults: [the channel map, how each control is written and measured, the rig and the traps](references/speaker-page.md), the scripts in `bench/speaker-rig`.
 
 ## Formats, rates and passthrough
 
@@ -89,6 +90,7 @@ AES5 (preferred sampling frequencies; its 2018 abstract: "A sampling frequency o
 
 From the lanes of 25 October to 16 November 2026; add the next lesson here as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 
+- The Speaker Setup page's traps: `node.dont-fallback` on the filter's playback stream hides the whole setup from every client with nothing in the log, a QML property named like its own id binds to itself (ORDER 20's "format in use" line never showed), and moc stops at a raw string literal so a green run quietly has fewer rows: [speaker-page](references/speaker-page.md#traps-symptom-cause-fix-how-found). (lane speaker-setup-kde-23)
 - The edition shipped Debian's PipeWire settings (48000 only, quality 4) until ORDER 631; before saying what a machine's graph does, read it (`pw-metadata -n settings`), never assume the defaults are ours. The traps of building the defaults and their rig (a container masks `/proc/asound`, an ALSA plugin needs `-DPIC`, nodes made from a WirePlumber script need a global table, dither on a 16 bit device costs bit perfection, a row that fails only in the green image) are in [system-defaults](references/system-defaults.md#traps-symptom-cause-fix-how-found). (lane system-audio-defaults-631)
 
 - Result of the VLC PipeWire fix: MOV004.mp4 20 s three times, +stereo3d8 no sound and 44 to 50 flushes, +stereo3d9 sound at the track's first sound (1.08 s) with 0 flushes and 0 silences; after four seeks sound at every target; drift view +0.6 ms (MOV004) and +3.3 ms (48 kHz stereo). With 24 kHz audio resampled to 96 kHz VLC's own drift view reads -21 ms (old) and -27 ms (fixed) because the SoX resampler latency is not counted; VLC corrects only above 40 ms. (lane players-shared-layer)

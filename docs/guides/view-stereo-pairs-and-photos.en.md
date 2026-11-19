@@ -39,9 +39,9 @@ A picture with the two views side by side or one above the other says nothing ab
 In Gwenview choose **View, 3D, 3D Input Format** and pick how the pair is packed: **Side by side** or **Top and bottom**, **left eye first** or **right eye first**.
 The pair shows in 3D at once.
 
-<a href="images/view-stereo-pairs/02-gwenview-3d-input-format-menu-anaglyph.jpg"><img src="images/view-stereo-pairs/02-gwenview-3d-input-format-menu-anaglyph.jpg" width="99%" alt="Gwenview's View, 3D, 3D Input Format menu with Top and bottom, left eye first chosen and Swap left and right eyes ticked (red-cyan anaglyph)"></a>
+<a href="images/view-stereo-pairs/09-showcase-menu-anaglyph.jpg"><img src="images/view-stereo-pairs/09-showcase-menu-anaglyph.jpg" width="99%" alt="Gwenview's View, 3D, 3D Input Format menus over a terrain pair, with a Plasma panel and pinned volume pop-up (red-cyan anaglyph)"></a>
 
-*[Download the MPO (both eyes)](https://raw.githubusercontent.com/Sparky-OS/sparky-stereo-os/main/docs/guides/images/view-stereo-pairs/02-gwenview-3d-input-format-menu.mpo)*
+*[Download the MPO (both eyes)](https://raw.githubusercontent.com/Sparky-OS/sparky-stereo-os/main/docs/guides/images/view-stereo-pairs/09-showcase-menu.mpo)*
 
 ## 4. Fix a pair that shows the wrong way round
 

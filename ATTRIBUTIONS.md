@@ -1259,7 +1259,11 @@ Meta, IDEA Research, ZhengPeng, Zhao Xiaoming, Johan Edstedt, Computer Vision an
 
 ## View stereo pairs and photos on any monitor (ORDER 38)
 
-The programs shown in the guide belong to their own projects, with the people their copyright files name: Gwenview (among them Aurélien Gâteau and Albert Astals Cid), Dolphin and Spectacle (KDE), digiKam and Showfoto (among them Gilles Caulier), KolourPaint (Clarence Dang), sView (Kirill Gavrilov) and Hugin's `align_image_stack` (the Hugin team, with Pablo d'Angelo as its original author).
+The programs shown in the guide belong to their own projects, with the people their copyright files name: Gwenview (among them Aurélien Gâteau and Albert Astals Cid), Dolphin (among them Peter Penz, Frank Reininghaus, Elvis Angelaccio, Méven Car and Felix Ernst) and Spectacle (Boudhayan Gupta, David Redondo and Noah Davis), digiKam and Showfoto (among them Gilles Caulier), KolourPaint (Clarence Dang), sView (Kirill Gavrilov) and Hugin's `align_image_stack` (the Hugin team, with Pablo d'Angelo as its original author).
 The elevation data of the topographic sample pair is the U.S. Geological Survey's 3D Elevation Program, in the U.S. Public Domain.
 The Nintendo 3DS sample pair was taken and shared by PantheraLeo1359531 on Wikimedia Commons, under CC BY-SA 4.0.
 The MPO format is CIPA DC-007, the JPS descriptor is VRex's General Purpose Stereoscopic Data Descriptor, and the PNG `sTER` chunk is in Extensions to the PNG 1.2 Specification, version 1.4.0, section 3.6.
+
+The Plasma shell in the guide’s screenshots names Marco Martin, Sebastian Kügler, David Edmundson and Harald Sitter in its source copyright records.
+The volume applet names Harald Sitter in its main QML file.
+System Settings’ copyright records name Alexander Lohnau, Ben Cooksley, Benjamin C Meyer, Harald Sitter, ivan tkachenko, Mathias Soeken and Will Stephenson among its authors.

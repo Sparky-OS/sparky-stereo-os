@@ -1254,3 +1254,12 @@ The **Consumer Technology Association**, **International Electrotechnical Commis
 Harry Chen and the Spirula Studio contributors.
 Omar Cornut, Marcus Geelnard, Camilla Löwy, Duane Merrill, NVIDIA, Rich Geldreich, RAD Game Tools, Valve Software, Tenacious Software, Sean Barrett, Leon Merten Lohse, The Regents of the University of Michigan, Adobe and Google.
 Meta, IDEA Research, ZhengPeng, Zhao Xiaoming, Johan Edstedt, Computer Vision and Geometry Lab, Wei Yin, Mu Hu, Microsoft, HUAWEI Bayer Lab, Qwen, Richard Zhang, Phillip Isola, Alexei A. Efros, Eli Shechtman, Oliver Wang and Soumith Chintala.
+
+---
+
+## View stereo pairs and photos on any monitor (ORDER 38)
+
+The programs shown in the guide belong to their own projects, with the people their copyright files name: Gwenview (among them Aurélien Gâteau and Albert Astals Cid), Dolphin and Spectacle (KDE), digiKam and Showfoto (among them Gilles Caulier), KolourPaint (Clarence Dang), sView (Kirill Gavrilov) and Hugin's `align_image_stack` (the Hugin team, with Pablo d'Angelo as its original author).
+The elevation data of the topographic sample pair is the U.S. Geological Survey's 3D Elevation Program, in the U.S. Public Domain.
+The Nintendo 3DS sample pair was taken and shared by PantheraLeo1359531 on Wikimedia Commons, under CC BY-SA 4.0.
+The MPO format is CIPA DC-007, the JPS descriptor is VRex's General Purpose Stereoscopic Data Descriptor, and the PNG `sTER` chunk is in Extensions to the PNG 1.2 Specification, version 1.4.0, section 3.6.

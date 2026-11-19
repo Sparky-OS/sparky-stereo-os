@@ -140,6 +140,10 @@ Before moving a heading, find who links to it: talk slides, forum posts, other l
 - After: "paint in 3D and in deep colour (16 bits per colour instead of 8)".
 - The reader who had asked "high bit-depth color, wide gamut, or something else?" then called it "clear in principle".
 
+## Guides that carry stereo screenshots (2026-11-19)
+
+A guide with stereo pictures is captured from the published packages, marked, measured and shown as a red-cyan anaglyph with a link to its MPO: [Guides that carry stereo screenshots](references/guides-with-stereo-screenshots.md) holds the pre-flight table, the capture and proof scripts, the sample set with its licences and the traps.
+
 ## Human and local-model review (2026-10-19)
 
 The two-model exercise above records the original review method; it is not a requirement to buy access to two providers for every edit.

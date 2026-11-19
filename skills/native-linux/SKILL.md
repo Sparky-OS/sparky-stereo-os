@@ -177,6 +177,8 @@ A closed program we cannot rebuild, with a quad buffer mode, shipped as an AppIm
 
 Every program that already draws OpenGL quad-buffer stereo, which switch and route each has, the capture recipe with eye tags and the traps (FreeCAD never asks for a stereo surface, ParaView's child pair is taken back, Debian's Blender 5.2.2 aborts in Time Sequential, the NVIDIA session environment in a virtual KWin): [references/quad-buffer-programs.md](references/quad-buffer-programs.md).
 
+A Qt 5 program whose OpenGL view stays empty (a `QGLWidget`: Fraqtive's 3D view is black on X11 and grey on native Wayland, on stock Debian as on the edition; the four-cell recipe with a green in the same rig, the vertex arrays set with no context current, QGLWidget drawing nothing under Wayland, and what a Qt 5 OpenGL program needs): [references/qglwidget-on-the-stereo-stack.md](references/qglwidget-on-the-stereo-stack.md).
+
 A 3D mouse (six axes) in a stereo program: libspnav and spacenavd, a stand-in daemon and a simulated kernel device for a test, what a vendor kit does on other systems, a program that closes itself while the view moves (`Signal is already emitting`): [references/3d-mouse-libspnav.md](references/3d-mouse-libspnav.md).
 
 ## Lessons from the lanes, October to November 2026

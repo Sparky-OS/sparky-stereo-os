@@ -8,7 +8,7 @@ Test both before changing any file association.
 
 ORDER 735 adds `sparky-stereo-midi` beside `sparky-stereo-audio` 0.3.0.
 The former is a small native libfluidsynth/PipeWire renderer; the latter retains the existing audio engine and adds its MIDI command, translations and dedicated user unit.
-This is implemented and tested in isolated containers, awaiting edition review and publication.
+This is implemented and tested in isolated containers.
 Real USB hardware and a real desktop login are separate tests.
 
 The dedicated `sparky-stereo-midi.service` starts `sparky-stereo-audio midi --serve` using Debian's libfluidsynth directly.

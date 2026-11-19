@@ -1238,7 +1238,7 @@ The **Consumer Technology Association**, **International Electrotechnical Commis
 
 ## HandBrake's stereo marks (ORDER 36)
 
-- **HandBrake** (GPL-2.0): its authors as its AUTHORS file names them — Eric Petit, Laurent Aimar, Damiano Galassi, John Stebbins, Bradley Sepos and the other contributors; the stereo 3D metadata read path (1d2087644) and the x264 frame packing signalling (b0145ad9f, pull request 8100) are the work whose reach the lane measured.
+- **HandBrake** (GPL-2.0): its authors as its AUTHORS file names them: Eric Petit, Laurent Aimar, Damiano Galassi, John Stebbins, Bradley Sepos and the other contributors; the stereo 3D metadata read path (1d2087644) and the x264 frame packing signalling (b0145ad9f, pull request 8100) are the work whose reach the lane measured.
 - **x264** (GPL-2.0-or-later): Loren Merritt, Fiona Glaser and the x264 contributors, whose `frame-packing` option wrote the H.264 marks the samples carry.
 - **x265** (GPL-2.0-or-later): the MulticoreWare x265 contributors, whose `--frame-packing` addition (1cf669d, closing issue 970 via pull request 986) is the writer the HEVC side now has.
 - **FFmpeg** (LGPL-2.1-or-later / GPL-2.0-or-later): Fabrice Bellard, Michael Niedermayer and the FFmpeg contributors, whose decoders, `stereo3d` filter and Matroska and MP4 muxers made and read the container marks, and whose frame side data the read-back used.

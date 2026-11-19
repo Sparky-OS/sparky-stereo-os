@@ -51,7 +51,8 @@ sparky-stereo-audio midi --play /absolute/path/music.mid
 ```
 
 TimGM6mb is the minimal dependency.
-Automatic follows Debian's `default-GM.sf2`/`default-GM.sf3` alternatives, so an installed higher-priority GM font is used.
+Automatic follows Debian's `default-GM.sf3` alternative first, then the SF2 fallback, so an installed higher-priority GM font is used.
+This order matters: MuseScore General registers only the SF3 group, while TimGM6mb and FluidR3 register both.
 An explicit per-person font wins; a person's existing `~/.config/fluidsynth` SOUND_FONT is respected in Automatic.
 The JSON choices live under the person's XDG configuration directory.
 A failed service restart rolls back a changed choices file.

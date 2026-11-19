@@ -74,3 +74,14 @@ A site that answers an automated request with a refusal is not worked around.
   Selecting its mode 4, the twin whose `stereo3D` is 5, changed `currentModeId` from 1 to 4; System Settings showed `(anaglyph, modern screens)` in Resolution.
   Mode IDs are local to that output: read the list before choosing one.
   This checks the state and selection on a virtual output, not physical scanout or the GUI checkbox.
+
+## The showcase capture
+
+Use the [showcase recipe](../../stereo-proof-rig/SKILL.md#a-showcase-stereo-screenshot): a real Plasma panel, the volume pop-up pinned, the program refocused, and three menu levels open.
+Keep a fake-input client alive and allow 300 ms between moving the pointer over the panel icon and clicking: an immediate move/click gave only a tooltip; the delayed click opened the applet.
+Read the pop-up's current frame from KWin, click its pin at frame-right minus 16 and frame-top plus 30, then refocus the program and verify that the pop-up remains.
+The published Spectacle Current Monitor route can capture the menus on a delay without taking focus (`-b -m -n -d 1500 -o capture.png` writes `capture.mpo`).
+Read the two frames, parse their marks and verify the active program and all three popup windows in KWin's window list after the capture.
+The ORDER 38 scene measured window and panel 0 px, volume +3 px, and the three menus +3, +5 and +8 px, with zero vertical disparity.
+These are measurements of that scene, not new depth defaults or a physical-output test.
+Keep the raw scene as marked PNS for exact pixels; the Markdown page retains the repository's anaglyph JPEG and MPO download link.

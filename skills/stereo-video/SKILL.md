@@ -151,6 +151,11 @@ These narrower topics have their own references:
 - [Screen-content codec comparisons](references/screen-content-codecs.md) (checked 2026-10-14): matched text quality, the controls, and x265 SCC that silently falls back to Main profile.
 - [Editing, playback and transport boundaries](references/editing-playback-transport.md) (2026-10-19): a reusable editing regression project, the per-file eye swap, and a slow phone stream measured stage by stage.
 
+## A transcoder that drops every stereo mark (ORDER 36, measured 2026-11-19)
+
+HandBrakeCLI 1.11.2 (Debian testing) drops every 3D mark — SEI, StereoMode, st3d — on all 36 encoder/container runs, with no message; upstream master (1d2087644 + our PR #8100) reads container marks and re-muxes them, writes the x264 SEI, but not the x265 one, and scans an SEI-only source as 2D.
+[How to make and verify the marked samples (incl. native HEVC SEI injection), how to read the scan JSON and the outputs, the survival table, the preview's draw path and the traps](references/handbrake.md).
+
 ## A player that dies of a Wayland protocol error
 
 A player that closes with `wl_display#1: error 0: invalid object N` used an object after it was destroyed; read the trace back to the object and to who destroyed it before blaming the compositor.

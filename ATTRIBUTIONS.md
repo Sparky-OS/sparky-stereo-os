@@ -1432,3 +1432,8 @@ The plugin carries these libraries, each compiled in as upstream ships it: **mar
 Mermaid's bundle names what it holds in its own licence block: **DOMPurify** by **Cure53** and its contributors, **lodash** (OpenJS Foundation and contributors) with **Underscore.js** (**Jeremy Ashkenas**, DocumentCloud and Investigative Reporters & Editors), **cytoscape** with its embedded Promises/A+ thenable by **Ralf S. Engelschall**, a Bezier curve generator by **Gaetan Renaudeau** and a spring physics generator adapted from Framer.js by **Koen Bok**.
 The author's own AI rule (AI-assisted work welcome, the level of AI involvement ticked in the issue and pull request forms) was read before any contribution was prepared; nothing has been sent.
 
+## HandBrake reconciliation (ORDER 742)
+
+HandBrake's AUTHORS.markdown names Eric Petit, Laurent Aimar, Van Jacobson, John Allen, Joe Crain, Damiano Galassi, Edward Groenendaal, David Foster, Rodney Hester, Andrew Kimpton, Chris Lee, Chris Long, Brian Mario, Maurj, Mirkwood, Nyx, Philippe Rigaux, Jonathon Rubin, Scott, John Stebbins, Chris Thoman, Mark Krenek, Kona "Mike" Blend, David Rickard, Tim Walker, Bradley Sepos, Maxym Dm, Simon L and Artem Galin.
+Damiano Galassi wrote the stereo metadata preservation commit; Daniel Ramos wrote the HandBrake x264 frame-packing commit, and Daniel Campos Ramos wrote the x265 frame-packing commit, as those commits record their authors.
+Christian Marillat maintains the deb-multimedia HandBrake packaging examined for this reconciliation.

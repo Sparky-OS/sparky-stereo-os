@@ -24,7 +24,7 @@ This is the only place where a screen's kind is chosen: the programs below hand 
 ## 2. Open a pair that carries its mark
 
 A stereo camera's **MPO** or **JPS** file, and a **PNG named .pns** with the stereo chunk, say by themselves that they hold two pictures.
-Open one in Gwenview, Showfoto, KolourPaint or sView: each eye gets its own picture, the left eye first, and the rest of the window stays flat.
+Open one in Gwenview, digiKam, Showfoto, KolourPaint or sView: each eye gets its own picture, the left eye first, and the rest of the window stays flat.
 Dolphin shows the same files as 3D thumbnails.
 
 <a href="images/view-stereo-pairs/04-dolphin-thumbnails-in-3d-anaglyph.jpg"><img src="images/view-stereo-pairs/04-dolphin-thumbnails-in-3d-anaglyph.jpg" width="99%" alt="Dolphin showing four pictures as thumbnails: three stereo files in 3D and one flat picture beside them (red-cyan anaglyph)"></a>

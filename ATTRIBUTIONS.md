@@ -1278,4 +1278,4 @@ Their bank-free edition sources preserve the full component notices.
 The DOSBox Staging records credit **Patryk Obara**, **kcgen** and **nemo93**, following DOSBox authors **Sjoerd v.d. Berg**, **Peter Veenstra**, **Ulf Wohlers**, **Tommy Frössman**, **Dean Beeler**, **Sebastian Strohhäcker** and **Ralf Grillenberger**.
 **John Novak** authored the upstream system-zlib detection fix carried in the edition recipe.
 The **FreeDOS** and **DOSBox Staging** contributors provide the licensed guest utilities, keyboard layouts and screen fonts with their source records.
-**Fabian Greffrath**, **Stephen Kitt**, **David Heidelberg** and the **Debian Games** and **Debian Multimedia** contributors provide the packaging and audit records that informed these decisions.
+**Cristi Mitrana**, **Fabian Greffrath**, **Stephen Kitt**, **David Heidelberg** and the **Debian Games** and **Debian Multimedia** contributors provide the packaging and audit records that informed these decisions.

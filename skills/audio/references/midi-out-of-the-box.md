@@ -15,6 +15,7 @@ The dedicated `sparky-stereo-midi.service` starts `sparky-stereo-audio midi --se
 Debian's CLI package cannot be the minimal dependency: its Qsynth recommendation pulls the 119.6 MB FluidR3 font even when TimGM6mb is already installed.
 An actual APT simulation exposed that chain; the library-backed service avoids it.
 Debian's existing fluidsynth.service remains independent and is not overridden or enabled.
+Its packaging uses --no-enable following Debian bug 1110912, which records unwanted starts and ALSA-card blocking.
 Turn this service off before selecting another General MIDI daemon.
 The unit uses Type=notify and requests PipeWire and WirePlumber.
 A vendor dependency of default.target starts it at login.
@@ -135,7 +136,7 @@ An offline systemd target-graph check proves dependencies; a direct command/noti
 
 ## Primary records
 
-[FluidSynth audio rendering](https://www.fluidsynth.org/api/group__audio__rendering.html), [MIDI settings](https://www.fluidsynth.org/api/settings_midi.html), [idle driver request](https://github.com/FluidSynth/fluidsynth/issues/1630), [Debian libADLMIDI ITP](https://bugs.debian.org/1123050), [bank audit](https://github.com/Wohlstand/libADLMIDI/issues/301), [DOSBox Staging ITP](https://bugs.debian.org/973822), [Debian DOSBox maintainer record](https://bugs.debian.org/825604), [upstream system-zlib fix](https://github.com/dosbox-staging/dosbox-staging/commit/482477a6f48ba30520920c0a09732371ba1cd772).
+[Debian service policy](https://bugs.debian.org/1110912), [FluidSynth audio rendering](https://www.fluidsynth.org/api/group__audio__rendering.html), [MIDI settings](https://www.fluidsynth.org/api/settings_midi.html), [idle driver request](https://github.com/FluidSynth/fluidsynth/issues/1630), [Debian libADLMIDI ITP](https://bugs.debian.org/1123050), [bank audit](https://github.com/Wohlstand/libADLMIDI/issues/301), [DOSBox Staging ITP](https://bugs.debian.org/973822), [Debian DOSBox maintainer record](https://bugs.debian.org/825604), [upstream system-zlib fix](https://github.com/dosbox-staging/dosbox-staging/commit/482477a6f48ba30520920c0a09732371ba1cd772).
 
 - Symptom: the supposedly small default announces a 120 MB installation despite a TimGM6mb dependency.
   Cause: Debian fluidsynth recommends Qsynth, which recommends FluidR3 directly.

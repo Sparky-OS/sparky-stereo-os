@@ -142,3 +142,8 @@ An offline systemd target-graph check proves dependencies; a direct command/noti
   Cause: Debian fluidsynth recommends Qsynth, which recommends FluidR3 directly.
   Fix: use Debian libfluidsynth with the small renderer's own user unit; leave the CLI package optional and independent.
   Found by running the actual app-center APT planner against a healthy fixture package status, including Recommends as the install action does.
+
+- Symptom: a staged app center has the same version as another lane's package and loses that lane's entries on integration.
+  Cause: the catalogue branch and its build pointer were based on an older master when the version was assigned.
+  Fix: rebase the catalogue and build branch together, keep both sets of rows and language keys, assign the next version, and compare every installed file with the accepted predecessor.
+  Found by the ORDER 735 review: Spirula Studio and the MIDI offers had both been packaged as 0.1.17; the combined successor is 0.1.18.

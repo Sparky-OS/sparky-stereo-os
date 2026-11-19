@@ -111,8 +111,9 @@ run-in-docker.sh       runs it inside the tool image as your user
 Dockerfile             tool image: QEMU, BusyBox, edid-decode, gcc, Python with Pillow
 guest/                 init and the phase scripts that run in the guest
 src/                   stereo-wb-test.c (writeback checks), drm-grab.c (frame readback and the HDMI 3D
-                       connector properties), and the Wayland test clients for the kwin phase:
-                       stereo-subsurface.c, fullscreen-2d.c and depth-client.c
+                       connector properties; DRM_GRAB_DEEP=1 keeps 16 bits per channel), and the Wayland test
+                       clients for the kwin phase: stereo-subsurface.c, fullscreen-2d.c, depth-client.c and
+                       deep-ramp.c (a 256 value ramp of a 16 bit channel, wl_shm or a declared EGL pair)
 edid/                  the test EDIDs, the generator, and the expectation reader
 kconfig/               kernel configuration fragments: small test kernel, desktop kernel, KASAN and kmemleak
 patches/               the VKMS stereo patches, on top of the v5 configfs series

@@ -8,7 +8,7 @@ All subtle, a few pixels, with the limits your own settings (System Settings, "3
 The active window sits at the screen; its menus, tooltips and notifications pop; the wallpaper and the windows behind sink.
 
 **Everything in between is Stereo KWin's job, by stacking order.**
-Stacked background windows fan out from sunk towards popped, always behind the active window, in the same order as in 2D.
+The windows beneath the active one step back one after another, in the same order as in 2D: the first sits right behind the screen and each further one a step deeper, a step being a fifth of the person's sunk limit; from the sixth on they share the limit, and none goes behind the wallpaper.
 A window caught in the middle of a pile, its edges out of the stack, reads as a sheet floating within it, the way a pile of papers looks in real life.
 No program declares this; it falls out of the order.
 

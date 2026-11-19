@@ -1212,6 +1212,10 @@ The lab joins rigs that other work made and credits their authors, from the entr
 - **PipeWire and WirePlumber** (MIT): Wim Taymans, George Kiagiadakis and their contributors wrote the sound graph, `pw-dump` and `pw-metadata`, and the monitor rules the audio rows read; the audio rig's fake sound devices are those of ORDER 631's bench.
 - **SDL** (zlib): Sam Lantinga and the SDL contributors; Tomasz Pakuła wrote the EV_BTN kernel series and the SDL pull request that the input row exercises.
 - **BusyBox** (GPL-2.0): Erik Andersen, Denys Vlasenko and the BusyBox developers, whose static build is the guests' userland.
+- **KWin and libkscreen** (GPL-2.0-or-later; LGPL-2.1-or-later): the next rows (deep colour, the plain monitor by its own EDID, the eye order matrix, the anaglyph output) read what Stereo KWin and its `kscreen-doctor` do with the output; they stand on the work of KWin's authors as KWin names them: Matthias Ettrich, Cristian Tibirna, Daniel M. Duley, Luboš Luňák, Martin Flöser (formerly Martin Gräßlin), David Edmundson, Roman Gilg, Vlad Zahorodnii and Xaver Hugl, and of the libkscreen and KScreen authors. The eye order matrix and its analysis are the edition's bench of ORDER 116 (the models of every packing are the mesa-stereo lane's before it).
+- **Eric Dubois** (the least-squares red/cyan anaglyph matrices, 2001) whose sets the anaglyph and eye order rows compute their expectation from, and **Mesa** (MIT) whose Wayland platform offers the 16 bit EGL configurations and `EGL_EXT_multiview_window` the deep ramp client uses.
+- **plasma-pa** (KDE) and its Sound Quality page: Harald Sitter, David Rosca, Nicolas Fella, Ismael Asensio, Sefa Eyeoglu and the other authors of the Sound page, credited above; the page rig is ORDER 20's.
+- **Python, Pillow and NumPy** (PSF, HPND, BSD-3-Clause): the contributors of each, whose libraries read the frames and count the levels.
 - **Debian** (the stock side of every row): the Debian kernel, KWin, Mesa, PipeWire and SDL maintainers; the CTA-861 audio data blocks the HDMI audio row builds its fixture from are the Consumer Technology Association's.
 
 ## Audio suite, ORDER 21

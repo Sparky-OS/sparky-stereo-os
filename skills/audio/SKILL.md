@@ -74,7 +74,7 @@ The ORDER 21 engine candidate adds automatic per-stream headphone insertion, opt
 
 FluidSynth and the FluidR3 and TimGM6mb soundfonts are in Debian; the MuseScore General and OPL3 soundfonts are too.
 Munt (MT-32), libADLMIDI and libOPNMIDI (FM synthesis) and DOSBox Staging are not, and require an archive and licence audit before edition packaging; MT-32 ROMs are the user's own. Debian already supplies a FluidSynth user service. The ORDER 21 table records the configuration and role entries still needed.
-**Being built:** a soundfont synthesizer running as a user service so emulators and games play MIDI out of the box.
+**Implemented and container-tested, awaiting review/publication (ORDER 735):** an idle-closing FluidSynth renderer, per-person font choice, bank-free emulator packages and optional app-center entries. See [MIDI out of the box](references/midi-out-of-the-box.md) for the route, proof boundaries, personal ROM requirements and traps.
 
 ## Bluetooth voice (HFP) and dongles
 

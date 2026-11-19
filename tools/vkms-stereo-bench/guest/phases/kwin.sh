@@ -9,6 +9,8 @@ edid=stereo-test
 cmdline_has bench.sbs_full=1 && edid=stereo-full
 # bench.depth=1: the EDID with every HDMI 1.4a 3D structure, and the depth steps after the others
 cmdline_has bench.depth=1 && edid=stereo-whole
+# bench.edid=NAME: any other EDID in /data (the 2D-only twin made by edid/make-2d-edid.py, for one)
+for w in $(cat /proc/cmdline); do case $w in bench.edid=*) edid=${w#bench.edid=} ;; esac; done
 mkvkms kwin $edid || echo "STEREO|check|configfs/kwin|FAIL|could not create the device"
 mkdir -p /r
 if ! mount -t 9p -o trans=virtio,version=9p2000.L,ro,cache=loose root /r; then

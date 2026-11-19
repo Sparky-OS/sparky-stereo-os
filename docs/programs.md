@@ -55,12 +55,14 @@ The words in quotes are each project's own description of itself; the line after
 
 **CloudCompare**, the point cloud and mesh program: clouds and meshes in 3D, with one Enable 3D choice.
 
+**PyMOL**, the molecule viewer: a molecule in 3D as soon as it opens on a 3D screen.
+
 **Coming:** **OpenSCAD** (*"The Programmers Solid 3D CAD Modeller"*): see your part in 3D before you print it.
 **KiCad**: the circuit board in 3D before it is made.
 **GRASS GIS**: terrain in 3D.
 **Netgen**, the mesh generator: the mesh in 3D with its own stereo option, once its drawing area, a window inside the window, is shown in 3D too.
 
-**Planned:** **PyMOL** and **Jmol**, the molecule viewers: a molecule in 3D with one Enable 3D choice.
+**Planned:** **Jmol**, the molecule viewer: a molecule in 3D with one Enable 3D choice.
 
 ## Play
 

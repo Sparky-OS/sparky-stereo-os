@@ -1279,3 +1279,11 @@ The DOSBox Staging records credit **Patryk Obara**, **kcgen** and **nemo93**, fo
 **John Novak** authored the upstream system-zlib detection fix carried in the edition recipe.
 The **FreeDOS** and **DOSBox Staging** contributors provide the licensed guest utilities, keyboard layouts and screen fonts with their source records.
 **Cristi Mitrana**, **Fabian Greffrath**, **Stephen Kitt**, **David Heidelberg** and the **Debian Games** and **Debian Multimedia** contributors provide the packaging and audit records that informed these decisions.
+
+## SenseGlove: SenseCom and the C++ API (ORDER 40, 2026-11-19)
+
+Names come from each repository's own contributor records (github.com/Adjuvo/SenseCom and github.com/Adjuvo/SenseGlove-API, read on 2026-11-19).
+**SenseGlove B.V.** (the repositories live under the organisation Adjuvo) makes the SenseGlove haptic gloves, **SenseCom** (the program that finds and connects them) and the **SenseGlove C++ API** (SGCore and SGConnect), all under the MIT licence.
+**Max Lammers** is the principal author of both repositories (45 commits on SenseCom and 44 on the API when read), and **Mamadou Babaei** is named as an author in the API's headers and made commits to SenseCom.
+The edition fetches SenseCom 1.9.2 and the API's v22 x86-64 release libraries from SenseGlove's own repositories on the person's machine, unchanged, checked against a pinned SHA-256, and packages the API's headers and example (checked against a pinned SHA-256) as `senseglove-api-dev`; nothing of theirs is rebuilt, modified or mirrored.
+SenseGlove does not endorse the edition.

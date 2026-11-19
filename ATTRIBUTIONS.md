@@ -1246,7 +1246,7 @@ The **Consumer Technology Association**, **International Electrotechnical Commis
 ## Fraqtive's 3D view (ORDER 28)
 
 - **[Fraqtive](https://fraqtive.mimec.org/)** (GPL-3.0-or-later): written by **Michał Męciński** (copyright 2004 to 2015, repository github.com/mimecorg/fraqtive; its icons are based on the KDE Crystal theme by the KDE Artists). **AxeMax** sent the build patches that its master took in 2023 (pull request 6, issue 5). **Chris Tall** published an unmerged Qt 6 port of the program on 2026-06-10 in a fork (commit 55765bc4d0, `QOpenGLWidget` for the 3D view, written for macOS headers), which the search for an existing port found; its way of drawing the view was read, not carried.
-- **Debian's Fraqtive package** is maintained by **Patrick Matthäi** (Debian), whose packaging the candidate builds on.
+- **Debian's Fraqtive package** is maintained by **Patrick Matthäi** (Debian), whose packaging the candidate builds on; ORDER 743 rebuilds it as the edition package `0.4.8.1-1+stereo3d1+lc1` from Debian's own source, unchanged but for the two patches, and ports the program to Qt 6 in a probe only (Chris Tall's unmerged port was not read for it; the port was written from Qt 6's own documentation and compiler errors). The probes build on **Michał Męciński's** program, on the Qt Project's `QOpenGLWidget` stereo target buffers (Qt 6.5) and on Wayland's `wp_viewporter` and `wl_subsurface` as the protocols specify them.
 
 
 ## Spirula Studio and its processing profiles

@@ -412,6 +412,7 @@ The edition's DisplayXR package (ORDER 58, [Sparky-OS/displayxr-packaging](https
 
 **Source**: [mesa3d.org](https://mesa3d.org/) **License**: MIT **What we changed**: OpenGL quad buffer, EGL multiview windows and two-layer Vulkan swapchains become one full side by side picture, declared to KWin; a Vulkan layer does the same over drivers outside Mesa.
 **Credit**: Brian Paul, who started Mesa in 1993, and the Mesa developers.
+The GLX files that patch 0045 (a stereo child is declared once its window is viewable, ORDER 50c) changes are `src/glx/dri_common.c`, `dri_common.h`, `dri3_glx.c` and `drisw_glx.c`; by Mesa's own commit history their main authors are Adam Jackson, Kristian Høgsberg, Mike Blumenkrantz, Emma Anholt, Keith Packard, Marek Olšák, Dave Airlie, Emil Velikov, Ian Romanick, Jeremy Huddleston and Kristóf Ralovich.
 The Kopper test series also carries Mike Blumenkrantz's [Present event-selection correction](https://gitlab.freedesktop.org/mesa/mesa/-/commit/b258e2a051761868734f09774295ee9cee5f7e8d), dated 6 October 2026; it remains outside the package recipe pending integration review.
 
 ### 2.3 NVIDIA's open GPU kernel modules and egl-wayland

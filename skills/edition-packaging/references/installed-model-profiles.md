@@ -99,3 +99,18 @@ The model owner’s legal text remains unmodified; the question, metered warning
   **Fix:** depend on the first integrated version that actually supplies the route, here 0.1.17, and prove apt rejects the predecessor when it is the only candidate.
   Keep entry-specific URI and consent-renderer tools on the application entry, so AppCenter’s own dependency fields stay equal to its predecessor.
   **How found:** the actual store/dependency test and 0.1.16 payload comparison exposed the version collision and two added AppCenter helper dependencies; moving those helpers to Spirula preserved the agreed entry-owned policy.
+
+## Retrying the archive phase and proving the installed successor
+
+- **Symptom:** native compilation is complete, every payload is projected, and the archive transaction removes its outputs at the link/start preflight.
+  **Cause:** a 6 GiB reservation plus the 2 GiB scratch floor exceeds the chosen SSD's free space; a successful link is not yet a qualified package.
+  **Fix:** preserve the authored source and complete linked executables, choose scratch with room for the whole reservation, and resume the committed `debian/rules binary` target with fresh generated runtime and automatic debug staging. Its dry-run sequence must contain no configure/build step. Supply the recipe's `Rules-Requires-Root` value as dpkg-buildpackage normally does; an obsolete `dh --after` flag is not a current resume interface. Finish with `dpkg-genbuildinfo --build=binary`, changes and the normal payload/build-record check. Retain the original host facts for the continuation and compare executable/archive hashes.
+  **How found:** the Spirula archive gate refused an SSD with 6.2 GiB free before its first link test; the root-backed retry passed all 36 runtime link/start checks and 39 payload checks without another compilation.
+- **Symptom:** an installed-proof image exits preparation successfully but its capture cannot find the test user or installed application.
+  **Cause:** Docker commit preserves a base-only environment flag; an early successful exit was mistaken for completed installation.
+  **Fix:** clear preparation-only flags explicitly, require the final package versions, real unprivileged account and empty dpkg audit, and copy a completion marker out before caching the image. Bind the cache identity to both preparation and driver code. A requested predecessor control must appear in the marker; avoid two contradictory values for the same Docker environment name.
+  **How found:** the first Spirula replay failed before D-Bus startup; the corrected image recorded the actual 0.1.16 refusal, 0.1.17 installation and both installed GPU launches.
+- **Symptom:** preserving an older source record fails although most orig archives have the same name and hash.
+  **Cause:** one font orig archive differs; equal version names do not prove equal archive bytes.
+  **Fix:** link an older orig archive to its successor only after SHA256 equality, and retain a full copy whenever bytes differ. Keep the earlier record and its actual source inputs together.
+  **How found:** the current-main Spirula stage replacement found three identical orig archives and one different font archive; it retained the previous 12 MB font archive instead of substituting a same-name file.

@@ -435,3 +435,11 @@ The audit records individual-layer tails separately; those tails are permitted b
 At 1024 by 491 per eye, ordinary installed Vulkan captures without projection tracing cost 46.2–47.0 ms for the two warm AMD fit samples and 14.0 ms for one warm NVIDIA fit sample.
 These samples measure the fit, not whole-application frame rate; GPU, concurrent load and first-use shader compilation affect the result.
 Both ordinary captures had more than 340,000 differing scene pixels and zero differing interface pixels.
+
+## A showcase without diagnostic marks
+
+Use the installed program and edition theme in a full private Plasma session, keeping Daniel's default limits and inactive-window translucency. Focus the model's window, leave About this System readable beside it, and capture the whole compositor pair. A procedural scene needs its generated inputs and credit, not outside media.
+
+Spirula's trace mode paints request/step witnesses into the two eye images. Use that mode to bind the captured scene to both exported projections, then restart the same installed entry without the trace environment and repeat the same initial GUI configuration, geometry and view. Compare every scene pixel outside the witness rectangles before transferring the measured bounds to the normal picture. The Spirula showcase matched those pixels exactly in both eyes.
+
+Keep the original compositor PNG and a marked left-first `.pns`; do not crop private details away. List what both eyes show for Daniel. Measure interface, scene, background window and panel separately. A focused reference and a bare-background reference distinguish inactive-window translucency from a capture fault. On a flat body patch, fitting wallpaper variation with a free colour intercept absorbs the inactive palette: the installed 91% setting measured about 90.89%, with about 0.31 RGB levels of residual error. The focused interface and panel measured 0 px; the unfocused information window +2 px for right minus left.

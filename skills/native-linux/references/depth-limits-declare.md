@@ -33,6 +33,69 @@ The full table of returns is in the library's API.md ("The person's depth limits
 - **One object per surface.** `get_limits` and `watch_limits` follow the surface's depth with the same `kde_stereo_depth_v1` that `stereo_depth_wayland_watch()` makes; the first call creates it, so `get` answers `-ENODATA` until the event is dispatched. The listener is not called for limits already received: read them with `get` right after watching.
 - **Live.** A change of the person's limits reaches the listener (Wayland) or the property event (X11) about 0.3 s after `qdbus6 org.kde.KWin /KWin reconfigure`; the same happens when the output's mode or kind changes or the window moves to another output.
 
+## Several screens: the compositor says which output
+
+A program can receive the correct limits and still be unable to convert them to buffer pixels.
+In staged libstereo-declare 1.11.0, `stereo_depth_wayland_get_buffer_limits(surface, buffer_width, shown_width, &limits)` first reads the surface's limits, then calls the display-wide `stereo_depth_wayland_output_width()`.
+That helper returns `-ENOTUNIQ` when two outputs are advertised, including when the window lies wholly on one of them.
+It leaves the destination untouched.
+Do not choose the first `wl_output`, guess from the window's size, or replace that error with zero limits.
+The compositor owns the surface's output selection; a program reports that it cannot obtain its limits through the layer's problem message.
+
+### Reconcile before a change
+
+1. Read the published KWin source's `debian/patches/series`, apply it to the matching orig archive and inspect `src/wayland/protocols/stereo/kde-stereo-content-v1.xml`.
+   In published KWin +stereo3d59 it is v5, with two fixed-point arguments on `depth_limits`, and no output width.
+   The XML in published plasma-wayland-protocols +stereo3d11 is still v3; the staged 1.11.0 library carries KWin's v5 copy.
+   Editing one copy does not update the others.
+2. Follow `StereoDepthStates::watch`, `scheduleUpdate` and `update` in `src/scene/stereodepthstates.cpp`.
+   They react to the window's geometry and output, settings and backend-output changes, then take both limits from `window->output()` and deliver them to every followed surface in its tree.
+   For a Wayland window, `WaylandWindow::updateGeometry` selects the output at the frame's center through `Workspace::outputAt`.
+3. Follow `SurfaceInterface::setStereoDepthState` and `StereoDepthSurfaceV1::sendState`.
+   A new follower gets cached state; subsequent updates send limits only if the values changed and the resource is new enough.
+   Moving between screens with equal limits sends no new `depth_limits` event in v5.
+4. The repair belongs in a new protocol version: KWin must carry the selected output's pixel width with the matching limits, send the new state on output changes even when the limits are equal, and the library must consume that surface-specific width.
+   Keep the old events and their version guards, and retain `-ENOTUNIQ` for an older compositor that cannot supply the width.
+   This is the pending repair, not functionality in +59 or 1.11.0.
+   The library's one conversion function continues to perform the buffer-pixel conversion; no program adds arithmetic.
+
+### Two-output wire rig
+
+Run only in a disposable container with its own session bus and runtime directory:
+
+```sh
+KWIN_VIRTUAL_STEREO_MODES=1 \
+KWIN_VIRTUAL_OUTPUT_SIZES=1920x1080,1280x800 \
+kwin_wayland --virtual --output-count 2 --socket=proof
+```
+
+Set `WAYLAND_DISPLAY=proof` for clients inside that session.
+Enumerate with `kscreen-doctor -j`, choose each output's listed `stereo3D: 1` mode by its current id, switch both, and read back the selected modes and widths.
+Keep the frame wholly on each output in turn and record its actual output with a KWin script.
+Use `WAYLAND_DEBUG=client` on a mapped xdg toplevel that calls `stereo_depth_wayland_watch_limits` and samples both the raw and buffer-limits getters while reading its Wayland socket.
+A bare surface is insufficient.
+With +59 and 1.11.0, both screens deliver raw 10/4 limits without a physical-size fixture, while the buffer getter returns `-ENOTUNIQ` on both.
+In a fresh one-output session, the same 640-pixel view receives buffer limits 10/4 on the 1920-pixel output.
+Change the test session's settings to 20/8 and reconfigure through its private D-Bus connection; require the changed event, then restore 10/4.
+For different per-output values, provide a public test EDID to only one output with `KWIN_VIRTUAL_OUTPUT_EDIDS=,PATH`; verify the physical sizes and the values actually received before judging a move.
+This checks the wire and library calls; the application's nearest-point disparity and both-eye pictures require the separate scene run.
+
+### Traps found in ORDER 750e's reconcile
+
+- **Symptom:** raw limits are available, but a scene gets no buffer limits with several screens.
+  **Cause:** v5 identifies neither the chosen output nor its width; 1.11.0's width helper deliberately refuses an ambiguous display-wide answer.
+  **Fix:** carry the compositor-selected output width with its limits in the next protocol version, then use it in the shared library.
+  **How found:** a mapped client on published +59, moved between 1920- and 1280-pixel virtual outputs, returned `-ENOTUNIQ` on both; the same call succeeded with one output.
+  The engine repair and the scene's image-based red and green remain to be run.
+- **Symptom:** moving to another output produces no new limits event.
+  **Cause:** `sendState` compares only the two limit values, which may be equal on different screens.
+  **Fix:** include the selected output state in the new version's change detection.
+  **How found:** the protocol trace kept one limits event across the move with equal values; an EDID case with different limits did send another event.
+- **Symptom:** `kscreen-doctor` prints "Cannot find output with id" and exits successfully, leaving the 2D mode current.
+  **Cause:** explicitly setting `KSCREEN_BACKEND=KWayland` differs in case from the backend's `name()` value, `kwayland`; `loadBackendInProcess` can replace that backend between getting and setting a configuration, so the output ids no longer match.
+  **Fix:** use `KSCREEN_BACKEND=kwayland`, or leave the selection to the Wayland platform, and require a mode readback.
+  **How found:** the failed readback, followed by the case-sensitive cache comparison in libkscreen's `src/backendmanager.cpp`; the same mode command then applied on both outputs.
+
 ## Traps, symptom first
 
 - **`interface 'kde_stereo_depth_v1' has no event 1` and the connection drops.** KWin sent `depth_limits` (since 5) to an object bound at a lower version. The library binds the lower of the compositor's version and the 5 its protocol copy knows (`STEREO_PROTOCOL_VERSION` in `stereo-declare.c`), so it never expects an event above the bound version. Raise that number only together with the protocol XML in `protocol/`; see `stereo-proof-rig/references/versioned-events.md` for the server side.

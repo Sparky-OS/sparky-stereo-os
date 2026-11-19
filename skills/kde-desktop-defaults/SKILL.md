@@ -32,6 +32,12 @@ A browser or player routed to another GPU can die in its first seconds with noth
 systemd already knows how every program KIO started ended; the Graphics page keeps a death in the problems engine through a drop-in on the `app-` units, with "Use NAME" for the GPU the program's desktop entry can name, and never starts the program again.
 [The recipe, why this place and not the launcher or a wrapper, the window and the traps](references/program-died-at-start.md).
 
+## The Game Mode applet takes plasmashell down
+
+plasmashell dies with SIGSEGV at login in `libplasma-gamemode.so` (Debian's `plasma-gamemode`, the Game Mode applet on the panel): `GamesModel::reload()` ran twice before the first answer and the answers' handlers deleted each other's watchers.
+The edition carries a patch on Debian's source (each answer owns its watcher).
+[The cause, the search, the test that crashes 29 runs in 30 on Debian's source and passes 200 in 200 on the patched one, the real plasmashell session and the traps](references/gamemode-applet-crash.md).
+
 ## Convertibles and small dense panels
 
 A notebook's built-in panel gets its first scale from its real size (125 % at least for a full HD panel of about 13 to 14 inches), a computer with a touch screen of its own gets Plasma Keyboard as its virtual keyboard in the session's language, shown only in tablet mode, and in tablet mode every panel hides by itself and goes back to its own setting afterwards.

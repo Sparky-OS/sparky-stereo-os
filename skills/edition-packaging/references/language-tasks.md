@@ -208,3 +208,27 @@ English needs a task too. Debian's task-english brings locales, ibritish and iam
   **Cause:** its private cgroup tree is read-only.
   **Fix:** use the systemd rig in [shadowed-by-another-archive.md](shadowed-by-another-archive.md), with private writable cgroups, /run tmpfs and no added capability. Mask periodic apt jobs in the rig, not in the package. Prove lock waiting with a real fcntl dpkg frontend lock and capture the unit's finished journal entry.
   **Found by:** systemd's startup diagnostic and the mount options; hand-running the worker would miss hook and unit failures.
+
+## Debian's own tasks at a tasksel transition (ORDER 756)
+
+Symptom first: after an update the journal says `Language support could not be completed: Remv: task-laptop. Check the network and retry the update.`, `sparky-stereo-language-tasks.service` and its path unit are failed, `systemd-analyze` shows the graphical target at 1 min 32 s against 33 s the boot before, and `apt-get -s dist-upgrade` keeps `tasksel` and `tasksel-data` back.
+Seen on the A10 on 2026-11-19, when Debian testing moved tasksel from 3.91 to 3.92.
+
+- **Cause.** Every binary built from the tasksel source (`Source: tasksel`) depends on `tasksel (= its own version)`: task-laptop, task-english, the language tasks and their desktop variants.
+  The edition pins Debian's `task-*` at -1, so a machine that still has them at 3.91 cannot take the 3.92 wrappers and tasksel stays back.
+  The migration allowed only the language wrappers named in each language's `conflicts`; task-laptop is not a language task, so its removal was refused.
+  The message said "check the network" for something that was not the network.
+- **The rule the edition already had.** Debian's tasks are not the edition's (`sparky-stereo-only-ours`: "the edition's tasks are task-sparky-*"; `lists/base-gone.tsv` has task-laptop and task-english); what they brought is kept (do-not-remove-functionality).
+  task-laptop has `Depends: tasksel (= 3.91)` and `Recommends: anacron, bluetooth, powertop, iw, wpasupplicant`; the Recommends were installed as automatic packages, so retiring the task alone would let `apt autoremove` take the laptop tools.
+- **Fix (sparky-stereo-language-tasks 1.0.9).** `debian_tasks()` finds the installed `task-*` packages whose `Source` is tasksel (not `task-sparky-*`); the migration allows apt to remove exactly those the plan removes, marks the installed packages in their Depends and Recommends as manually installed before the install, and says what it retired and kept.
+  Anything else in `Remv` still stops it, and the message names those packages (a new message, ten languages) instead of the network.
+  `languages retry` (run after every dpkg transaction) queues the migration by itself when a Debian task is locked to the installed tasksel and Debian offers a newer one.
+- **Rig.** `debian:testing` by digest, the edition's published tree as a `file:` source with the pins of `sparky-stereo-apt`, the 3.91 `.deb` files of tasksel, tasksel-data, task-laptop, task-english and the three Brazilian Portuguese tasks fetched from snapshot.debian.org by their SHA-1 (`/mr/binary/NAME/3.91/binfiles?fileinfo=1`, then `/file/HASH`, checked and sums recorded), installed with `apt-get install ./*.deb`, their Recommends installed and marked automatic.
+  Then the published upgrade in a container with systemd as PID 1 (`--cgroupns=private --security-opt writable-cgroups=true --tmpfs /run`), judged on `apt-get -s dist-upgrade`, the journal, `systemctl --failed` and the problems engine, and a second case on a machine with no Debian task.
+  The deb-multimedia source must be in the rig: the language tasks need its libdav1d7 and without it the failure is a different one.
+
+Traps:
+
+- **Symptom:** a failed oneshot started by a path unit stays failed with `Result=start-limit-hit`, and the next boot waits for it. **Cause:** `PathExists=` fires again as long as the file exists; the service's `StartLimitBurst=1` turns the second start into a failure, and `WantedBy=multi-user.target` makes the target wait for the whole run. **Fix:** [a queued job that fails must not loop or hold the boot](../../system-housekeeping/references/queued-job-retries-and-holds-the-boot.md).
+- **Symptom:** a rig run fails with `Depends: libdav1d7 ... but it is not going to be installed`. **Cause:** the container lacks deb-multimedia. **Fix:** the keyring from the edition's tree and the source of `sparky-stereo-apt`.
+- **Symptom:** `dpkg-query -W task-sparky-language-pt-br` says no packages found after a migration on a machine with no Brazilian packs. **Cause:** capture selects a language by its unique installed packs unless a retained set exists; read `pending` and `retained.json`. **Found by:** printing both files at the end of the proof.

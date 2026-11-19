@@ -90,13 +90,21 @@ Change the test session's settings to 20/8 and reconfigure through its private D
 For different per-output values, provide a public test EDID to only one output with `KWIN_VIRTUAL_OUTPUT_EDIDS=,PATH`; verify the physical sizes and the values actually received before judging a move.
 This checks the wire and library calls; the application's nearest-point disparity and both-eye pictures require the separate scene run.
 
+### Scene control for an unchanged-size move
+
+Use a fixed saved camera and three identifiable Gaussians: near red at (-0.35, -0.3, -1.5), green at (0, 0, -3) and far blue at (0.35, 0.3, -6), sigma 0.04. The camera is at the origin looking along negative Z, convergence 3 and FOV 90 degrees. Keep the person's private test limits at 10/4 and render each eye at 1920 pixels. With the virtual display factor 1, the nearest red point must reach -4 output pixels on 1920 and -2.666667 on 1280, independent of window width.
+
+Capture both screen eyes as arrays and mark their full side-by-side PNG with sTER. Require a maximized and a half-width window wholly on each output, then move a fixed 640x600 frame 1920 to 1280 to 1920. Record the frame, client and viewport dimensions: all three must retain their sizes during the fixed moves. Select the saved camera only before the sequence; no scene action, resize or forced refresh may hide a stale pair. Require the same camera's fresh one-output max/half scene to match its old-engine control in both eyes. Compare the central scene region, excluding dynamic timing glyphs and the flat orientation gizmo; never edit the captured pixels.
+
+The fixture's dominant red weights give a subpixel centroid in each eye. Measure right minus left, require the red Gaussian to be present in both arrays and use a fixed 0.03 px horizontal and vertical tolerance. Also retain the full arrays, wire log, actual output/mode readback, process library mappings and installed package versions. Run the installed Vulkan and CUDA backends separately; a shared source correction alone does not prove either binary.
+
 ### Traps found in ORDER 750e's reconcile
 
 - **Symptom:** raw limits are available, but a scene gets no buffer limits with several screens.
   **Cause:** v5 identifies neither the chosen output nor its width; 1.11.0's width helper deliberately refuses an ambiguous display-wide answer.
   **Fix:** carry the compositor-selected output width with its limits in the next protocol version, then use it in the shared library.
   **How found:** a mapped client on published +59, moved between 1920- and 1280-pixel virtual outputs, returned `-ENOTUNIQ` on both; the same call succeeded with one output.
-  The staged Spirula +stereo3d5 red scene also measured zero disparity on both screens in full and half windows; its one-screen control measured -3.984716 and -3.989684 px against -4 px. Its existing localized message says the limits were not received and the two pictures are identical, so this repair does not change the program.
+  The staged Spirula +stereo3d5 red scene also measured zero disparity on both screens in full and half windows; its one-screen control measured -3.984716 and -3.989684 px against -4 px. Its existing localized message says the limits were not received and the two pictures are identical, so no new problem message is needed. The separate fixed-size move below exposes a program cache fault.
 - **Symptom:** moving to another output produces no new limits event.
   **Cause:** `sendState` compares only the two limit values, which may be equal on different screens.
   **Fix:** include the selected output state in the new version's change detection.

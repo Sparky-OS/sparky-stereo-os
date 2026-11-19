@@ -1,0 +1,1 @@
+[{"op": "apply", "state": {"devices": {"alsa_output.rig_pcm16": {"bitPerfect": true}}}, "what": "device:alsa_output.rig_pcm16"}, {"op": "apply", "state": {}, "what": "device:alsa_output.rig_pcm16"}]

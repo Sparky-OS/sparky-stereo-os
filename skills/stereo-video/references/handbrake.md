@@ -122,8 +122,16 @@ Package preservation, the x265 mapping, SEI-only scan and stereo preview remain 
 
 ## Shared-library working steps (ORDER 742)
 
-The edition x265 successor imports PR #986's three merged commits (1cf669dfd8a4917a08f381012fd659a0869251d3, 143a263b2ee74866af04783f814bd1245d5a5413, 5143a2a00ad0cc600831654a248b96ec7307eb4a), plus HandBrake's ambient-viewing, Dolby RPU and other library fixes. The extra ambient API uses a separate SONAME; retain the old library for existing consumers and rebuild FFmpeg and HandBrake against the new development package. Check each actual bit depth, not only the default API.
+The edition x265 successor imports PR #986's three merged commits (1cf669dfd8a4917a08f381012fd659a0869251d3, 143a263b2ee74866af04783f814bd1245d5a5413, 5143a2a00ad0cc600831654a248b96ec7307eb4a), plus HandBrake's ambient-viewing, Dolby RPU and other library fixes. The final source assigns the extra ambient API SONAME 30219 (upstream master already uses 219 without these fields); retain the old library for existing consumers and rebuild FFmpeg and HandBrake against the new development package. Check each actual bit depth, not only the default API.
 
-Measured at this working step: nine of nine x265 encodes (arrangements 3, 4 and 5 at 8, 10 and 12 bits) decoded with their expected AVStereo3D type. Both the x265 and x264 successor package sets passed the edition's archive-qualified link gate and release checks. This does not yet qualify HandBrake's output or the preview.
+Measured on the superseded ABI 219 prototype: nine of nine x265 encodes (arrangements 3, 4 and 5 at 8, 10 and 12 bits) decoded with their expected AVStereo3D type. Both the x265 and x264 successor package sets passed the edition's archive-qualified link gate and release checks. ABI 30219 is prepared as source only and is not binary-tested. These measurements do not qualify HandBrake's output or the preview.
 
 A decoded-frame `ffprobe -show_frames` side-data entry may name Stereo 3D without printing its type. For an exact arrangement readback, decode independently with libavcodec and inspect AVStereo3D; the lane's read-stereo-frames.c does that. Presence alone is not proof of the right arrangement.
+
+## Preserving features across the shared-library boundary
+
+Symptom: the installed HandBrake offers `fdk_aac` and `fdk_haac`, while the shared build would omit them. Cause: `libhb/common.c` tests `avcodec_find_encoder_by_name("libfdk_aac")`; these choices come through FFmpeg, not from simply linking `-lfdk-aac` or passing HandBrake's `--enable-fdk-aac`. The edition FFmpeg deliberately excludes that encoder from shipped packages and has a separate local-build profile. The required-encoder gate measured it absent from both published +15 and compiled +16. No shared HandBrake package was built or accepted with those choices removed. This boundary remains unresolved; do not describe configure flags as proof that features survived.
+
+The recipe is `sparky-os/packages/handbrake-dmo/` in the ORDER 742 build bundle; `check-required-encoders.py` reports the actual loaded libavcodec path and required encoder availability before building. The 62-row contrib audit is source evidence, not full runtime equivalence. Upstream offer branches are English only and remain unbuilt drafts.
+
+The GTK layer prototype supplies the existing 27 input choices through the C policy and file store, plus a native eye-texture area. It compiles, and a protocol trace declares only its media subsurface. It has not been integrated into either HandBrake preview path or visually qualified. Device-free KWin selects QPainter and cancels ScreenShot2; the existing proof-rig lesson requires an authorized render node for the capture. A declaration trace is not both-eye proof.

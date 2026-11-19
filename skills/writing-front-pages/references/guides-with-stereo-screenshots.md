@@ -56,3 +56,21 @@ A site that answers an automated request with a refusal is not worked around.
   The GUI check selected Current Monitor with `-m` and saved with Ctrl+S; it did not exercise the GUI capture-mode selector.
 - **Symptom:** Pillow warns "Image appears to be a malformed MPO file" when it opens a JPEG taken out of an MPO. **Cause:** the extracted picture still holds the MPF segment. **Fix:** harmless; the file written by Align stereo pair has two frames.
 - A privacy pass on every capture: window titles and breadcrumbs show only the rig's own folders; strip anything else, and never put location data in a committed photo.
+
+## Continuing the proof with digiKam and Plasma
+
+- **Seed a collection instead of accepting a first-run assistant as the program.**
+  Follow [driving digiKam with a collection](../../stereo-pictures/references/joining-the-per-file-choice.md#driving-digikam-with-a-collection-in-the-rig).
+  Prove the album preview, light table and slide show separately; a positional file argument opens another preview window and establishes none of those three.
+  The published +stereo3d5 package showed the labelled left and right eyes in all three views.
+  Its album-grid thumbnails showed the left view in both eyes; keep that as work in digiKam's item view, never as a guide limitation.
+- **Bound a flat control to the window it tests.**
+  In a light table with two populated panes, Enable 3D acts on the focused pane; switch both panes off.
+  An inactive main window remains visible behind the light table at sunk depth, so whole-screen eye equality is the wrong expectation.
+  The foreground's opaque body and both photo areas measured zero differing pixels after the two switches; album preview and full-screen slide show measured zero over the whole capture.
+  The labelled photo and the terrain sample stayed byte-identical to their source files.
+- **Use the output verb, not the help text, to test anaglyph.**
+  In a real Plasma rig, `kscreen-doctor output.Virtual-0.anaglyph.enable` changed the serialized output's `anaglyph` from false to true.
+  Selecting its mode 4, the twin whose `stereo3D` is 5, changed `currentModeId` from 1 to 4; System Settings showed `(anaglyph, modern screens)` in Resolution.
+  Mode IDs are local to that output: read the list before choosing one.
+  This checks the state and selection on a virtual output, not physical scanout or the GUI checkbox.

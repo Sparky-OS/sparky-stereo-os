@@ -1213,3 +1213,13 @@ The lab joins rigs that other work made and credits their authors, from the entr
 - **SDL** (zlib): Sam Lantinga and the SDL contributors; Tomasz Pakuła wrote the EV_BTN kernel series and the SDL pull request that the input row exercises.
 - **BusyBox** (GPL-2.0): Erik Andersen, Denys Vlasenko and the BusyBox developers, whose static build is the guests' userland.
 - **Debian** (the stock side of every row): the Debian kernel, KWin, Mesa, PipeWire and SDL maintainers; the CTA-861 audio data blocks the HDMI audio row builds its fixture from are the Consumer Technology Association's.
+
+## Audio suite, ORDER 21
+
+PipeWire and WirePlumber remain the audio engine and policy, by **Wim Taymans**, **George Kiagiadakis** and their contributors. **Dmitry Sharshakov** contributed PipeWire's SOFA spatializer ([merged change](https://gitlab.freedesktop.org/pipewire/pipewire/-/merge_requests/1497)). PipeWire's authors supply the filter-chain nodes, PSD upmix and HeSuVi channel mapping. **Steve Davies** wrote the passive MPlayer matrix-surround decoder whose coefficients and delay inform this optional graph ([source notice](https://github.com/pigoz/mplayer-svn/blob/master/libaf/af_surround.c)).
+
+**Bill Gardner** and **Keith Martin**, MIT Media Laboratory, made the 1994 [KEMAR measurements](https://sound.media.mit.edu/resources/KEMAR.html). **Christian Hoene** and the [libmysofa contributors](https://github.com/hoene/libmysofa) provide the SOFA reader; its resampling credits include **Jean-Marc Valin** and **Thorvald Natvig**. The package uses Debian's supplied response rather than claiming those measurements as its own.
+
+The alternative sets audited, not supplied here, are SADIE II by **Cal Armstrong**, **Lewis Thresh** and **Gavin Kearney**, with **Damian Murphy** on its database publication ([University of York](https://www.york.ac.uk/sadie-project/database.html)); ARI by the Acoustics Research Institute, Austrian Academy of Sciences, including **Piotr Majdak**, **Michael J. Goupell** and **Bernhard Laback** ([database](https://www.oeaw.ac.at/en/ari/outreach/software/hrtf-database)); and IRCAM LISTEN, the IRCAM and AKG measurement teams, including **Olivier Warusfel** ([project](http://recherche.ircam.fr/equipes/salles/listen/)).
+
+The **Consumer Technology Association**, **International Electrotechnical Commission**, **Audio Engineering Society** and **International Telecommunication Union** maintain CTA-861, IEC 60958/61937, AES69 and ITU-R BS.775. Naming a standard here credits its authors; it does not assert conformance to an unread normative text.

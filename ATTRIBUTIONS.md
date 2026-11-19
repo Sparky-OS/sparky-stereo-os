@@ -1248,3 +1248,9 @@ The **Consumer Technology Association**, **International Electrotechnical Commis
 - **[Fraqtive](https://fraqtive.mimec.org/)** (GPL-3.0-or-later): written by **Michał Męciński** (copyright 2004 to 2015, repository github.com/mimecorg/fraqtive; its icons are based on the KDE Crystal theme by the KDE Artists). **AxeMax** sent the build patches that its master took in 2023 (pull request 6, issue 5). **Chris Tall** published an unmerged Qt 6 port of the program on 2026-06-10 in a fork (commit 55765bc4d0, `QOpenGLWidget` for the 3D view, written for macOS headers), which the search for an existing port found; its way of drawing the view was read, not carried.
 - **Debian's Fraqtive package** is maintained by **Patrick Matthäi** (Debian), whose packaging the candidate builds on.
 
+
+## Spirula Studio and its processing profiles
+
+Harry Chen and the Spirula Studio contributors.
+Omar Cornut, Marcus Geelnard, Camilla Löwy, Duane Merrill, NVIDIA, Rich Geldreich, RAD Game Tools, Valve Software, Tenacious Software, Sean Barrett, Leon Merten Lohse, The Regents of the University of Michigan, Adobe and Google.
+Meta, IDEA Research, ZhengPeng, Zhao Xiaoming, Johan Edstedt, Computer Vision and Geometry Lab, Wei Yin, Mu Hu, Microsoft, HUAWEI Bayer Lab, Qwen, Richard Zhang, Phillip Isola, Alexei A. Efros, Eli Shechtman, Oliver Wang and Soumith Chintala.

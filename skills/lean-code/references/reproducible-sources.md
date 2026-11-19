@@ -52,6 +52,20 @@ To compare with a published or staged source, extract both with `dpkg-source --n
 - **Pick scratch that cannot cross a disk floor.** The runs write 0.3 to 0.6 GB each; `/dev/shm` held them with no disk floor in play. Outputs are small and go into the lane's evidence.
 - **A transition rebuild must keep the preserve plan.** ORDER 427 found the `transition-rebuilds` route writing a +stereo3d2+lc1 source without `debian/sparky-lean-preserve.json`. Not an option problem: `plain-from-lc.py` removes the plan under every option, and the route never gave it back (ORDER 433 fixed the transition route, ORDER 435 every route through `--save-plan` / `--drop-plan` and `--preserve-plan`; see [native source consumers](native-source-consumers.md), "The preserve plan across routes").
 
+- **An external driver normalized the source, but the committed recipe did not.**
+  Symptom: the stage's reconstructed source matched, while the merged build tree's wiring gate refused Spirula's cold path.
+  Cause: the private packaging-only driver normalized immediately before packing; the public recipe omitted it.
+  Fix: both composition paths join at the recipe's own normalize-tree call immediately before dpkg-source -b.
+  Run the merged wiring gate and real source builds from both routes, including clean, under different clocks, zones and umasks.
+  Found by the main session's wiring refusal and reproduced in the isolated rig.
+- **Cold and reuse sources differed only in their original font component.**
+  Symptom: equal font data and Debian tarballs, different orig-fonts and descriptor hashes.
+  Cause: tar metadata inherited 0644 or 0664 from a cache; normalizing debian/ does not normalize an already compressed original component.
+  Fix: emit the already pinned original component metadata explicitly on both routes, preserving its bytes and filename; normalize extracted font inputs to 0644.
+  Compare all original component hashes separately from the Debian tarball.
+  Keep the native-input guard exact; dpkg-source extraction already applies the builder's umask, so no guard exception is needed.
+  Found by comparing tar member modes and hashes in the two real source routes.
+
 ## Commands
 
 ```

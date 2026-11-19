@@ -23,6 +23,7 @@ description: >-
 5. A fix that upstream made on its stable branch after the release a patched package was built on is carried as upstream's own commit, as [carrying a stable-branch fix](references/carrying-upstream-stable-fixes.md) says.
 6. A staged recipe that waited while a shared tool moved is redone on the new main as [rebasing a staged recipe](references/rebasing-a-staged-recipe.md) says.
 7. A package that downloads licensed data during installation follows [licensed data at install time](references/licensed-data-at-install.md): inspect consent, declare the download once, keep the data off the ISO and test refusal and retry.
+   Separately selectable processing weights use [installed model profiles](references/installed-model-profiles.md), with publisher pins, ownership-aware purge and the shared consent route.
 8. Our Plasma workspace takes one more patch from the staged predecessor, with the file-by-file comparison: [one patch on a staged workspace](references/one-patch-successor-of-a-staged-workspace.md).
 8. A development package must install every payload its CMake export needs; use [CMake development dependencies](references/cmake-development-dependencies.md) to check sibling packages with a clean installed consumer.
 9. A family of Rust programs that share their crates is built in one workspace and ships the shared crates once, as Rust dynamic libraries whose names carry their ABI: [a Rust suite as shared libraries](references/rust-suite-shared-libraries.md) has the recipe, the measured sizes and the traps.
@@ -226,6 +227,7 @@ A score is a measurement of the repository, not a gate: some checks (required re
 On a fork, Scorecard mostly measures upstream's code and settings, so a fork's low score is not ours to fix.
 
 For an unmodified vendor release with minisign signatures, [vendor-signed download entries](references/vendor-signed-download-entry.md) records the pinned key, release verification, refusal requirements and the stale local-branch trap.
+For a blank task bar or launcher icon, check [installed application artwork](references/application-icons.md) against the actual theme index and all three visible icon locations.
 
 ## Proof before shipping
 

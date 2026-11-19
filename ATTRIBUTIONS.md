@@ -1179,6 +1179,7 @@ The app center's entry mechanism is **Paweł "pavroo" Pijanowski's** APTus.
 **Genymobile and Romain Vimont** make scrcpy (Apache-2.0), whose camera mode and V4L2 sink are the fully open way.
 The app center's entry mechanism is **Paweł "pavroo" Pijanowski's** APTus.
 **The KDE Connect authors**, among them Aleix Pol i Gonzalez who wrote its virtual monitor plugin, made what the plan for "Use as webcam" builds on.
+The DroidCam OBS plugin is **Dev47Apps'** (the repository's own record lists the same authors as the client); OBS Studio is made by the **OBS Project** and its contributors (the plugin is built against libobs).
 
 ### A theme choice that is stored or refused (ORDER 718)
 

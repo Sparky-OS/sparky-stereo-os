@@ -227,6 +227,7 @@ A score is a measurement of the repository, not a gate: some checks (required re
 On a fork, Scorecard mostly measures upstream's code and settings, so a fork's low score is not ours to fix.
 
 For an unmodified vendor release with minisign signatures, [vendor-signed download entries](references/vendor-signed-download-entry.md) records the pinned key, release verification, refusal requirements and the stale local-branch trap.
+For a blank task bar or launcher icon, check [installed application artwork](references/application-icons.md) against the actual theme index and all three visible icon locations.
 
 ## Proof before shipping
 

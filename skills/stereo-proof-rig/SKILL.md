@@ -74,6 +74,12 @@ For a declared scene that looks flat on a real 3D output, read three things in o
 The last committed buffer decides the layer: halves that differ there and not on the output name the compositor; equal halves there name the program, its toolkit or Mesa, and the plain two-layer Vulkan client `vk2layer` tells Mesa from the toolkit.
 The recipe, the tools (`tools/vkms-stereo-bench/realoutput`) and the traps: [real-output-readback.md](references/real-output-readback.md).
 
+## A 2D source copied onto a 3D target
+
+Reconcile the ordinary 2D source against a 3D mode, an anaglyph twin, the native phone panel and the existing 3D-source copy control.
+Read both actual outputs and count display passes separately from a phone stream's paints: [four-case baseline recipe](references/2d-source-3d-replica.md).
+An attractive ScreenShot2 pair does not prove which eye buffers a replica consumed.
+
 ## A virtual camera without a camera
 
 A page, a player or a portal that lists cameras is proved with no real camera and no kernel module in `scripts/virtual-camera/`:

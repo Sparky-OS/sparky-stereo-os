@@ -4,7 +4,7 @@
  * the DRM master (needs CAP_SYS_ADMIN for the buffer handle, as root in the
  * test guest). Prints the CRTC's mode, its stereo layout and the frame size.
  *
- *   drm-grab CARD OUT.ppm
+ *   drm-grab CARD OUT.ppm [CONNECTOR_ID]
  *
  * The primary plane of the first active CRTC is read through
  * DRM_IOCTL_MODE_GETFB2 and DRM_IOCTL_MODE_MAP_DUMB. RGB formats of 8, 10 and
@@ -197,9 +197,10 @@ int main(int argc, char **argv)
 	uint8_t *pixels, *copy;
 	size_t size;
 	FILE *out;
+	uint32_t selected_crtc = 0;
 
-	if (argc != 3) {
-		fprintf(stderr, "usage: %s CARD OUT.ppm\n", argv[0]);
+	if (argc != 3 && argc != 4) {
+		fprintf(stderr, "usage: %s CARD OUT.ppm [CONNECTOR_ID]\n", argv[0]);
 		return 2;
 	}
 	fd = open(argv[1], O_RDWR | O_CLOEXEC);
@@ -209,6 +210,31 @@ int main(int argc, char **argv)
 	}
 	xioctl(DRM_IOCTL_SET_CLIENT_CAP, &(struct drm_set_client_cap){ DRM_CLIENT_CAP_UNIVERSAL_PLANES, 1 });
 	xioctl(DRM_IOCTL_SET_CLIENT_CAP, &(struct drm_set_client_cap){ DRM_CLIENT_CAP_STEREO_3D, 1 });
+	if (argc == 4) {
+		char *end;
+		unsigned long id;
+		struct drm_mode_get_connector connector = { 0 };
+		struct drm_mode_get_encoder encoder = { 0 };
+
+		errno = 0;
+		id = strtoul(argv[3], &end, 10);
+		if (errno || !argv[3][0] || *end || !id || id > UINT32_MAX) {
+			fprintf(stderr, "invalid connector id: %s\n", argv[3]);
+			return 2;
+		}
+		connector.connector_id = id;
+		if (xioctl(DRM_IOCTL_MODE_GETCONNECTOR, &connector) || !connector.encoder_id) {
+			fprintf(stderr, "connector %lu has no active encoder\n", id);
+			return 1;
+		}
+		encoder.encoder_id = connector.encoder_id;
+		if (xioctl(DRM_IOCTL_MODE_GETENCODER, &encoder) || !encoder.crtc_id) {
+			fprintf(stderr, "connector %lu has no active CRTC\n", id);
+			return 1;
+		}
+		selected_crtc = encoder.crtc_id;
+		printf("connector %lu crtc %u\n", id, selected_crtc);
+	}
 
 	if (xioctl(DRM_IOCTL_MODE_GETRESOURCES, &res) || res.count_crtcs > 8)
 		return 1;
@@ -218,6 +244,8 @@ int main(int argc, char **argv)
 		return 1;
 	for (i = 0; i < res.count_crtcs; i++) {
 		crtc.crtc_id = crtcs[i];
+		if (selected_crtc && crtc.crtc_id != selected_crtc)
+			continue;
 		if (!xioctl(DRM_IOCTL_MODE_GETCRTC, &crtc) && crtc.mode_valid)
 			break;
 	}

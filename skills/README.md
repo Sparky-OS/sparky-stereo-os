@@ -24,6 +24,7 @@ Core skills are `sparky-stereo`, `working-practices`, `ai-partners`, `making-ski
 | Artwork, animated pairs or theme assets | [stereo-artwork](stereo-artwork/SKILL.md) |
 | A test on a real machine or 3D television: baselines, recovery with a person at the bench, power and UPS, unattended labs with LAVA or labgrid | [test-bench](test-bench/SKILL.md) |
 | Proving compositor/application stereo, or why the two eyes differ; a showcase stereo screenshot | [stereo-proof-rig](stereo-proof-rig/SKILL.md) |
+| A 2D source copied onto a 3D target, a replica or a Catch phone monitor | [stereo-proof-rig](stereo-proof-rig/SKILL.md#a-2d-source-copied-onto-a-3d-target) |
 | Kernel/display driver or virtual display modes; the edition kernel's configuration, DKMS modules on a new kernel | [drivers](drivers/SKILL.md), [vkms-stereo](vkms-stereo/SKILL.md) |
 | A USB camera produces no YUYV frames, bulk payloads cross URB boundaries | [drivers](drivers/SKILL.md), its [camera diagnosis and KUnit reference](drivers/references/usb-camera-one-format.md) |
 | A QEMU or SPICE VM viewer and its pointer/mode changes | [stereo-vm](stereo-vm/SKILL.md) |

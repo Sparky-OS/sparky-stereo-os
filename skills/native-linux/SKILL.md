@@ -50,6 +50,11 @@ How Qt Widgets reach the screen (the raster backing store, the RHI composition, 
 
 ## Traps already found
 
+A Catch target is a KWin virtual display, not a declared application window: KRdp's `createPanelStream()` uses screencast v7 `stream_virtual_output_with_properties`, with the panel's pixels, refresh, scale and split-eye flag.
+KWin sets the identity and initial mode before announcing it, gives a split-eye panel two native eye viewports, and retains a plain 2D mode as an explicit alternative.
+KScreen configures its `replicationSource` through the existing output-management path, and the cast follows that panel across replication; the receiving client applies lens distortion.
+The source checked for this path is KRdp 6.7.4 +stereo3d8 and KWin 6.7.4 +stereo3d60; the isolated native-panel frame and the 2D-source baseline are in the [replica proof recipe](../stereo-proof-rig/references/2d-source-3d-replica.md).
+
 - **Declare before doubling.** Mesa must declare stereo *before* the window grows to hold both eyes; otherwise KWin takes the resize for a 2D window's.
 - **GLX offers stereo visuals only when KWin announces stereo,** so a program on a plain 2D session sees none, as before.
 - **No `glFinish` is needed, and `GL_BACK` follows the window.** Mesa packs the eyes when the swap flushes, and `GL_BACK` resolves to the drawable's stereo state from any context; a program that drew with a `glFinish` to force the pack can drop it.

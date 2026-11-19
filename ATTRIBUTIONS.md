@@ -1331,3 +1331,13 @@ GLib's module loading and default VFS are **Alexander Larsson**'s (gio/giomodule
 geoclue's main program and web source are **Zeeshan Ali (Khattak)**'s (Red Hat); its static source carries Oracle's copyright.
 libproxy 0.5's config-sysconfig plugin, on the path of the deadlock, is **The Libproxy Team**'s.
 Debian packages GLib as the Debian GNOME Maintainers (uploaders **Jeremy Bícha**, **Marco Trevisan (Treviño)** and **Simon McVittie**) and geoclue as **Laurent Bigonville**.
+
+## A 2D source copied onto a 3D target
+
+Names checked in the projects' packaged sources for the ORDER 763 baseline, 2026-11-19.
+KWin's compositor and workspace scene credit **Lubos Lunak**; its output abstraction and virtual output credit **Roman Gilg**, with **Xaver Hugl** also credited on the DRM virtual output and EGL layer.
+The output screencast source credits **Vlad Zahorodnii**.
+KScreen's output model and output panel credit **Roman Gilg**.
+KRdp's screencasting client and Plasma screencast session credit **Aleix Pol Gonzalez**, also credited on the screencast protocol.
+The edition's replica copy, native panel integration and declaration teardown fix are **Daniel Campos Ramos**'s work.
+The PipeWire stream API used by the isolated receiving fixture credits **Wim Taymans**.

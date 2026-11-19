@@ -18,7 +18,7 @@ ffmpeg -f lavfi -i "testsrc2=size=640x360:rate=25,drawtext=text='L':fontcolor=wh
 - H.264 SEI: `-x264-params frame-packing=3` (side by side) or `=4` (top and bottom). The `stereo3d` filter's metadata does not reach x264 on its own; the x264 option is what writes the frame packing SEI (payload type 45).
 - Matroska StereoMode: `mkvmerge -q -o out.mkv --stereo-mode "0:side_by_side_left_first" in.mkv` (values `mono`, `side_by_side_left_first`, `top_bottom_left_first`, …, one per StereoMode number).
 - MP4 `st3d`: has no direct writer in FFmpeg 9.0's muxer options, so remux a StereoMode-marked Matroska with `ffmpeg -i in.mkv -map 0:v -c copy -movflags +faststart out.mp4`; the demuxer's coded side data becomes the muxer's `st3d` box (movenc.c `mov_write_st3d_tag`).
-- HEVC SEI: the x265 in this HandBrake has no frame-packing option, so there is no encoder route. Build the payload natively per H.265 D.2.2 (payloadType 45, syntax order: id ue, cancel u1, arrangement type u7 — 3 is side by side, 4 top and bottom —, quincunx u1, content_interpretation_type u6 = 1, then the display/self-contained flags; the H.264 tail order differs, do not reuse its writer) and splice the prefix SEI NAL into the Annex B stream before the first VCL NAL with a small Python injector (the lane's `evidence/inject-hevc-sei.py`).
+- HEVC SEI: the x265 in this HandBrake has no frame-packing option, so there is no encoder route. Build the payload natively per H.265 D.2.2 (payloadType 45, syntax order: id ue, cancel u1, arrangement type u7: 3 is side by side, 4 top and bottom , , quincunx u1, content_interpretation_type u6 = 1, then the display/self-contained flags; the H.264 tail order differs, do not reuse its writer) and splice the prefix SEI NAL into the Annex B stream before the first VCL NAL with a small Python injector (the lane's `evidence/inject-hevc-sei.py`).
 - Always include a plain 2D control file with no mark at all; a read that finds a mark in the control is reading something else.
 
 Verify every sample before trusting any downstream result:
@@ -33,8 +33,8 @@ d=$(grep -abo st3d file.mp4 | head -1 | cut -d: -f1); dd if=file.mp4 bs=1 skip=$
 ## Reading HandBrake's scan and outputs
 
 `HandBrakeCLI --scan --json -i sample` prints one JSON document.
-On 1.11.2 the scan of a stereo file has no Stereo3D key at all — every 3D mark is invisible to it.
-On master, 1d2087644 ("libhb: preserve the stereo 3d metadata") reads `AVStereo3D` from the demuxer's coded side data (libhb/stream.c:6149-6153, coded side data only — frame-level SEI is never decoded at scan) and reports it in the scan JSON (libhb/hb_json.c:399-412); the enum crosses FFmpeg's boundary by a straight field copy (libhb/hbffmpeg.c:726-745 `hb_stereo_3d_ff_to_hb`, numerically identical enums).
+On 1.11.2 the scan of a stereo file has no Stereo3D key at all: every 3D mark is invisible to it.
+On master, 1d2087644 ("libhb: preserve the stereo 3d metadata") reads `AVStereo3D` from the demuxer's coded side data (libhb/stream.c:6149-6153, coded side data only: frame-level SEI is never decoded at scan) and reports it in the scan JSON (libhb/hb_json.c:399-412); the enum crosses FFmpeg's boundary by a straight field copy (libhb/hbffmpeg.c:726-745 `hb_stereo_3d_ff_to_hb`, numerically identical enums).
 
 For the outputs, re-encode every sample to x264 and to x265, into Matroska and into MP4, and read each output back with the same three tools above (SEI via frame side data after decode, StereoMode via mkvinfo, `st3d` via the byte scan).
 The lane's loop and table are `evidence/readback3.sh` and `evidence/survival-table-1.11.2.txt`.
@@ -47,17 +47,17 @@ The 2D control stays correctly unmarked in all four of its outputs.
 
 Upstream master of 2026-11-18 differs by exactly two commits, and a master-level build would instead:
 
-- read container marks and the pre-muxed SEI's coded side data at scan (stream.c:6149-6153) and report Stereo3D in JSON (hb_json.c:399-412) — but not a frame-level-SEI-only source, which scans as plain 2D with no notice;
+- read container marks and the pre-muxed SEI's coded side data at scan (stream.c:6149-6153) and report Stereo3D in JSON (hb_json.c:399-412): but not a frame-level-SEI-only source, which scans as plain 2D with no notice;
 - write Matroska StereoMode / MP4 `st3d` on every encoder/container pair, by attaching `AV_PKT_DATA_STEREO3D` coded side data at the mux (libhb/muxavformat.c:674-686);
 - write the H.264 frame packing SEI on x264 encodes of marked sources (libhb/encx264.c:404-414, our PR #8100, mapping to `i_frame_packing` 3/4; SBS and TAB only);
-- still write no SEI for x265 — HandBrake's encx265.c has no mapping. x265 itself gained `--frame-packing` on 2026-10-28 (multicoreware commit 1cf669d, closing issue #970, via PR #986), so the remaining gap is HandBrake's side of the call.
+- still write no SEI for x265: HandBrake's encx265.c has no mapping. x265 itself gained `--frame-packing` on 2026-10-28 (multicoreware commit 1cf669d, closing issue #970, via PR #986), so the remaining gap is HandBrake's side of the call.
 
 The per-mark matrix (every H.264 and HEVC arrangement type 0-6, Matroska StereoMode 0-14, `st3d` types 0/1/2, `sv3d`) is in the lane's `evidence/marks-table.md`; its anaglyph StereoModes 10/12 have no `AVStereo3D` value in FFmpeg 9.0 (matroska.h STEREOMODE_STEREO3D_MAPPING), and `mov_write_st3d_tag` warns and skips anything but 2D/TAB/SBS.
 
 ## The preview's path (master GTK 4 front end, read-only, nothing built)
 
 The summary preview draws one decoded still: `gtk/src/preview.c` drives the decode and hands the frame to a GtkPicture widget (`gtk/src/hb-backend.c` `hb_backend_video_frame` / the scanlib title decode), so the surface is an ordinary GTK texture, one flat picture, with no notion of eye packing.
-The stereo layout is available at the seam where the still is produced — the same `hb_title_t` Stereo3D fields the scan JSON already serializes (hb_json.c:399-412) — before the frame reaches preview.c.
+The stereo layout is available at the seam where the still is produced: the same `hb_title_t` Stereo3D fields the scan JSON already serializes (hb_json.c:399-412): before the frame reaches preview.c.
 What step 2 needs there: decode any packing, rearrange to full side by side, present the 1280-wide surface, and declare it once to KWin per the house contract (flat as the opt-out). How a GTK 4 application declares a stereo surface from its own process is an open step-2 question.
 
 ## Traps met on the way
@@ -68,4 +68,3 @@ What step 2 needs there: decode any packing, rearrange to full side by side, pre
 - **Master's scan is blind to SEI-only sources.** Symptom (source-verified): a stream whose only mark is the frame packing SEI reports no Stereo3D in `--scan --json`. Cause: stream.c:6149-6153 reads coded side data only; the scan never decodes a frame. Fix for step 2: during scan, decode a few frames and harvest frame-level side data. Found by reading the scan path after container-marked sources did report.
 - **`st3d` sits eight bytes past its atom type.** Symptom: reading the byte at the `grep -abo st3d` offset gives the ASCII "s". Cause: the atom's size (4) and type (4) precede the payload. Fix: `skip=$((offset+8))`. Found on the first byte read.
 
-The lane's full report (with the 36-row table, the scan JSONs, and the file:line chain) is `/K3D/partners/queue/handbrake-stereo-36/REPORT.md` + `evidence/`; nothing was sent upstream — the note to HandBrake is Daniel's.

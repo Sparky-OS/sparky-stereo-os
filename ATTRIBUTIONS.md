@@ -1342,3 +1342,12 @@ The libkscreen configuration operations used by the isolated controller credit *
 KRdp's screencasting client and Plasma screencast session credit **Aleix Pol Gonzalez**, also credited on the screencast protocol.
 The edition's replica copy, native panel integration and declaration teardown fix are **Daniel Campos Ramos**'s work.
 The PipeWire stream API used by the isolated receiving fixture credits **Wim Taymans**.
+
+## Surface depth limits across outputs (ORDER 750e, reconcile)
+
+The names below come from the published KWin +stereo3d59 source's SPDX notices, the stereo protocol's own copyright and libkscreen's source notices, read on 2026-11-19.
+**Daniel Campos Ramos** wrote the stereo content protocol, the declaration library and the compositor's surface-depth exchange.
+The KWin surfaces, window geometry, workspace selection and output types credit **Martin Gräßlin**, **Martin Flöser**, **Vlad Zahorodnii**, **David Edmundson**, **Matthias Ettrich**, **Lubos Lunak**, **Natalie Clarius** and **Roman Gilg**.
+The libkscreen backend and its selection machinery credit **Alejandro Fiestas Olivares**, **Daniel Vrátil**, **Sebastian Kügler** and **Méven Car**.
+The installed stable xdg-shell protocol credits **Kristian Høgsberg**, **Rafael Antognolli**, **Jasper St. Pierre**, **Intel Corporation**, **Samsung Electronics** and **Red Hat**; viewporter credits **Collabora**.
+These credits identify the source foundations used in the reconcile and its isolated virtual-output probe; they do not imply endorsement.

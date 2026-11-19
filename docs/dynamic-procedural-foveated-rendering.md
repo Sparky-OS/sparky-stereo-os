@@ -3,6 +3,8 @@
 **For people building spatial worlds and stereo renderers:** surface detail that adapts to where a person looks and to the device drawing it.
 **Status:** a proposal combining established techniques, named by Daniel Campos Ramos on 25 October 2026 for his input to [TPAC 2026 breakout #40](https://github.com/w3c/tpac2026-breakouts/issues/40).
 This page describes the idea and its requirements; it does not report an implemented or measured DPFR path in Sparky Stereo OS.
+**Try it:** [Dynamic Procedural Texture Rendering, a demo](https://w3c-cg.github.io/pm-kr/demos/procedural-texture-rendering/) runs in a browser and shows the base of this idea, the layers without the foveation: a 3D scene that is usable from 15 KB of procedures while its photographs are still downloading.
+It is Daniel's individual input, kept in the [W3C PM-KR Community Group's repository](https://github.com/w3c-cg/pm-kr/tree/main/demos/procedural-texture-rendering).
 
 ## What it means
 

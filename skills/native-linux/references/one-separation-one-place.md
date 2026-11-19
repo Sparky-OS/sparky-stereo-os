@@ -34,3 +34,12 @@ Render resolution is the other row: a buffer rendered at half the size it is sho
 - What other programs of the kind do when their window is resized, read at their source on 2026-11-19: see the lane's REPORT (upstream F3D's `render.stereo_eye_angle`, CloudCompare's `eyeSeparation_mm * scale` with scale from the convergence distance, neither reads the window's size).
 
 Wayland: the library cannot tell which output a toolkit surface entered; Stereo KWin sending the output width with `depth_limits` (a protocol 6 field) would remove the last special case.
+
+## Fraqtive (ORDER 750, +stereo3d3): the proof of a view at three sizes and two render resolutions
+
+A Qt 6 program with a declared 3D view: one fresh Stereo KWin session on a 1280x800 virtual output per row, `QT_QPA_PLATFORM=wayland`, the window maximized, or unmaximized at 640 wide (`w.setMaximize(false, false); w.frameGeometry = {...}` through `kwin_script.py`), Enable 3D by key, `capture.py` for both eyes, `eyes.py` for the disparity in the view's rectangle (right minus left, positive behind the screen), once more with `--swap` for the sign.
+Measured on the output (percentiles of the block matches, px): the +stereo3d2 package shows the far side at +1.44 in the 968 px view and +0.50 in the 328 px view; +stereo3d3 shows +1.99 in both, +2.06 and +2.08 at 50 % render resolution; the swapped reading flips every sign.
+The limits Fraqtive's log prints at 1280 px: popped 2.667 and sunk 6.667 in the buffer at 100 %, half that at 50 % (the buffer is shown at twice its size), whatever the window.
+- **Symptom:** the 50 % row changes nothing. **Cause:** the option is read from `$XDG_DATA_HOME/fraqtive/config.dat`, a `QDataStream` at version Qt_4_2 holding a qint32 2 and a QVariantMap, not from QSettings; a file written with the current stream version is ignored. **Fix:** write it with `setVersion(Qt_4_2)` and the leading 2.
+- **Symptom:** the 640 px row is the same as the full one. **Cause:** a new window opens maximized in a virtual session. **Fix:** unmaximize before setting the geometry; the window then opens centred, so find the view's rectangle in the capture before measuring.
+- **Symptom:** `apt-get install` picks Debian's package over the staged one. **Cause:** the flat repository's Release has no `Origin: Sparky Stereo OS`, so the 1001 pin does not apply. **Fix:** `apt-ftparchive -o APT::FTPArchive::Release::Origin="Sparky Stereo OS" release .`, made by the same user that owns the folder.

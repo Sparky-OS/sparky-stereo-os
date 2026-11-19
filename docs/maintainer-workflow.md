@@ -1,6 +1,7 @@
 # A working guide for distribution maintainers
 
 **For people building, testing and packaging Sparky Stereo OS:** the same instructions and checks are usable by hand or with a local or hosted AI partner.
+The decisions these steps serve are on one page: [How we work here](how-we-work.md).
 
 ## Choose the role
 

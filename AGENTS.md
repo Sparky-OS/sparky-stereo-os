@@ -25,6 +25,7 @@ Public messages and submissions need the responsible maintainer's authorization 
 
 ## Distribution maintenance
 
+[How we work here](docs/how-we-work.md) lists the decisions behind every package, each with the skill that carries its recipe; read it before proposing a change of direction.
 [Maintainer workflow](docs/maintainer-workflow.md) covers the `task-sparky-stereo-os-developer` role, the skills package, isolated checks and release handoffs.
 The installed reference tree is `/usr/share/sparky-stereo-os`; its `SOURCE` identifies the snapshot.
 It is documentation, not the writable source checkout. Use a checkout to make changes.

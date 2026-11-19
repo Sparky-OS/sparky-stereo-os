@@ -1,7 +1,7 @@
 import os, sys, io, struct, zlib, importlib.util, importlib.machinery
 from PIL import Image, ImageDraw, ImageFont
-fx=W+'/fx/'
 W=os.environ['WORK']; ALIGN=os.environ['ALIGN_SCRIPT']  # the installed /usr/lib/sparky-stereo/align/align
+fx=W+'/fx/'
 src=open(ALIGN).read()
 src=src.replace('sys.exit(main())','')
 g={'__name__':'alignmod'}; exec(compile(src,'align','exec'),g)

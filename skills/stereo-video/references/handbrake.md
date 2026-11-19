@@ -106,7 +106,7 @@ Inspect HandBrake's ELF `NEEDED` entries, Depends and the source returned by `ap
 The source is `handbrake-dmo`, whose packaging updates an included FFmpeg to 8.0.3.
 The installed executables have no dynamic libavcodec or libx265 dependency.
 Installing a newer system library alone therefore does not establish which encoder or decoder HandBrake uses.
-For the edition successor, retain deb-multimedia's bundled FFmpeg and x265 build route and carry the stereo fixes through it; unbundling would change unrelated encoders. Rerun the marked-source matrix on that package; the Debian study does not qualify the deb-multimedia candidate.
+Daniel's 2026-11-19 decision requires shared edition libraries: “handbreak should use our libraries, not be a snap like or flatpack like thing - if needed, fork a stereo handbreak instead”. Build the Sparky-OS/HandBrake fork on 1.11.2, adapt Debian's shared-library packaging without its ambient-viewing and Dolby Vision removal patches, and retain DMO's three binary names and encoder features. Audit HandBrake's contrib patches against each system library and carry missing library features into that library's edition package. Rerun the marked-source matrix: the Debian study does not qualify the deb-multimedia candidate.
 
 Recheck upstream records through the project's own repository:
 
@@ -119,3 +119,11 @@ Recheck upstream records through the project's own repository:
 
 Package preservation, the x265 mapping, SEI-only scan and stereo preview remain separate build and runtime proofs after this reconciliation.
 
+
+## Shared-library working steps (ORDER 742)
+
+The edition x265 successor imports PR #986's three merged commits (1cf669dfd8a4917a08f381012fd659a0869251d3, 143a263b2ee74866af04783f814bd1245d5a5413, 5143a2a00ad0cc600831654a248b96ec7307eb4a), plus HandBrake's ambient-viewing, Dolby RPU and other library fixes. The extra ambient API uses a separate SONAME; retain the old library for existing consumers and rebuild FFmpeg and HandBrake against the new development package. Check each actual bit depth, not only the default API.
+
+Measured at this working step: nine of nine x265 encodes (arrangements 3, 4 and 5 at 8, 10 and 12 bits) decoded with their expected AVStereo3D type. Both the x265 and x264 successor package sets passed the edition's archive-qualified link gate and release checks. This does not yet qualify HandBrake's output or the preview.
+
+A decoded-frame `ffprobe -show_frames` side-data entry may name Stereo 3D without printing its type. For an exact arrangement readback, decode independently with libavcodec and inspect AVStereo3D; the lane's read-stereo-frames.c does that. Presence alone is not proof of the right arrangement.

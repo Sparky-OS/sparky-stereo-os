@@ -1,0 +1,1 @@
+[{"op": "apply", "state": {"graph": {"rate": 96000, "allowedRates": [44100, 48000, 96000], "quantum": 256}, "quality": 8}, "what": "quality"}, {"op": "dump", "name": "x"}]

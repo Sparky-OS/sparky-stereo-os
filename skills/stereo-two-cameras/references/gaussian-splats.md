@@ -1,8 +1,8 @@
 # Gaussian splats in stereo: what is view-dependent, what a second camera costs, the route to a declared pair
 
 Started in ORDER 501, November 2026, from unchanged Spirula Studio master `b8e15cb8d7f8a2f45ca9b4fea3fa331181433caa`.
-The reference now includes the built ORDER 501 pair, its independent pixel checks and the original monoscopic baseline.
-The implementation is tested privately on the edition fork; it is not a package or an upstream acceptance claim.
+The reference includes the built ORDER 501 pair, its independent pixel checks and the original monoscopic baseline.
+ORDER 750c adds qualified `2026.11.12-1+stereo3d5+lc1` CUDA and Vulkan packages against libstereo-declare 1.11, verified through private installed-package captures.
 
 ## Working recipe
 
@@ -19,7 +19,8 @@ The implementation is tested privately on the edition fork; it is not a package 
 5. Measure an additional unchanged-camera render request before implementing a pair.
    State whether the timing includes readback, transfer, image encoding and presentation; a serial-request measurement is not a stereo frame-rate result.
 6. Make each native viewport its own declared pair below the flat interface.
-   Read the compositor's live depth limits, predict disparities independently, then prove geometry, scale, lifecycle and the no-limits case in the implementation milestone.
+   Read the compositor's live depth limits through libstereo-declare's buffer-limit function, predict disparities independently, then prove geometry, scale, lifecycle and the no-limits case in the implementation milestone.
+   The screen determines the limits; the viewport's width never reduces them (see the small-viewport trap below).
 
 ## Source map
 
@@ -443,3 +444,34 @@ Use the installed program and edition theme in a full private Plasma session, ke
 Spirula's trace mode paints request/step witnesses into the two eye images. Use that mode to bind the captured scene to both exported projections, then restart the same installed entry without the trace environment and repeat the same initial GUI configuration, geometry and view. Compare every scene pixel outside the witness rectangles before transferring the measured bounds to the normal picture. The Spirula showcase matched those pixels exactly in both eyes.
 
 Keep the original compositor PNG and a marked left-first `.pns`; do not crop private details away. List what both eyes show for Daniel. Measure interface, scene, background window and panel separately. A focused reference and a bare-background reference distinguish inactive-window translucency from a capture fault. On a flat body patch, fitting wallpaper variation with a free colour intercept absorbs the inactive palette: the installed 91% setting measured about 90.89%, with about 0.31 RGB levels of residual error. The focused interface and panel measured 0 px; the unfocused information window +2 px for right minus left.
+
+## The scene looks flat in a viewport smaller than the screen
+
+- **Symptom:** the scene looks flat in a viewport smaller than the screen.
+  **Cause:** the accepted camera fit multiplied the person's limits by the viewport's render width over 1920.
+  The limits describe the screen, so a half-width viewport received half the permitted separation.
+  **Fix:** keep the accepted visible-content fit and ask libstereo-declare 1.11 for limits in the buffer's pixels.
+  `NativeViewport::buffer_limits` calls `stereo_depth_wayland_get_buffer_limits` or `stereo_depth_x11_get_buffer_limits`; `CameraPair.h` and `PreviewStereo.cpp` no longer scale by the view's width.
+  The library converts the screen's limits with the output width and the buffer-to-shown ratio, which changes units and adds no depth rule.
+  There is one separation setting in the desktop's depth settings.
+  **How found:** ORDER 750 traced the scale in `camera_offset` and compared the same scene at three viewport widths.
+  ORDER 750c's independent analytic projection check links the staged 1.11 library and compiles once with the predecessor camera header and once with the corrected one.
+  On a 1920-pixel output, viewports 1920, 960 and 480 pixels wide give nearest disparities -4, -2 and -1 pixels before, and -4, -4 and -4 after.
+  The corrected far point remains +2 pixels; the near point binds the popped limit first.
+  All 18 corrected cases pass across 1920/3840 output widths and 0.5/1/2 render-to-shown ratios; reversing the two eye reads reverses the signs.
+  These analytic checks are supplemented by installed predecessor/successor captures in one-output Stereo KWin.
+  On a 1920-pixel output with the same centre camera, focal length, convergence and scene scale, shown widths 1887, 927 and 1081 pixels produce nearest output pixel means -3.93045, -1.93084 and -2.25162 before, then -3.99707, -3.99484 and -3.99548 after.
+  The popped bound sets the fit; the far means remain inside the +10-pixel sunk bound.
+  In the half-width window the contribution within half a pixel of the screen falls from 55.05% to 23.97%.
+  The actual static regression has a fixed 0.01-pixel tolerance; its maximum error is below 0.00517 pixels after presentation filtering.
+  Both native backends were cold built, with lc1, the HR companion, complete provenance and the archive-backed link/start gate.
+  The installed matrix has 58 stereo sessions and 76 captured states: AMD Vulkan, NVIDIA Vulkan and NVIDIA CUDA at all three layouts, with static, active camera motion and advancing training, plus AMD/NVIDIA Vulkan X11 panel controls.
+  All 76 pixel-mean budgets stay inside the screen's [-4,+10] pixels, with zero differing interface pixels.
+  Every captured state has two frame-identity witnesses per eye and retained decoded arrays; actually reversing the eye readings reverses all 228 measured signed feature samples.
+  Maximum feature registration error is 0.06505 pixels horizontally and 0.06204 vertically.
+  The ordinary AMD Vulkan monoscopic control is byte-identical before and after over the complete 1920-by-1080 RGB capture.
+  Individual translucent Gaussian-layer disparities are recorded separately from the accepted opacity-weighted pixel-mean fit.
+  **Separate source finding:** libstereo-declare 1.11's Wayland output-width helper returns `-ENOTUNIQ` when several `wl_output` globals are advertised.
+  Multi-output runtime behavior was not captured in this checkpoint; actual surface-output selection needs its own shared-layer correction and two-output proof.
+  Keep output selection and unit conversion in the shared layer.
+  See [the shared depth-limit API](../../native-linux/references/depth-limits-declare.md) for the screen units.

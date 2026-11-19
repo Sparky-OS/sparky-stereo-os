@@ -227,6 +227,11 @@ Sipeed for NanoKVM, Linaro and the LAVA contributors for LAVA, the labgrid proje
 Network UPS Tools and its contributors.
 Each is quoted from its own pages and licences, checked on 2026-11-04.
 
+## The system test lab
+
+One command runs the virtual rigs (screens in a guest with VKMS, sound with fake devices, input in a guest) twice, on the edition's components and on the stock ones, and writes one report: [the matrix, a row that is red on stock, the traps](references/system-test-lab.md).
+The contributor page is [the system test lab](../../docs/guides/system-test-lab.en.md).
+
 ## Lessons from the lanes, October to November 2026
 
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 11 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (18 entries).

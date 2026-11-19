@@ -7,16 +7,20 @@ Test both before changing any file association.
 ## The candidate packages
 
 ORDER 735 adds `sparky-stereo-midi` beside `sparky-stereo-audio` 0.3.0.
-The former is a small native libfluidsynth/PipeWire renderer; the latter retains the existing audio engine and adds its MIDI command, translations and Debian user-unit override.
+The former is a small native libfluidsynth/PipeWire renderer; the latter retains the existing audio engine and adds its MIDI command, translations and dedicated user unit.
 This is implemented and tested in isolated containers, awaiting edition review and publication.
 Real USB hardware and a real desktop login are separate tests.
 
-Debian's `fluidsynth.service` supplies the existing user-service identity and environment files.
-The override starts `sparky-stereo-audio midi --serve`, retains Type=notify, and requests PipeWire and WirePlumber rather than PulseAudio.
-A vendor dependency of `default.target` starts it at login.
-`systemctl is-enabled` can still print disabled because the dependency is in the vendor unit directory; verify the loaded target's Wants graph as well as the symlink.
-The wrapper sends READY=1 only after the MIDI input has opened and its font has loaded.
+The dedicated `sparky-stereo-midi.service` starts `sparky-stereo-audio midi --serve` using Debian's libfluidsynth directly.
+Debian's CLI package cannot be the minimal dependency: its Qsynth recommendation pulls the 119.6 MB FluidR3 font even when TimGM6mb is already installed.
+An actual APT simulation exposed that chain; the library-backed service avoids it.
+Debian's existing fluidsynth.service remains independent and is not overridden or enabled.
+Turn this service off before selecting another General MIDI daemon.
+The unit uses Type=notify and requests PipeWire and WirePlumber.
+A vendor dependency of default.target starts it at login.
+The wrapper sends READY=1 after the MIDI input has opened and its font has loaded.
 The problems engine stores a startup or rendering failure.
+An offline target-graph check is required; is-enabled alone does not show vendor-directory dependencies.
 
 ALSA programs see a FluidSynth sequencer client called `Sparky General MIDI` when `/dev/snd/seq` is available.
 The package requests `snd_seq` through modules-load on the installed system; a container test never loads a module on the host.
@@ -131,3 +135,8 @@ An offline systemd target-graph check proves dependencies; a direct command/noti
 ## Primary records
 
 [FluidSynth audio rendering](https://www.fluidsynth.org/api/group__audio__rendering.html), [MIDI settings](https://www.fluidsynth.org/api/settings_midi.html), [idle driver request](https://github.com/FluidSynth/fluidsynth/issues/1630), [Debian libADLMIDI ITP](https://bugs.debian.org/1123050), [bank audit](https://github.com/Wohlstand/libADLMIDI/issues/301), [DOSBox Staging ITP](https://bugs.debian.org/973822), [Debian DOSBox maintainer record](https://bugs.debian.org/825604), [upstream system-zlib fix](https://github.com/dosbox-staging/dosbox-staging/commit/482477a6f48ba30520920c0a09732371ba1cd772).
+
+- Symptom: the supposedly small default announces a 120 MB installation despite a TimGM6mb dependency.
+  Cause: Debian fluidsynth recommends Qsynth, which recommends FluidR3 directly.
+  Fix: use Debian libfluidsynth with the small renderer's own user unit; leave the CLI package optional and independent.
+  Found by running the actual app-center APT planner against a healthy fixture package status, including Recommends as the install action does.

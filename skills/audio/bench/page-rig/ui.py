@@ -48,8 +48,12 @@ time.sleep(2)
 for st in steps:
     if st.startswith('snap:'): snap(st[5:])
     elif st.startswith('press:'):
-        n,_,role=st[6:].partition('|'); press(find(n, role or None))
+        parts=st[6:].split('|'); press(find(parts[0], parts[1] if len(parts)>1 and parts[1] else None, int(parts[2]) if len(parts)>2 else 0))
     elif st.startswith('key:'): subprocess.run(['xdotool','key']+st[4:].split(),check=True); time.sleep(1)
+    elif st.startswith('click:'):
+        x,y=st[6:].split(','); subprocess.run(['xdotool','mousemove',x,y,'click','1'],check=True); time.sleep(1.5)
+    elif st.startswith('scroll:'):
+        subprocess.run(['xdotool','mousemove','800','700']); [subprocess.run(['xdotool','click','5']) for _ in range(int(st[7:]))]; time.sleep(1.5)
     elif st=='resize': resize()
     elif st=='wins':
         for w in subprocess.run(['xdotool','search','--name',''],capture_output=True,text=True).stdout.split(): print('WIN',w,subprocess.run(['xdotool','getwindowgeometry',w],capture_output=True,text=True).stdout.replace('\n',' '))

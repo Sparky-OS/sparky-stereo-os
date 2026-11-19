@@ -42,8 +42,8 @@ The October report (a packed frame, no anaglyph, while Qt said `stereoVideo` and
 
 ## Putting a DRM output in a 3D twin without Display Settings
 
-`kscreen-doctor` has no switch for an output's Anaglyph and Other stereo formats toggles.
-Start KWin once, set the plain mode (`kscreen-doctor output.NAME.mode.ID`), stop KWin, then edit `$XDG_CONFIG_HOME/kwinoutputconfig.json`: in the `outputs` section set `"anaglyph": true` (or `"otherStereoFormats": true`) and add to the mode's `flags` `VirtualStereo` (0x20000) and the layout (`Stereo3DAnaglyphModern` 0x200, `Stereo3DSideBySideHalf` 0x20; `src/core/output.h`), with `Preferred` (0x1) cleared; the next KWin restores the twin (`canRestoreVirtualMode`).
+`kscreen-doctor` of libkscreen +stereo3d12 and later has the switches, though `--help` does not list them: `output.NAME.anaglyph.enable` and `output.NAME.otherStereoFormats.enable` (measured by the system test lab, 2026-11-19); then choose the twin's mode by its id.
+Without them (an older libkscreen, or to see the file's route): start KWin once, set the plain mode (`kscreen-doctor output.NAME.mode.ID`), stop KWin, then edit `$XDG_CONFIG_HOME/kwinoutputconfig.json`: in the `outputs` section set `"anaglyph": true` (or `"otherStereoFormats": true`) and add to the mode's `flags` `VirtualStereo` (0x20000) and the layout (`Stereo3DAnaglyphModern` 0x200, `Stereo3DSideBySideHalf` 0x20; `src/core/output.h`), with `Preferred` (0x1) cleared; the next KWin restores the twin (`canRestoreVirtualMode`).
 The side by side twin is the easiest to read: the left half of the frame is the left eye.
 The anaglyph (modern) filter on a scanout of a red left view and a blue right view gives (170, 0, 255); red in both eyes gives (169, 154, 0) and blue in both (111, 0, 255), the two halves of the undeclared control.
 

@@ -9,7 +9,9 @@
  * The primary plane of the first active CRTC is read through
  * DRM_IOCTL_MODE_GETFB2 and DRM_IOCTL_MODE_MAP_DUMB. RGB formats of 8, 10 and
  * 16 bits per channel; the PPM keeps the high 8 bits. The last line printed is
- * the number of pixels that are not black. With the edition's HDMI 3D series it
+ * the number of pixels that are not black. With DRM_GRAB_DEEP=1 in the environment the PPM keeps
+ * the full 16 bits of every channel (maxval 65535, big endian; a 10-bit channel is widened
+ * to bits << 6 | bits >> 4, an 8-bit one to bits * 257), so a ramp can be counted level by level. With the edition's HDMI 3D series it
  * also prints the connectors' "side by side full timing" value and the bytes of
  * their "HDMI 3D metadata" blob.
  */
@@ -49,6 +51,44 @@ static int bits_of(uint32_t format)
 		return 64;
 	}
 	return 0;
+}
+
+/* The 16-bit red, green and blue of pixel x of a row (8-bit channels are widened by v * 257). */
+static void to_rgb16(uint32_t format, const uint8_t *row, unsigned int x, uint16_t rgb[3])
+{
+	uint64_t p = bits_of(format) == 64 ? ((const uint64_t *)row)[x] : ((const uint32_t *)row)[x];
+	uint32_t c[3];
+	int i;
+
+	switch (format) {
+	case DRM_FORMAT_XRGB8888:
+	case DRM_FORMAT_ARGB8888:
+		c[0] = (p >> 16 & 0xff) * 257; c[1] = (p >> 8 & 0xff) * 257; c[2] = (p & 0xff) * 257;
+		break;
+	case DRM_FORMAT_XBGR8888:
+	case DRM_FORMAT_ABGR8888:
+		c[0] = (p & 0xff) * 257; c[1] = (p >> 8 & 0xff) * 257; c[2] = (p >> 16 & 0xff) * 257;
+		break;
+	case DRM_FORMAT_XRGB2101010:
+	case DRM_FORMAT_ARGB2101010:
+		c[0] = p >> 20 & 0x3ff; c[1] = p >> 10 & 0x3ff; c[2] = p & 0x3ff;
+		for (i = 0; i < 3; i++) c[i] = c[i] << 6 | c[i] >> 4;
+		break;
+	case DRM_FORMAT_XBGR2101010:
+	case DRM_FORMAT_ABGR2101010:
+		c[0] = p & 0x3ff; c[1] = p >> 10 & 0x3ff; c[2] = p >> 20 & 0x3ff;
+		for (i = 0; i < 3; i++) c[i] = c[i] << 6 | c[i] >> 4;
+		break;
+	case DRM_FORMAT_XRGB16161616:
+	case DRM_FORMAT_ARGB16161616:
+		c[0] = p >> 32 & 0xffff; c[1] = p >> 16 & 0xffff; c[2] = p & 0xffff;
+		break;
+	default:	/* XBGR16161616, ABGR16161616 */
+		c[0] = p & 0xffff; c[1] = p >> 16 & 0xffff; c[2] = p >> 32 & 0xffff;
+		break;
+	}
+	for (i = 0; i < 3; i++)
+		rgb[i] = c[i];
 }
 
 /* The 8-bit red, green and blue of pixel x of a row (the high bits of each channel). */
@@ -248,6 +288,22 @@ int main(int argc, char **argv)
 		perror(argv[2]);
 		return 1;
 	}
+	if (getenv("DRM_GRAB_DEEP") && getenv("DRM_GRAB_DEEP")[0] == '1') {
+		fprintf(out, "P6\n%u %u\n65535\n", fb.width, fb.height);
+		for (y = 0; y < fb.height; y++) {
+			const uint8_t *row = pixels + fb.offsets[0] + (size_t)y * fb.pitches[0];
+
+			for (x = 0; x < fb.width; x++) {
+				uint16_t v[3];
+				uint8_t be[6];
+
+				to_rgb16(fb.pixel_format, row, x, v);
+				be[0] = v[0] >> 8; be[1] = v[0]; be[2] = v[1] >> 8; be[3] = v[1]; be[4] = v[2] >> 8; be[5] = v[2];
+				fwrite(be, 1, 6, out);
+				nonblack += v[0] || v[1] || v[2];
+			}
+		}
+	} else {
 	fprintf(out, "P6\n%u %u\n255\n", fb.width, fb.height);
 	for (y = 0; y < fb.height; y++) {
 		const uint8_t *row = pixels + fb.offsets[0] + (size_t)y * fb.pitches[0];
@@ -259,6 +315,7 @@ int main(int argc, char **argv)
 			fwrite(rgb, 1, 3, out);
 			nonblack += rgb[0] || rgb[1] || rgb[2];
 		}
+	}
 	}
 	fclose(out);
 	printf("saved %s\nnonblack %lu\n", argv[2], nonblack);

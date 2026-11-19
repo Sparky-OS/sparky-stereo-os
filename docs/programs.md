@@ -51,10 +51,31 @@ The words in quotes are each project's own description of itself; the line after
 
 **GNU Octave**, *"Interactive programming environment for numerical computations"* Any 3D figure in 3D, with two properties.
 
+**F3D**, *"A fast and minimalist 3D viewer"* Open a 3D model and see it in 3D.
+It is in the edition's repository.
+
+**Netgen**, the mesh generator: its stereo option now asks for a 3D window and draws the mesh once per eye.
+It is in the repository.
+The mesh drawing area, a window inside the window, is still to be proved in 3D.
+
+**CloudCompare**, the point cloud and mesh program: the 3D view with one Enable 3D choice.
+It is in the repository.
+
 **Coming:** **OpenSCAD** (*"The Programmers Solid 3D CAD Modeller"*): see your part in 3D before you print it.
+Built and measured, not in the packages yet.
+Debian's testing has no OpenSCAD today.
 **KiCad**: the circuit board in 3D before it is made.
-**F3D** (*"A fast and minimalist 3D viewer"*) and **GRASS GIS**: models and terrain in 3D.
-**Netgen**, the mesh generator: the mesh in 3D with its own stereo option, once its drawing area, a window inside the window, is shown in 3D too.
+Built and measured on KiCad 10.0.6, not in the packages yet.
+**GRASS GIS**: terrain in 3D.
+Built and measured on GRASS 8.5.0, not in the packages yet.
+
+**Planned:** **PyMOL**, the open-source molecule viewer.
+It has 3D modes of its own, but Debian's testing does not carry it today and the edition has not packaged it yet.
+
+**Works today without a patch:** **Jmol**, the molecule viewer.
+Its author answered in [issue 58](https://github.com/BobHanson/Jmol-SwingJS/issues/58) that the command `stereo 5` with `set perspectiveDepth off` gives both eyes at full width, left eye first.
+Written to an image with Jmol 16.3.55, the two eyes had no vertical difference.
+The edition does not set this for you yet.
 
 ## Play
 

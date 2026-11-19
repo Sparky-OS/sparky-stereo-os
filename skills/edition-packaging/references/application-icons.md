@@ -36,3 +36,8 @@ Trap: a source-input guard refuses many unchanged files because their modes chan
 The cause is the checkout's umask, not a content change.
 Use the edition's normal source normalizer before sealing the .dsc, then keep the guard strict.
 The refusal's mode/hash table distinguishes identical bytes with changed modes from actual source edits.
+
+Trap: an offscreen Qt probe reports every installed icon missing because its theme search path contains only `:/icons`.
+Read `QIcon.themeSearchPaths()` before trusting that result.
+Give the probe the installed `/usr/share/icons` path and rerun the old, cache-only and successor controls.
+The corrected probe still fails on the unindexed predecessor and succeeds on the indexed successor, matching the actual Plasma captures.

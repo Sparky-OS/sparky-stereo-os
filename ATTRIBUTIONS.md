@@ -1355,3 +1355,5 @@ ScreenShot2’s framebuffer conversion also credits **Nokia Corporation** in its
 These credits identify the source foundations used in the reconcile and its isolated virtual-output probe; they do not imply endorsement.
 
 The standard alternatives checked for this repair also credit **Kenny Levinsen** for fractional-scale-v1, **Simon Ser** for the core preferred-buffer-scale protocol, **Xaver Hugl** for experimental fractional-scale-v2 and the KDE scale work, **Pekka Paalanen** for the enter/leave wording proposal, and **Volodymyr Zolotopupov** for the output binding and scale-factor proposals. These names come from the projects’ source copyright and public merge-request author records read on 2026-11-19.
+
+Spirula Studio’s owning source and accepted base commit b8e15cb8 credit **Harry Chen**. The edition’s declared viewport, shared depth conversion and cache notification path build on **Daniel Campos Ramos**’s accepted fork d5c4ac86. Names were checked in the source commit records on 2026-11-19.

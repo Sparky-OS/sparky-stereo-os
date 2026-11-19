@@ -41,6 +41,11 @@ Conversions happen at the edges only: the decoder on the way in, the device's fo
 - A person's files win: the package's are `00-sparky-stereo-audio.conf`; `~/.config` and any later name in `/etc` override them.
 - Proof: `bench/rig` plays five rates to four fake devices with the published set (4 of 20 rows right) and with the package (20 of 20).
 
+## The Sound page's format and rate controls (ORDER 20)
+
+- Read the automatic choice from the engine (`choices.json`, `sparky-stereo-audio show`), the devices from `pw-dump`, a display from `/proc/asound/cardN/eld#*`; write only `50-sound-page.conf` files in PipeWire's `key = value` form (the engine's `apply` only recognises that form as the person's).
+- Every change is checked against the running graph or device and written back when it fails; the rig and the traps are in [sound-page-formats](references/sound-page-formats.md), the scripts in `bench/page-rig`.
+
 ## Why KDE hides some streams, and how to make them routable
 
 - KDE's audio library (pulseaudio-qt, `src/stream_p.h`) marks a stream **virtual** when it has no client application, and KDE's Sound page and volume widget hide virtual streams (plasma-pa, `src/kcm/ui/main.qml` and `applet/main.qml`, the `VirtualStream` filter).
@@ -61,7 +66,7 @@ For the optional Listen and combined-source implementation and its content tests
 ## Formats, rates and passthrough
 
 - Each device reports what it takes (ALSA through PipeWire); an [HDMI®](https://www.hdmi.org/resource/brand) sink's EDID lists the LPCM rates and depths and the encoded formats the TV accepts (CTA-861 audio data blocks).
-- **Being built:** KDE pages that show these, pre-select "Automatic (best this device supports)", and pre-fill the passthrough codecs (AC-3, E-AC-3, DTS, TrueHD, DTS-HD) from the EDID instead of asking the user.
+- **Built since ORDER 20 (plasma-pa +stereo3d3):** the Sound page's "Sound Quality…" page shows each device's rates, formats, format in use, a display's audio blocks and a Bluetooth codec, pre-selects "Automatic (best this device supports)" and writes the person's choice as their own drop-in: [where each value is read and written, the rig and the traps](references/sound-page-formats.md). **Still to build:** pre-filling the passthrough codecs (AC-3, E-AC-3, DTS, TrueHD, DTS-HD) from the EDID instead of asking the user.
 - Name features by what they do: "matrix surround, compatible with Dolby Surround and Pro Logic II content", never "Dolby" (a trademark). Ship only openly licensed head-response sets (MIT KEMAR first); users may import their own.
 
 ## MIDI and emulators

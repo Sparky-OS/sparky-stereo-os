@@ -51,7 +51,7 @@ Conversions happen at the edges only: the decoder on the way in, the device's fo
 - KDE's audio library (pulseaudio-qt, `src/stream_p.h`) marks a stream **virtual** when it has no client application, and KDE's Sound page and volume widget hide virtual streams (plasma-pa, `src/kcm/ui/main.qml` and `applet/main.qml`, the `VirtualStream` filter).
 - A loopback or filter loaded as a module in `pipewire.conf.d` has no client, so it never appears, and its output cannot be chosen in KDE (pavucontrol lists it).
 - Running it as a client program (`pw-loopback` from a systemd user service) gives it a client; pipewire-pulse still reports no client while the node carries `node.virtual = true` (the loopback's default), so set `node.virtual = false` in both stream property sets.
-- With a client program, do **not** set `node.linger = true`: the nodes would outlive each restart and multiply. Keep `node.dont-fallback = true` on a stream that must never fall back to another device (to avoid feeding a card its own output), and let systemd restart the client (`Restart=always`) when WirePlumber removes the stream because its target is gone.
+- Every edition loopback or filter carrying `node.dont-fallback = true` also carries `node.linger = true`. Its owner must explicitly unload it when its stream or target goes away; do not solve lifetime bugs by dropping the required linger property.
 - The edition's plasma-pa 4:6.7.4-1+stereo3d1+lc1 extends the applet's existing virtual-device option to streams and adds an independent Sound-page option, both off by default; both are proved from the installed package.
 - How the models, stream routes, isolated null-device rig and controls fit together: [KDE virtual streams](references/kde-virtual-streams.md).
 - The staged +stereo3d2 successor adds optional "Listen to this device" and a combined recording source (output mix plus microphone); its rebuild uses a self-contained wired recipe, and both interfaces name owned streams in the person’s language.
@@ -60,8 +60,8 @@ Conversions happen at the edges only: the decoder on the way in, the device's fo
 
 For the optional Listen and combined-source implementation and its content tests, see [KDE audio routes](references/kde-audio-routes.md).
 
-`/usr/share/pipewire/filter-chain/` holds ready filter graphs: binaural 5.1 for headphones with the MIT KEMAR recordings through libmysofa (`sink-virtual-surround-5.1-kemar.conf`), 7.1 with HeSuVi head responses (`sink-virtual-surround-7.1-hesuvi.conf`), matrix surround decoders (`sink-dolby-surround.conf`, `sink-dolby-pro-logic-ii.conf`), upmixing (`sink-upmix-5.1-filter.conf`), a subwoofer channel (`sink-make-LFE.conf`) and microphone noise removal (`source-rnnoise.conf`).
-**Being built:** switching them on by themselves (headphones plus multichannel content), and a speaker setup page per multichannel device (levels in dB, test signal, distance as delay, bass management).
+PipeWire supplies convolution, SOFA spatialization, PSD upmix, LFE and noise-removal examples. Its named KEMAR example uses an external WAV file; Debian's libmysofa separately ships MIT KEMAR SOFA. Its two named matrix-surround examples are encoders, not decoders.
+The ORDER 21 engine candidate adds automatic per-stream headphone insertion, optional passive matrix decoding and upmix, and per-output codec controls through the existing ELD and route state. [The commands, fake-device proof, licence boundaries and traps](references/surround-and-passthrough.md) distinguish what is implemented from what is accepted and published.
 
 ## Formats, rates and passthrough
 
@@ -72,7 +72,7 @@ For the optional Listen and combined-source implementation and its content tests
 ## MIDI and emulators
 
 FluidSynth and the FluidR3 and TimGM6mb soundfonts are in Debian; the MuseScore General and OPL3 soundfonts are too.
-Munt (MT-32), libADLMIDI and libOPNMIDI (FM synthesis) and DOSBox Staging are not, so the edition packages them from upstream; MT-32 ROMs are the user's own.
+Munt (MT-32), libADLMIDI and libOPNMIDI (FM synthesis) and DOSBox Staging are not, and require an archive and licence audit before edition packaging; MT-32 ROMs are the user's own. Debian already supplies a FluidSynth user service. The ORDER 21 table records the configuration and role entries still needed.
 **Being built:** a soundfont synthesizer running as a user service so emulators and games play MIDI out of the box.
 
 ## Bluetooth voice (HFP) and dongles

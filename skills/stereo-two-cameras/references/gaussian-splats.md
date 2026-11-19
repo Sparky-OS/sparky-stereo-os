@@ -1,8 +1,8 @@
 # Gaussian splats in stereo: what is view-dependent, what a second camera costs, the route to a declared pair
 
 Started in ORDER 501, November 2026, from unchanged Spirula Studio master `b8e15cb8d7f8a2f45ca9b4fea3fa331181433caa`.
-The reference now includes the built ORDER 501 pair, its independent pixel checks and the original monoscopic baseline.
-The implementation is tested privately on the edition fork; it is not a package or an upstream acceptance claim.
+The reference includes the built ORDER 501 pair, its independent pixel checks and the original monoscopic baseline.
+ORDER 750c adds qualified `2026.11.12-1+stereo3d5+lc1` CUDA and Vulkan packages against libstereo-declare 1.11, verified through private installed-package captures.
 
 ## Working recipe
 
@@ -459,5 +459,19 @@ Keep the original compositor PNG and a marked left-first `.pns`; do not crop pri
   On a 1920-pixel output, viewports 1920, 960 and 480 pixels wide give nearest disparities -4, -2 and -1 pixels before, and -4, -4 and -4 after.
   The corrected far point remains +2 pixels; the near point binds the popped limit first.
   All 18 corrected cases pass across 1920/3840 output widths and 0.5/1/2 render-to-shown ratios; reversing the two eye reads reverses the signs.
-  These are synthetic projections, not compositor captures; native successor packaging and the captured motion/training matrix are pending.
+  These analytic checks are supplemented by installed predecessor/successor captures in one-output Stereo KWin.
+  On a 1920-pixel output with the same centre camera, focal length, convergence and scene scale, shown widths 1887, 927 and 1081 pixels produce nearest output pixel means -3.93045, -1.93084 and -2.25162 before, then -3.99707, -3.99484 and -3.99548 after.
+  The popped bound sets the fit; the far means remain inside the +10-pixel sunk bound.
+  In the half-width window the contribution within half a pixel of the screen falls from 55.05% to 23.97%.
+  The actual static regression has a fixed 0.01-pixel tolerance; its maximum error is 0.00517 pixels after presentation filtering.
+  Both native backends were cold built, with lc1, the HR companion, complete provenance and the archive-backed link/start gate.
+  The installed matrix has 58 stereo sessions and 76 captured states: AMD Vulkan, NVIDIA Vulkan and NVIDIA CUDA at all three layouts, with static, active camera motion and advancing training, plus AMD/NVIDIA Vulkan X11 panel controls.
+  All 76 pixel-mean budgets stay inside the screen's [-4,+10] pixels, with zero differing interface pixels.
+  Every captured state has two frame-identity witnesses per eye and retained decoded arrays; actually reversing the eye readings reverses all 228 measured signed feature samples.
+  Maximum feature registration error is 0.06505 pixels horizontally and 0.06204 vertically.
+  The ordinary AMD Vulkan monoscopic control is byte-identical before and after over the complete 1920-by-1080 RGB capture.
+  Individual translucent Gaussian-layer disparities are recorded separately from the accepted opacity-weighted pixel-mean fit.
+  **Separate source finding:** libstereo-declare 1.11's Wayland output-width helper returns `-ENOTUNIQ` when several `wl_output` globals are advertised.
+  Multi-output runtime behavior was not captured in this checkpoint; actual surface-output selection needs its own shared-layer correction and two-output proof.
+  Keep output selection and unit conversion in the shared layer.
   See [the shared depth-limit API](../../native-linux/references/depth-limits-declare.md) for the screen units.

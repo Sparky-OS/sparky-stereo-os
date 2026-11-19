@@ -14,6 +14,20 @@ Item {
         }
     }
 
+    // Made when a step needs it: a package without the type (+stereo3d4 and older) still runs every other step.
+    property var lv: null
+    function levels() {
+        if (lv === null) {
+            try {
+                lv = Qt.createQmlObject('import QtQuick; import org.kde.plasma.private.volume; SpeakerLevels {}', root)
+            } catch (e) {
+                console.log("LEVELS " + JSON.stringify({error: String(e)}))
+                return null
+            }
+        }
+        return lv
+    }
+
     function next() {
         if (at >= steps.length) {
             Qt.quit()
@@ -38,6 +52,18 @@ Item {
             next()
         } else if (st.op === "stop") {
             s.stopTest()
+            next()
+        } else if (st.op === "setlevel") {
+            if (levels() !== null) {
+                lv.node = st.node
+                lv.setLevel(st.channel, st.db, st.raised === true)
+            }
+            next()
+        } else if (st.op === "levels") {
+            if (levels() !== null) {
+                lv.node = st.node
+                console.log("LEVELS " + JSON.stringify({name: st.name, node: st.node, available: lv.available, levels: lv.levels}))
+            }
             next()
         } else if (st.op === "seconds") {
             s.testSeconds = st.value

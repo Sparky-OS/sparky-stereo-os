@@ -4,6 +4,7 @@
 set -u
 ulimit -c 0
 mkdir -p /run/sa631 && chmod 777 /run/sa631
+[ -n "${SP_LATE:-}" ] && cp /src/90-sp23-rig-late.conf /etc/wireplumber/wireplumber.conf.d/90-sp23-rig.conf && cp /src/rig-alsa-nodes-late.lua /usr/share/wireplumber/scripts/
 cat >/usr/local/bin/systemctl <<'SC'
 #!/bin/bash
 if [ "$1" = "--user" ] && [ "$2" = "restart" ]; then
@@ -35,4 +36,5 @@ if [ -n "${SP_POLKIT:-}" ]; then
   sleep 2
 fi
 export PATH=/usr/local/bin:$PATH
+if [ -n "${SP_BARE:-}" ]; then exec setpriv --reuid 1001 --regid 1001 --clear-groups env HOME=/home/rig XDG_RUNTIME_DIR=/run/user/1001 PATH=$PATH QML_XHR_ALLOW_FILE_READ=1 XDG_DATA_DIRS=/usr/local/share:/usr/share dbus-run-session -- "$@"; fi
 exec setpriv --reuid 1001 --regid 1001 --clear-groups env HOME=/home/rig XDG_RUNTIME_DIR=/run/user/1001 PATH=$PATH QML_XHR_ALLOW_FILE_READ=1 XDG_DATA_DIRS=/usr/local/share:/usr/share QT_QPA_PLATFORM=offscreen bash /src/session.sh "$@"

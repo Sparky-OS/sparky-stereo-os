@@ -1292,3 +1292,13 @@ Names come from each repository's own contributor records (github.com/Adjuvo/Sen
 **Max Lammers** is the principal author of both repositories (45 commits on SenseCom and 44 on the API when read), and **Mamadou Babaei** is named as an author in the API's headers and made commits to SenseCom.
 The edition fetches SenseCom 1.9.2 and the API's v22 x86-64 release libraries from SenseGlove's own repositories on the person's machine, unchanged, checked against a pinned SHA-256, and packages the API's headers and example (checked against a pinned SHA-256) as `senseglove-api-dev`; nothing of theirs is rebuilt, modified or mirrored.
 SenseGlove does not endorse the edition.
+
+## Three faults of the A10's uplift: the Game Mode applet, Debian's tasks, the live-only autostart (ORDER 755, 2026-11-19)
+
+Names come from each project's own records (read on 2026-11-19).
+The **plasma-gamemode** applet is **Harald Sitter**'s (invent.kde.org/sitter/plasma-gamemode); **Stefan Dimitrijevic** made its Plasma 6 update (a185dcfb).
+Debian packages it as the **Debian KDE Extras Team**, with **Aurélien Couderc** as uploader.
+The edition's patch is a small change to one function of their code, found with their source and their packaging, and is not offered to KDE for now.
+**tasksel** is Debian's: its copyright file names, among many, **Joey Hess**, **Christian Perrier**, **Otavio Salvador**, **Frans Pop**, **Randolph Chung** and **Holger Wansing** (current changelog), maintained by the **Debian Install System Team**.
+The edition reads its 3.91 and 3.92 packages and does not change them.
+**sparky-backup-core** and its autostart entry **Sparky SetXKB** are **Paweł "pavroo" Pijanowski**'s (SparkyLinux); the installer module that removes the live tools (`sparky-backup-*`, `live-*`, `calamares`) is SparkyLinux's calamares-sparky.

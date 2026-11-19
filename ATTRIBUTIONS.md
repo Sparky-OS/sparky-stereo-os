@@ -1351,7 +1351,7 @@ The names below come from the published KWin +stereo3d59 source's SPDX notices, 
 **Daniel Campos Ramos** wrote the stereo content protocol, the declaration library and the compositor's surface-depth exchange.
 The KWin surfaces, window geometry, workspace selection and output types credit **Martin Gräßlin**, **Martin Flöser**, **Vlad Zahorodnii**, **David Edmundson**, **Matthias Ettrich**, **Lubos Lunak**, **Natalie Clarius** and **Roman Gilg**.
 The libkscreen backend and its selection machinery credit **Alejandro Fiestas Olivares**, **Daniel Vrátil**, **Sebastian Kügler** and **Méven Car**.
-The installed stable xdg-shell protocol credits **Kristian Høgsberg**, **Rafael Antognolli**, **Jasper St. Pierre**, **Intel Corporation**, **Samsung Electronics** and **Red Hat**; viewporter credits **Collabora**.
+ScreenShot2’s framebuffer conversion also credits **Nokia Corporation** in its published source. The installed stable xdg-shell protocol credits **Kristian Høgsberg**, **Rafael Antognolli**, **Jasper St. Pierre**, **Intel Corporation**, **Samsung Electronics** and **Red Hat**; viewporter credits **Collabora**.
 These credits identify the source foundations used in the reconcile and its isolated virtual-output probe; they do not imply endorsement.
 
 The standard alternatives checked for this repair also credit **Kenny Levinsen** for fractional-scale-v1, **Simon Ser** for the core preferred-buffer-scale protocol, **Xaver Hugl** for experimental fractional-scale-v2 and the KDE scale work, **Pekka Paalanen** for the enter/leave wording proposal, and **Volodymyr Zolotopupov** for the output binding and scale-factor proposals. These names come from the projects’ source copyright and public merge-request author records read on 2026-11-19.

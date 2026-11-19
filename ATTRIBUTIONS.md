@@ -460,6 +460,7 @@ Our first Qt change was reviewed within hours by **Tim Blechmann**, with **Artem
 **Source**: [Waterfox](https://github.com/BrowserWorks/Waterfox), our fork [Sparky-OS/waterfox](https://github.com/Sparky-OS/waterfox); Mozilla's Gecko and WebRender, under the Mozilla Public License 2.0 **What we changed**: WebXR's flat display and the camera hack, both handed to KWin as one declared full side-by-side surface, video marks, CSS depth; with the browser's own compositor in software (software WebRender), the pair keeps its stereo mark through the buffer read back for the compositor, so it is declared on that route too (ORDER 616).
 **Credit**: BrowserWorks Ltd and **Alex Kontos**, who makes Waterfox; Mozilla and Firefox's contributors for Gecko and WebRender.
 The software route rests on the Wayland native compositor for software WebRender that **Robert Mader** added to Firefox (Mozilla bug 1711224, 2021: the native surfaces in shared memory buffers that the edition's declaration now reaches).
+The flat WebXR display's separation (ORDER 750d) rests on Mozilla's WebXR implementation in `dom/vr`, whose authors the project's own history names; that history was not in the shallow clone this work used, so the names are to be added from Mozilla's repository before this text is published, never from memory.
 
 ### 2.9 The stereo virtual machine
 

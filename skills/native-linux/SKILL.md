@@ -175,6 +175,8 @@ A browser canvas (WebGL, three.js, CesiumJS), video or image with `image-renderi
 
 The browser's camera hack or flat WebXR display shown squeezed side by side, the same in each eye, where the browser draws without the graphics card (its own compositor in software, `WebRender (Software)`; not Stereo KWin's): where the pair lost its mark, the fix, the rig cases with a forced software route and with no device at all: [references/browser-software-webrender-pair.md](references/browser-software-webrender-pair.md).
 
+The browser's flat WebXR display (an inline-stereo session) gives half the separation in a window half as wide: the proof page with a tilted object, the two windows, the measurement, and why an immersive session cannot show it: [references/browser-webxr-flat-separation.md](references/browser-webxr-flat-separation.md).
+
 A closed program we cannot rebuild, with a quad buffer mode, shipped as an AppImage (what it bundles, which configuration it is offered, the program's fault told from the stack's with a small client, `GL_BACK` reaching one eye only, the FUSE 2 runtime, the settings file named after the start name, the 3D mouse boundary): [references/closed-program-quad-buffer-in-an-appimage.md](references/closed-program-quad-buffer-in-an-appimage.md).
 
 Every program that already draws OpenGL quad-buffer stereo, which switch and route each has, the capture recipe with eye tags and the traps (FreeCAD never asks for a stereo surface, ParaView's child pair is taken back, Debian's Blender 5.2.2 aborts in Time Sequential, the NVIDIA session environment in a virtual KWin): [references/quad-buffer-programs.md](references/quad-buffer-programs.md).

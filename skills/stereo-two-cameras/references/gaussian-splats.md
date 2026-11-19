@@ -463,7 +463,7 @@ Keep the original compositor PNG and a marked left-first `.pns`; do not crop pri
   On a 1920-pixel output with the same centre camera, focal length, convergence and scene scale, shown widths 1887, 927 and 1081 pixels produce nearest output pixel means -3.93045, -1.93084 and -2.25162 before, then -3.99707, -3.99484 and -3.99548 after.
   The popped bound sets the fit; the far means remain inside the +10-pixel sunk bound.
   In the half-width window the contribution within half a pixel of the screen falls from 55.05% to 23.97%.
-  The actual static regression has a fixed 0.01-pixel tolerance; its maximum error is 0.00517 pixels after presentation filtering.
+  The actual static regression has a fixed 0.01-pixel tolerance; its maximum error is below 0.00517 pixels after presentation filtering.
   Both native backends were cold built, with lc1, the HR companion, complete provenance and the archive-backed link/start gate.
   The installed matrix has 58 stereo sessions and 76 captured states: AMD Vulkan, NVIDIA Vulkan and NVIDIA CUDA at all three layouts, with static, active camera motion and advancing training, plus AMD/NVIDIA Vulkan X11 panel controls.
   All 76 pixel-mean budgets stay inside the screen's [-4,+10] pixels, with zero differing interface pixels.

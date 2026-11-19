@@ -106,11 +106,13 @@ This checks the wire and library calls; the application's nearest-point disparit
   **Fix:** use `KSCREEN_BACKEND=kwayland`, or leave the selection to the Wayland platform, and require a mode readback.
   **How found:** the failed readback, followed by the case-sensitive cache comparison in libkscreen's `src/backendmanager.cpp`; the same mode command then applied on both outputs.
 
-### Candidate package traps found while building the repair
+### Candidate package and measurement traps found while building the repair
 
 - **Symptom:** `dpkg-source -b` reports reverse hunks as unexpected upstream changes after replacing an old quilt patch. **Cause:** an in-place successor overlays new patch files onto an already-applied old stack. **Fix:** the explicit `lc-successor.py --reapply-patches` route temporarily restores the old patch files, pops that stack, installs the overlay and pushes it. **How found:** compared the source produced by both the KWin and protocols successor descriptors against the published applied trees.
 - **Symptom:** the scanner says the since version is not increasing, and the protocols suite fails. **Cause:** a since=6 event was placed before older requests. **Fix:** order versioned events after those requests, retaining the event opcode order, and run all 127 protocol tests. **How found:** the actual protocol package build, which exercises strict scanner tests absent from a library-only compile.
 - **Symptom:** an output-change cache fails to compile with QString versus QUuid. **Cause:** BackendOutput::uuid() returns a string. **Fix:** construct the QUuid explicitly. **How found:** the complete KWin compile; a fresh corrected descriptor was prepared.
+
+- **Symptom:** every desktop role measures zero, although the engine logs the expected per-eye shifts. **Cause:** the measurement indexes the left half for both views. **Fix:** address the right half at per-eye-width plus x, and require the zero-limits control and a distinct best match. **How found:** a read-only trace of StereoDepth::parallax and PaintData::toMatrix, followed by a fresh capture on the unmodified published binary. The corrected match gives the complete -10/0/-2/-4/+4/+8 table.
 
 ## Traps, symptom first
 

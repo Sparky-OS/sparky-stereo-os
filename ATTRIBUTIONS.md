@@ -1303,3 +1303,11 @@ The edition's patch is a small change to one function of their code, found with 
 **tasksel** is Debian's: its copyright file names, among many, **Joey Hess**, **Christian Perrier**, **Otavio Salvador**, **Frans Pop**, **Randolph Chung** and **Holger Wansing** (current changelog), maintained by the **Debian Install System Team**.
 The edition reads its 3.91 and 3.92 packages and does not change them.
 **sparky-backup-core** and its autostart entry **Sparky SetXKB** are **Paweł "pavroo" Pijanowski**'s (SparkyLinux); the installer module that removes the live tools (`sparky-backup-*`, `live-*`, `calamares`) is SparkyLinux's calamares-sparky.
+
+## An HDMI sound device that "could not be read" (ORDER 757, 2026-11-19)
+
+Names come from the headers of the kernel source files read (sound/hda/common/proc.c and sound/hda/codecs/hdmi/hdmi.c and eld.c at v7.3, 2026-11-19).
+**Takashi Iwai** wrote the HDA codec proc interface whose `Device:` line the reader relied on (copyright 2004).
+The HDMI codec driver and the ELD code list **Wu Fengguang** (Intel) and **Anssi Hannula** (2013), with copyright lines of Intel, ATI and NVIDIA and **Wei Ni** (NVIDIA, 2008).
+PipeWire and WirePlumber remain the engine the drop-ins configure, by **Wim Taymans**, **George Kiagiadakis** and their contributors.
+The idea of keeping a display's values for that display, as the desktop keeps a screen's settings, is Daniel's.

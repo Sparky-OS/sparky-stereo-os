@@ -46,6 +46,12 @@ Conversions happen at the edges only: the decoder on the way in, the device's fo
 - Read the automatic choice from the engine (`choices.json`, `sparky-stereo-audio show`), the devices from `pw-dump`, a display from `/proc/asound/cardN/eld#*`; write only `50-sound-page.conf` files in PipeWire's `key = value` form (the engine's `apply` only recognises that form as the person's).
 - Every change is checked against the running graph or device and written back when it fails; the rig and the traps are in [sound-page-formats](references/sound-page-formats.md), the scripts in `bench/page-rig`.
 
+## An HDMI sound device that "could not be read"
+
+The problems list says "The sound devices NVidia, Generic could not be read" with the displays lit: the reader of sparky-stereo-audio 0.1.0 to 0.3.0 took an HDA output only when its node had a `Device:` line, and the kernel prints that line for an HDMI or DisplayPort codec only while a PCM is open.
+Fixed in 0.3.1: a card with `eld#` files or HDMI/DP pins is a graphics card's audio, its outputs are the displays connected, what a display told is kept by its ELD identity, and a hotplug is noticed through the graphics driver's DRM event.
+Fixtures must be copied idle as well as playing; a read made while PipeWire holds the sink looks fine. [Cause with the kernel's lines, the events, the rig and the traps](references/hdmi-sound-device-could-not-be-read.md).
+
 ## Why KDE hides some streams, and how to make them routable
 
 - KDE's audio library (pulseaudio-qt, `src/stream_p.h`) marks a stream **virtual** when it has no client application, and KDE's Sound page and volume widget hide virtual streams (plasma-pa, `src/kcm/ui/main.qml` and `applet/main.qml`, the `VirtualStream` filter).
@@ -91,6 +97,7 @@ AES5 (preferred sampling frequencies; its 2018 abstract: "A sampling frequency o
 From the lanes of 25 October to 16 November 2026; add the next lesson here as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 
 - The Speaker Setup page's traps: a filter's playback stream with `node.dont-fallback` and no `node.linger` is destroyed by WirePlumber before its card exists, and the whole setup vanishes with nothing in the log (both flags together, bisected in `bench/speaker-rig/bisect-linger.sh`); a QML property named like its own id binds to itself (ORDER 20's "format in use" line never showed); moc stops at a raw string literal so a green run quietly has fewer rows; a QML `new RegExp(string)` with `\p{L}` throws and leaves Apply dimmed: [speaker-page](references/speaker-page.md#traps-symptom-cause-fix-how-found). (lane speaker-setup-kde-23)
+- An HDMI card "could not be read" whenever nothing played: the kernel's `Device:` line exists only while a PCM is open, so a reader and a fixture made during playback pass and the idle machine fails ([hdmi-sound-device-could-not-be-read](references/hdmi-sound-device-could-not-be-read.md)). (lane audio-hdmi-read-757)
 - The edition shipped Debian's PipeWire settings (48000 only, quality 4) until ORDER 631; before saying what a machine's graph does, read it (`pw-metadata -n settings`), never assume the defaults are ours. The traps of building the defaults and their rig (a container masks `/proc/asound`, an ALSA plugin needs `-DPIC`, nodes made from a WirePlumber script need a global table, dither on a 16 bit device costs bit perfection, a row that fails only in the green image) are in [system-defaults](references/system-defaults.md#traps-symptom-cause-fix-how-found). (lane system-audio-defaults-631)
 
 - Result of the VLC PipeWire fix: MOV004.mp4 20 s three times, +stereo3d8 no sound and 44 to 50 flushes, +stereo3d9 sound at the track's first sound (1.08 s) with 0 flushes and 0 silences; after four seeks sound at every target; drift view +0.6 ms (MOV004) and +3.3 ms (48 kHz stereo). With 24 kHz audio resampled to 96 kHz VLC's own drift view reads -21 ms (old) and -27 ms (fixed) because the SoX resampler latency is not counted; VLC corrects only above 40 ms. (lane players-shared-layer)

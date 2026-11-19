@@ -1254,3 +1254,28 @@ The **Consumer Technology Association**, **International Electrotechnical Commis
 Harry Chen and the Spirula Studio contributors.
 Omar Cornut, Marcus Geelnard, Camilla Löwy, Duane Merrill, NVIDIA, Rich Geldreich, RAD Game Tools, Valve Software, Tenacious Software, Sean Barrett, Leon Merten Lohse, The Regents of the University of Michigan, Adobe and Google.
 Meta, IDEA Research, ZhengPeng, Zhao Xiaoming, Johan Edstedt, Computer Vision and Geometry Lab, Wei Yin, Mu Hu, Microsoft, HUAWEI Bayer Lab, Qwen, Richard Zhang, Phillip Isola, Alexei A. Efros, Eli Shechtman, Oliver Wang and Soumith Chintala.
+
+
+## MIDI and old games, ORDER 735
+
+**Peter Hanappe** and the **FluidSynth contributors** provide FluidSynth.
+**Wim Taymans** supplies PipeWire and its MIT audio-stream example; **George Kiagiadakis** and **Julian Bouzas**, with the **PipeWire**, **WirePlumber** and **Collabora** contributors, provide the graph, policy and ALSA sequencer bridge.
+**Nedko Arnaudov**, **Jaco Kroon** and **Eric Hedekar** are credited in a2jmidid's own copyright records.
+
+**Tim Brechbill** and **David Bolton** made TimGM6mb.
+**Frank Wen** and **Toby Smithe** supply FluidR3 and its Debian integration.
+The MuseScore General records credit **S. Christian Collins**, **Amir Oosman**, **Sam Gossner**, **Simon Dalzell**, **Elan Hickler**, **Michael Cowgill**, **Ethan Winer**, **Michael Schorsch** and **Thorsten Glaser**, with the **MuseScore**, **Versilian Community Sample Library** and **Versilian Studios Chamber Orchestra** contributors.
+**Zandro Reveille** made the OPL3 SoundFont; **Bret Curtis** packaged it for Debian.
+The Debian font packages retain each sample set's full notices; the edition does not claim those recordings as its own.
+
+Munt's records credit **Dean Beeler**, **Jerome Fisher**, **Sergey V. Mikayev**, **Mok**, **Tristan**, **Jonathan Gevaryahu**, **The Guru**, **Laust Brock-Nannestad**, **balrog**, **Sarayan**, **IssaUt**, **Cloudschatze**, **Martin Lukasek**, **sdhizumi**, **Steven W. Dalton** and **Micael Hildenborg**.
+The emulation code is used without distributing or acquiring anyone's MT-32 ROMs.
+
+libADLMIDI and libOPNMIDI credit **Joel Yliluoma**, **Vitaly Novichkov** and **Jean Pierre Cimalando**.
+Their retained emulation-core notices credit their original authors, including **Alexey Khokholov**, **Stéphane Dallongeville**, **Stéphane Akhoun** and **David Korth** for the selected OPN2 code.
+Their bank-free edition sources preserve the full component notices.
+
+The DOSBox Staging records credit **Patryk Obara**, **kcgen** and **nemo93**, following DOSBox authors **Sjoerd v.d. Berg**, **Peter Veenstra**, **Ulf Wohlers**, **Tommy Frössman**, **Dean Beeler**, **Sebastian Strohhäcker** and **Ralf Grillenberger**.
+**John Novak** authored the upstream system-zlib detection fix carried in the edition recipe.
+The **FreeDOS** and **DOSBox Staging** contributors provide the licensed guest utilities, keyboard layouts and screen fonts with their source records.
+**Fabian Greffrath**, **Stephen Kitt**, **David Heidelberg** and the **Debian Games** and **Debian Multimedia** contributors provide the packaging and audit records that informed these decisions.

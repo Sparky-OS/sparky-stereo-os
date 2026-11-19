@@ -56,8 +56,18 @@ The compositor owns the surface's output selection; a program reports that it ca
    Moving between screens with equal limits sends no new `depth_limits` event in v5.
 4. The repair belongs in a new protocol version: KWin must carry the selected output's pixel width with the matching limits, send the new state on output changes even when the limits are equal, and the library must consume that surface-specific width.
    Keep the old events and their version guards, and retain `-ENOTUNIQ` for an older compositor that cannot supply the width.
-   This is the pending repair, not functionality in +59 or 1.11.0.
+   ORDER 750e implements this in KWin +stereo3d60, plasma-wayland-protocols +stereo3d12 and libstereo-declare 1.12.0; the candidate package and scene qualification status must accompany that claim. It is not functionality in +59 or 1.11.0.
    The library's one conversion function continues to perform the buffer-pixel conversion; no program adds arithmetic.
+
+### Version 6 plumbing and the standard alternatives
+
+Version 6 adds `output_width(uint width)` immediately before each `depth_limits` event. The value is the width in pixels of one view of the output KWin already selected for that window. Zero means unavailable. The cached state includes the selected backend output's UUID and width, so equal limit values still resend the pair on an output change. Legacy v5 resources retain their old event guard and change detection.
+
+The library stores the width on the independent depth follower for that surface. Its buffer getter consumes it on v6, and retains the existing display-wide helper only for old compositors. It calls the same conversion function, keeps SONAME 1 and every old exported symbol, and adds no UI dependency. A missing v6 width is `-ENODATA`, not an invented screen choice.
+
+Check standard APIs before adding an event. Wayland main's `wl_surface.enter` reports intersections, possibly several; `preferred_buffer_scale` reports an integer scale, not a pixel width. Both use the toolkit's surface listener, and `wl_proxy_add_listener` refuses a second implementation. Fractional-scale-v1 supplies a scale numerator and permits one object per surface; the toolkit may already own it. Experimental fractional-scale-v2 changes coordinate spaces, without associating this selected output width with depth limits. Wayland issue 576's preferred_outputs was still an open proposal when checked on 2026-11-19. Read KWin master, Wayland main, the protocols main, their merge requests and issues again before relying on that status.
+
+All three shipped XML copies must agree. Append the new since=6 event after older requests in the XML so the scanner's monotonic-since check passes; event and request opcodes are separate, so moving the since=5 event after requests preserves its event opcode 1 and gives output_width opcode 2. The protocols package's own contract test must check version 6 rather than freezing the former version 3.
 
 ### Two-output wire rig
 
@@ -86,7 +96,7 @@ This checks the wire and library calls; the application's nearest-point disparit
   **Cause:** v5 identifies neither the chosen output nor its width; 1.11.0's width helper deliberately refuses an ambiguous display-wide answer.
   **Fix:** carry the compositor-selected output width with its limits in the next protocol version, then use it in the shared library.
   **How found:** a mapped client on published +59, moved between 1920- and 1280-pixel virtual outputs, returned `-ENOTUNIQ` on both; the same call succeeded with one output.
-  The engine repair and the scene's image-based red and green remain to be run.
+  The staged Spirula +stereo3d5 red scene also measured zero disparity on both screens in full and half windows; its one-screen control measured -3.984716 and -3.989684 px against -4 px. Its existing localized message says the limits were not received and the two pictures are identical, so this repair does not change the program.
 - **Symptom:** moving to another output produces no new limits event.
   **Cause:** `sendState` compares only the two limit values, which may be equal on different screens.
   **Fix:** include the selected output state in the new version's change detection.
@@ -96,9 +106,15 @@ This checks the wire and library calls; the application's nearest-point disparit
   **Fix:** use `KSCREEN_BACKEND=kwayland`, or leave the selection to the Wayland platform, and require a mode readback.
   **How found:** the failed readback, followed by the case-sensitive cache comparison in libkscreen's `src/backendmanager.cpp`; the same mode command then applied on both outputs.
 
+### Candidate package traps found while building the repair
+
+- **Symptom:** `dpkg-source -b` reports reverse hunks as unexpected upstream changes after replacing an old quilt patch. **Cause:** an in-place successor overlays new patch files onto an already-applied old stack. **Fix:** the explicit `lc-successor.py --reapply-patches` route temporarily restores the old patch files, pops that stack, installs the overlay and pushes it. **How found:** compared the source produced by both the KWin and protocols successor descriptors against the published applied trees.
+- **Symptom:** the scanner says the since version is not increasing, and the protocols suite fails. **Cause:** a since=6 event was placed before older requests. **Fix:** order versioned events after those requests, retaining the event opcode order, and run all 127 protocol tests. **How found:** the actual protocol package build, which exercises strict scanner tests absent from a library-only compile.
+- **Symptom:** an output-change cache fails to compile with QString versus QUuid. **Cause:** BackendOutput::uuid() returns a string. **Fix:** construct the QUuid explicitly. **How found:** the complete KWin compile; a fresh corrected descriptor was prepared.
+
 ## Traps, symptom first
 
-- **`interface 'kde_stereo_depth_v1' has no event 1` and the connection drops.** KWin sent `depth_limits` (since 5) to an object bound at a lower version. The library binds the lower of the compositor's version and the 5 its protocol copy knows (`STEREO_PROTOCOL_VERSION` in `stereo-declare.c`), so it never expects an event above the bound version. Raise that number only together with the protocol XML in `protocol/`; see `stereo-proof-rig/references/versioned-events.md` for the server side.
+- **`interface 'kde_stereo_depth_v1' has no event 1` and the connection drops.** KWin sent `depth_limits` (since 5) to an object bound at a lower version. The library binds the lower of the compositor's version and the version its protocol copy knows (6 in 1.12.0, `STEREO_PROTOCOL_VERSION` in `stereo-declare.c`), so it never expects an event above the bound version. Raise that number only together with the protocol XML in `protocol/`; see `stereo-proof-rig/references/versioned-events.md` for the server side.
 - **A program built for 1.9 sees no limits on a KWin that sends them.** The 1.9 library binds version 4: nothing to read, no error. Upgrading the library to 1.10 is enough; the SONAME and every old symbol are unchanged, so no relink is needed (proved: a client built against 1.9 ran on KWin +stereo3d54 with the 1.9 and the 1.10 library, same depth_state, connection clean).
 - **`wl_global_create: implemented version ... higher than interface version (6 > 5)` in a test.** The generated server cannot advertise a global newer than the XML. To model a compositor newer than the library's copy, copy the `wl_interface` and raise its `version` (`tests/test-wayland.c`, `tests/wayland-shim.c`).
 - **An in-process fake compositor hangs in `wl_display_roundtrip`.** Server and client share one thread, so nobody dispatches the server; pump both sides (flush, `wl_event_loop_dispatch`, `wl_display_flush_clients`, read events). The Python Wayland test hung for minutes before the cause was found with `docker top` and `timeout` around the call.

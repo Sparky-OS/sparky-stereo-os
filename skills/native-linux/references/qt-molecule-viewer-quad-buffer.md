@@ -1,0 +1,29 @@
+# A Python and Qt molecule viewer's quad buffer as the one output (PyMOL)
+
+Written for ORDER 50 step 2 (PyMOL 3.1.0, 19 November 2026).
+PyMOL is a C++ renderer driven from Python, with its window made by PyQt5 (`QGLWidget`, `QGLFormat.setStereo`) on Debian.
+On the edition it needs no new engine: Mesa packs the quad buffer, Xwayland and Stereo KWin show it.
+The work is to make the quad buffer the one output and to make the program tell the truth when it did not get one.
+
+## What PyMOL already has (read, not assumed)
+
+- `modules/pmg_qt/pymol_gl_widget.py` asks Qt for a stereo visual when `stereo_mode` is 1 or 12 (or 0 on Windows and Qt before 5.7). Qt 6 builds use `QOpenGLWidget`, which has no stereo format before Qt 6.5, so they never ask.
+- `layer5/PyMOL.cpp` `check_gl_stereo_capable()` reads `GL_STEREO` from the real context ("stereo test with PyQt5 on Linux is broken (QTBUG-59636), so we test for stereo here"), and `PyMOL -S` makes `G->StereoCapable` true even when `GL_STEREO` is 0 (it prints a warning to the console).
+- `layer1/SceneRender.cpp` draws the left eye into `GL_BACK_LEFT` and the right into `GL_BACK_RIGHT` for `stereo_mode` 1; the other twelve modes (`crosseye`, `walleye`, `geowall`, `sidebyside`, `byrow`, `bycolumn`, `checkerboard`, `custom`, `anaglyph`, `dynamic`, `clonedynamic`, `openvr`) are PyMOL's own outputs.
+- The camera's own settings, `stereo_angle` and `stereo_shift`, stay as upstream has them.
+
+## The recipe
+
+1. One patch, `stereo-1-one-stereo-output.patch` (recipe folder `pymol-stereo-1`): `Scene.cpp` makes the scene's stereo mode the quad buffer whatever `stereo_mode` says; `ExecutiveStereo` refuses every other mode and the eye swap with a sentence (the swap is the output's, in Display Settings) and refuses `stereo on` when the window has no quad buffer; `check_gl_stereo_capable` no longer lets `-S` pass a window without `GL_STEREO` for a stereo one.
+2. Python: `pymol/edition3d.py` keeps one choice, "Enable 3D", in `~/.config/pymol/enable3d` (or the environment `PYMOL_ENABLE_3D=0|1` for a test), with the ten-language sentences; the Display menu holds Enable 3D, a shortcut to Display Settings (`systemsettings kcm_kscreen`) and Chromadepth (a colouring, not an output); `pymol_gl_widget.py` asks Qt for the stereo format only when 3D is enabled, and after the first draw turns `stereo` on, or says in the person's language that the window has no quad buffer and stays 2D (a message box, the console and the log). The command-line options for upstream's output modes (`-j`, `-t N`) are ignored; `-S` means Enable 3D for the run.
+3. Package: Debian unstable's source carried (PyMOL left testing for a flaky autopkgtest that Debian CI saw on riscv64 only), `+stereo3d1+lc1`, the scientist role names it.
+4. Prove it, one fresh session per row (stereo-proof-rig): X11 through Xwayland (`QT_QPA_PLATFORM=xcb`, `DISPLAY=:0`), three coloured atoms at x = -12, 0 and 12 turned 35 degrees about y, a capture of the screen (`scripts/sphere_disparity.py`, `scripts/x11watch.py`, `scripts/mark_pns.py` in stereo-proof-rig): a stereo capture is 2560 wide for a 1280 output, and each sphere's centre in the left half minus its centre in the right half is the disparity (positive: in front of the screen). Debian's PyMOL with `-S` and `stereo quadbuffer`: red +1.97, green -2.78, blue -9.05 px, vertical 0.05 px; the edition build with Enable 3D: the same numbers; the near side in front of the screen and the far side behind. The two halves swapped give the same magnitudes with the opposite signs. Enable 3D off: a 1280 wide capture, the 3D viewport equal to Debian's 2D one (0 differing pixels).
+
+## Traps (symptom, cause, fix, how found)
+
+- **Symptom:** `pymol -S` prints "OpenGL quad-buffer stereo 3D detected and enabled." and the window stays a 2D picture (capture 1280 wide, nothing declared). **Cause:** `-S` only requests the visual; the `stereo` setting is off until `stereo on`, and Mesa declares a window only when the program draws into `GL_BACK_RIGHT`. **Fix:** the edition turns stereo on after the first draw when 3D is enabled. **Found by:** the watch of `_KDE_NET_WM_STEREO_*` on the window tree (`x11watch.py`) showing no property, then the same run with `stereo quadbuffer` in the script.
+- **Symptom:** a flat window reads as 3D. **Cause:** `-S` sets `StereoCapable` without `GL_STEREO`. **Fix:** `StereoCapable = GL_STEREO`; the person is told. **Found by:** reading `check_gl_stereo_capable` before patching (search upstream: the issue about quad buffer under PyQt5, number 57, is closed and its fix is this function).
+- **Symptom:** `Debian's examples` autopkgtest "not ok" lines in a container with no network. **Cause:** the examples call `fetch` (PDB entry 7ahl); not the segmentation fault of the Debian bug. **Found by:** reading the two failing lines of the log; the same two lines in each of the twenty runs.
+- **The red row is not flat here.** Debian's PyMOL on the edition's stack shows a pair when the person asks for it by `-S` and `stereo quadbuffer`, so the red of this work is "works, with twelve other outputs, the eye swap and a forced flat window", not "shows nothing". Do not write a red that was not measured.
+- **Build trap:** `lean.debian_prepare` adds `nodejs`, `node-acorn`, `gcc`, `perl` and `python3-yaml` to Build-Depends, so a build container installs them after `apt-get build-dep`; and the link gate runs bubblewrap, which in Docker needs `--security-opt seccomp=unconfined --security-opt apparmor=unconfined --security-opt systempaths=unconfined` ("bwrap: Can't mount proc on /proc") and `SPARKY_LC_ARCHIVE_CONFIG` and `SPARKY_LC_SCRATCH`; without it the build ends at dh_builddeb with no .deb left.
+- **Marked pictures:** the capture is full side by side, left first: write it as `.pns` with the PNG `sTER` chunk, mode 1 (PNG Extensions 1.4.0, 3.6), width divisible by 16, before the first IDAT; parse the chunk list back.

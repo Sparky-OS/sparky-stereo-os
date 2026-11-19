@@ -1261,3 +1261,5 @@ Meta, IDEA Research, ZhengPeng, Zhao Xiaoming, Johan Edstedt, Computer Vision an
 |---|---|---|---|
 | [Dolphin](https://dolphin-emu.org/) (GameCube and Wii emulator) | GPL-2.0-or-later | Its stereo modes and presenter read for the declared pair; Debian's package of it | The Dolphin Emulator Project and its contributors; stereo work by stenzek (quad buffer), BryanJacobs (side by side aspect), AndrewGDX (float depth and convergence), jasonphillips (Vulkan stereo without geometry shaders, open); Debian Games Team packaging |
 | [Azahar](https://azahar-emu.org/) (Nintendo 3DS emulator, continuing Citra) | GPL-2.0 | Its stereo modes, layout and renderers read for the declared pair | The Azahar contributors and the Citra team before them; side by side full by OpenSauce04 and DavidRGriswold |
+
+The GX test scene of the Dolphin proof is our own program built with libogc (zlib licence), by Michael Wiedenbauer (shagkur) and Dave Murphy (WinterMute), with devkitPro's devkitPPC, from the image published by devkitPro.

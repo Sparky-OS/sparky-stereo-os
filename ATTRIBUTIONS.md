@@ -1437,3 +1437,18 @@ The author's own AI rule (AI-assisted work welcome, the level of AI involvement 
 HandBrake's AUTHORS.markdown names Eric Petit, Laurent Aimar, Van Jacobson, John Allen, Joe Crain, Damiano Galassi, Edward Groenendaal, David Foster, Rodney Hester, Andrew Kimpton, Chris Lee, Chris Long, Brian Mario, Maurj, Mirkwood, Nyx, Philippe Rigaux, Jonathon Rubin, Scott, John Stebbins, Chris Thoman, Mark Krenek, Kona "Mike" Blend, David Rickard, Tim Walker, Bradley Sepos, Maxym Dm, Simon L and Artem Galin.
 Damiano Galassi wrote the stereo metadata preservation commit; Daniel Ramos wrote the HandBrake x264 frame-packing commit, and Daniel Campos Ramos wrote the x265 frame-packing commit, as those commits record their authors.
 Christian Marillat maintains the deb-multimedia HandBrake packaging examined for this reconciliation.
+
+## ORDER 742: shared HandBrake media libraries
+
+Sources: x264 AUTHORS; x265 source/x265.h and carried patch headers; FFmpeg MAINTAINERS and carried patch headers; GTK AUTHORS (GNOME/gtk, blob ffd57df1f1fe138d259d11ef27fe3a3a9ed91f14); Debian HandBrake packaging. Names only.
+
+x264: Alex Izvorski, Alex Wright, bobololo, Christian Heine, David Wolstencroft, Eric Petit, Fiona Glaser, Gabriel Bouvigne, Guillaume Poirier, Henrik Gramner, Laurent Aimar, Loren Merritt, Mans Rullgard, Michael Niedermayer, Mike Matsnev, Min Chen, Radek Czyz.
+
+x265: Steve Borho, Min Chen, Daniel Campos Ramos.
+
+Library patch and packaging authors: Christian Marillat, Damiano Galassi, Daniel Campos Ramos, Daniel Ramos, John Stebbins, Max Dmitrichenko, Mr-Z-2697, Nomis101, Sebastian Ramacher, cubicibo, galinart, hnsteyding.
+
+FFmpeg: Michael Niedermayer, Anton Khirnov, Reimar Doeffinger, Baptiste Coudurier, Matthieu Bouron, Rick Kern, Aman Gupta, Zhao Zhili.
+
+GTK: Peter Mattis, Spencer Kimball, Josh MacDonald, Shawn T. Amundson, Jerome Bolliet, Damon Chaplin, Tony Gale, Jeff Garzik, Lars Hamann, Raja R Harinath, Carsten Haitzler, Tim Janik, Stefan Jeske, Elliot Lee, Raph Levien, Ian Main, Federico Mena, Paolo Molaro, Jay Painter, Manish Singh, Owen Taylor, Jonas Ådahl, Tim Bäder, Emmanuele Bassi, Chun-wei Fan, Matthias Clasen, Carlos Garnacho, Alexander Larsson, Benjamin Otte, Christian Hergert.
+

@@ -47,6 +47,12 @@ A site that answers an automated request with a refusal is not worked around.
 - **Symptom:** "Save the correction into the file" is refused on a PNG: "A correction can be saved into JPEG, JPS and MPO pictures only". **Cause:** Gwenview's save writes those three; use a JPEG for the demonstration of the save.
 - **Symptom:** after the save the open picture is shown flat, and a fresh Gwenview shows the saved file in 3D. **Cause:** not found (the view is not made again after the save); reproduced three times, 10 s after the save too.
 - **Symptom:** a half-width side-by-side picture shows its eyes narrow after "Side by side, left eye first". **Cause:** the menu has no "half" choice: each eye is handed over as it is, and nothing doubles its width. **Fix:** a half-width flag in the shared picture engine's menu is the missing piece; demonstrate with full-width pairs.
-- **Symptom:** `Spectacle -b -f -o x.png` gives a 2560x800 picture of both eyes and no mark (no `sTER`, no `_JPSJPS_`, a `stereo=false` text field). **Cause:** not found. A capture is not a marked file until it is converted.
+- **Symptom:** `spectacle -b -f -o x.png` gives both views in a PNG with `stereo=false`.
+  **Cause:** All Screens deliberately clears the stereo flag in `ImagePlatformKWin::takeScreenShotWorkspace`; the current monitor route preserves KWin's metadata.
+  **Fix:** use Current Monitor (`spectacle -b -m -n -o x.png`) for a stereo screen: the published +stereo3d2 package saves `x.mpo`, even with a forced PNG suffix; default PNG saves and the GUI's Save action also write MPO, and default JPG writes a marked JPS.
+  **Found by:** the published source patch, `strings -a -el` (the key is UTF-16), the active mode from `kscreen-doctor -o`, both routes on the same labelled scene, and independent file parsers.
+  Qt reads the MPO back as `Stereo3DLayout=multiViewLeftFirst`; two 1280 by 800 frames match the corresponding raw eyes with mean absolute error below 0.04 on the 0 to 255 scale.
+  A flat picture on a 2D output stays a one-view PNG with `stereo=false`.
+  The GUI check selected Current Monitor with `-m` and saved with Ctrl+S; it did not exercise the GUI capture-mode selector.
 - **Symptom:** Pillow warns "Image appears to be a malformed MPO file" when it opens a JPEG taken out of an MPO. **Cause:** the extracted picture still holds the MPF segment. **Fix:** harmless; the file written by Align stereo pair has two frames.
 - A privacy pass on every capture: window titles and breadcrumbs show only the rig's own folders; strip anything else, and never put location data in a committed photo.

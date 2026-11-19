@@ -1202,3 +1202,14 @@ These credits record the studied software and test dependencies; the edition's e
 - **KAuth and Polkit** (KDE Frameworks, LGPL-2.1-or-later; polkit, LGPL-2.0-or-later): the authors of KAuth and of polkit, whose action policy carries the every-account change.
 - **AES5-2018 (r2023)**: the Audio Engineering Society; its published abstract is quoted on the page's line about sampling frequencies.
 - **The Linux kernel's HDA and DRM code** (GPL-2.0): the authors of the ELD files in `/proc/asound` and of `drm_edid_to_sad()` and `include/linux/hdmi.h`, which carry a display's CTA-861 audio data blocks to the page.
+
+## The system test lab (ORDER 22)
+
+The lab joins rigs that other work made and credits their authors, from the entries above.
+
+- **VKMS and its configfs series** (Linux, GPL-2.0): Rodrigo Siqueira and Haneen Mohammed created VKMS; Louis Chauvet and José Expósito wrote the configfs work whose EDID attribute the screens rows use. The edition's [vkms-stereo-bench](tools/vkms-stereo-bench/README.md) scripts and its kwin phase carry the screens rows; Adam Jackson and Hans Verkuil wrote edid-decode, which computes their expectations.
+- **QEMU** (GPL-2.0): Fabrice Bellard and the QEMU developers, whose virtual machine runs every guest of the lab, KVM included.
+- **PipeWire and WirePlumber** (MIT): Wim Taymans, George Kiagiadakis and their contributors wrote the sound graph, `pw-dump` and `pw-metadata`, and the monitor rules the audio rows read; the audio rig's fake sound devices are those of ORDER 631's bench.
+- **SDL** (zlib): Sam Lantinga and the SDL contributors; Tomasz Pakuła wrote the EV_BTN kernel series and the SDL pull request that the input row exercises.
+- **BusyBox** (GPL-2.0): Erik Andersen, Denys Vlasenko and the BusyBox developers, whose static build is the guests' userland.
+- **Debian** (the stock side of every row): the Debian kernel, KWin, Mesa, PipeWire and SDL maintainers; the CTA-861 audio data blocks the HDMI audio row builds its fixture from are the Consumer Technology Association's.

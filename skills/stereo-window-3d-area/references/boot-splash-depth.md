@@ -16,7 +16,7 @@ The splash had levels fixed at the desktop's default limits, so a person who low
 3. **Plymouth** (+stereo3d3, patch stereo3d-0003) parses `popped=` and `sunk=` per entry, and the script plugin has `Window.GetStereoPoppedLimit ()` and `Window.GetStereoSunkLimit ()`.
    An entry without them gets 4 and 10 (the display default of the reference monitor) and the renderer says so once per output; a value that is no limit is said and the default stands.
 4. **The theme** (sparky-stereo-plymouth 20261119) places its levels from the limits: the base is one step, 1.135 times the popped limit (4.54 px at 1920 and the default limits), the logo two steps (9.08 px), the nearest electron the base plus the popped limit, the farthest electron 0.6 of the sunk limit behind the base. These are the levels before ORDER 472; 20261108 to 20261117 had cut them to half the popped limit and the popped limit.
-   At 4 and 10 these are the levels of the previous version (2, 4, 4 px), so nothing is raised.
+   Measured in the guest rig (ORDER 750, 20261119 against the published 20261109): at popped 4 and sunk 10 the base is 5 px and the logo 9 (published: 2 and 4); at popped 8 and sunk 20, 9 and 18 (published: 4 and 8); match error under 7 in all rows.
 
 No silent fallbacks: no limits saved is said in the journal and by `sparky-stereo-boot status` (the display's default); an unreadable value or file is kept by the problems engine (`splash-depth`), a libstereo-policy that cannot answer too (`splash-depth-display`).
 

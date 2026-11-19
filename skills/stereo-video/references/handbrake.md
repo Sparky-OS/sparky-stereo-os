@@ -106,7 +106,7 @@ Inspect HandBrake's ELF `NEEDED` entries, Depends and the source returned by `ap
 The source is `handbrake-dmo`, whose packaging updates an included FFmpeg to 8.0.3.
 The installed executables have no dynamic libavcodec or libx265 dependency.
 Installing a newer system library alone therefore does not establish which encoder or decoder HandBrake uses.
-Resolve the bundled-library boundary in the successor recipe and rerun the marked-source matrix on that package; the Debian study does not qualify the deb-multimedia candidate.
+For the edition successor, retain deb-multimedia's bundled FFmpeg and x265 build route and carry the stereo fixes through it; unbundling would change unrelated encoders. Rerun the marked-source matrix on that package; the Debian study does not qualify the deb-multimedia candidate.
 
 Recheck upstream records through the project's own repository:
 

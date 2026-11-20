@@ -3,8 +3,9 @@
 **For the contributor: write and test portable code on Linux, compile the native application on a standard hosted macOS runner, then sign and install from Linux.**
 Check freshness first: source workflows and local gates checked 2026-11-20.
 The first native proof target and workflow are implemented.
-Hosted run 44689690224 passes the portable tests, native app build and arm64 check; packaging then rejects the real two-line unsigned diagnostic.
-Artifact upload and phone launch are not yet established.
+[Hosted run 44690357195](https://github.com/Sparky-OS/flat-headset/actions/runs/44690357195) passes every step for commit 306c59c: the portable tests, the native app build, the arm64 and unsigned checks, the packaging and the artifact upload.
+The downloaded artifact was checked on Linux: the checksum, the manifest entry, only our own files inside, an arm64 program for iOS 16.0 and later with no code signature.
+Signing, installing and a launch on a phone are not yet established.
 
 ## Working recipe
 

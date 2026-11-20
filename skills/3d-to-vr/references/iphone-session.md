@@ -120,3 +120,11 @@ Do not delete the apps to refresh them; persistence of their paired identities a
 
 Flat Headset is the static desktop receiver, without tracking.
 The later iStereoVR pose path is outside this session.
+
+## Function icon and package counts
+
+The built set remains three programs with one KDE Connect pairing.
+The [two-shape cost table and function-icon instructions](iphone-functions.md) compare this set with a receiver inside KDE Connect, without changing the sign-in stop above.
+A person-created Shortcuts icon can open `flatheadset://catch` directly at the receiver’s Computers screen; the supplied picture is the existing Android Flat Headset artwork.
+The shortcut adds no free-provisioned application slot and needs no seven-day signing of its own; the native target still needs renewal.
+No combined package or quick-action menu has been built by this documentation change.

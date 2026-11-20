@@ -103,3 +103,7 @@
   **Cause:** its added-message parser only recognizes a singular `msgstr` and consumes later entries while seeking one after a plural.
   **Fix:** record the validator's failure and check the compiled catalogue with the native format tool and context-aware singular and plural lookups.
   **How found:** the KScreenLocker Spanish patch produced correct installed Ki18n output for both plural forms after the wrapper reported a failure.
+- **Symptom:** `desktop-file-validate` flags `MimeType` and `Actions` on a KDE service menu.
+  **Cause:** the freedesktop application validator treats the existing `Type=Service` entry as outside its application schema.
+  **Fix:** preserve the KDE service-menu type, record those diagnostics on both builds, and prove the service action's exact localized key through the desktop key reader.
+  **How found:** the published and rebuilt audio-format menu both drew the same diagnostics. The candidate's localized action values passed the installed lookup.

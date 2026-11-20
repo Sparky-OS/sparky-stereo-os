@@ -38,6 +38,7 @@ Claude Code adds more frontmatter fields it acts on (`when_to_use`, `disable-mod
 | Claude Code | `/etc/claude-code/.claude/skills` (managed) | `claude mcp add --scope user NAME -- COMMAND ARGS` (stored in `~/.claude.json`) | `claude mcp remove NAME` |
 | Codex | `/etc/codex/skills` (admin) | `codex mcp add NAME -- COMMAND ARGS` (`~/.codex/config.toml`, `[mcp_servers.NAME]`) | delete the table, or `enabled = false` |
 | Gemini CLI | none documented | `gemini mcp add -s user NAME COMMAND ARGS` (`~/.gemini/settings.json`, `mcpServers`) | `gemini mcp remove -s user NAME` |
+| Antigravity (`agy`, read 2026-11-20) | none documented; per user `~/.gemini/config/skills` | `agy mcp add NAME COMMAND ARGS`, or `agy mcp add NAME URL` (`~/.gemini/config/mcp_config.json`) | `agy mcp remove NAME` |
 | OpenCode | none documented | `opencode mcp add NAME --global -- COMMAND ARGS` | delete the entry in its config |
 | Cline | none documented | `cline mcp add NAME --yes -- COMMAND ARGS` (`~/.cline/data/settings/cline_mcp_settings.json`) | `cline mcp remove NAME` |
 | Cursor | none documented | edit `~/.cursor/mcp.json` (`mcpServers`, `command`, `args`) | delete the entry |

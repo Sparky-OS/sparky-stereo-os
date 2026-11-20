@@ -2,7 +2,8 @@
 
 **For the contributor: write and test portable code on Linux, compile the native application on a standard hosted macOS runner, then sign and install from Linux.**
 Check freshness first: source workflows and local gates checked 2026-11-20.
-The first native proof target and workflow are implemented; a hosted build and phone launch are not yet established by the local checks.
+The first native proof target and workflow are implemented.
+The first hosted run reached native catalog/project lint and then failed in the portable host compile; a successful app build and phone launch are not yet established.
 
 ## Working recipe
 
@@ -25,6 +26,13 @@ The first native proof target and workflow are implemented; a hosted build and p
 This does not make arbitrary larger/private runners free, nor justify unbounded artifact retention.
 The proof workflow selects the standard `macos-15` image, retains artifacts for seven days, has a twenty-minute timeout and builds with four jobs.
 The app's deployment minimum is iOS 16.0; the installed SDK version is printed instead of assuming it matches the deployed OS version.
+Keep that value in a project-specific variable such as `FLAT_HEADSET_IOS_MIN`, not a job-level `IPHONEOS_DEPLOYMENT_TARGET` that Apple Clang consumes during the macOS host tests.
+Pass `IPHONEOS_DEPLOYMENT_TARGET="$FLAT_HEADSET_IOS_MIN"` only as an argument to the native iPhone `xcodebuild` command.
+The first [hosted run](https://github.com/Sparky-OS/flat-headset/actions/runs/44687332888), checked 2026-11-20, used runner image `macos-15-arm64`, reported `ImageOS=macos15` and image version `20261118.0550.1`, and selected Xcode 16.4, build 16F6.
+Its SDK list was DriverKit 24.5, iOS/iOS Simulator 18.5, macOS 15.5, tvOS/tvOS Simulator 18.5, visionOS/visionOS Simulator 2.5 and watchOS/watchOS Simulator 11.5.
+The host compiler identified itself as AppleClang 17.0.0.17000013.
+These are observed values for that run, not a promise about future contents of the runner label.
+The iOS 18.5 SDK passes this proof's 16.0 floor; Xcode 16.4 does not meet FreeRDP's documented Xcode 26+ requirement, which the later core workflow must resolve on an appropriate hosted image.
 Reading [Apple's SDK agreement](https://www.apple.com/legal/sla/docs/xcode.pdf) is not legal advice; Daniel decides the applicable licence questions.
 The selected compile runs on hosted Apple machines running macOS, rather than moving Apple's SDK onto the Linux workstation.
 The prior Linux cross-compiler probes remain useful evidence in [the iPhone reference](iphone-arm.md); they are not the selected SDK build route.
@@ -121,3 +129,10 @@ Coverage proves presence, not a native speaker's acceptance or on-phone fallback
    **Cause:** a uint32 width was compared against a size_t maximum divided by four.
    **Fix:** after rejecting zero width, compare the size_t maximum divided by width with four; retain capacity/stride guards and compile with warnings as errors.
    **How found:** Clang 21.1.8's `-Wtautological-constant-out-of-range-compare`; the corrected generator and tests pass without suppressing the warning.
+
+7. **Symptom:** `using sysroot for 'MacOSX' but targeting 'iPhone' [-Werror,-Wincompatible-sysroot]` at the portable generator's first file.
+   **Cause:** job-level `IPHONEOS_DEPLOYMENT_TARGET=16.0` leaks into Apple Clang while CMake selects the macOS SDK for a host test executable.
+   **Fix:** keep the version in `FLAT_HEADSET_IOS_MIN`; pass the Apple deployment setting only on the native `xcodebuild` command, retaining warnings as errors and real host tests.
+   **How found:** run 44687332888 prints the inherited variable, macOS SDK and exact compiler failure; catalog/tooling checks and both plutil lints passed before it.
+   An SDK-free Clang 21.1.8 Darwin-driver `-###` probe selects `arm64-apple-ios16.0.0` with the old variable and `arm64-apple-macosx15.0.0` with the corrected workflow environment; no target compilation or Apple files are involved.
+   The workflow correction and Linux portable tests pass locally; a subsequent hosted run must establish that the Apple compiler/build now succeeds.

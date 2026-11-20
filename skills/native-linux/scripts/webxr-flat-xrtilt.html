@@ -1,0 +1,59 @@
+<!doctype html><html><head><meta charset="utf-8"><title>xrtilt</title>
+<style>html,body{margin:0;background:#f4f1ea;font:16px sans-serif;color:#222}canvas{width:800px;height:450px;display:block;margin:20px 40px}
+#immersive{position:fixed;left:2px;top:2px;z-index:9;font-size:14px}
+html.inline canvas{width:100vw;height:auto;margin:0}</style></head>
+<body><canvas id="c" width="800" height="450"></canvas>
+<p style="margin:10px 40px"><button id="immersive" hidden>Enter 3D</button> <span id="status">checking</span></p>
+<script type="module">
+// A tilted object: a grey ramp runs from the viewer (left, near) to far away (right), its near end a red square and its
+// far end a green square, each square facing the viewer and 0.06 of its distance wide, so both cover the same angle.
+const c = document.getElementById("c"), gl = c.getContext("webgl2", { antialias: false, depth: true, xrCompatible: true });
+const d = document.documentElement.dataset;
+const INLINE = location.search.includes("mode=inline");
+if (INLINE) { document.documentElement.classList.add("inline"); c.width = 2 * Math.round(innerWidth * devicePixelRatio); c.height = Math.round(innerWidth * devicePixelRatio * 9 / 16); c.style.height = (c.height / devicePixelRatio) + "px"; }
+const VS = `#version 300 es
+in vec3 pos; uniform mat4 pv; void main(){ gl_Position = pv * vec4(pos, 1.0); }`;
+const FS = `#version 300 es
+precision highp float; uniform vec3 col; out vec4 o; void main(){ o = vec4(col, 1.0); }`;
+const sh = (t, s) => { const x = gl.createShader(t); gl.shaderSource(x, s); gl.compileShader(x); return x; };
+const p = gl.createProgram(); gl.attachShader(p, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(p, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(p);
+const loc = { pos: gl.getAttribLocation(p, "pos"), pv: gl.getUniformLocation(p, "pv"), col: gl.getUniformLocation(p, "col") };
+const NEAR = 1.5, FAR = 150;
+function sq(z, x, rgb) { const h = 0.03 * z; return { rgb, z, x, v: [x - h, -h, -z, x + h, -h, -z, x + h, h, -z, x - h, -h, -z, x + h, h, -z, x - h, h, -z] }; }
+const objs = [];
+// the ramp: a strip from (x=-0.9 m, z=-NEAR) to (x=+0.9*FAR/NEAR... kept in view by angle) tilted in depth
+const rx0 = -0.05 * NEAR, rx1 = 0.05 * FAR; const hw = 0.012;
+objs.push({ rgb: [0.55, 0.55, 0.55], v: [rx0, -hw * NEAR, -NEAR, rx1, -hw * FAR, -FAR, rx1, hw * FAR, -FAR, rx0, -hw * NEAR, -NEAR, rx1, hw * FAR, -FAR, rx0, hw * NEAR, -NEAR] });
+objs.push(sq(NEAR, rx0, [1, 0, 0]));
+objs.push(sq(FAR, rx1, [0, 1, 0]));
+for (const o of objs) { o.b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, o.b); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(o.v), gl.STATIC_DRAW); }
+function draw(pv) { gl.useProgram(p); gl.enable(gl.DEPTH_TEST); gl.uniformMatrix4fv(loc.pv, false, pv);
+  for (const o of objs) { gl.bindBuffer(gl.ARRAY_BUFFER, o.b); gl.enableVertexAttribArray(loc.pos); gl.vertexAttribPointer(loc.pos, 3, gl.FLOAT, false, 0, 0); gl.uniform3fv(loc.col, o.rgb); gl.drawArrays(gl.TRIANGLES, 0, 6); } }
+function perspective(fovy, aspect, near, far) { const f = 1 / Math.tan(fovy / 2), nf = 1 / (near - far);
+  return new Float32Array([f / aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, (far + near) * nf, -1, 0, 0, 2 * far * near * nf, 0]); }
+function mul(a, b) { const o = new Float32Array(16); for (let cc = 0; cc < 4; cc++) for (let r = 0; r < 4; r++) { let s = 0; for (let k = 0; k < 4; k++) s += a[k * 4 + r] * b[cc * 4 + k]; o[cc * 4 + r] = s; } return o; }
+const pv = perspective(0.7854, c.width / c.height, 0.1, 300);
+d.canvas = JSON.stringify([c.width, c.height, innerWidth, innerHeight, devicePixelRatio]);
+function flat() { gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, c.width, c.height); gl.clearColor(0.2, 0.2, 0.25, 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); draw(pv); }
+flat();
+d.centres = JSON.stringify({ red: [rx0, 0, -NEAR], green: [rx1, 0, -FAR] });
+const st = document.getElementById("status"), btn = document.getElementById("immersive");
+const ok = navigator.xr ? await navigator.xr.isSessionSupported(INLINE ? "inline" : "immersive-vr").catch(() => false) : false;
+d.xrOffered = ok ? "1" : "0"; st.textContent = ok ? "immersive-vr offered" : "no immersive session"; btn.hidden = !ok;
+btn.addEventListener("click", async () => {
+  const s = INLINE ? await navigator.xr.requestSession("inline", { requiredFeatures: ["inline-stereo"] }) : await navigator.xr.requestSession("immersive-vr"); await gl.makeXRCompatible();
+  const layer = new XRWebGLLayer(s, gl, { antialias: false, depth: true });
+  s.updateRenderState({ baseLayer: layer, depthNear: 0.1, depthFar: 300 });
+  const space = await s.requestReferenceSpace(INLINE ? "viewer" : "local"); d.session = "1"; let n = 0;
+  s.requestAnimationFrame(function onFrame(t, f) {
+    s.requestAnimationFrame(onFrame);
+    const pose = f.getViewerPose(space); if (!pose) return;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, layer.framebuffer); gl.clearColor(0.2, 0.2, 0.25, 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    const rec = [];
+    for (const v of pose.views) { const vp = layer.getViewport(v); gl.viewport(vp.x, vp.y, vp.width, vp.height);
+      draw(mul(v.projectionMatrix, v.transform.inverse.matrix));
+      rec.push({ eye: v.eye, vp: [vp.x, vp.y, vp.width, vp.height], P: Array.from(v.projectionMatrix), V: Array.from(v.transform.inverse.matrix) }); }
+    if (++n) { d.views = JSON.stringify(rec); d.fb = JSON.stringify([layer.framebufferWidth, layer.framebufferHeight]); d.xrframes = n; }
+  });
+});
+</script></body></html>

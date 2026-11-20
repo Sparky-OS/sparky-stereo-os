@@ -16,9 +16,9 @@ The chain that carries the person's depth limits to the theme is in [boot-splash
    When it is false the window is one picture and the theme draws it once, with no parallax, exactly like its 2D look.
    Never `Image.Scale` an eye to half the window's width, never lay the pair out in one picture: that is what the output does.
 3. **Depth from the person's limits.**
-   `Window.GetStereoPoppedLimit ()` and `Window.GetStereoSunkLimit ()` are pixels of a view 1920 wide; the theme scales them by the eye's width over 1920, rounds to whole pixels, and places three levels inside them: the background on the screen, the base (the swirl and its orbits) at half the popped limit, the logo at the popped limit.
-   A moving item (the electrons) stays between the popped limit in front and the sunk limit behind.
-   No constant depth in a theme: an earlier splash that popped its logo 9 px against a limit of 4 had a constant.
+   `Window.GetStereoPoppedLimit ()` and `Window.GetStereoSunkLimit ()` are pixels of a view 1920 wide; the theme scales them by the eye's width over 1920 (the screen's, since the splash fills the screen) and by nothing else, rounds to whole pixels, and places three levels: the background on the screen, the base (the swirl and its orbits) one step in front, the logo two steps, with the step 1.135 times the popped limit (4.54 px at 1920 and the default limits, the SparkyOS stereo theme's measured raise); no level reads the size of a logo or any element.
+   A moving item (the electrons) pops by the popped limit from the base and sinks by 0.6 of the sunk limit.
+   No constant depth in a theme: the levels come from the limits Plymouth gives (the logo's 9.08 px is 2 * 1.135 * 4).
    With both limits at 0 everything is on the screen.
    Right minus left, in pixels, of a thing at depth `d`: `-int(d * eye_width / 1920 + 0.5)` (crossed, in front of the screen, is negative).
 4. **Lay out again at every display hotplug** (`Plymouth.SetDisplayHotplugFunction`), and keep the layout while `Window.GetWidth ()` is 0 (the gap between the firmware's framebuffer and the GPU's screens): with no display the limits are null and the script stops at every frame.

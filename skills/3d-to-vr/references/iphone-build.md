@@ -197,7 +197,11 @@ Only the iPhone mode compiles the VideoToolbox path; hardware decoding, software
 
 The `FlatHeadset-core-arm64-COMMIT` artifact is a development archive of third-party headers/static libraries, licenses, source lock, build commit/configuration and the unsigned link probe.
 It is not an IPA and must never be added to the renewal manifest.
-The first core hosted run compiled and linked successfully but stopped at the probe-path check; an uploaded core artifact is still pending.
+The first core hosted run compiled and linked successfully but stopped at the probe-path check.
+With the path taken from CMake, [run 44694434857](https://github.com/Sparky-OS/flat-headset/actions/runs/44694434857) passes both jobs for commit 3623f88 and uploads the core archive.
+That archive was checked on Linux: its checksum, the three licence texts, no file of Apple's SDK inside, every object of the eight static libraries built for arm64, and the link probe an unsigned arm64 program for iOS 16.0 and later (SDK 26.5).
+It also holds OpenSSL's `legacy.dylib` provider module, which an iPhone app cannot load as a loose file: build OpenSSL without that module or leave it out of the archive.
+Nothing was run on a phone.
 After the complete job is green, integrate authenticated pairing/certificate pinning and RDP lifecycle into the receiver, then decode-to-Metal and the Android viewer mathematics.
 KDE Connect and the Cardboard profile program follow the receiver in the brief's order.
 

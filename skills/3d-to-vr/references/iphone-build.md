@@ -388,15 +388,16 @@ The session advertises H.264; compiled HEVC support is not evidence of HEVC nego
 The frame queue tests cover padded rows, complete left/right geometry, ownership, late-frame replacement, concurrent coherence and closed/malformed inputs.
 The GDI integration test allocates the actual pinned FreeRDP surface, runs the production paint handoff and checks forty pairs, dirty-region reset, empty paints, wrong extents and closure without a network connection.
 These checks do not exercise an encoded stream, Apple's decoder, the Metal shader or the optics.
-The new view and strict decoder patch need the next hosted compile, then the later authorized phone session for runtime evidence.
+The view and original strict patch passed run 44770385750 below; the later authorized phone session is still needed for runtime evidence.
 The Android viewer's actual profile mathematics follows this integration; no distortion coefficient is inferred here.
 
 - **Symptom:** a failed VideoToolbox device initialization logs a software fallback and still attempts decoding.
   **Cause:** pinned FreeRDP's `h264_ffmpeg.c` jumps past the hardware setup to the common codec-open call; its frame receive path also accepts a non-hardware frame.
-  **Fix:** the receiver's small pinned-source patch takes the existing cleanup/failure path in both cases when WITH_VIDEOTOOLBOX is set.
+  **Fix:** stop presenting and ask for a per-session software-decoding choice, as described below.
+  The initial patch instead ended the session; that removed the silent switch but incorrectly removed the person's choice.
   Keep the patch beside the source lock in the core artifact; apply it with an exact forward or reverse check, never ignore a failed hunk.
   **How found:** source review of 3.28.0 and the current default branch before wiring the presentation path.
-  The Linux build checks patch application and the unchanged non-Apple path; native compilation and a real hardware failure remain separate checks.
+  The Linux analogue checks both failure reasons and decisions through the core permission API; Apple-path compilation and an actual hardware failure remain separate checks.
 - **Symptom:** a GDI receiver accumulates dirty-region entries although it copies the complete surface each time.
   **Cause:** clearing only `invalid->null` leaves `hwnd->ninvalid` growing in `gdi_InvalidateRegion`.
   **Fix:** reset the count with the aggregate dirty flag in BeginPaint, as the pinned SDL client does.
@@ -408,3 +409,101 @@ The Android viewer's actual profile mathematics follows this integration; no dis
 
 [Run 44770385750](https://github.com/Sparky-OS/flat-headset/actions/runs/44770385750) passes both jobs for commit 4970452: the desktop view, its Metal fragment and the core with the strict VideoToolbox patch compile and link, and the unsigned package was checked on Linux (arm64, no signature, no embedded library).
 No frame has been decoded or shown on a phone.
+
+
+## Hardware failure offers an explicit session choice
+
+When VideoToolbox cannot initialize or yields another frame format, hide the desktop and say that hardware video decoding failed.
+Offer two actions in the person's language: continue with software decoding for this session, with the explicit warning that it is slower and uses more battery, or go back.
+Never interpret a timeout, remote packet, stored pairing or closing the prompt as permission.
+No design found for remembering the decoder choice across sessions; every new paired RDP session starts with hardware decoding.
+
+The receiver's patch retains its `0001-require-videotoolbox.patch` filename but now carries a per-decoder permission callback.
+GDI passes the session callback into both AVC420 and AVC444 contexts before initialization.
+The callback's query operation does not block or prompt; it reports only an existing software choice for that session.
+The two failure reasons pause the owned-frame queue and wait on a cancellable condition variable while the main thread shows the actions.
+Continue permits the software path in that context and subsequent surfaces of the same session.
+Go back, Stop, backgrounding and losing the paired control connection cancel the waiter before FreeRDP teardown.
+There is no process-global flag, environment variable or stored preference.
+Keep the authenticated connection while the person decides and hold only its connection deadline during that decision.
+A later failure is still a failure, not another automatic switch.
+
+For initialization failure, approval skips the hardware setup before opening FFmpeg's decoder.
+For hardware format negotiation failure, select an offered YUV420P or YUVJ420P software format only after approval.
+For a received software frame, take an owned reference to those planar pixels only after approval; do not interpret an unrelated format as those planes.
+Clear the renderer's old texture and invalidate older GPU completion callbacks before resuming, so a completed old submission cannot hide the waiting message or make a stale frame look new.
+An early failure can happen before the desktop view's first draw: its layout path must also present the choice.
+
+The Linux analogue uses the real core permission API to inject each failure reason, tests both actions, verifies that no pending frame survives the wait, and decodes an authored H.264 left-red/right-blue pair after approval.
+It tests cancellation and new sessions separately; a new session must answer the software query with false.
+These tests do not simulate Apple's VideoToolbox device creation or execute UIKit.
+Run [44779150423](https://github.com/Sparky-OS/flat-headset/actions/runs/44779150423) compiled and uploaded the updated core for 576dd93.
+The application compile then stopped at an invalid Objective-C instance-variable initializer; the correction then passed both jobs in [run 44783586937](https://github.com/Sparky-OS/flat-headset/actions/runs/44783586937) for cd3c5f5. Its downloaded IPA and core passed checksum, arm64, iOS 16.0, unsigned and no-embedded-dylib checks. A device check still remains.
+
+- **Symptom:** the software decoder's eye-color assertion fails although decoding completes.
+  **Cause:** the first generated fixture used FFmpeg's limited-range BT.601 color source directly, but the RDP conversion uses full-range BT.709.
+  **Fix:** explicitly convert and mark the fixture as full-range BT.709 before encoding; keep the same pixel assertions.
+  **How found:** the initial Linux analogue failed, then the corrected fixture passed every pixel in both eyes through the pinned FreeRDP/FFmpeg decoder.
+  This qualifies the authored SDR fixture, not arbitrary HDR or color metadata.
+- **Symptom:** the receiver reports a generic disconnection after a hardware failure even though software decoding could continue.
+  **Cause:** replacing an automatic fallback with an unconditional error removed both the silent switch and the explicit alternative.
+  **Fix:** pause presentation, explain the hardware failure and wait for the person's session-scoped choice; cancel that wait on teardown.
+  **How found:** review of the original strict patch against the explicit-choice rule, followed by both-decision tests through the actual permission callback API.
+
+- **Symptom:** Clang stops at `Desktop.mm:18:34` with `expected ';' at end of declaration list`.
+  **Cause:** `_presentationEpoch=0` used a C++ member initializer inside an Objective-C instance-variable block.
+  The C++ `shared_ptr` and clock members are valid there; the scalar initializer syntax is not.
+  **Fix:** declare `_presentationEpoch;`; Objective-C allocation already zeroes scalar instance variables.
+  Assign any nonzero initial value inside the initializer method.
+  **How found:** the complete failing native build step identifies this sole error; Linux Clang reproduces it with authored test doubles and parses both corrected controller files.
+  Run `bash ios/Tools/check_objc_syntax.sh` locally to check `Desktop.mm`, `Desktop.h`, `Computers.mm` and `ViewerSettings.mm` with C++17, ARC, blocks and warnings as errors.
+  Its minimal declarations come from our call sites, not Apple's files; they check syntax and local type consistency, not real SDK signatures, ABI, availability, linking, shader compilation or runtime behavior.
+  Keep those test includes out of every product build and keep the hosted Xcode compile as the SDK check.
+
+
+## Carry the Android viewer geometry across unchanged
+
+Use the existing Android `FittedLensCorrection.kt`, `headset_fitted.frag`, `PanelView.kt` and `PanelDescriptor.kt` in [Flat Headset](https://github.com/Sparky-OS/flat-headset), not coefficients inferred from a viewer's brand.
+Uncorrected remains the default. The other independent choices are the existing Shinecon fitted D mapping and a Cardboard QR profile; never compose them.
+The fit uses strength 0.13 from the existing Android implementation, and was checked for one Android phone placement in the adjustable viewer. That is not an optical proof for an iPhone.
+The iPhone selection explains that limitation, is saved like Android's viewer selection, and is captured before establishing the paired connection. Decoder consent remains separate and per session.
+
+For QR geometry, retain the portable C++ subset from [Cardboard 8bd424da](https://github.com/googlevr/cardboard/tree/8bd424da7f1e399255a1b6e7c02be8e281ecc974): lens distortion, radial inverse, mesh and matrix, with its license and original source hashes.
+Feed validated actual DeviceParams and physical screen dimensions into its constructor. Do not substitute a fit strength for the QR distortion polynomial.
+The receiver uses the exact Cardboard v1 bytes only when v1 is explicitly chosen; an imported full profile link is decoded locally and invalid data is refused.
+Short-link resolution and the separate Cardboard program's scanner are not implemented by that import field.
+Use the upstream iPhone DPI table for the screen model; refuse unknown physical dimensions rather than choosing a plausible DPI.
+Preserve the upstream border constant, FOV and viewport math; retain its 1600 vertices and 3158 strip indices per eye.
+For Metal, flip mesh V exactly as the upstream Metal renderer does; keep the whole-panel viewport and each eye's source region.
+Never resize each eye to fill a lens mask or change separation to hide black edges.
+The authenticated native-panel reply must echo the selected Android lens-profile ID along with the exact panel dimensions and identity.
+
+Local commands, in the isolated Linux test environment:
+
+```sh
+bash ios/Tools/check_objc_syntax.sh
+python3 ios/Tools/check_localizations.py
+cmake -S ios -B build/viewer -DCMAKE_BUILD_TYPE=Debug -DFH_VIEWER_GLES_TEST=ON -DFH_VIEWER_SESSION_TEST=ON
+cmake --build build/viewer --parallel 4
+ctest --test-dir build/viewer -V
+```
+
+EGL/GLES2 and OpenSSL development packages are needed for these two optional tests; ordinary portable CMake checks also run on the hosted Mac.
+The expanded authored Objective-C stand-ins cover the profile settings UI and Metal mesh submission, without including Apple's headers.
+The 51 native string keys include the profile choices and refusals in ten languages.
+The native viewer changes still await their hosted compile; all optical checks on a phone remain unproven.
+
+- **Symptom:** a port's fitted picture differs by half a pixel or appears to use a different strength.
+  **Cause:** removing one of Android's two half-pixel operations, treating the fit strength as a QR coefficient, or measuring the radius in different units changes the mapping.
+  **Fix:** share the exact scalar pixel mapping between portable C++ and Metal and compare it against Android's actual shader on headless GLES. Keep its integer centre and per-eye diagonal normalization.
+  **How found:** the 0.13 mapping passes every pixel at 1920x1080, 2340x1080 and 1280x720 in both vertical orientations, with at most one channel value of interpolation rounding; bypass is exact. A deliberately wrong coefficient produces mismatches.
+- **Symptom:** a plausible QR mesh is not demonstrably the same geometry as Android's.
+  **Cause:** testing only a reimplementation against itself misses parser, FOV, viewport and eye-order changes.
+  **Fix:** build the pinned, unmodified Cardboard sources with their generated protobuf parser as an independent oracle, and compare every mesh coordinate, UV and index after the documented Metal V flip.
+  **How found:** the actual Cardboard v1 and I/O 2015 profiles give byte-identical 3200 vertices/UVs and 6316 indices at all three test panel sizes; exchanging the eyes fails the comparison.
+- **Symptom:** a malformed imported profile could hang inverse-distortion construction.
+  **Cause:** upstream's secant inverse loop has no iteration bound.
+  **Fix:** bound parsing and inverse iterations, refuse nonfinite results and report the invalid profile in the person's language. Do not silently replace its coefficients or select v1.
+  **How found:** source inspection while accepting imported profile bytes; legitimate-profile oracle comparisons and malformed-input tests preserve the valid math.
+
+These are arithmetic, parsing and session-control proofs on Linux. They do not execute Metal, display an RDP desktop on a phone or verify lens alignment through a viewer.

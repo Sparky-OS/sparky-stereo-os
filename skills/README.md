@@ -3,6 +3,7 @@
 **For distro maintainers, contributors and their AI partners:** reusable instructions, evidence and test recipes in plain Markdown.
 Humans can follow them directly. Local and hosted models can read the same files; no account or provider is required.
 These are edition-maintenance procedures, not a general application-development course.
+The decisions behind them are on one page: [How we work here](../docs/how-we-work.md).
 
 Start with [AGENTS.md](../AGENTS.md), the [edition contract](sparky-stereo/SKILL.md), [working practices](working-practices/SKILL.md) (where things go, which disk, ship then clean then hand back) and [working together](ai-partners/SKILL.md).
 Then choose one task below. Each domain starts with a short working recipe; detailed sections retain the measurements and traps that motivated it.

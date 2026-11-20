@@ -103,6 +103,8 @@ The rows, scripts and traps: [x11-child-clipping.md](references/x11-child-clippi
 
 A program whose interface is a toolkit window and whose 3D area is a native child (a player's video, a GL widget) declares the child with `stereo_declare_x11_child()` on its top-level window, not with `stereo_declare_x11()` on the child, and takes the declaration back when the area closes: the top-level must list the child, or Stereo KWin shows one view in both eyes.
 Each view keeps its resolution: the program draws on a window of its own inside the toolkit's child, twice a view wide, and declares that window with the size one view is shown at (support version 8), so Stereo KWin resizes once; where the desktop announces less, each view is drawn in half of the child and the program says so.
+A Tk or other toolkit that draws the child before it maps its window (Netgen): [x11-declared-child-limits-and-first-pair.md](references/x11-declared-child-limits-and-first-pair.md), last section.
+A Python and Qt molecule viewer whose quad buffer is the only output (PyMOL): [qt-molecule-viewer-quad-buffer.md](references/qt-molecule-viewer-quad-buffer.md).
 The recipe, the proof (a column-coded clip), and the traps (the toolkit that reads its child's real size, the library version, the link gate, the error handler, the notices) are in [x11-video-child.md](references/x11-video-child.md).
 
 ## Requalifying the gl-stereo savers
@@ -173,6 +175,8 @@ A compute or sparse-buffer program that draws nothing on the RTX through zink, w
 A browser canvas (WebGL, three.js, CesiumJS), video or image with `image-rendering: pixelated` that shows black, solid green or blurry on Stereo KWin: [references/browser-pixelated-canvas.md](references/browser-pixelated-canvas.md).
 
 The browser's camera hack or flat WebXR display shown squeezed side by side, the same in each eye, where the browser draws without the graphics card (its own compositor in software, `WebRender (Software)`; not Stereo KWin's): where the pair lost its mark, the fix, the rig cases with a forced software route and with no device at all: [references/browser-software-webrender-pair.md](references/browser-software-webrender-pair.md).
+
+The browser's flat WebXR display (an inline-stereo session) gives half the separation in a window half as wide: the proof page with a tilted object, the two windows, the measurement, and why an immersive session cannot show it: [references/browser-webxr-flat-separation.md](references/browser-webxr-flat-separation.md).
 
 A closed program we cannot rebuild, with a quad buffer mode, shipped as an AppImage (what it bundles, which configuration it is offered, the program's fault told from the stack's with a small client, `GL_BACK` reaching one eye only, the FUSE 2 runtime, the settings file named after the start name, the 3D mouse boundary): [references/closed-program-quad-buffer-in-an-appimage.md](references/closed-program-quad-buffer-in-an-appimage.md).
 

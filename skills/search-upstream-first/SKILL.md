@@ -66,6 +66,8 @@ Name the author and the commit in the recipe's credits and in the edition's ATTR
   The fix was already on the nouveau list, not yet in drm-misc: Jim Cromie's "drm/nouveau: Fix NULL pointer dereference in GET_ZCULL_INFO ioctl" of 2026-08-15.
   The edition's kernel carried his patch under his authorship, with Zhenhao Wan's fix for `GETPARAM_GRAPH_UNITS`, which the same machine hit next, instead of a duplicate of our own.
 
+[Reconciling an old multi-program request against what ships](references/reconciling-an-old-request.md) has the commands that tell what is published, what exists unshipped, how far a fork is behind and whether our patch series still applies, and the traps met (ORDER 50).
+
 ## Lessons from the lanes, October to November 2026
 
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (6 entries).

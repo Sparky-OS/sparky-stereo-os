@@ -412,6 +412,7 @@ The edition's DisplayXR package (ORDER 58, [Sparky-OS/displayxr-packaging](https
 
 **Source**: [mesa3d.org](https://mesa3d.org/) **License**: MIT **What we changed**: OpenGL quad buffer, EGL multiview windows and two-layer Vulkan swapchains become one full side by side picture, declared to KWin; a Vulkan layer does the same over drivers outside Mesa.
 **Credit**: Brian Paul, who started Mesa in 1993, and the Mesa developers.
+The GLX files that patch 0045 (a stereo child is declared once its window is viewable, ORDER 50c) changes are `src/glx/dri_common.c`, `dri_common.h`, `dri3_glx.c` and `drisw_glx.c`; by Mesa's own commit history their main authors are Adam Jackson, Kristian Høgsberg, Mike Blumenkrantz, Emma Anholt, Keith Packard, Marek Olšák, Dave Airlie, Emil Velikov, Ian Romanick, Jeremy Huddleston and Kristóf Ralovich.
 The Kopper test series also carries Mike Blumenkrantz's [Present event-selection correction](https://gitlab.freedesktop.org/mesa/mesa/-/commit/b258e2a051761868734f09774295ee9cee5f7e8d), dated 6 October 2026; it remains outside the package recipe pending integration review.
 
 ### 2.3 NVIDIA's open GPU kernel modules and egl-wayland
@@ -460,6 +461,7 @@ Our first Qt change was reviewed within hours by **Tim Blechmann**, with **Artem
 **Source**: [Waterfox](https://github.com/BrowserWorks/Waterfox), our fork [Sparky-OS/waterfox](https://github.com/Sparky-OS/waterfox); Mozilla's Gecko and WebRender, under the Mozilla Public License 2.0 **What we changed**: WebXR's flat display and the camera hack, both handed to KWin as one declared full side-by-side surface, video marks, CSS depth; with the browser's own compositor in software (software WebRender), the pair keeps its stereo mark through the buffer read back for the compositor, so it is declared on that route too (ORDER 616).
 **Credit**: BrowserWorks Ltd and **Alex Kontos**, who makes Waterfox; Mozilla and Firefox's contributors for Gecko and WebRender.
 The software route rests on the Wayland native compositor for software WebRender that **Robert Mader** added to Firefox (Mozilla bug 1711224, 2021: the native surfaces in shared memory buffers that the edition's declaration now reaches).
+The flat WebXR display's separation (ORDER 750d) rests on Mozilla's WebXR implementation in `dom/vr`: the session code our patch changes (`dom/vr/XRSession.cpp`) was written mostly by **Daosheng Mu**, **Imanol Fernandez**, **Emilio Cobos Álvarez**, **Simon Giesecke** and **Kearwood Gilbert**, among the authors that file's history in Mozilla's repository names (read on 2026-11-19).
 
 ### 2.9 The stereo virtual machine
 
@@ -536,7 +538,11 @@ Existing KWin, libkscreen, Qt and FFmpeg credits above also apply.
 | [KAlgebra](https://apps.kde.org/kalgebra/) and [Analitza](https://invent.kde.org/education/analitza) | GPL-2.0-or-later | The 3D plot drawn once per eye | Aleix Pol Gonzalez, Carl Schwan; KAlgebra also Swapnil Tripathi; Analitza also Percy Camilo Triveño Aucahuasi and Pino Toscano |
 | [Kalzium](https://apps.kde.org/kalzium/) and [Avogadro](https://avogadro.cc/) | GPL-2.0-or-later, BSD-3-Clause | Molecules in stereo; why Kalzium drew no molecule with Avogadro 2 (KDE bug 463018) | Kalzium: Carsten Niehaus, Andreas Cord-Landwehr, Marcus D. Hanwell, Inge Wallin and others. Avogadro: Geoff Hutchison, Marcus D. Hanwell and Kitware |
 | [Kubrick](https://apps.kde.org/kubrick/) | GPL-2.0-or-later | The cube once per eye | Ian Wadham |
-| [Netgen](https://ngsolve.org/) | LGPL-2.0-or-later | `-stereo` that does what it says | Joachim Schöberl |
+| [Netgen](https://ngsolve.org/) | LGPL-2.0-or-later | `-stereo` that does what it says, its drawing area (a Tk and Togl child window) shown in 3D; rebased on Debian's 6.2.2606+dfsg1-3 | Joachim Schöberl; Debian packaging by the Debian Science Maintainers (Kurt Kremitzki, Tobias Frost, Francesco Ballarin, Drew Parsons) |
+| [Jmol](https://jmol.sourceforge.net/) | LGPL-2.1 | `stereo 5` with `set perspectiveDepth off` as the full-width, left-eye-first setting (issue 58); no patch | Bob Hanson, who answered the question, and the Jmol developers; Debian's packaging by the Debichem Team |
+| [PyMOL](https://github.com/schrodinger/pymol-open-source) | Open-Source PyMOL licence (its LICENSE file) | The open-source build with one stereo output, the quad buffer, shown by Stereo KWin; carried from Debian unstable (3.1.0+dfsg-1) | Warren L. DeLano, Jason Vertrees, Blaine Bell, Thomas Holder, Piotr Rotkiewicz, Tor Colvin and the other authors of its AUTHORS file; Schrodinger, LLC; Debian packaging by the Debichem Team (Michael Banck, Tatiana Malygina, Stuart Prescott and earlier packagers) |
+| [OpenSCAD](https://openscad.org/) pull request 7112 | GPL-2.0-or-later | The optional stereo preview offered upstream, held until the 2026.11 release | Jordan Brown and Torsten Paul, who reviewed it, and Marius Kintel and the OpenSCAD developers |
+| [VTK](https://vtk.org/) | BSD-3-Clause | Read for the window-size bug: merge request 13642 (`vtkCamera::UpdateStereo`) | Dan Lipsa; Kitware and the VTK developers |
 | [Blender](https://www.blender.org/) | GPL-2.0-or-later | Every window a quad-buffer (Time Sequential) window, so a scene's stereoscopy shows at once; GHOST's EGL keeps the stereo request with two views on Wayland; a mono context instead of an exit when GLX has no stereo; the right eye follows mono frames after stereo stops | The Blender Foundation and the Blender developers, from Ton Roosendaal's first Blender on; Debian's packaging by the Debian Multimedia Maintainers and Matteo F. Vescovi |
 | [GNU Octave](https://octave.org/) | GPL-3.0-or-later | `stereo` figure properties | John W. Eaton and the Octave developers |
 | [GRASS GIS](https://grass.osgeo.org/), [KiCad](https://www.kicad.org/), [OpenSCAD](https://openscad.org/), [F3D](https://f3d.app/) | GPL family, BSD-3-Clause (F3D) | Stereo views; for F3D: libf3d as shared packages, the window as one declared stereo surface, a pair thumbnail for every model | The GRASS Development Team; Jean-Pierre Charras and the KiCad developers; Marius Kintel and the OpenSCAD developers; Mathieu Westphal, Michael Migliore, Kitware and the F3D-APP Foundation (F3D's LICENSE.md); Francois Mazen, who maintains F3D in Debian (its changelog), on whose source package ours is built |
@@ -1246,7 +1252,7 @@ The **Consumer Technology Association**, **International Electrotechnical Commis
 ## Fraqtive's 3D view (ORDER 28)
 
 - **[Fraqtive](https://fraqtive.mimec.org/)** (GPL-3.0-or-later): written by **Michał Męciński** (copyright 2004 to 2015, repository github.com/mimecorg/fraqtive; its icons are based on the KDE Crystal theme by the KDE Artists). **AxeMax** sent the build patches that its master took in 2023 (pull request 6, issue 5). **Chris Tall** published an unmerged Qt 6 port of the program on 2026-06-10 in a fork (commit 55765bc4d0, `QOpenGLWidget` for the 3D view, written for macOS headers), which the search for an existing port found; its way of drawing the view was read, not carried.
-- **Debian's Fraqtive package** is maintained by **Patrick Matthäi** (Debian), whose packaging the candidate builds on; ORDER 743 rebuilds it as the edition package `0.4.8.1-1+stereo3d1+lc1` from Debian's own source, unchanged but for the two patches, and ports the program to Qt 6 in a probe only (Chris Tall's unmerged port was not read for it; the port was written from Qt 6's own documentation and compiler errors). The probes build on **Michał Męciński's** program, on the Qt Project's `QOpenGLWidget` stereo target buffers (Qt 6.5) and on Wayland's `wp_viewporter` and `wl_subsurface` as the protocols specify them.
+- **Debian's Fraqtive package** is maintained by **Patrick Matthäi** (Debian), whose packaging the candidate builds on; ORDER 743 rebuilds it as the edition package `0.4.8.1-1+stereo3d1+lc1` from Debian's own source, unchanged but for the two patches, and ports the program to Qt 6 in a probe only (Chris Tall's unmerged port was not read for it; the port was written from Qt 6's own documentation and compiler errors). The Qt 6 port and the stereo view of milestone 2 are written on **Michał Męciński's** program, from Qt 6's documentation and compiler errors (no code of Chris Tall's fork was carried); the probes build on **Michał Męciński's** program, on the Qt Project's `QOpenGLWidget` stereo target buffers (Qt 6.5) and on Wayland's `wp_viewporter` and `wl_subsurface` as the protocols specify them.
 
 
 ## Spirula Studio and its processing profiles
@@ -1263,3 +1269,53 @@ Meta, IDEA Research, ZhengPeng, Zhao Xiaoming, Johan Edstedt, Computer Vision an
 | [Azahar](https://azahar-emu.org/) (Nintendo 3DS emulator, continuing Citra) | GPL-2.0 | Its stereo modes, layout and renderers read for the declared pair | The Azahar contributors and the Citra team before them; side by side full by OpenSauce04 and DavidRGriswold |
 
 The GX test scene of the Dolphin proof is our own program built with libogc (zlib licence), by Michael Wiedenbauer (shagkur) and Dave Murphy (WinterMute), with devkitPro's devkitPPC, from the image published by devkitPro.
+
+## MIDI and old games, ORDER 735
+
+**Peter Hanappe** and the **FluidSynth contributors** provide FluidSynth.
+**Wim Taymans** supplies PipeWire and its MIT audio-stream example; **George Kiagiadakis** and **Julian Bouzas**, with the **PipeWire**, **WirePlumber** and **Collabora** contributors, provide the graph, policy and ALSA sequencer bridge.
+**Nedko Arnaudov**, **Jaco Kroon** and **Eric Hedekar** are credited in a2jmidid's own copyright records.
+
+**Tim Brechbill** and **David Bolton** made TimGM6mb.
+**Frank Wen** and **Toby Smithe** supply FluidR3 and its Debian integration.
+The MuseScore General records credit **S. Christian Collins**, **Amir Oosman**, **Sam Gossner**, **Simon Dalzell**, **Elan Hickler**, **Michael Cowgill**, **Ethan Winer**, **Michael Schorsch** and **Thorsten Glaser**, with the **MuseScore**, **Versilian Community Sample Library** and **Versilian Studios Chamber Orchestra** contributors.
+**Zandro Reveille** made the OPL3 SoundFont; **Bret Curtis** packaged it for Debian.
+The Debian font packages retain each sample set's full notices; the edition does not claim those recordings as its own.
+
+Munt's records credit **Dean Beeler**, **Jerome Fisher**, **Sergey V. Mikayev**, **Mok**, **Tristan**, **Jonathan Gevaryahu**, **The Guru**, **Laust Brock-Nannestad**, **balrog**, **Sarayan**, **IssaUt**, **Cloudschatze**, **Martin Lukasek**, **sdhizumi**, **Steven W. Dalton** and **Micael Hildenborg**.
+The emulation code is used without distributing or acquiring anyone's MT-32 ROMs.
+
+libADLMIDI and libOPNMIDI credit **Joel Yliluoma**, **Vitaly Novichkov** and **Jean Pierre Cimalando**.
+Their retained emulation-core notices credit their original authors, including **Alexey Khokholov**, **Stéphane Dallongeville**, **Stéphane Akhoun** and **David Korth** for the selected OPN2 code.
+Their bank-free edition sources preserve the full component notices.
+
+The DOSBox Staging records credit **Patryk Obara**, **kcgen** and **nemo93**, following DOSBox authors **Sjoerd v.d. Berg**, **Peter Veenstra**, **Ulf Wohlers**, **Tommy Frössman**, **Dean Beeler**, **Sebastian Strohhäcker** and **Ralf Grillenberger**.
+**John Novak** authored the upstream system-zlib detection fix carried in the edition recipe.
+The **FreeDOS** and **DOSBox Staging** contributors provide the licensed guest utilities, keyboard layouts and screen fonts with their source records.
+**Cristi Mitrana**, **Fabian Greffrath**, **Stephen Kitt**, **David Heidelberg** and the **Debian Games** and **Debian Multimedia** contributors provide the packaging and audit records that informed these decisions.
+
+## SenseGlove: SenseCom and the C++ API (ORDER 40, 2026-11-19)
+
+Names come from each repository's own contributor records (github.com/Adjuvo/SenseCom and github.com/Adjuvo/SenseGlove-API, read on 2026-11-19).
+**SenseGlove B.V.** (the repositories live under the organisation Adjuvo) makes the SenseGlove haptic gloves, **SenseCom** (the program that finds and connects them) and the **SenseGlove C++ API** (SGCore and SGConnect), all under the MIT licence.
+**Max Lammers** is the principal author of both repositories (45 commits on SenseCom and 44 on the API when read), and **Mamadou Babaei** is named as an author in the API's headers and made commits to SenseCom.
+The edition fetches SenseCom 1.9.2 and the API's v22 x86-64 release libraries from SenseGlove's own repositories on the person's machine, unchanged, checked against a pinned SHA-256, and packages the API's headers and example (checked against a pinned SHA-256) as `senseglove-api-dev`; nothing of theirs is rebuilt, modified or mirrored.
+SenseGlove does not endorse the edition.
+
+## Three faults of the A10's uplift: the Game Mode applet, Debian's tasks, the live-only autostart (ORDER 755, 2026-11-19)
+
+Names come from each project's own records (read on 2026-11-19).
+The **plasma-gamemode** applet is **Harald Sitter**'s (invent.kde.org/sitter/plasma-gamemode); **Stefan Dimitrijevic** made its Plasma 6 update (a185dcfb).
+Debian packages it as the **Debian KDE Extras Team**, with **Aurélien Couderc** as uploader.
+The edition's patch is a small change to one function of their code, found with their source and their packaging, and is not offered to KDE for now.
+**tasksel** is Debian's: its copyright file names, among many, **Joey Hess**, **Christian Perrier**, **Otavio Salvador**, **Frans Pop**, **Randolph Chung** and **Holger Wansing** (current changelog), maintained by the **Debian Install System Team**.
+The edition reads its 3.91 and 3.92 packages and does not change them.
+**sparky-backup-core** and its autostart entry **Sparky SetXKB** are **Paweł "pavroo" Pijanowski**'s (SparkyLinux); the installer module that removes the live tools (`sparky-backup-*`, `live-*`, `calamares`) is SparkyLinux's calamares-sparky.
+
+## An HDMI sound device that "could not be read" (ORDER 757, 2026-11-19)
+
+Names come from the headers of the kernel source files read (sound/hda/common/proc.c and sound/hda/codecs/hdmi/hdmi.c and eld.c at v7.3, 2026-11-19).
+**Takashi Iwai** wrote the HDA codec proc interface whose `Device:` line the reader relied on (copyright 2004).
+The HDMI codec driver and the ELD code list **Wu Fengguang** (Intel) and **Anssi Hannula** (2013), with copyright lines of Intel, ATI and NVIDIA and **Wei Ni** (NVIDIA, 2008).
+PipeWire and WirePlumber remain the engine the drop-ins configure, by **Wim Taymans**, **George Kiagiadakis** and their contributors.
+The idea of keeping a display's values for that display, as the desktop keeps a screen's settings, is Daniel's.

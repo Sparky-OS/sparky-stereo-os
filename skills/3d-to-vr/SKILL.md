@@ -4,7 +4,7 @@ metadata:
 name: 3d-to-vr
 description: >-
   Show the stereo desktop or stereo media in a VR headset or a phone viewer (Cardboard, Android XR, a Plasma Mobile
-  receiver, the Catch frontend, KRdp and RDP, DLNA to a phone): the transport, the decoding (HEVC, late frames), the
+  receiver, iPhone SDK and signing, the Catch frontend, KRdp and RDP, DLNA to a phone): the transport, the decoding (HEVC, late frames), the
   lens output and the lifecycle proof. Load it when a headset or phone shows one eye, a swapped eye, a black frame, a
   stalled or late stream, a Cardboard QR profile that does not load, iio-sensor-proxy head tracking, head-tracked audio,
   or when a phone or headset becomes one more output of Stereo KWin. Not for VR games on a 3D TV (vr-to-3d) or USB-C 3D
@@ -18,6 +18,8 @@ description: >-
 1. Identify sender/receiver builds, panel pixels, link layout, codec and active route. Select the matching transport or receiver section below.
 2. Prove eye identity, geometry and progress first; then change one latency variable at a time and measure each queue. Keep cleanup and reconnect checks.
 3. Return functional captures and measured stage timings separately from physical latency, thermal and optical observations. A cable alone is not USB networking.
+
+For the native iPhone port, read [the Linux build/signing route and eight traps](references/iphone-arm.md), with its [unsigned hosted-macOS build route](references/iphone-build.md).
 
 For reverse camera/sensor work, start with the [RDP sensor and emulator preflight](references/rdp-sensors-preflight.md).
 It distinguishes the embedding's build overrides from upstream defaults and checks the actual SDK, container and JDK before an endpoint test.

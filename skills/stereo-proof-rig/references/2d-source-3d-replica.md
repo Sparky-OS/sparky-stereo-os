@@ -64,13 +64,27 @@ Case c also delivers a real 3840×1080 PipeWire frame with zero differing pixels
 The source and virtual panel each log single display scene passes; the stream's own per-eye paints are separate.
 Case d takes the existing replica-copy path: the replica logs zero scene passes and two eye copies, and the captured eyes differ.
 These results expose the missing ordinary-desktop depth on a replica of a 2D logical output.
-They do not establish a complete desktop level table or a corrected implementation.
+The initial four-case captures do not establish a complete desktop level table or a corrected implementation.
 
 With the declared fixture on the 2D source, its normal scanout is red and its swapped scanout is blue, while the target's red/blue eye witnesses retain their order.
 Swapping the physical replica exchanges its witnesses; swapping the native phone panel leaves the received stream's witnesses in their original order on this baseline.
 KScreen +stereo3d14 gates the swap loader on the output's swap capability and whether any advertised mode is stereo, rather than the session's current eye composition.
 The measured phone output advertises no swap capability, so that loader stays hidden there.
 These page conclusions combine an actual output-device trace with the shipped QML and model binding; they are not an interaction test of an opened settings page.
+
+## Preserve the complete level table before changing the engine
+
+Use a static fixture with one layer-shell desktop, one layer-shell dock, six ordinary toplevels, and a menu with a submenu.
+Put a narrow white vertical probe in every surface on a solid background, with the six windows at distinct vertical positions, and make the sixth window active.
+Create the menu chain only after window placement has settled.
+Capture both connectors from the same guest and measure each probe's left and right x bounds at a fixed row.
+Keep the settings, output configuration, actual loaded library hash, captures and the ten measured rows together.
+Compare the modified 3D-source control and the modified 2D-source replica against this table without changing the fixture, EDID, scale, settings or measurement.
+The existing display policy can multiply the person's limits for the output's physical size; compare the measured baseline exactly rather than substituting the configured numbers for measured pixels.
+
+The +60 continuation fixture measured matching source and replica rows: wallpaper −13, dock 0, the six windows −13/−10/−8/−5/−3/0, menu +5 and submenu +10 pixels of left-minus-right parallax.
+These are the results of that EDID and fixture, not universal depth defaults.
+No depth arithmetic was changed to obtain them.
 
 ## Traps
 
@@ -94,6 +108,19 @@ These page conclusions combine an actual output-device trace with the shipped QM
   The rig lacked `qt6-wayland`, and `kscreen-doctor` aborted because no shell integration loaded.
   Install that package and preserve the child's failure status while still shutting the guest down normally.
   Found by the doctor's “No shell integration named xdg-shell” error; KWin itself had already initialized OpenGL and both outputs.
+
+- **A layer-shell panel sinks with ordinary windows in the level fixture.**
+  KWin classifies the layer-shell namespaces `desktop` and `dock` specially; arbitrary fixture namespaces do not acquire those roles from the layer alone.
+  Give the wallpaper namespace `desktop` and the panel namespace `dock`, then repeat the unchanged baseline capture.
+  Found by comparing the fixture's namespace strings with `LayerShellV1Window::scopeToType()` after the first diagnostic capture.
+- **A non-root test's D-Bus reports an allocation failure and EOF before any test starts.**
+  The container has no password-database entry for the numeric test UID.
+  Supply an entry for that disposable user before `dbus-run-session`; keep the test unprivileged.
+  Found by the preceding “Could not get password database information for UID” diagnostic.
+- **KWin configures for packaging but its test build cannot find `libei-1.0`.**
+  The integration tests use the libei client library in addition to the libeis server library required by the production build.
+  Install the available `libei-dev` in the disposable test builder, then configure the tests again.
+  Found by the test-enabled CMake package check; this is a test-builder dependency, not a new runtime dependency.
 
 Use libstereo-declare with the output-proxy teardown fix, commit `bc7d18f`, when running these clients.
 Versions 1.11.0 and uncorrected 1.12.0 can leave output proxies on a private event queue after `finish()` and abort the client when that queue is destroyed.

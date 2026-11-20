@@ -405,3 +405,6 @@ The Android viewer's actual profile mathematics follows this integration; no dis
   **Cause:** it references decoder-owned mutable pixels, or appends each frame to an unbounded main-thread/GPU queue.
   **Fix:** copy into owned complete frames, keep only the latest pending one and retain immutable textures for at most two GPU submissions.
   **How found:** review of decoder/renderer ownership and a concurrent producer/consumer fixture; actual phone cadence and latency remain unmeasured.
+
+[Run 44770385750](https://github.com/Sparky-OS/flat-headset/actions/runs/44770385750) passes both jobs for commit 4970452: the desktop view, its Metal fragment and the core with the strict VideoToolbox patch compile and link, and the unsigned package was checked on Linux (arm64, no signature, no embedded library).
+No frame has been decoded or shown on a phone.

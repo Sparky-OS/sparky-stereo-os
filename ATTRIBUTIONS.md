@@ -1396,3 +1396,30 @@ CardboardXR: **brenpoly**.
 
 actionlint: **rhysd**.
 openstep-parser: **Ignacio Calderon**.
+
+## KDE Screen Locker localization
+
+The KDE Screen Locker release credits Bhushan Shah, Chani Armitage, Chris Howells, Cyril Rossi, David Edmundson, David Redondo, Harald Sitter, Kevin Ottens, Luboš Luňák, Marco Martin, Martin Gräßlin, Martin R. Jones, Nate Graham, Oswald Buddenhagen and Yifan Zhu in its source package copyright.
+
+The lock-screen settings catalogues credit Łukasz Wojniłowicz, Guilherme Marçal Silva, Xavier Besnard, Alois.spitzbart, Eloy Cuadra, UTUMI Hirosi, Shinjo Park, KDE's Simplified Chinese translation team and Kisaragi Hiu in their own headers.
+
+## Infrastructure catalogue recipes (ORDER 46)
+
+These project credits come from the copyright notices in the checked Debian source packages and the original catalogue headers. The localization patches carry the edition’s added or changed strings.
+
+- command-not-found credits Zygmunt Krynicki.
+- KDE Connect credits Albert Vaca Cintora, Aleix Pol i Gonzalez and Andy Holmes.
+- KFileMetaData credits Alexander Stippich, Christoph Cullmann and Friedrich W. H. Kossebau.
+- KIO credits Aaron J. Seigo, Ahmad Samir, Akseli Lahtinen and Alexander Lohnau.
+- KInfoCenter credits Ismael Asensio, Kai Uwe Broulik and Matthias Hoelzer-Kluepfel.
+- KRDC credits AT&T Laboratories Boston, Abner Silva, Arend van Beelen jr, Const Kaplinsky and Collabora Ltd.
+- KRdp credits Akseli Lahtinen, Aleix Pol Gonzalez, Arjen Hiemstra, David Edmundson, Nate Graham and Sebastian Kügler.
+- KScreenLocker’s source and catalogue credits are listed above.
+- KWin credits Martin Gräßlin, Vlad Zahorodnii, David Edmundson, Xaver Hugl and Aleix Pol i Gonzalez.
+- Plasma Desktop credits Aaron Seigo, Akseli Lahtinen, Alexander Lohnau and Alexander Mezin.
+- Discover credits Aleix Pol Gonzalez, Alexey Minnekhanov, Carl Schwan and Harald Sitter.
+- Plasma Network Management credits Andreas Cord-Landwehr, Daniel Nicoletti, David Rosca and Devin Lin.
+- Plasma Stereo Wallpaper credits Marco Martin, Sebastian Kügler, Kai Uwe Broulik, David Redondo, Fushan Wen, Vlad Zahorodnii and Daniel Ramos.
+- Plasma Workspace credits Aaron Seigo, Alex Merry, Alexis Ménard, Antonio Larrosa and Arjen Hiemstra.
+- PowerDevil credits Aurélien Gâteau, Bohdan Onofriichuk, Dario Freddi and Felix Geyer.
+- Sparky Stereo Browser’s packaging credits BrowserWorks alongside Mozilla Foundation and contributors. The edition’s packaging credits Daniel Ramos.

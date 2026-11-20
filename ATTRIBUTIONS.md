@@ -1261,6 +1261,14 @@ Harry Chen and the Spirula Studio contributors.
 Omar Cornut, Marcus Geelnard, Camilla Löwy, Duane Merrill, NVIDIA, Rich Geldreich, RAD Game Tools, Valve Software, Tenacious Software, Sean Barrett, Leon Merten Lohse, The Regents of the University of Michigan, Adobe and Google.
 Meta, IDEA Research, ZhengPeng, Zhao Xiaoming, Johan Edstedt, Computer Vision and Geometry Lab, Wei Yin, Mu Hu, Microsoft, HUAWEI Bayer Lab, Qwen, Richard Zhang, Phillip Isola, Alexei A. Efros, Eli Shechtman, Oliver Wang and Soumith Chintala.
 
+## Console emulators and their stereo modes (ORDER 39)
+
+| Project | Licence | What we used | Authors and maintainers |
+|---|---|---|---|
+| [Dolphin](https://dolphin-emu.org/) (GameCube and Wii emulator) | GPL-2.0-or-later | Its stereo modes and presenter read for the declared pair; Debian's package of it | The Dolphin Emulator Project and its contributors; stereo work by stenzek (quad buffer), BryanJacobs (side by side aspect), AndrewGDX (float depth and convergence), jasonphillips (Vulkan stereo without geometry shaders, open); Debian Games Team packaging |
+| [Azahar](https://azahar-emu.org/) (Nintendo 3DS emulator, continuing Citra) | GPL-2.0 | Its stereo modes, layout and renderers read for the declared pair | The Azahar contributors and the Citra team before them; side by side full by OpenSauce04 and DavidRGriswold |
+
+The GX test scene of the Dolphin proof is our own program built with libogc (zlib licence), by Michael Wiedenbauer (shagkur) and Dave Murphy (WinterMute), with devkitPro's devkitPPC, from the image published by devkitPro.
 
 ## MIDI and old games, ORDER 735
 

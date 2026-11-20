@@ -1395,3 +1395,5 @@ CardboardXR: **brenpoly**.
 
 actionlint: **rhysd**.
 openstep-parser: **Ignacio Calderon**.
+
+Local anisette source audit: **FDKevin**, **jkcoxson**.

@@ -108,3 +108,21 @@ Do not call an unmarked wide PNG a successful stereo export because it decodes o
 For a PNG, parse each chunk length, type, payload and CRC through `IEND`, record whether `sTER` exists and its mode, and separately read the image's text keys.
 A text key saying `stereo=true` does not replace the format-native mark.
 Keep defective unmarked pairs only in explicitly named disposable scratch; delivered stereo evidence must carry its format's mark.
+
+## Output mode and paired content are different
+
+KWin order772-kwin adds `stereoOutput` to ScreenShot2 version 7. It says whether a captured output composes two eyes. `stereo` keeps its pixel-pair meaning. Spectacle must follow the mode for its default: a declared pair on an ordinary 2D output is a mono export by default, with stereo offered as an option. Equal eyes in a 3D mode remain a pair.
+
+The plugin-only plain build passes 34 new real-DBus QtTest rows, including a mono monitor at either side of a stereo workspace, and all16 unchanged screenshot tests. All32 fresh-session probes pass; each of the16 2D-only raw images is byte-identical to its +60 baseline. This establishes KWin reply behavior, not a corrected Spectacle package.
+
+Upstream ScreenShot3 is KWin MR10307, commit5be042886b6404b220bc92df4707fe59d30f09be, the counterpart required by Spectacle dda3c729. It is a memfd transport port, not the stereo repair. The plain branch carries Xaver Hugl's ad655ed7 and Vlad Zahorodnii's dc8d2b7f context-restoration fixes with their author credit.
+
+## Trap: a region selection closes but no file appears
+
+**Symptom:** the published Spectacle accepts a rectangle in a stereo screenshot and then prints `Cannot save screenshot. Error while writing file.` The background process remains alive.
+
+**Cause under investigation:** its ordinary canvas crop applies to the packed image, rather than the same rectangle in both eyes. An odd-width rectangle leaves an invalid pair for MPO. Do not classify a timeout alone as lost synthetic input.
+
+**How found:** three isolated runs on the published package; the final run traced pointer press, motion and release reaching Spectacle, its full-screen overlay disappearing, and the writer error. KWin's before/after window inventory independently showed the overlay closing.
+
+**Fix status:** not fixed or packaged yet. Check the per-eye region dimensions and both native format entries after the application correction.

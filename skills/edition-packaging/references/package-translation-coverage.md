@@ -42,14 +42,18 @@ Keep the published gap identities fixed while comparing recipe main and staged r
 | Bino | Compile the TS catalogue with Qt 6 `lrelease` and check the QM with `lconvert`. Use the `Gui` and `Mode` contexts where the input labels use them. Keep `zh_CN` and `zh_TW` separate. |
 | VLC Stereo | The flat source path is `po/LOCALE.po`. Check the gettext domain under `/usr/share/vlc-stereo/locale` and the localized desktop actions independently. The VLC policy says “AI help with writing or translation is fine.” Keep edition strings in the package recipe. [VideoLAN AI policy](https://code.videolan.org/videolan/vlc/-/blob/master/doc/VideoLAN_AI_Policy.md) |
 | Lutris | Meson builds the `lutris` gettext domain from `po/LOCALE.po` and `po/LINGUAS`. Preserve Python named `%()` placeholders and check the built lookup in a real locale. Lutris says contributors are “free to use any tool available to help you create your contributions” and expects validated work. Keep edition strings in the package recipe. [Contribution rules](https://github.com/lutris/lutris/blob/master/CONTRIBUTING.md) · [Translation workflow](https://github.com/lutris/lutris/blob/master/po/README.md) |
+| Marble | Match core Ki18n messages in `po/LOCALE/marble.po`, QML map tooltips in `marble-maps.po`, and the Qt main-window actions in `poqm/LOCALE/marble_qt.po`. The Qt PO context uses the `Marble::MainWindow\|` encoding. Convert the latter to TS and compile to QM before checking the Qt context and ID. |
+| Wine SBS View | Match the flat PO path and enable the language in the Makefile that creates the actual installed MO. Read that MO from the built package. Preserve newlines in the command's usage and diagnostic keys. |
+| UMS settings | Localized `X-KDE-Keywords[LOCALE]` comes from the embedded KPlugin metadata. Extract the package and use the versioned `/usr/lib/qt6/bin/qtplugininfo --full-json` on the plugin. |
 
-Read the project's own current contribution and translation rules. KDE routes translations through its language teams. Its Spanish team prohibits using the output of online translation services or ChatGPT, and Krita's README bars AI use pending a decision. KDE forks carry the edition's strings in package recipes. If the checked upstream records give no AI rule, record the consulted records and keep edition changes in the recipe. [KDE Localization](https://l10n.kde.org/) · [KDE Spanish team](https://es.l10n.kde.org/responsabilidad.php) · [Krita README](https://github.com/KDE/krita#ai-moratorium)
+Read the project's own current contribution and translation rules. KDE routes translations through its language teams. Its Spanish team prohibits using the output of online translation services or ChatGPT, and Krita's README bars AI use pending a decision. KDE forks carry the edition's strings in package recipes. XScreenSaver excludes contributions built with or assisted by an LLM. These programme rules apply to upstream contributions. Carry the edition’s own additions in its package recipes and keep this work local to the edition. If the checked upstream records give no AI rule, record the consulted records and keep edition changes in the recipe. [KDE Localization](https://l10n.kde.org/) · [KDE Spanish team](https://es.l10n.kde.org/responsabilidad.php) · [Krita README](https://github.com/KDE/krita#ai-moratorium) · [XScreenSaver FAQ](https://www.jwz.org/xscreensaver/faq.html#writing-savers)
 
 ## Fill and verify a gap
 
 1. Build a glossary from the extracted packages.
    Use the 3D Depth page in Stereo KWin where its terms disagree with another catalogue.
-   Keep the shipped words for the depth planes, 3D controls, Throw and frame packing.
+   Keep the shipped words for the depth planes, 3D controls and frame packing.
+   Write Throw and Catch as feature names, with the meaning in parentheses after the first mention in each localized string. The Brazilian Portuguese forms are “Throw (jogar)” and “Catch (receber)”. Keep the arrival notification “Receba!”.
    Record the domain, key, context, language and package version for each wording.
 2. Insert translations in the programme's own format.
    For KDE forks carry the edition keys through the distribution package recipe.
@@ -66,6 +70,22 @@ Read the project's own current contribution and translation rules. KDE routes tr
    Compare a known localized string with the tool's output, lookup or loaded page in each language.
    For example, a MIME label goes through GIO's `content_type_get_description` after installing the package and letting dpkg run the shared MIME database trigger.
    Keep the expected and observed values for both builds.
+
+## Prove the installed sView resources
+
+1. Build the pinned recipe with its usual Lean Code checks. Install the
+   published package in the container first, then install the candidate with
+   its declared dependencies.
+2. Compile a small lookup probe against the pinned `StTranslations.h` and the
+   installed `libStShared`. Install the probe in `/usr/bin` in the test
+   container. The loader discovers resources relative to the executable.
+3. Run the probe in a separate process for each real UTF-8 locale. Open the
+   two module names independently and request the same numeric keys from each.
+   Record Expected and Got for the locale controls and each newly added key.
+   Include the absent-numbered-key control in the published Spanish package.
+4. Check embedded line breaks through the loader. `StLangMap` decodes the
+   written `\n` and puts a space before the line break. Keep the numbered
+   source files' CRLF line endings when creating the package patch.
 
 ## Traps
 
@@ -141,3 +161,32 @@ Read the project's own current contribution and translation rules. KDE routes tr
   **Cause:** the link-check snapshot lacks the edition's shipped APT policy and the unchanged provider or runtime siblings.
   **Fix:** give the link gate the signed published policy package and the exact unchanged siblings in both snapshots. Keep strict pinning and the package's own dependency declarations.
   **How found:** the same Power Profiles controls failed the generic archive solve. Both versions resolved once the edition policy, the versioned PowerDevil provider and its Qt runtime were supplied.
+
+- **Symptom:** the corrected validator reports “no file section” on an old Dragon or VLC patch that GNU patch can read.
+  **Cause:** plain unified sections begin with `--- a/…` and lack the Git file boundary the validator uses.
+  **Fix:** add the matching `diff --git a/… b/…` header before each section. Apply both forms to the same preimage with fuzz disabled and compare bytes before carrying the normalized patch.
+  **How found:** the affected sections were replayed on the published or recorded quilt preimage. All 26 applied catalogue pairs matched byte for byte.
+- **Symptom:** gettext reports a duplicate key after a formerly obsolete entry is translated.
+  **Cause:** the obsolete copy and a newly added active copy use the same context and msgid.
+  **Fix:** replace the matching obsolete entry with one active entry. Compile the resulting catalogue and compare the exact lookup.
+  **How found:** six digiKam locales already had an obsolete “View” entry.
+- **Symptom:** the rewritten PO silently loses part of a translation containing a Unicode separator.
+  **Cause:** splitting PO text with Python's `str.splitlines()` treats U+2028 as a line break even inside a quoted PO value.
+  **Fix:** split physical lines on LF and let the native compiler check the reconstructed PO.
+  **How found:** a KDE catalogue contained U+2028 in a quoted string.
+- **Symptom:** Wine SBS View's Spanish PO compiles but the package ships no Spanish MO.
+  **Cause:** the recipe points at `po/LOCALE.po` and builds only the locales in the Makefile.
+  **Fix:** use the flat path and carry the shipped recipe's language-list change. Inspect the candidate MO.
+  **How found:** compiling an extra `po/es/wine-sbs-view.po` by hand did not affect the build output. The rebuilt candidate returned all four Spanish values.
+- **Symptom:** a compiled Marble gettext value exists but the globes' Qt menu still uses English.
+  **Cause:** a Qt MainWindow string lives in the Qt catalogue and is looked up with its Qt context.
+  **Fix:** use the `poqm` domain for Qt, then compare the compiled QM.
+  **How found:** inspecting the source calls and compiled catalogues separated 18 Qt menu labels from the Ki18n and QML values.
+- **Symptom:** an sView lookup probe returns empty values in every language.
+  **Cause:** the executable lives in a scratch directory, so the loader searches under the wrong resource root.
+  **Fix:** install the probe in the same executable directory as sView inside the test container.
+  **How found:** both published and candidate controls became readable after moving the probe to `/usr/bin`.
+- **Symptom:** a catalogue-only Stereo Create build stops in the picture probe test.
+  **Cause:** the test expects a blank, unmarked 400×200 picture to be flat. The installed Stereo Layer treats its 2:1 shape as side by side.
+  **Fix:** keep the gate enabled and run the same test on the unmodified published source against the same library. If it reproduces, retain the translation recipe and record the package gate failure.
+  **How found:** both the published source and the candidate failed only the same assertion in `EngineTest::probePictures`.

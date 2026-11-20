@@ -915,7 +915,9 @@ The Ed521 prototype is public-verification-only and unaudited.
 Trust-store membership, cryptographic verification and document-signature policy compliance are distinct.
 Credits do not imply endorsement or upstream acceptance.
 
-## Flat Headset and StereoDroid artwork (2026-10-14)
+<a id="flat-headset-and-stereodroid-artwork-2026-10-14"></a>
+
+## Flat Headset and StereoDroidVR artwork (2026-10-14)
 
 **Sparky Stereo, by Daniel Ramos and partners.** Daniel Ramos directs the work.
 OpenAI GPT-6 Astra (`gpt-6-astra`), through Codex, drew the original SVGs and wrote their rendering and verification scripts. No image generator was used.

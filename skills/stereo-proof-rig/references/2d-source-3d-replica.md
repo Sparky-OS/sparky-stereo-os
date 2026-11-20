@@ -122,6 +122,12 @@ No depth arithmetic was changed to obtain them.
   Install the available `libei-dev` in the disposable test builder, then configure the tests again.
   Found by the test-enabled CMake package check; this is a test-builder dependency, not a new runtime dependency.
 
+- **A static phone level fixture times out waiting for its eighth frame.**
+  The capture produces a frame when there is damage; a settled static fixture does not keep producing frames.
+  For the static level-table readback, request one complete frame only after window placement and menu creation have settled.
+  Keep the eight-frame check for the animated identity fixture.
+  Found by a successful stereo copy in the stream log followed by the receiver's timeout; a one-frame receiver then captured the complete ten-row table and the source matched its left view byte for byte.
+
 Use libstereo-declare with the output-proxy teardown fix, commit `bc7d18f`, when running these clients.
 Versions 1.11.0 and uncorrected 1.12.0 can leave output proxies on a private event queue after `finish()` and abort the client when that queue is destroyed.
 The rig's 1.11.1 source carries that fix; verify the library actually loaded, not just the package database's version after an overlay install.

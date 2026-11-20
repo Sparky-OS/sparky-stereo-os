@@ -113,16 +113,24 @@ Keep defective unmarked pairs only in explicitly named disposable scratch; deliv
 
 KWin order772-kwin adds `stereoOutput` to ScreenShot2 version 7. It says whether a captured output composes two eyes. `stereo` keeps its pixel-pair meaning. Spectacle must follow the mode for its default: a declared pair on an ordinary 2D output is a mono export by default, with stereo offered as an option. Equal eyes in a 3D mode remain a pair.
 
-The plugin-only plain build passes 34 new real-DBus QtTest rows, including a mono monitor at either side of a stereo workspace, and all16 unchanged screenshot tests. All32 fresh-session probes pass; each of the16 2D-only raw images is byte-identical to its +60 baseline. This establishes KWin reply behavior, not a corrected Spectacle package.
+The plugin-only plain build passes 34 new real-DBus QtTest rows, including a mono monitor at either side of a stereo workspace, and all 16 unchanged screenshot tests. All 32 fresh-session probes pass; each of the 16 2D-only raw images is byte-identical to its +60 baseline. This establishes KWin reply behavior, not a corrected Spectacle package.
 
-Upstream ScreenShot3 is KWin MR10307, commit5be042886b6404b220bc92df4707fe59d30f09be, the counterpart required by Spectacle dda3c729. It is a memfd transport port, not the stereo repair. The plain branch carries Xaver Hugl's ad655ed7 and Vlad Zahorodnii's dc8d2b7f context-restoration fixes with their author credit.
+Upstream ScreenShot3 is KWin MR10307, commit 5be042886b6404b220bc92df4707fe59d30f09be, the counterpart required by Spectacle dda3c729. It is a memfd transport port, not the stereo repair. The plain branch carries Xaver Hugl's ad655ed7 and Vlad Zahorodnii's dc8d2b7f context-restoration fixes with their author credit.
 
 ## Trap: a region selection closes but no file appears
 
 **Symptom:** the published Spectacle accepts a rectangle in a stereo screenshot and then prints `Cannot save screenshot. Error while writing file.` The background process remains alive.
 
-**Cause under investigation:** its ordinary canvas crop applies to the packed image, rather than the same rectangle in both eyes. An odd-width rectangle leaves an invalid pair for MPO. Do not classify a timeout alone as lost synthetic input.
+**Cause:** its ordinary canvas crop applies to the packed image, rather than the same rectangle in both eyes. The source path and a failing QtTest establish the single-rectangle crop; the published writer rejects the observed odd-width result. Do not classify a timeout alone as lost synthetic input.
 
 **How found:** three isolated runs on the published package; the final run traced pointer press, motion and release reaching Spectacle, its full-screen overlay disappearing, and the writer error. KWin's before/after window inventory independently showed the overlay closing.
 
-**Fix status:** not fixed or packaged yet. Check the per-eye region dimensions and both native format entries after the application correction.
+**Fix status:** the plain source correction crops the same rectangle in both eyes and passes the region QtTest and virtual-session region capture. Packaging and installed-package checks remain pending.
+
+## Plain-build results, package still pending
+
+The Spectacle source correction passes 92 QtTest cases, including 20 formerly failing mode/default rows and two region geometry rows. A further failing case required the explicit All Monitors 3D choice to retain a mono monitor in both eyes. The plain executable produces 201×121 views for the same 201×121 region in both eyes; a uniform wallpaper patch supplies the flat-content control. Its MPO contains two identical views and remains stereo because the output mode is 3D. These are plain-build results; no installed candidate package has been verified.
+
+A source-rebuild builder needs packaging helpers in addition to the source descriptor's Build-Depends. Check `command -v git dch` before source preparation: `git` identifies the fork inputs and `dch` (devscripts) is used by Lean Code preparation. The ORDER 772 run stopped under its three-attempt rule when the third preparation reached missing `dch`, after patches and translation checks had succeeded. Installing it and rerunning has not been measured in this run.
+
+Do not trust a flat-content label without measuring the two views: a patterned wallpaper at sunk depth has real disparity. Use a uniform patch with a margin larger than the desktop depth shift, decode both JPEGs independently, and compare their pixels. The proof must still read the MPO's native disparity-view and viewpoint entries.

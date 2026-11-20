@@ -37,6 +37,10 @@ If vendor checksums already disagree with the accepted source, establish that ba
 
 Check the actual language of shared headers, not only their extension. Mesa's shader includes and BVH headers can feed both C and GLSL; preserve them until both consumers are qualified. Inactive architecture branches can also contain target pragmas that the host compiler rejects during a preprocessing check. Preserve those reviewed inputs with an explicit reason, or use the appropriate target checker; never remove the pragma to make a check pass.
 
+GObject introspection's g-ir-scanner reads the gtk-doc blocks, and `lang_c.py` leaves every file that has one whole, so annotations and typelibs do not change (GLib 2.90.1, ORDER 768b: every typelib byte-identical to Debian's).
+It also records each symbol's line in its header as `<source-position filename=... line=N/>`, and headers with only plain comments are projected before it reads them, so the GIR names lean lines and gi-docgen's `[src]` links in the documentation point a few lines off in upstream's file (GLib: 1,420 GIR lines from 32 headers, 530 documentation pages).
+Keeping such headers authored through the preserve plan, or accepting lean lines as for debug information, is a decision not yet taken.
+
 ## The preserve plan across routes (ORDER 433, 435)
 
 `debian/sparky-lean-preserve.json` maps source patterns to the reason each is kept authored for a consumer that reads source text.

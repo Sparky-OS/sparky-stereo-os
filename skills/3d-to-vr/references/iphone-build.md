@@ -297,8 +297,8 @@ Do not replace this with an arbitrary UDP broadcast or assume permission was gra
 Follow the Android `LanLinkProvider.java`, `PairingHandler.kt` and `SslHelper.kt` in the receiver tree.
 The TCP initiator is the TLS server.
 Check the device ID in the peer certificate and the encrypted identity, require protocol 8, and reject a changed saved certificate pin.
-For first pairing, show the same timestamped public-key verification code and require local confirmation as well as remote acceptance before saving trust.
-Store the identity and pins in this app's Keychain; no private identity is passed to a separate app through a URL or an unverified shared entitlement.
+First pairing and trust changes belong to KDE Connect’s own screen.
+The receiver reads its canonical identity and paired certificates through the provisioned keychain access group; it never creates a second identity or copies trust into its own store.
 Stop connections and pending prompts when the screen closes or the app enters the background.
 The current tests use AF_UNIX socketpairs inside a container with no network; they cover mutual TLS, pin reuse/change, identity mismatch, downgrade refusal, confirmation ordering, timeouts and malformed packets.
 They establish the portable code only.
@@ -521,10 +521,10 @@ The image reported macos26 20261117.0516.1, Xcode 26.6 and iPhoneOS 26.5.
 The downloaded IPA independently passed its SHA-256 check: one unsigned arm64 executable, iOS 16.0 minimum, the expected bundle identity, ten VirtualMonitor catalogs and no embedded framework, dylib or provisioning profile.
 This proves compilation and packaging; Security identity import, Bonjour and Keychain persistence still require the phone.
 
-Keep each app's paired identity independent until shared signing entitlements have been proved.
+Use the shared-keychain route described in the authentication reference; fail closed if signing or Keychain access cannot establish it.
 KDE Connect's virtualmonitor plugin checks the paired computer's protocol-v2 capabilities, explains refusal or timeout in ten languages, and opens only `flatheadset://catch`.
 That URL carries no address, pin, password or session credential and never authorizes a connection.
-Flat Headset opens its computer list, confirms its own pairing with the same PC and owns the virtual monitor and RDP session while in the foreground.
+Flat Headset opens its computer list, checks KDE Connect’s existing paired identity and owns the virtual monitor and RDP session while in the foreground.
 Returning to the KDE Connect page performs a fresh capability query; losing pairing or reachability revokes the launch permission.
 Do not advertise this KDE Connect app as an RDP consumer or pass the receiver credentials through a URL.
 
@@ -619,3 +619,40 @@ The package fixtures reject signature commands, embedded dynamic code, wrong ide
 Prepare all three packages using [the one-session page](iphone-session.md).
 The manifest joiner checks their common workflow commit, exact roles/IDs and IPA hashes before writing the private renewal input.
 It neither authenticates nor installs; the person types their account only at the later xtool authentication step.
+
+
+## One pairing and the Linux signer's data path
+
+The source audit and Apple capability quotations are in [the authentication reference](iphone-auth.md).
+The current Apple table permits Keychain Sharing for the free Apple Developer membership; the former two-pairing page was incorrect.
+KDE Connect keeps its existing default group and canonical records; the receiver joins that group through the signer's explicit profile-checked entitlement.
+App Groups are available too, but a second shared container is unnecessary.
+
+- **Symptom:** an unsigned app builds successfully, but cannot read KDE Connect's identity after signing.
+  **Cause:** stock xtool 1.24.0 replaces keychain groups with only the app's own group, and an unsigned executable carries no entitlement to preserve.
+  **Fix:** the reviewed signer adds only KDE Connect's default group to the receiver after checking the returned provisioning profile; it keeps the receiver's own group first and refuses missing permission.
+  **How found:** `DeveloperServicesAddAppOperation.swift` and `EntitlementWithTeamOrBundleID.swift` at 70e1568; Linux policy tests cover exact and prefix-wildcard grants, wrong prefixes, omitted permission and unrelated apps.
+- **Symptom:** importing KDE Connect's key as an RSA DER key fails.
+  **Cause:** this iOS port creates a P-256 identity; Security exports its EC private key as `04 || X || Y || K`.
+  **Fix:** import those parameters through OpenSSL's provider API, check the public/private key pair, certificate signature, name and dates, and reject malformed input.
+  **How found:** KDE Connect's certificate helper and Apple's SecKeyCopyExternalRepresentation documentation; Linux tests exercise matching and altered scalar/DER/date inputs.
+- **Symptom:** a stale trust snapshot would let the receiver connect after KDE Connect unpaired the PC.
+  **Fix:** read canonical keychain records before opening a socket, after TLS, on each control iteration and before starting an RDP grant; do not persist a second trust store.
+  **How found:** source trace and portable trust tests for absent, removed and replaced host/peer certificates.
+  Real Keychain propagation, export permission and the signed cross-app access remain phone checks.
+- **Symptom:** a service called local anisette still needs an Apple download.
+  **Cause:** the inspected Linux servers execute Apple's ADI binary; their open-source server licence does not license that runtime.
+  **Fix:** keep the no-Apple-files stop explicit and before sign-in; do not present a metadata fixture as working anisette.
+  **How found:** anisette-server-rs asset manifest and compatibility documentation; no proprietary runtime was downloaded.
+
+The Cardboard program and all three unsigned IPA packages passed [run 44808754903](https://github.com/Sparky-OS/flat-headset/actions/runs/44808754903).
+The shared-keychain receiver revision needs a new hosted build; the signer and a real Apple profile require their own checks.
+
+- **Symptom:** the loopback anisette metadata probe crashes at `HTTPClientProtocol.swift:40`.
+  **Cause:** stock xtool assigns the HTTP authority, including its port, to URLComponents.host; the resulting URL is nil.
+  **Fix:** parse the authority as part of the origin, retaining the port, and reject an invalid URL without force-unwrapping.
+  **How found:** the compiled Linux client against an authored HTTP fixture on loopback, inside a container with no network; the current upstream file still contained the same assignment.
+- **Symptom:** a V3 finish message carries `x-_apple-_i-md-rinfo` instead of `X-Apple-I-MD-RINFO`.
+  **Cause:** JSONEncoder's snake-case policy rewrites even an explicit header-shaped CodingKey.
+  **Fix:** serialize the finish dictionary with exact field names and test its actual JSON keys and base64 values.
+  **How found:** a Linux Foundation encoding probe before any real anisette service or account was used.

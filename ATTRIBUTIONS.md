@@ -20,6 +20,8 @@ Fredrik Lundh, Alex Clark, NumPy Developers.
 
 Martin Gräßlin, Pier Luigi Fiorini, Xaver Hugl.
 
+Kai Uwe Broulik, Mohanraj Velayutham, Pranav Kunjir, Frog Chen.
+
 ---
 
 ## OpenGL quad-buffer programs, swept in ORDER 26

@@ -37,6 +37,37 @@ Read this at the start of a task, then again before you hand back.
 7. **Run the lane check** before the hand-back and put its output in the report: `lane-check.py LANE_FOLDER` in the workspace's partners folder reads the folder and says pass or what is wrong, line by line; exit status 0 only when every line passes. A check that cannot run is a failure with its reason, never a pass.
 8. **Hand back with a Kept section** that lists what is left, each item with its path or name, its size measured now and why it stays ([the section](#the-kept-section)).
 
+## Start a build or test container so its crashes stay inside
+
+Set the workspace's Docker socket in `DOCKER_HOST` before the first container.
+Record the time before starting it, keep the program's exit status, and use a core limit of exactly 1 on the outer Docker command:
+
+```sh
+started=$(date --iso-8601=seconds)
+status=0
+docker run --rm --pull=never --ulimit core=1 --cpus 4 --platform linux/amd64 \
+  --network none --user "$(id -u):$(id -g)" \
+  "${IMAGE:?select the test image}" /path/to/test || status=$?
+printf 'container exit status: %s\n' "$status"
+coredumpctl list -q --since "$started"
+```
+
+Use the network only when the case needs it, and keep test inputs and outputs in the workspace's allowed mounts.
+Apply the same core flag to `docker create`, Python argument lists and shared argument helpers.
+Put it on the launcher: an inner shell cannot raise a hard limit already set to zero.
+The empty crash query is expected; a record belonging to this container is a failed isolation check even when no core file was stored.
+Read the container's own result as well: suppressing the host's crash helper never makes an aborted program successful.
+A link gate reports a nonzero application exit as a note when loading and binding succeeded; a dynamic-loader error remains a finding.
+
+The [crash trap](../stereo-proof-rig/SKILL.md#traps-that-fooled-us) gives the symptom, cause, correction and the measured control: the kernel ignores zero for a piped core helper, whereas exactly 1 suppresses that helper.
+Do not rerun the zero-limit crash control on a person's desktop.
+Debug an expected crash under a debugger inside the container and keep its diagnosis with the test result.
+
+From the distribution build checkout, run `python3 sparky-os/tests/supply-chain/check-container-core.py` or `bash sparky-os/tests/supply-chain/test-wiring.sh` before starting builds.
+The check reads tracked shell and Python launchers, continuations and referenced core-limit arrays without starting a container.
+Its regression cases reject a missing flag, a zero flag, a protected neighbouring launcher and a flag hidden in the container's command.
+It failed on the earlier tree and passed after the launchers were corrected; a newly constructed launch form needs a corresponding check rather than an assumed pass.
+
 ## Where each thing goes
 
 | Kind of thing | Where | Lasts? |

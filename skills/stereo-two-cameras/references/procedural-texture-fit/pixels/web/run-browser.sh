@@ -1,4 +1,5 @@
 #!/bin/sh
+# A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../../../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
 # Open a page in Debian's Chromium, headless, inside a container, on one GPU, and wait until the page posts /done.
 # run-browser.sh GPU ROOT OUTDIR [PAGE] [TIMEOUT-S]
 #   GPU: nvidia (the RTX through CDI), amd (the iGPU's render node), cpu (no GPU device: SwiftShader or nothing)
@@ -20,7 +21,7 @@ case $GPU in
 esac
 NAME=ppx-508-web-$GPU-$$
 rm -f "$OUT/DONE"
-docker run --rm --name "$NAME" --network none --ulimit core=0 --shm-size 1g $DEV \
+docker run --rm --name "$NAME" --network none --ulimit core=1 --shm-size 1g $DEV \
   --user "$(id -u):$(id -g)" -e HOME="$S/m2c/home-$GPU" -e VK_DRIVER_FILES="$ICD" -e VK_ICD_FILENAMES="$ICD" -e VK_LOADER_DEBUG="${VKDEBUG:-}" -e XVFB="${XVFB:-0}" \
   -v "$ROOT:$ROOT:ro" -v "$OUT:$OUT" -v "$W:$W:ro" -v "$S/m2c:$S/m2c" \
   ppx-508-webgpu:forky sh -c '

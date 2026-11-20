@@ -1,5 +1,7 @@
 # zink on NVIDIA: 64-bit atomics in another buffer, and a sparse buffer's tail reading zero
 
+A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
+
 Two faults that made a point cloud (StereoVista, a compute rasteriser) load and draw nothing on the RTX 3060 through zink, with no error anywhere.
 Both are carried as patches in the edition's Mesa since +stereo3d20 (0035 and 0036); each has a test that fails on +stereo3d19 and passes on +stereo3d20.
 Read the search first: on 2026-11-09 Mesa main still had both lines, and no merge request or issue named the first.
@@ -31,7 +33,7 @@ Read the search first: on 2026-11-09 Mesa main still had both lines, and no merg
 ## Running the two on the RTX through zink, in a container
 
 ```sh
-docker run --rm --ulimit core=0 --network none --device nvidia.com/gpu=0 \
+docker run --rm --ulimit core=1 --network none --device nvidia.com/gpu=0 \
   -e __EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/50_mesa.json:/usr/share/glvnd/egl_vendor.d/10_nvidia.json \
   -e __GLX_VENDOR_LIBRARY_NAME=mesa -e MESA_LOADER_DRIVER_OVERRIDE=zink -e LIBGL_KOPPER_DISABLE=1 \
   IMAGE sh -c 'cc -O2 -Wall -Wextra -Werror -o /tmp/t egl-surfaceless-ssbo64.c -lEGL -lGL && /tmp/t'

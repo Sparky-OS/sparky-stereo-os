@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../skills/stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
 """Build and serve the preview on this machine only, in a disposable static-server container.
 
 python3 site/preview.py          builds, serves on http://localhost:8548/ and waits; Ctrl+C stops it
@@ -25,7 +26,7 @@ def main():
     if not 1024 <= a.port <= 65535 or not a.name.startswith('fp-548'): raise SystemExit('Use an unprivileged port and an fp-548 container name.')
     output=SITE/'_build'; address=f'http://localhost:{a.port}/'
     build(output,config(address.rstrip('/'),'/'))
-    cmd=['docker','run','--rm','-d','--name',a.name,'--platform','linux/amd64','--ulimit','core=0','--cpus','2',
+    cmd=['docker','run','--rm','-d','--name',a.name,'--platform','linux/amd64','--ulimit','core=1','--cpus','2',
          '--user',f'{os.getuid()}:{os.getgid()}','--read-only','--cap-drop','ALL',
          '-p',f'127.0.0.1:{a.port}:8000','-v',f'{output}:/site:ro',IMAGE,
          'python3','-m','http.server','8000','--bind','0.0.0.0','--directory','/site']

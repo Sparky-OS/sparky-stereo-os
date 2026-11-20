@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
 """Two tiled control pictures drawn by OpenKTG's own operators, 8 x 8 tiles of 256 pixels.
 
 Usage: KTG_IMAGE=image make_tiled_controls.py WORKDIR
@@ -20,7 +21,7 @@ rng = np.random.default_rng(473)
 
 def render(lines):
     cmd = ["docker", "run", "--rm", "-i", "--name", "x3d-473w-controls-%d" % os.getpid(), "--network", "none",
-           "--ulimit", "core=0", "--cpus", "1", "--user", "%d:%d" % (os.getuid(), os.getgid()),
+           "--ulimit", "core=1", "--cpus", "1", "--user", "%d:%d" % (os.getuid(), os.getgid()),
            "-v", WORK + ":" + WORK + ":ro", IMAGE, WORK + "/bin/ktgtool", "tiles", "8"]
     raw = subprocess.run(cmd, input=("\n".join(lines) + "\n").encode(), stdout=subprocess.PIPE, check=True).stdout
     t = np.frombuffer(raw, dtype=np.uint8).reshape(8, 8, 256, 256, 3)

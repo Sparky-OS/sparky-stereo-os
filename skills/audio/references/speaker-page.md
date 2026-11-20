@@ -1,5 +1,7 @@
 # The Sound page's Speaker Setup: the channel map, level, delay and crossover, and the rig that measures them
 
+A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
+
 **Check freshness first.**
 Written on 2026-11-19 by Claude Sonnet 5.5 (ORDER 23, continuation 1), on plasma-pa 6.7.4 with the edition's +stereo3d5, PipeWire 1.6.9-2, WirePlumber 0.5.19-1 and sparky-stereo-audio 0.1.0.
 PipeWire's plugin labels and control names change between releases: read the builtin plugin's ports in a graph dump of the installed version before trusting a name here.
@@ -39,7 +41,7 @@ A setup whose device left stays in the graph, linked to nothing and playing nowh
 
 ## The rig (bench/speaker-rig)
 
-Containers only, `--network none`, `--ulimit core=0`. Fake ALSA devices (`../rig/pcm_sa631.c`): a 5.1 card, a 7.1 card, a stereo card, as sinks made by `rig-alsa-nodes.lua` with their channel maps in `audio.position`.
+Containers only, `--network none`, `--ulimit core=1`. Fake ALSA devices (`../rig/pcm_sa631.c`): a 5.1 card, a 7.1 card, a stereo card, as sinks made by `rig-alsa-nodes.lua` with their channel maps in `audio.position`.
 
 - `build-rig.sh BASE NEW`: the image (a base with pipewire, wireplumber, pipewire-pulse, pulseaudio-utils, libasound2-dev, gcc, python3-numpy, qml6, plus the package under test).
 - `rig-run.sh NAME IMAGE COMMAND...`: one container per case; root prepares `/run/sa631`, a `systemctl` that restarts the private session as systemd would (and keeps each PipeWire log as `/tmp/pw-N.log`), and optionally hides the filter-chain module (`SP_HIDE_MODULE=1`) or overlays a build tree (`SP_BUILD`); then COMMAND runs as the user `rig` inside a private PipeWire, WirePlumber and pipewire-pulse session.

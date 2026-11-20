@@ -1,5 +1,7 @@
 # Serving skills over MCP: what exists and what to check
 
+A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
+
 **For distro developers and their partners, human or model:** the facts to have in hand before writing, registering or testing an MCP server that serves skill folders.
 Everything here was read from the project's own documents on 2026-11-06 and is dated; read the source again before relying on a detail that may have moved.
 
@@ -72,7 +74,7 @@ The layout lives next to the code (`docs/TREE.md` of the product); the short rec
    Test it by adding and removing a file in a scratch folder and by searching the parents for the variant's id as a string (the id of a variant must not appear outside `_kinds/`).
 3. Write contracts and failing tests first: atoms that return `error.NotImplemented`, tests that state the expected value from an outside source (the extension's own digests, a golden recorded from the Python engine).
    A stub that refuses everything passes the "must refuse" tests vacuously; trust only the tests whose positive twin fails, and show each lint test going red on a copy that breaks its rule.
-4. Run the test binaries in a container, never on the host: build them static (`-target x86_64-linux-musl`) with the station's compiler, then `docker run --network none --ulimit core=0 --tmpfs /tmp` with the product tree mounted read only.
+4. Run the test binaries in a container, never on the host: build them static (`-target x86_64-linux-musl`) with the station's compiler, then `docker run --network none --ulimit core=1 --tmpfs /tmp` with the product tree mounted read only.
 
 Traps:
 - cgm-zig is dynamically linked against LLVM; compile on the station, run the static result in the container.

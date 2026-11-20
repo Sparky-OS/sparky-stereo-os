@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
 """Draw wzrender scripts in a container and return pictures.
 
 Usage as a program: KTG_IMAGE=image wz.py BUILD_DIR SCRIPT.txt OUT.png
@@ -18,7 +19,7 @@ def render(build, script):
     """script: the text for wzrender. Returns an RGB uint8 array, or raises with wzrender's message."""
     _n[0] += 1
     cmd = ["docker", "run", "--rm", "-i", "--name", "procedural-texture-%d-%d" % (os.getpid(), _n[0]), "--network", "none",
-           "--ulimit", "core=0", "--cpus", "1", "--user", "%d:%d" % (os.getuid(), os.getgid()),
+           "--ulimit", "core=1", "--cpus", "1", "--user", "%d:%d" % (os.getuid(), os.getgid()),
            "-v", build + ":" + build + ":ro", os.environ["KTG_IMAGE"], build + "/wzrender"]
     r = subprocess.run(cmd, input=script.encode(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if r.returncode != 0:

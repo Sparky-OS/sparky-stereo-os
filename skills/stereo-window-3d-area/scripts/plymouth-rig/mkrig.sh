@@ -1,4 +1,5 @@
 #!/bin/bash
+# A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
 # The Plymouth guest rig: an initramfs holding Plymouth, a theme, udev and a tiny init (./init), booted by QEMU
 # (virtio-vga with stereo on) under a kernel that has virtio-gpu. Nothing of it runs on the machine you work on.
 #   mkrig.sh VARIANT THEME_DEB [PLYMOUTH_DEBS_DIR]
@@ -16,7 +17,7 @@ HERE=$(dirname "$(readlink -f "$0")")
 mkdir -p "$RIG"
 PM=()
 [ -n "$PDEBS" ] && PM=(-v "$(realpath "$PDEBS")":/pdebs:ro)
-docker run --rm --name "${PREFIX:-rig}-mkrig-$VARIANT" --ulimit core=0 --platform linux/amd64 --user 0 \
+docker run --rm --name "${PREFIX:-rig}-mkrig-$VARIANT" --ulimit core=1 --platform linux/amd64 --user 0 \
 	-e OWNER="$(id -u):$(id -g)" -e KVER="$KVER" -e VARIANT="$VARIANT" "${PM[@]}" \
 	-v "$RIG":/rig -v "$HERE":/here:ro -v "$THEME":/theme.deb:ro -v "$(readlink -f "$REPO")":/repo:ro \
 	-v "/lib/modules/$KVER":"/hm/lib/modules/$KVER":ro \

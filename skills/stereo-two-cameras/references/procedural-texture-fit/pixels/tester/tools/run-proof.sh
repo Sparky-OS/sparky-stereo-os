@@ -1,4 +1,5 @@
 #!/bin/sh
+# A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../../../../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
 # One run of the Procedural Texture Rendering page in Debian's Chromium inside a container, watched by drive.py.
 # run-proof.sh GPU OUTDIR TAG QUERY [TIMEOUT-S]
 #   GPU: nvidia (the RTX through CDI; Chromium on an Xvfb inside the container), amd (the iGPU's render node,
@@ -42,7 +43,7 @@ SUBPATH=${SUBPATH:-demos/procedural-texture-rendering/}
 PORT=8537
 mkdir -p "$S/home"
 rm -f "$OUT/DONE"
-docker run --rm --name "$NAME" --platform linux/amd64 --network none --ulimit core=0 --shm-size 1g --cpus 2 $DEV \
+docker run --rm --name "$NAME" --platform linux/amd64 --network none --ulimit core=1 --shm-size 1g --cpus 2 $DEV \
   --user "$(id -u):$(id -g)" -e HOME="$S/home" -e VK_DRIVER_FILES="$ICD" -e VK_ICD_FILENAMES="$ICD" -e XV="$XV" \
   -e HOSTMODE="$HOSTMODE" -e SUBPATH="$SUBPATH" -e ALSO="${ALSO:-}" -e WINDOW="${WINDOW:-1600,1500}" -e EXTRA="${EXTRA:-}" -e CONTROL="${CONTROL:-}" -e HIDE="${HIDE:-}" -e TAIL="${TAIL:-}" \
   -v "$W:$W:ro" -v "$OUT:$OUT" -v "$S/home:$S/home" ${ALSOMOUNT:+-v "$ALSOMOUNT:$ALSOMOUNT:ro"} \

@@ -1,11 +1,12 @@
 #!/bin/bash
+# A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
 # Builds the speaker rig image from a base that has pipewire, wireplumber, pipewire-pulse, libasound2-dev, gcc, python3-numpy:
 # build-rig.sh BASE_IMAGE NEW_IMAGE ; needs DOCKER_HOST (the lane's socket). The fake ALSA device is ../rig/pcm_sa631.c, built into /opt/sa631.
 set -euo pipefail
 HERE=$(cd "$(dirname "$0")" && pwd)
 NAME=${NAME:-sp23-rigbuild}
 docker rm -f "$NAME" >/dev/null 2>&1 || true
-docker run --name "$NAME" --pull=never --network none --ulimit core=0 --cpus 2 -v "$HERE":/src:ro -v "$HERE/../rig":/rig:ro "$1" sh -c '
+docker run --name "$NAME" --pull=never --network none --ulimit core=1 --cpus 2 -v "$HERE":/src:ro -v "$HERE/../rig":/rig:ro "$1" sh -c '
 set -e
 id rig >/dev/null 2>&1 || useradd -m -u 1001 rig
 mkdir -p /opt/sa631 /run/sa631 /etc/wireplumber/wireplumber.conf.d

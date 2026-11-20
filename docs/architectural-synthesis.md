@@ -216,7 +216,7 @@ These projects are at different stages. For example, the edition's recorded chil
 | [KHARVOX](https://github.com/Sparky-OS/KHARVOX) | Fork of CactusVRStudios' DOOM (2016) VR conversion mod, used for the desktop stereo demonstration. |
 | [waterfox-stereo](https://github.com/Sparky-OS/waterfox-stereo) | Browser-side stereo and WebXR development. |
 | [flat-headset](https://github.com/Sparky-OS/flat-headset) | Android phone as an untracked stereo desktop screen; [APK and development instructions](https://github.com/Sparky-OS/flat-headset/tree/main/apk). |
-| [stereodroid](https://github.com/Sparky-OS/stereodroid) | Planned phone-headset work with tracking through ALVR and PhoneVR. |
+| [StereoDroidVR](https://github.com/Sparky-OS/stereodroid) | Tracked Android phone headset project: paired RDP picture and pose, PC OpenXR integration still open. |
 | [OpenVR-ArduinoHMD](https://github.com/Sparky-OS/OpenVR-ArduinoHMD) | DIY headset driver fork; Linux compatibility work is a starting point, not a qualified end-to-end headset output. |
 
 ### Business editions and system utilities

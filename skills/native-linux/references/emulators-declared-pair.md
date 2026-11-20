@@ -70,7 +70,7 @@ dolphin-emu 2609.b+dfsg-1+stereo3d1+lc1: Debian's 2609.b+dfsg-1 with two patches
 - **The host's crash list shows the emulator** although the container had `--ulimit core=0`: the session script killed the compositor first and Dolphin died on its lost X connection. Kill Dolphin first by SIGKILL.
 - **Debian's KWin cannot be installed in an edition image:** the edition's `libegl-mesa0` Breaks `kwin-wayland (<< 4:6.7.4-2+stereo3d24~)`. "A desktop without Stereo KWin" runs on a plain X server (Xvfb) instead.
 - **Lean Code wrote a C++ comment into Dolphin's empty GraphicMods markers.** Without a payload source plan the restore maps an installed file to its source by the hash of the source's projected form; `Externals/picojson/picojson.cpp` is one comment, so its projected form is empty like every marker. Fix in the recipe: `debian/sparky-lean-payload-sources.json` (the installed Sys folder to `Data/Sys`). Found by comparing the package with Debian's file by file.
-- **`docker run` cannot bind /var/tmp/sparky-repo-current.** It is a symlink; mount its target.
+- **`docker run` cannot bind a repository folder given as a symbolic link.** The daemon refuses it; mount the link's target.
 
 ## Not proven
 

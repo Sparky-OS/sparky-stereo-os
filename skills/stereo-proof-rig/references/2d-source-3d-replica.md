@@ -131,3 +131,25 @@ No depth arithmetic was changed to obtain them.
 Use libstereo-declare with the output-proxy teardown fix, commit `bc7d18f`, when running these clients.
 Versions 1.11.0 and uncorrected 1.12.0 can leave output proxies on a private event queue after `finish()` and abort the client when that queue is destroyed.
 The rig's 1.11.1 source carries that fix; verify the library actually loaded, not just the package database's version after an overlay install.
+
+## Failure and lifecycle probes
+
+- **Symptom:** changing `kwinrc` to QPainter and asking for reconfiguration leaves OpenGL running.
+  **Cause:** `Compositor::reinitialize()` retains the selected renderer; the environment chooses it at process startup (`options.cpp`).
+  **Fix:** start a fresh owned guest process with `KWIN_COMPOSE=Q`, verify its QPainter initialization log and read whether the requested output configuration applied.
+  **How found:** ORDER 763's three reconfigure probes did not induce QPainter; the corrected startup reached a VKMS atomic stereo-mode rejection before composition.
+- **Symptom:** a failed stereo replica configuration leaves no visible problem, or a successful restart leaves yesterday's problem behind.
+  **Cause:** a backend can reject the configuration before the compositor sees a stereo output, its live UUID may still be empty, and process-local failure caches cannot represent persisted state.
+  **Fix:** report the rejection at the output-configuration boundary using the requested identity; on the first successful configuration and complete frame, clear the matching persisted problem even in a new process.
+  **How found:** the forced-QPainter probe needed configuration reporting; a same-HOME OpenGL restart exposed the stale-record case. Query every required language, then verify the records are empty after recovery and after disabling the target.
+- **Symptom:** a KScreen controller aborts with `double free or corruption` while changing a replica.
+  **Cause:** `ConfigOperation` schedules itself with `deleteLater()`; a stack operation is destroyed again when its scope ends.
+  **Fix:** allocate GetConfigOperation and SetConfigOperation on the heap as KScreen does, and retain the returned ConfigPtr before starting the next operation.
+  **How found:** ORDER 763's first three-output rig controller failed before applying its configuration; the corrected controller applied both replica settings and captured all three scanouts.
+
+For two replicas, create three independent VKMS connector/CRTC/primary-plane chains.
+Apply one SBS-full replica and one plain replica to the same plain source with the real KScreen configuration operation.
+Compare the plain replica and source directly with the stereo target's left half, and inspect each output's pass log separately.
+For a colour control, set only the target brightness to 0.55 and compare the old 3D-source copy with the new 2D-source copy.
+With the ORDER 763 EDID these use different blending references, 200 and 112.25 cd/m², retain the existing SDR conversion copy and produce identical target pixels.
+A separate animated-fixture swap comparison must exclude the marker's antialiased coloured-to-white edges as well as its fully white centre; retain the mask rule and count every other changed pixel.

@@ -1,7 +1,7 @@
 # A 2D source copied onto a 3D target
 
 Baseline reconciliation on Stereo KWin 6.7.4 +stereo3d60, plasma-wayland-protocols +stereo3d12, and libstereo-declare 1.11.1 (ORDER 763).
-This is a baseline recipe, not a claim that the requested desktop depth has been implemented.
+The recipe first records the red baseline; successor qualification and the rig traps follow below.
 
 ## Recipe
 
@@ -160,3 +160,13 @@ Repeat in a new guest with both selected modes plain: the same checkbox is visib
 Cache `QAbstractItemModel::roleNames()` in a local hash before iterating; iterators from separate temporary hashes caused the first introspection helper to abort, while the rebuilt helper with a retained hash completed both states.
 Before booting a newly exported guest root, verify every initramfs bind and tmpfs mount target exists.
 An absent `var/tmp` stopped the first exported-app-root boot before KWin; creating that empty directory fixed the boot without a package change.
+
+## Packaged successor qualification
+
+ORDER 763's KWin +stereo3d61 and KScreen +stereo3d15 candidates pass the Lean Code and archive link gates.
+With those packages installed, the plain source, physical replica, 3D-source control and native phone stream retain every +60 level-table probe bound.
+The plain source equals the target's left image byte for byte; its swap selects the right declared view while the target pair keeps its order.
+For the tested red/cyan anaglyph twin, read the full static fixture's actual filtered scanout: red ≥245 locates the left white probe and green ≥245 the right.
+Each probe contains exactly 20 pixels in each channel, and all ten pairs of bounds equal the raw +60 stereo table.
+This measures the filter's two contributions; it does not turn a filtered scanout into an exported pair of eye buffers.
+Keep the before/after marked PNS pictures on the SBS and native-phone routes, with 1920-wide views and the mono source explicitly labelled as one picture repeated for viewing.

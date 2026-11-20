@@ -154,3 +154,37 @@ In a virtual-session proof, first save the compositor's own output configuration
 The devscripts prerequisite was subsequently installed and `dch --version` measured. A native successor needs fresh staging, the signed archive configuration for its mandatory link/start gate, and `sparky_provenance_init` immediately before the build container starts. Do not reuse a staging tree already carrying an lc1 marker. The native rebuild helper copies genuine receipts back beside the input descriptor, so give it a disposable writable descriptor directory. Do not opt out of provenance to bypass a missing initialization.
 
 A minimal container can exclude `/usr/share/locale/*` during installation. Remove that fixture exclusion and reinstall the package before testing its translations. KI18n lookups also need a non-C locale: glibc gettext does not translate in C or C.UTF-8. After installing locales, the installed capture labels passed 200 exact contextual lookups in ten languages, including Spanish. Reading a `.mo` with Python is a separate control and does not establish the running application's locale behavior.
+
+## Trap: the package was built, but its recipe is outside the build tree
+
+**Symptom:** a qualified screenshot package has a clean application branch, but the package's preparation scripts and translations exist only in another lane's packaging clone.
+
+**Cause:** an application commit does not identify the edition's complete source preparation and build recipe.
+
+**Fix:** commit the preparation script, build scripts, full patch overlay, translations, binary source assets and rerun instructions under `sparky-os/packages/kde-spectacle/` in the build repository. Build from that clean commit with provenance enabled. Compare its file list, payload hashes, dependencies and ELF sections against the accepted package, and explain every difference. A changed recipe date can change Qt's embedded resource timestamps as well as the changelog, build ID, debug link and consequential Lean Code manifest hashes.
+
+**How found:** rebuilding +stereo3d3 from the complete committed recipe retained all 317 package members. The 314 unchanged members and three changed members were accounted for; after normalizing the resource timestamps and removing the build-ID/debug-link sections, executable bytes matched the accepted build. All 92 QtTest cases passed again. An installed compositor successor must still be qualified with the installed screenshot package, with no plain screenshot-plugin overlay.
+
+A container with Docker `--ulimit core=1` inherits a one-byte hard limit. Do not set bash `ulimit -c 1` inside it: bash counts KiB, so that command tries to raise the hard limit and fails. Inherit Docker's limit. A QEMU runner whose first command is `timeout` needs Docker `--init`, because the timeout process must be able to create its process group. Both are fixture setup facts, not changes to screenshot behavior.
+
+For a same-version rebuild, installing the local archive with apt can leave the earlier executable in place. Use an explicit reinstall and compare the installed executable hash with the rebuilt archive before accepting any GUI or capture row. ORDER 772's final hash check caught precisely this fixture error; the exact rebuilt executable then passed the old-KWin controls too.
+
+## Trap: a screenshot package installs without its required compositor API
+
+**Symptom:** Spectacle +stereo3d3 on KWin +stereo3d61 reports “Stereo screenshots require KWin ScreenShot2 version 7 or later.” for a 3D capture, while ordinary 2D capture still saves PNG.
+
+**Cause:** the application detects the missing API honestly, but its package has not declared the dependency the designed feature needs.
+
+**Fix:** retain the runtime explanation and declare `Depends: kwin-common (>= 4:6.7.4-2+stereo3d62~)`.
+The staged file lists place `screenshot.so` in kwin-common; verify the owning binary package instead of guessing from the compositor executable's package name.
+Use apt's actual upgrade and held-package simulations to check that the pair upgrades together and a held compositor keeps Spectacle back, without removing packages.
+Do not replace this dependency with Breaks.
+
+**How found:** the installed +61/new Spectacle compatibility control measured the explicit 3D error and the successful ordinary 2D PNG.
+Review then assigned the versioned dependency to the screenshot plugin's owning package.
+The final apt simulations from both +60 and +61 upgraded the pair without removals; holding KWin kept Spectacle back in both cases.
+
+Before rebuilding a carried recipe on current main, run its supply-chain wiring check and the full Lean suite in the builder.
+Carried patch headers keep author names without other people's addresses.
+Source-package dates use `repo/reproducible.py`'s `rfc2822(stamp)`: a local fixed-date `formatdate` call can produce identical bytes and still fail the tree's producer check.
+ORDER 772's replacement preserved the changelog byte for byte.

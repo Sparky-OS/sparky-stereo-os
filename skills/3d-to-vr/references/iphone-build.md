@@ -438,7 +438,7 @@ The Linux analogue uses the real core permission API to inject each failure reas
 It tests cancellation and new sessions separately; a new session must answer the software query with false.
 These tests do not simulate Apple's VideoToolbox device creation or execute UIKit.
 Run [44779150423](https://github.com/Sparky-OS/flat-headset/actions/runs/44779150423) compiled and uploaded the updated core for 576dd93.
-The application compile then stopped at an invalid Objective-C instance-variable initializer; the corrected native buttons still await the next hosted compile and later device check.
+The application compile then stopped at an invalid Objective-C instance-variable initializer; the correction then passed both jobs in [run 44783586937](https://github.com/Sparky-OS/flat-headset/actions/runs/44783586937) for cd3c5f5. Its downloaded IPA and core passed checksum, arm64, iOS 16.0, unsigned and no-embedded-dylib checks. A device check still remains.
 
 - **Symptom:** the software decoder's eye-color assertion fails although decoding completes.
   **Cause:** the first generated fixture used FFmpeg's limited-range BT.601 color source directly, but the RDP conversion uses full-range BT.709.
@@ -456,6 +456,54 @@ The application compile then stopped at an invalid Objective-C instance-variable
   **Fix:** declare `_presentationEpoch;`; Objective-C allocation already zeroes scalar instance variables.
   Assign any nonzero initial value inside the initializer method.
   **How found:** the complete failing native build step identifies this sole error; Linux Clang reproduces it with authored test doubles and parses both corrected controller files.
-  Run `bash ios/Tools/check_objc_syntax.sh` locally to check `Desktop.mm`, `Desktop.h` and `Computers.mm` with C++17, ARC, blocks and warnings as errors.
+  Run `bash ios/Tools/check_objc_syntax.sh` locally to check `Desktop.mm`, `Desktop.h`, `Computers.mm` and `ViewerSettings.mm` with C++17, ARC, blocks and warnings as errors.
   Its minimal declarations come from our call sites, not Apple's files; they check syntax and local type consistency, not real SDK signatures, ABI, availability, linking, shader compilation or runtime behavior.
   Keep those test includes out of every product build and keep the hosted Xcode compile as the SDK check.
+
+
+## Carry the Android viewer geometry across unchanged
+
+Use the existing Android `FittedLensCorrection.kt`, `headset_fitted.frag`, `PanelView.kt` and `PanelDescriptor.kt` in [Flat Headset](https://github.com/Sparky-OS/flat-headset), not coefficients inferred from a viewer's brand.
+Uncorrected remains the default. The other independent choices are the existing Shinecon fitted D mapping and a Cardboard QR profile; never compose them.
+The fit uses strength 0.13 from the existing Android implementation, and was checked for one Android phone placement in the adjustable viewer. That is not an optical proof for an iPhone.
+The iPhone selection explains that limitation, is saved like Android's viewer selection, and is captured before establishing the paired connection. Decoder consent remains separate and per session.
+
+For QR geometry, retain the portable C++ subset from [Cardboard 8bd424da](https://github.com/googlevr/cardboard/tree/8bd424da7f1e399255a1b6e7c02be8e281ecc974): lens distortion, radial inverse, mesh and matrix, with its license and original source hashes.
+Feed validated actual DeviceParams and physical screen dimensions into its constructor. Do not substitute a fit strength for the QR distortion polynomial.
+The receiver uses the exact Cardboard v1 bytes only when v1 is explicitly chosen; an imported full profile link is decoded locally and invalid data is refused.
+Short-link resolution and the separate Cardboard program's scanner are not implemented by that import field.
+Use the upstream iPhone DPI table for the screen model; refuse unknown physical dimensions rather than choosing a plausible DPI.
+Preserve the upstream border constant, FOV and viewport math; retain its 1600 vertices and 3158 strip indices per eye.
+For Metal, flip mesh V exactly as the upstream Metal renderer does; keep the whole-panel viewport and each eye's source region.
+Never resize each eye to fill a lens mask or change separation to hide black edges.
+The authenticated native-panel reply must echo the selected Android lens-profile ID along with the exact panel dimensions and identity.
+
+Local commands, in the isolated Linux test environment:
+
+```sh
+bash ios/Tools/check_objc_syntax.sh
+python3 ios/Tools/check_localizations.py
+cmake -S ios -B build/viewer -DCMAKE_BUILD_TYPE=Debug -DFH_VIEWER_GLES_TEST=ON -DFH_VIEWER_SESSION_TEST=ON
+cmake --build build/viewer --parallel 4
+ctest --test-dir build/viewer -V
+```
+
+EGL/GLES2 and OpenSSL development packages are needed for these two optional tests; ordinary portable CMake checks also run on the hosted Mac.
+The expanded authored Objective-C stand-ins cover the profile settings UI and Metal mesh submission, without including Apple's headers.
+The 51 native string keys include the profile choices and refusals in ten languages.
+The native viewer changes still await their hosted compile; all optical checks on a phone remain unproven.
+
+- **Symptom:** a port's fitted picture differs by half a pixel or appears to use a different strength.
+  **Cause:** removing one of Android's two half-pixel operations, treating the fit strength as a QR coefficient, or measuring the radius in different units changes the mapping.
+  **Fix:** share the exact scalar pixel mapping between portable C++ and Metal and compare it against Android's actual shader on headless GLES. Keep its integer centre and per-eye diagonal normalization.
+  **How found:** the 0.13 mapping passes every pixel at 1920x1080, 2340x1080 and 1280x720 in both vertical orientations, with at most one channel value of interpolation rounding; bypass is exact. A deliberately wrong coefficient produces mismatches.
+- **Symptom:** a plausible QR mesh is not demonstrably the same geometry as Android's.
+  **Cause:** testing only a reimplementation against itself misses parser, FOV, viewport and eye-order changes.
+  **Fix:** build the pinned, unmodified Cardboard sources with their generated protobuf parser as an independent oracle, and compare every mesh coordinate, UV and index after the documented Metal V flip.
+  **How found:** the actual Cardboard v1 and I/O 2015 profiles give byte-identical 3200 vertices/UVs and 6316 indices at all three test panel sizes; exchanging the eyes fails the comparison.
+- **Symptom:** a malformed imported profile could hang inverse-distortion construction.
+  **Cause:** upstream's secant inverse loop has no iteration bound.
+  **Fix:** bound parsing and inverse iterations, refuse nonfinite results and report the invalid profile in the person's language. Do not silently replace its coefficients or select v1.
+  **How found:** source inspection while accepting imported profile bytes; legitimate-profile oracle comparisons and malformed-input tests preserve the valid math.
+
+These are arithmetic, parsing and session-control proofs on Linux. They do not execute Metal, display an RDP desktop on a phone or verify lens alignment through a viewer.

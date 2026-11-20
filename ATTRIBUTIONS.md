@@ -1379,6 +1379,7 @@ Spectacle's own About records name **Boudhayan Gupta**, **David Redondo** and **
 
 FreeRDP: **Marc-André Moreau**, **Armin Novak**, **Martin Fleisz**, **Dorian Johnson**, **Thincast Technologies**.
 Cardboard: **Google**, **Phoenix Huang**.
+FFmpeg lenscorrection: **Richard Spindler**, **Daniel Oberhoff**.
 KDE Connect: **Albert Vaca Cintora**, **Vineet Garg**, **YANG Qiao**, **Inoki**, **Lucas Wang**.
 nlohmann/json: **Niels Lohmann**, **Evan Nemerson**, **Björn Hoehrmann**, **The Abseil Authors**.
 LLVM: **The LLVM Project**.

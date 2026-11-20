@@ -23,7 +23,9 @@ The window masks the picture's rectangle out of its own drawing only while both 
 On X11 the same area is a child window declared with `stereo_declare_x11_child_place()`.
 
 `stereo_gtk_unpack()` follows the Qt layer's rule (`storedView()`, `Picture::fromAnaglyph()`): side by side and quincunx give two half-width views, top and bottom and rows two half-height views, columns and checkerboard the view's own samples, the three anaglyph pairs two full-size colour reconstructions.
-Frames in turn, block laced, multiview and the picture-and-depth packings need another picture or a depth engine; the call fails with a translated sentence for the program to show.
+A picture and its depth map in one frame (side by side, top and bottom, four rows with graphics, four quarters with the background) are drawn by libstereo-dibr inside `stereo_gtk_unpack()`, cut and drawn as the Qt layer's `unpackWithDepth()` and `Picture::fromDepth()` do: the depth map's gray (qGray) as nearness, 8 bits, the library's one default (`stereo_dibr_options_default()`), the picture as the left eye. Nothing reads or changes the person's depth limits (since 1.23.1).
+Frames in turn, both views in one block, multiview and a separate depth map need a second picture: `stereo_gtk_layout_needs_two_pictures(layout)` says so, `stereo_gtk_unpack(one picture)` fails with a translated sentence for the program to show, and `stereo_gtk_unpack_pair(first, second, layout, order, &left, &right, &error)` gives the eyes: two decoded pictures in turn (the first is the left eye unless the right comes first; sizes must match) or a picture and its depth map of any size. The Qt layer has the same rule for two pictures in turn, `Picture::fromViewsInTurn()`.
+Where the second picture comes from is the program's: a played clip pairs an even frame (frame number from `gtk_media_stream_get_timestamp()` and the source's frame rate) with the odd frame after it; a still needs the picture decoded after it (Stereo HandBrake's scan keeps it as preview number + `HB_PREVIEW_NEIGHBOUR`).
 
 ## Traps
 

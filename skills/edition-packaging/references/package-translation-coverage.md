@@ -67,3 +67,27 @@
   **Cause:** the recipe cannot see the checkout metadata through its build mount.
   **Fix:** set `SOURCE_DATE_EPOCH` to the last commit touching the recipe.
   **How found:** the MIME recipe found its version and sources but failed its date lookup until the host supplied the recipe commit timestamp.
+- **Symptom:** all parsed translations pass, but the terminal menu still has English paragraphs.
+  **Cause:** the source scanner recognized only single-line i18n arguments.
+  **Fix:** take active multiline IDs from the format's extractor, retain their line breaks, and exercise the terminal menu through a PTY.
+  **How found:** the Sparky CA recount found two terminal menu variants and one fingerprint tooltip absent from the checked key list.
+- **Symptom:** the tasksel recount loses all its measured keys after adding an English overlay.
+  **Cause:** treating the English catalogue's absence of a key as its identity changed the denominator on the candidate.
+  **Fix:** keep the published key list fixed. Read the actual merged tasksel domain and call `tasksel --task-desc` to exercise the description body.
+  **How found:** the package installs the same domain for current systems and for the installer.
+- **Symptom:** the compiled PolicyKit XML has an empty localized message although the KAuth action contains text.
+  **Cause:** an unquoted comma in an `.actions` value makes Qt's settings parser return a list to the generator.
+  **Fix:** quote the value and read the generated XML by action ID and locale.
+  **How found:** the Graphics page's Polish and German messages appeared in the rebuilt action after quoting.
+- **Symptom:** `msgfmt --xml` cannot find its AppStream rules, or the recount misses the Chinese values in valid generated XML.
+  **Cause:** the build is missing AppStream ITS data, or the auditor recognizes only short locale names.
+  **Fix:** install the declared AppStream build dependency. Accept `zh-Hans-CN` and `zh-Hant-TW` as the Chinese locale tags emitted for `zh_CN` and `zh_TW`.
+  **How found:** the AppStream build dependency made the generator run, and the generated XML showed both explicit script and region tags.
+- **Symptom:** a desktop file in `/etc/xdg/autostart` is absent after a successful dpkg unpack.
+  **Cause:** dpkg installs the conffile at configuration time.
+  **Fix:** configure the package with its exact siblings and read the final autostart path.
+  **How found:** the GL stereo show desktop entry existed in the archive and was absent during the unpack-only check.
+- **Symptom:** a metadata-only GL stereo change fails the saver receipt check.
+  **Cause:** the plain build's stripped layer differs from the Lean Code layer named in the receipts.
+  **Fix:** reproduce the published Lean Code recipe and qualify the actual stripped layer, keeping the receipt gate active.
+  **How found:** the plain build rejected the layer hash. The equivalent Lean Code build passed all 132 receipts.

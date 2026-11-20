@@ -4,9 +4,9 @@ metadata:
 name: system-housekeeping
 description: >-
   Bounded logs, kernel retention and cleanup that keep user settings, boot recovery and diagnostic evidence:
-  old kernels per flavour (APT::NeverAutoRemove::KernelCount, never a general apt autoremove), update-initramfs for
+  old kernels per flavour, update-initramfs for
   every image, GRUB tested in a container, the journal as the one log, crash dumps capped, /etc/skel, system mail,
-  BleachBit, safe scratch folders, cleaning a shared build machine, services failing on absent hardware. Load it when a disk fills with kernels or logs, a removal would take the running kernel, a cleaner would
+  BleachBit, safe scratch folders, cleaning a shared build machine, services failing on absent hardware. Load it when a Type=dbus service times out and never takes its bus name, a disk fills with kernels or logs, a removal would take the running kernel, a cleaner would
   delete the evidence of a crash or shows Access denied on a mailbox, a tool exits 0 with no message on an unreadable
   HOME, nvidia-persistenced or thermald fails on a machine without that hardware, GRUB's menu never shows after a failed
   start or Advanced options starts a kernel under Secure Boot, a GRUB test in a container shows
@@ -22,7 +22,7 @@ description: >-
 3. Return the reviewed removal set and recovery evidence. Never substitute broad autoremove for the kernel-only policy.
 
 **Check freshness first.**
-Written on 2026-10-07; old kernels and the boot chain revised on 2026-10-30; local system mail added on 2026-11-06.
+Written on 2026-10-07; old kernels and the boot chain revised on 2026-10-30; local system mail added on 2026-11-06; a D-Bus service that never takes its name on 2026-11-19.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
 
 Daniel's rule: "we don't grow so fast, and when grow self prune".
@@ -127,6 +127,13 @@ Debian's postinst enables such a unit wherever the package is installed, so the 
 A oneshot that does package work from a queue (a path unit, a timer, a post-invoke hook) must start once per request, say what failed and never hold the boot.
 Symptom: the graphical target arrives a minute late after an update, two failed units (`.path` and `.service`, `start-limit-hit`), a message that tells the person to check the network when apt refused a removal.
 [The cause, the real-systemd red and green with the numbers, the unit shape that works and the traps](references/queued-job-retries-and-holds-the-boot.md).
+
+## A D-Bus service that never takes its name
+
+Symptom: a `Type=dbus` unit ends with `start operation timed out. Terminating.` after 90 s, the program that asked over D-Bus waits 25 s (`Failed to activate service ... timed out`), and a start by hand sometimes works.
+It is a hang, not a crash: the process is alive and `activating` during the 90 s.
+[How to tell a hang from a crash, every thread's backtrace with symbols, the thread that holds the lock read from the mutex itself, the cause found in geoclue on GLib 2.90.1, the start loop and the reproducer, the rig for a sandboxed unit and the traps](references/dbus-service-never-takes-its-name.md).
+Never a raised timeout, a restart loop or a masked unit: the fix is where the lock is.
 
 ## Cleaning a system safely
 

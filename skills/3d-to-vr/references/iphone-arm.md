@@ -87,7 +87,8 @@ Its ordinary background suspension means it cannot simply act as an Android-styl
 Embed the KDE Connect protocol/backend in the receiver's foreground process and add the virtual-monitor protocol there; retain the separate KDE Connect program as requested.
 Until shared keychain entitlements are actually provisioned and verified, each executable keeps its own paired identity and pairs explicitly with the same PC.
 Do not export pairing secrets or RDP credentials through a custom URL.
-Nonsensitive Cardboard viewer parameters can use a document import/export handoff.
+Nonsensitive Cardboard viewer parameters use `flatheadset://viewer?p=BASE64URL`; the receiver validates them again and asks before saving them for its next connection.
+The paste field remains the second route; no pairing secret or session grant travels in this URL.
 [Shared keychain access](https://developer.apple.com/documentation/security/sharing-access-to-keychain-items-among-a-collection-of-apps) requires matching access groups and signing entitlements; common authorship alone does not grant it.
 
 Flat Headset stays a static screen with no tracking.

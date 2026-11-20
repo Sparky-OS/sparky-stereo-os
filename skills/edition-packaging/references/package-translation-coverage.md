@@ -99,10 +99,18 @@
   **Cause:** the image already has Debian's newer Qt installed.
   **Fix:** start with a clean image that has the packaging tools and no preinstalled Qt, then resolve the pinned build dependencies together.
   **How found:** the pinned KScreenLocker dependencies installed together in the fresh base and the package built.
-- **Symptom:** the legacy PO patch validator reports a Spanish ID missing even though the patch applies and msgfmt succeeds.
-  **Cause:** its added-message parser only recognizes a singular `msgstr` and consumes later entries while seeking one after a plural.
-  **Fix:** record the validator's failure and check the compiled catalogue with the native format tool and context-aware singular and plural lookups.
-  **How found:** the KScreenLocker Spanish patch produced correct installed Ki18n output for both plural forms after the wrapper reported a failure.
+- **Symptom:** the PO patch validator reports a Spanish ID missing even though the patch applies and msgfmt succeeds.
+  **Cause:** its old parser only recognized singular `msgstr` and read later entries while seeking one after a plural.
+  **Fix:** parse the context, singular ID, plural ID, and each indexed translation. Compare every form on the applied side. Keep the structural gate and the native `msgfmt --check --check-format` check. Test that changing only the second plural form fails.
+  **How found:** the exact Spanish hunk in KScreenLocker failed the old parser and passed the corrected one. The installed probe independently matched both plural forms.
+- **Symptom:** a source scan says a locale is complete but the compiled catalogue falls back to English.
+  **Cause:** the source has a fuzzy translation carried from an unrelated msgid. Gettext omits it from the compiled catalogue.
+  **Fix:** verify the translated meaning before clearing the fuzzy flag, then compare the compiled lookup against the corrected value.
+  **How found:** the Japanese KWin translation for “Unsupported compositing type” held the old “Suspend Compositing” wording and was absent from the compiled catalogue.
+- **Symptom:** a well-formed catalogue patch fails on the receiving release even though the published release takes it.
+  **Cause:** the staged successor changed the patch context after the measured publication.
+  **Fix:** checksum every member of the receiving .dsc, reconcile its current keys, then generate a patch against that tree. Replay the quilt series through dpkg-source and directly apply changes to files under debian/ before building the new .dsc.
+  **How found:** KRdp's published and staged catalogues differed in context. The rebased patch applied to the staged source and the compiler returned each expected translation.
 - **Symptom:** `desktop-file-validate` flags `MimeType` and `Actions` on a KDE service menu.
   **Cause:** the freedesktop application validator treats the existing `Type=Service` entry as outside its application schema.
   **Fix:** preserve the KDE service-menu type, record those diagnostics on both builds, and prove the service action's exact localized key through the desktop key reader.

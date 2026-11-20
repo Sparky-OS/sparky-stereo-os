@@ -18,13 +18,13 @@ if [ ! -d "$SRC/igt" ]; then
     git clone -q https://gitlab.freedesktop.org/drm/igt-gpu-tools.git "$SRC/igt"
 fi
 [ -n "${2:-}" ] && git -C "$SRC/igt" checkout -q "$2"
-docker run --rm --cpus 4 --user "$(id -u):$(id -g)" -v "$SRC:$SRC" -e HOME=/tmp "$IMAGE" sh -c "
+docker run --rm --ulimit core=1 --cpus 4 --user "$(id -u):$(id -g)" -v "$SRC:$SRC" -e HOME=/tmp "$IMAGE" sh -c "
     meson setup --wipe '$SRC/build' '$SRC/igt' -Dprefix=/usr/local -Dtests=enabled -Drunner=disabled \
         -Dchamelium=disabled -Dvalgrind=disabled -Dman=disabled -Ddocs=disabled -Doverlay=disabled \
         -Dtestplan=disabled -Dsphinx=disabled -Dlibdrm_drivers= -Dvmtb=disabled -Doping=disabled \
         -Dlibunwind=enabled -Dxe_driver=disabled >/dev/null &&
     ninja -C '$SRC/build' -j4 tests/kms_3d"
-cid=$(docker create "$IMAGE")
+cid=$(docker create --ulimit core=1 "$IMAGE")
 docker export "$cid" | tar -x -C "$OUT" 2>/dev/null || true
 docker rm "$cid" >/dev/null
 mkdir -p "$OUT/usr/local/bin" "$OUT/usr/local/lib" "$OUT/usr/local/share/igt-gpu-tools"

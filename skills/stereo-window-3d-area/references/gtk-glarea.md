@@ -71,3 +71,9 @@ What GDK needs from KWin and Mesa (both are lane 160's, nothing was changed here
 | a popover or menu over the area | a separate surface: works |
 | a `GtkOverlay` child over the area | Wayland: works (the area lies below the window with a hole); X11: hidden |
 | the GTK demo (`gtk4-demo --run glarea`, `GTK_DEMO_GLAREA_STEREO=1` or the check button) | shown in 3D on NVIDIA's EGL and on Mesa +stereo3d18's zink over the RTX 3060: the triangle's two views 22 samples apart, the rest of the window identical in both eyes |
+
+## Native memory-texture prototype (ORDER 742; unqualified)
+
+The stereo-layer order742 branch adds a GTK file-choice menu on the shared C input list and store, and a prototype media area taking two native GdkTextures. It uses a SHM subsurface on Wayland or a declared X11 child; the ordinary window masks only the media rectangle. Its source compiles, but no both-eye capture qualified it and neither HandBrake preview path uses it yet. Keep it as a draft until the two-eye, geometry, controls, resize and lifecycle checks pass.
+
+The device-free witness reported QPainter through KWin supportInformation and every ScreenShot2 call was Cancelled. This repeats the cause in the proof-rig November lesson: stereo captures require EGL and a render node. HOUSE-RULES requires a brief to name a device before a lane may pass it to Docker. Do not count the successful child declaration as a visual result or use a host display to get past that boundary.

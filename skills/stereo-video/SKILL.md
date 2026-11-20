@@ -153,7 +153,9 @@ These narrower topics have their own references:
 
 ## A transcoder that drops every stereo mark (ORDER 36, measured 2026-11-19)
 
-HandBrakeCLI 1.11.2 (Debian testing) drops every 3D mark (SEI, StereoMode, st3d) on all 36 encoder/container runs, with no message; upstream master (1d2087644 + our PR #8100) reads container marks and re-muxes them, writes the x264 SEI, but not the x265 one, and scans an SEI-only source as 2D.
+HandBrakeCLI 1.11.2 (Debian testing) drops every 3D mark (SEI, StereoMode, st3d) on 32 marked-source encoder/container runs, with no message; four 2D controls remain unmarked.
+Upstream master (1d2087644 + our PR #8100) reads container marks and re-muxes them, writes the x264 SEI, but not the x265 one, and scans an SEI-only source as 2D.
+The edition's deb-multimedia candidate and bundled-library boundary need their own reconciliation and proof, described in the same reference.
 [How to make and verify the marked samples (incl. native HEVC SEI injection), how to read the scan JSON and the outputs, the survival table, the preview's draw path and the traps](references/handbrake.md).
 
 ## A player that dies of a Wayland protocol error

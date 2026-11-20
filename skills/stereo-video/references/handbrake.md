@@ -1,7 +1,8 @@
 # What HandBrake does with a 3D source (ORDER 36, measured 2026-11-19)
 
 A study of HandBrake, the transcoder Daniel wants a stereo preview in.
-Measured on Debian testing's HandBrakeCLI 1.11.2+ds1-1+b3 (what the edition ships; the edition carries no HandBrake of its own in `/var/tmp/sparky-repo-current`), in a Debian testing container with FFmpeg 9.0.2, x264 r3108, the x265 HandBrake bundles (4.0), and MKVToolNix 103.0.
+The original study measured Debian testing's HandBrakeCLI 1.11.2+ds1-1+b3, in a Debian testing container with FFmpeg 9.0.2, x264 r3108, the x265 HandBrake bundles (4.0), and MKVToolNix 103.0.
+That is a Debian baseline; the edition also enables deb-multimedia, whose candidate is different, as the reconciliation below measures.
 No display was used; everything below is either a measurement on that version or a file:line read of upstream master (28cae12c0, 2026-11-18).
 
 ## Making the marked samples
@@ -18,7 +19,7 @@ ffmpeg -f lavfi -i "testsrc2=size=640x360:rate=25,drawtext=text='L':fontcolor=wh
 - H.264 SEI: `-x264-params frame-packing=3` (side by side) or `=4` (top and bottom). The `stereo3d` filter's metadata does not reach x264 on its own; the x264 option is what writes the frame packing SEI (payload type 45).
 - Matroska StereoMode: `mkvmerge -q -o out.mkv --stereo-mode "0:side_by_side_left_first" in.mkv` (values `mono`, `side_by_side_left_first`, `top_bottom_left_first`, …, one per StereoMode number).
 - MP4 `st3d`: has no direct writer in FFmpeg 9.0's muxer options, so remux a StereoMode-marked Matroska with `ffmpeg -i in.mkv -map 0:v -c copy -movflags +faststart out.mp4`; the demuxer's coded side data becomes the muxer's `st3d` box (movenc.c `mov_write_st3d_tag`).
-- HEVC SEI: the x265 in this HandBrake has no frame-packing option, so there is no encoder route. Build the payload natively per H.265 D.2.2 (payloadType 45, syntax order: id ue, cancel u1, arrangement type u7: 3 is side by side, 4 top and bottom , , quincunx u1, content_interpretation_type u6 = 1, then the display/self-contained flags; the H.264 tail order differs, do not reuse its writer) and splice the prefix SEI NAL into the Annex B stream before the first VCL NAL with a small Python injector (the lane's `evidence/inject-hevc-sei.py`).
+- HEVC SEI: check the encoder used by HandBrake separately from the system CLI. For a build without the option, construct a prefix SEI payload following H.265 D.2.16, payload type 45, and insert it before the first VCL NAL; use the HEVC syntax, not the H.264 tail syntax, and verify it through an independent decoder.
 - Always include a plain 2D control file with no mark at all; a read that finds a mark in the control is reading something else.
 
 Verify every sample before trusting any downstream result:
@@ -34,23 +35,24 @@ d=$(grep -abo st3d file.mp4 | head -1 | cut -d: -f1); dd if=file.mp4 bs=1 skip=$
 
 `HandBrakeCLI --scan --json -i sample` prints one JSON document.
 On 1.11.2 the scan of a stereo file has no Stereo3D key at all: every 3D mark is invisible to it.
-On master, 1d2087644 ("libhb: preserve the stereo 3d metadata") reads `AVStereo3D` from the demuxer's coded side data (libhb/stream.c:6149-6153, coded side data only: frame-level SEI is never decoded at scan) and reports it in the scan JSON (libhb/hb_json.c:399-412); the enum crosses FFmpeg's boundary by a straight field copy (libhb/hbffmpeg.c:726-745 `hb_stereo_3d_ff_to_hb`, numerically identical enums).
+On master, 1d2087644 ("libhb: preserve the stereo 3d metadata") reads `AVStereo3D` from the demuxer's coded side data (libhb/stream.c:6149-6153, coded side data only: decoded frame-level stereo data is not copied into the title) and reports it in the scan JSON (libhb/hb_json.c:399-412); the enum crosses FFmpeg's boundary by a straight field copy (libhb/hbffmpeg.c:726-745 `hb_stereo_3d_ff_to_hb`, numerically identical enums).
 
 For the outputs, re-encode every sample to x264 and to x265, into Matroska and into MP4, and read each output back with the same three tools above (SEI via frame side data after decode, StereoMode via mkvinfo, `st3d` via the byte scan).
 The lane's loop and table are `evidence/readback3.sh` and `evidence/survival-table-1.11.2.txt`.
 
 ## What survives
 
-Measured on HandBrakeCLI 1.11.2, 9 sources × (x264, x265) × (mkv, mp4) = 36 encodes: **every 3D mark dropped, 36/36, no message**.
+Measured on Debian's HandBrakeCLI 1.11.2, 9 sources × (x264, x265) × (mkv, mp4) = 36 encodes: **all 32 marked-source outputs lost their 3D marks, with no message**.
 1.11.2 has no 3D-stereo path in libhb at all (`git grep -i stereo` on the tag finds audio layouts and the `HB_FRAME_PACKING = 45` constant only).
 The 2D control stays correctly unmarked in all four of its outputs.
 
-Upstream master of 2026-11-18 differs by exactly two commits, and a master-level build would instead:
+The two relevant stereo commits on upstream master of 2026-11-18 are 1d2087644 and b0145ad9f; source inspection predicts that a master-level build would instead:
 
 - read container marks and the pre-muxed SEI's coded side data at scan (stream.c:6149-6153) and report Stereo3D in JSON (hb_json.c:399-412): but not a frame-level-SEI-only source, which scans as plain 2D with no notice;
 - write Matroska StereoMode / MP4 `st3d` on every encoder/container pair, by attaching `AV_PKT_DATA_STEREO3D` coded side data at the mux (libhb/muxavformat.c:674-686);
 - write the H.264 frame packing SEI on x264 encodes of marked sources (libhb/encx264.c:404-414, our PR #8100, mapping to `i_frame_packing` 3/4; SBS and TAB only);
-- still write no SEI for x265: HandBrake's encx265.c has no mapping. x265 itself gained `--frame-packing` on 2026-10-28 (multicoreware commit 1cf669d, closing issue #970, via PR #986), so the remaining gap is HandBrake's side of the call.
+- still write no SEI for x265: HandBrake's encx265.c has no mapping.
+  x265's option was merged through [PR #986](https://github.com/Multicorewareinc/x265/pull/986) on 2026-10-22; whether an installed encoder provides it must be measured.
 
 The per-mark matrix (every H.264 and HEVC arrangement type 0-6, Matroska StereoMode 0-14, `st3d` types 0/1/2, `sv3d`) is in the lane's `evidence/marks-table.md`; its anaglyph StereoModes 10/12 have no `AVStereo3D` value in FFmpeg 9.0 (matroska.h STEREOMODE_STEREO3D_MAPPING), and `mov_write_st3d_tag` warns and skips anything but 2D/TAB/SBS.
 
@@ -62,9 +64,156 @@ What step 2 needs there: decode any packing, rearrange to full side by side, pre
 
 ## Traps met on the way
 
-- **x265 writes no frame packing SEI.** Symptom: HEVC samples made "the same way" as the H.264 ones have no SEI in ffprobe. Cause: the x265 in Debian's HandBrake (4.0) has no frame-packing option; only x265 ≥ the 2026-10-28 commit (1cf669d) does. Fix: inject the SEI NAL natively per H.265 D.2.2 with a tiny Python writer. Found by diffing the sample verification: H.264 files had frame-level Stereo 3D, HEVC files did not, and x265's option list has no such switch.
+- **An x265 release label does not establish the option.** Symptom: HEVC samples have no SEI, and the installed CLI rejects `--frame-packing 3`. Cause: this candidate lacks the option despite its upstream merge. Fix: build the encoder carrying the upstream option before adding the HandBrake mapping; injection serves fixtures only. Found by comparing a two-frame control encode with the same command plus the option, and by the parameter API, as detailed below.
 - **mkvmerge rewrites your container mark.** Symptom: a stream meant to be SEI-only (no container mark) still showed StereoMode 1 in mkvinfo. Cause: MKVToolNix 103.0 auto-derives StereoMode from the frame packing SEI (!6311 merged 2026-09-21, !6312 2026-10-11). Fix: for a true SEI-only sample, inject into the elementary stream and remux to MP4 (`-c copy`), whose muxer does not inspect the SEI. Found when the "SEI-only" mkv control failed its own absence check.
 - **1.11.2 drops every mark silently.** Symptom: all 36 encode outputs read back unmarked, including sources HandBrake itself could not have misparsed. Cause: no 3D path in libhb on that tag at all. Fix: none in 1.11.2; the edition needs a master-level HandBrake or a backport of 1d2087644 + b0145ad9f. Found by the full-matrix run, after the 2D control ruled out a readback error.
-- **Master's scan is blind to SEI-only sources.** Symptom (source-verified): a stream whose only mark is the frame packing SEI reports no Stereo3D in `--scan --json`. Cause: stream.c:6149-6153 reads coded side data only; the scan never decodes a frame. Fix for step 2: during scan, decode a few frames and harvest frame-level side data. Found by reading the scan path after container-marked sources did report.
+- **Master's scan is blind to SEI-only sources.** Symptom (source-inspected): the only stereo mark is frame-level side data. Cause: stream.c:6149-6153 reads coded side data only; the preview scan already decodes frames but does not harvest their stereo data. Fix for step 2: read stereo side data at that existing decode boundary. Found by following the scan path after container-marked sources did report.
 - **`st3d` sits eight bytes past its atom type.** Symptom: reading the byte at the `grep -abo st3d` offset gives the ASCII "s". Cause: the atom's size (4) and type (4) precede the payload. Fix: `skip=$((offset+8))`. Found on the first byte read.
+
+## Reconcile before rebuilding (ORDER 742, measured 2026-11-19)
+
+Use a fresh amd64 container with Debian testing, deb-multimedia forky and the signed edition repository, together with preferences extracted from its published apt configuration package.
+Run `apt-cache policy`, simulate the install and install the candidates.
+The measured candidates and installed versions were:
+
+| Package | Version | Archive |
+| --- | --- | --- |
+| handbrake, handbrake-cli, handbrake-gtk | 1:1.11.2-dmo3 | deb-multimedia |
+| x265, libx265-217 | 1:4.3-dmo1 | deb-multimedia |
+| ffmpeg, libavcodec63, libavformat63 | 10:9.0.2-dmo1+stereo3d15+lc1 | edition |
+
+The package indexes mention HandBrake in the creator task's recommendations, and the build tree lists it in the applications list and app centre.
+Those references do not constitute a HandBrake binary package or a build recipe.
+Search all package indexes and the build tree before claiming an absence.
+
+`handbrake` is a metapackage with the dependency `handbrake-cli | handbrake-gtk`.
+Requesting it together with the CLI does not install the GTK program when recommendations are disabled; explicitly install `handbrake-gtk` for preview proof.
+Discover executable names with `dpkg-query -L`, rather than assuming `/usr/bin/ghb`.
+
+Generate two 64×64 Y4M frames with FFmpeg and run:
+
+```sh
+x265 --y4m --input input.y4m --output control.hevc --preset ultrafast --pools 1 --frame-threads 1
+x265 --y4m --input input.y4m --output marked.hevc --preset ultrafast --pools 1 --frame-threads 1 --frame-packing 3
+```
+
+The first exited 0 and encoded two frames; the second exited 1 with an unrecognized-option message.
+The installed library's `x265_param_parse` accepted `frame-threads=1` (0) and rejected `frame-packing=3` (−1).
+Its version banner reported 4.0 despite the package version above; preserve both facts.
+`x265 --fullhelp` also exits 1 on this build, so capture its status without treating it as a failed encode.
+
+Inspect HandBrake's ELF `NEEDED` entries, Depends and the source returned by `apt-get source handbrake`.
+The source is `handbrake-dmo`, whose packaging updates an included FFmpeg to 8.0.3.
+The installed executables have no dynamic libavcodec or libx265 dependency.
+Installing a newer system library alone therefore does not establish which encoder or decoder HandBrake uses.
+Daniel's 2026-11-19 decision requires shared edition libraries: “handbreak should use our libraries, not be a snap like or flatpack like thing - if needed, fork a stereo handbreak instead”. Build the Sparky-OS/HandBrake fork on 1.11.2, adapt Debian's shared-library packaging without its ambient-viewing and Dolby Vision removal patches, and retain DMO's three binary names and encoder features. Audit HandBrake's contrib patches against each system library and carry missing library features into that library's edition package. Rerun the marked-source matrix: the Debian study does not qualify the deb-multimedia candidate.
+
+Recheck upstream records through the project's own repository:
+
+- [x265 commit 1cf669dfd8a4917a08f381012fd659a0869251d3](https://github.com/Multicorewareinc/x265/commit/1cf669dfd8a4917a08f381012fd659a0869251d3), by Daniel Campos Ramos, adds the option and the `framePacking` member, with X265_BUILD raised to 218.
+  [PR #986](https://github.com/Multicorewareinc/x265/pull/986) merged on 2026-10-22; issue #970 closed on 2026-10-28.
+  [PR #999](https://github.com/Multicorewareinc/x265/pull/999) concerns `--field`, its b-adapt restriction and tests, not the intra-refresh frame-packing fix; the latter is a commit within #986.
+- HandBrake master remained at 28cae12c062ff68c6851fed5621fdbd56ca00cb7 on 2026-11-19.
+  [Issue #5826](https://github.com/HandBrake/HandBrake/issues/5826) is titled “CALF Cam video stripped of 3D metadata” and is closed; it is not an open umbrella request dating to 2013.
+  The frame-packing PR search returned #8100 only; that search does not establish an absence beyond its query.
+
+Package preservation, the x265 mapping, SEI-only scan and stereo preview remain separate build and runtime proofs after this reconciliation.
+
+
+## Shared-library working steps (ORDER 742)
+
+The edition x265 successor imports PR #986's three merged commits (1cf669dfd8a4917a08f381012fd659a0869251d3, 143a263b2ee74866af04783f814bd1245d5a5413, 5143a2a00ad0cc600831654a248b96ec7307eb4a), plus HandBrake's ambient-viewing, Dolby RPU and other library fixes. The final source assigns the extra ambient API SONAME 30219 (upstream master already uses 219 without these fields); retain the old library for existing consumers and rebuild FFmpeg and HandBrake against the new development package. Check each actual bit depth, not only the default API.
+
+Measured on the superseded ABI 219 prototype: nine of nine x265 encodes (arrangements 3, 4 and 5 at 8, 10 and 12 bits) decoded with their expected AVStereo3D type. Both the x265 and x264 successor package sets passed the edition's archive-qualified link gate and release checks. ABI 30219 is prepared as source only and is not binary-tested. These measurements do not qualify HandBrake's output or the preview.
+
+A decoded-frame `ffprobe -show_frames` side-data entry may name Stereo 3D without printing its type. For an exact arrangement readback, decode independently with libavcodec and inspect AVStereo3D; the lane's read-stereo-frames.c does that. Presence alone is not proof of the right arrangement.
+
+## Preserving features across the shared-library boundary
+
+Symptom: the installed HandBrake offers `fdk_aac` and `fdk_haac`, while the shared build would omit them. Cause: `libhb/common.c` tests `avcodec_find_encoder_by_name("libfdk_aac")`; these choices come through FFmpeg, not from simply linking `-lfdk-aac` or passing HandBrake's `--enable-fdk-aac`. The edition FFmpeg deliberately excludes that encoder from shipped packages and has a separate local-build profile. The required-encoder gate measured it absent from both published +15 and compiled +16. No shared HandBrake package was built or accepted with those choices removed. This boundary remains unresolved; do not describe configure flags as proof that features survived.
+
+The recipe is `sparky-os/packages/handbrake-dmo/` in the ORDER 742 build bundle; `check-required-encoders.py` reports the actual loaded libavcodec path and required encoder availability before building. The 62-row contrib audit is source evidence, not full runtime equivalence. Upstream offer branches are English only and remain unbuilt drafts.
+
+The GTK layer prototype supplies the existing 27 input choices through the C policy and file store, plus a native eye-texture area. It compiles, and a protocol trace declares only its media subsurface. It has not been integrated into either HandBrake preview path or visually qualified. Device-free KWin selects QPainter and cancels ScreenShot2; the existing proof-rig lesson requires an authorized render node for the capture. A declaration trace is not both-eye proof.
+
+## Stereo HandBrake on the shared libraries, built and measured (ORDER 742, 2026-11-20)
+
+The chain, each by its recipe in the build tree's `sparky-os/packages/`, each with the Lean Code link gate and a build record:
+x265-dmo 1:4.3-dmo1+stereo3d2+lc1 (ABI 30219, upstream PR 986's frame packing), then ffmpeg-dmo 10:9.0.2-dmo1+stereo3d16+lc1 against it (HandBrake's 24 FFmpeg patches imported), then stereo-layer 1.23.0-1+lc1 (`libstereo-gtk1`), then handbrake-dmo 1:1.11.2+gitCOMMIT-dmo3+stereo3d1+lc1 from the Sparky-OS/HandBrake fork's order742 branch.
+The cohort's link gate needs three inputs in the work folder: the published archives as `/repo/...` paths (siblings), the candidate's predecessors (deb-multimedia's packages for x265 and HandBrake, the published +15 for FFmpeg), and `cohort-siblings.py` to swap the cohort's new libraries in.
+
+Green table, the same samples on both sides (the fixtures of `generate-samples.sh`, x264 and x265, Matroska and MP4): deb-multimedia's 1:1.11.2-dmo3 keeps the marks of 4 of 44 encodes (the four 2D controls); Stereo HandBrake keeps all 44, the 8 SEI-only sources included (StereoMode 1 or 3, st3d 2 or 1, the frame packing SEI on every frame).
+
+Fraunhofer AAC: deb-multimedia's HandBrake does not use HandBrake's bundled fdk-aac 2.0.3; its packaging drops `contrib/fdk-aac` and links the system `libfdk-aac.so.2`, which deb-multimedia ships as `libfdk-aac2 1:3.0.0-dmo1` (it wins over Debian non-free's 2.0.3-1 by its epoch). The AAC encoder sources of 2.0.3 and 3.0.0 are identical (libAACenc, libSBRenc, libSACenc, libMpegTPEnc; encoder library 4.0.1); 3.0.0 adds the separate fdk-xhe-aac library. FFmpeg 8.0.3's `libfdk-aacenc.c` (HandBrake's private copy) and 9.0.2's differ in one line, the discard padding in samples of the time base, which ours has. With the edition's own profile (`pkg.ffmpeg-dmo.fdk`, what `sparky-stereo-ffmpeg-fdk` builds on the person's computer), Stereo HandBrake's five FDK encodes (AAC-LC stereo 128, 5.1 384, VBR 4, HE-AAC stereo 64, 5.1 160) are bit identical to deb-multimedia's: nothing to import. HandBrake offers no HE-AAC v2; our FFmpeg's `-profile:a aac_he_v2` gives it.
+
+## Traps of the shared build (ORDER 742)
+
+- Symptom: `dh_install: missing files` for every HandBrake binary. Cause: the recipe gave configure the `x86_64-unknown-linux-gnu` tuple, configure built in that folder, debhelper looked in `x86_64-linux-gnu`. Fix: rewrite `dh $@ -B$(DEB_HOST_GNU_TYPE)` with the same tuple. Found by: `dh_auto_build` printing nothing after "Build is configured!".
+- Symptom: the link gate refuses HandBrakeCLI and ghb, "stereo imports lost: speex_decode_stereo_int, speex_std_stereo_request_handler". Cause: deb-multimedia's binaries linked FFmpeg statically, so they imported libspeex's audio stereo decoding; the shared libavcodec63 imports it now (`nm -D --undefined-only`). Fix: the gate's own `debian/sparky-lean-retired-stereo-imports`, symbol and reason.
+- Symptom: a recipe's build fails at `dh_builddeb` with `No such file or directory: '/work/siblings-x265.txt'`. Cause: the link gate's siblings list was never made. Fix: write the published archives' list and run `cohort-siblings.py --candidate DIR [--replace DIR ...]`.
+- Symptom: the layer's depth-source recipe exits 100 at `apt-get update`. Cause: the build image already has a `file:/repo` source with another Signed-By. Fix: an image without that source file.
+- Symptom: the FFmpeg successor has no build record. Cause: build-shared.sh never ran `lean.release check-debs`. Fix: run the x265 recipe's `check-built.py` at its end.
+- Symptom: a machine with FFmpeg's i386 libraries keeps libavcodec63, libavutil61, libswresample7 and libx264-165 back, and Stereo HandBrake installs anyway and runs on the old FFmpeg (its Depends say `libavcodec63 (>= 10:9.0.2)`). Cause: no i386 twins of the cohort; shlibs give no floor for the imported patches. Fix (open): the i386 twins from the same sources, and a Depends floor on the +16 libraries.
+- Symptom: the fresh image (no FDK build) lists only `av_aac`; `-E fdk_haac` exits 0 with an AAC-LC stream and nothing said. Cause: libhb replaces an encoder FFmpeg lacks (the job's `"Encoder": "av_aac"`). Fix (open): say it in the log and the window, and offer `sparky-stereo-ffmpeg-fdk`.
+
+## The preview in 3D (ORDER 742)
+
+Stereo HandBrake's preview window is a `StereoGtkWindow`; the still picture and the played clip go through libstereo-gtk (recipe in skill stereo-window-3d-area, references/gtk-media-area.md). Measured on Stereo KWin (`kwin_wayland --virtual`, `KWIN_VIRTUAL_STEREO_MODES=1`, the side by side twin saved with "Other stereo formats", ScreenShot2 with the AMD render node): with sources whose left view is red and right view blue, each eye holds only its own colour at the window's first size and at 1500x900, side by side and top and bottom, on Wayland and through Xwayland; a stored swap reverses them; a stored top and bottom choice makes an unmarked file 3D; "Not 3D" and a 2D control give equal eyes; every source's checksum is unchanged.
+Rig traps: `WAYLAND_DEBUG=client` held ghb before its first window, and so did a missing accessibility bus (`GTK_A11Y=none`); an X11 program needs KWin's Xwayland environment (give it as KWin's application argument); on an output with 3D modes Stereo KWin turns 3D on for declared content, and ScreenShot2 returns the pair even on an output without 3D modes, so a 2D screen's picture is read from a DRM output's scanout.
+
+## Making it whole (ORDER 742, Continuation 5)
+
+- **An absent audio encoder is said, never replaced.** libhb maps the name of an encoder its FFmpeg lacks (Fraunhofer's `fdk_aac` and `fdk_haac` until `sparky-stereo-ffmpeg-fdk` has run) to another encoder of its group in `hb_common_global_init()`, so `-E fdk_haac` encoded AAC-LC with av_aac and said nothing. The fork's `hb_audio_encoder_get_absent()` and `hb_audio_encoder_absent_reason()` find such an encoder and say why; `HandBrakeCLI` stops before the scan with the sentence and exit 3 unless `--audio-fallback` names another encoder (then it uses that one and says so); a preset or queued job naming one carries the name (`AbsentEncoder`) and `do_job()` refuses it with `HB_ERROR_INIT` before any encoder starts, while its still preview is still made (refusing in `hb_dict_to_job()` turned the preview black: that function also builds the preview's job). The window lists the two Fraunhofer encoders and choosing one, or a preset that names one, says the sentence in the person's language (`gtk/po`, ten languages; pl and zh_TW are catalogues holding only the edition's sentences).
+- **MV-HEVC decodes as one full side-by-side frame.** The HEVC decoder gives only the base view unless `view_ids` is set; libhb now sets it to -1 at both of its open calls, reads `view_ids_available` at the first frame with `AV_FRAME_DATA_VIEW_ID`, and with two views puts the two frames of each access unit side by side (left first by each frame's `AVStereo3D.view`, else the base view), each at its own size, with a side-by-side `AVStereo3D`; `decavcodecvInfo()` reports that size so the scan's geometry check passes. The encode, its marks and the preview then follow the side-by-side path.
+- **Every packing in the preview.** The picture-and-depth packings go through libstereo-gtk 1.23.1's depth path (libstereo-dibr at its one default); a packing whose views come in turn needs two pictures: in the played clip an even frame (frame number from `gtk_media_stream_get_timestamp()` and the source's rate) and the odd one after it, in the still the preview and the picture the scan decoded after it, kept as preview number + `HB_PREVIEW_NEIGHBOUR` and read only when needed.
+- **Machines with the i386 FFmpeg libraries.** Stereo HandBrake's programs Depend on the cohort by version (FFmpeg +16, x264 +stereo3d1, libx265-30219); `handbrake-dmo/build-twin-i386.sh` builds the i386 twins of x264, x265 and FFmpeg from the .dsc their amd64 build wrote.
+- Symptom: a recipe build stops at `ulimit: core file size: cannot modify limit: Operation not permitted`. Cause: `ulimit -c 1` in the container's shell asks for 1024 bytes (bash counts blocks) over the 1-byte hard limit of `--ulimit core=1`. Fix: no core ulimit in the shell (lean-code skill, lessons).
+- Symptom: `sparky-stereo-ffmpeg-fdk --yes` stops at `apt-get build-dep` with "libnvidia-glvkspirv ... is not selected for install" on a machine without NVIDIA. Cause: ffmpeg-dmo Build-Depends `libnvidia-glvkspirv [amd64 i386]`, and sparky-stereo-apt's preferences pin the edition's NVIDIA sources at -1 unless an NVIDIA lock names them (`apt-cache policy libnvidia-glvkspirv`: -1, no candidate). The recipes install that .deb by file path first; the published tool does not. Open (measured 2026-11-20, ORDER 742): the tool cannot build the Fraunhofer FFmpeg on such a machine, for +15 as for +16.
+- Rig for the tool's own route: the published tree, a local archive standing for the round (`apt-ftparchive packages`, `sources` and `release` with Origin "Sparky Stereo OS", Types deb deb-src), SparkyLinux's repository (sparky-stereo-apt Depends sparky-apt), the tool's package, a person with sudo; `--status` in `LANG=es_ES.UTF-8` reads the Spanish catalogue.
+- Rebuilding the whole cohort (one commit): x265, x264, FFmpeg (build-shared.sh), the layer (depth-source/build.sh with `ROUND_SOURCES="ffmpeg-dmo x265-dmo x264-dmo"`, packages in `WORK/lc/`), HandBrake, then the i386 twins from the amd64 .dsc (`handbrake-dmo/build-twin-i386.sh`; predecessors downloaded in the i386 image; FFmpeg's twin gets the i386 `libnvidia-glvkspirv` named first). About 35 minutes of builds on 4 threads.
+
+## The Fraunhofer tool on a machine without an NVIDIA lock (ORDER 742, Continuation 6)
+
+- Symptom: `sparky-stereo-ffmpeg-fdk --yes` stops at `apt-get build-dep` with "libnvidia-glvkspirv ... is not selected for install". Cause: ffmpeg-dmo's Build-Depends names `libnvidia-glvkspirv [amd64 i386]`, and sparky-stereo-apt pins the edition's NVIDIA sources at -1 where no driver lock is installed. Fix: FFmpeg +17 drops the name; no pin is lifted and nothing installs an NVIDIA library. Found by: `apt-cache policy libnvidia-glvkspirv` (-1, no candidate) and the published .dsc.
+- Why dropping it is safe, and how it was checked first: the name came with deb-multimedia's sources (absent in `6.1.6-dmo0+deb12u1`, present in `7.1.5-dmo1+deb13u1`, `9.0.2-dmo4` and `9.0.2-dmo5`; no changelog entry names it); nothing in the source uses it (`grep -rn -I glvkspirv` finds only `debian/control`; FFmpeg's SPIR-V route is `spirv_compiler`, which is glslc or libglslang); its package ships one versioned private library (no header, no unversioned link, no `.pc`), so nothing can link it by name. Read deb-multimedia's `dists/SUITE/main/source/Sources.xz` and the pool's older `.dsc` files for the history; Debian keeps the library in non-free (`api.ftp-master.debian.org/madison?package=libnvidia-glvkspirv`).
+- Trap: `dch --newversion` on a changelog whose top entry is UNRELEASED changes that entry's version and adds the bullet to it; it does not open a new entry. FFmpeg +17's changelog therefore has one entry with the HandBrake import (+16, staged, never published) and the Build-Depends change. Release an entry first (`dch -r`) only when that release really happened.
+- FFmpeg +17 against +16, the check that the dropped name was unused: one build of the cohort's source in a builder where the library is not installed (`.buildinfo` names no NVIDIA package), then package by package, amd64 and i386, the file lists, every relation (the version normalized), NEEDED and exported symbols (`nm -D --defined-only --with-symbol-versions`) of every ELF file and the sizes of their code and data sections, and, in fresh containers, `ffmpeg -buildconf` and the lists of encoders, decoders, filters, hwaccels, bitstream filters, protocols, muxers, demuxers and pixel formats (lane scripts `compare-ffmpeg17.py`, `ffmpeg-lists.sh`). Measured: equal everywhere but the changelog.
+- The tool's own run needs the round's packages as a signed suite. Symptom: the tool builds FFmpeg, then its link check stops at `dh_builddeb` with "libavcodec63 ... Depends libx265-30219 ... none of the choices are installable". Cause: `link-config` takes only signed archives ("the link check needs a signed archive"), so a flat `Trusted: yes` folder standing for the round is not in its archive list. Fix: `apt-ftparchive` a `dists/round/main` suite with Origin "Sparky Stereo OS", sign its InRelease with a throwaway key, `Signed-By` that key (lane script `fdk-tool-run.sh`). Found by: the tool's "link check: archives of this computer" line, which named three archives and not the round's.
+- Measured on +17 (2026-11-20), no NVIDIA lock and with the main lock (`sparky-stereo-nvidia-driver-lock`, a preferences file only): `apt-get -s -P pkg.ffmpeg-dmo.fdk build-dep` plans 365 packages, none NVIDIA's; the tool ends with `10:9.0.2-dmo1+stereo3d17+lc1+fdk1` installed, `ffmpeg -encoders` lists libfdk_aac, `--status` names the build, the five FDK encodes give the same packets as deb-multimedia's HandBrake, and Stereo HandBrake's `-E fdk_haac` writes HE-AAC.
+
+## The preview's rows, Continuation 6 (ORDER 742)
+
+- Every packing of the input list (`stereo_policy_input_format_at`, 25 entries but Automatic and Not 3D), one fresh session each, the packing given as the file's stored choice: fixtures and verdicts in the lane scripts `g4-fixtures.sh` (two colours or two luma levels per view, frames in turn by frame parity, a dark square 40 px apart for the anaglyphs, a picture with a blue bar beside a white depth map), `g4-packings.sh`, `g4-verdict.py`. Measured: 25 of 25 shown as pairs on the stage; on the previous stage the 10 rows that need two pictures or depth were flat.
+- Frames in turn and both views in one block paired by the parity of the preview's own frame up to Stereo HandBrake +stereo3d1 (fixed in +stereo3d2, next section).
+- Rig traps (GTK 4): the preview's controls are drawn only while the pointer moves over the picture, so move the pointer before reading them; GTK 4 gives a button's tooltip as its accessible name ("Encode and play a short sequence ..."); an empty `GTK_A11Y` is read as a backend named "" (set `atspi`); a GtkPopoverMenu's items are not in the AT-SPI tree, so open the menu and choose its item with the pointer (places read from a capture); after an item is chosen, the first click on the menu button opens nothing in this rig and the second does.
+- Symptom: ghb ends with "Aborted" and no message when Play is pressed. Cause: GTK's media backend plays through GStreamer's GstPlay, which calls `g_error` when the `playbin` element is missing; `gstreamer1.0-plugins-base` was not installed (handbrake-gtk Recommends gstreamer1.0-libav and gstreamer1.0-x, as deb-multimedia's does, and neither brings playbin). Fix in the rig: GStreamer's base, good, libav and x plugins, as a desktop has them. Found by: gdb in the container (`GHB_GDB=1`), thread "GstPlay" stopped in `g_log`.
+- Found in Continuation 7 (two causes, both fixed): after "Enable 3D" was turned off from the preview's menu, turning it on again brought no pair back. See the next section.
+
+## Four corrections (ORDER 742, Continuation 7)
+
+**MV-HEVC that would not scan.**
+- Symptom: `scan: video geometry information does not match buffer` for every preview, then `No title found.` (HandBrakeCLI exit 2), for a two-view MV-HEVC source, raw or MP4.
+- Cause: the decoder pairs the two views into one 1280x360 frame and `decavcodecvInfo()` reports that size, but the scan's own filter graph (`reinit_video_filters()`, the branch without a job) takes its target size from the codec context, which is one view (640x360), and scales the pair back to it: the info said 1280, the preview buffer 640.
+- Fix: one size for what the decoder hands on (`decoded_width()`/`decoded_height()`: the coded size, or the paired size), used by both.
+- Found by: two temporary `hb_log` lines, one at the scan's mismatch (both sides' sizes), one after the pairing (context size, frame size, view count); 60 of 60 frames were 1280 after pairing and 640 at `copy_frame()`.
+- Second fault behind it: the encode never paired the views. `view_ids_available` is set only in the decoding thread's context under frame threading, so at the first frame the caller's context said nothing and each view went on as a frame of its own, stretched to the paired size (100 frames for 50 access units). FFmpeg documents the option as accurate only in `get_format()`: read it there (the callback gets the thread's context). Found by logging each frame entering the pairing: `held 0` on view 1.
+- A view held for its pair is dropped at a decoder flush (a seek), and a view left without its pair at the end of the stream is passed on in both eyes.
+- Fixtures: x265's CLI with `-DENABLE_MULTIVIEW=ON`, `--bframes 0` (a raw stream has no timestamps; with B-frames its MP4 copy gets `pts = dts` and drops frames); remux to MP4 with `-disposition:v:0 multilayer`, or FFmpeg's MP4 muxer drops the second layer's parameter sets from an `hvc1` track (it strips VPS, SPS and PPS from the samples and writes `lhvC` only for a stream marked multilayer, which the raw HEVC demuxer never does): the plain copy decodes one view, "PPS id out of range: 1".
+- Green: 16 of 16 encodes (two-view and one-view-at-the-end streams, raw and MP4, x264 and x265, Matroska and MP4) are 1280x360 with the container mark and the SEI; every frame's eyes read back (the left view's box in the left half): 50 of 50 left-right pairs, and for the one-view stream 35 pairs then 15 frames with the left view in both halves, from the frame where the second view stops.
+
+**"Enable 3D" that did not come back.** Two causes, each enough alone:
+- The library: each new media area called `stereo_declare_wayland_init()` again; libstereo-declare keeps one state per thread for the application on its display and answers `-EBUSY`, so the area failed with "Device or resource busy" (in ghb's activity log) and stayed flat. Fixed in libstereo-gtk 1.23.2: set up once per display and kept.
+- The program: the 3D menu's button sits in the preview's HUD, which hides 500 ms after the pointer leaves the picture unless it sees the pointer enter the HUD. After a popover was used, GTK's enter and leave for the HUD fell out of step (the HUD got its enter at the pointer's last place in the window while the pointer was over the popover), so the next time the menu opened, the pending hide unmapped the button and GTK closed the popover about 150 ms after it opened. Fixed in ghb: the HUD is held while the menu's popover is open (`ghb_preview_hud_hold()`).
+- Found by: a capture-phase click gesture and a `notify::visible` handler on the popover in a dev build (`popover visible 1`, then `hud hidden`, then `popover visible 0`), KWin's `WAYLAND_DEBUG=server` (the client destroyed the popup itself, no `popup_done`), and gdb with a breakpoint on `gtk_popover_popdown` (`gtk_widget_hide` from a property notify).
+- Rig trap: ghb sends its own and libhb's messages, stderr included, into its activity log under `~/.config/ghb/` (`Activity.log.PID`), never to the terminal; copy it out of the throwaway home before it goes.
+- Green: off flat (0 differing pixels), on again the pair (left red, right blue) and a second `set_content(3)` on the area's new subsurface, on AMD and on the RTX 3060.
+
+**Views in turn paired from the source's first frame.**
+- The scan keeps the other picture of a preview's pair by the preview's frame number in the source (`s.start` times the frame rate, for a source read through libavformat, whose timestamps start at the source's start): the picture after it when even, the one before it when odd (the title's `preview_partner_before` bit). Where the frame number is not known, nothing is kept and the scan says so.
+- The played clip of a source shown with the 3D menu is encoded from a time range that starts half a frame before a frame boundary, so the clip's first frame is a known source frame: measured with `HandBrakeCLI --start-at pts:N`, a clip that starts at frame 100 begins with an even (red) frame, at 101 with an odd one, first timestamp 0.
+- The activity log names the clip's first frame ("the clip of preview 2 starts at frame 22 of the source", measured on the MV-HEVC row) and each still's place in its pair, so a row can say whether it ran at an even or an odd position.
+
+**Play without GStreamer's playbin.** GTK plays the preview through GstPlay, which calls `g_error()` when `playbin` is missing: ghb ended with "Aborted". `playbin` is in gstreamer1.0-plugins-base (`dpkg -S libgstplayback.so`, Multi-Arch: same; handbrake-gtk is amd64 only, so only the native one is needed); handbrake-gtk Depends on it, and ghb looks for the element (`gst_element_factory_find()`) before it encodes a clip and says what is missing, in ten languages.
+
+**Version.** The recipe's upstream version is `1.11.2+rCOUNT.gitHASH`: `1.11.2+gitHASH` does not sort by time (`git2...` sorts below `gitb4...`).
 

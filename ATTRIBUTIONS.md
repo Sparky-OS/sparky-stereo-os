@@ -1369,3 +1369,7 @@ The standard alternatives checked for this repair also credit **Kenny Levinsen**
 Spirula Studio’s owning source and accepted base commit b8e15cb8 credit **Harry Chen**. The edition’s declared viewport, shared depth conversion and cache notification path build on **Daniel Campos Ramos**’s accepted fork d5c4ac86. Names were checked in the source commit records on 2026-11-19.
 
 The pinned GLFW Wayland platform files credit **Jonas Ådahl**; the pinned Dear ImGui licence credits **Omar Cornut**. These names were read in the original source components used for the +stereo3d6 build.
+
+## Screenshots of a 3D screen (ORDER 772)
+
+Spectacle's own About records name **Boudhayan Gupta**, **David Redondo** and **Noah Davis**. The capture and save commits carried from upstream retain the authors **Noah Davis**, **Kai Uwe Broulik**, **Pranav Kunjir**, **Mohanraj Velayutham**, **Frog Chen** and **Xaver Hugl**. The KWin screenshot plugin's headers credit **Martin Gräßlin**, **Vlad Zahorodnii** and **Nokia Corporation**; its carried context fixes retain **Xaver Hugl** and **Vlad Zahorodnii**. **Daniel Campos Ramos** supplied the stereo design and the edition changes, built on **Paweł “pavroo” Pijanowski**'s SparkyLinux. Qt, KDE Frameworks, Wayland, PipeWire and their contributors provide the native image writers, session interfaces and test infrastructure; their original notices remain in the source and packages.

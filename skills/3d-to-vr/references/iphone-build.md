@@ -35,7 +35,9 @@ Use xtool's measured signing CLI independently; validate the Swift build toolcha
 
 Run in an isolated Linux build container, at most four build threads, with source inputs read-only and the external SDK mounted read-only.
 All source downloads happen separately; these commands do not fetch dependencies automatically.
-Use the pinned revisions recorded with the investigation for OpenSSL, zlib and FreeRDP; obtain the FFmpeg version and hash from FreeRDP's `cmake/DepVersions.cmake` before its separate source preparation.
+FreeRDP 3.28.0 pins OpenSSL 4.0.1 and FFmpeg n8.1 in `cmake/DepVersions.cmake`; use those revisions and its source hashes for the completion build.
+The first SDK-free dependency probe used OpenSSL 3.6.0; a follow-up used the upstream-pinned OpenSSL 4.0.1 and FFmpeg n8.1.
+Use the recorded zlib revision, and do not call a build against different dependency revisions the same tested configuration.
 Set these absolute paths to existing inputs and a separate writable build directory:
 
 ```sh

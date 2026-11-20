@@ -1455,3 +1455,18 @@ FFmpeg: Michael Niedermayer, Anton Khirnov, Reimar Doeffinger, Baptiste Coudurie
 
 GTK: Peter Mattis, Spencer Kimball, Josh MacDonald, Shawn T. Amundson, Jerome Bolliet, Damon Chaplin, Tony Gale, Jeff Garzik, Lars Hamann, Raja R Harinath, Carsten Haitzler, Tim Janik, Stefan Jeske, Elliot Lee, Raph Levien, Ian Main, Federico Mena, Paolo Molaro, Jay Painter, Manish Singh, Owen Taylor, Jonas Ådahl, Tim Bäder, Emmanuele Bassi, Chun-wei Fan, Matthias Clasen, Carlos Garnacho, Alexander Larsson, Benjamin Otte, Christian Hergert.
 
+
+## Program catalogues in ten languages (ORDER 46)
+
+The edition's catalogue additions build on the programs and translator teams credited above. The project source and package records also name the people who maintain the affected programs and catalogue formats.
+
+| Program | Credits and source records |
+|---|---|
+| Haruna, sView, Bino | George Florea Bănuș and Muhammet Sadık Uğursoy (Haruna), Kirill Gavrilov (sView), Martin Lambers (Bino), from their program records. |
+| VLC Stereo, Lutris, Kdenlive, Plank Player, Dragon Player | VideoLAN and the VLC authors, Mathieu Comandon and the Lutris Team, Jean-Baptiste Mardelle and the Kdenlive team, Aditya Mehra for Plank Player, Harald Sitter and the Dragon contributors. See the video player credits and Lutris's `debian/copyright`. |
+| Partition Manager, Gwenview, Dolphin, Marble, KAlgebra | Volker Lanz, Andrius Štikonas and the Partition Manager team, Aurélien Gâteau and the Gwenview developers, Peter Penz, Frank Reininghaus, Méven Car and the Dolphin team, Torsten Rahn, Inge Wallin and the Marble team, Aleix Pol Gonzalez and the KAlgebra contributors. See the project credits above. |
+| Krita, Plasma Foreground Booster, Kubrick | Halla Rempt, Dmitry Kazakov and the Krita developers, Henri Chain and David Redondo for KDE Foreground Booster with Natalie Vock for the dmem port, and Ian Wadham for Kubrick. See the project credits and Foreground Booster's package description. |
+| KolourPaint, Koko, KPhotoAlbum, digiKam, Kalzium | Clarence Dang, Thurston Dang and Martin Koller for KolourPaint, Vishesh Handa, Atul Sharma, Marco Martin, Nicolas Fella and Carl Schwan in Koko's `src/main.cpp`, Jesper K. Pedersen, Johannes Zarl-Zierl and Tobias Leupold in KPhotoAlbum's source headers, Gilles Caulier, Maik Qualmann, Marcel Wiesweg and the digiKam team, and Carsten Niehaus, Andreas Cord-Landwehr and the Kalzium contributors. |
+| Variety, Karton, XScreenSaver | Peter Levi and James Lu in Variety's `AUTHORS`; Aaron Rainbolt and Derek Lin for Karton; Jamie Zawinski and the XScreenSaver contributors. |
+| Language teams | The KDE localization teams, including Eloy Cuadra and the Spanish team whose published catalogues supplied terms for the shared glossary. |
+| Throw and Catch | Fabian Druschke and Aleix Pol i Gonzalez for KDE Connect, Aleix Pol Gonzalez and Arjen Hiemstra for KRdp, Urs Wolfer and Tony Murray for KRDC, and Xaver Hugl and Vlad Zahorodnii from the KWin source credits above. |

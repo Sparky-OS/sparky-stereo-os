@@ -1,5 +1,8 @@
 # A package of another archive that ships our files under another name
 
+A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
+The kernel control supports this core-limit correction; the systemd startup variant with `DefaultLimitCORE=1:1` has not been rerun.
+
 ORDER 458 (2026-11-09). Blocking an archive's builds by NAME does not stop a package of another name from shipping the same files.
 deb-multimedia ships MLT 7 as `libmlt7-data`, `libmlt-7-7`, `melt7` and others; our MLT is `libmlt-data`, `libmlt7`, `melt`.
 `libmlt7-data` has `Replaces: libmlt-data` and no `Conflicts`, so it installed beside ours, took over its 400 files under `/usr/share/mlt-7` (Debian Policy 7.6.1: the overwriting package's file "will no longer be listed as owned by the old package"), and our MLT 7.40 ran with 7.42 data while `dpkg-stereo --verify libmlt-data` reported 16 changed files and `dpkg -S /usr/share/mlt-7` named both.
@@ -32,15 +35,15 @@ ORDER 458 ran the unit's command by hand because its containers had no systemd. 
 
 Recipe (`sparky-stereo-apt/tests/shadowed/run-systemd.sh MODE`, same checks as `run.sh`, `SYSTEMD=1` in `inside.sh`):
 
-1. An amd64 forky image with `systemd systemd-sysv dbus ca-certificates` and `/etc/systemd/system.conf.d/core.conf` with `[Manager]` and `DefaultLimitCORE=0:0`.
-2. `docker run -d --cgroupns=private --security-opt writable-cgroups=true --tmpfs /run --tmpfs /run/lock --tmpfs /tmp --ulimit core=0 --stop-signal SIGRTMIN+3 IMAGE /sbin/init`. No `--privileged`, no added capability. Mount files for the rig (CA bundle, the https-only helper) under `/run` beside the tmpfs: Docker orders the mounts, and they stay.
+1. An amd64 forky image with `systemd systemd-sysv dbus ca-certificates` and `/etc/systemd/system.conf.d/core.conf` with `[Manager]` and `DefaultLimitCORE=1:1`.
+2. `docker run -d --cgroupns=private --security-opt writable-cgroups=true --tmpfs /run --tmpfs /run/lock --tmpfs /tmp --ulimit core=1 --stop-signal SIGRTMIN+3 IMAGE /sbin/init`. No `--privileged`, no added capability. Mount files for the rig (CA bundle, the https-only helper) under `/run` beside the tmpfs: Docker orders the mounts, and they stay.
 3. Wait for `systemctl is-system-running` to say `running` (2 s here), then `docker exec -e SYSTEMD=1 NAME bash inside.sh MODE`. After the install of the new package, wait for the unit: `systemctl show -p ActiveState --value UNIT` is `inactive` and the journal holds its `Finished` line (`Result=success`, `ExecMainStatus=0`). The first `apt-get install` of the stack takes minutes (dpkg-stereo's postinst qualifies the files): keep a download cache mounted on `/var/cache/apt/archives`, one per container that runs at the same time (apt locks it).
 4. Read what the person would: `journalctl -u UNIT -o cat`, and apt's `Inst` and `Remv` lines.
 
 Traps:
 
 - Symptom: the container exits 255 at once with no output. Cause: Docker mounts `/sys/fs/cgroup` read-only and systemd 262 will not run as PID 1 on it (`mount | grep cgroup` shows `ro`; run `/usr/lib/systemd/systemd --system --log-level=debug --log-target=console` by hand to see). Fix: `--cgroupns=private --security-opt writable-cgroups=true` (Docker 25 and later; the cgroup tree is the container's own). Not `-v /sys/fs/cgroup:/sys/fs/cgroup:rw --cgroupns=host`, which hands the host's tree to a systemd that wants to manage it.
-- Symptom: `Failed to set RLIMIT_CORE: Operation not permitted`, exit 255, with `--ulimit core=0`. Cause: PID 1 tries to set the core limit and the hard limit is 0. Fix: `DefaultLimitCORE=0:0` in the image; the house rule `--ulimit core=0` stays, so a crash in the container reaches no host core handler.
+- Symptom: `Failed to set RLIMIT_CORE: Operation not permitted`, exit 255, with the former `--ulimit core=0`. Cause: PID 1 tries to set the core limit and the former hard limit was 0. Fix: `DefaultLimitCORE=1:1` in the image; start with `--ulimit core=1` and check that the service has soft and hard limits of 1; a zero limit does not suppress a piped core handler.
 - Symptom: `journalctl -u sparky-stereo-apt-shadowed.service` shows apt's lines but not what `sparky-stereo-problems say` printed, which the hook names as the place to look. Cause: journald finds a line's unit from the writing process's cgroup, and a child that has exited when journald looks leaves the line with no `_SYSTEMD_UNIT` (a native line from the engine, and the unit's own stderr line from it, both; `journalctl -b -t sparky-stereo-apt` still shows them). apt's lines come from processes that live longer. Found by `journalctl -b -o json` and the lines' `_SYSTEMD_UNIT`, `_PID` and `_COMM`. Fix: the script captures the engine's output and prints it itself (`out=$("$PROBLEMS" ... 2>&1)`; `printf '%s\n' "$out" >&2`), from the process that stays; the run-systemd test greps the unit's journal for the message, so the next such line is checked.
 - Symptom: `docker cp` of a script into a container with `--tmpfs /tmp` lands nowhere. Cause: the tmpfs covers it. Fix: copy to `/root`.
 - A check that reads the unit's journal for a line must not stop at the first `inactive`: wait for `inactive` and a non-empty journal (`Starting`/`Finished` come from the manager), or an `activating` state not yet reached reads as a finished one.

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
 """Three control pictures whose right answer is known before the fit runs.
 
 Usage: make_controls.py WORKDIR
@@ -20,7 +21,7 @@ os.makedirs(WORK + "/tex", exist_ok=True)
 
 truth = dict(freq=2, oct=7, fadeoff=0.55, seed=1234, mode=2)
 stops = [[20 + 12 * k, 30 + 9 * k, 70 + 5 * k] for k in range(16)]
-cmd = ["docker", "run", "--rm", "--network", "none", "--ulimit", "core=0", "--cpus", "4",
+cmd = ["docker", "run", "--rm", "--network", "none", "--ulimit", "core=1", "--cpus", "4",
        "--user", "%d:%d" % (os.getuid(), os.getgid()), "-v", WORK + ":" + WORK + ":ro", IMAGE,
        WORK + "/bin/ktgtool", "noise", "11", "2", "7", "0.55", "1234", "2"] + [str(v) for s in stops for v in s]
 raw = subprocess.run(cmd, stdout=subprocess.PIPE, check=True).stdout

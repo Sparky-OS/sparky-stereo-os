@@ -1,4 +1,5 @@
 #!/bin/bash
+# A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
 # The proof scenarios (ORDER 631), run in containers of one rig image: scenarios.sh IMAGE TAG EVIDENCE_DIR [SCENARIO...]
 # IMAGE is sa631-rig:red (the published set: Debian's PipeWire and WirePlumber, the edition's repository) or
 # sa631-rig:green (the same with the staged package installed by apt). Each scenario writes EVIDENCE_DIR/TAG-NAME.jsonl.
@@ -12,7 +13,7 @@ ALL="matrix pulse bluetooth dither24 dither16 person apply weakcpu hook wuh"
 SCEN=${*:-$ALL}
 run() { # NAME ROOT_PREP COMMAND... : root prepares, then the session runs as the unprivileged user "rig"
 	local name=$1 prep=$2; shift 2
-	docker run --rm --name "sa631-$name" --cpus 2 --ulimit core=0 -v "$HERE":/src:ro \
+	docker run --rm --name "sa631-$name" --cpus 2 --ulimit core=1 -v "$HERE":/src:ro \
 		-v "$HW/scripts/sparky-stereo-new-output.lua":/usr/share/wireplumber/scripts/sparky-stereo-new-output.lua:ro \
 		-v "$HW/wireplumber.conf.d/50-sparky-stereo-new-output.conf":/usr/share/wireplumber/wireplumber.conf.d/50-sparky-stereo-new-output.conf:ro \
 		"$IMG" sh -c "$prep; exec setpriv --reuid 1001 --regid 1001 --clear-groups env HOME=/home/rig bash /src/session.sh $*" 2>/dev/null

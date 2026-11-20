@@ -1,5 +1,8 @@
 # A D-Bus service that never takes its name
 
+A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
+The kernel control supports this core-limit correction; the systemd startup variant with `DefaultLimitCORE=1:1` has not been rerun.
+
 **For whoever meets a `Type=dbus` unit that times out at start:** tell a hang from a crash, take every thread's backtrace with symbols, name the thread that holds the lock, and prove the fix with a start loop.
 Written 2026-11-19 from ORDER 768: geoclue 2.8.2 on GLib 2.90.1, Debian testing.
 
@@ -73,7 +76,7 @@ The base recipe is in [lessons](lessons-2026-11.md) (ORDER 460, 463).
 A unit with `User=`, `ProtectSystem=strict` and `PrivateTmp=` needs more, and each step below was met in this order:
 
 - `Failed to keep CAP_SYS_ADMIN: Operation not permitted`, then `status=217/USER`: systemd needs `CAP_SYS_ADMIN` to set up the sandbox before it drops to the user. Add `--cap-add SYS_ADMIN`.
-- With `CAP_SYS_ADMIN`, systemd as PID 1 stops at once with `Failed to set RLIMIT_CORE: Operation not permitted` when the container has `--ulimit core=0`. Add `--cap-add SYS_RESOURCE` and give PID 1 `DefaultLimitCORE=0:0` (a file in `/etc/systemd/system.conf.d`), so every unit still runs with a core limit of 0; check `/proc/PID/limits` of the service.
+- With `CAP_SYS_ADMIN`, systemd as PID 1 stops at once with `Failed to set RLIMIT_CORE: Operation not permitted` under the former `--ulimit core=0`. Add `--cap-add SYS_RESOURCE` and give PID 1 `DefaultLimitCORE=1:1` (a file in `/etc/systemd/system.conf.d`), and start with `--ulimit core=1`, so each unit uses soft and hard limits of 1; check `/proc/PID/limits` of the service.
 - `Failed to remount root directory as MS_SLAVE: Permission denied`, `Failed to start up manager`: AppArmor's docker-default profile refuses systemd's mounts. Add `--security-opt apparmor=unconfined`.
 - systemd as PID 1 prints nothing in `docker logs` without a terminal: add `-t` to read why it stopped.
 - `ModemManager.service ... skipped, unmet condition check ConditionVirtualization=!container`: run its binary as a transient unit (`systemd-run --unit=NAME /usr/sbin/ModemManager`) when the service under test watches its bus name.

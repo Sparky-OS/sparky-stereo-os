@@ -1,4 +1,5 @@
 #!/bin/bash
+# A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../SKILL.md#traps-that-fooled-us) explains.
 # SPDX-License-Identifier: MIT
 # mkrig.sh TAG REPO_DIR APT_CONF_DIR [EXTRA_DEB_DIR]: the rig image, from a Debian testing base pinned by digest and a signed tree of
 # the edition (dists/mashtabba, pool) mounted at /repo. APT_CONF_DIR holds sparky-stereo-apt's pin files (sparky-stereo,
@@ -13,7 +14,7 @@ NAME=${NAME_PREFIX:-splash-rig}-mk-$$
 SAFE_TAG=${TAG//:/-}; SAFE_TAG=${SAFE_TAG//\//-}
 LOGS=${LOGS:-$PWD/rig-build-$SAFE_TAG}; mkdir -p "$LOGS"
 extra=(); [ -n "$EXTRA" ] && extra=(--mount "type=bind,src=$(cd "$EXTRA" && pwd),dst=/extra,readonly")
-docker run --name "$NAME" --ulimit core=0 --platform linux/amd64 --cpus 4 \
+docker run --name "$NAME" --ulimit core=1 --platform linux/amd64 --cpus 4 \
 	--mount type=bind,src=/etc/ssl/certs/ca-certificates.crt,dst=/run/host-ca.crt,readonly \
 	--mount "type=bind,src=$HTTPS_ONLY_APT,dst=/run/https-only-apt.sh,readonly" \
 	--mount "type=bind,src=$REPO,dst=/repo,readonly" --mount "type=bind,src=$CONF,dst=/aptconf,readonly" "${extra[@]}" \

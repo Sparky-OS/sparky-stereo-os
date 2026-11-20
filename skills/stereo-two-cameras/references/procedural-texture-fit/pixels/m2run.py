@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
 """Run fitter jobs, each in its own container, PAR at a time, and wait for all of them (milestone 2).
 
 m2run.py BINARY JOBFILE [PAR]
@@ -50,7 +51,7 @@ def start(job):
     out, tile, extra = job[0], job[1], job[2:]
     os.makedirs(os.path.dirname(out), exist_ok=True)
     name = '%s-%d-%d' % (prefix, os.getpid(), k)
-    cmd = ['docker', 'run', '--rm', '--name', name, '--network', 'none', '--ulimit', 'core=0', '--cpus', '1',
+    cmd = ['docker', 'run', '--rm', '--name', name, '--network', 'none', '--ulimit', 'core=1', '--cpus', '1',
            '--user', '%d:%d' % (os.getuid(), os.getgid()), '-e', 'HOME=' + S,
            '-e', 'WZ_FONTMAP=', '-e', 'WZ_FONTINDEX=' + fontindex, '-e', 'WZ_GLYPHINDEX=',
            '-v', '/usr/share/fonts:/usr/share/fonts:ro', '-v', '/usr/local/share/fonts:/usr/local/share/fonts:ro',

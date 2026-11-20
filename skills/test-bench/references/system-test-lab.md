@@ -1,5 +1,7 @@
 # The system test lab: the matrix, a row that is red on stock, the traps
 
+A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
+
 **Check freshness first.**
 Written on 2026-11-19 (ORDER 22, milestone 1) and extended on 2026-11-19 (continuation 1, the next rows), against the published tree r1117a (kernel 7.3.4-stereo3d18, Stereo KWin 6.7.4-2+stereo3d58, libkscreen 6.7.4-1+stereo3d12), the staged sparky-stereo-audio 0.1.0 and the staged plasma-pa 6.7.4-1+stereo3d3 (the Sound Quality page).
 The build tree's `sparky-os/tests/lab/` holds the runner; the contributor page is [the system test lab](../../../docs/guides/system-test-lab.en.md).
@@ -14,7 +16,7 @@ The build tree's `sparky-os/tests/lab/` holds the runner; the contributor page i
 ## The matrix
 
 `matrix.json` has `{"prefix": "lab22", "rows": [...]}`. A row: `id` (a-z, 0-9, dash), `kind` (screens, audio, input, weak), `title`, `needs` (`docker`, `image:NAME`, `path:P`, `kvm`), `image`, `mounts` (`[src, dst, "rw"]`, read only by default), `limits` (`cpus`, `memory`), `devices`, `user` (`host` is the caller's uid), `env`, `sides.ours` and `sides.stock` (each `cmd`, optionally its own `image`, `mounts`, `env`, `versions`), `expect` (default ours pass, stock fail), `proves`, `not_proven`. `{work}`, `{skills}`, `{lab}` and `{tree}` in any string come from `--var` or the runner. A `weak` row names a `base` row and its own `limits`. A row with `skip` is a named skip (`tracks` says whose it is).
-A command's exit status is its answer: 0 holds, 1 does not, 77 cannot run (`SKIP: reason` on stdout). Green runs first; the red side runs only after a green one. The container is `lab22-ROW-SIDE`, `--pull=never --ulimit core=0 --network none`, removed by its literal name; `/evidence` is the side's own folder.
+A command's exit status is its answer: 0 holds, 1 does not, 77 cannot run (`SKIP: reason` on stdout). Green runs first; the red side runs only after a green one. The container is `lab22-ROW-SIDE`, `--pull=never --ulimit core=1 --network none`, removed by its literal name; `/evidence` is the side's own folder.
 
 The screens guest (`rows/screens_guest.sh`) has four phases, picked by `env.LAB_PHASE`, and three EDIDs, picked by `env.LAB_EDID`; the arguments of the command are the layouts or tags the phase shoots:
 

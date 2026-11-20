@@ -168,3 +168,23 @@ A minimal container can exclude `/usr/share/locale/*` during installation. Remov
 A container with Docker `--ulimit core=1` inherits a one-byte hard limit. Do not set bash `ulimit -c 1` inside it: bash counts KiB, so that command tries to raise the hard limit and fails. Inherit Docker's limit. A QEMU runner whose first command is `timeout` needs Docker `--init`, because the timeout process must be able to create its process group. Both are fixture setup facts, not changes to screenshot behavior.
 
 For a same-version rebuild, installing the local archive with apt can leave the earlier executable in place. Use an explicit reinstall and compare the installed executable hash with the rebuilt archive before accepting any GUI or capture row. ORDER 772's final hash check caught precisely this fixture error; the exact rebuilt executable then passed the old-KWin controls too.
+
+## Trap: a screenshot package installs without its required compositor API
+
+**Symptom:** Spectacle +stereo3d3 on KWin +stereo3d61 reports “Stereo screenshots require KWin ScreenShot2 version 7 or later.” for a 3D capture, while ordinary 2D capture still saves PNG.
+
+**Cause:** the application detects the missing API honestly, but its package has not declared the dependency the designed feature needs.
+
+**Fix:** retain the runtime explanation and declare `Depends: kwin-common (>= 4:6.7.4-2+stereo3d62~)`.
+The staged file lists place `screenshot.so` in kwin-common; verify the owning binary package instead of guessing from the compositor executable's package name.
+Use apt's actual upgrade and held-package simulations to check that the pair upgrades together and a held compositor keeps Spectacle back, without removing packages.
+Do not replace this dependency with Breaks.
+
+**How found:** the installed +61/new Spectacle compatibility control measured the explicit 3D error and the successful ordinary 2D PNG.
+Review then assigned the versioned dependency to the screenshot plugin's owning package.
+The final apt simulations from both +60 and +61 upgraded the pair without removals; holding KWin kept Spectacle back in both cases.
+
+Before rebuilding a carried recipe on current main, run its supply-chain wiring check and the full Lean suite in the builder.
+Carried patch headers keep author names without other people's addresses.
+Source-package dates use `repo/reproducible.py`'s `rfc2822(stamp)`: a local fixed-date `formatdate` call can produce identical bytes and still fail the tree's producer check.
+ORDER 772's replacement preserved the changelog byte for byte.

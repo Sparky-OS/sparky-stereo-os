@@ -171,9 +171,9 @@ Read the project's own current contribution and translation rules. KDE routes tr
   **Fix:** replace the matching obsolete entry with one active entry. Compile the resulting catalogue and compare the exact lookup.
   **How found:** six digiKam locales already had an obsolete “View” entry.
 - **Symptom:** the rewritten PO silently loses part of a translation containing a Unicode separator.
-  **Cause:** splitting PO text with Python's `str.splitlines()` treats U+2028 as a line break even inside a quoted PO value.
+  **Cause:** splitting PO text with Python's `str.splitlines()` treats U+2028 and U+2029 as line breaks even inside a quoted PO value.
   **Fix:** split physical lines on LF and let the native compiler check the reconstructed PO.
-  **How found:** a KDE catalogue contained U+2028 in a quoted string.
+  **How found:** Partition Manager's published Traditional Chinese PO has U+2029 inside ten quoted strings. Both sources compile with gettext. The PO patch validator's catalogue reader fails before looking up any key because it also uses `splitlines()`.
 - **Symptom:** Wine SBS View's Spanish PO compiles but the package ships no Spanish MO.
   **Cause:** the recipe points at `po/LOCALE.po` and builds only the locales in the Makefile.
   **Fix:** use the flat path and carry the shipped recipe's language-list change. Inspect the candidate MO.

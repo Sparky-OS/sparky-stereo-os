@@ -174,3 +174,84 @@ Do not describe the native build as an uploaded or installed program until those
 The remainder was re-audited after run 44689690224: the compiled app path and executable match the packaging input; the source plist's literal display name and Xcode's product/deployment settings match the manifest requirements.
 The hosted tooling test already exercised the same Python manifest and hashing code successfully.
 The ditto Payload-root invocation, sibling manifest paths and upload-artifact directory remain as in the packaging audit above; no further defect was identified by this inspection.
+
+## FreeRDP core build after the green native proof
+
+Start from the merged skills main branch and the green receiver commit before adding the next build.
+Run 44690357195's artifact was independently downloaded and checked: SHA-256 `3bbe7cb9539fea2db09d4e8532000a0826c4080660b59f039ca3640ca0304729`, arm64 executable, LC_BUILD_VERSION platform iOS with minimum 16.0 / SDK 18.5, no LC_CODE_SIGNATURE, and only the app's expected files and ten locale directories.
+That establishes the unsigned native build route; it is not a phone launch or a received desktop.
+
+The receiver's `ios/Core/sources.json` pins FreeRDP 5370fb26 (3.28.0), OpenSSL 4.0.1 and FFmpeg n8.1 with archive hashes.
+The latter two match that FreeRDP revision's `cmake/DepVersions.cmake`.
+`ios/Tools/fetch_core_sources.py` validates every hash before extraction and refuses existing destination source directories.
+`ios/Tools/build_core.sh ios SOURCES BUILD` compiles static dependencies and the portable core with four jobs, using OpenSSL's own `ios64-xcrun` target and FFmpeg's explicit arm64 iPhoneOS sysroot/VideoToolbox options.
+CMake searches target dependency and SDK roots for headers/libraries/packages; pkg-config sees only the target prefix.
+Apple's SDK stays on the hosted machine and is not copied into the core artifact.
+
+The separate `iphone-core` job uses `macos-26` because [the hosted image inventory](https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md), read 2026-11-20, supplies Xcode 26 or newer; its actual version is still printed and checked by the job.
+The existing macos-15 generated-picture app job stays separate.
+The core target includes client-common, TLS/authentication, FFmpeg H.264/HEVC and drdynvc/rdpgfx/disp/cliprdr channels.
+Its link probe pulls in context creation, channel registration, H.264 lifecycle and OpenSSL/FFmpeg symbols.
+The Linux `host` mode builds the same pinned dependencies and executes that probe without network access; the iPhone mode links it and checks arm64 and absence of a signature, without executing on a phone.
+Only the iPhone mode compiles the VideoToolbox path; hardware decoding, software fallback behavior and zero-copy remain separate receiver tests.
+
+The `FlatHeadset-core-arm64-COMMIT` artifact is a development archive of third-party headers/static libraries, licenses, source lock, build commit/configuration and the unsigned link probe.
+It is not an IPA and must never be added to the renewal manifest.
+The first core hosted run compiled and linked successfully but stopped at the probe-path check.
+With the path taken from CMake, [run 44694434857](https://github.com/Sparky-OS/flat-headset/actions/runs/44694434857) passes both jobs for commit 3623f88 and uploads the core archive.
+That archive was checked on Linux: its checksum, the three licence texts, no file of Apple's SDK inside, every object of the eight static libraries built for arm64, and the link probe an unsigned arm64 program for iOS 16.0 and later (SDK 26.5).
+It also holds OpenSSL's `legacy.dylib` provider module, which an iPhone app cannot load as a loose file: build OpenSSL without that module or leave it out of the archive.
+Nothing was run on a phone.
+After the complete job is green, integrate authenticated pairing/certificate pinning and RDP lifecycle into the receiver, then decode-to-Metal and the Android viewer mathematics.
+KDE Connect and the Cardboard profile program follow the receiver in the brief's order.
+
+### Core build traps checked locally
+
+- **Symptom:** the Linux host analogue stops at `Failed to find all ICU components` in WinPR's CRT configuration.
+  **Cause:** WinPR uses ICU on Linux but Foundation on Apple platforms when built-in Unicode conversion is disabled.
+  **Fix:** install libicu-dev in the Linux test container; keep Foundation as the native iPhone route instead of changing Unicode behavior to satisfy the host build.
+  **How found:** the host CMake failure and `winpr/libwinpr/crt/CMakeLists.txt` at the pinned revision.
+- **Symptom:** an upstream iOS dependency build runs unrestricted `make -j` or enables FFmpeg audio components that were not built.
+  **Cause:** the upstream UI superbuild has different parallelism and dependency defaults from this receiver-core target.
+  **Fix:** use explicit four-job commands and a declared video-only dependency configuration; desktop audio remains on the PC.
+  **How found:** reading client/iOS/cmake/ExternalOpenSSL.cmake, ExternalFFmpeg.cmake and ExternalFreeRDP.cmake before writing the receiver build.
+- **Symptom:** the core smoke probe links but fails with `Failed to load channel rdpdr`.
+  **Cause:** the first probe used the low-level context constructor and inherited RDP8 network/device defaults outside the declared four-channel build.
+  **Fix:** use `freerdp_client_context_new` to register the static addin provider, then explicitly select graphics/display/clipboard and disable unsupported network/device/audio channel settings in the probe before loading addins.
+  **How found:** the container lifecycle failure and the pinned client/common/client.c plus cmdline.c; the corrected probe passes without a server or any network access.
+  This is the build probe's configuration, not a claim that the receiver's connection policy is finished.
+
+The build also checks generated FFmpeg definitions for H.264/HEVC and disabled GPL/nonfree code, and on iPhone requires both VideoToolbox hardware accelerators and FreeRDP's VideoToolbox definition.
+An accepted configure flag alone does not establish that the requested backend was compiled.
+
+
+### Core hosted probe-path failure
+
+[Run 44692772893](https://github.com/Sparky-OS/flat-headset/actions/runs/44692772893), read 2026-11-20, used `ImageOS=macos26`, image `20261117.0516.1`, Xcode 26.6 build 17F113 and iPhoneOS SDK 26.5.
+It compiled and installed OpenSSL, FFmpeg and FreeRDP for the iPhone, and linked `core-link-check.app/core-link-check`.
+It then failed because lipo was given the nonexistent unbundled path.
+The app job remained green; no core artifact was uploaded by this run.
+
+- **Symptom:** lipo cannot open `freerdp/core-link-check` after a successful compile and install.
+  **Cause:** [CMake defaults MACOSX_BUNDLE to ON for iOS](https://cmake.org/cmake/help/latest/variable/CMAKE_MACOSX_BUNDLE.html), so the executable is inside an application bundle.
+  **Fix:** generate the exact executable path with [`$<TARGET_FILE:core-link-check>`](https://cmake.org/cmake/help/latest/manual/cmake-generator-expressions.7.html#genex:TARGET_FILE), verify that file exists and copy it to the build root's `core-link-check`.
+  Use that same normalized file for lipo, otool and artifact packaging; do not guess the platform's bundle layout or remove a signature to pass the check.
+  **How found:** the run's `[352/353] Linking C executable core-link-check.app/core-link-check` followed by the failing lipo path.
+- **Symptom:** `Found FFmpeg ... found components: AVCODEC` is immediately followed by `FFmpeg AVCODEC not found - MJPEG support disabled in video codec wrappers`.
+  **Cause:** pinned FreeRDP's `libfreerdp/CMakeLists.txt:179` tests `FFmpeg_avcodec_FOUND`, but `cmake/FindFFmpeg.cmake` sets `FFmpeg_AVCODEC_FOUND` with uppercase component names.
+  **Fix for diagnosis:** check the independent H.264 path, generated definitions and actual libraries before treating this message as a lost decoder; do not force a variable or suppress the message to make the log green.
+  **How found:** this run found the target prefix's libavcodec/libavutil, printed WITH_VIDEO_FFMPEG and WITH_VIDEOTOOLBOX, compiled `h264_ffmpeg.c.o` and linked the probe with the static codec libraries.
+  The video-only FFmpeg configuration enables H.264 and HEVC, not MJPEG; no MJPEG decoder claim follows from finding avcodec.
+  The optional wrapper diagnostic does not unset the explicitly enabled WITH_FFMPEG or WITH_VIDEO_FFMPEG in this build.
+
+The probe links FreeRDP's build-tree static targets, and installed OpenSSL/FFmpeg archives.
+It is not a separate consumer of the installed FreeRDP CMake/pkg-config package.
+The artifact uses the installed FreeRDP archives; an independently configured installed consumer has not been tested.
+Do not assume a byte-for-byte archive comparison is valid across installation: CMake's Darwin install script reruns ranlib on the installed static archive, as a generation-only Linux fixture confirms.
+That fixture establishes CMake output layout and install commands, not an Apple linker or SDK build.
+The runner also reports that CMake cannot find pkg-config under the ignored Homebrew prefix; its direct header/library lookup nevertheless finds the target dependencies, as the paths in the log establish.
+Hardware decode and presentation remain unverified, and the corrected path/signature/archive checks still need a new hosted run.
+
+The correction passes a fresh Linux build and client/channel/H.264 lifecycle test, a CMake-generated Darwin bundle-path fixture without an SDK, and the real packaging commands against a host artifact.
+The original shell fails the log-derived bundle-path fixture; the corrected shell passes bundled and plain paths (including spaces) and still rejects a missing executable.
+Stand-ins for lipo and otool in that fixture establish shell control flow only.

@@ -59,6 +59,7 @@ xcodebuild -project ios/FlatHeadset.xcodeproj -scheme FlatHeadset \
   -derivedDataPath "$RUNNER_TEMP/flat-headset-build" -jobs 4 \
   IPHONEOS_DEPLOYMENT_TARGET=16.0 \
   CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' \
+  FH_CORE_PREFIX="$RUNNER_TEMP/flat-headset-core/install" \
   DEVELOPMENT_TEAM='' build
 ```
 
@@ -189,7 +190,8 @@ CMake searches target dependency and SDK roots for headers/libraries/packages; p
 Apple's SDK stays on the hosted machine and is not copied into the core artifact.
 
 The separate `iphone-core` job uses `macos-26` because [the hosted image inventory](https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md), read 2026-11-20, supplies Xcode 26 or newer; its actual version is still printed and checked by the job.
-The existing macos-15 generated-picture app job stays separate.
+The macos-15 job runs the portable picture/catalog checks.
+Once the app links OpenSSL, its native build follows the dependency build in the macos-26 job and takes `FH_CORE_PREFIX` from that build's install directory.
 The core target includes client-common, TLS/authentication, FFmpeg H.264/HEVC and drdynvc/rdpgfx/disp/cliprdr channels.
 Its link probe pulls in context creation, channel registration, H.264 lifecycle and OpenSSL/FFmpeg symbols.
 The Linux `host` mode builds the same pinned dependencies and executes that probe without network access; the iPhone mode links it and checks arm64 and absence of a signature, without executing on a phone.
@@ -200,7 +202,8 @@ It is not an IPA and must never be added to the renewal manifest.
 The first core hosted run compiled and linked successfully but stopped at the probe-path check.
 With the path taken from CMake, [run 44694434857](https://github.com/Sparky-OS/flat-headset/actions/runs/44694434857) passes both jobs for commit 3623f88 and uploads the core archive.
 That archive was checked on Linux: its checksum, the three licence texts, no file of Apple's SDK inside, every object of the eight static libraries built for arm64, and the link probe an unsigned arm64 program for iOS 16.0 and later (SDK 26.5).
-It also holds OpenSSL's `legacy.dylib` provider module, which an iPhone app cannot load as a loose file: build OpenSSL without that module or leave it out of the archive.
+That first archive also holds OpenSSL's `legacy.dylib` provider module.
+The next configuration disables the module at build time with `no-module no-legacy`, rather than deleting an installed dependency after packaging; see the provider trap below.
 Nothing was run on a phone.
 After the complete job is green, integrate authenticated pairing/certificate pinning and RDP lifecycle into the receiver, then decode-to-Metal and the Android viewer mathematics.
 KDE Connect and the Cardboard profile program follow the receiver in the brief's order.
@@ -250,8 +253,55 @@ The artifact uses the installed FreeRDP archives; an independently configured in
 Do not assume a byte-for-byte archive comparison is valid across installation: CMake's Darwin install script reruns ranlib on the installed static archive, as a generation-only Linux fixture confirms.
 That fixture establishes CMake output layout and install commands, not an Apple linker or SDK build.
 The runner also reports that CMake cannot find pkg-config under the ignored Homebrew prefix; its direct header/library lookup nevertheless finds the target dependencies, as the paths in the log establish.
-Hardware decode and presentation remain unverified, and the corrected path/signature/archive checks still need a new hosted run.
+Hardware decode and presentation remain unverified.
+Run 44694434857 establishes the corrected path/signature/archive checks; the provider-removal and foreground-pairing changes still need their own hosted run.
 
 The correction passes a fresh Linux build and client/channel/H.264 lifecycle test, a CMake-generated Darwin bundle-path fixture without an SDK, and the real packaging commands against a host artifact.
 The original shell fails the log-derived bundle-path fixture; the corrected shell passes bundled and plain paths (including spaces) and still rejects a missing executable.
 Stand-ins for lipo and otool in that fixture establish shell control flow only.
+
+
+## Static provider and foreground pairing integration
+
+The downloaded core from commit 3623f88 has SHA-256 `249abac088171376e189d7f7b4f8fffdfac8c74870179aa428a37ad9f8e87b6b`.
+Its 648 members include eight static libraries, the three dependency licenses and an unsigned arm64 link probe for iOS 16.0 / SDK 26.5.
+Every Mach-O object in those libraries was checked as arm64; no SDK headers or frameworks are in the archive.
+This is a build artifact audit, not runtime proof.
+
+- **Symptom:** a supposedly static iPhone core archive contains `lib/ossl-modules/legacy.dylib`.
+  **Cause:** OpenSSL's `no-shared` does not disable provider modules.
+  **Fix:** configure the pinned OpenSSL with `no-shared no-module no-legacy`; reject remaining `.dylib` or `.so` inputs before packaging.
+  [OpenSSL's own build options](https://github.com/openssl/openssl/blob/openssl-4.0.1/INSTALL.md) distinguish shared libraries, modules and the legacy provider.
+  Keep FreeRDP's `WITH_INTERNAL_MD4`, `WITH_INTERNAL_MD5` and `WITH_INTERNAL_RC4` enabled.
+  **How found:** inspection of the green hosted core artifact; a fresh Linux analogue produces no provider module and passes MD4, MD5, HMAC-MD5 and RC4 known answers plus the pinned upstream `TestSspiNTLM` exchanges using in-memory public fixtures.
+  The iPhone rebuild must still prove the revised artifact's contents.
+- **Symptom:** WinPR prints `OpenSSL LEGACY provider failed to load, no md4 support available!` even with internal MD4 enabled.
+  **Cause:** `winpr/libwinpr/utils/ssl.c` attempts the provider and emits the warning unconditionally for OpenSSL 3 and later.
+  **Fix for diagnosis:** execute the configured WinPR MD4 and NTLM paths, check the provider remains unavailable, and report the warning separately from their result.
+  Do not suppress the warning or enable a module merely to make it disappear.
+  **How found:** the configured host build passes its crypto known answers and upstream NTLM exchanges after normal `winpr_InitializeSSL`, with the warning retained.
+  This does not establish a live KRdp login or arbitrary legacy protocols.
+- **Symptom:** new C++ pairing code fails against OpenSSL 4 on `X509_NAME_add_entry_by_txt` and a deprecated `X509_cmp_current_time`.
+  **Cause:** `X509_get_subject_name` now exposes a const name; the old time helper is deprecated.
+  **Fix:** build an owned `X509_NAME`, set it with `X509_set_subject_name`, and compare validity with `ASN1_TIME_cmp_time_t`.
+  Accept only its documented -1/0/1 results as appropriate; -2 means invalid time, not an earlier date.
+  **How found:** the Linux build with the exact pinned OpenSSL headers and warnings treated as errors.
+
+The next native target adds a foreground Computers screen, before RDP integration.
+Its discovery uses the desktop's `_kdeconnect._udp` Bonjour service, whose SRV value advertises the TCP port.
+The desktop implementation is [Avahi discovery](https://github.com/Sparky-OS/kdeconnect-kde/blob/master/core/backends/lan/avahidiscovery.cpp); the remaining identity exchange occurs after mutual TLS in protocol 8.
+Declare that specific service in `NSBonjourServices` and provide the ten-language `NSLocalNetworkUsageDescription`.
+[Apple TN3179](https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy) distinguishes ordinary Bonjour/local-network permission from restricted multicast operations.
+Do not replace this with an arbitrary UDP broadcast or assume permission was granted because compilation succeeded.
+
+Follow the Android `LanLinkProvider.java`, `PairingHandler.kt` and `SslHelper.kt` in the receiver tree.
+The TCP initiator is the TLS server.
+Check the device ID in the peer certificate and the encrypted identity, require protocol 8, and reject a changed saved certificate pin.
+For first pairing, show the same timestamped public-key verification code and require local confirmation as well as remote acceptance before saving trust.
+Store the identity and pins in this app's Keychain; no private identity is passed to a separate app through a URL or an unverified shared entitlement.
+Stop connections and pending prompts when the screen closes or the app enters the background.
+The current tests use AF_UNIX socketpairs inside a container with no network; they cover mutual TLS, pin reuse/change, identity mismatch, downgrade refusal, confirmation ordering, timeouts and malformed packets.
+They establish the portable code only.
+Native Bonjour, Keychain behavior and interoperability with a desktop remain device checks after the hosted compile.
+The UI explicitly says desktop reception is not available in this intermediate build; no plugin traffic or credentials are consumed yet.
+The next integration remains the paired RDP session lifecycle, then decode to Metal and the actual Android viewer mathematics.

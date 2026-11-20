@@ -1,4 +1,4 @@
-# Bringing a new assistant onto the project
+# Bringing a new partner onto the project
 
 Written on 2026-11-20, from the day Google's Antigravity command-line tool (`agy` 1.5.13, Gemini 3.8 Flash) joined the edition's partners.
 What the tool does was read from its own built-in guide (`~/.gemini/antigravity-cli/builtin/skills/agy-customizations/`) and from Google's pages `antigravity.google/docs/cli/reference.md`, `cli/headless.md`, `permissions.md` and `settings.md`, all read that day.
@@ -6,7 +6,7 @@ Check freshness: these tools change monthly; read the tool's own guide again bef
 
 ## Working recipe
 
-1. **Read the tool before you wire it.** Its own guide says where it finds rules, skills, servers and hooks. Do not carry the paths of another assistant over: every one of the first guesses below was wrong.
+1. **Read the tool before you wire it.** Its own guide says where it finds rules, skills, servers and hooks. Do not carry the paths of another partner's tool over: every one of the first guesses below was wrong.
 2. **Wire four things, and prove each by asking the tool:** the skills, the reference index and the skills server, the rules, and the shared memory.
 3. **Give it a guard that binds only the sessions you start**, and prove the guard inside a real session.
 4. **Onboard it in three sittings:** reading with cases, the reference index with exercises it runs itself, then its own notes.
@@ -38,10 +38,10 @@ In a workspace file it binds the sessions you start there and leaves the person'
 
 - It refuses by tool name: subagents, swarms, schedules, workflows, web access.
 - It refuses by argument: commands that send something out or change the system, and the paths nobody opens (credentials, keys, private mail).
-- It refuses a write outside the session's workspace, resolving `..` and links first. The tool's own setting already confines writes; this is the second lock, and it was the new assistant's own proposal.
-- It writes every call and decision to a log. That log is how a review knows what the assistant really read.
+- It refuses a write outside the session's workspace, resolving `..` and links first. The tool's own setting already confines writes; this is the second lock, and it was the new partner's own proposal.
+- It writes every call and decision to a log. That log is how a review knows what the partner really read.
 - What it cannot read, it refuses and says: a missing policy file, input that is not JSON, a write with no path.
-- **Prove it in a real session,** not only by piping JSON into it: ask the assistant to start a subagent and to push, and read its answer and the log. Ours refused both, and the assistant quoted the refusals without trying another way.
+- **Prove it in a real session,** not only by piping JSON into it: ask the partner to start a subagent and to push, and read its answer and the log. Ours refused both, and the partner quoted the refusals without trying another way.
 
 ## The three sittings
 
@@ -52,7 +52,7 @@ Then ask it to review what it was given: contradictions, stale lines, rules nobo
 
 **B. The reference index, with exercises it runs itself.** Run every exercise yourself before you hand it out.
 - Our own trial showed the skills search looked only in another project's collection unless the workspace was named, and the lesson would have taught the wrong call.
-- The assistant's run then showed the lesson wrong a second time: the collection that looked obvious held nothing, and the wide search found the subject in another one. So: one wide query when you do not know where a subject lives, read which collection the high scores come from, then ask that collection by name.
+- The partner's run then showed the lesson wrong a second time: the collection that looked obvious held nothing, and the wide search found the subject in another one. So: one wide query when you do not know where a subject lives, read which collection the high scores come from, then ask that collection by name.
 - Include one question the index cannot answer, and ask for the sentence a report would carry about it.
 
 **C. Its own notes.** After your corrections, it writes the short text it wants loaded at the start of every later task: the project, the rules it would check work against, the call forms with their traps, its own slips with the habit that prevents each, and which tasks it takes. You review it and install it as a rule.
@@ -61,5 +61,5 @@ Then ask it to review what it was given: contradictions, stale lines, rules nobo
 
 - **Quotations checked against the files, with their line numbers.** In sitting A nine of nine were exact. In sitting B one Source line named "lines 533-541" of a file that has 165 lines, under the word `Sure`. One invented reference is the fault to stop for.
 - **A given text outranking what is in front of it.** Twice ours repeated a sentence it had been handed against its own evidence: it proposed building a guard the brief said existed, and it concluded what the lesson said although its own calls showed the opposite. Ask every time: is this what you measured, or what you were told?
-- **A snapshot is not access.** A packet of copied files proves reading. It does not prove the assistant can reach the shared memory. Load the memory's index by default, grant reading of the folder, refuse writing, and prove all three in a session that was told nothing.
-- **Your own texts.** The onboarding found two faults in the rule file written for it and one in the lesson. Correct them in front of the assistant, with the reason: that is the practice it is being taught.
+- **A snapshot is not access.** A packet of copied files proves reading. It does not prove the partner can reach the shared memory. Load the memory's index by default, grant reading of the folder, refuse writing, and prove all three in a session that was told nothing.
+- **Your own texts.** The onboarding found two faults in the rule file written for it and one in the lesson. Correct them in front of the partner, with the reason: that is the practice it is being taught.

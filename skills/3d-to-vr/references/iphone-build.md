@@ -197,7 +197,8 @@ Only the iPhone mode compiles the VideoToolbox path; hardware decoding, software
 
 The `FlatHeadset-core-arm64-COMMIT` artifact is a development archive of third-party headers/static libraries, licenses, source lock, build commit/configuration and the unsigned link probe.
 It is not an IPA and must never be added to the renewal manifest.
-The first core hosted result is pending; after it is green, integrate authenticated pairing/certificate pinning and RDP lifecycle into the receiver, then decode-to-Metal and the Android viewer mathematics.
+The first core hosted run compiled and linked successfully but stopped at the probe-path check; an uploaded core artifact is still pending.
+After the complete job is green, integrate authenticated pairing/certificate pinning and RDP lifecycle into the receiver, then decode-to-Metal and the Android viewer mathematics.
 KDE Connect and the Cardboard profile program follow the receiver in the brief's order.
 
 ### Core build traps checked locally
@@ -218,3 +219,35 @@ KDE Connect and the Cardboard profile program follow the receiver in the brief's
 
 The build also checks generated FFmpeg definitions for H.264/HEVC and disabled GPL/nonfree code, and on iPhone requires both VideoToolbox hardware accelerators and FreeRDP's VideoToolbox definition.
 An accepted configure flag alone does not establish that the requested backend was compiled.
+
+
+### Core hosted probe-path failure
+
+[Run 44692772893](https://github.com/Sparky-OS/flat-headset/actions/runs/44692772893), read 2026-11-20, used `ImageOS=macos26`, image `20261117.0516.1`, Xcode 26.6 build 17F113 and iPhoneOS SDK 26.5.
+It compiled and installed OpenSSL, FFmpeg and FreeRDP for the iPhone, and linked `core-link-check.app/core-link-check`.
+It then failed because lipo was given the nonexistent unbundled path.
+The app job remained green; no core artifact was uploaded by this run.
+
+- **Symptom:** lipo cannot open `freerdp/core-link-check` after a successful compile and install.
+  **Cause:** [CMake defaults MACOSX_BUNDLE to ON for iOS](https://cmake.org/cmake/help/latest/variable/CMAKE_MACOSX_BUNDLE.html), so the executable is inside an application bundle.
+  **Fix:** generate the exact executable path with [`$<TARGET_FILE:core-link-check>`](https://cmake.org/cmake/help/latest/manual/cmake-generator-expressions.7.html#genex:TARGET_FILE), verify that file exists and copy it to the build root's `core-link-check`.
+  Use that same normalized file for lipo, otool and artifact packaging; do not guess the platform's bundle layout or remove a signature to pass the check.
+  **How found:** the run's `[352/353] Linking C executable core-link-check.app/core-link-check` followed by the failing lipo path.
+- **Symptom:** `Found FFmpeg ... found components: AVCODEC` is immediately followed by `FFmpeg AVCODEC not found - MJPEG support disabled in video codec wrappers`.
+  **Cause:** pinned FreeRDP's `libfreerdp/CMakeLists.txt:179` tests `FFmpeg_avcodec_FOUND`, but `cmake/FindFFmpeg.cmake` sets `FFmpeg_AVCODEC_FOUND` with uppercase component names.
+  **Fix for diagnosis:** check the independent H.264 path, generated definitions and actual libraries before treating this message as a lost decoder; do not force a variable or suppress the message to make the log green.
+  **How found:** this run found the target prefix's libavcodec/libavutil, printed WITH_VIDEO_FFMPEG and WITH_VIDEOTOOLBOX, compiled `h264_ffmpeg.c.o` and linked the probe with the static codec libraries.
+  The video-only FFmpeg configuration enables H.264 and HEVC, not MJPEG; no MJPEG decoder claim follows from finding avcodec.
+  The optional wrapper diagnostic does not unset the explicitly enabled WITH_FFMPEG or WITH_VIDEO_FFMPEG in this build.
+
+The probe links FreeRDP's build-tree static targets, and installed OpenSSL/FFmpeg archives.
+It is not a separate consumer of the installed FreeRDP CMake/pkg-config package.
+The artifact uses the installed FreeRDP archives; an independently configured installed consumer has not been tested.
+Do not assume a byte-for-byte archive comparison is valid across installation: CMake's Darwin install script reruns ranlib on the installed static archive, as a generation-only Linux fixture confirms.
+That fixture establishes CMake output layout and install commands, not an Apple linker or SDK build.
+The runner also reports that CMake cannot find pkg-config under the ignored Homebrew prefix; its direct header/library lookup nevertheless finds the target dependencies, as the paths in the log establish.
+Hardware decode and presentation remain unverified, and the corrected path/signature/archive checks still need a new hosted run.
+
+The correction passes a fresh Linux build and client/channel/H.264 lifecycle test, a CMake-generated Darwin bundle-path fixture without an SDK, and the real packaging commands against a host artifact.
+The original shell fails the log-derived bundle-path fixture; the corrected shell passes bundled and plain paths (including spaces) and still rejects a missing executable.
+Stand-ins for lipo and otool in that fixture establish shell control flow only.

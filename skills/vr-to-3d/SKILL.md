@@ -17,6 +17,8 @@ description: >-
 
 ## Working recipe
 
+For StereoDroidVR or iStereoVR, start with the [tracked phone clause map](references/tracked-phone-headset.md). It separates the paired RDP sensor prototype from the still-open OpenXR headset consumer and tracked viewer. The flat-display formula below does not turn off tracking on a phone headset.
+
 1. Choose flat-display play or spectator mirroring; identify eye images, poses/FOV, HUD and tracking ownership.
 2. For play, apply the formula below. For spectators, retain the headset view relationship and test both eyes reaching one declared desktop surface.
 3. Return pose/image evidence, input/restoration checks and device limits. A WebXR session-support result alone does not prove or disprove stereo image presentation.

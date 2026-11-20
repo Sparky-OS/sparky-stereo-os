@@ -107,3 +107,7 @@
   **Cause:** the freedesktop application validator treats the existing `Type=Service` entry as outside its application schema.
   **Fix:** preserve the KDE service-menu type, record those diagnostics on both builds, and prove the service action's exact localized key through the desktop key reader.
   **How found:** the published and rebuilt audio-format menu both drew the same diagnostics. The candidate's localized action values passed the installed lookup.
+- **Symptom:** a catalogue-only candidate's dependency solve selects Debian's PowerDevil or cannot select the exact Qt version required by Graphics.
+  **Cause:** the link-check snapshot lacks the edition's shipped APT policy and the unchanged provider or runtime siblings.
+  **Fix:** give the link gate the signed published policy package and the exact unchanged siblings in both snapshots. Keep strict pinning and the package's own dependency declarations.
+  **How found:** the same Power Profiles controls failed the generic archive solve. Both versions resolved once the edition policy, the versioned PowerDevil provider and its Qt runtime were supplied.

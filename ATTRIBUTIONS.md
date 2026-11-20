@@ -1393,3 +1393,6 @@ CardboardXR: **brenpoly**.
 
 actionlint: **rhysd**.
 openstep-parser: **Ignacio Calderon**.
+## Screenshots of a 3D screen (ORDER 772)
+
+Spectacle's own About records name **Boudhayan Gupta**, **David Redondo** and **Noah Davis**. The capture and save commits carried from upstream retain the authors **Noah Davis**, **Kai Uwe Broulik**, **Pranav Kunjir**, **Mohanraj Velayutham**, **Frog Chen** and **Xaver Hugl**. The KWin screenshot plugin's headers credit **Martin Gräßlin**, **Vlad Zahorodnii** and **Nokia Corporation**; its carried context fixes retain **Xaver Hugl** and **Vlad Zahorodnii**. **Daniel Campos Ramos** supplied the stereo design and the edition changes, built on **Paweł “pavroo” Pijanowski**'s SparkyLinux. Qt, KDE Frameworks, Wayland, PipeWire and their contributors provide the native image writers, session interfaces and test infrastructure; their original notices remain in the source and packages.

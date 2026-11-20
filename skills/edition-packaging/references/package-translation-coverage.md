@@ -91,3 +91,15 @@
   **Cause:** the plain build's stripped layer differs from the Lean Code layer named in the receipts.
   **Fix:** reproduce the published Lean Code recipe and qualify the actual stripped layer, keeping the receipt gate active.
   **How found:** the plain build rejected the layer hash. The equivalent Lean Code build passed all 132 receipts.
+- **Symptom:** a context-aware Ki18n probe still returns English although the compiled MO contains the exact translation.
+  **Cause:** the probe set the requested Ki18n language but started in the C locale.
+  **Fix:** install the UTF-8 test locales and set a real `LANG` for each probe process, clearing `LC_ALL` and `LANGUAGE`.
+  **How found:** both singular and plural KScreenLocker lookups matched after switching the process locale.
+- **Symptom:** a build dependency installation with the edition pin wants to downgrade an entire Qt stack.
+  **Cause:** the image already has Debian's newer Qt installed.
+  **Fix:** start with a clean image that has the packaging tools and no preinstalled Qt, then resolve the pinned build dependencies together.
+  **How found:** the pinned KScreenLocker dependencies installed together in the fresh base and the package built.
+- **Symptom:** the legacy PO patch validator reports a Spanish ID missing even though the patch applies and msgfmt succeeds.
+  **Cause:** its added-message parser only recognizes a singular `msgstr` and consumes later entries while seeking one after a plural.
+  **Fix:** record the validator's failure and check the compiled catalogue with the native format tool and context-aware singular and plural lookups.
+  **How found:** the KScreenLocker Spanish patch produced correct installed Ki18n output for both plural forms after the wrapper reported a failure.

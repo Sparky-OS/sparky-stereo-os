@@ -1396,3 +1396,9 @@ CardboardXR: **brenpoly**.
 
 actionlint: **rhysd**.
 openstep-parser: **Ignacio Calderon**.
+
+## KDE Screen Locker localization
+
+The KDE Screen Locker release credits Bhushan Shah, Chani Armitage, Chris Howells, Cyril Rossi, David Edmundson, David Redondo, Harald Sitter, Kevin Ottens, Luboš Luňák, Marco Martin, Martin Gräßlin, Martin R. Jones, Nate Graham, Oswald Buddenhagen and Yifan Zhu in its source package copyright.
+
+The lock-screen settings catalogues credit Łukasz Wojniłowicz, Guilherme Marçal Silva, Xavier Besnard, Alois.spitzbart, Eloy Cuadra, UTUMI Hirosi, Shinjo Park, KDE's Simplified Chinese translation team and Kisaragi Hiu in their own headers.

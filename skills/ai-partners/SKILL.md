@@ -268,7 +268,7 @@ Read the traps before a change to this part, and add the next lesson there as yo
 
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.
 
-[Bringing a new assistant onto the project](references/onboarding-a-new-assistant.md) gives the recipe used when Google's Antigravity joined: read the tool's own guide before wiring, wire skills, servers, rules and the shared memory and prove each by asking the tool, a guard that binds only the sessions you start, three sittings (cases, the reference index, its own notes), and what a review looks for (an invented line number, a given text outranking the evidence, a snapshot taken for access).
+[Bringing a new partner onto the project](references/onboarding-a-new-partner.md) gives the recipe used when Google's Antigravity joined: read the tool's own guide before wiring, wire skills, servers, rules and the shared memory and prove each by asking the tool, a guard that binds only the sessions you start, three sittings (cases, the reference index, its own notes), and what a review looks for (an invented line number, a given text outranking the evidence, a snapshot taken for access).
 
 [Keeping a work queue](references/keeping-a-queue.md) gives the practice behind the queue-keeper hook: the state apart from the journal, a row with its true origin for every item, the gate that serves the oldest request of the person first, what to do at a launch, a hand-back and an acceptance, how a queue drifts, and how to start one in five minutes.
 

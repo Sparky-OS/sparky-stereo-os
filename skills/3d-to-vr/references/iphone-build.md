@@ -3,7 +3,8 @@
 **For the contributor: write and test portable code on Linux, compile the native application on a standard hosted macOS runner, then sign and install from Linux.**
 Check freshness first: source workflows and local gates checked 2026-11-20.
 The first native proof target and workflow are implemented.
-Hosted run 44688342867 passes the portable tests and native app build, then fails at the packaging architecture command; artifact upload and phone launch are not yet established.
+Hosted run 44689690224 passes the portable tests, native app build and arm64 check; packaging then rejects the real two-line unsigned diagnostic.
+Artifact upload and phone launch are not yet established.
 
 ## Working recipe
 
@@ -144,10 +145,11 @@ Coverage proves presence, not a native speaker's acceptance or on-phone fallback
    Linux LLVM's lipo accepts the corrected invocation on an SDK-free arm64 Mach-O object and rejects an x86_64 requirement; this does not replace the hosted Apple-tool check.
 9. **Symptom:** an unsigned-artifact gate accepts every nonzero `codesign --verify` result.
    **Cause:** signature verification failure can mean unsigned code, damaged signed code or a tool failure.
-   **Fix:** retain and print the diagnostic, set `LC_ALL=C`, reject successful verification and accept failure only when the entire diagnostic is the app path followed by `code object is not signed at all`.
+   **Fix:** retain and print the diagnostic, set `LC_ALL=C`, reject successful verification and accept failure only when the entire diagnostic is the app path followed by `code object is not signed at all`, a newline and `In architecture: arm64`.
    **How found:** review of the packaging step after the lipo failure; controlled command responses exercise unsigned, valid signed, damaged, missing-tool, empty-error and nested-code errors against the actual workflow shell.
    Apple's [code-signing error definitions](https://github.com/apple-oss-distributions/Security/blob/main/OSX/libsecurity_codesigning/lib/CSCommon.h) distinguish unsigned code from invalid signatures.
-   No signature is removed to make this gate pass; the real diagnostic still needs the next hosted run.
+   No signature is removed to make this gate pass; run 44689690224 supplies the real two-line diagnostic.
+   Its second line was omitted by the first exact-match gate and must be retained, as trap 10 describes.
 
 ### Packaging audit after the native compile
 
@@ -158,3 +160,16 @@ It writes the JSON and SHA256SUMS next to the IPA in `ios-artifact/`, the direct
 The IPA is already a ZIP, preserving its executable modes inside the artifact's outer ZIP.
 A Linux fixture checks these paths, a binary plist, the manifest digest and `sha256sum -c`; substitutes for codesign and ditto test shell control flow only.
 Do not describe the native build as an uploaded or installed program until those later checks actually pass.
+
+10. **Symptom:** the unsigned gate says it cannot establish unsigned status even though codesign reports `code object is not signed at all`.
+    **Cause:** codesign appends `In architecture: arm64` on a second line, but the expected string and the original synthetic fixture contained only the first line.
+    **Fix:** compare the whole captured diagnostic with `"$app: code object is not signed at all"$'\nIn architecture: arm64'` under Bash, retaining LC_ALL=C and rejection of successful verification.
+    **How found:** [run 44689690224](https://github.com/Sparky-OS/flat-headset/actions/runs/44689690224) shows both lines after a successful native build and lipo check.
+    A fixture extracted from that log, with only the temporary app path substituted, fails the old gate and passes the corrected gate.
+    Reject a missing architecture line, a different architecture/path, additional or nested-code diagnostics, damaged signatures, successful verification and tool errors.
+    Bash command substitution removes trailing newlines; the internal newline and both complete lines remain part of the exact match.
+    The full packaging shell passes controlled Linux fixtures; the actual ditto archive, manifest from compiled metadata and artifact upload still require a hosted run.
+
+The remainder was re-audited after run 44689690224: the compiled app path and executable match the packaging input; the source plist's literal display name and Xcode's product/deployment settings match the manifest requirements.
+The hosted tooling test already exercised the same Python manifest and hashing code successfully.
+The ditto Payload-root invocation, sibling manifest paths and upload-artifact directory remain as in the packaging audit above; no further defect was identified by this inspection.

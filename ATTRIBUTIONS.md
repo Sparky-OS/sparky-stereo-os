@@ -1342,3 +1342,20 @@ The libkscreen configuration operations used by the isolated controller credit *
 KRdp's screencasting client and Plasma screencast session credit **Aleix Pol Gonzalez**, also credited on the screencast protocol.
 The edition's replica copy, native panel integration and declaration teardown fix are **Daniel Campos Ramos**'s work.
 The PipeWire stream API used by the isolated receiving fixture credits **Wim Taymans**.
+
+## Surface depth limits across outputs (ORDER 750e, reconcile)
+
+## Surface depth limits across outputs (ORDER 750e)
+
+The names below come from the published KWin +stereo3d59 source's SPDX notices, the stereo protocol's own copyright and libkscreen's source notices, read on 2026-11-19.
+**Daniel Campos Ramos** wrote the stereo content protocol, the declaration library and the compositor's surface-depth exchange.
+The KWin surfaces, window geometry, workspace selection and output types credit **Martin Gräßlin**, **Martin Flöser**, **Vlad Zahorodnii**, **David Edmundson**, **Matthias Ettrich**, **Lubos Lunak**, **Natalie Clarius** and **Roman Gilg**.
+The libkscreen backend and its selection machinery credit **Alejandro Fiestas Olivares**, **Daniel Vrátil**, **Sebastian Kügler** and **Méven Car**.
+ScreenShot2’s framebuffer conversion also credits **Nokia Corporation** in its published source. The installed stable xdg-shell protocol credits **Kristian Høgsberg**, **Rafael Antognolli**, **Jasper St. Pierre**, **Intel Corporation**, **Samsung Electronics** and **Red Hat**; viewporter credits **Collabora**.
+These credits identify the source foundations used in the reconcile and its isolated virtual-output probe; they do not imply endorsement.
+
+The standard alternatives checked for this repair also credit **Kenny Levinsen** for fractional-scale-v1, **Simon Ser** for the core preferred-buffer-scale protocol, **Xaver Hugl** for experimental fractional-scale-v2 and the KDE scale work, **Pekka Paalanen** for the enter/leave wording proposal, and **Volodymyr Zolotopupov** for the output binding and scale-factor proposals. These names come from the projects’ source copyright and public merge-request author records read on 2026-11-19.
+
+Spirula Studio’s owning source and accepted base commit b8e15cb8 credit **Harry Chen**. The edition’s declared viewport, shared depth conversion and cache notification path build on **Daniel Campos Ramos**’s accepted fork d5c4ac86. Names were checked in the source commit records on 2026-11-19.
+
+The pinned GLFW Wayland platform files credit **Jonas Ådahl**; the pinned Dear ImGui licence credits **Omar Cornut**. These names were read in the original source components used for the +stereo3d6 build.

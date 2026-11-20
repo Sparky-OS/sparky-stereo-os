@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: MIT
-// depthtest: a static GX scene with three planes of vertical stripes at known distances (40, 80 and 160 units), each
-// plane filling one third of the picture, so a stereo view of it shows three known horizontal disparities.
-// Written for ORDER 39 of Sparky Stereo OS; built on the libogc GX API (zlib licence), same set-up as devkitPro's triangle example.
+// depthtest: a static GX scene with three planes of vertical stripes at known distances (w = 40, 80 and 160 units),
+// each plane 80 % of one third of the picture, so a stereo view of it shows three known horizontal disparities.
+// The stripes and the gaps between them have irregular widths (a fixed pseudo-random sequence per plane), so the
+// shift of a plane has one match only, however large it is (no aliasing of a periodic pattern).
+// Written for ORDER 39 of Sparky Stereo OS; built on the libogc GX API (zlib licence), same set-up as devkitPro's
+// triangle example.
 #include <stdlib.h>
 #include <string.h>
 #include <malloc.h>
@@ -10,7 +13,7 @@
 #include <wiiuse/wpad.h>
 
 #define FIFO_SIZE (256 * 1024)
-#define STRIPES 10
+#define SEGMENTS 32
 
 static GXRModeObj *rmode;
 static void *frameBuffer;
@@ -27,20 +30,39 @@ static void copy_buffers(u32 unused)
 	}
 }
 
-static void plane(float z, int third, float aspect, u8 r, u8 g, u8 b)
+static void quad(float xa, float xb, float y0, float y1, float z, u8 r, u8 g, u8 b)
+{
+	GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
+	GX_Position3f32(xa, y0, z); GX_Color4u8(r, g, b, 255);
+	GX_Position3f32(xb, y0, z); GX_Color4u8(r, g, b, 255);
+	GX_Position3f32(xb, y1, z); GX_Color4u8(r, g, b, 255);
+	GX_Position3f32(xa, y1, z); GX_Color4u8(r, g, b, 255);
+	GX_End();
+}
+
+// One plane at view distance -z: SEGMENTS segments, stripe and gap in turn, widths 1 to 5 units from a linear
+// congruential sequence seeded per plane, laid over 80 % of the plane's third of the view, centred in it.
+static void plane(float z, int third, float aspect, unsigned seed, u8 r, u8 g, u8 b)
 {
 	const float half_h = -z * tanf(30.0f * M_PI / 180.0f);
 	const float half_w = half_h * aspect;
-	const float x0 = -half_w + third * (2.0f * half_w / 3.0f);
-	const float sw = (2.0f * half_w / 3.0f) / (2 * STRIPES);
-	for (int i = 0; i < STRIPES; i++) {
-		const float xa = x0 + (2 * i) * sw, xb = xa + sw;
-		GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
-		GX_Position3f32(xa, -half_h * 0.6f, z); GX_Color4u8(r, g, b, 255);
-		GX_Position3f32(xb, -half_h * 0.6f, z); GX_Color4u8(r, g, b, 255);
-		GX_Position3f32(xb, half_h * 0.6f, z);  GX_Color4u8(r, g, b, 255);
-		GX_Position3f32(xa, half_h * 0.6f, z);  GX_Color4u8(r, g, b, 255);
-		GX_End();
+	const float third_w = 2.0f * half_w / 3.0f;
+	const float x0 = -half_w + third * third_w + 0.1f * third_w;
+	int widths[SEGMENTS];
+	int total = 0;
+	unsigned s = seed;
+	for (int i = 0; i < SEGMENTS; i++) {
+		s = s * 1103515245u + 12345u;
+		widths[i] = 1 + (int)((s >> 16) % 5u);
+		total += widths[i];
+	}
+	const float unit = 0.8f * third_w / total;
+	float x = x0;
+	for (int i = 0; i < SEGMENTS; i++) {
+		const float w = widths[i] * unit;
+		if ((i & 1) == 0)
+			quad(x, x + w, -half_h * 0.6f, half_h * 0.6f, z, r, g, b);
+		x += w;
 	}
 }
 
@@ -97,9 +119,9 @@ int main(void)
 		GX_InvVtxCache();
 		GX_InvalidateTexAll();
 		GX_LoadPosMtxImm(view, GX_PNMTX0);
-		plane(-40.0f, 0, aspect, 255, 40, 40);
-		plane(-80.0f, 1, aspect, 40, 255, 40);
-		plane(-160.0f, 2, aspect, 80, 80, 255);
+		plane(-40.0f, 0, aspect, 7u, 255, 40, 40);
+		plane(-80.0f, 1, aspect, 1234u, 40, 255, 40);
+		plane(-160.0f, 2, aspect, 98765u, 80, 80, 255);
 		GX_DrawDone();
 		readyForCopy = GX_TRUE;
 		VIDEO_WaitVSync();

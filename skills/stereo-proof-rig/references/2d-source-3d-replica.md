@@ -153,3 +153,10 @@ Compare the plain replica and source directly with the stereo target's left half
 For a colour control, set only the target brightness to 0.55 and compare the old 3D-source copy with the new 2D-source copy.
 With the ORDER 763 EDID these use different blending references, 200 and 112.25 cd/m², retain the existing SDR conversion copy and produce identical target pixels.
 A separate animated-fixture swap comparison must exclude the marker's antialiased coloured-to-white edges as well as its fully white centre; retain the mask rule and count every other changed pixel.
+
+To inspect the installed Display Settings control without editing its package, load `kcm_kscreen` with `KQuickConfigModuleLoader` in an owned guest.
+Select the plain source by its model `name`, then read the actual QQuickItem's `visible` and `enabled` properties and the explanatory label.
+Repeat in a new guest with both selected modes plain: the same checkbox is visible but disabled, with the one-line reason.
+Cache `QAbstractItemModel::roleNames()` in a local hash before iterating; iterators from separate temporary hashes caused the first introspection helper to abort, while the rebuilt helper with a retained hash completed both states.
+Before booting a newly exported guest root, verify every initramfs bind and tmpfs mount target exists.
+An absent `var/tmp` stopped the first exported-app-root boot before KWin; creating that empty directory fixed the boot without a package change.

@@ -7,7 +7,7 @@ from Xlib import X, display
 d = display.Display()
 root = d.screen().root
 names = ["_KDE_NET_WM_STEREO_CONTENT", "_KDE_NET_WM_STEREO_CONTENT_CLASS", "_KDE_NET_WM_STEREO_CONTENT_CHILDREN",
-         "_KDE_NET_WM_STEREO_CONTENT_ONE_VIEW_SIZE", "_KDE_NET_WM_STEREO_CONTENT_CHILD_PLACE", "_KDE_NET_WM_STEREO_CONTENT_VERSION", "WM_STATE"]
+         "_KDE_NET_WM_STEREO_CONTENT_ONE_VIEW_SIZE", "_KDE_NET_WM_STEREO_CONTENT_CHILD_PLACE", "_KDE_NET_WM_STEREO_CONTENT_VERSION", "_KDE_NET_WM_STEREO_DEPTH_LIMITS", "WM_STATE"]
 atoms = {n: d.intern_atom(n, True) for n in names}
 sup = d.intern_atom("_KDE_NET_WM_STEREO_CONTENT_SUPPORTED", True)
 p = root.get_full_property(sup, X.AnyPropertyType) if sup else None
@@ -38,4 +38,4 @@ def walk(w, parent):
     except Exception as e:
         pass
 walk(root, 0)
-print(json.dumps(out))
+print(json.dumps(out, default=lambda o: o.decode("utf-8", "replace") if isinstance(o, bytes) else str(o)))

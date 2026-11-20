@@ -1,5 +1,7 @@
 # A development package imports a library its dependencies did not install
 
+A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
+
 Symptom: installing a development package succeeds, then `find_package(... REQUIRED)` fails because an imported target references a missing library, or generating a consumer fails because an exported include directory is absent.
 The package's own build can still pass: its build dependencies and staging tree contain files a clean consumer never receives.
 
@@ -10,7 +12,7 @@ The package's own build can still pass: its build dependencies and staging tree 
    Map every imported library, header directory and linker symlink to its binary package.
    A runtime dependency generated from ELF linkage does not supply a sibling's development headers or unversioned linker symlink.
 2. Start a clean Debian testing container, pinned by amd64 digest, with the edition's signed repository, deb-multimedia and the edition's pins as [the repository reference](repository.md) describes.
-   Mount the HTTPS-only apt helper and CA bundle as required by the build tools, run the helper first, and set `--ulimit core=0`.
+   Mount the HTTPS-only apt helper and CA bundle as required by the build tools, run the helper first, and set `--ulimit core=1`.
    Install build tools and only the development package under investigation as the explicit stereo root:
 
    ```sh

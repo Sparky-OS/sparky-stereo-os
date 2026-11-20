@@ -1,4 +1,5 @@
 #!/bin/bash
+# A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
 # Builds the green image: the rig's image with the staged package installed by apt (the published edition's repository
 # beside Debian's, the stage as a flat repository). prep-green.sh STAGE EVIDENCE_DIR; needs DOCKER_HOST (the lane's socket).
 set -euo pipefail
@@ -8,7 +9,7 @@ REPO_MOUNT=${REPO_MOUNT:-}
 STAGE=$1 EV=$2
 HERE=$(cd "$(dirname "$0")" && pwd)
 docker rm -f sa631-green-prep >/dev/null 2>&1 || true
-docker run --name sa631-green-prep --cpus 2 --ulimit core=0 \
+docker run --name sa631-green-prep --cpus 2 --ulimit core=1 \
 	$APT_MOUNTS $REPO_MOUNT -v "$STAGE":/stage:ro -v "$HERE/proc-asound":/opt/sa631/proc-asound:ro -v "$EV":/ev \
 	sa631-rig:builder sh -c '
 set -e

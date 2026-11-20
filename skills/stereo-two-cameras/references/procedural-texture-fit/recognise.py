@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
 """Does a tile hold one known operator? If so, return it and its parameters.
 
 For a picture cut into 256 pixel tiles, each tile is tried as a flat colour, as
@@ -29,7 +30,7 @@ _run = [0]
 def ktg(args, stdin=None):
     _run[0] += 1
     cmd = ["docker", "run", "--rm", "-i", "--name", "x3d-473w-rec-%d-%d" % (os.getpid(), _run[0]),
-           "--network", "none", "--ulimit", "core=0", "--cpus", "1", "--user", UID,
+           "--network", "none", "--ulimit", "core=1", "--cpus", "1", "--user", UID,
            "-v", WORK + ":" + WORK + ":ro", IMAGE, WORK + "/bin/ktgtool"] + [str(a) for a in args]
     return subprocess.run(cmd, input=stdin, stdout=subprocess.PIPE, check=True).stdout
 

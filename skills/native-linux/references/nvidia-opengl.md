@@ -1,5 +1,7 @@
 # OpenGL stereo on NVIDIA's own driver
 
+A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
+
 NVIDIA's closed EGL cannot give a window a second view: its window surfaces take only `GL_FRONT` and `GL_BACK`, and it lists no `EGL_EXT_multiview_window`.
 OpenGL stereo on a desktop run by NVIDIA's driver therefore goes through one of two paths of the edition, and the person (or the program's launcher) picks per program.
 
@@ -17,7 +19,7 @@ When the vendor files are missing it says so on stderr and runs on NVIDIA's own 
 
 The rig's scripts are the gl-stereo source's `tests/nvidia-rig` (session script, client programs, capture check, loops); the numbered steps say what they do.
 
-1. A container with the edition's Stereo KWin, Mesa, SDL, the layer and `libvulkan-dev`, started with `--device nvidia.com/gpu=0 --group-add RENDER_GID --cap-add SYS_NICE --ulimit core=0` and no other GPU; `python3-gi` for the capture script of `stereo-proof-rig`.
+1. A container with the edition's Stereo KWin, Mesa, SDL, the layer and `libvulkan-dev`, started with `--device nvidia.com/gpu=0 --group-add RENDER_GID --cap-add SYS_NICE --ulimit core=1` and no other GPU; `python3-gi` for the capture script of `stereo-proof-rig`.
 2. One fresh `kwin_wayland --virtual --xwayland --socket=w` inside `dbus-run-session` per probe, KWin's environment holding `KWIN_SCREENSHOT_NO_PERMISSION_CHECKS=1`; the client started from the session script, not from the container's shell (see the second trap below).
 3. A client that draws red into `GL_BACK_LEFT` and blue into `GL_BACK_RIGHT` (`SDL_GL_STEREO`, `glDrawBuffer`), captured with `CaptureActiveScreen`: a stereo screen is twice the output's width, the left half must hold the red, the right half the blue. Keep a client with the colours swapped: it must read as swapped, or the check proves nothing.
 4. The paths: `gl-stereo-run --nvidia-opengl nvidia` for the shim, `--nvidia-opengl zink` for zink, and for zink without the launcher the three variables above.

@@ -1,4 +1,5 @@
 #!/bin/bash
+# A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
 # One command for the unit tests and the container proof of a Universal Media Server change.
 # Offline: it needs only three local images (below), a Maven repository cache and a scratch folder.
 # One line per unit-test class and per proof case ("PASS" or "FAIL" first); exit status 0 only
@@ -62,7 +63,7 @@ fresh() {
 
 maven() { # name of the container, then the Maven arguments
   local name=$1; shift
-  docker run --rm --name "$name" --cpus 4 --ulimit core=0 --network none --user "$UID_GID" \
+  docker run --rm --name "$name" --cpus 4 --ulimit core=1 --network none --user "$UID_GID" \
     -e HOME=/work/home -v "$RUN:/work" -w /work/src --entrypoint mvn "$IMAGE_JAVA" "${MVN_FLAGS[@]}" "$@"
 }
 
@@ -136,7 +137,7 @@ fixtures() {
   local sum; sum=$(sha256sum "$PROOF/generate-fixtures.sh" | cut -c1-16)
   if [ "$(cat "$SCR/fixtures/.generated" 2>/dev/null)" != "$sum" ]; then
     fresh "$SCR/fixtures"
-    docker run --rm --name ums-proof-fixtures --cpus 4 --ulimit core=0 --network none --user "$UID_GID" \
+    docker run --rm --name ums-proof-fixtures --cpus 4 --ulimit core=1 --network none --user "$UID_GID" \
       -v "$PROOF:/proof:ro" -v "$SCR/fixtures:/out" --entrypoint sh "$IMAGE_TOOLS" \
       /proof/generate-fixtures.sh /out/media /out/probes > "$SCR/rerun-fixtures.log" 2>&1 \
       || { line "FAIL fixtures: see $SCR/rerun-fixtures.log"; return 1; }
@@ -159,7 +160,7 @@ shared_folders = /media
 uuid = $SERVER_UUID
 EOF
   printf '[\n  {\n    "file": "/media",\n    "monitored": true,\n    "metadata": true,\n    "active": true,\n    "groups": [],\n    "type": "Folder"\n  }\n]\n' > "$RUN/profile/SHARED.conf"
-  docker run -d --name ums-proof-server --network "$NETWORK" --ip 192.0.2.1 --cpus 4 --ulimit core=0 --user "$UID_GID" \
+  docker run -d --name ums-proof-server --network "$NETWORK" --ip 192.0.2.1 --cpus 4 --ulimit core=1 --user "$UID_GID" \
     -e JAVA_OPTS=-Duser.home=/home/ums -v "$RUN/home:/home/ums" -v "$RUN/profile:/home/ums/.config/UMS" \
     -v "$RUN/ums-home:/opt/ums" -v "$SCR/fixtures/media:/media:ro" -w /opt/ums --entrypoint ./UMS.sh \
     "$IMAGE_JAVA" -console > /dev/null || return 1
@@ -182,7 +183,7 @@ start_renderers() {
     agent=${agent//_/ }
     mkdir -p "$RUN/records/$name"
     local extra=(); [ "$ssdp" = no-ssdp ] && extra=(--no-ssdp)
-    docker run -d --name "ums-proof-r-$name" --network "$NETWORK" --ip "$ip" --cpus 1 --ulimit core=0 --user "$UID_GID" \
+    docker run -d --name "ums-proof-r-$name" --network "$NETWORK" --ip "$ip" --cpus 1 --ulimit core=1 --user "$UID_GID" \
       -v "$PROOF/emulated-renderer.py:/proof/emulated-renderer.py:ro" -v "$RUN/records/$name:/records" "$IMAGE_RENDERER" \
       python3 /proof/emulated-renderer.py --host "$ip" --port 8000 --record-dir /records --identity "$identity" \
       --user-agent "$agent" "${extra[@]}" > /dev/null || return 1
@@ -192,7 +193,7 @@ start_renderers() {
 
 controller() { # instance, ip, agent, then the proof.py arguments
   local name=$1 ip=$2 agent=$3; shift 3
-  docker run --rm --name "ums-proof-c-$name" --network "container:ums-proof-r-$name" --cpus 2 --ulimit core=0 --user "$UID_GID" \
+  docker run --rm --name "ums-proof-c-$name" --network "container:ums-proof-r-$name" --cpus 2 --ulimit core=1 --user "$UID_GID" \
     -v "$PROOF:/proof:ro" -v "$RUN/records/$name:/records" "$IMAGE_TOOLS" python3 /proof/proof.py "$@"
 }
 
@@ -243,10 +244,10 @@ proof_pc() {
     return
   fi
   mkdir -p "$RUN/records/pc"
-  docker run -d --name ums-proof-r-pc --network "$NETWORK" --ip 192.0.2.10 --cpus 1 --ulimit core=0 --user "$UID_GID" \
+  docker run -d --name ums-proof-r-pc --network "$NETWORK" --ip 192.0.2.10 --cpus 1 --ulimit core=1 --user "$UID_GID" \
     -v "$RUN/records/pc:/records" ums-proof-rygel:1 > /dev/null || { line "FAIL pc: the container did not start"; return; }
   sleep 12
-  local output; output=$(docker run --rm --name ums-proof-c-pc --network container:ums-proof-r-pc --cpus 2 --ulimit core=0 --user "$UID_GID" \
+  local output; output=$(docker run --rm --name ums-proof-c-pc --network container:ums-proof-r-pc --cpus 2 --ulimit core=1 --user "$UID_GID" \
     -v "$PROOF:/proof:ro" -v "$RUN/records/pc:/records" "$IMAGE_TOOLS" python3 /proof/pc.py --address 192.0.2.10 \
     --server-ip 192.0.2.1 --user-agent ProofController/1.0 --title seek-sbs)
   while IFS= read -r result; do line "$result"; done <<< "$output"

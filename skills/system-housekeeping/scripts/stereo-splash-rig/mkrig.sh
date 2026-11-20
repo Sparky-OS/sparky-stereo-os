@@ -1,4 +1,5 @@
 #!/bin/bash
+# A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
 # mkrig.sh VARIANT THEME_DEB_OR_DIR PLYMOUTH_DEBS_DIR (a theme .deb, or a folder of every theme .deb of the set): the rig's initramfs ($RIGOUT/initrd-VARIANT.img), from the image
 # $RIG_IMAGE (Debian testing with plymouth, plymouth-label, udev, kmod, busybox, cpio, gcc, libc6-dev, linux-libc-dev,
 # fonts-dejavu-core installed: the README says how to make it), with the Plymouth build under test
@@ -11,7 +12,7 @@ VARIANT=${1:?variant} THEME=$(realpath "${2:?theme deb or folder of theme debs}"
 [ -d "$THEME" ] || { T=$(mktemp -d); cp "$THEME" "$T/"; THEME=$T; }
 HERE=$(dirname "$(readlink -f "$0")")
 mkdir -p "$RIGOUT"
-docker run --rm --name "${PREFIX:-rig}-mkrig-$VARIANT" --ulimit core=0 --platform linux/amd64 --cpus 2 --network none --user 0 \
+docker run --rm --name "${PREFIX:-rig}-mkrig-$VARIANT" --ulimit core=1 --platform linux/amd64 --cpus 2 --network none --user 0 \
 	-e OWNER="$(id -u):$(id -g)" -e KVER="$KVER" -e VARIANT="$VARIANT" \
 	-v "$RIGOUT":/rig -v "$HERE":/here:ro -v "$THEME":/themes:ro -v "$PDEBS":/pdebs:ro \
 	-v "/lib/modules/$KVER":"/hm/lib/modules/$KVER":ro \

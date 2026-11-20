@@ -13,6 +13,8 @@ description: >-
 
 # A virtual machine in stereo
 
+A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
+
 ## Working recipe
 
 1. Record host/guest/viewer versions and the guest logical display size; distinguish it from the packed stereo frame.
@@ -208,7 +210,7 @@ HDMI® 1.4a's "L + depth" and "L + depth + graphics + graphics-depth" are 3D str
 
 **Both eyes at Stereo KWin (the real chain, once per layout)**
 
-- Image: the QEMU build image plus the edition's `kwin-wayland` from its repository (a `file:` source with a pin above Debian's), `python3-gi python3-numpy python3-pil libgl1-mesa-dri`. Container flags: `--cap-add SYS_NICE` (kwin_wayland carries a file capability and exec fails with "Operation not permitted" without it), `--user UID:GID` with a mounted passwd entry, `--device /dev/dri/renderD128 --group-add RENDER_GID` (without a render node every ScreenShot2 answers Cancelled), `--ulimit core=0`.
+- Image: the QEMU build image plus the edition's `kwin-wayland` from its repository (a `file:` source with a pin above Debian's), `python3-gi python3-numpy python3-pil libgl1-mesa-dri`. Container flags: `--cap-add SYS_NICE` (kwin_wayland carries a file capability and exec fails with "Operation not permitted" without it), `--user UID:GID` with a mounted passwd entry, `--device /dev/dri/renderD128 --group-add RENDER_GID` (without a render node every ScreenShot2 answers Cancelled), `--ulimit core=1`.
 - One script inside `dbus-run-session`: `kwin_wayland --virtual --socket=sub --width 3840 --height 2400` (a 1920x1080 view plus its title bar does not fit a smaller output: the window is centred and clipped), then the QEMU GTK display with `GDK_BACKEND=wayland WAYLAND_DISPLAY=sub WAYLAND_DEBUG=client` and `-display gtk,show-menubar=off,zoom-to-fit=off`, wait for the guest's `READY`, 12 s, then the stereo skill's `capture.py` (a stereo screen is one picture of both eyes, 7680x2400 here).
 - Set `QEMU_STEREO_DEPTH_OPTIONS="strength=58 zero=0.50196078"` so the screen plane (depth 128) has parallax 0; with the library default (zero 0.5) the ground shifts 0.45 px, its stripe edges blur in one eye and "the eyes equal at the screen plane" fails by design.
 - Compare the capture with the views the viewer's own function draws from the guest's screendump (`E2E_WRITE`): locate the window by the marker's centre in the left eye, then count differing samples per eye. Measured at 1920x1080 per view: left eye 0 of 2,073,600 differ, right eye 0, the swapped assignment 23,800 (layout 5) and 41,800 (layout 6) differ, vertical disparity 0.0 px, marker disparity -58.0 and -57.5 px against the predicted -57.5, 0 of 270,000 ground samples differ between the eyes. The declaration in the Wayland log: `kde_stereo_content_manager_v1#44.create(...)`, `kde_stereo_content_v1#50.set_content(3)` once, `wp_viewport.set_destination(1920, 1080)`.

@@ -1,5 +1,7 @@
 # A real login with the loading screen
 
+A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../SKILL.md#traps-that-fooled-us) explains.
+
 Load this to capture what a person sees between the login and the desktop: KSplash's loading screen on one or several virtual outputs, in a 3D mode or not, from a real `startplasma-wayland`, with both eyes of each screen and each level's disparity measured against a prediction.
 Written for ORDER 571 (the edition's loading screen, 2026-11-15); what the splash is and why is in [kde-desktop-defaults, the loading screen](../../kde-desktop-defaults/references/loading-screen.md).
 
@@ -30,7 +32,7 @@ A run: `run-case.sh IMAGE OUTDIR MODES="3d 2d" OUTPUTS=2 HOLD=6 SHOTS="1 3" POPP
 
 An isolated tool environment may not expose the host's render-node path to `stat` even though Docker can pass that node to a container.
 Set `RENDER_GROUP` to the group measured inside a preflight container; `run-case.sh` uses it instead of probing the hidden host path.
-Keep the render node and group explicit, and keep `--ulimit core=0`.
+Keep the render node and group explicit, and keep `--ulimit core=1`.
 
 `DESKTOP_PROBE` names a mounted script to run in the same private session bus after the desktop capture, for example a real Splash Screen KCM opened with `kcmshell6`.
 A failing desktop probe propagates its status through the session and container.

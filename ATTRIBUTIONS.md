@@ -18,6 +18,8 @@ Boudhayan Gupta, David Redondo, Noah Davis, Vlad Zahorodnii, Daniel Campos Ramos
 
 Fredrik Lundh, Alex Clark, NumPy Developers.
 
+Martin Gräßlin, Pier Luigi Fiorini.
+
 ---
 
 ## OpenGL quad-buffer programs, swept in ORDER 26

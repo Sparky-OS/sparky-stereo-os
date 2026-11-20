@@ -11,6 +11,8 @@ description: >-
 
 # One more program, integrated
 
+**Briefing an old plan again?** Reconcile it first against what shipped: [reconciling an old plan](references/reconciling-an-old-plan.md).
+
 **Check freshness first.**
 Written on 2026-10-14 from a preliminary study and finished on 2026-10-24 from the first two real packs, `sparky-stereo-align` and `sparky-stereo-mkv-mark`, proved in a fresh Debian testing container with the edition's repository.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; [`edition-packaging`](../edition-packaging/SKILL.md) holds the tasks and the repository rules this builds on, and [`stereo-pictures`](../stereo-pictures/SKILL.md) and [`stereo-video`](../stereo-video/SKILL.md) hold the file marks the packs write.

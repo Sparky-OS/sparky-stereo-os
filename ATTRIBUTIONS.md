@@ -1311,3 +1311,15 @@ Names come from the headers of the kernel source files read (sound/hda/common/pr
 The HDMI codec driver and the ELD code list **Wu Fengguang** (Intel) and **Anssi Hannula** (2013), with copyright lines of Intel, ATI and NVIDIA and **Wei Ni** (NVIDIA, 2008).
 PipeWire and WirePlumber remain the engine the drop-ins configure, by **Wim Taymans**, **George Kiagiadakis** and their contributors.
 The idea of keeping a display's values for that display, as the desktop keeps a screen's settings, is Daniel's.
+
+## A location service that never takes its name (ORDER 768, 2026-11-19)
+
+Names come from each project's own records (commits, merge requests, issues and file headers, read on 2026-11-19).
+**Thomas Hebb** found and fixed the deadlock: GLib issue 4078, geoclue issue 226, and the commit the edition's test build carries, "gnetworkmonitornetlink: Avoid deadlock by creating enumerator directly in can_reach_async()" (main afa628df, glib-2-90 4301b496).
+**Philip Withnall** merged it on main and prepared the backport to the 2.90 branch, which **Emmanuele Bassi** merged.
+**Sorah Fukumori** wrote the route-lookup change of GNetworkMonitorNetlink (GLib merge request 5222) whose background check the fix adjusts.
+**Julian Grinblat** reported the same hang first (GLib issue 4047, geoclue issue 225), with the GLib versions that do and do not show it.
+GLib's module loading and default VFS are **Alexander Larsson**'s (gio/giomodule.c and gio/gvfs.c, Red Hat); GProxyResolver and glib-networking's libproxy resolver are **Nicolas Dufresne**'s (Collabora).
+geoclue's main program and web source are **Zeeshan Ali (Khattak)**'s (Red Hat); its static source carries Oracle's copyright.
+libproxy 0.5's config-sysconfig plugin, on the path of the deadlock, is **The Libproxy Team**'s.
+Debian packages GLib as the Debian GNOME Maintainers (uploaders **Jeremy Bícha**, **Marco Trevisan (Treviño)** and **Simon McVittie**) and geoclue as **Laurent Bigonville**.

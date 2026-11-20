@@ -12,6 +12,7 @@ Daniel, 2026-11-19: "one separation setting, centralized, tailored TO THE SCREEN
 
 A program with its own internal 3D settings, and content that carries its own authored pair (a stereo photograph, a film, an icon pair rendered by a tool).
 Established programs have no formula tying separation to a window or screen size: Bino's source has no separation or parallax code, sView's separation is the person's own offset, mpv and VLC have none.
+The Dolphin emulator keeps its own Depth and Convergence (ORDER 39): its eyes differ by a share of the picture, so the same scene measured +6.34 px for its near plane in a window 640 wide and +17.42 px maximized on a 1920 wide output (the picture 1750 wide), and the desktop's limits do not move it ([emulators-declared-pair.md](emulators-declared-pair.md)).
 
 ## How a place gets the value
 

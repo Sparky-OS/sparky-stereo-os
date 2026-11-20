@@ -388,15 +388,16 @@ The session advertises H.264; compiled HEVC support is not evidence of HEVC nego
 The frame queue tests cover padded rows, complete left/right geometry, ownership, late-frame replacement, concurrent coherence and closed/malformed inputs.
 The GDI integration test allocates the actual pinned FreeRDP surface, runs the production paint handoff and checks forty pairs, dirty-region reset, empty paints, wrong extents and closure without a network connection.
 These checks do not exercise an encoded stream, Apple's decoder, the Metal shader or the optics.
-The new view and strict decoder patch need the next hosted compile, then the later authorized phone session for runtime evidence.
+The view and original strict patch passed run 44770385750 below; the later authorized phone session is still needed for runtime evidence.
 The Android viewer's actual profile mathematics follows this integration; no distortion coefficient is inferred here.
 
 - **Symptom:** a failed VideoToolbox device initialization logs a software fallback and still attempts decoding.
   **Cause:** pinned FreeRDP's `h264_ffmpeg.c` jumps past the hardware setup to the common codec-open call; its frame receive path also accepts a non-hardware frame.
-  **Fix:** the receiver's small pinned-source patch takes the existing cleanup/failure path in both cases when WITH_VIDEOTOOLBOX is set.
+  **Fix:** stop presenting and ask for a per-session software-decoding choice, as described below.
+  The initial patch instead ended the session; that removed the silent switch but incorrectly removed the person's choice.
   Keep the patch beside the source lock in the core artifact; apply it with an exact forward or reverse check, never ignore a failed hunk.
   **How found:** source review of 3.28.0 and the current default branch before wiring the presentation path.
-  The Linux build checks patch application and the unchanged non-Apple path; native compilation and a real hardware failure remain separate checks.
+  The Linux analogue checks both failure reasons and decisions through the core permission API; Apple-path compilation and an actual hardware failure remain separate checks.
 - **Symptom:** a GDI receiver accumulates dirty-region entries although it copies the complete surface each time.
   **Cause:** clearing only `invalid->null` leaves `hwnd->ninvalid` growing in `gdi_InvalidateRegion`.
   **Fix:** reset the count with the aggregate dirty flag in BeginPaint, as the pinned SDL client does.
@@ -408,3 +409,42 @@ The Android viewer's actual profile mathematics follows this integration; no dis
 
 [Run 44770385750](https://github.com/Sparky-OS/flat-headset/actions/runs/44770385750) passes both jobs for commit 4970452: the desktop view, its Metal fragment and the core with the strict VideoToolbox patch compile and link, and the unsigned package was checked on Linux (arm64, no signature, no embedded library).
 No frame has been decoded or shown on a phone.
+
+
+## Hardware failure offers an explicit session choice
+
+When VideoToolbox cannot initialize or yields another frame format, hide the desktop and say that hardware video decoding failed.
+Offer two actions in the person's language: continue with software decoding for this session, with the explicit warning that it is slower and uses more battery, or go back.
+Never interpret a timeout, remote packet, stored pairing or closing the prompt as permission.
+No design found for remembering the decoder choice across sessions; every new paired RDP session starts with hardware decoding.
+
+The receiver's patch retains its `0001-require-videotoolbox.patch` filename but now carries a per-decoder permission callback.
+GDI passes the session callback into both AVC420 and AVC444 contexts before initialization.
+The callback's query operation does not block or prompt; it reports only an existing software choice for that session.
+The two failure reasons pause the owned-frame queue and wait on a cancellable condition variable while the main thread shows the actions.
+Continue permits the software path in that context and subsequent surfaces of the same session.
+Go back, Stop, backgrounding and losing the paired control connection cancel the waiter before FreeRDP teardown.
+There is no process-global flag, environment variable or stored preference.
+Keep the authenticated connection while the person decides and hold only its connection deadline during that decision.
+A later failure is still a failure, not another automatic switch.
+
+For initialization failure, approval skips the hardware setup before opening FFmpeg's decoder.
+For hardware format negotiation failure, select an offered YUV420P or YUVJ420P software format only after approval.
+For a received software frame, take an owned reference to those planar pixels only after approval; do not interpret an unrelated format as those planes.
+Clear the renderer's old texture and invalidate older GPU completion callbacks before resuming, so a completed old submission cannot hide the waiting message or make a stale frame look new.
+An early failure can happen before the desktop view's first draw: its layout path must also present the choice.
+
+The Linux analogue uses the real core permission API to inject each failure reason, tests both actions, verifies that no pending frame survives the wait, and decodes an authored H.264 left-red/right-blue pair after approval.
+It tests cancellation and new sessions separately; a new session must answer the software query with false.
+These tests do not simulate Apple's VideoToolbox device creation or execute UIKit.
+The updated callback/header integration and native buttons await the next hosted compile, then the later device check.
+
+- **Symptom:** the software decoder's eye-color assertion fails although decoding completes.
+  **Cause:** the first generated fixture used FFmpeg's limited-range BT.601 color source directly, but the RDP conversion uses full-range BT.709.
+  **Fix:** explicitly convert and mark the fixture as full-range BT.709 before encoding; keep the same pixel assertions.
+  **How found:** the initial Linux analogue failed, then the corrected fixture passed every pixel in both eyes through the pinned FreeRDP/FFmpeg decoder.
+  This qualifies the authored SDR fixture, not arbitrary HDR or color metadata.
+- **Symptom:** the receiver reports a generic disconnection after a hardware failure even though software decoding could continue.
+  **Cause:** replacing an automatic fallback with an unconditional error removed both the silent switch and the explicit alternative.
+  **Fix:** pause presentation, explain the hardware failure and wait for the person's session-scoped choice; cancel that wait on teardown.
+  **How found:** review of the original strict patch against the explicit-choice rule, followed by both-decision tests through the actual permission callback API.

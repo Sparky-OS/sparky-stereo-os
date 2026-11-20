@@ -254,7 +254,7 @@ Do not assume a byte-for-byte archive comparison is valid across installation: C
 That fixture establishes CMake output layout and install commands, not an Apple linker or SDK build.
 The runner also reports that CMake cannot find pkg-config under the ignored Homebrew prefix; its direct header/library lookup nevertheless finds the target dependencies, as the paths in the log establish.
 Hardware decode and presentation remain unverified.
-Run 44694434857 establishes the corrected path/signature/archive checks; the provider-removal and foreground-pairing changes still need their own hosted run.
+Run 44694434857 establishes the corrected path/signature/archive checks; the provider-removal and foreground-pairing changes are established by run 44698940422 below.
 
 The correction passes a fresh Linux build and client/channel/H.264 lifecycle test, a CMake-generated Darwin bundle-path fixture without an SDK, and the real packaging commands against a host artifact.
 The original shell fails the log-derived bundle-path fixture; the corrected shell passes bundled and plain paths (including spaces) and still rejects a missing executable.
@@ -274,7 +274,7 @@ This is a build artifact audit, not runtime proof.
   [OpenSSL's own build options](https://github.com/openssl/openssl/blob/openssl-4.0.1/INSTALL.md) distinguish shared libraries, modules and the legacy provider.
   Keep FreeRDP's `WITH_INTERNAL_MD4`, `WITH_INTERNAL_MD5` and `WITH_INTERNAL_RC4` enabled.
   **How found:** inspection of the green hosted core artifact; a fresh Linux analogue produces no provider module and passes MD4, MD5, HMAC-MD5 and RC4 known answers plus the pinned upstream `TestSspiNTLM` exchanges using in-memory public fixtures.
-  The iPhone rebuild must still prove the revised artifact's contents.
+  The checked iPhone artifact from run 44698940422 contains no loadable provider.
 - **Symptom:** WinPR prints `OpenSSL LEGACY provider failed to load, no md4 support available!` even with internal MD4 enabled.
   **Cause:** `winpr/libwinpr/utils/ssl.c` attempts the provider and emits the warning unconditionally for OpenSSL 3 and later.
   **Fix for diagnosis:** execute the configured WinPR MD4 and NTLM paths, check the provider remains unavailable, and report the warning separately from their result.
@@ -287,7 +287,7 @@ This is a build artifact audit, not runtime proof.
   Accept only its documented -1/0/1 results as appropriate; -2 means invalid time, not an earlier date.
   **How found:** the Linux build with the exact pinned OpenSSL headers and warnings treated as errors.
 
-The next native target adds a foreground Computers screen, before RDP integration.
+The foreground-pairing target adds a Computers screen, before RDP integration.
 Its discovery uses the desktop's `_kdeconnect._udp` Bonjour service, whose SRV value advertises the TCP port.
 The desktop implementation is [Avahi discovery](https://github.com/Sparky-OS/kdeconnect-kde/blob/master/core/backends/lan/avahidiscovery.cpp); the remaining identity exchange occurs after mutual TLS in protocol 8.
 Declare that specific service in `NSBonjourServices` and provide the ten-language `NSLocalNetworkUsageDescription`.
@@ -303,5 +303,61 @@ Stop connections and pending prompts when the screen closes or the app enters th
 The current tests use AF_UNIX socketpairs inside a container with no network; they cover mutual TLS, pin reuse/change, identity mismatch, downgrade refusal, confirmation ordering, timeouts and malformed packets.
 They establish the portable code only.
 Native Bonjour, Keychain behavior and interoperability with a desktop remain device checks after the hosted compile.
-The UI explicitly says desktop reception is not available in this intermediate build; no plugin traffic or credentials are consumed yet.
-The next integration remains the paired RDP session lifecycle, then decode to Metal and the actual Android viewer mathematics.
+The pairing-only target did not consume plugin traffic or desktop credentials.
+The next integration adds the paired RDP lifecycle described below, followed by decode to Metal and the actual Android viewer mathematics.
+
+
+## Paired RDP session lifecycle
+
+**For receiver contributors:** preserve authorization from the paired identity through session creation, TLS and teardown.
+Checked against the pinned FreeRDP 3.28.0 source and the Android/desktop virtualmonitor implementations on 2026-11-20.
+
+[Run 44698940422](https://github.com/Sparky-OS/flat-headset/actions/runs/44698940422) compiled the foreground pairing target and static core successfully.
+The downloaded app has SHA-256 `1367bca24581b9daaf495037f61d07ce4234e0aeaa3d595f80d32d6caa5a79a1`.
+The core has SHA-256 `7f9823119cb6f00d8497fe907a147d08aea50a1581d3dc602f5c7e5a166d18e7`, 647 members, eight static libraries and no `.dylib` or `.so` provider.
+Every archive Mach-O object is arm64; the core probe and app are unsigned arm64 iOS executables with minimum 16.0 and SDK 26.5.
+The app links UIKit, Security, Metal/MetalKit and system Foundation/C/C++ libraries; it does not yet link the FreeRDP session adapter in this checked run.
+These are downloaded-artifact and compile checks, not phone behavior.
+
+1. Save the verified pairing pin before enabling Catch or accepting session replies.
+   Bind the controller to the peer ID, its certificate pin, the local certificate fingerprint and `getpeername`'s numeric address from the authenticated socket.
+2. Advertise both virtualmonitor packet types in the encrypted identity.
+   Exchange capabilities only after pairing, require protocol 2 and native-panel version 1, and send a fresh session ID with the physical panel descriptor.
+   The descriptor's identity is the local certificate SHA-256, which the desktop compares with its paired phone certificate before asking for session permission.
+3. Accept credentials only in a matching `connect` reply with the same panel, NLA security and SHA-256 certificate fingerprint.
+   Ignore stale/replayed session IDs; refuse malformed fields, mismatched addresses and security downgrades.
+   Receive the RDP address from the authenticated control socket rather than accepting a remote `host` field.
+4. Create the context through `freerdp_client_context_new`, which registers static channel addins.
+   Keep `rdpClientContext` first in the extended context so the common graphics channel handlers see the expected layout.
+   Set `ExternalCertificateManagement`, install `VerifyX509Certificate`, and return 2 only for the exact session fingerprint, host and port; return 0 otherwise.
+   Refuse gateway/redirect verification, set the Redirect callback to reject, and disable auto-reconnect and weaker security protocols.
+5. Load the declared channels in PreConnect, initialize GDI in PostConnect, and publish connected only after `freerdp_connect` succeeds.
+   Check the negotiated native dimensions, service event handles, then disconnect, unsubscribe channels, free GDI and free the context after the worker ends.
+   Stop or unpair revokes the grant; a new Catch creates a fresh grant and context.
+6. Test the control parser and the certificate callback on Linux with the pinned static libraries before the native compile.
+   The host build adds `paired-session` to the lifecycle, pairing and NTLM tests.
+   Then push through the reviewed workflow and check the unsigned app's new dependency closure; the session adapter's native compile remains pending at this revision.
+
+The session adapter currently initializes a BGRA GDI surface; decode-to-Metal presentation and viewer mathematics follow it.
+No received desktop, VideoToolbox runtime, optical result or real-phone lifecycle has been established.
+Native status messages cover refusal, invalid replies, certificate mismatch, timeout, stop and reconnect in all ten catalogs.
+Remote error text is not a translated status and is not passed directly to the screen.
+
+- **Symptom:** a reply received after timeout can still create an RDP grant.
+  **Cause:** clearing the deadline alone leaves the matching session ID eligible for a later `connect` reply.
+  **Fix:** accept a first grant only while waiting for permission/start/connect information, and invalidate every outstanding grant on timeout or revoke.
+  **How found:** the negative `paired-session` test failed on the late reply, then passed after the state restriction; a fresh request receives a new nonce.
+- **Symptom:** certificate pinning code can be skipped for an otherwise trusted RDP certificate.
+  **Cause:** the pinned FreeRDP TLS implementation's normal CA path can return before the interactive certificate callbacks.
+  **Fix:** use `ExternalCertificateManagement` with `VerifyX509Certificate`, including host/port and session-revocation checks, instead of relying only on `VerifyCertificateEx`.
+  **How found:** reading `libfreerdp/crypto/tls.c` at the pinned revision and exercising the adapter's actual verification entry point with matching, changed, redirected and revoked fixture certificates.
+  This callback test does not establish a live TLS/NLA exchange.
+- **Symptom:** a retry is canceled immediately by the previous session's failure state.
+  **Cause:** the control loop keeps polling a stopped adapter after sending Stop.
+  **Fix:** move the old adapter out of the active slot, abort it and join its worker before accepting a new session grant.
+  **How found:** review of the native control loop before hosted compilation; foreground runtime behavior still needs the device check.
+
+The app now names all eight installed static archives explicitly and includes the FreeRDP and FFmpeg licenses alongside the existing licenses.
+The framework list comes from the checked core probe's load commands: Foundation, CoreFoundation, VideoToolbox, CoreMedia and CoreVideo, plus the app's UIKit, Security and Metal frameworks.
+Do not blindly copy the installed `.pc` private requirements: this pinned FreeRDP package still lists unbuilt libavfilter/libavformat and WinPR's platform-independent `-lrt` despite this successful iOS closure.
+The next hosted app link is the separate installed-library consumer check.

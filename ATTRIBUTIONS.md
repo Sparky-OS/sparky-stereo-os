@@ -1411,3 +1411,5 @@ The subsequent depth provenance audit also read camera-profile work by **Greg Fo
 The KRdp packaging foundation credits the **Debian Qt/KDE Maintainers**, **Aurélien COUDERC** and **Patrick Franz**. The package recipe preserves their upstream packaging while carrying only the edition's targeted dependency changes.
 
 - **Paired phone reference-space events:** Jakob Bornecrantz and Collabora for the XRT event-sink and space-overseer pattern read here; the Khronos Group for the OpenXR reference-space time and origin contract. Daniel Campos Ramos for the paired provider integration and its controls. Names only.
+
+The capture-completion audit reads the common desktop capture worker by **David**, merged through DisplayXR PR 2259, and adjacent desktop-control history by **byungjul**. The carried ordering correction and its regression case are by **Daniel Campos Ramos**, with **Codex (OpenAI)** assistance.

@@ -1,6 +1,7 @@
 # system-housekeeping: lessons from the lanes of 25 October to 6 November 2026
 
 A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
+The kernel control supports this core-limit correction; the systemd startup variant with `DefaultLimitCORE=1:1` has not been rerun.
 
 Harvested by ORDER 429 from the accepted lane reports; each line names the lane it came from.
 A trap gives its symptom, its cause, its fix and how the cause was found; a recipe gives the commands and the result to expect.

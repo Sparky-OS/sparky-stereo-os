@@ -1,6 +1,7 @@
 # A package of another archive that ships our files under another name
 
 A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
+The kernel control supports this core-limit correction; the systemd startup variant with `DefaultLimitCORE=1:1` has not been rerun.
 
 ORDER 458 (2026-11-09). Blocking an archive's builds by NAME does not stop a package of another name from shipping the same files.
 deb-multimedia ships MLT 7 as `libmlt7-data`, `libmlt-7-7`, `melt7` and others; our MLT is `libmlt-data`, `libmlt7`, `melt`.

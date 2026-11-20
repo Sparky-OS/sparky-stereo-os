@@ -19,6 +19,7 @@ Core skills are `sparky-stereo`, `working-practices`, `ai-partners`, `making-ski
 | Video decoding, editing, export or streaming | [stereo-video](stereo-video/SKILL.md) |
 | Serving or casting to a television, player or phone over the network | [stereo-serving](stereo-serving/SKILL.md) |
 | Photos, format marks or thumbnails | [stereo-pictures](stereo-pictures/SKILL.md) |
+| A screenshot of a 3D screen; a wide PNG with both eyes and no mark | [stereo-pictures](stereo-pictures/SKILL.md#a-screenshot-of-a-3d-screen) |
 | A 3D model, point cloud or splat: its thumbnail, F3D, CloudCompare, a viewer | [3d-models](3d-models/SKILL.md) |
 | Colour precision or HDR metadata | [deep-colour](deep-colour/SKILL.md) |
 | Artwork, animated pairs or theme assets | [stereo-artwork](stereo-artwork/SKILL.md) |

@@ -437,7 +437,8 @@ An early failure can happen before the desktop view's first draw: its layout pat
 The Linux analogue uses the real core permission API to inject each failure reason, tests both actions, verifies that no pending frame survives the wait, and decodes an authored H.264 left-red/right-blue pair after approval.
 It tests cancellation and new sessions separately; a new session must answer the software query with false.
 These tests do not simulate Apple's VideoToolbox device creation or execute UIKit.
-The updated callback/header integration and native buttons await the next hosted compile, then the later device check.
+Run [44779150423](https://github.com/Sparky-OS/flat-headset/actions/runs/44779150423) compiled and uploaded the updated core for 576dd93.
+The application compile then stopped at an invalid Objective-C instance-variable initializer; the corrected native buttons still await the next hosted compile and later device check.
 
 - **Symptom:** the software decoder's eye-color assertion fails although decoding completes.
   **Cause:** the first generated fixture used FFmpeg's limited-range BT.601 color source directly, but the RDP conversion uses full-range BT.709.
@@ -448,3 +449,13 @@ The updated callback/header integration and native buttons await the next hosted
   **Cause:** replacing an automatic fallback with an unconditional error removed both the silent switch and the explicit alternative.
   **Fix:** pause presentation, explain the hardware failure and wait for the person's session-scoped choice; cancel that wait on teardown.
   **How found:** review of the original strict patch against the explicit-choice rule, followed by both-decision tests through the actual permission callback API.
+
+- **Symptom:** Clang stops at `Desktop.mm:18:34` with `expected ';' at end of declaration list`.
+  **Cause:** `_presentationEpoch=0` used a C++ member initializer inside an Objective-C instance-variable block.
+  The C++ `shared_ptr` and clock members are valid there; the scalar initializer syntax is not.
+  **Fix:** declare `_presentationEpoch;`; Objective-C allocation already zeroes scalar instance variables.
+  Assign any nonzero initial value inside the initializer method.
+  **How found:** the complete failing native build step identifies this sole error; Linux Clang reproduces it with authored test doubles and parses both corrected controller files.
+  Run `bash ios/Tools/check_objc_syntax.sh` locally to check `Desktop.mm`, `Desktop.h` and `Computers.mm` with C++17, ARC, blocks and warnings as errors.
+  Its minimal declarations come from our call sites, not Apple's files; they check syntax and local type consistency, not real SDK signatures, ABI, availability, linking, shader compilation or runtime behavior.
+  Keep those test includes out of every product build and keep the hosted Xcode compile as the SDK check.

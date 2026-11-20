@@ -1,153 +1,123 @@
-# Completing the iPhone build after the SDK prerequisite
+# Building Flat Headset for iPhone from Linux
 
-**For the build contributor: an untested SDK-dependent continuation of the SDK-free compiler probes.**
-Checked against FreeRDP 3.28.0 sources and Apple's compatibility table on 2026-11-20.
-These commands have not run with Apple's files and are not a finished three-app build system.
-They contain no SDK download, account login or device operation.
+**For the contributor: write and test portable code on Linux, compile the native application on a standard hosted macOS runner, then sign and install from Linux.**
+Check freshness first: source workflows and local gates checked 2026-11-20.
+The first native proof target and workflow are implemented; a hosted build and phone launch are not yet established by the local checks.
 
-## Select and locate the SDK
+## Working recipe
 
-The native investigation selects **Xcode 26.0.1, iPhoneOS 26.0 SDK, arm64, minimum deployment target 16.0**.
-The SDK version need not equal the installed iOS version.
-[Apple's compatibility table](https://developer.apple.com/xcode/system-requirements/) lists iOS 15–26 deployment targets and iOS 15+ device support for Xcode 26.0.1, with Swift 6.2; this includes iOS 16.
-FreeRDP 3.28.0's revived iOS client asks for Xcode 26 or later, so an old Xcode 14/iOS 16 SDK is not the selected baseline.
-The selection is a compatible candidate, not a measured minimum SDK for every reused source file.
+1. Work in the receiver's repository on Linux; leave Android sources unchanged when adding its `ios/` target.
+2. Run the portable generator's C++ tests, the ten-language native catalog check, the tooling negative controls and actionlint on the new workflow.
+   UIKit and Metal compilation belong to the hosted Mac; missing UIKit on Linux is a recorded boundary, not a passing native compilation.
+3. Have the authorized publisher push the reviewed branch to our public repository.
+   The first workflow step prints `xcodebuild -version`, `xcodebuild -showsdks` and the hosted image name/version, then checks that the installed iPhoneOS SDK meets the deployment-target version floor.
+   Use the image's default Xcode as it stands, with no SDK download to the Linux station.
+4. Compile the native arm64 app with the literal command below, `CODE_SIGNING_ALLOWED=NO` and no development team.
+   A workflow must not contain credentials, certificates, provisioning profiles or an Apple account.
+5. Package the built application under `Payload/FlatHeadset.app` as `FlatHeadset-unsigned.ipa` and keep its SHA-256 and receiver manifest entry in the same artifact.
+   This is a development build artifact, not an installable signed application or a store submission.
+6. Read the run for the exact pushed commit; a local lint pass, an absent run or a run for another SHA is not a hosted build result.
+   Fix a failing run before starting the next program; three failures at the same step with no cause found are a stop to report.
+7. Once the three programs exist, combine their reviewed artifact entries into a private manifest with the intended phone's UDID and use the [Linux renewal helper](../scripts/iphone-renew.py).
+   Account authentication and phone prompts remain the person's steps; signing needs no SDK on Linux.
 
-After the person's licence decision, they obtain Xcode 26.0.1 themselves from [Apple's downloads](https://developer.apple.com/download/all/?q=Xcode%2026.0.1).
-The Universal archive is the relevant host variant for Intel Macs, although this recipe uses the SDK as target files and does not run the bundled macOS executables on Linux.
-Archive byte size and extracted SDK byte size were **not verified** from Apple's unauthenticated pages; record the authenticated listing's size and `stat`/`du` results before selecting extraction space.
-Do not substitute a remembered size for a measurement.
-The SDK is under:
+[GitHub's billing documentation](https://docs.github.com/en/actions/concepts/billing-and-usage) says standard hosted runners are free for public repositories.
+This does not make arbitrary larger/private runners free, nor justify unbounded artifact retention.
+The proof workflow selects the standard `macos-15` image, retains artifacts for seven days, has a twenty-minute timeout and builds with four jobs.
+The app's deployment minimum is iOS 16.0; the installed SDK version is printed instead of assuming it matches the deployed OS version.
+Reading [Apple's SDK agreement](https://www.apple.com/legal/sla/docs/xcode.pdf) is not legal advice; Daniel decides the applicable licence questions.
+The selected compile runs on hosted Apple machines running macOS, rather than moving Apple's SDK onto the Linux workstation.
+The prior Linux cross-compiler probes remain useful evidence in [the iPhone reference](iphone-arm.md); they are not the selected SDK build route.
 
-```text
-Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk
-Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1
-```
+## The first receiver target
 
-The first path may be a symlink to a versioned `iPhoneOS26.0.sdk`.
-Resolve it inside the external SDK store; keep the C++ headers, target Swift resources and framework module maps with their provenance when needed.
-Extracting a modern `.xip` on Linux needs an extractor that handles its pbzx payload; xtool's SDK builder contains that extraction logic, but it also builds and transforms a Swift SDK.
-Do not equate successful `xtool --help` with a tested SDK extraction.
-Current xtool documentation asks for Swift 6.4 and Xcode 27.1; pairing that flow with Xcode 26.0.1/Swift 6.2 remains untested.
-Use xtool's measured signing CLI independently; validate the Swift build toolchain separately before promising the complete KDE Connect iOS build.
+The app is named **Flat Headset** on iPhone, exactly as on Android.
+Its Xcode project is `ios/FlatHeadset.xcodeproj`, shared scheme `FlatHeadset`, bundle ID `org.sparkyos.flatheadset`.
+The smallest proof displays a generated full-panel left/right image in landscape with Metal, using `UIScreen.nativeBounds` for physical pixels.
+A portable C++ generator supplies the grid, complete eye borders, pixel-circular geometry and L/R marks.
+The fragment shader reads the corresponding texel without texture rescaling; this is not lens calibration.
+Xcode compiles the `.metal` source into the application's default Metal library.
+The native Objective-C++ shell owns the window, drawable, texture and command submission, and shows localized failure text.
+There is no desktop reception, pairing, lens profile or tracking in this first generated-picture proof.
+The eventual receiver still requires KDE Connect pairing, FreeRDP/KRdp and the Android viewer mathematics.
 
-## Native dependency continuation, not yet run
-
-Run in an isolated Linux build container, at most four build threads, with source inputs read-only and the external SDK mounted read-only.
-All source downloads happen separately; these commands do not fetch dependencies automatically.
-FreeRDP 3.28.0 pins OpenSSL 4.0.1 and FFmpeg n8.1 in `cmake/DepVersions.cmake`; use those revisions and its source hashes for the completion build.
-The first SDK-free dependency probe used OpenSSL 3.6.0; a follow-up used the upstream-pinned OpenSSL 4.0.1 and FFmpeg n8.1.
-Use the recorded zlib revision, and do not call a build against different dependency revisions the same tested configuration.
-Set these absolute paths to existing inputs and a separate writable build directory:
-
-```sh
-export IOS_SDK=/path/to/external/SDKs/iPhoneOS26.0.sdk
-export IOS_CXX_HEADERS=/path/to/external/XcodeDefault.xctoolchain/usr/include/c++/v1
-export OPENSSL_SRC=/path/to/openssl
-export ZLIB_SRC=/path/to/zlib
-export FFMPEG_SRC=/path/to/ffmpeg
-export FREERDP_SRC=/path/to/freerdp
-export IOS_WORK=/path/to/ios-build
-```
-
-First establish the sysroot, compiler and linker rather than using host include directories:
+The workflow's build command is:
 
 ```sh
-set -eu
-test -f "$IOS_SDK/usr/include/TargetConditionals.h"
-test -f "$IOS_CXX_HEADERS/vector"
-mkdir -p "$IOS_WORK/bin" "$IOS_WORK/deps" "$IOS_WORK/openssl" "$IOS_WORK/zlib" "$IOS_WORK/ffmpeg"
-export IOS_DEPS="$IOS_WORK/deps"
-cat > "$IOS_WORK/bin/ios-clang" <<'SH'
-#!/bin/sh
-exec clang --target=arm64-apple-ios16.0 -isysroot "$IOS_SDK" -fuse-ld=lld "$@"
-SH
-cat > "$IOS_WORK/bin/ios-clang++" <<'SH'
-#!/bin/sh
-exec clang++ --target=arm64-apple-ios16.0 -isysroot "$IOS_SDK" -nostdinc++ -isystem "$IOS_CXX_HEADERS" -fuse-ld=lld "$@"
-SH
-chmod +x "$IOS_WORK/bin/ios-clang" "$IOS_WORK/bin/ios-clang++"
-export CC="$IOS_WORK/bin/ios-clang"
-export CXX="$IOS_WORK/bin/ios-clang++"
-export AR=llvm-ar RANLIB=llvm-ranlib NM=llvm-nm
-export CROSS_TOP="$(dirname "$(dirname "$IOS_SDK")")"
-export CROSS_SDK="$(basename "$IOS_SDK")"
-cd "$IOS_WORK/openssl"
-"$OPENSSL_SRC/Configure" ios64-cross no-shared no-tests no-asm --prefix="$IOS_DEPS"
-make -j4 build_libs
-make -j4 install_dev
-cd "$IOS_WORK/zlib"
-"$ZLIB_SRC/configure" --static --prefix="$IOS_DEPS"
-make -j4 libz.a
-make -j4 install
+xcodebuild -project ios/FlatHeadset.xcodeproj -scheme FlatHeadset \
+  -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
+  -derivedDataPath "$RUNNER_TEMP/flat-headset-build" -jobs 4 \
+  IPHONEOS_DEPLOYMENT_TARGET=16.0 \
+  CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' \
+  DEVELOPMENT_TEAM='' build
 ```
 
-FFmpeg supplies the upstream FreeRDP VideoToolbox path; a direct zero-copy adapter is additional receiver work, not provided by these switches:
+After checking the executable's arm64 architecture and absence of signing/provisioning data, copy the app into a temporary `Payload` directory and package it with `ditto -c -k --keepParent`.
+Do not use `xcodebuild -exportArchive` as an unsigned packaging shortcut; its distribution/export flow adds provisioning concerns this step deliberately does not need.
+The artifact is named `FlatHeadset-unsigned-COMMIT` and contains the IPA, `SHA256SUMS` and `flat-headset-artifact.json`.
+The JSON's `apps` array contains one `flat-headset` entry with `path`, `sha256` and `bundle_id`, plus the build commit outside that array.
+It is not yet the three-app renewal manifest and deliberately has no phone identifier.
+Keep the fixed bundle IDs across renewal, and verify the SHA-256 after download before combining the three entries privately.
+
+## Upstream project reconciliation
+
+Read the actual revision before copying a CI command; a runner called macOS can still be building Android.
+
+| Program | iPhone source baseline and project | Actual upstream command or absence |
+| --- | --- | --- |
+| Our KDE Connect | KDE Connect iOS a3036396; `KDE Connect.xcodeproj`; embedded Swift package dependencies, not a root application Swift package | `.gitlab-ci.yml` builds the iPhone simulator with the exact command below. It does not establish an arm64 device IPA. |
+| Our Cardboard profile program | Cardboard 8bd424da; `sdk/sdk.xcodeproj`, `hellocardboard-ios/HelloCardboard.xcodeproj`, root workspace and Podfile | `.github/workflows/Android-CI.yml` uses macOS but runs `./gradlew :sdk:assemble`, `./gradlew :hellocardboard-android:assembleDebug`, `./gradlew check`. No upstream iOS `xcodebuild`/`swift build` CI command was found. Google's iOS quickstart says `pod install`, open the workspace and Run. |
+| Flat Headset's eventual RDP core | FreeRDP 3.28.0, 5370fb26; CMake generates the iOS Xcode project | `macos.yml` runs `./scripts/bundle-mac-os.sh` for the desktop build. `docs/README.ios` separately documents CMake's Xcode generator and `cmake --build`; no dedicated iOS CI line was found. The minimal Metal proof does not yet link this core. |
+
+KDE Connect's exact simulator build line, with its upstream plugin-validation choice retained as evidence:
 
 ```sh
-cd "$IOS_WORK/ffmpeg"
-"$FFMPEG_SRC/configure" --prefix="$IOS_DEPS" --enable-cross-compile --target-os=darwin --arch=arm64 \
-  --cc="$CC" --cxx="$CXX" --ar=llvm-ar --ranlib=llvm-ranlib --nm=llvm-nm --sysroot="$IOS_SDK" \
-  --enable-static --disable-shared --enable-pic --disable-gpl --disable-autodetect \
-  --disable-programs --disable-doc --disable-debug --disable-network --disable-everything \
-  --disable-avdevice --disable-avformat --disable-avfilter --enable-swscale --enable-swresample \
-  --enable-avcodec --enable-avutil --enable-decoder=h264 --enable-parser=h264 \
-  --enable-decoder=hevc --enable-parser=hevc --enable-videotoolbox \
-  --enable-hwaccel=h264_videotoolbox --enable-hwaccel=hevc_videotoolbox
-make -j4
-make -j4 install
+xcodebuild build -project 'KDE Connect.xcodeproj' -scheme 'KDE Connect' \
+  -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' \
+  -skipPackagePluginValidation CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
 ```
 
-Configure the portable core without the upstream Xcode UI target:
+[FreeRDP's iOS instructions](https://github.com/FreeRDP/FreeRDP/blob/5370fb26fbf034ecd11d3026b6ad639b5fff493f/docs/README.ios) request Xcode 26+, CMake, OpenSSL and FFmpeg.
+They generate with `cmake -S client/iOS -B build/ios.client.build -DCMAKE_TOOLCHAIN_FILE="$PWD/cmake/ios.toolchain.cmake" -DPLATFORM=OS64 -DDEPLOYMENT_TARGET=15.0 -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=XXXXXXXXXX -G Xcode`, then `cmake --build build/ios.client.build`.
+That team-bearing example is an upstream quotation, not our unsigned workflow.
+The later core workflow must remove the team, disable signing, bound build parallelism, print the actual SDK and apply the iOS 16 deployment target.
+Its dependency pins are OpenSSL 4.0.1 and FFmpeg n8.1; the initial SDK-free OpenSSL 3.6.0 probe was not that dependency configuration.
+Do not start that feature step until the generated-picture app's hosted workflow is green.
+Next come the paired RDP receiver, our KDE Connect with virtualmonitor, then the Cardboard profile program, each with its own green workflow before the next.
+Tracking belongs later to **iStereoVR** and **StereoDroidVR**, outside Flat Headset.
 
-```sh
-cat > "$IOS_WORK/ios.cmake" <<'CMAKE'
-set(CMAKE_SYSTEM_NAME iOS)
-set(CMAKE_SYSTEM_PROCESSOR arm64)
-set(CMAKE_OSX_ARCHITECTURES arm64)
-set(CMAKE_OSX_DEPLOYMENT_TARGET 16.0 CACHE STRING "")
-set(CMAKE_OSX_SYSROOT "$ENV{IOS_SDK}" CACHE PATH "")
-set(CMAKE_C_COMPILER "$ENV{IOS_WORK}/bin/ios-clang")
-set(CMAKE_CXX_COMPILER "$ENV{IOS_WORK}/bin/ios-clang++")
-set(CMAKE_AR llvm-ar)
-set(CMAKE_RANLIB llvm-ranlib)
-set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
-set(CMAKE_FIND_ROOT_PATH "$ENV{IOS_SDK}" "$ENV{IOS_DEPS}")
-set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
-set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
-CMAKE
-export PKG_CONFIG_LIBDIR="$IOS_DEPS/lib/pkgconfig"
-export PKG_CONFIG_PATH=
-cmake -S "$FREERDP_SRC" -B "$IOS_WORK/freerdp" -G Ninja \
-  -DCMAKE_TOOLCHAIN_FILE="$IOS_WORK/ios.cmake" -DIOS=ON \
-  -DCMAKE_INSTALL_PREFIX="$IOS_DEPS" -DCMAKE_PREFIX_PATH="$IOS_DEPS" \
-  -DOPENSSL_ROOT_DIR="$IOS_DEPS" -DOPENSSL_USE_STATIC_LIBS=ON \
-  -DBUILD_SHARED_LIBS=OFF -DWITH_CLIENT=OFF -DWITH_CLIENT_COMMON=ON \
-  -DWITH_CLIENT_SDL=OFF -DWITH_SERVER=OFF -DWITH_SAMPLE=OFF \
-  -DWITH_MANPAGES=OFF -DWITH_SYSTEMD=OFF -DWITH_X11=OFF -DWITH_WAYLAND=OFF \
-  -DWITH_CUPS=OFF -DWITH_PCSC=OFF -DWITH_KRB5=OFF -DWITH_OPENSSL=ON \
-  -DWITH_INTERNAL_RC4=ON -DWITH_INTERNAL_MD4=ON -DWITH_INTERNAL_MD5=ON \
-  -DWITH_FFMPEG=ON -DWITH_VIDEO_FFMPEG=ON -DWITH_DSP_FFMPEG=ON \
-  -DWITH_SWSCALE=ON -DWITH_VIDEOTOOLBOX=ON -DWITH_OPENH264=OFF
-cmake --build "$IOS_WORK/freerdp" --parallel 4
-cmake --install "$IOS_WORK/freerdp"
-```
+## Ten native languages
 
-Inspect generated compile commands for host header/library leakage, unused CMake options and missing optional dependency errors.
-Do not disable TLS or certificate verification to obtain a successful build.
-Use `llvm-ar t` and `llvm-objdump --macho --private-headers` on extracted archive members to establish arm64 target identity.
-Link a small UIKit application before treating static archives as usable; this will expose missing Apple frameworks, `.tbd` support or target compiler-rt builtins.
-The latter must be an iOS runtime built or supplied for that target, never Linux's runtime archive.
-No claim is made yet that the full app links.
+Every added native string ships in en, pl, pt-BR, fr, de, es, ja, ko, zh-Hans and zh-Hant.
+The latter three spelling differences map the edition's pt_BR, zh_CN and zh_TW catalogs to iOS resource names.
+The app display/name keys remain Flat Headset in all ten; failure messages are translated.
+Check missing, extra, duplicate and empty keys, plus keys used by native code.
+A negative control that removes one Spanish key must fail the same checker, not a parallel imitation of it.
+Coverage proves presence, not a native speaker's acceptance or on-phone fallback behaviour.
 
-## Application targets still to implement
+## Traps
 
-Create three native targets with stable bundle IDs, minimum iOS 16.0 and no unnecessary app extensions: the KDE Connect port, the Cardboard profile program and Flat Headset.
-Retain licences: FreeRDP Apache-2.0 core, MPL-2.0 for any reused iOS client files, Cardboard Apache-2.0 and KDE Connect GPLv3 with its existing exception text.
-Build native screens programmatically; put launch metadata and icons into each app bundle without silently assuming `xcodebuild`, `ibtool` or `actool` exists on Linux.
-The complete KDE Connect UI is Swift/Objective-C and still needs a validated compatible Swift cross-toolchain; replacing it with a stub is not a completed port.
-Use the original profile protobuf and C++ mesh logic, Cardboard's Metal renderer, and iOS-specific platform adapters; QR scanning must use a native camera implementation.
-Package each app as `Payload/Name.app` in its IPA, then produce the three-file SHA-256 manifest consumed by the renewal helper.
-Provisioning must establish the permitted entitlements for that account; unsigned or ad-hoc Mach-O output does not authorize installation on a stock phone.
+1. **Symptom:** local tool probes stop at `UIKit/UIKit.h` or an Apple SDK prerequisite and the whole iPhone route appears blocked.
+   **Cause:** the compile was assumed to happen on the Linux workstation.
+   **Fix:** keep Linux editing and portable tests, compile the native target on the selected standard hosted Mac, sign on Linux later.
+   **How found:** the SDK-free compiler boundary followed by the hosted-build continuation; hosted execution still requires the first pushed run.
+2. **Symptom:** a green upstream macOS job is treated as proof of an iPhone app.
+   **Cause:** Cardboard's job builds Android and FreeRDP's job builds the desktop client; KDE Connect targets a simulator.
+   **Fix:** record exact commands and build an explicit arm64 `iphoneos` target.
+   **How found:** reading the three pinned workflow files and FreeRDP's iOS instructions.
+3. **Symptom:** an IPA name exists but its bundle is signed, provisioned, misnamed or has the wrong bundle ID.
+   **Cause:** packaging alone says nothing about the application inside it.
+   **Fix:** validate compiled metadata, executable architecture, signature/profile absence and hash before keeping the artifact.
+   **How found:** synthetic package tests accept the expected metadata and reject a provisioning entry or unexpected bundle ID; the real IPA remains a hosted-run result.
+4. **Symptom:** a phone shows cropped borders or a noncircular grid despite a successful build.
+   **Cause:** point coordinates or the three-times backing store were used instead of physical drawable pixels, or the shader resampled the eyes.
+   **Fix:** size the drawable and source texture to native landscape pixels and read one source texel per destination pixel; verify borders and circle through the device separately.
+   **How found:** the earlier physical-panel correction and portable full-border/pixel-radius tests; Metal and phone verification remain pending.
+5. **Symptom:** a localization gate stays green when a language silently falls back to English.
+   **Cause:** comparing only existing directories does not require all ten catalogs.
+   **Fix:** enumerate the ten required iOS locale names and the complete key set, then remove one real translated key as a negative control.
+   **How found:** the native catalog checker and missing-Spanish-key test.
+6. **Symptom:** Clang rejects a width overflow guard as always false on a 64-bit host.
+   **Cause:** a uint32 width was compared against a size_t maximum divided by four.
+   **Fix:** after rejecting zero width, compare the size_t maximum divided by width with four; retain capacity/stride guards and compile with warnings as errors.
+   **How found:** Clang 21.1.8's `-Wtautological-constant-out-of-range-compare`; the corrected generator and tests pass without suppressing the warning.

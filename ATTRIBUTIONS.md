@@ -1388,3 +1388,8 @@ OpenSSL: **The OpenSSL Project Authors**.
 zlib: **Jean-loup Gailly**, **Mark Adler**.
 zsign: **zhlynn**.
 CardboardXR: **brenpoly**.
+
+## iPhone workflow validation
+
+actionlint: **rhysd**.
+openstep-parser: **Ignacio Calderon**.

@@ -70,3 +70,42 @@ Automatic switching later selects the static or tracked program against the shar
 | An old ALVR proof is called the paired RDP route | Earlier plans used a different transport | Retain historical attribution and proof scope, and use the same-session RDP design for integration. Found by comparing the earlier report and current brief. |
 
 For established source-time, mounting, mailbox, status-drain and emulator traps, use [RDP sensors and emulator preflight](../../3d-to-vr/references/rdp-sensors-preflight.md). No new executable result is claimed by this reconciliation.
+
+## Paired orientation adapter implementation
+
+The tracked Android target now lives in PhoneVR's `code/mobile/android/StereoDroidVR`, with application identifier `viritualisres.phonevr` and versionCode 20001. It carries the paired KDE Connect/FreeRDP receiver foundation. The tracked entry always asks for a virtual output and the fixed half-SBS link; the static receiver's descriptor helper remains separate so its format and no-echo controls stay meaningful. The source is implemented, but the final APK and complete headset remain unqualified.
+
+KRdp's `PairedPanelSessionService` binds tracking to the actual paired peer, control lease, session and output. It does not take the sensor fixture's synthetic grant. Revoking the panel lease clears the shared active-grant state. `HeadsetPoseConsumer` sends validated orientation to a same-user local Unix socket; this is a PC-internal boundary, not another phone transport.
+
+The runtime creates `$XDG_RUNTIME_DIR/stereodroidvr/pose` as `AF_UNIX/SOCK_SEQPACKET`, in an owner-checked 0700 directory with a 0600 socket. Both ends check `SO_PEERCRED`. `STEREODROIDVR=1` selects this provider explicitly for the integration rig. It fails closed if the endpoint cannot be created; it does not silently use keyboard tracking. Automatic product/runtime selection is still open.
+
+The local ABI is 160 bytes, all integers little endian, with no native structure layout:
+
+| Byte offset | Field |
+| --- | --- |
+| 0, 4, 6 | `SDVR`, uint16 version 1, uint16 kind: register 0, pose 1, invalidate 2, end 3 |
+| 8, 24, 40, 56 | Four 16-byte identities: source, RDP session, control lease, output |
+| 72, 80, 88, 96 | uint64 PC BOOTTIME capture, original source capture, uncertainty, origin; time fields in ns |
+| 104 | Four IEEE-754 float64 values, quaternion xyzw, canonical -Z forward/+Y up |
+| 136, 140, 144 | uint32 source epoch, mounting, validity flags (bit 0 orientation valid) |
+| 148, 150 | uint16 reason, ten reserved zero bytes |
+
+The runtime accepts registration before pose, requires all four identities and preserves their equality. It bounds a poll to sixteen messages, rejects malformed size/version/reserved fields and nonfinite/nonunit quaternions, invalidates on stale or nonmonotonic capture times, and clears validity at 100 ms even without another message. Uncertainty over 50 ms is rejected. EOF, end and invalidation remove tracking validity. A fresh connection requires a fresh registration. It advertises only measured orientation, never tracked position or invented angular velocity. Origin is retained, but an OpenXR reference-space-change event on recenter is not yet implemented or qualified.
+
+An isolated prototype used actual KDE Connect pairing and consent, an Android framework-fused sensor, the RDP DVC, this local adapter and real `xrLocateViews`. Rotation changed the reported orientation and pausing the receiver cleared validity. This proves the prototype boundary, not a final installed-package pair, eye rendering, lens reprojection, xrizer, SteamVR, hands or audio. The final runtime package gate is blocked by the inherited viewer-pose-page stress assertion; do not call this a released headset.
+
+## Traps found while building the adapter
+
+| Symptom | Cause | Fix or remaining action; how found |
+| --- | --- | --- |
+| Paused source still reports a runtime available after its socket closes | Availability only tested whether the descriptor existed | Poll HUP/ERR/NVAL; the consumer red test fails before and passes after the change. |
+| Missing runtime becomes an Android epoch-mismatch message | Rejection before SELECT used the newly allocated nonzero epoch | Send epoch zero until SELECT and report TrackerUnavailable; the handshake red/green tests cover the actual state transition. |
+| Paired panel cannot create its virtual stream although the edition has the protocol | Apt picked newer stock plasma-wayland-protocols, then generated headers outlived the corrected XML | Build against the edition XML and regenerate the affected cached headers; reproduced in the isolated rig. A container dependency error is not absence from the edition. |
+| KDE Connect appears unpaired despite the expected name | Stock Debian packages were selected instead of the edition's paired-headset extension | Inspect installed versions and use the published edition packages; actual UI pairing plus PC acceptance then produced a reachable paired device. |
+| Loopback-only Android guest never discovers the PC | KDE Connect filters loopback broadcasts and the emulator NAT did not forward the discovery packet | A rig-only helper sends the installed library's public identity packet; adb reverse carries the guest's normal TLS connection. Pairing and consent still happen normally. Never ship this fixture as a connection route. |
+| Two static descriptor controls fail after adding the tracked target | A global change forced half-SBS even for static tests | Keep static `measure()` semantics and add a separate fixed-format `tracked()` entry. The final 94-test rerun remains owed after the interrupted APK rebuild. |
+| APK rebuild stops while projecting OpenSSL | Disk exhaustion interrupted the projection and left an in-progress marker | Discard the disposable projection and rebuild from authored sources on a disk with room; never reuse partial projection as authored input. The resumed lane did not claim this APK verified. |
+| Viewer-pose stress gate loses some samples in its accounting on all three retries | The writer can lap the reader before its first drain; that drain starts at the oldest retained sample, while the stress assertion counts from sample one | Report the inherited API/test disagreement. Do not change scheduling, exclude the test or modify an unrelated runtime contract to obtain green. The package remains blocked. |
+| Bubblewrap fails in Docker, then also fails inside a guest chroot | Docker namespace restrictions, followed by the kernel's chroot restriction on user namespaces | Use the authorized KVM guest with a private mount namespace and a real pivot_root, then run the unchanged gate. No extra host capability or passthrough device is needed. |
+
+The older clause table above records the accepted predecessor boundaries. The adapter and tracked target are new implementation work with prototype evidence, not accepted replacements for those records.

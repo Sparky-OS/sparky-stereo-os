@@ -31,6 +31,20 @@
 | Fluent and LNG | Compare actual Fluent keys and label attributes, including each maintained browser locale variant, inside the shipped archive. Match sView's numeric IDs against the pinned upstream base and skip commented-out entries. |
 | Markdown | Pin the revision and compare visible blocks and alternative text with the translated page. Record absent pages by their English blocks. Keep structural coverage separate from the reading of the translation. |
 
+## Reconcile program catalogues before writing strings
+
+Keep the published gap identities fixed while comparing recipe main and staged release reports. A report that gives a total or mentions a program does not establish that a particular locale and key are present. Confirm existing translations by compiling the applicable catalogue against the receiving source. Record these keys as ready to carry forward and keep their publication status open until a package contains them.
+
+| Program | Files and checks |
+|---|---|
+| Haruna and Dragon Player | Read the applied source and extract QML with `xgettext --language=JavaScript` and the program's Ki18n keyword signatures. Compile the PO with `msgfmt --check-format` and compare context and complete English key in the installed domain. |
+| sView | Compare `StImageViewer.lng` and `StMoviePlayer.lng` independently. Spanish source files live under `lang/spanish` and install under `lang/Español`. Preserve the source file's line endings and compare the numeric keys, `{0}` and literal `\n` escapes. Check the program's language loader against the installed resources. |
+| Bino | Compile the TS catalogue with Qt 6 `lrelease` and check the QM with `lconvert`. Use the `Gui` and `Mode` contexts where the input labels use them. Keep `zh_CN` and `zh_TW` separate. |
+| VLC Stereo | The flat source path is `po/LOCALE.po`. Check the gettext domain under `/usr/share/vlc-stereo/locale` and the localized desktop actions independently. The VLC policy says “AI help with writing or translation is fine.” Keep edition strings in the package recipe. [VideoLAN AI policy](https://code.videolan.org/videolan/vlc/-/blob/master/doc/VideoLAN_AI_Policy.md) |
+| Lutris | Meson builds the `lutris` gettext domain from `po/LOCALE.po` and `po/LINGUAS`. Preserve Python named `%()` placeholders and check the built lookup in a real locale. Lutris says contributors are “free to use any tool available to help you create your contributions” and expects validated work. Keep edition strings in the package recipe. [Contribution rules](https://github.com/lutris/lutris/blob/master/CONTRIBUTING.md) · [Translation workflow](https://github.com/lutris/lutris/blob/master/po/README.md) |
+
+Read the project's own current contribution and translation rules. KDE routes translations through its language teams. Its Spanish team prohibits using the output of online translation services or ChatGPT, and Krita's README bars AI use pending a decision. KDE forks carry the edition's strings in package recipes. If the checked upstream records give no AI rule, record the consulted records and keep edition changes in the recipe. [KDE Localization](https://l10n.kde.org/) · [KDE Spanish team](https://es.l10n.kde.org/responsabilidad.php) · [Krita README](https://github.com/KDE/krita#ai-moratorium)
+
 ## Fill and verify a gap
 
 1. Build a glossary from the extracted packages.
@@ -55,6 +69,14 @@
 
 ## Traps
 
+- **Symptom:** the audit reports an English key ending in the middle of a sentence, and also has an entry for the whole sentence.
+  **Cause:** a patch scanner stopped at the first operand of a JavaScript string concatenation in QML.
+  **Fix:** extract the complete key from the applied source with `xgettext --language=JavaScript` and verify that the installed MO has no fragment lookup.
+  **How found:** the compiled catalogues and extracted keys confirmed 117 Haruna and 36 Dragon Player fragment rows whose complete keys already had their own rows.
+- **Symptom:** a translation audit skips Spanish hunks in a patch that visibly contains them.
+  **Cause:** a hunk reader that trusts line counts across the entire file can keep reading the next target as part of a malformed or unfamiliar hunk.
+  **Fix:** scan each file diff independently, then apply the relevant hunk with fuzz disabled and check the compiled result. Run the structural validator on the actual delivery patch.
+  **How found:** separating the file sections exposed the existing Spanish Kalzium and Kubrick entries. Applying the Spanish hunks and compiling their PO files returned all seven values.
 - **Symptom:** invoking `lconvert` says the Qt 5 executable is absent although Qt 6 is installed.
   **Cause:** the unversioned program is resolved by a Qt selector that chose Qt 5.
   **Fix:** run `/usr/lib/qt6/bin/lconvert` for this catalogue.

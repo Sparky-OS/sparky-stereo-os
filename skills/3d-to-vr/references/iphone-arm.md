@@ -59,6 +59,14 @@ A fourth iStereo app cannot be promised alongside the first three under that lim
 Keep bundle IDs and the same signing identity stable across renewal to preserve application data; that preservation still requires a real install/refresh test.
 Paid membership has a [100-device limit per product family per membership year](https://developer.apple.com/help/account/devices/devices-overview/), and profile lifetimes must be read from the issued profile; this work uses the free seven-day route.
 
+## Panel pixels
+
+Do not advertise a browser backing-store size as the physical panel.
+[Apple lists the iPhone 8 Plus at 1920 × 1080 pixels and 401 ppi](https://support.apple.com/en-us/111950).
+The iOS receiver must measure its window scene screen with `nativeBounds`/`nativeScale`, orient the dimensions for landscape and set the Metal drawable accordingly; UIKit `bounds` is in points.
+The recorded 2208 × 1242 browser render size does not establish physical pixels or an RDP display mode.
+Verify the native drawable and source-to-eye mapping on the device before accepting the descriptor.
+
 ## What crosses from Android
 
 - Share the KDE Connect virtual-monitor packet schema and validation contract, not Kotlin or Android lifecycle code unchanged.

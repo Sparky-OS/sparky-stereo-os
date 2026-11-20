@@ -1,6 +1,7 @@
 # A D-Bus service that never takes its name
 
 A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
+The kernel control supports this core-limit correction; the systemd startup variant with `DefaultLimitCORE=1:1` has not been rerun.
 
 **For whoever meets a `Type=dbus` unit that times out at start:** tell a hang from a crash, take every thread's backtrace with symbols, name the thread that holds the lock, and prove the fix with a start loop.
 Written 2026-11-19 from ORDER 768: geoclue 2.8.2 on GLib 2.90.1, Debian testing.

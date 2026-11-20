@@ -55,6 +55,18 @@ Measured on GRASS 8.5.0-1+stereo3d1 (a 1132 px view on a 1920 output, the Octobe
 
 Every matched block inside the limits, vertical disparity 0, 0 pixels differ between the eyes outside the 3D area; with Enable 3D off the 3D view equals Debian's to the pixel (0 of 996,160).
 
+Measured on KiCad 10.0.6 with the edition patches (a reduced build of the `pcbnew` target laid over Debian's same version; a 1083 px view on a 1920 output, the pic_programmer demo board tilted by a drag), from the trace and the capture:
+
+| Limits, view, card | Separation | Nearest, farthest (trace) | Measured 1st to 99th percentile | Inside the limits | Half a pixel from the screen |
+|---|---|---|---|---|---|
+| 10/4, perspective, AMD | 0.03102816 | -4.000, +2.902 | -3.82 .. +2.81 | 99.93 % of 4,186 blocks | 12.7 % |
+| 20/8, perspective, AMD | 0.06205632 | -8.000, +5.804 | -7.43 .. +5.50 | 100 % of 4,161 | 7.0 % |
+| 10/4, orthographic (shear), AMD | 0.03629871 | -4.000, +3.857 | -3.83 .. +3.78 | 99.95 % of 4,095 | 12.0 % |
+| 10/4, perspective, RTX 3060 (zink) | 0.03101935 | -4.000, +2.893 | -3.81 .. +2.80 | 99.93 % | 12.9 % |
+
+The traced ratio of the two extremes equals the closed form to six digits (perspective -0.725525 against -0.725524, orthographic -0.964275 against -0.964270); the blocks outside the limits are false matches on the board's repeated pads.
+A per-block vertical test flags about 8 % of KiCad's blocks with a one to three row shift, symmetric in sign and all on the socket's and the connector's pin columns (vertically periodic): matching aliasing, not vertical disparity; the whole area's rows align best at offset 0 (mean difference 1.43 against 2.06 at one row), and the camera test against an independent projection gives 0.
+
 ## Traps, symptom first
 
 - **Symptom:** on a Wayland desktop GRASS stops when its 3D view opens: "Fatal Error: This program wasn't compiled with EGL support required under Wayland, either install EGL libraries and rebuild or run it under X11 backend by setting environment variable GDK_BACKEND=x11". Debian's own GRASS 8.5.0 does it too.
@@ -69,4 +81,7 @@ Every matched block inside the limits, vertical disparity 0, 0 pixels differ bet
 - **Symptom:** `msgfmt -c` fails on KiCad's own catalogues (and GRASS's pt_BR) before any change. **Cause:** upstream entries with mismatched format strings. **Fix:** count the errors before and after the patch, and check the added entries alone.
 - **Symptom:** a rig variable named `GRASS_DEBUG` makes `grass` print "GRASS_DEBUG environmental variable is set. It is meant to be an internal variable for debugging only this script" and GRASS's own debug lines never come. **Cause:** the launcher owns that name. **Fix:** name rig variables with a prefix of your own (`RIG_...`) and set GRASS's level with `DEBUG: 3` in its rc file.
 - **Symptom:** the build machine's root disk fills while Debian's KiCad package builds; `dh_install` stops with "No space left on device" after a full compile and `make install`. **Cause:** Debian's rules build KiCad's QA test programs too (`nocheck` does not stop that) and the whole build carries `-g` debug information: the build tree was 31.5 GB when `make install` began, and the install and the package copies come on top. **Fix:** start a KiCad package build only on a disk with about 40 GB free, watch it, and pause the container before the disk reaches its floor; for a proof of a code change alone, build the `pcbnew` target with `-DKICAD_BUILD_QA_TESTS=OFF` and no debug information (a few GB) and lay its files over the same version's package in the rig. **How found:** the disk guard reached 0 MB at the copy step (ORDER 50 step 3).
+- **Symptom:** KiCad's 3D viewer told nothing although the depth limits were not offered (identical eyes, no info bar). **Cause:** a board (re)load in the same frame reports its own warning, often an empty one, into the same `INFOBAR_REPORTER` (`BOARD_ADAPTER::InitSettings`), which keeps only the last message, so the sentence was replaced and the bar dismissed; the sentence was marked as told and never came back. **Fix:** say it after the render passes, and only when the frame has no warning of its own (otherwise on the next frame). **How found:** a libstereo-declare stand-in answering `-ENOTSUP` (preloaded into KiCad, mounted over the library for GRASS's ctypes), then reading who else reports into the bar.
+- **Symptom:** a KiCad row driven in German never tilts its board. **Cause:** the rig found the viewer window by its English title "3D Viewer"; in German it is "3D-Betrachter". **Fix:** search for every language's title (`xdotool search --name '3D Viewer|3D-Betrachter'`).
+- **Symptom:** a vertical-disparity test flags blocks of a picture with vertical stripes. **Cause:** a stripe matches every row alike, so the smallest cost picks a row at random. **Fix:** count a row shift only when it matches clearly better than row 0, and check the whole area's row offset as well.
 - **Symptom:** GRASS has no zh_TW catalogue. **Fix:** a new `grasswxpy_zh_TW.po` with only the added sentences: Python's `gettext.translation` chains every catalogue it finds, so zh_TW still falls back to GRASS's `zh` catalogue for the rest.

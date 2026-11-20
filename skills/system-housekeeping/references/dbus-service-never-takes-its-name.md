@@ -40,7 +40,7 @@ print ((pthread_mutex_t *) default_modules_lock.p)->__data.__owner
 ```
 
 `__owner` is the kernel thread id: match it with the `LWP` column of `info threads`; `__count` is how many times that thread holds it.
-A GOnce records no owner, but `print 'gthread.c'::g_once_init_list` lists every location being initialised right now; the owner is the thread whose stack is inside that function past its `g_once_init_enter()`.
+A GOnce records no owner, but `print 'gthread.c'::g_once_init_list` lists every location being initialised right now; the holder is the thread whose stack is inside that function past its `g_once_init_enter()`.
 The script used here is [`lockowner.gdb`](../scripts/dbus-service-hang/lockowner.gdb), run with `gdb -p PID -batch -nx -x lockowner.gdb`; [`catchhang.py`](../scripts/dbus-service-hang/catchhang.py) starts the unit until a start hangs and runs it on that process.
 
 ## The cause found here (GLib 2.89.2 to 2.90.1)
@@ -54,7 +54,7 @@ geoclue builds its sources in `on_bus_acquired()`, before it asks for its name.
 - Meanwhile the main thread reaches the static source's `check_monitor()` (src/gclue-static-source.c:431), calls `g_file_new_for_path()`, wins that GOnce and waits for `default_modules_lock`.
 
 Each waits for the other; the name is never requested; systemd's 90 s run out.
-Measured in the rig: the owner field of `default_modules_lock` named the pool thread whose stack is inside the resolver's construction, and `g_once_init_list` held exactly `vfs_default_singleton` and `proxy_resolver_default_singleton`.
+Measured in the rig: the `__owner` field of `default_modules_lock` named the pool thread whose stack is inside the resolver's construction, and `g_once_init_list` held exactly `vfs_default_singleton` and `proxy_resolver_default_singleton`.
 
 The fix is GLib's: Thomas Hebb's commit builds the enumerator on the calling thread and keeps only the resolution asynchronous (main afa628df, glib-2-90 4301b496; GLib issue 4078, geoclue issue 226).
 On 2026-11-19 it was on the glib-2-90 branch and in no tagged release; Debian's 2.90.1-2 did not carry it.

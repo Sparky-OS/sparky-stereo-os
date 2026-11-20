@@ -514,9 +514,12 @@ These are arithmetic, parsing and session-control proofs on Linux. They do not e
 ## KDE Connect as a separate unsigned application
 
 The KDE Connect iOS base is [a3036396](https://invent.kde.org/network/kdeconnect-ios/-/tree/a303639652c1cf486bd6fb61335970723c2085a7).
-The proposed `kdeconnect-iphone` job in Flat Headset's unsigned workflow checks out Sparky-OS/kdeconnect-ios at an exact commit and runs its `Sparky/build_unsigned.sh` and `Sparky/package_unsigned.sh` scripts.
+The `kdeconnect-iphone` job in Flat Headset's unsigned workflow checks out Sparky-OS/kdeconnect-ios at an exact commit and runs its `Sparky/build_unsigned.sh` and `Sparky/package_unsigned.sh` scripts.
 It emits a separate `KDEConnect-unsigned-COMMIT` artifact with the IPA, SHA256SUMS and the `kdeconnect` renewal-manifest role.
-This native job is pending its first hosted run; Linux checks do not establish SwiftUI, Security, Bonjour or Keychain behavior.
+The native job passed with KDE Connect `0e2b712987e3a347af3f8a8f5103b981935ed30c` in [the green hosted run](https://github.com/Sparky-OS/flat-headset/actions/runs/44795627406).
+The image reported macos26 20261117.0516.1, Xcode 26.6 and iPhoneOS 26.5.
+The downloaded IPA independently passed its SHA-256 check: one unsigned arm64 executable, iOS 16.0 minimum, the expected bundle identity, ten VirtualMonitor catalogs and no embedded framework, dylib or provisioning profile.
+This proves compilation and packaging; Security identity import, Bonjour and Keychain persistence still require the phone.
 
 Keep each app's paired identity independent until shared signing entitlements have been proved.
 KDE Connect's virtualmonitor plugin checks the paired computer's protocol-v2 capabilities, explains refusal or timeout in ten languages, and opens only `flatheadset://catch`.
@@ -562,4 +565,57 @@ Wait for all three unsigned applications before one device session for signing, 
 - **Symptom:** an unsigned build still executes a package build plugin despite `-skipPackagePluginValidation`.
   **Cause:** that flag suppresses validation, not execution; upstream's CI comment claims otherwise.
   **Fix:** the unsigned fork removes its SwiftLint target dependency and unused package references, keeping only the three linked source packages pinned by revision.
-  **How found:** inspection of the project dependency graph and upstream CI command, then parsing every project reference and checking the exact package lock on Linux; native resolution remains pending.
+  **How found:** inspection of the project dependency graph and upstream CI command, then parsing every project reference and checking the exact package lock on Linux; the hosted run also resolved and built the pinned packages successfully.
+
+
+## Cardboard camera profile application
+
+The separate `cardboard-iphone` job checks out Sparky-OS/cardboard at an exact commit and the matching Flat Headset workflow commit in sibling folders.
+Its base is Google's [Cardboard 8bd424da](https://github.com/googlevr/cardboard/tree/8bd424da7f1e399255a1b6e7c02be8e281ecc974).
+The native AVFoundation capture path is adapted from `sdk/qrcode/ios/qr_scan_view_controller.mm`; no Android source is changed.
+The new `profile-ios` target links the receiver's actual profile parser and Cardboard C++ sources, so both programs validate the same parameters.
+It adds no lens coefficient or output-format selector.
+The application carries GPL-3.0-or-later terms for the shared receiver code and preserves Google's Apache-2.0 notices and licence.
+
+The workflow calls `bash cardboard/profile-ios/Tools/build_unsigned.sh "$RUNNER_TEMP/cardboard-iphone"` and its packaging script.
+It retains `Cardboard-unsigned-COMMIT`, containing an unsigned IPA, SHA256SUMS and `cardboard-artifact.json` with both source commits and the `cardboard` renewal role.
+The build uses UIKit, AVFoundation, Foundation and QuartzCore from the hosted SDK only, iOS 16.0 minimum, arm64 and no signing team.
+This new target awaits its first hosted build; Linux syntax doubles do not qualify Apple's APIs.
+
+Full QR links are parsed offline.
+The exact upstream `g.co/cardboard` code denotes Cardboard v1; an invalid scan never silently selects v1.
+A shortened `goo.gl` or `g.co` link requires an explicit localized action before an ephemeral HTTPS HEAD request, with five redirects and 10/15-second request/resource limits.
+Other hosts, credentials, ports, query/fragment additions to shortened links and excessive input are refused.
+The final full profile is consumed locally without fetching its page or body.
+Cancellation/backgrounding stops capture and requests; generation and capture-output checks reject stale callbacks.
+Ten language catalogs cover all fifteen UI keys and three InfoPlist keys, including the camera usage sentence.
+
+The **Use in Flat Headset** action passes only validated lens parameters through `flatheadset://viewer?p=BASE64URL`.
+Flat Headset revalidates the bytes and screen geometry, then asks before saving the profile for its next connection.
+The person's current frame stream is not reconfigured by a URL.
+The receiver's full-link paste field stays available as the second way.
+No credential crosses app boundaries and this profile handoff authorizes no desktop session.
+
+Linux proof uses an isolated container without a network: the production policy tests permissions, bad profiles, consent, timeout/failure, redirect bounds, cancellation and stale callbacks.
+Actual v1 and I/O 2015 parameter bytes and per-eye mesh coordinates survive the handoff unchanged.
+An independent QR encoder/decoder checks both fixtures at four rotations and feeds the result into that same policy.
+It does not execute AVFoundation or demonstrate focus, camera permission UI, URL routing or physical lens alignment.
+Keep the five-file Objective-C++ syntax pass before every push; stand-ins remain test-only and ship in no app.
+The package fixtures reject signature commands, embedded dynamic code, wrong identities and missing catalogs/licences; Xcode plus a downloaded IPA audit still settle the native artifact.
+
+- **Symptom:** the upstream scanner has fixed English text, and denied camera access can lead into Settings without a clear choice.
+  **Cause:** its camera UI predates this three-program route and its ten-language catalog.
+  **Fix:** explicit permission state, a localized refusal and retry action, with no forced Settings jump or fallback viewer.
+  **How found:** upstream [issue 384](https://github.com/googlevr/cardboard/issues/384), [issue 527](https://github.com/googlevr/cardboard/issues/527) and the pinned camera source; tested policy branches on Linux, native UI awaits the phone.
+- **Symptom:** some QR parameters can freeze a consumer during lens construction.
+  **Cause:** unvalidated profile data reaches the distortion routine, as reported in upstream [issue 182](https://github.com/googlevr/cardboard/issues/182).
+  **Fix:** use the receiver's bounded parser and existing geometry validation at both ends; retain the real profile, never repair it by inventing coefficients.
+  **How found:** upstream report, source inspection and existing malformed-profile/mesh tests; this does not claim reproduction of every upstream fixture.
+- **Symptom:** an old camera or redirect callback changes a newer scan after cancellation.
+  **Cause:** asynchronous capture and URL requests can outlive the visible scan.
+  **Fix:** serialize camera start/stop, bind policy transitions to a generation, and reject callbacks from a different output/session.
+  **How found:** lifecycle review and stale-generation Linux tests; actual background capture cancellation remains a phone observation.
+
+Prepare all three packages using [the one-session page](iphone-session.md).
+The manifest joiner checks their common workflow commit, exact roles/IDs and IPA hashes before writing the private renewal input.
+It neither authenticates nor installs; the person types their account only at the later xtool authentication step.

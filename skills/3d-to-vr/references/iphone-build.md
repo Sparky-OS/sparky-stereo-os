@@ -336,7 +336,9 @@ These are downloaded-artifact and compile checks, not phone behavior.
    Stop or unpair revokes the grant; a new Catch creates a fresh grant and context.
 6. Test the control parser and the certificate callback on Linux with the pinned static libraries before the native compile.
    The host build adds `paired-session` to the lifecycle, pairing and NTLM tests.
-   Then push through the reviewed workflow and check the unsigned app's new dependency closure; the session adapter's native compile remains pending at this revision.
+   Then push through the reviewed workflow and check the unsigned app's new dependency closure; the session adapter's native compile was pending at this revision.
+   [Run 44702615908](https://github.com/Sparky-OS/flat-headset/actions/runs/44702615908) then passed both jobs for commit df8455e: the app links the session adapter and the eight static libraries, and the unsigned package (checked on Linux) carries FreeRDP, OpenSSL and the H.264 decoder inside one arm64 program that links only system frameworks, VideoToolbox among them.
+   No session has connected and nothing has run on a phone.
 
 The session adapter currently initializes a BGRA GDI surface; decode-to-Metal presentation and viewer mathematics follow it.
 No received desktop, VideoToolbox runtime, optical result or real-phone lifecycle has been established.

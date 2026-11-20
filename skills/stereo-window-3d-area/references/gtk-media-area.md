@@ -25,7 +25,7 @@ On X11 the same area is a child window declared with `stereo_declare_x11_child_p
 `stereo_gtk_unpack()` follows the Qt layer's rule (`storedView()`, `Picture::fromAnaglyph()`): side by side and quincunx give two half-width views, top and bottom and rows two half-height views, columns and checkerboard the view's own samples, the three anaglyph pairs two full-size colour reconstructions.
 A picture and its depth map in one frame (side by side, top and bottom, four rows with graphics, four quarters with the background) are drawn by libstereo-dibr inside `stereo_gtk_unpack()`, cut and drawn as the Qt layer's `unpackWithDepth()` and `Picture::fromDepth()` do: the depth map's gray (qGray) as nearness, 8 bits, the library's one default (`stereo_dibr_options_default()`), the picture as the left eye. Nothing reads or changes the person's depth limits (since 1.23.1).
 Frames in turn, both views in one block, multiview and a separate depth map need a second picture: `stereo_gtk_layout_needs_two_pictures(layout)` says so, `stereo_gtk_unpack(one picture)` fails with a translated sentence for the program to show, and `stereo_gtk_unpack_pair(first, second, layout, order, &left, &right, &error)` gives the eyes: two decoded pictures in turn (the first is the left eye unless the right comes first; sizes must match) or a picture and its depth map of any size. The Qt layer has the same rule for two pictures in turn, `Picture::fromViewsInTurn()`.
-Where the second picture comes from is the program's: a played clip pairs an even frame (frame number from `gtk_media_stream_get_timestamp()` and the source's frame rate) with the odd frame after it; a still needs the picture decoded after it (Stereo HandBrake's scan keeps it as preview number + `HB_PREVIEW_NEIGHBOUR`).
+Where the second picture comes from is the program's, and pairs are counted from the source's first frame (H.264 and H.265 frame packing type 5, Matroska StereoMode 13 and 14), never from the program's own position: a played clip needs the source frame number of its first frame (Stereo HandBrake encodes the clip from a time range on a frame boundary and adds the clip's own frame number from `gtk_media_stream_get_timestamp()` and the frame rate); a still needs the other picture of its pair, the one after it for an even frame and the one before it for an odd one (Stereo HandBrake's scan keeps it as preview number + `HB_PREVIEW_NEIGHBOUR` and marks which).
 
 ## Traps
 
@@ -39,3 +39,12 @@ Where the second picture comes from is the program's: a played clip pairs an eve
 - Symptom: the area's events never reach the program.
   Cause: an overlay child takes the pointer.
   Fix: `gtk_widget_set_can_target(area, FALSE)`.
+- Symptom: after the program turns its 3D area off and on again ("Enable 3D"), the area stays flat and the program's log says "Device or resource busy".
+  Cause: up to libstereo-gtk 1.23.1 each new area set libstereo-declare up again; the library keeps one state per thread for the application on its display and answers EBUSY.
+  Fix: libstereo-gtk 1.23.2 sets it up once per display.
+  Found by: the area's `stereo-error` message in the program's log, then `stereo_declare_wayland_init()`'s `if (state.display) return -EBUSY`.
+- Symptom: the program's 3D menu, whose button sits in an overlay that hides itself (a player's HUD), closes about 150 ms after it opens, and its item is never chosen.
+  Cause: the overlay's own hide timer unmapped the button while the popover was open (GTK's enter and leave for the overlay can be out of step after a popover was used).
+  Fix: keep the overlay shown while the menu's popover is visible (`notify::visible` on `gtk_menu_button_get_popover()`).
+  Found by: a `notify::visible` handler on the popover and the overlay's hide logged in a dev build.
+

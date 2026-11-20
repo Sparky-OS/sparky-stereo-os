@@ -1423,3 +1423,12 @@ These project credits come from the copyright notices in the checked Debian sour
 - Plasma Workspace credits Aaron Seigo, Alex Merry, Alexis Ménard, Antonio Larrosa and Arjen Hiemstra.
 - PowerDevil credits Aurélien Gâteau, Bohdan Onofriichuk, Dario Freddi and Felix Geyer.
 - Sparky Stereo Browser’s packaging credits BrowserWorks alongside Mozilla Foundation and contributors. The edition’s packaging credits Daniel Ramos.
+## Katemark, a Markdown preview for Kate (ORDER 51, 2026-11-20)
+
+Names come from the project's own records (README, THIRD-PARTY-NOTICES.md, packaging/copyright and the bundled files' banners of release 0.4.7, read on 2026-11-20).
+**Olivier Booklage** wrote Katemark, the Markdown preview plugin for Kate (GPL-3.0-or-later), as a fork of **uwuclxdy**'s Katdown; Katemark's README thanks **Matija Šuklje** (the Arch Linux package), **Olivier Belleux** (Wolfheri, the openSUSE package) and **Christophe Marin** (who added it to `KDE:Extra`).
+The edition builds it from the release tag's source and changes nothing in it; its Kate is Debian's package of KDE's editor.
+The plugin carries these libraries, each compiled in as upstream ships it: **markdown-it** and its plugins and **js-yaml** by **Vitaly Puzrin** (markdown-it with **Alex Kocharin**), **markdown-it-texmath** by **Stefan Goessner**, **KaTeX** by **Khan Academy** and its contributors (its fonts under the SIL Open Font License 1.1), **Mermaid** by **Knut Sveidqvist**, **highlight.js** by **Ivan Sagalaev** and **Josh Goebel** with its contributors, and **github-markdown-css** by **Sindre Sorhus**.
+Mermaid's bundle names what it holds in its own licence block: **DOMPurify** by **Cure53** and its contributors, **lodash** (OpenJS Foundation and contributors) with **Underscore.js** (**Jeremy Ashkenas**, DocumentCloud and Investigative Reporters & Editors), **cytoscape** with its embedded Promises/A+ thenable by **Ralf S. Engelschall**, a Bezier curve generator by **Gaetan Renaudeau** and a spring physics generator adapted from Framer.js by **Koen Bok**.
+The author's own AI rule (AI-assisted work welcome, the level of AI involvement ticked in the issue and pull request forms) was read before any contribution was prepared; nothing has been sent.
+

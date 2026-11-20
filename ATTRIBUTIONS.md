@@ -1438,6 +1438,9 @@ HandBrake's AUTHORS.markdown names Eric Petit, Laurent Aimar, Van Jacobson, John
 Damiano Galassi wrote the stereo metadata preservation commit; Daniel Ramos wrote the HandBrake x264 frame-packing commit, and Daniel Campos Ramos wrote the x265 frame-packing commit, as those commits record their authors.
 Christian Marillat maintains the deb-multimedia HandBrake packaging examined for this reconciliation.
 
+- **fdk-aac** (Fraunhofer FDK AAC Codec Library for Android, Copyright Fraunhofer-Gesellschaft zur Förderung der angewandten Forschung e.V., as its NOTICE says): the AAC-LC and HE-AAC encoder that deb-multimedia's HandBrake and the edition's FFmpeg built with the `pkg.ffmpeg-dmo.fdk` profile both load; packaged for deb-multimedia as fdk-aac-dmo by Christian Marillat (ORDER 742).
+- **Dragon Player's edition strings**: the "Display Settings…" wording of the stereo layer's GTK menu is the edition's Dragon translation, in nine languages (ORDER 742).
+
 ## ORDER 742: shared HandBrake media libraries
 
 Sources: x264 AUTHORS; x265 source/x265.h and carried patch headers; FFmpeg MAINTAINERS and carried patch headers; GTK AUTHORS (GNOME/gtk, blob ffd57df1f1fe138d259d11ef27fe3a3a9ed91f14); Debian HandBrake packaging. Names only.

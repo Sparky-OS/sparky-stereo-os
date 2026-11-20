@@ -456,7 +456,7 @@ The application compile then stopped at an invalid Objective-C instance-variable
   **Fix:** declare `_presentationEpoch;`; Objective-C allocation already zeroes scalar instance variables.
   Assign any nonzero initial value inside the initializer method.
   **How found:** the complete failing native build step identifies this sole error; Linux Clang reproduces it with authored test doubles and parses both corrected controller files.
-  Run `bash ios/Tools/check_objc_syntax.sh` locally to check `Desktop.mm`, `Desktop.h`, `Computers.mm` and `ViewerSettings.mm` with C++17, ARC, blocks and warnings as errors.
+  Run `bash ios/Tools/check_objc_syntax.sh` locally to check `Main.mm`, `Desktop.mm`, `Desktop.h`, `Computers.mm` and `ViewerSettings.mm` with C++17, ARC, blocks and warnings as errors.
   Its minimal declarations come from our call sites, not Apple's files; they check syntax and local type consistency, not real SDK signatures, ABI, availability, linking, shader compilation or runtime behavior.
   Keep those test includes out of every product build and keep the hosted Xcode compile as the SDK check.
 
@@ -491,7 +491,9 @@ ctest --test-dir build/viewer -V
 EGL/GLES2 and OpenSSL development packages are needed for these two optional tests; ordinary portable CMake checks also run on the hosted Mac.
 The expanded authored Objective-C stand-ins cover the profile settings UI and Metal mesh submission, without including Apple's headers.
 The 51 native string keys include the profile choices and refusals in ten languages.
-The native viewer changes still await their hosted compile; all optical checks on a phone remain unproven.
+The native viewer changes passed both jobs in [run 44787732216](https://github.com/Sparky-OS/flat-headset/actions/runs/44787732216) for 159bc572.
+The downloaded IPA passes checksum, unsigned arm64, iOS 16.0, no embedded dynamic library and six-license checks.
+All optical checks on a phone remain unproven.
 
 - **Symptom:** a port's fitted picture differs by half a pixel or appears to use a different strength.
   **Cause:** removing one of Android's two half-pixel operations, treating the fit strength as a QR coefficient, or measuring the radius in different units changes the mapping.
@@ -507,3 +509,57 @@ The native viewer changes still await their hosted compile; all optical checks o
   **How found:** source inspection while accepting imported profile bytes; legitimate-profile oracle comparisons and malformed-input tests preserve the valid math.
 
 These are arithmetic, parsing and session-control proofs on Linux. They do not execute Metal, display an RDP desktop on a phone or verify lens alignment through a viewer.
+
+
+## KDE Connect as a separate unsigned application
+
+The KDE Connect iOS base is [a3036396](https://invent.kde.org/network/kdeconnect-ios/-/tree/a303639652c1cf486bd6fb61335970723c2085a7).
+The proposed `kdeconnect-iphone` job in Flat Headset's unsigned workflow checks out Sparky-OS/kdeconnect-ios at an exact commit and runs its `Sparky/build_unsigned.sh` and `Sparky/package_unsigned.sh` scripts.
+It emits a separate `KDEConnect-unsigned-COMMIT` artifact with the IPA, SHA256SUMS and the `kdeconnect` renewal-manifest role.
+This native job is pending its first hosted run; Linux checks do not establish SwiftUI, Security, Bonjour or Keychain behavior.
+
+Keep each app's paired identity independent until shared signing entitlements have been proved.
+KDE Connect's virtualmonitor plugin checks the paired computer's protocol-v2 capabilities, explains refusal or timeout in ten languages, and opens only `flatheadset://catch`.
+That URL carries no address, pin, password or session credential and never authorizes a connection.
+Flat Headset opens its computer list, confirms its own pairing with the same PC and owns the virtual monitor and RDP session while in the foreground.
+Returning to the KDE Connect page performs a fresh capability query; losing pairing or reachability revokes the launch permission.
+Do not advertise this KDE Connect app as an RDP consumer or pass the receiver credentials through a URL.
+
+Local checks in an isolated Linux container with Clang, GNUstep Base development files, GCC, Make and Python:
+
+```sh
+bash Sparky/test_protocol.sh build/protocol
+python3 Sparky/Tests/PackageTest.py
+# Fetch and hash-check the source before the test container loses network access.
+python3 Sparky/fetch_openssl.py sources
+bash Sparky/build_openssl.sh host sources/openssl build/openssl
+cc -Wall -Wextra -Werror -I build/openssl/install/include Sparky/Tests/CryptoTest.c build/openssl/install/lib/libcrypto.a -ldl -pthread -o build/crypto-test
+OPENSSL_MODULES=/nonexistent OPENSSL_CONF=/nonexistent build/crypto-test
+```
+
+The Objective-C protocol implementation runs against GNUstep Foundation; its tests cover trust gates, malformed replies, revocation, deadline/retry, unsolicited credentials and exact certificate equality.
+The receiver's separate Linux mutual-TLS tests run over local socket pairs without a container network.
+The package fixtures test rejection of extra apps, signatures, profiles, frameworks, dynamic libraries, extensions, Watch bundles, missing catalogs and wrong bundle identity.
+They do not replace the hosted lipo/codesign checks or a later downloaded-IPA audit.
+The twelve added UI keys have all ten native catalogs; upstream strings remain in their own catalog.
+Wait for all three unsigned applications before one device session for signing, installation and observations.
+
+- **Symptom:** an independently signed KDE Connect build searches KDE's team Keychain group for its UUID.
+  **Cause:** `KdeConnectSettings.getUUID` names a group belonging to the upstream signing team.
+  **Fix:** use the app's own default Keychain group and an app-specific UUID service; do not assert shared credentials with Flat Headset.
+  **How found:** source inspection of the pinned upstream, including its previously merged Keychain fixes; on-device persistence remains unproven.
+- **Symptom:** the OpenSSL Swift package supplies an embedded dynamic framework to a build intended to contain a single unsigned executable.
+  **Cause:** the pinned package is a binary target; its arm64 Mach-O header has file type 6, `MH_DYLIB`.
+  **Fix:** replace that package with hash-checked OpenSSL source and static archives; reject dynamic libraries in the IPA.
+  KDE Connect's iOS 16/17 identity import needs the legacy provider, unlike FreeRDP's core.
+  Configure this separate build with `no-shared no-module` and retain legacy as a built-in provider, as [OpenSSL's provider build rules](https://github.com/openssl/openssl/blob/openssl-4.0.1/providers/build.info) specify.
+  **How found:** inspected the package manifest and binary header, then built OpenSSL on Linux and round-tripped both PKCS12 formats with nonexistent module/config paths.
+  Apple's identity import is still a device check.
+- **Symptom:** OpenSSL 4 rejects a mutable `X509_NAME *` from `X509_get_subject_name` under warnings as errors.
+  **Cause:** the accessor returns a const pointer.
+  **Fix:** construct an `X509_NAME`, assign it with the subject and issuer setters, then free the temporary name.
+  **How found:** the static-library identity-format test caught the incompatible declaration; the updated helper and test preserve the certificate fields.
+- **Symptom:** an unsigned build still executes a package build plugin despite `-skipPackagePluginValidation`.
+  **Cause:** that flag suppresses validation, not execution; upstream's CI comment claims otherwise.
+  **Fix:** the unsigned fork removes its SwiftLint target dependency and unused package references, keeping only the three linked source packages pinned by revision.
+  **How found:** inspection of the project dependency graph and upstream CI command, then parsing every project reference and checking the exact package lock on Linux; native resolution remains pending.

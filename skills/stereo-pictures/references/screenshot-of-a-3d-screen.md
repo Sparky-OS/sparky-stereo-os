@@ -57,6 +57,38 @@ A plain QML window supplied the active-window witness, and KWin's own window lis
 No physical display, fork build, 2D control, region result or corrected package is claimed by this observation.
 The initial attempt without a render node timed out without a screenshot; the successful preflight used the authorized AMD render node.
 
+## ScreenShot2 method reconciliation on KWin +stereo3d60
+
+The continuation measured every method in the staged interface XML, in 32 fresh virtual sessions: ordinary or declared full-side-by-side target, on a 1920×1080 output in its 3D or ordinary 2D mode.
+Each scene has a desktop-role wallpaper and an inactive ordinary window behind the active target, so desktop depth and declared eye identity have separate witnesses.
+Both interactive kinds were selected using KWin's private fake-input connection, and their returned window IDs were checked against the selected target.
+
+| Method | Input signature | 3D ordinary target | 3D declared target |
+| --- | --- | --- | --- |
+| CaptureWindow | `(sa{sv}h)` | 640×360, stereo=false: one eye | 1280×360, stereo=true: pair |
+| CaptureActiveWindow | `(a{sv}h)` | 640×360, stereo=false: one eye | 1280×360, stereo=true: pair |
+| CaptureArea | `(iiuua{sv}h)` | 2400×400, stereo=true: pair | 2400×400, stereo=true: pair |
+| CaptureScreen | `(sa{sv}h)` | 3840×1080, stereo=true: pair | 3840×1080, stereo=true: pair |
+| CaptureActiveScreen | `(a{sv}h)` | 3840×1080, stereo=true: pair | 3840×1080, stereo=true: pair |
+| CaptureInteractive, kind 0 window | `(ua{sv}h)` | 640×360, stereo=false: one eye | 1280×360, stereo=true: pair |
+| CaptureInteractive, kind 1 screen | `(ua{sv}h)` | 3840×1080, stereo=true: pair | 3840×1080, stereo=true: pair |
+| CaptureWorkspace | `(a{sv}h)` | 3840×1080, stereo=false: both eyes, wrong flag | 3840×1080, stereo=false: both eyes, wrong flag |
+
+These are red observations, not a fixed KWin result.
+The area is the same requested 1200×400 logical rectangle in both eyes.
+On the 2D-only ordinary-target control, all methods return mono: window 640×360, area 1200×400, screen/workspace 1920×1080.
+On the 2D-only declared-target control, +60 still returns pairs from those content-bearing captures, with the workspace flag still false.
+That existing 2D behavior is a preservation baseline for the screenshot-plugin change, not proof of a stereo output mode.
+
+**Trap: CaptureArea appears absent.**
+Symptom: D-Bus reports UnknownMethod for CaptureArea despite the method appearing in the interface.
+Cause: the caller used `(iiiia{sv}h)`; the XML requires unsigned width and height, `(iiuua{sv}h)`.
+Fix: generate input signatures from the actual interface XML and compare them with runtime introspection before classifying a capture failure.
+How found: the original incorrectly signed call failed; the corrected call returned both 1200×400 eyes on +60.
+
+Keep raw bytes and the original reply metadata together.
+A marked JPS made from a raw reply by the stack's writer is a viewing derivative; its valid mark does not change the original KWin reply's stereo=false result.
+
 ## Read back independently
 
 Run inside the proof container, using this skill folder as `PICTURES`:

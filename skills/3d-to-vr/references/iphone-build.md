@@ -336,11 +336,9 @@ These are downloaded-artifact and compile checks, not phone behavior.
    Stop or unpair revokes the grant; a new Catch creates a fresh grant and context.
 6. Test the control parser and the certificate callback on Linux with the pinned static libraries before the native compile.
    The host build adds `paired-session` to the lifecycle, pairing and NTLM tests.
-   Then push through the reviewed workflow and check the unsigned app's new dependency closure; the session adapter's native compile was pending at this revision.
-   [Run 44702615908](https://github.com/Sparky-OS/flat-headset/actions/runs/44702615908) then passed both jobs for commit df8455e: the app links the session adapter and the eight static libraries, and the unsigned package (checked on Linux) carries FreeRDP, OpenSSL and the H.264 decoder inside one arm64 program that links only system frameworks, VideoToolbox among them.
-   No session has connected and nothing has run on a phone.
+   Then push through the reviewed workflow and check the unsigned app's new dependency closure; the session adapter's native compile and installed-library consumer link passed run 44702615908 below.
 
-The session adapter currently initializes a BGRA GDI surface; decode-to-Metal presentation and viewer mathematics follow it.
+The compiled session adapter initializes a BGRA GDI surface; the next integration presents its completed paints to Metal, followed by viewer mathematics.
 No received desktop, VideoToolbox runtime, optical result or real-phone lifecycle has been established.
 Native status messages cover refusal, invalid replies, certificate mismatch, timeout, stop and reconnect in all ten catalogs.
 Remote error text is not a translated status and is not passed directly to the screen.
@@ -362,4 +360,51 @@ Remote error text is not a translated status and is not passed directly to the s
 The app now names all eight installed static archives explicitly and includes the FreeRDP and FFmpeg licenses alongside the existing licenses.
 The framework list comes from the checked core probe's load commands: Foundation, CoreFoundation, VideoToolbox, CoreMedia and CoreVideo, plus the app's UIKit, Security and Metal frameworks.
 Do not blindly copy the installed `.pc` private requirements: this pinned FreeRDP package still lists unbuilt libavfilter/libavformat and WinPR's platform-independent `-lrt` despite this successful iOS closure.
-The next hosted app link is the separate installed-library consumer check.
+Run 44702615908 establishes that separate installed-library consumer link.
+
+
+## Completed GDI paints to Metal
+
+[Run 44702615908](https://github.com/Sparky-OS/flat-headset/actions/runs/44702615908), checked on 2026-11-20, passes both jobs for receiver commit df8455ea6e74541d53651379074938227368774f.
+The downloaded app checksum is `dde15f79829a4f32cacd848747f6430e23e4d5394761b4d43ea4ce9ae871cd94`; the core checksum is `8f910f5b48b3628511cab5333bf18966cc9a07c96a42d37fc0b4fda94953c018`.
+The app now links the installed FreeRDP/FFmpeg core, includes all five license files, and has no embedded framework or dylib.
+The core has eight static libraries, all Mach-O objects arm64, and no loose provider module.
+Both executables are unsigned arm64 for iOS 16.0 and later, built with SDK 26.5.
+This proves native compilation and packaging of the paired session, not a desktop arriving on a phone.
+
+For the decoded-frame integration, keep the paired grant as the authorization boundary.
+Attach BeginPaint/EndPaint after GDI initialization and preserve FreeRDP's graphics channel handlers.
+Reset both the aggregate dirty flag and the dirty-region count at the start of each paint.
+Copy a completed BGRA surface into owned rows before the decoder can change it again.
+Keep one pending frame, replacing only that pending frame when the consumer is late.
+Retain immutable textures for in-flight GPU commands, bound those commands and consume the latest frame only when a GPU slot is available.
+Check the received native extent against the drawable and read matching texels; this step must not add eye scaling or separation.
+Closing the session closes the queue and hides the old image; a first-frame timeout and renderer errors must be visible in every language.
+Pushing the desktop controller must preserve the authenticated Computers connection; leaving or backgrounding the receiver still closes it.
+
+This path is VideoToolbox through FFmpeg, CPU transfer and GDI reconstruction, owned BGRA memory, then a Metal texture upload.
+It is not a zero-copy CVPixelBuffer-to-Metal path.
+The session advertises H.264; compiled HEVC support is not evidence of HEVC negotiation.
+The frame queue tests cover padded rows, complete left/right geometry, ownership, late-frame replacement, concurrent coherence and closed/malformed inputs.
+The GDI integration test allocates the actual pinned FreeRDP surface, runs the production paint handoff and checks forty pairs, dirty-region reset, empty paints, wrong extents and closure without a network connection.
+These checks do not exercise an encoded stream, Apple's decoder, the Metal shader or the optics.
+The new view and strict decoder patch need the next hosted compile, then the later authorized phone session for runtime evidence.
+The Android viewer's actual profile mathematics follows this integration; no distortion coefficient is inferred here.
+
+- **Symptom:** a failed VideoToolbox device initialization logs a software fallback and still attempts decoding.
+  **Cause:** pinned FreeRDP's `h264_ffmpeg.c` jumps past the hardware setup to the common codec-open call; its frame receive path also accepts a non-hardware frame.
+  **Fix:** the receiver's small pinned-source patch takes the existing cleanup/failure path in both cases when WITH_VIDEOTOOLBOX is set.
+  Keep the patch beside the source lock in the core artifact; apply it with an exact forward or reverse check, never ignore a failed hunk.
+  **How found:** source review of 3.28.0 and the current default branch before wiring the presentation path.
+  The Linux build checks patch application and the unchanged non-Apple path; native compilation and a real hardware failure remain separate checks.
+- **Symptom:** a GDI receiver accumulates dirty-region entries although it copies the complete surface each time.
+  **Cause:** clearing only `invalid->null` leaves `hwnd->ninvalid` growing in `gdi_InvalidateRegion`.
+  **Fix:** reset the count with the aggregate dirty flag in BeginPaint, as the pinned SDL client does.
+  **How found:** reading the pinned region allocator and SDL paint callback, then checking the reset across forty real GDI paints.
+- **Symptom:** an asynchronous renderer can show mixed frames or an increasing delay.
+  **Cause:** it references decoder-owned mutable pixels, or appends each frame to an unbounded main-thread/GPU queue.
+  **Fix:** copy into owned complete frames, keep only the latest pending one and retain immutable textures for at most two GPU submissions.
+  **How found:** review of decoder/renderer ownership and a concurrent producer/consumer fixture; actual phone cadence and latency remain unmeasured.
+
+[Run 44770385750](https://github.com/Sparky-OS/flat-headset/actions/runs/44770385750) passes both jobs for commit 4970452: the desktop view, its Metal fragment and the core with the strict VideoToolbox patch compile and link, and the unsigned package was checked on Linux (arm64, no signature, no embedded library).
+No frame has been decoded or shown on a phone.

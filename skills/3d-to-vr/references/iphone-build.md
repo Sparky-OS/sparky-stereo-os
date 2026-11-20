@@ -3,7 +3,7 @@
 **For the contributor: write and test portable code on Linux, compile the native application on a standard hosted macOS runner, then sign and install from Linux.**
 Check freshness first: source workflows and local gates checked 2026-11-20.
 The first native proof target and workflow are implemented.
-The first hosted run reached native catalog/project lint and then failed in the portable host compile; a successful app build and phone launch are not yet established.
+Hosted run 44688342867 passes the portable tests and native app build, then fails at the packaging architecture command; artifact upload and phone launch are not yet established.
 
 ## Working recipe
 
@@ -108,7 +108,7 @@ Coverage proves presence, not a native speaker's acceptance or on-phone fallback
 1. **Symptom:** local tool probes stop at `UIKit/UIKit.h` or an Apple SDK prerequisite and the whole iPhone route appears blocked.
    **Cause:** the compile was assumed to happen on the Linux workstation.
    **Fix:** keep Linux editing and portable tests, compile the native target on the selected standard hosted Mac, sign on Linux later.
-   **How found:** the SDK-free compiler boundary followed by the hosted-build continuation; hosted execution still requires the first pushed run.
+   **How found:** the SDK-free compiler boundary followed by the hosted-build continuation; run 44688342867 now proves the native compile; packaging and phone execution remain separate checks.
 2. **Symptom:** a green upstream macOS job is treated as proof of an iPhone app.
    **Cause:** Cardboard's job builds Android and FreeRDP's job builds the desktop client; KDE Connect targets a simulator.
    **Fix:** record exact commands and build an explicit arm64 `iphoneos` target.
@@ -135,4 +135,26 @@ Coverage proves presence, not a native speaker's acceptance or on-phone fallback
    **Fix:** keep the version in `FLAT_HEADSET_IOS_MIN`; pass the Apple deployment setting only on the native `xcodebuild` command, retaining warnings as errors and real host tests.
    **How found:** run 44687332888 prints the inherited variable, macOS SDK and exact compiler failure; catalog/tooling checks and both plutil lints passed before it.
    An SDK-free Clang 21.1.8 Darwin-driver `-###` probe selects `arm64-apple-ios16.0.0` with the old variable and `arm64-apple-macosx15.0.0` with the corrected workflow environment; no target compilation or Apple files are involved.
-   The workflow correction and Linux portable tests pass locally; a subsequent hosted run must establish that the Apple compiler/build now succeeds.
+   Run [44688342867](https://github.com/Sparky-OS/flat-headset/actions/runs/44688342867) confirms the corrected host tests and native iPhone build both pass on the same Xcode 16.4 image; its next step fails at the architecture-check invocation.
+
+8. **Symptom:** `lipo: unknown architecture specification flag` followed by the app executable path during `-verify_arch`.
+   **Cause:** `-verify_arch` consumes the following architecture names, so the executable placed after `arm64` is interpreted as another architecture.
+   **Fix:** use `xcrun lipo "$app/FlatHeadset" -verify_arch arm64` with the input first.
+   **How found:** run 44688342867 prints `Mach-O 64-bit executable arm64`, then the error and `lipo <input_file> <command>` usage; the native build has already succeeded.
+   Linux LLVM's lipo accepts the corrected invocation on an SDK-free arm64 Mach-O object and rejects an x86_64 requirement; this does not replace the hosted Apple-tool check.
+9. **Symptom:** an unsigned-artifact gate accepts every nonzero `codesign --verify` result.
+   **Cause:** signature verification failure can mean unsigned code, damaged signed code or a tool failure.
+   **Fix:** retain and print the diagnostic, set `LC_ALL=C`, reject successful verification and accept failure only when the entire diagnostic is the app path followed by `code object is not signed at all`.
+   **How found:** review of the packaging step after the lipo failure; controlled command responses exercise unsigned, valid signed, damaged, missing-tool, empty-error and nested-code errors against the actual workflow shell.
+   Apple's [code-signing error definitions](https://github.com/apple-oss-distributions/Security/blob/main/OSX/libsecurity_codesigning/lib/CSCommon.h) distinguish unsigned code from invalid signatures.
+   No signature is removed to make this gate pass; the real diagnostic still needs the next hosted run.
+
+### Packaging audit after the native compile
+
+Reviewed 2026-11-20: the compiled app path in run 44688342867 matches the packaging input and `FlatHeadset` executable name.
+[Apple's archive recipe](https://developer.apple.com/documentation/xcode/packaging-mac-software-for-distribution) uses `ditto -c -k --keepParent`; passing `Payload` as the source preserves the `Payload/FlatHeadset.app` layout expected by the manifest reader.
+The manifest uses Python plistlib, which handles the binary plist produced by Xcode; its tests passed on the hosted Mac, including its SHA-256 helper.
+It writes the JSON and SHA256SUMS next to the IPA in `ios-artifact/`, the directory passed to the pinned [upload-artifact action](https://github.com/actions/upload-artifact/tree/ea165f8d65b6e75b540449e92b4886f43607fa02).
+The IPA is already a ZIP, preserving its executable modes inside the artifact's outer ZIP.
+A Linux fixture checks these paths, a binary plist, the manifest digest and `sha256sum -c`; substitutes for codesign and ditto test shell control flow only.
+Do not describe the native build as an uploaded or installed program until those later checks actually pass.

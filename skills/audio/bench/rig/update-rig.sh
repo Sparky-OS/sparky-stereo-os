@@ -1,4 +1,5 @@
 #!/bin/bash
+# A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
 # Updates the rig images with the current rig files (asound.conf, the stand-in ALSA monitor script) and the tools the rows
 # need: update-rig.sh IMAGE... ; needs DOCKER_HOST (the lane's socket).
 set -euo pipefail
@@ -10,7 +11,7 @@ REPO_MOUNT=${REPO_MOUNT:-}
 HERE=$(cd "$(dirname "$0")" && pwd)
 for img in "$@"; do
 	docker rm -f sa631-upd >/dev/null 2>&1 || true
-	docker run --name sa631-upd --cpus 2 --ulimit core=0 $APT_MOUNTS -v "$HERE":/src:ro $REPO_MOUNT "$img" sh -c '
+	docker run --name sa631-upd --cpus 2 --ulimit core=1 $APT_MOUNTS -v "$HERE":/src:ro $REPO_MOUNT "$img" sh -c '
 set -e
 cp /src/asound.conf /etc/asound.conf
 cp /src/rig-alsa-nodes.lua /usr/share/wireplumber/scripts/

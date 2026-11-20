@@ -1,5 +1,7 @@
 # Reproducible sources: the recipe date, the real clean, and how to compare runs
 
+A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
+
 Written 2026-11-06 from ORDERS 421, 421b and 427 (build tree 77768db9).
 The same recipe commit must give the same `.dsc` and `.debian.tar.xz` whatever the clock, the time zone, the umask and the checkout time.
 This page is the working recipe, what the real `dpkg-buildpackage` does to a tree, how to prove a route, and the traps met on the way.
@@ -72,7 +74,7 @@ To compare with a published or staged source, extract both with `dpkg-source --n
 # Debian's real source, in a container with https-only apt (the CA bundle mounted read only)
 apt-get source --download-only qt6-declarative        # then check the .dsc sha256 the recipe pins
 # one run: the route's own script, the clock and zone moved, the umask set inside, no network
-docker run --rm --ulimit core=0 --network none --user 1000:1000 "${SPARKY_PROV_ARGS[@]}" \
+docker run --rm --ulimit core=1 --network none --user 1000:1000 "${SPARKY_PROV_ARGS[@]}" \
   -e TZ=Asia/Tokyo -e LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1 \
   -e FAKETIME='@2026-11-20 03:30:00' -e FAKETIME_DONT_RESET=1 -e NO_FAKE_STAT=1 IMAGE \
   bash -c 'umask 077; exec bash ROUTE-SCRIPT'

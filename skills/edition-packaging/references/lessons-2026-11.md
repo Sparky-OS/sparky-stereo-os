@@ -1,5 +1,7 @@
 # edition-packaging: lessons from the lanes of 25 October to 6 November 2026
 
+A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
+
 Harvested by ORDER 429 from the accepted lane reports; each line names the lane it came from.
 A trap gives its symptom, its cause, its fix and how the cause was found; a recipe gives the commands and the result to expect.
 
@@ -163,7 +165,7 @@ Recipe, in order:
 Traps:
 - Symptom: the build ends with `make[1]: *** [debian/rules:299: override_dh_builddeb] Error 1` after the last package, with no message about why. Cause: the link and start gate refuses to run with less than 12 GiB free on `/` (the message `/: free space ... is below root floor` is printed once, far above, after the meson test output); the floors cannot be set lower (`space floors cannot be below 2 GiB scratch and 12 GiB root`). A Mesa amd64 build uses about 13 GiB. Fix: have 25 GiB free on `/` before starting, and watch `df` during the build. Found with `grep -n "free space\|floor" build.log`.
 - Symptom: a "+20" container behaves exactly like +19 (same red result). Cause: the image was committed after an apt step that failed (`The repository 'file:/repo mashtabba' no longer has a Release file`) because the edition repository was not mounted; the packages never changed. Fix: check `dpkg -l | grep mesa` in the committed image for the new version before testing, and mount the repository (`realpath`) in every container that runs apt with the edition source configured.
-- Symptom: a lane-written wrapper `docker()` function exported with `export -f` to rename the containers of a shared script works, but cannot lower a safety floor the script enforces. Use it only for names and `--ulimit core=0`.
+- Symptom: a lane-written wrapper `docker()` function exported with `export -f` to rename the containers of a shared script works, but cannot lower a safety floor the script enforces. Use it only for names and `--ulimit core=1`.
 
 ## A published lc1 source is not the authored recipe
 

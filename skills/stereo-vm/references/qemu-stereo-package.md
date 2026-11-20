@@ -1,5 +1,7 @@
 # The next qemu-stereo package from fork commits
 
+A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
+
 Written on 2026-11-16 by Claude Opus 5.5 with Daniel Ramos (ORDER 156b), when the depth work of Sparky-OS/qemu branch `order156-depth` became `qemu 1:11.1.2+ds-3+stereo3d8+lc1`, the successor of the published `+stereo3d7+lc1`.
 The general packaging rules are in [edition-packaging](../../edition-packaging/SKILL.md) and the Lean Code ones in [lean-code](../../lean-code/SKILL.md); this page is the QEMU route and its traps.
 
@@ -22,7 +24,7 @@ The general packaging rules are in [edition-packaging](../../edition-packaging/S
    - `SPARKY_LC_ARCHIVE_DIR`: a folder with the recipe's `gate-sources.json` as `sources.json` and the three keyrings it names under `keyrings/` (Debian's archive keyring, deb-multimedia's, the edition repository's public key);
    - `SPARKY_LC_PREVIOUS_DIR`: the published package's binaries, so the gate compares against them;
    - `SPARKY_CONTAINER_PREFIX` set to the lane's prefix, `CPUS=4`;
-   - the script has no `--ulimit core=0`: wrap `docker` in an exported shell function that adds it to `docker run` and nothing else;
+   - the script has no `--ulimit core=1`: wrap `docker` in an exported shell function that adds it to `docker run` and nothing else;
    - read the gates in the build's own log: `lc1: verified N packages`, `archive-qualified link check passed`, `build record`.
 6. **Install by apt from the published set** in the proof image: a flat repository of the new `.deb` files (`dpkg-scanpackages -m . > Packages`, `deb [trusted=yes] file:/local ./`, pinned at 1001 with `Pin: origin ""`), then `apt-get -s install` of exactly the installed binary packages of source `qemu` (`dpkg-query -W -f '${source:Package} ${Package}\n'`); keep the `Inst` and `Remv` lines, every `Inst` naming the new version and no `Remv`.
 7. **Red and green** on the installed packages, below.

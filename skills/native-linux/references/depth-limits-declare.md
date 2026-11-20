@@ -1,5 +1,7 @@
 # The person's depth limits through libstereo-declare (1.10.0)
 
+A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
+
 A program that shows depth reads the limits here before it invents numbers.
 Stereo KWin resolves them per output, from the person's sunk and popped limits built on the output's display, and hands them over on both routes; the library gives the same two numbers on both.
 

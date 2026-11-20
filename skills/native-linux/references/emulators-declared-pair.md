@@ -1,5 +1,7 @@
 # Emulators that hand Stereo KWin a declared pair (Dolphin and Azahar)
 
+A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
+
 Learned on ORDER 39 (November 2026). Milestone 1: the reconcile and the reading of both programs. Continuation 1: Dolphin built and run in a Stereo KWin. Continuation 3 (19 November 2026): the fit withdrawn, Dolphin's own Depth and Convergence back, the Vulkan pair from two image layers and its fault found in Mesa (rows below). Azahar is its own item and was not run.
 
 ## What each program does today

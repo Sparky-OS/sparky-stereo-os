@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
 """Run p2p commands, each in its own container, PAR at a time, and wait for all (milestone 2c).
 
 m2b_run.py BINARY JOBFILE [PAR]
@@ -38,7 +39,7 @@ def start(job):
     out, args = job[0], job[1:]
     os.makedirs(os.path.dirname(out), exist_ok=True)
     name = 'ppx-508-2c-%d-%d' % (os.getpid(), k)
-    cmd = ['docker', 'run', '--rm', '--name', name, '--network', 'none', '--ulimit', 'core=0', '--cpus', '1',
+    cmd = ['docker', 'run', '--rm', '--name', name, '--network', 'none', '--ulimit', 'core=1', '--cpus', '1',
            '--user', '%d:%d' % (os.getuid(), os.getgid()), '-e', 'HOME=' + S,
            '-e', 'WZ_FONTMAP=', '-e', 'WZ_FONTINDEX=%s/candidates.tsv' % ix, '-e', 'WZ_GLYPHINDEX=',
            '-v', '/usr/share/fonts:/usr/share/fonts:ro', '-v', '/usr/local/share/fonts:/usr/local/share/fonts:ro',

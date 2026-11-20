@@ -1,4 +1,5 @@
 #!/bin/sh
+# A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
 # Build the driver, make the controls, fit every picture, check the controls.
 # Usage: KTG_IMAGE=image run.sh WORKDIR OUTDIR
 # WORKDIR holds fr_public/ (a clone of github.com/farbrausch/fr_public) and tex/*.png
@@ -8,7 +9,7 @@ WORK=$1; OUT=$2
 HERE=$(cd "$(dirname "$0")" && pwd)
 IMAGE=${KTG_IMAGE:?name a local container image that has g++}
 mkdir -p "$WORK/bin" "$WORK/oct" "$OUT"
-docker run --rm --network none --ulimit core=0 --cpus 4 --user "$(id -u):$(id -g)" \
+docker run --rm --network none --ulimit core=1 --cpus 4 --user "$(id -u):$(id -g)" \
   -v "$WORK:$WORK" -v "$HERE:/src:ro" "$IMAGE" sh -euc "
     cd '$WORK'
     g++ -O2 -w -I fr_public/ktg -o bin/ktgtool /src/ktgtool.cpp

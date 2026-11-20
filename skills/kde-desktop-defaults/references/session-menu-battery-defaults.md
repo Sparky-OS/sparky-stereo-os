@@ -1,5 +1,7 @@
 # Session, menu, sound and battery defaults
 
+A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
+
 ORDER 668, measured on Plasma 6.7.4 in fresh private `startplasma-wayland` logins.
 The look package and power-profiles package supply system defaults, never a login-time rewrite of the person's settings.
 
@@ -18,7 +20,7 @@ The look package and power-profiles package supply system defaults, never a logi
    Hash this home before and after the package upgrade, then supply it as `CONFIG_SEED` to another fresh successor login with `EXPECT_USER=1`.
    Require the existing panel and every saved choice to survive.
 
-Use one container and one session per case, `--ulimit core=0`, an isolated runtime directory and the lane's Docker socket.
+Use one container and one session per case, `--ulimit core=1`, an isolated runtime directory and the lane's Docker socket.
 The probe queries the actual panel through `org.kde.PlasmaShell.evaluateScript`, then reads the installed KConfig layers inside that session.
 A configuration result does not prove physical brightness, battery-triggered shutdown, audible playback, application restoration or a logout dialog.
 State those limits separately.

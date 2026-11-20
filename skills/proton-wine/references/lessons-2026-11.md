@@ -1,5 +1,7 @@
 # proton-wine: lessons from the lanes of 25 October to 6 November 2026
 
+A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
+
 Harvested by ORDER 429 from the accepted lane reports; each line names the lane it came from.
 A trap gives its symptom, its cause, its fix and how the cause was found; a recipe gives the commands and the result to expect.
 
@@ -27,7 +29,7 @@ A trap gives its symptom, its cause, its fix and how the cause was found; a reci
 
 Recipe (ORDER 274, 6 November 2026; gamescope master 309eee74 plus ValveSoftware/gamescope#2438):
 
-- Read `.github/workflows/main.yml` of master and copy its steps. At that date: container `archlinux:base-devel`, `pacman -Syu`, the package list in the workflow, `submodules: true`, then three meson setups (gcc with `-Dinput_emulation=disabled --werror --auto-features=enabled`; the same with `-Denable_openvr_support=false`; the same with `-Db_coverage=true`) and `meson test -C build-coverage --suite gamescope -v`. Run it as root in a container with `--ulimit core=0 --cpus 4`, the source mounted. Result to expect: both builds link `src/gamescope`, 17 tests Ok, 0 Fail (about 20 minutes on 4 CPUs, 0.9 GB image).
+- Read `.github/workflows/main.yml` of master and copy its steps. At that date: container `archlinux:base-devel`, `pacman -Syu`, the package list in the workflow, `submodules: true`, then three meson setups (gcc with `-Dinput_emulation=disabled --werror --auto-features=enabled`; the same with `-Denable_openvr_support=false`; the same with `-Db_coverage=true`) and `meson test -C build-coverage --suite gamescope -v`. Run it as root in a container with `--ulimit core=1 --cpus 4`, the source mounted. Result to expect: both builds link `src/gamescope`, 17 tests Ok, 0 Fail (about 20 minutes on 4 CPUs, 0.9 GB image).
 - No unit test touches `vulkan_make_swapchain`, so the change is shown by running a nested gamescope. Red and green use the same tree: `git checkout origin/master -- src/rendervulkan.cpp`, `ninja -C build-gcc`, copy the binary, restore the file, rebuild.
 - To see the mode the driver was given, not only what gamescope logs, preload a 30-line shim that interposes `vkGetDeviceProcAddr` and `vkCreateSwapchainKHR` and prints `presentMode`; gamescope loads its device functions through `vkGetDeviceProcAddr`, so interposing the plain symbol alone misses it.
 - Run `gamescope --backend sdl -W 640 -H 360 -- sleep 5` with `DISPLAY` on Xvfb and `SDL_VIDEODRIVER=x11`, one fresh start per value of the variable. Result: master gives mode 2 (FIFO) for every value; the change gives 2 for unset and `fifo`, 2 plus an error line naming the three values for an unknown word, 0 for `immediate`, and 2 plus the error line for `mailbox` on NVIDIA, whose X11 surface does not offer MAILBOX.

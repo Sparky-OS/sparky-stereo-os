@@ -1,4 +1,5 @@
 #!/bin/bash
+# A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
 # upgrade-test.sh NEWDIR PLYDIR [PERSON]: apt installs sparkyos-plymouth over the published one in a container of its own
 # (ORDER 715). The published tree (REPO_PUB, read only) is one apt source, a flat folder holding the successor and the
 # Plymouth +stereo3d4 .debs (NEWDIR, PLYDIR) the other, both file: sources. The published set is installed first
@@ -15,7 +16,7 @@ PERSON=${3:-}
 IMAGE=${SPARKY_BUILD_IMAGE:-${PREFIX:-rig}-build:1}
 NAME=${PREFIX:-rig}-upgrade${PERSON:+-$PERSON}${CONTROL:+-control}
 docker rm "$NAME" >/dev/null 2>&1 || true
-docker run --rm --pull=never --name "$NAME" --ulimit core=0 --platform linux/amd64 --user 0 \
+docker run --rm --pull=never --name "$NAME" --ulimit core=1 --platform linux/amd64 --user 0 \
 	--mount type=bind,src=/etc/ssl/certs/ca-certificates.crt,dst=/run/host-ca.crt,readonly --mount type=bind,src=${HTTPS_ONLY_APT:?the https-only apt helper script of your lane rules},dst=/run/https-only-apt.sh,readonly \
 	--mount type=bind,src=${REPO_PUB:?the published tree (an apt repository folder)},dst=/repo-pub,readonly --mount "type=bind,src=$NEW,dst=/new,readonly" --mount "type=bind,src=$PLY,dst=/ply,readonly" \
 	-e PERSON="$PERSON" -e CONTROL="${CONTROL:-}" "$IMAGE" bash -c '

@@ -1,5 +1,7 @@
 # The Game Mode applet takes plasmashell down at login
 
+A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
+
 Symptom first: plasmashell dies with SIGSEGV a few seconds after login, systemd-coredump keeps several dumps, and the stack is in `libplasma-gamemode.so`: `QObject::deleteLater` called from the lambda in `GamesModel::reload()` (`src/gamesmodel.cpp`), reached from `QDBusPendingCallWatcher::finished`.
 The journal shows `GamesModel::reload()` twice, the lambda twice, then the crash.
 The applet is Debian's `plasma-gamemode` (Harald Sitter's applet, version `0.0~git20240315.4d60358-2`) on the edition's panel.
@@ -34,5 +36,5 @@ Measured 2026-11-19: Debian's source, 29 of 30 runs crash with signal 11 (gdb: `
 
 - **A test that calls `reload()` twice at once does not crash.** The second `reload()` deletes the first watcher before any answer arrives. The crash needs the first answer in the queue before the second reload: block the thread between the two calls (`QThread::msleep`) and make the stand-in answer at once (`DELAY_MS=0`).
 - **A stand-in that answers after 400 ms crashes 1 run in 20.** The blocking call inside `reset()` returns before the answer arrives, so the order of the queue changes from run to run. Fix: answer at once and hold the thread.
-- **`dbus-run-session` as a user with no passwd entry stops with "Looking up user ID 1000: not found"** in a container. Run the test as root, with `--ulimit core=0`.
+- **`dbus-run-session` as a user with no passwd entry stops with "Looking up user ID 1000: not found"** in a container. Run the test as root, with `--ulimit core=1`.
 - **gdb's timing hides the crash** unless the stand-in's delay is set to 0 in the gdb run too.

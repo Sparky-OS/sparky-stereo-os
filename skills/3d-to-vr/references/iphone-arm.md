@@ -8,11 +8,12 @@ No native app build, provisioning, installation or optical qualification is esta
 
 1. Preserve the paired KDE Connect control plane, KRdp/FreeRDP picture and authenticated panel identity; the receiver's button is **Catch**.
 2. Separate a tool that emits arm64 Mach-O from the Apple SDK it still needs: run the freestanding probe below without an SDK.
-3. Read [Apple's Xcode and SDK agreement](https://www.apple.com/legal/sla/docs/xcode.pdf) before acquiring or using its files; the agreement restricts execution to an Apple-branded product running macOS.
+3. The selected compile runs on GitHub’s standard hosted macOS machines with their installed Xcode; editing, portable checks and later signing stay on Linux.
+   Read [Apple’s Xcode and SDK agreement](https://www.apple.com/legal/sla/docs/xcode.pdf); the agreement restricts execution to an Apple-branded product running macOS.
    Reading a licence is not legal advice; the decision is Daniel's.
    Linux on Apple hardware does not itself meet the quoted macOS condition.
-4. Keep personally acquired Apple files outside source repositories, evidence and bundles.
-   The [SDK completion recipe](iphone-build.md) is an untested continuation, not a claim that an SDK alone produces the three applications.
+4. Keep Apple SDK files on the hosted Mac, outside source repositories, evidence and bundles.
+   Use the [unsigned hosted build route](iphone-build.md); the previous local-SDK completion proposal is superseded.
 5. Use a real terminal for the Linux [xtool](https://github.com/xtool-org/xtool) account step, `xtool auth login --mode password`.
    The person enters their own account, password and any verification code; a partner never supplies or records them.
    The observed prompt discloses virtual-Mac emulation and a third-party anisette service using a randomized token; reaching the prompt proves neither authentication nor signing.
@@ -43,7 +44,8 @@ An include of `TargetConditionals.h` fails without the SDK; FreeRDP's iOS CMake 
 OpenSSL 3.6.0 and zlib configured but did not cross-compile without the platform C headers.
 Do not fill the gap with Linux headers, fake Apple headers, or third-party repackaged SDKs.
 
-Choose Clang/LLD for the native C/C++/Objective-C investigation and xtool for the provisioning/install investigation.
+The Clang/LLD observations below describe the earlier SDK-free investigation.
+For native application compilation use the hosted Mac route; xtool remains the Linux provisioning/install candidate.
 Theos is a build orchestrator and still needs an SDK and target libraries; its Linux installer offers SDK downloads, so do not run that installer as an SDK-free test.
 The cctools-port configure probe stopped on missing libdispatch; that is a dependency result, not evidence that the project cannot work on Linux.
 Its assembler/linker tools are not an SDK, a Swift compiler or an interface builder.
@@ -55,7 +57,7 @@ Cardboard's existing Metal renderer compiles its shader source at runtime with `
 The three initial programs occupy all three application slots.
 A phone-side signing helper would consume a slot too; the selected host-side xtool flow does not install such a helper.
 Extensions have their own identifiers and profiles; omit unnecessary extension targets at build time rather than stripping signed packages later.
-A fourth iStereo app cannot be promised alongside the first three under that limit.
+A fourth iStereoVR app cannot be promised alongside the first three under that limit.
 Keep bundle IDs and the same signing identity stable across renewal to preserve application data; that preservation still requires a real install/refresh test.
 Paid membership has a [100-device limit per product family per membership year](https://developer.apple.com/help/account/devices/devices-overview/), and profile lifetimes must be read from the issued profile; this work uses the free seven-day route.
 
@@ -89,14 +91,14 @@ Nonsensitive Cardboard viewer parameters can use a document import/export handof
 [Shared keychain access](https://developer.apple.com/documentation/security/sharing-access-to-keychain-items-among-a-collection-of-apps) requires matching access groups and signing entitlements; common authorship alone does not grant it.
 
 Flat Headset stays a static screen with no tracking.
-iStereo later adds time-stamped head pose in a dynamic virtual channel belonging to the same authenticated RDP session, consumed by the PC's VR integration, plus the tracked presentation needed for games and spatial video.
+iStereoVR later adds time-stamped head pose in a dynamic virtual channel belonging to the same authenticated RDP session, consumed by the PC's VR integration, plus the tracked presentation needed for games and spatial video.
 Cardboard's iOS/CoreMotion sensor adapter and the tracked design carry over; a README mentioning ALVR or PhoneVR is not evidence of an implemented RDP pose channel.
 
 ## Traps
 
 1. **Symptom:** `iphoneos is not an iOS SDK` or `TargetConditionals.h` is missing.
    **Cause:** a cross-target compiler does not contain Apple's sysroot.
-   **Fix:** stop at the SDK prerequisite; after the licence decision, point the build at the person's separately acquired SDK.
+   **Fix:** stop at the SDK prerequisite; use the hosted Mac’s installed SDK for the native build, and keep the Linux test explicitly portable.
    **Found by:** the Debian Clang/CMake probes, 2026-11-20.
 2. **Symptom:** configure succeeds, then zlib includes host `bits/libc-header-start.h` or OpenSSL uses `/SDKs/`.
    **Cause:** missing target sysroot and missing OpenSSL `CROSS_TOP`/`CROSS_SDK`.

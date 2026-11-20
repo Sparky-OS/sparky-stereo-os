@@ -19,7 +19,7 @@ description: >-
 2. Prove eye identity, geometry and progress first; then change one latency variable at a time and measure each queue. Keep cleanup and reconnect checks.
 3. Return functional captures and measured stage timings separately from physical latency, thermal and optical observations. A cable alone is not USB networking.
 
-For the native iPhone port, read [the Linux build/signing route and eight traps](references/iphone-arm.md), with its [untested SDK completion recipe](references/iphone-build.md).
+For the native iPhone port, read [the Linux build/signing route and eight traps](references/iphone-arm.md), with its [unsigned hosted-macOS build route](references/iphone-build.md).
 
 For reverse camera/sensor work, start with the [RDP sensor and emulator preflight](references/rdp-sensors-preflight.md).
 It distinguishes the embedding's build overrides from upstream defaults and checks the actual SDK, container and JDK before an endpoint test.

@@ -12,6 +12,10 @@ Contact details are left out on purpose.
 
 David Zeuthen.
 
+## Spectacle screenshot reconciliation
+
+Boudhayan Gupta, David Redondo, Noah Davis, Vlad Zahorodnii, Daniel Campos Ramos.
+
 ---
 
 ## OpenGL quad-buffer programs, swept in ORDER 26

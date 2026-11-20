@@ -8,7 +8,7 @@ set -eu
 image=$1 name=$2; shift 2
 here=$(cd "$(dirname "$0")" && pwd)
 W=${WORK:?the scratch folder}; mkdir -p "$W/rows"
-[ -f "$W/passwd" ] || { docker run --rm --entrypoint "" "$image" cat /etc/passwd > "$W/passwd"; echo "builder:x:1000:1000::/home/builder:/bin/bash" >> "$W/passwd"; }
+[ -f "$W/passwd" ] || { docker run --rm --ulimit core=1 --entrypoint "" "$image" cat /etc/passwd > "$W/passwd"; echo "builder:x:1000:1000::/home/builder:/bin/bash" >> "$W/passwd"; }
 docker run --rm --name "${PREFIX:-rig}-$name" --ulimit core=1 --cpus 2 --network none --user 1000:1000 --cap-add SYS_NICE \
 	--device /dev/dri/renderD128 --group-add "${RENDER_GID:-125}" -v "$W/passwd:/etc/passwd:ro" --tmpfs /tmp \
 	-v "$W/rows:/rows" -v "$W/fix:/fix:ro" -v "$W/bin:/fakeinput:ro" -v "$here/..:/tools:ro" -v "$here:/rig:ro" \

@@ -46,6 +46,8 @@ An app center row for a program the edition ships, its test, the package version
 14. An action with retained administrator authorization names a separate privileged entry point, as [privileged entry points](references/privileged-entry-points.md) explains.
     A program never restricts itself because a parent left an environment variable behind.
 
+20. A published package reads English in a localized session. Use [package translation coverage](references/package-translation-coverage.md) to count it, recover the shipped terms, and prove the localized upgrade.
+
 **Check freshness first.**
 Written on 2026-10-07; the developer tasks and the skills package on 2026-10-16; provenance, Paweł's formula, rebuilt packages, the repository and the ISO on 2026-10-23, from rules dated 2026-10-02 to 2026-10-22; pins by architecture and the packages that are not ours on 2026-10-31; the i386 blocks, the order of pin files and the conversion to conffiles on 2026-11-01.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.

@@ -1,0 +1,46 @@
+# The edition's own build of a Debian base library with one upstream commit
+
+For a library every program loads (GLib) when Debian's package lacks a fix that upstream has merged: the edition builds its own, amd64 and i386, with upstream's commit as its one patch, and retires it when Debian ships the commit.
+Written 2026-11-20 from ORDER 768b: Debian's glib2.0 2.90.1-2 plus Thomas Hebb's GLib commit 4301b49671, which removes the deadlock that kept the location service (geoclue) from starting.
+The route stopped at the Lean Code step on GLib (trap 1). The recipe below is what ran; the section after it lists what such a package still has to prove, not yet run on GLib.
+
+## Recipe, as run
+
+1. **Reconcile first.** Nothing is built if Debian or a release already has the commit.
+   - Debian: in a clean `debian:testing` container with `deb-src` and the suites testing, unstable and experimental, `apt-cache madison` for each binary of the source and `apt-cache showsrc NAME`.
+   - The packaging: Salsa's API, `projects/<team>%2F<repo>/repository/branches` sorted by commit date, then `repository/files/debian%2Fchangelog/raw?ref=debian%2Flatest` and `debian%2Fpatches%2Fseries`, grepped for the file, the function, both commit hashes, the merge request and the issue numbers; `merge_requests` for one in flight.
+   - Upstream: GitLab's `repository/commits/SHA/refs?type=all` for the branch commit and for the main commit. A list with branches only means no tag, so no release has it; `repository/tags?order_by=updated` names the newest release.
+   - Debian's tracker over SOAP (`get_bugs`, `src`, for the library and for the program that showed the symptom, then `get_status` one bug at a time: an array of ids answers `Not an ARRAY reference`).
+2. **Debian's source and binaries through apt**, so apt checks them against the signed indexes: `dpkg --add-architecture i386`, `apt-get source --download-only NAME=VERSION`, then `apt-get download PKG:ARCH=VERSION` for every name of the `.dsc`'s `Package-List` (the Architecture: all ones on amd64 only, no udeb). The `.dsc`'s SHA-256 goes into the recipe. These are the link gate's predecessors and the comparison's reference.
+3. **The patch is upstream's commit.** Compare its code with the forge's own diff (`repository/commits/SHA/diff`) byte for byte, then write the header in the form of KWin's carried commits: `From: Name`, upstream's message, one line saying it is carried unchanged, `Origin: upstream, <commit URL>`, `Author:`, `Bug:`, `Applied-Upstream:` (branch commit and main commit, with their merge requests), `Forwarded: not-needed`, `Last-Update:`, `Assisted-by:`. Names only: an address in `From:` or `Signed-off-by:` stays out of our files.
+4. **The recipe in `librsvg`'s form** (`sparky-os/packages/NAME/`): `build.sh` makes the source once and the `+lc1` source, then builds amd64 with the link and start gate against Debian's build; `build-i386.sh` builds `-B` from that same `+lc1` `.dsc` and checks that every file under `/usr/share` is the same bytes as amd64's; `changelog-stereo3d1.txt`; `patches/`; `tests/` with the fix's own reproducer and runner. `SPARKY_BUILD_IMAGE` names a lane's own builder image; the main session's default stays `sparky-lc-migration:20261020`. Commit before building: the build record's `recipeDirty` reads the tree.
+5. **A lane's builder image** is `debian:testing` by digest plus the edition builder's package list (`build-essential debhelper devscripts dpkg-dev fakeroot equivs python3 python3-yaml nodejs node-acorn perl ca-certificates pkgconf git`, after `apt-get dist-upgrade`), built through `tools/https-only-build.sh` with the base as a build argument.
+6. **The link gate's folder** (`SPARKY_LC_ARCHIVE_DIR`): `sources.json` with Debian forky main, deb-multimedia forky main non-free and the published round as `file:/repo`, each with a keyring path as the container sees it (`/archive/keyrings/...`). The gate copies each keyring to a `.gpg` name, so it must be binary: `gpg --dearmor` the edition's `sparky-stereo-repo.asc`.
+
+## What such a package still has to prove (not yet run on GLib)
+
+The checks ORDER 768b's brief set for a library every program loads; each needs the built packages.
+
+- Both architectures at one version, co-installable (`Multi-Arch: same`), `/usr/share` the same bytes apart from each Lean Code record.
+- The library's own test suite on our build and on Debian's unpatched source in the same container: no test that passes on Debian's and fails on ours, every difference listed.
+- Red and green on installed packages: the reproducer and the real service, each on Debian's build and then on ours installed by apt.
+- Every binary package against Debian's, both architectures: `dpkg-deb -c` file lists, `readelf -d` NEEDED, the control fields, and the exported symbols of each library (`nm -D --defined-only`), which must be the same lists. For GLib also the GIR and typelib files, because the introspection data is read from source comments (trap 3).
+- apt's `Inst` lines of a dist-upgrade over the published round plus the stage, on a system with both architectures installed: every binary goes to ours, nothing removed, nothing kept back.
+- Real program starts on the installed packages (a file manager, a terminal, an editor, System Settings and one GTK program, each `timeout 12 PROGRAM` giving 124 and no core dump): a library every program loads is never accepted on rig rows alone.
+
+## Retirement
+
+The build is retired when Debian's package carries the commit: a Debian revision with the patch, or a new upstream release that contains it (check with step 1's commands).
+Ours stays the candidate while the repository ships it, because the pin file that blocks Debian's builds is generated from the repository's index (the skill's "Only our builds are candidates"); retiring it means leaving it out of the next round, so the generated block list drops the names and Debian's build is the candidate again.
+
+## Traps
+
+1. **Symptom:** `build.sh` says `the build failed (exit 1)`, and `build.log` ends right after `extracting unsigned source package (NAME_VERSION+stereo3d1.dsc)` with `Existing execute_before_dh_auto_configure: preserve and integrate its behavior explicitly`.
+   **Cause:** `lean.debian_prepare` adds three targets of its own (`execute_before_dh_auto_configure`, `execute_before_dh_auto_clean`, `override_dh_builddeb`, the `TARGETS` of `sparky-os/lean/debian_prepare.py`) and refuses a `debian/rules` that already has one, with or without `-arch`/`-indep`. Debian's glib2.0 has `execute_before_dh_auto_configure: cross-tools` (it writes the wrappers for gi-compile-repository and the other introspection tools used when cross-building).
+   **How found:** the build log, then `grep -nE '^(execute_before_dh_auto_configure|execute_before_dh_auto_clean|override_dh_builddeb)(-arch|-indep)?\s*:' debian/rules`.
+   **Fix:** none in the route on 2026-11-20. The Go recipe's fix (trap 5 of [Go release packaging](go-release-packaging.md)) moves a hook of our own; here the hook is Debian's, so either the recipe changes Debian's packaging or the toolkit learns to keep an existing hook, and that choice is the coordinator's. Run the grep above on Debian's `debian/rules` before writing a recipe of this kind.
+2. **Symptom:** `diff -rq` of Debian's `debian/` and ours shows `Only in Debian's: debian/tests/manual/.gitignore`. **Cause:** `dpkg-source -b` of a 3.0 (quilt) source leaves out files that match its default ignore list. **Fix:** none needed: no binary package carries it; say it in the comparison. **How found:** comparing the two `debian.tar.xz` files after the first source build.
+3. **The perk for GLib's introspection:** `lang_c.py` leaves a whole C file authored when it holds a `/**` or `/*!` comment longer than four characters, so every gtk-doc block that g-ir-scanner reads (annotations such as `(transfer full)`) reaches it unchanged; files with only plain comments are projected. Check it on the built packages: the GIR and typelib files must equal Debian's.
+4. **Symptom:** an empty folder appears on the host where a keyring file was expected. **Cause:** `docker run -v HOSTPATH:...` creates a missing host path as a folder, as root. **Fix:** `ls -la` every mounted host file before the first run.
+5. **Symptom:** the build stops at the toolchain record with no message. **Cause:** `dpkg-query -W NAME` exits 1 for a name that is not installed, and the script runs under `set -e`. **Fix:** record only names the Build-Depends install.
+6. **Symptom:** a diff for another project carries times like `-0300`. **Cause:** `diff -Nru` writes local times with the zone. **Fix:** `touch -d '... UTC'` the new files and run `TZ=UTC diff -Nru`.

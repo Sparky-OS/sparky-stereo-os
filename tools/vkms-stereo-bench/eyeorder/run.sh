@@ -1,4 +1,5 @@
 #!/bin/sh
+# A core limit of exactly 1 suppresses the piped core helper; a zero limit does not, as the [crash trap](../../../skills/stereo-proof-rig/SKILL.md#traps-that-fooled-us) explains.
 # run.sh NAME SCENARIO [EDID]: one disposable guest (KVM, no network, no display, no GPU); VKMS exists only inside it.
 set -eu
 B=$(cd "$(dirname "$0")" && pwd)
@@ -7,7 +8,7 @@ OUT=$B/runs/$NAME
 rm -rf "$OUT"; mkdir -p "$OUT"
 sh "$B/mkinit.sh" "$B/vm/eyeorder.cpio.gz"
 docker rm -f eyeorder-vm >/dev/null 2>&1 || true
-docker run --rm --name eyeorder-vm --network none --cpus 4 --memory 8g --ulimit core=0 --user "$(id -u):$(id -g)" \
+docker run --rm --name eyeorder-vm --network none --cpus 4 --memory 8g --ulimit core=1 --user "$(id -u):$(id -g)" \
     --device /dev/kvm --group-add "$(getent group kvm | cut -d: -f3)" -v "$B:$B" -v "$B/root:$B/root:ro" \
     ${QEMU_IMAGE:?an image with qemu-system-x86_64} \
     sh -c "timeout ${VM_TIMEOUT:-1500} qemu-system-x86_64 -machine q35,accel=kvm -cpu host -smp 4 -m 6G -no-reboot -nodefaults \

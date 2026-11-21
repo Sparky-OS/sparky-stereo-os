@@ -259,3 +259,17 @@ That is not proof of flat rendering or of current limits, and the person must be
 
 The dependency blocker remains unresolved in this record.
 No static copy, runtime lookup or gate exemption was introduced to make the check pass.
+
+
+### Edition depth successor
+
+The native Linux compositor owns one observer per session window. Its worker owns the library's Wayland queue state or X11 connection and stops before the window is destroyed. `stereo_depth_*_get_buffer_limits` converts to the solver's 1920-wide coordinates using the displayed width of one eye. No second output-class factor or strength is applied. Output movement and live settings must be tested on the window, not against a fabricated process-global announcement.
+
+A missing announcement retains the current camera rig and creates a per-window problem through sparky-stereo-problems; recovery and session destruction clear it. Do not describe this as necessarily flat: a previous camera rig can remain. Native sample checks and a direct held-resolver comparison are distinct evidence; the held +8 package had no production announcement publisher.
+
+| Symptom | Cause | Fix and how found |
+| --- | --- | --- |
+| Required edition library is rejected by upstream's archive soname gate | The upstream list qualifies Ubuntu dependencies, while this edition links libstereo-declare | Carry one edition-only patch adding libstereo-declare.so.1, a versioned Depends, and the unchanged edition archive link/start gate. The old gate rejects a linked ELF, the new list accepts it, and an unrelated soname is still rejected. |
+| A fullscreen test window appears not to follow output limits | XMoveWindow did not move the managed fullscreen window | Use the standard fullscreen-monitor request and verify actual coordinates. Only then compare per-window announcements. |
+| Incremental build refuses an edited source after projection | Lean records the authored inputs of its projection | Commit the correction, refresh the carried patch and recipe pin, and build a fresh projection. Never edit projected source to evade the check. |
+| Vulkan sample headers do not match the sample's extension names | The standalone sample pins a newer displayxr-common than the runtime source component | Build the sample against its own declared dependency tag; leave the runtime's component intact. The sample's CMake pin and upstream tag identify the matching header. |

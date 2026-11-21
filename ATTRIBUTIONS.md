@@ -1413,3 +1413,5 @@ The KRdp packaging foundation credits the **Debian Qt/KDE Maintainers**, **Auré
 - **Paired phone reference-space events:** Jakob Bornecrantz and Collabora for the XRT event-sink and space-overseer pattern read here; the Khronos Group for the OpenXR reference-space time and origin contract. Daniel Campos Ramos for the paired provider integration and its controls. Names only.
 
 The capture-completion audit reads the common desktop capture worker by **David**, merged through DisplayXR PR 2259, and adjacent desktop-control history by **byungjul**. The carried ordering correction and its regression case are by **Daniel Campos Ramos**, with **Codex (OpenAI)** assistance.
+
+The native Vulkan sample's pinned displayxr-common v2.29.0 is credited to **David**. The edition's final-depth library, observer integration and packaging allowance are by **Daniel Campos Ramos**, with **OpenAI Codex** assistance.

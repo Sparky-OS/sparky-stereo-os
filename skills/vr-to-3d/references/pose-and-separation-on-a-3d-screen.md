@@ -2,18 +2,16 @@
 
 Learned on DisplayXR, xrizer and an OpenVR program with a scene of known depth (ORDER 478 milestones 2 and 2b, November 2026).
 A 3D screen has no head.
-An OpenVR or OpenXR program that expects one gets its view from the runtime's keyboard and mouse driver (qwerty) or from a gamepad, and the eye separation and screen plane come from the desktop's depth limits and the person's choices on top, not from numbers of the runtime's own.
+An OpenVR or OpenXR program that expects one gets its view from the runtime's keyboard and mouse driver (qwerty) or from a gamepad, and the eye separation follows the final depth limits of its window's output. The screen plane remains a separate camera parameter.
 Both live in the runtime, so every program gets them with no setting of its own, and nothing in KWin changes ([openvr-on-the-openxr-runtime.md](openvr-on-the-openxr-runtime.md) has the chain).
 
 ## Current edition requirement, 2026-11-21
 
-The measurements below describe the earlier prototype, not the held +8 package's production connection.
-The edition now requires KWin's output limits unchanged, with no runtime class, strength or absolute-depth replacement.
-The old override table below is historical evidence, not setup instructions for the edition.
-The screen plane and upstream camera profiles/chained rigs remain outside this removal.
-The held +8 source has no production caller of `u_depth_limits_publish`; the older X11 reader described below is not present there.
-Use the engine's library for buffer-unit conversion and prove live changes on the actual session window before claiming that path works.
-See [depth from the engine](tracked-phone-headset.md#depth-from-the-engine).
+The historical measurements below describe the earlier prototype. The edition's successor runtime reads the actual session window with libstereo-declare 1.12.1 or newer. The library alone converts the output's announcement into the camera solver's 1920-wide coordinates; the runtime copies those limits without a class factor, strength or absolute override. The old class, strength and absolute-depth environment variables and file keys are removed. Do not set them in xrizer launchers or application wrappers.
+
+The observer follows output movement and setting changes. Without a usable announcement, the current rig stays in place and the edition's problem engine tells the person; a previous rig may be stale. A restored announcement clears that problem. The screen plane and upstream camera profiles/chained rigs are unchanged.
+
+The held +8 package had no production caller of its announcement store. Its resolver's old 2.5 multiplier can be demonstrated directly, but that is not evidence that +8 received live KWin announcements. See [depth from the engine](tracked-phone-headset.md#depth-from-the-engine).
 
 ## Where the view comes from
 
@@ -62,8 +60,8 @@ Historical prototype overrides, superseded for new edition work, with the names 
 | screen plane, mm | `DXR_VIEW_SCREEN_PLANE_MM` | `view-depth`: `screen-plane-mm=` |
 | absolute sunk, popped | `DXR_VIEW_SUNK_PX`, `DXR_VIEW_POPPED_PX` | `view-depth`: `sunk-px=`, `popped-px=` |
 
-`tv` leaves the announced limits as they are; `headset` takes libstereo-policy's headset factor (2.5) over them; unset is as announced; the class is the person's, never read from the output (a desktop can drive a 3D television and a viewer at once).
-Absolute values replace the limit they name.
+In that retired prototype, `tv` left the announced limits as they were; `headset` took libstereo-policy's headset factor (2.5) over them; unset is as announced; the class is the person's, never read from the output (a desktop can drive a 3D television and a viewer at once).
+Its absolute values replaced the limit they named.
 The environment wins over the file key by key, the files are read again twice a second so a change reaches the next frame, and a wrong value (not a number, out of range, an unknown class or key) is refused and said once, never dropped quietly and never read past to the next source.
 
 ## How an X11 window is told its limits (Stereo KWin +stereo3d52, ORDER 485)
@@ -99,7 +97,7 @@ From version 10 of `_KDE_NET_WM_STEREO_CONTENT_SUPPORTED` (on the root window), 
    Run it through xrizer into DisplayXR on the headless Stereo KWin, once per set of limits, and capture the output (3840x1080 for a 1920x1080 view: the eyes side by side).
 3. Predict from the limits alone, d(Z) = -S (1 - D/Z) in pixels of a view 1920 wide (left centroid minus right, positive in front), and from the returned views (a pinhole camera per eye, 8x8 samples per pixel).
    Measured at 4 squares (0.8, 2, 6, 30 m): against the limits 0.0024 px rms at 10/4 and 0.066 px at 24/9.5, against the returned views 0.04 px horizontal and 0.000 px vertical, 0 swapped pixels, no square past a limit.
-4. Live: rewrite `view-depth` while the runtime runs; the next logged line is the new limits and the capture after it follows them.
+4. Historical prototype only: rewrite `view-depth` while that old runtime runs; the next logged line is the new limits and the capture after it follows them.
 5. Controls that must fail: a capture against the other set's limits (9.8 px rms), a value that is not a number (refused once, no limits then), no limits at all (said, DisplayXR's own rig).
 6. The keys' proof of milestone 2 stands: the pictures change as a camera moved, not as a shifted copy (the shifts follow 1/Z).
 
@@ -162,13 +160,13 @@ Never run it on a machine whose session or games should not see a new pad.
 The client averages 3x3 samples per pixel, so an edge is placed to a third of a pixel and a centroid to about 0.1 px.
 That is why the horizontal disparity error is 0.04 to 0.09 px and not zero; the limit asked for is 0.5 px.
 
-### A per-title profile makes the limits look ignored
+### Historical prototype: a per-title profile makes the limits look ignored
 
 - **Symptom:** `DXR_VIEW_SUNK_PX` is set and the eye separation does not change.
 - **Cause:** `DXR_LEGACY_CAMERA_RIG` or `app-profiles/<executable>.json` exists; a per-title record is the person's more specific choice and the rig does not follow the limits then.
 - **How found:** the log has a `Legacy camera profile:` line with the profile's numbers and no `Depth limits:` line.
 
-### The same wrong value is logged every half second
+### Historical prototype: the same wrong value is logged every half second
 
 - **Symptom:** the log fills with the same `depth: DXR_VIEW_SUNK_PX holds "abc"` line.
 - **Cause:** the settings are read again twice a second so that an edited file takes effect; each read refused the same value again.

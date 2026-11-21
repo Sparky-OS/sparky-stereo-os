@@ -157,7 +157,7 @@ A pack that only calls a program's command line, as these two do, needs no messa
 
 ## A program's AI: partners, local and at providers
 
-A program's AI feature (KMail and the other KDE programs through ktextaddons, Vibe, Kdenlive, Spirula Studio, Betterbird with ThunderAI) follows the person's choice on the Partners page: an engine on this computer or a provider's service, a model and a card per kind of work. [Partners](references/partners.md) has the engine package as built (Ollama split by hardware, NVIDIA's libraries from NVIDIA's repository), how a computer gets its runner, what each program reads today, how to read each part without pulling a model, which card the engine computes on and how the Partners choice reaches it (measured), the Partners page and its command, and twenty-seven traps.
+A program's AI feature (KMail and the other KDE programs through ktextaddons, Vibe, Kdenlive, Spirula Studio, Betterbird with ThunderAI) follows the person's choice on the Partners page: an engine on this computer or a provider's service, a model and a card per kind of work. [Partners](references/partners.md) has the engine package as built (Ollama split by hardware, NVIDIA's libraries from NVIDIA's repository), how a computer gets its runner, what each program reads today, how to read each part without pulling a model, which card the engine computes on and how the Partners choice reaches it (measured), the Partners page and its command, and thirty-four traps.
 
 ## Lessons from the lanes, October to November 2026
 

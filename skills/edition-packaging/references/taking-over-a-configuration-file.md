@@ -30,7 +30,7 @@ Only where the owning package offers nothing is a diversion left, and then the e
 | `/etc/zsh/zshrc` | zsh-common 5.9.2-1 | nothing; then the person's `~/.zshrc` | none: stays a diversion |
 | `/etc/initramfs-tools/update-initramfs.conf` | initramfs-tools 0.151 | nothing: `CONF=/etc/initramfs-tools/update-initramfs.conf`, `[ -r ${CONF} ] && . ${CONF}`, no folder, no environment, no program | none: stays a diversion |
 | `/etc/issue`, `/etc/issue.net`, `/etc/update-motd.d/10-uname` | base-files (SparkyLinux's, carried through Lean Code) | agetty reads `--issue-file` and `/etc/issue.d/` after `/etc/issue`; sshd's `Banner` names any file; pam_motd runs every script of `/etc/update-motd.d` | see the row's notes in the hand-back: a banner file of our own for SSH; the console's other two need a choice |
-| `/etc/grub.d/10_linux` | grub2-common 2.14-5 | `/etc/grub.d/` takes scripts of our own; GRUB runs every function a later script defines | the boot menu's own script (system-housekeeping, boot-menu) |
+| `/etc/grub.d/10_linux` | grub2-common 2.14-5 | `/etc/grub.d/` takes scripts of our own; GRUB runs the last definition of a function, and `10_linux` calls `load_video` in each entry | the boot menu's own script redefines `load_video` (sparky-stereo-boot 0.1.13; system-housekeeping, boot-menu); the 0.1.12 diversion is removed in the postinst |
 
 ## A diversion that stays: the safe form
 
@@ -93,6 +93,12 @@ Keep the copy outside a folder something copies whole: sparky-stereo-console kee
   **Cause:** the recipe passed only `./PKG_VERSION_all.deb`; once a file is projected the package's manifest names its `-lc-hr` companion, and `check-debs` requires the pair together.
   **Fix:** pass both, `./"$PKG"*_"$VERSION"_all.deb` (sparky-stereo-console's recipe; dpkg-stereo's passes `./*.deb` into an output folder of its own).
   **How found:** `lean/release.py` `check_debs()`, read before the first build with 0.1.31.
+- **Symptom:** at the upgrade that removes a diversion, dpkg prints `warning: cannot delete old directory '/etc/sparky-stereo-boot': Directory not empty`.
+  **Cause:** the old version shipped the folder that holds the diverted name; at the unpack dpkg tries to remove it, while the owning package's diverted copy is still in it until the postinst renames it back.
+  **Effect:** none: the postinst renames the copy back and removes the empty folder (`rmdir`), `dpkg --audit` is clean. Shipping the folder again would leave it empty and owned for good.
+  **How found:** the upgrade rows of sparky-stereo-boot 0.1.12 to 0.1.13 (rows 629/802), dpkg's own output.
+- **Symptom:** a person's edit of the program the diversion pointed at (`/usr/lib/...`) is gone after the upgrade that removes the diversion, with no word.
+  **Cause:** dpkg removes a file the new version no longer ships; under `/usr` no edit survives any upgrade (Policy 10.7.2: configuration files reside in `/etc`). Measured with sparky-stereo-boot 0.1.12's `10_linux` program; dpkg-stereo had called it `LCCHANGED` before.
 - **Symptom:** after the upgrade that drops a diversion, the owning package's conffile is missing (`dpkg -S` names the owning package, `--verify` says MISSING), with no error from dpkg.
   **Cause:** the successor removed the diversion in its preinst; at the unpack dpkg removed the path as a file the old version shipped and the new one does not, and that was now the owning package's file.
   **Fix:** remove the diversion in the postinst. **How found:** fixture packages, both shapes (a link, a plain file), with and without a person's edit, both places (the table above).

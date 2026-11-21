@@ -107,9 +107,14 @@ Look before you build: `grep -n recordfail /etc/grub.d/* /boot/grub/grub.cfg` on
 What the edition adds (`sparky-stereo-boot` 0.1.11):
 
 - `/etc/grub.d/01_sparky_stereo_menu` writes the function, and while the flag is set: `timeout_style=menu`, the time, and `sparky_stereo_check="fsck.mode=force sparky_stereo.start=unfinished"`, which the kernel line of every Linux entry carries through `GRUB_CMDLINE_LINUX`.
-- `/etc/grub.d/10_linux` is a link to a program that runs Debian's `10_linux` and writes `recordfail` after each `menuentry ... {` of its output.
-  Debian's file is moved aside with `dpkg-divert` (to `/etc/sparky-stereo-boot/10_linux.debian`), the same shape as the diverted `update-initramfs.conf`: a link owned by the package, never a conffile at the diverted name.
-  Only the Linux entries record a start: an entry of another system (Windows, another Linux) must not, or every start of Windows would count as one of ours that did not finish.
+- The call, since 0.1.13 (rows 629/802), with no diversion: Debian's `10_linux` writes `load_video` into each of its entries, recovery included, unless `GRUB_GFXPAYLOAD_LINUX=text` (its lines 124 to 128 in 2.14-5).
+  GRUB runs the last definition of a function (`grub-core/script/function.c`) and sets `chosen` to the entry's id, `parent>child` inside a submenu, before it runs the entry (`grub-core/normal/menu.c`).
+  So `01_sparky_stereo_menu` takes `00_header`'s own `function load_video { ... }` from its output at `update-grub` time (its body depends on `GRUB_VIDEO_BACKEND` and `GRUB_FORCE_EFI_ALL_VIDEO`), writes it again as `sparky_stereo_load_video`, and writes a `load_video` that calls `recordfail` when `regexp '^gnulinux-' "${chosen}"` matches, then that body.
+  `regexp` is in Debian's signed image (`build-efi-images`).
+  `00_header`'s own font lines call `load_video` before any entry runs, with `chosen` unset, so they record nothing.
+  `90_sparky_stereo_start` runs `00_header` and `10_linux` once more and keeps the problem LOCAL97 when a Linux entry (one with a `linux` line) has no `load_video`, or `00_header` writes none; it clears it otherwise.
+  Up to 0.1.12, `/etc/grub.d/10_linux` was a link to a program that ran Debian's file, diverted to `/etc/sparky-stereo-boot/10_linux.debian`; Debian Policy, appendix 7, says "Do not attempt to divert a conffile", and dpkg-stereo read the diverted file as changed by the person. 0.1.13's postinst gives it back (edition-packaging, `taking-over-a-configuration-file.md`).
+  Only the Linux entries record a start: an entry of another system (Windows, another Linux) is `osprober-...` and must not, or every start of Windows would count as one of ours that did not finish.
 - `/etc/grub.d/90_sparky_stereo_start` adds the menu's last entry, there only while the flag is set, with the reason as its title in the system's language.
   It is the last one so that no other entry changes its number (a person's `GRUB_DEFAULT=2` keeps meaning the same entry).
 - The time: the person's `GRUB_RECORDFAIL_TIMEOUT` when set; otherwise a menu that is shown anyway keeps its time, and a hidden one is shown for 30 seconds, GRUB's default for it.

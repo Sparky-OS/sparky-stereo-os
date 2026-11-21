@@ -257,8 +257,8 @@ That is not proof of flat rendering or of current limits, and the person must be
 | Linking the required declaration library fails the runtime's soname gate | DisplayXR's `scripts/package_deb_linux.sh` permits only a list of dependencies whose package names it qualifies across Ubuntu releases; `libstereo-declare.so.1` is not on that list | Report the gate conflict before changing its policy. A compiled call to staged 1.12.1 returned 10/4 unchanged, while the verbatim soname subgate rejected its ELF with exit 1. The held +8 runtime passed that subgate. No package or rendered-eye qualification follows from this dependency probe. |
 | An older skill says the runtime publishes X11 limits, but the held package has no publisher | The skill described an earlier prototype whose reader is absent from the source used for the held package | Search the exact applied source and trace the production caller; a decoder test or a standalone publisher does not establish session-window delivery. |
 
-The dependency blocker remains unresolved in this record.
-No static copy, runtime lookup or gate exemption was introduced to make the check pass.
+The dependency blocker above describes the held predecessor. The edition-only
+successor below resolves it with an explicit package dependency and named patch.
 
 
 ### Edition depth successor
@@ -273,3 +273,21 @@ A missing announcement retains the current camera rig and creates a per-window p
 | A fullscreen test window appears not to follow output limits | XMoveWindow did not move the managed fullscreen window | Use the standard fullscreen-monitor request and verify actual coordinates. Only then compare per-window announcements. |
 | Incremental build refuses an edited source after projection | Lean records the authored inputs of its projection | Commit the correction, refresh the carried patch and recipe pin, and build a fresh projection. Never edit projected source to evade the check. |
 | Vulkan sample headers do not match the sample's extension names | The standalone sample pins a newer displayxr-common than the runtime source component | Build the sample against its own declared dependency tag; leave the runtime's component intact. The sample's CMake pin and upstream tag identify the matching header. |
+
+### Stop before claiming rendered eyes
+
+The unmodified native Vulkan cube sample's existing eye-colour control clears
+view 0 red and view 1 blue. In a paired tracked session started before the local
+runtime, reconnecting the phone made the pose valid but did not produce a valid
+eye pair: the native 3840 × 1080 window contained its blue rectangle at x=640–1279,
+y=0–719, entirely inside the left half, with no blue in the right half. The phone
+capture showed the same identity failure with its lens profile active.
+
+This locates the observed failure at or before the native window, before KRdp
+and phone decoding. The renderer cause is not isolated and no fix is claimed.
+The initial target was 1280 × 720; the recreated output later produced a
+3840 × 1080 window. That size transition is a lead, not a demonstrated cause.
+Retain the native and phone captures, sample log, valid-pose record and fresh
+pairing replay. A replay that reproduces this failure is not stereo qualification.
+Do not proceed to disparity, eye-swap or pose-motion claims until eye identity
+passes in the actual paired route.

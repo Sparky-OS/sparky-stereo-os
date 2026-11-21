@@ -200,6 +200,17 @@ Do not replace the form with an unofficial download or describe media conversion
 
 For a closed program that its vendor offers free of charge (Open Cascade's CAD Assistant, ORDER 559), read the licence text inside the file before preparing the entry: the entry's page says in one sentence that installing accepts the vendor's agreement and where its text is kept, it names the vendor as author, and where the vendor publishes no checksum the pinned SHA-256 is said to be of the file as downloaded on a named day; an AppImage whose runtime needs the FUSE 2 library is unpacked once with its own `--appimage-extract` and started from the unpacked tree under the program's own name ([the recipe and its traps](../../native-linux/references/closed-program-quad-buffer-in-an-appimage.md)).
 
+## A maker's archive (Betterbird, ORDER 70)
+
+A program its maker publishes as one tar archive (Betterbird 153.7.0esr-bb13: one `linux-x86_64.tar.xz` per language, about 81 MB, with a same-origin SHA-256 list and no signature) needs no kind of its own in the edition's AppCenter.
+`download` leaves one checked file in the cache and places nothing; `vendortree` places a pinned tree and removes exactly it, but fetched file by file.
+So the vendor tree's pinned list may name an `archive` (its file under the maker's address, its size, the maker's SHA-256, its top folder) and list the files inside it as for a tree; the archive is fetched once, checked, unpacked in the work folder (regular files and folders only, nothing outside its top folder), every listed file is checked again, and the tree is placed and removed as any tree is.
+
+1. Download the archive once, check it against the maker's list, unpack it, and write the pinned list from what is inside (`src` with the top folder, `dest` without it, size, SHA-256, mode `0755` or `0644`); count its files, links (Betterbird: 55 files, no links) and the C library it needs (`objdump -T`, Betterbird: glibc 2.18).
+2. Read the program's own places before choosing where anything goes: Betterbird reads enterprise policies from `/etc/thunderbird/policies/policies.json` (its `SysConfD`, `MOZ_APP_NAME` is `thunderbird`), then `<install>/distribution/policies.json`, and an add-on's managed storage from a policy naming it, else from `~/.mozilla/managed-storage/ID.json` (its `ext-storage.js` and `NativeManifests.sys.mjs` in `omni.ja`, read with Python's `zipfile`).
+3. Each failure has its own sentence: no network, the archive's or a file's checksum, no room (said before the download: the archive and twice the unpacked size), the archive cannot be unpacked (damaged, a link, a device, a path outside its top folder), and a copy the person placed at the prefix (never replaced). Test each beside `tests/vendortree.py` (`tests/vendortree_archive.py`), the checksum's red control being the green archive with one byte changed.
+4. An entry on one of main's pages (Internet, Email: `netema_betterbird`) is a row of `main-entries.json` with `kind` `tree`; the main page's card shows the pin before the download, and the direct backends route it like Vinci and KamLynk. The page's table keeps its rows of six (CRLF endings): insert in alphabetical order and reflow the cells.
+
 ## The same entry in both app centers
 
 An entry offered to SparkyLinux's main APTus also belongs in the edition's AppCenter, on the same page and with the same protocol key.

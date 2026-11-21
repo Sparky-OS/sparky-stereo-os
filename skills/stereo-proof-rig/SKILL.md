@@ -67,6 +67,11 @@ For a defect that shows only after many runs in one session: one compositor sess
 ScreenShot2 draws each eye itself, and the `--virtual` backend draws its own output once, never per eye: to see the compositor's own choice to draw the scene per eye, run KWin on a DRM output (VKMS in a virtual machine) and read the scanned-out frame.
 The recipe, the vocabulary of the results, the VM and the traps: [relaunch-soak.md](references/relaunch-soak.md).
 
+## A program that aborts now and then (a sanitizer build in the rig)
+
+For a heap fault that shows only sometimes (`malloc(): unaligned tcache chunk detected`): reduce the route to the rig, count starts under a load that shows it (pin the container to two CPUs; a busy loop inside its own quota hides it), build everything of ours in the process with ASan and UBSan from authored source, and when they stay silent move to gdb on each start, a crash-trace preload and Valgrind with the system libraries' debug symbols: a write from an uninstrumented library into freed memory is invisible to ASan by construction.
+The recipe, what each tool can and cannot see, and the traps: [sanitizer-diagnostic-build.md](references/sanitizer-diagnostic-build.md).
+
 ## A real output read back (the frame the display gets)
 
 A capture answers what KWin would draw for each eye; it does not read the output, and it is one moment.

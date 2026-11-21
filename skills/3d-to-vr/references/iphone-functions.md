@@ -1,9 +1,9 @@
 # iPhone package shapes and function icons
 
-Checked 2026-11-20 against Apple's documentation and the current receiver sources.
+Checked 2026-11-20 against Apple's icon documentation; Mac-route status updated 2026-11-21.
 The built shape is three separate programs sharing one KDE Connect pairing.
 The receiver inside KDE Connect is a comparison, not a second built package.
-The [session page](iphone-session.md) now uses Xcode on the Mac, with the person adding the account there; its new helper must pass hosted review before the hardware session.
+The [session page](iphone-session.md) now uses Xcode on the Mac, with the person adding the account there; its unsigned helper passed run 44854555442; signing, shared-keychain access and actual icons still await the hardware session.
 
 ## Installation and seven-day renewal
 

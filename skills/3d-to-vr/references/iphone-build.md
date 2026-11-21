@@ -695,7 +695,9 @@ No download-size figure can be inferred from it.
 Keep the optional-component check in both hosted and first-session paths.
 
 The Mac helper in `ios/Tools/Mac` fetches exact reviewed commits from our three repositories, checks their hashes, builds the dependencies and apps with four jobs, and offers an unsigned path without account or device operations.
-The new `mac-session-intel` job exercises that path and the plain failure branches; its result is pending a reviewed push.
+The `mac-session-intel` job passed that complete unsigned path and 11 authored failure/control-flow tests in [run 44854555442](https://github.com/Sparky-OS/flat-headset/actions/runs/44854555442), read 2026-11-21.
+It used macOS 15.7.9, x86_64, Xcode 26.3 build 17C529, SDK 26.2 and Metal 32023.864.
+The source fetches verified KDE Connect 57d3725b, Cardboard d8ba9bce and receiver 4804c519; no account, phone discovery or signing was performed.
 Its separate artifact contains the three session-built IPAs and checksums, while the existing jobs continue to publish their normal artifacts.
 The signing path uses the person's non-secret team ID only; Xcode obtains provisioning using its own account entry.
 All three signed app profiles are inspected before the first USB install, including expiry, device, app prefix and the shared pairing groups.
@@ -708,8 +710,25 @@ This is a diagnostic guard using Apple's TN3125 plist view, not a replacement fo
 | Signing over SSH reports `errSecInternalComponent` | A locked keychain or a private-key access dialog cannot be satisfied in that context; other certificate failures can produce the same error | Let the person unlock the keychain and authorize `codesign` as Apple's DTS guide describes; never put the password in the helper | Apple DTS thread 712005; real signing still untested |
 | Receiver cannot read KDE Connect's pairing under Xcode signing | The old unsigned build had no receiver signing entitlement; the former external signer injected it | Receiver declares its own default group first and KDE Connect's group second through `$(AppIdentifierPrefix)`; KDE Connect explicitly retains its own default group | Source review of both projects and the shared-group discovery code; signed-profile and phone proof pending |
 | A fork selects an unrelated development team | Upstream KDE Connect's project contained a fixed team and extra capabilities | Remove the fixed team, use our bundle identifier and minimal sideload entitlements; supply the person's team only to Xcode's build | Project-file audit before preparing automatic signing |
-| `ios-deploy --check-developer-mode` is absent from the built tool | Its 1.12.2 source guards that option behind a build definition | Compile the pinned source with `IOS_DEPLOY_FEATURE_DEVELOPER_MODE=1` and check the compiled option string and tool version on the hosted Intel Mac | Inspection of the option table and build settings; hosted helper run pending |
+| `ios-deploy --check-developer-mode` is absent from the built tool | Its 1.12.2 source guards that option behind a build definition | Compile the pinned source with `IOS_DEPLOY_FEATURE_DEVELOPER_MODE=1` and check the compiled option string and tool version on the hosted Intel Mac | Inspection of the option table and build settings, then the compiled-option/version checks passed in run 44854555442 |
 
 The Linux analogue covers supported/wrong macOS, missing Xcode, Xcode too new for iOS 16, missing Metal, no/multiple/wrong/untrusted phone, Developer Mode, source-pin/dirty-tree refusal, profile expiry/team/device/group/order refusals and the no-input command boundary.
 It does not compile Apple's tools, prove a personal keychain unlock or replace a real phone's trust response.
 Keep running the four Objective-C++ stand-in syntax checks before every source push; their SDK/API limitations remain unchanged.
+
+### Comparing helper and individual-job packages (2026-11-21)
+
+In run 44854555442 all six Intel IPA checksums passed, with identical Info.plist contents per program, identical identifiers, one unsigned arm64 iOS executable per package, minimum iOS 16.0 and SDK 26.2.
+None embeds a framework, dylib, provisioning profile or code-signature load command.
+The helper's package counts are 69 KDE Connect, 35 Cardboard and 36 Flat Headset ZIP members; the individual jobs have 76, 38 and 43 respectively.
+The helper does not run the individual workflows' licence-copy steps, so its app bundles omit six, two and six licence-text files respectively, plus the directory entry.
+These are local session builds, not substitutes for the individual jobs' distribution packages; preserve the licence-bearing individual artifacts for redistribution.
+Within each pair every common non-executable file is identical, including all plist/localization/Metal resources.
+The executables differ in size/hash/UUID and contain the different checkout, object, dependency and install-prefix paths; ZIP timestamps also differ.
+The helper receiver is pinned to 4804c519 while its individual job uses 94067879; the intervening commit changes tooling/tests/workflow, not receiver runtime sources.
+This is source-pin and package-structure verification, not a claim of byte-reproducible or runtime-equivalent binaries.
+
+| Symptom | Cause | Fix or boundary | How found |
+| --- | --- | --- | --- |
+| Helper IPA hash differs from its individual-job IPA | Different build directories embedded in executables, binary UUIDs and ZIP times; individual packaging also adds licence texts | Compare identifiers, platform, signatures, source pins and per-file contents; do not promise identical package hashes | Downloaded six IPAs from run 44854555442 and compared their plists, Mach-O commands, strings and ZIP members |
+| Green helper log does not show the installer compile command | The helper captures successful build output in its private work directory, and only failure logs are uploaded | Infer the mandatory compile/version/option checks from the pinned control flow and successful helper completion; do not claim a downloaded installer binary audit | Read all of mac-session-intel and its 12-file artifact inventory |

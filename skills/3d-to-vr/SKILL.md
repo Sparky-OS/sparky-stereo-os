@@ -19,8 +19,9 @@ description: >-
 2. Prove eye identity, geometry and progress first; then change one latency variable at a time and measure each queue. Keep cleanup and reconnect checks.
 3. Return functional captures and measured stage timings separately from physical latency, thermal and optical observations. A cable alone is not USB networking.
 
-For the native iPhone port, read [the Linux build/signing route and eight traps](references/iphone-arm.md), with its [unsigned hosted-macOS build route and paired-session, decoded-frame and explicit software-choice checks](references/iphone-build.md).
-For the three-app phone session, use [the preparation, signing, scan and observation page](references/iphone-session.md); do not start until all three unsigned artifacts are green and checked.
+For the native iPhone port, read [the historical Linux build/signing audit](references/iphone-arm.md), with its [unsigned hosted-macOS build route and paired-session, decoded-frame and explicit software-choice checks](references/iphone-build.md).
+For the three-app phone session, use [the Mac setup, SSH, signing, renewal and observation page](references/iphone-session.md), with [the Xcode signing/keychain and iOS 16 installer facts](references/iphone-mac-signing.md); do not start until the reviewed unsigned builds and session helper are green.
+The [historical account/anisette audit](references/iphone-auth.md) and [function icons and shared-pairing costs](references/iphone-functions.md) retain the earlier findings.
 
 For reverse camera/sensor work, start with the [RDP sensor and emulator preflight](references/rdp-sensors-preflight.md).
 It distinguishes the embedding's build overrides from upstream defaults and checks the actual SDK, container and JDK before an endpoint test.

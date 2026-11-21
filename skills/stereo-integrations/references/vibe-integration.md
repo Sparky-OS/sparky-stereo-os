@@ -1,7 +1,8 @@
 # Vibe presets and captions
 
 Check freshness first: source and published-package audit, 21 November 2026.
-This reference records the integration contract and inspected interfaces; the preset package, seeding service and captions action are not yet implemented or runtime-qualified by this audit.
+This reference records the integration contract, measured startup behavior and candidate runner/seed/caption implementation.
+Source-level and real user-manager tests pass; installed-package, GPU and player proofs must be checked in the final qualification before release.
 
 ## Reconcile before building
 
@@ -55,7 +56,7 @@ Do not infer the store path from `config_watcher.rs`, which watches the applicat
 | First run | `general.firstRun`: coordinate the app's setup and missing-model UI with the no-prompt seed and explicit model-download click. Do not claim that a JSON value alone proves this flow. |
 
 Read the precise object shapes from the approved input and the matching release's consumers before generating presets.
-Download no model in package installation or the seed unit; show the model's size before the person's download click.
+Download no model in package installation or initialization; show the model's size before the person's download click.
 Missing-model behavior was measured in an offline 1920-wide Xvfb rig using the signed v3.3.5 binary.
 With Default, Light and Basic seeded in the actual data store, `general.firstRun=false` still reaches setup when no model exists: the first screen says “No Connection”, offers “Try Again” and “I prefer to download manually”, and shows no model size.
 The app changes `model.path` to null in every case.
@@ -69,7 +70,7 @@ This first-start flow needs an application change or an approved integration flo
 
 ## Seed once without replacing the person's file
 
-The following is an untested implementation pattern, not a shipped service recipe.
+The candidate seeder implements exclusive publication of complete JSON and passes concurrent-writer tests; package installation qualification is separate.
 
 Compute the destination from the recipient's actual store directory, verified against the shipped binary; v3.3.5 uses XDG data.
 An existing file, directory or symlink at that path must be left alone.
@@ -80,7 +81,12 @@ After a successful exclusive commit, remove the temporary name and make the file
 Prove competing seeds, app creation during seeding, failed writes, custom XDG paths, an existing symlink and unchanged contents on every subsequent start.
 
 Runner 0.1.4 declares `program`, `worker` and `menus`; its presence check runs at actions and menu sync, not through a declarative initializer callback.
-Do not claim that an unsupported initializer key supplies late-install seeding.
+The candidate 0.1.5 runner adds `initialize=/absolute/executable`, emitted from pack.json by make-pack.py.
+It runs an idempotent, noninteractive, offline callback only when the program exists, serialized by a per-user, per-pack lock.
+One shared user path unit watches atomic dpkg status replacements and integrations.d changes; login sync and explicit actions call the same initializer.
+A real systemd user manager in an isolated container proved both arrival orders, callback UID 1000, existing bytes, removed declarations and a burst of fifteen package events.
+Disable the service start limit and path trigger limit for this event source; otherwise many package changes can leave initialization disabled.
+Do not backport the declaration alone to 0.1.4 and claim it provides this behavior.
 A login unit with only `ConditionPathExists=/usr/bin/vibe` does not by itself prove late installation works in an already-running user session.
 Exercise pack-first, program-first, late installation and purge; define how the unit is activated before Vibe first creates its store.
 The seed must run without network access and must never wait for a model download.
@@ -92,7 +98,7 @@ No RAM-size interface was found in its inspected command.
 Do not call it from the seed to probe the station or introduce a second GPU detector.
 
 `sparky-stereo-graphics` owns the GPU inventory and policy.
-Its `sparky-gpu-env --list --json` implementation exposes stable IDs, kind, driver, render node, main GPU and measured-best flags; `--app` resolves the program's saved policy.
+Its `sparky-stereo-gpu-env --list --json` implementation exposes stable IDs, kind, driver, render node, main GPU and measured-best flags; `--app` resolves the program's saved policy.
 Vibe's `vibe-server devices` returns ggml device indices, names and descriptions.
 A shared graphics ID is not a ggml index, and a renderable DRM device is not proof that Vibe can use Vulkan on it.
 The bridge between the shared policy and the engine's enumeration still needs a runtime proof, including an explicit user selection and a dual-GPU default.
@@ -106,7 +112,9 @@ The v3.3.5 CLI retains that shape.
 
 In v3.2.2 `server/transcription.rs`, the HTTP transcription handler accepts `response_format` values `verbose_json`, `text`, `srt` and `vtt`; its default returns JSON.
 `server/format.rs` generates numbered SRT blocks with comma milliseconds from engine centiseconds.
-Choose and test either a correct CLI-to-SRT formatter or this HTTP route; do not invent a CLI `--output-srt` option.
+The candidate uses `--word-timestamps --max-segment-len 80`, validates each timed line and converts it into a numbered SRT block with comma milliseconds.
+Do not invent a CLI `--output-srt` option.
+Tests cover spaces in filenames, existing captions, a racing caption writer, failed engines and rejection of untimed output; actual transcription remains a separate proof.
 These interface facts are from source, not a transcription run in this audit.
 
 The Dolphin action belongs to the shared integration runner: missing Vibe offers installation, while missing models and unreadable files must say what failed and how to proceed.
@@ -121,8 +129,19 @@ A caption is identical 2D content in both eyes at the compositor's depth; compar
 | Seeded theme and model settings are ignored. | The loader reads XDG data, while the seed was written to XDG config. | Seed the binary's actual store path, leaving existing files alone. | v3.3.5 first-start runs: wrong-path file byte-identical, separate data store created; corrected-path theme applied. |
 | A dependency repair is proposed for an already-correct package. | An upstream archive was confused with the edition archive. | Inspect the signed repository's exact binary control first; no libgomp1 successor is needed for 3.2.2-1+lc1. | `dpkg-deb -f`, verified offline. |
 | The generated map exists but Vibe still installs alone. | The published inherited AppCenter installer has no map reader. | Implement and exercise the existing main entry's companion-package path. This repair is not yet implemented here. | Archive extraction, search of installed scripts, inspection of `also` handling. |
-| A first-run seed replaces a person's new settings. | Existence check and ordinary rename are not one exclusive operation. | Untested pattern: exclusive destination creation; confirm with a concurrent app writer. | Filesystem operation semantics; no race test yet. |
+| A first-run seed replaces a person's new settings. | Existence check and ordinary rename are not one exclusive operation. | Exclusive publication using a fresh complete temporary JSON and link; never a hard link to a package file. | Twenty concurrent seeds produce one store, and a competing writer remains byte-identical. |
 | Captions saved with an .srt suffix cannot be read as SRT. | CLI output was mistaken for its HTTP formatter. | Test a proper formatter or the API's SRT response. | Both release CLI sources and the v3.2.2 HTTP formatter dispatch. |
 | GPU number 1 selects a different card after enumeration changes. | A personal engine ordinal was treated as hardware identity. | Use the shared graphics resolver, then validate the engine mapping; runtime proof still owed. | Graphics JSON schema and Vibe's device enumeration source. |
 
 Primary sources: [Vibe v3.3.5](https://github.com/thewh1teagle/vibe/releases/tag/v3.3.5), [persisted keys](https://github.com/thewh1teagle/vibe/blob/v3.3.5/desktop/src/lib/config-keys.ts), [store loader](https://github.com/thewh1teagle/vibe/blob/v3.3.5/desktop/src/lib/config-store.ts), [CLI v3.2.2](https://github.com/thewh1teagle/vibe/blob/v3.2.2/server/crates/vibe-server/src/cli.rs), [HTTP transcription](https://github.com/thewh1teagle/vibe/blob/v3.2.2/server/crates/vibe-server/src/server/transcription.rs).
+
+## Settings ownership
+
+Templates are package data; the one live model and transcription store is Vibe's data-home app_config.json.
+The seed never maintains a second profile selection file.
+Read MemTotal directly from /proc/meminfo; use the approved Default threshold of 8 GiB or an engine-usable GPU, otherwise Light.
+Basic remains an explicit template with the Light speech model, ffmpeg retained and AI tasks disabled.
+GPU policy belongs to Graphics; the initial model.gpuDevice is only a mapping to Vibe's enumeration.
+The captions action resolves Graphics' --app vibe.desktop policy on every invocation, so later Graphics choices apply without rewriting the person's native store.
+Match one exact name/description only; an ambiguous match leaves the index null.
+AI connection integration belongs to the Partners page; the pack introduces neither a separate provider store nor a provider-selection UI.

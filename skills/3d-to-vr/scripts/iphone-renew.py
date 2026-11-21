@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Re-sign/install the three reviewed iPhone apps with an already authenticated xtool.
+"""Historical Linux helper; the active Mac procedure is references/iphone-session.md.
+
+Re-sign/install the three reviewed iPhone apps with an already authenticated xtool.
 
 Manifest: {"udid": "...", "apps": [{"role": "kdeconnect", "path": "...ipa",
 "sha256": "...", "bundle_id": "..."}, ...]}.

@@ -2,7 +2,8 @@
 
 **Use Xcode on the Mac to build and sign KDE Connect, Cardboard and Flat Headset, then pair once through KDE Connect.**
 Check freshness first: prepared 2026-11-21 for Intel macOS, Xcode 26.3 and an iPhone on iOS 16.7.
-The three native builds are green on Intel in [run 44850264729](https://github.com/Sparky-OS/flat-headset/actions/runs/44850264729); the new session helper's hosted proof must also be green and reviewed before using its signing path.
+The three native builds and the session helper's complete unsigned path are green on Intel in [run 44854555442](https://github.com/Sparky-OS/flat-headset/actions/runs/44854555442), checked 2026-11-21.
+Its three downloaded packages pass checksum, identifier, unsigned arm64 and iOS 16.0 checks; signing and installation still await the real Mac and phone.
 Nothing here claims a phone run.
 Before any Apple-account sign-in, including the Xcode download page, read [what goes to Apple and what stays on the Mac](iphone-mac-signing.md#before-entering-an-apple-account); the person types those credentials only into Apple's own page or application.
 The former Linux sign-in route is retained only in the [anisette audit](iphone-auth.md); its third-party identity-service question is why this procedure uses the Mac.
@@ -59,7 +60,8 @@ No App Store publishing, paid membership or cloud signing API key is used.
 
 ## First command and expected results
 
-After the new Intel session job for commit `94067879dfa4c59af665983db3195ca296657a55` is green and reviewed, the partner prepares this public source on the Mac:
+Run 44854555442 verified the unsigned helper at commit `94067879dfa4c59af665983db3195ca296657a55`.
+The partner prepares that reviewed public source on the Mac:
 
 ```sh
 git clone --no-checkout https://github.com/Sparky-OS/flat-headset.git "$HOME/FlatHeadset-tools"
@@ -86,6 +88,15 @@ bash ios/Tools/Mac/first-session.sh --unsigned --work "$HOME/FlatHeadset-session
 
 Expected: one verified commit per repository, three arm64 builds, then one `unsigned build verified; nothing installed` sentence per program.
 This compiles the pinned USB installer's source too, but never discovers a phone or signs anything.
+## Choose how to install
+
+Both choices build and sign the same pinned sources with Xcode and use the same Personal Team.
+Choose one explicitly; the helper never switches automatically after a failure.
+The scripted choice uses ios-deploy for USB installation; the Xcode-window choice uses Apple's own installer and does not build or run ios-deploy.
+Both still need the build prerequisites above.
+
+### Scripted installation over SSH
+
 The real session uses the non-secret team ID selected above.
 In the person's private shell set `TEAM_ID` to that ten-character value with a shell assignment; it is neither the account name nor a password.
 Then run:
@@ -102,6 +113,67 @@ Any failed command stops the sequence with a `STOP:` sentence and the action to 
 Keep the work directory private: it contains signed profiles and USB-install logs.
 If a signing build fails, its output is not stored by this helper; check the account, keychain and automatic-signing status in Xcode with the person before retrying.
 If iOS reports an untrusted developer, open **Settings → General → VPN & Device Management** and trust this account's development apps; verification may need Apple's network service.
+
+### Installation in Xcode's own window
+
+This is the choice with no extra USB installation tool.
+Apple says: “Use the Devices and Simulators window to install or uninstall your apps on devices.” ([Xcode Help](https://help.apple.com/xcode/mac/current/en.lproj/devade83d1d7.html), read 2026-11-21).
+The Add button installs an already signed package; it does not turn the hosted unsigned IPA into a signed one.
+The partner first builds with the same reviewed helper functions, omitting USB discovery and ios-deploy entirely.
+At the Mac, select the phone in **Window → Devices and Simulators → Devices** and copy its **Identifier** into the private session's `DEVICE_ID` shell variable; keep it out of chat, repository files and reports.
+Set the non-secret `TEAM_ID` as above.
+Do not proceed if Xcode shows an unavailable, untrusted or preparing phone.
+Run this block from the reviewed FlatHeadset-tools checkout, at the Mac or over SSH; it makes three signed IPA files for the window:
+
+```sh
+python3 - "$HOME/FlatHeadset-session" "$TEAM_ID" "$DEVICE_ID" <<'PYCODE'
+import json, os, shutil, sys, tempfile
+from pathlib import Path
+sys.path.insert(0, str(Path('ios/Tools/Mac').resolve()))
+import session
+try:
+    os.umask(0o077)
+    root = Path(sys.argv[1]).expanduser().resolve()
+    team, phone = sys.argv[2:4]
+    session.host_check()
+    session.signing_flags(team, phone, '')
+    if not phone.strip():
+        raise session.Stop('No phone identifier was supplied; copy it from Xcode Devices and Simulators.')
+    root.mkdir(parents=True, exist_ok=True)
+    if shutil.disk_usage(root).free < 10 * 1024**3:
+        raise session.Stop('Less than 10 GiB is free for this build; free space on the Mac before retrying.')
+    pins = json.loads(session.LOCK.read_text())['repositories']
+    repos = {name: session.fetch_repository(root / 'sources', name, pin) for name, pin in pins.items()}
+    work = Path(tempfile.mkdtemp(prefix='window-', dir=root))
+    print('Private build folder:', work)
+    apps = session.build_apps(repos, work, team, phone)
+    prefixes = [session.verify_signed(app, 'org.sparkyos.' + suffix, team, phone) for _, suffix, app in apps]
+    if len(set(prefixes)) != 1:
+        raise session.Stop('The three profiles use different application prefixes; stop and review the signing team.')
+    for title, suffix, app in apps:
+        payload = work / (suffix + '-ipa') / 'Payload'
+        payload.mkdir(parents=True)
+        shutil.copytree(app, payload / app.name)
+        ipa = work / (suffix + '-signed.ipa')
+        session.run(['ditto', '-c', '-k', '--sequesterRsrc', '--keepParent', payload, ipa])
+        print(title + ': signed package verified; install in Xcode: ' + str(ipa))
+except session.Stop as error:
+    sys.exit('STOP: ' + str(error))
+except (OSError, ValueError, KeyError):
+    sys.exit('STOP: A session file or tool response could not be read; check the private build folder before retrying.')
+PYCODE
+```
+
+This block retains the helper's source pins, four-job builds and all-three-profile checks before packaging.
+It does not discover, install or launch a phone app, and never reads an account or password.
+Its signed path, like the scripted signed path, is reserved for the hardware session; Linux fixtures check its control flow, not Apple's acceptance.
+
+1. At the Mac, keep the phone selected in **Window → Devices and Simulators → Devices**. Under **Installed Apps**, click **+**, choose the printed `kdeconnect-signed.ipa`, then **Open**.
+2. Wait for KDE Connect to appear in Installed Apps, then repeat with `cardboard-signed.ipa`, followed by `flatheadset-signed.ipa`.
+3. If Xcode shows an error, stop and keep its exact wording for review. It is Xcode's dialog, not a `STOP:` line from our script. Do not uninstall an existing app or change its identifier as a shortcut around the error.
+4. When all three appear, continue below. Alternatively, Apple's [Run procedure](https://help.apple.com/xcode/mac/current/en.lproj/dev5a825a1ca.html) installs and launches a source project, but that requires configuring each project's dependency and signing settings; the signed-IPA window procedure above avoids those manual project edits.
+
+The three installed-app entries prove installation only, not pairing, reception or lens alignment.
 
 ## Open, pair, scan, catch
 
@@ -127,6 +199,10 @@ Expect the same three installation sentences, then open the programs and check t
 Do not uninstall the programs to renew them.
 If Xcode's account session has expired, sign in again in Xcode itself; the helper never requests a password or verification code.
 No change of source pin is required just to renew, and new releases are a separate reviewed update.
+For the Xcode-window choice, repeat its signed-package block and replace all three through **Installed Apps → +**, in the same order; no uninstall and no ios-deploy are needed.
+The same expiry and retained-pairing observations apply.
+
+The [before-session table](iphone-mac-signing.md#before-the-session-who-does-what) separates the person's screens, SSH work and exact stop messages.
 
 ## One observation for each unknown
 

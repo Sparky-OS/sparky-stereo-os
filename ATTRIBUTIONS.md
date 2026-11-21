@@ -1474,3 +1474,5 @@ The edition's catalogue additions build on the programs and translator teams cre
 ## iPhone USB installation
 
 Greg Hughes, Sam Marshall, ios-deploy contributors.
+
+Local anisette source audit: **FDKevin**, **jkcoxson**.

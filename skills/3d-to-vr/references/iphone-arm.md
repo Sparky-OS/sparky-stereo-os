@@ -2,9 +2,11 @@
 
 **For contributors porting the phone receiver: the measured Linux tool boundary, the SDK and signing prerequisites, and eight traps to check before an iPhone build.**
 Check freshness first: source and SDK-free Linux probes checked 2026-11-20.
-No native app build, provisioning, installation or optical qualification is established by these probes.
+No native app build, provisioning, installation or optical qualification is established by these historical probes.
+The active procedure is now [Xcode on the Mac](iphone-session.md), verified unsigned in run 44854555442.
+The Linux sign-in and renewal steps below are retained as the earlier investigation, not instructions for the current session.
 
-## Working recipe
+## Historical working recipe
 
 1. Preserve the paired KDE Connect control plane, KRdp/FreeRDP picture and authenticated panel identity; the receiver's button is **Catch**.
 2. Separate a tool that emits arm64 Mach-O from the Apple SDK it still needs: run the freestanding probe below without an SDK.
@@ -16,7 +18,7 @@ No native app build, provisioning, installation or optical qualification is esta
    Use the [unsigned hosted build route](iphone-build.md); the previous local-SDK completion proposal is superseded.
 5. Use a real terminal for the Linux [xtool](https://github.com/xtool-org/xtool) account step, `xtool auth login --mode password`.
    The person enters their own account, password and any verification code; a partner never supplies or records them.
-   The observed prompt discloses virtual-Mac emulation and a third-party anisette service using a randomized token; reaching the prompt proves neither authentication nor signing.
+   Read the source-audited anisette fields, disk storage and local-runtime stop in [the authentication reference](iphone-auth.md) first; reaching a prompt proves neither authentication nor signing.
 6. Once the three reviewed IPAs exist, the person runs `python3 iphone-renew.py /path/to/private/iphone-apps.json` using [the renewal helper](../scripts/iphone-renew.py).
    The helper validates all three files and their hashes before invoking xtool, then targets one explicit USB UDID and stops on the first error.
    Its manifest contains exactly `kdeconnect`, `cardboard` and `flat-headset`, each with `path`, `sha256` and `bundle_id`, plus the top-level `udid`.
@@ -25,7 +27,7 @@ No native app build, provisioning, installation or optical qualification is esta
 7. On the phone, unlock, accept **Trust This Computer** for the intended computer, enable **Settings → Privacy & Security → Developer Mode**, restart and confirm if requested.
    If launch reports an untrusted developer, use **Settings → General → VPN & Device Management** to trust the developer shown for these apps; network access may be required for verification.
    Computer trust, developer trust, Developer Mode and KDE Connect pairing are four distinct steps.
-8. Pair the receiver with the desktop, tap **Catch**, and count success only when the actual desktop arrives through RDP and both eyes are correct through the selected viewer.
+8. Pair the desktop once in KDE Connect; the receiver reads that same provisioned Keychain identity and trust, tap **Catch**, and count success only when the actual desktop arrives through RDP and both eyes are correct through the selected viewer.
    Validate expiry and renewal on the device before calling the seven-day operation proven.
 
 ## Build and installation boundary
@@ -85,7 +87,8 @@ Verify the native drawable and source-to-eye mapping on the device before accept
 KDE Connect iOS has a TLS pairing backend but no `virtualmonitor` plugin in the audited revision.
 Its ordinary background suspension means it cannot simply act as an Android-style permanent broker beside the foreground receiver.
 Embed the KDE Connect protocol/backend in the receiver's foreground process and add the virtual-monitor protocol there; retain the separate KDE Connect program as requested.
-Until shared keychain entitlements are actually provisioned and verified, each executable keeps its own paired identity and pairs explicitly with the same PC.
+The receiver uses KDE Connect’s canonical identity and paired certificates through a shared keychain access group.
+The signer must verify that Apple’s actual provisioning profile permits that group; missing permission is a stop, never a second pairing.
 Do not export pairing secrets or RDP credentials through a custom URL.
 Nonsensitive Cardboard viewer parameters use `flatheadset://viewer?p=BASE64URL`; the receiver validates them again and asks before saving them for its next connection.
 The paste field remains the second route; no pairing secret or session grant travels in this URL.
@@ -123,7 +126,7 @@ Cardboard's iOS/CoreMotion sensor adapter and the tracked design carry over; a R
    **Found by:** Apple's account-limit page and the helper's installation model, not a device experiment.
 7. **Symptom:** the receiver loses its paired control broker after switching apps.
    **Cause:** iOS suspends ordinary background applications.
-   **Fix:** keep the authenticated protocol endpoint in the foreground receiver; verify shared credentials separately if later used.
+   **Fix:** keep the authenticated protocol endpoint in the foreground receiver; verify the provisioned shared keychain access before the one phone session.
    **Found by:** the KDE Connect iOS lifecycle documentation and Apple lifecycle rules; receiver implementation pending.
 8. **Symptom:** hardware decode is selected but a software decoder runs without an obvious product error.
    **Cause:** FreeRDP's FFmpeg VideoToolbox backend is marked experimental and contains fallback paths.

@@ -58,6 +58,12 @@ def prepare(manifest_path):
     return udid, prepared
 
 
+def verify_signer(executable):
+    result = subprocess.run([executable, "sparky-policy"], check=False, capture_output=True, text=True, timeout=20)
+    if result.returncode or not result.stdout.splitlines() or result.stdout.splitlines()[0] != "sparky-shared-pairing-1":
+        raise ValueError("Use the reviewed shared-pairing xtool build; stock xtool drops the required keychain group")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("manifest", type=Path)
@@ -69,6 +75,8 @@ def main():
         executable = shutil.which(args.xtool)
         if not executable:
             raise ValueError("xtool not found; install the reviewed Linux release first")
+        if not args.dry_run:
+            verify_signer(executable)
         for role, path in prepared:
             command = [executable, "install", "--usb", "--udid", udid, str(path)]
             if args.dry_run:
@@ -82,7 +90,7 @@ def main():
         if not args.dry_run:
             print("xtool reported all three installations successful. Open each app on the phone; this does not prove desktop reception or seven-day refresh.")
         return 0
-    except (OSError, ValueError, KeyError, TypeError, zipfile.BadZipFile, plistlib.InvalidFileException) as error:
+    except (OSError, subprocess.TimeoutExpired, ValueError, KeyError, TypeError, zipfile.BadZipFile, plistlib.InvalidFileException) as error:
         print(f"No further action: {error}", file=sys.stderr)
         return 2
 

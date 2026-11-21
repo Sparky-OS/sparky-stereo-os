@@ -7,6 +7,8 @@ from pathlib import Path
 import plistlib
 import tempfile
 import unittest
+from unittest.mock import patch
+import subprocess
 import zipfile
 
 HERE=Path(__file__).resolve().parents[1]
@@ -56,5 +58,15 @@ class ManifestTests(unittest.TestCase):
     def test_bad_udid(self):
         result=join.assemble(self.root,self.commit,'invalid',self.out);self.out.write_text(json.dumps(result))
         with self.assertRaises(ValueError):renew.prepare(self.out)
+
+class SignerPolicyTests(unittest.TestCase):
+    def test_reviewed_signer(self):
+        with patch.object(renew.subprocess, 'run', return_value=subprocess.CompletedProcess([],0,'sparky-shared-pairing-1\nAnisette endpoint: http://127.0.0.1:6969\n')) as call:
+            renew.verify_signer('reviewed-xtool')
+            self.assertEqual(call.call_args.args[0], ['reviewed-xtool','sparky-policy'])
+    def test_stock_or_failed_signer(self):
+        for code, output in [(0,'xtool 1.24.0\n'),(1,'sparky-shared-pairing-1\n'),(0,'')]:
+            with patch.object(renew.subprocess, 'run', return_value=subprocess.CompletedProcess([],code,output)):
+                with self.assertRaises(ValueError): renew.verify_signer('wrong-xtool')
 
 if __name__=='__main__':unittest.main()

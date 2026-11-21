@@ -90,10 +90,24 @@ The new Debian XMLGUI requires icon themes 6.32, but that historical universe pi
 Rebuilding the candidate fork changes only the candidate universe.
 **How found:** read all four conditional policy solves, including the first attempt without either driver lock; inspect the successful candidate resolution and the separately hashed previous universe.
 The final attempt's mutually exclusive NVIDIA locks are secondary and do not explain the first three failures.
-**Disposition:** retain the stop and the exact published snapshot; a passing candidate solve is not a completed comparison.
-The publication maintainer must resolve how to qualify that historical baseline before this gate can pass.
-Do not substitute the successor into the previous snapshot, invent rollback pins, remove predecessor checks, or describe an incomplete invocation as a pass.
-This is a remaining proof-contract boundary, not a failed patch rebase or a defect repaired by another rebuild of the same successor.
+**Rule:** use the link gate's explicit `--previous-archive-config` and `--previous-published-at` mode when the previous edition cannot solve because of packages outside the selected candidate set.
+The gate tries the previous edition alone in the candidate view first and examines every conditional-policy solver attempt.
+Its terminal unsatisfied relation owners must all be outside the candidate set; a request chain naming the predecessor is not itself the cause.
+No selected candidate identity may appear in the previous sibling snapshot or its public universe.
+The dated view must contain the same archives, components and signing keys, with every signed InRelease Date no later than the predecessor publication instant.
+Debian uses its timestamped snapshot service, also no later than publication.
+APT authenticates the InRelease files; the gate independently binds every retained Packages file to its own signed size and SHA-256 and records the metadata hashes.
+All third-party archives need dated signed metadata too: a current deb-multimedia or Sparky index newer than the cutoff cannot stand in for its historical view.
+A missing historical archive is a missing proof input, not permission to omit that archive or change its pins.
+
+The previous exact sibling snapshot must qualify in the dated view, including its runtime libraries and applicable start probes.
+The narrow Recommends case uses that same predecessor view.
+Candidate solving, linking and starting stay in the candidate's frozen view, and regression checks remain in force.
+Each result says which predecessor view it used, and the summary counts dated baselines.
+Without the two options the gate retains its existing behavior.
+The signed offline tests demonstrate current-view red, dated green, both-views red, a post-publication snapshot refusal and an actual missing-library regression that still blocks.
+Additional controls cover candidate contamination, a candidate-owned solver cause, a changed key and mutated authenticated metadata.
+This rule replaces the former proof-contract impasse; it does not make an incomplete whole-pool invocation pass.
 
 **Test-image trap:** a committed build-dependency image can retain `SPARKY_BUILD_INVOCATION` and related provenance variables.
 A unit fixture that intentionally opts out of build provenance then correctly fails because it sees both modes.

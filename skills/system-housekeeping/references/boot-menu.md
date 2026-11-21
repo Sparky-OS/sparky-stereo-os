@@ -115,6 +115,13 @@ What the edition adds (`sparky-stereo-boot` 0.1.11):
   `90_sparky_stereo_start` runs `00_header` and `10_linux` once more and keeps the problem LOCAL97 when a Linux entry (one with a `linux` line) has no `load_video`, or `00_header` writes none; it clears it otherwise.
   Up to 0.1.12, `/etc/grub.d/10_linux` was a link to a program that ran Debian's file, diverted to `/etc/sparky-stereo-boot/10_linux.debian`; Debian Policy, appendix 7, says "Do not attempt to divert a conffile", and dpkg-stereo read the diverted file as changed by the person. 0.1.13's postinst gives it back (edition-packaging, `taking-over-a-configuration-file.md`).
   Only the Linux entries record a start: an entry of another system (Windows, another Linux) is `osprober-...` and must not, or every start of Windows would count as one of ours that did not finish.
+  Proved at boot in QEMU (rows 629/802), under OVMF with Secure Boot on and Debian's signed GRUB (the ESP's `grubx64.efi` has the hash of grub-efi-amd64-signed 1+2.14+5's image), after an upgrade from 0.1.10: `regexp` runs in the signed image, `chosen` is set for the default entry of a hidden menu with no wait (a power cut 1.5 s into the kernel brings the menu at the next start), and a start from inside "Advanced options" records itself too (`chosen` is `gnulinux-advanced-...>gnulinux-...`: the older kernel picked there and cut, the next start shows the menu and carries the forced check).
+  On a BIOS start GRUB's `i386-pc` image loads `regexp` as a module at its first use, and the same power cut brings the menu.
+  Beside Windows the menu keeps its 5 seconds at a normal start and after an unfinished one; ten normal starts each of 0.1.10 and 0.1.13, in turns, show no menu frame and the same time to the kernel (median 2.786 s and 2.787 s).
+  A generated `grub.cfg` reads: 00_header's `function load_video`, its font block's call (Debian's body, before any entry), then 01's `function sparky_stereo_load_video` and the recording `function load_video`, then `load_video` in each of 10_linux's entries, recovery included.
+- **With `GRUB_GFXPAYLOAD_LINUX=text` no start can be recorded, and the person is told.**
+  Debian's `10_linux` then writes no function call into its entries at all (only `set gfxpayload=$linux_gfx_mode`, `insmod`, `echo`, `linux`, `initrd`, all commands, which a function cannot replace), so `update-grub` keeps LOCAL97 and the login says it; a start that does not finish then brings no menu and no forced check (measured).
+  `sparky-stereo-boot repair` runs `update-grub` again, which keeps the problem while the setting stays ("Still failing: update-grub (exit status 0)").
 - `/etc/grub.d/90_sparky_stereo_start` adds the menu's last entry, there only while the flag is set, with the reason as its title in the system's language.
   It is the last one so that no other entry changes its number (a person's `GRUB_DEFAULT=2` keeps meaning the same entry).
 - The time: the person's `GRUB_RECORDFAIL_TIMEOUT` when set; otherwise a menu that is shown anyway keeps its time, and a hidden one is shown for 30 seconds, GRUB's default for it.
@@ -165,6 +172,7 @@ Each row boots a copy-on-write disk (`qemu-img create -f qcow2 -b BASE -F raw`) 
   The kernel line needs `console=ttyS0 earlycon=uart8250,io,0x3f8,115200 ignore_loglevel`, or `quiet` keeps the first line off the port.
 - A damaged root that only a forced check finds: make a file, `sync`, `fsfreeze -f /; fsfreeze -u /` (the journal is written out to its final place), `echo 3 > /proc/sys/vm/drop_caches`, `debugfs -w -R "sif FILE links_count 5" DEVICE` on the mounted root, then the power cut.
   Without the freeze the journal's replay at the next start puts the good inode back and the check finds nothing but the replay.
+- A start from inside "Advanced options" that does not finish: `sparky-stereo-boot menu`, then at the next start the keys to the older kernel and the power cut 1.5 s after its first line (`RIG_CUT_ON` with the keys in one boot); the start after must show the menu, and its kernel line must carry `fsck.mode=force`, which only a set flag adds (the menu asked for once shows anyway).
 - The older kernel from the menu: Down, Enter (the submenu), Down, Down, Enter.
   Send the keys only once the menu is on the screen (two seconds of screenshots that show its box), and take a screenshot after each key: under Secure Boot the firmware takes 14 to 20 seconds on a busy machine, and a key sent by the clock lands on the wrong line.
 - A login screen that fails to start: a unit whose program does not exist, linked as `display-manager.service` and wanted by `multi-user.target`.
@@ -209,6 +217,13 @@ Each row boots a copy-on-write disk (`qemu-img create -f qcow2 -b BASE -F raw`) 
 - **Symptom:** the installer stops at its `fstab` step on a btrfs root in the rig: `TypeError: 'NoneType' object is not iterable`.
   **Cause:** the step reads `btrfsSubvolumes` from the installer's storage, which the mount step fills.
   **Fix:** the rig makes the subvolume `@`, mounts the root from it and puts `[{"mountPoint": "/", "subvolume": "/@"}]` in the storage, as the installer's own mount step does.
+- **Symptom:** a rig check "no diversion of 10_linux" passes on a system that has one.
+  **Cause:** the guest's dpkg speaks the system's language: `dpkg-divert --list` prints "desvio de ..." on a pt_BR guest, so a grep for "diversion of" never matches.
+  **Fix:** `LC_ALL=C dpkg-divert --list` and `LC_ALL=C dpkg -S` in the guest's commands.
+  **Found by:** reading the guest's `cmd.log` beside the passing check.
+- **Symptom:** "no forced check on the kernel line" fails on a start whose kernel line has none.
+  **Cause:** the facts file also quotes `grub.cfg`, whose header always defines `sparky_stereo_check="fsck.mode=force ..."`.
+  **Fix:** read the `== cmdline` line of that start only; a check is shown able to fail by running it on a row that did carry the check.
 - **Symptom:** lintian prints `systemd-service-file-refers-to-unusual-wantedby-target` twenty times for one unit.
   **Cause:** sleep targets in the unit's `[Install]` line, counted once per link.
   **Fix:** the package ships the links in the targets' `.wants` folders; `[Install]` names `multi-user.target` only.

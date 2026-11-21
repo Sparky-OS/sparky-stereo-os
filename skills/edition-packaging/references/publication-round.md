@@ -728,3 +728,7 @@ Treat a source changelog containment test as a lead for review, not a feature-pr
 For a whole-pool Lintian delta, group increased contexts by tag and demonstrated cause, retaining counts, one concrete example, and the owning fix or false-positive evidence.
 A common helper's purge/error handling and a valid space-containing conffile can require reading the actual helper or an isolated dpkg unpack to explain a diagnostic.
 Name new error-severity findings in edition-authored packaging at the top of the hand-back even when the functional gates pass; a classified finding is not a corrected package.
+
+A patch-reader size cutoff can silently make two large patches compare equal as two missing values.
+Read and hash every member named by `series`, and fail if any member was not read; a large combined edition patch is still a patch that must be compared.
+The symptom was identical `missing` hashes for different generations; removing the reader's cutoff exposed the actual depth-conversion and cache-invalidation changes for review.

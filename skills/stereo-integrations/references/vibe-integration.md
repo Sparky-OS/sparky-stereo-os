@@ -2,7 +2,7 @@
 
 Check freshness first: source and published-package audit, 21 November 2026.
 This reference records the integration contract and measured startup, installed-package initialization and caption behavior.
-The optional role and final graphical proofs must be qualified alongside the package before publication.
+The optional role was installed and removed on the published desktop dependency set; graphical caption and dictation controls ran in private Plasma Wayland sessions.
 
 ## Reconcile before building
 
@@ -159,3 +159,31 @@ The generated catalogue is a separate package; declaring integrations.tsv does n
 - **The desktop dependency cannot be installed.** A rig with Debian, deb-multimedia and the edition can still omit SparkyLinux's own AppCenter. Add authenticated core and tiamat indexes and their verified public key, matching the image's apt setup. The resolver names the missing sparky-aptus-appcenter dependency; do not replace it with a dummy package.
 - **A selected installed model still leads to setup.** The frontend enumerates the native models folder before checking model.path. For an independently downloaded rig model, place it in that folder or set the native models_folder value to its directory. A file elsewhere being readable is enough for the CLI but not for the GUI's installed-model list. This was found by comparing session.tsx with get_models_folder in cmd/app.rs, then opening the signed binary.
 - **A fake-input pointer click does nothing.** Its virtual pointer disappears when the short-lived client exits. Use one persistent input client, or navigate the selected file's context menu with keyboard events and confirm the highlighted action before Enter. Read back the resulting SRT and hash the media; a menu screenshot alone does not prove the action ran.
+
+## Installed role and graphical evidence
+
+A role uses the creator task's dependency convention: Depends on the desktop, Recommends for its programs.
+Installing with recommendations can also bring a recommended program's existing runtime recommendations.
+In the minimal desktop rig, the new task brought Vibe, its pack, xdg-desktop-portal, fuse3 and the two json-glib packages, with no removals.
+Purging a task alone leaves the programs; explicitly purging the test additions restored the baseline package set.
+The generated catalogue Breaks older integrations metas, so ship the matching integrations meta with it.
+A catalogue-only upgrade removed the desktop meta in the negative test; the matching pair retained it and left Vibe and the optional task absent.
+The inert data pack enters the shared integrations meta by the existing data-pack rule, without putting Vibe on the image.
+
+Compare subtitle content with an independently captured no-subtitle control, not just whole eye buffers or a tolerance threshold.
+The published VLC renderer had an exactly equal complete caption band with visible text and a scene box at +40 pixels disparity.
+Haruna's complete band failed equality by one RGB code, including background dithering.
+On a black-background marked clip, a separate no-subtitle capture established R=B=0 and G=0 or 1 in that band.
+All 25,548 visible subtitle-ink pixels (R or B nonzero in either eye) then compared exactly in RGB, while the scene box retained its disparity.
+Keep the full-band failure alongside this narrower content proof; neither a white-only glyph comparison nor a numerical tolerance proves all caption content identical.
+
+For dictation, start a real private Plasma session, give it a synthetic PipeWire microphone, select the independently downloaded model through Vibe's native store and enable its own shortcut in that test account only.
+Prove each target accepts an ordinary key and that the microphone received speech before testing the shortcut.
+The signed 3.3.5 application inserted no speech into Kate, Konsole or a Qt Quick TextArea in the tested Plasma Wayland session; Konsole echoed two NUL shortcut characters, and the other fields remained empty.
+This is a measured negative result, not a diagnosed cause or a claim that speech transcription fails: the same model and clip worked through the installed captions action.
+Do not enable dictation in the shipped presets based on a failed insertion test.
+
+The future Partners-page adapter reads sparky-stereo-partnersrc through KConfig: program-specific Program/vibe/text choices override Default/text, and Interface/<id> supplies Kind and Url.
+An empty Model means none was selected; never invent a model or credential.
+The adapter's destination is Vibe's native ai.connection object, and enabling tasks remains the person's choice.
+The presets do not implement that adapter or maintain another connection store.

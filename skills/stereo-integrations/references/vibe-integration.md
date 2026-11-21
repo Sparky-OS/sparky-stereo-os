@@ -1,8 +1,8 @@
 # Vibe presets and captions
 
 Check freshness first: source and published-package audit, 21 November 2026.
-This reference records the integration contract, measured startup behavior and candidate runner/seed/caption implementation.
-Source-level and real user-manager tests pass; installed-package, GPU and player proofs must be checked in the final qualification before release.
+This reference records the integration contract and measured startup, installed-package initialization and caption behavior.
+The optional role and final graphical proofs must be qualified alongside the package before publication.
 
 ## Reconcile before building
 
@@ -39,8 +39,8 @@ Do not infer the store path from `config_watcher.rs`, which watches the applicat
 
 | Preset value | Persisted key and handling |
 |---|---|
-| Default model | `model.path`: resolve `ggml-large-v3-turbo.bin` inside this user's model directory; never copy another account's absolute path. |
-| Light model | `model.path`: `ggml-medium-q8_0.bin`; no smaller-model substitution. |
+| Default model | Recommend `ggml-large-v3-turbo.bin` in text; omit `model.path` because first start clears an absent model. |
+| Light model | Recommend `ggml-medium-q8_0.bin` in the AppCenter and role description; omit the ineffective `model.path`. |
 | Basic model | Same speech model as Light; keep ffmpeg, disable AI tasks. |
 | GPU | `model.gpuDevice`: null in portable preset data; first-run selection must respect the shared graphics policy and the person's choice. A machine-specific ordinal is not portable. |
 | Audio processing | `transcription.ffmpegOptions`: preserve loudness normalization and the other approved values. |
@@ -53,10 +53,10 @@ Do not infer the store path from `config_watcher.rs`, which watches the applicat
 | Transcript line layout | `transcript.lines`: `original`, the upstream default; retains engine segmentation rather than regrouping into sentences or paragraphs. |
 | Transcript export | `transcript.exportOptions`: PDF settings with speakers and timestamps shown, light appearance. |
 | AI | `ai.connection`, `ai.tasks`: never seed credentials or a private cloud-model selection; tasks remain disabled. Shared-engine configuration belongs to its own integration. |
-| First run | `general.firstRun`: coordinate the app's setup and missing-model UI with the no-prompt seed and explicit model-download click. Do not claim that a JSON value alone proves this flow. |
+| First run | `general.firstRun=false` survives, but cannot suppress upstream setup when no model is installed. Preserve the unmodified optional application's first start. |
 
 Read the precise object shapes from the approved input and the matching release's consumers before generating presets.
-Download no model in package installation or initialization; show the model's size before the person's download click.
+Download no model in package installation or initialization. The optional application retains its own setup behavior; the pack must not claim that its preset selects the model or adds download consent.
 Missing-model behavior was measured in an offline 1920-wide Xvfb rig using the signed v3.3.5 binary.
 With Default, Light and Basic seeded in the actual data store, `general.firstRun=false` still reaches setup when no model exists: the first screen says “No Connection”, offers “Try Again” and “I prefer to download manually”, and shows no model size.
 The app changes `model.path` to null in every case.
@@ -65,12 +65,12 @@ That control proves a way to avoid automatic setup, not a complete consent-compa
 The source explains the result: `pages/main/session.tsx` clears a missing model and navigates to setup unless skipped; setup's effect calls `downloadIfOnline()` on mount.
 Without an explicit route URL, setup takes `config.modelUrls.default` (large-v3-turbo), not the cleared preset model.
 No online run or model download was performed; automatic downloading when online is a source finding, not an observed transfer.
-Keep the required size-before-click and Light model rules; do not ship the skip control as if it satisfied both.
-This first-start flow needs an application change or an approved integration flow before the presets can be shipped.
+Do not ship the skip control. Keep upstream first start unchanged, and name the Light/Basic recommendation in the optional installation descriptions.
+After removing model.path, isolated starts preserved all 15 Default and Light keys and all 14 Basic keys byte-for-value; this includes analytics off, AI tasks off, the two new default-valued keys and FFmpeg normalization. These offline tests do not claim an online download was observed.
 
 ## Seed once without replacing the person's file
 
-The candidate seeder implements exclusive publication of complete JSON and passes concurrent-writer tests; package installation qualification is separate.
+The seeder implements exclusive publication of complete JSON. Both concurrency tests and installed-package arrival tests pass.
 
 Compute the destination from the recipient's actual store directory, verified against the shipped binary; v3.3.5 uses XDG data.
 An existing file, directory or symlink at that path must be left alone.
@@ -88,7 +88,7 @@ A real systemd user manager in an isolated container proved both arrival orders,
 Disable the service start limit and path trigger limit for this event source; otherwise many package changes can leave initialization disabled.
 Do not backport the declaration alone to 0.1.4 and claim it provides this behavior.
 A login unit with only `ConditionPathExists=/usr/bin/vibe` does not by itself prove late installation works in an already-running user session.
-Exercise pack-first, program-first, late installation and purge; define how the unit is activated before Vibe first creates its store.
+Installed-package tests proved pack-first, program-first, late installation, byte-identical existing data and purge while the user manager was already running. Package purge removes its declaration and menu, and preserves personal data.
 The seed must run without network access and must never wait for a model download.
 
 ## One GPU inventory
@@ -101,8 +101,8 @@ Do not call it from the seed to probe the station or introduce a second GPU dete
 Its `sparky-stereo-gpu-env --list --json` implementation exposes stable IDs, kind, driver, render node, main GPU and measured-best flags; `--app` resolves the program's saved policy.
 Vibe's `vibe-server devices` returns ggml device indices, names and descriptions.
 A shared graphics ID is not a ggml index, and a renderable DRM device is not proof that Vibe can use Vulkan on it.
-The bridge between the shared policy and the engine's enumeration still needs a runtime proof, including an explicit user selection and a dual-GPU default.
-Do not silently substitute another device when the selected one cannot run.
+Prove the bridge with each actual card and an explicit saved per-app choice. A unique exact name or description match maps to its ggml index; duplicated names or no exact match leave the index null.
+Measured PCI marketing names differed from Vulkan descriptions on both AMD and NVIDIA, so both mappings were null. Single-card isolated transcription passed on both; that is not proof of a certain ordinal mapping on a dual-GPU system. Do not invent substring matching or a second inventory.
 
 ## Command-line output and captions
 
@@ -114,8 +114,7 @@ In v3.2.2 `server/transcription.rs`, the HTTP transcription handler accepts `res
 `server/format.rs` generates numbered SRT blocks with comma milliseconds from engine centiseconds.
 The candidate uses `--word-timestamps --max-segment-len 80`, validates each timed line and converts it into a numbered SRT block with comma milliseconds.
 Do not invent a CLI `--output-srt` option.
-Tests cover spaces in filenames, existing captions, a racing caption writer, failed engines and rejection of untimed output; actual transcription remains a separate proof.
-These interface facts are from source, not a transcription run in this audit.
+Tests cover spaces in filenames, existing captions, a racing caption writer, failed engines and rejection of untimed output. Actual installed action runs on AMD and NVIDIA produced the same three timed sentences from generated speech, and the movie hash remained unchanged. The real Dolphin context action also produced the sibling SRT.
 
 The Dolphin action belongs to the shared integration runner: missing Vibe offers installation, while missing models and unreadable files must say what failed and how to proceed.
 Write captions as a separate sibling file, without modifying the source media or replacing existing captions without consent.
@@ -128,10 +127,10 @@ A caption is identical 2D content in both eyes at the compositor's depth; compar
 |---|---|---|---|
 | Seeded theme and model settings are ignored. | The loader reads XDG data, while the seed was written to XDG config. | Seed the binary's actual store path, leaving existing files alone. | v3.3.5 first-start runs: wrong-path file byte-identical, separate data store created; corrected-path theme applied. |
 | A dependency repair is proposed for an already-correct package. | An upstream archive was confused with the edition archive. | Inspect the signed repository's exact binary control first; no libgomp1 successor is needed for 3.2.2-1+lc1. | `dpkg-deb -f`, verified offline. |
-| The generated map exists but Vibe still installs alone. | The published inherited AppCenter installer has no map reader. | Implement and exercise the existing main entry's companion-package path. This repair is not yet implemented here. | Archive extraction, search of installed scripts, inspection of `also` handling. |
+| The generated map exists but Vibe still installs alone. | The published inherited AppCenter installer has no map reader. | Implement and exercise the existing main entry's companion-package path. The fork override and inherited direct-entry path both install the program and its pack. | Archive extraction, search of installed scripts, inspection of `also` handling. |
 | A first-run seed replaces a person's new settings. | Existence check and ordinary rename are not one exclusive operation. | Exclusive publication using a fresh complete temporary JSON and link; never a hard link to a package file. | Twenty concurrent seeds produce one store, and a competing writer remains byte-identical. |
 | Captions saved with an .srt suffix cannot be read as SRT. | CLI output was mistaken for its HTTP formatter. | Test a proper formatter or the API's SRT response. | Both release CLI sources and the v3.2.2 HTTP formatter dispatch. |
-| GPU number 1 selects a different card after enumeration changes. | A personal engine ordinal was treated as hardware identity. | Use the shared graphics resolver, then validate the engine mapping; runtime proof still owed. | Graphics JSON schema and Vibe's device enumeration source. |
+| GPU number 1 selects a different card after enumeration changes. | A personal engine ordinal was treated as hardware identity. | Use the shared resolver, then accept only a certain engine mapping; measured unmatched names remain null. | Graphics JSON schema and Vibe's device enumeration source. |
 
 Primary sources: [Vibe v3.3.5](https://github.com/thewh1teagle/vibe/releases/tag/v3.3.5), [persisted keys](https://github.com/thewh1teagle/vibe/blob/v3.3.5/desktop/src/lib/config-keys.ts), [store loader](https://github.com/thewh1teagle/vibe/blob/v3.3.5/desktop/src/lib/config-store.ts), [CLI v3.2.2](https://github.com/thewh1teagle/vibe/blob/v3.2.2/server/crates/vibe-server/src/cli.rs), [HTTP transcription](https://github.com/thewh1teagle/vibe/blob/v3.2.2/server/crates/vibe-server/src/server/transcription.rs).
 
@@ -145,3 +144,18 @@ GPU policy belongs to Graphics; the initial model.gpuDevice is only a mapping to
 The captions action resolves Graphics' --app vibe.desktop policy on every invocation, so later Graphics choices apply without rewriting the person's native store.
 Match one exact name/description only; an ambiguous match leaves the index null.
 AI connection integration belongs to the Partners page; the pack introduces neither a separate provider store nor a provider-selection UI.
+
+## Optional role task
+
+Add a role through lists/make-meta.py and its role list, following the creator task.
+The partner enhanced accessibility features task recommends Vibe and its data pack, with the standard sparky-stereo-desktop dependency.
+Keep it in OPT_IN so the full image meta does not recommend it; do not remove Vibe from creator.
+Future engine/page names live in the role's pending list and enter its recommendations only after the edition index publishes them.
+The generator's ordinary apt lookup is insufficient for this future-package condition.
+The generated catalogue is a separate package; declaring integrations.tsv does not change an already-built catalogue.
+
+## Runtime traps
+
+- **The desktop dependency cannot be installed.** A rig with Debian, deb-multimedia and the edition can still omit SparkyLinux's own AppCenter. Add authenticated core and tiamat indexes and their verified public key, matching the image's apt setup. The resolver names the missing sparky-aptus-appcenter dependency; do not replace it with a dummy package.
+- **A selected installed model still leads to setup.** The frontend enumerates the native models folder before checking model.path. For an independently downloaded rig model, place it in that folder or set the native models_folder value to its directory. A file elsewhere being readable is enough for the CLI but not for the GUI's installed-model list. This was found by comparing session.tsx with get_models_folder in cmd/app.rs, then opening the signed binary.
+- **A fake-input pointer click does nothing.** Its virtual pointer disappears when the short-lived client exits. Use one persistent input client, or navigate the selected file's context menu with keyboard events and confirm the highlighted action before Enter. Read back the resulting SRT and hash the media; a menu screenshot alone does not prove the action ran.

@@ -240,3 +240,22 @@ The joined paired controls repeat both signed-axis mountings, stale/epoch/replay
 The optional flat preview's touch proof uses a private pre-join source build, with its existing preference on. A real tap yields zero production requestRecenter method entries before the correction and one after; an outside tap yields zero and no remote mouse event. Returning the preference to its default off hides the local status control and retains the same flat descriptor without a tracking field. The tracked paired test separately proves origin/status delivery; a local callback observation alone does not establish a pose channel in flat mode.
 
 Retain compiled binaries, exact package/APK hashes and a fresh factory-userdata launcher for independent review. The no-build replay pairs through actual UI and daemon acceptance, checks the held owner-message red and successor name/fallback/clear, both cold/warm function entries and stop/start with one pairing. Never retain a seeded pairing as proof. A completed fresh-image replay checks the tool permissions and bootstrap as well as the product; a manually repaired running container does not qualify the saved image.
+
+
+## Depth from the engine
+
+The edition's runtime must use the session window output's final KWin limits without a class multiplier, strength or absolute-depth override.
+KWin already tailors those numbers to the screen; multiplying a headset announcement by 2.5 again applies the headset adjustment twice.
+Use libstereo-declare's conversion, not a copied formula.
+In 1.12.1, `stereo_depth_wayland_get_buffer_limits` uses the selected surface's output width when protocol version 6 supplies it; the older display-wide helper is ambiguous on multiple outputs.
+Watch the window's actual output and settings changes, and retain no guessed announcement when either is unavailable.
+The held +8 legacy resolver retains its current camera rig when no announcement exists; its first rig is the existing default.
+That is not proof of flat rendering or of current limits, and the person must be told through the edition's failure engine.
+
+| Symptom | Cause | Fix or required action; how found |
+| --- | --- | --- |
+| Linking the required declaration library fails the runtime's soname gate | DisplayXR's `scripts/package_deb_linux.sh` permits only a list of dependencies whose package names it qualifies across Ubuntu releases; `libstereo-declare.so.1` is not on that list | Report the gate conflict before changing its policy. A compiled call to staged 1.12.1 returned 10/4 unchanged, while the verbatim soname subgate rejected its ELF with exit 1. The held +8 runtime passed that subgate. No package or rendered-eye qualification follows from this dependency probe. |
+| An older skill says the runtime publishes X11 limits, but the held package has no publisher | The skill described an earlier prototype whose reader is absent from the source used for the held package | Search the exact applied source and trace the production caller; a decoder test or a standalone publisher does not establish session-window delivery. |
+
+The dependency blocker remains unresolved in this record.
+No static copy, runtime lookup or gate exemption was introduced to make the check pass.

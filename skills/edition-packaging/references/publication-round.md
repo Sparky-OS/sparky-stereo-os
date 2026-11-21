@@ -136,6 +136,46 @@ If the build record names another descriptor, search only the authorized bounded
 - **Fix:** rebuild the retained descriptor, admit complete genuine receipts only after all-member equality, and hold a differing source with its required family. For this cohort the coordinator required Graphics and both Qt sources to travel together, so all three stayed out while the remaining cohort continued.
 - **How found:** Calamares branding's two archives matched and its repaired receipts passed the source audit; Graphics' streamed payload/control maps exposed five differing installed files and two control members. The original recorded descriptor was absent from the bounded search, so its origin was not inferred.
 
+### Compare generated kernel-meta versions with the published controls
+
+A round suffix is a Debian version input, not merely a unique label.
+Before staging generated metas, read each published kernel-meta Version and require `dpkg --compare-versions "$new" gt "$published"` for a replacement.
+Perform that comparison for every generated binary, including kernel metas whose version is independent of the ordinary round version.
+After generation, repeat it on `dpkg-deb -f "$deb" Version`, and retain the installed-target check in the upgrade proof.
+
+- **Symptom:** apt's simulation offers many upgrades, no removals and nothing kept back, but does not offer two selected kernel metas.
+- **Cause:** a generated `7.3.4+stereo3d18+round20261121.794` sorts below published `7.3.4+stereo3d18.703+lc1`; the added plus suffix is less than the existing dot suffix in Debian version ordering.
+  The round preparer supplied that suffix without comparing the resulting version to the published control.
+- **Fix:** reject that generated version before freezing and generate a monotonic version through the recipe's supported input; an already frozen failing pool stays blocked, with its target mismatch preserved.
+  The correction still needs source receipts, qualification and the actual installed upgrade proof.
+- **How found:** ORDER 794's installed-target assertion compared 61 selected upgrades against the full apt Inst log and named both missing metas, despite a simulation with 78 Inst and zero Remv.
+  No real upgrade had run when the check stopped.
+
+### Check the whole output set before repairing receipts
+
+Before comparing members, compare the exact binary filename sets from the accepted descriptor, existing receipts and retained stage with the rebuild's outputs.
+Require every primary, debug and HR archive named by the source to have an accepted reference.
+An equality check over only the files found in both folders cannot certify a missing companion.
+Keep the set comparison beside the member comparison and the repaired receipts.
+
+- **Symptom:** a receipt repair appears possible because the main binary and descriptor are present, but an existing receipt names a debug archive absent from the stage.
+- **Cause:** comparing only retained files would leave part of the source build without an accepted reference.
+- **Fix:** hold that source when the missing reference cannot be recovered within its authorized stage; do not manufacture an accepted debug archive from the rebuild.
+  For complete sources, require equal output sets before checking every payload and control member.
+- **How found:** the receipt filenames exposed two incomplete source families during ORDER 794; eleven other repairs passed both exact output-set equality and all-member comparison.
+
+### Carry a held generation through dependency selection
+
+A newer accepted binary without its own source closure remains held under the coordinator's ruling.
+Select the newest earlier accepted generation whose complete closure is available; if it is already published, retain the published bytes.
+Read every candidate's actual dependency constraint against that version before freezing the pool.
+Hold any dependent source whose version requirement cannot be met, and stop the round when a required meta cannot survive that hold.
+
+- **Symptom:** retaining an earlier complete library appears to solve a binary-only stage, but a separately staged integration pack still cannot install.
+- **Cause:** the pack requires the held library's newer version explicitly; acceptance of the pack does not relax that constraint.
+- **Fix:** keep both the newer library and that pack out, name the retained published version and each unsatisfied relation, and qualify the remaining metas against the actual supplied universe.
+- **How found:** ORDER 794's source inventory found no complete intermediate layer, and reading the integration pack's Depends exposed its minimum version; the required edition meta passed its archive check with the earlier published layer retained.
+
 ### A clean successor when the accepted descriptor cannot reproduce its binary
 
 An exact receipt repair and a new source-built successor are different operations.

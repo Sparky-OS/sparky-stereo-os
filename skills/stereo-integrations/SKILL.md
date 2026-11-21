@@ -113,7 +113,7 @@ Audit the real commands before writing an action; do not invent flags. For Hugin
 ## Step 2: choose the kind of package
 
 - **Data pack** (above): scripts, presets, fragments, service menus, `/etc/xdg` defaults.
-- **Native pack**: anything compiled against the program.
+- **Native pack**: anything compiled against the program. The first one, `sparky-stereo-obs` for OBS Studio, has the recipe: building against the shipped program's development package, how the program finds the module with no click, what its events and settings let a module reach, driving it in a rig and the traps: [a native pack](references/native-pack.md).
 - **Inside our rebuild**: when the edition rebuilds the program anyway (`+stereo3dN`), the integration is a patch in that build and needs no discovery.
 - **Settings only**: `/etc/xdg/<app>rc` for a default the person has not set; a `kconf_update` script only to move an existing key.
 
@@ -160,4 +160,5 @@ A pack that only calls a program's command line, as these two do, needs no messa
 From the lanes of 25 October to 6 November 2026; add the next lesson here as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 
 - Symptom: a `bash -c '...'` script breaks at parse. Cause: an apostrophe inside a comment in a single-quoted script; the same with an apostrophe inside `"${var:-word}"` in a function. Fix: no apostrophes in such comments; use a plain variable. (lane nvidia-legacy-354)
+- Symptom: OBS 33 never loads a module copied to `~/.config/obs-studio/plugins/NAME/`. Cause: its plug-in manager reads a person's modules from `$XDG_DATA_HOME/obs-studio/plugins/NAME/` (the config folder is the legacy layout, with `bin/64bit/`). Fix: the system folder for a package, `~/.local/share` for a test; found in `PluginModuleLoader_Linux.cpp` when the log's "Loaded Modules" list lacked it ([a native pack](references/native-pack.md); lane obs-stereo-61obs)
 - Symptom: stereo-display-info says "not announced" when the probe itself failed or timed out. Fix: separate "could not be checked (timeout / exit status / not installed)" from "not announced"; catalogue unreadable is told and kept as a person problem, not treated as nothing installed (lane no-fallbacks-system-346f3)

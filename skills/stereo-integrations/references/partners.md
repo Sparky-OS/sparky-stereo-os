@@ -47,9 +47,26 @@ The recipe's `tests/` folder, each in a throwaway Debian testing container where
 - `engine-empty.sh` (an ordinary user, `--network none`): the unit's own `ExecStart` and `Environment` lines; listening on `127.0.0.1:11434` and nothing else; no model in the store; a `moz-extension://` origin gets `Access-Control-Allow-Origin`, a web page's origin `403 Forbidden`; a model download fails with its cause ("dial tcp: lookup registry.ollama.ai ... network is unreachable") and the store stays empty.
 - `runners-link.sh ollama ollama-rocm`, and `ollama-cuda` with NVIDIA's CUDA 13.5 runtime installed: every program and ggml back end resolves its libraries (`ldd` with `/usr/lib/ollama` on the path, since the engine loads `libggml-base` before it opens a back end).
 - `gpu-discovery.sh CUDA` (the RTX 3060 through CDI, NVIDIA's driver 615 on the host): `library=CUDA compute=8.6 "NVIDIA GeForce RTX 3060" libdirs=ollama,cuda_v13 driver=13.4`; the 13.5 runtime runs on the driver's CUDA 13.4.
-- Not proven: the Vulkan runner on that card in the rig (`load_backend: failed to initialize backend from /usr/lib/ollama/vulkan/libggml-vulkan.so: ggml_backend_init returned NULL`, with NVIDIA's ICD file present through CDI; no `vulkaninfo` in the rig to look further); the ROCm runner on an AMD card (none here that its gfx list covers).
+- `gpu-discovery.sh Vulkan` on the same card without `ollama-cuda` (with the rig's `libxext6` and `libegl1`, see the traps): `library=Vulkan description="NVIDIA GeForce RTX 3060" libdirs=ollama,vulkan`.
+- Not proven: the ROCm runner on an AMD card (none here that its gfx list covers).
 - Perks of the engine's own log: `OLLAMA_DEBUG=2` prints each `llama-server` discovery run with its `libDirs`, and the native probe stops at the first back end that fails to start, so hiding CUDA with `CUDA_VISIBLE_DEVICES=-1` also hides every later back end.
 - With cloud-hosted models allowed, the running engine asks `ollama.com` at start for its hosted model list and its model recommendations (no text is sent): seen as two failed requests in a run with no network.
+
+## Which card the engine uses: measured on Ollama 0.40.16
+
+On a computer with an RTX 3060 and both the CUDA and Vulkan runners installed, through CDI, no model:
+
+| Variables | The engine's card |
+| --- | --- |
+| none | CUDA, RTX 3060 |
+| `OLLAMA_LLM_LIBRARY=cuda_v13` | CUDA, RTX 3060 |
+| `GGML_VK_VISIBLE_DEVICES=-1` | CUDA, RTX 3060 |
+| `OLLAMA_LLM_LIBRARY=vulkan` | processor only |
+| `CUDA_VISIBLE_DEVICES=-1 OLLAMA_LLM_LIBRARY=vulkan` | processor only |
+
+With `ollama-cuda` absent, the same card is found through Vulkan (`library=Vulkan ... libdirs=ollama,vulkan`).
+So with the CUDA runner installed, hiding CUDA does not move the engine to another card: the native probe stops at the back end that fails to start, and only the processor is left.
+A choice of "the other card" on such a computer needs the CUDA runner out of the engine's way; choosing among NVIDIA cards, or the processor, works with CUDA's own variables.
 
 ## Which runner a computer gets
 
@@ -126,6 +143,10 @@ AMD has no line yet: the ROCm runner carries gfx1030, gfx1100 to gfx1102, gfx115
   **Cause:** rocBLAS's kernels are ELF files for the AMD GPU; the gate takes another machine's ELF as data only in an `Architecture: all` package under `/usr/share` (its rule follows Debian's qemu-system-data and Lintian's binary-from-other-architecture), and fails it anywhere else by design.
   **Fix:** move the kernel folder to an `Architecture: all` package under `/usr/share/PROGRAM`, with a `debian/PACKAGE.links` line that puts it back where the library looks, and a Lintian override for `arch-independent-package-contains-binary-or-object` naming why.
   **How found:** the gate's messages after the NVIDIA fix, and its rule in `sparky-os/lean/linkcheck.py` (`GUEST_DATA`).
+- **Symptom:** the Vulkan runner on an NVIDIA card in a container: `load_backend: failed to initialize backend from .../libggml-vulkan.so: ggml_backend_init returned NULL`; `vulkaninfo` says "Failed loading library associated with ICD JSON libGLX_nvidia.so.0", then "Could not get 'vkCreateInstance' via 'vk_icdGetInstanceProcAddr'".
+  **Cause:** CDI brings NVIDIA's libraries without their package dependencies: `libGLX_nvidia.so.0` links `libXext.so.6` and opens `libEGL.so.1` at run time, and a minimal container has neither (a desktop has both through NVIDIA's driver packages).
+  **Fix:** in the rig, install `libxext6` and `libegl1` with `vulkan-tools`; nothing changes in the package.
+  **How found:** `vulkaninfo --summary` in the container named the first library; the second is the stereo-two-cameras skill's trap for the same message (`LD_DEBUG=files vulkaninfo`).
 - **Symptom:** the publish check stops a recipe on a mail add-on's id as "another person's email address".
   **Cause:** a Gecko extension id may have the form of an address (ThunderAI's does).
   **Fix:** Daniel, 2026-11-21: "addon IDs look alike emails huh? that place then is not an exeption, it's not an email": in a policy's own key for the add-on it is an identifier and stays as it is; the coordinator teaches the check that place.

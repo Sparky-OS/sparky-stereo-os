@@ -22,6 +22,17 @@ The depth is Jmol's own: 10 px in front of the screen, past a popped limit of 4.
 **The fit:** draw the figure once with Matplotlib's own camera while recording every point it projects with an Axes3D's own matrix (wrap `proj3d._proj_transform_vec` and `_proj_transform_vec_clip`, match the matrix by identity): data, panes, grid, ticks and labels. Disparity is linear in `b`, so each point's disparity per unit offset gives the largest `b` for which every point inside the 3D area stays within `[-popped, +sunk]`. A planar polygon's depth between its corners is bounded by its corners', so no drawn pixel passes a limit.
 **The limits:** `stereo_declare.x11_buffer_limits(display, window, buffer_width, shown_width)` on the declared window (libstereo-declare 1.11 or later), never an arithmetic of the module's own.
 
+**Measured** (the installed package, a Tk figure 960x720 in a virtual Stereo KWin 1920 wide; a tilted surface and three markers; prediction `b x disparity per unit offset` from the module's own trace of `b`):
+
+| Row | Offset b | Near marker | Far marker | Vertical | Blocks, 1st to 99th percentile | Inside the limits | Within half a pixel of the screen |
+|---|---|---|---|---|---|---|---|
+| Tk, limits 10/4, AMD (also Qt on xcb and the RTX 3060: the same numbers) | 0.0765 | -2.98 / -2.99 px | +2.63 / +2.64 | at most 0.04 | -3.01 .. +3.74 | 100 % | 20.1 % |
+| limits 20/8 | 0.1531 (twice) | -5.98 / -5.98 | +5.34 / +5.29 | at most 0.04 | -5.98 .. +7.06 | 100 % | 11.0 % |
+| orthographic, 10/4 | 0.0083 | -3.11 / -3.05 | +3.08 / +3.05 | at most 0.02 | -3.03 .. +4.10 | 100 % | 17.2 % |
+| a live change 10/4 to 20/8 | 0.0765 then 0.1531 | | | | -3.01 .. +3.74 then -5.98 .. +7.06 | 100 % | |
+
+Controls: Debian's Matplotlib alone, flat and undeclared; Enable 3D off, flat and undeclared; Qt on native Wayland, flat and told once in the person's language; nothing differs between the eyes outside the 3D area in any pair row. Negative control: with the eyes exchanged the rendered-pair test fails.
+
 ## Traps
 
 - **Symptom:** the nearest pixel of the captured pair stands at -3.04 px where the popped limit is 4, so the plot has a quarter less depth than the rule allows. **Cause:** Matplotlib's axis code projects all eight corners of the axes' box (`Axes3D._transformed_cube`, from `Axis3D._get_coord_info`) to choose which panes to draw; the corner nearest the camera is never drawn, yet it bound the fit. **Fix:** skip the projections made inside `_transformed_cube` while recording, and add the corners of the panes `active_pane()` picks. The offset grew by 18 % and the nearest recorded points are drawn edges. **Found by:** listing the recorded points with the largest crossed disparity: one place on screen, projected many times, with no pixel of the capture there.

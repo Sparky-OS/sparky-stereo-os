@@ -66,7 +66,8 @@ The source explains the result: `pages/main/session.tsx` clears a missing model 
 Without an explicit route URL, setup takes `config.modelUrls.default` (large-v3-turbo), not the cleared preset model.
 No online run or model download was performed; automatic downloading when online is a source finding, not an observed transfer.
 Do not ship the skip control. Keep upstream first start unchanged, and name the Light/Basic recommendation in the optional installation descriptions.
-After removing model.path, isolated starts preserved all 15 Default and Light keys and all 14 Basic keys byte-for-value; this includes analytics off, AI tasks off, the two new default-valued keys and FFmpeg normalization. These offline tests do not claim an online download was observed.
+After removing model.path, Default and Light have identical retained JSON; their speech-model recommendations differ only in text.
+Isolated starts preserved all 15 Default and Light keys and all 14 Basic keys byte-for-value; this includes analytics off, AI tasks off, the two new default-valued keys and FFmpeg normalization. These offline tests do not claim an online download was observed.
 
 ## Seed once without replacing the person's file
 

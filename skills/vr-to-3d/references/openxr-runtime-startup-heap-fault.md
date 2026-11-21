@@ -40,3 +40,13 @@ A runtime change is not the fix: the same library race reaches any program that 
 5. Red and green: Debian's libxext source rebuilt unchanged still crashes the program 10 of 10; rebuilt with the fix it finishes 10 of 10 and memcheck reports 0 errors. The runtime +11 itself, unchanged, pinned to two CPUs, with the library given by `LD_LIBRARY_PATH`: with DisplayXR's 1 ms poll 4 failures in 20 starts (stock), 2 in 20 (rebuilt unchanged), 0 in 20 (fixed); without it 4 in 40 (stock), 0 in 40 (fixed).
 
 The rig, the tools and their traps: [stereo-proof-rig: a diagnostic build with sanitizers](../../stereo-proof-rig/references/sanitizer-diagnostic-build.md).
+
+## The edition's package
+
+The fix ships as the edition's own libxext: `libxext6`, `libxext-dev` and `libxext-doc` 2:1.3.4-1+stereo3d1+lc1, amd64 and i386, Debian's 2:1.3.4-1 with the patch (recipe `sparky-os/packages/libxext/`; how it was built and every trap: [a Debian base library with a patch of our own](../../edition-packaging/references/a-debian-base-library-with-a-vendor-patch.md)).
+A machine with the runtime needs only `libxext6` from it (and `libxext-dev` where that is installed, because it pins `libxext6` to its own version).
+Measured with the packages installed by apt, never by `LD_LIBRARY_PATH` (2026-11-21, queue row 762c, two CPUs pinned):
+
+- the stress program: Debian's 2:1.3.4-1+b4 broke the heap in 10 of 10 rounds, ours finished 10 of 10, and memcheck reported no error in 10 of 10;
+- the runtime +11 sample on lane 762's image, unchanged against the same image with the edition's libxext6: with DisplayXR's 1 ms poll 2 failures in 20 starts (both SIGSEGV) against 0 in 20; without it 0 in 40 against 0 in 40 (the start-up fault is rare without the poll: 4 and 2 in 40 in earlier series); the image rebuilt from the final packages gave 0 in 20 and 0 in 40 again;
+- Dolphin, Konsole, Kate, System Settings, gtk4-demo, xeyes and glxgears start under the edition's KWin; gtk4-demo and the two X11 programs map the installed library.

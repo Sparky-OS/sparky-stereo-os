@@ -763,3 +763,5 @@ Keep the index hashes alongside the pool hash and distinguish a newly selected u
 When a partial Debian Frameworks transition breaks the published desktop as well as the candidate, measure the whole fork set before rebuilding.
 Bind one signed snapshot for the successor builds and all index-dependent proofs, preserve every edition patch and binary source fixture, and leave a fork on its current source until testing supplies its successor.
 The [Frameworks transition recipe](frameworks-transition.md) records the measurement and source-preparation traps; source preparation alone does not qualify the new binaries.
+
+When a Frameworks transition builds past failed tests or removes a retired Debian compatibility library, use the measured cases in [Frameworks transitions](frameworks-transition.md); the build exit alone does not qualify its tests, and every removal needs its own evidence.

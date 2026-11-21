@@ -56,3 +56,13 @@ Compare every binary's file list with the published version, explain each remove
   **Cause:** upstream Debian produces one ordinary binary, while the edition's Lean Code step also emits HR companions.
   **Fix:** retain the edition's existing multi-binary debhelper form while incorporating the new Debian packaging elsewhere.
   **How found:** the old Debian, published edition and new Debian control-file comparison isolated that sequence change.
+
+- **Symptom:** the source build continues after CTest reports three failures in HEIF JPEG reading, HEJ2 writing and AVCI reading.
+  **Cause:** the new tests need libheif codec plug-ins absent from Build-Depends, and Debian's rules append an unconditional `|| true` through `fail_param`.
+  **Fix:** add the signed archive's JPEG decoder/encoder, JPEG 2000 encoder and FFmpeg decoder as test build dependencies; remove the ignored return from the amd64 test invocation and rebuild from a committed recipe.
+  Keep the test bodies and enabled formats unchanged.
+  **How found:** the complete CTest summary reported 42 of 45 passing while dpkg-buildpackage proceeded; individual diagnostics named missing codecs, and apt-cache policy showed the edition already publishes them.
+- **Symptom:** the transition simulation removes `libkirigamipolyfill6`.
+  **Cause:** upstream Kirigami commit `38f09a837eed7e4984d744e148d0f8a2b99cfcbc` removed the unused SafeArea compatibility module after raising the Qt floor beyond 6.9.
+  **Fix:** retain the exact removal, old/new controls and upstream retirement evidence for transaction review; do not confuse an obsolete Debian compatibility package with an edition dependency being removed by the solver.
+  **How found:** reading all Remv lines exposed the package, and the upstream tag comparison identified its deliberate removal.

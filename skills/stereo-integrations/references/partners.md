@@ -77,6 +77,39 @@ Vulkan's choice between the two cards without the CUDA runner (`ollama` only, `O
 `compute-env` uses the PCI form of `DRI_PRIME` with `!` (two identical cards have the same vendor and device ids) beside the loader's driver filter; Mesa's environment variables page: "For Vulkan it's possible to append !, in which case only the selected GPU will be exposed to the application".
 For CUDA it uses the card's UUID from `/proc/driver/nvidia/gpus/SLOT/information`, and `-1` for any other card (CUDA C++ Programming Guide 13.0: "If one of the indices is invalid, only the devices whose index precedes the invalid index are visible"); for ROCm, the card's place among the KFD's graphics nodes, matched by `drm_render_minor` in `/sys/class/kfd/kfd/topology/nodes/N/properties`, with `HIP_VISIBLE_DEVICES=0`, since HIP otherwise falls back to `CUDA_VISIBLE_DEVICES` (ROCm's HIP environment variables page). The ROCm part is not proven here: the APU is gfx90c, which the runner does not carry, and `/dev/kfd` was not passed.
 
+## The Partners page (sparky-stereo-partners 0.1.0)
+
+- **Where it sits:** a category of its own at the top of System Settings: `share/settings-partners.desktop` in `/usr/share/systemsettings/categories/` (`X-KDE-System-Settings-Category=partners`, an empty parent, weight 55, between Apps & Windows and Security & Privacy), and the page's metadata names `partners` as its parent. Plasma 6.7's System Settings reads every `categories/*.desktop` on the data path (`app/SettingsBase.cpp`), so a package adds one without a patch; seen on screen in the rig.
+- **One command for every fact and change:** `sparky-stereo-partners status --json | resolve --kind K [--program ID] | set-default | program | card | engine on|off | models | download | provider | install-plan | install`. The page (a thin `KQuickConfigModule`) runs it, so programs, tests and the page read the same answers; choices wait for Apply, actions run at once.
+- **Settings:** `/etc/xdg/sparky-stereo-partnersrc` (shipped) under `~/.config/sparky-stereo-partnersrc`, key by key; the command writes only the person's file, through `kwriteconfig6`. The card is not in it: it is Graphics' `[Render] Partners`.
+- **Install:** `pkexec /usr/libexec/sparky-stereo-partners/install-engine plan|install`, root, with the hardware setup's own `partner` lines (`sparky-stereo-hardware --auto --dry-run` needs root, so the sizes of the runner are shown after the one authentication, `auth_admin_keep`, before anything is downloaded).
+- **Downloads:** the model's size from the registry's manifest first; held on a metered connection and when NetworkManager cannot say (exit 5, "Download anyway" is the person's explicit choice), through `sparky-stereo-apt`'s `metered()`.
+- **Rows, as run (`tests/partners-test.sh`, 49 checks):** in a container booted with systemd, the packages installed by apt, no network: the engine on and off through `systemctl --user`, its address taken (exit 6, the other program named, kept), the card that cannot be used (exit 4, kept by Graphics), the model list from a stand-in registry, a download held when metered and when unknown, the stand-in's few kilobytes downloaded, the registry gone (exit 3, kept), a provider and a program's own choice, `resolve`.
+
+## The page's traps
+
+- **Symptom:** a stand-in registry serves a blob and Ollama 0.40.16 says "http: no Location header in response".
+  **Cause:** Ollama follows a redirect inside the registry's origin and takes the Location of one that leaves it (`server/download.go`, `downloadDiscoveryRedirect`), as the real registry sends a blob to its CDN.
+  **Fix:** the stand-in answers a blob with 307 to another origin of this computer (`127.0.0.2` for `127.0.0.1`; `localhost` resolved to `::1` and was refused).
+  **How found:** the engine's error, then the source.
+- **Symptom:** `kwallet-query -w` on a new account: "Wallet kdewallet not found".
+  **Cause:** `kwallet-query` never makes a wallet; since KF 6.18 Debian's `kwallet6` runs `ksecretd` behind a `kwalletd6` shim.
+  **Fix:** ask KDE Wallet to open the wallet over D-Bus (`org.kde.KWallet.open`, `gdbus call`), which makes it through its own dialog.
+  **How found:** the command's own message in the rig.
+- **Symptom:** in a rig session, the wallet's daemon dies at once ("Process org.kde.kwalletd6 received signal 6").
+  **Cause:** D-Bus activates it with the environment `dbus-run-session` had before `WAYLAND_DISPLAY` was set.
+  **Fix:** `dbus-update-activation-environment WAYLAND_DISPLAY QT_QPA_PLATFORM XDG_RUNTIME_DIR`, as a Plasma login does.
+  **How found:** the command's message, then the daemon run by hand.
+- **Symptom:** an apt install in a rig stops at "Configuration file '/etc/apt/sources.list.d/sparky-stereo.sources' ... end of file on <standard input> at conffile prompt".
+  **Cause:** the rig wrote the edition's source file before installing `sparky-stereo-apt`, which ships it as a conffile.
+  **Fix:** `-o Dpkg::Options::=--force-confnew`.
+- **Symptom:** the link gate, or a rig's apt, cannot install an edition package: "sparky-stereo-apt Depends sparky-apt", then "sparky-stereo-hardware Depends nvidia-detect".
+  **Cause:** the edition's packages depend on SparkyLinux's own repository (`repo.sparkylinux.org`, suites `core` and `tiamat`) and on Debian's `non-free`.
+  **Fix:** both in the gate's `sources.json` (with SparkyLinux's public key) and in the rig, and the edition's packages the page depends on as the gate's siblings.
+- **Symptom:** `systemsettings kcm_sparkystereo_partners` shows no window after 15 seconds in the rig.
+  **Cause:** the page runs `status --json` before it shows (about 5 s in the rig: the Graphics command is asked five times).
+  **Fix:** wait for KWin's window list (a KWin script printing `workspace.windowList().length`), never a fixed sleep.
+
 ## Which runner a computer gets
 
 The hardware setup answers, as it answers for every per-vendor piece: `sparky-stereo-hardware`'s detection prints a plan line of its own kind, `partner`, naming `ollama-cuda` for the cards the edition's open modules run (Turing and newer, which run CUDA 13).

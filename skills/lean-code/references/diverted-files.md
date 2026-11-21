@@ -23,7 +23,7 @@ A record of bash's `/etc/skel/.bashrc`, projected when dpkg-stereo was installed
 
 Only the conffiles whose owner was projected before the diversion existed show the row.
 On the round's image bash is in the base container before dpkg-stereo, so its `.bashrc` has a record; `nano`, `zsh-common` and `initramfs-tools` arrive in the same apt run as the packages that divert their conffiles, so the scan met the diversion first and made no record; `/etc/issue`, `/etc/issue.net` and `10-uname` have no comments to remove and are never projected.
-`grub-common`'s `10_linux` was projected in the published image (boot 0.1.10 did not divert it) and diverted by the upgrade to 0.1.11.
+`grub2-common`'s `10_linux` was projected in the published image (boot 0.1.10 did not divert it) and diverted by the upgrade to 0.1.11.
 
 ## Fix (0.1.43)
 

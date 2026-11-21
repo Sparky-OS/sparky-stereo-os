@@ -190,3 +190,6 @@ Read the project's own current contribution and translation rules. KDE routes tr
   **Cause:** the test expects a blank, unmarked 400×200 picture to be flat. The installed Stereo Layer treats its 2:1 shape as side by side.
   **Fix:** keep the gate enabled and run the same test on the unmodified published source against the same library. If it reproduces, retain the translation recipe and record the package gate failure.
   **How found:** both the published source and the candidate failed only the same assertion in `EngineTest::probePictures`.
+
+- A numeric Qt argument may touch a word. A validator using a word boundary after the digit missed `%2` in the Korean OBS value `%2입니다`. Read the complete digit run after `%` and compare the resulting argument sequence. For width and height messages, check the order of both dimensions against the call site.
+- OBS's module locale and the layer catalogue can ship different parts of one dialog. The module loads `stereo-layer_qt` for shared controls like “Enable 3D” and “Display Settings…”. A published layer older than the module's minimum version can lack a shared key. Compile the catalogue from the minimum supported layer source and check the exact context and terms. Use OBS's own frontend locale for its menu and settings labels.

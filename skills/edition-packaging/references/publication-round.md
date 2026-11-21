@@ -796,3 +796,8 @@ The mode still exits 1 while any uncovered stop remains; it retains every input,
 Keep `uninstallable-predecessors.json` and the summary's separate list headed `published predecessor not installable at its publication`.
 Describe each such input in the round's description as repairing already published breakage; never call the old baseline passing.
 The main publication invocation must carry the same historical-view options and evidence bindings; a stage list alone does not select this proof mode.
+
+A provider-presence inventory is not a second policy grammar check for every unrelated signed archive entry.
+Keep legacy mixed-case virtual names and compact version syntax literally; a signed third-party office alias exposed this during the full-run startup.
+Count a transitive missing dependency only when the required path has no alternate virtual provider, and retain the named path as evidence.
+The complete archive solver remains authoritative for installability.

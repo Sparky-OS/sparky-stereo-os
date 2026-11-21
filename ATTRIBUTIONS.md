@@ -1470,3 +1470,7 @@ The edition's catalogue additions build on the programs and translator teams cre
 | Variety, Karton, XScreenSaver | Peter Levi and James Lu in Variety's `AUTHORS`; Aaron Rainbolt and Derek Lin for Karton; Jamie Zawinski and the XScreenSaver contributors. |
 | Language teams | The KDE localization teams, including Eloy Cuadra and the Spanish team whose published catalogues supplied terms for the shared glossary. |
 | Throw and Catch | Fabian Druschke and Aleix Pol i Gonzalez for KDE Connect, Aleix Pol Gonzalez and Arjen Hiemstra for KRdp, Urs Wolfer and Tony Murray for KRDC, and Xaver Hugl and Vlad Zahorodnii from the KWin source credits above. |
+
+## iPhone USB installation
+
+Greg Hughes, Sam Marshall, ios-deploy contributors.

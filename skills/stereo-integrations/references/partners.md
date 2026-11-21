@@ -84,6 +84,7 @@ For CUDA it uses the card's UUID from `/proc/driver/nvidia/gpus/SLOT/information
 - **Settings:** `/etc/xdg/sparky-stereo-partnersrc` (shipped) under `~/.config/sparky-stereo-partnersrc`, key by key; the command writes only the person's file, through `kwriteconfig6`. The card is not in it: it is Graphics' `[Render] Partners`.
 - **Install:** `pkexec /usr/libexec/sparky-stereo-partners/install-engine plan|install`, root, with the hardware setup's own `partner` lines (`sparky-stereo-hardware --auto --dry-run` needs root, so the sizes of the runner are shown after the one authentication, `auth_admin_keep`, before anything is downloaded).
 - **Downloads:** the model's size from the registry's manifest first; held on a metered connection and when NetworkManager cannot say (exit 5, "Download anyway" is the person's explicit choice), through `sparky-stereo-apt`'s `metered()`.
+- **The wallet row, as run:** on a new account the first key makes KDE Wallet show its new-wallet dialog (driven by fake input in the rig: Classic, a password twice); the key read back from the wallet is the key written, the settings file holds only `Wallet=sparky-stereo-partners/provider-ID`, and no file in the home folder or `/etc/xdg` holds the key.
 - **Rows, as run (`tests/partners-test.sh`, 49 checks):** in a container booted with systemd, the packages installed by apt, no network: the engine on and off through `systemctl --user`, its address taken (exit 6, the other program named, kept), the card that cannot be used (exit 4, kept by Graphics), the model list from a stand-in registry, a download held when metered and when unknown, the stand-in's few kilobytes downloaded, the registry gone (exit 3, kept), a provider and a program's own choice, `resolve`.
 
 ## The page's traps
@@ -108,6 +109,13 @@ For CUDA it uses the card's UUID from `/proc/driver/nvidia/gpus/SLOT/information
   **Cause:** with gpgme present, `ksecretd`'s new-wallet page (KF 6.30) selects "Use GPG encryption, for better protection"; "Classic, blowfish encrypted file" is the other choice.
   **Fix:** none needed: the choice is the person's; a test that drives the dialog clicks Classic first.
   **How found:** the rig's picture of the dialog.
+- **Symptom:** KDE Wallet makes the wallet through its dialog (`kdewallet.kwl` appears), yet the step that asked reports it was not made.
+  **Cause:** the handle `org.kde.KWallet.open` answered through KF 6.30's `kwalletd6` shim was not a usable answer.
+  **Fix:** ask the wallet itself afterwards (`kwallet-query -l`), write the key, read it back with `-r`, and count the step only when the key read back is the key written.
+  **How found:** the rig's wallet folder and the command's message.
+- **Symptom:** fake input built into `$XDG_RUNTIME_DIR` says "Permission denied" when run.
+  **Cause:** the user manager mounts `/run/user/UID` without exec.
+  **Fix:** build it in the home folder. In the wallet's dialog, the first click on "Classic, blowfish encrypted file" only focuses the window: click twice, then Enter (Next), type the password, Tab, type it again, Enter (Finish).
 - **Symptom:** the page's lists show "None" for an interface that is set.
   **Cause:** `currentIndex: indexOfValue(...)` ran before the ComboBox had its model, and is not evaluated again when the model arrives.
   **Fix:** read the index from the list itself: `model.findIndex(o => o.value === current)`.

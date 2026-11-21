@@ -24,6 +24,8 @@ The depth is Jmol's own: 10 px in front of the screen, past a popped limit of 4.
 
 ## Traps
 
+- **Symptom:** the nearest pixel of the captured pair stands at -3.04 px where the popped limit is 4, so the plot has a quarter less depth than the rule allows. **Cause:** Matplotlib's axis code projects all eight corners of the axes' box (`Axes3D._transformed_cube`, from `Axis3D._get_coord_info`) to choose which panes to draw; the corner nearest the camera is never drawn, yet it bound the fit. **Fix:** skip the projections made inside `_transformed_cube` while recording, and add the corners of the panes `active_pane()` picks. The offset grew by 18 % and the nearest recorded points are drawn edges. **Found by:** listing the recorded points with the largest crossed disparity: one place on screen, projected many times, with no pixel of the capture there.
+
 - **Symptom:** an interactive figure redraws without end once the pair is drawn. **Cause:** marking an axes stale (`ax.stale = True`) when the eye cameras are put on or taken off makes a figure in interactive mode schedule a redraw, whose draw event draws the pair again. **Fix:** never mark stale around `Figure.draw`; a draw computes every projection anew.
 - **Symptom:** a test that counts projected points fails with exactly three. **Cause:** with the axes switched off only the markers are projected. Count what the scene draws; test the axes box separately (panes, grid and labels give more than fifty points).
 - **Symptom:** Tk or Qt dies on an X error after the canvas is destroyed. **Cause:** Xlib's error handler is one for the whole process and the toolkit's Xlib shares it. **Fix:** set a quiet handler only around the module's own calls, `XSync`, and put the previous one back.

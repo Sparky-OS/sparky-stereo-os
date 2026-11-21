@@ -9,8 +9,7 @@ description: >-
   a VR game should play on a 3D TV, the HUD or crosshair doubles, effects smear across the eyes, a spectator view must
   keep the headset's camera, OpenXR or Waydroid needs gralloc/dma-buf transport, Sneeze needs two eyes, an
   OpenVR program must run with no SteamVR (xrizer, openvrpaths.vrpath, VR_Init Installation Not Found, both eyes show
-  the left view), an OpenVR or OpenXR program on a 3D screen has no head or wrong depth (depth limits, tv or headset,
-  DXR_VIEW_SUNK_PX), or a Linux gamepad gives no pose (evdev).
+  the left view), an OpenVR or OpenXR program on a 3D screen has no head or wrong depth (the window output's announced limits), or a Linux gamepad gives no pose (evdev).
 ---
 
 # From a VR engine to a 3D display
@@ -94,9 +93,11 @@ The recipe, the controls, the numbers and the traps (SDL on Wayland crashes the 
 ## No head on a 3D screen (checked 2026-11-09)
 
 On a 3D screen the program drives the view and no tracker runs: the runtime's keyboard and mouse driver or a gamepad (the Linux evdev reader, three layers, each tested alone) gives the head pose, and the eye separation and screen plane come from the runtime, not from the program.
-They follow the depth limits Stereo KWin announces for the output (`kde_stereo_depth_v1.depth_limits`: the person's limits built on the display), with the person's choices on top under the browser's names: class `tv` or `headset` (`DXR_VIEW_CLASS`, never read from the output), strength, screen plane, absolute sunk and popped (`DXR_VIEW_SUNK_PX`, the file `view-depth`).
-A hosted session's window is an X11 client: from Stereo KWin +stereo3d52 (declaration version 10) it is told its limits in `_KDE_NET_WM_STEREO_DEPTH_LIMITS` and the runtime follows them live; on an older KWin the runtime says `Depth limits: none` and why. The property, the traps and the proof are in the reference.
-Measured against the limits alone the disparity is within 0.07 px rms at two sets, the pictures change as a camera moved, and every wrong value is refused and said once.
+The edition takes the output's final limits from Stereo KWin, with no runtime class factor, strength or absolute override.
+Use libstereo-declare's `stereo_depth_limits_for_buffer` for the engine's unit conversion, and follow the session window when its output or the person's setting changes.
+The screen plane, upstream camera profiles and chained rigs are separate from this removal.
+The held +8 runtime still contains the older overrides and has no production caller of `u_depth_limits_publish`; do not mistake the earlier prototype's measured path for that package's implementation.
+The production connection and rendered-eye qualification are pending; the dependency preflight is recorded in the [tracked-phone clause map](references/tracked-phone-headset.md#depth-from-the-engine).
 The closed forms, the files, the finding, the proof, the gamepad's mapping and tests, and the traps (a pointer gesture split over two tool calls, why 100 px turn 11.345 degrees, a capture older than the log, a mutation test that stays green) are in [pose-and-separation-on-a-3d-screen.md](references/pose-and-separation-on-a-3d-screen.md).
 
 ## Who runs whose VR software

@@ -5,6 +5,16 @@ A 3D screen has no head.
 An OpenVR or OpenXR program that expects one gets its view from the runtime's keyboard and mouse driver (qwerty) or from a gamepad, and the eye separation and screen plane come from the desktop's depth limits and the person's choices on top, not from numbers of the runtime's own.
 Both live in the runtime, so every program gets them with no setting of its own, and nothing in KWin changes ([openvr-on-the-openxr-runtime.md](openvr-on-the-openxr-runtime.md) has the chain).
 
+## Current edition requirement, 2026-11-21
+
+The measurements below describe the earlier prototype, not the held +8 package's production connection.
+The edition now requires KWin's output limits unchanged, with no runtime class, strength or absolute-depth replacement.
+The old override table below is historical evidence, not setup instructions for the edition.
+The screen plane and upstream camera profiles/chained rigs remain outside this removal.
+The held +8 source has no production caller of `u_depth_limits_publish`; the older X11 reader described below is not present there.
+Use the engine's library for buffer-unit conversion and prove live changes on the actual session window before claiming that path works.
+See [depth from the engine](tracked-phone-headset.md#depth-from-the-engine).
+
 ## Where the view comes from
 
 A legacy application (no `XR_DXR_display_info`) never chooses its own camera.
@@ -43,7 +53,7 @@ A scene nearer than D s / (s + q) pops past the popped limit: the camera does wh
 The runtime logs one `Depth limits:` line with the values in force, that distance included, whenever they change.
 The runtime's comfort rule (the plane no nearer than the viewer) still holds, and the line says when it binds.
 
-The person's choices on top, with the names the runtimes and the upstream browser offer use (`dom.vr.flat.mode`, `depth-strength`, `screen-plane-mm`; the edition's browser no longer has them):
+Historical prototype overrides, superseded for new edition work, with the names the runtimes and the upstream browser offer used (`dom.vr.flat.mode`, `depth-strength`, `screen-plane-mm`; the edition's browser no longer has them):
 
 | Choice | Environment | File in the configuration directory |
 | --- | --- | --- |

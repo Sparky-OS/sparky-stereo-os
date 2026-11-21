@@ -100,6 +100,18 @@ For CUDA it uses the card's UUID from `/proc/driver/nvidia/gpus/SLOT/information
   **Cause:** D-Bus activates it with the environment `dbus-run-session` had before `WAYLAND_DISPLAY` was set.
   **Fix:** `dbus-update-activation-environment WAYLAND_DISPLAY QT_QPA_PLATFORM XDG_RUNTIME_DIR`, as a Plasma login does.
   **How found:** the command's message, then the daemon run by hand.
+- **Symptom:** asking KDE Wallet to make a wallet with `gdbus call` returns an error after 25 seconds while its dialog is still open.
+  **Cause:** gdbus's own call limit; KWallet opens a wallet synchronously and waits for the person (KIO's `kpasswdserver.h`: "KWallet opens a wallet synchronously with a timeout of 24 days").
+  **Fix:** `gdbus call --timeout 600`, and the command's own limit above it.
+  **How found:** the kde_corpus query on opening a wallet.
+- **Symptom:** KDE Wallet's dialog for a new wallet offers GPG first.
+  **Cause:** with gpgme present, `ksecretd`'s new-wallet page (KF 6.30) selects "Use GPG encryption, for better protection"; "Classic, blowfish encrypted file" is the other choice.
+  **Fix:** none needed: the choice is the person's; a test that drives the dialog clicks Classic first.
+  **How found:** the rig's picture of the dialog.
+- **Symptom:** the page's lists show "None" for an interface that is set.
+  **Cause:** `currentIndex: indexOfValue(...)` ran before the ComboBox had its model, and is not evaluated again when the model arrives.
+  **Fix:** read the index from the list itself: `model.findIndex(o => o.value === current)`.
+  **How found:** the rig's picture.
 - **Symptom:** an apt install in a rig stops at "Configuration file '/etc/apt/sources.list.d/sparky-stereo.sources' ... end of file on <standard input> at conffile prompt".
   **Cause:** the rig wrote the edition's source file before installing `sparky-stereo-apt`, which ships it as a conffile.
   **Fix:** `-o Dpkg::Options::=--force-confnew`.

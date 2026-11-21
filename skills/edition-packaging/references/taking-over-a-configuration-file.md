@@ -30,7 +30,7 @@ Only where the owning package offers nothing is a diversion left, and then the e
 | `/etc/zsh/zshrc` | zsh-common 5.9.2-1 | nothing; then the person's `~/.zshrc` | none: stays a diversion |
 | `/etc/initramfs-tools/update-initramfs.conf` | initramfs-tools 0.151 | nothing: `CONF=/etc/initramfs-tools/update-initramfs.conf`, `[ -r ${CONF} ] && . ${CONF}`, no folder, no environment, no program | none: stays a diversion |
 | `/etc/issue`, `/etc/issue.net`, `/etc/update-motd.d/10-uname` | base-files (SparkyLinux's, carried through Lean Code) | agetty reads `--issue-file` and `/etc/issue.d/` after `/etc/issue`; sshd's `Banner` names any file; pam_motd runs every script of `/etc/update-motd.d` | see the row's notes in the hand-back: a banner file of our own for SSH; the console's other two need a choice |
-| `/etc/grub.d/10_linux` | grub-common 2.14-5 | `/etc/grub.d/` takes scripts of our own; GRUB runs every function a later script defines | the boot menu's own script (system-housekeeping, boot-menu) |
+| `/etc/grub.d/10_linux` | grub2-common 2.14-5 | `/etc/grub.d/` takes scripts of our own; GRUB runs every function a later script defines | the boot menu's own script (system-housekeeping, boot-menu) |
 
 ## Removing a diversion in a successor, keeping the person's edit
 

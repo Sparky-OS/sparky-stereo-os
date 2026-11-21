@@ -32,7 +32,9 @@ These checks execute neither maintainer scripts nor Vibe.
 The package contract has three JSON presets in `/usr/share/sparky-stereo/vibe/presets/`.
 Vibe stores dotted keys literally at the top level of `app_config.json`; do not turn `model.path` into a nested `model` object.
 The `ai` value itself is an object.
-On Linux the user file is under `$XDG_CONFIG_HOME/github.com.thewh1teagle.vibe/`, defaulting to `~/.config`.
+The Linux v3.3.5 binary reads the store from `$XDG_DATA_HOME/github.com.thewh1teagle.vibe/app_config.json`, defaulting to `~/.local/share`.
+An isolated first-start run proved that a file in the XDG config directory is ignored: its bytes stayed unchanged while the app created a different store under XDG data.
+Do not infer the store path from `config_watcher.rs`, which watches the application config directory even though the store plugin loads from data.
 
 | Preset value | Persisted key and handling |
 |---|---|
@@ -46,19 +48,30 @@ On Linux the user file is under `$XDG_CONFIG_HOME/github.com.thewh1teagle.vibe/`
 | Timing and meetings | `transcription.stableTimestamps`, `recording.meetingDetectionEnabled`: false. |
 | Appearance | `general.theme`: dark; `general.closeToTray`: true. |
 | Analytics | `analytics_enabled`: false in every preset. |
+| Update channel | `general.updateChannel`: `stable`, the upstream default; controls stable versus beta updater releases. |
+| Transcript line layout | `transcript.lines`: `original`, the upstream default; retains engine segmentation rather than regrouping into sentences or paragraphs. |
 | Transcript export | `transcript.exportOptions`: PDF settings with speakers and timestamps shown, light appearance. |
 | AI | `ai.connection`, `ai.tasks`: never seed credentials or a private cloud-model selection; tasks remain disabled. Shared-engine configuration belongs to its own integration. |
 | First run | `general.firstRun`: coordinate the app's setup and missing-model UI with the no-prompt seed and explicit model-download click. Do not claim that a JSON value alone proves this flow. |
 
 Read the precise object shapes from the approved input and the matching release's consumers before generating presets.
 Download no model in package installation or the seed unit; show the model's size before the person's download click.
-Missing-model behavior with a seeded configuration remains a required runtime test.
+Missing-model behavior was measured in an offline 1920-wide Xvfb rig using the signed v3.3.5 binary.
+With Default, Light and Basic seeded in the actual data store, `general.firstRun=false` still reaches setup when no model exists: the first screen says “No Connection”, offers “Try Again” and “I prefer to download manually”, and shows no model size.
+The app changes `model.path` to null in every case.
+A separate control with `general.skippedSetup=true` opens the main view and offers “Download model”, again without a size.
+That control proves a way to avoid automatic setup, not a complete consent-compatible integration.
+The source explains the result: `pages/main/session.tsx` clears a missing model and navigates to setup unless skipped; setup's effect calls `downloadIfOnline()` on mount.
+Without an explicit route URL, setup takes `config.modelUrls.default` (large-v3-turbo), not the cleared preset model.
+No online run or model download was performed; automatic downloading when online is a source finding, not an observed transfer.
+Keep the required size-before-click and Light model rules; do not ship the skip control as if it satisfied both.
+This first-start flow needs an application change or an approved integration flow before the presets can be shipped.
 
 ## Seed once without replacing the person's file
 
 The following is an untested implementation pattern, not a shipped service recipe.
 
-Compute the destination from the recipient's XDG config directory.
+Compute the destination from the recipient's actual store directory, verified against the shipped binary; v3.3.5 uses XDG data.
 An existing file, directory or symlink at that path must be left alone.
 Write a complete temporary file beside the destination and commit it with an exclusive operation, such as `renameat2(RENAME_NOREPLACE)` or linking that newly created temporary file into the destination name.
 A check followed by ordinary rename can replace a file created by the app in between.
@@ -66,6 +79,8 @@ Never hard-link a package stage or shared preset into a user's configuration.
 After a successful exclusive commit, remove the temporary name and make the file writable by that user.
 Prove competing seeds, app creation during seeding, failed writes, custom XDG paths, an existing symlink and unchanged contents on every subsequent start.
 
+Runner 0.1.4 declares `program`, `worker` and `menus`; its presence check runs at actions and menu sync, not through a declarative initializer callback.
+Do not claim that an unsupported initializer key supplies late-install seeding.
 A login unit with only `ConditionPathExists=/usr/bin/vibe` does not by itself prove late installation works in an already-running user session.
 Exercise pack-first, program-first, late installation and purge; define how the unit is activated before Vibe first creates its store.
 The seed must run without network access and must never wait for a model download.
@@ -103,6 +118,7 @@ A caption is identical 2D content in both eyes at the compositor's depth; compar
 
 | Symptom | Cause | Fix or next proof | Evidence |
 |---|---|---|---|
+| Seeded theme and model settings are ignored. | The loader reads XDG data, while the seed was written to XDG config. | Seed the binary's actual store path, leaving existing files alone. | v3.3.5 first-start runs: wrong-path file byte-identical, separate data store created; corrected-path theme applied. |
 | A dependency repair is proposed for an already-correct package. | An upstream archive was confused with the edition archive. | Inspect the signed repository's exact binary control first; no libgomp1 successor is needed for 3.2.2-1+lc1. | `dpkg-deb -f`, verified offline. |
 | The generated map exists but Vibe still installs alone. | The published inherited AppCenter installer has no map reader. | Implement and exercise the existing main entry's companion-package path. This repair is not yet implemented here. | Archive extraction, search of installed scripts, inspection of `also` handling. |
 | A first-run seed replaces a person's new settings. | Existence check and ordinary rename are not one exclusive operation. | Untested pattern: exclusive destination creation; confirm with a concurrent app writer. | Filesystem operation semantics; no race test yet. |

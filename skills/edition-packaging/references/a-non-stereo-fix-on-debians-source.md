@@ -13,6 +13,8 @@ The edition rebuilds the package so that its machines stop crashing, without wai
 5. Prove it: the test red on Debian's source and green on the patched one, then the packages compared with Debian's file by file (`dpkg-deb -c`, byte comparison of each file), `readelf -d` NEEDED, and the control fields (Depends).
 6. In the hand-back, give "Unfiled failures" the facts for the main session's list: what fails, the cause, the fix, the test.
 
+For a library every program loads, built for amd64 and i386 with a patch of our own (and a Debian source in format 1.0, with no series to append to): [a Debian base library with a patch of our own](a-debian-base-library-with-a-vendor-patch.md).
+
 ## Traps
 
 - **Symptom:** `lean.debian_prepare` stops with `[Errno 2] No such file or directory: 'dch'`. **Cause:** the build image lacks devscripts. **Fix:** install `devscripts`.

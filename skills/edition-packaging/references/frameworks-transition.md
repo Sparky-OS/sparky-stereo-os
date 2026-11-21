@@ -1,0 +1,58 @@
+# Debian moved a Frameworks version under the edition forks
+
+**For publication maintainers:** measure a partial Debian testing transition, carry the edition forks onto the available source versions, and keep every proof on one signed index.
+
+Check freshness first: written 2026-11-21 during the Frameworks 6.30 to 6.32 transition.
+The source preparation below has run; successor binaries and installed checks must still pass before a round is qualified.
+
+## Measure the whole set
+
+1. Keep the failed gate's complete solver attempts, public archive configuration and signed index bytes.
+2. Compare a fresh solve for the published desktop with the candidate desktop, and retain `apt-get -s dist-upgrade` on the installed published baseline both with and without the candidate pool.
+   Save every Inst and Remv line and every kept-back name with its dependency reason.
+3. Read the signed Sources and Packages entries for every edition Frameworks fork, including forks not named by the first failure.
+   A partially migrated collection is not one version: an edition KIO fork stays on its published source while testing still has that upstream version, provided its closure remains installable.
+4. Bind an immutable Debian snapshot whose signed InRelease equals the live index at the start.
+   Record both compressed-file hashes and the unpacked Packages/Sources hashes authenticated by InRelease.
+   Use that URI for source retrieval, build dependencies and final qualification.
+   If testing changes again, finish against the bound index and report what the later index would add.
+
+## Prepare each successor
+
+Use the source's existing recipe directory, even when it belongs to an older work's folder.
+A shared preparation helper can consume a per-source manifest binding the old published descriptor, the new Debian descriptor and the exact published patch series.
+Verify every component named by both descriptors before unpacking.
+Start from Debian's new packaging and carry the edition's additions, rather than changing version strings throughout its older packaging.
+Retain the edition changelog, symbols, dependencies, copyright additions, source-consumer preservation plan when present, and installed-test harness.
+Restart the edition revision at `+stereo3d1` for a new upstream version and prove that the resulting version sorts above the published one.
+Commit the recipe before building and require `recipeDirty` false in the record.
+
+Read upstream's comparison between the two release tags before rebasing an overlapping patch.
+Keep one fate for every series entry: unchanged, rebased with its exact adjustment, or redundant with the upstream commit named.
+A context conflict is not evidence that the behavior is already upstream.
+Copy binary test fixtures from the published Debian tarball as well as text patches and `debian/source/include-binaries`.
+Prepare a fresh Lean Code source with the accepted toolkit, then run the package's tests and the existing installed red/green checks.
+Compare every binary's file list with the published version, explain each removed path, and qualify the complete source closure and all publication gates.
+
+## Traps measured during source preparation
+
+- **Symptom:** XMLGUI or a style library requires `libkf6iconthemes6 >= 6.32`, while the edition's policy retains its 6.30 fork.
+  **Cause:** testing migrated part of Frameworks before the edition rebuilt its patched sources.
+  **Fix:** measure all forks and prepare successors only on source versions testing actually publishes; neither an invented rollback pin nor replacing the fork with Debian's binary preserves the edition.
+  **How found:** the published desktop failed with no candidate packages present, and the signed source index put four forks at 6.32 while KIO remained at 6.30.
+- **Symptom:** the HEIF stereo reader patch conflicts at the selected-image assignment.
+  **Cause:** upstream added optional library-version metadata in the same block.
+  **Fix:** keep that metadata code and the edition's second/third-image selection together.
+  **How found:** the upstream tag comparison identified the metadata addition; a three-way source comparison showed independent changes to adjacent lines.
+- **Symptom:** a historical cleanup patch appears to delete new upstream FFmpeg test cases.
+  **Cause:** that edition patch removed duplicated test functions and a duplicate main; upstream had since inserted location and Apple metadata tests in the duplicated region.
+  **Fix:** remove the duplicate definitions while retaining the new tests exactly once beside the stereo tests.
+  **How found:** comparing all three versions of the conflict isolated the two new functions; the prepared source keeps their declarations and definitions.
+- **Symptom:** a text-only patch carry appears complete but loses stereo fixtures.
+  **Cause:** source-format 3.0 quilt stores binary additions in the Debian tarball rather than the text series.
+  **Fix:** carry and compare those source members and their include-binaries list.
+  **How found:** listing the published Debian tarballs revealed 72 KImageFormats and 125 KFileMetaData fixture members outside debian/.
+- **Symptom:** the new Debian KImageFormats packaging selects the single-binary debhelper sequence.
+  **Cause:** upstream Debian produces one ordinary binary, while the edition's Lean Code step also emits HR companions.
+  **Fix:** retain the edition's existing multi-binary debhelper form while incorporating the new Debian packaging elsewhere.
+  **How found:** the old Debian, published edition and new Debian control-file comparison isolated that sequence change.

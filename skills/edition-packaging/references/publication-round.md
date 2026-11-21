@@ -758,3 +758,8 @@ Keep the index hashes alongside the pool hash and distinguish a newly selected u
 - **Cause:** Debian testing's newly signed index advances XMLGUI and the style library to a generation requiring an icon-theme library newer than the edition's unchanged published rebuild. The edition's existing policy correctly refuses replacing that patched library with Debian's build.
 - **Fix:** retain every solver attempt and both index digests, compare the unchanged published predecessor's dependency resolution, and check the required meta before proposing a source hold. A selective hold cannot repair a mismatch also present with the published desktop and no candidate packages. Name the published library's qualified-successor requirement; do not waive the gate, invent an archive rollback pin, or silently replace the edition's library. Preserve earlier authorized proofs with their exact input hashes and state their original archive scope.
 - **How found:** the previous and new signed Debian index hashes differed while all pool files matched. The published GL package failed through XMLGUI too, and both published and candidate desktop metas failed through Oxygen and the style library on the same icon-theme minimum version.
+
+
+When a partial Debian Frameworks transition breaks the published desktop as well as the candidate, measure the whole fork set before rebuilding.
+Bind one signed snapshot for the successor builds and all index-dependent proofs, preserve every edition patch and binary source fixture, and leave a fork on its current source until testing supplies its successor.
+The [Frameworks transition recipe](frameworks-transition.md) records the measurement and source-preparation traps; source preparation alone does not qualify the new binaries.

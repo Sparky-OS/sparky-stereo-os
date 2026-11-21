@@ -304,7 +304,8 @@ Trap:
 ### Public indexes between bounded invocations
 
 One copied pool can need separate complete native and meta invocations to stay inside its scratch allocation.
-Each invocation still compares old and new against one frozen signed public snapshot.
+By default, each invocation compares old and new against one frozen signed public snapshot.
+The checked archive-transition exception described below may qualify a predecessor in a dated or mixed view; it never changes the candidate view.
 Record every invocation's metadata hashes; do not infer that a later invocation read identical public indexes.
 If an external index refreshed, retain the record diff and check every selected resolution identity on both sides.
 A changed selected input needs fresh qualification under the intended snapshot; an unused index record is reported without pretending that its program was tested.

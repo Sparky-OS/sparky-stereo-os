@@ -72,6 +72,7 @@ Keep the copy outside a folder something copies whole: sparky-stereo-console kee
   Setting only the coloured `PS1` there would give colour on a terminal where the published copy gave none.
 - The proof is a new account's interactive shell before and after the upgrade: `PS1` (as `printf %q`), `alias`, `GCC_COLORS`, `EDITOR`, `VISUAL`, for `TERM` xterm-256color, linux and dumb, as a user, as root with the skel files, and as root with its own `/root/.bashrc` (base-files', which neither version touches): identical in all nine cases.
 - `dpkg-stereo --verify`, the published 0.1.41 included, is clean on the untouched system after the upgrade: with no diversion of `.bashrc` there is nothing to misread.
+- A file in `/etc/skel` lands in every new account's home, so its comments say only what its lines do; a quote of a request or a design note goes in the recipe's comment. From 20261121.1 the file ships lean (Lean Code 0.1.31: the pointer line and the code), and its authored text is in `sparky-stereo-console-lc-hr`, as the skel `.bashrc`'s was up to 20261102.
 
 ## Traps
 
@@ -85,8 +86,13 @@ Keep the copy outside a folder something copies whole: sparky-stereo-console kee
 - **Symptom:** lintian `uses-dpkg-database-directly [preinst]`.
   **Cause:** reading the old version's `md5sums` from `/var/lib/dpkg/info`. **Fix:** `dpkg-query --control-path PACKAGE md5sums`.
 - **Symptom:** the successor builds no `-lc-hr` companion where the published version had one.
-  **Cause:** Lean Code projected the old `/etc/skel/.bashrc` (its shell handler knows the name) but does not classify `.bash_aliases` as shell, so the new file ships with its comments and needs no authored-text companion. Nothing breaks: the installed old companion depends on nothing.
-  **How found:** the step 1 table of rows 629/802: the owning package's copy absent at the diverted name, then `dpkg-query ${Conffiles}` and `dpkg.log`.
+  **Cause:** up to Lean Code 0.1.30 the shell handler knew `.bashrc` by name but not `.bash_aliases`, so the new file shipped with its comments and needed no authored-text companion, and a machine kept the old companion with nobody's text in it.
+  **Fix:** Lean Code 0.1.31 classifies bash's startup files by name (`.bashrc`, `.bash_aliases`, `.bash_logout`, `.bash_profile`, `.bash_login`, `.profile`); rebuild the package with it (sparky-stereo-console 20261121.1).
+  **How found:** `dpkg-deb -c` of the successor beside the published pair: the companion was missing from the build output.
+- **Symptom:** a standalone recipe's `lean.release check-debs` stops with `matching HR documentation package is missing` after a rebuild that starts to project a file.
+  **Cause:** the recipe passed only `./PKG_VERSION_all.deb`; once a file is projected the package's manifest names its `-lc-hr` companion, and `check-debs` requires the pair together.
+  **Fix:** pass both, `./"$PKG"*_"$VERSION"_all.deb` (sparky-stereo-console's recipe; dpkg-stereo's passes `./*.deb` into an output folder of its own).
+  **How found:** `lean/release.py` `check_debs()`, read before the first build with 0.1.31.
 - **Symptom:** after the upgrade that drops a diversion, the owning package's conffile is missing (`dpkg -S` names the owning package, `--verify` says MISSING), with no error from dpkg.
   **Cause:** the successor removed the diversion in its preinst; at the unpack dpkg removed the path as a file the old version shipped and the new one does not, and that was now the owning package's file.
   **Fix:** remove the diversion in the postinst. **How found:** fixture packages, both shapes (a link, a plain file), with and without a person's edit, both places (the table above).

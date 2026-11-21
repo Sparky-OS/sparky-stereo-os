@@ -782,3 +782,17 @@ A baseline image assembled after publication can already contain newer third-par
 The publication script must copy that directory into the round's supply-chain record and run `sha256sum -c SHA256SUMS` in every architecture directory before publishing.
 Retain the successful whole-pool gate result as well: an authenticated input snapshot alone is not a passing comparison.
 A prior round without these retained archive views cannot supply a dated baseline for an archive that subsequently moves, unless an independent signed snapshot service supplies it.
+
+
+### A published binding with no usable publication-time baseline
+
+- **Symptom:** the predecessor gate stops on a taken package's old Perl binding, whose required virtual ABI is absent from both signed archive views; the last policy attempt instead names two conflicting driver locks.
+- **Cause:** the old package was already uninstallable when published. Judging the failed relation by its owner confuses the taken binding with the external provider it needs.
+- **Fix:** use the toolkit's checked publication-time absence rule, never omit the predecessor by hand. It checks concrete names and Provides across both complete edition sets and both authenticated archive views, binds a mandatory dependency path from the requested predecessor, and retains every solver attempt. Providers owned by either edition still block. A predecessor that solves at publication keeps that real baseline. An external name absent then and now yields no usable baseline only after both real solves fail; every candidate link and start result must then pass without comparison allowances.
+- **How found:** the first three solver logs named the retired ABI; the fourth ended at a policy conflict. The previous control and both authenticated Packages indexes showed the old relation and the newer runtime's actual Provides. The candidate's exact dependency qualification succeeded with that newer ABI.
+
+Run the full pool with `--collect-predecessor-stops` to collect uncovered eligibility failures once, rather than discovering one per multi-hour invocation.
+The mode still exits 1 while any uncovered stop remains; it retains every input, complete solver lines and archive evidence in `predecessor-stops.json`.
+Keep `uninstallable-predecessors.json` and the summary's separate list headed `published predecessor not installable at its publication`.
+Describe each such input in the round's description as repairing already published breakage; never call the old baseline passing.
+The main publication invocation must carry the same historical-view options and evidence bindings; a stage list alone does not select this proof mode.

@@ -137,3 +137,9 @@ A producer recipe had omitted that Perl predecessor from its private comparison 
 **Handling:** preserve the full publication predecessor set and report the exact relation, provider search and eligibility refusal.
 Do not transfer the producer's omission into publication, broaden the checked eligibility rule silently, or count an index inspection as a completed dated solve.
 A working successor and a missing predecessor baseline are separate facts; replacing or dropping packages to conceal the latter does not qualify the comparison.
+
+
+When the published predecessor was already uninstallable in its publication-time view, follow [the provider-absence rule](publication-round.md#a-published-binding-with-no-usable-publication-time-baseline).
+A missing virtual ABI is judged by its providers across both edition sets and both signed views, not solely by its relation owner.
+The candidate still passes every baseline-free check; an available publication-time provider instead keeps the ordinary dated or mixed baseline.
+Collect every uncovered predecessor eligibility stop in one invocation and return the complete list with exit 1.

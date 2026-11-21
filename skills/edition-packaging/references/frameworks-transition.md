@@ -124,3 +124,16 @@ Retain every candidate archive's signed InRelease and Packages bytes with the pu
 The publication step copies that directory into the round's supply-chain record and verifies the checksums before publication.
 The preparation hands back its exact path and complete gate result for that wiring.
 An archive that later moves needs the prior round's retained authenticated view or an independent signed dated snapshot; the exception for unrelated archives cannot replace it.
+
+
+## A predecessor whose Perl ABI was already retired
+
+**Symptom:** the full gate reaches a Perl-binding debug package, then rejects its published predecessor as a failure inside the selected candidate-name set.
+**Cause:** the terminal unsatisfied relation belongs to the old binding itself, which requires a vanished virtual `perlapi-*` ABI; its successor uses the current ABI.
+The dated snapshot that solves the Frameworks transition may already contain the newer Perl and no provider for that older ABI.
+**How found:** read every solver attempt, the old and new package controls, and `Provides` in every authenticated Packages file in both frozen views.
+In the observed case, the first three attempts named the old Perl ABI; the final attempt also hit the mutually exclusive driver locks.
+A producer recipe had omitted that Perl predecessor from its private comparison set, explaining why its build gate passed.
+**Handling:** preserve the full publication predecessor set and report the exact relation, provider search and eligibility refusal.
+Do not transfer the producer's omission into publication, broaden the checked eligibility rule silently, or count an index inspection as a completed dated solve.
+A working successor and a missing predecessor baseline are separate facts; replacing or dropping packages to conceal the latter does not qualify the comparison.

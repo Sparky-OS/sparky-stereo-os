@@ -68,6 +68,7 @@ Every package of ours says who made it, the Sparky way, and [`provenance.sh`](ht
 - `Bugs:` is the edition's [tracker](https://github.com/Sparky-OS/sparky-stereo-os/issues): a problem in our build never goes to the maintainer of the package we modified (Daniel, 2026-10-08).
 - The copyright file keeps its holders and gains our credit (the whole `Files: debian/*` in our own packages; in a rebuilt Debian package only our own files, after Debian's paragraph: [crediting our additions](references/rebuilt-packages.md#crediting-our-additions-without-overriding-the-packagers)), with the credit in Daniel's wording of 2026-10-07: "Sparky Stereo OS, Daniel Ramos's (Capitain Jack) edition of SparkyLinux (https://sparkylinux.org, by Paweł "pavroo" Pijanowski)".
 - Paweł's own packages keep his `Maintainer:` and are never modified in place: ship ours beside them, divert with `dpkg-divert`, or send him a pull request.
+  A diversion is never for a configuration file (Debian Policy 4.7.4.1, appendix 7: "Do not attempt to divert a conffile, as dpkg does not handle it well"): first use what the owning package offers, as [taking over another package's configuration file](references/taking-over-a-configuration-file.md) says, owner by owner.
 - **Order:** `provenance.sh --tree STAGING` runs before Lean Code and the final checksums. A package sealed with the lc mark is never restamped (wrong provenance there needs a fresh build), and `make-repo.sh` never rewrites archives.
 
 ## Paweł's way first

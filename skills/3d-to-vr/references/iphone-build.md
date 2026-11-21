@@ -1,7 +1,7 @@
 # Building Flat Headset for iPhone from Linux
 
-**For the contributor: write and test portable code on Linux, compile the native application on a standard hosted macOS runner, then sign and install from Linux.**
-Check freshness first: source workflows and local gates checked 2026-11-20.
+**For the contributor: write and test portable code on Linux, compile the native application on a standard hosted macOS runner, then sign and install with Xcode on a Mac.**
+Check freshness first: Intel runner inventory and Apple Xcode compatibility checked 2026-11-21; all seven jobs passed run 44850264729, including the Intel receiver on Xcode 26.3; its downloaded IPA checksum and unsigned arm64 iOS 16.0 executable passed independent inspection.
 The first native proof target and workflow are implemented.
 [Hosted run 44690357195](https://github.com/Sparky-OS/flat-headset/actions/runs/44690357195) passes every step for commit 306c59c: the portable tests, the native app build, the arm64 and unsigned checks, the packaging and the artifact upload.
 The downloaded artifact was checked on Linux: the checksum, the manifest entry, only our own files inside, an arm64 program for iOS 16.0 and later with no code signature.
@@ -14,15 +14,17 @@ Signing, installing and a launch on a phone are not yet established.
    UIKit and Metal compilation belong to the hosted Mac; missing UIKit on Linux is a recorded boundary, not a passing native compilation.
 3. Have the authorized publisher push the reviewed branch to our public repository.
    The first workflow step prints `xcodebuild -version`, `xcodebuild -showsdks` and the hosted image name/version, then checks that the installed iPhoneOS SDK meets the deployment-target version floor.
-   Use the image's default Xcode as it stands, with no SDK download to the Linux station.
+   Select the recorded Xcode installation explicitly for each runner, with no SDK download to the Linux station.
 4. Compile the native arm64 app with the literal command below, `CODE_SIGNING_ALLOWED=NO` and no development team.
    A workflow must not contain credentials, certificates, provisioning profiles or an Apple account.
 5. Package the built application under `Payload/FlatHeadset.app` as `FlatHeadset-unsigned.ipa` and keep its SHA-256 and receiver manifest entry in the same artifact.
    This is a development build artifact, not an installable signed application or a store submission.
 6. Read the run for the exact pushed commit; a local lint pass, an absent run or a run for another SHA is not a hosted build result.
    Fix a failing run before starting the next program; three failures at the same step with no cause found are a stop to report.
-7. Once the three programs exist, combine their reviewed artifact entries into a private manifest with the intended phone's UDID and use the [Linux renewal helper](../scripts/iphone-renew.py).
-   Account authentication and phone prompts remain the person's steps; signing needs no SDK on Linux.
+7. Signing and installation now use Xcode on the person's Mac, with their free Personal Team added by them in Xcode settings.
+   The Linux signing audit remains historical evidence.
+   Use the revised [Mac session page](iphone-session.md) and [signing/SSH comparison](iphone-mac-signing.md); do not follow the former Linux sign-in procedure.
+   Complete the unsigned Intel build checks before the one hardware session.
 
 [GitHub's billing documentation](https://docs.github.com/en/actions/concepts/billing-and-usage) says standard hosted runners are free for public repositories.
 This does not make arbitrary larger/private runners free, nor justify unbounded artifact retention.
@@ -521,7 +523,8 @@ The image reported macos26 20261117.0516.1, Xcode 26.6 and iPhoneOS 26.5.
 The downloaded IPA independently passed its SHA-256 check: one unsigned arm64 executable, iOS 16.0 minimum, the expected bundle identity, ten VirtualMonitor catalogs and no embedded framework, dylib or provisioning profile.
 This proves compilation and packaging; Security identity import, Bonjour and Keychain persistence still require the phone.
 
-Keep each app's paired identity independent until shared signing entitlements have been proved.
+KDE Connect owns the sole pairing identity and trust; the receiver reads them through the shared keychain group.
+Xcode signing must grant the receiver access to that group under the same Personal Team before a hardware session.
 KDE Connect's virtualmonitor plugin checks the paired computer's protocol-v2 capabilities, explains refusal or timeout in ten languages, and opens only `flatheadset://catch`.
 That URL carries no address, pin, password or session credential and never authorizes a connection.
 Flat Headset opens its computer list, confirms its own pairing with the same PC and owns the virtual monitor and RDP session while in the foreground.
@@ -619,3 +622,113 @@ The package fixtures reject signature commands, embedded dynamic code, wrong ide
 Prepare all three packages using [the one-session page](iphone-session.md).
 The manifest joiner checks their common workflow commit, exact roles/IDs and IPA hashes before writing the private renewal input.
 It neither authenticates nor installs; the person types their account only at the later xtool authentication step.
+
+
+## Intel macOS builds and Xcode 26
+
+The unsigned workflow builds each complete program on both `macos-26` (arm64, Xcode 26.6) and `macos-15-intel` (x86_64, Xcode 26.3).
+The selected `DEVELOPER_DIR` values are `/Applications/Xcode_26.6.app/Contents/Developer` and `/Applications/Xcode_26.3.app/Contents/Developer`.
+The Intel runner's default Xcode is 16.4, so accepting the default would miss FreeRDP's Xcode 26 requirement.
+[GitHub's macOS 15 inventory](https://github.com/actions/runner-images/blob/main/images/macos/macos-15-Readme.md) lists Xcode 26.0.1, 26.1.1, 26.2 and 26.3.
+Its [macOS 26 Intel inventory](https://github.com/actions/runner-images/blob/main/images/macos/macos-26-Readme.md) also lists 26.4.1, 26.5 and 26.6.
+The standard Intel label is `macos-15-intel`, not the larger-runner `macos-15-large` label.
+Xcode 26.3 allows the Intel build to be reproduced from macOS Sequoia 15.6, without requiring Tahoe first.
+[Apple's requirements](https://developer.apple.com/xcode/system-requirements) give Xcode 26.0 through 26.3 a Sequoia 15.6 floor; the listed 26.4.1 through 26.6 require Tahoe 26.2.
+Both groups support connected iOS 16 devices; Xcode 27's connected-device support starts at iOS 17 even though its deployment-target column starts earlier.
+Do not infer connected-device support from a deployment-target setting.
+
+Each matrix job starts by printing the image name/version, `uname -m`, `xcodebuild -version` and `xcodebuild -showsdks`.
+It refuses an unexpected host architecture or missing selected Xcode with a plain error.
+The core job also records the selected Xcode installation's disk usage; that figure is neither the archive's download size nor a fixed space requirement for every installation.
+Intel artifacts append `-intel` after the workflow commit, so parallel jobs cannot replace each other's IPA, core archive or checksum.
+The artifact contents and all three app targets remain unsigned arm64 for iOS 16.0, regardless of the host CPU.
+No account, development team, provisioning profile or signing key is available to these jobs.
+The Intel receiver app remains unverified until the missing Metal component is installed and the rerun produces a checked IPA; the first run results are recorded below.
+
+Host/target audit:
+
+- OpenSSL's own `ios64-xcrun` target selects `xcrun -sdk iphoneos cc` and arm64; its assembly generators use host Perl, and apps/tests are disabled.
+- FFmpeg's target compiler and flags use the iPhoneOS SDK and arm64. Its host compiler now explicitly uses `xcrun --sdk macosx --find clang`, with the macOS sysroot in host compile and link flags. Generated build-time programs must run on the Intel Mac, not on iOS.
+- FreeRDP's CMake target is iOS/arm64. Include, library and package lookup are confined to the target prefix and SDK; program lookup stays on the host. Both `/usr/local` and `/opt/homebrew` are excluded as target dependency prefixes. Build tools come from the host PATH, without a hard-coded Homebrew path.
+- KDE Connect's three Swift package dependencies remain revision-pinned source packages. Its OpenSSL archives are rebuilt on each runner. Its protocol executable is a macOS host test; the crypto link probe and app are iPhone targets.
+- Cardboard builds the shared portable profile code as a host test, then builds its native program for the phone. No host-architecture prebuilt binary was introduced.
+
+Traps found by source and runner-inventory inspection, before an Intel run:
+
+- **Symptom:** FreeRDP rejects the default compiler on an Intel runner. **Cause:** the macOS 15 default is Xcode 16.4. **Fix:** select its installed Xcode 26.3 explicitly and fail if that installation disappears. **Found:** GitHub's Xcode inventory and FreeRDP's declared requirement.
+- **Symptom:** a generated codec build tool targets the phone or picks a different host compiler through PATH. **Cause:** target and host compilers were not independently specified. **Fix:** FFmpeg gets a separate macOS compiler/sysroot for build-time tools. **Found:** FFmpeg n8.1 configure's host-compiler default and cross-compile options; this is preventive, not a claimed observed Intel failure.
+- **Symptom:** parallel jobs contend for an artifact name. **Cause:** names used only the workflow commit. **Fix:** Intel job names append `-intel`. **Found:** reviewing the new matrix before upload.
+- **Symptom:** the receiver cannot read KDE Connect's keychain after a local Xcode build. **Cause:** the former Linux signer injected the shared entitlement; unsigned Xcode projects do not yet do that. **Fix to complete in the Mac signing recipe:** receiver own default group first, KDE Connect group second, both using `$(AppIdentifierPrefix)`, same Personal Team, and inspect the issued profile. **Found:** comparing the signer with the project entitlement inputs. No second pairing is an alternative.
+
+
+### Intel first run: missing Metal component
+
+[Run 44848751393](https://github.com/Sparky-OS/flat-headset/actions/runs/44848751393), checked 2026-11-21, passed six of seven jobs at commit c11178e.
+The Intel image reported `macos15 20260824.0482.1`, `x86_64`, Xcode 26.3 build 17C529 and iPhoneOS SDK 26.2.
+KDE Connect and Cardboard built and packaged successfully on this host.
+The static receiver libraries and link probe also built and uploaded before the app failed.
+The arm64 image reported `macos26 20261117.0516.1`, Xcode 26.6 build 17F113 and SDK 26.5, and built all three apps.
+All seven available artifact payloads passed their downloaded SHA-256 checks; there is no Intel receiver IPA for this run.
+The five available IPAs contain unsigned arm64 programs for iOS 16.0 without embedded dynamic libraries/frameworks or provisioning profiles.
+Both core archives contain eight static libraries and an unsigned arm64 link probe for iOS 16.0.
+
+The selected Xcode Contents directory measured 4,515,932 KiB on the Intel host and 4,646,300 KiB on the arm64 host.
+These are allocated-size measurements of those runner installations before the missing component is installed, not download sizes or total disk requirements including components stored elsewhere.
+
+- **Symptom:** `CompileMetalFile` fails because the `metal` tool cannot execute without its Metal Toolchain.
+- **Cause:** Xcode 26's optional Metal component was absent on the Intel runner. The log does not establish an Intel CPU or old-SDK source incompatibility.
+- **Fix:** before compiling the core/app, execute `xcrun --sdk iphoneos metal --version`; if unavailable, visibly run `xcodebuild -downloadComponent MetalToolchain` on the hosted Mac, then verify the compiler again. Download failure or a still-unavailable compiler stops with a plain instruction. Nothing is fetched to the Linux workstation.
+- **Found:** the complete failing app-build step names the missing component and prints the installation command. [Apple documents the separate Metal component](https://developer.apple.com/documentation/xcode/downloading-and-installing-additional-xcode-components).
+
+Xcode 26.3 remains selected for the next Intel attempt; only a green receiver build will establish it for all three programs.
+The earlier LTO probe's x86_64 linker warnings were nonfatal capability-detection diagnostics; the configured core disables LTO and its actual arm64 libraries/probe passed.
+Do not confuse those diagnostics with the app's Metal compilation failure.
+The eventual real Mac setup also needs the Metal component, but installation/signing and SSH instructions wait for the complete Intel unsigned proof.
+
+## Intel session and signing preparation
+
+[Run 44850264729](https://github.com/Sparky-OS/flat-headset/actions/runs/44850264729), read 2026-11-21, passed all seven jobs.
+The Intel receiver used Xcode 26.3, SDK 26.2, and Metal 32023.864 on `macos-15-intel`.
+Its IPA SHA-256 is `424f97ad7f42ac6ce270a395cf8f74ec440932fd1cac7d83e4b0f87e16d2c40d`; it contains 43 ZIP members, one unsigned arm64 executable, minimum iOS 16.0, and no embedded framework, dylib or provisioning profile.
+The Metal preflight succeeded immediately from a mounted toolchain; the conditional download was not exercised in this successful run.
+No download-size figure can be inferred from it.
+Keep the optional-component check in both hosted and first-session paths.
+
+The Mac helper in `ios/Tools/Mac` fetches exact reviewed commits from our three repositories, checks their hashes, builds the dependencies and apps with four jobs, and offers an unsigned path without account or device operations.
+The `mac-session-intel` job passed that complete unsigned path and 11 authored failure/control-flow tests in [run 44854555442](https://github.com/Sparky-OS/flat-headset/actions/runs/44854555442), read 2026-11-21.
+It used macOS 15.7.9, x86_64, Xcode 26.3 build 17C529, SDK 26.2 and Metal 32023.864.
+The source fetches verified KDE Connect 57d3725b, Cardboard d8ba9bce and receiver 4804c519; no account, phone discovery or signing was performed.
+Its separate artifact contains the three session-built IPAs and checksums, while the existing jobs continue to publish their normal artifacts.
+The signing path uses the person's non-secret team ID only; Xcode obtains provisioning using its own account entry.
+All three signed app profiles are inspected before the first USB install, including expiry, device, app prefix and the shared pairing groups.
+This is a diagnostic guard using Apple's TN3125 plist view, not a replacement for iOS signature/provisioning enforcement; the DER profile representation and actual install remain Apple's checks.
+
+| Symptom | Cause | Fix | How found |
+| --- | --- | --- | --- |
+| Intel source build succeeds but `metal` cannot execute | Xcode's optional Metal component is separate from the SDK and may be absent | Check `xcrun --sdk iphoneos metal --version`; install Metal Toolchain in Xcode Components on the Mac and check again | Failed Intel run 44848751393, Apple component documentation, then successful 44850264729 |
+| `devicectl` does not list the iOS 16 phone | Its CoreDevice route supports iOS 17+ | Explicitly use the pinned `ios-deploy` installer for iOS 16; signing stays in Xcode, and no automatic installer substitution is made | Apple DTS thread 772724 and ios-deploy's own README/source |
+| Signing over SSH reports `errSecInternalComponent` | A locked keychain or a private-key access dialog cannot be satisfied in that context; other certificate failures can produce the same error | Let the person unlock the keychain and authorize `codesign` as Apple's DTS guide describes; never put the password in the helper | Apple DTS thread 712005; real signing still untested |
+| Receiver cannot read KDE Connect's pairing under Xcode signing | The old unsigned build had no receiver signing entitlement; the former external signer injected it | Receiver declares its own default group first and KDE Connect's group second through `$(AppIdentifierPrefix)`; KDE Connect explicitly retains its own default group | Source review of both projects and the shared-group discovery code; signed-profile and phone proof pending |
+| A fork selects an unrelated development team | Upstream KDE Connect's project contained a fixed team and extra capabilities | Remove the fixed team, use our bundle identifier and minimal sideload entitlements; supply the person's team only to Xcode's build | Project-file audit before preparing automatic signing |
+| `ios-deploy --check-developer-mode` is absent from the built tool | Its 1.12.2 source guards that option behind a build definition | Compile the pinned source with `IOS_DEPLOY_FEATURE_DEVELOPER_MODE=1` and check the compiled option string and tool version on the hosted Intel Mac | Inspection of the option table and build settings, then the compiled-option/version checks passed in run 44854555442 |
+
+The Linux analogue covers supported/wrong macOS, missing Xcode, Xcode too new for iOS 16, missing Metal, no/multiple/wrong/untrusted phone, Developer Mode, source-pin/dirty-tree refusal, profile expiry/team/device/group/order refusals and the no-input command boundary.
+It does not compile Apple's tools, prove a personal keychain unlock or replace a real phone's trust response.
+Keep running the four Objective-C++ stand-in syntax checks before every source push; their SDK/API limitations remain unchanged.
+
+### Comparing helper and individual-job packages (2026-11-21)
+
+In run 44854555442 all six Intel IPA checksums passed, with identical Info.plist contents per program, identical identifiers, one unsigned arm64 iOS executable per package, minimum iOS 16.0 and SDK 26.2.
+None embeds a framework, dylib, provisioning profile or code-signature load command.
+The helper's package counts are 69 KDE Connect, 35 Cardboard and 36 Flat Headset ZIP members; the individual jobs have 76, 38 and 43 respectively.
+The helper does not run the individual workflows' licence-copy steps, so its app bundles omit six, two and six licence-text files respectively, plus the directory entry.
+These are local session builds, not substitutes for the individual jobs' distribution packages; preserve the licence-bearing individual artifacts for redistribution.
+Within each pair every common non-executable file is identical, including all plist/localization/Metal resources.
+The executables differ in size/hash/UUID and contain the different checkout, object, dependency and install-prefix paths; ZIP timestamps also differ.
+The helper receiver is pinned to 4804c519 while its individual job uses 94067879; the intervening commit changes tooling/tests/workflow, not receiver runtime sources.
+This is source-pin and package-structure verification, not a claim of byte-reproducible or runtime-equivalent binaries.
+
+| Symptom | Cause | Fix or boundary | How found |
+| --- | --- | --- | --- |
+| Helper IPA hash differs from its individual-job IPA | Different build directories embedded in executables, binary UUIDs and ZIP times; individual packaging also adds licence texts | Compare identifiers, platform, signatures, source pins and per-file contents; do not promise identical package hashes | Downloaded six IPAs from run 44854555442 and compared their plists, Mach-O commands, strings and ZIP members |
+| Green helper log does not show the installer compile command | The helper captures successful build output in its private work directory, and only failure logs are uploaded | Infer the mandatory compile/version/option checks from the pinned control flow and successful helper completion; do not claim a downloaded installer binary audit | Read all of mac-session-intel and its 12-file artifact inventory |

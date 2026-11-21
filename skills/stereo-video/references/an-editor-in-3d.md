@@ -2,7 +2,7 @@
 
 Part of the [`stereo-video`](../SKILL.md) skill.
 
-Check freshness first: written on 2026-11-21 from Kdenlive 26.08.1-1+stereo3d9+lc1 and MLT 7.40.0-1+stereo3d8+lc1 (the edition's build tree, `sparky-os/packages/kdenlive-stereo-61e`; ORDER 61e, two milestones), on Stereo KWin +stereo3d59.
+Check freshness first: written on 2026-11-21 from Kdenlive 26.08.1-1+stereo3d10+lc1 and MLT 7.40.0-1+stereo3d9+lc1 (the edition's build tree, `sparky-os/packages/kdenlive-stereo-61e`; ORDER 61e, three milestones, the third as 61f), on the stereo layer 1.23.2 and Stereo KWin +stereo3d59.
 
 An editor shows media, so it is a player for its monitors and a writer for its renders.
 Its 3D options are the contract's: Enable 3D, the render resolution per eye (the project's resolution), a shortcut to Display Settings, and for each clip the input corrections.
@@ -25,6 +25,11 @@ Each part below has its own place and its own proof.
 | Half or whole views in a player | MLT 0016: the shared rule reads the producer's own frame, not the monitor's | A clip shown in the clip monitor keeps its eyes' shape |
 | An unknown preset name | Kdenlive patch 0017 | `kdenlive --render` stops and says so, exit status 1 |
 | Thumbnails | Kdenlive patch 0013: `stereo3d_unpack` with output left first in the thumbnail producer | One picture, the left eye, at the view's shape |
+| 2D elements in a 3D project | MLT 0017 (`stereo3d_unpack packing=mono`) and Kdenlive patch 0019 | A 2D clip, title, picture or colour is the same picture in both eyes, at the screen plane, in the monitors and the renders |
+| The monitors at one eye's full resolution | Kdenlive patch 0019 (`VideoWidget::updateScaling()`, the monitors' profile twice as wide) | Both monitors work on the project's frame of two eyes, each at the project's resolution |
+| The layer's own input list | Kdenlive patch 0020 (`stereo_policy_input_format_at()`, stereo-policy 1.23) | The 3D Input Format list is the installed layer's, read when Kdenlive runs |
+| 3D stills | MLT 0018 (the Qt image producer through `Stereo::Picture::load()`) and Kdenlive patch 0021 | JPS, MPO, PNG with sTER and a pair by the photo policy are 3D clips with the corrections in their properties |
+| A render's depth | Kdenlive patch 0022 (`RenderRequest::chooseStereoRenderDepth()`) and the 3D FFV1 preset | A 3D preset writes the deepest clip's bits up to its codec's, and says so when it writes fewer |
 
 ### The default, and how it is decided
 
@@ -47,7 +52,9 @@ Each part below has its own place and its own proof.
 - Each clip's `stereo3d_unpack` fits its views to whole pictures (`target_views=full`). A clip with no filter in the project (a side-by-side clip of the project's own kind) gets one in the render.
 - A clip whose frame is the doubled frame itself (3840x1080, square samples, left eye first) is taken as it is, decoded at its own depth.
 - A project whose own frame already holds two whole views (3840x1080) is written as it is. So is a project whose packing the person declared by hand.
-- **The monitors** show the project's frame at its resolution: in a 1920x1080 3D project both eyes are in that frame at half width, and the monitor hands them to the compositor as they are (KWin scales once).
+- **The monitors** work on the same frame as the render: in a 3D project the monitors' profile (`pCore->getMonitorProfile()`) is twice as wide, of twice the display aspect, and the timeline's `stereo3d_unpack` filters are made with it, so each eye is a whole picture of the project's resolution and KWin scales once. The preview resolution the person chooses scales that frame. A project whose own frame already holds two whole views keeps it.
+  - The cost, measured playing a mixed 3D project for 20 s in the rig: Kdenlive took 0.52 of a processor core where +stereo3d9's half-width frame took 0.29 (AMD Renoir), 0.53 against 0.27 (NVIDIA RTX 3060, OpenGL on zink as the session gives it); KWin 0.02 to 0.04 either way; the GPU busy share 17 to 25 % on the AMD card either way (it also draws the station's desktop) and about 5 % on the NVIDIA card either way.
+  - "Off" shows that frame as it is in the monitor's 16:9 area: the two eyes side by side, each squeezed to half its width.
 - **Plain presets** in a 3D project write the same doubled frame, marked: the resolution is one eye's whatever the preset.
 - **Matroska's DisplayWidth** is one plane's. RFC 9559 section 18.10 (and Matroska's own notes, "Multi-planar and 3D Videos"): "The pixel count of the track (PixelWidth/PixelHeight) is the raw number of pixels (for example, 3840x1080 for full HD side by side), and the DisplayWidth/DisplayHeight in pixels is the number of pixels for one plane (1920x1080 for that full HD stream)." FFmpeg's muxer writes half the frame's width for side by side.
   - A 3840x1080 render carries 1920x1080, which is right.
@@ -55,21 +62,25 @@ Each part below has its own place and its own proof.
 
 ### A clip's input corrections
 
-- **Every video clip's Properties** offer the stereo layer's "3D Input Format": every entry of the layer's list, both eye orders, the anaglyph pairs and the picture-with-depth layouts.
+- **Every video clip's and still's Properties** offer the stereo layer's "3D Input Format": every entry of the layer's list, both eye orders, the anaglyph pairs and the picture-with-depth layouts.
   - The ids are the file marks' `Stereo3DLayout` words.
   - The words are the layer's, in its `Stereo::FileChoiceMenu` context, translated by the layer's own catalogue.
-  - The layer 1.22 has no public list yet (its C list `stereo_policy_input_format_at()` came in 1.23), so Kdenlive keeps a copy of the table in `src/utils/stereo3d.cpp`. A format Kdenlive shows as one picture says "(one view shown here)".
+  - The list is the installed layer's, read when Kdenlive first needs it (`stereo_policy_input_format_count()` and `_at()`, stereo-policy 1.23); Kdenlive keeps no copy. Its packings map to MLT's as layouts 1, 2, 4 to 8; the others (both views in one block, the anaglyphs, the picture-with-depth layouts) are shown as one picture and say "(one view shown here)". The layer 1.23.2's list is 1.22's table with "automatic" first: no packing is new, so the proof that the list is read at run time is a rig library preloaded into Kdenlive that adds one entry (`scripts/tools/rig-input-entry.c`): it appears at the list's end and, chosen, makes the clip a pair.
 - **Swap left and right eyes** is shown for a clip shown in 3D, or to take back a swap the clip has; **Save the correction into the file** for a clip shown in 3D (greyed while there is nothing to save) or holding a correction (a 3D clip set to Not 3D can be saved as 2D). A clip shown flat with no correction gets the list only, so an unmarked 3D clip can be declared, and nothing else.
 - **Kept in the project** (`kdenlive:stereo3d_input`, `kdenlive:stereo3d_swap` on the clip, undoable), never in the file. The packing a clip is shown with (monitors, thumbnails, the project's conversion, renders) is the file's unless the person corrected it.
 - **The save** writes the file's own mark through the layer's libstereo-av (`stereo_mark_save()`: Matroska's StereoMode with mkvpropedit, MP4's st3d in place). The library reads it back; Kdenlive then takes the correction off the clip and reads the clip again from the file.
   - A refusal says why: a container with no mark, a value the mark has not, the stream's own SEI declaring another format, an MP4 without room, mkvpropedit missing.
   - On a refusal the file is as it was and the correction stays in the project.
+  - A still's correction is written by the layer (`Stereo::Picture::saveCorrection()`), which (1.23.2) writes only into JPEG pictures, a JPS's descriptor or an MPO; Kdenlive refuses a PNG itself with that reason.
+  - After a save the clip is read again from the file and the project monitor shows its frame at once (patch 0021); +stereo3d9 showed black until the playhead moved.
 
 ### The source's depth
 
 - MLT's `stereo3d_unpack` asked every producer for RGBA, 8 bits a sample, so a 10 bit 3D clip taken apart lost its depth: 256 luma levels in a row of a 10 bit ramp, where the source has 877.
 - MLT 0015: asked for more than 8 bits a sample, the filter works the views in RGBA64 and hands back the format asked for, an opaque picture with no alpha mask. The result is 877 levels in each eye, through Kdenlive's headless render with its track compositing.
 - Kdenlive itself keeps a 10 bit clip at 10 bits in a 2D project with no effect (877 levels with a 10 bit preset). Kdenlive's own presets are 8 bit.
+- **A 3D project's render** (patch 0022): a 3D preset that names no pixel format writes the deepest video clip's depth (its stream's `pix_fmt`) up to its codec's: H.264 10 bits (ITU-T H.264 Annex A, High 10; its High 4:4:4 Predictive carries 14, which libx264 does not write), H.265 12 (Annex A, Main 10 and the format range extensions' Main 12; libx265 writes up to 12), FFV1 16 (RFC 9043; the 3D Matroska-FFV1 preset). Deeper than 10 bits MLT works the frame in RGBA64 (`mlt_image_format=rgba64`): with no format named, its encoder works yuv420p and a 12 bit request comes out with 8 bit steps.
+- When the render writes fewer bits than the deepest clip (a 12 bit clip through H.264, a preset that names an 8 bit format), the person is told before it runs (the render dialog, and the command line's output); the render goes ahead.
 
 ### What a 3D render preset writes
 
@@ -90,6 +101,12 @@ In a producer the filter takes the views out of the producer's own picture and f
 `target_views=half` is for a profile whose frames carry half views squeezed to half their width (a 1920x1080 side by side profile, the shape the players' shared rule reads as half views); the view is fitted to a half shown twice as wide.
 A clip already side by side, left eye first, with views of the project's kind keeps its frames as they are (no RGBA conversion).
 Frame sequences are not taken apart in a producer.
+
+### 2D elements in a 3D project
+
+- "Faked 3D becomes stereo by doubling": in a 3D project a 2D clip, a title, a picture or a colour is the same picture in both eyes, at the screen plane (MLT's `stereo3d_unpack packing=mono` as the first filter of its timeline producer, patch 0019), in the monitors and the renders alike. Its transparency is kept, so a title over a 3D clip shows the clip's pair under it, the title at the same place in both eyes.
+- Colours, pictures, titles and templates use a cut of the bin clip's own producer in a 2D project; in a 3D project they get producers of their own, which carry the filter (`ProjectClip::getTimelineProducer()`). When a project becomes 3D (or stops being), every clip's timeline instances are made again, and once more when the project has finished opening (`KdenliveDoc::checkStereo3DPairProject()`).
+- Not done: a composition or an effect with its own geometry acts on the frame of two eyes, not per eye (a picture in a box of the frame's left half lands in the left eye only).
 
 ### Proof
 
@@ -128,6 +145,12 @@ The rig is the lane's scripts (a headless Stereo KWin as in [`stereo-proof-rig`]
 - **Symptom:** the monitor's 3D menu is not in the monitor's context menu. **Cause:** it is in the monitor's configuration menu, which a narrow monitor puts behind its toolbar's overflow (`>`), then More Options. **How found:** captures after each click.
 - **Symptom:** `tests/validate-po-patches.py` passes a patch with no output. **Cause:** run from the wrong folder it finds no patch (its build root defaults to the current folder); run from the build clone's root it says "no file section" for a quilt-refreshed patch (it needs a `diff --git` line before each file) and "no DSC mapping" for a patch not in its table. **Fix:** a `diff --git` line in the patch (quilt keeps it); the package build proves the rest (quilt applies it, msgfmt -c).
 - **Symptom (open):** in a 3D project a 2D clip shows a different half of its picture in each eye: in the monitors and the published renders it fills the packed frame (left half in the left eye), in a +stereo3d9 render it sits at its own shape in the middle of the doubled frame (columns 960 to 2879 of 3840). **Cause:** only 3D clips get `stereo3d_unpack`; a 2D clip, a title or a picture is fitted to the profile like any producer. **Fix owed:** by the doubling rule each 2D element of a 3D project is drawn into both eyes, the same picture (a mono packing for `stereo3d_unpack` that fills both halves, given to every 2D producer of a 3D project, in the monitors and the renders alike). **How found:** a render of a 3D clip followed by a 2D clip, the 2D clip's columns measured.
+- **Symptom:** in the monitor a 2D picture or a title is split between the eyes although its producer has the mono filter; the log says "the producer gave 1920x540, not 1920x1080: the views are not taken out". **Cause:** a producer that scales its own picture (qimage, kdenlivetitle) takes `rescale_width` and `rescale_height`, which a rescale filter after this one set on the frame for the frame of two eyes, over the size asked. **Fix:** MLT 0017 clears them while it asks for the producer's own picture. **How found:** the filter's own log line.
+- **Symptom:** a colour or a title of a 3D render fills half the height of each eye. **Cause:** a producer that makes its picture has no size of its own, and the frame's (two eyes) was taken for it. **Fix:** MLT 0017 takes one eye's size for a producer without a file. **How found:** each eye's colour share (0.5 magenta, 0.5 black).
+- **Symptom:** a project opened at a stored position shows the first frame in the monitor wherever the playhead is. **Cause:** the monitor is not refreshed for the stored position. **Fix (rig):** reach a place by a click on the monitor's ruler (it spans the timeline: x = left + width × frame / length).
+- **Symptom:** saving a PNG still's correction says "The JPEG segments or scan data are truncated or invalid." **Cause:** the layer 1.23.2's `saveCorrection()` scans every file as a JPEG; it has no PNG `sTER` writer. **Fix:** Kdenlive refuses a non-JPEG still itself with the true reason; the writer belongs in the layer (owed there). **How found:** a ten-line program calling the layer on PNG, PNS, JPS and MPO files.
+- **Symptom:** an MPO made by Pillow reads as one picture. **Cause:** Pillow writes no disparity type in the MP index. **Fix:** write the fixture with the build tree's `tools/proof-pair/sbs2mpo.cpp` (KImageFormats' stereo plugin).
+- **Symptom (packaging):** the recipe cannot build against a layer the round carries but has not published. **Fix:** `SPARKY_LC_INSTALL_SIBLINGS=1` with `SPARKY_LC_SIBLINGS_DIR` (release/build-from-lc-dsc.sh): the staged packages are installed, pinned at their versions, before the build dependencies; the recipe checks them against `layer-1.23.2.sha256`.
 - **Symptom:** ScreenShot2 answers "Screenshot got cancelled". **Cause:** without a render node `kwin_wayland --virtual` falls back to QPainter. **Fix:** give the container the render node.
 - **Symptom:** a log search finds no declaration. **Cause:** `WAYLAND_DEBUG` names objects `interface#id`, not `interface@id`.
 

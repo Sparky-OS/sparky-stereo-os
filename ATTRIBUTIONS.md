@@ -663,6 +663,20 @@ The unchanged kernel-settings package records **Sultan Alsawaf** and **Eric Naim
 The helper itself contains no copied CachyOS code. /tmp on disk follows **Debian's trixie release notes** (5.1.6 and 5.2.1, the Debian Documentation Project).
 Names above come from upstream copyright, Debian copyright or git records; contact details are omitted.
 
+### Plasma widgets the edition forks for stereo depth
+
+Each original stays in its author's repository, where bugs and patches for it go; the edition's fork holds only the stereo variant.
+Names are given as each project's README and history give them.
+
+**[Advanced Weather Widget](https://github.com/pnedyalkov91/advanced-weather-widget)** (GPL-2.0-or-later; the edition's fork is [stereo-advanced-weather-widget](https://github.com/Sparky-OS/stereo-advanced-weather-widget)) is the work of its author and maintainer and of the people who joined him:
+- **Author and maintainer:** Petar Nedyalkov, who also wrote the Bulgarian translation.
+- **Code:** rcspam (among it the weather maps), Mizu Ikki, Yoan Dimitrov, Zhora Zmeykin (Katze-942), Kassandra (KassLavender), JoshuaKimsey (among it the Meteocons icon work) and Zhuocheng-Lang.
+- **Translations:** HolySoap and TomfromBerlin (German), PauloAlbqrq (Brazilian Portuguese), Heimen Stoffels (Dutch), Dmaliog, PhvntxmX and Katze-942 (Russian), LAZER-TY and rcspam (French), herzane52 (Turkish), NecaX and BroxiCoros (Spanish), Yo-oo (Traditional Chinese), Guokangz (Simplified Chinese), Zero-MF (Czech), Aldo Latino (Italian), summoner001 (Hungarian), l3monik (Polish), NaviMen (Ukrainian), presire (Japanese), vitneum (Korean) and tonikarppi (Swedish).
+- **What it builds on** is listed with each licence in its README's "Data Sources": Weather Icons by Erik Flowers, Meteocons by Bas Milius, SunCalc and Leaflet by Vladimir Agafonkin, MapLibre GL JS, OpenFreeMap, OpenStreetMap and its contributors, Photon by komoot, Open-Meteo, RainViewer, LibreWXR, Natural Earth, NASA's Moon and night-lights images, NOAA's Space Weather Prediction Center and KDE's FOSS Public Alert Server among them.
+
+**[Plasma Panel Colorizer](https://github.com/luisbocanegra/plasma-panel-colorizer)** (GPL-3.0; the edition's fork is [plasma-stereo-panel-colorizer](https://github.com/Sparky-OS/plasma-stereo-panel-colorizer)) is by Luis Bocanegra, its author and maintainer, with contributions from the people in its [contributors list](https://github.com/luisbocanegra/plasma-panel-colorizer/graphs/contributors): J0anJosep, Heimen Stoffels (Vistaus), mill413, chester-berkeley, qud0, smileyhead, novuskeylabs, kkkzbh, Vaithre, dinhkarate, blrain3, JustTNE, jerry2714, HeitorAugustoLN, Harald Sitter (hsitter), Ericferraz15, chun-awa and eggroll-bot.
+What it builds on is in its README's "Acknowledgements & useful resources".
+
 ### Controller input
 
 The Game Controller page keeps every raw button, axis and hat reported by SDL.

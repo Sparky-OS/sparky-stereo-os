@@ -676,10 +676,12 @@ Plant the failures to see the stops: a commit that breaks a wired build script (
 - **How found:** reading all four published indexes increased the non-meta replacement count from 142 to 185; the final generated-and-taken set contained 244 replacements and every comparison passed before copying.
 
 - **Symptom:** an installed upgrade succeeds, preserves planted conffiles, has no removals and an empty dpkg audit, but `dpkg-stereo --verify` reports `CHANGED /etc/grub.d/10_linux`.
-- **Cause:** a successor boot package diverts Debian's program and installs its own wrapper link at the old name; an earlier projection record still associates that name with Debian's hash.
+- **Cause:** a successor boot package diverts Debian's conffile and installs its own wrapper link at the old name; an earlier projection record still associates that name with Debian's hash.
+  The package must not divert a conffile; teaching the verifier about diversions alone does not make that packaging valid.
   The verifier opens the old name and follows the replacement link rather than checking the diverted original.
 - **Fix:** stop the proof and preserve its state; do not declare the change a planted person edit or loosen the proof's refusal.
-  The owning verifier needs a successor that resolves recorded package diversions and verifies the correct owner and location, with a regression covering both a preserved original and a changed diverted original.
+  Hold the diverting boot generation and retain the published predecessor.
+  Its owning package needs a successor that provides the boot menu without diverting the conffile; the verifier separately needs diversion-aware ownership checks and regressions for both preserved and changed diverted originals.
   That package repair is separate from a frozen round when the preparation brief forbids changing package content.
 - **How found:** the diverted Debian file's SHA-256 exactly matched the stored lean hash, while the old name resolved to the new boot wrapper.
   Reading the verifier showed its direct open of the recorded path; the transaction and all installed selected versions had already passed.
@@ -689,3 +691,25 @@ A rebuilt source reconstructed from Git does not qualify an existing binary mere
 Where the coordinator explicitly authorizes trying this despite a missing staged descriptor, bind both the recipe and upstream commits to the acceptance record and compare every member of every accepted archive.
 A 20-for-20 output set with 90 differing payload/control members still fails receipt repair; preserve the comparison and hold the source and dependent pack.
 This exceptional authorization does not change the normal requirement to rebuild the retained staged descriptor.
+
+## Propagate holds and bind the evidence of a replacement preparation
+
+- **Symptom:** removing a held generation leaves a selected companion or generated meta requiring it.
+- **Cause:** source qualification and acceptance were checked independently of the taken packages' dependency and joint-acceptance conditions.
+- **Fix:** read every taken Depends, Pre-Depends and Breaks and the relevant acceptance records before regenerating metas. Hold required or inseparable companions; keep independently accepted successors when the published predecessor satisfies them. Record the relation and acceptance evidence for each decision.
+- **How found:** a held boot generation had an unversioned system-meta dependency, while later Plymouth and theme generations had independent acceptances and used an already supported interface. A separately held stereo layer had a pack requiring its newer interface, so that pack stayed held.
+
+A later accepted recipe may be the sole exception to an otherwise frozen build commit when the coordinator explicitly authorizes it.
+Bind the recipe directory by Git tree equality between the accepted main commit, the staged build record's commit, and the preparation tree.
+Keep every other recipe at the original freeze, and regenerate metas when the new package changes minimum versions.
+Do not infer whole-tree provenance from one matching recipe directory.
+
+A new preparation gets a fresh copied pool and manifest; the blocked pool is evidence, never its input.
+Checks reused across preparations need an explicit list of equal input hashes, including their tools and published comparison inputs.
+Rerun every installed-system check from the retained published baseline.
+Only after the new manifest verifies may the old pool be removed by its literal path under the coordinator's cleanup authorization.
+
+Before planting conffile edits, retain the published baseline's verification output and the relevant original file hashes.
+A unique appended test marker distinguishes the proof's edit from an already changed baseline file.
+Compare baseline and upgraded problem rows side by side, separating explicit planted edits; a coordinator-approved baseline comparison does not waive any newly introduced problem or alter the verifier.
+Run deep verification with HTTPS access to the originals it needs, and retain exact download failures when those originals are unavailable.

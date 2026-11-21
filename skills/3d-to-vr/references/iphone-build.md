@@ -1,7 +1,7 @@
 # Building Flat Headset for iPhone from Linux
 
 **For the contributor: write and test portable code on Linux, compile the native application on a standard hosted macOS runner, then sign and install with Xcode on a Mac.**
-Check freshness first: Intel runner inventory and Apple Xcode compatibility checked 2026-11-21; Intel builds are prepared and await their first hosted run.
+Check freshness first: Intel runner inventory and Apple Xcode compatibility checked 2026-11-21; Intel KDE Connect, Cardboard and core archives passed run 44848751393; the Intel receiver awaits a rerun after installing the missing Metal component.
 The first native proof target and workflow are implemented.
 [Hosted run 44690357195](https://github.com/Sparky-OS/flat-headset/actions/runs/44690357195) passes every step for commit 306c59c: the portable tests, the native app build, the arm64 and unsigned checks, the packaging and the artifact upload.
 The downloaded artifact was checked on Linux: the checksum, the manifest entry, only our own files inside, an arm64 program for iOS 16.0 and later with no code signature.
@@ -643,7 +643,7 @@ The core job also records the selected Xcode installation's disk usage; that fig
 Intel artifacts append `-intel` after the workflow commit, so parallel jobs cannot replace each other's IPA, core archive or checksum.
 The artifact contents and all three app targets remain unsigned arm64 for iOS 16.0, regardless of the host CPU.
 No account, development team, provisioning profile or signing key is available to these jobs.
-The first Intel run remains unverified until its logs and downloaded artifacts pass the same checks as the arm64-host builds.
+The Intel receiver app remains unverified until the missing Metal component is installed and the rerun produces a checked IPA; the first run results are recorded below.
 
 Host/target audit:
 
@@ -659,3 +659,28 @@ Traps found by source and runner-inventory inspection, before an Intel run:
 - **Symptom:** a generated codec build tool targets the phone or picks a different host compiler through PATH. **Cause:** target and host compilers were not independently specified. **Fix:** FFmpeg gets a separate macOS compiler/sysroot for build-time tools. **Found:** FFmpeg n8.1 configure's host-compiler default and cross-compile options; this is preventive, not a claimed observed Intel failure.
 - **Symptom:** parallel jobs contend for an artifact name. **Cause:** names used only the workflow commit. **Fix:** Intel job names append `-intel`. **Found:** reviewing the new matrix before upload.
 - **Symptom:** the receiver cannot read KDE Connect's keychain after a local Xcode build. **Cause:** the former Linux signer injected the shared entitlement; unsigned Xcode projects do not yet do that. **Fix to complete in the Mac signing recipe:** receiver own default group first, KDE Connect group second, both using `$(AppIdentifierPrefix)`, same Personal Team, and inspect the issued profile. **Found:** comparing the signer with the project entitlement inputs. No second pairing is an alternative.
+
+
+### Intel first run: missing Metal component
+
+[Run 44848751393](https://github.com/Sparky-OS/flat-headset/actions/runs/44848751393), checked 2026-11-21, passed six of seven jobs at commit c11178e.
+The Intel image reported `macos15 20260824.0482.1`, `x86_64`, Xcode 26.3 build 17C529 and iPhoneOS SDK 26.2.
+KDE Connect and Cardboard built and packaged successfully on this host.
+The static receiver libraries and link probe also built and uploaded before the app failed.
+The arm64 image reported `macos26 20261117.0516.1`, Xcode 26.6 build 17F113 and SDK 26.5, and built all three apps.
+All seven available artifact payloads passed their downloaded SHA-256 checks; there is no Intel receiver IPA for this run.
+The five available IPAs contain unsigned arm64 programs for iOS 16.0 without embedded dynamic libraries/frameworks or provisioning profiles.
+Both core archives contain eight static libraries and an unsigned arm64 link probe for iOS 16.0.
+
+The selected Xcode Contents directory measured 4,515,932 KiB on the Intel host and 4,646,300 KiB on the arm64 host.
+These are allocated-size measurements of those runner installations before the missing component is installed, not download sizes or total disk requirements including components stored elsewhere.
+
+- **Symptom:** `CompileMetalFile` fails because the `metal` tool cannot execute without its Metal Toolchain.
+- **Cause:** Xcode 26's optional Metal component was absent on the Intel runner. The log does not establish an Intel CPU or old-SDK source incompatibility.
+- **Fix:** before compiling the core/app, execute `xcrun --sdk iphoneos metal --version`; if unavailable, visibly run `xcodebuild -downloadComponent MetalToolchain` on the hosted Mac, then verify the compiler again. Download failure or a still-unavailable compiler stops with a plain instruction. Nothing is fetched to the Linux workstation.
+- **Found:** the complete failing app-build step names the missing component and prints the installation command. [Apple documents the separate Metal component](https://developer.apple.com/documentation/xcode/downloading-and-installing-additional-xcode-components).
+
+Xcode 26.3 remains selected for the next Intel attempt; only a green receiver build will establish it for all three programs.
+The earlier LTO probe's x86_64 linker warnings were nonfatal capability-detection diagnostics; the configured core disables LTO and its actual arm64 libraries/probe passed.
+Do not confuse those diagnostics with the app's Metal compilation failure.
+The eventual real Mac setup also needs the Metal component, but installation/signing and SSH instructions wait for the complete Intel unsigned proof.

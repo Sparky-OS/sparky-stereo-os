@@ -155,9 +155,9 @@ Then the stereo proof of the general skill for anything that changes what a pers
 Check the project's stance on AI before anything (OBS discourages it, Krita has a moratorium, Blender has a published policy, KDE had none adopted in October 2026); find who owns the code in its own records; draft the heads-up as [`upstream-outreach`](../upstream-outreach/SKILL.md) says; the main session and Daniel send it.
 A pack that only calls a program's command line, as these two do, needs no message to its authors.
 
-## A program's assistant: the one local engine
+## A program's AI: partners, local and at providers
 
-A program's AI feature (KMail and the other KDE programs through ktextaddons, Vibe, Betterbird with ThunderAI) is wired to the edition's one local engine, off until the person turns it on: [the one local assistant engine](references/local-assistant.md) has what each part offers, where its settings live, how to read them without pulling a model, and eight traps.
+A program's AI feature (KMail and the other KDE programs through ktextaddons, Vibe, Kdenlive, Spirula Studio, Betterbird with ThunderAI) follows the person's choice on the Partners page: an engine on this computer or a provider's service, a model and a card per kind of work. [Partners](references/partners.md) has the engine package as built (Ollama split by hardware, NVIDIA's libraries from NVIDIA's repository), how a computer gets its runner, what each program reads today, how to read each part without pulling a model, and twelve traps.
 
 ## Lessons from the lanes, October to November 2026
 

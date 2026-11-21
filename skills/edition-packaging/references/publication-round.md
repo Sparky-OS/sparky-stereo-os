@@ -732,3 +732,10 @@ Name new error-severity findings in edition-authored packaging at the top of the
 A patch-reader size cutoff can silently make two large patches compare equal as two missing values.
 Read and hash every member named by `series`, and fail if any member was not read; a large combined edition patch is still a patch that must be compared.
 The symptom was identical `missing` hashes for different generations; removing the reader's cutoff exposed the actual depth-conversion and cache-invalidation changes for review.
+
+## An archive failure whose last attempt hides a missing compute repository
+
+- **Symptom:** the link gate's final APT error names two mutually conflicting NVIDIA driver-lock packages while checking a CUDA application's debug companion.
+- **Cause:** the supplied archive universe omits the vendor's compute repository. The no-lock and each single-lock solve already fail because the CUDA runtime dependency has no candidate; the final both-lock combination reports its own conflict and masks that first cause in the top-level message.
+- **Fix:** preserve every policy-attempt log and the application's actual dependency control. Bind the edition's intended compute repository, public signing key and architecture restrictions from its source-package/ISO configuration, retain the edition's display-driver locks, and rerun the complete archive gate against the corrected explicit universe. Do not waive the failure, request both locks, or classify the application as broken solely from the last attempt. A preparation with a stop-on-gate-failure contract hands back the exact configuration gap and unprocessed tail instead of claiming a whole-pool pass.
+- **How found:** the first three solver logs said the exact CUDA runtime had no choices; the archive configuration listed Debian, multimedia and distribution repositories but no vendor compute archive. Reading the policy solver showed that it raises its last unsuccessful alternative, not necessarily the most informative one.

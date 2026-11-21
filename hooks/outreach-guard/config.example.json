@@ -22,6 +22,7 @@
     {"pattern": "code\\.videolan\\.org|videolan/vlc", "skill": "contrib-vlc"},
     {"pattern": "x265|Multicorewareinc", "skill": "contrib-x265"},
     {"pattern": "HandBrake", "skill": "contrib-handbrake"},
+    {"pattern": "anthropics/", "skill": "contrib-claude-code"},
     {"pattern": "mkvtoolnix", "skill": "contrib-mkvtoolnix"},
     {"pattern": "PeerTube", "skill": "contrib-peertube"},
     {"pattern": "mplayer", "skill": "contrib-mplayer"}

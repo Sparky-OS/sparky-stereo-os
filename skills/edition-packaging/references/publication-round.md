@@ -713,3 +713,18 @@ Before planting conffile edits, retain the published baseline's verification out
 A unique appended test marker distinguishes the proof's edit from an already changed baseline file.
 Compare baseline and upgraded problem rows side by side, separating explicit planted edits; a coordinator-approved baseline comparison does not waive any newly introduced problem or alter the verifier.
 Run deep verification with HTTPS access to the originals it needs, and retain exact download failures when those originals are unavailable.
+
+## A successor audit must distinguish same-version source branches
+
+- **Symptom:** a newer accepted application catalogue lacks an entry and helper found in an older staged package, even though every comparison with the published package passes.
+- **Cause:** two different staged source closures use the same version; only one was merged into the build tree. A review acceptance that explicitly holds the code merge does not make the other closure a release predecessor.
+- **Fix:** identify each predecessor by descriptor hash and stage path as well as version. Read its acceptance and merge condition, compare the catalogue entries and authored helpers, and name an excluded unmerged branch separately. For accepted predecessors, explain every lost feature; a higher version or a retained filename is not proof of preservation.
+- **How found:** comparing catalogue dictionaries showed one missing entry and the native source comparison showed its missing verifier helper. The journal explicitly held that branch's merge, while the accepted same-version branch's entries survived exactly.
+
+Read native authored files and embedded upstream trees as well as quilt series: an unchanged one-patch series can accompany changed application code in the original component.
+A file moved between packages needs a comparison at its new owner; retain an assertion that every former association or entry survives there.
+Treat a source changelog containment test as a lead for review, not a feature-preservation verdict: qualification headers, combined source packages and held outputs can change the generated history.
+
+For a whole-pool Lintian delta, group increased contexts by tag and demonstrated cause, retaining counts, one concrete example, and the owning fix or false-positive evidence.
+A common helper's purge/error handling and a valid space-containing conffile can require reading the actual helper or an isolated dpkg unpack to explain a diagnostic.
+Name new error-severity findings in edition-authored packaging at the top of the hand-back even when the functional gates pass; a classified finding is not a corrected package.

@@ -81,3 +81,21 @@ A binary phase interrupted after source creation can resume without repacking a 
 Keep the original authored descriptor and compare it with independent real-clean source builds.
 If a resume reports an already-marked debug archive, follow [the stale dbgsym-root lesson](lessons-2026-11.md): remove the failed debug staging roots and failed binary outputs, then repeat the binary phase and its unchanged gates.
 Keep the initial failure and successful resume logs together.
+
+## A repaired candidate does not repair its historical comparison
+
+**Symptom:** the complete pool gate now resolves the candidate, then reports `previous edition dependency qualification failed` for its published predecessor.
+**Cause:** the gate gives both sides the same frozen public index, while the previous sibling universe correctly contains the old edition fork.
+The new Debian XMLGUI requires icon themes 6.32, but that historical universe pins the edition's 6.30 icon-theme build.
+Rebuilding the candidate fork changes only the candidate universe.
+**How found:** read all four conditional policy solves, including the first attempt without either driver lock; inspect the successful candidate resolution and the separately hashed previous universe.
+The final attempt's mutually exclusive NVIDIA locks are secondary and do not explain the first three failures.
+**Disposition:** retain the stop and the exact published snapshot; a passing candidate solve is not a completed comparison.
+The publication maintainer must resolve how to qualify that historical baseline before this gate can pass.
+Do not substitute the successor into the previous snapshot, invent rollback pins, remove predecessor checks, or describe an incomplete invocation as a pass.
+This is a remaining proof-contract boundary, not a failed patch rebase or a defect repaired by another rebuild of the same successor.
+
+**Test-image trap:** a committed build-dependency image can retain `SPARKY_BUILD_INVOCATION` and related provenance variables.
+A unit fixture that intentionally opts out of build provenance then correctly fails because it sees both modes.
+Use the clean tools image from before provenance initialization for the isolated suite, preserve the failing attempt, and rerun the affected tests without changing their assertions.
+The error naming both `SPARKY_PROVENANCE_OPTOUT` and `sparky_provenance_init`, followed by inspection of the image's recorded environment, distinguishes this from a package defect.

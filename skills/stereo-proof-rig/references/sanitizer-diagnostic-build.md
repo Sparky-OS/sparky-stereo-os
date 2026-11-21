@@ -49,3 +49,11 @@ The fault itself, with its fix, is in [vr-to-3d: the runtime's start-up heap fau
 - **Symptom:** a busy-loop load in the container never brings the fault out, while unrelated work on the machine does.
   **Cause:** the CFS quota throttles the whole container together instead of preempting threads one at a time.
   **Fix:** pin the container to fewer CPUs (`--cpuset-cpus`) and record what ran beside it.
+- **Symptom:** `coredumpctl list` on the host shows `memcheck-amd64-linux` SIGSEGV records from a container started with `--ulimit core=1`.
+  **Cause:** when the program under Valgrind dies of a signal, Valgrind sets its own core limit to 0 before raising the signal again, and the kernel ignores a limit of 0 for a piped core handler, so the host's handler runs (and can notify the desktop).
+  **Fix:** a test program that is expected to crash calls `prctl(PR_SET_DUMPABLE, 0)` first; under Valgrind that covers Valgrind too, since they are one process.
+  **Found by:** reading `coredumpctl list --since` before the hand-back, then `coredumpctl info PID` for the container's cgroup.
+- **Symptom:** the launcher printed no summary, and stopped containers of the lane piled up, their IDs never recorded.
+  **Cause:** under `set -e`, `kill "$sampler"; wait "$sampler"` returns the killed job's status (143) and ends the script before `docker inspect` and `docker rm`.
+  **Fix:** `wait "$sampler" || true`; list `docker ps -a --filter name=PREFIX` after every series, not only running containers.
+  **Found by:** a crash record whose container ID was missing from the lane's ID list.

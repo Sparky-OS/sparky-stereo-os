@@ -3,7 +3,7 @@
 **For publication maintainers:** measure a partial Debian testing transition, carry the edition forks onto the available source versions, and keep every proof on one signed index.
 
 Check freshness first: written 2026-11-21 during the Frameworks 6.30 to 6.32 transition.
-The source preparation below has run; successor binaries and installed checks must still pass before a round is qualified.
+The four successor builds and their installed feature checks have passed; complete pool and transaction gates remain separate requirements.
 
 ## Measure the whole set
 
@@ -34,7 +34,7 @@ Copy binary test fixtures from the published Debian tarball as well as text patc
 Prepare a fresh Lean Code source with the accepted toolkit, then run the package's tests and the existing installed red/green checks.
 Compare every binary's file list with the published version, explain each removed path, and qualify the complete source closure and all publication gates.
 
-## Traps measured during source preparation
+## Traps measured during preparation and build
 
 - **Symptom:** XMLGUI or a style library requires `libkf6iconthemes6 >= 6.32`, while the edition's policy retains its 6.30 fork.
   **Cause:** testing migrated part of Frameworks before the edition rebuilt its patched sources.
@@ -66,3 +66,18 @@ Compare every binary's file list with the published version, explain each remove
   **Cause:** upstream Kirigami commit `38f09a837eed7e4984d744e148d0f8a2b99cfcbc` removed the unused SafeArea compatibility module after raising the Qt floor beyond 6.9.
   **Fix:** retain the exact removal, old/new controls and upstream retirement evidence for transaction review; do not confuse an obsolete Debian compatibility package with an edition dependency being removed by the solver.
   **How found:** reading all Remv lines exposed the package, and the upstream tag comparison identified its deliberate removal.
+
+## Verify the installed forks
+
+Reuse the owning source or row fixtures against installed headers, libraries and plug-ins, without a build-tree search path.
+KIconThemes can use the existing stereo icon-loader fixture: the Debian headers reject its edition API, then the installed fork compiles and passes the same cases.
+KImageFormats uses its stereo round-trip, metadata, depth and JPS-writer fixtures; verify the generated JPS APP3 and MPO MPF marks independently.
+PNS belongs to the Qt PNG reader, whose existing sTER fixture must also pass; do not describe that reader check as a new KImageFormats writer.
+KFileMetaData's installed fixture harness queries actual extractor plug-ins and their stereo properties.
+NetworkManagerQt's existing setter and installed KCM fixture can use a private D-Bus service in a networkless container: test writes, real signals, denial, unchanged unrelated state, reload, persistence and missing-service errors.
+The private service must never share the host system bus or network namespace.
+
+A binary phase interrupted after source creation can resume without repacking a projected source tree.
+Keep the original authored descriptor and compare it with independent real-clean source builds.
+If a resume reports an already-marked debug archive, follow [the stale dbgsym-root lesson](lessons-2026-11.md): remove the failed debug staging roots and failed binary outputs, then repeat the binary phase and its unchanged gates.
+Keep the initial failure and successful resume logs together.

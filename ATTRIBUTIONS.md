@@ -1476,3 +1476,10 @@ The edition's catalogue additions build on the programs and translator teams cre
 Greg Hughes, Sam Marshall, ios-deploy contributors.
 
 Local anisette source audit: **FDKevin**, **jkcoxson**.
+## OBS Studio's stereo module (ORDER 61)
+
+Sources: OBS Studio 33.0.1's AUTHORS and source headers, obs-websocket 5.7.6's source headers, deb-multimedia's obs-studio-dmo packaging, JackDesBwa's OBS_SBS_scripts repository. Names only.
+
+- **OBS Studio**: original author Lain Bailey, with the contributors OBS's AUTHORS file names first (jpark37, PatTheMav, Ryan Foster, derrod, Sebastian Beckmann, R1CH, cg2121, Palana, tytan652, WizardCM, Warchamp7, Norihiro Kamae, fryshorts, pkv) and the rest of that file; GPL-2.0-or-later. The module builds on libobs and the frontend API, and its rig drives OBS through **obs-websocket** (Stephane Lepin and Kyle Manning, from its source headers).
+- **deb-multimedia**: Christian Marillat packages the obs-studio and libobs-dev the module is built against.
+- **JackDesBwa**: his MIT-licensed Lua filters for side by side in OBS (`obs_filter_sbs2a.lua`, `obs_filter_sbsadjust.lua`) were read; they are not carried, since one makes an output format (anaglyph) and the other moves the views, which changes depth, and the edition leaves both to Stereo KWin. His vertical alignment of a side-by-side source is the idea behind the input correction proposed for the module's next milestone.

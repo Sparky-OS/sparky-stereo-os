@@ -48,25 +48,33 @@ The recipe's `tests/` folder, each in a throwaway Debian testing container where
 - `runners-link.sh ollama ollama-rocm`, and `ollama-cuda` with NVIDIA's CUDA 13.5 runtime installed: every program and ggml back end resolves its libraries (`ldd` with `/usr/lib/ollama` on the path, since the engine loads `libggml-base` before it opens a back end).
 - `gpu-discovery.sh CUDA` (the RTX 3060 through CDI, NVIDIA's driver 615 on the host): `library=CUDA compute=8.6 "NVIDIA GeForce RTX 3060" libdirs=ollama,cuda_v13 driver=13.4`; the 13.5 runtime runs on the driver's CUDA 13.4.
 - `gpu-discovery.sh Vulkan` on the same card without `ollama-cuda` (with the rig's `libxext6` and `libegl1`, see the traps): `library=Vulkan description="NVIDIA GeForce RTX 3060" libdirs=ollama,vulkan`.
+- Since `0.40.16+ds-2` the tests take the Partners card: `CARD=CHOICE gpu-discovery.sh LIBRARY@PCI...` starts the unit's own `ExecStart` and passes only when the engine reports exactly those cards; `card-start.sh USER CHOICE=EXPECTED...` does the same through `systemctl --user` in a container booted with systemd (below).
 - Not proven: the ROCm runner on an AMD card (none here that its gfx list covers).
-- Perks of the engine's own log: `OLLAMA_DEBUG=2` prints each `llama-server` discovery run with its `libDirs`, and the native probe stops at the first back end that fails to start, so hiding CUDA with `CUDA_VISIBLE_DEVICES=-1` also hides every later back end.
+- Perks of the engine's own log: `OLLAMA_DEBUG=2` prints each `llama-server` discovery run with its `libDirs`. Discovery runs once for each runner folder (`discover/runner.go`: `llama-server --list-devices` with `LD_LIBRARY_PATH` and `GGML_BACKEND_PATH` set to that folder), then a native probe (`ollama gpu-discover --lib-dir ...`). A runner that finds no card (CUDA with `CUDA_VISIBLE_DEVICES=-1`) makes that probe exit 1 ("native GPU discovery failed"), and discovery goes on with the next folder: it does not hide the other runners.
 - With cloud-hosted models allowed, the running engine asks `ollama.com` at start for its hosted model list and its model recommendations (no text is sent): seen as two failed requests in a run with no network.
 
-## Which card the engine uses: measured on Ollama 0.40.16
+## Which card the engine uses: the Partners choice, measured on Ollama 0.40.16
 
-On a computer with an RTX 3060 and both the CUDA and Vulkan runners installed, through CDI, no model:
+The card is one choice shared by the Graphics and Partners pages, `[Render] Partners` in `sparky-stereo-graphicsrc` (Automatic, any card, or `cpu`, Processor only).
+The service starts `sparky-stereo-gpu-run --compute --category partners /usr/bin/ollama serve`, which takes the variables of `sparky-stereo-gpu-env --category partners --print compute-env`: only the chosen card is visible to every runner, and `ollama-cuda` stays installed whatever the choice.
+Ollama reads no variable for its runner folders: `OLLAMA_LIBRARY_PATH` is only a label in its log, and its library root is the executable's own folder after `filepath.EvalSymlinks` (`ml/path.go`), so a folder of links cannot move it; the visibility variables are what work.
 
-| Variables | The engine's card |
+The workstation, every runner installed (`ollama`, `ollama-cuda`, `ollama-rocm`), the RTX 3060 through CDI and the Renoir APU through its own render node (`--device /dev/dri/renderD128`), no model:
+
+| Variables | What the engine computes on |
 | --- | --- |
-| none | CUDA, RTX 3060 |
-| `OLLAMA_LLM_LIBRARY=cuda_v13` | CUDA, RTX 3060 |
-| `GGML_VK_VISIBLE_DEVICES=-1` | CUDA, RTX 3060 |
-| `OLLAMA_LLM_LIBRARY=vulkan` | processor only |
-| `CUDA_VISIBLE_DEVICES=-1 OLLAMA_LLM_LIBRARY=vulkan` | processor only |
+| none | CUDA on the RTX 3060 (the APU is left out as integrated) |
+| `OLLAMA_IGPU_ENABLE=1` | CUDA on the RTX 3060 and Vulkan on the APU, both |
+| the RTX 3060 chosen: `CUDA_DEVICE_ORDER=PCI_BUS_ID CUDA_VISIBLE_DEVICES=0 HIP_VISIBLE_DEVICES=-1 VK_LOADER_DRIVERS_SELECT=*nvidia* DRI_PRIME=pci-0000_01_00_0! OLLAMA_IGPU_ENABLE=1` | CUDA on the RTX 3060 alone |
+| the APU chosen: `CUDA_VISIBLE_DEVICES=-1 HIP_VISIBLE_DEVICES=-1 VK_LOADER_DRIVERS_SELECT=*radeon* DRI_PRIME=pci-0000_0b_00_0! OLLAMA_IGPU_ENABLE=1` | Vulkan on the APU alone |
+| the same without `OLLAMA_IGPU_ENABLE=1` | the processor: "dropping integrated GPU" |
+| the processor: `CUDA_VISIBLE_DEVICES=-1 HIP_VISIBLE_DEVICES=-1 GGML_VK_VISIBLE_DEVICES=` | the processor |
+| `OLLAMA_LLM_LIBRARY=vulkan` | Vulkan on the RTX 3060 (one runner folder only) |
+| `OLLAMA_LLM_LIBRARY=cpu` | the processor |
 
-With `ollama-cuda` absent, the same card is found through Vulkan (`library=Vulkan ... libdirs=ollama,vulkan`).
-So with the CUDA runner installed, hiding CUDA does not move the engine to another card: the native probe stops at the back end that fails to start, and only the processor is left.
-A choice of "the other card" on such a computer needs the CUDA runner out of the engine's way; choosing among NVIDIA cards, or the processor, works with CUDA's own variables.
+Vulkan's choice between the two cards without the CUDA runner (`ollama` only, `OLLAMA_IGPU_ENABLE=1`): `GGML_VK_VISIBLE_DEVICES=0` gave the APU and `=1` the RTX 3060 (the order is the loader's, after Mesa's device-select layer puts its default first, so an index is not a name); `MESA_VK_DEVICE_SELECT=1002:1638!` and `=10de:2504!`, `DRI_PRIME=pci-0000_0b_00_0!` and `=pci-0000_01_00_0!`, and `VK_LOADER_DRIVERS_SELECT=*radeon*` and `=*nvidia*` each gave that card alone.
+`compute-env` uses the PCI form of `DRI_PRIME` with `!` (two identical cards have the same vendor and device ids) beside the loader's driver filter; Mesa's environment variables page: "For Vulkan it's possible to append !, in which case only the selected GPU will be exposed to the application".
+For CUDA it uses the card's UUID from `/proc/driver/nvidia/gpus/SLOT/information`, and `-1` for any other card (CUDA C++ Programming Guide 13.0: "If one of the indices is invalid, only the devices whose index precedes the invalid index are visible"); for ROCm, the card's place among the KFD's graphics nodes, matched by `drm_render_minor` in `/sys/class/kfd/kfd/topology/nodes/N/properties`, with `HIP_VISIBLE_DEVICES=0`, since HIP otherwise falls back to `CUDA_VISIBLE_DEVICES` (ROCm's HIP environment variables page). The ROCm part is not proven here: the APU is gfx90c, which the runner does not carry, and `/dev/kfd` was not passed.
 
 ## Which runner a computer gets
 
@@ -147,6 +155,14 @@ AMD has no line yet: the ROCm runner carries gfx1030, gfx1100 to gfx1102, gfx115
   **Cause:** CDI brings NVIDIA's libraries without their package dependencies: `libGLX_nvidia.so.0` links `libXext.so.6` and opens `libEGL.so.1` at run time, and a minimal container has neither (a desktop has both through NVIDIA's driver packages).
   **Fix:** in the rig, install `libxext6` and `libegl1` with `vulkan-tools`; nothing changes in the package.
   **How found:** `vulkaninfo --summary` in the container named the first library; the second is the stereo-two-cameras skill's trap for the same message (`LD_DEBUG=files vulkaninfo`).
+- **Symptom:** a rig that should reach the NVIDIA card through Vulkan leaves the engine on the processor, though the image was made with `libxext6` and `libegl1`; `ldd libGLX_nvidia.so.0` says "libX11.so.6 => not found".
+  **Cause:** the image had `ollama-cuda` installed with `dpkg -i --force-depends` (its `libcuda1` comes from CDI), so the next `apt-get install` refused everything ("Unmet dependencies") and the script committed the image anyway.
+  **Fix:** run every `apt-get install` before the forced `dpkg -i`, and commit an image only when the install step exited 0.
+  **How found:** `dpkg-query -W libxext6 libegl1` in the image named neither; a rig built in that order found the card. The lane's first selection table (processor only with `OLLAMA_LLM_LIBRARY=vulkan`) came from that image and was withdrawn.
+- **Symptom:** the card chosen for partners is an integrated one (an APU) and the engine still computes on the processor: `dropping integrated GPU; to enable, set OLLAMA_IGPU_ENABLE=1`.
+  **Cause:** Ollama leaves integrated cards out by default (`discover/runner.go`: allowed by default only for CUDA and for ROCm's gfx1151).
+  **Fix:** the unit sets `OLLAMA_IGPU_ENABLE=1`; only the chosen card is visible, so the flag never adds a card the person did not choose.
+  **How found:** the rig's APU row, with and without the variable.
 - **Symptom:** the publish check stops a recipe on a mail add-on's id as "another person's email address".
   **Cause:** a Gecko extension id may have the form of an address (ThunderAI's does).
   **Fix:** Daniel, 2026-11-21: "addon IDs look alike emails huh? that place then is not an exeption, it's not an email": in a policy's own key for the add-on it is an identifier and stays as it is; the coordinator teaches the check that place.

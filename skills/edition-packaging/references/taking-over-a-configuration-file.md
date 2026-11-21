@@ -49,7 +49,7 @@ fi
 and the postrm does the reverse after `--remove --rename` (`$f.debian.dpkg-new` back to `$f.dpkg-new`), and removes only a diversion `--listpackage` says is its own.
 Only in the run that adds the diversion: once it exists, the owning package's unpack already goes to the diverted name.
 Measured (rows 629/802): fixture packages in four install orders (one apt run, one dpkg call either way round, two dpkg calls), sealed with Lean Code or not, keep the owning package's conffile only in this form; with the real packages, nano and sparky-stereo-console in one `apt-get install` on the published edition (apt unpacked nano, then the console, then zsh-common), the published console leaves `/etc/nanorc newconffile` with nothing at `/etc/nanorc.debian`, and sparky-stereo-console 20261121 leaves nano's hash recorded and Debian's file at `/etc/nanorc.debian`; zsh-common, unpacked after the console, kept its file with both.
-Machines that already lost a conffile this way are not repaired by this form; that is a repair of its own (reinstalling the owning package after the dpkg run).
+Machines that already lost a conffile this way are not repaired by this form: dpkg-stereo 0.1.44 does it, for any package's diversion, by reinstalling the owning package after the dpkg run (lean-code, [a file under a dpkg diversion](../../lean-code/references/diverted-files.md)).
 
 ## Removing a diversion in a successor, keeping the person's edit
 

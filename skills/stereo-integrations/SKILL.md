@@ -43,7 +43,9 @@ A device's own tool (a headset's HeadsetControl) is joined the other way: a page
 - `native`: links against the program (an OBS module, a digiKam plug-in). `Depends: <program>`, `Enhances: <program>`. Recommended by every role task whose `roles.tsv` rows list the program, installed with it by the AppCenter, removed with it.
 
 `make-meta.py` reads the list (`read_integrations()`), drops a pack the repository does not carry yet and says so, and `--list-integrations` prints each pack, its kind, its program, what carries it and whether the repository has it.
-`make-appcenter-entries.py` writes the AppCenter's install sets from the same list; `sparky-stereo-integrations` ships them as `/usr/share/sparky-stereo/integrations.map`, and the fork's `aptus-package-install` adds the names to its apt call.
+`make-appcenter-entries.py` writes the AppCenter's install sets from the same list; `sparky-stereo-integration-catalogue` ships them as `/usr/share/sparky-stereo/integrations.map` (the file moved out of the meta package in November 2026).
+Check the published AppCenter's consumer as well as the generated map: 0.1.12+lc1's inherited `aptus-package-install` does not read it.
+Its `stereo/actions/entry` supports companion packages through an apt entry's `also` list; see the [Vibe reconciliation](references/vibe-integration.md) before adding an entry or claiming automatic installation.
 Debian's apt installs from Depends, Pre-Depends and Recommends only; `Enhances` is read by people and tools, not acted on, and `Supplements` is not a Debian field.
 
 ## The pack format

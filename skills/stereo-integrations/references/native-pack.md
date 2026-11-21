@@ -56,6 +56,7 @@ A module could not make OBS 33's VA-API, NVENC or Quick Sync write the frame pac
 - NVENC: an `NV_ENC_SEI_PAYLOAD`, payloadType 45, built bit by bit (H.264 D.1.26, H.265 D.2.16, with the payload's alignment bits); HEVC only types 3 to 5.
 - The muxer helper: one more positional argument, then `AV_PKT_DATA_STEREO3D` in `codecpar->coded_side_data`; FFmpeg's MP4 muxer writes `st3d` only at `FF_COMPLIANCE_UNOFFICIAL` and only left eye first (`mov_write_video_tag()`, `mov_write_st3d_tag()`).
 - OBS's own MP4 muxer: an `st3d` FullBox after `pasp` in each visual sample entry.
+- The encoders and muxers are core modules in the `obs-studio` package (`/usr/lib/<triplet>/obs-modules/core/obs-x264.so`, `obs-ffmpeg.so`, `obs-nvenc.so`, `obs-outputs.so`), not in `obs-plugins`; read their `NEEDED` lines there: `obs-ffmpeg` links the edition's shared FFmpeg (which writes the VA-API SEI), `obs-x264` the shared libx264.
 
 ## What a screencast gives a recorder on a 3D desktop (KWin +stereo3d59, read at the source)
 
@@ -70,7 +71,7 @@ OBS records the screen through the portal, which asks KWin for a `zkde_screencas
   - `obs-studio/plugin_config/obs-websocket/config.json`: `{"first_load": false, "server_enabled": true, "server_port": 4455, "auth_required": false}`.
 - obs-websocket 5 with `python3-websocket`: Hello (op 0), Identify (op 1, `rpcVersion` 1), requests (op 6) and their responses (op 7). `CreateInput` with `image_source`, `CreateSourceFilter`, `StartRecord` and `StopRecord` (its `outputPath`), and `GetSourceScreenshot` (PNG of the source after its filters, at the filtered size): a filter's output read exactly, with no recording in between.
 - End OBS with SIGTERM and wait (OBS 33 closes and saves on SIGTERM); then copy `obs-studio/logs/*.txt` for the module's lines.
-- **A person's first start in Stereo KWin:** `kwin_wayland --virtual --xwayland` with `KWIN_VIRTUAL_STEREO_MODES=1` (the output gets its 3D twins; `kscreen-doctor output.Virtual-0.mode.N` picks one with `stereo3D` 1), `--cap-add SYS_NICE` on the container, `dbus-update-activation-environment WAYLAND_DISPLAY XDG_RUNTIME_DIR` as a Plasma session does, a fresh `HOME` with `~/Videos`, and OBS started with its desktop entry's own `Exec` line.
+- **A person's first start in Stereo KWin:** `kwin_wayland --virtual --xwayland` with `KWIN_VIRTUAL_STEREO_MODES=1` (the output gets its 3D twins; `kscreen-doctor output.Virtual-0.mode.N` picks one with `stereo3D` 1), `--cap-add SYS_NICE` on the container, `dbus-update-activation-environment WAYLAND_DISPLAY XDG_RUNTIME_DIR` as a Plasma session does, a fresh `HOME` with `~/Videos`, and OBS started with its desktop entry's own `Exec` line. "Told once" is proved by a second start of the same account, whose log has no notice.
 
 ## Reading the result
 

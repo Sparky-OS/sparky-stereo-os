@@ -25,7 +25,7 @@ For detection, conflicting marks or half/full packing, read [metadata precedence
 These are settled rules; check the existing shared policy and its callers before designing another detector.
 
 **Check freshness first.**
-Written on 2026-10-07; metadata precedence and geometry clarified on 2026-10-20; the television's two paths added on 2026-11-02.
+Written on 2026-10-07; metadata precedence and geometry clarified on 2026-10-20; the television's two paths added on 2026-11-02; an editor in 3D (Kdenlive and MLT) added on 2026-11-21.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; a player also loads [`stereo-window-3d-area`](../stereo-window-3d-area/SKILL.md) for its video layer.
 
 ## The marks a video carries
@@ -67,7 +67,7 @@ A server or caster that feeds another device (a DLNA television, a cast receiver
 | x264 (through VLC) | the input's layout signalled by default | [VLC !10366](https://code.videolan.org/videolan/vlc/-/merge_requests/10366), in review |
 | x265 | `--frame-packing` writes the H.265 SEI | [x265 #986](https://github.com/Multicorewareinc/x265/pull/986) and the single-SEI fix [#988](https://github.com/Multicorewareinc/x265/pull/988), both in review |
 | mkvmerge | `StereoMode` from the H.264 SEI, then from the HEVC SEI | [MKVToolNix !6311](https://codeberg.org/mbunkus/mkvtoolnix/pulls/6311) (merged), [!6312](https://codeberg.org/mbunkus/mkvtoolnix/pulls/6312) (in review) |
-| Kdenlive and MLT | a clip knows its packing, the render writes the SEI and `StereoMode` | [Kdenlive `stereo3d-26.08`](https://invent.kde.org/danielcamposramos/kdenlive/-/tree/stereo3d-26.08), [MLT `stereo3d-7.40`](https://github.com/Sparky-OS/mlt/tree/stereo3d-7.40) |
+| Kdenlive and MLT | a clip knows its packing, the render writes the SEI and `StereoMode`; 3D presets for H.264 and HEVC in MP4 (`st3d`) and Matroska, clips of any packing taken apart side by side ([an editor in 3D](references/an-editor-in-3d.md)) | [Kdenlive `stereo3d-26.08`](https://invent.kde.org/danielcamposramos/kdenlive/-/tree/stereo3d-26.08), [MLT `stereo3d-7.40`](https://github.com/Sparky-OS/mlt/tree/stereo3d-7.40) |
 | Universal Media Server | H.264 transcodes keep the SEI | [#6330](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6330), in 15.9.0 |
 | PeerTube | a container's packing kept through transcoding, right eye first included | [#7816](https://github.com/Chocobozzz/PeerTube/pull/7816), merged |
 | Android's Media3 | the SEI read in MP4 and fragmented MP4, right-eye-first modes, `StereoMode` in the WebM muxer | [androidx/media #3439](https://github.com/androidx/media/pull/3439), in review |
@@ -168,6 +168,11 @@ VLC Stereo up to +stereo3d19 drew its video on a Qt window's surface, which Qt 5
 A Qt Quick player (Dragon Player, Plank Player) keeps only its menu, its per-file store and its message: the drawing, the declaration and a refused declaration (`stereoLayerFailure`) are Qt Multimedia's.
 Which frames take the GPU route through the layer and which the wl_shm copy, how to see it (the presenter's route line, the CPU figure, the layer's dump) and the traps of the fix are in the same reference (ORDER 500).
 [What the player keeps, the refused declaration shown, the red and green recipe and its traps](references/a-player-on-the-video-layer.md) (ORDER 453, 453b and 453c), including the shipped recipes, Plank’s QSettings store, the actual menu-item visibility guard, the carried and local QML fixes with their control tests, why a player's video takes the memory route (`Handle type: NoHandle`, `createTexturesFromMemory`: Dragon's AMD texture hack, ORDER 497) and how to read the route from Qt's log.
+
+## An editor: the monitor in 3D by default, presets, clips of any packing, the resolution per eye, a clip's corrections
+
+Kdenlive's monitors show a 3D clip in 3D by default wherever the compositor takes stereo content, and say once why when they cannot; its 3D options are the layer's Enable 3D, the left eye's view and Display Settings; its Stereoscopic 3D render presets write full side by side marked in the stream and the container; a 3D project's resolution is one eye's, so a 1920x1080 project renders 3840x1080; in a 3D project each clip is taken apart side by side in MLT before the project's frames are made, a 10 bit clip at its depth; each clip's properties carry the layer's 3D Input Format, Swap left and right eyes and the save into the file; thumbnails are the left eye's view.
+[The recipe, where each part lives, the proof and the traps](references/an-editor-in-3d.md) (ORDER 61e): KConfig keeps no choice equal to the default, MLT's normalizers pad a packed frame before a producer's filter (and in a chain they are links before every filter), libx265 writes no frame packing SEI, FFmpeg's MP4 muxer writes `st3d` only with `strict=-1`.
 
 ## A film without sound says so
 

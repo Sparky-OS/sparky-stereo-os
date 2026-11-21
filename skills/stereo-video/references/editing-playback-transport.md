@@ -6,6 +6,7 @@ Kdenlive's render-comparison approach suggests a small reusable regression proje
 Check source metadata, timeline preview, proxy/transcode, render output and independent playback separately; effects may assume an ordinary single view.
 Keep per-eye history separate where needed, and compare an unchanged 2D project.
 A successful monitor preview does not qualify every effect or higher-bit-depth MLT path.
+Kdenlive's own 3D parts (the monitor, the presets, clips of any packing, thumbnails) are in [an editor in 3D](an-editor-in-3d.md).
 
 Keep input eye-order correction separate from the display output format.
 Offer the same per-file Swap Eyes action in applicable playback menus and keep it in the player's own per-file store; write it to the source file only when the person chooses to save it there.

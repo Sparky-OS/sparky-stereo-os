@@ -274,20 +274,10 @@ A missing announcement retains the current camera rig and creates a per-window p
 | Incremental build refuses an edited source after projection | Lean records the authored inputs of its projection | Commit the correction, refresh the carried patch and recipe pin, and build a fresh projection. Never edit projected source to evade the check. |
 | Vulkan sample headers do not match the sample's extension names | The standalone sample pins a newer displayxr-common than the runtime source component | Build the sample against its own declared dependency tag; leave the runtime's component intact. The sample's CMake pin and upstream tag identify the matching header. |
 
-### Stop before claiming rendered eyes
+### A declared pair is not desktop space
 
-The unmodified native Vulkan cube sample's existing eye-colour control clears
-view 0 red and view 1 blue. In a paired tracked session started before the local
-runtime, reconnecting the phone made the pose valid but did not produce a valid
-eye pair: the native 3840 × 1080 window contained its blue rectangle at x=640–1279,
-y=0–719, entirely inside the left half, with no blue in the right half. The phone
-capture showed the same identity failure with its lens profile active.
+A native full-SBS sample can show its right-eye blue rectangle inside the left half after its output changes, before KRdp or phone decoding. Do not infer a stale swapchain extent from the rectangle alone. Start at the final size, resize on a single output, then move between two outputs with the compositor's segment trace enabled.
 
-This locates the observed failure at or before the native window, before KRdp
-and phone decoding. The renderer cause is not isolated and no fix is claimed.
-The initial target was 1280 × 720; the recreated output later produced a
-3840 × 1080 window. That size transition is a lead, not a demonstrated cause.
-Retain the native and phone captures, sample log, valid-pose record and fresh
-pairing replay. A replay that reproduces this failure is not stereo qualification.
-Do not proceed to disparity, eye-swap or pose-motion claims until eye identity
-passes in the actual paired route.
+In the measured runtime, final-size startup and a plain 1280×720 to 3840×1080 resize were already correct. The two-output case exposed `vk_segments_frame_update_split`: the declared two-eye canvas was intersected with physical desktop screen rectangles, then cropped and packed a second time. The edition's full-SBS integration introduced that interaction; upstream's physical-screen segment path preceded it.
+
+An already declared pair bypasses that physical-screen split. Stereo KWin owns its output placement and filtering; the declaration and library are unchanged. The narrow correction passed native startup, resize and output-movement colour controls, and the paired phone capture: red only in the left eye, blue only in the right. These are compiled-core controls, not package/archive qualification or proof of disparity, lens mapping, pose-linked frames or retained-frame reprojection. Keep those gates separate.

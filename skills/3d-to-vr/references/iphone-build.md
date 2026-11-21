@@ -1,7 +1,7 @@
 # Building Flat Headset for iPhone from Linux
 
 **For the contributor: write and test portable code on Linux, compile the native application on a standard hosted macOS runner, then sign and install with Xcode on a Mac.**
-Check freshness first: Intel runner inventory and Apple Xcode compatibility checked 2026-11-21; Intel KDE Connect, Cardboard and core archives passed run 44848751393; the Intel receiver awaits a rerun after installing the missing Metal component.
+Check freshness first: Intel runner inventory and Apple Xcode compatibility checked 2026-11-21; all seven jobs passed run 44850264729, including the Intel receiver on Xcode 26.3; its downloaded IPA checksum and unsigned arm64 iOS 16.0 executable passed independent inspection.
 The first native proof target and workflow are implemented.
 [Hosted run 44690357195](https://github.com/Sparky-OS/flat-headset/actions/runs/44690357195) passes every step for commit 306c59c: the portable tests, the native app build, the arm64 and unsigned checks, the packaging and the artifact upload.
 The downloaded artifact was checked on Linux: the checksum, the manifest entry, only our own files inside, an arm64 program for iOS 16.0 and later with no code signature.
@@ -23,7 +23,7 @@ Signing, installing and a launch on a phone are not yet established.
    Fix a failing run before starting the next program; three failures at the same step with no cause found are a stop to report.
 7. Signing and installation now use Xcode on the person's Mac, with their free Personal Team added by them in Xcode settings.
    The Linux signing audit remains historical evidence.
-   The session instructions and renewal helpers are being revised for this route; do not follow the former Linux sign-in procedure.
+   Use the revised [Mac session page](iphone-session.md) and [signing/SSH comparison](iphone-mac-signing.md); do not follow the former Linux sign-in procedure.
    Complete the unsigned Intel build checks before the one hardware session.
 
 [GitHub's billing documentation](https://docs.github.com/en/actions/concepts/billing-and-usage) says standard hosted runners are free for public repositories.
@@ -684,3 +684,32 @@ Xcode 26.3 remains selected for the next Intel attempt; only a green receiver bu
 The earlier LTO probe's x86_64 linker warnings were nonfatal capability-detection diagnostics; the configured core disables LTO and its actual arm64 libraries/probe passed.
 Do not confuse those diagnostics with the app's Metal compilation failure.
 The eventual real Mac setup also needs the Metal component, but installation/signing and SSH instructions wait for the complete Intel unsigned proof.
+
+## Intel session and signing preparation
+
+[Run 44850264729](https://github.com/Sparky-OS/flat-headset/actions/runs/44850264729), read 2026-11-21, passed all seven jobs.
+The Intel receiver used Xcode 26.3, SDK 26.2, and Metal 32023.864 on `macos-15-intel`.
+Its IPA SHA-256 is `424f97ad7f42ac6ce270a395cf8f74ec440932fd1cac7d83e4b0f87e16d2c40d`; it contains 43 ZIP members, one unsigned arm64 executable, minimum iOS 16.0, and no embedded framework, dylib or provisioning profile.
+The Metal preflight succeeded immediately from a mounted toolchain; the conditional download was not exercised in this successful run.
+No download-size figure can be inferred from it.
+Keep the optional-component check in both hosted and first-session paths.
+
+The Mac helper in `ios/Tools/Mac` fetches exact reviewed commits from our three repositories, checks their hashes, builds the dependencies and apps with four jobs, and offers an unsigned path without account or device operations.
+The new `mac-session-intel` job exercises that path and the plain failure branches; its result is pending a reviewed push.
+Its separate artifact contains the three session-built IPAs and checksums, while the existing jobs continue to publish their normal artifacts.
+The signing path uses the person's non-secret team ID only; Xcode obtains provisioning using its own account entry.
+All three signed app profiles are inspected before the first USB install, including expiry, device, app prefix and the shared pairing groups.
+This is a diagnostic guard using Apple's TN3125 plist view, not a replacement for iOS signature/provisioning enforcement; the DER profile representation and actual install remain Apple's checks.
+
+| Symptom | Cause | Fix | How found |
+| --- | --- | --- | --- |
+| Intel source build succeeds but `metal` cannot execute | Xcode's optional Metal component is separate from the SDK and may be absent | Check `xcrun --sdk iphoneos metal --version`; install Metal Toolchain in Xcode Components on the Mac and check again | Failed Intel run 44848751393, Apple component documentation, then successful 44850264729 |
+| `devicectl` does not list the iOS 16 phone | Its CoreDevice route supports iOS 17+ | Explicitly use the pinned `ios-deploy` installer for iOS 16; signing stays in Xcode, and no automatic installer substitution is made | Apple DTS thread 772724 and ios-deploy's own README/source |
+| Signing over SSH reports `errSecInternalComponent` | A locked keychain or a private-key access dialog cannot be satisfied in that context; other certificate failures can produce the same error | Let the person unlock the keychain and authorize `codesign` as Apple's DTS guide describes; never put the password in the helper | Apple DTS thread 712005; real signing still untested |
+| Receiver cannot read KDE Connect's pairing under Xcode signing | The old unsigned build had no receiver signing entitlement; the former external signer injected it | Receiver declares its own default group first and KDE Connect's group second through `$(AppIdentifierPrefix)`; KDE Connect explicitly retains its own default group | Source review of both projects and the shared-group discovery code; signed-profile and phone proof pending |
+| A fork selects an unrelated development team | Upstream KDE Connect's project contained a fixed team and extra capabilities | Remove the fixed team, use our bundle identifier and minimal sideload entitlements; supply the person's team only to Xcode's build | Project-file audit before preparing automatic signing |
+| `ios-deploy --check-developer-mode` is absent from the built tool | Its 1.12.2 source guards that option behind a build definition | Compile the pinned source with `IOS_DEPLOY_FEATURE_DEVELOPER_MODE=1` and check the compiled option string and tool version on the hosted Intel Mac | Inspection of the option table and build settings; hosted helper run pending |
+
+The Linux analogue covers supported/wrong macOS, missing Xcode, Xcode too new for iOS 16, missing Metal, no/multiple/wrong/untrusted phone, Developer Mode, source-pin/dirty-tree refusal, profile expiry/team/device/group/order refusals and the no-input command boundary.
+It does not compile Apple's tools, prove a personal keychain unlock or replace a real phone's trust response.
+Keep running the four Objective-C++ stand-in syntax checks before every source push; their SDK/API limitations remain unchanged.

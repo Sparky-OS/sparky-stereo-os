@@ -92,7 +92,8 @@ Rebuilding the candidate fork changes only the candidate universe.
 The final attempt's mutually exclusive NVIDIA locks are secondary and do not explain the first three failures.
 **Rule:** use the link gate's explicit `--previous-archive-config` and `--previous-published-at` mode when the previous edition cannot solve because of packages outside the selected candidate set.
 The gate tries the previous edition alone in the candidate view first and examines every conditional-policy solver attempt.
-Its terminal unsatisfied relation owners must all be outside the candidate set; a request chain naming the predecessor is not itself the cause.
+For a changed-archive compatibility failure, the solver must identify the external archive cause; a request chain naming the predecessor is not itself the cause.
+An unavailable dependency name is judged by its providers, not solely by its relation owner, under the publication-time absence rule below.
 No selected candidate identity may appear in the previous sibling snapshot or its public universe.
 The predecessor view contains the same archives, components and signing keys. The archive responsible for the failure needs a signed snapshot at or before publication.
 Debian uses its timestamped snapshot service, also no later than publication.
@@ -100,14 +101,14 @@ APT authenticates the InRelease files; the gate independently binds every retain
 An unrelated archive without a dated signed copy may remain at the candidate's exact authenticated frozen index only with the gate's per-archive search evidence: official mirrors, the retained baseline and archive searches, their outcomes and file hashes.
 The gate attributes every solver-named package to authenticated archive indexes and refuses this exception if the failure names that archive.
 It checks exact index equality and prints each archive's view and reason.
-A mixed-view failure still blocks with the solver's package and archive names; no new pin or substituted sibling repairs the proof.
+An uncovered mixed-view failure still blocks with the solver's package and archive names; no new pin or substituted sibling repairs the proof.
 
-The previous exact sibling snapshot must qualify in the dated view, including its runtime libraries and applicable start probes.
+The previous exact sibling snapshot must qualify in the dated view, including its runtime libraries and applicable start probes, unless the checked publication-time absence rule establishes that it cannot serve as a baseline.
 The narrow Recommends case uses that same predecessor view.
 Candidate solving, linking and starting stay in the candidate's frozen view, and regression checks remain in force.
 Each result says which view each archive supplied and why; the summary counts dated and mixed baselines.
 Without the two options the gate retains its existing behavior.
-The signed offline tests demonstrate current-view red, dated green, both-views red, a post-publication snapshot refusal and an actual missing-library regression that still blocks.
+The signed offline tests demonstrate current-view red, dated green, uncovered both-views red, a post-publication snapshot refusal and an actual missing-library regression that still blocks.
 Additional controls cover candidate contamination, a candidate-owned solver cause, a changed key and mutated authenticated metadata.
 This rule replaces the former proof-contract impasse; it does not make an incomplete whole-pool invocation pass.
 
@@ -134,7 +135,7 @@ The dated snapshot that solves the Frameworks transition may already contain the
 **How found:** read every solver attempt, the old and new package controls, and `Provides` in every authenticated Packages file in both frozen views.
 In the observed case, the first three attempts named the old Perl ABI; the final attempt also hit the mutually exclusive driver locks.
 A producer recipe had omitted that Perl predecessor from its private comparison set, explaining why its build gate passed.
-**Handling:** preserve the full publication predecessor set and report the exact relation, provider search and eligibility refusal.
+**Handling:** preserve the full publication predecessor set and apply the checked publication-time absence rule below, recording the exact relation, provider search and both real solver refusals.
 Do not transfer the producer's omission into publication, broaden the checked eligibility rule silently, or count an index inspection as a completed dated solve.
 A working successor and a missing predecessor baseline are separate facts; replacing or dropping packages to conceal the latter does not qualify the comparison.
 

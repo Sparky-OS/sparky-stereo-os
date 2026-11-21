@@ -1415,3 +1415,5 @@ The KRdp packaging foundation credits the **Debian Qt/KDE Maintainers**, **Auré
 The capture-completion audit reads the common desktop capture worker by **David**, merged through DisplayXR PR 2259, and adjacent desktop-control history by **byungjul**. The carried ordering correction and its regression case are by **Daniel Campos Ramos**, with **Codex (OpenAI)** assistance.
 
 The native Vulkan sample's pinned displayxr-common v2.29.0 is credited to **David**. The edition's final-depth library, observer integration and packaging allowance are by **Daniel Campos Ramos**, with **OpenAI Codex** assistance.
+
+The physical-screen segmentation history read for the declared-pair correction is by **David**. The full-SBS integration and its correction are by **Daniel Campos Ramos**, with **OpenAI Codex** assistance.

@@ -51,6 +51,7 @@ The recipe's `tests/` folder, each in a throwaway Debian testing container where
 - Since `0.40.16+ds-2` the tests take the Partners card: `CARD=CHOICE gpu-discovery.sh LIBRARY@PCI...` starts the unit's own `ExecStart` and passes only when the engine reports exactly those cards; `card-start.sh USER CHOICE=EXPECTED...` does the same through `systemctl --user` in a container booted with systemd (below).
 - Not proven: the ROCm runner on an AMD card (none here that its gfx list covers).
 - Perks of the engine's own log: `OLLAMA_DEBUG=2` prints each `llama-server` discovery run with its `libDirs`. Discovery runs once for each runner folder (`discover/runner.go`: `llama-server --list-devices` with `LD_LIBRARY_PATH` and `GGML_BACKEND_PATH` set to that folder), then a native probe (`ollama gpu-discover --lib-dir ...`). A runner that finds no card (CUDA with `CUDA_VISIBLE_DEVICES=-1`) makes that probe exit 1 ("native GPU discovery failed"), and discovery goes on with the next folder: it does not hide the other runners.
+- At its first start the engine writes a key pair, `~/.ollama/id_ed25519` and its `.pub`, and prints the public key to its log (Ollama's identity for its own service); nothing is sent then.
 - With cloud-hosted models allowed, the running engine asks `ollama.com` at start for its hosted model list and its model recommendations (no text is sent): seen as two failed requests in a run with no network.
 
 ## Which card the engine uses: the Partners choice, measured on Ollama 0.40.16
@@ -163,6 +164,10 @@ AMD has no line yet: the ROCm runner carries gfx1030, gfx1100 to gfx1102, gfx115
   **Cause:** Ollama leaves integrated cards out by default (`discover/runner.go`: allowed by default only for CUDA and for ROCm's gfx1151).
   **Fix:** the unit sets `OLLAMA_IGPU_ENABLE=1`; only the chosen card is visible, so the flag never adds a card the person did not choose.
   **How found:** the rig's APU row, with and without the variable.
+- **Symptom:** `journalctl -t ollama` shows nothing for the running engine; its lines are under `sparky-stereo-gpu-run`.
+  **Cause:** systemd names a service's journal lines after the first word of `ExecStart` (the wrapper), and the wrapper's `exec` keeps that name.
+  **Fix:** `SyslogIdentifier=ollama` in the unit.
+  **How found:** the systemd rig's journal, read with `-o cat --output-fields=SYSLOG_IDENTIFIER`.
 - **Symptom:** the publish check stops a recipe on a mail add-on's id as "another person's email address".
   **Cause:** a Gecko extension id may have the form of an address (ThunderAI's does).
   **Fix:** Daniel, 2026-11-21: "addon IDs look alike emails huh? that place then is not an exeption, it's not an email": in a policy's own key for the add-on it is an identifier and stays as it is; the coordinator teaches the check that place.

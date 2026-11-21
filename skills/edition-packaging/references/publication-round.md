@@ -174,6 +174,27 @@ Traps found during bounded discovery in ORDER 701:
   **Fix:** retain both fields and keep variants outside the candidate set until their own acceptance is recorded.
   **How found:** controls of staged stereo-library variants said `Architecture: amd64` while their filenames named `amd64v3`; reading the additional control field distinguished them.
 
+### Check source closure before copying an accepted binary cohort
+
+An accepted application test and a complete binary `SHA256SUMS` do not establish that its source archives and receipts survived cleanup.
+Before the large copy, group the accepted binaries by their control `Source` and source version, then require a matching descriptor and its named components for every group.
+Search the explicitly named outputs as well as bounded discovered stages; a result directory need not be named `stage` or `out`.
+Keep missing paths and unreadable directories in the search evidence, and distinguish "absent from the allowed search" from "absent everywhere".
+A receipt-only repair requires the retained descriptor and binaries; it cannot manufacture a missing descriptor or certify regenerated source archives.
+Report that source gap and keep the affected generation out until its source recovery or successor build is authorized and qualified.
+
+Traps found in ORDER 794:
+
+- **Symptom:** a fully accepted multimedia cohort has 101 checksum-correct binaries but no matching source descriptor or build receipt for any of its six source generations in the allowed search.
+  **Cause:** the retained stage contains only binaries, its checksum manifest and its retention note; neither acceptance nor binary checksum verification checks source retention.
+  **Fix:** perform the per-source completeness check before freezing a pool, report the exact missing generations, and stop their selection without substituting an older descriptor or inventing receipts.
+  Recovery was not performed in this preparation; a search outside the authorized scope or reconstruction needs its own instruction.
+  **How found:** binary controls identified the six source/version pairs; a bounded metadata search and an independent stage-directory listing found no matching descriptors, buildinfo, changes or build records.
+- **Symptom:** a no-follow directory walk still reads an archive through a symlink, or a missing explicitly named output silently disappears from the inventory.
+  **Cause:** `os.walk(..., followlinks=False)` only prevents recursion into linked directories; file opens and a linked root can still follow links.
+  **Fix:** reject symlink files and directories, check each explicit root's ancestors, record skipped links and missing directories, and retain separate directory-discovery and stage-file depth bounds.
+  **How found:** inspection of the inventory's file-open path exposed the gap; temporary-directory fixtures cover a linked file, linked directory, linked root ancestor, missing root, depth limit and explicitly named output.
+
 ### Compare installed paths as well as archive listing lines
 
 Keep the complete `dpkg-deb -c` diff, then map every removed line to the archive member it describes.

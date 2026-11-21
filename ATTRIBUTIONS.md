@@ -414,6 +414,7 @@ The edition's DisplayXR package (ORDER 58, [Sparky-OS/displayxr-packaging](https
 - the fix follows the technique of libXrandr's `Xrandr.c` (Jim Gettys) and of libXext's own extensions, which keep their record for the life of the process;
 - David Fattal reported the same symptom in DisplayXR (#2711); the runtime's private X displays and its display hotplug thread are by byungjul and David in DisplayXR's history;
 - Valgrind (Julian Seward and its developers) named the write; the debug symbols came from Debian's X Strike Force packaging.
+- The edition's libxext 2:1.3.4-1+stereo3d1, which carries the fix, is Debian's packaging of libXext 1.3.4 by the Debian X Strike Force (its 2:1.3.4-1 upload by Sven Joachim and Timo Aaltonen), with Helmut Grohne's `noudeb` build profile from Debian bug 1024924; the fix's upstream form was built and tested with libXext's own CI job on freedesktop.org's ci-templates.
 
 ### 2.1 The Linux kernel
 

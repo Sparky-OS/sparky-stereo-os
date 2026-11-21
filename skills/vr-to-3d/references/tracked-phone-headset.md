@@ -280,4 +280,21 @@ A native full-SBS sample can show its right-eye blue rectangle inside the left h
 
 In the measured runtime, final-size startup and a plain 1280×720 to 3840×1080 resize were already correct. The two-output case exposed `vk_segments_frame_update_split`: the declared two-eye canvas was intersected with physical desktop screen rectangles, then cropped and packed a second time. The edition's full-SBS integration introduced that interaction; upstream's physical-screen segment path preceded it.
 
-An already declared pair bypasses that physical-screen split. Stereo KWin owns its output placement and filtering; the declaration and library are unchanged. The narrow correction passed native startup, resize and output-movement colour controls, and the paired phone capture: red only in the left eye, blue only in the right. These are compiled-core controls, not package/archive qualification or proof of disparity, lens mapping, pose-linked frames or retained-frame reprojection. Keep those gates separate.
+An already declared pair bypasses that physical-screen split. Stereo KWin owns its output placement and filtering; the declaration and library are unchanged. The narrow correction passed native startup, resize and output-movement colour controls, and the paired phone capture: red only in the left eye, blue only in the right. The correction subsequently passed the unchanged clean package suite and archive link/start gate in the edition runtime +10. The installed package preserves those colour controls. Package qualification, geometry and lens measurements, pose-linked frames and retained-frame reprojection are separate proofs.
+
+
+### Predict geometry and lens before changing pose
+
+Anchor a fixed scene once at the first valid paired pose. Record both OpenXR view poses, FOVs and the per-eye resolution; project the same world vertices independently and compare their disparities and image centroids. Check every corner against the output announcement, not only a centroid. A deliberately zero-disparity prediction must fail. For the phone, apply the selected viewer profile and measured display DPI to the prediction. A continuous radial prediction is not a claim of bit-exact equivalence to the viewer's distortion mesh.
+
+Two stationary cubes measured through the paired route gave a maximum native centroid error of 0.82 pixels and phone lens-mapped error of 0.58 pixels. The native eyes were each 1920 by 1080; the phone capture was 640 by 320. These stationary-view measurements do not establish which render pose belongs to a received frame, or prove retained-frame reprojection.
+
+### Output swap accepted, phone eyes unchanged
+
+**Symptom:** KWin's output-management request for eye swap succeeds and the output-device event announces the requested value, but a fresh paired phone capture remains red in the left eye and blue in the right with swap both off and on.
+
+**Cause found:** in the published edition KWin +stereo3d59, `OutputScreenCastSource::renderStereo` loops over the two destination halves and calls `setStereoEye(eye == 0 ? StereoEye::Left : StereoEye::Right)` without reading the output's eye-swap state. The edition's native-panel phone screencast patch introduced that loop; it is separate from DisplayXR's intact-pair correction.
+
+**Required action:** correct the output owner before qualifying eye exchange on this route. No KWin correction is carried by the runtime package, and exchanging the application's source eyes would not repair the output setting. The definitive swap remains per output in KWin.
+
+**How found:** read the exact published source with its packaging patches applied, then compare the applied/announced output setting and phone pixels while the same colour sample has valid paired tracking. With either setting, each measured eye region held 49,935 pixels of its original colour and zero of the opposite colour. A new RDP connection with swap already enabled reproduced it. Save both the native pair and phone capture so a transport or stale-frame assumption can be checked.

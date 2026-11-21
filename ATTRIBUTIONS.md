@@ -409,6 +409,12 @@ The edition's DisplayXR package (ORDER 58, [Sparky-OS/displayxr-packaging](https
 - programs reach it through the OpenXR loader of the Khronos Group, as Debian packages it;
 - it joins the `openxr1-active-runtime` alternatives group of Debian's Monado packaging, maintained by Rylie Pavlik, so both runtimes stay selectable.
 
+**The runtime's start-up heap fault (queue row 762c, 2026-11-21)** was found in libXext's Generic Event code, in the work of the people in X.Org's records:
+- libXext's `Xge.c` is by Peter Hutterer, and its `extutil.c` by Jim Fulton (MIT X Consortium); the change that frees the extension record at the last display (ed8d50ba, 2012) is by Chase Douglas, signed off by Peter Hutterer; Alan Coopersmith maintains the file today;
+- the fix follows the technique of libXrandr's `Xrandr.c` (Jim Gettys) and of libXext's own extensions, which keep their record for the life of the process;
+- David Fattal reported the same symptom in DisplayXR (#2711); the runtime's private X displays and its display hotplug thread are by byungjul and David in DisplayXR's history;
+- Valgrind (Julian Seward and its developers) named the write; the debug symbols came from Debian's X Strike Force packaging.
+
 ### 2.1 The Linux kernel
 
 **Source**: [kernel.org](https://www.kernel.org/) **License**: GPL-2.0 **What we changed**: amdgpu lists and signals the HDMI® 3D modes a display's EDID declares and times frame packing; full side by side handled in the DRM core, i915, nouveau and amdgpu; nouveau gains 16 bits per colour on Turing and newer; a fix for rumble-less gamepads in hid-betopff; VKMS, the virtual display driver, sets HDMI® 3D modes and composes and writes back the frame of both eyes, on Louis Chauvet's configfs series.

@@ -1487,3 +1487,13 @@ Sources: OBS Studio 33.0.1's AUTHORS and source headers, obs-websocket 5.7.6's s
 - **OBS Studio**: original author Lain Bailey, with the contributors OBS's AUTHORS file names first (jpark37, PatTheMav, Ryan Foster, derrod, Sebastian Beckmann, R1CH, cg2121, Palana, tytan652, WizardCM, Warchamp7, Norihiro Kamae, fryshorts, pkv) and the rest of that file; GPL-2.0-or-later. The module builds on libobs and the frontend API, and its rig drives OBS through **obs-websocket** (Stephane Lepin and Kyle Manning, from its source headers).
 - **deb-multimedia**: Christian Marillat packages the obs-studio and libobs-dev the module is built against.
 - **JackDesBwa**: his MIT-licensed Lua filters for side by side in OBS (`obs_filter_sbs2a.lua`, `obs_filter_sbsadjust.lua`) were read; they are not carried, since one makes an output format (anaglyph) and the other moves the views, which changes depth, and the edition leaves both to Stereo KWin. His vertical alignment of a side-by-side source is the idea behind the input correction proposed for the module's next milestone.
+
+## Partners: the local engine (ORDER 70, 2026-11-21)
+
+The edition's partners, the engines its programs' AI features use, build on these projects, named from their own records. Names only; these projects do not endorse the edition.
+
+- **Ollama** ([github.com/ollama/ollama](https://github.com/ollama/ollama), MIT, "Copyright (c) Ollama"): the engine its clients already speak to; read at v0.40.16 for its parts, its settings and its cloud switch.
+- **llama.cpp and ggml** ([github.com/ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp), [github.com/ggml-org/ggml](https://github.com/ggml-org/ggml), MIT, "Copyright (c) 2023-2026 The ggml authors"): Georgi Gerganov and the ggml authors; the inference Ollama's runners are built from, and Debian's `llama.cpp` and `ggml` packages, measured as the other engine a person may choose.
+- **ktextaddons** ([invent.kde.org/libraries/ktextaddons](https://invent.kde.org/libraries/ktextaddons)): Laurent Montel and Florian Richer; the library through which KMail and the other KDE programs reach the engine.
+- **AMD's ROCm libraries** (ROCm 7.2.1: MIT, BSD 2-clause, NCSA, Apache 2.0 with LLVM exceptions): Advanced Micro Devices, Inc.; carried in `ollama-rocm` with their licence texts.
+- **ThunderAI** ([github.com/micz/ThunderAI](https://github.com/micz/ThunderAI), GPL-3.0): Mic; the mail add-on that reaches the engine from Betterbird, configured by policy and never installed by the edition.

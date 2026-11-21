@@ -3,6 +3,7 @@
 For a library every program loads (GLib) when Debian's package lacks a fix that upstream has merged: the edition builds its own, amd64 and i386, with upstream's commit as its one patch, and retires it when Debian ships the commit.
 Written 2026-11-20 from ORDER 768b: Debian's glib2.0 2.90.1-2 plus Thomas Hebb's GLib commit 4301b49671, which removes the deadlock that kept the location service (geoclue) from starting.
 The route first stopped at the Lean Code step (trap 1); the toolkit then learned to keep a hook the rules file already defines, and the recipe below ran to the end on both architectures.
+When nobody upstream has a fix and the patch is ours, on a format 1.0 source (libxext, queue row 762c): [a Debian base library with a patch of our own](a-debian-base-library-with-a-vendor-patch.md).
 
 ## Recipe, as run
 

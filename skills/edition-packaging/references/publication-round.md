@@ -770,8 +770,14 @@ When a Frameworks transition builds past failed tests or removes a retired Debia
 ### Published predecessors during an archive transition
 
 If the candidate resolves but its correct published predecessor fails against newly migrated Debian packages, retain every solver attempt and the previous sibling snapshot.
-The explicit dated-view rule in the build toolkit's `lean/archive.md` qualifies only the predecessor against authenticated publication-time indexes of the same archives.
+The explicit dated-view rule in the build toolkit’s `lean/archive.md` qualifies the predecessor against a publication-time snapshot of the implicated archive; unrelated archives may retain the candidate’s exact signed indexes only with the checked search-evidence exception.
 It checks the external solver cause, archive identities, publication cutoff, signed Packages hashes and absence of candidate packages itself; the candidate never leaves its current frozen view.
 The complete recipe, refusal controls and third-party archive requirement are in [Debian Frameworks transitions](frameworks-transition.md#a-repaired-candidate-does-not-repair-its-historical-comparison).
 The symptom was a successful 6.32 candidate followed by a 6.30 predecessor blocked by Debian's new XMLGUI minimum; reading the full solver chain identified archive movement rather than a candidate regression.
 A baseline image assembled after publication can already contain newer third-party indexes, so retain the signed publication-time metadata when the round goes online.
+
+
+**Required supply-chain input:** run the candidate qualification with `--archive-evidence` and keep the resulting per-architecture InRelease, Packages, public keys, archive-view.json and SHA256SUMS beside the selected pool's evidence.
+The publication script must copy that directory into the round's supply-chain record and run `sha256sum -c SHA256SUMS` in every architecture directory before publishing.
+Retain the successful whole-pool gate result as well: an authenticated input snapshot alone is not a passing comparison.
+A prior round without these retained archive views cannot supply a dated baseline for an archive that subsequently moves, unless an independent signed snapshot service supplies it.

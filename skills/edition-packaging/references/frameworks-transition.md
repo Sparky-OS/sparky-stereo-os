@@ -94,16 +94,18 @@ The final attempt's mutually exclusive NVIDIA locks are secondary and do not exp
 The gate tries the previous edition alone in the candidate view first and examines every conditional-policy solver attempt.
 Its terminal unsatisfied relation owners must all be outside the candidate set; a request chain naming the predecessor is not itself the cause.
 No selected candidate identity may appear in the previous sibling snapshot or its public universe.
-The dated view must contain the same archives, components and signing keys, with every signed InRelease Date no later than the predecessor publication instant.
+The predecessor view contains the same archives, components and signing keys. The archive responsible for the failure needs a signed snapshot at or before publication.
 Debian uses its timestamped snapshot service, also no later than publication.
 APT authenticates the InRelease files; the gate independently binds every retained Packages file to its own signed size and SHA-256 and records the metadata hashes.
-All third-party archives need dated signed metadata too: a current deb-multimedia or Sparky index newer than the cutoff cannot stand in for its historical view.
-A missing historical archive is a missing proof input, not permission to omit that archive or change its pins.
+An unrelated archive without a dated signed copy may remain at the candidate's exact authenticated frozen index only with the gate's per-archive search evidence: official mirrors, the retained baseline and archive searches, their outcomes and file hashes.
+The gate attributes every solver-named package to authenticated archive indexes and refuses this exception if the failure names that archive.
+It checks exact index equality and prints each archive's view and reason.
+A mixed-view failure still blocks with the solver's package and archive names; no new pin or substituted sibling repairs the proof.
 
 The previous exact sibling snapshot must qualify in the dated view, including its runtime libraries and applicable start probes.
 The narrow Recommends case uses that same predecessor view.
 Candidate solving, linking and starting stay in the candidate's frozen view, and regression checks remain in force.
-Each result says which predecessor view it used, and the summary counts dated baselines.
+Each result says which view each archive supplied and why; the summary counts dated and mixed baselines.
 Without the two options the gate retains its existing behavior.
 The signed offline tests demonstrate current-view red, dated green, both-views red, a post-publication snapshot refusal and an actual missing-library regression that still blocks.
 Additional controls cover candidate contamination, a candidate-owned solver cause, a changed key and mutated authenticated metadata.
@@ -113,3 +115,12 @@ This rule replaces the former proof-contract impasse; it does not make an incomp
 A unit fixture that intentionally opts out of build provenance then correctly fails because it sees both modes.
 Use the clean tools image from before provenance initialization for the isolated suite, preserve the failing attempt, and rerun the affected tests without changing their assertions.
 The error naming both `SPARKY_PROVENANCE_OPTOUT` and `sparky_provenance_init`, followed by inspection of the image's recorded environment, distinguishes this from a package defect.
+
+
+**Archive retention trap:** requiring publication-time third-party indexes can reveal that no such record was kept and the archive has no snapshot service.
+The bounded search of official mirrors, retained baseline metadata and archive captures must be input evidence, not an assumption.
+Only an unrelated unchanged archive is eligible for the mixed-view rule; the control in which that archive supplies a solver-named package still blocks.
+Retain every candidate archive's signed InRelease and Packages bytes with the public keys and checksums using the gate's `--archive-evidence` option.
+The publication step copies that directory into the round's supply-chain record and verifies the checksums before publication.
+The preparation hands back its exact path and complete gate result for that wiring.
+An archive that later moves needs the prior round's retained authenticated view or an independent signed dated snapshot; the exception for unrelated archives cannot replace it.

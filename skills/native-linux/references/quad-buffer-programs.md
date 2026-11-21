@@ -31,7 +31,7 @@ Block matching along rows gives a median over textured blocks; report the minimu
 | Mesa demos 9.0 `glxgears` | `-stereo` | quad buffer only | GLX on Xwayland | pair, declared, both GPUs |
 | OpenSceneGraph 3.6.5 `osgviewer` | `--stereo QUAD_BUFFER` or `OSG_STEREO_MODE` | anaglyphic, quad buffer, split, left or right eye, interlaced, checkerboard | GLX on Xwayland (no Wayland backend in 3.6.5) | pair on both GPUs; Debian's unpatched +b2 gives a bit-identical capture to our +stereo3d4 |
 | Blender 5.0.1 (our +stereo3d3) | Output properties, Stereoscopy (`render.use_multiview`); the window's display mode is Time Sequential by default and the only one our build has | Time Sequential only in our build | native Wayland (EGL, `EGL_EXT_multiview_window`) and GLX on Xwayland | pair on both routes and both GPUs |
-| ParaView 6.1.1 | `--stereo --stereo-type="Crystal Eyes"` (Render View's Stereo Type) | Crystal Eyes (quad buffer), Red-Blue, Interlaced, Dresden, Anaglyph, Checkerboard, SplitViewportHorizontal | GLX child window on Xwayland | NVIDIA 2 pairs in 4 runs, AMD 0 in 6: the child's pair is taken back |
+| ParaView 6.1.1 | `--stereo --stereo-type="Crystal Eyes"` (Render View's Stereo Type) | Crystal Eyes (quad buffer), Red-Blue, Interlaced, Dresden, Anaglyph, Checkerboard, SplitViewportHorizontal | native Wayland (a stereo `QWindow` in a window container, Mesa's EGL declares the subsurface) as the session starts it; GLX child window on Xwayland with `QT_QPA_PLATFORM=xcb` | 18 November: NVIDIA 2 pairs in 4 runs, AMD 0 in 6 on xcb (the child's pair taken back). Re-tested on r1118a (KWin +stereo3d59, Mesa +stereo3d26), 21 November: a pair in every run, Wayland AMD 6 of 6 and NVIDIA 4 of 4, xcb AMD 6 of 6 and NVIDIA 4 of 4; see [the re-test](#paraview-re-tested-on-the-published-tree-21-november-2026) |
 | FreeCAD 1.1.3 | View, Stereo, Stereo Quad Buffer (`setStereoType("QuadBuffer")`) | off, red/cyan, quad buffer, interleaved rows, interleaved columns | Qt 6 `QOpenGLWidget` | flat: the program never asks for a stereo surface |
 | Jmol 16.3, RasMol 2.7.6, Gwyddion 3.12, MeshLab 2025.07 | none is a quad-buffer switch | Jmol `stereo` and RasMol `stereo` draw their own pictures; Gwyddion and MeshLab: no stereo string in the installed libraries, none on Gwyddion's OpenGL page | Java 2D, GTK, Qt | not in this sweep |
 
@@ -46,3 +46,28 @@ Block matching along rows gives a median over textured blocks; report the minimu
 - **Symptom:** a click or key from `xdotool` does nothing. **Cause:** KWin's Xwayland input prompt; set `XwaylandEisNoPrompt=true` in the rig's `kwinrc`. A native Wayland client (Blender) never receives XTEST events: set what it needs in its preference file (`show_splash` false through `blender -b --python-expr ... save_userpref()`).
 - **Symptom:** Debian's ParaView has no `paraview` Python module, so `--script` fails (`ModuleNotFoundError`). **Fix:** open a legacy VTK file (`two.vtk`, two squares at different depths) and press Apply with a key and a click.
 - **Symptom:** a case measures the one before it. **Cause:** a shared `HOME` keeps KWin's `kwinoutputconfig.json` and the programs' settings. **Fix:** a fresh `HOME` per case.
+
+## ParaView, re-tested on the published tree (21 November 2026)
+
+Debian's ParaView 6.1.1+dfsg1-3, unchanged, on the published tree r1118a (Stereo KWin +stereo3d59, Mesa +stereo3d26, Xwayland +stereo3d3), a 1920x1080 virtual output, one fresh session per run.
+Fixture: a legacy VTK file of two squares, the far one 2x2 at z = 0 coloured by scalar 0 (blue), the near one 0.8x0.8 at z = 1 (red), opened with `--data` and Auto Apply, the window maximized by a KWin script.
+
+**How ParaView makes its pair (read in Debian's sources):** `--stereo-type` sets the Render View's `StereoType` (Remoting/Views/vtkSMRenderViewProxy.cxx, the client's type taken as given); the view is VTK's `QVTKOpenGLStereoWidget`; VTK 9.6 shears each eye's projection by plus or minus half its `EyeAngle` (2 degrees, ParaView sets none of its own) about the camera's focal distance (vtkCamera.cxx, `vtkPerspectiveTransform::Stereo`), in eye space before the frustum: two parallel off-axis cameras `D tan(1 deg)` to each side, zero parallax at the focal point. The closed form is `disparity = 2 f tan(EyeAngle / 2) (1 - D / depth)` pixels, `f` the focal length in pixels; the rig solves `f` and the near square's depth from the two squares' captured widths (sizes 2 and 0.8, depths one apart) and takes the focal point at the box's centre, as VTK's ResetCamera does.
+
+| Route, card | Runs with a pair | Near square, measured / predicted | Far square | Vertical | Declaration |
+|---|---|---|---|---|---|
+| Wayland (the session's default), AMD | 6 of 6 | -5 / -5.04 px | +4 / +4.24 px | 0 | one `set_content` on Mesa's subsurface |
+| Wayland, RTX 3060 (zink) | 4 of 4 | -5 / -5.04 | +4 / +4.24 | 0 | the same |
+| xcb (GLX child on Xwayland), AMD | 6 of 6 | -5 / -5.26 | +4 / +4.42 | 0 | the child: content 3, version 4, listed by its top-level, limits 10 and 4 |
+| xcb, RTX 3060 (zink) | 4 of 4 | -5 / -5.26 | +4 / +4.42 | 0 | the same |
+| Red-Blue, Interlaced, Anaglyph, Checkerboard, Dresden, SplitViewportHorizontal | one flat picture each, nothing declared | | | | ParaView's own output formats, drawn into one picture |
+| no `--stereo` (the 2D control) | flat, nothing declared | | | | |
+
+Every pixel that differs between the eyes lies in the render view.
+ParaView's pair keeps ParaView's own separation (Daniel, 2026-11-18: a program that draws its own pair keeps it); at these sizes the near square stands 5 px in front, past a popped limit of 4.
+
+Traps:
+- **Symptom:** ParaView opens a window over the view, "Output Messages", full of `Generic Warning: ... vtkOpenGLState.cxx ... Error in cache state for GL_DRAW_BUFFER got 1027 expected1029`, 16 to 25 per start, in Crystal Eyes only, on both cards and both routes. **Cause:** VTK's state cache for the draw buffer and the buffer GL reports disagree around the eyes' blit (QVTKOpenGLWindow.cxx blits the right eye into `GL_BACK_RIGHT`); ParaView issue 19038 (Mathieu Westphal, 2019, open) records the same warnings on another vendor's Windows driver, so it is VTK's, not the edition's stack. **Found by:** counting the line in ParaView's log per run and searching VTK's and ParaView's trackers for the message. The pair is right with the warnings; the window is the fault a person meets.
+- **Symptom:** the welcome dialog covers the view although `ParaView-UserSettings.json` says `ShowWelcomeDialog: 0`. **Cause:** ParaViewMainWindow.cxx reads it from Qt's settings file. **Fix:** `~/.config/ParaView/ParaView.ini`, `[General]` `GeneralSettings.ShowWelcomeDialog=0`.
+- **Symptom:** ParaView starts on native Wayland in the rig and logs "ParaView is not fully tested on Wayland". **Cause:** Qt picks Wayland when `WAYLAND_DISPLAY` is set, as in a person's Plasma session. Measure that route first: it is the one people get; `QT_QPA_PLATFORM=xcb` gives the GLX child route.
+- ParaView merge request 7994 (Scott Wittenburg, open) restores a missing negation in the client's stereo type; 6.1.1 does not have the code it fixes (it sets the client's type directly), so it changes nothing here.

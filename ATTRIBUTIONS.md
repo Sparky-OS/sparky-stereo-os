@@ -8,6 +8,14 @@ Our contribution lies in making stereo 3D and deep colour a property of the open
 Names are given as each project gives them: in its about box, its copyright file or its Debian packaging, and for the people who reviewed our patches, as their public profiles show them.
 Contact details are left out on purpose.
 
+## Screen reader and accessibility effects
+
+Brad Hiebert-Treuer, Sarri Al Nashashibi, Daniel Scharstein.
+
+Joanmarie Diggs, Federico Mena Quintero, Mike Gorse.
+
+Lubos Lunak, Sebastian Sauer, Vlad Zahorodnii, Christian Nitschkowski, Martin Gräßlin, Nicolas Fella, Martin Riethmayer, Tomaz Canabrava.
+
 ## polkit
 
 David Zeuthen.

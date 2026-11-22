@@ -395,6 +395,22 @@ Continuation lessons from ORDER 587:
   Record the complete root, incomplete predecessor, verified cache, sampled allocation and allocation after the stop; an incomplete predecessor does not establish an exact minimum.
   If that unqualified source supplies the required edition metas, hand back blocked with the unchanged pool identity; the passing installed transaction does not replace archive qualification.
 
+### Case e's checks on a small rig, offline, before the round
+
+To prove a few staged packages together without the full meta (a full case e needs about 28 GiB on Docker's disk), run case e's own checks on a smaller rig (rows 629/802, 2026-11-22):
+
+1. A rig of the published tree installed as case e installs it: the edition's dpkg and dpkg-stereo first, then the packages under test and the packages whose files they touch.
+2. Bring it up to date once with its own lists (`apt-get dist-upgrade`, no `update`), as a person's edition is after its updates and as a round's base is; download every installed package's .deb at its installed version into a folder (`apt-get download NAME:ARCH=VERSION`); commit that container as the rig.
+3. The stages as one flat source whose Release says `Origin: Sparky Stereo OS`, so the edition's pin treats them as the edition's; read again only that source (`-o Dir::Etc::SourceList=FILE -o Dir::Etc::SourceParts=- -o APT::Get::List-Cleanup=0`).
+4. One fresh container per mode, `--network none`: source `proof-common.sh` and `proof-checks.sh` read-only and call their checks (`check_inst_remv`, `check_real_log`, `plant_conffiles`, `check_planted_conffiles`, `check_verify`); require an exact-version `Inst` line for each staged package and none for anything else; put the folder of .debs into APT's cache only around `--verify --deep`, and take it out before the upgrade.
+
+Traps:
+
+- **Symptom:** the simulation installs a dozen Debian packages besides the stages. **Cause:** the rig was made by installing, so packages of the base image stay older than the rig's own lists. **Fix:** step 2. **How found:** the origins on the `Inst` lines.
+- **Symptom:** `--verify --deep` prints thousands of `NODEB` rows and "This check is not complete". **Cause:** it compares each file with its package's .deb, taken from APT's cache first, else downloaded; offline, or for a version the lists no longer offer, nothing comes. **Fix:** the folder of .debs in APT's cache around the deep run. **How found:** its summary line.
+- **Symptom:** a planted edit of an owning package's copy reads as lost, although it is there. **Cause:** while a diversion stays, the owning package's copy is at the diverted name; the check read the path. **Fix:** read the diverted name while the diversion stays, the path once it is gone.
+- **Symptom:** case e passes while a lean conffile has no dpkg-stereo record, so a later change of that file by its package will be taken for the person's. **Cause:** `check_verify` reads `--verify`'s rows, and a lean file without a record gives none. **How found:** `count-lost-records.py --list` before and after the upgrade (lean-code, [a file under a dpkg diversion](../../lean-code/references/diverted-files.md)).
+- **Symptom:** a person's edit of `/etc/issue`, `/etc/zsh/zshrc` or `/etc/nanorc` on the published edition is replaced at the console's upgrade, and case e passes. **Cause:** `plant_conffiles` plants only into a package's `Conffiles`, and sparky-stereo-console ships these files at the diverted paths as plain files, which dpkg writes at every unpack. **How found:** edits planted in those files beside case e's own.
 
 ## The recipe
 

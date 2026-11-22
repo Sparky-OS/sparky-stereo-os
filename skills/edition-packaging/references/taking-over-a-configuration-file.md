@@ -68,15 +68,29 @@ Why, in dpkg's own source (1.23.11):
 - `src/main/remove.c`, purge: a conffile is dropped from the purge list only while another package's diversion covers it; `conffderef` follows the conffile's own name with no diversion lookup, so once our postrm has removed our diversion, purge unlinks the owning package's file.
 
 So our file at a name we divert is not shipped in the package's data (Debian Policy 10.7.3 names this way: maintainer scripts that "create, update and maintain the file" and "must not overwrite the user's version").
-As built in sparky-stereo-console 20261122:
-- the defaults ship under `/usr/share/PACKAGE/defaults/PATH`;
-- the postinst writes a default where nothing is, and records what it wrote (`/var/lib/PACKAGE/written`: path, md5, mode, the default last said);
-- an untouched file (same md5 and mode as recorded) follows the new default silently;
-- a file the person changed, replaced or removed stays as they made it; the new default goes beside it as `PATH.dpkg-dist` (mode 644, so `run-parts` skips one in `/etc/update-motd.d`) and is said once per new default, in ten languages, on the terminal and in the journal;
-- the postrm, at removal, deletes an untouched file and keeps a changed one in `/var/backups/PACKAGE/PATH` (said), before it removes the diversion with `--rename`, so the owning package's file comes back; purge removes `/var/lib/PACKAGE`.
-- The safe form F2 above stays in the preinst for the owning package's pending `.dpkg-new`.
+The maintainer scripts keep it through ucf, Debian's tool for exactly this (ucf 3.0056, Priority standard, on the edition's image), so its records name what was written and `dpkg-stereo --verify` (0.1.46) names a person's change to it.
 
-**Open (row 813):** a file only the maintainer scripts keep is in no package's file list, so neither `dpkg --verify` nor `dpkg-stereo --verify` (0.1.45) names a person's change to it; the fixture's edit of `/etc/c11.conf` was kept and said, and named by nothing.
+### Through ucf, with nothing asked (sparky-stereo-console 20261122, row 813)
+
+Measured with fixture packages and ucf 3.0056 in the published-edition rig, every apt run `apt-get -y` with stdin from `/dev/null`, "at a terminal" meaning a pseudo-terminal (`script`) with debconf's readline frontend:
+
+| The postinst calls | An untouched file, new default | A changed file, new default, at a terminal | The same with the round's `--force-confdef --force-confold` | A changed file under a running debconf frontend (`debconf-apt-progress`) |
+|---|---|---|---|---|
+| `ucf NEW PATH` | replaced, "Replacing config file PATH with new version" | **asked**: "What do you want to do about modified configuration file", the run waits | asked | **fails**: rc 100, the package half-configured |
+| `UCF_FORCE_CONFFOLD=1 ucf NEW PATH` | **not replaced**: the old file stays, the new default goes to `PATH.ucf-dist`, and ucf records the new default's md5sum, so from then on the untouched file reads as changed | kept, `PATH.ucf-dist` | **asked**: dpkg passes `DPKG_FORCE=security-mac,downgrade,unsafe-io,confold,confdef`, and ucf's `confdef` unsets the choice | not measured |
+| `DEBIAN_FRONTEND=noninteractive ucf NEW PATH` | replaced, the same line | kept, `PATH.ucf-dist`, nothing asked | kept, nothing asked | kept, nothing asked |
+
+Why, in `/usr/bin/ucf` (3.0056): `DPKG_FORCE` "overrides all others" (`confdef` unsets the forced choice and stops reading the list); with no forced choice a changed file reaches the question `ucf/changeprompt` at priority critical, whose default is `keep_current`, and `keep_current` records the new default's md5sum and copies it to `PATH.ucf-dist`; debconf's noninteractive frontend takes that default without showing anything.
+So the third form is ucf answering its own question with its own default: the person's file kept, the new default beside it.
+
+As built in sparky-stereo-console 20261122 (Depends: `ucf (>= 3.0056)`):
+- the defaults ship under `/usr/share/PACKAGE/defaults/PATH`;
+- the postinst runs `DEBIAN_FRONTEND=noninteractive ucf --package PACKAGE DEFAULT PATH` and `ucfr PACKAGE PATH` for each file: ucf creates a missing one ("Creating config file PATH with new version"), replaces an untouched one, keeps one the person changed, replaced or removed and puts the new default beside it as `PATH.ucf-dist`;
+- when `PATH.ucf-dist` was written anew, the package says once, in ten languages, on the terminal and in the journal, that the person's file is kept and where the new default is (ucf's own English lines go only to the terminal and `/var/log/apt/term.log`);
+- ucf copies a default it creates with the default's mode, so a script in `/etc/update-motd.d` gets `chmod 755` when ucf created it, and the default beside a kept one stays 644;
+- the upgrade from the plain files: the preinst sets each old file aside and marks it changed when it is not the old version's bytes (`dpkg-query --control-path PACKAGE md5sums`); the postinst drops an untouched one, so ucf creates the new default, and puts a changed one back first, so ucf, which has no record of it, keeps it with the new default beside it;
+- the postrm, at removal, deletes a file whose md5sum is the one ucf recorded (read from `/var/lib/ucf/hashfile`: Policy 6.5 lets a postrm rely only on Essential packages), keeps a changed one in `/var/backups/PACKAGE/PATH` (said), runs `ucf --package PACKAGE --purge PATH` and `ucfr --purge PACKAGE PATH`, and only then removes the diversion with `--rename`;
+- the safe form F2 above stays in the preinst for the owning package's pending `.dpkg-new`.
 
 ## Removing a diversion in a successor, keeping the person's edit
 
@@ -108,7 +122,7 @@ Keep the copy outside a folder something copies whole: sparky-stereo-console kee
   **Cause:** the verifier read the owning package's record at the path; fixed in dpkg-stereo 0.1.43.
   **How found:** the published edition installed as the round installs it; `dpkg-divert --list` beside `records/*.tsv`.
 - **Symptom:** a conffile of the owning package is in `newconffile` state and its file is nowhere.
-  **Cause:** above (the shared `.dpkg-new` name). **Fix:** do not divert a conffile; where a diversion stays, the safe form above. A package that makes its file at the path in its postinst instead of shipping it also keeps the owning package's file (fixtures), but the path is then no file of any package's list, so neither dpkg nor dpkg-stereo judges a person's edit of it.
+  **Cause:** above (the shared `.dpkg-new` name). **Fix:** do not divert a conffile; where a diversion stays, the safe form above. A package that makes its file at the path in its postinst instead of shipping it also keeps the owning package's file (fixtures); the path is then no file of any package's list, so it keeps it through ucf, whose records `dpkg-stereo --verify` reads from 0.1.46 (above).
 - **Symptom:** after an upgrade, every new account made with `useradd -m` has a stray `.bashrc.dpkg-old` in its home.
   **Cause:** a copy kept in `/etc/skel`; useradd copies that folder whole (Debian's adduser skips `*.dpkg-old` by its `SKEL_IGNORE_REGEX`). **Fix:** keep such a copy outside `/etc/skel` (sparky-stereo-console uses `/var/backups`). **How found:** the proof's new account, listed before and after.
 - **Symptom:** lintian `uses-dpkg-database-directly [preinst]`.
@@ -135,3 +149,13 @@ Keep the copy outside a folder something copies whole: sparky-stereo-console kee
 - **Symptom:** a fixture case fails in a way the case alone cannot explain (the owning package's conffile with our hash, a question at the owning package's configure).
   **Cause:** an earlier case in the same container left a package in `config-files` state that still lists the shared path as its conffile, and the next install inherited that hash (the same "at random" choice). **Fix:** one fresh container per case. **How found:** the same case passed alone.
 - **Symptom:** `apt-get update` with a flat `file:` source says `Symlinking file  to /var/lib/apt/lists/partial/..._Packages.zst failed` and the packages are not found. **Fix:** give apt the `.deb` files by path (`apt-get install ./a.deb ./b.deb`); apt still orders and splits the dpkg calls itself.
+- **Symptom:** after the install, the owning package's copy at the diverted name (`/etc/issue.debian`) holds our default, ucf's hashfile lists the diverted name, and the file at the name is missing or not ours.
+  **Cause:** ucf follows a dpkg diversion unless the caller is the diverting package: `ucf --help`, "-P foo, --package foo   Don't follow dpkg-divert diversions by package foo" (`/usr/bin/ucf` 399-407 runs `dpkg-divert --truename`).
+  **Fix:** `ucf --package PACKAGE DEFAULT PATH`, and `ucf --package PACKAGE --purge PATH` at removal. **How found:** the console's `tests/etc-files.sh` fresh and up-none ("is the package's" failed for all five), then a fixture's `ls /etc/default/uc-demo*`.
+- **Symptom:** after a removal and a new install, a file the package keeps through ucf is not there, and ucf printed "Not replacing deleted config file".
+  **Cause:** ucf's record outlived the file: when its md5sum is the new default's and the file is gone, ucf takes the person's removal as kept (`/usr/bin/ucf` 811-821). A diverting package's file leaves its name at the removal, so the owning package's file can come back.
+  **Fix:** purge the package's ucf records at `remove`, not only at `purge`. **How found:** `/usr/bin/ucf`'s own source, then the console's reinstall row.
+- **Symptom:** `UCF_FORCE_CONFFOLD=1` leaves an untouched file at the old default, with `PATH.ucf-dist` beside it, and the next verify calls it changed.
+  **Cause:** ucf's "keep the old file" covers an unmodified file too (`/usr/bin/ucf` 863-872), unlike dpkg's `--force-confold`, and it records the new default's md5sum. **Fix:** the noninteractive form above. **How found:** the fixture row `old:untouched`.
+- **Symptom:** a fixture's purge deletes the owning package's file that its removal had just given back.
+  **Cause:** dpkg calls the postrm with `remove` and then with `purge`; a block run for both, after the diversion is gone, removes the owning package's file at the name. **Fix:** act only while `dpkg-divert --listpackage PATH` names the package itself (the console's postrm does). **How found:** dpkg-stereo's `test/ucf-test.sh` U7.

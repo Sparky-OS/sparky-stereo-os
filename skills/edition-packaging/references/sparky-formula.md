@@ -55,7 +55,8 @@ In `/etc/skel` the new default goes to `/var/backups/PACKAGE/etc/skel/NAME.dpkg-
 dpkg records the new conffile's hash, so it and `dpkg-stereo --verify` see the person's file as their change from then on.
 A fresh install needs it too: without it, a package that turns `/etc/motd` into its conffile is asked about base-files' motd at its first install.
 After the conversion the file is an ordinary conffile: a later version that changes a default the person changed meets dpkg's own question, and an `apt-get -y` with no `--force-conf*` and no terminal stops at it (`end of file on <standard input> at conffile prompt`, rc 100); with `--force-confdef --force-confold`, as the round's upgrade runs, the change is kept and the new file written as `.dpkg-dist` (measured with fixture packages, row 813).
-A file at a name the package diverts cannot take this way: see [taking over another package's configuration file](taking-over-a-configuration-file.md#our-own-file-at-a-name-we-divert-made-and-kept-by-the-maintainer-scripts-never-a-conffile).
+That is dpkg's honest question about a real edit, as every conffile of every package on the system meets it, and what the edition's updater does with a conffile question is the updater's design, not the package's: "nothing is asked" stands for an untouched file and for this transition (the main session's ruling, row 813).
+A file at a name the package diverts cannot take this way: the maintainer scripts keep it through ucf, with nothing asked; see [taking over another package's configuration file](taking-over-a-configuration-file.md#our-own-file-at-a-name-we-divert-made-and-kept-by-the-maintainer-scripts-never-a-conffile).
 
 ## Versions and the changelog
 

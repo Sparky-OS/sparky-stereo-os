@@ -136,6 +136,46 @@ If the build record names another descriptor, search only the authorized bounded
 - **Fix:** rebuild the retained descriptor, admit complete genuine receipts only after all-member equality, and hold a differing source with its required family. For this cohort the coordinator required Graphics and both Qt sources to travel together, so all three stayed out while the remaining cohort continued.
 - **How found:** Calamares branding's two archives matched and its repaired receipts passed the source audit; Graphics' streamed payload/control maps exposed five differing installed files and two control members. The original recorded descriptor was absent from the bounded search, so its origin was not inferred.
 
+### Compare generated kernel-meta versions with the published controls
+
+A round suffix is a Debian version input, not merely a unique label.
+Before staging generated metas, read each published kernel-meta Version and require `dpkg --compare-versions "$new" gt "$published"` for a replacement.
+Perform that comparison for every generated binary, including kernel metas whose version is independent of the ordinary round version.
+After generation, repeat it on `dpkg-deb -f "$deb" Version`, and retain the installed-target check in the upgrade proof.
+
+- **Symptom:** apt's simulation offers many upgrades, no removals and nothing kept back, but does not offer two selected kernel metas.
+- **Cause:** a generated `7.3.4+stereo3d18+round20261121.794` sorts below published `7.3.4+stereo3d18.703+lc1`; the added plus suffix is less than the existing dot suffix in Debian version ordering.
+  The round preparer supplied that suffix without comparing the resulting version to the published control.
+- **Fix:** reject that generated version before freezing and generate a monotonic version through the recipe's supported input; an already frozen failing pool stays blocked, with its target mismatch preserved.
+  The correction still needs source receipts, qualification and the actual installed upgrade proof.
+- **How found:** ORDER 794's installed-target assertion compared 61 selected upgrades against the full apt Inst log and named both missing metas, despite a simulation with 78 Inst and zero Remv.
+  No real upgrade had run when the check stopped.
+
+### Check the whole output set before repairing receipts
+
+Before comparing members, compare the exact binary filename sets from the accepted descriptor, existing receipts and retained stage with the rebuild's outputs.
+Require every primary, debug and HR archive named by the source to have an accepted reference.
+An equality check over only the files found in both folders cannot certify a missing companion.
+Keep the set comparison beside the member comparison and the repaired receipts.
+
+- **Symptom:** a receipt repair appears possible because the main binary and descriptor are present, but an existing receipt names a debug archive absent from the stage.
+- **Cause:** comparing only retained files would leave part of the source build without an accepted reference.
+- **Fix:** hold that source when the missing reference cannot be recovered within its authorized stage; do not manufacture an accepted debug archive from the rebuild.
+  For complete sources, require equal output sets before checking every payload and control member.
+- **How found:** the receipt filenames exposed two incomplete source families during ORDER 794; eleven other repairs passed both exact output-set equality and all-member comparison.
+
+### Carry a held generation through dependency selection
+
+A newer accepted binary without its own source closure remains held under the coordinator's ruling.
+Select the newest earlier accepted generation whose complete closure is available; if it is already published, retain the published bytes.
+Read every candidate's actual dependency constraint against that version before freezing the pool.
+Hold any dependent source whose version requirement cannot be met, and stop the round when a required meta cannot survive that hold.
+
+- **Symptom:** retaining an earlier complete library appears to solve a binary-only stage, but a separately staged integration pack still cannot install.
+- **Cause:** the pack requires the held library's newer version explicitly; acceptance of the pack does not relax that constraint.
+- **Fix:** keep both the newer library and that pack out, name the retained published version and each unsatisfied relation, and qualify the remaining metas against the actual supplied universe.
+- **How found:** ORDER 794's source inventory found no complete intermediate layer, and reading the integration pack's Depends exposed its minimum version; the required edition meta passed its archive check with the earlier published layer retained.
+
 ### A clean successor when the accepted descriptor cannot reproduce its binary
 
 An exact receipt repair and a new source-built successor are different operations.
@@ -173,6 +213,27 @@ Traps found during bounded discovery in ORDER 701:
   **Cause:** the first inventory kept `Architecture` but omitted `Architecture-Variant`.
   **Fix:** retain both fields and keep variants outside the candidate set until their own acceptance is recorded.
   **How found:** controls of staged stereo-library variants said `Architecture: amd64` while their filenames named `amd64v3`; reading the additional control field distinguished them.
+
+### Check source closure before copying an accepted binary cohort
+
+An accepted application test and a complete binary `SHA256SUMS` do not establish that its source archives and receipts survived cleanup.
+Before the large copy, group the accepted binaries by their control `Source` and source version, then require a matching descriptor and its named components for every group.
+Search the explicitly named outputs as well as bounded discovered stages; a result directory need not be named `stage` or `out`.
+Keep missing paths and unreadable directories in the search evidence, and distinguish "absent from the allowed search" from "absent everywhere".
+A receipt-only repair requires the retained descriptor and binaries; it cannot manufacture a missing descriptor or certify regenerated source archives.
+Report that source gap and keep the affected generation out until its source recovery or successor build is authorized and qualified.
+
+Traps found in ORDER 794:
+
+- **Symptom:** a fully accepted multimedia cohort has 101 checksum-correct binaries but no matching source descriptor or build receipt for any of its six source generations in the allowed search.
+  **Cause:** the retained stage contains only binaries, its checksum manifest and its retention note; neither acceptance nor binary checksum verification checks source retention.
+  **Fix:** perform the per-source completeness check before freezing a pool, report the exact missing generations, and stop their selection without substituting an older descriptor or inventing receipts.
+  Recovery was not performed in this preparation; a search outside the authorized scope or reconstruction needs its own instruction.
+  **How found:** binary controls identified the six source/version pairs; a bounded metadata search and an independent stage-directory listing found no matching descriptors, buildinfo, changes or build records.
+- **Symptom:** a no-follow directory walk still reads an archive through a symlink, or a missing explicitly named output silently disappears from the inventory.
+  **Cause:** `os.walk(..., followlinks=False)` only prevents recursion into linked directories; file opens and a linked root can still follow links.
+  **Fix:** reject symlink files and directories, check each explicit root's ancestors, record skipped links and missing directories, and retain separate directory-discovery and stage-file depth bounds.
+  **How found:** inspection of the inventory's file-open path exposed the gap; temporary-directory fixtures cover a linked file, linked directory, linked root ancestor, missing root, depth limit and explicitly named output.
 
 ### Compare installed paths as well as archive listing lines
 
@@ -243,7 +304,8 @@ Trap:
 ### Public indexes between bounded invocations
 
 One copied pool can need separate complete native and meta invocations to stay inside its scratch allocation.
-Each invocation still compares old and new against one frozen signed public snapshot.
+By default, each invocation compares old and new against one frozen signed public snapshot.
+The checked archive-transition exception described below may qualify a predecessor in a dated or mixed view; it never changes the candidate view.
 Record every invocation's metadata hashes; do not infer that a later invocation read identical public indexes.
 If an external index refreshed, retain the record diff and check every selected resolution identity on both sides.
 A changed selected input needs fresh qualification under the intended snapshot; an unused index record is reported without pretending that its program was tested.
@@ -620,3 +682,204 @@ Plant the failures to see the stops: a commit that breaks a wired build script (
 - **Fix:** find the endings first (`\.(?:md|markdown)\b`, linear), then each ending's run of path bytes. The new function was compared with the old pattern on 200,000 generated byte strings and 700 real files before it replaced it, and the package is read in under four seconds.
 - **Restarting the round:** stop Part 1 by process id (its log gets `part1 exit 143`), keep its logs, remove the frozen worktree, `src`, `dest`, `tmp`, `lc-scratch`, the scratch folder and the non-empty `pre-round` folder (Part 1 refuses each), and start again with `ROUND_COMMIT` naming the round's first commit plus only the fix, on a branch pushed under the fix's number. The cohort stays the same.
 - **Rule for a gate that reads compiled files:** no pattern that can backtrack over a run of arbitrary bytes; test it on the largest library of the archive, not only on fixtures. When a round's step is quiet for longer than its last run took, look at the process before waiting further.
+
+## Pre-freeze version coverage and a diverted file after the real upgrade
+
+- **Symptom:** the version gate finds fewer replacements than the package inventory, even though generated kernel metas pass.
+- **Cause:** reading only native and foreign-machine architecture indexes omits packages published in a separate `binary-all` index.
+- **Fix:** give `tools/publication-reconcile/check-replacement-versions.py` every published Packages index, including `binary-all`, and the exact selected binary paths before freezing.
+  Require every replacement to satisfy `dpkg --compare-versions NEW gt PUBLISHED`; retain named failures and refuse equal versions too.
+  Generate kernel suffixes through the existing recipe input: replacing a published `.703+lc1` with `.794+lc1` keeps the generator's form, while ordinary metas keep their independent round version.
+- **How found:** reading all four published indexes increased the non-meta replacement count from 142 to 185; the final generated-and-taken set contained 244 replacements and every comparison passed before copying.
+
+- **Symptom:** an installed upgrade succeeds, preserves planted conffiles, has no removals and an empty dpkg audit, but `dpkg-stereo --verify` reports `CHANGED /etc/grub.d/10_linux`.
+- **Cause:** a successor boot package diverts Debian's conffile and installs its own wrapper link at the old name; an earlier projection record still associates that name with Debian's hash.
+  The package must not divert a conffile; teaching the verifier about diversions alone does not make that packaging valid.
+  The verifier opens the old name and follows the replacement link rather than checking the diverted original.
+- **Fix:** stop the proof and preserve its state; do not declare the change a planted person edit or loosen the proof's refusal.
+  Hold the diverting boot generation and retain the published predecessor.
+  Its owning package needs a successor that provides the boot menu without diverting the conffile; the verifier separately needs diversion-aware ownership checks and regressions for both preserved and changed diverted originals.
+  That package repair is separate from a frozen round when the preparation brief forbids changing package content.
+- **How found:** the diverted Debian file's SHA-256 exactly matched the stored lean hash, while the old name resolved to the new boot wrapper.
+  Reading the verifier showed its direct open of the recorded path; the transaction and all installed selected versions had already passed.
+  Inspect the retained baseline too: a pre-existing verification problem is a distinct fact, not an excuse to waive a new failure.
+
+A rebuilt source reconstructed from Git does not qualify an existing binary merely because its complete output filename set matches.
+Where the coordinator explicitly authorizes trying this despite a missing staged descriptor, bind both the recipe and upstream commits to the acceptance record and compare every member of every accepted archive.
+A 20-for-20 output set with 90 differing payload/control members still fails receipt repair; preserve the comparison and hold the source and dependent pack.
+This exceptional authorization does not change the normal requirement to rebuild the retained staged descriptor.
+
+## Propagate holds and bind the evidence of a replacement preparation
+
+- **Symptom:** removing a held generation leaves a selected companion or generated meta requiring it.
+- **Cause:** source qualification and acceptance were checked independently of the taken packages' dependency and joint-acceptance conditions.
+- **Fix:** read every taken Depends, Pre-Depends and Breaks and the relevant acceptance records before regenerating metas. Hold required or inseparable companions; keep independently accepted successors when the published predecessor satisfies them. Record the relation and acceptance evidence for each decision.
+- **How found:** a held boot generation had an unversioned system-meta dependency, while later Plymouth and theme generations had independent acceptances and used an already supported interface. A separately held stereo layer had a pack requiring its newer interface, so that pack stayed held.
+
+A later accepted recipe may be the sole exception to an otherwise frozen build commit when the coordinator explicitly authorizes it.
+Bind the recipe directory by Git tree equality between the accepted main commit, the staged build record's commit, and the preparation tree.
+Keep every other recipe at the original freeze, and regenerate metas when the new package changes minimum versions.
+Do not infer whole-tree provenance from one matching recipe directory.
+
+A new preparation gets a fresh copied pool and manifest; the blocked pool is evidence, never its input.
+Checks reused across preparations need an explicit list of equal input hashes, including their tools and published comparison inputs.
+Rerun every installed-system check from the retained published baseline.
+Only after the new manifest verifies may the old pool be removed by its literal path under the coordinator's cleanup authorization.
+
+Before planting conffile edits, retain the published baseline's verification output and the relevant original file hashes.
+A unique appended test marker distinguishes the proof's edit from an already changed baseline file.
+Compare baseline and upgraded problem rows side by side, separating explicit planted edits; a coordinator-approved baseline comparison does not waive any newly introduced problem or alter the verifier.
+Run deep verification with HTTPS access to the originals it needs, and retain exact download failures when those originals are unavailable.
+
+## A successor audit must distinguish same-version source branches
+
+- **Symptom:** a newer accepted application catalogue lacks an entry and helper found in an older staged package, even though every comparison with the published package passes.
+- **Cause:** two different staged source closures use the same version; only one was merged into the build tree. A review acceptance that explicitly holds the code merge does not make the other closure a release predecessor.
+- **Fix:** identify each predecessor by descriptor hash and stage path as well as version. Read its acceptance and merge condition, compare the catalogue entries and authored helpers, and name an excluded unmerged branch separately. For accepted predecessors, explain every lost feature; a higher version or a retained filename is not proof of preservation.
+- **How found:** comparing catalogue dictionaries showed one missing entry and the native source comparison showed its missing verifier helper. The journal explicitly held that branch's merge, while the accepted same-version branch's entries survived exactly.
+
+Read native authored files and embedded upstream trees as well as quilt series: an unchanged one-patch series can accompany changed application code in the original component.
+A file moved between packages needs a comparison at its new owner; retain an assertion that every former association or entry survives there.
+Treat a source changelog containment test as a lead for review, not a feature-preservation verdict: qualification headers, combined source packages and held outputs can change the generated history.
+
+For a whole-pool Lintian delta, group increased contexts by tag and demonstrated cause, retaining counts, one concrete example, and the owning fix or false-positive evidence.
+A common helper's purge/error handling and a valid space-containing conffile can require reading the actual helper or an isolated dpkg unpack to explain a diagnostic.
+Name new error-severity findings in edition-authored packaging at the top of the hand-back even when the functional gates pass; a classified finding is not a corrected package.
+
+A patch-reader size cutoff can silently make two large patches compare equal as two missing values.
+Read and hash every member named by `series`, and fail if any member was not read; a large combined edition patch is still a patch that must be compared.
+The symptom was identical `missing` hashes for different generations; removing the reader's cutoff exposed the actual depth-conversion and cache-invalidation changes for review.
+
+## An archive failure whose last attempt hides a missing compute repository
+
+- **Symptom:** the link gate's final APT error names two mutually conflicting NVIDIA driver-lock packages while checking a CUDA application's debug companion.
+- **Cause:** the supplied archive universe omits the vendor's compute repository. The no-lock and each single-lock solve already fail because the CUDA runtime dependency has no candidate; the final both-lock combination reports its own conflict and masks that first cause in the top-level message.
+- **Fix:** preserve every policy-attempt log and the application's actual dependency control. Bind the edition's intended compute repository, public signing key and architecture restrictions from its source-package/ISO configuration, retain the edition's display-driver locks, and rerun the complete archive gate against the corrected explicit universe. Do not waive the failure, request both locks, or classify the application as broken solely from the last attempt. Follow the preparation's explicit failure contract: when archive correction is authorized, bind the missing installed-system archive and rerun from input one; report the exact gap and unchecked tail until that run completes.
+- **How found:** the first three solver logs said the exact CUDA runtime had no choices; the archive configuration listed Debian, multimedia and distribution repositories but no vendor compute archive. Reading the policy solver showed that it raises its last unsuccessful alternative, not necessarily the most informative one.
+
+Bind the compute archive from the frozen `packages/sparky-stereo-cuda-repo` recipe: `sparky-stereo-cuda.sources` supplies the HTTPS URI, exact-path suite `/`, no components and `Architectures: amd64`; `cuda-archive-keyring.gpg` in that same recipe supplies Signed-By.
+Record the Git commit and hashes and verify that the working files equal that commit; do not obtain another key or disable archive signature verification.
+The gate already reads package-shipped policy: compare `91sparky-stereo-cuda` with the recipe's records and `10sparky-stereo-nvidia-driver-lock` with its version-generated template, then retain their package owners and hashes in the solve evidence.
+The frozen ISO installs the CUDA source package and main driver lock together before reading the vendor archive; the alternative legacy lock remains mutually exclusive, as the unchanged gate's policy solves require.
+No additional preference record is needed to repair a missing archive entry.
+
+- **Symptom:** adding the vendor URL alone leaves the provenance and installed-system policy of the proof unclear.
+- **Cause:** archive sources are explicit gate inputs, while pin files come from the supplied binary packages; neither should be inferred from the other.
+- **Fix:** bind source, architecture, public key and shipped pin records separately, preserve the unchanged pool manifest before and after, and hash the retained checks' inputs when their reuse is explicitly authorized. Read every solver attempt on a later failure; correct another missing installed-system archive before blaming a candidate package. A real candidate dependency or load failure requires the authorized source-family hold and a new preparation with its dependent proofs.
+- **How found:** the frozen source file specified a flat amd64 archive, the public key matched the published source package byte for byte, and both CUDA and generated driver-lock pin records matched the frozen recipes. The earlier failed solver already recorded those pins, proving that the omitted archive entry was a separate configuration gap.
+
+An unchanged pool does not freeze an external archive's next signed index.
+Keep the index hashes alongside the pool hash and distinguish a newly selected upstream dependency from a changed edition binary.
+
+- **Symptom:** after restoring the missing compute archive, the full gate fails on its first GUI package, earlier than the original CUDA failure.
+- **Cause:** Debian testing's newly signed index advances XMLGUI and the style library to a generation requiring an icon-theme library newer than the edition's unchanged published rebuild. The edition's existing policy correctly refuses replacing that patched library with Debian's build.
+- **Fix:** retain every solver attempt and both index digests, compare the unchanged published predecessor's dependency resolution, and check the required meta before proposing a source hold. A selective hold cannot repair a mismatch also present with the published desktop and no candidate packages. Name the published library's qualified-successor requirement; do not waive the gate, invent an archive rollback pin, or silently replace the edition's library. Preserve earlier authorized proofs with their exact input hashes and state their original archive scope.
+- **How found:** the previous and new signed Debian index hashes differed while all pool files matched. The published GL package failed through XMLGUI too, and both published and candidate desktop metas failed through Oxygen and the style library on the same icon-theme minimum version.
+
+
+When a partial Debian Frameworks transition breaks the published desktop as well as the candidate, measure the whole fork set before rebuilding.
+Bind one signed snapshot for the successor builds and all index-dependent proofs, preserve every edition patch and binary source fixture, and leave a fork on its current source until testing supplies its successor.
+The [Frameworks transition recipe](frameworks-transition.md) records the measurement and source-preparation traps; source preparation alone does not qualify the new binaries.
+
+When a Frameworks transition builds past failed tests or removes a retired Debian compatibility library, use the measured cases in [Frameworks transitions](frameworks-transition.md); the build exit alone does not qualify its tests, and every removal needs its own evidence.
+
+
+### Published predecessors during an archive transition
+
+If the candidate resolves but its correct published predecessor fails against newly migrated Debian packages, retain every solver attempt and the previous sibling snapshot.
+The explicit dated-view rule in the build toolkit’s `lean/archive.md` qualifies the predecessor against a publication-time snapshot of the implicated archive; unrelated archives may retain the candidate’s exact signed indexes only with the checked search-evidence exception.
+It checks the external solver cause, archive identities, publication cutoff, signed Packages hashes and absence of candidate packages itself; the candidate never leaves its current frozen view.
+The complete recipe, refusal controls and third-party archive requirement are in [Debian Frameworks transitions](frameworks-transition.md#a-repaired-candidate-does-not-repair-its-historical-comparison).
+The symptom was a successful 6.32 candidate followed by a 6.30 predecessor blocked by Debian's new XMLGUI minimum; reading the full solver chain identified archive movement rather than a candidate regression.
+A baseline image assembled after publication can already contain newer third-party indexes, so retain the signed publication-time metadata when the round goes online.
+
+
+**Required supply-chain input:** run the candidate qualification with `--archive-evidence` and keep the resulting per-architecture InRelease, Packages, public keys, archive-view.json and SHA256SUMS beside the selected pool's evidence.
+The publication script must copy that directory into the round's supply-chain record and run `sha256sum -c SHA256SUMS` in every architecture directory before publishing.
+Retain the successful whole-pool gate result as well: an authenticated input snapshot alone is not a passing comparison.
+A prior round without these retained archive views cannot supply a dated baseline for an archive that subsequently moves, unless an independent signed snapshot service supplies it.
+
+
+### A published binding with no usable publication-time baseline
+
+- **Symptom:** the predecessor gate stops on a taken package's old Perl binding, whose required virtual ABI is absent from both signed archive views; the last policy attempt instead names two conflicting driver locks.
+- **Cause:** the old package was already uninstallable when published. Judging the failed relation by its owner confuses the taken binding with the external provider it needs.
+- **Fix:** use the toolkit's checked publication-time absence rule, never omit the predecessor by hand. It checks concrete names and Provides across both complete edition sets and both authenticated archive views, binds a mandatory dependency path from the requested predecessor, and retains every solver attempt. Providers owned by either edition still block. A predecessor that solves at publication keeps that real baseline. An external name absent then and now yields no usable baseline only after both real solves fail; every candidate link and start result must then pass without comparison allowances.
+- **How found:** the first three solver logs named the retired ABI; the fourth ended at a policy conflict. The previous control and both authenticated Packages indexes showed the old relation and the newer runtime's actual Provides. The candidate's exact dependency qualification succeeded with that newer ABI.
+
+Run the full pool with `--collect-predecessor-stops` to collect uncovered eligibility failures once, rather than discovering one per multi-hour invocation.
+The mode still exits 1 while any uncovered stop remains; it retains every input, complete solver lines and archive evidence in `predecessor-stops.json`.
+Keep `uninstallable-predecessors.json` and the summary's separate list headed `published predecessor not installable at its publication`.
+Describe each such input in the round's description as repairing already published breakage; never call the old baseline passing.
+The main publication invocation must carry the same historical-view options and evidence bindings; a stage list alone does not select this proof mode.
+
+A provider-presence inventory is not a second policy grammar check for every unrelated signed archive entry.
+Keep legacy mixed-case virtual names and compact version syntax literally; a signed third-party office alias exposed this during the full-run startup.
+Count a transitive missing dependency only when the required path has no alternate virtual provider, and retain the named path as evidence.
+The complete archive solver remains authoritative for installability.
+
+
+### Exact companion dependencies and a completed failure inventory
+
+- **Symptom:** a checksum-correct, exactly reproduced style package fails candidate qualification because it requires an older exact version of its GTK companion; its menu-bar variant fails through the same relation.
+- **Cause:** separate accepted source generations retain an exact cross-source dependency that the selected newer companion cannot satisfy. Receipt equality proves reproduction, not compatibility of the assembled cohort.
+- **Fix:** retain all policy-attempt logs and read the actual binary controls of both selected and published style packages. Trace direct dependents and Recommends before naming a source-family hold; leaving out only the new style does not help when its published predecessor has the same old exact dependency. Reconcile that source family through the authorized successor or new-preparation workflow, without changing the already accepted archives or weakening the solver.
+- **How found:** the first three policy attempts named the old exact companion version, while the fourth reported the independent driver-lock conflict. Scanning the complete pool's relations found the dependent menu-bar source and the base look's recommendation; the published style control retained the same exact dependency.
+
+Compare the installed proof baseline with the image builder’s default Recommends closure as well.
+A transaction on a baseline that omits the incompatible recommended companion does not prove that the image’s requested combination upgrades.
+Record the absent packages beside the image-install command and binary relations; do not call a recommendation successfully installed merely because apt can omit it.
+
+`--collect-predecessor-stops` collects predecessor eligibility failures, not arbitrary candidate failures.
+A candidate solve or runtime failure still ends that invocation with exit 1.
+When the task requires a complete failure inventory, retain that invocation and check the unvisited inputs with the unchanged gate and complete sibling universes, verifying that every invocation uses byte-identical signed archive views.
+Record every invocation's input interval and exit, every failed input and all solver attempts, and assert that the union accounts for the entire selection.
+Those diagnostic continuations do not turn the interrupted full invocation into a passing whole-pool proof; a corrected preparation still needs its own complete gate.
+
+## A successor family and a bound continuation of its proof
+
+**Symptom:** a look and its menu-bar variant require an obsolete exact GTK package version, while the round carries a compatible newer GTK theme.
+**Cause:** a recipe's default version was interpolated into a dependency, independently of the GTK package's actual version.
+**Fix:** read the commit introducing the pin and compare the actual theme names, colour-scheme mapping and files it protects.
+If equality protects no interface, declare the oldest compatible GTK version as a minimum in the required version-definition file shared by the builders; refuse a missing definition.
+Build both look successors from that committed recipe, retain every language file, and compare them with both staged and published predecessors.
+Keep an unchanged GTK archive unchanged.
+**How found:** the solver's first attempts named the exact pin; the original theme files and current files were equal despite independent package version counters.
+The installed upgrade baseline must contain both published looks as the image's Recommends request, and prove their upgrade together with GTK, not merely an edition without those looks.
+
+A predecessor requiring an unavailable publication-time third-party archive has `no-baseline-available` only through the gate's explicit option and checked archive search records.
+The unchanged predecessor is first tried in the candidate view; any permitted successful view remains a real baseline.
+A failure attributed to an archive without its dated signed index cannot use a later implicated index as a substitute.
+Such a candidate gets no inherited-failure allowance and must install, link and start in full in the frozen candidate view.
+The real unresolved-library regression control must remain red.
+This is not the separate class proving a missing provider in both extant views.
+
+A changed gate rule requires the full toolkit suite on the exact new code, plus a seeded fresh sample of 24 previously completed comparisons, including at least four mixed baselines and both publication-time-uninstallable inputs when present.
+Use the gate's bound reuse mode, not a hand-edited passing table.
+It checks candidate and predecessor hashes, original sibling inputs, authenticated signed views, code, prior result hashes and the suite record.
+Changed inputs, their transitive dependents and inputs without a passing prior result run fresh.
+The sample's findings, notes and predecessor classes must agree before reuse is permitted.
+Every input then receives one fresh or reused verdict with its binding, and exit zero requires every row to pass.
+Retained signed indexes must be restored and authenticated without updating the public archives during either the link proof or installed upgrade; updating the local candidate index must leave those public bytes unchanged.
+Record old/new pool digests, the replaced source sets, complete verdict, sample seed/list, exact archive evidence paths and all publication-copy inputs.
+
+### Frozen installed indexes must cover installed foreign architectures
+
+**Symptom:** the expanded installed proof keeps back the two architectures of the stereo declaration library and Mesa, although both architecture link gates pass.
+**Cause:** restoring only the amd64 proof indexes omits the i386 public dependency universe; copying the i386 indexes without changing the generated `arch=amd64` selectors still leaves those packages invisible to APT.
+**Fix:** authenticate and copy both already-qualified views, require equal shared InRelease hashes, and expose both installed architectures for archives that support both.
+Keep NVIDIA's compute archive amd64-only as its edition source declares.
+Refresh only the local candidate index, checking the public index hashes before and after.
+**How found:** all eight kept-back names were read before any transaction, and the source architecture selectors explained why the copied i386 Packages files were unused.
+Retain failed setup attempts separately; do not change pins, package archives or the frozen public view to satisfy the solver.
+
+### Frozen source selection must preserve packaged files
+
+**Symptom:** the installed transaction and ordinary verification pass, but deep verification reports `LCCHANGED` for the edition's deb-multimedia source file.
+**Cause:** the proof replaced APT's source selection by deleting every sourceparts file, including a packaged Lean payload; a baseline image captured after that setup inherited the missing file.
+**Fix:** preserve packaged source files and select a private sourceparts directory through an unowned proof APT configuration file.
+Expose the proof's local edition source there and keep the authenticated public view in the generated main source list, with the same archive keys, architecture selectors and pins.
+If a derived baseline already contains the setup mutation, restart from the original published baseline and install its recommended companion packages again before applying the corrected setup.
+Rerun the complete installed transaction and deep verification; never exempt the source path or weaken the verifier.
+**How found:** deep verification named the one extra path, the stopped container had no such file, and the original published image still held it; the setup's unlink loop and derived-image timing explained the difference.
+Keep the failed attempt and compare the public index hashes after the corrected proof as well.

@@ -11,7 +11,8 @@ No capture, encoder, PipeWire layout round trip or compositor pixel comparison w
    Resolve the binary through `Filename` and the source files through `Directory` and `Checksums-Sha256`.
    Verify every named file's hash, list the Debian archive with `tar tf`, and read its `debian/patches/series` and changelog.
    The checked package `26.04.0-1+stereo3d1+lc1` has one patch, `0001-follow-the-session-default-camera.patch`; this establishes default-camera selection, not stereo capture.
-2. Configure the disposable environment with the required Debian snapshot, the edition's signed archive at priority 1001 and deb-multimedia's signed archive.
+2. Configure the disposable environment with the required Debian snapshot, the edition's signed archive at priority 1001, the accepted round's indexed pool at the same priority, and deb-multimedia's signed archive.
+   Record the deb-multimedia InRelease hash and date on every run because that archive moves independently of Debian's snapshot.
    Keep package downloads separate from running the camera or compositor.
 3. Run `apt-cache policy kamoso kwin-wayland libkf6xmlgui6 libkf6iconthemes6 libkf6iconwidgets6` and `apt-get -s --no-install-recommends install kwin-wayland`.
    The expected result is dependency resolution with the edition's compositor and stereo libraries selected.
@@ -32,6 +33,10 @@ The audited version holds a literal list and omits temporal packings.
 The current shared policy exposes `stereo_policy_input_format_count()` and `stereo_policy_input_format_at()` in `stereo-policy.h`.
 Verify that the selected development package actually exports those APIs before depending on them.
 A newer checkout's header is not evidence that the published library provides it.
+In a follow-up measurement, the accepted pool had no stereo-layer binary or source entry, so the combined archives still selected published `1.22.0-1+lc1`.
+That package's checked headers and the policy library's dynamic symbol table contain neither enumeration function; its picture header also lacks `fromViewsInTurn`.
+Its JPS and MPF descriptor encoder declarations and exported functions are present.
+Do not compile against a development checkout to hide a missing accepted dependency.
 
 ## Boundaries still requiring runtime proof
 
@@ -77,9 +82,14 @@ The v4l2loopback bridge needs a separate virtual-machine test; it is not a reaso
 
 - **Symptom:** Kamoso alone resolves, but installing `kwin-wayland` fails.
   **Cause:** in the measured snapshot, XMLGUI 6.32 requires IconThemes at least 6.32, while priority 1001 selects the edition's IconThemes 6.30 build.
-  **Required fix:** qualify an edition package set compatible with that snapshot, preserving the stereo changes.
+  **Fix:** include the accepted round's indexed pool at the edition's priority alongside the published archive.
   **How found:** `apt-cache policy` plus `apt-get -s --no-install-recommends install kwin-wayland` exposes the direct chain through `kwin-common`; recommendations are not the cause.
-  This fix was not built or tested by the camera audit.
+  The corrected preflight selected IconThemes `6.32.0-1+stereo3d1+lc1` and KWin `4:6.7.4-2+stereo3d64+lc1`; both the minimal KWin and complete camera-rig dependency simulations returned zero.
+  These are dependency simulations, not an installed session or a stereo capture pass.
+- **Symptom:** the corrected rig resolves, but the required shared camera-packing enumeration still cannot be used.
+  **Cause:** the accepted pool has no stereo-layer entries and APT selects the older published layer without those APIs.
+  **Required fix:** supply the accepted indexed layer dependency closure before implementing against it; keep the published dependency as an explicit failed prerequisite rather than substituting a work-tree library.
+  **How found:** both pool indexes match their Release hashes, their layer entry counts are zero, and the selected package's header and dynamic-export audits agree that the functions are absent.
 - **Symptom:** apt stops at `libavcodec63` requiring a newer `libaom3`.
   **Cause:** the test environment omitted deb-multimedia.
   **Fix:** add its signed archive alongside the edition pin.

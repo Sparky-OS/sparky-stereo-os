@@ -1557,3 +1557,11 @@ The trigger, Kirigami's per-eye icon and the proof in a real plasmashell build o
 - **KIconThemes**: Hamish Rodda (`KIconEngine`), Geert Jansen, Antonio Larrosa and Michael Pyne (`KIconLoader`, `KIconTheme`), as for milestone 1; the edition's `+stereo3d3` counts each drawing of a stereo icon.
 - **Plasma's desktop and workspace** ([invent.kde.org/plasma/plasma-desktop](https://invent.kde.org/plasma/plasma-desktop), [invent.kde.org/plasma/plasma-workspace](https://invent.kde.org/plasma/plasma-workspace)): the folder view (Eike Hein), Kickoff, the task manager, the system tray and the wastebin applet, unchanged, are the places of the proof; the applets' own authors were not read, as their QML is compiled into the installed plugins.
 - **Kubabbar Glass**: the edition's look and its stereo icon theme, whose Bin pictures the proof shows in both eyes.
+
+## Live captions and transcript editing
+
+Kaption and captiond: Alex Márquez Pérez Muñíz Díaz Puras Thaureaux Fagúndo Rivera.
+
+Vibe: thewh1teagle. Whisper.cpp and ggml: Georgi Gerganov and the ggml contributors.
+
+Orca: Joanmarie Diggs, Federico Mena Quintero, Marc Mulcahy, Willie Walker, Mike Pedersen, Rich Burridge, Eitan Isaacson and Scott Haeger.

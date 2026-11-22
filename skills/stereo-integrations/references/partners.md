@@ -190,7 +190,7 @@ For CUDA it uses the card's UUID from `/proc/driver/nvidia/gpus/SLOT/information
 
 - `tests/speech-to-text.sh SOURCE NEW_BUILD` in the recipe folder builds the library's speech targets with tests and runs them against the stand-in (`autotests/data/vibe-server-standin.py`: Vibe's command line, ready line, route and error shapes; modes `ok`, `clip`, `noload`, `noready`, `silent`, `invalid-audio`, `busy`, `empty`; it records its process number, its arguments, the form and the audio). Rows: the WAV header and bytes, the form, the command line, each failure's sentence, the server gone when the result is given, nothing started without audio or model, the engine offered with `vibe-server` on `PATH` and not without.
 - Red control: with the job's stop removed, five cases fail on "the server is gone when the result is given"; with the loader's check removed, the loader test without `vibe-server` fails.
-- The rig: the packages installed by apt, a private session bus with PipeWire, WirePlumber and pipewire-pulse of the container's own, a virtual microphone (`pactl load-module module-null-sink media.class=Audio/Source/Virtual sink_name=vmic channel_map=mono rate=16000`, `pactl set-default-source vmic`), a spoken clip (`espeak-ng`, then `sox` to 16 kHz mono) played into it with `pw-play --target vmic`, the tool button clicked by a small program built against the installed `libktextaddons-dev`, the text read back from its field. The stand-in in mode `clip` answers the known text only when the received audio's loudness follows the clip's (20 ms envelopes, correlation at least 0.6), so a silent recording answers "UNRECOGNISED AUDIO": that is the control that the microphone carried the clip.
+- The rig: the packages installed by apt, a private session bus with PipeWire, WirePlumber and pipewire-pulse of the container's own, a virtual microphone made of two null devices (`pactl load-module module-null-sink sink_name=vmic channel_map=mono rate=16000`, the sink the clip is played into; `pactl load-module module-null-sink media.class=Audio/Source/Virtual sink_name=mic channel_map=mono rate=16000`, the microphone; `pw-link vmic:monitor_MONO mic:input_MONO`; `pactl set-default-source mic`), a spoken clip (`espeak-ng`, then `sox` to 16 kHz mono) played with `pw-play --target vmic`, the tool button clicked by a small program built against the installed `libktextaddons-dev`, the text read back from its field. The stand-in in mode `clip` answers the known text only when the received audio's loudness follows the clip's (20 ms envelopes, correlation at least 0.6), so a silent recording answers "UNRECOGNISED AUDIO": that is the control that the microphone carried the clip.
 - No model is loaded or run on a shared station; the row with a real model is a kit for a test machine.
 
 ### Traps
@@ -211,6 +211,18 @@ For CUDA it uses the card's UUID from `/proc/driver/nvidia/gpus/SLOT/information
   **Cause:** Vibe's catalogue (`website/public/models.json`) lists `ggml-large-v3-turbo.bin` but not the quantized medium model the Light preset names.
   **Fix:** read both sizes from the publisher's file listing (`https://huggingface.co/api/models/ggerganov/whisper.cpp/tree/main`, metadata only, nothing downloaded).
   **How found:** searching the release source for both file names.
+- **Symptom:** the clip played with `pw-play --target NAME` into a virtual source (`media.class=Audio/Source/Virtual`) never reaches the recording (RMS 0, the stand-in's correlation 0.0).
+  **Cause:** WirePlumber links a player's output only to a sink; the player went to the default null sink (`pw-link -l` shows `pw-play:output_FL |-> auto_null:playback_FL`).
+  **Fix:** play into a null sink and link its monitor port into the virtual source's input port with `pw-link` (the recipe above); measured: RMS 0.075 recorded, correlation 0.978.
+  **How found:** `pw-link -io` and `pw-link -l` in a throwaway session while the clip played.
+- **Symptom:** `dbus-run-session` in the rig container: "Could not get password database information for UID of current process", then "Failed to start message bus".
+  **Cause:** the container runs as an ordinary uid that has no account in the image.
+  **Fix:** mount a small `/etc/passwd` and `/etc/group` naming that uid.
+  **How found:** the session log.
+- **Symptom:** a row run with `LANG`, `LC_ALL` and `LANGUAGE` set to Brazilian Portuguese shows the size with a decimal comma (Qt took the locale) and the sentence still in English, though the `.mo` holds it.
+  **Cause:** gettext translates nothing in a locale that is not generated (glibc falls back to C), whatever `LANGUAGE` says.
+  **Fix:** install `locales` and run `localedef -i pt_BR -f UTF-8 pt_BR.UTF-8` in the rig image.
+  **How found:** `msgunfmt` on the shipped catalogue, then the edition's own rule for translation tests.
 
 ## Which runner a computer gets
 

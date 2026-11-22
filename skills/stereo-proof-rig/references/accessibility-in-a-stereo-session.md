@@ -193,3 +193,17 @@ Retain source hashes, provenance and a declaration trace; the extension alone is
 **Cause:** not fully established. The installed kaccess event definitions lack an Action, and KNotificationManager returns when the configured action is empty; that alone did not explain the whole runtime result.
 **Probe:** a private `Action=Popup` override and configuration reparse still produced no observed modifier popup. Restore the override and record that the candidate failed. Do not call a capture named green a passing row merely because it follows a proposed change.
 **How found:** actual Shift input, page and input evidence, notification trees, captures and the failed configuration probe in both edition and Debian sessions.
+
+### A greeter process is not its accessible password field
+
+**Symptom:** a real lock capture exists, but the tree has no password-text node.
+**Cause:** the dump ran after the greeter process started and before it registered its accessible field.
+**Fix:** wait for the actual password-text role, then dump and capture; never record password contents. Keep a failed early dump distinct from the later ready row.
+**How found:** final row validation found missing nodes despite successful process checks. Lock-only reruns waiting on the role exposed it in the edition's mono and Debian sessions.
+
+### Pillow silently discards the requested stereo mark
+
+**Symptom:** a `.pns` written with `PngInfo.add(b'sTER', b'\x01')` contains no sTER chunk.
+**Cause:** Pillow writes known public chunks and unknown private chunks; sTER is an unknown public chunk.
+**Fix:** follow [Writing the marks](../../stereo-pictures/SKILL.md#writing-the-marks-2026-10-07): insert the one-byte mode with its CRC immediately after IHDR, then parse the actual output and check order, CRCs and mode. Preserve all original PNG chunks when annotating a captured pair. Keep the original bytes/hashes and identify an annotation made after capture; it does not prove that an earlier input decoder read a mark.
+**How found:** the final independent chunk gate caught the omission. The captured image data stayed byte-identical after insertion. The fixture writer now uses the same explicit insertion and immediate read-back instead of trusting Pillow's requested metadata.

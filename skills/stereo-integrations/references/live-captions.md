@@ -118,6 +118,12 @@ a declared stereo video. The white glyph masks were identical after alignment.
 The translucent backgrounds composite different scene pixels; equality of the
 whole RGB rectangle is not the right test. No caption depth was assigned.
 These are ScreenShot2 eye renders, not physical scanout evidence.
+An independent reconstruction later captured the first NVIDIA desktop frame at
+0 pixels, with 3 white-mask differences among 13,694 glyph pixels; its later
+video frame was again -2 pixels with zero differences. The cause of that change
+is unresolved. A fixed -2 regression row correctly reports the difference but
+must not be mistaken for a specified depth. Measure timing as well as position
+before treating one snapshot as the program's permanent placement.
 Each case delivered the fixed settled phrase as AT-SPI `object:announcement`.
 No speech output or recognition model ran.
 

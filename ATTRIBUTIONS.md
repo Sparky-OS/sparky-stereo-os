@@ -8,6 +8,14 @@ Our contribution lies in making stereo 3D and deep colour a property of the open
 Names are given as each project gives them: in its about box, its copyright file or its Debian packaging, and for the people who reviewed our patches, as their public profiles show them.
 Contact details are left out on purpose.
 
+## Screen reader and accessibility effects
+
+Brad Hiebert-Treuer, Sarri Al Nashashibi, Daniel Scharstein.
+
+Joanmarie Diggs, Federico Mena Quintero, Mike Gorse.
+
+Lubos Lunak, Sebastian Sauer, Vlad Zahorodnii, Christian Nitschkowski, Martin Gräßlin, Nicolas Fella, Martin Riethmayer, Tomaz Canabrava.
+
 ## polkit
 
 David Zeuthen.
@@ -1520,3 +1528,22 @@ The edition's partners, the engines its programs' AI features use, build on thes
 - **ktextaddons** ([invent.kde.org/libraries/ktextaddons](https://invent.kde.org/libraries/ktextaddons)): Laurent Montel and Florian Richer; the library through which KMail and the other KDE programs reach the engine.
 - **AMD's ROCm libraries** (ROCm 7.2.1: MIT, BSD 2-clause, NCSA, Apache 2.0 with LLVM exceptions): Advanced Micro Devices, Inc.; carried in `ollama-rocm` with their licence texts.
 - **ThunderAI** ([github.com/micz/ThunderAI](https://github.com/micz/ThunderAI), GPL-3.0): Mic; the mail add-on that reaches the engine from Betterbird, configured by policy and never installed by the edition.
+
+## Dictation with Vibe in KDE's text add-ons (ORDER 72, 2026-11-22)
+
+Dictation in the programs built on KDE's speech-to-text library, with Vibe's engine, builds on these projects, named from their own records. Names only; these projects do not endorse the edition.
+
+- **ktextaddons** ([invent.kde.org/libraries/ktextaddons](https://invent.kde.org/libraries/ktextaddons), GPL-2.0-or-later): Laurent Montel, who finished the speech-to-text manager in September 2026 and exported its settings dialog in October 2026 (both carried from the v2.3.0 tag into the edition's 2.1.2 build, with his name on the patches), and Florian Richer; the library the Vibe engine is a plugin of.
+- **Vibe** ([github.com/thewh1teagle/vibe](https://github.com/thewh1teagle/vibe), MIT): thewh1teagle; its `vibe-server`, run unchanged through its documented local API, is the engine.
+- **whisper.cpp and ggml** ([github.com/ggml-org/whisper.cpp](https://github.com/ggml-org/whisper.cpp), [github.com/ggml-org/ggml](https://github.com/ggml-org/ggml)): Georgi Gerganov and the ggml contributors; the speech inference inside `vibe-server`.
+
+## Stereo icons wherever the desktop draws an icon (queue row 77, milestone 1, 2026-11-22)
+
+Each eye's view of a stereo icon, given by the icon engine while the edition's Qt draws a window once per eye, builds on these projects, named from the headers of the files read. Names only; these projects do not endorse the edition.
+
+- **KIconThemes** ([invent.kde.org/frameworks/kiconthemes](https://invent.kde.org/frameworks/kiconthemes), LGPL-2.0-or-later): Hamish Rodda (`KIconEngine`), Geert Jansen, Antonio Larrosa and Michael Pyne (`KIconLoader`, `KIconTheme`); the edition's stereo folders and per-eye views are patches on their loader.
+- **Kirigami** ([invent.kde.org/frameworks/kirigami](https://invent.kde.org/frameworks/kirigami), LGPL-2.0-or-later): Marco Martin and Aleix Pol Gonzalez (the `Icon` item that draws Plasma's icons), read for the plan.
+- **Plasma's desktop folder view** ([invent.kde.org/plasma/plasma-desktop](https://invent.kde.org/plasma/plasma-desktop)): Eike Hein (`FolderItemDelegate.qml`), read for the plan.
+- **KIO** ([invent.kde.org/frameworks/kio](https://invent.kde.org/frameworks/kio), LGPL-2.0-or-later): Kevin Ottens, Rafael Fernández López, Kai Uwe Broulik and Harald Sitter (the Places view), Fredrik Höglund and Shaun Reich (the file item delegate); the places a person meets first in the file manager and the file dialog.
+- **The KDE platform theme** ([invent.kde.org/plasma/plasma-integration](https://invent.kde.org/plasma/plasma-integration)): Kevin Ottens, Aleix Pol Gonzalez, Lukáš Tinkl and Harald Sitter; it gives every Qt program of a KDE session the KIconThemes engine.
+- **Oxygen Icons** ([invent.kde.org/frameworks/oxygen-icons](https://invent.kde.org/frameworks/oxygen-icons), LGPL-3.0-or-later): David Miller, David Vignoni, Johann Ollivier Lapeyre, Kenneth Wimer, Nuno Pinheiro and Riccardo Iaconelli, named in the Debian package's copyright record; their icons are in the file dialog of the proof.

@@ -1525,6 +1525,6 @@ The edition's partners, the engines its programs' AI features use, build on thes
 
 Dictation in the programs built on KDE's speech-to-text library, with Vibe's engine, builds on these projects, named from their own records. Names only; these projects do not endorse the edition.
 
-- **ktextaddons** ([invent.kde.org/libraries/ktextaddons](https://invent.kde.org/libraries/ktextaddons), GPL-2.0-or-later): Laurent Montel, who finished the speech-to-text manager in September 2026 (carried from the v2.3.0 tag into the edition's 2.1.2 build, with his name on the patch), and Florian Richer; the library the Vibe engine is a plugin of.
+- **ktextaddons** ([invent.kde.org/libraries/ktextaddons](https://invent.kde.org/libraries/ktextaddons), GPL-2.0-or-later): Laurent Montel, who finished the speech-to-text manager in September 2026 and exported its settings dialog in October 2026 (both carried from the v2.3.0 tag into the edition's 2.1.2 build, with his name on the patches), and Florian Richer; the library the Vibe engine is a plugin of.
 - **Vibe** ([github.com/thewh1teagle/vibe](https://github.com/thewh1teagle/vibe), MIT): thewh1teagle; its `vibe-server`, run unchanged through its documented local API, is the engine.
 - **whisper.cpp and ggml** ([github.com/ggml-org/whisper.cpp](https://github.com/ggml-org/whisper.cpp), [github.com/ggml-org/ggml](https://github.com/ggml-org/ggml)): Georgi Gerganov and the ggml contributors; the speech inference inside `vibe-server`.

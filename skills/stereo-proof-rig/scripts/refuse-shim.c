@@ -45,6 +45,26 @@ int stereo_declare_wayland(void *surface, int layout, int content_class, unsigne
     return result;
 }
 
+/* the format only (libstereo-declare 1.1.0 and later), as a program that sets its own content type declares: refused
+ * by the same switches */
+int stereo_declare_wayland_format(void *surface, int layout)
+{
+    static int (*fn)(void *, int);
+    static int calls;
+    if (!fn)
+        fn = real("stereo_declare_wayland_format");
+    const char *file = getenv("STEREO_REFUSE_FILE");
+    int refuse = on("STEREO_REFUSE") || (file && access(file, F_OK) == 0);
+    fprintf(stderr, "stereo-shim: declare format call %d: %s\n", ++calls, refuse ? "refused" : "passed");
+    if (refuse)
+        return -ENOTSUP;
+    if (!fn) {
+        fprintf(stderr, "stereo-shim: the real stereo_declare_wayland_format is not found\n");
+        return -ENOTSUP;
+    }
+    return fn(surface, layout);
+}
+
 int stereo_declare_wayland_init(void *display, void *queue)
 {
     static int (*fn)(void *, void *);

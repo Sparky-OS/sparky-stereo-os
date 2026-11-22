@@ -176,3 +176,13 @@ but must be labelled separately from new installed-program measurements.
   matching, before any model run.
 
 Actual recognition, real-weight sharing and physical output remain bench work.
+
+- **Symptom:** a mapped caption window has no text in a captured desktop frame.
+  **Cause:** mapping is not visible-content readiness; an idle hide/re-show can
+  occur between the window query and capture while the frontend catches up.
+  **Found by:** a failed glyph-witness check and matching hide/re-show protocol
+  logs during an independently reconstructed rig run.
+  **Fix for the measurement fixture:** retain the failing frame, then wait within
+  a fixed 60-second deadline for caption ink in both eyes and measure that exact
+  frame with its contemporaneous window geometry. Keep the disparity and glyph
+  equality checks unchanged. This does not fix or conceal application latency.

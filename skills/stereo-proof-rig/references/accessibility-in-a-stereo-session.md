@@ -2,7 +2,7 @@
 
 ## Establish the inputs first
 
-Source audit dated 2026-11-22: KWin 6.7.4 with the edition's +stereo3d64 patches, plasma-desktop 6.7.4 +stereo3d4, Orca 51.1, at-spi2-core 2.62.1 and speech-dispatcher 0.12.1. These are source findings. The three-session accessibility test, silent speech output and eye measurements have not yet run.
+Source audit dated 2026-11-22: KWin 6.7.4 with the edition's +stereo3d64 patches, plasma-desktop 6.7.4 +stereo3d4, Orca 51.1, at-spi2-core 2.62.1 and speech-dispatcher 0.12.1. The source audit establishes these inputs. A later isolated AMD run verified the speech file sink and measured Zoom and Magnifier; the complete accessibility comparison remains in progress.
 
 1. Follow the [dated snapshot recipe](dated-snapshot-rig.md). Record the published tree, accepted package additions, Debian snapshot, image digest and the candidates of `orca`, `at-spi2-core`, `speech-dispatcher`, `kwin-wayland` and `plasma-desktop`. A candidate is not an installed version or proof that the whole dependency set installs.
 2. Obtain the matching source descriptors and their components. Verify their SHA256 and size fields; unpack with `dpkg-source -x`. Read the applied source, not an older development checkout. Retain the descriptor hashes and patch series with the private test record. Check signatures separately; a matching checksum alone does not authenticate an author.
@@ -30,7 +30,7 @@ Source audit dated 2026-11-22: KWin 6.7.4 with the edition's +stereo3d64 patches
 
 **Symptom:** a supposedly silent configuration names the dummy module.
 **Cause:** speech-dispatcher `src/modules/dummy.c`, `_dummy_child()`, tries `play`, then `aplay`, then `paplay` on `dummy-message.wav`.
-**Fix:** do not use that module as a silence guarantee. Keep audio access outside the container and validate a file-output module before starting Orca. A working file-output recipe is still pending.
+**Fix:** do not use that module as a silence guarantee. Keep audio access outside the container and validate a file-output module before starting Orca. Use the validated generic file-output recipe below.
 **How found:** direct source inspection of the three command strings and their `system()` calls; no audio program was launched in this audit.
 
 ### The wrong source tree answers the question
@@ -65,3 +65,26 @@ At 2x and 4x, capture both eyes as marked stereo files and measure scale, corres
 The X11 legacy focus/caret trackers are guarded by `KWIN_WAYLAND_ZOOM_FORCE_LEGACY_FOCUS_TRACKING` and `KWIN_WAYLAND_ZOOM_FORCE_LEGACY_TEXT_CARET_TRACKING`. Do not enable these overrides and call it a default-session pass. Read the source comments about blocking accessibility calls before considering a diagnostic run.
 
 A virtual ScreenShot2 pair establishes compositor rendering. It does not establish physical display scanout. Retain the session logs, load, configuration, raw captures and measured results with the private test record. This reference will gain runnable speech, tree-dump and zoom-measurement recipes only after those rows have run.
+
+## Validated speech file output
+
+Use one private session bus shared by KWin, kaccess, Plasma, Orca and the test clients. Do not mount sound devices, a host audio socket or a host runtime directory. The following was run with speech-dispatcher 0.12.1.
+
+Configure `speechd.conf` with `AddModule "filelog" "sd_generic" "filelog.conf"`, `DefaultModule "filelog"`, a private Unix socket, `LogLevel 5` and a log directory under the test output. Set `AudioOutputMethod "alsa"` and `AudioALSADevice "null"`: the generic module still initializes its audio backend, even when the synthesis command only writes text. Without this initialization it tried PulseAudio, failed and the server selected another module.
+
+In `modules/filelog.conf`, use a `GenericExecuteSynth` command that passes the module's escaped `$DATA` substitution to a file writer through standard input. The tested command was `printf %s \'$DATA\' | python3 /rig/speech-sink.py`; the Python writer appended JSON containing the received text and a timestamp. Also set `GenericDefaultCharset "utf-8"`, `GenericLanguage "en" "en"`, `AddVoice "en" "MALE1" "filelog"` and `DefaultVoice "filelog"`. These are fixture settings, not desktop defaults.
+
+Start the server once in the private session, with `speech-dispatcher -s -t 0 -C CONFIG_DIRECTORY -P PRIVATE_PID_FILE`. Check an explicit `spd-say -o filelog -w` witness: the test recorded its text in the file sink, `702 END` in the dispatcher log and exit zero. A startup line alone is insufficient. Stop an old server and observe its exit before restarting; an overlapping restart led to an autospawn/socket race during setup.
+
+### kaccess needs the private Xwayland display
+
+**Symptom:** kaccess exits with an xcb display connection error although KWin and Plasma run on Wayland.
+**Cause:** this kaccess version explicitly chooses xcb. The private Wayland socket alone is insufficient.
+**Fix:** start KWin with Xwayland and give kaccess the display of that private Xwayland instance, on the same private session bus. Never inherit a host display.
+**How found:** kaccess startup log, followed by a successful launch with the container's Xwayland display.
+
+### Zoom changes disparity as well as size
+
+An isolated virtual SBS run with the audited KWin measured a flat Qt witness at 1920 pixels per eye. Its circular mark grew from 48 to 96 to 192 pixels in width at 1x, 2x and 4x, equally in both eyes; its disparity grew from 4 to 8 to 16 pixels. This fails the design that plain zoom keeps constant parallax. `ZoomEffect::paintScreen()` scales the already rendered offscreen scene. Treat this as a measured failure, not a supported-mode exception.
+
+The same run measured the Magnifier border at zero disparity at both 2x and 4x. Its area did not come forward as the design requires. At 4x a 200-pixel magnifier clipped the 192-pixel circular mark; do not infer full enlargement from a clipped bounding box. Retain the raw marked pair and the border measurement separately. These measurements establish the audited AMD rendering path only; they do not replace other GPU or control rows.

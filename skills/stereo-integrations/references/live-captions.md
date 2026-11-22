@@ -286,3 +286,17 @@ recipe commit unchanged through the build; the successful build record is
 written only after every gate passes. Package closures and retained proof files
 belong in durable stage and evidence directories, separate from disposable
 archive caches and object trees.
+
+An accepted dependency can be staged outside the publication round. Read that stage's checksum manifest, verify each needed source/binary before and after copying
+to private scratch, and offer the copied binaries as explicit gate siblings.
+They do not become an archive. Replace the older same-name round sibling rather
+than offering two authoritative versions. Supply the accepted previous Partners
+package through the predecessor directory and a coherent previous sibling list;
+the successor still qualifies against the dated public archives.
+
+For the installed packaging proof, install the accepted predecessor first and
+read APT's `Inst` lines for the successor and adapter, and its `Remv` lines for
+removal. Keep synthetic personal configuration/model-file witnesses in the rig
+and compare their hashes after removal. A text witness checks preservation; it
+is never a real speech-model or transcription result. Installed lifecycle proof
+does not replace the separate page-controlled session and both-eye proof.

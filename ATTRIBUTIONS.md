@@ -1520,3 +1520,11 @@ The edition's partners, the engines its programs' AI features use, build on thes
 - **ktextaddons** ([invent.kde.org/libraries/ktextaddons](https://invent.kde.org/libraries/ktextaddons)): Laurent Montel and Florian Richer; the library through which KMail and the other KDE programs reach the engine.
 - **AMD's ROCm libraries** (ROCm 7.2.1: MIT, BSD 2-clause, NCSA, Apache 2.0 with LLVM exceptions): Advanced Micro Devices, Inc.; carried in `ollama-rocm` with their licence texts.
 - **ThunderAI** ([github.com/micz/ThunderAI](https://github.com/micz/ThunderAI), GPL-3.0): Mic; the mail add-on that reaches the engine from Betterbird, configured by policy and never installed by the edition.
+
+## Dictation with Vibe in KDE's text add-ons (ORDER 72, 2026-11-22)
+
+Dictation in the programs built on KDE's speech-to-text library, with Vibe's engine, builds on these projects, named from their own records. Names only; these projects do not endorse the edition.
+
+- **ktextaddons** ([invent.kde.org/libraries/ktextaddons](https://invent.kde.org/libraries/ktextaddons), GPL-2.0-or-later): Laurent Montel, who finished the speech-to-text manager in September 2026 (carried from the v2.3.0 tag into the edition's 2.1.2 build, with his name on the patch), and Florian Richer; the library the Vibe engine is a plugin of.
+- **Vibe** ([github.com/thewh1teagle/vibe](https://github.com/thewh1teagle/vibe), MIT): thewh1teagle; its `vibe-server`, run unchanged through its documented local API, is the engine.
+- **whisper.cpp and ggml** ([github.com/ggml-org/whisper.cpp](https://github.com/ggml-org/whisper.cpp), [github.com/ggml-org/ggml](https://github.com/ggml-org/ggml)): Georgi Gerganov and the ggml contributors; the speech inference inside `vibe-server`.

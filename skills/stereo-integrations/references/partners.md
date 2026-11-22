@@ -166,6 +166,52 @@ For CUDA it uses the card's UUID from `/proc/driver/nvidia/gpus/SLOT/information
 - **The page's lists** take the width of their longest entry (`implicitContentWidthPolicy: ComboBox.WidestText`, capped by the page); a label beside a button is `Layout.fillWidth` with `elide` and a `ToolTip` when `truncated`; a block's name is `Layout.alignment: Qt.AlignTop`.
 - **Languages:** `tests/check-lang.py` runs in the build's test step; sentences waiting for the translations lane are listed in `po/pending-translation.txt` (one `CONTEXT|TEXT` per line) and named in its output, any other gap fails. From 0.1.2 every catalogue is whole (119 sentences each, 1071 values checked) and the list is gone. The page on screen in German and Japanese needs the rig's `de_DE.UTF-8` and `ja_JP.UTF-8` generated and `fonts-noto-cjk` installed, with `LANG`, `LC_ALL` and `LANGUAGE` set together.
 
+## Speech back ends: Vibe in KDE's speech-to-text library (ORDER 72)
+
+**For** whoever gives KDE programs dictation through a local engine: the library's interface, the server's lifetime, the stand-in server, the virtual microphone, and the traps met (written 2026-11-22, ktextaddons 2.1.2-8+stereo3d3, Vibe 3.3.5).
+
+### What the library is, read before building
+
+- KDE's text add-ons have a speech-to-text library, `libkf6textspeechtotext1`: engines are Qt plugins in `kf6/speechtotext/` (`TextSpeechToText::SpeechToTextClient`, `EngineType` `Locale` or `Network`), each making a `SpeechToTextPlugin` that gets the microphone through `audioDevice()` at `sampleRate()` (mono, 16 bits) and answers with `speechToTextDone(text)`; programs use `SpeechToTextAction` or `SpeechToTextToolButtonWidget`, whose `textAvailable(text)` the program inserts where the person types.
+- At 2.1.2 (Debian testing) the library is unfinished: nothing calls `SpeechToTextManager::switchEngine()`, `initializeInput()` (the microphone) has no caller, the Whisper and Google engines print "Not implemented yet", and the action calls into an engine that was never made. Laurent Montel finished the manager upstream in September 2026 (in v2.2.0 and v2.3.0: the engine stored in the program's settings is loaded at the first dictation, the action starts and stops the capture, the engine gives its result at `stop()`).
+- No program in Debian links the library: on the dated snapshot of 2026-11-19, `apt-cache rdepends libkf6textspeechtotext1` names only `libktextaddons-dev`; KMail and kdepim-addons link the text-generation and text-to-speech parts, not this one. So the engine is proved through the library's own tool button, and a program needs one action in its editor to offer dictation.
+
+### The recipe as built
+
+1. Carry upstream's manager (`speech-to-text-manager-v2.3.0.patch`, `Origin: backport`, Laurent Montel as author): the files of v2.3.0 for the manager, the plugin's `stop()`, the engine-name helpers, the action, the tool button and the test program `speechtotextgui`; keep the 2.1.2 entry point `speechToText()` beside `speechToText(QObject *)` so no symbol goes; leave out the Whisper Python installer of later versions.
+2. The engine (`vibe-speech-to-text.patch`): `speechtotext/plugins/vibe/`, a client named `vibe`, `EngineType` `Locale`, metadata `{"X-KTextAddons-RequiredExecutable": "vibe-server"}`; the loader skips a plugin whose required program is not on `PATH`, so without Vibe the engine is not offered and nothing else changes.
+3. The plugin records into a `QBuffer` while the person speaks; at `stop()` a job starts `vibe-server serve MODEL --host 127.0.0.1 --port 0`, reads the ready line `{"status":"ready","port":N,...}` (printed after the model is loaded), posts the recording as a 16 kHz mono 16-bit WAV (`file`, `response_format=json`, `language` or `detect_language=true`) to `/v1/audio/transcriptions`, takes `{"text": ...}`, and stops the server with SIGTERM, then SIGKILL after 5 s, whatever the outcome. `vibe-server` also exits within a second of its parent (`--exit-with-parent`, on by default).
+4. The model: the one the person selected in Vibe (`model.path` in Vibe's data-home `github.com.thewh1teagle.vibe/app_config.json`; Vibe reads its store from the data folder, not the configuration folder), or a file chosen in Partners; the language: Vibe's own `transcription.modelOptions.lang`, else detected (with no language `vibe-server` assumes English). No model selected: nothing starts and nothing is downloaded; the person is told the model Vibe's preset recommends for this computer (Default `ggml-large-v3-turbo.bin`, 1,624,555,275 bytes, with 8 GiB of memory or a device `vibe-server devices` lists; Light `ggml-medium-q8_0.bin`, 823,369,779 bytes, otherwise; the sizes are the publisher's file listing), and to download it in Vibe.
+5. The card: the environment lines `sparky-stereo-partners resolve --kind speech` prints after its `PARTNER_*` lines are the server's environment, so it computes on the card chosen for partners.
+6. The default: with no engine stored in the program (`[SpeechToText] engine` of its own settings), the library asks `sparky-stereo-partners resolve --kind speech --program DESKTOP-ID`; `PARTNER_KIND=vibe` makes `vibe` the engine, interface `none` turns dictation off and says so; nothing is written until the person chooses an engine in the library's settings.
+7. Failures are said: the plugin's `speechToTextFailed(message)`, the manager's `speechToTextFailedFor(requester, message)`, and the action's and tool button's `errorOccurred(message)`; when no program listens to that signal the widget shows the sentence in a message box. One sentence each: the server did not start (with its own last line), the model did not load, the audio was refused (`invalid_audio`), the transcription failed (`busy`, others), no speech heard, nothing recorded, no model selected, the microphone not opened, no engine ready, no partner for speech.
+
+### Proofs
+
+- `tests/speech-to-text.sh SOURCE NEW_BUILD` in the recipe folder builds the library's speech targets with tests and runs them against the stand-in (`autotests/data/vibe-server-standin.py`: Vibe's command line, ready line, route and error shapes; modes `ok`, `clip`, `noload`, `noready`, `silent`, `invalid-audio`, `busy`, `empty`; it records its process number, its arguments, the form and the audio). Rows: the WAV header and bytes, the form, the command line, each failure's sentence, the server gone when the result is given, nothing started without audio or model, the engine offered with `vibe-server` on `PATH` and not without.
+- Red control: with the job's stop removed, five cases fail on "the server is gone when the result is given"; with the loader's check removed, the loader test without `vibe-server` fails.
+- The rig: the packages installed by apt, a private session bus with PipeWire, WirePlumber and pipewire-pulse of the container's own, a virtual microphone (`pactl load-module module-null-sink media.class=Audio/Source/Virtual sink_name=vmic channel_map=mono rate=16000`, `pactl set-default-source vmic`), a spoken clip (`espeak-ng`, then `sox` to 16 kHz mono) played into it with `pw-play --target vmic`, the tool button clicked by a small program built against the installed `libktextaddons-dev`, the text read back from its field. The stand-in in mode `clip` answers the known text only when the received audio's loudness follows the clip's (20 ms envelopes, correlation at least 0.6), so a silent recording answers "UNRECOGNISED AUDIO": that is the control that the microphone carried the clip.
+- No model is loaded or run on a shared station; the row with a real model is a kit for a test machine.
+
+### Traps
+
+- **Symptom:** the speech-to-text action of ktextaddons 2.1.2 does nothing, or a program crashes at the first dictation.
+  **Cause:** the 2.1.2 manager never loads an engine and never opens the microphone; `speechToText()` calls the plugin pointer unchecked.
+  **Fix:** carry upstream's manager of v2.3.0 (step 1).
+  **How found:** reading `speechtotextmanager.cpp` at Debian's version and searching the tree for callers of `switchEngine` and `initializeInput`; the upstream commits on `textspeechtotext` since v2.1.2 (126 of them) through KDE's GitLab API.
+- **Symptom:** a test that checks the server is gone after a transcription still passes with the job's stop removed.
+  **Cause:** `QProcess`'s destructor kills its child when the job object is deleted, so "gone later" is true by another path.
+  **Fix:** check the server's process at the moment the result is emitted (a slot connected to `finished` and `failed`).
+  **How found:** the red control.
+- **Symptom:** a build image made with `apt-get build-dep ktextaddons=2.1.2-8` stops the recipe at once: "dpkg-checkbuilddeps: error: unmet build dependencies: node-acorn nodejs".
+  **Cause:** the Lean-prepared source adds the comment checkers' build dependencies (`gcc`, `node-acorn`, `nodejs`, `perl`, `python3`, `python3-yaml`).
+  **Fix:** install those beside the package's own build dependencies.
+  **How found:** the recipe log.
+- **Symptom:** a size for `ggml-medium-q8_0.bin` cannot be found in Vibe's model catalogue.
+  **Cause:** Vibe's catalogue (`website/public/models.json`) lists `ggml-large-v3-turbo.bin` but not the quantized medium model the Light preset names.
+  **Fix:** read both sizes from the publisher's file listing (`https://huggingface.co/api/models/ggerganov/whisper.cpp/tree/main`, metadata only, nothing downloaded).
+  **How found:** searching the release source for both file names.
+
 ## Which runner a computer gets
 
 The hardware setup answers, as it answers for every per-vendor piece: `sparky-stereo-hardware`'s detection prints a plan line of its own kind, `partner`, naming `ollama-cuda` for the cards the edition's open modules run (Turing and newer, which run CUDA 13).
@@ -189,6 +235,7 @@ AMD has no line yet: the ROCm runner carries gfx1030, gfx1100 to gfx1102, gfx115
 | Program | Kind of work | Reads |
 | --- | --- | --- |
 | KMail, Kontact, Sieve editor (ktextaddons 2.1.2) | text | one shared file for every program built on the library, `autogeneratetextinstances` (cascades from `/etc/xdg`): `[General] currentInstance`, `[Instance #N]` `enabled` (default false), `pluginName`, `uuid`, `Name`, `CurrentModel`, `ServerUrl` (default `http://127.0.0.1:11434`); KMail's three AI editor plugins are `EnabledByDefault: false` |
+| Programs on KDE's speech-to-text library (ktextaddons 2.1.2-8+stereo3d3) | speech | the program's own settings `[SpeechToText] engine`, else `sparky-stereo-partners resolve --kind speech`; the Vibe engine then reads Vibe's `app_config.json` (`model.path`, `transcription.modelOptions.lang`); no program in Debian links the library yet |
 | Vibe 3.2.2 | speech; text | `app_config.json`: `ai.connection.platform`, `ai.connection.model`, `ai.connection.ollamaBaseUrl`, `ai.tasks.{dictation,summary}.enabled` |
 | Kdenlive 26.08.2 | speech to text; masking | `kdenliverc`: `[speech] speechEngine` (default `whisper`), `whisperModel` (default `turbo`), `whisperDevice`, VOSK's paths; `[sam] samModelFile` |
 | Spirula Studio | 3D | its model profiles; the card through `sparky-stereo-gpu-env --app spirula-studio.desktop --3d --print id`, then `--choice ID --print env` |
@@ -265,3 +312,4 @@ AMD has no line yet: the ROCm runner carries gfx1030, gfx1100 to gfx1102, gfx115
 ## Credits
 
 Ollama, by its authors ("Copyright (c) Ollama"); llama.cpp and ggml, by Georgi Gerganov and the ggml authors; AMD's ROCm libraries, by Advanced Micro Devices, Inc.; ktextaddons, by Laurent Montel and Florian Richer; ThunderAI, by Mic.
+The speech-to-text manager carried into the edition's build is Laurent Montel's (ktextaddons v2.3.0); Vibe and its `vibe-server`, by thewh1teagle; whisper.cpp, by Georgi Gerganov and the ggml contributors.

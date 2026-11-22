@@ -188,3 +188,5 @@ Kdenlive's monitors show a 3D clip in 3D by default wherever the compositor take
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.
+
+For camera capture prerequisites, the Camera page store, writer ownership and the measured dependency traps, read [a camera in 3D](references/a-camera-in-3d.md).

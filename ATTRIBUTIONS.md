@@ -1623,3 +1623,7 @@ Ragnar Hojland Espinosa and David Herrmann ([Linux input documentation](https://
 ## Foot locomotion in Linux VR (ORDER 37b)
 
 Collabora, Ltd., Jakob Bornecrantz and the Monado contributors. Sapphire and the xrizer contributors. Valve Corporation. David Fattal and the DisplayXR contributors. JP Technology Initiatives Inc. and the Foottroller team.
+
+## Kamoso camera capture audit
+
+Kamoso: Aleix Pol and Álex Fiestas, as named in the release's [AUTHORS](https://invent.kde.org/multimedia/kamoso/-/blob/v26.04.0/AUTHORS).

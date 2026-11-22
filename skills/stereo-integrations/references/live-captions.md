@@ -179,7 +179,8 @@ Actual recognition, real-weight sharing and physical output remain bench work.
 
 - **Symptom:** a mapped caption window has no text in a captured desktop frame.
   **Cause:** mapping is not visible-content readiness; an idle hide/re-show can
-  occur between the window query and capture while the frontend catches up.
+  occur between the window query and capture. The cause of that hide/re-show
+  during a continuous synthetic feed was not established.
   **Found by:** a failed glyph-witness check and matching hide/re-show protocol
   logs during an independently reconstructed rig run.
   **Fix for the measurement fixture:** retain the failing frame, then wait within

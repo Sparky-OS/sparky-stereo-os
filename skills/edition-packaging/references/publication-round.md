@@ -856,3 +856,14 @@ Keep NVIDIA's compute archive amd64-only as its edition source declares.
 Refresh only the local candidate index, checking the public index hashes before and after.
 **How found:** all eight kept-back names were read before any transaction, and the source architecture selectors explained why the copied i386 Packages files were unused.
 Retain failed setup attempts separately; do not change pins, package archives or the frozen public view to satisfy the solver.
+
+### Frozen source selection must preserve packaged files
+
+**Symptom:** the installed transaction and ordinary verification pass, but deep verification reports `LCCHANGED` for the edition's deb-multimedia source file.
+**Cause:** the proof replaced APT's source selection by deleting every sourceparts file, including a packaged Lean payload; a baseline image captured after that setup inherited the missing file.
+**Fix:** preserve packaged source files and select a private sourceparts directory through an unowned proof APT configuration file.
+Expose the proof's local edition source there and keep the authenticated public view in the generated main source list, with the same archive keys, architecture selectors and pins.
+If a derived baseline already contains the setup mutation, restart from the original published baseline and install its recommended companion packages again before applying the corrected setup.
+Rerun the complete installed transaction and deep verification; never exempt the source path or weaken the verifier.
+**How found:** deep verification named the one extra path, the stopped container had no such file, and the original published image still held it; the setup's unlink loop and derived-image timing explained the difference.
+Keep the failed attempt and compare the public index hashes after the corrected proof as well.

@@ -108,8 +108,71 @@ The fixture uses only private null sink/source nodes, not sound hardware.
 A checker must fail when the microphone target is changed to the system sink;
 this negative control catches a test that merely counts two nodes.
 
-## Scope still to prove
+## Installed frontend measurements
 
-Captiond packages pass their source, payload and link gates and the installed
-stub-engine routing check above. Frontend installed stereo disparity, AT-SPI,
-shared model listing and actual recognition latency remain unproven here.
+On the published edition's Stereo KWin at a 1920-wide virtual output, installed
+Kaption 0.1.0 has layer-shell layer 3 (Overlay) and KWin stacking layer 9.
+AMD/radeonsi and NVIDIA RTX 3060, at 100 and 125 percent scale, gave a
+left-minus-right text disparity of -2 physical pixels over both the desktop and
+a declared stereo video. The white glyph masks were identical after alignment.
+The translucent backgrounds composite different scene pixels; equality of the
+whole RGB rectangle is not the right test. No caption depth was assigned.
+These are ScreenShot2 eye renders, not physical scanout evidence.
+Each case delivered the fixed settled phrase as AT-SPI `object:announcement`.
+No speech output or recognition model ran.
+
+First install leaves the service and socket disabled. Opening Kaption alone
+reports that captiond is not running, matching the README's separate start step.
+Explicitly starting captiond with empty model search directories opens the model
+offer. Neither traced process made an internet syscall before Install.
+
+- **Symptom:** first model offer says 0 KiB free and no model fits, although the
+  filesystem has room. **Cause:** `ModelAdvisor::environment()` calls
+  `QStorageInfo` on a model directory that does not exist yet; `bytesAvailable()`
+  is -1, then clamped to zero. **Found by:** the installed first-start screen and
+  a Qt probe comparing the missing directory, its existing parent and the newly
+  created directory. **Proposed fix, not applied:** query the nearest existing
+  ancestor and distinguish unknown capacity from zero. The downloader already
+  creates the directory before checking its own free space.
+
+## Shared model paths and bench timing
+
+Vibe's native store is `app_config.json` in the application data directory
+`github.com.thewh1teagle.vibe`, with literal keys `models_folder` and `model.path`.
+Point its model folder and captiond's extra search path at one existing directory;
+never move or duplicate the person's files as a discovery step.
+The native Vibe listing and `captionctl list-models` both found one 52-byte path
+witness with one checksum. Vibe correctly rejected it as incomplete or corrupt.
+This proves path discovery only: it is plain text, not a speech model.
+A common Whisper ggml `.bin` is supported by both sources, but usability of the
+same real weights still needs the bench. Vibe's server `/v1/models` lists loaded
+models, so it is unsuitable for a model-free disk-listing proof.
+
+Measure final caption arrival against the known audio's end, separately from
+model-load time. Record every caption, actual accelerator, processor usage and
+host load. A requested GPU that becomes CPU is a failed route, not a timing row.
+Use a fresh daemon for each repeated phrase trial so late text from the previous
+trial cannot satisfy the next one. A private null-sink playback drain measures
+settled-text delay; it is not a physical speaker or display timing measurement.
+A bench installer records the original package set, refuses version changes to
+existing packages, prints every download's source and size, and removes only its
+own additions after checking the removal plan.
+
+## Repeating a model-free rig
+
+Retain the exact installed package versions and the input archives' source,
+size and checksum, alongside the base image identity. Reconstruct offline from
+those archives, rather than depending on a mutable image tag or current archive
+candidate. Download preparation is a separate step. Missing bytes or changed
+checksums must fail the rerun. A rerun writes its logs and container ledger in a
+new output directory, prints expected/found rows, and removes its exact temporary
+containers and image even after a failed row. Rechecking saved captures is useful
+but must be labelled separately from new installed-program measurements.
+
+- **Symptom:** repeated known phrases appear to have very low delay after an
+  earlier slow trial. **Cause:** a late settled caption can match the next copy
+  of the same phrase. **Prevention:** use a fresh daemon per trial, with its own
+  event log and load interval. **Found by:** review of the bench helper's event
+  matching, before any model run.
+
+Actual recognition, real-weight sharing and physical output remain bench work.

@@ -875,3 +875,7 @@ If the official fresh-install check finds a new Frameworks dependency floor, aut
 The [later-migration procedure](frameworks-transition.md#a-later-migration-before-publication) covers disabled Debian patches, installed public-API controls and catalogue source mapping.
 After the successor pool is complete, rerun fresh installation and the installed upgrade against both the frozen view and live Debian, recording the live minute and all retained signed indexes.
 A library loaded throughout the desktop still needs the real-machine program-start bench before acceptance.
+
+During that measurement, compare failing test packages and Multi-Arch pairs with Debian's own packages in the identical signed view before choosing a rebuild.
+The [archive-failure controls](frameworks-transition.md#separate-archive-failures-from-a-forks-regression) distinguish an inherited dependency conflict, task reachability and a base-library fix's actual retirement condition.
+Keep every finding in the inventory; report-mode exit zero is completion, not qualification.

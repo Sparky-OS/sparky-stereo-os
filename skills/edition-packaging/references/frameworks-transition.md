@@ -200,3 +200,27 @@ When the full upstream suite expects success for a deliberately retained source 
 Adapt that result assertion to the exact directory-removal error while retaining all destination-flush, edited-source, warning and undo-record assertions.
 Run the copy tests on separate mounted filesystems and with their xattr helper installed; a same-filesystem rename can skip the relevant rows, and an absent helper can masquerade as a lost extended attribute.
 Keep initial failures and the final complete results separately.
+
+## Separate archive failures from a fork's regression
+
+A complete installability report includes test packages and Multi-Arch pairs that ordinary tasks never request.
+Keep those rows visible while deciding which source actually needs a successor.
+
+- **Symptom:** the edition's two Mesa OpenCL architectures cannot install together, although each installs alone.
+  **Cause:** the frozen Debian dependency set may itself prohibit the pair, for example a non-co-installable `libclang-cpp21`.
+  **Check:** create an empty-status APT state with only the same authenticated Debian snapshot and its own policy, then solve Debian's two exact package versions together and each separately.
+  Keep the complete solver explanation and dependency control fields.
+  If Debian's pair also fails, do not change Mesa merely to conceal that archive condition; separately prove that the edition's task transaction does not request the incompatible pair.
+  A reverse graph including every virtual provider is only an over-approximation, not the installed selection.
+- **Symptom:** a foreign-architecture GLib test package fails on Python D-Bus tooling.
+  **Cause:** its architecture-specific Python dependency can conflict with the native dependency of an Architecture: all test helper.
+  **Check:** solve Debian's own test package in the same empty-status state, then inspect reverse Depends, Pre-Depends and Recommends, including virtual Provides, to establish whether any edition task reaches it.
+  A debug companion depending on its test binary is not evidence that a task installs it.
+  Retain the row and its cause; do not remove the runtime library's required fix because an unused test package fails.
+- **Symptom:** a carried base-library fix has a retirement condition, but a newer archive timestamp alone appears to trigger it.
+  **Cause:** archive movement does not imply that this source changed.
+  **Check:** retrieve the source through authenticated APT, compare its descriptor hash with the original recipe's pinned input, read its patch series and the affected function.
+  Retire only when that source actually includes the fix, and measure every resulting package replacement and removal.
+
+These causes were distinguished by Debian-only solver controls, authenticated source equality and reverse dependency inspection, not by exemptions in the link gate.
+A report-mode exit zero means the inventory completed; it does not mean every package can be installed.

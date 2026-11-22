@@ -10,6 +10,8 @@ Contact details are left out on purpose.
 
 ## Screen reader and accessibility effects
 
+Brad Hiebert-Treuer, Sarri Al Nashashibi, Daniel Scharstein.
+
 Joanmarie Diggs, Federico Mena Quintero, Mike Gorse.
 
 Lubos Lunak, Sebastian Sauer, Vlad Zahorodnii, Christian Nitschkowski, Martin Gräßlin, Nicolas Fella, Martin Riethmayer, Tomaz Canabrava.

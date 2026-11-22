@@ -195,3 +195,8 @@ Use the same cases against Debian's unpatched version as negative controls.
 A directory-removal fixture must reach the failed removal: put its source and destination on different mounted filesystems, otherwise an earlier denied rename tests a different path.
 Record the actual copied payload and remaining empty directory, not only an error status.
 The staged catalogue check also needs a source-map entry for each newly carried catalogue patch; an unknown patch is an error, never a coverage pass.
+
+When the full upstream suite expects success for a deliberately retained source directory, the carried directory-error policy still requires an error.
+Adapt that result assertion to the exact directory-removal error while retaining all destination-flush, edited-source, warning and undo-record assertions.
+Run the copy tests on separate mounted filesystems and with their xattr helper installed; a same-filesystem rename can skip the relevant rows, and an absent helper can masquerade as a lost extended attribute.
+Keep initial failures and the final complete results separately.

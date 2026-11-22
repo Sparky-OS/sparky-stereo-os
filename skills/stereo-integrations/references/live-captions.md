@@ -353,3 +353,72 @@ Keep the caption's expected disparity at zero. List nonzero caption rows apart
 as waiting for the compositor correction, preserving their measured disparity
 and aligned glyph error. Readiness checks for KWin wait for its bus ownership
 and actual reply within a declared deadline; do not rely on a five-second sleep.
+
+## Bench kit and the complete rerun
+
+Keep real recognition behind an explicit bench-machine guard and a separate
+model-download choice. Exercise the same integration worker in a model-free
+container with two declared substitutions: the daemon/model catalogue, and the
+file recognizer's HTTP boundary. Require the known clip's complete words in
+both the daemon's settled caption and Kaption's AT-SPI announcement. A nonempty
+caption or HTTP 200 is not a speech result. Save negative controls for unrelated
+words, an incomplete sentence, and an empty transcription response.
+
+Use a temporary bench account, its own user manager, virtual compositor and
+private PipeWire. Disable physical ALSA and Bluetooth monitors in that account;
+do not capture the person's default microphone, which can change when a USB
+microphone is plugged in. Select each card through Partners using Graphics'
+stable inventory, not a ggml ordinal. Refuse an ambiguous route. Turn the actual
+integration on and off and retain its generated configuration and actual route.
+
+- **Symptom:** a player stream exists and a synthetic caption appears, but the
+  known WAV never drains. **Cause found in the private rig:** the graph had not
+  connected the player/monitor path; stream presence did not establish audio
+  progress. **Fix for the measuring fixture:** wait for the named ports and link
+  the private mono player to both null-sink playback ports and that sink's monitor
+  to the private caption input, as captiond's own testing helper does. Keep the
+  graph before and after, require player exit zero, and keep the original trial
+  deadline. This is no claim about a physical speaker route.
+- **Symptom:** a shell kit exits while reading temperature on an older machine.
+  **Cause:** it assumes thermal_zone files exist. **Fix:** read the `k10temp`
+  hwmon device's `temp1_input`, tolerate a failed read and record its reason.
+  Retain the bench's thermal stop bound. The station mechanics test uses a
+  synthetic hwmon tree; applying the laptop's bound to the station's sensor is
+  a fixture error, not a reason to raise that bound.
+- **Symptom:** package cleanup could purge an existing package after refusing an
+  upgrade. **Cause:** the planned additions were saved before checking for
+  existing package states. **Fix:** validate the complete Inst/Remv plan first,
+  then remember only new additions; check purge's plan against that set and
+  restore automatic/manual marks. Test an existing installed and config-only
+  state as negative controls. Never use an unrestricted autoremove.
+
+Measure settled-caption and accessible-announcement arrival against monotonic
+playback drain, with CPU ticks, load and sampling interval recorded. Report what
+that metric is: delay after this known clip's end, excluding model load; not
+per-word alignment or physical acoustic latency. Performance is information;
+missing known words or a failed requested route is a failed correctness row.
+
+For Vibe 3.3.5, `vibe-server serve --host 127.0.0.1 --port 0` prints its allocated
+port when ready. Load the same absolute file via `POST /v1/models/load` with
+`path`, `gpu_device` and `no_gpu`; `GET /v1/models` lists the loaded basename.
+Transcription uses `POST /v1/audio/transcriptions` and multipart `file`, not a
+JSON pathname. Check the returned words and retain the selected path, native
+listing and model hash/inode before and after. Unload and stop the private server.
+These shapes come from the release's server/routes source; the stand-in must
+reject a wrong request shape rather than manufacture a successful answer.
+
+A whole rerun accepts a new output folder and explicit local input configuration.
+Verify immutable image IDs and stage hashes, run the unchanged package gates,
+install the staged packages fresh, exercise apt Inst/Remv and preservation,
+native capture separation, both cards/scales, and the bench worker's synthetic
+mechanics. Put every log, ledger and generated helper under that output. Check
+the actual container exit, not just `docker start -a`. Remove exact temporary
+container/image names in cleanup, including a failed run.
+
+Print known compositor-depth waits separately from ordinary rows. Zero remains
+the expectation. A known -2-pixel scope/depth fault with identical glyphs and
+layer 9 may wait for the separately assigned correction; a glyph mismatch,
+different layer or unexplained disparity is a new failure and exits nonzero.
+Do not turn every nonzero disparity into an exception. A complete run's table
+and exit are part of the hand-back; real-model bench measurements remain clearly
+unrun until the person runs that kit.

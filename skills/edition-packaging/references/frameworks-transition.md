@@ -187,3 +187,11 @@ Read the published series and the new Debian changelog together.
 In KIO 6.32, Debian disabled its directory-removal error patch while upstream moved directory deletion after a destination flush.
 Preserving that patch requires reporting the saved error at the new completion point, while retaining the flush and source-retention ordering.
 Keep the initial rejected hunk, the upstream commits, the rebase and its tests together; source application alone does not prove behavior.
+
+**Installed proof:** private test symbols enabled only by `BUILD_TESTING` are absent from a normal package build.
+Run the private source suite as a source test, and separately compile the existing public assertions against installed imported targets with no build-directory library search path.
+KIO's partial-download cases can use public `PreviewJob`, keeping their sidecar, retry, pixel and cache-metadata assertions; its launcher cases link the installed KIO libraries directly.
+Use the same cases against Debian's unpatched version as negative controls.
+A directory-removal fixture must reach the failed removal: put its source and destination on different mounted filesystems, otherwise an earlier denied rename tests a different path.
+Record the actual copied payload and remaining empty directory, not only an error status.
+The staged catalogue check also needs a source-map entry for each newly carried catalogue patch; an unknown patch is an error, never a coverage pass.

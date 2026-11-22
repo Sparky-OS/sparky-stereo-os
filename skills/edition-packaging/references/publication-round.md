@@ -867,3 +867,11 @@ If a derived baseline already contains the setup mutation, restart from the orig
 Rerun the complete installed transaction and deep verification; never exempt the source path or weaken the verifier.
 **How found:** deep verification named the one extra path, the stopped container had no such file, and the original published image still held it; the setup's unlink loop and derived-image timing explained the difference.
 Keep the failed attempt and compare the public index hashes after the corrected proof as well.
+
+### A migration between preparation and publication
+
+A successful frozen-view qualification is not evidence for a later live archive.
+If the official fresh-install check finds a new Frameworks dependency floor, authenticate a new snapshot matching the live InRelease, measure every fork counterpart and every candidate's installability, and prepare the necessary successors with all edition patches.
+The [later-migration procedure](frameworks-transition.md#a-later-migration-before-publication) covers disabled Debian patches, installed public-API controls and catalogue source mapping.
+After the successor pool is complete, rerun fresh installation and the installed upgrade against both the frozen view and live Debian, recording the live minute and all retained signed indexes.
+A library loaded throughout the desktop still needs the real-machine program-start bench before acceptance.

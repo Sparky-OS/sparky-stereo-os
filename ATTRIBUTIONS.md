@@ -1627,3 +1627,6 @@ Collabora, Ltd., Jakob Bornecrantz and the Monado contributors. Sapphire and the
 ## Kamoso camera capture audit
 
 Kamoso: Aleix Pol and Álex Fiestas, as named in the release's [AUTHORS](https://invent.kde.org/multimedia/kamoso/-/blob/v26.04.0/AUTHORS).
+
+GStreamer element records used by the camera audit (`gst-inspect-1.0`, 1.28.9): Edgard Lima and Stefan Kost (V4L2), Wim Taymans (PipeWire), Josef Zlomek and Mark Nauwelaerts (x264), Thiago Sousa Santos (MP4), He Junyan (VA-API), and Seungha Yang (NVENC).
+The Matroska element's author record names the GStreamer maintainers collectively.

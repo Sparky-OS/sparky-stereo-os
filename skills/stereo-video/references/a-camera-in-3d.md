@@ -2,8 +2,8 @@
 
 **For contributors adding stereo capture to Kamoso: verify the installed camera policy, media path and isolated desktop before changing the viewfinder.**
 Checked on 2026-11-22 against Kamoso 26.04.0 and the edition's first default-camera patch.
-This is a source audit and a measured dependency preflight, not a completed stereo camera implementation.
-No capture, encoder, PipeWire layout round trip or compositor pixel comparison was completed in this audit.
+The installed stereo-layer 1.23.2 now supports the shared input list and native-size viewfinder prototype.
+The prototype has an AMD Stereo KWin capture and native conversion tests; this does not establish completed camera recording or publication.
 
 ## Preparation that was run
 
@@ -29,7 +29,8 @@ Read the same identity; a PipeWire numeric node ID is not that persistent key.
 The Camera page's own [reference](../../kde-desktop-defaults/references/camera-page.md) describes the separate session default and its preview.
 
 Do not copy the Camera page's `packings.cpp` list into another application.
-The audited version holds a literal list and omits temporal packings.
+The audited Camera 0.1.1 holds 22 literal entries and omits temporal packings.
+The repair enumerates all 27 entries from the installed 1.23.2 policy and tests count, IDs and ordering against that library.
 The current shared policy exposes `stereo_policy_input_format_count()` and `stereo_policy_input_format_at()` in `stereo-policy.h`.
 Verify that the selected development package actually exports those APIs before depending on them.
 A newer checkout's header is not evidence that the published library provides it.
@@ -54,7 +55,11 @@ Kamoso's capture implementation is `src/video/webcamcontrol.cpp`, not `src/webca
 Search upstream history on the real path: a query on a nonexistent path returns an empty result too.
 The inspected release uses GStreamer; an FFmpeg encoder fix does not establish that a GStreamer VA-API or NVENC element writes the same mark.
 The [GPU encoder reference](gpu-encoder-marks.md) gives the FFmpeg boundary and its proven scope.
-No GStreamer caps-loss location was measured in this audit.
+On the installed GStreamer 1.28.9 elements, x264 passed the caps through H.264 parsing to Matroska and wrote frame-packing SEI type 3, interpretation 1; Matroska contained StereoMode 1.
+With the same declared input, the VA-API and NVENC H.264 elements produced Matroska StereoMode 1 but no frame-packing SEI.
+The MP4 muxer produced no `st3d` box with any of the three encoders.
+These are element measurements, not a successful recording implementation.
+Preserve the failing rows and implement the missing mark at the owning encoder or muxer boundary; never repair the completed camera film.
 
 ## Photo and video writer ownership
 
@@ -68,7 +73,30 @@ RFC 9559 section 18.10 also defines stereoscopic display dimensions.
 Marks must be written by the encoder and muxer during recording; correcting the completed movie does not prove capture preserves its layout.
 Parser and independent-reader evidence for these camera paths remains outstanding.
 
-## Proof to prepare after dependencies resolve
+## A native-size viewfinder
+
+1. Use the Camera page's V4L2 identity and packing key.
+   PipeWire may expose the path as `object.path=v4l2:/dev/videoN` rather than `api.v4l2.path`; handle the same two properties the Camera page reads.
+2. Feed GStreamer's appsink into the shared `Stereo::Picture` conversion, then a `QVideoSink`.
+   Mark its canonical frame side by side and select Qt VideoOutput's explicit full-side-by-side interpretation.
+   The word full describes the layout: a half-width source eye stays half width.
+3. Let the edition's Qt VideoOutput own the declared child surface and the hole in its ordinary parent.
+   Use the shared `Enable3DAction`; retain the original sink for 3D off.
+   Keep the window alpha-capable so enabling the child later can open the hole.
+4. A temporal source needs an ordinal from the source, not a counter of received frames.
+   Accept an even first frame followed immediately by its odd partner; a gap or discontinuity invalidates a pending pair.
+   Refuse an unknown ordinal instead of reversing the eyes after a dropped frame.
+   The Camera page must still list temporal choices even if its own preview cannot preserve that ordinal; keep its preview refusal visible.
+5. Stop and recreate the camera wrapper when switching sink types, and remove the old bus watch through `gst_bus_remove_watch`.
+   A watch created by the render thread can belong to another GLib context, so `g_source_remove(id)` on the GUI thread is not reliable.
+
+The measured native test sends nonuniform pixel patterns through appsrc and appsink for both eye orders, side-by-side and top/bottom, two native eye widths, and caps-declared inputs.
+It compares every resulting pixel and the exact output size.
+A separate temporal test covers starting halfway through a pair, gaps, discontinuities, missing ordinals and reversed input order.
+The initial compositor capture recorded one child declaration and 18 identical 1280-by-480 buffers, with 640-by-480 eyes.
+The complete packing, GPU, recording and publication matrix remains to be run.
+
+## Proof still required
 
 Use an isolated PipeWire instance and a synthetic camera, with different colors and address patterns in the two eyes.
 Enumerate inputs from the installed layer's complete list and test both eye orders.
@@ -85,10 +113,10 @@ The v4l2loopback bridge needs a separate virtual-machine test; it is not a reaso
   **Fix:** include the accepted round's indexed pool at the edition's priority alongside the published archive.
   **How found:** `apt-cache policy` plus `apt-get -s --no-install-recommends install kwin-wayland` exposes the direct chain through `kwin-common`; recommendations are not the cause.
   The corrected preflight selected IconThemes `6.32.0-1+stereo3d1+lc1` and KWin `4:6.7.4-2+stereo3d64+lc1`; both the minimal KWin and complete camera-rig dependency simulations returned zero.
-  These are dependency simulations, not an installed session or a stereo capture pass.
+  A subsequent real install and upgrade completed with no packages left to upgrade; the stereo capture still has its own separate checks.
 - **Symptom:** the corrected rig resolves, but the required shared camera-packing enumeration still cannot be used.
   **Cause:** the accepted pool has no stereo-layer entries and APT selects the older published layer without those APIs.
-  **Required fix:** supply the accepted indexed layer dependency closure before implementing against it; keep the published dependency as an explicit failed prerequisite rather than substituting a work-tree library.
+  **Fix:** install the checksum-pinned 1.23.2 siblings before build dependencies and pass the same siblings to the link gate, at a priority above the published archive; do not substitute a work-tree library.
   **How found:** both pool indexes match their Release hashes, their layer entry counts are zero, and the selected package's header and dynamic-export audits agree that the functions are absent.
 - **Symptom:** apt stops at `libavcodec63` requiring a newer `libaom3`.
   **Cause:** the test environment omitted deb-multimedia.
@@ -98,3 +126,11 @@ The v4l2loopback bridge needs a separate virtual-machine test; it is not a reaso
   **Cause:** the queried capture path omitted its `video` directory.
   **Fix:** read the release archive's file list and query the actual path.
   **How found:** `tar tf` identifies `src/video/webcamcontrol.cpp`; an empty query is not evidence that the file exists or is unchanged.
+- **Symptom:** the original viewfinder fails at `gst_bin_add_many`, because `glupload` is null.
+  **Cause:** a no-recommends rig omitted `gstreamer1.0-gl`; the published camera fails there too.
+  **Fix:** include the GL plugin package and require a functioning published video control before comparing pixels.
+  **How found:** actual 3D-off switching and the published camera log, not the stereo viewfinder's successful capture.
+- **Symptom:** a synthetic encoder probe cannot link `videotestsrc` with side-by-side caps.
+  **Cause:** that source advertises mono; declaring its output in the source caps filter is refused before encoding starts.
+  **Fix:** generate the intended packed test frame, then set its multiview caps at the interpretation boundary with `capssetter` or appsrc.
+  **How found:** the failed link occurred before the encoder; the corrected probes completed and exposed distinct SEI and container outcomes.

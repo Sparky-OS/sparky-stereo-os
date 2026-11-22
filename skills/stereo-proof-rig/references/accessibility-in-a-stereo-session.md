@@ -45,16 +45,16 @@ Source audit dated 2026-11-22: KWin 6.7.4 with the edition's +stereo3d64 patches
 **Symptom:** the UI can find Orca, but the launch path contains another prerequisite.
 **Cause:** `setScreenReaderEnabled()` starts Orca only after `gsettings` succeeds. The UI's `orca --version` probe does not test that operation.
 **Fix:** verify the schema and capture the `gsettings` exit and resulting Orca process during the switch test. Do not replace the page test with a manual Orca launch.
-**How found:** reading the UI probe and the conditional launch in the same plasma-desktop source. No switch failure has yet been reproduced.
+**How found:** reading the UI probe and the conditional launch in the same plasma-desktop source. The first minimal runtime image lacked the executable; adding libglib2.0-bin and gsettings-desktop-schemas to the isolated image allowed the page startup row to complete. This was a rig dependency failure, not proof of a shipped desktop failure.
 
 ### A quick fake key does not prove slow-key acceptance
 
 **Symptom:** a press immediately followed by a release produces no character with slow keys enabled.
 **Cause:** `SlowKeysFilter::keyboardKey()` consumes the first press; acceptance is evaluated on a later press or repeat after the configured interval.
 **Fix:** use the [input-delivery recipe](input-delivery.md), preserve the connection, observe hold/repeat events and verify the focused client's received text. Include a deliberately rejected short press. Do not make compositor speed the acceptance gate.
-**How found:** the first-event map and time comparison in `slowkeys.cpp`; the acceptance test remains to be run.
+**How found:** the first-event map and time comparison in `slowkeys.cpp`; subsequent real key injection rejected the short B and accepted the held A.
 
-## Runtime evidence still required
+## Evidence required for each run
 
 Run the same fixtures in stereo, with stereo off, and with Debian's KWin from the same snapshot. Dump AT-SPI roles, names, states and relations for the panel, launcher, Dolphin, System Settings, notifications and the lock password field; omit secrets. Keep the raw trees as well as any normalized comparison. Record each normalization and preserve differences in roles, names and accessible state. The `SHOWING` state matters when locating visible Qt controls.
 
@@ -171,3 +171,25 @@ Pack its decoded left and right pictures without resizing; put `(-eye_width) % 8
 Read the packed result back and compare each extracted eye byte for byte with its decoded source.
 This is the PNG extension's packing padding, not a change in either eye's geometry.
 Retain source hashes, provenance and a declaration trace; the extension alone is not proof that the viewer created a stereo area.
+
+
+### A source-eye capture is not the flat output
+
+**Symptom:** a screen capture is twice the output width even after the virtual output is switched to 2D.
+**Cause:** Stereo KWin's `CaptureActiveScreen` can preserve a declared window's source eyes; its metadata says `stereo: true` but `stereoOutput: false`.
+**Fix:** for a single-output 2D control, use `CaptureWorkspace`, whose stereo selection follows whether an output has stereo eyes. Retain the method and metadata. If a mono frame is duplicated into a marked pair for viewing, explicitly label that duplication; it is not two independently rendered eyes.
+**How found:** the paired source-view capture conflicted with the output mode, followed by inspection of `screenshotdbusinterface2.cpp` and a rerun through workspace capture.
+
+### Stock Gwenview rejects the marked picture
+
+**Symptom:** Debian's Gwenview reports that it cannot display `image/x-pns` instead of loading the identity fixture.
+**Cause:** the control lacks the edition's PNS reader integration.
+**Fix:** retain that refusal as its own row. A byte-identical `.png` copy can exercise the control's ordinary 2D viewer, provided the change is explicit and it is not called a PNS or stereo-declaration pass.
+**How found:** the error's accessible text and capture; the PNG copy loaded while preserving the file's bytes.
+
+### A plausible notification setting is not a verified fix
+
+**Symptom:** the modifier-notification option is enabled and sticky input works, but no modifier popup appears.
+**Cause:** not fully established. The installed kaccess event definitions lack an Action, and KNotificationManager returns when the configured action is empty; that alone did not explain the whole runtime result.
+**Probe:** a private `Action=Popup` override and configuration reparse still produced no observed modifier popup. Restore the override and record that the candidate failed. Do not call a capture named green a passing row merely because it follows a proposed change.
+**How found:** actual Shift input, page and input evidence, notification trees, captures and the failed configuration probe in both edition and Debian sessions.

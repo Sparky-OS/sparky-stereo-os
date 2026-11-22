@@ -53,6 +53,31 @@ sparky-stereo-boot 0.1.13 carries the same form for initramfs-tools' `update-ini
 Machines that already lost a conffile this way are not repaired by this form: dpkg-stereo 0.1.44 does it, for any package's diversion, by reinstalling the owning package after the dpkg run (lean-code, [a file under a dpkg diversion](../../lean-code/references/diverted-files.md)).
 An owning package's copy that sat at the diverted name when dpkg-stereo 0.1.41 or 0.1.42 lost its record (bash's skel `.bashrc` under the published console) gets the record back from dpkg-stereo 0.1.45, which judges a conffile where dpkg keeps it and again whenever dpkg's diversions change, so the copy keeps it when a successor gives the path back; one a person edited there is left as it is and named by `dpkg-stereo --verify` with its diverted name, where `dpkg --verify` gives no line.
 
+## Our own file at a name we divert: made and kept by the maintainer scripts, never a conffile
+
+Measured on 2026-11-22 (row 813) with dpkg 1.23.11+stereo3d3, fixture packages built from sparky-stereo-console's own maintainer-script templates (`tests/diverted-forms.sh` in its recipe), an owner with a conffile and a diverting package in two forms, each case in a fresh container, every apt run with no `--force-conf*` and stdin from `/dev/null`:
+
+| Our file at the diverted name | The owning package installed first, then ours (the usual case: base-files is always there) | The owning package and ours in one run (apt, one dpkg call either order, two calls) | Upgrade from the plain file | Removal | Purge after removal |
+|---|---|---|---|---|---|
+| a conffile (C) | **asked**: our conffile takes the owning package's hash, our file is not installed, `end of file on <standard input> at conffile prompt`, rc 100 | installed | **asked**, as in the first column | **fails**: `dpkg-divert: error: rename involves overwriting '/etc/X' with different file '/etc/X.debian', not allowed`, package left half-installed | **the owning package's conffile is deleted** (`dpkg --verify`: `missing c /etc/X`) |
+| made and kept by the postinst (S) | installed, the owning package's hash kept | installed, the owning package's hash kept, all four orders | untouched: the new default; changed: kept, the new default beside it, said once; nothing asked | the owning package's file back at its name; a changed file kept in `/var/backups/PACKAGE/PATH` and said | clean |
+
+Why, in dpkg's own source (1.23.11):
+- `src/main/unpack.c`, where a new conffile gets its old hash: "If several packages are listed as owning the file we pick one at random". The owning package lists the path too, so our new conffile can take the owning package's hash; at configure our file is absent (the preinst renamed the owning package's away) and `src/main/configure.c` then sees a file "Deleted locally since installation" and asks.
+- `src/main/remove.c`: "Non-shared conffiles are kept" at `remove`, so our conffile stays at the path and `dpkg-divert --remove --rename` refuses to rename the owning package's copy over it (`src/divert/main.c`, `check_rename`).
+- `src/main/remove.c`, purge: a conffile is dropped from the purge list only while another package's diversion covers it; `conffderef` follows the conffile's own name with no diversion lookup, so once our postrm has removed our diversion, purge unlinks the owning package's file.
+
+So our file at a name we divert is not shipped in the package's data (Debian Policy 10.7.3 names this way: maintainer scripts that "create, update and maintain the file" and "must not overwrite the user's version").
+As built in sparky-stereo-console 20261122:
+- the defaults ship under `/usr/share/PACKAGE/defaults/PATH`;
+- the postinst writes a default where nothing is, and records what it wrote (`/var/lib/PACKAGE/written`: path, md5, mode, the default last said);
+- an untouched file (same md5 and mode as recorded) follows the new default silently;
+- a file the person changed, replaced or removed stays as they made it; the new default goes beside it as `PATH.dpkg-dist` (mode 644, so `run-parts` skips one in `/etc/update-motd.d`) and is said once per new default, in ten languages, on the terminal and in the journal;
+- the postrm, at removal, deletes an untouched file and keeps a changed one in `/var/backups/PACKAGE/PATH` (said), before it removes the diversion with `--rename`, so the owning package's file comes back; purge removes `/var/lib/PACKAGE`.
+- The safe form F2 above stays in the preinst for the owning package's pending `.dpkg-new`.
+
+**Open (row 813):** a file only the maintainer scripts keep is in no package's file list, so neither `dpkg --verify` nor `dpkg-stereo --verify` (0.1.45) names a person's change to it; the fixture's edit of `/etc/c11.conf` was kept and said, and named by nothing.
+
 ## Removing a diversion in a successor, keeping the person's edit
 
 Measured on 2026-11-21 with fixture packages (a conffile owner; a diverting package whose 1.0 puts a link or a plain file at the path and diverts the owning package's copy with `--rename`; a 2.0 that ships nothing there):
@@ -105,3 +130,8 @@ Keep the copy outside a folder something copies whole: sparky-stereo-console kee
 - **Symptom:** after the upgrade that drops a diversion, the owning package's conffile is missing (`dpkg -S` names the owning package, `--verify` says MISSING), with no error from dpkg.
   **Cause:** the successor removed the diversion in its preinst; at the unpack dpkg removed the path as a file the old version shipped and the new one does not, and that was now the owning package's file.
   **Fix:** remove the diversion in the postinst. **How found:** fixture packages, both shapes (a link, a plain file), with and without a person's edit, both places (the table above).
+- **Symptom:** installing our package on a system where the owning package is already installed stops with `Configuration file '/etc/X' ==> Deleted locally since installation.` and `end of file on <standard input> at conffile prompt` (rc 100, our package left unpacked), though nobody touched anything.
+  **Cause:** our package lists `/etc/X`, a name it diverts, in `DEBIAN/conffiles`; dpkg gave our new conffile the owning package's hash (unpack.c: "we pick one at random"). **Fix:** never list a diverted name as our conffile; make and keep the file in the maintainer scripts (the section above). **How found:** the fixture order "the owning package first", `dpkg-query -W -f '${Conffiles}'` of our package showing the owning package's md5 for `/etc/X`.
+- **Symptom:** a fixture case fails in a way the case alone cannot explain (the owning package's conffile with our hash, a question at the owning package's configure).
+  **Cause:** an earlier case in the same container left a package in `config-files` state that still lists the shared path as its conffile, and the next install inherited that hash (the same "at random" choice). **Fix:** one fresh container per case. **How found:** the same case passed alone.
+- **Symptom:** `apt-get update` with a flat `file:` source says `Symlinking file  to /var/lib/apt/lists/partial/..._Packages.zst failed` and the packages are not found. **Fix:** give apt the `.deb` files by path (`apt-get install ./a.deb ./b.deb`); apt still orders and splits the dpkg calls itself.

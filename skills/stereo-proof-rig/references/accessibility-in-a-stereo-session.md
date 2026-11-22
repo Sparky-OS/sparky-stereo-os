@@ -88,3 +88,24 @@ Start the server once in the private session, with `speech-dispatcher -s -t 0 -C
 An isolated virtual SBS run with the audited KWin measured a flat Qt witness at 1920 pixels per eye. Its circular mark grew from 48 to 96 to 192 pixels in width at 1x, 2x and 4x, equally in both eyes; its disparity grew from 4 to 8 to 16 pixels. This fails the design that plain zoom keeps constant parallax. `ZoomEffect::paintScreen()` scales the already rendered offscreen scene. Treat this as a measured failure, not a supported-mode exception.
 
 The same run measured the Magnifier border at zero disparity at both 2x and 4x. Its area did not come forward as the design requires. At 4x a 200-pixel magnifier clipped the 192-pixel circular mark; do not infer full enlargement from a clipped bounding box. Retain the raw marked pair and the border measurement separately. These measurements establish the audited AMD rendering path only; they do not replace other GPU or control rows.
+
+### Replacing Orca in a container stalls on stale PIDs
+
+**Symptom:** `orca --replace --debug-file ...` reports a cleanup timeout, then produces only periodic cache messages instead of speech initialization.
+**Cause:** a container whose PID 1 does not reap adopted children retains terminated Orca processes as zombies. Orca's replacement scan finds those stale PIDs. A second race occurs if the replacement is started while the shortcut-launched instance is still initializing: the two replacement scans can terminate each other.
+**Fix:** start the test container with Docker's `--init`. Before replacing a page- or shortcut-launched instance for debug logging, observe its completed startup utterance in the file sink. Test startup and debug replacement as separate operations.
+**How found:** `/proc/PID/status`, the replacement log's PID list, and the process list before and after adding an init process. The isolated session then reached logged focus reading and real sticky/slow-key input.
+
+### A process-title change is not process exit
+
+**Symptom:** the test says Orca exited almost immediately after launch.
+**Cause:** Orca changes its command line from the Python script invocation to `orca`. A probe matching only `/usr/bin/orca` misses the live process.
+**Fix:** match both forms and inspect the process state; retain the PID and the speech evidence. A process appearing is not yet evidence that its speech startup completed.
+**How found:** the same PID remained sleeping with name `orca` in `/proc/PID/status`.
+
+### Native accessible coordinates need their window origin
+
+**Symptom:** a pointer click intended for a field hits a label or another control.
+**Cause:** native Qt and GTK component bounds are relative to their client window in this rig. Browser bounds can include an estimated frame origin.
+**Fix:** use the component bounds relative to the accessible frame, then add KWin's actual client origin. First activate the window with a titlebar click; verify the selected page or field before sending the next input. Preserve the raw bounds and the actual injected point.
+**How found:** raw AT-SPI trees, KWin's `clientGeometry`, screenshots, and the fixture's received-text log. A guessed first-field point missed the field; the measured point delivered it.

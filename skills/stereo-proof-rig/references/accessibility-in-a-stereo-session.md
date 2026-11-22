@@ -2,7 +2,7 @@
 
 ## Establish the inputs first
 
-Source audit dated 2026-11-22: KWin 6.7.4 with the edition's +stereo3d64 patches, plasma-desktop 6.7.4 +stereo3d4, Orca 51.1, at-spi2-core 2.62.1 and speech-dispatcher 0.12.1. The source audit establishes these inputs. A later isolated AMD run verified the speech file sink and measured Zoom and Magnifier; the complete accessibility comparison remains in progress.
+Source audit dated 2026-11-22: KWin 6.7.4 with the edition's +stereo3d64 patches, plasma-desktop 6.7.4 +stereo3d4, Orca 51.1, at-spi2-core 2.62.1 and speech-dispatcher 0.12.1. The source audit establishes these inputs. Isolated AMD and NVIDIA runs subsequently verified the speech file sink, actual sticky/slow/bounce input and the Zoom/Magnifier measurements below. A result remains scoped to its recorded package closure and session.
 
 1. Follow the [dated snapshot recipe](dated-snapshot-rig.md). Record the published tree, accepted package additions, Debian snapshot, image digest and the candidates of `orca`, `at-spi2-core`, `speech-dispatcher`, `kwin-wayland` and `plasma-desktop`. A candidate is not an installed version or proof that the whole dependency set installs.
 2. Obtain the matching source descriptors and their components. Verify their SHA256 and size fields; unpack with `dpkg-source -x`. Read the applied source, not an older development checkout. Retain the descriptor hashes and patch series with the private test record. Check signatures separately; a matching checksum alone does not authenticate an author.
@@ -64,7 +64,7 @@ At 2x and 4x, capture both eyes as marked stereo files and measure scale, corres
 
 The X11 legacy focus/caret trackers are guarded by `KWIN_WAYLAND_ZOOM_FORCE_LEGACY_FOCUS_TRACKING` and `KWIN_WAYLAND_ZOOM_FORCE_LEGACY_TEXT_CARET_TRACKING`. Do not enable these overrides and call it a default-session pass. Read the source comments about blocking accessibility calls before considering a diagnostic run.
 
-A virtual ScreenShot2 pair establishes compositor rendering. It does not establish physical display scanout. Retain the session logs, load, configuration, raw captures and measured results with the private test record. This reference will gain runnable speech, tree-dump and zoom-measurement recipes only after those rows have run.
+A virtual ScreenShot2 pair establishes compositor rendering. It does not establish physical display scanout. Retain the session logs, load, configuration, raw captures and measured results with the private test record. The following recipes were exercised in those isolated sessions. Preserve the raw logs and captures alongside each result.
 
 ## Validated speech file output
 
@@ -87,7 +87,7 @@ Start the server once in the private session, with `speech-dispatcher -s -t 0 -C
 
 An isolated virtual SBS run with the audited KWin measured a flat Qt witness at 1920 pixels per eye. Its circular mark grew from 48 to 96 to 192 pixels in width at 1x, 2x and 4x, equally in both eyes; its disparity grew from 4 to 8 to 16 pixels. This fails the design that plain zoom keeps constant parallax. `ZoomEffect::paintScreen()` scales the already rendered offscreen scene. Treat this as a measured failure, not a supported-mode exception.
 
-The same run measured the Magnifier border at zero disparity at both 2x and 4x. Its area did not come forward as the design requires. At 4x a 200-pixel magnifier clipped the 192-pixel circular mark; do not infer full enlargement from a clipped bounding box. Retain the raw marked pair and the border measurement separately. These measurements establish the audited AMD rendering path only; they do not replace other GPU or control rows.
+The same run measured the Magnifier border at zero disparity at both 2x and 4x. Its area did not come forward as the design requires. At 4x a 200-pixel magnifier clipped the 192-pixel circular mark; do not infer full enlargement from a clipped bounding box. Retain the raw marked pair and the border measurement separately. The AMD and NVIDIA stereo paths reproduced the 4, 8 and 16 pixel Zoom disparities and the zero-disparity Magnifier frame. Debian and edition 2D controls are separate rows, not inferred from those stereo captures.
 
 ### Replacing Orca in a container stalls on stale PIDs
 
@@ -109,3 +109,65 @@ The same run measured the Magnifier border at zero disparity at both 2x and 4x. 
 **Cause:** native Qt and GTK component bounds are relative to their client window in this rig. Browser bounds can include an estimated frame origin.
 **Fix:** use the component bounds relative to the accessible frame, then add KWin's actual client origin. First activate the window with a titlebar click; verify the selected page or field before sending the next input. Preserve the raw bounds and the actual injected point.
 **How found:** raw AT-SPI trees, KWin's `clientGeometry`, screenshots, and the fixture's received-text log. A guessed first-field point missed the field; the measured point delivered it.
+
+
+## Runtime row recipe
+
+1. Start the Accessibility page, a Qt form with two labelled fields, a GTK form with two labelled fields, a local browser form, Dolphin and Gwenview on the private bus.
+   Wait for their visible accessible controls, not a fixed startup delay.
+   The page's screen-reader switch and Meta+Alt+S are independent startup cases.
+   Observe a completed startup utterance before replacing Orca with `orca --replace --debug-file OUTPUT/orca-debug.log` for the reading rows.
+2. Dump AT-SPI through `pyatspi.Registry.getDesktop(0)`.
+   For each non-null application, recurse over `getChildAtIndex()` and retain `name`, `getRoleName()`, states, component bounds, relations and ordered children.
+   Bound the walk by node count and depth, record a vanished application slot or an exception, and never dump password contents.
+   For the caret fixture, retain its text length and caret offset; these establish that Home and End reached the field.
+3. Capture the panel, launcher, Dolphin, Accessibility page, notification and real lock greeter separately.
+   Compare roles, names and ordered children independently of bounds and transient focus/visibility states; retain the latter in the raw dump.
+   Normalize only identified changing labels such as clock time, and state the normalization in the comparison record.
+   A semantic difference is not automatically a compositor fault: the Debian control may need matching Qt, Mesa and client builds because the edition's packages declare Breaks on the older compositor.
+4. Mark each focus transition in a timestamped event log, then match the target names against both Orca's `SPEECH OUTPUT` lines and the speech file sink.
+   A tree containing a label does not prove that Orca spoke it.
+   A process existing does not prove that its speech startup completed.
+5. Enable each keyboard aid through the page, apply, focus the receiving field and inject through KWin's fake-input protocol.
+   Sticky: release Shift, then press A; the receiving field gets `A`.
+   Slow: a short B is rejected and a held A passes; the tested 500 ms acceptance setting used a 1200 ms held key.
+   Bounce: three A presses, with the middle gap 100 ms and the final gap 1000 ms under a 500 ms rejection setting, produce `aa`.
+   Record actual input timestamps, received text and the page states; disable each test setting through the page before the next independent row.
+6. Use a deterministic coloured witness at 1x, 2x and 4x.
+   Wait for repeated stable measurements, then compare against the expected dimensions.
+   Do not wait until the expected dimensions appear: that confuses a wrong result with unfinished rendering.
+   Measure `left_x - right_x` at the output's 1920-pixel eye width, both eye widths/heights, and pointer and caret responses independently.
+   Global-accelerator D-Bus invocation isolates rendering from shortcut interception; label it as such instead of claiming a shortcut-input test.
+7. Keep a separate labelled eye-identity image: one eye green, one blue, with geometric landmarks.
+   Count opposite-eye colours in a documented interior region at each magnification.
+   Measure a flat window's desktop-plane disparity separately from intrinsic disparity in the stereo image.
+   Zero opposite-eye pixels in that region is a bounded observation, not a proof about every frame or output arrangement.
+8. Capture normal, shaken and explicitly enlarged cursors with a background capture from the same position.
+   Compare only the pointer region so clock or notification updates cannot become false cursor pixels.
+   Report each eye's bounding box and the change in disparity; different stacking orders can put the same pointer coordinate over different desktop planes.
+9. Lock the real private session last through its ScreenSaver interface, capture its accessible password role and marked pair, then remove the container.
+   A testing-mode greeter is a different row and must not substitute for the session lock.
+
+### A clipped marker gives a false disparity
+
+**Symptom:** the 4x Magnifier's circular witness appears narrower and its centroid disparity falls below the expected shift.
+**Cause:** the default 200-pixel area clips the enlarged circle differently in the two eyes.
+**Fix:** retain the clipping as evidence, measure the frame separately, and register a common interior image region over horizontal shifts.
+Do not infer scale or disparity from the clipped centroid.
+**How found:** the black frame measured 210 pixels including its borders; the interior matched exactly after an 8-pixel shift at 2x and a 16-pixel shift at 4x, despite the clipped centroid.
+
+### A browser coordinate click can land behind its window
+
+**Symptom:** a requested browser-field transition is followed by Gwenview speech and a Gwenview screenshot.
+**Cause:** the injected point did not identify the browser control reliably; the accessible coordinate estimate and native window geometry were insufficient for that click.
+**Fix:** for the screen-reader focus row, raise the intended window and use the field's AT-SPI Component `grabFocus()`, then verify the focused node and utterance.
+Keep actual KWin key injection for keyboard-filter rows.
+**How found:** timestamped click points, focus trees, captured window contents and the speech sink; the corrected browser row spoke both field names.
+
+### Preserve native picture pixels in a PNS fixture
+
+A real stereo photograph complements the labelled synthetic identity fixture.
+Pack its decoded left and right pictures without resizing; put `(-eye_width) % 8` padding columns between them and write `sTER` mode 1 before IDAT.
+Read the packed result back and compare each extracted eye byte for byte with its decoded source.
+This is the PNG extension's packing padding, not a change in either eye's geometry.
+Retain source hashes, provenance and a declaration trace; the extension alone is not proof that the viewer created a stereo area.

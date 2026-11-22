@@ -810,6 +810,10 @@ The complete archive solver remains authoritative for installability.
 - **Fix:** retain all policy-attempt logs and read the actual binary controls of both selected and published style packages. Trace direct dependents and Recommends before naming a source-family hold; leaving out only the new style does not help when its published predecessor has the same old exact dependency. Reconcile that source family through the authorized successor or new-preparation workflow, without changing the already accepted archives or weakening the solver.
 - **How found:** the first three policy attempts named the old exact companion version, while the fourth reported the independent driver-lock conflict. Scanning the complete pool's relations found the dependent menu-bar source and the base look's recommendation; the published style control retained the same exact dependency.
 
+Compare the installed proof baseline with the image builder’s default Recommends closure as well.
+A transaction on a baseline that omits the incompatible recommended companion does not prove that the image’s requested combination upgrades.
+Record the absent packages beside the image-install command and binary relations; do not call a recommendation successfully installed merely because apt can omit it.
+
 `--collect-predecessor-stops` collects predecessor eligibility failures, not arbitrary candidate failures.
 A candidate solve or runtime failure still ends that invocation with exit 1.
 When the task requires a complete failure inventory, retain that invocation and check the unvisited inputs with the unchanged gate and complete sibling universes, verifying that every invocation uses byte-identical signed archive views.

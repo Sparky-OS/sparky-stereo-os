@@ -1528,3 +1528,14 @@ Dictation in the programs built on KDE's speech-to-text library, with Vibe's eng
 - **ktextaddons** ([invent.kde.org/libraries/ktextaddons](https://invent.kde.org/libraries/ktextaddons), GPL-2.0-or-later): Laurent Montel, who finished the speech-to-text manager in September 2026 and exported its settings dialog in October 2026 (both carried from the v2.3.0 tag into the edition's 2.1.2 build, with his name on the patches), and Florian Richer; the library the Vibe engine is a plugin of.
 - **Vibe** ([github.com/thewh1teagle/vibe](https://github.com/thewh1teagle/vibe), MIT): thewh1teagle; its `vibe-server`, run unchanged through its documented local API, is the engine.
 - **whisper.cpp and ggml** ([github.com/ggml-org/whisper.cpp](https://github.com/ggml-org/whisper.cpp), [github.com/ggml-org/ggml](https://github.com/ggml-org/ggml)): Georgi Gerganov and the ggml contributors; the speech inference inside `vibe-server`.
+
+## Stereo icons wherever the desktop draws an icon (queue row 77, milestone 1, 2026-11-22)
+
+Each eye's view of a stereo icon, given by the icon engine while the edition's Qt draws a window once per eye, builds on these projects, named from the headers of the files read. Names only; these projects do not endorse the edition.
+
+- **KIconThemes** ([invent.kde.org/frameworks/kiconthemes](https://invent.kde.org/frameworks/kiconthemes), LGPL-2.0-or-later): Hamish Rodda (`KIconEngine`), Geert Jansen, Antonio Larrosa and Michael Pyne (`KIconLoader`, `KIconTheme`); the edition's stereo folders and per-eye views are patches on their loader.
+- **Kirigami** ([invent.kde.org/frameworks/kirigami](https://invent.kde.org/frameworks/kirigami), LGPL-2.0-or-later): Marco Martin and Aleix Pol Gonzalez (the `Icon` item that draws Plasma's icons), read for the plan.
+- **Plasma's desktop folder view** ([invent.kde.org/plasma/plasma-desktop](https://invent.kde.org/plasma/plasma-desktop)): Eike Hein (`FolderItemDelegate.qml`), read for the plan.
+- **KIO** ([invent.kde.org/frameworks/kio](https://invent.kde.org/frameworks/kio), LGPL-2.0-or-later): Kevin Ottens, Rafael Fernández López, Kai Uwe Broulik and Harald Sitter (the Places view), Fredrik Höglund and Shaun Reich (the file item delegate); the places a person meets first in the file manager and the file dialog.
+- **The KDE platform theme** ([invent.kde.org/plasma/plasma-integration](https://invent.kde.org/plasma/plasma-integration)): Kevin Ottens, Aleix Pol Gonzalez, Lukáš Tinkl and Harald Sitter; it gives every Qt program of a KDE session the KIconThemes engine.
+- **Oxygen Icons** ([invent.kde.org/frameworks/oxygen-icons](https://invent.kde.org/frameworks/oxygen-icons), LGPL-3.0-or-later): David Miller, David Vignoni, Johann Ollivier Lapeyre, Kenneth Wimer, Nuno Pinheiro and Riccardo Iaconelli, named in the Debian package's copyright record; their icons are in the file dialog of the proof.

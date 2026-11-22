@@ -1,0 +1,40 @@
+# A rig that does not depend on the day: Debian testing from a dated snapshot
+
+A review reruns a lane's rows on another day. Debian testing moves twice a day, the published edition does not, and a rig image remade from `deb.debian.org` some hours later can stop installing at all: on 2026-11-22 a review lost two rig images that way, and nothing could be rerun.
+So a rig takes Debian testing from snapshot.debian.org at one stated instant, freezes every other moving source, and its remake script never removes an image before the replacement exists.
+Written from queue row 50, step 5, continuation 3 (ParaView and VTK, 2026-11-22).
+
+## The recipe
+
+1. **Choose the instant from measurements, not from the calendar.**
+   - List the month's instants: `https://snapshot.debian.org/archive/debian/?year=YYYY&month=MM` (each `href="YYYYMMDDTHHMMSSZ/"`).
+   - Fetch `dists/testing/Release` and `dists/testing/main/binary-amd64/Packages.xz` at the candidate instants (`curl -L`: the archive answers with a 302 to `/file/HASH`) and read the `Date:` line: several instants can carry the same index (an instant is when snapshot took it, the index is when Debian's archive made it).
+   - The instant must satisfy three things, each measured: the published tree installs whole on it (step 4), the stage's packages install on it, and the builder that built the stage is close enough that no staged package depends on anything newer (simulate the stage's install on the instant; compare `dpkg-query -W` in the builder image with the instant's `Packages`).
+   - Start from the published tree's own `Release` date and take the last index before it: the day the published edition was made against. On row 50 the tree r1118a is dated 2026-11-19 06:12 UTC, so the instant is 20261119T023717Z (testing's index of 02:12 UTC). Testing moved past it twice in the next three days: the 2026-11-20 02:11 UTC index replaced OpenImageIO 3.1 by 3.2 (the tree's Blender depends on `libopenimageio3.1`), and the 2026-11-21 14:13 UTC index brought KDE Frameworks 6.32 (libkf6xmlgui6, libkf6iconthemes6, libkf6iconwidgets6; libkf6parts6 at 02:09 UTC the next day) while the tree holds its own 6.30 at pin 1001.
+   - A stage built later can still install there: row 50's builder (made 2026-11-21 from the 20:10 UTC index) differed from the 11-19 index in 26 packages (compiler drivers, TeX Live, BLAS and LAPACK, p11-kit), and every staged package, the rig's set and KScreen's page resolved together on 11-19 (1037 new, 0 to remove).
+2. **The sources (deb822), Debian only on the snapshot:**
+   ```
+   Types: deb
+   URIs: https://snapshot.debian.org/archive/debian/20261119T023717Z
+   Suites: testing testing-updates
+   Components: main
+   Signed-By: /usr/share/keyrings/debian-archive-keyring.pgp
+   Check-Valid-Until: no
+   ```
+   and the same for `debian-security` with `testing-security`. `Check-Valid-Until: no` belongs to these entries alone: apt.conf(5) says the per-source option "should be preferred to disable the check selectively instead of using this global override" (`Acquire::Check-Valid-Until`). Remove the base image's `/etc/apt/sources.list` and replace its `debian.sources`; an `Acquire::Retries` of a few helps, since the archive is slow at times. Write the instant into the image (`/etc/apt/<lane>-snapshot`) so every later run can print it.
+3. **Freeze every other moving source.** deb-multimedia has no snapshot archive: keep a partial mirror of it in the lane's scratch, signed as published.
+   - Fetch `dists/forky/InRelease`, check it with `gpgv --keyring deb-multimedia-keyring.pgp`, and fetch every index file it lists for `binary-amd64`, `binary-all` and `i18n` of `main` and `non-free`, each checked against the InRelease's SHA-256 and size and written at its path and at `by-hash/SHA256/HASH` (the Release says `Acquire-By-Hash: yes`).
+   - Fetch only the pool files the rig needs: simulate every install command of the rig against the frozen index (`apt-get -s install ...`), keep the `Inst` lines whose origin is deb-multimedia, take each `Filename` and `SHA256` from the frozen index, and keep a file only when its SHA-256 matches. Row 50 needed 28 files (15 MB with the index).
+   - Use it as `URIs: file:///dmo` with deb-multimedia's keyring, the folder mounted read-only. A copy of another lane's stage that the rig installs (here libstereo-declare 1.12.1) goes into the same frozen folder with that stage's sums.
+   - The published tree is already fixed (its own folder, its own `Release`).
+4. **Prove it before using it:** every package of the published tree simulated alone (`apt-get -s install --no-install-recommends P`, amd64 and all, without `-dbgsym` and `-lc-hr`) on the instant, and the same against testing of the day for the dated fact; then `apt-get -y dist-upgrade` in the rig image itself, and `apt-get -s dist-upgrade` of the finished image must say `0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded`.
+5. **The Lean Code link gate takes the same instant:** its archive file (`SPARKY_LC_ARCHIVE_CONFIG`) accepts `"check_valid_until": false` per source (`lean/archive.py`), and a `file:` source with a keyring for the frozen deb-multimedia.
+6. **Remake by replacing, never by removing first.** Build each image under `NAME-new`; only when every asked image is built, move each tag (`docker tag NAME-new NAME`, then `docker rmi NAME-new`, which only untags) and remove each replaced image by its ID, children before parents; an image another image is built on stays and is said.
+
+## Traps
+
+- **Symptom:** a rig image cannot be remade some hours after the lane built it: `Reached two conflicting assignments ... libkf6xmlgui6 Depends libkf6iconthemes6 (>= 6.32.0~)`, or `paraview : Depends: kde-cli-tools but it is not going to be installed`. **Cause:** Debian testing moved past the published tree (Frameworks 6.32 against the tree's 6.30 at pin 1001), and the rig took testing of the day. **Fix:** the snapshot above. **How found:** the testing index of each instant, read for the Frameworks packages: the hold began with the 2026-11-21 14:13 UTC index, not on 11-22 as the lane's earlier report had dated it from the first failed simulation.
+- **Symptom:** the finished rig image's `apt-get -s dist-upgrade` says `2 downgraded` (libstereo-declare1 and python3-stereo-declare, 1.12.1 to 1.10.0). **Cause:** the rig installs a newer build from a file than the published tree has, and pin 1001 on the tree allows a downgrade. **Fix:** pin that one version above the tree in the image (`Package: libstereo-declare1 python3-stereo-declare`, `Pin: version 1.12.1-1+lc1`, `Pin-Priority: 1002`), and let the rows command's dist-upgrade check fail on any `downgraded` count. **How found:** the dist-upgrade simulation the image script writes for every image.
+- **Symptom:** a review's remake script leaves the review with no image at all. **Cause:** the script removed each image and then failed to build it (the trap above). **Fix:** build under a new tag, then move the tag (recipe step 6).
+- **Symptom:** a check meant to show "testing of the day" reports almost every package refused, `The repository 'https://deb.debian.org/debianlive testing Release' does not have a Release file`. **Cause:** the snapshot prelude was sourced with the instant set to the word `live`, and the substitution `debian/[0-9TZ]*` matched an empty string and left `live` behind. **Fix:** source the prelude with a real instant, substitute `[0-9]*T[0-9]*Z`, and check the result (`grep -q '^URIs: https://deb.debian.org/debian$'`) before trusting the run.
+- **Symptom:** deb-multimedia's plain `Packages` fails its SHA-256 and has the size of the `.xz`. **Cause:** that server answers the plain path with the compressed bytes. **Fix:** fetch the `.xz` and decompress it; the result matches the plain file's SHA-256 in the InRelease.

@@ -801,3 +801,17 @@ A provider-presence inventory is not a second policy grammar check for every unr
 Keep legacy mixed-case virtual names and compact version syntax literally; a signed third-party office alias exposed this during the full-run startup.
 Count a transitive missing dependency only when the required path has no alternate virtual provider, and retain the named path as evidence.
 The complete archive solver remains authoritative for installability.
+
+
+### Exact companion dependencies and a completed failure inventory
+
+- **Symptom:** a checksum-correct, exactly reproduced style package fails candidate qualification because it requires an older exact version of its GTK companion; its menu-bar variant fails through the same relation.
+- **Cause:** separate accepted source generations retain an exact cross-source dependency that the selected newer companion cannot satisfy. Receipt equality proves reproduction, not compatibility of the assembled cohort.
+- **Fix:** retain all policy-attempt logs and read the actual binary controls of both selected and published style packages. Trace direct dependents and Recommends before naming a source-family hold; leaving out only the new style does not help when its published predecessor has the same old exact dependency. Reconcile that source family through the authorized successor or new-preparation workflow, without changing the already accepted archives or weakening the solver.
+- **How found:** the first three policy attempts named the old exact companion version, while the fourth reported the independent driver-lock conflict. Scanning the complete pool's relations found the dependent menu-bar source and the base look's recommendation; the published style control retained the same exact dependency.
+
+`--collect-predecessor-stops` collects predecessor eligibility failures, not arbitrary candidate failures.
+A candidate solve or runtime failure still ends that invocation with exit 1.
+When the task requires a complete failure inventory, retain that invocation and check the unvisited inputs with the unchanged gate and complete sibling universes, verifying that every invocation uses byte-identical signed archive views.
+Record every invocation's input interval and exit, every failed input and all solver attempts, and assert that the union accounts for the entire selection.
+Those diagnostic continuations do not turn the interrupted full invocation into a passing whole-pool proof; a corrected preparation still needs its own complete gate.

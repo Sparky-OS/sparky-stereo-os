@@ -1,7 +1,7 @@
 # A file under a dpkg diversion
 
 **For whoever reads `dpkg-stereo --verify` on a system where a package diverts another package's file, or changes how dpkg-stereo reads a recorded file.**
-Written on 2026-11-21 for dpkg-stereo 0.1.43 (queue rows 629 and 802), with dpkg 1.23.11+stereo3d3; extended for 0.1.44 and 0.1.45 (2026-11-22).
+Written on 2026-11-21 for dpkg-stereo 0.1.43 (queue rows 629 and 802), with dpkg 1.23.11+stereo3d3; extended for 0.1.44 to 0.1.47 (2026-11-22).
 
 ## Symptom
 
@@ -127,15 +127,27 @@ Traps met on the way:
 **Symptom:** a person's change to a file that maintainer scripts keep (sparky-stereo-console's `/etc/issue`, `issue.net`, `nanorc`, `zsh/zshrc`, `update-motd.d/10-uname` at the names it diverts; samba-common's `/etc/samba/smb.conf`; grub's `/etc/default/grub`) is kept, and `dpkg-stereo --verify` up to 0.1.45, `--verify --deep` and `dpkg --verify` all give no line for it.
 **Cause:** such a file is in no package's file list, and the verifier judged only listed files.
 **Fix (0.1.46):** `--verify` reads ucf's records, read only: the md5sum of what ucf last wrote (`/var/lib/ucf/hashfile`, "md5  path") and the package `ucfr` registered (`/var/lib/ucf/registry`).
-- other bytes: `EDITED    PATH (kept by PACKAGE through ucf) (changed by the person: left as they made it)`, not counted, as a conffile the person changed after an upgrade; `(kept through ucf)` when no package registered it (nfs-common hands `/etc/nfs.conf` and `/etc/idmapd.conf` to ucf without `ucfr`);
+- other bytes (0.1.47): `EDITED    PATH (kept by PACKAGE through ucf) (differs from the default PACKAGE last offered: left as it is)`, not counted; with `, which is beside it as PATH.ucf-dist` before the colon when that file holds the default ucf recorded; `(kept through ucf) (differs from the default last offered: left as it is)` when no package registered it (nfs-common hands `/etc/nfs.conf` and `/etc/idmapd.conf` to ucf without `ucfr`); the sentence is LOCAL103 to LOCAL106, in the ten languages ([why not "changed by the person"](#why-the-row-does-not-say-changed-by-the-person)); 0.1.46 printed `(changed by the person: left as they made it)` there;
 - a file that is gone: no row, not counted, and the exit status is not changed by it; the summary line says `N files kept through ucf are gone (ucf leaves a removed file removed)` (LOCAL102, ten languages) when N is not 0, and `--verify --deep` lists each as `GONE      PATH (kept by PACKAGE through ucf)`, also not counted ([why](#why-a-gone-file-is-no-fault)); a link whose target is gone is no gone file: it stands at the name and is `EDITED`;
 - a path a package lists as its own conffile, where that package's copy is, stays with that package's judgement; under a diversion the owning package's record keeps the path's name while its copy is at the diverted name, so the file at the name (the diverting package's, kept through ucf) is judged by ucf's record;
 - a non-root `--verify` stops at the existing `This needs root: sudo dpkg-stereo --verify` before it reads anything; a file root cannot read is counted in the summary and said once, and the check is then incomplete (exit 2);
 - the dpkg hooks never read `/var/lib/ucf` (a Python audit hook logged no open there across a `dpkg -i` and a `dpkg -P`), and nothing there is written.
 **How found:** the console's `tests/etc-files.sh up-edited` and the lane's round-style mode `console8` (each change kept and said, no row); then ucf's records read on a long-used edition machine and in the rig.
-**Test:** `test/ucf-test.sh DEB WORKDIR` in the published-edition rig with ucf, samba-common, nfs-common and grub-efi-amd64 installed: 38 passes on 0.1.46; on the first build of 0.1.46, which printed a gone file as `MISSING` and counted it, exactly the ten rows of U4 fail; on 0.1.45, which reads no ucf record, twelve.
+**Test:** `test/ucf-test.sh DEB WORKDIR` in the published-edition rig with ucf, samba-common, nfs-common and grub-efi-amd64 installed: 55 passes on 0.1.47; on 0.1.46, 21 rows fail: every ucf row in the new wording and all of U11 (the three measured shapes, a `.ucf-dist` that is not the recorded default, the sentence in each of the ten languages). With 0.1.46's version of the test: 38 passes on 0.1.46; on the first build of 0.1.46, which printed a gone file as `MISSING` and counted it, exactly the ten rows of U4 fail; on 0.1.45, which reads no ucf record, twelve.
 U4 removes samba-common's registered `smb.conf` by hand and installs a fixture whose second version's postinst removes its own ucf-kept file with `rm -f` and no `ucf --purge` (libdebuginfod-common's shape), then a link with a missing target at an unregistered name.
 The lane's round-style proof does the same at the edition's scale: on the published edition with ucf, samba-common's `smb.conf` removed before the upgrade, then the real `dist-upgrade`; after it `--verify` exits 0 with no row for the file and one gone file in its summary, and `--deep` lists it as `GONE` and exits 0.
+
+### Why the row does not say "changed by the person"
+
+- **What ucf records.** `/var/lib/ucf/hashfile` holds the md5sum of the default the package last handed to ucf, not of anything a person did; a file whose bytes differ from it was changed after ucf wrote it, by someone or something the record does not name.
+- **Measured on 2026-11-22 on an installed edition machine nobody had edited these files on** (dpkg-stereo 0.1.46 printed all three as `changed by the person`):
+  - `/etc/libreoffice/registry/main.xcd`: libreoffice-common's own older default, kept by ucf at an upgrade, with the new default beside it as `main.xcd.ucf-dist` (four lines differ: the version strings);
+  - `/etc/R/Renviron`: r-base-core's postinst writes the paper size into it after ucf;
+  - `/etc/default/grub`: the menu settings written at installation.
+- **So the row says only what the records show** (the main session's ruling for continuation 14): the file differs from the default the package last offered, and is left as it is; when `PATH.ucf-dist` holds that default, the row names it, since that is where the person finds it. A `.ucf-dist` with other bytes is not named as it.
+- **What does not change:** the keyword `EDITED`, the counting (never a problem) and the exit status.
+- **The round's own parser:** case e's `check_verify` passes any run that exits 0, and in a run that exits 1 (planted edits) lets an `EDITED` row through only with the fixed end `(changed by the person: left as they made it)` and a planted path; a ucf row in the new wording there is called a problem. The round's image had no ucf-kept file with other bytes when this was written; the lane's round-style modes `ucf2` and `owners` match the new wording.
+- **Not changed yet:** the sentence for dpkg's own conffiles keeps `(changed by the person ...)`, with the same doubt (dpkg's record is the hash of the conffile it installed, and a package's own script can change a conffile too, though Policy 10.7.4 says "The maintainer scripts must not alter a conffile of any package, including the one the scripts belong to").
 
 ### Why a gone file is no fault
 
@@ -145,6 +157,10 @@ The lane's round-style proof does the same at the edition's scale: on the publis
 - **What stays judged.** Anything that stands at the name: other bytes, a file of another kind, a link (even one whose target is gone) is `EDITED`. A path a package also lists as its own conffile stays with that package's record: a projected conffile that is gone is still `MISSING` and counted, as before.
 
 Traps:
+- **Symptom:** `dpkg-stereo --verify` 0.1.46 says `EDITED    /etc/R/Renviron (kept by r-base-core through ucf) (changed by the person: left as they made it)`, and the same for `/etc/default/grub` and libreoffice-common's `main.xcd`, on a machine where nobody edited them.
+  **Cause:** ucf's record is the default the package last offered; a package's own script (r-base-core's postinst) and ucf's own "keep the old file" (libreoffice-common's main.xcd, with `main.xcd.ucf-dist` beside it) leave other bytes than the record as well as a person does.
+  **Fix (0.1.47):** the row says that the file differs from the default the package last offered, and names `PATH.ucf-dist` when it holds that default ([above](#why-the-row-does-not-say-changed-by-the-person)).
+  **How found:** on an installed edition machine, not in the rig: the rig's ucf-kept files were all untouched; each row's file compared with ucf's record and with its `.ucf-dist`, and the package's postinst read.
 - **Symptom:** on a system nobody touched, a ucf-kept file differs from ucf's md5sum: `/etc/default/nfs-common`, whose first line is the Lean Code pointer while ucf's cached copy (`/var/lib/ucf/cache/:etc:default:nfs-common`) has the comments.
   **Cause:** nfs-common lists the file as its conffile and also hands it to `ucf --three-way`; Lean Code projects it as a conffile (its record's original md5sum is ucf's), so ucf's md5sum is of the original. **Fix:** the verifier leaves a path a package lists as its conffile to that package's record. **How found:** each hashfile row's md5sum against the file on the untouched rig; a long-used edition machine shows the same file the same way.
   **Not proven:** what ucf does at nfs-common's next upgrade that changes that default: it compares the lean file with the original's md5sum, and it would take the projection for a person's change unless dpkg-stereo's pre-invoke gives the original back first.

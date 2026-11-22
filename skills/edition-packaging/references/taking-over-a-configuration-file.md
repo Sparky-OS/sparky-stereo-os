@@ -68,7 +68,7 @@ Why, in dpkg's own source (1.23.11):
 - `src/main/remove.c`, purge: a conffile is dropped from the purge list only while another package's diversion covers it; `conffderef` follows the conffile's own name with no diversion lookup, so once our postrm has removed our diversion, purge unlinks the owning package's file.
 
 So our file at a name we divert is not shipped in the package's data (Debian Policy 10.7.3 names this way: maintainer scripts that "create, update and maintain the file" and "must not overwrite the user's version").
-The maintainer scripts keep it through ucf, Debian's tool for exactly this (ucf 3.0056, Priority standard, on the edition's image), so its records name what was written and `dpkg-stereo --verify` (0.1.46) names a person's change to it; a file of it that is gone is counted in the summary and never a problem, since ucf itself leaves a removed file removed ([lean-code, a file kept through ucf](../../lean-code/references/diverted-files.md#why-a-gone-file-is-no-fault)).
+The maintainer scripts keep it through ucf, Debian's tool for exactly this (ucf 3.0056, Priority standard, on the edition's image), so its records name what was written and `dpkg-stereo --verify` (0.1.46) names a file with other bytes (from 0.1.47 as differing from the default the package last offered, since ucf's record cannot tell who changed it: [lean-code](../../lean-code/references/diverted-files.md#why-the-row-does-not-say-changed-by-the-person)); a file of it that is gone is counted in the summary and never a problem, since ucf itself leaves a removed file removed ([lean-code, a file kept through ucf](../../lean-code/references/diverted-files.md#why-a-gone-file-is-no-fault)).
 
 ### Through ucf, with nothing asked (sparky-stereo-console 20261122, row 813)
 
@@ -90,7 +90,8 @@ As built in sparky-stereo-console 20261122 (Depends: `ucf (>= 3.0056)`):
 - ucf copies a default it creates with the default's mode, so a script in `/etc/update-motd.d` gets `chmod 755` when ucf created it, and the default beside a kept one stays 644;
 - the upgrade from the plain files: the preinst sets each old file aside and marks it changed when it is not the old version's bytes (`dpkg-query --control-path PACKAGE md5sums`); the postinst drops an untouched one, so ucf creates the new default, and puts a changed one back first, so ucf, which has no record of it, keeps it with the new default beside it;
 - the postrm, at removal, deletes a file whose md5sum is the one ucf recorded (read from `/var/lib/ucf/hashfile`: Policy 6.5 lets a postrm rely only on Essential packages), keeps a changed one in `/var/backups/PACKAGE/PATH` (said), runs `ucf --package PACKAGE --purge PATH` and `ucfr --purge PACKAGE PATH`, and only then removes the diversion with `--rename`;
-- the safe form F2 above stays in the preinst for the owning package's pending `.dpkg-new`.
+- the safe form F2 above stays in the preinst for the owning package's pending `.dpkg-new`;
+- the package ships every folder it puts a file into, empty if need be (`/etc/zsh` and `/etc/update-motd.d` from 20261122.1), so dpkg never removes one under the files ucf keeps there (a trap below); the postrm removes such a folder at the removal when it is left empty and no other package lists it (`dpkg-query -S`), and the folders it made under `/var/backups/PACKAGE` at the purge when nothing of the person's is in them; the postinst removes `/var/lib/PACKAGE` when its scratch is emptied.
 
 ## Removing a diversion in a successor, keeping the person's edit
 
@@ -117,6 +118,17 @@ Keep the copy outside a folder something copies whole: sparky-stereo-console kee
 - A file in `/etc/skel` lands in every new account's home, so its comments say only what its lines do; a quote of a request or a design note goes in the recipe's comment. From 20261121.1 the file ships lean (Lean Code 0.1.31: the pointer line and the code), and its authored text is in `sparky-stereo-console-lc-hr`, as the skel `.bashrc`'s was up to 20261102.
 
 ## Traps
+
+- **Symptom:** on a machine without zsh-common the upgrade stops: `Creating config file /etc/zsh/zshrc with new version`, `cp: cannot create regular file '/etc/zsh/zshrc': No such file or directory`, `dpkg: error processing package sparky-stereo-console (--configure)`, apt exit 100; a fresh install stops the same way.
+  **Cause:** a folder only we owned leaves with our plain file. The published console shipped `/etc/zsh/zshrc` as a plain file and, without zsh-common, was the only package listing `/etc/zsh`; 20261122 shipped nothing in that folder, so at the unpack dpkg removed the file and the empty folder, and ucf creates no parent folder.
+  **Fix:** the package ships every folder it puts a file into (sparky-stereo-console 20261122.1). dpkg-maintscript-helper(1) gives the same rule for the folders of its symlink and directory switches: they "need to be shipped in the new packages, or dpkg will not be able to remove them on purge". Measured against the other form, the postinst making the folder before ucf: it configures too, but the folder is in no package's list (`dpkg -S` finds nothing) and zsh-common's purge then warns `directory '/etc/zsh' not empty so not removed`.
+  **How found:** on an installed machine, not in the rig. The rig installed every owning package together with the packages that divert their files, so zsh-common was always there; a minimal edition rig (the round's sources, the edition's dpkg and dpkg-stereo, ucf and the published console with no recommends) showed `dpkg -S /etc/zsh` naming the console alone, and reproduced the stop. Read `dpkg -S` of the parent of every file the scripts keep, on the smallest system the package installs on.
+- **Symptom:** after the upgrade an empty `/var/lib/sparky-stereo-console` stays, and after the purge an empty `/var/backups/sparky-stereo-console/etc/skel`.
+  **Cause:** the scripts removed the files they kept there, and not the folders they had made for them.
+  **Fix:** remove each such folder when it is left empty and no other package lists it (above). **How found:** the console's test lists every empty folder of ours that no other package lists, after the upgrade, the removal and the purge.
+- **Symptom:** after the owning package is purged while ours still diverts its conffile, its file stays at the diverted name (`/etc/zsh/zshrc.debian`, zsh-common's own bytes), and our later removal gives it back at the name, a file of no installed package.
+  **Cause:** dpkg's purge drops a conffile from its list while another package's diversion covers it (`src/main/remove.c`, above): Policy's "dpkg does not handle it well".
+  **Not changed:** our file and ucf's record of it are untouched throughout; the leftover is the owning package's, and is listed for the main session. **How found:** the console's test case `zsh-later` (zsh-common installed after the console and purged again).
 
 - **Symptom:** `dpkg-stereo --verify` says `CHANGED PATH (changed by the person)` on an untouched system, for a path one of our packages diverts.
   **Cause:** the verifier read the owning package's record at the path; fixed in dpkg-stereo 0.1.43.

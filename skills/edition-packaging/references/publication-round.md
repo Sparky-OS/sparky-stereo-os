@@ -846,3 +846,13 @@ The sample's findings, notes and predecessor classes must agree before reuse is 
 Every input then receives one fresh or reused verdict with its binding, and exit zero requires every row to pass.
 Retained signed indexes must be restored and authenticated without updating the public archives during either the link proof or installed upgrade; updating the local candidate index must leave those public bytes unchanged.
 Record old/new pool digests, the replaced source sets, complete verdict, sample seed/list, exact archive evidence paths and all publication-copy inputs.
+
+### Frozen installed indexes must cover installed foreign architectures
+
+**Symptom:** the expanded installed proof keeps back the two architectures of the stereo declaration library and Mesa, although both architecture link gates pass.
+**Cause:** restoring only the amd64 proof indexes omits the i386 public dependency universe; copying the i386 indexes without changing the generated `arch=amd64` selectors still leaves those packages invisible to APT.
+**Fix:** authenticate and copy both already-qualified views, require equal shared InRelease hashes, and expose both installed architectures for archives that support both.
+Keep NVIDIA's compute archive amd64-only as its edition source declares.
+Refresh only the local candidate index, checking the public index hashes before and after.
+**How found:** all eight kept-back names were read before any transaction, and the source architecture selectors explained why the copied i386 Packages files were unused.
+Retain failed setup attempts separately; do not change pins, package archives or the frozen public view to satisfy the solver.

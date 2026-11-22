@@ -94,6 +94,10 @@ The measured native test sends nonuniform pixel patterns through appsrc and apps
 It compares every resulting pixel and the exact output size.
 A separate temporal test covers starting halfway through a pair, gaps, discontinuities, missing ordinals and reversed input order.
 The initial compositor capture recorded one child declaration and 18 identical 1280-by-480 buffers, with 640-by-480 eyes.
+A fresh replay also reads the synthetic camera through an independent PipeWire client and compares every RGB pixel with each submitted buffer: zero differ.
+Real input events switch the shared action off and on; both sinks remain live and the settings persist.
+The strict window comparison still finds one differing pixel per eye, including between two separate runs of the published camera.
+That control failure has no established cause and the zero-difference requirement remains failed.
 The complete packing, GPU, recording and publication matrix remains to be run.
 
 ## Proof still required
@@ -134,3 +138,9 @@ The v4l2loopback bridge needs a separate virtual-machine test; it is not a reaso
   **Cause:** that source advertises mono; declaring its output in the source caps filter is refused before encoding starts.
   **Fix:** generate the intended packed test frame, then set its multiview caps at the interpretation boundary with `capssetter` or appsrc.
   **How found:** the failed link occurred before the encoder; the corrected probes completed and exposed distinct SEI and container outcomes.
+
+- **Symptom:** a switch test expects pure blue but reads RGB (1, 0, 255).
+  **Cause:** the independently captured camera input already has that value; the test assumed the generator's nominal color survived its format conversion.
+  **Fix:** read the same camera through an independent client and compare exact source values, while retaining the separate expected eye identity check.
+  **How found:** the independent source and every submitted native buffer have the same hash and zero differing RGB pixels.
+  This fixture correction does not waive the separate zero-difference window comparison.

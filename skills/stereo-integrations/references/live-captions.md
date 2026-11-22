@@ -261,3 +261,28 @@ Removing the package must not remove models or personal settings.
   configuration and sibling package closure. **Disposition:** retain the failed
   row and prepare that closure; never bypass the gate or call source tests a
   qualified package. **Found by:** the integration's first source-package build.
+
+### Preparing the archive and sibling inputs
+
+Keep an explicit signed archive configuration, including the Debian snapshot,
+deb-multimedia and the published edition. A local mirror retains the original
+InRelease and its hashed Packages files; HTTPS downloads are a separate step
+from the network-disabled build. Reusing a cached package requires its size and
+SHA-256, and the gate checks it again against the signed index it selected.
+Supply the accepted edition packages through `SPARKY_LC_SIBLINGS_FILE`; an
+installed build dependency is not a runtime sibling in the gate's empty system.
+
+Check the minimum versions in the successor's control before assuming the
+accepted pool closes its dependencies. Partners 0.1.3 requires Graphics 0.2.17;
+a pool containing Graphics 0.2.15 and a published archive containing 0.2.14
+cannot qualify it. The unchanged APT solver reports that relation and
+`[no choices]`. Keep the full failed build log and solver record, obtain the
+accepted dependency, then rebuild. Do not lower the dependency, replace it with
+a test double or label a removed candidate as a package.
+
+A failed conventional recipe must copy its complete build log out of its
+throwaway work directory before its cleanup trap runs. Keep the source date and
+recipe commit unchanged through the build; the successful build record is
+written only after every gate passes. Package closures and retained proof files
+belong in durable stage and evidence directories, separate from disposable
+archive caches and object trees.

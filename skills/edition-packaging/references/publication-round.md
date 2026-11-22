@@ -819,3 +819,30 @@ A candidate solve or runtime failure still ends that invocation with exit 1.
 When the task requires a complete failure inventory, retain that invocation and check the unvisited inputs with the unchanged gate and complete sibling universes, verifying that every invocation uses byte-identical signed archive views.
 Record every invocation's input interval and exit, every failed input and all solver attempts, and assert that the union accounts for the entire selection.
 Those diagnostic continuations do not turn the interrupted full invocation into a passing whole-pool proof; a corrected preparation still needs its own complete gate.
+
+## A successor family and a bound continuation of its proof
+
+**Symptom:** a look and its menu-bar variant require an obsolete exact GTK package version, while the round carries a compatible newer GTK theme.
+**Cause:** a recipe's default version was interpolated into a dependency, independently of the GTK package's actual version.
+**Fix:** read the commit introducing the pin and compare the actual theme names, colour-scheme mapping and files it protects.
+If equality protects no interface, declare the oldest compatible GTK version as a minimum in the required version-definition file shared by the builders; refuse a missing definition.
+Build both look successors from that committed recipe, retain every language file, and compare them with both staged and published predecessors.
+Keep an unchanged GTK archive unchanged.
+**How found:** the solver's first attempts named the exact pin; the original theme files and current files were equal despite independent package version counters.
+The installed upgrade baseline must contain both published looks as the image's Recommends request, and prove their upgrade together with GTK, not merely an edition without those looks.
+
+A predecessor requiring an unavailable publication-time third-party archive has `no-baseline-available` only through the gate's explicit option and checked archive search records.
+The unchanged predecessor is first tried in the candidate view; any permitted successful view remains a real baseline.
+A failure attributed to an archive without its dated signed index cannot use a later implicated index as a substitute.
+Such a candidate gets no inherited-failure allowance and must install, link and start in full in the frozen candidate view.
+The real unresolved-library regression control must remain red.
+This is not the separate class proving a missing provider in both extant views.
+
+A changed gate rule requires the full toolkit suite on the exact new code, plus a seeded fresh sample of 24 previously completed comparisons, including at least four mixed baselines and both publication-time-uninstallable inputs when present.
+Use the gate's bound reuse mode, not a hand-edited passing table.
+It checks candidate and predecessor hashes, original sibling inputs, authenticated signed views, code, prior result hashes and the suite record.
+Changed inputs, their transitive dependents and inputs without a passing prior result run fresh.
+The sample's findings, notes and predecessor classes must agree before reuse is permitted.
+Every input then receives one fresh or reused verdict with its binding, and exit zero requires every row to pass.
+Retained signed indexes must be restored and authenticated without updating the public archives during either the link proof or installed upgrade; updating the local candidate index must leave those public bytes unchanged.
+Record old/new pool digests, the replaced source sets, complete verdict, sample seed/list, exact archive evidence paths and all publication-copy inputs.

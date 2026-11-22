@@ -110,6 +110,7 @@ A program whose interface is a toolkit window and whose 3D area is a native chil
 Each view keeps its resolution: the program draws on a window of its own inside the toolkit's child, twice a view wide, and declares that window with the size one view is shown at (support version 8), so Stereo KWin resizes once; where the desktop announces less, each view is drawn in half of the child and the program says so.
 A Tk or other toolkit that draws the child before it maps its window (Netgen): [x11-declared-child-limits-and-first-pair.md](references/x11-declared-child-limits-and-first-pair.md), last section.
 A Python and Qt molecule viewer whose quad buffer is the only output (PyMOL): [qt-molecule-viewer-quad-buffer.md](references/qt-molecule-viewer-quad-buffer.md).
+A Java Swing program, whose panels have no X window of their own (Jmol: OpenJDK under Xwayland, a place window and a window two views wide made through JNA, declared with `stereo_declare_x11_child`, lightweight popups that would hide under it): [java-swing-3d-area.md](references/java-swing-3d-area.md).
 The recipe, the proof (a column-coded clip), and the traps (the toolkit that reads its child's real size, the library version, the link gate, the error handler, the notices) are in [x11-video-child.md](references/x11-video-child.md).
 
 ## Requalifying the gl-stereo savers
@@ -185,7 +186,7 @@ The browser's flat WebXR display (an inline-stereo session) gives half the separ
 
 A closed program we cannot rebuild, with a quad buffer mode, shipped as an AppImage (what it bundles, which configuration it is offered, the program's fault told from the stack's with a small client, `GL_BACK` reaching one eye only, the FUSE 2 runtime, the settings file named after the start name, the 3D mouse boundary): [references/closed-program-quad-buffer-in-an-appimage.md](references/closed-program-quad-buffer-in-an-appimage.md).
 
-Every program that already draws OpenGL quad-buffer stereo, which switch and route each has, the capture recipe with eye tags and the traps (FreeCAD never asks for a stereo surface, ParaView's child pair is taken back, Debian's Blender 5.2.2 aborts in Time Sequential, the NVIDIA session environment in a virtual KWin): [references/quad-buffer-programs.md](references/quad-buffer-programs.md).
+Every program that already draws OpenGL quad-buffer stereo, which switch and route each has, the capture recipe with eye tags and the traps (FreeCAD never asks for a stereo surface, Debian's Blender 5.2.2 aborts in Time Sequential, the NVIDIA session environment in a virtual KWin), and ParaView's stereo types re-tested on the published tree (Crystal Eyes a pair on Wayland and on the GLX child, both cards; its other types flat; VTK's draw-buffer warnings window): [references/quad-buffer-programs.md](references/quad-buffer-programs.md).
 
 A Qt 5 program whose OpenGL view stays empty (a `QGLWidget`: Fraqtive's 3D view is black on X11 and grey on native Wayland, on stock Debian as on the edition; the four-cell recipe with a green in the same rig, the vertex arrays set with no context current, QGLWidget drawing nothing under Wayland, and what a Qt 5 OpenGL program needs): [references/qglwidget-on-the-stereo-stack.md](references/qglwidget-on-the-stereo-stack.md).
 

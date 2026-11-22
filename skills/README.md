@@ -56,6 +56,7 @@ Core skills are `sparky-stereo`, `working-practices`, `ai-partners`, `making-ski
 | A program outside the archive added to a distribution's app center (an AppImage from its author's release, checked, installed for every user, removed cleanly) | [upstream-outreach](upstream-outreach/SKILL.md), [adding a program to an app center](upstream-outreach/references/adding-a-program-to-an-app-center.md) |
 | An FFmpeg pull request: series, trailers, FATE, the review bot (with upstream-outreach) | [contrib-ffmpeg](contrib-ffmpeg/SKILL.md) |
 | A HandBrake pull request (with upstream-outreach) | [contrib-handbrake](contrib-handbrake/SKILL.md) |
+| An issue, plugin or mod for Claude Code, and what its terms allow (with upstream-outreach) | [contrib-claude-code](contrib-claude-code/SKILL.md) |
 | A Universal Media Server pull request (with upstream-outreach) | [contrib-ums](contrib-ums/SKILL.md) |
 | An MKVToolNix merge request (with upstream-outreach) | [contrib-mkvtoolnix](contrib-mkvtoolnix/SKILL.md) |
 | An mpv pull request (with upstream-outreach) | [contrib-mpv](contrib-mpv/SKILL.md) |

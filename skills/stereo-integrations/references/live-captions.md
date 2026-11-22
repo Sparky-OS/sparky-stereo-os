@@ -300,3 +300,56 @@ removal. Keep synthetic personal configuration/model-file witnesses in the rig
 and compare their hashes after removal. A text witness checks preservation; it
 is never a real speech-model or transcription result. Installed lifecycle proof
 does not replace the separate page-controlled session and both-eye proof.
+
+
+## Proving the installed Partners switch
+
+Run the installed KCM with `kcmshell6 kcm_sparkystereo_partners`, then invoke its
+accessible controls by their translated names. Check each resulting service,
+configuration and socket state; an accepted accessibility action alone is not
+proof of the requested change. Save the accessible page and a marked stereo
+capture in English and Brazilian Portuguese. Check the known fixture sentence
+at AT-SPI, rather than accepting any nonempty caption.
+
+Use a real systemd user manager in a private container cgroup, as the
+[Partners rig](partners.md) does. Start `graphical-session.target` as a dependency
+of a disposable session target: it deliberately refuses direct manual starts.
+Enable the caption unit only through the page's login control, stop/start the
+session target and verify both the enabled and disabled cases. Add the render
+supplementary group before starting the user manager; otherwise its services
+retain the old groups even if a later `runuser` compositor can access the GPU.
+
+The model-free integration fixture replaces the daemon executable boundary and
+the model catalogue only inside the disposable container. A short text witness
+satisfies the fixture catalogue's checksum without entering any model loader.
+The installed adapter, KCM, user unit and Kaption remain unchanged. The stand-in
+speaks captiond's protocol to both clients, reports an explicitly synthetic
+route, and opens private null-sink/source capture streams according to the
+adapter's generated configuration. Check that Off removes its processes,
+private socket and capture streams. This proves coordination, not recognition
+quality or real-model interoperability; those require known words on the bench.
+
+- **Symptom:** normal Off briefly reports that captiond or Kaption stopped
+  unexpectedly, and the user unit ends failed despite removing every child.
+  **Cause:** `KillMode=control-group` sends SIGTERM to the coordinator and its
+  children together; the protocol can reach EOF before the coordinator handles
+  its stop flag. **Fix:** `KillMode=mixed` signals the coordinator first, allowing
+  its existing orderly child cleanup, while retaining systemd's final group kill
+  at the stop deadline. **Found by:** the installed KCM's Off action and the user
+  journal. Require `Result=success` after Off as well as absence of children,
+  sockets and streams; mere absence passed even before the correction.
+- **Symptom:** a private PipeWire socket exists but the first registry dump fails.
+  **Cause:** the user manager's socket activation races a directly started
+  server in a minimal rig without its complete D-Bus user-service packaging.
+  **Fix for this rig:** stop that container's stock PipeWire socket/service before
+  starting its private daemon, then wait for a successful registry dump, not
+  just the socket pathname. Do not touch the workstation's PipeWire.
+- **Symptom:** playback visibly loops but an advancing-time check times out.
+  **Cause:** the loop returns to timestamp zero and a truth-value readiness
+  helper discards it. **Fix:** return a nonempty observation containing zero;
+  retain the distinct positions and keep the original deadline.
+
+Keep the caption's expected disparity at zero. List nonzero caption rows apart
+as waiting for the compositor correction, preserving their measured disparity
+and aligned glyph error. Readiness checks for KWin wait for its bus ownership
+and actual reply within a declared deadline; do not rely on a five-second sleep.

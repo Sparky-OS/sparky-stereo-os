@@ -68,7 +68,7 @@ Why, in dpkg's own source (1.23.11):
 - `src/main/remove.c`, purge: a conffile is dropped from the purge list only while another package's diversion covers it; `conffderef` follows the conffile's own name with no diversion lookup, so once our postrm has removed our diversion, purge unlinks the owning package's file.
 
 So our file at a name we divert is not shipped in the package's data (Debian Policy 10.7.3 names this way: maintainer scripts that "create, update and maintain the file" and "must not overwrite the user's version").
-The maintainer scripts keep it through ucf, Debian's tool for exactly this (ucf 3.0056, Priority standard, on the edition's image), so its records name what was written and `dpkg-stereo --verify` (0.1.46) names a person's change to it.
+The maintainer scripts keep it through ucf, Debian's tool for exactly this (ucf 3.0056, Priority standard, on the edition's image), so its records name what was written and `dpkg-stereo --verify` (0.1.46) names a person's change to it; a file of it that is gone is counted in the summary and never a problem, since ucf itself leaves a removed file removed ([lean-code, a file kept through ucf](../../lean-code/references/diverted-files.md#why-a-gone-file-is-no-fault)).
 
 ### Through ucf, with nothing asked (sparky-stereo-console 20261122, row 813)
 

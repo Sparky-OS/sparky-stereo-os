@@ -177,8 +177,8 @@ Retain source hashes, provenance and a declaration trace; the extension alone is
 
 **Symptom:** a screen capture is twice the output width even after the virtual output is switched to 2D.
 **Cause:** Stereo KWin's `CaptureActiveScreen` can preserve a declared window's source eyes; its metadata says `stereo: true` but `stereoOutput: false`.
-**Fix:** for a single-output 2D control, use `CaptureWorkspace`, whose stereo selection follows whether an output has stereo eyes. Retain the method and metadata. If a mono frame is duplicated into a marked pair for viewing, explicitly label that duplication; it is not two independently rendered eyes.
-**How found:** the paired source-view capture conflicted with the output mode, followed by inspection of `screenshotdbusinterface2.cpp` and a rerun through workspace capture.
+**Fix:** do not infer output pixels from either API in that case. In this build `CaptureWorkspace` also returned a source pair while its metadata said `stereo: false`: the interface checks output mode while ScreenShotManager checks visible stereo content. For a flat Qt fixture, minimize the stereo viewer and verify the returned width is the actual 1920-pixel output width. Retain the method, visible-window condition and metadata. If a mono frame is duplicated into a marked pair for viewing, explicitly label that duplication; it is not two independently rendered eyes.
+**How found:** the paired source-view capture conflicted with the output mode; the workspace rerun exposed the metadata mismatch. Inspection of `screenshotdbusinterface2.cpp` and `screenshot.cpp` identified the differing predicates. Captures of a visible declared stereo area on the flat output remain source-view diagnostics, not output proof.
 
 ### Stock Gwenview rejects the marked picture
 

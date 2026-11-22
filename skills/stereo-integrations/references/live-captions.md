@@ -121,9 +121,10 @@ These are ScreenShot2 eye renders, not physical scanout evidence.
 An independent reconstruction later captured the first NVIDIA desktop frame at
 0 pixels, with 3 white-mask differences among 13,694 glyph pixels; its later
 video frame was again -2 pixels with zero differences. The cause of that change
-is unresolved. A fixed -2 regression row correctly reports the difference but
-must not be mistaken for a specified depth. Measure timing as well as position
-before treating one snapshot as the program's permanent placement.
+is unresolved. The specified result is now zero disparity: captions are subtitles, identical
+at the same coordinates in both eyes. A -2 result is a failed screen-plane row,
+not a baseline to preserve. Measure timing as well as position before treating
+one snapshot as the program's permanent placement.
 Each case delivered the fixed settled phrase as AT-SPI `object:announcement`.
 No speech output or recognition model ran.
 
@@ -185,11 +186,78 @@ Actual recognition, real-weight sharing and physical output remain bench work.
 
 - **Symptom:** a mapped caption window has no text in a captured desktop frame.
   **Cause:** mapping is not visible-content readiness; an idle hide/re-show can
-  occur between the window query and capture. The cause of that hide/re-show
-  during a continuous synthetic feed was not established.
+  occur between the window query and capture. In 0.1.0, CaptionBox restarts its
+  ten-second clear timer only when the computed captionBlock string changes.
+  Repeated equal final utterances eventually leave that string unchanged; the
+  timer clears the box, and the next utterance shows it again. The Wayland
+  trace records client layer-surface destruction and null-buffer unmap, so this
+  is not evidence of a lost compositor buffer or interrupted audio feed.
   **Found by:** a failed glyph-witness check and matching hide/re-show protocol
   logs during an independently reconstructed rig run.
   **Fix for the measurement fixture:** retain the failing frame, then wait within
   a fixed 60-second deadline for caption ink in both eyes and measure that exact
   frame with its contemporaneous window geometry. Keep the disparity and glyph
   equality checks unchanged. This does not fix or conceal application latency.
+
+
+## Screen plane and the compositor's separate layer rules
+
+KWin's stacking layer and stereo depth role are different classifications.
+In the packaged +stereo3d59 source, `LayerShellV1Window::scopeToType` does not
+recognize `kaption-overlay`, so it is a normal window. `StereoDepth::roleOf`
+exempts a top layer-shell overlay only when its frame covers the whole output.
+A partial, inactive caption therefore becomes Sunk. The first sunk rank is
+one fifth of the negative limit: at a ten-pixel physical limit it is -2 pixels,
+including at 125 percent logical scale. Inspect the exact package source and
+contemporaneous stacking snapshot; a different working checkout is not proof.
+
+The smallest proposed compositor correction is a narrow caption-role exemption
+at the depth classifier, retaining ordinary partial overlays as controls.
+No compositor or application patch is included in this integration. A transient
+zero-disparity frame is not explained by the steady classification alone:
+remapping, deletion/fade handling and depth motion need a frame-specific trace.
+Retain unresolved frames and repeat them; do not infer an internal motion value
+from a window-list snapshot taken before or after the render.
+
+For Kaption's idle rule, the proposed application correction is to restart the
+activity timer on the relevant channel's new utterance event even when the text
+is equal. Test repeated equal final utterances with distinct IDs beyond the idle
+timeout, then real silence, and verify that microphone activity does not hold
+system captions open. This is a source-backed proposed correction, not a patch
+in the package or a claimed upstream acceptance.
+
+## The optional Partners adapter
+
+The adapter uses the page's Settings cascade, KConfig writer, metered policy and
+shared Graphics inventory. It adds no independent hardware detector or renderer.
+One disabled user unit owns captiond and Kaption. Start is explicit; login and
+microphone are separate choices. The frontend starts only after a compatible
+socket status confirms the requested recognition route. A mismatch stops the
+pair and is kept by the Problems engine. The recognizer's measured `behind`
+status supplies the cannot-keep-up message; the assumed command-line latency
+estimate does not.
+
+The shared file stays at its original absolute path or in captiond's native
+model folder. Verify byte count and SHA-256 without calling a model loader.
+Keep Vibe closed while updating its native model.path and models_folder; accept
+only an absent store, an exact edition seed, or this adapter's unchanged receipt.
+Refuse unknown, changed, read-only or symlink stores. Exclusive publication of
+a first file must reject an application that creates the name in between.
+Removing the package must not remove models or personal settings.
+
+- **Symptom:** the recognition route agrees with a device listing but ignores
+  the page's card. **Cause:** the shared compute wrapper intentionally preserves
+  inherited CUDA/HIP/ROCR/ggml visibility as a caller override. **Fix:** the
+  page-owned session removes inherited compute visibility before asking the
+  shared wrapper for both its device listing and its session. **Found by:**
+  reading the wrapper while checking route agreement; a model-free regression
+  asserts that stale visibility and CAPTIOND_INPUT cannot leak into the child.
+- **Symptom:** the user-unit package build rejects `--no-start`. **Cause:** that
+  switch is not accepted by dh_installsystemduser. **Fix:** use its supported
+  `--no-enable`, as the Partners engine packages do, and prove installed state
+  and upgrade behavior separately. **Found by:** the offline debhelper build.
+- **Symptom:** source tests pass but no candidate survives the build. **Cause:**
+  the mandatory archive-backed link gate lacks an explicit signed-archive
+  configuration and sibling package closure. **Disposition:** retain the failed
+  row and prepare that closure; never bypass the gate or call source tests a
+  qualified package. **Found by:** the integration's first source-package build.

@@ -1520,3 +1520,9 @@ The edition's partners, the engines its programs' AI features use, build on thes
 - **ktextaddons** ([invent.kde.org/libraries/ktextaddons](https://invent.kde.org/libraries/ktextaddons)): Laurent Montel and Florian Richer; the library through which KMail and the other KDE programs reach the engine.
 - **AMD's ROCm libraries** (ROCm 7.2.1: MIT, BSD 2-clause, NCSA, Apache 2.0 with LLVM exceptions): Advanced Micro Devices, Inc.; carried in `ollama-rocm` with their licence texts.
 - **ThunderAI** ([github.com/micz/ThunderAI](https://github.com/micz/ThunderAI), GPL-3.0): Mic; the mail add-on that reaches the engine from Betterbird, configured by policy and never installed by the edition.
+
+## Live captions and transcript editing
+
+Kaption and captiond: Alex Márquez Pérez Muñíz Díaz Puras Thaureaux Fagúndo Rivera.
+
+Vibe: thewh1teagle. Whisper.cpp and ggml: Georgi Gerganov and the ggml contributors.

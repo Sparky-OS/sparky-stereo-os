@@ -1547,3 +1547,13 @@ Each eye's view of a stereo icon, given by the icon engine while the edition's Q
 - **KIO** ([invent.kde.org/frameworks/kio](https://invent.kde.org/frameworks/kio), LGPL-2.0-or-later): Kevin Ottens, Rafael Fernández López, Kai Uwe Broulik and Harald Sitter (the Places view), Fredrik Höglund and Shaun Reich (the file item delegate); the places a person meets first in the file manager and the file dialog.
 - **The KDE platform theme** ([invent.kde.org/plasma/plasma-integration](https://invent.kde.org/plasma/plasma-integration)): Kevin Ottens, Aleix Pol Gonzalez, Lukáš Tinkl and Harald Sitter; it gives every Qt program of a KDE session the KIconThemes engine.
 - **Oxygen Icons** ([invent.kde.org/frameworks/oxygen-icons](https://invent.kde.org/frameworks/oxygen-icons), LGPL-3.0-or-later): David Miller, David Vignoni, Johann Ollivier Lapeyre, Kenneth Wimer, Nuno Pinheiro and Riccardo Iaconelli, named in the Debian package's copyright record; their icons are in the file dialog of the proof.
+
+## A window showing a stereo icon is drawn once per eye, in Qt Widgets and in plasmashell (queue row 77, milestone 2, 2026-11-22)
+
+The trigger, Kirigami's per-eye icon and the proof in a real plasmashell build on these projects, named from the headers of the files changed. Names only; these projects do not endorse the edition.
+
+- **The KDE platform theme** ([invent.kde.org/plasma/plasma-integration](https://invent.kde.org/plasma/plasma-integration)): Kevin Ottens, Aleix Pol Gonzalez, Lukáš Tinkl and Harald Sitter; the edition's build adds the trigger beside their Wayland integration.
+- **Kirigami** ([invent.kde.org/frameworks/kirigami](https://invent.kde.org/frameworks/kirigami), LGPL-2.0-or-later): Marco Martin and Aleix Pol Gonzalez (`Icon`, `icon.cpp`); the edition's build asks for each eye's view inside the eye's pass.
+- **KIconThemes**: Hamish Rodda (`KIconEngine`), Geert Jansen, Antonio Larrosa and Michael Pyne (`KIconLoader`, `KIconTheme`), as for milestone 1; the edition's `+stereo3d3` counts each drawing of a stereo icon.
+- **Plasma's desktop and workspace** ([invent.kde.org/plasma/plasma-desktop](https://invent.kde.org/plasma/plasma-desktop), [invent.kde.org/plasma/plasma-workspace](https://invent.kde.org/plasma/plasma-workspace)): the folder view (Eike Hein), Kickoff, the task manager, the system tray and the wastebin applet, unchanged, are the places of the proof; the applets' own authors were not read, as their QML is compiled into the installed plugins.
+- **Kubabbar Glass**: the edition's look and its stereo icon theme, whose Bin pictures the proof shows in both eyes.

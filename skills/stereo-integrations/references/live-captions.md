@@ -83,8 +83,33 @@ expectations rather than a benchmark on the person's machine.
   edition pin; explicitly retain the intended Whisper/ggml versions because
   deb-multimedia also offers them with a higher epoch.
 
+- **Symptom:** the privacy-documentation link test fails after native projection:
+  `TrayMenu.cpp has 184 lines`, while its link names lines 195–199.
+  **Cause:** those source files are also text/line-number inputs to
+  `tools/check-doc-links.py`; compiler equivalence does not qualify that consumer.
+  **Fix:** preserve all eleven C/C++ files cited by the release documentation
+  through a reasoned source-consumer plan passed to `lean.debian_prepare`.
+  Keep the checker unchanged. The authored release passes it before projection.
+- **Symptom:** application-icon and both tray-platform suites get empty or
+  transparent icons. **Cause:** `libqt6svg6` does not install Qt's SVG icon/image
+  plugins. **Fix:** require `qt6-svg-plugins` at build and runtime. The same three
+  compiled suites pass once it is installed, without a source change.
+
+## Installed daemon without a speech model
+
+The packaged testing library's `PrivatePipeWire` plus `Daemon` with
+`--engine stub --no-gpu` measures capture routing without speech inference.
+Record `pw-dump` before start, output-only, separate-input, input-off and pause.
+The installed 0.1.0 daemon opens `captiond` with `stream.capture.sink=true` and
+`target.object=captiond-test-sink`; explicitly selecting input adds
+`captiond-input`, targeting `captiond-test-source` with `node.dont-fallback=true`.
+Disabling input removes that node alone. Pausing removes both capture nodes.
+The fixture uses only private null sink/source nodes, not sound hardware.
+A checker must fail when the microphone target is changed to the system sink;
+this negative control catches a test that merely counts two nodes.
+
 ## Scope still to prove
 
-These notes establish source and packaging preparation. They do not yet claim
-an installed package, stereo disparity, AT-SPI event, shared model listing or
-real recognition latency. Add the measured results only after those rows run.
+Captiond packages pass their source, payload and link gates and the installed
+stub-engine routing check above. Frontend installed stereo disparity, AT-SPI,
+shared model listing and actual recognition latency remain unproven here.

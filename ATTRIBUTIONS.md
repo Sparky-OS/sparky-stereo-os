@@ -1526,3 +1526,5 @@ The edition's partners, the engines its programs' AI features use, build on thes
 Kaption and captiond: Alex Márquez Pérez Muñíz Díaz Puras Thaureaux Fagúndo Rivera.
 
 Vibe: thewh1teagle. Whisper.cpp and ggml: Georgi Gerganov and the ggml contributors.
+
+Orca: Joanmarie Diggs, Federico Mena Quintero, Marc Mulcahy, Willie Walker, Mike Pedersen, Rich Burridge, Eitan Isaacson and Scott Haeger.

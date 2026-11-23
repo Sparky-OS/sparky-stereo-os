@@ -175,3 +175,14 @@ The real shutter and burst routes produced MPO disparity views (MPF 0x020002, tw
 Trap: a successful QSaveFile capture could not be reopened in the rig. Cause: the virtual-camera open interposer forwarded a mode only for O_CREAT, while Qt used O_TMPFILE. Fix: forward the third argument for either flag. Found by a real shutter capture (permission denied), source inspection and the repeated readable capture; changing product permissions would have concealed the fixture defect.
 
 Declaration-library siblings are pinned at 1.12.2 beside layer 1.23.2. Earlier kam61-rig:1 used 1.12.1. Both are joint round dependencies. The local source-ordinal pairing is pending engine row 839; this camera work does not implement that row.
+
+
+## Recording marks and a sustained camera fixture
+
+x264enc takes side-by-side multiview caps and writes frame-packing arrangement SEI. qtmux needed an owning-element change to emit st3d in its visual sample entry; the source is deb-multimedia gst-plugins-good1.0-dmo 1.28.9-dmo1. Both container routes are written once, then checked independently with FFmpeg trace_headers and mkvinfo or a recursive MP4 box parser. Native camera pairs remain 1280×480 (640×480 per eye). The automatic audio source is retained; the isolated test selects audiotestsrc through GStreamer's feature rank, never a station sound device.
+
+The MP4 preflight reads the muxer's writes-st3d capability. VA-API and NVENC H.264 and HEVC currently fail the SEI measurement, so their recording choices refuse before creating a file. Hardware repairs belong in gst-plugins-bad1.0-dmo, not in a later rewrite of the film. The H.265 codecparser currently has no frame-packing message writer, a shared boundary those encoder repairs must address.
+
+Trap: the static viewfinder looked correct but recording received no new frames. A standalone 120-buffer PipeWire consumer, without Kamoso, also stalled on the fixture's default shared pool. With pipewiresink use-bufferpool=false the same consumer reached EOS at 120 frames. The producer then copies unchanged samples into PipeWire-owned buffers. Keep this fixture setting and a sustained-frame control; a single screenshot cannot prove a live source. No camera-pipeline product workaround is needed.
+
+Photo clause audit: CIPA DC-007-Translation-2009 sections 5.2.3.2–5.2.3.3 cover image count and MP entries, 5.2.4.2 MPIndividualNum, 5.2.4.5 BaseViewpointNum, and 6.2.2.2 left-to-right disparity viewpoints. JPS uses the VRex descriptor's stereo type, SBS layout and left-first flag. Video clauses: H.264 Annex D frame packing arrangement; RFC 9559 section 5.1.4.1.28.3 StereoMode; Spherical Video V2 st3d visual sample entry and modes. These marks describe packing, not the person's display geometry.

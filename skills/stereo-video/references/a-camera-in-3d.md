@@ -339,3 +339,16 @@ retains its default 2,048 kbit/s VBV cap. The ordinary Theora quality route has
 no such ceiling. Disable it with vbv-buf-capacity=0, then read the actual x264
 options in the film: rc=crf and normal lookahead, with no vbv_maxrate. Looking
 only at the pass property would miss this restriction on a full stereo pair.
+
+
+**Keep every recording action acknowledgement:** a final response with
+`before=true, checked=false` describes a normal stop, not an automatic start.
+Match its serial to the request before diagnosing a toggle. Inspect the initial
+state, request the desired state, and repeat each desired state once to prove
+idempotence. Consume the serial before invoking a Qt action, which may enter a
+nested event loop. Preserve the whole journal rather than only its last reply.
+Wait for buffers at the preview sink instead of sleeping after camerabin setup;
+log pad counts, timestamps and queue/state snapshots to distinguish a stalled
+stream from a failed action. Ten fresh first-case ordinary recordings passed
+with this fixture. The preceding empty-file stall was not reproduced or called
+fixed by that result.

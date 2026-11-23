@@ -481,3 +481,17 @@ A minimal rig can have translated CJK strings but lack their fonts. Missing-glyp
 boxes can fit where the real text would not. Verify the font inputs, capture the
 rendered page, and reject zero glyph indexes in the laid-out text before treating
 its geometry as a pass. This is a rig-input correction, not a translation.
+
+- **Symptom:** Kaption's live-daemon test sees its output source but immediately
+  fails to find the private input source. **Cause in the test:** it waits for
+  outputSources, then checks inputSources with an immediate QVERIFY although
+  their updates arrive separately. **Proposed upstream test fix, not applied:**
+  wait for the input source independently within the existing readiness bound.
+  Retain the failed log and rerun the unchanged recipe; a retry pass does not
+  erase the race. This is separate from the installed microphone-routing proof.
+- **Symptom:** the link gate refuses conflicting supplied package versions.
+  **Cause:** a successor's own predecessor binaries were also supplied as current
+  siblings. **Fix:** exclude the source's produced binary names and generated
+  companions from current siblings. Keep predecessor packages in the predecessor
+  directory, with a coherent separate predecessor sibling list when other staged
+  sources have also advanced. Do not change the solver or discard its failed row.

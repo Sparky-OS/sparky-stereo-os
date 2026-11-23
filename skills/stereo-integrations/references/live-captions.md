@@ -513,3 +513,15 @@ For a checkout using host Git alternates, a container clone cannot resolve the
 host-only alternate path. Make a self-contained bundle under the new output,
 clone it inside the container, and perform the scratch merge there. Keep the
 fetched base and tested tip in the record; do not mount another checkout writable.
+
+A white-mask comparison must use the caption text viewport, not the whole
+rounded surface. At 125% a three-pixel frame inset included one white pixel
+from the Problems window behind the transparent bottom-right corner; both
+captures falsely reported one differing glyph pixel. The retained coordinate
+was (1723, 926), with right RGB 245/245/245 and left 206/218/232.
+Kaption 0.1.0 CaptionBox.qml defines 36 logical pixels of horizontal padding,
+14 of bottom margin, and viewport height plus 28 for the box. Use those text
+viewport bounds for sampling; keep the same zero glyph-error and disparity
+expectations. Keep the original frame and failed result. Negative controls
+must ignore a pixel outside the text viewport while still detecting a single
+changed pixel inside it. This changes the observer, not Kaption or KWin.

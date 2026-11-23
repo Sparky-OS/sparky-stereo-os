@@ -305,3 +305,31 @@ the corrected header; the full package must rebuild all plugins. An isolated
 FREI0R_PATH must include the system directory after the new plugins to keep
 ordinary C plugins available. Check the header's historical frame-parallelism
 fix separately: it does not repair metadata rewritten during construction.
+
+**Measure ordinary recording before selecting stereo codecs:** published
+Kamoso names its film .mkv but camerabin writes Ogg, Theora quality 48 and Vorbis
+quality 0.3. Read the bytes and negotiated caps, not the suffix. Theora/Ogg cannot
+provide the required H.264 frame-packing SEI plus Matroska StereoMode or MP4 st3d.
+The marked route therefore uses H.264, keeping quality-based encoding, ordinary
+x264 quality defaults and full chroma instead of forcing zerolatency and I420.
+Theora and x264 quality numbers are not equivalent scales. Matroska can keep
+Vorbis; mp4mux cannot, so the MP4 choice names its AAC difference. Remove extra
+audio resampling and test fixed source rate/channel combinations with an actual
+media reader. Use a multiqueue for the two branches: x264's lookahead exceeds a
+plain audio queue's usual limit; disabling lookahead changes encoding quality.
+
+**A viewfinder can work while a recording is empty:** the synthetic PipeWire
+source supplied buffers with GST_CLOCK_TIME_NONE timestamps. Camerabin's
+videorate discarded every buffer, then oggmux reported no video headers on EOS.
+GST_DEBUG=videorate:6 exposed the cause. For this synthetic-camera fixture only,
+set its source's do-timestamp property to use the pipeline clock; leave the
+published program and its encoding profile intact. The resulting Ogg can be
+read back with both audio and video. This finding does not explain missing files
+from the separate stereo recorder, whose appsrc already timestamps its pairs.
+
+**Force overload without stressing the desktop:** attach a blocking probe to
+the recorder's appsrc source pad, enqueue more than its eight-pair guard, then
+remove the probe. The earlier guard destroyed the recording; drop whole pairs
+instead, notify once and keep finalization. Check a second recording resets the
+notice. Pausing immediately after pipeline creation is a bad fixture: a source
+still transitioning can return FLUSHING rather than exercise back pressure.

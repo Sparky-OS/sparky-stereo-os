@@ -422,3 +422,57 @@ different layer or unexplained disparity is a new failure and exits nonzero.
 Do not turn every nonzero disparity into an exception. A complete run's table
 and exit are part of the hand-back; real-model bench measurements remain clearly
 unrun until the person runs that kit.
+
+## Merge qualification and full-page text geometry
+
+Run the unchanged supply-chain wiring test on a scratch merge with the current
+main branch, in addition to package gates. The wiring checker recognizes the
+standard `docker run` launcher; a `docker create` launcher can be rejected even
+when provenance initialization precedes it. Use the standard detached run form,
+initialize provenance first, record its container ID, and inspect its final exit.
+Keep the red checker result and its green successor; do not edit the checker.
+
+Authored DEP-5 files name contributors without copying their contact addresses.
+Audit every added line of the whole branch diff before handing it back. The
+original upstream archives remain byte-identical. A packaging-only correction
+increments the Debian revision, not the upstream release. Rebuild the source
+closure as well as binaries. Create stage retention markers before generating
+SHA256SUMS, include hidden regular files, and reject unlisted files. Retain the
+predecessor closure with verified sums until acceptance. Compare every payload,
+control and source archive member with the predecessor.
+
+- **Symptom:** the full Partners page clips its caption controls at 125 percent,
+  even though their labels already have Text.Wrap. **Cause:** minimum widths of
+  other rows and combo boxes force the containing column wider than its scroll
+  viewport. **Fix:** allow those layout children to shrink, and let each program's
+  choice controls flow onto another line when needed. Keep long text wrapping
+  inside the real page width; a standalone caption component cannot prove this.
+- **Symptom:** a geometry checker reports every native combo label clipped.
+  **Cause:** the native style item's contentWidth is a style size hint including
+  the widest menu entry, not the displayed glyph width. **Fix for the observer:**
+  measure the current text using the control's actual font and available width;
+  use contentWidth/contentHeight for ordinary QQuickText. Require neither
+  truncation nor horizontal overflow; vertical content must remain reachable
+  within the scroll content height.
+- **Symptom:** initial labels momentarily occupy tiny widths and fail the check.
+  **Cause:** asynchronous QML layout has not settled. **Fix for measurement:**
+  require several fresh equal geometry snapshots within the existing readiness
+  deadline, then evaluate them, including a stable failing layout. Never wait
+  until the verdict becomes green.
+
+Load a test-only geometry observer into the installed KCM and capture the full
+page. Check every catalogue found in the installed Partners and caption packages,
+with both cards at 100 and 125 percent. Supply verified locale data so KDE uses
+the selected language; an English fallback is not a translated page. Eight
+caption catalogues still need translation, although the surrounding Partners
+page already has all ten. Catalogue discovery adds their rows when they arrive;
+verify that the adapter actually uses each installed caption catalogue.
+
+- **Symptom:** the bench kit ends in a Python traceback while apt cannot plan
+  installation against an older published package set. **Cause:** an exception
+  escapes the install-plan stage. **Fix:** say that installation cannot be planned,
+  include apt's exact unmet dependency explanation, then run the normal cleanup
+  path and exit nonzero. Test the real apt solver against an isolated empty
+  archive with a deliberately unavailable dependency; assert no fetching or
+  installation, no traceback, and a written cleanup record. This test does not
+  authorize running the real bench kit or loading a model on the station.

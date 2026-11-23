@@ -534,3 +534,11 @@ phase within the same 120-second bound, recording each error. Never retry
 activation after a lost reply: a toggle may already have happened. Negative
 controls cover stale state, stale action introspection and a lost activation
 reply that must produce exactly one activation attempt.
+
+The diagnostic repeat identified an AT-SPI doAction reply timeout: the
+installed Atspi-2.0 GIR documents an 800 ms default method timeout. The
+outer 120-second readiness loop did not change that internal timeout. Set
+atspi_set_timeout from the remaining readiness budget before discovery and
+activation, with startup grace disabled; retain activation duration. Do not
+retry a toggle. This is the existing readiness bound, not a relaxed product
+latency or geometry criterion.

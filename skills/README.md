@@ -25,6 +25,7 @@ Core skills are `sparky-stereo`, `working-practices`, `ai-partners`, `making-ski
 | Artwork, animated pairs or theme assets | [stereo-artwork](stereo-artwork/SKILL.md) |
 | A test on a real machine or 3D television: baselines, recovery with a person at the bench, power and UPS, unattended labs with LAVA or labgrid | [test-bench](test-bench/SKILL.md) |
 | Proving compositor/application stereo, or why the two eyes differ; a showcase stereo screenshot | [stereo-proof-rig](stereo-proof-rig/SKILL.md) |
+| Orca, AT-SPI, slow keys or magnification in a stereo session | [stereo-proof-rig](stereo-proof-rig/references/accessibility-in-a-stereo-session.md) |
 | A 2D source copied onto a 3D target, a replica or a Catch phone monitor | [stereo-proof-rig](stereo-proof-rig/SKILL.md#a-2d-source-copied-onto-a-3d-target) |
 | Kernel/display driver or virtual display modes; the edition kernel's configuration, DKMS modules on a new kernel | [drivers](drivers/SKILL.md), [vkms-stereo](vkms-stereo/SKILL.md) |
 | A USB camera produces no YUYV frames, bulk payloads cross URB boundaries | [drivers](drivers/SKILL.md), its [camera diagnosis and KUnit reference](drivers/references/usb-camera-one-format.md) |
@@ -56,6 +57,7 @@ Core skills are `sparky-stereo`, `working-practices`, `ai-partners`, `making-ski
 | A program outside the archive added to a distribution's app center (an AppImage from its author's release, checked, installed for every user, removed cleanly) | [upstream-outreach](upstream-outreach/SKILL.md), [adding a program to an app center](upstream-outreach/references/adding-a-program-to-an-app-center.md) |
 | An FFmpeg pull request: series, trailers, FATE, the review bot (with upstream-outreach) | [contrib-ffmpeg](contrib-ffmpeg/SKILL.md) |
 | A HandBrake pull request (with upstream-outreach) | [contrib-handbrake](contrib-handbrake/SKILL.md) |
+| An issue, plugin or mod for Claude Code, and what its terms allow (with upstream-outreach) | [contrib-claude-code](contrib-claude-code/SKILL.md) |
 | A Universal Media Server pull request (with upstream-outreach) | [contrib-ums](contrib-ums/SKILL.md) |
 | An MKVToolNix merge request (with upstream-outreach) | [contrib-mkvtoolnix](contrib-mkvtoolnix/SKILL.md) |
 | An mpv pull request (with upstream-outreach) | [contrib-mpv](contrib-mpv/SKILL.md) |

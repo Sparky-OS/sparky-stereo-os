@@ -66,7 +66,7 @@ A file whose comments are smaller than that line stays as it is.
 | --- | --- |
 | sh, bash | bash parses both as one function body; `declare -f` must print the same program (dash also runs `dash -n`) |
 | Python | the same abstract syntax tree (`ast.dump`, positions excluded) |
-| QML, JavaScript | acorn gives the same tokens with the same line breaks (semicolon insertion depends on them) |
+| QML, JavaScript | acorn gives the same tokens with the same line breaks (semicolon insertion depends on them); a `.qml` file is read as QML, with `@` (an annotation, Qt's `T_AT`) as a token of its own since toolkit 0.1.32 |
 | C, C++ | GCC: the same tokens and directives (`-fpreprocessed`), and the same full preprocessing tokens with `__LINE__` pinned where the file preprocesses on its own; no `#line` (since toolkit 0.1.20 a comment-only line goes completely and the authored empty lines stay, so the lines move and `__LINE__`, `assert` and debug line tables name lean lines; the check names every file whose own code reads line numbers), and include guards keep GCC's read-once optimisation |
 | systemd units and its configuration, udev rules, KConfig, desktop entries, tmpfiles, sysctl, kmod | each consumer's documented comment rule (whole lines only; none of these parsers has inline comments) |
 | YAML, TOML | PyYAML composes the same node graph; tomllib reads the same document |
@@ -104,6 +104,8 @@ The [reproducible sources reference](references/reproducible-sources.md) has the
 - `dpkg-stereo --hr /path/to/file`: writes the full HR text to `/usr/share/doc/<package>/hr/<path>`. The HR copies of projected settings arrive by themselves with the first successful online update.
 - `dpkg-stereo --restore [package]`: the way back (removing dpkg-stereo runs it for everything). Originals come from the pristine copies of conffiles and from each package's `.deb`, read once per package from APT's cache or the archive. When the installed version is no longer in either, its files stay lean and recorded, and the package is named: `apt-get install --reinstall <package>` brings them back. `--hold package|path`: never project it again.
 - Conffiles: with native `dpkg-lean-code (= 2)`, a verified projection stays in place and dpkg judges it by its owner's genuine original; older dpkg uses the pre-invoke restoration route. A real edit keeps dpkg's ordinary prompt and force-option decisions. [Proving the native conffile contract](references/dpkg-conffiles.md) has the installed baseline/candidate commands, owner and verifier controls, and the distinction from physical-byte `dpkg --verify`.
+- A file under a dpkg diversion is judged where dpkg keeps its owner's copy (the diverted name), and the diverting package's file at the path as that package's (0.1.43). Before, `--verify` read the owning package's record on the diverting package's file and said `CHANGED /etc/skel/.bashrc (changed by the person)` on an untouched system: [a file under a dpkg diversion](references/diverted-files.md) has the cause, the fix, the test and the traps. Since 0.1.44 the engine also installs a conffile a diversion kept from its package (a unit after the dpkg run), gives back the records 0.1.41 and 0.1.42 lost, downloads nothing by itself on a metered connection, and tells a person who is not root what it needs.
+  Since 0.1.45 one judgement decides every lean conffile without a record, where dpkg keeps it: once after the install, in `--repair`, when dpkg's diversions change and inside the projection of a package a dpkg run unpacked; its record comes back when it is exactly its package's projection, otherwise it is the person's and `--verify` names it (`EDITED PATH (at NAME: ...) (changed by the person: left as they made it)` for a diverted copy).
 
 ## Verifying a projected package by hand
 
@@ -127,3 +129,5 @@ The [reproducible sources reference](references/reproducible-sources.md) has the
 
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part, and ORDER 638's per-file steps on every processor (17 November): the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (47 entries).
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
+
+[Counting what a system does not read](references/counting-what-a-system-does-not-read.md) (ORDER 845, 23 November 2026) is the recipe for the number the principle asks for: trace a real workload, join it with dpkg-stereo's records, two rows per open, a cross-check against the authored forms, and the traps met on the way.

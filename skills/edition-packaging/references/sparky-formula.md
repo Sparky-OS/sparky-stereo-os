@@ -50,6 +50,14 @@ What to check before publishing, each in a throwaway container that starts from 
 
 A file the person deleted before the conversion comes back once, since the old version never recorded it as theirs; after the conversion a deleted conffile stays deleted.
 
+**The conversion with no question at all, a changed file included** (sparky-stereo-console 20261122, row 813): the preinst, on `install` with no old version and on `upgrade` from a version before the first one with conffiles, sets every such file aside under `/var/lib/PACKAGE/held/`, marking it changed when it is neither the old version's bytes (`dpkg-query --control-path PACKAGE md5sums`) nor a default another package puts there (base-files' postinst writes `/etc/motd` from `/usr/share/base-files/motd`); dpkg then finds no file and installs the new conffile without asking; the postinst deletes an unchanged copy, and puts a changed one back at its name with the new conffile beside it as `FILE.dpkg-dist` (what dpkg itself does with `--force-confold`; `dpkg-maintscript-helper mv_conffile` likewise puts the person's file over the new one in its postinst), and says so once in ten languages; the postrm puts the held files back on `abort-install` and `abort-upgrade`.
+In `/etc/skel` the new default goes to `/var/backups/PACKAGE/etc/skel/NAME.dpkg-dist` instead, since useradd copies that folder whole.
+dpkg records the new conffile's hash, so it and `dpkg-stereo --verify` see the person's file as their change from then on.
+A fresh install needs it too: without it, a package that turns `/etc/motd` into its conffile is asked about base-files' motd at its first install.
+After the conversion the file is an ordinary conffile: a later version that changes a default the person changed meets dpkg's own question, and an `apt-get -y` with no `--force-conf*` and no terminal stops at it (`end of file on <standard input> at conffile prompt`, rc 100); with `--force-confdef --force-confold`, as the round's upgrade runs, the change is kept and the new file written as `.dpkg-dist` (measured with fixture packages, row 813).
+That is dpkg's honest question about a real edit, as every conffile of every package on the system meets it, and what the edition's updater does with a conffile question is the updater's design, not the package's: "nothing is asked" stands for an untouched file and for this transition (the main session's ruling, row 813).
+A file at a name the package diverts cannot take this way: the maintainer scripts keep it through ucf, with nothing asked; see [taking over another package's configuration file](taking-over-a-configuration-file.md#our-own-file-at-a-name-we-divert-made-and-kept-by-the-maintainer-scripts-never-a-conffile).
+
 ## Versions and the changelog
 
 - Small tools: `0.MINOR.PATCH`, one step per change.

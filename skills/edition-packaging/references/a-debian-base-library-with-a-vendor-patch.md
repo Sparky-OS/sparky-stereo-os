@@ -1,0 +1,58 @@
+# A Debian base library with a patch of our own
+
+For a library every program loads when nobody upstream has a fix yet: the edition builds its own, amd64 and i386, with its own patch (`Origin: vendor`), and retires it when Debian ships a fix.
+The route is GLib's ([a Debian base library with one upstream commit](a-debian-base-library-with-one-upstream-commit.md)); this page holds what a patch of our own on a Debian format 1.0 source needed besides, and every trap met.
+Written 2026-11-21 from queue row 762c: Debian's libxext 2:1.3.4-1 (published for amd64 and i386 as the binNMU 2:1.3.4-1+b4) with the patch that keeps libXext's Generic Event record for the life of the process, the heap fault behind DisplayXR's crashes at start ([the fault](../../vr-to-3d/references/openxr-runtime-startup-heap-fault.md)).
+The recipe is `sparky-os/packages/libxext/` in the build tree; its rig scripts (reconcile, comparison, apt plan, installed red and green, program starts, runtime starts, upstream form) are named under each step.
+
+## What a patch of our own needed that GLib's route did not
+
+1. **The reconcile finds nothing, and says so with dates.** GLib's step 1, plus X.Org's GitLab `repository/commits?path=src%2FXge.c` (every commit on the file since the release we build on), and its merge requests and issues searched for the fault's words (`xge`, `generic event`, `thread`, `race`, `use after`).
+   A packaging repository can be asleep: Salsa's libxext had its last commit on 2021-09-16 and no `debian/patches/series` at all (the API answers 404), so "no patch" is read from the 404 and the changelog, not from an empty series.
+   `apt-cache madison` printing no experimental line means experimental has no such package; write that, not "none found in experimental".
+2. **The header is the vendor form of [a non-stereo fix](a-non-stereo-fix-on-debians-source.md):** `Description` with the mechanism and the reproduction, `Author:` by name only, `Origin: vendor, <row>`, `Bug-Upstream:` with the dated search, `Forwarded: no`, `Assisted-by:`, `Last-Update:`.
+   The same code is one commit on upstream's own tree (step 6), so the patch and the commit cannot drift apart.
+3. **Debian's source is format 1.0** (a `.diff.gz`, no `debian/source/format`), so there is no series to append to. The recipe applies each patch in a fixed order with `patch -p1 --forward --no-backup-if-mismatch`, copies each file with its header into `debian/patches/` as the record, and checks the change landed (`grep` for one line of each).
+   After `dpkg-source -b` it checks that the new `.dsc` names Debian's orig tarball by its SHA-256 and a `.diff.gz`, never a native tarball.
+   The format is kept as Debian has it; converting to 3.0 (quilt) would also need Debian's own changes outside `debian/` (libxext's diff touches `ChangeLog` and `autogen.sh`) turned into a patch.
+4. **The udeb has no `noudeb` profile in Debian's control.** The edition builds no udeb (the link gate cannot solve udeb dependencies, GLib's trap 8), so the recipe carries the patch attached to Debian bug 1024924 (Helmut Grohne, 2022, `Build-Profiles: <!noudeb>`), with `Origin: other, <bug URL>`, `Bug-Debian:` and `Forwarded: not-needed`.
+   The bug's attachment is not in the SOAP log (`get_bug_log` returns the bodies only): read it from the bug's mailbox, `https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=N;mbox=yes`, with Python's `mailbox` module.
+5. **The fix's test needs an X server.** `tests/xge-thread-stress/run.sh` starts its own when `DISPLAY` is unset: `Xvfb -displayfd 1 -nolisten tcp`, which prints the display number once it accepts clients, so the runner waits for that line and never guesses. With `DISPLAY` set it uses that server (a session's Xwayland).
+   Two CPUs (`docker run --cpuset-cpus A,B`) make the race certain: on Debian's library every round broke within 0.4 s. The program marks itself not dumpable, so its crashes never reach the host's crash list, Valgrind included.
+6. **The upstream form is built as upstream builds it.** libXext's `.gitlab-ci.yml` build job, in Debian testing with the job's `FDO_DISTRIBUTION_PACKAGES`: `autoreconf -ivf`, then in `_builddir` `../configure --disable-silent-rules --enable-specs`, `make`, `make check`, `make distcheck`. Both main and main plus our commit pass it, and the stress program runs against each `_builddir/src/.libs/libXext.so.6` (rig `upstream-form.sh`).
+7. **A library with no test suite says so.** libXext 1.3.4 has none (`SUBDIRS = man src specs`, no `TESTS`): `debian/rules build-arch` without `nocheck` on Debian's tree and on ours runs `dh_auto_test`, which runs `make -j4 check`, and neither leaves a `test-suite.log` or a PASS or FAIL line (rig `own-tests.sh`).
+8. **Name the programs that load the library.** In a Wayland session Dolphin, Konsole, Kate and System Settings do not load libXext; GTK 4 programs do (GTK links its X11 backend), and so do X11 programs through Xwayland. The program-start proof reads each program's `/proc/PID/maps` at 6 s and compares the mapped file's SHA-256 with the installed package's (rig `program-starts.sh`).
+9. **The comparison explains every differing file by an exact rule** (rig `compare-debs.py`; anything else fails it):
+   - Debian's binNMU packages ship `changelog.Debian.ARCH.gz` with the binNMU entry; a source build has none.
+   - Our `changelog.Debian.gz` is our two entries on Debian's text, which debhelper 14.5 trims before 2014 and says so in its last lines (trap 5).
+   - `copyright` is Debian's text, then the edition's packaging paragraph.
+   - `libXext.a` has the same members and global symbols; `Xge.o` no longer calls `XextCreateExtension` or `XextDestroyExtension`, which is the patch; on i386 the compiler's hidden PIC helpers (`__x86.get_pc_thunk.REG`) differ by member.
+   - The generated specifications differ in docbook-xsl's anchor names (`idm36` in Debian's 2021 build, `id-1.1.10` now) and one notice line of xorg-sgml-doctools' stylesheet, and the text pages w3m renders from them in blank lines only.
+
+## The proof, as run on libxext 2:1.3.4-1+stereo3d1+lc1
+
+- **Both architectures from one recipe commit**, at 4 threads, in 70 to 110 s each: build records with `recipeDirty` false and `unrecorded` empty, the link and start gate passed (3 packages on amd64, 2 on i386), the twin check 3 `Multi-Arch: same` packages and 49 shared files, all the same bytes. `dpkg --compare-versions` in each builder: `2:1.3.4-1+stereo3d1+lc1 > 2:1.3.4-1+b4`.
+- **Every package against Debian's:** `libXext.so.6.4.0` keeps NEEDED (`libX11.so.6`, `libc.so.6`), SONAME and its 135 defined dynamic symbols with their versions, on both architectures; nothing unexplained.
+- **apt's plan** on a Debian testing system with libxext6 for amd64 and i386, brought to the published round, then the stage added: 2 `Inst` lines, no `Remv`, nothing kept back.
+- **Red and green on installed packages**, one image (Debian testing, Xvfb, Valgrind): Debian's libxext6 broke the heap in 10 of 10 rounds; the stage's, installed by apt, finished 10 of 10, and memcheck reported no error in 10 of 10.
+- **Real program starts** under the edition's KWin (`--virtual`, Xwayland) with the stage installed by apt: Dolphin, Konsole, Kate, System Settings, gtk4-demo, xeyes and glxgears still running when ended at 12 s; gtk4-demo, xeyes and glxgears map the installed `libXext.so.6.4.0`, whose SHA-256 is the package's.
+- **The upstream form:** X.Org main and main plus our commit both pass the CI build through `make distcheck`; the stress program breaks in 10 of 10 rounds on main and finishes 10 of 10 with the commit; the defined dynamic symbols are identical.
+- **The next version can start from it:** `repo/plain-from-lc.py` on the unpacked `+lc1` source of format 1.0 gives back 2:1.3.4-1+stereo3d1 (exit 0), which differs from Debian's 2:1.3.4-1 only by the changelog entry, the control's `<!noudeb>`, `debian/patches` and `src/Xge.c`, and `dpkg-source -b` packs it again next to the orig tarball.
+- The runtime numbers (DisplayXR's sample on lane 762's image, with and without the library) are on [the fault's page](../../vr-to-3d/references/openxr-runtime-startup-heap-fault.md#the-editions-package).
+
+## Retirement
+
+As GLib's: when Debian's package carries a fix (a Debian revision with a patch, or an upstream release that contains one), the build leaves the next round and Debian's is the candidate again.
+
+## Traps
+
+1. **Symptom:** `build.sh` ends at once with `docker: Error response from daemon: error while creating mount source path '/var/tmp/sparky-repo-current': mkdir /var/tmp/sparky-repo-current: file exists`.
+   **Cause:** the round's folder is a symbolic link (to `/var/lib/sparky-lanes/sparky-repo-r1118a`), and this daemon (Docker Desktop) does not follow a link given as a bind source; it tries to create the path.
+   **Fix:** the launchers mount every folder by its real path (`cd DIR && pwd -P`), the round included. **How found:** `ls -ld` on the path the message named.
+2. **Symptom:** the next run says `Conflict. The container name "/NAME" is already in use`. **Cause:** `docker run -d` created the container and failed at its mounts; `build.sh` stopped under `set -e` before its `docker rm`. **Fix:** `docker run -d ... || { docker rm "$name"; exit 1; }`. **How found:** `docker inspect` showed the container `created`, never started.
+3. **Symptom:** libxext-doc's text pages show `?` where Debian's show `©`. **Cause:** w3m writes them in the build's locale, and the build image has none (POSIX). **Fix:** `LC_ALL=C.UTF-8` in the build's environment, both architectures. **How found:** the comparison of every file with Debian's.
+4. **Format 1.0 warnings that are expected:** `no source format specified`, `source directory 'source' is not <sourcepackage>-<upstreamversion>`, `the diff modifies the following upstream files: ChangeLog autogen.sh src/Xge.c`, and `executable mode 0755 of 'debian/sparky-lean-toolkit/provenance.sh' will not be represented in diff`. The last is harmless: the Lean Code step runs the file through `bash`, never by its mode.
+5. **Symptom:** our `changelog.Debian.gz` lacks Debian's entries from 2013 and earlier. **Cause:** `dh_installchangelogs` of debhelper 14.5 trims old entries and ends the file with `# Older entries have been removed from this changelog.`; Debian's own +b4 build, of January 2026, did not. **Fix:** none needed; the source changelog is whole. **How found:** the comparison.
+6. **Symptom:** an image of Debian testing plus the published round at pin 1001 cannot install System Settings: `Reached two conflicting assignments ... libkf6xmlgui6 Depends libkf6iconthemes6 (>= 6.32.0~) ... libkf6iconthemes6=6.32.0-1 is not selected for install`. **Cause:** the round holds libkf6iconthemes6 6.30.0-1+stereo3d2+lc1 at 1001 while testing's KDE programs need Frameworks 6.32. **Fix for the proof:** build the program-start image from a rig image that already holds the edition's KWin and add the programs from its own sources; the round's lag is a finding of its own. **How found:** the image build's resolver output.
+7. **Symptom:** installing the stage's libxext6 over an image wants to remove libxext-dev. **Cause:** libxext-dev's Depends pin libxext6 to its own version. **Fix:** install both `.deb` files in one `apt-get install`. **How found:** `dpkg-query -W 'libxext*'` in the base image first.
+8. **Symptom:** the lane's evidence files belong to root and cannot be removed. **Cause:** containers that install packages run as root and wrote to the bind-mounted folder. **Fix:** the container's last command is `chown -R CALLER /out`.

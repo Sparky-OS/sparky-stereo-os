@@ -40,6 +40,42 @@ effcol, maintainer of wiz3D, the open continuation of iZ3D's stereo driver ([wiz
 
 skyfishgoo, on the KDE Discuss thread about real depth on the desktop ([KDE Discuss](https://discuss.kde.org/t/real-depth-for-oceans-elevation-a-design-question-for-union/50744)).
 
+> "I'm glad to see it adopted, and the credits to Eisteed's Menu 11 Next, adhe's OnzeMenuKDE and the other authors are exactly right."
+
+naykkalak, author of Fenestra Menu 11, on its place in the edition as a menu the person can choose ([fenestra-menu-11 #7](https://github.com/naykkalak/fenestra-menu-11/issues/7#issuecomment-7085034370)).
+
+> "Hi, thanks for making this software part of your project. Please send the PRs, I will gladly add them here, should be no problem."
+
+Daniel Schopf, author of the Qalculate applet for Plasma, on the translations we offered ([plasma-applet-qalculate #83](https://github.com/dschopf/plasma-applet-qalculate/issues/83#issuecomment-7084856499)).
+
+> "Thank you so much, this is great news! I’m really happy that RadioGlobe will ship in Sparky Stereo OS, and a globe in stereo 3D sounds amazing."
+
+rcspam, author of RadioGlobe, on its place in the edition ([radioglobe #4](https://github.com/rcspam/radioglobe/issues/4#issuecomment-7077384762)).
+
+> "You are absolutely welcome to include the widget in your edition."
+
+Petar Nedyalkov, author of the Advanced Weather Widget ([advanced-weather-widget #283](https://github.com/pnedyalkov91/advanced-weather-widget/issues/283#issuecomment-7059603180)).
+
+> "É uma honra ver a edgetk hospedada no repositório da distribuição, ao lado do Sparky CA, a partir das versões publicadas."
+
+Pedro F. Albanese, author of e521 and edgetk, in Portuguese: it is an honour to see edgetk hosted in the distribution's repository, beside the Sparky CA, from its published versions ([e521 #10](https://github.com/pedroalbanese/e521/issues/10#issuecomment-6782423183)).
+
+> "Thanks, Daniel! I reviewed the patch: the diagnosis is right, and since both places that apply the saved preference (startup and changing it in Preferences) go through `apply_gpu_choice`, the fix covers both."
+
+Dionatan Simioni, author of Vinci, a guided installer for DaVinci Resolve on Linux, on the fix he applied and released in v0.4.8 ([vinci #2](https://github.com/dionatansimioni/vinci/issues/2#issuecomment-6881774258)).
+
+> "Hi @danielcamposramos, thank you, merged for 0.6.3."
+
+Marco Sumari Tellez, author of IngeTrazo, on the stereo eye camera, which he combined with the camera's new lens shift and clip planes ([ingetrazo #1311](https://github.com/ingelibre/ingetrazo/pull/1311#issuecomment-7086809544)).
+
+> "Thanks for the patches. Slightly amended and merged"
+
+Kirill Gavrilov, author of sView, on the three fixes for saving stereo pictures ([sview #186](https://github.com/gkv311/sview/pull/186#issuecomment-6802812863)).
+
+> "Seems like a good change, thanks!"
+
+SubJunk, Universal Media Server maintainer, on telling the person why a 3D file cannot be converted for a renderer ([#6462](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6462#issuecomment-6805583048)).
+
 ## Merged
 
 The maintainers who read the change and merged it are listed, with links, in [Merged outside Sparky Stereo](upstream-merges.md).

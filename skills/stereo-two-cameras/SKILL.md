@@ -54,7 +54,11 @@ Marble's earlier 0.5 to 10 degree controls are historical evidence, superseded f
 
 [Gaussian splats in stereo](references/gaussian-splats.md) traces projection, visibility ordering, shared engine state and the native viewport surface in a splat trainer.
 
+A program that makes its second eye by turning the model (Jmol: its own pair and angle, the closed form of a one-sided turn, the vertical disparity with and without perspective depth) and a plotting module of ours whose cameras are fitted to the person's limits (python3-stereo-matplotlib: the shear in Matplotlib's projection, the fit over every projected point, the proof): [references/rotated-pair-and-fitted-plot.md](references/rotated-pair-and-fitted-plot.md).
+
 A wxWidgets OpenGL canvas (KiCad's 3D viewer) and GRASS GIS's 3D view as declared 3D areas: which case a program is (its own pair or our cameras), the GLX route under Xwayland when wx has no EGL canvas, the limits read on the GL child window, the fit by the depth of every pixel from the camera between the eyes, Enable 3D and Display Settings, the proofs and the traps: [references/wx-gl-canvas-and-grass-view.md](references/wx-gl-canvas-and-grass-view.md).
+
+A Qt 6 `QOpenGLWidget` 3D view (OpenSCAD's preview and rendered model) as a declared 3D area: the stereo format on the view only, a shear for orthographic eyes, the limits read for the top-level surface on Wayland and on the view's own window on X11, the fit by the depth read in a pass from the camera between the eyes, picking from that camera, the options and what is told, the proofs and the traps: [references/qt6-opengl-view-openscad.md](references/qt6-opengl-view-openscad.md).
 
 ## The OpenGL routes
 

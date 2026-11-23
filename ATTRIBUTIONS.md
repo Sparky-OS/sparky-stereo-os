@@ -8,6 +8,14 @@ Our contribution lies in making stereo 3D and deep colour a property of the open
 Names are given as each project gives them: in its about box, its copyright file or its Debian packaging, and for the people who reviewed our patches, as their public profiles show them.
 Contact details are left out on purpose.
 
+## Screen reader and accessibility effects
+
+Brad Hiebert-Treuer, Sarri Al Nashashibi, Daniel Scharstein.
+
+Joanmarie Diggs, Federico Mena Quintero, Mike Gorse.
+
+Lubos Lunak, Sebastian Sauer, Vlad Zahorodnii, Christian Nitschkowski, Martin Gräßlin, Nicolas Fella, Martin Riethmayer, Tomaz Canabrava.
+
 ## polkit
 
 David Zeuthen.
@@ -409,6 +417,13 @@ The edition's DisplayXR package (ORDER 58, [Sparky-OS/displayxr-packaging](https
 - programs reach it through the OpenXR loader of the Khronos Group, as Debian packages it;
 - it joins the `openxr1-active-runtime` alternatives group of Debian's Monado packaging, maintained by Rylie Pavlik, so both runtimes stay selectable.
 
+**The runtime's start-up heap fault (queue row 762c, 2026-11-21)** was found in libXext's Generic Event code, in the work of the people in X.Org's records:
+- libXext's `Xge.c` is by Peter Hutterer, and its `extutil.c` by Jim Fulton (MIT X Consortium); the change that frees the extension record at the last display (ed8d50ba, 2012) is by Chase Douglas, signed off by Peter Hutterer; Alan Coopersmith maintains the file today;
+- the fix follows the technique of libXrandr's `Xrandr.c` (Jim Gettys) and of libXext's own extensions, which keep their record for the life of the process;
+- David Fattal reported the same symptom in DisplayXR (#2711); the runtime's private X displays and its display hotplug thread are by byungjul and David in DisplayXR's history;
+- Valgrind (Julian Seward and its developers) named the write; the debug symbols came from Debian's X Strike Force packaging.
+- The edition's libxext 2:1.3.4-1+stereo3d1, which carries the fix, is Debian's packaging of libXext 1.3.4 by the Debian X Strike Force (its 2:1.3.4-1 upload by Sven Joachim and Timo Aaltonen), with Helmut Grohne's `noudeb` build profile from Debian bug 1024924; the fix's upstream form was built and tested with libXext's own CI job on freedesktop.org's ci-templates.
+
 ### 2.1 The Linux kernel
 
 **Source**: [kernel.org](https://www.kernel.org/) **License**: GPL-2.0 **What we changed**: amdgpu lists and signals the HDMI® 3D modes a display's EDID declares and times frame packing; full side by side handled in the DRM core, i915, nouveau and amdgpu; nouveau gains 16 bits per colour on Turing and newer; a fix for rumble-less gamepads in hid-betopff; VKMS, the virtual display driver, sets HDMI® 3D modes and composes and writes back the frame of both eyes, on Louis Chauvet's configfs series.
@@ -423,6 +438,9 @@ The edition's DisplayXR package (ORDER 58, [Sparky-OS/displayxr-packaging](https
 **Source**: [mesa3d.org](https://mesa3d.org/) **License**: MIT **What we changed**: OpenGL quad buffer, EGL multiview windows and two-layer Vulkan swapchains become one full side by side picture, declared to KWin; a Vulkan layer does the same over drivers outside Mesa.
 **Credit**: Brian Paul, who started Mesa in 1993, and the Mesa developers.
 The GLX files that patch 0045 (a stereo child is declared once its window is viewable, ORDER 50c) changes are `src/glx/dri_common.c`, `dri_common.h`, `dri3_glx.c` and `drisw_glx.c`; by Mesa's own commit history their main authors are Adam Jackson, Kristian Høgsberg, Mike Blumenkrantz, Emma Anholt, Keith Packard, Marek Olšák, Dave Airlie, Emil Velikov, Ian Romanick, Jeremy Huddleston and Kristóf Ralovich.
+Row 830 (a declared surface's lifetime, November 2026) rests on Mesa's Wayland EGL platform, `src/egl/drivers/dri2/platform_wayland.c`, whose header names its authors Kristian Høgsberg and Benjamin Franzke, and on libwayland, by Kristian Høgsberg, Benjamin Franzke, Jason Ekstrand, Jonas Ådahl, Marek Chalupa, Giulio Camuffo, Yong Bakos, Keith Packard and Junio C Hamano with Intel, Collabora, Red Hat, Klarälvdalens Datakonsult, NVIDIA and Samsung, as its copyright file records them.
+Its search of upstream found Pierre-Eric Pelloux-Prayer's [amdgpu winsys import and destroy race fix](https://gitlab.freedesktop.org/mesa/mesa/-/commit/ee625bbb02), reviewed by Marek Olšák, in Mesa 26.2.7 and later, and in mpv llyyr's [handling of an unknown output in `wl_surface.enter`](https://github.com/mpv-player/mpv/commit/f4d13e1c2c).
+Row 835 (November 2026) carries that commit in the edition's mpv with the one it is built on, Dudemanguy's [handling of all outputs disappearing](https://github.com/mpv-player/mpv/commit/3847a8157f6e), and gives libstereo-declare a connection of its own for the outputs, through libwayland's `wl_display_connect_to_fd` and its event queues, by the libwayland authors named above.
 The Kopper test series also carries Mike Blumenkrantz's [Present event-selection correction](https://gitlab.freedesktop.org/mesa/mesa/-/commit/b258e2a051761868734f09774295ee9cee5f7e8d), dated 6 October 2026; it remains outside the package recipe pending integration review.
 
 ### 2.3 NVIDIA's open GPU kernel modules and egl-wayland
@@ -549,10 +567,13 @@ Existing KWin, libkscreen, Qt and FFmpeg credits above also apply.
 | [Kalzium](https://apps.kde.org/kalzium/) and [Avogadro](https://avogadro.cc/) | GPL-2.0-or-later, BSD-3-Clause | Molecules in stereo; why Kalzium drew no molecule with Avogadro 2 (KDE bug 463018) | Kalzium: Carsten Niehaus, Andreas Cord-Landwehr, Marcus D. Hanwell, Inge Wallin and others. Avogadro: Geoff Hutchison, Marcus D. Hanwell and Kitware |
 | [Kubrick](https://apps.kde.org/kubrick/) | GPL-2.0-or-later | The cube once per eye | Ian Wadham |
 | [Netgen](https://ngsolve.org/) | LGPL-2.0-or-later | `-stereo` that does what it says, its drawing area (a Tk and Togl child window) shown in 3D; rebased on Debian's 6.2.2606+dfsg1-3 | Joachim Schöberl; Debian packaging by the Debian Science Maintainers (Kurt Kremitzki, Tobias Frost, Francesco Ballarin, Drew Parsons) |
-| [Jmol](https://jmol.sourceforge.net/) | LGPL-2.1 | `stereo 5` with `set perspectiveDepth off` as the full-width, left-eye-first setting (issue 58); no patch | Bob Hanson, who answered the question, and the Jmol developers; Debian's packaging by the Debichem Team |
+| [Jmol](https://jmol.sourceforge.net/) | LGPL-2.1 | `stereo 5` with `set perspectiveDepth off` as the full-width, left-eye-first setting (issue 58), the preset of the edition's build, whose display is a declared 3D area (ORDER 50 step 4) | Bob Hanson, who answered the question, and the Jmol developers; Debian's packaging by the Debichem Team |
+| [ParaView](https://www.paraview.org/) | BSD-3-Clause | Its Crystal Eyes stereo re-tested on the edition: a declared pair on both routes and both cards; the draw-buffer warnings of issue 19038. The edition's ParaView (ORDER 50 step 5) offers one stereo output, the declared pair, with "Enable 3D" | Kitware and the ParaView developers; Scott Wittenburg (merge requests 7667 and 7994), Cory Quammen (merge request 7363), Mathieu Westphal (issue 19038); Debian's packaging by the Debian Science Maintainers and Alastair McKinstry, on whose source package ours is built |
+| [Matplotlib](https://matplotlib.org/) | Matplotlib License (PSF-based) | Its 3D projection (mplot3d) read for the edition's own stereo module, python3-stereo-matplotlib, which lives outside Matplotlib | The Matplotlib development team |
 | [PyMOL](https://github.com/schrodinger/pymol-open-source) | Open-Source PyMOL licence (its LICENSE file) | The open-source build with one stereo output, the quad buffer, shown by Stereo KWin; carried from Debian unstable (3.1.0+dfsg-1) | Warren L. DeLano, Jason Vertrees, Blaine Bell, Thomas Holder, Piotr Rotkiewicz, Tor Colvin and the other authors of its AUTHORS file; Schrodinger, LLC; Debian packaging by the Debichem Team (Michael Banck, Tatiana Malygina, Stuart Prescott and earlier packagers) |
 | [OpenSCAD](https://openscad.org/) pull request 7112 | GPL-2.0-or-later | The optional stereo preview offered upstream, held until the 2026.11 release | Jordan Brown and Torsten Paul, who reviewed it, and Marius Kintel and the OpenSCAD developers |
-| [VTK](https://vtk.org/) | BSD-3-Clause | Read for the window-size bug: merge request 13642 (`vtkCamera::UpdateStereo`) | Dan Lipsa; Kitware and the VTK developers |
+| OpenSCAD 2026.11 in the edition (queue row 50, step 4) | GPL-2.0-or-later with the CGAL linking exception; Manifold Apache-2.0 | The package from upstream's 2026.11 release candidate, with the 3D view as a declared stereo pair fitted to the person's depth limits | Marius Kintel, OpenSCAD's maintainer, Claire Xenia Wolf, and the developers OpenSCAD's about box lists; Jordan Brown and Torsten Paul, who reviewed pull request 7112; Kristian Nielsen and Christian M. Amsüss, whose Debian packaging of 2021.01 is the base of ours; The Manifold Authors (Emmett Lalish), whose library is built in; Karl Ljungkvist, whose analysis on upstream issue 7205 tells which mimalloc versions OpenSCAD may link |
+| [VTK](https://vtk.org/) | BSD-3-Clause | Read for the window-size bug: merge request 13642 (`vtkCamera::UpdateStereo`). The Qt adapter's draw-buffer state fault behind ParaView issue 19038, fixed in the edition's vtk9 (ORDER 50 step 5) with the technique of merge request 4818, which moved `QVTKOpenGLNativeWidget`'s blit to the state object. The colour-size warnings of a flat Qt view on Wayland, fixed in vtk9 +stereo3d2 with the technique of dc7b841a ("Do not query a missing depth attachment"); 29fc5a9b (issue 19474) had fixed the same warnings on macOS | Dan Lipsa; Cory Quammen (merge request 4818); Spiros Tsalikis (dc7b841a); Jaswant Panchumarti (29fc5a9b); Kitware and the VTK developers; Debian's packaging by the Debian Science Maintainers, Anton Gladky, Gert Wollny and Nico Schlömer, on whose source package ours is built |
 | [Blender](https://www.blender.org/) | GPL-2.0-or-later | Every window a quad-buffer (Time Sequential) window, so a scene's stereoscopy shows at once; GHOST's EGL keeps the stereo request with two views on Wayland; a mono context instead of an exit when GLX has no stereo; the right eye follows mono frames after stereo stops | The Blender Foundation and the Blender developers, from Ton Roosendaal's first Blender on; Debian's packaging by the Debian Multimedia Maintainers and Matteo F. Vescovi |
 | [GNU Octave](https://octave.org/) | GPL-3.0-or-later | `stereo` figure properties | John W. Eaton and the Octave developers |
 | [GRASS GIS](https://grass.osgeo.org/), [KiCad](https://www.kicad.org/), [OpenSCAD](https://openscad.org/), [F3D](https://f3d.app/) | GPL family, BSD-3-Clause (F3D) | Stereo views; for F3D: libf3d as shared packages, the window as one declared stereo surface, a pair thumbnail for every model | The GRASS Development Team; Jean-Pierre Charras and the KiCad developers; Marius Kintel and the OpenSCAD developers; Mathieu Westphal, Michael Migliore, Kitware and the F3D-APP Foundation (F3D's LICENSE.md); Francois Mazen, who maintains F3D in Debian (its changelog), on whose source package ours is built |
@@ -640,7 +661,9 @@ Existing KWin, libkscreen, Qt and FFmpeg credits above also apply.
 | [snapshot.debian.org](https://snapshot.debian.org/) and its machine-readable interface | `dpkg-stereo --restore` fetches the exact installed Debian version when no cache or archive has it any more | The Debian Project; hardware and hosting by Glasklar Teknik AB, LeaseWeb Netherlands B.V. and the Wellcome Trust Sanger Institute, earlier by the University of British Columbia's ECE department and Nordic Gaming; its Flask frontend by Baptiste Beauplat (snapshot.debian.org's own front page) |
 | [APT](https://salsa.debian.org/apt-team/apt)'s apt-helper | The download behind that fetch, so APT's proxies and TLS settings apply | The APT Development Team; Jason Gunthorpe and others (APT's copyright file) |
 | devscripts' debsnap | The way restore uses snapshot's /mr/ interface | David Paleino |
-| [dpkg](https://salsa.debian.org/dpkg-team/dpkg) | The hooks, md5sums and conffile rules dpkg-stereo builds on, and the shared-file check the edition's own dpkg build extends so that Multi-Arch twins install over Lean Code projections (ORDER 363) | Guillem Jover, its maintainer since 2006; Raphaël Hertzog, Christian Perrier, Frank Lichtenheld and others before; Ian Jackson, who wrote its C implementation (dpkg's AUTHORS) |
+| [dpkg](https://salsa.debian.org/dpkg-team/dpkg) | The hooks, md5sums and conffile rules dpkg-stereo builds on, its diversion rules (dpkg-divert: the diverting package's copy at the path, every other copy at the diverted name), by which dpkg-stereo judges a diverted file where dpkg keeps it (rows 629 and 802), and the shared-file check the edition's own dpkg build extends so that Multi-Arch twins install over Lean Code projections (ORDER 363) | Guillem Jover, its maintainer since 2006; Raphaël Hertzog, Christian Perrier, Frank Lichtenheld and others before; Ian Jackson, who wrote its C implementation (dpkg's AUTHORS) |
+| [ucf](https://salsa.debian.org/debian/ucf) | Keeps the files sparky-stereo-console makes at the names it diverts (a person's change kept, the new default beside it as `.ucf-dist`), and its records let `dpkg-stereo --verify` name any file a package keeps through it whose bytes differ from the default that package last offered (row 813) | Manoj Srivastava, its author; Mark Hindley, its maintainer; Marc Haber, its helper functions (ucf's copyright file) |
+| [Debian's bash package](https://salsa.debian.org/debian/bash) | The skel `.bashrc` that reads `~/.bash_aliases` ("You may want to put all your additions into a separate file like ~/.bash_aliases"), where sparky-stereo-console puts the edition's prompt, colours and editor for new accounts instead of diverting bash's file (rows 629 and 802) | Matthias Klose, its maintainer (the package's Maintainer field) |
 | [git](https://git-scm.com/)'s "racy git" rule | A file changed in the same second its record was written is looked at again | Junio C Hamano ("Racy GIT", 2005-12-20; Documentation/technical/racy-git.txt, 2006-08-15) |
 | systemd's syntax pages and [KConfig](https://invent.kde.org/frameworks/kconfig) | The settings formats each Lean Code adapter follows (systemd.syntax(7), tmpfiles.d(5), sysctl.d(5) and the others) | The systemd and KDE Frameworks contributors |
 | [Sparky Backup Core](https://github.com/sparkylinux/sparky-backup-core) | The packer whose pre-squashfs hook, in the edition's fork, runs Lean Code's step for the image | Paweł "pavroo" Pijanowski |
@@ -654,6 +677,20 @@ The unchanged kernel-settings package records **Sultan Alsawaf** and **Eric Naim
 **Valve** publishes the mapping ceiling in [Proton's requirements](https://github.com/ValveSoftware/Proton/wiki/Requirements).
 The helper itself contains no copied CachyOS code. /tmp on disk follows **Debian's trixie release notes** (5.1.6 and 5.2.1, the Debian Documentation Project).
 Names above come from upstream copyright, Debian copyright or git records; contact details are omitted.
+
+### Plasma widgets the edition forks for stereo depth
+
+Each original stays in its author's repository, where bugs and patches for it go; the edition's fork holds only the stereo variant.
+Names are given as each project's README and history give them.
+
+**[Advanced Weather Widget](https://github.com/pnedyalkov91/advanced-weather-widget)** (GPL-2.0-or-later; the edition's fork is [stereo-advanced-weather-widget](https://github.com/Sparky-OS/stereo-advanced-weather-widget)) is the work of its author and maintainer and of the people who joined him:
+- **Author and maintainer:** Petar Nedyalkov, who also wrote the Bulgarian translation.
+- **Code:** rcspam (among it the weather maps), Mizu Ikki, Yoan Dimitrov, Zhora Zmeykin (Katze-942), Kassandra (KassLavender), JoshuaKimsey (among it the Meteocons icon work) and Zhuocheng-Lang.
+- **Translations:** HolySoap and TomfromBerlin (German), PauloAlbqrq (Brazilian Portuguese), Heimen Stoffels (Dutch), Dmaliog, PhvntxmX and Katze-942 (Russian), LAZER-TY and rcspam (French), herzane52 (Turkish), NecaX and BroxiCoros (Spanish), Yo-oo (Traditional Chinese), Guokangz (Simplified Chinese), Zero-MF (Czech), Aldo Latino (Italian), summoner001 (Hungarian), l3monik (Polish), NaviMen (Ukrainian), presire (Japanese), vitneum (Korean) and tonikarppi (Swedish).
+- **What it builds on** is listed with each licence in its README's "Data Sources": Weather Icons by Erik Flowers, Meteocons by Bas Milius, SunCalc and Leaflet by Vladimir Agafonkin, MapLibre GL JS, OpenFreeMap, OpenStreetMap and its contributors, Photon by komoot, Open-Meteo, RainViewer, LibreWXR, Natural Earth, NASA's Moon and night-lights images, NOAA's Space Weather Prediction Center and KDE's FOSS Public Alert Server among them.
+
+**[Plasma Panel Colorizer](https://github.com/luisbocanegra/plasma-panel-colorizer)** (GPL-3.0; the edition's fork is [plasma-stereo-panel-colorizer](https://github.com/Sparky-OS/plasma-stereo-panel-colorizer)) is by Luis Bocanegra, its author and maintainer, with contributions from the people in its [contributors list](https://github.com/luisbocanegra/plasma-panel-colorizer/graphs/contributors): J0anJosep, Heimen Stoffels (Vistaus), mill413, chester-berkeley, qud0, smileyhead, novuskeylabs, kkkzbh, Vaithre, dinhkarate, blrain3, JustTNE, jerry2714, HeitorAugustoLN, Harald Sitter (hsitter), Ericferraz15, chun-awa and eggroll-bot.
+What it builds on is in its README's "Acknowledgements & useful resources".
 
 ### Controller input
 
@@ -1485,3 +1522,65 @@ Sources: OBS Studio 33.0.1's AUTHORS and source headers, obs-websocket 5.7.6's s
 - **OBS Studio**: original author Lain Bailey, with the contributors OBS's AUTHORS file names first (jpark37, PatTheMav, Ryan Foster, derrod, Sebastian Beckmann, R1CH, cg2121, Palana, tytan652, WizardCM, Warchamp7, Norihiro Kamae, fryshorts, pkv) and the rest of that file; GPL-2.0-or-later. The module builds on libobs and the frontend API, and its rig drives OBS through **obs-websocket** (Stephane Lepin and Kyle Manning, from its source headers).
 - **deb-multimedia**: Christian Marillat packages the obs-studio and libobs-dev the module is built against.
 - **JackDesBwa**: his MIT-licensed Lua filters for side by side in OBS (`obs_filter_sbs2a.lua`, `obs_filter_sbsadjust.lua`) were read; they are not carried, since one makes an output format (anaglyph) and the other moves the views, which changes depth, and the edition leaves both to Stereo KWin. His vertical alignment of a side-by-side source is the idea behind the input correction proposed for the module's next milestone.
+
+## Partners: the local engine (ORDER 70, 2026-11-21)
+
+The edition's partners, the engines its programs' AI features use, build on these projects, named from their own records. Names only; these projects do not endorse the edition.
+
+- **Ollama** ([github.com/ollama/ollama](https://github.com/ollama/ollama), MIT, "Copyright (c) Ollama"): the engine its clients already speak to; read at v0.40.16 for its parts, its settings and its cloud switch.
+- **llama.cpp and ggml** ([github.com/ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp), [github.com/ggml-org/ggml](https://github.com/ggml-org/ggml), MIT, "Copyright (c) 2023-2026 The ggml authors"): Georgi Gerganov and the ggml authors; the inference Ollama's runners are built from, and Debian's `llama.cpp` and `ggml` packages, measured as the other engine a person may choose.
+- **ktextaddons** ([invent.kde.org/libraries/ktextaddons](https://invent.kde.org/libraries/ktextaddons)): Laurent Montel and Florian Richer; the library through which KMail and the other KDE programs reach the engine.
+- **AMD's ROCm libraries** (ROCm 7.2.1: MIT, BSD 2-clause, NCSA, Apache 2.0 with LLVM exceptions): Advanced Micro Devices, Inc.; carried in `ollama-rocm` with their licence texts.
+- **ThunderAI** ([github.com/micz/ThunderAI](https://github.com/micz/ThunderAI), GPL-3.0): Mic; the mail add-on that reaches the engine from Betterbird, configured by policy and never installed by the edition.
+
+## Dictation with Vibe in KDE's text add-ons (ORDER 72, 2026-11-22)
+
+Dictation in the programs built on KDE's speech-to-text library, with Vibe's engine, builds on these projects, named from their own records. Names only; these projects do not endorse the edition.
+
+- **ktextaddons** ([invent.kde.org/libraries/ktextaddons](https://invent.kde.org/libraries/ktextaddons), GPL-2.0-or-later): Laurent Montel, who finished the speech-to-text manager in September 2026 and exported its settings dialog in October 2026 (both carried from the v2.3.0 tag into the edition's 2.1.2 build, with his name on the patches), and Florian Richer; the library the Vibe engine is a plugin of.
+- **Vibe** ([github.com/thewh1teagle/vibe](https://github.com/thewh1teagle/vibe), MIT): thewh1teagle; its `vibe-server`, run unchanged through its documented local API, is the engine.
+- **whisper.cpp and ggml** ([github.com/ggml-org/whisper.cpp](https://github.com/ggml-org/whisper.cpp), [github.com/ggml-org/ggml](https://github.com/ggml-org/ggml)): Georgi Gerganov and the ggml contributors; the speech inference inside `vibe-server`.
+
+## Stereo icons wherever the desktop draws an icon (queue row 77, milestone 1, 2026-11-22)
+
+Each eye's view of a stereo icon, given by the icon engine while the edition's Qt draws a window once per eye, builds on these projects, named from the headers of the files read. Names only; these projects do not endorse the edition.
+
+- **KIconThemes** ([invent.kde.org/frameworks/kiconthemes](https://invent.kde.org/frameworks/kiconthemes), LGPL-2.0-or-later): Hamish Rodda (`KIconEngine`), Geert Jansen, Antonio Larrosa and Michael Pyne (`KIconLoader`, `KIconTheme`); the edition's stereo folders and per-eye views are patches on their loader.
+- **Kirigami** ([invent.kde.org/frameworks/kirigami](https://invent.kde.org/frameworks/kirigami), LGPL-2.0-or-later): Marco Martin and Aleix Pol Gonzalez (the `Icon` item that draws Plasma's icons), read for the plan.
+- **Plasma's desktop folder view** ([invent.kde.org/plasma/plasma-desktop](https://invent.kde.org/plasma/plasma-desktop)): Eike Hein (`FolderItemDelegate.qml`), read for the plan.
+- **KIO** ([invent.kde.org/frameworks/kio](https://invent.kde.org/frameworks/kio), LGPL-2.0-or-later): Kevin Ottens, Rafael Fernández López, Kai Uwe Broulik and Harald Sitter (the Places view), Fredrik Höglund and Shaun Reich (the file item delegate); the places a person meets first in the file manager and the file dialog.
+- **The KDE platform theme** ([invent.kde.org/plasma/plasma-integration](https://invent.kde.org/plasma/plasma-integration)): Kevin Ottens, Aleix Pol Gonzalez, Lukáš Tinkl and Harald Sitter; it gives every Qt program of a KDE session the KIconThemes engine.
+- **Oxygen Icons** ([invent.kde.org/frameworks/oxygen-icons](https://invent.kde.org/frameworks/oxygen-icons), LGPL-3.0-or-later): David Miller, David Vignoni, Johann Ollivier Lapeyre, Kenneth Wimer, Nuno Pinheiro and Riccardo Iaconelli, named in the Debian package's copyright record; their icons are in the file dialog of the proof.
+
+## A window showing a stereo icon is drawn once per eye, in Qt Widgets and in plasmashell (queue row 77, milestone 2, 2026-11-22)
+
+The trigger, Kirigami's per-eye icon and the proof in a real plasmashell build on these projects, named from the headers of the files changed. Names only; these projects do not endorse the edition.
+
+- **The KDE platform theme** ([invent.kde.org/plasma/plasma-integration](https://invent.kde.org/plasma/plasma-integration)): Kevin Ottens, Aleix Pol Gonzalez, Lukáš Tinkl and Harald Sitter; the edition's build adds the trigger beside their Wayland integration.
+- **Kirigami** ([invent.kde.org/frameworks/kirigami](https://invent.kde.org/frameworks/kirigami), LGPL-2.0-or-later): Marco Martin and Aleix Pol Gonzalez (`Icon`, `icon.cpp`); the edition's build asks for each eye's view inside the eye's pass.
+- **KIconThemes**: Hamish Rodda (`KIconEngine`), Geert Jansen, Antonio Larrosa and Michael Pyne (`KIconLoader`, `KIconTheme`), as for milestone 1; the edition's `+stereo3d3` counts each drawing of a stereo icon.
+- **Plasma's desktop and workspace** ([invent.kde.org/plasma/plasma-desktop](https://invent.kde.org/plasma/plasma-desktop), [invent.kde.org/plasma/plasma-workspace](https://invent.kde.org/plasma/plasma-workspace)): the folder view (Eike Hein), Kickoff, the task manager, the system tray and the wastebin applet, unchanged, are the places of the proof; the applets' own authors were not read, as their QML is compiled into the installed plugins.
+- **Kubabbar Glass**: the edition's look and its stereo icon theme, whose Bin pictures the proof shows in both eyes.
+
+## Lean Code reads QML annotations; Kirigami packaged; a screen whose mode cannot be read is told (queue row 77, milestone 3, 2026-11-22)
+
+Names only, from each project's records and the headers of the files read; these projects do not endorse the edition.
+
+- **acorn** ([github.com/acornjs/acorn](https://github.com/acornjs/acorn), MIT): Marijn Haverbeke and its contributors; the Lean Code QML check extends its tokenizer with QML's `@` token through acorn's own plugin interface (`Parser.extend`).
+- **Qt Declarative's QML lexer and grammar** (`qqmljslexer.cpp`, `qqmljs.g`; The Qt Company and the Qt Project): the clauses the check follows for annotations (`T_AT`, `UiAnnotation`, `UiAnnotatedObject`, `UiAnnotatedObjectMember`).
+- **Kirigami's `ListSectionHeader`**: Björn Feber; its annotation is the first QML annotation the edition's packaging met, and Debian's file is the test's fixture, read in place.
+- **libkscreen** ([invent.kde.org/plasma/libkscreen](https://invent.kde.org/plasma/libkscreen)): Daniel Vrátil and Sebastian Kügler (`backendmanager.cpp`); the platform theme's one read uses `KScreen::GetConfigOperation`, and the rig makes it fail through `KSCREEN_BACKEND`.
+- **Solid** ([invent.kde.org/frameworks/solid](https://invent.kde.org/frameworks/solid)): its fake backend (`SOLID_FAKEHW`) gives the rig a machine with no drive; its fstab backend's overlay support is why a container's root showed in the Places panel.
+- **ECM** (`kde_package_app_templates`) and **KDevelop**'s app templates: the reason Kirigami's template stays authored.
+
+## Live captions and transcript editing
+
+Kaption and captiond: Alex Márquez Pérez Muñíz Díaz Puras Thaureaux Fagúndo Rivera.
+
+Vibe: thewh1teagle. Whisper.cpp and ggml: Georgi Gerganov and the ggml contributors.
+
+Orca: Joanmarie Diggs, Federico Mena Quintero, Marc Mulcahy, Willie Walker, Mike Pedersen, Rich Burridge, Eitan Isaacson and Scott Haeger.
+
+## Counting what Lean Code saves a system from reading (ORDER 845)
+
+strace ([github.com/strace/strace](https://github.com/strace/strace)), whose own copyright file names Paul Kranenburg, Branko Lankester, Ulrich Pegelow, Michael Elizabeth Chastain, Rick Sladkey, Wichert Akkerman and the strace developers: the traces of opens and reads. Netdata ([github.com/netdata/netdata](https://github.com/netdata/netdata)): the station's history, read through its read-only API. The earlier count of a boot's reads is the Lean Code lane's of 17 October 2026 (milestone 4); its method (the files a boot opens joined with the survey of what was projected) is the starting point of this one.

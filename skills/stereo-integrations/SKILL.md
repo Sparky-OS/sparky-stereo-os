@@ -157,6 +157,10 @@ Then the stereo proof of the general skill for anything that changes what a pers
 Check the project's stance on AI before anything (OBS discourages it, Krita has a moratorium, Blender has a published policy, KDE had none adopted in October 2026); find who owns the code in its own records; draft the heads-up as [`upstream-outreach`](../upstream-outreach/SKILL.md) says; the main session and Daniel send it.
 A pack that only calls a program's command line, as these two do, needs no message to its authors.
 
+## A program's AI: partners, local and at providers
+
+A program's AI feature (KMail and the other KDE programs through ktextaddons, Vibe, Kdenlive, Spirula Studio, Betterbird with ThunderAI) follows the person's choice on the Partners page: an engine on this computer or a provider's service, a model and a card per kind of work. [Partners](references/partners.md) has the engine package as built (Ollama split by hardware, NVIDIA's libraries from NVIDIA's repository), how a computer gets its runner, what each program reads today, how to read each part without pulling a model, which card the engine computes on and how the Partners choice reaches it (measured), the Partners page and its command, and thirty-four traps; and the speech back end: Vibe as an engine of KDE's speech-to-text library (dictation), its server's lifetime (started at the press, ended at the answer or a cancel), why an engine cannot dictate, the language field (never `detect_language`, which Vibe answers with an empty text), the stand-in server that follows the real one, the virtual microphone and eighteen traps.
+
 ## Lessons from the lanes, October to November 2026
 
 From the lanes of 25 October to 6 November 2026; add the next lesson here as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
@@ -164,3 +168,5 @@ From the lanes of 25 October to 6 November 2026; add the next lesson here as you
 - Symptom: a `bash -c '...'` script breaks at parse. Cause: an apostrophe inside a comment in a single-quoted script; the same with an apostrophe inside `"${var:-word}"` in a function. Fix: no apostrophes in such comments; use a plain variable. (lane nvidia-legacy-354)
 - Symptom: OBS 33 never loads a module copied to `~/.config/obs-studio/plugins/NAME/`. Cause: its plug-in manager reads a person's modules from `$XDG_DATA_HOME/obs-studio/plugins/NAME/` (the config folder is the legacy layout, with `bin/64bit/`). Fix: the system folder for a package, `~/.local/share` for a test; found in `PluginModuleLoader_Linux.cpp` when the log's "Loaded Modules" list lacked it ([a native pack](references/native-pack.md); lane obs-stereo-61obs)
 - Symptom: stereo-display-info says "not announced" when the probe itself failed or timed out. Fix: separate "could not be checked (timeout / exit status / not installed)" from "not announced"; catalogue unreadable is told and kept as a person problem, not treated as nothing installed (lane no-fallbacks-system-346f3)
+
+[Live captions](references/live-captions.md) covers Kaption and captiond release packaging, model-free frontend proofs, and their boundary with Vibe.

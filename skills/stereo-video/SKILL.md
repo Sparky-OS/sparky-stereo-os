@@ -25,7 +25,7 @@ For detection, conflicting marks or half/full packing, read [metadata precedence
 These are settled rules; check the existing shared policy and its callers before designing another detector.
 
 **Check freshness first.**
-Written on 2026-10-07; metadata precedence and geometry clarified on 2026-10-20; the television's two paths added on 2026-11-02; an editor in 3D (Kdenlive and MLT) added on 2026-11-21.
+Written on 2026-10-07; metadata precedence and geometry clarified on 2026-10-20; the television's two paths added on 2026-11-02; an editor in 3D (Kdenlive and MLT) added on 2026-11-21, its effects and compositions on each eye on 2026-11-22.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; a player also loads [`stereo-window-3d-area`](../stereo-window-3d-area/SKILL.md) for its video layer.
 
 ## The marks a video carries
@@ -171,8 +171,8 @@ Which frames take the GPU route through the layer and which the wl_shm copy, how
 
 ## An editor: the monitor in 3D by default, presets, clips of any packing, the resolution per eye, a clip's corrections
 
-Kdenlive's monitors show a 3D clip in 3D by default wherever the compositor takes stereo content, and say once why when they cannot; its 3D options are the layer's Enable 3D, the left eye's view and Display Settings; its Stereoscopic 3D render presets write full side by side marked in the stream and the container; a 3D project's resolution is one eye's, so a 1920x1080 project renders 3840x1080; in a 3D project each clip is taken apart side by side in MLT before the project's frames are made, a 10 bit clip at its depth; each clip's properties carry the layer's 3D Input Format, Swap left and right eyes and the save into the file; thumbnails are the left eye's view.
-[The recipe, where each part lives, the proof and the traps](references/an-editor-in-3d.md) (ORDER 61e): KConfig keeps no choice equal to the default, MLT's normalizers pad a packed frame before a producer's filter (and in a chain they are links before every filter), libx265 writes no frame packing SEI, FFmpeg's MP4 muxer writes `st3d` only with `strict=-1`.
+Kdenlive's monitors show a 3D clip in 3D by default wherever the compositor takes stereo content, and say once why when they cannot; its 3D options are the layer's Enable 3D, the left eye's view and Display Settings; its Stereoscopic 3D render presets write full side by side marked in the stream and the container; a 3D project's resolution is one eye's, so a 1920x1080 project renders 3840x1080 and both monitors work on that frame of two eyes; in a 3D project each clip is taken apart side by side in MLT before the project's frames are made, a 10 or 12 bit clip at its depth, and a 2D clip, title, still or colour is the same picture in both eyes; every effect and composition acts on each eye in that eye's coordinates (MLT gives each service each eye as a picture of its own), and an effect that can only work on the two eyes as one picture says so; each clip's and 3D still's properties carry the installed layer's 3D Input Format, Swap left and right eyes and the save into the file; thumbnails are the left eye's view.
+[The recipe, where each part lives, the proof and the traps](references/an-editor-in-3d.md) (ORDER 61e): MLT's consumer writes its width into the profile it shares with every service (give it a profile of its own), a qtblend leaves its scaling on the frame for the next, crop sizes itself at process time, KConfig keeps no choice equal to the default, MLT's normalizers pad a packed frame before a producer's filter (and in a chain they are links before every filter), libx265 writes no frame packing SEI, FFmpeg's MP4 muxer writes `st3d` only with `strict=-1`.
 
 ## A film without sound says so
 

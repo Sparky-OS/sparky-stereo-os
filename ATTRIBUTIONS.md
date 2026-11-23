@@ -16,6 +16,8 @@ Advanced Weather Widget: Petar Nedyalkov, rcspam, Mizu Ikki, ydimitrof, Katze-94
 
 KImageFormats, libjxl, libavif, Qt SVG.
 
+Blender, Cycles, ExifTool, Exiv2.
+
 ## Screen reader and accessibility effects
 
 Brad Hiebert-Treuer, Sarri Al Nashashibi, Daniel Scharstein.

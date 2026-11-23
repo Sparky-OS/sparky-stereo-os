@@ -182,6 +182,10 @@ Check both the bytes and a reader round trip: an unmarked `.jps` can reopen corr
 
 [Stereo files that open anywhere](references/stereo-files-that-open-anywhere.md): the recipe for MPO, JPS, PNS, MP4 with `st3d` and the frame packing SEI, Matroska and WebM with `StereoMode` made from real left and right pictures, each mark written by a script in `scripts/` and read back by a second parser, the eye-order measurement for a found pair, what a plain viewer shows, and seven traps.
 
+## Animated stereo theme icons
+
+[Proving an animated stereo icon in Plasma](references/animated-stereo-icons.md) covers the applets' themed and file paths, the SVG and timed raster fixture recipes, decoded and scene graph formats, and how to match a frame across both eyes in the compositor.
+
 ## Lessons from the lanes, October to November 2026
 
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (13 entries).

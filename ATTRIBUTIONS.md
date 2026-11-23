@@ -8,6 +8,14 @@ Our contribution lies in making stereo 3D and deep colour a property of the open
 Names are given as each project gives them: in its about box, its copyright file or its Debian packaging, and for the people who reviewed our patches, as their public profiles show them.
 Contact details are left out on purpose.
 
+## Weather applets and animated image readers
+
+Weather Report: Luís Gabriel Lima, Bohdan Onofriichuk, Friedrich W. H. Kossebau, Petri Damstén, Ismael Asensio.
+
+Advanced Weather Widget: Petar Nedyalkov, rcspam, Mizu Ikki, ydimitrof, Katze-942, KassLavender, JoshuaKimsey, Zhuocheng-Lang.
+
+KImageFormats, libjxl, libavif, Qt SVG.
+
 ## Screen reader and accessibility effects
 
 Brad Hiebert-Treuer, Sarri Al Nashashibi, Daniel Scharstein.

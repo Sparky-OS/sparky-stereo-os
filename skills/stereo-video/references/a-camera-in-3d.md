@@ -164,3 +164,14 @@ Dynamic labels also need extraction: generate the xgettext input from `stereo_po
 **Cause:** Qt Quick's distance-field glyph atlas allocation depends on QSet iteration. Qt's randomized hash seed changes that order and thus glyph texture coordinates. In the measured renderer this changes a rounding result at a text edge; that last floating-point mechanism is an inference from the source and controlled seed comparison, not a captured shader trace.
 **Fix:** set `QT_HASH_SEED=0` in the isolated test environment, for both published and changed programs. Do not set it as a product default or weaken pixel equality.
 **How found:** five published pairs under each seed policy, followed by off/published and on/off comparisons, with all samples retained. Qt 6.11.2's [populate implementation](https://github.com/qt/qtdeclarative/blob/v6.11.2/src/quick/scenegraph/qsgadaptationlayer.cpp) collects new glyphs into a QSet; [requestGlyphs](https://github.com/qt/qtdeclarative/blob/v6.11.2/src/quick/scenegraph/qsgrhidistancefieldglyphcache.cpp) allocates atlas rectangles in its iteration order.
+
+
+## Fresh MPO and JPS captures
+
+The camera's latest normalized pair is given to QImageWriter with Stereo3DLayout=sideBySideLeftFirst. The edition's KImageFormats writers call the shared descriptor writers; do not assemble MPF or JPS bytes in Kamoso. MPO is the study's first/default choice; JPS is selectable. Use QSaveFile for a fresh local capture, and complete the temporary file before starting KIO for a remote destination. Preserve jpegenc's default quality (85 in the measured rig). Camera changes invalidate the retained pair. A missing or unwritable writer reports failure.
+
+The real shutter and burst routes produced MPO disparity views (MPF 0x020002, two images, BaseViewpointNum=1) and JPS left-first side-by-side. ExifTool and KFileMetaData identify the marks; the layer returns two native 640×480 views. Native writer tests also reject malformed pairs and leave an existing destination unchanged.
+
+Trap: a successful QSaveFile capture could not be reopened in the rig. Cause: the virtual-camera open interposer forwarded a mode only for O_CREAT, while Qt used O_TMPFILE. Fix: forward the third argument for either flag. Found by a real shutter capture (permission denied), source inspection and the repeated readable capture; changing product permissions would have concealed the fixture defect.
+
+Declaration-library siblings are pinned at 1.12.2 beside layer 1.23.2. Earlier kam61-rig:1 used 1.12.1. Both are joint round dependencies. The local source-ordinal pairing is pending engine row 839; this camera work does not implement that row.

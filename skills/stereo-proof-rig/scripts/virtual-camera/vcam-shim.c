@@ -211,7 +211,7 @@ int open(const char *path, int flags, ...)
 {
     va_list ap;
     va_start(ap, flags);
-    int mode = (flags & O_CREAT) ? va_arg(ap, int) : 0;
+    int mode = ((flags & O_CREAT) || (flags & O_TMPFILE) == O_TMPFILE) ? va_arg(ap, int) : 0;
     va_end(ap);
     int handled;
     int fd = vopen(path, flags, mode, &handled);

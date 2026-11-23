@@ -25,6 +25,36 @@ For an off-axis photograph, predict the horizontal shift at distance z from the 
 
 At every rendered size, check that the first and last row and column of each eye have alpha exactly zero. Count the interior pixels whose alpha is 1 to 15, both in the stored precision and after conversion to 8-bit. These counts distinguish a soft intended silhouette from a large faint layer.
 
+## Judge the icon where the person sees it
+
+1. Read the look's own files for the panel, not a review colour. The edition's default look names its Plasma style in `default/org.sparkystereo.desktop/contents/defaults`; that style's `widgets/panel-background.svg` gives the panel centre's fill and opacity (black at 0.91015625), and its `plasmarc` says whether blur and contrast change what shows through (both off). What shows through a bottom panel is the wallpaper, so composite the panel over the default wallpaper's bottom rows (grey 24.8 gives `#020202`).
+2. Take the text colour from the same style's `colors` file, `[Colors:Window] ForegroundNormal`. A symbolic icon takes that colour on the panel.
+3. Put each sheet on the dark panel first, then on the second look's panel, then on a light fill, at native sizes. A 22 px icon is judged at 22 px, then magnified with nearest-neighbour sampling, never only at 64.
+
+## The symbolic treatment
+
+KDE's weather applet asks for the `-symbolic` name in a panel ([KDE HIG, icons](https://develop.kde.org/hig/icons/): at 22 px icons are "almost always symbolic"). A KDE symbolic icon is one colour: its SVG paths use the class `ColorScheme-Text` with `fill:currentColor`, and the icon loader replaces the stylesheet's colour with the panel's text colour (Oxygen 6.30's `applets/22x22/weather-few-clouds-symbolic.svg` is one such path).
+The stereo symbolic proposal keeps the model's cameras and depth and draws every solid in that one colour. Two consequences to show the person before choosing:
+
+- **A plate of the same colour hides its glyph.** Draw a sign's plate as an outline (two overlapping open contours for a disc, three quads for a triangle) so the glyph stays visible; check that the four status signs still differ at 22 and 24 px (half-alpha silhouettes compared pairwise).
+- **Overlapping solids merge in one colour.** A storm's bolt in front of its cloud, or a moon behind a cloud, become one silhouette in each view at 22 px; only the disparity separates them. Put the coloured icon beside the symbolic one on the same sheet so the difference is seen, not described.
+
+## Tell two names apart at 22 px
+
+Colour alone does not tell two names apart in a panel, because the symbolic icon has one colour. Measure the difference of the two left views' silhouettes at 22 px: the pixels whose alpha is on different sides of one half, and the sum of the alpha differences in pixels.
+A direction cue must change the silhouette: an arrow below a horizon line, up for sunrise and down for sunset, with a wide head on a thin stem, so that turning it over swaps where the head and the stem are.
+Keep the measurement in the sheet script as an assertion, so a later change of the model that makes the two names alike again stops the sheets.
+
+## Pale models on a light background
+
+A pale pigment (a moon of `#f9dda0`, flakes of `#d6ecff`) keeps a median contrast near 1.1 against a light fill: the icon fades.
+Propose a darker shade of the same solids (pigment only) and show it beside the present colour on the dark, the second and the light background. Check that the camera records and scene extents of the proposal equal the original's, so the depth did not change.
+
+## Pop one element of a flat sign
+
+A sign whose plate stands at the icon's plane can still have one element in front of it. Give the plate the depth that puts the camera's convergence on its face, the same depth the sun's disc has (`1/(2/D − 1/(D − z_near)) − D` for a nearest element at `z_near`), place the element at `z_near`, and take the solids' front ring as the outline both looks measure.
+If the renderer gives status signs a flat camera, keep that exception for the signs that stay flat only; otherwise the popped element renders flat and every check still passes.
+
 ## Verify a metadata rewrite
 
 Use the same JPEG XL codestream with three inputs: standalone XML, one XMP packet with a custom property, and the marked XMP packet with a second XML box on either side.
@@ -41,4 +71,6 @@ KImageFormats 6.30.0 read the first XML box. The libjxl 0.13.0 CLI re-encode and
 - **Symptom:** a metadata tool displays a stereo mark and the mark disappears after editing a title or description. **Cause:** a bare XML box can be read as metadata and replaced by an XMP packet on write. **Fix:** place the namespaced property in the same XMP packet as the ordinary properties. **How found:** ExifTool's unrelated description edit preserved the XMP form and replaced the standalone form.
 - **Symptom:** a decoder reports the right mark but a rewrite leaves a still. **Cause:** a one-image API does not write a timeline. **Fix:** compare the frame count and delay as well as the XMP value, and use an animation-aware writer. **How found:** KImageFormats read twelve frames and wrote one despite keeping the XMP packet.
 - **Symptom:** an SVG seek reports unequal first and wrapped phases. **Cause:** setting QSvgRenderer's repaint rate leaves the document's own seek rate at 30 fps. **Fix:** in the fixed-time probe, load `QSvgDocument` with `AnimatorType::Controlled`, set the time in milliseconds, advance and draw. **How found:** the public probe rendered repeated poses at the wrong reported times. The controlled readback made the first and wrapped sun images byte-identical.
+- **Symptom:** the verifier stops with `IndexError` at `isolated[0].outline` after many names passed. **Cause:** the model file was changed while the render job ran; Blender had imported the old geometry at its start and the verifier imported the new one later, so a recorded feature name (`status`) no longer existed (`status-0`). **Fix:** commit the geometry before a render job starts, never edit it while a job runs, and render and check a name in the same job from the same commit. **How found:** the job's start time was earlier than the model file's modification time, and the names that failed were exactly the ones whose solids the edit renamed.
+- **Symptom:** sunrise and sunset are told apart in colour but are the same picture in a symbolic panel. **Cause:** the cue was a small arrow in a corner, one to two pixels of silhouette at 22 px. **Fix:** an arrow below the horizon line whose head and stem trade places when it turns over; 6 to 8 half-alpha pixels and about 8 pixels of alpha differ at 22 px in either look. **How found:** comparing the 22 px left views' half-alpha masks, with the colours replaced by one tint.
 - **Symptom:** a narrow snowflake edge fits outside the camera's predicted interval at 64 px. **Cause:** the isolated feature spans too few pixels along its contour to support a stable shift fit. **Fix:** re-render that feature at 256 px with the same model and the native-size camera rule. Keep both measurements and test the same tolerance. **How found:** the scattered snow branch fit was −1.34 px at 64 and −0.96 px at 256, inside its predicted −0.983 to −0.920 px interval.

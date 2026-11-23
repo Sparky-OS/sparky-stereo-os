@@ -185,7 +185,9 @@ Check both the bytes and a reader round trip: an unmarked `.jps` can reopen corr
 ## Animated stereo theme icons
 
 [Proving an animated stereo icon in Plasma](references/animated-stereo-icons.md) covers the applets' themed and file paths, the SVG and timed raster fixture recipes, decoded and scene graph formats, and how to match a frame across both eyes in the compositor.
-[Author a stereo icon model and its loop](references/stereo-icon-models.md) covers shared model geometry, fixed cameras, transparent tile edges, native-size sheets, loop joins and metadata rewrites.
+[Author a stereo icon model and its loop](references/stereo-icon-models.md) covers shared model geometry, fixed cameras, transparent tile edges, native-size sheets, loop joins and metadata rewrites, the panel a person sees, the symbolic treatment, telling two names apart at 22 px and pale models on a light background.
+A program that plays an animated pair reads it through the layer's `Stereo::AnimatedPicture`: one clock, both views from one frame, the file's frames, delays and loop count, 16 bits kept, and a reason instead of an empty picture ([read an animated pair](references/animated-stereo-icons.md#read-an-animated-pair-one-clock-one-frame-a-reason)).
+A JPEG XL pair is marked by the JXLStereo property in the file's XMP (stereo-layer reads it in every top-level `xml ` box and every `brob` box that wraps one, attribute and element form, the orientation applied first).
 
 ## Lessons from the lanes, October to November 2026
 

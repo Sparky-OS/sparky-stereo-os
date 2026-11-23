@@ -16,6 +16,8 @@ Advanced Weather Widget: Petar Nedyalkov, rcspam, Mizu Ikki, ydimitrof, Katze-94
 
 KImageFormats, libjxl, libavif, Qt SVG.
 
+Brotli (RFC 7932, by Jyrki Alakuijala and Zoltan Szabadka), whose decoder reads the JPEG XL metadata boxes the stereo layer finds compressed.
+
 Blender, Cycles, ExifTool, Exiv2.
 
 ## Screen reader and accessibility effects

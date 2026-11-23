@@ -1,7 +1,7 @@
 # A camera in 3D: establish the capture and proof prerequisites
 
 **For contributors adding stereo capture to Kamoso: verify the installed camera policy, media path and isolated desktop before changing the viewfinder.**
-Checked on 2026-11-22 against Kamoso 26.04.0 and the edition's first default-camera patch.
+Checked on 2026-11-23 against Kamoso 26.04.0 and the edition's first default-camera patch.
 The installed stereo-layer 1.23.2 now supports the shared input list and native-size viewfinder prototype.
 The prototype has an AMD Stereo KWin capture and native conversion tests; this does not establish completed camera recording or publication.
 
@@ -96,8 +96,9 @@ A separate temporal test covers starting halfway through a pair, gaps, discontin
 The initial compositor capture recorded one child declaration and 18 identical 1280-by-480 buffers, with 640-by-480 eyes.
 A fresh replay also reads the synthetic camera through an independent PipeWire client and compares every RGB pixel with each submitted buffer: zero differ.
 Real input events switch the shared action off and on; both sinks remain live and the settings persist.
-The strict window comparison still finds one differing pixel per eye, including between two separate runs of the published camera.
-That control failure has no established cause and the zero-difference requirement remains failed.
+The first strict window comparison found one differing pixel per eye, including between separate runs of the published camera.
+Five published control pairs with ordinary hash randomization reproduced differences at two toolbar text positions.
+With `QT_HASH_SEED=0` set only in the fixture, all five control pairs, 3D off versus published, and the ordinary controls with 3D on versus off compared at zero differing pixels. Nothing was masked or tolerated.
 The complete packing, GPU, recording and publication matrix remains to be run.
 
 ## Proof still required
@@ -144,3 +145,22 @@ The v4l2loopback bridge needs a separate virtual-machine test; it is not a reaso
   **Fix:** read the same camera through an independent client and compare exact source values, while retaining the separate expected eye identity check.
   **How found:** the independent source and every submitted native buffer have the same hash and zero differing RGB pixels.
   This fixture correction does not waive the separate zero-difference window comparison.
+
+## Native samples, separate views and deterministic text
+
+`Picture::fromPackedImage()` reconstructs interleaved pictures for ordinary picture consumers. Passing its `sideBySide()` result directly to a stereo surface therefore expands rows, columns, checkerboard and quincunx input.
+Use `cropEyes(picture, picture.left.size()).packed` to select the original native samples with no zoom or pan. Apply the camera's mirror separately to the resulting views, after this selection; modifying the intermediate views first prevents the layer from recognizing their original sample phases.
+Reject dimensions for which the library would fall back to resizing, with an explanation. The address-coded pipeline test must check native dimensions and every sample, including mirroring; constant red and blue alone would miss reconstruction.
+
+A GStreamer `separated` buffer carries individual `GstVideoMeta` records with view IDs. Map IDs 0 and 1 with `gst_video_frame_map_id`, require exactly two views and give them to `Picture::fromViewsInTurn()` in the caps' declared order. Missing second-view metadata must produce the camera's visible refusal. The normal RGBA passthrough route retains these records; adding an unnecessary caps feature can instead stop negotiation before a frame reaches the application.
+Test native caps against a contradictory saved packing. Test temporal input through appsrc/appsink with source ordinals, gaps, discontinuities and missing ordinals, as well as calling the pairing helper directly.
+
+The Camera page's list remains complete even when its preview cannot show a source. Test the actual QML page against the synthetic camera for every installed policy entry: the preview button, its visible refusal and the ordinary Not 3D choice. A warning available only by hovering over a disabled control is too easy to miss. The temporal preview still needs its source ordinal; that work is separate from keeping the whole list.
+Dynamic labels also need extraction: generate the xgettext input from `stereo_policy_input_format_count()` and `_at()` on the installed library. A plain scan of `i18n(format->text)` does not discover the 27 labels. Compare the generated catalogue with the runtime list; do not maintain a second literal packing list for translations.
+
+### Toolbar text that differs by one sample
+
+**Symptom:** two launches of the same published camera differ by one RGB sample in the Record a Video or Take a Picture toolbar label; comparisons between builds vary similarly.
+**Cause:** Qt Quick's distance-field glyph atlas allocation depends on QSet iteration. Qt's randomized hash seed changes that order and thus glyph texture coordinates. In the measured renderer this changes a rounding result at a text edge; that last floating-point mechanism is an inference from the source and controlled seed comparison, not a captured shader trace.
+**Fix:** set `QT_HASH_SEED=0` in the isolated test environment, for both published and changed programs. Do not set it as a product default or weaken pixel equality.
+**How found:** five published pairs under each seed policy, followed by off/published and on/off comparisons, with all samples retained. Qt 6.11.2's [populate implementation](https://github.com/qt/qtdeclarative/blob/v6.11.2/src/quick/scenegraph/qsgadaptationlayer.cpp) collects new glyphs into a QSet; [requestGlyphs](https://github.com/qt/qtdeclarative/blob/v6.11.2/src/quick/scenegraph/qsgrhidistancefieldglyphcache.cpp) allocates atlas rectangles in its iteration order.

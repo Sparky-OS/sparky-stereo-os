@@ -1632,3 +1632,12 @@ GStreamer element records used by the camera audit (`gst-inspect-1.0`, 1.28.9): 
 The Matroska element's author record names the GStreamer maintainers collectively.
 
 GStreamer's Qt material lifetime repair: Will, author of [MR !12461](https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/12461), carried into the edition's camera plugin build. Mark Nauwelaerts also authored the MP4 muxer code this camera's st3d change extends.
+
+GStreamer camera effects and app boundary, from the installed element records:
+Erik Walthinsen (identity); Filippo Argiolas (bulge, mirror, square, stretch,
+colour effects); Thiago Santos (kaleidoscope, pinch, twirl); David Schleef
+(video balance and app elements); Wim Taymans (app elements, DiceTV, EdgeTV,
+RevTV, ShagadelicTV, VertigoTV); Sam Lantinga (AgingTV, WarpTV); Kentaro Fukuchi
+(OpTV, QuarkTV, RadioacTV, RippleTV, StreakTV); Sebastian Dröge (effectv and
+frei0r integration); Dries Pruimboom and Jaromil (Cartoon); Martin Bayer
+(Twolay0r and delay0r); the Gephex crew (Distort0r).

@@ -199,3 +199,49 @@ For H.264 (08/2024), frame-packing syntax and semantics are Annex D.1.26 and D.2
 Preserve and restore Qt's current OpenGL context around each gallery render job. A later stressed run lost the usable rendering context, emitted shader/EGL errors and died; restoring it made the repeated-action control pass. Keep that negative run rather than treating one successful drawer opening as a lifetime proof.
 
 The lifecycle fixture first clicks the real checkbox off and on and checks its pixels. For the remaining cycles it invokes the existing named Qt Enable 3D action through the meta-object API, checks its returned state and persisted setting, and awaits child-surface destruction/new declaration in the Wayland trace. This separates a lifecycle test from fixed pointer coordinates in a scrolling drawer. It changes no product state directly and does not claim fifty pointer clicks.
+
+## Per-eye effects and recording lifecycle evidence
+
+Normalize the camera packing first, then give each native view to a separate
+ordinary GStreamer effect pipeline with mono caps. Keep separate filter instances
+and frame history, and submit the same timestamp to both. Poll appsink without
+waiting on the GUI thread; retain only one complete pair in flight. Join the
+results only when both are ready and their dimensions still equal the input eye.
+Feed this result to the viewfinder and the camera's photo/recording path. Do not
+apply a spatial filter to the packed frame before splitting it.
+
+The camera's 31 existing choices now pass the native matrix, enumerated from its
+QML model rather than a second test catalogue. Pad probes check each eye's input
+samples and 160×120 dimensions exactly over three frames. An address-coded bulge
+control compares the results against separately processed views. Missing filters
+name the failed choice, explain the unfiltered view, and remain selectable by name
+in the stereo picker even when their thumbnail cannot render. The original flat
+filter path is retained.
+
+The real camera's grayscale JPS differs from the independent mono-filter/JPS
+reference in 614,290 decoded pixels before this change and zero afterward. The
+live bulge pair also equals its reference, but the static source does not
+separate that case from no effect; the address-coded native control does. Both
+saved images retain their JPS marks and native 640×480 eyes. Do not interpret an
+ideal grayscale formula as the GStreamer oracle: its YUV conversion can leave a
+one-channel rounding difference. Compare actual independent filter output exactly.
+
+For a suspected missing recording, acknowledge the existing recording action
+before expecting a file and retain creation, close, rename and deletion events in
+the private video folder. Keep the request, temporary name, EOS completion and
+final destination together. A coordinate click that never reached Record is not
+evidence of a deleted film. The repeated probe completes fifty MP4 starts/stops on
+two pinned CPUs while a test-only timer gives the application's main thread 60 ms
+of work per 150 ms. Fifty marked films and fifty final renames, with no completed
+file deleted, did not reproduce the earlier two missing films. This is explicitly
+not a fix for those uninstrumented observations.
+
+Freeze launcher scripts while they run. Editing a shell script that Bash is still
+reading can make its next read repeat a command: one development probe restarted
+its container and overwrote lifecycle logs after fifty recordings. Its files did
+not substitute for the lost trace; a fresh run retained the complete trace.
+No extra host stress is enabled by default. Repeated GL cases use NVIDIA through
+zink or software rendering; the display-driving AMD card is not a soak device.
+Record the actual renderer: these application tests used zink on the RTX 3060,
+while the rig's KWin fell back to QPainter. They do not establish stereo output
+captures on that compositor.

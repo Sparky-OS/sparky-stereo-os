@@ -245,3 +245,45 @@ zink or software rendering; the display-driving AMD card is not a soak device.
 Record the actual renderer: these application tests used zink on the RTX 3060,
 while the rig's KWin fell back to QPainter. They do not establish stereo output
 captures on that compositor.
+
+
+## Publishing the processed camera through PipeWire (2026-11-23)
+
+The camera's processed native-size pair is published by pipewiresink in provide
+mode, media.class Video/Source and media.role Camera. Its node name starts with
+kamoso.stereo.; Kamoso excludes these nodes from capture inputs, including another
+instance's output. Disable 3D, a flat input, source replacement and closing the
+program remove the node. A failed publisher is named in the viewfinder while
+local capture keeps working. The pair is copied unchanged to RGBA buffers, with
+two views, side-by-side mode and no half-aspect or eye-order flag. It is the same
+post-effect pair used by photos and recording, not the unprocessed input camera.
+
+**Lost layout at the adapter:** the source caps said side-by-side but an independent
+native PipeWire consumer read mode 0 and views 0. PipeWire 1.6.9's
+src/gst/gstpipewireformat.c converted neither multiview mode, flags nor views in
+either direction; current main and its history/MR/issue searches supplied no fix.
+The repair belongs to PipeWire's own GStreamer adapter, not a private node tag or
+an application format guess. The pipewire-stereo-61 recipe retains Debian 1.6.9-2
+and adds that conversion; Kamoso requires its new gstreamer1.0-pipewire binary.
+Public enum/flag values are compile-time checked against both libraries. Native
+checks cover all twelve defined modes and nine flag combinations in both
+directions (108 rows). This proves format fields, not temporal buffer metadata
+or partial flag-mask negotiation. The camera publishes complete SBS pairs only.
+
+**Independent reader:** request RGBA and native dimensions through pw_stream,
+without requesting multiview fields; parse the negotiated SPA raw format, then
+read ten buffers. Before the adapter fix the reader rejects mode 0/views 0;
+after it reads mode 3/flags 0/views 2 and every sample matches the source.
+Exercise the shared Enable 3D action off/on and program exit, checking node
+removal/recreation and the input model (the output never appears as an input).
+An unrelated device removal must not clear the currently selected camera:
+check the identity before changing selection in DeviceManager::deviceRemoved.
+
+**Fixture traps:** a publisher node can take longer than a fixed startup sleep
+under shared station load; wait for the actual node. An unconstrained Gst
+consumer can report target not found even when the publisher exists; give its
+raw sample format and dimensions. Native SPA parsing is independent of the
+adapter under test. Query a render node's group inside the CDI container when
+the tool's own namespace has no /dev/dri, then use that group with SYS_NICE and
+the installed KWin. Client zink rendering still does not prove KWin's renderer:
+in this probe KWin reports EGL_NOT_INITIALIZED and falls back to QPainter.

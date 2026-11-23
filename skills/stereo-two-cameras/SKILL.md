@@ -58,6 +58,8 @@ A program that makes its second eye by turning the model (Jmol: its own pair and
 
 A wxWidgets OpenGL canvas (KiCad's 3D viewer) and GRASS GIS's 3D view as declared 3D areas: which case a program is (its own pair or our cameras), the GLX route under Xwayland when wx has no EGL canvas, the limits read on the GL child window, the fit by the depth of every pixel from the camera between the eyes, Enable 3D and Display Settings, the proofs and the traps: [references/wx-gl-canvas-and-grass-view.md](references/wx-gl-canvas-and-grass-view.md).
 
+A Togl drawing area inside a Tk window (Netgen's mesh view) as a declared GLX child: which case it is, the quad-buffer widget asked for at the start with the ordinary one on a 2D desktop, the limits read on Togl's drawable, the fit by the depth read from the camera between the eyes, a Tcl poll for a live change, Enable 3D in `ng.opt` and what is told, the closed-form two-box scene, the proofs, the traps of Netgen's compiled-in Tcl and of building an in-place successor package: [references/tk-togl-area-netgen.md](references/tk-togl-area-netgen.md).
+
 A Qt 6 `QOpenGLWidget` 3D view (OpenSCAD's preview and rendered model) as a declared 3D area: the stereo format on the view only, a shear for orthographic eyes, the limits read for the top-level surface on Wayland and on the view's own window on X11, the fit by the depth read in a pass from the camera between the eyes, picking from that camera, the options and what is told, the proofs and the traps: [references/qt6-opengl-view-openscad.md](references/qt6-opengl-view-openscad.md).
 
 ## The OpenGL routes

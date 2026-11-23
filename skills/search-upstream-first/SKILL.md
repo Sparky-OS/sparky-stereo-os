@@ -41,6 +41,21 @@ The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first. [`up
 
 7. **At the next rebase,** drop the carried commit when the new base contains it.
 
+## A driver fault: the vendor's whole stack, before the hunt and again after it
+
+Daniel, 2026-11-23, when a program's memory was found corrupted on one vendor's graphics card only: "before investigate and after fining it - see if amd had a patch to it"; "I follow the kernel list and saw some fixes regarding memory on the amd, that's why I suspect it and not our mesa, also because it works on the other driver (nvidia) is a indicative is amd problem".
+
+1. **One vendor only points at that vendor's stack first.** A fault that shows on one vendor's driver and not on another's is first a suspect of that vendor's own code, and that is more than the user-space driver: the kernel driver, the user-space driver with its window-system layer, and the vendor's helper library. Our own patches come after them in the list of suspects, not before.
+2. **Search before the investigation.** For each layer, from our base to the newest release and the development branch:
+   - the kernel driver: the vendor's list and `dri-devel` through their lore mirrors (the recipe above), and the stable series' changelogs from our kernel to the newest;
+   - the user-space driver: its log on the paths the fault touches, the vendor's own maintainers' commits with special care;
+   - the trackers, for the symptom's words (use after free, double free, corruption, the abort's text) and the function names.
+   A candidate fix is tried on our build before any hunt.
+3. **Search again once the cause is known,** now for the exact function, structure and field. Then say which it is: repaired upstream (carry it), present upstream too (the fix and its test go to them), or in our own patch.
+4. **Say how far behind our patched driver is,** each time: our base, the distribution's versions, upstream's newest tag. A series that is a release or more behind gets its rebase ordered with the fault's repair, each patch with its fate (applies, rebased, taken by upstream, conflicts).
+5. **Read what each control really runs before concluding from it.** A row "works on the other card" is evidence only about the layers that run on both. Write the table: which kernel driver, which user-space driver, which of our patches each control loads. A program on another vendor's own libraries does not load ours at all, so that control clears neither the first vendor's driver nor our patches in it; a software-renderer run loads our patches without the hardware driver and without the kernel driver.
+6. **Tell a user-space write from a kernel one.** A memory checker on the user-space libraries shows an invalid write with its stack. Memory found damaged with no such write points below: an ioctl that fills more than the buffer it was given. Then the same test on a newer kernel decides.
+
 ## The header of a carried commit
 
 Debian's patch tagging guidelines, [DEP-3](https://dep-team.pages.debian.net/deps/dep3/), define the fields.

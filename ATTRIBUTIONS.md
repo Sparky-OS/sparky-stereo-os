@@ -612,6 +612,7 @@ Existing KWin, libkscreen, Qt and FFmpeg credits above also apply.
 |---|---|---|
 | [KInfoCenter](https://invent.kde.org/plasma/kinfocenter) | A page for each display's 3D modes and colour depths | Matthias Hoelzer-Kluepfel, Kai Uwe Broulik, Ismael Asensio, Pino Toscano |
 | [org.kde.video](https://github.com/Sparky-OS/org.kde.video) | Video wallpapers and lock screens; in SparkyLinux since 2018 at Daniel's request, now in Sparky-OS with its author as maintainer, and the base of 3D backgrounds | Jeromy Streets |
+| [anacron in Debian](https://tracker.debian.org/pkg/anacron) | Mains power triggering for scheduled maintenance jobs | Lance Lin, maintainer of Debian's mains rule, and Sam Bull, who requested the mains-only match in [#1148276](https://bugs.debian.org/1148276) |
 | [PipeWire](https://pipewire.org/) | Sound, the model for this edition's stereo pipeline | Wim Taymans and the PipeWire developers |
 | [OpenRGB](https://openrgb.org/) | Lighting control | Adam Honse and the OpenRGB contributors |
 | [xpadneo](https://github.com/atar-axis/xpadneo) | Xbox wireless controllers | Florian Dollinger and Kai Krakow |

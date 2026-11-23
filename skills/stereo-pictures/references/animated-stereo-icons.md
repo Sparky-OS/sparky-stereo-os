@@ -22,7 +22,7 @@ Use one SVG document with the SVGStereo 0.4 layout and a repeating `animateTrans
 For the raster files, feed twelve whole left-first packed frames at 100 ms each to libjxl and libavif.
 Use 16-bit RGBA and an open loop in JPEG XL. Use 12-bit AV1 YUV 4:4:4 with an alpha sequence and an open loop in AVIF.
 Read all twelve images, delays, loop count, format and alpha through QImageReader. Read one QMovie frame and compare its format.
-Read the marks separately. The JPEG XL lane draft uses a standard XML box for its proposed declaration. The timed AVIF experiment uses the ISOBMFF stereoscopic-video advisory scheme.
+Read the marks separately. The JPEG XL draft uses an XMP property in the standard XML box. [Metadata rewrite checks](stereo-icon-models.md#verify-a-metadata-rewrite) explain how the carrier was chosen. The timed AVIF experiment uses the ISOBMFF stereoscopic-video advisory scheme.
 The HEIF `ster` entity group pairs two still image items by their IDs; its members cannot be timed tracks. [SVGStereo 0.4](https://github.com/Sparky-OS/svgstereo/blob/66a673d/README.md#animated-drawings), [AVIF v1.2.0 §§3, 4.1, 5.2](https://aomedia.org/docs/AV1%20Image%20File%20Format%20%28AVIF%29%20v1.2.0.pdf), [ISO/IEC 14496-12:2026 §13.5.4.2](https://webstore.iec.ch/en/publication/113218)
 
 ## Read the whole path

@@ -185,6 +185,7 @@ Check both the bytes and a reader round trip: an unmarked `.jps` can reopen corr
 ## Animated stereo theme icons
 
 [Proving an animated stereo icon in Plasma](references/animated-stereo-icons.md) covers the applets' themed and file paths, the SVG and timed raster fixture recipes, decoded and scene graph formats, and how to match a frame across both eyes in the compositor.
+[Author a stereo icon model and its loop](references/stereo-icon-models.md) covers shared model geometry, fixed cameras, transparent tile edges, native-size sheets, loop joins and metadata rewrites.
 
 ## Lessons from the lanes, October to November 2026
 

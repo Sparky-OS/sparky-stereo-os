@@ -393,3 +393,11 @@ comparison to about 34 dB. An integral 640×480 fixture (700×526 client) isolat
 packing/order checks, scoring over 81 dB for the side-by-side source against
 FFmpeg's one bilinear resize. This fixture does not repair or certify arbitrary
 fractional resize boundaries; retain that observed limitation separately.
+
+**Carry the fixture settings into every new launcher:** omitting QT_HASH_SEED
+from the five-pair wrapper reintroduced changing toolbar glyph samples; omitting
+the repaired Qt GStreamer plugin reintroduced its known material assertion on
+hide/show. Record the actual renderer and loaded dependency, and make the seed
+part of the session script itself. A fifty-cycle child-lifecycle row can invoke
+the same shared action directly; opening the gallery is a separate UI case.
+Do not report a successful lifecycle run as proof of unrelated gallery transitions.

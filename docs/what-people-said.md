@@ -68,6 +68,14 @@ Dionatan Simioni, author of Vinci, a guided installer for DaVinci Resolve on Lin
 
 Marco Sumari Tellez, author of IngeTrazo, on the stereo eye camera, which he combined with the camera's new lens shift and clip planes ([ingetrazo #1311](https://github.com/ingelibre/ingetrazo/pull/1311#issuecomment-7086809544)).
 
+> "Thanks for the patches. Slightly amended and merged"
+
+Kirill Gavrilov, author of sView, on the three fixes for saving stereo pictures ([sview #186](https://github.com/gkv311/sview/pull/186#issuecomment-6802812863)).
+
+> "Seems like a good change, thanks!"
+
+SubJunk, Universal Media Server maintainer, on telling the person why a 3D file cannot be converted for a renderer ([#6462](https://github.com/UniversalMediaServer/UniversalMediaServer/pull/6462#issuecomment-6805583048)).
+
 ## Merged
 
 The maintainers who read the change and merged it are listed, with links, in [Merged outside Sparky Stereo](upstream-merges.md).

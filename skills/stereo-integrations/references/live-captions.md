@@ -495,3 +495,21 @@ its geometry as a pass. This is a rig-input correction, not a translation.
   companions from current siblings. Keep predecessor packages in the predecessor
   directory, with a coherent separate predecessor sibling list when other staged
   sources have also advanced. Do not change the solver or discard its failed row.
+
+When the rig already has Qaption and captiond's development/testing packages,
+upgrade that whole co-installed source cohort together. Their exact-version
+relations otherwise make apt plan removals when only the six runtime targets
+are offered. Read and reject every Remv line during upgrade, and run apt-get
+check after the fresh installation. This is a rig dependency closure, not a new
+runtime dependency of the integration or bench kit.
+
+Do not rely on a standalone `! grep` or `! pgrep` under `set -e`: shell negation
+is exempt from errexit, so a forbidden match can be ignored. Use an explicit
+conditional failure or a checked parser. Retain the actual rejected apt plan;
+negative controls must reject a removed companion and an unrelated installation,
+as well as accept the complete intended upgrade set.
+
+For a checkout using host Git alternates, a container clone cannot resolve the
+host-only alternate path. Make a self-contained bundle under the new output,
+clone it inside the container, and perform the scratch merge there. Keep the
+fetched base and tested tip in the record; do not mount another checkout writable.

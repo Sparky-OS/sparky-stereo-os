@@ -66,7 +66,7 @@ A file whose comments are smaller than that line stays as it is.
 | --- | --- |
 | sh, bash | bash parses both as one function body; `declare -f` must print the same program (dash also runs `dash -n`) |
 | Python | the same abstract syntax tree (`ast.dump`, positions excluded) |
-| QML, JavaScript | acorn gives the same tokens with the same line breaks (semicolon insertion depends on them) |
+| QML, JavaScript | acorn gives the same tokens with the same line breaks (semicolon insertion depends on them); a `.qml` file is read as QML, with `@` (an annotation, Qt's `T_AT`) as a token of its own since toolkit 0.1.32 |
 | C, C++ | GCC: the same tokens and directives (`-fpreprocessed`), and the same full preprocessing tokens with `__LINE__` pinned where the file preprocesses on its own; no `#line` (since toolkit 0.1.20 a comment-only line goes completely and the authored empty lines stay, so the lines move and `__LINE__`, `assert` and debug line tables name lean lines; the check names every file whose own code reads line numbers), and include guards keep GCC's read-once optimisation |
 | systemd units and its configuration, udev rules, KConfig, desktop entries, tmpfiles, sysctl, kmod | each consumer's documented comment rule (whole lines only; none of these parsers has inline comments) |
 | YAML, TOML | PyYAML composes the same node graph; tomllib reads the same document |

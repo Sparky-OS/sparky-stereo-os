@@ -1571,3 +1571,11 @@ Names only, from each project's records and the headers of the files read; these
 - **libkscreen** ([invent.kde.org/plasma/libkscreen](https://invent.kde.org/plasma/libkscreen)): Daniel Vrátil and Sebastian Kügler (`backendmanager.cpp`); the platform theme's one read uses `KScreen::GetConfigOperation`, and the rig makes it fail through `KSCREEN_BACKEND`.
 - **Solid** ([invent.kde.org/frameworks/solid](https://invent.kde.org/frameworks/solid)): its fake backend (`SOLID_FAKEHW`) gives the rig a machine with no drive; its fstab backend's overlay support is why a container's root showed in the Places panel.
 - **ECM** (`kde_package_app_templates`) and **KDevelop**'s app templates: the reason Kirigami's template stays authored.
+
+## Live captions and transcript editing
+
+Kaption and captiond: Alex Márquez Pérez Muñíz Díaz Puras Thaureaux Fagúndo Rivera.
+
+Vibe: thewh1teagle. Whisper.cpp and ggml: Georgi Gerganov and the ggml contributors.
+
+Orca: Joanmarie Diggs, Federico Mena Quintero, Marc Mulcahy, Willie Walker, Mike Pedersen, Rich Burridge, Eitan Isaacson and Scott Haeger.

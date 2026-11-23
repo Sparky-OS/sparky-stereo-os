@@ -352,3 +352,44 @@ log pad counts, timestamps and queue/state snapshots to distinguish a stalled
 stream from a failed action. Ten fresh first-case ordinary recordings passed
 with this fixture. The preceding empty-file stall was not reproduced or called
 fixed by that result.
+
+**Mono input with Enable 3D still on:** select the saving route from the received
+frame, not the switch. Keep mono frames for readiness and use camerabin's
+ordinary photo and film writers, including its effects and mirroring. A source
+classification change rebuilds the source filter; discard the transition frame
+that still carries the preceding filter. Stop the recorder that actually started.
+The regression is an undeclared mono camera, Enable 3D on, with both photo and
+film read back: the former source rejected the photo and requested a stereo
+recording without a pair.
+
+**An installed NVIDIA compositor, separately from its zink client:** the working
+CDI route on this rig is `nvidia.com/gpu=all`, SYS_NICE, no added render group and
+no Mesa override for KWin. Give only the client Mesa's EGL vendor first,
+NVIDIA's second, `__GLX_VENDOR_LIBRARY_NAME=mesa`,
+`MESA_LOADER_DRIVER_OVERRIDE=zink` and `LIBGL_KOPPER_DISABLE=1`.
+Read KWin's supportInformation; a zink client proves nothing about its compositor.
+For a software scene capture, CDI supplies a render node but `GBM_BACKEND=dri`,
+Mesa's EGL vendor, `LIBGL_ALWAYS_SOFTWARE=1`, `GALLIUM_DRIVER=llvmpipe` and a
+bounded LP_NUM_THREADS select llvmpipe. Without the DRI allocator, EGL did not
+initialize and KWin fell back to QPainter. The virtual backend's output allocation
+can still fail on the NVIDIA render node; its scene captures are not output
+readback. Keep that limit explicit.
+
+**A 2D output needs a different witness:** ScreenShot2 returns both scene eyes
+when a declared child is present, even with stereoOutput=false. Nest the installed
+KWin on a separate private compositor, fullscreen on a 1920×1080 2D Wayland
+output. Capture that outer compositor, where the inner output is an ordinary
+undeclared surface. Record both window/output geometries and renderer strings.
+This reads the nested output presented to its parent; it is not a DRM scanout
+claim. The left-eye notice is an intentional overlay: read its exact QML bounds,
+check its visible text and drawn pixels separately, and compare the remaining
+view with the one source eye. Never crop a ScreenShot2 stereo pair and call it
+the actual 2D output.
+
+**A fractional viewfinder edge:** a default 700×525 client creates a
+638.666×479 content rectangle. The parent's fractional hole can cover one column
+of its child's rounded 639-pixel viewport; this lowered the complete-eye
+comparison to about 34 dB. An integral 640×480 fixture (700×526 client) isolates
+packing/order checks, scoring over 81 dB for the side-by-side source against
+FFmpeg's one bilinear resize. This fixture does not repair or certify arbitrary
+fractional resize boundaries; retain that observed limitation separately.

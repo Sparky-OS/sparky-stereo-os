@@ -25,6 +25,21 @@ Read all twelve images, delays, loop count, format and alpha through QImageReade
 Read the marks separately. The JPEG XL lane draft uses a standard XML box for its proposed declaration. The timed AVIF experiment uses the ISOBMFF stereoscopic-video advisory scheme.
 The HEIF `ster` entity group pairs two still image items by their IDs; its members cannot be timed tracks. [SVGStereo 0.4](https://github.com/Sparky-OS/svgstereo/blob/66a673d/README.md#animated-drawings), [AVIF v1.2.0 §§3, 4.1, 5.2](https://aomedia.org/docs/AV1%20Image%20File%20Format%20%28AVIF%29%20v1.2.0.pdf), [ISO/IEC 14496-12:2026 §13.5.4.2](https://webstore.iec.ch/en/publication/113218)
 
+## Read the whole path
+
+| Format | Ordinary icon and Image | Animation item | Precision measured on the tested path |
+|---|---|---|---|
+| SVG | The theme name and file URL show one image. Image and AnimatedImage retain a still. | VectorImage changes at the virtual output's refresh rate. | The SVG image plugin returns ARGB32 premultiplied. VectorImage builds a scene of primitives, so it has no single input image texture. The grab returned RGBA8888 premultiplied. |
+| JPEG XL | The file URL and Image show one image. The theme extension lookup rejects the name. | AnimatedImage advances the 100 ms frames at about 10 fps. | QImageReader returns RGBA64 with alpha for the 16-bit source. QMovie returns ARGB32 premultiplied and the QRhi texture is BGRA8 with alpha. |
+| AVIF | The file URL and Image show one image. The theme extension lookup rejects the name. | AnimatedImage advances the unmarked 100 ms frames at about 10 fps. The native advisory packing control does not preserve the full samples. | QImageReader returns RGBA64 with alpha for the 12-bit source. QMovie returns ARGB32 premultiplied and the QRhi texture is BGRA8 with alpha. |
+
+Read the QImageReader format, the QMovie image, and the Qt Quick image item's texture format and alpha on the render thread.
+A window grab is an independent readback; it cannot establish the precision of an upstream decoder or a physical display link.
+Measure process CPU time after warm-up and divide by measured wall time. Record the peak resident size and the host load alongside each row.
+Use three fresh sessions at 22, 48, 64 and 256 px per eye.
+A changing frame count comes from the movie or scene, and the captured pixels establish that the content moved.
+A temporary fixture applet can run the same item types in plasmashell. Use three item grabs to confirm that both the still and animated routes behave the same there.
+
 ## Keep the two times equal
 
 Use one animation instance for the packed fixture. Declare one full side-by-side surface through libstereo-declare. For a stable theme pair this declaration belongs to the flow described in [themed icons per eye](themed-icons-per-eye.md).
@@ -40,3 +55,7 @@ A surface-level proof on a probe establishes compositor eye selection and synchr
 - **Symptom:** both KImageFormats readers return RGBA64, yet the animated item uploads BGRA8. **Cause:** Qt's QMovie stores a QPixmap (`qtbase/src/gui/image/qmovie.cpp:370–377,399–405`) and the Qt Quick item takes its image (`qtdeclarative/src/quick/items/qquickanimatedimage.cpp:35–43`). **Fix:** preserve the frame as an image into a texture route that supports the desired format. **How found:** QImageReader reported RGBA64, QMovie reported ARGB32 premultiplied and the scene's QRhi texture reported BGRA8 with alpha. This is a path to qualify in the shared engine.
 - **Symptom:** the first ScreenShot2 image has no movie marker. **Cause:** the capture ran before the client mapped and committed the declared pair. **Fix:** wait for the declaration and draw before the three samples, and fail on any missing marker. **How found:** the first captures showed the virtual desktop while the second and third held both markers.
 - **Symptom:** the private D-Bus daemon exits before Plasma starts. **Cause:** the numeric test UID has no passwd entry in the image. **Fix:** add a container-local entry and drop to that account before launching programs. **How found:** `dbus-daemon` named the missing UID.
+
+- **Symptom:** marked AVIF reports an alpha decode error or gives a decoded canvas one eye wide. **Cause:** the ISOBMFF stereo scheme places per-view presentation dimensions in the track header while the sample-entry dimensions describe the packed frame; libavif 1.4.2 uses the track width as its output tile width and rescales the packed sample (`src/read.c:6227–6237,6782–6791`). **Fix:** the stereo-aware read path must preserve the coded packed samples and their matching alpha, or retain the static pair with a reason. **How found:** a 128×64 packed sequence with a 64×64 colour presentation and a 128×64 alpha presentation failed alpha decode; with both presentations at 64×64 the same coded image opened at 64×64. [ISOBMFF edition 8 §§13.5.2–13.5.4.2](https://webstore.iec.ch/en/publication/113218), [libavif 1.4.2 source](https://github.com/AOMediaCodec/libavif/blob/v1.4.2/src/read.c#L6782)
+- **Symptom:** the direct Kirigami file URL reports Ready with a blank item. **Cause:** status can precede a successful pixel decode when the imageformat plugin is absent. **Fix:** a shared animation loader checks that it owns a decoded frame, returns the static pair when appropriate, and reports which reader is missing. **How found:** hiding each plugin separately yielded grabs with only the background. In the Qt SVG control, VectorImage continued to animate.
+- **Symptom:** the file changes every tick but two compositor captures cover the same phase. **Cause:** the wall interval includes the D-Bus capture, assembly and PNG write, so a later request can land after a wrap. **Fix:** classify the returned marker on each capture, discard repeated phases and require three distinct values. **How found:** the AVIF source advanced by frame log while the first sampling pass returned a duplicate marker.

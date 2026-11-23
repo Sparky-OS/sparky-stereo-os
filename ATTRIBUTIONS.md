@@ -1641,3 +1641,7 @@ RevTV, ShagadelicTV, VertigoTV); Sam Lantinga (AgingTV, WarpTV); Kentaro Fukuchi
 (OpTV, QuarkTV, RadioacTV, RippleTV, StreakTV); Sebastian Dröge (effectv and
 frei0r integration); Dries Pruimboom and Jaromil (Cartoon); Martin Bayer
 (Twolay0r and delay0r); the Gephex crew (Distort0r).
+
+The recording comparison also uses GStreamer's element author records from
+`gst-inspect-1.0` 1.28.9: **Wim Taymans** (Theora), **Monty and Wim Taymans**
+(Vorbis), and **Wim Taymans and Ronald Bultje** (the libav AAC element).

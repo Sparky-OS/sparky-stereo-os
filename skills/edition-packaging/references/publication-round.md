@@ -893,3 +893,13 @@ The failure was found while binding a replacement pool to its accepted frozen vi
 When copying an isolated apt universe to a different scratch path, rename its local edition list filenames too: apt encodes that URI in the list names.
 Otherwise apt ignores the copied local Packages and says the edition metas cannot be located, even though the public indexes are present.
 Keep the signed public index bytes unchanged, update the private local URI/list names together, and read the solver's complete lines before attributing that setup failure to a package.
+
+### Zero removals and a caller's shell mode
+
+Symptom: a fresh task plan resolves thousands of installs and zero removals, then the wrapper exits without a FAIL verdict before installing anything.
+Cause: the proof helper counts removals with `grep -c`; zero matches prints zero but returns status one, which a new caller's `set -e` treats as fatal.
+The existing upgrade caller already disables errexit around helpers that call `fail` explicitly.
+Invoke these explicit-failure helpers in a checked conditional, or use their established caller mode; retain every install, kept-back and removal check.
+Read the helper and the complete plan before treating this shell exit as a package failure.
+Keep the interrupted invocation, bind the unchanged planned root and signed indexes, and resume the actual transaction only after the same helper passes.
+Do not confuse a fresh install command's unrequested bootstrap upgrades with solver-kept packages: name those packages and their versions separately, and still read back every selected edition target exactly.

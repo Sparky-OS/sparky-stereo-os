@@ -55,6 +55,21 @@ Daniel, on the first drafts, which linked to our own build scripts: "tell them t
    "regression" is Launchpad's, not Debian's; the BTS drops it.
 7. **The body:** what fails and where (file and line), the exact message, why (the missing dependency, the lost build flag), the patch, and the one line on AI.
 
+## Adding the cause and the fix to someone else's open bug
+
+When the tracker already has the symptom (found over SOAP, step 1) but nobody has named the cause, the fix goes into that bug, not into a new one.
+
+1. Prove it as for a new report: red with Debian's package in a clean testing container, the cause isolated (remove one candidate at a time in a copy), and green with Debian's own source rebuilt with the fix.
+   Installing a rebuilt package of the same version over Debian's needs `dpkg -i`; `apt-get install ./file.deb` keeps the installed one and the "green" run then tests nothing.
+2. When upstream already has the fix, the patch is upstream's commit with a DEP-3 header (`Origin: upstream, URL`, `Author:` by name, `Bug:`, `Bug-Debian:`, `Applied-Upstream:`), and the upstream bug it names is read at upstream's tracker before it is cited.
+3. Compose with reportbug against the bug's number: the command of step 4 above without `-s`, `-S` and `-T`, with `-N BUGNUMBER`, and `x` on its standard input (its menu's "provide extra information"; with an empty standard input it quits, exit 0, and writes nothing).
+   The file is addressed to the bug's own address (its number at bugs.debian.org) and opens with `Package:` and `Followup-For: Bug #BUGNUMBER`.
+4. `Control:` lines (`tags -1 + patch fixed-upstream`, `forwarded -1 UPSTREAM-BUG-URL`) written at the top of the body file land after a blank line, outside the pseudo-header block: join them to it (no blank line after `Followup-For`), and check that the approved body is still whole in the file.
+5. Send as any report; the tracker sends no new number.
+
+Worked example, 2026-11-23: Debian #1154120 (oxygen-icon-theme 5:6.32.0-1 left without an icon cache), cause three entries named `go-first copy.svg`, fix upstream's commit 5bfe432258ff by Nuno Pinheiro.
+`gtk-update-icon-cache` prints "The generated cache was invalid" when an icon's file name contains a space.
+
 ## After sending
 
 - The BTS answers with the bug number by mail.

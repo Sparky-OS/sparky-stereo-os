@@ -1559,3 +1559,14 @@ The trigger, Kirigami's per-eye icon and the proof in a real plasmashell build o
 - **KIconThemes**: Hamish Rodda (`KIconEngine`), Geert Jansen, Antonio Larrosa and Michael Pyne (`KIconLoader`, `KIconTheme`), as for milestone 1; the edition's `+stereo3d3` counts each drawing of a stereo icon.
 - **Plasma's desktop and workspace** ([invent.kde.org/plasma/plasma-desktop](https://invent.kde.org/plasma/plasma-desktop), [invent.kde.org/plasma/plasma-workspace](https://invent.kde.org/plasma/plasma-workspace)): the folder view (Eike Hein), Kickoff, the task manager, the system tray and the wastebin applet, unchanged, are the places of the proof; the applets' own authors were not read, as their QML is compiled into the installed plugins.
 - **Kubabbar Glass**: the edition's look and its stereo icon theme, whose Bin pictures the proof shows in both eyes.
+
+## Lean Code reads QML annotations; Kirigami packaged; a screen whose mode cannot be read is told (queue row 77, milestone 3, 2026-11-22)
+
+Names only, from each project's records and the headers of the files read; these projects do not endorse the edition.
+
+- **acorn** ([github.com/acornjs/acorn](https://github.com/acornjs/acorn), MIT): Marijn Haverbeke and its contributors; the Lean Code QML check extends its tokenizer with QML's `@` token through acorn's own plugin interface (`Parser.extend`).
+- **Qt Declarative's QML lexer and grammar** (`qqmljslexer.cpp`, `qqmljs.g`; The Qt Company and the Qt Project): the clauses the check follows for annotations (`T_AT`, `UiAnnotation`, `UiAnnotatedObject`, `UiAnnotatedObjectMember`).
+- **Kirigami's `ListSectionHeader`**: Björn Feber; its annotation is the first QML annotation the edition's packaging met, and Debian's file is the test's fixture, read in place.
+- **libkscreen** ([invent.kde.org/plasma/libkscreen](https://invent.kde.org/plasma/libkscreen)): Daniel Vrátil and Sebastian Kügler (`backendmanager.cpp`); the platform theme's one read uses `KScreen::GetConfigOperation`, and the rig makes it fail through `KSCREEN_BACKEND`.
+- **Solid** ([invent.kde.org/frameworks/solid](https://invent.kde.org/frameworks/solid)): its fake backend (`SOLID_FAKEHW`) gives the rig a machine with no drive; its fstab backend's overlay support is why a container's root showed in the Places panel.
+- **ECM** (`kde_package_app_templates`) and **KDevelop**'s app templates: the reason Kirigami's template stays authored.

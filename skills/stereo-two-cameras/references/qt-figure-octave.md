@@ -67,6 +67,27 @@ On the published build (the property's 0.05) the same scene measured red -12.0 a
 | Tools, 3D display settings, in a session with neither program (German) | told once | "Die Anzeigeeinstellungen konnten nicht geöffnet werden." once |
 | `print -dpng` of a 3D figure | as the published build writes it | 3840 x 1080, the window once per eye side by side (red centre 776.5 left, 772.5 right), no stereo mark; Debian's 1920 x 1080 |
 
+## Proof of the package (octave 11.3.0-1+stereo3d3+lc1 installed by apt from the stage, the same rig, one fresh session per row)
+
+Installed over Debian's 11.3.0-1+b1: octave and octave-common upgraded, nothing removed; over the published +stereo3d2+lc1 the same; `dpkg --audit` clean both ways.
+
+| Row | Expected | Measured |
+|---|---|---|
+| Debian's 11.3.0-1+b1; the published +stereo3d2 with `stereo` on | one view; a pair at the property's depth | one 1920-wide view, nothing declared; a pair, only the drawing area declared, red -12.0, blue +20.0 |
+| A new account, 10/4 | -4.000, +6.667; every block inside; 0 pixels outside the area | the trace: separation 0.0390, then 0.0168 once maximized, disparities -4.0000 and +6.6673 at both; red -4.0, blue +6.0; every block from -4 to +6; 0 pixels outside the area (3, 80, 1914 x 975); rows aligned |
+| Live change to 20/8 | -8.000, +13.333 | red -8.0, blue +14.0; every block inside |
+| Rotate by a drag, `camzoom`, a click on the red square | every block inside; the pick as in 2D | every block inside at each step, 0 pixels outside; view [-16.99 3.40]; the red surface picked |
+| `surf (peaks (40))` | every pixel inside | 1st to 99th percentile -3.65 to +3.99 against the trace's -4.000 and +4.49; the 31 blocks outside each a false match one mesh cell away, none agreeing with its neighbours |
+| Enable 3D off against Debian's, five views; a 2D figure (3D on) against Debian's | 0 pixels | 0 of 1,866,150 in each view, 0 outside; 0 and 0 |
+| Limits not offered (German); `stereoeyeseparation` set by a script (Portuguese) | told once each; eyes equal; the depth unchanged | told once, still declared, eyes equal; told once, red still -4.0 |
+| The X11 route; NVIDIA through zink; a 2D screen (Xvfb) | as above; one view, nothing said | red -4.0, blue +7.0; red -4.0, blue +6.0; one 1920-wide view with both squares, nothing said |
+| The GUI's start, an account that used it and a new one | the welcome as a pair, 0 pixels differ outside it | both pairs, 0 outside; 704 blocks from -1.97 to +1.16 and 753 from -3.34 to +2.36 |
+| Tools: Enable 3D off (German), then a new figure; 3D display settings with neither program | the choice kept, the new figure flat; told once | preference 0, default off, the new figure flat, one declared surface; told once |
+| `print -dpng` of a 3D figure | as the published build writes it | 3840 x 1080 as the published build's; Debian's 1920 x 1080 |
+
+The edition's m-files in the installed package: 359 checks, none failed.
+A session without X11 (no `DISPLAY`): the published build says "X11 DISPLAY environment variable not set" and has no graphics toolkit at all; this build draws the figure, because its build dependencies now bring `wayland-client.h` and Octave's own configure turns on its Wayland display code (`cdisplay.c`), which Debian's build leaves off.
+
 The edition's m-files alone (`octave-cli`): 359 checks pass (every sentence in ten languages with its placeholders, the language chosen from `LANGUAGE`, `LC_ALL`, `LC_MESSAGES` and `LANG` as gettext chooses, told once, the 2D desktop told only after the person's own choice); the same test fails on the published site files, which have no sentence table.
 
 ## Traps
@@ -79,4 +100,6 @@ The edition's m-files alone (`octave-cli`): 359 checks pass (every sentence in t
 - **A GUI row with the wire trace hides what the GUI says.** **Symptom:** after Octave's first-run assistant the GUI showed no welcome, and its command window was full of `wl_surface` lines. **Cause:** Octave's GUI shows its own stderr in its command window, and `WAYLAND_DEBUG=client` filled it. **Fix:** no wire trace in GUI rows; place the welcome by KWin's client rectangle of its window and require 0 differing pixels outside it. **How found:** the capture of the GUI after the assistant.
 - **Octave's first-run assistant.** A new account's GUI start shows "Welcome to Octave!" first (Enter on Next, Next, Finish); the edition's welcome follows it. An account that used the GUI has `global_skip_welcome_wizard=true` under `[General]` in `~/.config/octave/octave-gui.ini`; an empty file does not skip it.
 - **A told sentence without "3D" in it.** A filter of the program's output on "3D" dropped the German "Die Anzeigeeinstellungen konnten nicht geöffnet werden.": read the whole output for told sentences.
+- **The installed GUI opens on a warning, the development build did not.** **Symptom:** the package's GUI rows found no welcome window; the capture shows one dialog, "Octave Documentation: Could not setup the data required for the documentation viewer. Maybe the Qt SQlite module is missing?", and the published +stereo3d2 shows the same in the same image. **Cause:** the rig images install without Recommends, and Qt's SQLite plugin (`libqt6sql6-sqlite`) comes only as a Recommends of `libqt6sql6`; Octave's help engine needs it, and the dialog is compiled only with `ENABLE_DOCS` (`libgui/src/documentation.cc`), which the package has and the development build (configured without documentation) did not. **Fix:** the green image installs `libqt6sql6-sqlite` beside Xvfb, as a default installation would. **How found:** the window list of the capture held only "Octave Documentation"; the picture showed the dialog; `dpkg-query` in the three images and on the station.
+- **Without X11, Octave's resolution comes out negative on KWin's virtual output.** **Symptom:** with `DISPLAY` empty, `get (0, "screenpixelsperinch")` is -38100 and Octave warns once "opengl_renderer: Error 'invalid value' (1281) occurred drawing 'text' object". **Cause:** the virtual output announces `wl_output.geometry(0, 0, -1, -1, ...)`, a physical size of -1 mm, and Octave's `cdisplay.c` falls back to 96 only for exactly 0 mm (`wd_mm == 0 || ht_mm == 0`, unchanged on upstream's default branch on 2026-11-23), so it divides by -1 (the mean of 1920 x 25.4 / -1 and 1080 x 25.4 / -1). With Xwayland's `DISPLAY` the X11 path runs first and gives 96.13. **How found:** the case's Wayland trace of the run without `DISPLAY`. Not filed; a real screen announces its millimetres.
 - **A mesh matches one cell away.** On `peaks` with its mesh lines 0.5 % of blocks matched at about +-20 px, one cell, though the program's own nearest and farthest pixels give -4.000 and +4.49; a surface's disparity is continuous, so a block more than 5 px from the median of its neighbours (within 24 px) is a false match, and none was a real one.

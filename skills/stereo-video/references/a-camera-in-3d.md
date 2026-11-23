@@ -401,3 +401,24 @@ hide/show. Record the actual renderer and loaded dependency, and make the seed
 part of the session script itself. A fifty-cycle child-lifecycle row can invoke
 the same shared action directly; opening the gallery is a separate UI case.
 Do not report a successful lifecycle run as proof of unrelated gallery transitions.
+
+**Complete the mirror for the gate's empty-status solve:** an installed builder's
+prefetch list is not the release gate's dependency closure. The Camera successor
+compiled and passed its packing-list and payload checks, then the gate selected
+`dbus-user-session` and `lsb-base` from frozen Debian instead of the packages the
+pinned builder already had. Retain the gate's actual plan, run its unchanged
+empty-status solver for every predecessor binary of all affected sources, and
+fetch the union of selected archives. Authenticate each exact filename, size and
+hash against the retained signed indexes; do not update the archive date or
+weaken the gate. The unchanged Camera gate passed after those two inputs were
+added. When later successors become siblings, keep their candidate universe
+separate from the predecessor universe used for comparison.
+
+**Keep a successful source closure, not its disposable build tree:** take the
+binary and metadata names from the successful build record, then follow every
+file named by the source descriptor, buildinfo and changes files. Verify their
+hashes before copying, create `.keep` first, and include hidden files in the
+stage's checksum list. Retain the gate's signed-index, resolution, execution
+and link-check receipts before deleting its regenerable unpack and archive
+caches. A source directory full of objects is neither the closure nor necessary
+for replaying it.

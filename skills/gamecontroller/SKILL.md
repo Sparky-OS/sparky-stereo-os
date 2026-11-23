@@ -28,6 +28,8 @@ Follow [house formats](../../docs/house-formats.md): every button, axis and hat 
 The game or the user's mapping owns conversion.
 Hardware counts determine the model; gamepad names describe a presentation.
 
+For a foot controller whose hardware is off the bench, see [A Hub for a device nobody has on the bench](references/a-hub-for-a-device-nobody-has-on-the-bench.md).
+
 ## Preserve the raw device
 
 The accepted raw-controls base is plasma-desktop v6.7.4 with commit `30a4e86b23` on `sparky/gamecontroller-raw-controls` in [the edition's Plasma fork](https://invent.kde.org/danielcamposramos/plasma-desktop).

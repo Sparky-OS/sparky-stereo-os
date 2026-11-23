@@ -1584,3 +1584,13 @@ Orca: Joanmarie Diggs, Federico Mena Quintero, Marc Mulcahy, Willie Walker, Mike
 ## Counting what Lean Code saves a system from reading (ORDER 845)
 
 strace ([github.com/strace/strace](https://github.com/strace/strace)), whose own copyright file names Paul Kranenburg, Branko Lankester, Ulrich Pegelow, Michael Elizabeth Chastain, Rick Sladkey, Wichert Akkerman and the strace developers: the traces of opens and reads. Netdata ([github.com/netdata/netdata](https://github.com/netdata/netdata)): the station's history, read through its read-only API. The earlier count of a boot's reads is the Lean Code lane's of 17 October 2026 (milestone 4); its method (the files a boot opens joined with the survey of what was projected) is the starting point of this one.
+
+## Foottroller Hub for Linux (ORDER 37)
+
+X. Tian, JP Technology Initiatives Inc. ([Foottroller's IsaacTeleop plugin](https://github.com/smoothmover/IsaacTeleop-Foottroller/blob/f447a3f2f16ff34b996b362c8b4efc0d4fb7f288/src/plugins/foottroller/README.md)): the Linux joystick ordinals and normalization. JP Technology Initiatives Inc. ([FoottrollerSupport](https://github.com/smoothmover/foottrollersupport)): public Unity and Unreal integrations and Hub notes.
+
+Ragnar Hojland Espinosa and David Herrmann ([Linux input documentation](https://docs.kernel.org/input/)): the joystick ABI and gamepad specification. Andrew Kelley, Zig contributors and Daniel Campos Ramos ([cgm-zig](https://github.com/danielcamposramos/cgm-zig)): compiler and standard library. GNU C Library contributors ([glibc](https://www.gnu.org/software/libc/)): POSIX and Linux interfaces used by the Hub.
+
+## Foot locomotion in Linux VR (ORDER 37b)
+
+Collabora, Ltd., Jakob Bornecrantz and the Monado contributors. Sapphire and the xrizer contributors. Valve Corporation. David Fattal and the DisplayXR contributors. JP Technology Initiatives Inc. and the Foottroller team.

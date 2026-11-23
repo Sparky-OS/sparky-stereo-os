@@ -883,3 +883,75 @@ If a derived baseline already contains the setup mutation, restart from the orig
 Rerun the complete installed transaction and deep verification; never exempt the source path or weaken the verifier.
 **How found:** deep verification named the one extra path, the stopped container had no such file, and the original published image still held it; the setup's unlink loop and derived-image timing explained the difference.
 Keep the failed attempt and compare the public index hashes after the corrected proof as well.
+
+### A migration between preparation and publication
+
+A successful frozen-view qualification is not evidence for a later live archive.
+If the official fresh-install check finds a new Frameworks dependency floor, authenticate a new snapshot matching the live InRelease, measure every fork counterpart and every candidate's installability, and prepare the necessary successors with all edition patches.
+The [later-migration procedure](frameworks-transition.md#a-later-migration-before-publication) covers disabled Debian patches, installed public-API controls and catalogue source mapping.
+After the successor pool is complete, rerun fresh installation and the installed upgrade against both the frozen view and live Debian, recording the live minute and all retained signed indexes.
+A library loaded throughout the desktop still needs the real-machine program-start bench before acceptance.
+
+During that measurement, compare failing test packages and Multi-Arch pairs with Debian's own packages in the identical signed view before choosing a rebuild.
+The [archive-failure controls](frameworks-transition.md#separate-archive-failures-from-a-forks-regression) distinguish an inherited dependency conflict, task reachability and a base-library fix's actual retirement condition.
+Keep every finding in the inventory; report-mode exit zero is completion, not qualification.
+
+### A fresh whole-pool run still uses the frozen indexes
+
+Symptom: a full rerun has no reusable comparison records, but the default archive initialization updates every third-party index even when Debian has a dated URL.
+Cause: a dated Debian source does not freeze the other archives; the retained-index loader was exposed only through the reuse path.
+Use `check-link --archive-view CONTEXT --previous-archive-view DATED_CONTEXT` for a fresh full comparison on the retained candidate and publication views.
+These are the Archive context directories containing metadata.json and state/lists, not a bare Packages file or an unverified mirror.
+The loader rechecks source configuration, keys, sizes, hashes, signatures and signed Packages hashes, and the normal predecessor eligibility rules still run.
+The options cannot be combined with --reuse-manifest, which already binds its two views.
+The failure was found while binding a replacement pool to its accepted frozen view; altered-index and genuinely broken-candidate controls still refuse it.
+
+When copying an isolated apt universe to a different scratch path, rename its local edition list filenames too: apt encodes that URI in the list names.
+Otherwise apt ignores the copied local Packages and says the edition metas cannot be located, even though the public indexes are present.
+Keep the signed public index bytes unchanged, update the private local URI/list names together, and read the solver's complete lines before attributing that setup failure to a package.
+
+### Zero removals and a caller's shell mode
+
+Symptom: a fresh task plan resolves thousands of installs and zero removals, then the wrapper exits without a FAIL verdict before installing anything.
+Cause: the proof helper counts removals with `grep -c`; zero matches prints zero but returns status one, which a new caller's `set -e` treats as fatal.
+The existing upgrade caller already disables errexit around helpers that call `fail` explicitly.
+Invoke these explicit-failure helpers in a checked conditional, or use their established caller mode; retain every install, kept-back and removal check.
+Read the helper and the complete plan before treating this shell exit as a package failure.
+Keep the interrupted invocation, bind the unchanged planned root and signed indexes, and resume the actual transaction only after the same helper passes.
+Do not confuse a fresh install command's unrequested bootstrap upgrades with solver-kept packages: name those packages and their versions separately, and still read back every selected edition target exactly.
+
+### APT's versioned terminal assignment is not its request chain
+
+Symptom: an old runtime and its debug companion stop as failures inside the candidate set, although their missing external ABI names exist in the authenticated publication-day view.
+Cause: the terminal-owner parser does not recognize `package:architecture=version`, and an unanchored search for `   2. ` can select a nested second request-chain item before the actual second conflicting assignment.
+Read the top-level assignment anchored at the start of its line, accept the optional version after the architecture, and use that same terminal section for the unmet relation.
+Keep the complete request chain for archive attribution; fixing the terminal parser does not allow a later implicated third-party archive or an edition-owned provider.
+The dated solve must still succeed, or the existing checked unavailable/uninstallable-baseline rules must apply; no inherited-failure allowance is invented.
+The defect was found by reading every policy attempt and both signed provider indexes, then reproducing the versioned owner and nested chain with a concrete-library transition fixture.
+Keep the old full-run evidence, run the whole toolkit suite on the corrected code, and certify any reused comparisons through the bound seeded-sample procedure above.
+
+
+### A diversion-removal message is not a removed package
+
+**Symptom:** the real-install log checker reports a removed package named `'diversion`, although apt planned no removals and the installed package database retains the baseline names.
+**Cause:** `dpkg-divert --remove` prints `Removing 'diversion of /PATH to /OTHER by PACKAGE'` during merged-/usr maintainer-script cleanup.
+A parser that takes every line starting with `Removing ` as a package removal confuses that message with dpkg's `Removing PACKAGE (VERSION) ...` record.
+**Fix:** exclude the complete known diversion-message form, then apply the unchanged package-removal allow-list to every other `Removing` line.
+Unknown lines must still fail; a broad exclusion of removal output would hide real package loss.
+Run the proof-check suite with diversion-only, diversion plus an unlisted architecture-qualified removal, diversion plus an allowed removal, and unknown-output controls.
+Read the before/after package database as well as the simulation and real log.
+**How found:** every rejected line named a diversion path, not a package/version pair; two positive fixtures failed under the old parser and passed after the correction, while real unlisted removals remained red.
+If apt completed before this post-install parser stopped, keep the exact transaction log and failed checker output, then resume the checks on the same installed root.
+Do not reinstall or discard the completed transaction merely to work around a log-parser fault.
+
+
+### Deep verification needs the bootstrap's exact originals too
+
+**Symptom:** the real fresh task transaction succeeds, but deep verification prints `NODEB` for an unchanged bootstrap package whose exact version has left the candidate index.
+**Cause:** installing the tasks need not upgrade every package already present in the base image, while the verifier needs the original archive of the installed version.
+Name these unrequested bootstrap upgrades separately; do not upgrade them merely to erase a verification finding.
+**Fix:** recover the exact original into the disposable APT cache, independently authenticating its dated InRelease, archive key, signed Packages hash, binary SHA-256 and package/version/architecture.
+Keep that original-only archive evidence separate from the candidate's solver view; neither the installed files nor the candidate indexes change.
+Retain the complete first verification output, then rerun the unchanged verifier with the authenticated original available.
+The whole-pool rerun must provision the same original when that bootstrap version remains installed.
+**How found:** the verifier's download error named the old bootstrap version, the installed readback confirmed it, and its signed historical Packages record bound the recovered archive.

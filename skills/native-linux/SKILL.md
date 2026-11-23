@@ -175,6 +175,8 @@ A client drawing on a GPU other than the compositor's (a dmabuf import failure, 
 
 A declared surface (a 3D area, a player's video, a two-view EGL window) and its lifetime: the orders a client may take it down in and what each must leave safe, the minimal client that runs them all on every card, a sanitizer build of the edition's Mesa in the rig, how to tell which layer wrote into a damaged heap, and the traps of queue row 830 (a program's write into freed memory taken for Mesa's, `libstereo-declare`'s outputs crashing mpv's `wl_surface.enter`): [declared-surface-lifetime-in-mesa.md](references/declared-surface-lifetime-in-mesa.md).
 
+A library that a program hands its `wl_display` (what it may bind there, why a `wl_output` it binds reaches the program's `wl_surface.enter`, proxy tags and their limit, a connection of the library's own, a surface made at a dead surface's address, the matrix over every program that loads it, six traps of row 835): [library-sharing-the-programs-connection.md](references/library-sharing-the-programs-connection.md).
+
 A program that dies with `wl_display#1: error 0: invalid object N` (or another object's "no longer exists" error): read the client's `WAYLAND_DEBUG` trace back from the error to the object's creation and its `destroy`, and name the side from libwayland's rules (a request on an id the client itself destroyed is the client's fault).
 On Qt 5 a hidden window's `wl_surface` is destroyed, so a thread that draws on a Qt window's surface must draw on a surface of its own (VLC Stereo +stereo3d20, as VLC 4 does): [references/wayland-protocol-errors.md](references/wayland-protocol-errors.md), with the recipe, the forced trigger (`../stereo-proof-rig/scripts/qt5-hideshow.cpp`) and the traps.
 

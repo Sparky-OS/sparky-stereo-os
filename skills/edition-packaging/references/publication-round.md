@@ -903,3 +903,13 @@ Invoke these explicit-failure helpers in a checked conditional, or use their est
 Read the helper and the complete plan before treating this shell exit as a package failure.
 Keep the interrupted invocation, bind the unchanged planned root and signed indexes, and resume the actual transaction only after the same helper passes.
 Do not confuse a fresh install command's unrequested bootstrap upgrades with solver-kept packages: name those packages and their versions separately, and still read back every selected edition target exactly.
+
+### APT's versioned terminal assignment is not its request chain
+
+Symptom: an old runtime and its debug companion stop as failures inside the candidate set, although their missing external ABI names exist in the authenticated publication-day view.
+Cause: the terminal-owner parser does not recognize `package:architecture=version`, and an unanchored search for `   2. ` can select a nested second request-chain item before the actual second conflicting assignment.
+Read the top-level assignment anchored at the start of its line, accept the optional version after the architecture, and use that same terminal section for the unmet relation.
+Keep the complete request chain for archive attribution; fixing the terminal parser does not allow a later implicated third-party archive or an edition-owned provider.
+The dated solve must still succeed, or the existing checked unavailable/uninstallable-baseline rules must apply; no inherited-failure allowance is invented.
+The defect was found by reading every policy attempt and both signed provider indexes, then reproducing the versioned owner and nested chain with a concrete-library transition fixture.
+Keep the old full-run evidence, run the whole toolkit suite on the corrected code, and certify any reused comparisons through the bound seeded-sample procedure above.

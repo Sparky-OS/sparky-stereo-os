@@ -927,3 +927,15 @@ Read the before/after package database as well as the simulation and real log.
 **How found:** every rejected line named a diversion path, not a package/version pair; two positive fixtures failed under the old parser and passed after the correction, while real unlisted removals remained red.
 If apt completed before this post-install parser stopped, keep the exact transaction log and failed checker output, then resume the checks on the same installed root.
 Do not reinstall or discard the completed transaction merely to work around a log-parser fault.
+
+
+### Deep verification needs the bootstrap's exact originals too
+
+**Symptom:** the real fresh task transaction succeeds, but deep verification prints `NODEB` for an unchanged bootstrap package whose exact version has left the candidate index.
+**Cause:** installing the tasks need not upgrade every package already present in the base image, while the verifier needs the original archive of the installed version.
+Name these unrequested bootstrap upgrades separately; do not upgrade them merely to erase a verification finding.
+**Fix:** recover the exact original into the disposable APT cache, independently authenticating its dated InRelease, archive key, signed Packages hash, binary SHA-256 and package/version/architecture.
+Keep that original-only archive evidence separate from the candidate's solver view; neither the installed files nor the candidate indexes change.
+Retain the complete first verification output, then rerun the unchanged verifier with the authenticated original available.
+The whole-pool rerun must provision the same original when that bootstrap version remains installed.
+**How found:** the verifier's download error named the old bootstrap version, the installed readback confirmed it, and its signed historical Packages record bound the recovered archive.

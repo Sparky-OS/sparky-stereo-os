@@ -48,6 +48,26 @@ naykkalak, author of Fenestra Menu 11, on its place in the edition as a menu the
 
 Daniel Schopf, author of the Qalculate applet for Plasma, on the translations we offered ([plasma-applet-qalculate #83](https://github.com/dschopf/plasma-applet-qalculate/issues/83#issuecomment-7084856499)).
 
+> "Thank you so much, this is great news! I’m really happy that RadioGlobe will ship in Sparky Stereo OS, and a globe in stereo 3D sounds amazing."
+
+rcspam, author of RadioGlobe, on its place in the edition ([radioglobe #4](https://github.com/rcspam/radioglobe/issues/4#issuecomment-7077384762)).
+
+> "You are absolutely welcome to include the widget in your edition."
+
+Petar Nedyalkov, author of the Advanced Weather Widget ([advanced-weather-widget #283](https://github.com/pnedyalkov91/advanced-weather-widget/issues/283#issuecomment-7059603180)).
+
+> "É uma honra ver a edgetk hospedada no repositório da distribuição, ao lado do Sparky CA, a partir das versões publicadas."
+
+Pedro F. Albanese, author of e521 and edgetk, in Portuguese: it is an honour to see edgetk hosted in the distribution's repository, beside the Sparky CA, from its published versions ([e521 #10](https://github.com/pedroalbanese/e521/issues/10#issuecomment-6782423183)).
+
+> "Thanks, Daniel! I reviewed the patch: the diagnosis is right, and since both places that apply the saved preference (startup and changing it in Preferences) go through `apply_gpu_choice`, the fix covers both."
+
+Dionatan Simioni, author of Vinci, a guided installer for DaVinci Resolve on Linux, on the fix he applied and released in v0.4.8 ([vinci #2](https://github.com/dionatansimioni/vinci/issues/2#issuecomment-6881774258)).
+
+> "Hi @danielcamposramos, thank you, merged for 0.6.3."
+
+Marco Sumari Tellez, author of IngeTrazo, on the stereo eye camera, which he combined with the camera's new lens shift and clip planes ([ingetrazo #1311](https://github.com/ingelibre/ingetrazo/pull/1311#issuecomment-7086809544)).
+
 ## Merged
 
 The maintainers who read the change and merged it are listed, with links, in [Merged outside Sparky Stereo](upstream-merges.md).

@@ -72,6 +72,15 @@ Read the project's own current contribution and translation rules. KDE routes tr
    For example, a MIME label goes through GIO's `content_type_get_description` after installing the package and letting dpkg run the shared MIME database trigger.
    Keep the expected and observed values for both builds.
 
+## Check live-caption adapter catalogues
+
+- Count the adapter's JSON keys separately from the entries extracted by Kaption and captiond's upstream `Messages.sh`. Kaption and Qaption share one upstream domain. The edition's settings adapter owns a separate key set.
+- Keep the adapter's numbered JSON placeholders and the corresponding positional `%s` values in its Problems language files. Render both against distinct arguments, especially the device-mismatch and model-offer messages. Test all required locales through the adapter, including the two Chinese scripts.
+- **Symptom:** the adapter's source tests pass while a built package serves captions settings only in English and Brazilian Portuguese.
+  **Cause:** the gettext shipping check only read MO payloads. The adapter installs its JSON directly.
+  **Fix:** register the source and payload directory in the shipping test's `JSON_CATALOGUES` map. Run `translations-shipped.py --only sparky-stereo-live-captions STAGE` and compare every key with the recipe. Check the journal catalogues separately with the Problems compiler.
+  **How found:** the existing package contained 60 of the 300 expected JSON values. The same checker passed 60 of 60 when given the previous source's catalogues.
+
 ## Prove the installed sView resources
 
 1. Build the pinned recipe with its usual Lean Code checks. Install the

@@ -10,7 +10,7 @@ description: >-
   delete the evidence of a crash or shows Access denied on a mailbox, a tool exits 0 with no message on an unreadable
   HOME, nvidia-persistenced or thermald fails on a machine without that hardware, GRUB's menu never shows after a failed
   start or Advanced options starts a kernel under Secure Boot, a GRUB test in a container shows
-  English and an empty menu, the boot splash shows a flat pair, or a build machine's disks fill with finished build trees, duplicates and Docker images.
+  English and an empty menu, the boot splash shows a flat pair, udev stalls boot on mains power, or build trees and Docker images fill the disk.
 ---
 
 # System housekeeping
@@ -121,6 +121,11 @@ Debian's postinst enables such a unit wherever the package is installed, so the 
 3. **A service the person installed by hand is theirs.** Do not gate, mask or drop-in a vendor-specific unit to hide its failure: Daniel, 2026-11-07, "If manually installed leave it, maybe a intel user is planning a migration". A thermald or nvidia-imex marked manual stays exactly as the person made it, even where its unit fails. An earlier version of this lane shipped `ExecCondition=` and `Condition...=` drop-ins for them; they were removed for this reason. If a package of the edition never installs a service (nvidia-imex, urfkill), any copy is the person's and needs nothing from us.
 4. **Machines that got the package from an earlier image are settled once, after the apt run.** The old metapackage installed thermald as an automatic package everywhere, and the new one no longer depends on it. A script run by the postinst and by dpkg's post-invoke hook starts a oneshot unit with `systemctl --no-block` (inside an apt run apt rewrites its state file at the end, so a change made earlier is lost); the unit waits with `apt-get -o DPkg::Lock::Timeout=-1 check`, then: on the vendor, marks the package manual (so `apt autoremove` keeps it); on any other vendor, removes it with `apt-get remove` (configuration kept) only when it is automatic and `apt-get -s remove` lists nothing but it; a manual one is left. A stamp makes it run once, and the journal gets one line saying why. A package that something still depends on is left, with no stamp, and looked at again at the next dpkg run.
 5. **Prove it with fixtures on both sides.** Detection: one fixture folder per case (Intel and AMD, laptop and desktop) through `sparky-stereo-hardware --auto --dry-run --fixture DIR`, red on the published package and green on the new one. The settling step: four containers (Intel and AMD, installed automatic and manual) with a cpuinfo fixture bind-mounted over `/proc/cpuinfo`, running the unit's own command (a container has no systemd): Intel automatic gives manual and `apt-get -s autoremove` stops listing it, AMD automatic gives removed with the configuration kept and a second run does nothing, both manual cases are untouched, and a package that depends on it keeps it. Upgrade: published packages first, then the new ones, judged on apt's `Inst` and `Remv` lines (none), then the diff of `dpkg-query` before and after the step (exactly the one package).
+
+## An early boot waits for the udev queue
+
+[Find a udev rule that blocks the boot](references/a-udev-rule-that-blocks-the-boot.md) when a worker runs a command for more than 59 seconds and settle times out.
+Use an online mains supply in QEMU and measure the same guest with the rule, with the rule masked and with the settle consumer removed.
 
 ## A queued job that fails: no loop, no held boot
 

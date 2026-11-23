@@ -40,6 +40,14 @@ effcol, maintainer of wiz3D, the open continuation of iZ3D's stereo driver ([wiz
 
 skyfishgoo, on the KDE Discuss thread about real depth on the desktop ([KDE Discuss](https://discuss.kde.org/t/real-depth-for-oceans-elevation-a-design-question-for-union/50744)).
 
+> "I'm glad to see it adopted, and the credits to Eisteed's Menu 11 Next, adhe's OnzeMenuKDE and the other authors are exactly right."
+
+naykkalak, author of Fenestra Menu 11, on its place in the edition as a menu the person can choose ([fenestra-menu-11 #7](https://github.com/naykkalak/fenestra-menu-11/issues/7#issuecomment-7085034370)).
+
+> "Hi, thanks for making this software part of your project. Please send the PRs, I will gladly add them here, should be no problem."
+
+Daniel Schopf, author of the Qalculate applet for Plasma, on the translations we offered ([plasma-applet-qalculate #83](https://github.com/dschopf/plasma-applet-qalculate/issues/83#issuecomment-7084856499)).
+
 ## Merged
 
 The maintainers who read the change and merged it are listed, with links, in [Merged outside Sparky Stereo](upstream-merges.md).

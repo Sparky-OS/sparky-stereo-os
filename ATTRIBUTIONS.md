@@ -1633,6 +1633,8 @@ The Matroska element's author record names the GStreamer maintainers collectivel
 
 GStreamer's Qt material lifetime repair: Will, author of [MR !12461](https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/12461), carried into the edition's camera plugin build. Mark Nauwelaerts also authored the MP4 muxer code this camera's st3d change extends.
 
+GStreamer's late-caps test synchronization: Dominique Leroux, author of [MR !12910](https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/12910), carried from commit 6e4d5222c26cf5d719df9409d26bdf51f2130555 into the camera plugin build. It replaces timing assumptions with synchronization and timestamped input.
+
 GStreamer camera effects and app boundary, from the installed element records:
 Erik Walthinsen (identity); Filippo Argiolas (bulge, mirror, square, stretch,
 colour effects); Thiago Santos (kaleidoscope, pinch, twirl); David Schleef

@@ -476,3 +476,8 @@ verify that the adapter actually uses each installed caption catalogue.
   archive with a deliberately unavailable dependency; assert no fetching or
   installation, no traceback, and a written cleanup record. This test does not
   authorize running the real bench kit or loading a model on the station.
+
+A minimal rig can have translated CJK strings but lack their fonts. Missing-glyph
+boxes can fit where the real text would not. Verify the font inputs, capture the
+rendered page, and reject zero glyph indexes in the laid-out text before treating
+its geometry as a pass. This is a rig-input correction, not a translation.

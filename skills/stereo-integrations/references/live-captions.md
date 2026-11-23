@@ -542,3 +542,19 @@ atspi_set_timeout from the remaining readiness budget before discovery and
 activation, with startup grace disabled; retain activation duration. Do not
 retry a toggle. This is the existing readiness bound, not a relaxed product
 latency or geometry criterion.
+
+A long proof can be interrupted when its tool session is renewed, even if a
+shell child was started with nohup and setsid: the child still belongs to the
+tool's PID namespace. Retain that partial run as incomplete. Where the work
+already permits private Docker jobs, a daemon-owned controller can run the same
+command independently of the tool session. Record its image, command, mounts,
+CPU allocation and container ID, and remove it after its exit is recorded.
+Budget the controller and serial child together; one controller CPU plus three
+child CPUs stayed within the four-CPU allowance in this proof.
+
+Match the original runner's UID. A root controller created output directories
+that a UID-1000 native PipeWire fixture could not write. The observer correctly
+failed on its missing before-daemon.json even though the fixture returned zero.
+The same command under a UID-1000 controller preserved the expected ownership.
+Keep readiness and geometry expectations unchanged when repairing this runner
+boundary; retain the failure and verify all expected output files.

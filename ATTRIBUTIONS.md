@@ -1579,3 +1579,7 @@ Kaption and captiond: Alex Márquez Pérez Muñíz Díaz Puras Thaureaux Fagúnd
 Vibe: thewh1teagle. Whisper.cpp and ggml: Georgi Gerganov and the ggml contributors.
 
 Orca: Joanmarie Diggs, Federico Mena Quintero, Marc Mulcahy, Willie Walker, Mike Pedersen, Rich Burridge, Eitan Isaacson and Scott Haeger.
+
+## Counting what Lean Code saves a system from reading (ORDER 845)
+
+strace ([github.com/strace/strace](https://github.com/strace/strace)), whose own copyright file names Paul Kranenburg, Branko Lankester, Ulrich Pegelow, Michael Elizabeth Chastain, Rick Sladkey, Wichert Akkerman and the strace developers: the traces of opens and reads. Netdata ([github.com/netdata/netdata](https://github.com/netdata/netdata)): the station's history, read through its read-only API. The earlier count of a boot's reads is the Lean Code lane's of 17 October 2026 (milestone 4); its method (the files a boot opens joined with the survey of what was projected) is the starting point of this one.

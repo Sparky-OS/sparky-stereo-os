@@ -333,3 +333,9 @@ remove the probe. The earlier guard destroyed the recording; drop whole pairs
 instead, notify once and keep finalization. Check a second recording resets the
 notice. Pausing immediately after pipeline creation is a bad fixture: a source
 still transitioning can return FLUSHING rather than exercise back pressure.
+
+**Constant quality can still carry a bitrate ceiling:** x264enc's pass=qual
+retains its default 2,048 kbit/s VBV cap. The ordinary Theora quality route has
+no such ceiling. Disable it with vbv-buf-capacity=0, then read the actual x264
+options in the film: rc=crf and normal lookahead, with no vbv_maxrate. Looking
+only at the pass property would miss this restriction on a full stereo pair.

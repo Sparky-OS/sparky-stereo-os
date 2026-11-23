@@ -913,3 +913,17 @@ Keep the complete request chain for archive attribution; fixing the terminal par
 The dated solve must still succeed, or the existing checked unavailable/uninstallable-baseline rules must apply; no inherited-failure allowance is invented.
 The defect was found by reading every policy attempt and both signed provider indexes, then reproducing the versioned owner and nested chain with a concrete-library transition fixture.
 Keep the old full-run evidence, run the whole toolkit suite on the corrected code, and certify any reused comparisons through the bound seeded-sample procedure above.
+
+
+### A diversion-removal message is not a removed package
+
+**Symptom:** the real-install log checker reports a removed package named `'diversion`, although apt planned no removals and the installed package database retains the baseline names.
+**Cause:** `dpkg-divert --remove` prints `Removing 'diversion of /PATH to /OTHER by PACKAGE'` during merged-/usr maintainer-script cleanup.
+A parser that takes every line starting with `Removing ` as a package removal confuses that message with dpkg's `Removing PACKAGE (VERSION) ...` record.
+**Fix:** exclude the complete known diversion-message form, then apply the unchanged package-removal allow-list to every other `Removing` line.
+Unknown lines must still fail; a broad exclusion of removal output would hide real package loss.
+Run the proof-check suite with diversion-only, diversion plus an unlisted architecture-qualified removal, diversion plus an allowed removal, and unknown-output controls.
+Read the before/after package database as well as the simulation and real log.
+**How found:** every rejected line named a diversion path, not a package/version pair; two positive fixtures failed under the old parser and passed after the correction, while real unlisted removals remained red.
+If apt completed before this post-install parser stopped, keep the exact transaction log and failed checker output, then resume the checks on the same installed root.
+Do not reinstall or discard the completed transaction merely to work around a log-parser fault.

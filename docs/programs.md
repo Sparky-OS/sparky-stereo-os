@@ -62,7 +62,7 @@ The words in quotes are each project's own description of itself; the line after
 **Jmol**, the molecule viewer: a molecule in 3D with one Enable 3D choice.
 **ParaView**: your data in 3D with one Enable 3D choice.
 **Matplotlib**, with the edition's module: 3D plots in 3D.
-**Netgen**, the mesh generator: the mesh in 3D with its own stereo option, once its drawing area, a window inside the window, is shown in 3D too.
+**Netgen**, the mesh generator: the mesh in 3D with one Enable 3D choice, as deep as your screen's 3D settings allow.
 
 ## Play
 

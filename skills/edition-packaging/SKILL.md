@@ -56,6 +56,8 @@ The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first.
 
 For a package that disappeared from testing, read [carried from Debian unstable](references/carried-from-debian-unstable.md): removal records, suites, RC bugs, fixes, versions, retirement and the installed proof.
 
+For a program missing from testing whose Debian source is years behind the upstream tree the edition's work stands on (OpenSCAD: Debian's 2021 release, upstream's 2026.11 release candidate), read [a program whose Debian source is years behind its upstream](references/debian-source-years-behind-upstream.md): the source, a reproducible orig tarball from a tag, the version that the final release replaces, what of Debian's packaging to keep and the traps.
+
 For a recorded decision authorizing a stereo version of a SparkyLinux tool, use [the pinned carry recipe](references/carried-sparkylinux-tool.md); it preserves the published base and checks every payload file before the narrow change.
 
 ## Provenance (Daniel, 2026-10-02): always

@@ -438,6 +438,9 @@ The edition's DisplayXR package (ORDER 58, [Sparky-OS/displayxr-packaging](https
 **Source**: [mesa3d.org](https://mesa3d.org/) **License**: MIT **What we changed**: OpenGL quad buffer, EGL multiview windows and two-layer Vulkan swapchains become one full side by side picture, declared to KWin; a Vulkan layer does the same over drivers outside Mesa.
 **Credit**: Brian Paul, who started Mesa in 1993, and the Mesa developers.
 The GLX files that patch 0045 (a stereo child is declared once its window is viewable, ORDER 50c) changes are `src/glx/dri_common.c`, `dri_common.h`, `dri3_glx.c` and `drisw_glx.c`; by Mesa's own commit history their main authors are Adam Jackson, Kristian Høgsberg, Mike Blumenkrantz, Emma Anholt, Keith Packard, Marek Olšák, Dave Airlie, Emil Velikov, Ian Romanick, Jeremy Huddleston and Kristóf Ralovich.
+Row 830 (a declared surface's lifetime, November 2026) rests on Mesa's Wayland EGL platform, `src/egl/drivers/dri2/platform_wayland.c`, whose header names its authors Kristian Høgsberg and Benjamin Franzke, and on libwayland, by Kristian Høgsberg, Benjamin Franzke, Jason Ekstrand, Jonas Ådahl, Marek Chalupa, Giulio Camuffo, Yong Bakos, Keith Packard and Junio C Hamano with Intel, Collabora, Red Hat, Klarälvdalens Datakonsult, NVIDIA and Samsung, as its copyright file records them.
+Its search of upstream found Pierre-Eric Pelloux-Prayer's [amdgpu winsys import and destroy race fix](https://gitlab.freedesktop.org/mesa/mesa/-/commit/ee625bbb02), reviewed by Marek Olšák, in Mesa 26.2.7 and later, and in mpv llyyr's [handling of an unknown output in `wl_surface.enter`](https://github.com/mpv-player/mpv/commit/f4d13e1c2c).
+Row 835 (November 2026) carries that commit in the edition's mpv with the one it is built on, Dudemanguy's [handling of all outputs disappearing](https://github.com/mpv-player/mpv/commit/3847a8157f6e), and gives libstereo-declare a connection of its own for the outputs, through libwayland's `wl_display_connect_to_fd` and its event queues, by the libwayland authors named above.
 The Kopper test series also carries Mike Blumenkrantz's [Present event-selection correction](https://gitlab.freedesktop.org/mesa/mesa/-/commit/b258e2a051761868734f09774295ee9cee5f7e8d), dated 6 October 2026; it remains outside the package recipe pending integration review.
 
 ### 2.3 NVIDIA's open GPU kernel modules and egl-wayland
@@ -1557,6 +1560,17 @@ The trigger, Kirigami's per-eye icon and the proof in a real plasmashell build o
 - **KIconThemes**: Hamish Rodda (`KIconEngine`), Geert Jansen, Antonio Larrosa and Michael Pyne (`KIconLoader`, `KIconTheme`), as for milestone 1; the edition's `+stereo3d3` counts each drawing of a stereo icon.
 - **Plasma's desktop and workspace** ([invent.kde.org/plasma/plasma-desktop](https://invent.kde.org/plasma/plasma-desktop), [invent.kde.org/plasma/plasma-workspace](https://invent.kde.org/plasma/plasma-workspace)): the folder view (Eike Hein), Kickoff, the task manager, the system tray and the wastebin applet, unchanged, are the places of the proof; the applets' own authors were not read, as their QML is compiled into the installed plugins.
 - **Kubabbar Glass**: the edition's look and its stereo icon theme, whose Bin pictures the proof shows in both eyes.
+
+## Lean Code reads QML annotations; Kirigami packaged; a screen whose mode cannot be read is told (queue row 77, milestone 3, 2026-11-22)
+
+Names only, from each project's records and the headers of the files read; these projects do not endorse the edition.
+
+- **acorn** ([github.com/acornjs/acorn](https://github.com/acornjs/acorn), MIT): Marijn Haverbeke and its contributors; the Lean Code QML check extends its tokenizer with QML's `@` token through acorn's own plugin interface (`Parser.extend`).
+- **Qt Declarative's QML lexer and grammar** (`qqmljslexer.cpp`, `qqmljs.g`; The Qt Company and the Qt Project): the clauses the check follows for annotations (`T_AT`, `UiAnnotation`, `UiAnnotatedObject`, `UiAnnotatedObjectMember`).
+- **Kirigami's `ListSectionHeader`**: Björn Feber; its annotation is the first QML annotation the edition's packaging met, and Debian's file is the test's fixture, read in place.
+- **libkscreen** ([invent.kde.org/plasma/libkscreen](https://invent.kde.org/plasma/libkscreen)): Daniel Vrátil and Sebastian Kügler (`backendmanager.cpp`); the platform theme's one read uses `KScreen::GetConfigOperation`, and the rig makes it fail through `KSCREEN_BACKEND`.
+- **Solid** ([invent.kde.org/frameworks/solid](https://invent.kde.org/frameworks/solid)): its fake backend (`SOLID_FAKEHW`) gives the rig a machine with no drive; its fstab backend's overlay support is why a container's root showed in the Places panel.
+- **ECM** (`kde_package_app_templates`) and **KDevelop**'s app templates: the reason Kirigami's template stays authored.
 
 ## Live captions and transcript editing
 

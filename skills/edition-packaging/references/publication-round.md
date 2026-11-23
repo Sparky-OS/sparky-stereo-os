@@ -879,3 +879,17 @@ A library loaded throughout the desktop still needs the real-machine program-sta
 During that measurement, compare failing test packages and Multi-Arch pairs with Debian's own packages in the identical signed view before choosing a rebuild.
 The [archive-failure controls](frameworks-transition.md#separate-archive-failures-from-a-forks-regression) distinguish an inherited dependency conflict, task reachability and a base-library fix's actual retirement condition.
 Keep every finding in the inventory; report-mode exit zero is completion, not qualification.
+
+### A fresh whole-pool run still uses the frozen indexes
+
+Symptom: a full rerun has no reusable comparison records, but the default archive initialization updates every third-party index even when Debian has a dated URL.
+Cause: a dated Debian source does not freeze the other archives; the retained-index loader was exposed only through the reuse path.
+Use `check-link --archive-view CONTEXT --previous-archive-view DATED_CONTEXT` for a fresh full comparison on the retained candidate and publication views.
+These are the Archive context directories containing metadata.json and state/lists, not a bare Packages file or an unverified mirror.
+The loader rechecks source configuration, keys, sizes, hashes, signatures and signed Packages hashes, and the normal predecessor eligibility rules still run.
+The options cannot be combined with --reuse-manifest, which already binds its two views.
+The failure was found while binding a replacement pool to its accepted frozen view; altered-index and genuinely broken-candidate controls still refuse it.
+
+When copying an isolated apt universe to a different scratch path, rename its local edition list filenames too: apt encodes that URI in the list names.
+Otherwise apt ignores the copied local Packages and says the edition metas cannot be located, even though the public indexes are present.
+Keep the signed public index bytes unchanged, update the private local URI/list names together, and read the solver's complete lines before attributing that setup failure to a package.

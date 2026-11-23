@@ -224,3 +224,21 @@ Keep those rows visible while deciding which source actually needs a successor.
 
 These causes were distinguished by Debian-only solver controls, authenticated source equality and reverse dependency inspection, not by exemptions in the link gate.
 A report-mode exit zero means the inventory completed; it does not mean every package can be installed.
+
+## Follow the library transition through its consumers
+
+A clean patch application does not carry all edition packaging.
+Compare the published `debian/` against the new Debian packaging outside the patch series and toolkit too.
+For KIO Extras the five thumbnail patches applied unchanged, but the published install manifest also installed `usr/share/kconf_update/` for the thumbnail-cache migration.
+Retaining only the series would omit that migration from the binary package.
+The control-file comparison also retains the required StereoLayer build and runtime relations and the mandatory CMake feature check.
+
+A consumer built after an edition library successor must name that accepted library as a build input when the edition's changes are required.
+Pin the exact development-package version in the recipe, provide the source closure's binaries in the local build-input repository, and read back APT's selected version.
+The local repository needs its normal edition Origin in Release metadata so that the shipped edition preferences recognize it; a bare Packages index can otherwise leave the requested version unselected.
+Do not invent a higher-priority preference or substitute Debian's library to make the build proceed.
+This cause was found by the failed exact-version build-dependency solve and the subsequent `apt-cache policy` output.
+
+When an explicitly authorized unchanged-source rebuild repairs a retired library ABI while a larger upstream port remains separate, keep the rejected port hunks and name their owning follow-up.
+Carry every published patch and source-consumer plan unchanged, advance the edition revision, and compare the resulting source members before accepting the rebuilt binaries.
+A successful compile alone does not establish that the installed stereo paths still work.

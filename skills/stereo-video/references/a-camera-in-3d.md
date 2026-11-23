@@ -287,3 +287,21 @@ adapter under test. Query a render node's group inside the CDI container when
 the tool's own namespace has no /dev/dri, then use that group with SYS_NICE and
 the installed KWin. Client zink rendering still does not prove KWin's renderer:
 in this probe KWin reports EGL_NOT_INITIALIZED and falls back to QPainter.
+
+
+**Concurrent effect construction:** a later fresh replay aborted in Cartoon's
+f0r_construct with a double free, although earlier effect matrices passed.
+frei0r.hpp clears, swaps and rebuilds a plugin-global parameter vector for every
+instance. Its metadata must instead be built once by the registration instance
+and remain immutable; parameter values and their pointers stay per instance.
+A deterministic paused-constructor check reads zero public parameters before
+and the expected two after; 2,000 constructions on two threads retain independent
+values, and the unchanged 31-effect matrix passes. This is distinct from sharing
+one instance's frame history between threads (related upstream issue 188).
+The owning frei0r-dmo source is 1:3.7.1-dmo1, not Debian's same-number release;
+query the installed binary's source before apt-get source. The recipe successor
+is 1:3.7.1-dmo1+stereo3d1+lc1. Native tests compile the three C++ choices against
+the corrected header; the full package must rebuild all plugins. An isolated
+FREI0R_PATH must include the system directory after the new plugins to keep
+ordinary C plugins available. Check the header's historical frame-parallelism
+fix separately: it does not repair metadata rewritten during construction.

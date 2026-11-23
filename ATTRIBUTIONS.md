@@ -258,6 +258,19 @@ KDE's colour editor and Plasma explorer work on private project copies; model, a
 No 3D model is included in this slice.
 These names credit the records inspected, rather than replacing each project's complete contributor list.
 
+### 0.3.3 The whole Oxygen suite (queue row 59)
+
+Daniel, 2026-10-14: "we need the entire oxygen suite from kde".
+The edition carries the Oxygen pieces Debian testing no longer has, from KDE's own trees and Debian's last packaging ([carrying a package Debian removed](skills/edition-packaging/references/carrying-a-package-debian-removed.md)).
+Names come from each project's `AUTHORS`, copyright records and commits, and from the trailer lines of each Debian changelog.
+
+| Piece | Work we build on | People named by its records |
+|---|---|---|
+| [Oxygen](https://invent.kde.org/plasma/oxygen), the widget style built for Qt 5 | KDE's oxygen 6.7.4 release, its Qt 5 style and library | Hugo Pereira Da Costa, Matthew Woehlke, Long Huynh Huu, Thomas Luebking, Casper Boemann, René J.V. Bertin, Christoph Feck, Zhigalin Alexander, Vlad Zahorodnii, Sandro Giessl, Riccardo Iaconelli and Maksim Orlovich; Debian's packaging by Aurélien COUDERC, Maximiliano Curia, Patrick Franz, Norbert Preining, Jonathan Riddell, Pino Toscano, Scarlett Clark and Harald Sitter |
+| [oxygen-gtk](https://invent.kde.org/plasma/oxygen-gtk), the engine for GTK 2 programs | Release 1.4.6 and the later fixes of its master branch | Hugo Pereira Da Costa, Ruslan Kabatsayev and Cédric Bellegarde, on Robert Staudinger's NULL engine; Matt Whitlock for the tree view crash fix, Heiko Becker, Nicolas Fella and Andreas Sturmlechner for the build fixes; Debian's packaging by Kai Wasserbäch, Fathi Boudra, Felix Geyer, Ralf Jung and Boyuan Yang |
+| [Oxygen fonts](https://invent.kde.org/unmaintained/oxygen-fonts) | Release 5.4.3 and the later glyph fix | Vernon Adams, the fonts' designer; Miro Hrončok for the ď and ť fix, Matthias Klumpp for the metainfo; Debian's packaging by Jonathan Riddell, Maximiliano Curia, Scarlett Clark, Harald Sitter, Scott Kitterman, Sandro Knauß, Pino Toscano and Matthias Klumpp |
+| oxygen-gtk's GTK 3 branch, measured and not carried | The engine GTK 3.24 no longer loads | Hugo Pereira Da Costa and Ruslan Kabatsayev; Debian's packaging by Dmitry Smirnov, Philip Muškovac and Felix Geyer |
+
 ### 0.4 Conectiva and its programmers
 
 **Source**: [Conectiva on Wikipedia (in Portuguese)](https://pt.wikipedia.org/wiki/Conectiva), [APT-RPM](https://en.wikipedia.org/wiki/APT-RPM), [Synaptic](https://en.wikipedia.org/wiki/Synaptic_(software)), [Exame on Conectiva's history](https://exame.com/tecnologia/conectiva-linux-sistema-operacional-do-parana-que-quase-venceu-o-windows-no-brasil-dos-anos-2000/)

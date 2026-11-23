@@ -525,3 +525,12 @@ viewport bounds for sampling; keep the same zero glyph-error and disparity
 expectations. Keep the original frame and failed result. Negative controls
 must ignore a pixel outside the text viewport while still detecting a single
 changed pixel inside it. This changes the observer, not Kaption or KWin.
+
+Keep subprocess stdout and stderr on a failed page action. A refresh-button
+lookup failed in one installed run, but its caller discarded stderr, so the
+traceback alone did not identify the cause. Accessibility objects can become
+stale between discovery and state/action introspection: retry that read-only
+phase within the same 120-second bound, recording each error. Never retry
+activation after a lost reply: a toggle may already have happened. Negative
+controls cover stale state, stale action introspection and a lost activation
+reply that must produce exactly one activation attempt.

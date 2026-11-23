@@ -1630,3 +1630,5 @@ Kamoso: Aleix Pol and Álex Fiestas, as named in the release's [AUTHORS](https:/
 
 GStreamer element records used by the camera audit (`gst-inspect-1.0`, 1.28.9): Edgard Lima and Stefan Kost (V4L2), Wim Taymans (PipeWire), Josef Zlomek and Mark Nauwelaerts (x264), Thiago Sousa Santos (MP4), He Junyan (VA-API), and Seungha Yang (NVENC).
 The Matroska element's author record names the GStreamer maintainers collectively.
+
+GStreamer's Qt material lifetime repair: Will, author of [MR !12461](https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/12461), carried into the edition's camera plugin build. Mark Nauwelaerts also authored the MP4 muxer code this camera's st3d change extends.

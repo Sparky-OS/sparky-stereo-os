@@ -186,3 +186,12 @@ The MP4 preflight reads the muxer's writes-st3d capability. VA-API and NVENC H.2
 Trap: the static viewfinder looked correct but recording received no new frames. A standalone 120-buffer PipeWire consumer, without Kamoso, also stalled on the fixture's default shared pool. With pipewiresink use-bufferpool=false the same consumer reached EOS at 120 frames. The producer then copies unchanged samples into PipeWire-owned buffers. Keep this fixture setting and a sustained-frame control; a single screenshot cannot prove a live source. No camera-pipeline product workaround is needed.
 
 Photo clause audit: CIPA DC-007-Translation-2009 sections 5.2.3.2–5.2.3.3 cover image count and MP entries, 5.2.4.2 MPIndividualNum, 5.2.4.5 BaseViewpointNum, and 6.2.2.2 left-to-right disparity viewpoints. JPS uses the VRex descriptor's stereo type, SBS layout and left-first flag. Video clauses: H.264 Annex D frame packing arrangement; RFC 9559 section 5.1.4.1.28.3 StereoMode; Spherical Video V2 st3d visual sample entry and modes. These marks describe packing, not the person's display geometry.
+
+
+## Repeated viewfinder and gallery lifetimes
+
+A live fixture exposed failures that a static first buffer did not. Kamoso's sample getter creates and removes a temporary placeholder around its capture request; a synchronous replacement writer therefore loses the file and can notify QML reentrantly. Keep the complete fresh sample write asynchronous, as camerabin was. A QML sample binding must not compare its own value with its source. Gallery GL sink creation belongs on the render thread, and each bus watch must be removed before its PipelineItem is replaced or destroyed. These fixes preserve the original 2D gallery; they are not the stereo effect matrix.
+
+A separate abort at gstqsg6material.cc:497 came from a recreated Qt scene-graph material lacking its caps. Upstream already fixed this in Will's [GStreamer MR !12461](https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/12461): mark caps changed when allocating each new material. Carry that owning-plugin fix with its credit. The separate pending-caps issue #4944 is already fixed in the measured source. Verify fifty hide/show cycles with live frames and one declaration for each child surface lifetime; one static screenshot cannot exercise this path.
+
+For H.264 (08/2024), frame-packing syntax and semantics are Annex D.1.26 and D.2.26; older editions used D.1.25 and D.2.25. Name the edition when recording a clause.

@@ -171,3 +171,74 @@ The sample's findings, notes and predecessor classes must agree before reuse is 
 Every input then receives one fresh or reused verdict with its binding, and exit zero requires every row to pass.
 Retained signed indexes must be restored and authenticated without updating the public archives during either the link proof or installed upgrade; updating the local candidate index must leave those public bytes unchanged.
 Record old/new pool digests, the replaced source sets, complete verdict, sample seed/list, exact archive evidence paths and all publication-copy inputs.
+
+## A later migration before publication
+
+**Symptom:** an already qualified pool fails the official fresh-install proof because testing has since migrated another Frameworks source.
+**Cause:** the frozen comparison established installability in its recorded view; it did not establish installability against a later base archive.
+**Fix:** authenticate the current live InRelease and an immutable snapshot with exactly the same digest, compare every edition source counterpart against the previous view, and retain a complete current installability inventory.
+Prepare the newly required successors from that snapshot, then rerun both fresh installation and installed upgrade against it and against the live archive at a recorded minute.
+Do not replace the edition fork with Debian's unpatched binary or silently keep back the desktop.
+**How found:** the new Parts, Baloo and TextEditor dependencies required KIO 6.32 while the previously qualified fork remained at 6.30.
+The whole-source comparison distinguished that source migration from separate missing shared-library transitions in Blender and KIO Extras.
+
+A disabled Debian patch is not proof that its behavior became redundant upstream.
+Read the published series and the new Debian changelog together.
+In KIO 6.32, Debian disabled its directory-removal error patch while upstream moved directory deletion after a destination flush.
+Preserving that patch requires reporting the saved error at the new completion point, while retaining the flush and source-retention ordering.
+Keep the initial rejected hunk, the upstream commits, the rebase and its tests together; source application alone does not prove behavior.
+
+**Installed proof:** private test symbols enabled only by `BUILD_TESTING` are absent from a normal package build.
+Run the private source suite as a source test, and separately compile the existing public assertions against installed imported targets with no build-directory library search path.
+KIO's partial-download cases can use public `PreviewJob`, keeping their sidecar, retry, pixel and cache-metadata assertions; its launcher cases link the installed KIO libraries directly.
+Use the same cases against Debian's unpatched version as negative controls.
+A directory-removal fixture must reach the failed removal: put its source and destination on different mounted filesystems, otherwise an earlier denied rename tests a different path.
+Record the actual copied payload and remaining empty directory, not only an error status.
+The staged catalogue check also needs a source-map entry for each newly carried catalogue patch; an unknown patch is an error, never a coverage pass.
+
+When the full upstream suite expects success for a deliberately retained source directory, the carried directory-error policy still requires an error.
+Adapt that result assertion to the exact directory-removal error while retaining all destination-flush, edited-source, warning and undo-record assertions.
+Run the copy tests on separate mounted filesystems and with their xattr helper installed; a same-filesystem rename can skip the relevant rows, and an absent helper can masquerade as a lost extended attribute.
+Keep initial failures and the final complete results separately.
+
+## Separate archive failures from a fork's regression
+
+A complete installability report includes test packages and Multi-Arch pairs that ordinary tasks never request.
+Keep those rows visible while deciding which source actually needs a successor.
+
+- **Symptom:** the edition's two Mesa OpenCL architectures cannot install together, although each installs alone.
+  **Cause:** the frozen Debian dependency set may itself prohibit the pair, for example a non-co-installable `libclang-cpp21`.
+  **Check:** create an empty-status APT state with only the same authenticated Debian snapshot and its own policy, then solve Debian's two exact package versions together and each separately.
+  Keep the complete solver explanation and dependency control fields.
+  If Debian's pair also fails, do not change Mesa merely to conceal that archive condition; separately prove that the edition's task transaction does not request the incompatible pair.
+  A reverse graph including every virtual provider is only an over-approximation, not the installed selection.
+- **Symptom:** a foreign-architecture GLib test package fails on Python D-Bus tooling.
+  **Cause:** its architecture-specific Python dependency can conflict with the native dependency of an Architecture: all test helper.
+  **Check:** solve Debian's own test package in the same empty-status state, then inspect reverse Depends, Pre-Depends and Recommends, including virtual Provides, to establish whether any edition task reaches it.
+  A debug companion depending on its test binary is not evidence that a task installs it.
+  Retain the row and its cause; do not remove the runtime library's required fix because an unused test package fails.
+- **Symptom:** a carried base-library fix has a retirement condition, but a newer archive timestamp alone appears to trigger it.
+  **Cause:** archive movement does not imply that this source changed.
+  **Check:** retrieve the source through authenticated APT, compare its descriptor hash with the original recipe's pinned input, read its patch series and the affected function.
+  Retire only when that source actually includes the fix, and measure every resulting package replacement and removal.
+
+These causes were distinguished by Debian-only solver controls, authenticated source equality and reverse dependency inspection, not by exemptions in the link gate.
+A report-mode exit zero means the inventory completed; it does not mean every package can be installed.
+
+## Follow the library transition through its consumers
+
+A clean patch application does not carry all edition packaging.
+Compare the published `debian/` against the new Debian packaging outside the patch series and toolkit too.
+For KIO Extras the five thumbnail patches applied unchanged, but the published install manifest also installed `usr/share/kconf_update/` for the thumbnail-cache migration.
+Retaining only the series would omit that migration from the binary package.
+The control-file comparison also retains the required StereoLayer build and runtime relations and the mandatory CMake feature check.
+
+A consumer built after an edition library successor must name that accepted library as a build input when the edition's changes are required.
+Pin the exact development-package version in the recipe, provide the source closure's binaries in the local build-input repository, and read back APT's selected version.
+The local repository needs its normal edition Origin in Release metadata so that the shipped edition preferences recognize it; a bare Packages index can otherwise leave the requested version unselected.
+Do not invent a higher-priority preference or substitute Debian's library to make the build proceed.
+This cause was found by the failed exact-version build-dependency solve and the subsequent `apt-cache policy` output.
+
+When an explicitly authorized unchanged-source rebuild repairs a retired library ABI while a larger upstream port remains separate, keep the rejected port hunks and name their owning follow-up.
+Carry every published patch and source-consumer plan unchanged, advance the edition revision, and compare the resulting source members before accepting the rebuilt binaries.
+A successful compile alone does not establish that the installed stereo paths still work.

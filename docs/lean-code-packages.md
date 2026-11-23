@@ -33,6 +33,20 @@ The compiled objects are byte-identical to the ones built with Debian's headers.
 An earlier form that replaced removed lines with `#line` references cost about a fifth more preprocessing (+21%); the design finds a location by its content in the source, not by its line number.
 The same shape on a faster machine, counted in instructions: [Lean Code compile cycles](proofs/lean-code-compile-cycles.md).
 
+**Counted** on a rig of the published edition (Debian testing of 2026-11-19 plus the 18 November repository tree, dpkg-stereo 0.1.41, `nodejs` and `node-acorn` installed so QML and JavaScript are projected as on a station): what a program did not have to read because the files it opened are Lean Code's shortened forms. Each row is the median of three runs of `strace -f -y`, joined with dpkg-stereo's records by `dpkg-stereo-read-count`; "bytes read" is every read call of the run, libraries and pipes included, so the share is the smallest honest one. This counts bytes; it says nothing about time.
+
+| Work | Shortened files opened | Bytes not read | Share of the bytes the run read |
+|---|---|---|---|
+| Compiling a C++ program against the standard library | 95 | 213,727 | 3.25% |
+| Compiling a Qt Widgets program | 304 | 534,524 | 3.33% |
+| A login shell | 1 | 813 | 3.67% |
+| System Settings to idle | 10 | 6,703 | 0.19% |
+| Konsole to idle | 3 | 2,134 | 0.43% |
+| A Plasma session on a virtual output, 30 s idle | 5 | 3,980 | 0.01% |
+| `apt-get install` of one small package | 25 | 30,120 | 0.015% |
+
+The three rows that were also run with the authored forms put back (a shell script, Konsole, the C++ compile) match the records file by file: 77 paths, bytes read with the authored forms minus bytes read with the lean forms equal what the records predict, to the byte. Where the shortened files are read whole (headers, scripts, settings) the saving is the records' saving; most of what a program reads at start is libraries, which Lean Code does not touch. Reproduce one row: `sparky-os/packages/dpkg-stereo/test/read-count-test.py` (the tool's own test), then `strace -f -y -e trace=openat,close,read,pread64,readv,preadv,mmap,dup,dup2,dup3 -o run.st g++ -c x.cpp -o x.o` and `dpkg-stereo-read-count --root / --strace run.st`. The recipe and its traps: [Counting what a system does not read](../skills/lean-code/references/counting-what-a-system-does-not-read.md).
+
 **Next:** an energy measurement of a whole day's work on one PC, Lean Code against Debian's files, read from the processor's own energy counter, so the saving can be stated in watt-hours per year.
 
 ## Release requirement

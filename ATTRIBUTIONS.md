@@ -566,12 +566,13 @@ Existing KWin, libkscreen, Qt and FFmpeg credits above also apply.
 | [KAlgebra](https://apps.kde.org/kalgebra/) and [Analitza](https://invent.kde.org/education/analitza) | GPL-2.0-or-later | The 3D plot drawn once per eye | Aleix Pol Gonzalez, Carl Schwan; KAlgebra also Swapnil Tripathi; Analitza also Percy Camilo Triveño Aucahuasi and Pino Toscano |
 | [Kalzium](https://apps.kde.org/kalzium/) and [Avogadro](https://avogadro.cc/) | GPL-2.0-or-later, BSD-3-Clause | Molecules in stereo; why Kalzium drew no molecule with Avogadro 2 (KDE bug 463018) | Kalzium: Carsten Niehaus, Andreas Cord-Landwehr, Marcus D. Hanwell, Inge Wallin and others. Avogadro: Geoff Hutchison, Marcus D. Hanwell and Kitware |
 | [Kubrick](https://apps.kde.org/kubrick/) | GPL-2.0-or-later | The cube once per eye | Ian Wadham |
-| [Netgen](https://ngsolve.org/) | LGPL-2.0-or-later | `-stereo` that does what it says, its drawing area (a Tk and Togl child window) shown in 3D; rebased on Debian's 6.2.2606+dfsg1-3 | Joachim Schöberl; Debian packaging by the Debian Science Maintainers (Kurt Kremitzki, Tobias Frost, Francesco Ballarin, Drew Parsons) |
+| [Netgen](https://ngsolve.org/) | LGPL-2.0-or-later | `-stereo` that does what it says, its drawing area (a Tk and Togl child window) shown in 3D; rebased on Debian's 6.2.2606+dfsg1-3; the drawing area fitted to the person's depth limits, with Enable 3D on by default (row 50, step 5) | Joachim Schöberl; Debian packaging by the Debian Science Maintainers (Kurt Kremitzki, Tobias Frost, Francesco Ballarin, Drew Parsons) |
 | [Jmol](https://jmol.sourceforge.net/) | LGPL-2.1 | `stereo 5` with `set perspectiveDepth off` as the full-width, left-eye-first setting (issue 58), the preset of the edition's build, whose display is a declared 3D area (ORDER 50 step 4) | Bob Hanson, who answered the question, and the Jmol developers; Debian's packaging by the Debichem Team |
 | [ParaView](https://www.paraview.org/) | BSD-3-Clause | Its Crystal Eyes stereo re-tested on the edition: a declared pair on both routes and both cards; the draw-buffer warnings of issue 19038. The edition's ParaView (ORDER 50 step 5) offers one stereo output, the declared pair, with "Enable 3D" | Kitware and the ParaView developers; Scott Wittenburg (merge requests 7667 and 7994), Cory Quammen (merge request 7363), Mathieu Westphal (issue 19038); Debian's packaging by the Debian Science Maintainers and Alastair McKinstry, on whose source package ours is built |
 | [Matplotlib](https://matplotlib.org/) | Matplotlib License (PSF-based) | Its 3D projection (mplot3d) read for the edition's own stereo module, python3-stereo-matplotlib, which lives outside Matplotlib | The Matplotlib development team |
 | [PyMOL](https://github.com/schrodinger/pymol-open-source) | Open-Source PyMOL licence (its LICENSE file) | The open-source build with one stereo output, the quad buffer, shown by Stereo KWin; carried from Debian unstable (3.1.0+dfsg-1) | Warren L. DeLano, Jason Vertrees, Blaine Bell, Thomas Holder, Piotr Rotkiewicz, Tor Colvin and the other authors of its AUTHORS file; Schrodinger, LLC; Debian packaging by the Debichem Team (Michael Banck, Tatiana Malygina, Stuart Prescott and earlier packagers) |
 | [OpenSCAD](https://openscad.org/) pull request 7112 | GPL-2.0-or-later | The optional stereo preview offered upstream, held until the 2026.11 release | Jordan Brown and Torsten Paul, who reviewed it, and Marius Kintel and the OpenSCAD developers |
+| OpenSCAD 2026.11 in the edition (queue row 50, step 4) | GPL-2.0-or-later with the CGAL linking exception; Manifold Apache-2.0 | The package from upstream's 2026.11 release candidate, with the 3D view as a declared stereo pair fitted to the person's depth limits | Marius Kintel, OpenSCAD's maintainer, Claire Xenia Wolf, and the developers OpenSCAD's about box lists; Jordan Brown and Torsten Paul, who reviewed pull request 7112; Kristian Nielsen and Christian M. Amsüss, whose Debian packaging of 2021.01 is the base of ours; The Manifold Authors (Emmett Lalish), whose library is built in; Karl Ljungkvist, whose analysis on upstream issue 7205 tells which mimalloc versions OpenSCAD may link |
 | [VTK](https://vtk.org/) | BSD-3-Clause | Read for the window-size bug: merge request 13642 (`vtkCamera::UpdateStereo`). The Qt adapter's draw-buffer state fault behind ParaView issue 19038, fixed in the edition's vtk9 (ORDER 50 step 5) with the technique of merge request 4818, which moved `QVTKOpenGLNativeWidget`'s blit to the state object. The colour-size warnings of a flat Qt view on Wayland, fixed in vtk9 +stereo3d2 with the technique of dc7b841a ("Do not query a missing depth attachment"); 29fc5a9b (issue 19474) had fixed the same warnings on macOS | Dan Lipsa; Cory Quammen (merge request 4818); Spiros Tsalikis (dc7b841a); Jaswant Panchumarti (29fc5a9b); Kitware and the VTK developers; Debian's packaging by the Debian Science Maintainers, Anton Gladky, Gert Wollny and Nico Schlömer, on whose source package ours is built |
 | [Blender](https://www.blender.org/) | GPL-2.0-or-later | Every window a quad-buffer (Time Sequential) window, so a scene's stereoscopy shows at once; GHOST's EGL keeps the stereo request with two views on Wayland; a mono context instead of an exit when GLX has no stereo; the right eye follows mono frames after stereo stops | The Blender Foundation and the Blender developers, from Ton Roosendaal's first Blender on; Debian's packaging by the Debian Multimedia Maintainers and Matteo F. Vescovi |
 | [GNU Octave](https://octave.org/) | GPL-3.0-or-later | `stereo` figure properties | John W. Eaton and the Octave developers |
@@ -611,6 +612,7 @@ Existing KWin, libkscreen, Qt and FFmpeg credits above also apply.
 |---|---|---|
 | [KInfoCenter](https://invent.kde.org/plasma/kinfocenter) | A page for each display's 3D modes and colour depths | Matthias Hoelzer-Kluepfel, Kai Uwe Broulik, Ismael Asensio, Pino Toscano |
 | [org.kde.video](https://github.com/Sparky-OS/org.kde.video) | Video wallpapers and lock screens; in SparkyLinux since 2018 at Daniel's request, now in Sparky-OS with its author as maintainer, and the base of 3D backgrounds | Jeromy Streets |
+| [anacron in Debian](https://tracker.debian.org/pkg/anacron) | Mains power triggering for scheduled maintenance jobs | Lance Lin, maintainer of Debian's mains rule, and Sam Bull, who requested the mains-only match in [#1148276](https://bugs.debian.org/1148276) |
 | [PipeWire](https://pipewire.org/) | Sound, the model for this edition's stereo pipeline | Wim Taymans and the PipeWire developers |
 | [OpenRGB](https://openrgb.org/) | Lighting control | Adam Honse and the OpenRGB contributors |
 | [xpadneo](https://github.com/atar-axis/xpadneo) | Xbox wireless controllers | Florian Dollinger and Kai Krakow |
@@ -1571,3 +1573,25 @@ Names only, from each project's records and the headers of the files read; these
 - **libkscreen** ([invent.kde.org/plasma/libkscreen](https://invent.kde.org/plasma/libkscreen)): Daniel Vrátil and Sebastian Kügler (`backendmanager.cpp`); the platform theme's one read uses `KScreen::GetConfigOperation`, and the rig makes it fail through `KSCREEN_BACKEND`.
 - **Solid** ([invent.kde.org/frameworks/solid](https://invent.kde.org/frameworks/solid)): its fake backend (`SOLID_FAKEHW`) gives the rig a machine with no drive; its fstab backend's overlay support is why a container's root showed in the Places panel.
 - **ECM** (`kde_package_app_templates`) and **KDevelop**'s app templates: the reason Kirigami's template stays authored.
+
+## Live captions and transcript editing
+
+Kaption and captiond: Alex Márquez Pérez Muñíz Díaz Puras Thaureaux Fagúndo Rivera.
+
+Vibe: thewh1teagle. Whisper.cpp and ggml: Georgi Gerganov and the ggml contributors.
+
+Orca: Joanmarie Diggs, Federico Mena Quintero, Marc Mulcahy, Willie Walker, Mike Pedersen, Rich Burridge, Eitan Isaacson and Scott Haeger.
+
+## Counting what Lean Code saves a system from reading (ORDER 845)
+
+strace ([github.com/strace/strace](https://github.com/strace/strace)), whose own copyright file names Paul Kranenburg, Branko Lankester, Ulrich Pegelow, Michael Elizabeth Chastain, Rick Sladkey, Wichert Akkerman and the strace developers: the traces of opens and reads. Netdata ([github.com/netdata/netdata](https://github.com/netdata/netdata)): the station's history, read through its read-only API. The earlier count of a boot's reads is the Lean Code lane's of 17 October 2026 (milestone 4); its method (the files a boot opens joined with the survey of what was projected) is the starting point of this one.
+
+## Foottroller Hub for Linux (ORDER 37)
+
+X. Tian, JP Technology Initiatives Inc. ([Foottroller's IsaacTeleop plugin](https://github.com/smoothmover/IsaacTeleop-Foottroller/blob/f447a3f2f16ff34b996b362c8b4efc0d4fb7f288/src/plugins/foottroller/README.md)): the Linux joystick ordinals and normalization. JP Technology Initiatives Inc. ([FoottrollerSupport](https://github.com/smoothmover/foottrollersupport)): public Unity and Unreal integrations and Hub notes.
+
+Ragnar Hojland Espinosa and David Herrmann ([Linux input documentation](https://docs.kernel.org/input/)): the joystick ABI and gamepad specification. Andrew Kelley, Zig contributors and Daniel Campos Ramos ([cgm-zig](https://github.com/danielcamposramos/cgm-zig)): compiler and standard library. GNU C Library contributors ([glibc](https://www.gnu.org/software/libc/)): POSIX and Linux interfaces used by the Hub.
+
+## Foot locomotion in Linux VR (ORDER 37b)
+
+Collabora, Ltd., Jakob Bornecrantz and the Monado contributors. Sapphire and the xrizer contributors. Valve Corporation. David Fattal and the DisplayXR contributors. JP Technology Initiatives Inc. and the Foottroller team.

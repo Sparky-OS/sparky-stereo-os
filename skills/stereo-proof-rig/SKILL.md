@@ -22,6 +22,8 @@ description: >-
 2. Start an isolated compositor/runtime, wait for actual readiness, capture both eyes and declarations, and inspect a representative image.
 3. Return commands, hashes, counts, control result and limits. A black or stale frame is not a valid successful stereo witness.
 
+Check the reference tile against the source frame at its actual fitted size. Before trusting a picture measure, run it on a known bad capture and its known good counterpart. Confirm the requested window geometry with KWin, then change the desktop behind it and compare the same interior pixels to detect transparency.
+
 **Check freshness first.**
 Written on 2026-10-07, the NVIDIA card added on 2026-10-16, KWin's shrink and the X11 view size on 2026-10-22, eyes that differ under an opaque region on 2026-11-01, the showcase screenshot on 2026-11-02, the relaunch soak on 2026-11-07.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill says what counts as proof; this one says how to produce it.

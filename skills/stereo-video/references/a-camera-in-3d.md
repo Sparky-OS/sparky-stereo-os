@@ -376,3 +376,16 @@ A source directory full of objects is neither the closure nor necessary for repl
   **Cause:** the rig carries the stock frei0r, whose shared plugin metadata the per-eye instances race on; the package depends on the edition's frei0r with the fix.
   **Fix:** run the rig's Kamoso tests with the edition's frei0r (`FREI0R_PATH` to its unpacked plugins), the version the package's `Depends` names.
   **How found:** the abort's backtrace in the test's own output, and the passing run in the package builder that has the successor installed.
+
+## The effects grid: a removed row's delegate builds "undefined" (2026-11-24)
+
+- **Symptom:** the `switch` session (Enable 3D off and on with the effects drawer) ends red because Kamoso logs `error: no element "undefined"`, in 16 of 20 runs; the line comes right after the click that opens the drawer again in 2D.
+  **Cause:** in 2D a failed effect preview removes its own row from the delegate's `onFailed` handler (upstream Kamoso does the same; here the effectv previews stop with `streaming stopped, reason not-linked`).
+  The delegate of the removed row lives on until its deferred deletion, with `index` -1 and `model.filters` undefined.
+  When the drawer opens again before that deletion, the new sample image re-evaluates its description to `... ! undefined name=last`, which `gst_parse_launch()` refuses: a race between the deferred deletion and the next opening.
+  **Fix:** a delegate without its row (`index < 0` or no `filters`) builds no pipeline and removes nothing (Kamoso patch 0003).
+  A test reaches it without the race: load the real `Config.qml` with stand-ins for the types Kamoso registers in C++ (`qmlRegisterType` and `qmlRegisterSingletonInstance` under `org.kde.kamoso` and `org.freedesktop.gstreamer.Qt6GLVideoItem`), fail one preview, and change the sample image in the same call stack; the old file hands over exactly that description.
+  **How found:** `console.warn` probes in a scratch build of `Config.qml` printed `index=-1 visible=false stereo=false` for the delegate that built the description, and the session's Wayland trace timestamps put the line after the reopening click.
+- **Symptom:** a Kamoso package builds although one of its tests fails.
+  **Cause:** Debian's `override_dh_auto_test` runs `-xvfb-run ... dh_auto_test`; the leading `-` ignores the result.
+  **Fix:** the recipe removes the `-`, so the edition's tests stop the build; the QML modules a test loads go into Build-Depends with `<!nocheck>`.

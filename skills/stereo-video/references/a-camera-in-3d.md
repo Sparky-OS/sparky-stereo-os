@@ -360,3 +360,19 @@ When later successors become siblings, keep their candidate universe separate fr
 Verify their hashes before copying, create `.keep` first, and include hidden files in the stage's checksum list.
 Retain the gate's signed-index, resolution, execution and link-check receipts before deleting its regenerable unpack and archive caches.
 A source directory full of objects is neither the closure nor necessary for replaying it.
+
+## Rig traps of the whole rerun (2026-11-24)
+
+- **Symptom:** on the NVIDIA card a photo row fails with `org.kde.KWin.ScreenShot2.Error.Cancelled: Screenshot got cancelled`, and `kwin.log` repeats `Failed to find a working output layer configuration!` hundreds of times after `eglInitialize failed` and `Configured compositor not supported by Platform`.
+  **Cause:** the session launcher put Mesa's EGL vendor file first and `MESA_LOADER_DRIVER_OVERRIDE=zink` on the whole container, KWin included; a virtual KWin on the NVIDIA render node cannot use them, falls back, and never presents a frame, so a capture has nothing to read.
+  Rows that read Kamoso's own frames or its PipeWire node still pass under that fault, which is how it hid.
+  **Fix:** start `kwin_wayland` (and so Xwayland) with `env -u __EGL_VENDOR_LIBRARY_FILENAMES -u MESA_LOADER_DRIVER_OVERRIDE`, as a real session's KWin runs on NVIDIA's own EGL, and leave the variables for the programs (the edition's session gives them to programs only).
+  **How found:** the same installed photo case red with the variables on KWin (353 output-layer failures) and green without them (none); the recorded trap in native-linux's quad-buffer reference says the same for GLX programs.
+- **Symptom:** a session row exits 255 within a minute; `source-caps.log` says `target not found` and the PipeWire dump has only its two driver nodes.
+  **Cause:** every session script waited a fixed three seconds after starting the virtual camera; on a station at load 28 the node appeared later.
+  **Fix:** wait for the named node (`cam-sbs`, `cam-b`) in the PipeWire graph with a deadline and a message, never a fixed sleep.
+  **How found:** the camera's own log shows it reached PLAYING after the dump was taken.
+- **Symptom:** Kamoso's `stereoeffects` test aborts with `free(): invalid pointer` after the second effect when the source is compiled in an older rig, while the same suite passes in the package build.
+  **Cause:** the rig carries the stock frei0r, whose shared plugin metadata the per-eye instances race on; the package depends on the edition's frei0r with the fix.
+  **Fix:** run the rig's Kamoso tests with the edition's frei0r (`FREI0R_PATH` to its unpacked plugins), the version the package's `Depends` names.
+  **How found:** the abort's backtrace in the test's own output, and the passing run in the package builder that has the successor installed.

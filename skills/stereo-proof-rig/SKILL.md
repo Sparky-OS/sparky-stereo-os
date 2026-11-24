@@ -68,6 +68,7 @@ Recipe, rows and traps: [native-linux, wayland-protocol-errors.md](../native-lin
 For a fault that shows only after Xwayland went away: one fresh session per case (Xwayland killed with an X11 window selected, the X11 client killed, a window killed during its closing animation, nothing), Wayland windows selected in turn through a KWin script, and each window's opacity read from a ScreenShot2 capture as the median of a white window over the black desktop.
 A stand-in notification server on the private bus shows what the person is told.
 The recipe, the rows on the published KWin, the traps (no render node cancels every capture) and the scripts: [xwayland-death-and-opacity.md](references/xwayland-death-and-opacity.md), [`scripts/xwayland-death`](scripts/xwayland-death/).
+The same folder drives the explicit-sync error that killed Xwayland: `traced-xwayland-session.sh` (one session, Xwayland's connection traced, any X11 command), `x11-surface-switch.c` (red in one run on radeonsi with Xwayland `+stereo3d3`), `x11-program-actions.sh` (a program resized, minimized, restored and covered) and `explicit-sync-verdict.py`; the recipe is in skill `native-linux`, [xwayland-explicit-sync.md](../native-linux/references/xwayland-explicit-sync.md).
 
 ## A relaunch soak (a client killed and started, or its 3D area remade, many times)
 

@@ -1635,15 +1635,6 @@ GStreamer's Qt material lifetime repair: Will, author of [MR !12461](https://git
 
 GStreamer's late-caps test synchronization: Dominique Leroux, author of [MR !12910](https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/12910), carried from commit 6e4d5222c26cf5d719df9409d26bdf51f2130555 into the camera plugin build. It replaces timing assumptions with synchronization and timestamped input.
 
-GStreamer camera effects and app boundary, from the installed element records:
-Erik Walthinsen (identity); Filippo Argiolas (bulge, mirror, square, stretch,
-colour effects); Thiago Santos (kaleidoscope, pinch, twirl); David Schleef
-(video balance and app elements); Wim Taymans (app elements, DiceTV, EdgeTV,
-RevTV, ShagadelicTV, VertigoTV); Sam Lantinga (AgingTV, WarpTV); Kentaro Fukuchi
-(OpTV, QuarkTV, RadioacTV, RippleTV, StreakTV); Sebastian Dröge (effectv and
-frei0r integration); Dries Pruimboom and Jaromil (Cartoon); Martin Bayer
-(Twolay0r and delay0r); the Gephex crew (Distort0r).
+GStreamer camera effects and app boundary, from the installed element records: Erik Walthinsen (identity); Filippo Argiolas (bulge, mirror, square, stretch, colour effects); Thiago Santos (kaleidoscope, pinch, twirl); David Schleef (video balance and app elements); Wim Taymans (app elements, DiceTV, EdgeTV, RevTV, ShagadelicTV, VertigoTV); Sam Lantinga (AgingTV, WarpTV); Kentaro Fukuchi (OpTV, QuarkTV, RadioacTV, RippleTV, StreakTV); Sebastian Dröge (effectv and frei0r integration); Dries Pruimboom and Jaromil (Cartoon); Martin Bayer (Twolay0r and delay0r); the Gephex crew (Distort0r).
 
-The recording comparison also uses GStreamer's element author records from
-`gst-inspect-1.0` 1.28.9: **Wim Taymans** (Theora), **Monty and Wim Taymans**
-(Vorbis), and **Wim Taymans and Ronald Bultje** (the libav AAC element).
+The recording comparison also uses GStreamer's element author records from `gst-inspect-1.0` 1.28.9: **Wim Taymans** (Theora), **Monty and Wim Taymans** (Vorbis), and **Wim Taymans and Ronald Bultje** (the libav AAC element).

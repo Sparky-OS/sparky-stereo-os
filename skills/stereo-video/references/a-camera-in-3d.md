@@ -202,223 +202,161 @@ The lifecycle fixture first clicks the real checkbox off and on and checks its p
 
 ## Per-eye effects and recording lifecycle evidence
 
-Normalize the camera packing first, then give each native view to a separate
-ordinary GStreamer effect pipeline with mono caps. Keep separate filter instances
-and frame history, and submit the same timestamp to both. Poll appsink without
-waiting on the GUI thread; retain only one complete pair in flight. Join the
-results only when both are ready and their dimensions still equal the input eye.
-Feed this result to the viewfinder and the camera's photo/recording path. Do not
-apply a spatial filter to the packed frame before splitting it.
+Normalize the camera packing first, then give each native view to a separate ordinary GStreamer effect pipeline with mono caps.
+Keep separate filter instances and frame history, and submit the same timestamp to both.
+Poll appsink without waiting on the GUI thread; retain only one complete pair in flight.
+Join the results only when both are ready and their dimensions still equal the input eye.
+Feed this result to the viewfinder and the camera's photo/recording path.
+Do not apply a spatial filter to the packed frame before splitting it.
 
-The camera's 31 existing choices now pass the native matrix, enumerated from its
-QML model rather than a second test catalogue. Pad probes check each eye's input
-samples and 160×120 dimensions exactly over three frames. An address-coded bulge
-control compares the results against separately processed views. Missing filters
-name the failed choice, explain the unfiltered view, and remain selectable by name
-in the stereo picker even when their thumbnail cannot render. The original flat
-filter path is retained.
+The camera's 31 existing choices now pass the native matrix, enumerated from its QML model rather than a second test catalogue.
+Pad probes check each eye's input samples and 160×120 dimensions exactly over three frames.
+An address-coded bulge control compares the results against separately processed views.
+Missing filters name the failed choice, explain the unfiltered view, and remain selectable by name in the stereo picker even when their thumbnail cannot render.
+The original flat filter path is retained.
 
-The real camera's grayscale JPS differs from the independent mono-filter/JPS
-reference in 614,290 decoded pixels before this change and zero afterward. The
-live bulge pair also equals its reference, but the static source does not
-separate that case from no effect; the address-coded native control does. Both
-saved images retain their JPS marks and native 640×480 eyes. Do not interpret an
-ideal grayscale formula as the GStreamer oracle: its YUV conversion can leave a
-one-channel rounding difference. Compare actual independent filter output exactly.
+The real camera's grayscale JPS differs from the independent mono-filter/JPS reference in 614,290 decoded pixels before this change and zero afterward.
+The live bulge pair also equals its reference, but the static source does not separate that case from no effect; the address-coded native control does.
+Both saved images retain their JPS marks and native 640×480 eyes.
+Do not interpret an ideal grayscale formula as the GStreamer oracle: its YUV conversion can leave a one-channel rounding difference.
+Compare actual independent filter output exactly.
 
-For a suspected missing recording, acknowledge the existing recording action
-before expecting a file and retain creation, close, rename and deletion events in
-the private video folder. Keep the request, temporary name, EOS completion and
-final destination together. A coordinate click that never reached Record is not
-evidence of a deleted film. The repeated probe completes fifty MP4 starts/stops on
-two pinned CPUs while a test-only timer gives the application's main thread 60 ms
-of work per 150 ms. Fifty marked films and fifty final renames, with no completed
-file deleted, did not reproduce the earlier two missing films. This is explicitly
-not a fix for those uninstrumented observations.
+For a suspected missing recording, acknowledge the existing recording action before expecting a file and retain creation, close, rename and deletion events in the private video folder.
+Keep the request, temporary name, EOS completion and final destination together.
+A coordinate click that never reached Record is not evidence of a deleted film.
+The repeated probe completes fifty MP4 starts/stops on two pinned CPUs while a test-only timer gives the application's main thread 60 ms of work per 150 ms.
+Fifty marked films and fifty final renames, with no completed file deleted, did not reproduce the earlier two missing films.
+This is explicitly not a fix for those uninstrumented observations.
 
-Freeze launcher scripts while they run. Editing a shell script that Bash is still
-reading can make its next read repeat a command: one development probe restarted
-its container and overwrote lifecycle logs after fifty recordings. Its files did
-not substitute for the lost trace; a fresh run retained the complete trace.
-No extra host stress is enabled by default. Repeated GL cases use NVIDIA through
-zink or software rendering; the display-driving AMD card is not a soak device.
-Record the actual renderer: these application tests used zink on the RTX 3060,
-while the rig's KWin fell back to QPainter. They do not establish stereo output
-captures on that compositor.
+Freeze launcher scripts while they run.
+Editing a shell script that Bash is still reading can make its next read repeat a command: one development probe restarted its container and overwrote lifecycle logs after fifty recordings.
+Its files did not substitute for the lost trace; a fresh run retained the complete trace.
+No extra host stress is enabled by default.
+Repeated GL cases use NVIDIA through zink or software rendering; the display-driving AMD card is not a soak device.
+Record the actual renderer: these application tests used zink on the RTX 3060, while the rig's KWin fell back to QPainter.
+They do not establish stereo output captures on that compositor.
 
 
 ## Publishing the processed camera through PipeWire (2026-11-23)
 
-The camera's processed native-size pair is published by pipewiresink in provide
-mode, media.class Video/Source and media.role Camera. Its node name starts with
-kamoso.stereo.; Kamoso excludes these nodes from capture inputs, including another
-instance's output. Disable 3D, a flat input, source replacement and closing the
-program remove the node. A failed publisher is named in the viewfinder while
-local capture keeps working. The pair is copied unchanged to RGBA buffers, with
-two views, side-by-side mode and no half-aspect or eye-order flag. It is the same
-post-effect pair used by photos and recording, not the unprocessed input camera.
+The camera's processed native-size pair is published by pipewiresink in provide mode, media.class Video/Source and media.role Camera.
+Its node name starts with kamoso.stereo.; Kamoso excludes these nodes from capture inputs, including another instance's output.
+Disable 3D, a flat input, source replacement and closing the program remove the node.
+A failed publisher is named in the viewfinder while local capture keeps working.
+The pair is copied unchanged to RGBA buffers, with two views, side-by-side mode and no half-aspect or eye-order flag.
+It is the same post-effect pair used by photos and recording, not the unprocessed input camera.
 
-**Lost layout at the adapter:** the source caps said side-by-side but an independent
-native PipeWire consumer read mode 0 and views 0. PipeWire 1.6.9's
-src/gst/gstpipewireformat.c converted neither multiview mode, flags nor views in
-either direction; current main and its history/MR/issue searches supplied no fix.
-The repair belongs to PipeWire's own GStreamer adapter, not a private node tag or
-an application format guess. The pipewire-stereo-61 recipe retains Debian 1.6.9-2
-and adds that conversion; Kamoso requires its new gstreamer1.0-pipewire binary.
-Public enum/flag values are compile-time checked against both libraries. Native
-checks cover all twelve defined modes and nine flag combinations in both
-directions (108 rows). This proves format fields, not temporal buffer metadata
-or partial flag-mask negotiation. The camera publishes complete SBS pairs only.
+**Lost layout at the adapter:** the source caps said side-by-side but an independent native PipeWire consumer read mode 0 and views 0.
+PipeWire 1.6.9's src/gst/gstpipewireformat.c converted neither multiview mode, flags nor views in either direction; current main and its history/MR/issue searches supplied no fix.
+The repair belongs to PipeWire's own GStreamer adapter, not a private node tag or an application format guess.
+The pipewire-stereo-61 recipe retains Debian 1.6.9-2 and adds that conversion; Kamoso requires its new gstreamer1.0-pipewire binary.
+Public enum/flag values are compile-time checked against both libraries.
+Native checks cover all twelve defined modes and nine flag combinations in both directions (108 rows).
+This proves format fields, not temporal buffer metadata or partial flag-mask negotiation.
+The camera publishes complete SBS pairs only.
 
-**Independent reader:** request RGBA and native dimensions through pw_stream,
-without requesting multiview fields; parse the negotiated SPA raw format, then
-read ten buffers. Before the adapter fix the reader rejects mode 0/views 0;
-after it reads mode 3/flags 0/views 2 and every sample matches the source.
-Exercise the shared Enable 3D action off/on and program exit, checking node
-removal/recreation and the input model (the output never appears as an input).
-An unrelated device removal must not clear the currently selected camera:
-check the identity before changing selection in DeviceManager::deviceRemoved.
+**Independent reader:** request RGBA and native dimensions through pw_stream, without requesting multiview fields; parse the negotiated SPA raw format, then read ten buffers.
+Before the adapter fix the reader rejects mode 0/views 0; after it reads mode 3/flags 0/views 2 and every sample matches the source.
+Exercise the shared Enable 3D action off/on and program exit, checking node removal/recreation and the input model (the output never appears as an input).
+An unrelated device removal must not clear the currently selected camera: check the identity before changing selection in DeviceManager::deviceRemoved.
 
-**Fixture traps:** a publisher node can take longer than a fixed startup sleep
-under shared station load; wait for the actual node. An unconstrained Gst
-consumer can report target not found even when the publisher exists; give its
-raw sample format and dimensions. Native SPA parsing is independent of the
-adapter under test. Query a render node's group inside the CDI container when
-the tool's own namespace has no /dev/dri, then use that group with SYS_NICE and
-the installed KWin. Client zink rendering still does not prove KWin's renderer:
-in this probe KWin reports EGL_NOT_INITIALIZED and falls back to QPainter.
+**Fixture traps:** a publisher node can take longer than a fixed startup sleep under shared station load; wait for the actual node.
+An unconstrained Gst consumer can report target not found even when the publisher exists; give its raw sample format and dimensions.
+Native SPA parsing is independent of the adapter under test.
+Query a render node's group inside the CDI container when the tool's own namespace has no /dev/dri, then use that group with SYS_NICE and the installed KWin.
+Client zink rendering still does not prove KWin's renderer: in this probe KWin reports EGL_NOT_INITIALIZED and falls back to QPainter.
 
 
-**Concurrent effect construction:** a later fresh replay aborted in Cartoon's
-f0r_construct with a double free, although earlier effect matrices passed.
-frei0r.hpp clears, swaps and rebuilds a plugin-global parameter vector for every
-instance. Its metadata must instead be built once by the registration instance
-and remain immutable; parameter values and their pointers stay per instance.
-A deterministic paused-constructor check reads zero public parameters before
-and the expected two after; 2,000 constructions on two threads retain independent
-values, and the unchanged 31-effect matrix passes. This is distinct from sharing
-one instance's frame history between threads (related upstream issue 188).
-The owning frei0r-dmo source is 1:3.7.1-dmo1, not Debian's same-number release;
-query the installed binary's source before apt-get source. The recipe successor
-is 1:3.7.1-dmo1+stereo3d1+lc1. Native tests compile the three C++ choices against
-the corrected header; the full package must rebuild all plugins. An isolated
-FREI0R_PATH must include the system directory after the new plugins to keep
-ordinary C plugins available. Check the header's historical frame-parallelism
-fix separately: it does not repair metadata rewritten during construction.
+**Concurrent effect construction:** a later fresh replay aborted in Cartoon's f0r_construct with a double free, although earlier effect matrices passed. frei0r.hpp clears, swaps and rebuilds a plugin-global parameter vector for every instance.
+Its metadata must instead be built once by the registration instance and remain immutable; parameter values and their pointers stay per instance.
+A deterministic paused-constructor check reads zero public parameters before and the expected two after; 2,000 constructions on two threads retain independent values, and the unchanged 31-effect matrix passes.
+This is distinct from sharing one instance's frame history between threads (related upstream issue 188).
+The owning frei0r-dmo source is 1:3.7.1-dmo1, not Debian's same-number release; query the installed binary's source before apt-get source.
+The recipe successor is 1:3.7.1-dmo1+stereo3d1+lc1.
+Native tests compile the three C++ choices against the corrected header; the full package must rebuild all plugins.
+An isolated FREI0R_PATH must include the system directory after the new plugins to keep ordinary C plugins available.
+Check the header's historical frame-parallelism fix separately: it does not repair metadata rewritten during construction.
 
 **Measure ordinary recording before selecting stereo codecs:** published
-Kamoso names its film .mkv but camerabin writes Ogg, Theora quality 48 and Vorbis
-quality 0.3. Read the bytes and negotiated caps, not the suffix. Theora/Ogg cannot
-provide the required H.264 frame-packing SEI plus Matroska StereoMode or MP4 st3d.
-The marked route therefore uses H.264, keeping quality-based encoding, ordinary
-x264 quality defaults and full chroma instead of forcing zerolatency and I420.
-Theora and x264 quality numbers are not equivalent scales. Matroska can keep
-Vorbis; mp4mux cannot, so the MP4 choice names its AAC difference. Remove extra
-audio resampling and test fixed source rate/channel combinations with an actual
-media reader. Use a multiqueue for the two branches: x264's lookahead exceeds a
-plain audio queue's usual limit; disabling lookahead changes encoding quality.
+Kamoso names its film .mkv but camerabin writes Ogg, Theora quality 48 and Vorbis quality 0.3.
+Read the bytes and negotiated caps, not the suffix.
+Theora/Ogg cannot provide the required H.264 frame-packing SEI plus Matroska StereoMode or MP4 st3d.
+The marked route therefore uses H.264, keeping quality-based encoding, ordinary x264 quality defaults and full chroma instead of forcing zerolatency and I420.
+Theora and x264 quality numbers are not equivalent scales.
+Matroska can keep Vorbis; mp4mux cannot, so the MP4 choice names its AAC difference.
+Remove extra audio resampling and test fixed source rate/channel combinations with an actual media reader.
+Use a multiqueue for the two branches: x264's lookahead exceeds a plain audio queue's usual limit; disabling lookahead changes encoding quality.
 
-**A viewfinder can work while a recording is empty:** the synthetic PipeWire
-source supplied buffers with GST_CLOCK_TIME_NONE timestamps. Camerabin's
-videorate discarded every buffer, then oggmux reported no video headers on EOS.
-GST_DEBUG=videorate:6 exposed the cause. For this synthetic-camera fixture only,
-set its source's do-timestamp property to use the pipeline clock; leave the
-published program and its encoding profile intact. The resulting Ogg can be
-read back with both audio and video. This finding does not explain missing files
-from the separate stereo recorder, whose appsrc already timestamps its pairs.
+**A viewfinder can work while a recording is empty:** the synthetic PipeWire source supplied buffers with GST_CLOCK_TIME_NONE timestamps.
+Camerabin's videorate discarded every buffer, then oggmux reported no video headers on EOS.
+GST_DEBUG=videorate:6 exposed the cause.
+For this synthetic-camera fixture only, set its source's do-timestamp property to use the pipeline clock; leave the published program and its encoding profile intact.
+The resulting Ogg can be read back with both audio and video.
+This finding does not explain missing files from the separate stereo recorder, whose appsrc already timestamps its pairs.
 
-**Force overload without stressing the desktop:** attach a blocking probe to
-the recorder's appsrc source pad, enqueue more than its eight-pair guard, then
-remove the probe. The earlier guard destroyed the recording; drop whole pairs
-instead, notify once and keep finalization. Check a second recording resets the
-notice. Pausing immediately after pipeline creation is a bad fixture: a source
-still transitioning can return FLUSHING rather than exercise back pressure.
+**Force overload without stressing the desktop:** attach a blocking probe to the recorder's appsrc source pad, enqueue more than its eight-pair guard, then remove the probe.
+The earlier guard destroyed the recording; drop whole pairs instead, notify once and keep finalization.
+Check a second recording resets the notice.
+Pausing immediately after pipeline creation is a bad fixture: a source still transitioning can return FLUSHING rather than exercise back pressure.
 
-**Constant quality can still carry a bitrate ceiling:** x264enc's pass=qual
-retains its default 2,048 kbit/s VBV cap. The ordinary Theora quality route has
-no such ceiling. Disable it with vbv-buf-capacity=0, then read the actual x264
-options in the film: rc=crf and normal lookahead, with no vbv_maxrate. Looking
-only at the pass property would miss this restriction on a full stereo pair.
+**Constant quality can still carry a bitrate ceiling:** x264enc's pass=qual retains its default 2,048 kbit/s VBV cap.
+The ordinary Theora quality route has no such ceiling.
+Disable it with vbv-buf-capacity=0, then read the actual x264 options in the film: rc=crf and normal lookahead, with no vbv_maxrate.
+Looking only at the pass property would miss this restriction on a full stereo pair.
 
 
 **Keep every recording action acknowledgement:** a final response with
 `before=true, checked=false` describes a normal stop, not an automatic start.
-Match its serial to the request before diagnosing a toggle. Inspect the initial
-state, request the desired state, and repeat each desired state once to prove
-idempotence. Consume the serial before invoking a Qt action, which may enter a
-nested event loop. Preserve the whole journal rather than only its last reply.
-Wait for buffers at the preview sink instead of sleeping after camerabin setup;
-log pad counts, timestamps and queue/state snapshots to distinguish a stalled
-stream from a failed action. Ten fresh first-case ordinary recordings passed
-with this fixture. The preceding empty-file stall was not reproduced or called
-fixed by that result.
+Match its serial to the request before diagnosing a toggle.
+Inspect the initial state, request the desired state, and repeat each desired state once to prove idempotence.
+Consume the serial before invoking a Qt action, which may enter a nested event loop.
+Preserve the whole journal rather than only its last reply.
+Wait for buffers at the preview sink instead of sleeping after camerabin setup; log pad counts, timestamps and queue/state snapshots to distinguish a stalled stream from a failed action.
+Ten fresh first-case ordinary recordings passed with this fixture.
+The preceding empty-file stall was not reproduced or called fixed by that result.
 
-**Mono input with Enable 3D still on:** select the saving route from the received
-frame, not the switch. Keep mono frames for readiness and use camerabin's
-ordinary photo and film writers, including its effects and mirroring. A source
-classification change rebuilds the source filter; discard the transition frame
-that still carries the preceding filter. Stop the recorder that actually started.
-The regression is an undeclared mono camera, Enable 3D on, with both photo and
-film read back: the former source rejected the photo and requested a stereo
-recording without a pair.
+**Mono input with Enable 3D still on:** select the saving route from the received frame, not the switch.
+Keep mono frames for readiness and use camerabin's ordinary photo and film writers, including its effects and mirroring.
+A source classification change rebuilds the source filter; discard the transition frame that still carries the preceding filter.
+Stop the recorder that actually started.
+The regression is an undeclared mono camera, Enable 3D on, with both photo and film read back: the former source rejected the photo and requested a stereo recording without a pair.
 
 **An installed NVIDIA compositor, separately from its zink client:** the working
-CDI route on this rig is `nvidia.com/gpu=all`, SYS_NICE, no added render group and
-no Mesa override for KWin. Give only the client Mesa's EGL vendor first,
-NVIDIA's second, `__GLX_VENDOR_LIBRARY_NAME=mesa`,
-`MESA_LOADER_DRIVER_OVERRIDE=zink` and `LIBGL_KOPPER_DISABLE=1`.
+CDI route on this rig is `nvidia.com/gpu=all`, SYS_NICE, no added render group and no Mesa override for KWin.
+Give only the client Mesa's EGL vendor first, NVIDIA's second, `__GLX_VENDOR_LIBRARY_NAME=mesa`, `MESA_LOADER_DRIVER_OVERRIDE=zink` and `LIBGL_KOPPER_DISABLE=1`.
 Read KWin's supportInformation; a zink client proves nothing about its compositor.
-For a software scene capture, CDI supplies a render node but `GBM_BACKEND=dri`,
-Mesa's EGL vendor, `LIBGL_ALWAYS_SOFTWARE=1`, `GALLIUM_DRIVER=llvmpipe` and a
-bounded LP_NUM_THREADS select llvmpipe. Without the DRI allocator, EGL did not
-initialize and KWin fell back to QPainter. The virtual backend's output allocation
-can still fail on the NVIDIA render node; its scene captures are not output
-readback. Keep that limit explicit.
+For a software scene capture, CDI supplies a render node but `GBM_BACKEND=dri`, Mesa's EGL vendor, `LIBGL_ALWAYS_SOFTWARE=1`, `GALLIUM_DRIVER=llvmpipe` and a bounded LP_NUM_THREADS select llvmpipe.
+Without the DRI allocator, EGL did not initialize and KWin fell back to QPainter.
+The virtual backend's output allocation can still fail on the NVIDIA render node; its scene captures are not output readback.
+Keep that limit explicit.
 
-**A 2D output needs a different witness:** ScreenShot2 returns both scene eyes
-when a declared child is present, even with stereoOutput=false. Nest the installed
-KWin on a separate private compositor, fullscreen on a 1920×1080 2D Wayland
-output. Capture that outer compositor, where the inner output is an ordinary
-undeclared surface. Record both window/output geometries and renderer strings.
-This reads the nested output presented to its parent; it is not a DRM scanout
-claim. The left-eye notice is an intentional overlay: read its exact QML bounds,
-check its visible text and drawn pixels separately, and compare the remaining
-view with the one source eye. Never crop a ScreenShot2 stereo pair and call it
-the actual 2D output.
+**A 2D output needs a different witness:** ScreenShot2 returns both scene eyes when a declared child is present, even with stereoOutput=false.
+Nest the installed KWin on a separate private compositor, fullscreen on a 1920×1080 2D Wayland output.
+Capture that outer compositor, where the inner output is an ordinary undeclared surface.
+Record both window/output geometries and renderer strings.
+This reads the nested output presented to its parent; it is not a DRM scanout claim.
+The left-eye notice is an intentional overlay: read its exact QML bounds, check its visible text and drawn pixels separately, and compare the remaining view with the one source eye.
+Never crop a ScreenShot2 stereo pair and call it the actual 2D output.
 
 **A fractional viewfinder edge:** a default 700×525 client creates a
-638.666×479 content rectangle. The parent's fractional hole can cover one column
-of its child's rounded 639-pixel viewport; this lowered the complete-eye
-comparison to about 34 dB. An integral 640×480 fixture (700×526 client) isolates
-packing/order checks, scoring over 81 dB for the side-by-side source against
-FFmpeg's one bilinear resize. This fixture does not repair or certify arbitrary
-fractional resize boundaries; retain that observed limitation separately.
+638.666×479 content rectangle.
+The parent's fractional hole can cover one column of its child's rounded 639-pixel viewport; this lowered the complete-eye comparison to about 34 dB.
+An integral 640×480 fixture (700×526 client) isolates packing/order checks, scoring over 81 dB for the side-by-side source against FFmpeg's one bilinear resize.
+This fixture does not repair or certify arbitrary fractional resize boundaries; retain that observed limitation separately.
 
-**Carry the fixture settings into every new launcher:** omitting QT_HASH_SEED
-from the five-pair wrapper reintroduced changing toolbar glyph samples; omitting
-the repaired Qt GStreamer plugin reintroduced its known material assertion on
-hide/show. Record the actual renderer and loaded dependency, and make the seed
-part of the session script itself. A fifty-cycle child-lifecycle row can invoke
-the same shared action directly; opening the gallery is a separate UI case.
+**Carry the fixture settings into every new launcher:** omitting QT_HASH_SEED from the five-pair wrapper reintroduced changing toolbar glyph samples; omitting the repaired Qt GStreamer plugin reintroduced its known material assertion on hide/show.
+Record the actual renderer and loaded dependency, and make the seed part of the session script itself.
+A fifty-cycle child-lifecycle row can invoke the same shared action directly; opening the gallery is a separate UI case.
 Do not report a successful lifecycle run as proof of unrelated gallery transitions.
 
-**Complete the mirror for the gate's empty-status solve:** an installed builder's
-prefetch list is not the release gate's dependency closure. The Camera successor
-compiled and passed its packing-list and payload checks, then the gate selected
-`dbus-user-session` and `lsb-base` from frozen Debian instead of the packages the
-pinned builder already had. Retain the gate's actual plan, run its unchanged
-empty-status solver for every predecessor binary of all affected sources, and
-fetch the union of selected archives. Authenticate each exact filename, size and
-hash against the retained signed indexes; do not update the archive date or
-weaken the gate. The unchanged Camera gate passed after those two inputs were
-added. When later successors become siblings, keep their candidate universe
-separate from the predecessor universe used for comparison.
+**Complete the mirror for the gate's empty-status solve:** an installed builder's prefetch list is not the release gate's dependency closure.
+The Camera successor compiled and passed its packing-list and payload checks, then the gate selected `dbus-user-session` and `lsb-base` from frozen Debian instead of the packages the pinned builder already had.
+Retain the gate's actual plan, run its unchanged empty-status solver for every predecessor binary of all affected sources, and fetch the union of selected archives.
+Authenticate each exact filename, size and hash against the retained signed indexes; do not update the archive date or weaken the gate.
+The unchanged Camera gate passed after those two inputs were added.
+When later successors become siblings, keep their candidate universe separate from the predecessor universe used for comparison.
 
-**Keep a successful source closure, not its disposable build tree:** take the
-binary and metadata names from the successful build record, then follow every
-file named by the source descriptor, buildinfo and changes files. Verify their
-hashes before copying, create `.keep` first, and include hidden files in the
-stage's checksum list. Retain the gate's signed-index, resolution, execution
-and link-check receipts before deleting its regenerable unpack and archive
-caches. A source directory full of objects is neither the closure nor necessary
-for replaying it.
+**Keep a successful source closure, not its disposable build tree:** take the binary and metadata names from the successful build record, then follow every file named by the source descriptor, buildinfo and changes files.
+Verify their hashes before copying, create `.keep` first, and include hidden files in the stage's checksum list.
+Retain the gate's signed-index, resolution, execution and link-check receipts before deleting its regenerable unpack and archive caches.
+A source directory full of objects is neither the closure nor necessary for replaying it.

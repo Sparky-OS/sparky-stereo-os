@@ -114,7 +114,7 @@ PhotoCraft 和 FilmCraft 已带 3D 发布；我们正在把这项工作连同 Li
 - **屏幕：**3D 电视、显示器或投影仪，包括 2010 到 2013 年的 [HDMI®](https://www.hdmi.org/resource/brand) 3D 套件，或者任何普通显示器配红青眼镜；每块屏幕可以同时显示不同类型的 3D，裸眼 3D 显示器正在与 DisplayXR 团队一起推进。
 - **电影：**3D 视频可以在 Haruna、VLC、mpv、Bino、PlasmaTube 等播放器中以 3D 播放。
 - **照片：**Gwenview、digiKam 和 KolourPaint 以 3D 显示 3D 照片（MPO、JPS 和立体 PNG）。
-- **游戏：**窗口中的 DOOM (2016) 和 Half-Life 2，都通过 VR 模式（[公式](formula.md)）。
+- **游戏：**窗口中的 DOOM (2016) 和 Half-Life 2，都通过 VR 模式（[公式](formula.md)）；Windows 游戏 [Slay the Tire](https://store.steampowered.com/app/5379690/Slay_the_Tire/?utm_source=web-github-com&utm_medium=press&utm_campaign=launch_2026) 通过它自己的并排 3D 模式。
 - **为游戏调优的内核：**发行版运行 Linux 7.3，带我们的立体补丁。它的全新调度器在作者自己的测试中，把一款游戏在旧 CPU 上的最低帧率从 4 fps 提高到 29 fps（[数据](https://lore.kernel.org/all/20260511113104.563854162@infradead.org/)），并让显存很小的 AMD 显卡把游戏内存留在显卡上（[修改](https://pixelcluster.dev/VRAM-Mgmt-fixed/)）。
 
 每个程序、它得到了什么以及如何证明：[程序](#programs-the-edition-changes-for-stereo-3d-and-deep-colour)。
@@ -128,6 +128,7 @@ PhotoCraft 和 FilmCraft 已带 3D 发布；我们正在把这项工作连同 Li
 - **立体桌面，半透明**（[MPO](https://raw.githubusercontent.com/Sparky-OS/sparky-stereo-os/main/docs/screenshots/translucent-stereo-desktop.mpo)），在 3D 电视上，2026 年 10 月 15 日。窗口是玻璃，所以能透过它看到后面的层。双眼间测量：Dolphin，焦点窗口，0 px，它的设置菜单 +5 px（前面，位于用户设置的浮出上限）；很长的配色方案列表 0 px，因为它碰到屏幕顶部，而碰到边缘的浮出元素会留在屏幕上；Thunderbird 后面 -3 px；系统监视器部件和壁纸 -10 px；面板 0 px。两个电子邮件地址在两只眼睛中都做了模糊处理。
 - **立体桌面，菜单上叠菜单**（[MPO](screenshots/stereo-desktop-dialogs.mpo)），在帧封装的 3D 电视上，2026 年 10 月 13 日。双眼间测量：焦点 Marble 窗口 0 px，它的设置菜单 +2 px，面板子菜单 +4 px，后面的四个窗口 -3、-5、-8 和 -10 px，部件和壁纸 -10 px；窗口内部，Marble 自身的 3D：地球标签 +12 px，星星 -13 px。后面 Diolinux 聊天中的消息是模糊的。
 - **普通窗口中的 DOOM (2016)**（[MPO](screenshots/doom-2016-in-a-window.mpo)），基于 [KHARVOX](https://github.com/CactusVRStudios/KHARVOX)，CactusVRStudios 的 DOOM (2016) VR 转换模组（MIT）：游戏有深度，而面板和窗口边框在两只眼睛中都保持平面。双眼间测量：最近的岩石相距 23 px，远山 1 px，面板 0 px。
+- **Slay the Tire，自带 3D 模式的游戏**（[MPO](screenshots/slay-the-tire-battle.mpo)），由 [Save Point LLC](https://store.steampowered.com/app/5379690/Slay_the_Tire/?utm_source=web-github-com&utm_medium=press&utm_campaign=launch_2026) 制作，在帧封装的 3D 电视上，2026 年 11 月 24 日。这是一款通过 Proton 运行的 Windows 游戏：它的 Full SBS 模式为每只眼睛绘制一幅完整的 1920x1080 画面，桌面再把这一对画面交给电视。在游戏的 40 % 深度设置下，双眼间测量：卡牌和游戏自己的面板 0 px，前景的骑手最多 +6 px，远岸的树 -20 px。从游戏窗口截取。
 - **Marble 的地球仪**（[MPO](screenshots/marble-globe.mpo)）：地球在屏幕前（+11 px），星星在它后面（-12 px），侧面板保持平面。这张截图早于之后的修复；菜单上叠菜单的图片展示的是今天的 Marble。
 - **立体桌面，弹出窗口**（[MPO](screenshots/stereo-desktop.mpo)），同一天。双眼间测量：面板 0 px（在屏幕上），声音弹出窗口 +4 px（前面），后面的三个窗口 -3、-7 和 -10 px，系统监视器部件 -10 px，和壁纸一起在最深处。
 

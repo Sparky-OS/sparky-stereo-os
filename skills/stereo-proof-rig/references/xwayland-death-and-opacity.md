@@ -24,13 +24,15 @@ Written on 2026-11-24 for queue row 862 (every selected window stayed translucen
 | killed during its closing animation | the same | wl-a 1.00, wl-b 0.91 | wl-b 1.00, wl-a 0.91 | 0 |
 | control (nothing goes) | the same | wl-a 1.00, wl-b 0.91, x11-a 0.91 | wl-b 1.00, wl-a 0.91, x11-a 0.91 | 0 |
 
+On KWin +stereo3d65 (the fix), Xwayland killed: wl-a selected 1.00 with wl-b 0.91, then wl-b 1.00 with wl-a 0.91, no journal line, 20 runs of 20; the three controls the same.
+Each layer alone was green too: the published libkwin with the new `main.js` mounted over the installed one, and the new libkwin with the published `main.js`.
 The cause and the fix: [stereo-window-3d-area, a scripted effect that keeps a window that died](../../stereo-window-3d-area/references/effect-keeps-a-dead-window.md).
 
 ## What the person is told: a stand-in notification server
 
 `fake-notifyd.py OUT` owns `org.freedesktop.Notifications` on the session's private bus (Desktop Notifications 1.2: `Notify`, `GetCapabilities`, `GetServerInformation`, `CloseNotification`) and writes every `Notify` as one JSON line; start it before KWin (`FAKE_NOTIFY=1` in `session.sh`).
 With Xwayland killed, KWin 6.7.4 sent no `Notify` at all: KWin reads the broken X11 connection first (`kwin_xwl: The X11 connection broke`), and `XwaylandLauncher::stop()` disconnects the process's `finished` signal, so the "Xwayland has crashed" popup (`kwin.notifyrc`, `xwaylandcrash`, `Action=Popup`, translated in the ten languages) is never reached on that path.
-Read the person's problems store too (`$XDG_STATE_HOME/sparky-stereo-problems`).
+Read the person's problems store too (`$XDG_STATE_HOME/sparky-stereo-problems`): from KWin +stereo3d65 it holds one notice, `kwin-wayland_xwayland-stopped.json` (message LOCAL6, the time with seconds and the X11 programs' WM_CLASS), and `sparky-stereo-problems text --person --lang L kwin-wayland xwayland-stopped` renders it in each language; the popup itself comes from sparky-stereo-problems-plasma in a Plasma session, which this rig does not start.
 
 ## Traps
 

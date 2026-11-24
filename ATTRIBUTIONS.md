@@ -1623,3 +1623,18 @@ Ragnar Hojland Espinosa and David Herrmann ([Linux input documentation](https://
 ## Foot locomotion in Linux VR (ORDER 37b)
 
 Collabora, Ltd., Jakob Bornecrantz and the Monado contributors. Sapphire and the xrizer contributors. Valve Corporation. David Fattal and the DisplayXR contributors. JP Technology Initiatives Inc. and the Foottroller team.
+
+## Kamoso camera capture audit
+
+Kamoso: Aleix Pol and Álex Fiestas, as named in the release's [AUTHORS](https://invent.kde.org/multimedia/kamoso/-/blob/v26.04.0/AUTHORS).
+
+GStreamer element records used by the camera audit (`gst-inspect-1.0`, 1.28.9): Edgard Lima and Stefan Kost (V4L2), Wim Taymans (PipeWire), Josef Zlomek and Mark Nauwelaerts (x264), Thiago Sousa Santos (MP4), He Junyan (VA-API), and Seungha Yang (NVENC).
+The Matroska element's author record names the GStreamer maintainers collectively.
+
+GStreamer's Qt material lifetime repair: Will, author of [MR !12461](https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/12461), carried into the edition's camera plugin build. Mark Nauwelaerts also authored the MP4 muxer code this camera's st3d change extends.
+
+GStreamer's late-caps test synchronization: Dominique Leroux, author of [MR !12910](https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/12910), carried from commit 6e4d5222c26cf5d719df9409d26bdf51f2130555 into the camera plugin build. It replaces timing assumptions with synchronization and timestamped input.
+
+GStreamer camera effects and app boundary, from the installed element records: Erik Walthinsen (identity); Filippo Argiolas (bulge, mirror, square, stretch, colour effects); Thiago Santos (kaleidoscope, pinch, twirl); David Schleef (video balance and app elements); Wim Taymans (app elements, DiceTV, EdgeTV, RevTV, ShagadelicTV, VertigoTV); Sam Lantinga (AgingTV, WarpTV); Kentaro Fukuchi (OpTV, QuarkTV, RadioacTV, RippleTV, StreakTV); Sebastian Dröge (effectv and frei0r integration); Dries Pruimboom and Jaromil (Cartoon); Martin Bayer (Twolay0r and delay0r); the Gephex crew (Distort0r).
+
+The recording comparison also uses GStreamer's element author records from `gst-inspect-1.0` 1.28.9: **Wim Taymans** (Theora), **Monty and Wim Taymans** (Vorbis), and **Wim Taymans and Ronald Bultje** (the libav AAC element).

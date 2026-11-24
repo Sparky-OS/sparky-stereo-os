@@ -53,7 +53,7 @@ The daemon is not built yet: every line below says whether it was read in the so
 5. `LAUNCH` the Default Media Receiver, app id `CC1AD845`; the `RECEIVER_STATUS` answer names its `transportId`.
 6. `CONNECT` to that transport, then `LOAD` on `urn:x-cast:com.google.cast.media` with `contentId` (the URL of the live stream on the computer), `contentType` and `streamType: LIVE`; the answer is `MEDIA_STATUS` with a `playerState`.
 7. `STOP` closes the application, `CLOSE` the channel.
-8. Since openscreen 64d7c985d1 (Taesun Yeoum, 2026-10-30) a message over 64 KiB may arrive in chunks, with `remaining_length` and `continued` and the payload in `payload_binary`: reassemble, or say that the message could not be read.
+8. openscreen implements "the Cast V2 Message Chunking specification" since 64d7c985d1 (Taesun Yeoum, 2026-10-30): a message over 64 KiB is split into chunks with `remaining_length` and `continued`, the payload in `payload_binary`. Whether a device sends a chunked message to a sender was not checked; a channel that meets one reassembles it or says that the message could not be read.
 
 ## The software receiver as the test fixture
 

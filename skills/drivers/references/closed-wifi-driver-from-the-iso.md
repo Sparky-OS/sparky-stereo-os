@@ -3,6 +3,7 @@
 **For anyone who must make a vendor's closed Wi-Fi driver work on a machine that has no cable:** Broadcom's `wl` (Debian's `broadcom-sta-dkms`) is the worked case.
 The licence is shown from the package file before anything is installed, the package comes from the ISO without the network, DKMS builds it on the edition's kernel, and every step is checked and every failure told and kept.
 Written 2026-11-16 from ORDER 614; the loading of the module on a real BCM4360 was not proven (see the end).
+Extended 2026-11-23 from row 728 (a MacBookPro9,2 whose BCM4331 dropped its Wi-Fi on `b43`): [a card two drivers drive](#a-card-two-drivers-drive), [the NetworkManager file matched on a driver](#the-networkmanager-file-matched-on-a-driver), [saved profiles after the interface is renamed](#saved-profiles-after-the-interface-is-renamed) and [the network applet's speed 0](#the-network-applets-speed-0-with-wl).
 
 ## Working recipe
 
@@ -76,6 +77,80 @@ Written 2026-11-16 from ORDER 614; the loading of the module on a real BCM4360 w
 - The unit test (`tests/broadcom-wl.sh`) catches ten different broken versions of the step (a mutant that skips the checksum, the licence, the interface wait, the headers, the Secure Boot reading, the DKMS status, the engine's keep and clear, the modprobe error, the module unloading): keep that style for the next closed driver.
 - The packer's block and the layout check are tested without an ISO build: `iso-build/tests/no-silent-failures.py` (stubbed commands) and `iso-build/tests/test-check-layout.sh` (small ISOs made with the packer's literal xorriso options).
 
+## A card two drivers drive
+
+Some Broadcom chips run on a free driver of the kernel and on `wl` both: the BCM4331 (14e4:4331) is driven by `bcma` (the bus, on the PCI device) and `b43` (the 802.11 core, `CONFIG_B43_PHY_HT`), and Broadcom's own README lists it for `wl`.
+Debian's `usr/share/broadcom-sta/broadcom-sta.ids` comments it out as "supported by b43", so nothing proposes `wl` for it by itself.
+On that chip `b43` has no 5 GHz and no 802.11n features (linux-wireless documentation, b43, "Known issues").
+
+1. **Find which ids both drive, from the published kernel's own modules.** `modinfo -F alias` of `bcma`, `ssb`, `b43`, `b43legacy`, `brcmsmac`, `brcmfmac` and `b44`, matched against each id of the package's list and of `share/network-ids.tsv`.
+   A PCI claim by `bcma` or `ssb` is only the bus: the card is driven when a core driver binds its 802.11 core (`bcma:m04BFid0812rev1D` for the BCM4331's `b43`).
+   Two rows of the table named a free driver that no module claims (14e4:432a and 14e4:432d): they take the `wl`-only route.
+2. **Keep the kernel's driver; offer `wl`.** Detection prints `fact network-two-drivers ID FREE` and `action broadcom-wl-swap`; nothing is installed unasked.
+   The plan window says which driver has the card and has a button for the other: `--broadcom-wl swap` and `--broadcom-wl back`.
+3. **The swap is the `wl` route plus an undo.** Broadcom's licence from the package file, then install, DKMS, Secure Boot, unload the free modules in Debian's order (`b44 b43 b43legacy ssb brcmsmac bcma`), load `wl`, wait for an interface that `wl` drives.
+   Record the free modules that were loaded first; when a step fails: unload `wl`, **purge** the package, load those modules again in reverse order (the bus first), wait for the free driver's interface, and say both the cause and the undo.
+4. **The way back purges, then loads the card's own alias** (`/sys/bus/pci/devices/ADDRESS/modalias`), as the kernel does at the start: the bus driver comes, and udev loads the core's driver.
+5. **Find the card's interface under its PCI device, not only on it.** `wl` binds the PCI device; `b43` binds the core below it, so the interface's `device` link points at `.../0000:03:00.0/bcma0:1`. Match the PCI address as a path component, and read the driver from the interface's own `device/driver`.
+
+## The NetworkManager file matched on a driver
+
+`/usr/lib/NetworkManager/conf.d/sparky-stereo-wl.conf`, one `[device-…]` and one `[connection-…]` section, both `match-device=driver:wl`:
+
+| Key | Section | What it does (manual page) |
+|---|---|---|
+| `wifi.scan-rand-mac-address=no` | DEVICE | the card keeps its address while it scans (NetworkManager.conf(5), DEVICE SECTION) |
+| `wifi.powersave=2` | CONNECTION | power saving off; the file takes the number, `disable` is 2 (nm-settings-nmcli(5), `802-11-wireless.powersave`; NetworkManager.conf(5): enum values "only can be configured via their numeric magic number") |
+| `wifi.cloned-mac-address=permanent` | CONNECTION | the card's permanent hardware address while connected (nm-settings-nmcli(5), `802-11-wireless.cloned-mac-address`) |
+
+- A connection default applies only when the profile asks for the default (`powersave` 0, `cloned-mac-address` unset): NetworkManager 1.58.1 reads it in `set_powersave()` (`src/core/devices/wifi/nm-device-wifi.c`) and in `nm-device.c` for the address. A person's own profile value wins.
+- `/usr/lib/NetworkManager/conf.d` is read first; a file of the same name in `/etc/NetworkManager/conf.d` shadows it (NetworkManager.conf(5), DESCRIPTION), so an empty one switches it off.
+- Debian's `wpasupplicant` (not `network-manager`) already ships `no-mac-addr-change.conf` with the scan setting for `wl` (Andrew Shadura, wpa 2:2.6-12, Debian #833507); nothing in Debian sets `wifi.powersave`.
+- Debian's `broadcom-sta` carries Diego Escalante Urrelo's "wl: Make sure power_mgmt settings are honored" (since 6.30.223.271-16~exp1): `wl` turns power saving off as `PM_FORCE_OFF` when NetworkManager asks.
+
+**Proving the form for real, without the card:** a QEMU guest with KVM, the edition's kernel, a Debian testing root with NetworkManager, wpa_supplicant, hostapd and iw, booted from an ext4 image (`docker export` of a prepared container, then `mke2fs -d`).
+In the guest: `modprobe mac80211_hwsim radios=2`; `wlan1` is the access point under hostapd and unmanaged (`[keyfile] unmanaged-devices=interface-name:wlan1`); before NetworkManager starts, `wlan0` gets a non-permanent address and `iw dev wlan0 set power_save on`.
+Three cases, each from a fresh radio: the file with `driver:wl` replaced by `driver:mac80211_hwsim` (the driver `nmcli -g GENERAL.DRIVER device show wlan0` reports), the file as shipped, and no file.
+Read back while connected: `iw dev wlan0 get power_save`, `/sys/class/net/wlan0/address` against `ethtool -P wlan0`, the station hostapd saw (`iw dev wlan1 station dump`), and the addresses seen while it scanned.
+Measured with NetworkManager 1.58.1 on 7.3.4-stereo3d18:
+
+| Case | Address while scanning | Power save, connected | Address, connected |
+|---|---|---|---|
+| matched on `mac80211_hwsim` | unchanged | off | the permanent one |
+| as shipped (`driver:wl`) | random | on | unchanged (not the permanent one) |
+| no file | random | on | unchanged |
+
+## Saved profiles after the interface is renamed
+
+`b43` on a BCM4331 core names the card `wlp3s0b1` and `wl` on the PCI device names it `wlp3s0` (systemd.net-naming-scheme(7): "bnumber: Broadcom bus (BCMA) core number").
+A profile with `connection.interface-name` set to the old name is refused on the new device: NetworkManager 1.58.1 says "No suitable device found for this connection (device wlrenamed not available because profile is not compatible with device (mismatching interface name))".
+The swap and the way back list the Wi-Fi profiles tied to the old name before the person's yes, empty that one property (`nmcli connection modify UUID connection.interface-name ''`), read it back, and keep the old value with the date and both drivers in `/var/lib/sparky-stereo-hardware/broadcom-wl-profiles`.
+Proved in the same guest with the package's own function: the bound profile failed, was freed, and came up.
+
+## The network applet's speed 0 with wl
+
+Plasma's network applet shows NetworkManager's `Bitrate`, which NetworkManager fills from an `NL80211_CMD_GET_STATION` dump without a MAC filter (`wifi_nl80211_get_station()`, `src/libnm-platform/wifi/nm-wifi-utils-nl80211.c`, since Andrew Zaborowski's 277e8eaa1fbc of 2020; before it, a non-dump request with the BSSID).
+The kernel answers an unfiltered station dump only through the driver's `dump_station` (`nl80211_dump_station()`, `net/wireless/nl80211.c`, v7.3), and `wl`'s cfg80211 operations have `get_station` and no `dump_station` (`src/wl/sys/wl_cfg80211_hybrid.c`), so the dump fails with `EOPNOTSUPP` and `Bitrate` stays 0.
+On the machine: `iw dev IF station dump` fails with "Operation not supported (-95)" and `iw dev IF link`, which asks with the MAC, shows the "tx bitrate". Nothing of ours is wrong; no fix exists upstream (searched 2026-11-23).
+
+## Traps of the two-driver work, with how each was found
+
+- **Symptom: after `apt-get remove broadcom-sta-dkms` the free driver does not come back at the next start.**
+  Cause: `/etc/modprobe.d/broadcom-sta-dkms.conf` is a conffile; a removal keeps it (dpkg status `config-files`) and it still blacklists `b43`, `bcma` and `ssb`.
+  Fix: purge. Found by the rig: `modprobe --showconfig` still listed `blacklist b43` after the removal.
+- **Symptom: `modinfo -k KERNEL wl` says "Module wl not found" right after DKMS installed it, in a container.**
+  Cause: a container with only the kernel's headers has no `modules.dep`, so a name finds nothing although `updates/dkms/wl.ko` is there.
+  Fix: read the file (`modinfo -F vermagic FILE` must start with the kernel's release). Found by `find /lib/modules -name 'wl.ko*'`.
+- **Symptom: in the guest every connection times out (`nmcli connection up` exit 3) and "after" reads show no change.**
+  Cause: hostapd's network has no DHCP server, so activation waits for IPv4. Fix: `ipv4.method manual` and `ipv6.method disabled` in the test profile; read the values while connected, because NetworkManager puts the first address back when it gives up.
+- **Symptom: after `ip link set wlan0 name X` a freed profile still fails at "authenticating".**
+  Cause: renaming keeps the device and wpa_supplicant's old registration (its P2P device stays `p2p-dev-wlan0`). Fix: model a driver swap as it is, a new device: unload and load `mac80211_hwsim` again and rename the new interface before NetworkManager starts.
+- **Symptom: the guest's container exits 125 at once with no output.**
+  Cause: `timeout` as the container's first process (the [proof rig's](../../stereo-proof-rig/SKILL.md) trap); an attached `docker run` through the lane's socket kept exiting 125 after that too, for a reason not found. Fix: start the container detached, `docker wait` it, keep `docker logs`.
+- **Symptom: an nmcli double finds no profile.** Cause: `${*##* }` removes the pattern from each argument, not from the joined line. Fix: `${!#}` for the last argument.
+- **Symptom: `bash -n` says "unexpected EOF while looking for matching quote" far below the edit.** Cause: an apostrophe inside a double-quoted `"${var:-it's}"`. Fix: no quote characters in a default word.
+
 ## Not proven here
 
 Loading `wl` on a real BCM4360, the card's scan and association, WPA3 (the Debian wiki says `wl` may fail with it), the power-management note for frequent disconnections, the first boot after the install with Debian's blacklist in the initramfs, and Secure Boot with the edition's first-boot enrolment of the DKMS key.
+For the two-driver work: `wl` and `b43` on a real BCM4331 (the swap, the way back and the restart Debian's README.Debian asks for after the first installation; Debian #1088231 reports `wl` failing after `b43` was loaded and unloaded until a restart), `iw dev IF get power_save` reading `off` under `wl` with the file, and the `iw` readings of the speed 0 cause.

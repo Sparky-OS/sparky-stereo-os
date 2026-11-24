@@ -1274,6 +1274,7 @@ The app center's entry mechanism is **Paweł "pavroo" Pijanowski's** APTus.
 The app center's entry mechanism is **Paweł "pavroo" Pijanowski's** APTus.
 **The KDE Connect authors**, among them Aleix Pol i Gonzalez who wrote its virtual monitor plugin, made what the plan for "Use as webcam" builds on.
 The DroidCam OBS plugin is **Dev47Apps'** (the repository's own record lists the same authors as the client); OBS Studio is made by the **OBS Project** and its contributors (the plugin is built against libobs).
+The first run with a real phone (ORDER 731) read how the app is spoken to from both open clients: the Linux client by **aramg** (Dev47Apps) with the authors above, and the OBS plugin's request and frame header (its source, tag 2.5.1); the maintainer's own words on issue #241 of the client's tracker, that the camera starting is the app's side, were read there. The first-frame wait in droidcam 2.1.7-2 is ours. The interrupted receive (a stop and continue) and the whole-or-failed receive of droidcam 2.1.7-2 are written from the Linux man-pages project's recv(2) and signal(7) (Michael Kerrisk, maintainer, and the page authors); no upstream commit or sibling client has the technique, the OBS plugin's receive being a plain `recv` with `MSG_WAITALL`.
 
 ### A theme choice that is stored or refused (ORDER 718)
 

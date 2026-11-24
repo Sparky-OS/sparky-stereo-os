@@ -177,6 +177,8 @@ A declared surface (a 3D area, a player's video, a two-view EGL window) and its 
 
 A library that a program hands its `wl_display` (what it may bind there, why a `wl_output` it binds reaches the program's `wl_surface.enter`, proxy tags and their limit, a connection of the library's own, a surface made at a dead surface's address, the matrix over every program that loads it, six traps of row 835): [library-sharing-the-programs-connection.md](references/library-sharing-the-programs-connection.md).
 
+Xwayland closed by the compositor with `wp_linux_drm_syncobj_surface_v1#N: error 4: explicit sync is used, but no acquire point is set`, and every X11 program with it: which X11 programs present with explicit sync, the three places Xwayland keeps its sync object consistent, the early returns that did not (upstream merge request !2399), how the edition's patches reach them, and the rig client that drives each path: [xwayland-explicit-sync.md](references/xwayland-explicit-sync.md).
+
 A program that dies with `wl_display#1: error 0: invalid object N` (or another object's "no longer exists" error): read the client's `WAYLAND_DEBUG` trace back from the error to the object's creation and its `destroy`, and name the side from libwayland's rules (a request on an id the client itself destroyed is the client's fault).
 On Qt 5 a hidden window's `wl_surface` is destroyed, so a thread that draws on a Qt window's surface must draw on a surface of its own (VLC Stereo +stereo3d20, as VLC 4 does): [references/wayland-protocol-errors.md](references/wayland-protocol-errors.md), with the recipe, the forced trigger (`../stereo-proof-rig/scripts/qt5-hideshow.cpp`) and the traps.
 

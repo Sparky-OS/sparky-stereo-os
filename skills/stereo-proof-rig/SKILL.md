@@ -63,6 +63,12 @@ Drive the program as a person does (fake input: moves, double clicks, keys, its 
 To make a Qt 5 child window's lost surface certain, preload `scripts/qt5-hideshow.cpp`; the natural trigger then becomes the rig row.
 Recipe, rows and traps: [native-linux, wayland-protocol-errors.md](../native-linux/references/wayland-protocol-errors.md).
 
+## Xwayland killed under a virtual KWin, and a window's opacity on a capture
+
+For a fault that shows only after Xwayland went away: one fresh session per case (Xwayland killed with an X11 window selected, the X11 client killed, a window killed during its closing animation, nothing), Wayland windows selected in turn through a KWin script, and each window's opacity read from a ScreenShot2 capture as the median of a white window over the black desktop.
+A stand-in notification server on the private bus shows what the person is told.
+The recipe, the rows on the published KWin, the traps (no render node cancels every capture) and the scripts: [xwayland-death-and-opacity.md](references/xwayland-death-and-opacity.md), [`scripts/xwayland-death`](scripts/xwayland-death/).
+
 ## A relaunch soak (a client killed and started, or its 3D area remade, many times)
 
 For a defect that shows only after many runs in one session: one compositor session, a player and a plain Wayland client of the same shape, each killed (SIGKILL and SIGTERM in turn) and started hundreds of times with a capture after each start, the 3D area also torn down and made again inside one client, and a `--no-declare` control that must come out flat.

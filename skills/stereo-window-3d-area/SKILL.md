@@ -117,6 +117,13 @@ How a theme designer meets them is on [For theme designers](../../docs/for-theme
 - **Study KWin's removed effects before designing a new one** (Snap Helper, Resize, the C++ Flip Switch, the old Cube): "the solution might be there and being ditched".
   Resize's scaled drawing while resizing serves XR, the old Cube's cylinder and sphere mappings serve the 3D cube and a VR home, and Present Windows' layouts a headset overview, credited to Kompose.
 
+## A scripted effect that keeps a window that died
+
+Symptom: every selected window stays translucent, and the journal says `<Unknown File>:171: Error: Window property references invalid window` at each window switch, after Xwayland died with an X11 window selected.
+Cause: KWin released the X11 windows without saying that the active window went, so the Translucency effect kept the dead window and its `set()` threw at every later activation, before it stored the new window.
+Fix (KWin +stereo3d65): the compositor emits `windowActivated(nullptr)` when the active window is removed, and the effect forgets a deleted window and handles the new one first; relief on a running desktop: `qdbus6 org.kde.KWin /Effects unloadEffect translucency`, then `loadEffect translucency`.
+The cause, how it was found, the rule for every effect that keeps a window, and the tests: [effect-keeps-a-dead-window.md](references/effect-keeps-a-dead-window.md).
+
 ## Proof for this kind of work
 
 As in the general skill, plus:

@@ -49,6 +49,14 @@ Split the 3840×1080 result into two 1920×1080 views. Find the left colour only
 Require three different positions to catch a stuck frame. Store the SBS capture with PNG Extensions 1.4 §3.6 `sTER` mode 1 and verify the mark before review.
 A surface-level proof on a probe establishes compositor eye selection and synchronization for that route. The theme-driven applet proof needs the staged engine and a real pair in its theme.
 
+## Check the installed theme route before changing the engine
+
+On r1123a, Weather Report uses `Kirigami.Icon` in its compact, temperature-and-icon, top and forecast components. Its panel condition name has the `-symbolic` suffix. KIconThemes 6.32.0-1+stereo3d1 has a separate `KIconLoader::loadStereoIcon()` for explicit callers. Normal lookup still reads one image. A directory named by `X-StereoDirectories` is not evidence that a program asks for the pair.
+
+To check an installed stack, start a real plasmashell on Stereo KWin's 1920 × 1080 virtual SBS output. Make a test theme with a marked pair whose eyes have two disjoint marker colours. Provide the left view under the same name in the theme's normal directory. Put a Kirigami icon with that name on the test desktop, capture with ScreenShot2 and check the two halves. First run the same classifier on the known packed pair. In the r1123a control the known picture gave 2,210 marker pixels of the expected colour in each eye. The shell gave 2,210 left-colour pixels in each eye. Keep both the marked capture and the package versions.
+
+The PNG `sTER` padding for an eye of width `w` is `(-w) % 8` pixels between the views (PNG Extensions v1.4, §3.6). For a 22 px eye the file is 46 px across. The layer removes the padding before passing the two 22 px views on. The output's own full SBS buffer does not carry that padding.
+
 ## Read an animated pair: one clock, one frame, a reason
 
 A program never decodes the two views of an animated pair on its own, and never runs a timer per view.
@@ -64,6 +72,9 @@ The caller keeps one clock and calls `pairAt(msecs)`: both views come from the o
 Tests and fixtures: stereo-layer `autotests/animatedpicturetest.cpp`, `animatedpicturenoreadertest.cpp` and `autotests/readers/jxlstereo` (the generator writes the frames' green samples as 1000 times the frame number plus 1000, so a test reads the frame and the precision from one sample).
 
 ## Traps
+
+- **Symptom:** a packed RGBA64 image fails an equality check against its unpacked eyes. **Cause:** Qt 6.11.2 `QImage::operator==` compares `QColorSpace` as well as format, size and samples. **Fix:** preserve the views' common colour space and copy the premultiplied 16-bit scanlines when packing the compositor buffer. Check both views against their native, premultiplied forms. **How found:** the same comparison failed even after a direct copy of the samples. The Qt equality implementation identified the additional comparison. [Qt 6.11.2 `qimage.cpp`](https://github.com/qt/qtbase/blob/v6.11.2/src/gui/image/qimage.cpp)
+- **Symptom:** a full Moon has almost no visible relief after opening the phase. **Cause:** the crescent's lamp strength clips the newly lit face. **Fix:** keep the camera and geometry and test lower Moon-only lamp strengths. Measure a wide crop of the face in addition to the two small-icon panel contrast checks. **How found:** at 256 px the old lamp strength of 24 clipped 99.5% of a 50 × 50 interior crop even though the small contrast checks passed. Strength 4 clipped none in the same crop.
 
 - **Symptom:** a JPEG XL pair is split across the wrong axis, or one view holds both colours. **Cause:** KImageFormats' JPEG XL reader keeps the orientation for the caller (`jxl.cpp`, `JxlDecoderSetKeepOrientation`) and reports it as `ImageTransformation`; `QImageReader` applies it only when `setAutoTransform(true)` is set or the plugin claims `TransformedByDefault`, which this one does not. **Fix:** set auto-transform before reading a JPEG XL, and take the even-width rule from the presented size (`reader.size()` transposed for a quarter turn). **How found:** a fixture stored 4 × 16 with orientation 6 came out as a 4-wide picture whose left half held red and blue.
 - **Symptom:** an animation keeps looping smoothly although its file is cut short. **Cause:** a reader that cannot count the frames of a damaged file reports none, and a loop over the frames that did decode wraps over them as if the file were whole. **Fix:** a decode failure ends the timeline at the last good frame, and every later time gives no picture and the reason. **How found:** the fixture `animated-pair-truncated.jxl`, the same file without its last 40 bytes.

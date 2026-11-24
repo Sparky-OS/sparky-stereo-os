@@ -39,6 +39,8 @@ The words in quotes are each project's own description of itself; the line after
 
 **StorySplat**, in the browser, *"Turn your 3D scans into interactive tours"* Tell stories inside 3D scans of real places, and show them in 3D with its 3D View.
 
+**Coming:** **Kamoso** (*"Use your webcam to take pictures and make videos"*): with a two-lens camera the viewfinder is in 3D, and photos and films are saved as 3D files that open in 3D.
+
 ## Learn, study and design
 
 **Marble**, *"Virtual Globe"* The Earth floats in front of the screen, with the stars far behind it.

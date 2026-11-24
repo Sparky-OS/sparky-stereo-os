@@ -389,3 +389,7 @@ A source directory full of objects is neither the closure nor necessary for repl
 - **Symptom:** a Kamoso package builds although one of its tests fails.
   **Cause:** Debian's `override_dh_auto_test` runs `-xvfb-run ... dh_auto_test`; the leading `-` ignores the result.
   **Fix:** the recipe removes the `-`, so the edition's tests stop the build; the QML modules a test loads go into Build-Depends with `<!nocheck>`.
+- **Symptom:** a fix shows no effect in the rig (15 of 20 `switch` runs still red) although the package build passes the fix's new test.
+  **Cause:** the rig's replay applied a fixed list of the recipe's patch names, so the new patch never reached the replay's source.
+  **Fix:** the replay applies every patch of the recipe in order; before counting, check the replay's own source for the change (`grep` the new property in its `Config.qml`).
+  **How found:** the new property was absent from the replay's `Config.qml`; with all three patches the same 20 runs gave 0 lines.

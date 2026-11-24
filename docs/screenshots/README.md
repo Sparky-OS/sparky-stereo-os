@@ -5,6 +5,17 @@ Each one is shown as a red-cyan anaglyph, so red-cyan glasses show it in 3D on a
 Its MPO file holds both eyes as taken; GitHub cannot show an MPO, so the link downloads it, and it opens in 3D in the edition's photo programs on any of the registered outputs.
 Measurements are the distance between the eyes in pixels: positive pops in front of the screen, negative sinks behind it.
 
+## Slay the Tire, a game with its own 3D mode (24 November 2026)
+
+<img src="slay-the-tire-battle-anaglyph.jpg" width="99%" alt="Slay the Tire in 3D: a battle on a flooded road, the cards and the game's panels at the screen, the rider in front and the far shore behind (red-cyan anaglyph)">
+
+[Download the MPO (both eyes)](https://raw.githubusercontent.com/Sparky-OS/sparky-stereo-os/main/docs/screenshots/slay-the-tire-battle.mpo)
+
+[Slay the Tire](https://store.steampowered.com/app/5379690/Slay_the_Tire/?utm_source=web-github-com&utm_medium=press&utm_campaign=launch_2026) by Save Point LLC, a Windows game running through Proton, on a 3D TV in frame packing.
+Its Full SBS mode draws a full 1920x1080 picture for each eye and the desktop hands the pair to the TV.
+At the game's 40 % depth: the cards and the game's own panels 0 px, the rider in front up to +6 px, the trees on the far shore -20 px.
+This one was captured from the game's window, both eyes whole, not with Spectacle.
+
 ## A stereo picture in the photo viewer (17 November 2026)
 
 <img src="speed-dreams-in-gwenview-anaglyph.jpg" width="99%" alt="The Stereo Desktop in 3D with translucent windows: Gwenview showing a stereo picture of Speed Dreams' chase view, the Info Centre and the file manager behind it, the Audio Volume pop-up in front, the system monitor widgets and the starry wallpaper deepest (red-cyan anaglyph)">

@@ -114,7 +114,7 @@ PhotoCraft와 FilmCraft는 3D와 함께 게시되어 있습니다. 그 작업과
 - **화면:** 3D TV, 모니터 또는 프로젝터, 2010년부터 2013년까지의 [HDMI®](https://www.hdmi.org/resource/brand) 3D 세트 포함, 또는 적청 안경을 쓴 일반 모니터; 각 화면이 동시에 다른 종류의 3D를 보여줄 수 있으며, 무안경 3D 모니터는 DisplayXR 팀과 함께 진행 중입니다.
 - **영화:** 3D 비디오가 Haruna, VLC, mpv, Bino, PlasmaTube 등에서 3D로 재생됩니다.
 - **사진:** Gwenview, digiKam, KolourPaint가 3D 사진(MPO, JPS, 스테레오 PNG)을 3D로 보여줍니다.
-- **게임:** 창 안의 DOOM (2016)과 Half-Life 2, 둘 다 VR 모드를 통해 ([공식](formula.md)).
+- **게임:** 창 안의 DOOM (2016)과 Half-Life 2, 둘 다 VR 모드를 통해 ([공식](formula.md)); Windows 게임 [Slay the Tire](https://store.steampowered.com/app/5379690/Slay_the_Tire/?utm_source=web-github-com&utm_medium=press&utm_campaign=launch_2026)는 게임 자체의 사이드 바이 사이드 3D 모드를 통해.
 - **게임에 맞춘 커널:** 에디션은 저희 스테레오 패치를 적용한 Linux 7.3을 사용합니다. 새 스케줄러는 작성자 본인의 테스트에서 오래된 CPU로 게임의 최저 프레임 레이트를 4에서 29 fps로 끌어올렸고([수치](https://lore.kernel.org/all/20260511113104.563854162@infradead.org/)), 비디오 메모리가 적은 AMD 그래픽 카드가 게임의 메모리를 카드에 유지할 수 있게 합니다([변경 내용](https://pixelcluster.dev/VRAM-Mgmt-fixed/)).
 
 각 프로그램, 얻는 것과 입증 방법: [프로그램](#programs-the-edition-changes-for-stereo-3d-and-deep-colour).
@@ -128,6 +128,7 @@ PhotoCraft와 FilmCraft는 3D와 함께 게시되어 있습니다. 그 작업과
 - **스테레오 데스크톱, 반투명** ([MPO](https://raw.githubusercontent.com/Sparky-OS/sparky-stereo-os/main/docs/screenshots/translucent-stereo-desktop.mpo)), 3D TV에서, 2026년 10월 15일. 창들이 유리라서 더미가 비쳐 보입니다. 양안 간 측정: Dolphin, 포커스된 창, 0 px, 그 설정 메뉴 +5 px (앞, 사용자의 팝 한도에서); 긴 색 구성표 목록 0 px, 화면 상단에 닿아 있고 가장자리에 닿는 팝된 것은 화면에 머물기 때문; Thunderbird 뒤 -3 px; 시스템 모니터 위젯과 배경화면 -10 px; 패널 0 px. 두 이메일 주소는 양쪽 눈에서 흐리게 처리되었습니다.
 - **스테레오 데스크톱, 메뉴 위의 메뉴** ([MPO](screenshots/stereo-desktop-dialogs.mpo)), 프레임 패킹의 3D TV에서, 2026년 10월 13일. 양안 간 측정: 포커스된 Marble 창 0 px, 그 설정 메뉴 +2 px, Panels 하위 메뉴 +4 px, 뒤의 네 창 -3, -5, -8, -10 px, 위젯과 배경화면 -10 px; 창 안에서 Marble 자체의 3D: 지구 라벨 +12 px, 별들 -13 px. 뒤의 Diolinux 채팅 메시지는 흐리게 처리되었습니다.
 - **일반 창 안의 DOOM (2016)** ([MPO](screenshots/doom-2016-in-a-window.mpo)), [KHARVOX](https://github.com/CactusVRStudios/KHARVOX) 기반, CactusVRStudios의 DOOM (2016) VR 변환 모드 (MIT): 게임에는 깊이가 있고 패널과 창 테두리는 양쪽 눈에서 평면 그대로입니다. 양안 간 측정: 가장 가까운 바위 23 px, 먼 산 1 px, 패널 0 px.
+- **Slay the Tire, 자체 3D 모드가 있는 게임** ([MPO](screenshots/slay-the-tire-battle.mpo)), [Save Point LLC](https://store.steampowered.com/app/5379690/Slay_the_Tire/?utm_source=web-github-com&utm_medium=press&utm_campaign=launch_2026) 제작, 프레임 패킹의 3D TV에서, 2026년 11월 24일. Proton으로 실행되는 Windows 게임입니다: 게임의 Full SBS 모드가 눈마다 1920x1080의 온전한 그림을 그리고, 데스크톱이 그 쌍을 TV에 넘깁니다. 게임의 깊이 설정 40 %에서 양안 간 측정: 카드와 게임 자체의 패널 0 px, 앞쪽의 라이더 최대 +6 px, 먼 물가의 나무 -20 px. 게임 창에서 캡처했습니다.
 - **Marble의 지구본** ([MPO](screenshots/marble-globe.mpo)): 지구는 화면 앞에 (+11 px), 별들은 그 뒤에 (-12 px), 옆 패널은 평면입니다. 이 캡처는 이후 수정 이전의 것입니다; 지금의 Marble은 메뉴 위의 메뉴 그림에서 볼 수 있습니다.
 - **스테레오 데스크톱, 팝업** ([MPO](screenshots/stereo-desktop.mpo)), 같은 날. 양안 간 측정: 패널 0 px (화면에), 사운드 팝업 +4 px (앞에), 뒤의 세 창 -3, -7, -10 px, 시스템 모니터 위젯 -10 px, 배경화면과 함께 가장 뒤에.
 

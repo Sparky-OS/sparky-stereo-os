@@ -155,7 +155,7 @@ StorySplatはこの種類の3Dスキャンからツアーを作り、3Dで表示
   各画面で同時に異なる方式の3Dを表示でき、DisplayXRチームと裸眼3Dモニターへの対応も進めています。
 - **映画：** Haruna、VLC、mpv、Bino、PlasmaTubeなどで3D動画を3D再生できます。
 - **写真：** Gwenview、digiKam、KolourPaintは、3D写真（MPO、JPS、ステレオPNG）を3D表示します。
-- **ゲーム：** DOOM (2016)はウィンドウ内で、Half-Life 2も、いずれもVRモードを通じて動作します（[その仕組み](formula.md)）。
+- **ゲーム：** DOOM (2016)はウィンドウ内で、Half-Life 2も、いずれもVRモードを通じて動作します（[その仕組み](formula.md)）。Windows用ゲームの[Slay the Tire](https://store.steampowered.com/app/5379690/Slay_the_Tire/?utm_source=web-github-com&utm_medium=press&utm_campaign=launch_2026)は、ゲーム自身のサイドバイサイド3Dモードで動作します。
 - **ゲーム向けに調整したカーネル：** このエディションは、私たちのステレオパッチを適用したLinux 7.3を使います。
   新しいスケジューラは、作者自身のテストで、古いCPU上のあるゲームの最低フレームレートを4 fpsから29 fpsへ引き上げました（[測定値](https://lore.kernel.org/all/20260511113104.563854162@infradead.org/)）。
   また、ビデオメモリの少ないAMDカードで、ゲームのメモリをカード上に保持できるようにします（[変更内容](https://pixelcluster.dev/VRAM-Mgmt-fixed/)）。
@@ -187,6 +187,11 @@ Danielが2014年から2016年にLG Optimus 3Dで撮影した3D写真とオリジ
   CactusVRStudiosによるDOOM (2016)のVR化MOD、[KHARVOX](https://github.com/CactusVRStudios/KHARVOX)（MIT）を基にしています。
   ゲームには奥行きがあり、パネルとウィンドウ枠は左右両方の目で平面のままです。
   左右の目の画像間で測定したずれは、最も近い岩が23 px、遠くの山が1 px、パネルが0 pxです。
+- **Slay the Tire、独自の3Dモードを持つゲーム**（[MPO](screenshots/slay-the-tire-battle.mpo)）。
+  [Save Point LLC](https://store.steampowered.com/app/5379690/Slay_the_Tire/?utm_source=web-github-com&utm_medium=press&utm_campaign=launch_2026)の作品です。2026年11月24日、フレームパッキングの3Dテレビで撮影しました。
+  Protonで動くWindows用ゲームです。ゲームのFull SBSモードが左右の目それぞれに1920x1080の完全な画像を描き、デスクトップがその組をテレビに渡します。
+  ゲームの奥行き設定40 %で、左右の目の画像間で測定したずれは、カードとゲーム自身のパネルが0 px、手前のライダーが最大+6 px、対岸の木々が-20 pxです。
+  ゲームのウィンドウから取り込みました。
 - **Marbleの地球儀**（[MPO](screenshots/marble-globe.mpo)）。
   地球は画面の手前（+11 px）、星は奥（-12 px）にあり、サイドパネルは平面です。
   この画像は、その後の修正より前に撮影しました。

@@ -114,7 +114,7 @@ PhotoCraft 與 FilmCraft 已帶 3D 發布；我們正在把這項工作連同 Li
 - **螢幕：**3D 電視、螢幕或投影機（含 2010 到 2013 年的 [HDMI®](https://www.hdmi.org/resource/brand) 3D 機種），或任何配上紅青眼鏡的一般螢幕；每種螢幕可以同時顯示不同類型的 3D，而裸視 3D 螢幕正與 DisplayXR 團隊合作進行中。
 - **電影：**3D 影片能在 Haruna、VLC、mpv、Bino、PlasmaTube 等播放器中以 3D 播放。
 - **照片：**Gwenview、digiKam 與 KolourPaint 能以 3D 顯示 3D 照片（MPO、JPS 與立體 PNG）。
-- **遊戲：**視窗中的 DOOM (2016) 與 Half-Life 2，兩者都透過 VR 模式（[公式](formula.md)）。
+- **遊戲：**視窗中的 DOOM (2016) 與 Half-Life 2，兩者都透過 VR 模式（[公式](formula.md)）；Windows 遊戲 [Slay the Tire](https://store.steampowered.com/app/5379690/Slay_the_Tire/?utm_source=web-github-com&utm_medium=press&utm_campaign=launch_2026) 則透過它自己的並排 3D 模式。
 - **為遊戲調校的核心：**本版本執行附上我們立體修補的 Linux 7.3。它的新排程器在作者自己的測試中，把一款遊戲在較舊 CPU 上的最低幀率從 4 提升到 29 fps（[數字](https://lore.kernel.org/all/20260511113104.563854162@infradead.org/)），而且能讓視訊記憶體不多的 AMD 顯示卡把遊戲記憶體留在卡上（[這項變更](https://pixelcluster.dev/VRAM-Mgmt-fixed/)）。
 
 每個程式的收穫與驗證方式：[Programs](#programs-the-edition-changes-for-stereo-3d-and-deep-colour)。
@@ -128,6 +128,7 @@ PhotoCraft 與 FilmCraft 已帶 3D 發布；我們正在把這項工作連同 Li
 - **立體桌面，半透明**（[MPO](https://raw.githubusercontent.com/Sparky-OS/sparky-stereo-os/main/docs/screenshots/translucent-stereo-desktop.mpo)），2026 年 10 月 15 日在 3D 電視上拍攝。視窗是玻璃的，所以後面那疊會透出來。兩眼之間的實測數值：被聚焦的視窗 Dolphin 為 0 px，它的「設定」選單 +5 px（在前方，位於使用者設定的浮出上限）；很長的配色方案列表為 0 px，因為它頂到螢幕上緣，而浮出且碰到邊緣的東西會留在螢幕平面；Thunderbird 在後方 -3 px；系統監控小工具與桌布 -10 px；面板 0 px。兩個電子郵件地址在雙眼中都已模糊處理。
 - **立體桌面，選單疊選單**（[MPO](screenshots/stereo-desktop-dialogs.mpo)），2026 年 10 月 13 日在以 frame packing 顯示的 3D 電視上拍攝。兩眼之間的實測數值：被聚焦的 Marble 視窗 0 px，它的「設定」選單 +2 px、Panels 子選單 +4 px，後面的四個視窗 -3、-5、-8 與 -10 px，小工具與桌布 -10 px；視窗內部是 Marble 自己的 3D：地球標籤 +12 px，星星 -13 px。後方 Diolinux 聊天室裡的訊息已模糊處理。
 - **DOOM (2016) 在普通視窗中**（[MPO](screenshots/doom-2016-in-a-window.mpo)），基於 [KHARVOX](https://github.com/CactusVRStudios/KHARVOX)，CactusVRStudios 的 DOOM (2016) VR 轉換模組 (MIT)：遊戲有深度，而面板與視窗邊框在雙眼中都保持平面。兩眼之間的實測數值：最近的岩石相差 23 px，遠山 1 px，面板 0 px。
+- **Slay the Tire，自帶 3D 模式的遊戲**（[MPO](screenshots/slay-the-tire-battle.mpo)），由 [Save Point LLC](https://store.steampowered.com/app/5379690/Slay_the_Tire/?utm_source=web-github-com&utm_medium=press&utm_campaign=launch_2026) 製作，2026 年 11 月 24 日在以 frame packing 顯示的 3D 電視上拍攝。這是一款透過 Proton 執行的 Windows 遊戲：它的 Full SBS 模式為每隻眼睛繪製一幅完整的 1920x1080 畫面，桌面再把這一對畫面交給電視。在遊戲的 40 % 深度設定下，兩眼之間的實測數值：卡牌與遊戲自己的面板 0 px，前景的騎士最多 +6 px，遠岸的樹 -20 px。擷取自遊戲視窗。
 - **Marble 的地球儀**（[MPO](screenshots/marble-globe.mpo)）：地球在螢幕前方（+11 px），星星在後方（-12 px），側邊面板保持平面。這張圖早於後來完成的修正；要看看 Marble 今天的樣子，請看選單疊選單那張圖。
 - **立體桌面，一個彈出視窗**（[MPO](screenshots/stereo-desktop.mpo)），同一天拍攝。兩眼之間的實測數值：面板 0 px（在螢幕平面），音效彈出視窗 +4 px（在前方），後面的三個視窗 -3、-7 與 -10 px，系統監控小工具 -10 px，和桌布一起位於最後方。
 

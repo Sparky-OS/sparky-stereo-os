@@ -1546,6 +1546,7 @@ The edition's catalogue additions build on the programs and translator teams cre
 | Variety, Karton, XScreenSaver | Peter Levi and James Lu in Variety's `AUTHORS`; Aaron Rainbolt and Derek Lin for Karton; Jamie Zawinski and the XScreenSaver contributors. |
 | Language teams | The KDE localization teams, including Eloy Cuadra and the Spanish team whose published catalogues supplied terms for the shared glossary. |
 | Throw and Catch | Fabian Druschke and Aleix Pol i Gonzalez for KDE Connect, Aleix Pol Gonzalez and Arjen Hiemstra for KRdp, Urs Wolfer and Tony Murray for KRDC, and Xaver Hugl and Vlad Zahorodnii from the KWin source credits above. |
+| Throw to a Cast device | Benjamin Berg, Christian Glombek and Anupam Kumar for GNOME Network Displays and its Chromecast code (read and followed, never copied; its NEWS credits @kyteinsky for the Chromecast protocol), Paulus Schoutsen and Erik Montnemery for pychromecast (the protocol reference and the sender of the software receiver's proof), The Chromium Authors for the Open Screen Library, with Taesun Yeoum for Cast message chunking. |
 
 ## iPhone USB installation
 

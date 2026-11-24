@@ -393,3 +393,19 @@ A source directory full of objects is neither the closure nor necessary for repl
   **Cause:** the rig's replay applied a fixed list of the recipe's patch names, so the new patch never reached the replay's source.
   **Fix:** the replay applies every patch of the recipe in order; before counting, check the replay's own source for the change (`grep` the new property in its `Config.qml`).
   **How found:** the new property was absent from the replay's `Config.qml`; with all three patches the same 20 runs gave 0 lines.
+
+## Effects that leave the 2D grid or show black tiles in 3D (2026-11-24)
+
+- **Symptom:** of the 31 effects in Kamoso's drawer, 12 rows leave the 2D grid a moment after it opens (the effectv set: `dicetv`, `edgetv`, `agingtv`, `optv`, `quarktv`, `radioactv`, `revtv`, `rippletv`, `shagadelictv`, `streaktv`, `vertigotv`, `warptv`); in 3D the same 12 stay as black tiles.
+  **Cause:** each preview links `FILTER ! glupload ! qml6glsink` with no conversion.
+  The effectv elements offer only `RGBx`, `xRGB`, `BGRx` and `xBGR`; `qml6glsink` takes only `RGBA`, `BGRA`, `RGB`, `YV12` and `NV12` as GL memory, and `glupload` passes the format through unchanged, so negotiation fails (`not-negotiated`, then `not-linked` upstream).
+  In 2D the delegate's `onFailed` handler removes the row (upstream behaviour); in 3D it returns early, which leaves the tile black.
+  The camera pipeline is not affected: camerabin's viewfinder bin puts `videoconvert` in by itself (gst-plugins-bad `gst/camerabin2/gstviewfinderbin.c`, unless `disable-converters` is set), and photos carry the effect.
+  **Fix:** one `videoconvert` between the filter and `glupload` (Kamoso patch 0004, `src/video/effectpreview.h`).
+  `glcolorconvert` after `glupload` works too; measured over the whole grid (median of five), `videoconvert` cost 3.388 s against 4.005 s on llvmpipe and 4.589 s against 4.743 s on the NVIDIA card, so the recipe carries `videoconvert`.
+  **How found:** the two elements' pad templates side by side (`gst-inspect-1.0 dicetv`, `gst-inspect-1.0 qml6glsink`), then all 31 descriptions run against `qml6glsink`'s caps three ways (as shipped: 19 of 31; with either conversion: 31 of 31).
+- **Symptom:** a GUI-less test that stands in for `qml6glsink` with a `capsfilter` refuses every effect, `identity` included.
+  **Cause:** the sink pad template's caps carry the `memory:GLMemory` feature and a `texture-target` field; copied as they are, or with the features emptied, no system-memory buffer matches.
+  **Fix:** for each structure, set the features to `GST_CAPS_FEATURE_MEMORY_SYSTEM_MEMORY` and remove `texture-target`; then the shipped link fails the 12 effectv rows and the converted link passes all 31 (`autotests/effectpreview-test.cpp`, which reads the 31 filters from the real `Config.qml`).
+- **What may still remove a row:** an element missing from the system.
+  Every element of the 31 effects, and the fix's own `videoconvert` (gstreamer1.0-plugins-base, through plugins-good and plugins-bad), is in the closure of the package's `Depends`: effectv, `videobalance` and the rest in plugins-good, `coloreffects`, the geometric transforms and `frei0r-filter-*` in plugins-bad, their plugin files in frei0r-plugins.

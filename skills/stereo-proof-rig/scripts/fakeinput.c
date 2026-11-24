@@ -10,6 +10,8 @@
  *   t:X,Y       a tap of one finger on a touch screen at X,Y (logical pixels): down, 80 ms, up (ORDER 567: KWin shows
  *               its on-screen keyboard only when the last input came from a touch screen or a pen)
  *   p:272       press a pointer button and leave it down; r:272 releases it (a drag: p:, m: steps, r:; ORDER 551c)
+ *   w:VALUE     turn the wheel: one vertical axis event of VALUE (15 is one notch down, -15 one notch up, as a
+ *               mouse wheel sends; row 50, FreeCAD's zoom)
  * fakeinput --serve IN ACK: stay connected (KWin's fake input device, and with it the seat's pointer, lives only
  * while the client is connected) and run each line read from IN as steps, writing "ok" to ACK after each line, or
  * "error" when a step is malformed (ORDER 441: a line that was one comma-joined token used to run only its first
@@ -137,6 +139,14 @@ static int step(struct wl_display *display, const char *a)
 			if (c == 0)
 				wait_ms(90);
 		}
+	} else if (strncmp(a, "w:", 2) == 0) {
+		double v = 0;
+		int used = 0;
+		if (sscanf(a + 2, "%lf%n", &v, &used) != 1 || a[2 + used] != '\0') {
+			fprintf(stderr, "fakeinput: malformed step %s\n", a);
+			return 2;
+		}
+		org_kde_kwin_fake_input_axis(fake, WL_POINTER_AXIS_VERTICAL_SCROLL, wl_fixed_from_double(v));
 	} else if (strncmp(a, "t:", 2) == 0) {
 		double x = 0, y = 0;
 		int used = 0;

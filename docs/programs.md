@@ -66,6 +66,7 @@ The words in quotes are each project's own description of itself; the line after
 **Matplotlib**, with the edition's module: 3D plots in 3D.
 **Netgen**, the mesh generator: the mesh in 3D with one Enable 3D choice, as deep as your screen's 3D settings allow.
 **GNU Octave**, the next build: every 3D figure in 3D from the first start, as deep as your screen's 3D settings allow, with one Enable 3D choice.
+**FreeCAD** (*"An open source parametric 3D CAD modeler"*): your model in 3D in its 3D view from the first start, as deep as your screen's 3D settings allow, with one Enable 3D choice.
 
 ## Play
 

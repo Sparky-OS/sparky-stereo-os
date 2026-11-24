@@ -3,7 +3,8 @@
 **For anyone who must make a vendor's closed Wi-Fi driver work on a machine that has no cable:** Broadcom's `wl` (Debian's `broadcom-sta-dkms`) is the worked case.
 The licence is shown from the package file before anything is installed, the package comes from the ISO without the network, DKMS builds it on the edition's kernel, and every step is checked and every failure told and kept.
 Written 2026-11-16 from ORDER 614; the loading of the module on a real BCM4360 was not proven (see the end).
-Extended 2026-11-23 from row 728 (a MacBookPro9,2 whose BCM4331 dropped its Wi-Fi on `b43`): [a card two drivers drive](#a-card-two-drivers-drive), [the NetworkManager file matched on a driver](#the-networkmanager-file-matched-on-a-driver), [saved profiles after the interface is renamed](#saved-profiles-after-the-interface-is-renamed) and [the network applet's speed 0](#the-network-applets-speed-0-with-wl).
+Extended 2026-11-23 from row 728 (a MacBookPro9,2 whose BCM4331 dropped its Wi-Fi on `b43`): [a card two drivers drive](#a-card-two-drivers-drive), [saved profiles after the interface is renamed](#saved-profiles-after-the-interface-is-renamed) and [the network applet's speed 0](#the-network-applets-speed-0-with-wl).
+Corrected 2026-11-24 from row 728b: the NetworkManager settings are for every card `wl` can drive, whichever driver has it, so [the settings follow the card, not the driver](#the-settings-follow-the-card-not-the-driver) (row 728 had matched them on `driver:wl`).
 
 ## Working recipe
 
@@ -93,26 +94,81 @@ On that chip `b43` has no 5 GHz and no 802.11n features (linux-wireless document
 4. **The way back purges, then loads the card's own alias** (`/sys/bus/pci/devices/ADDRESS/modalias`), as the kernel does at the start: the bus driver comes, and udev loads the core's driver.
 5. **Find the card's interface under its PCI device, not only on it.** `wl` binds the PCI device; `b43` binds the core below it, so the interface's `device` link points at `.../0000:03:00.0/bcma0:1`. Match the PCI address as a path component, and read the driver from the interface's own `device/driver`.
 
-## The NetworkManager file matched on a driver
+## The settings follow the card, not the driver
 
-`/usr/lib/NetworkManager/conf.d/sparky-stereo-wl.conf`, one `[device-…]` and one `[connection-…]` section, both `match-device=driver:wl`:
+<a id="the-networkmanager-file-matched-on-a-driver"></a>
+Daniel, 2026-11-24, on a file "for cards on Broadcom's driver only": "the proper shape is "that are broadcom able" since we know these features tend to make it fail no matter the drive (we attempted both drivers with default settings)".
+So Wi-Fi power saving off, no address change while scanning and the permanent address apply to every card that `wl` can drive (the `BROADCOM-WL` rows of `share/network-ids.tsv`), under the kernel's free driver or under `wl`, and to no other card: power saving off everywhere would cost every other laptop its battery.
+
+### How NetworkManager can find a card
+
+NetworkManager.conf(5) of 1.58.1, "Device List Format", has these forms, and its matcher (`match_device_eval()`, `src/core/nm-core-utils.c`) no others: `*`; a bare interface name or address; `interface-name:IFNAME` (with `~` for a glob and `=` for a literal name); `mac:HWADDR`, "the permanent MAC address of the device"; `s390-subchannels:`; `type:TYPE`; `driver:DRIVER`, optionally `/VERSION`; `dhcp-plugin:`; and `except:SPEC`, joined with `,` or `;`.
+No form names a PCI id or a udev property, and forms are joined by "or", never "and".
+
+| Form | What it catches wrongly | Measured |
+|---|---|---|
+| `driver:wl` (row 728) | nothing, but it misses the card under the free driver | guest: the card on the list under the free driver's stand-in scanned with a random address and connected with power saving on |
+| `driver:wl,driver:b43,driver:b43legacy,driver:brcmsmac,driver:brcmfmac` | 82 device ids that are not `BROADCOM-WL` rows: 28 PCIe chips `brcmfmac` drives (BCM4350, BCM43602, BCM4364, BCM4377, BCM4378 and BCM4387 among them), 19 older PCI ids under `bcma` or `ssb` (`b43`, `b43legacy` or `brcmsmac` bind their 802.11 core by revision), 2 PC Cards, 24 SDIO and 9 USB ids | the module aliases of the published 7.3.4 kernel against the table; guest: a card not on the list, under the same driver, got power saving off and its permanent address |
+| `interface-name:wlp3s0b1` | loses the card at the swap: `b43` names it `wlp3s0b1`, `wl` names it `wlp3s0` | guest: after the swap, power saving on and not the permanent address |
+| `mac:` of every permanent address the card has shown | nothing: an address is one card's | guest: under both stand-ins, renamed, with a different permanent address under each |
+
+### `mac:` needs the permanent address the kernel reports
+
+- NetworkManager reads the kernel's `IFLA_PERM_ADDRESS` (`nm_platform_link_get_permanent_address()`), which rtnetlink sends only when `dev->perm_addr` is not all zero (`net/core/rtnetlink.c`, v7.3); `register_netdevice()` copies `dev_addr` into it when `addr_assign_type` is `NET_ADDR_PERM`, the default (`net/core/dev.c`).
+- When NetworkManager cannot read one, it uses the current address as a "fake" permanent one, and the matcher gets none: `nm_match_spec_device_data_init_from_device()` passes `.hwaddr = is_fake ? NULL : hw_address` (`src/core/NetworkManagerUtils.c`), so `mac:` never matches such a device. The writer says so and keeps it as a failure.
+- `wl` sets its `cur_etheraddr` with `eth_hw_addr_set()` before `register_netdev()` (Debian's patched `wl_linux.c`), so the kernel reports it as permanent. mac80211 drivers copy the wiphy's address into `perm_addr` (`net/mac80211/iface.c`); `b43` takes it from the SPROM, `et1mac` when it is valid, else `il0mac` (`b43/main.c`).
+- `wl`'s address comes from Broadcom's closed core, so the two drivers may report different addresses for one card. Keep every address the card has shown, with the driver it showed it under.
+
+### The recipe
+
+1. `/usr/lib/sparky-stereo-hardware/broadcom-wl-settings write --reload` lists the PCI devices whose id is a `BROADCOM-WL` row, finds each wireless interface whose `device` is that card or a device under it, and asks the kernel for its permanent address (one `RTM_GETLINK` naming the interface, then `IFLA_PERM_ADDRESS`, attribute 54).
+2. It keeps each address with its card and the drivers it was seen under in `/var/lib/sparky-stereo-hardware/broadcom-wl-cards`; a card no longer on the bus leaves the record.
+3. It writes `/run/NetworkManager/conf.d/sparky-stereo-broadcom-wl.conf`, NetworkManager's per-boot folder ("Scripts can also put per-boot configuration into /run/NetworkManager/conf.d"): one device and one connection section, each `match-device=mac:A,mac:B`. With no such card it removes the file. A file of that name that does not start with the writer's own first line is left as it is, and that is kept as a failure.
+4. When the file changed and NetworkManager is active (`systemctl show -p ActiveState --value NetworkManager.service`, waiting while it is `activating`), it runs `nmcli general reload conf`.
+5. It runs before NetworkManager starts (a oneshot with `Before=NetworkManager.service`), from udev (`SUBSYSTEM=="net", ACTION=="add", ATTRS{vendor}=="0x14e4"` and `SUBSYSTEM=="pci", ACTION=="remove", ENV{PCI_ID}=="14E4:*"`, as `RUN`), after the swap, the way back and the `wl` route, and in the postinst. udev announces a device only after its `RUN` programs end, so NetworkManager reads the new address before it scans or connects on the new interface.
+6. A failure (that foreign file, an interface with no permanent address, a refused reload) is kept by `sparky-stereo-problems` with the writer as its repair; a later run that works clears it.
+7. A file of the same name in `/etc/NetworkManager/conf.d` is the person's: NetworkManager reads it instead ("The loading of a file /run/NetworkManager/conf.d/name.conf can be prevented by adding a file /etc/NetworkManager/conf.d/name.conf"), so an empty one switches ours off, and the writer never touches it. Sections in later files win (`/usr/lib` < `/run` < `/etc`), and a profile's own value wins over every default.
+
+The three keys:
 
 | Key | Section | What it does (manual page) |
 |---|---|---|
-| `wifi.scan-rand-mac-address=no` | DEVICE | the card keeps its address while it scans (NetworkManager.conf(5), DEVICE SECTION) |
-| `wifi.powersave=2` | CONNECTION | power saving off; the file takes the number, `disable` is 2 (nm-settings-nmcli(5), `802-11-wireless.powersave`; NetworkManager.conf(5): enum values "only can be configured via their numeric magic number") |
+| `wifi.scan-rand-mac-address=no` | DEVICE | the card keeps its address while it scans (NetworkManager.conf(5), DEVICE SECTION); read at each scan request (`_hw_addr_set_scanning()`, `nm-device-wifi.c`), so a reload counts at the next scan |
+| `wifi.powersave=2` | CONNECTION | power saving off; the file takes the number, `disable` is 2 (nm-settings-nmcli(5), `802-11-wireless.powersave`; NetworkManager.conf(5): enum values "only can be configured via their numeric magic number"); set at activation, the one place `set_powersave()` is called |
 | `wifi.cloned-mac-address=permanent` | CONNECTION | the card's permanent hardware address while connected (nm-settings-nmcli(5), `802-11-wireless.cloned-mac-address`) |
 
 - A connection default applies only when the profile asks for the default (`powersave` 0, `cloned-mac-address` unset): NetworkManager 1.58.1 reads it in `set_powersave()` (`src/core/devices/wifi/nm-device-wifi.c`) and in `nm-device.c` for the address. A person's own profile value wins.
-- `/usr/lib/NetworkManager/conf.d` is read first; a file of the same name in `/etc/NetworkManager/conf.d` shadows it (NetworkManager.conf(5), DESCRIPTION), so an empty one switches it off.
 - Debian's `wpasupplicant` (not `network-manager`) already ships `no-mac-addr-change.conf` with the scan setting for `wl` (Andrew Shadura, wpa 2:2.6-12, Debian #833507); nothing in Debian sets `wifi.powersave`.
 - Debian's `broadcom-sta` carries Diego Escalante Urrelo's "wl: Make sure power_mgmt settings are honored" (since 6.30.223.271-16~exp1): `wl` turns power saving off as `PM_FORCE_OFF` when NetworkManager asks.
 
-**Proving the form for real, without the card:** a QEMU guest with KVM, the edition's kernel, a Debian testing root with NetworkManager, wpa_supplicant, hostapd and iw, booted from an ext4 image (`docker export` of a prepared container, then `mke2fs -d`).
-In the guest: `modprobe mac80211_hwsim radios=2`; `wlan1` is the access point under hostapd and unmanaged (`[keyfile] unmanaged-devices=interface-name:wlan1`); before NetworkManager starts, `wlan0` gets a non-permanent address and `iw dev wlan0 set power_save on`.
-Three cases, each from a fresh radio: the file with `driver:wl` replaced by `driver:mac80211_hwsim` (the driver `nmcli -g GENERAL.DRIVER device show wlan0` reports), the file as shipped, and no file.
-Read back while connected: `iw dev wlan0 get power_save`, `/sys/class/net/wlan0/address` against `ethtool -P wlan0`, the station hostapd saw (`iw dev wlan1 station dump`), and the addresses seen while it scanned.
-Measured with NetworkManager 1.58.1 on 7.3.4-stereo3d18:
+### Proving it with simulated radios
+
+The guest: QEMU with KVM, the edition's kernel, a Debian testing root with NetworkManager, wpa_supplicant, hostapd, iw and python3, booted from an ext4 image (`docker export` of a prepared container, then `mke2fs -d`). Everything that decides the result is real: the radios, the kernel's permanent address, udev, NetworkManager and its matching. Only the bus is a stand-in.
+1. `modprobe mac80211_hwsim radios=0`, then make each radio through the driver's generic netlink family (`MAC80211_HWSIM`: `HWSIM_CMD_NEW_RADIO` with `HWSIM_ATTR_RADIO_NAME` and `HWSIM_ATTR_PERM_ADDR`, `HWSIM_CMD_DEL_RADIO` by name; `drivers/net/wireless/virtual/mac80211_hwsim.h`). A driver swap makes a new device, so "the same card under the other driver" is a new radio with another permanent address.
+2. `.link` files matched on `PermanentMACAddress=` give each stand-in the name its driver gives the card (`wlp3s0b1`, `wlp3s0`) and a current address that is not the permanent one (`MACAddress=`), so the address in use while connected tells whether `cloned-mac-address=permanent` applied. The access point's radio is named `ap0` and unmanaged.
+3. A guest rule after `80-net-setup-link.rules` runs `iw dev $name set power_save on` for each station radio, because a new hwsim radio starts with power saving off and "off" would prove nothing.
+4. A small sysfs tree says which PCI card each name belongs to (`0000:03:00.0`, 14e4:4331, and a 14e4:4318 beside it), read by the writer through `SPARKY_STEREO_SYSFS`; a guest rule runs the writer with the same arguments on each new `wlan*` interface (a radio has no PCI parent for `ATTRS{vendor}`).
+5. Read: `NetworkManager --print-config`, the addresses while it scans, then while connected `iw dev IF get power_save`, the address against `ethtool -P`, the station the access point saw, NetworkManager's PID, and its journal with monotonic times.
+
+Measured with NetworkManager 1.58.1 on 7.3.4-stereo3d18 (row 728b):
+
+| Case | Address while scanning | Power save, connected | Address, connected |
+|---|---|---|---|
+| 0.1.39 (`driver:wl`), the card under the free driver's stand-in | random | on | not the permanent one |
+| 0.1.40, the card appears while NetworkManager is stopped | unchanged | off | the permanent one |
+| 0.1.40, the swap while it runs: a new device, the other name, another permanent address, the profile's own autoconnect | unchanged | off | the new permanent one; NetworkManager not restarted |
+| 0.1.40, the way back | not read | off | the first permanent one |
+| 0.1.40, the next start from the record alone (the file exists before any interface) | unchanged | off | the permanent one |
+| a card not on the list beside one on it, the same driver | random | on | not the permanent one |
+| rejected: the list of driver names, a card not on the list | unchanged | off | the permanent one (caught wrongly) |
+| rejected: `interface-name:wlp3s0b1`, after the swap | not read | on | not the permanent one |
+| the person's file of the same name in `/etc` | random | on | not the permanent one (theirs wins; ours unchanged in `/run`) |
+
+At the swap the writer ran from udev between 26.36 s and 26.41 s of the guest's uptime (the same clock as the journal's monotonic times in a guest that never sleeps), NetworkManager logged its configuration reload (`config: signal: CONF`, listing the file) at 26.406 s and took the new device (`unmanaged -> unavailable`) at 26.419 s.
+When the card left, the file went and NetworkManager's reload listed no file of ours.
+`udevadm verify` and `systemd-analyze verify` accept the rule and the unit, and the unit is ordered before `NetworkManager.service`.
+
+The first form, `driver:wl` (row 728), measured the same way with the radio's own driver name put in its place:
 
 | Case | Address while scanning | Power save, connected | Address, connected |
 |---|---|---|---|
@@ -147,6 +203,28 @@ On the machine: `iw dev IF station dump` fails with "Operation not supported (-9
   Cause: renaming keeps the device and wpa_supplicant's old registration (its P2P device stays `p2p-dev-wlan0`). Fix: model a driver swap as it is, a new device: unload and load `mac80211_hwsim` again and rename the new interface before NetworkManager starts.
 - **Symptom: the guest's container exits 125 at once with no output.**
   Cause: `timeout` as the container's first process (the [proof rig's](../../stereo-proof-rig/SKILL.md) trap); an attached `docker run` through the lane's socket kept exiting 125 after that too, for a reason not found. Fix: start the container detached, `docker wait` it, keep `docker logs`.
+- **Symptom: a guest rule `KERNEL=="wlp*"` never runs for an interface a `.link` file renames to `wlp3s0`.**
+  Cause: while rules match, `KERNEL` is still the kernel's name (`wlan0`); the rename comes from `80-net-setup-link.rules` later in the same event.
+  Fix: match the kernel's name or a parent's attribute (`ATTRS{vendor}`); the program still runs after the rename and sees the new name in sysfs.
+  Found by: the writer's log stayed empty while the radio was up as `wlp3s0`.
+- **Symptom: udevd says `Process '/usr/sbin/iw dev wlan0 set power_save on' failed with exit code 237` for a device now named `wlp3s0b1`.**
+  Cause: udev expands `$name` in a `RUN` value when the rule matches; before `80-net-setup-link.rules` it is the kernel's name, though the program runs after the rename.
+  Fix: put a rule that passes `$name` after the renaming rule (`81-…`); a program that reads sysfs itself needs no name.
+  Found by: `journalctl -u systemd-udevd` in the guest.
+- **Symptom: a radio helper reports an error although the radio is there.**
+  Cause: the generic netlink acknowledgement carries the handler's return value, and `HWSIM_CMD_NEW_RADIO` returns the new radio's id.
+  Fix: only a negative value is an errno. Found by: the radio's interface existed after each "ERROR radio" line.
+- **Symptom: `iw dev IF get power_save` says off on a new hwsim radio before any setting.**
+  Cause: hwsim does not turn power saving on by default; NetworkManager sets it only at activation (the one call of `set_powersave()`).
+  Fix: switch it on before NetworkManager sees the device, or the "off" proves nothing.
+- **Symptom: after `nmcli device disconnect IF`, the profile does not autoconnect on the device that replaces it.**
+  Fix: delete the profile to let the card scan, and add it again before the next device appears.
+- **Symptom: `nmcli` asked while NetworkManager is stopped: does it start it?**
+  Measured with 1.58.1 (enabled, stopped): it stayed inactive. The writer still asks systemd first (`ActiveState`) and reloads only an active NetworkManager.
+- **Symptom: in a test, `check 'x' bash -c "my_function"` fails though the function works.**
+  Cause: a child shell does not inherit the test's functions. Fix: `check 'x' my_function`.
+- **Symptom: a writer test reports the interface's driver as `none`.**
+  Cause: the test double's `driver` link does not resolve, and the writer asked `os.path.exists`. Fix: read the link's name (`os.readlink`), as the shell library does.
 - **Symptom: an nmcli double finds no profile.** Cause: `${*##* }` removes the pattern from each argument, not from the joined line. Fix: `${!#}` for the last argument.
 - **Symptom: `bash -n` says "unexpected EOF while looking for matching quote" far below the edit.** Cause: an apostrophe inside a double-quoted `"${var:-it's}"`. Fix: no quote characters in a default word.
 
@@ -154,3 +232,4 @@ On the machine: `iw dev IF station dump` fails with "Operation not supported (-9
 
 Loading `wl` on a real BCM4360, the card's scan and association, WPA3 (the Debian wiki says `wl` may fail with it), the power-management note for frequent disconnections, the first boot after the install with Debian's blacklist in the initramfs, and Secure Boot with the edition's first-boot enrolment of the DKMS key.
 For the two-driver work: `wl` and `b43` on a real BCM4331 (the swap, the way back and the restart Debian's README.Debian asks for after the first installation; Debian #1088231 reports `wl` failing after `b43` was loaded and unloaded until a restart), `iw dev IF get power_save` reading `off` under `wl` with the file, and the `iw` readings of the speed 0 cause.
+For the settings that follow the card: whether `b43` and `wl` report the same permanent address on a real card (`ip -d link show IF` under each), the package's own udev rule on a real PCI card (the guest ran the same program from a rule matched on the name), a card's hot removal, and whether the settings end the drops.

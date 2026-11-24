@@ -20,6 +20,11 @@ Brotli (RFC 7932, by Jyrki Alakuijala and Zoltan Szabadka), whose decoder reads 
 
 Blender, Cycles, ExifTool, Exiv2.
 
+Sparky Stereo Real Weather, the realistic look of the weather icons, carries two outside pictures, each credited in the form its own page asks for:
+
+- The Moon: NASA's Scientific Visualization Studio, CGI Moon Kit (visualizer Ernie Wright, scientist Noah Petro), from the Lunar Reconnaissance Orbiter's camera (LROC, Arizona State University, the WAC colour mosaic) and laser altimeter (LOLA) teams. The kit's page asks: "Please give credit for this item to: NASA's Scientific Visualization Studio".
+- The Sun: the STEREO mission and its SECCHI instrument consortium, an EUVI 304 Å picture taken by STEREO Ahead on 10 May 2024 at 11:55:45 UT, shown in false colour. The STEREO notice asks: "Courtesy of STEREO/SECCHI consortium."
+
 ## Screen reader and accessibility effects
 
 Brad Hiebert-Treuer, Sarri Al Nashashibi, Daniel Scharstein.

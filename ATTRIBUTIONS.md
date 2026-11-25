@@ -1125,6 +1125,20 @@ The first scale of a built-in panel, the on-screen keyboard of a computer with a
 - **KConfig** (KDE Frameworks): its cascading configuration, a system default below the person's file, is what lets a default exist on some computers only.
 These projects do not endorse the edition.
 
+## The on-screen keyboard for Japanese, Korean and Chinese (row 71, 2026-11-25)
+
+Plasma Keyboard as the on-screen keyboard of Fcitx 5 (plasma-keyboard 6.7.4-2+stereo3d1, sparky-stereo-hardware 0.1.42) builds on these projects, named from each one's own records:
+
+- **Plasma Keyboard** ([invent.kde.org/plasma/plasma-keyboard](https://invent.kde.org/plasma/plasma-keyboard); its own code GPL 2.0 or 3.0, its layouts from Qt GPL 3.0 or Qt's commercial licence): Devin Lin, Kristen McWilliam and Aleix Pol i Gonzalez, as its files name them, and the translators its catalogues name; the edition's Fcitx 5 mode is its keyboard, its layouts and its settings page with one more switch.
+- **Fcitx 5** ([github.com/fcitx/fcitx5](https://github.com/fcitx/fcitx5), LGPL 2.1 or later): Weng Xuetian (CSSlayer) and its contributors; its keyboard bridge, the "DBus Virtual Keyboard" addon (`src/ui/virtualkeyboard`) that the edition's keyboard talks to, is liulinsong's (2022), with commits by Weng Xuetian, shijie.chen and Qijia Liu. Packaged in Debian by the Debian Input Method Team.
+- **The engines that convert the keys**: **Mozc** (Google; [github.com/google/mozc](https://github.com/google/mozc), packaged in Debian by Nobuhiro Iwamatsu) for Japanese; **fcitx5-hangul** (Weng Xuetian) with **libhangul** (Choe Hwanjin; packaged by Debian Korean L10N) for Korean; **fcitx5-chinese-addons** and **libime** (Weng Xuetian) for Pinyin; **fcitx5-chewing** (Weng Xuetian and Tai-Lin Chu) with **libchewing** (the chewing development team) for Chinese (Taiwan). Each of these but Mozc and libhangul is packaged by the Debian Input Method Team.
+- **Qt Virtual Keyboard** (The Qt Company; packaged by the Debian Qt/KDE Maintainers): the keys, the layouts' format and the fallback layout the Japanese and Chinese (China) keys use.
+- **LayerShellQt** ([invent.kde.org/plasma/layer-shell-qt](https://invent.kde.org/plasma/layer-shell-qt)): Aleix Pol Gonzalez, on Drew DeVault's layer-shell protocol: the keyboard's window, at the bottom of the screen, that never takes the keyboard focus.
+- **KWin**: the `org.kde.kwin.VirtualKeyboard` interface whose touch, pen and tablet-mode rule decides when the keyboard shows, and the fake input protocol (`fake-input.xml`, Martin Gräßlin, 2015) through which the keys type plain text when Fcitx 5 does not answer.
+- **libxkbcommon** (the xkbcommon project): the conversion of characters to X keysyms that Fcitx 5 reads.
+- **Plasma Keyboard's reworked engine**, cited and measured, not carried: Devin Lin's merge requests 109 ("Introduce new input engine and framework to replace Qt VKBD") and 113 ("Add Chinese, Japanese and Korean layouts and text composers") with the layout and settings work after them, and commits since 6.7.4 by Kristen McWilliam, Jakob Petsovits, Ryan Brue and Maximilian Meßmann.
+These projects do not endorse the edition.
+
 ## The desktop's loading screen (ORDER 571, 2026-11-15)
 
 The loading screen between the login and the desktop shows the boot splash's picture, with depth on a screen in a 3D mode. It builds on other people's work, named from each project's own records:

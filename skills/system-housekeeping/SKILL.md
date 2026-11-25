@@ -142,6 +142,8 @@ Never a raised timeout, a restart loop or a masked unit: the fix is where the lo
 
 ## Cleaning a system safely
 
+[Storage cleanup preview and fixture](references/storage-cleanup.md) covers candidate ownership and loss, allocated space, explicit selection and seven verified traps.
+
 For loose files beside already-audited clones in a finished lane, use [Loose files outside a finished lane's clones](references/loose-files-in-finished-lanes.md).
 It distinguishes authored work from reproducible output, requires independent retained copies, and gives the review-only literal removal script form.
 A reviewer's lesson from its first use (ORDER 617c): build outputs of delivered work (old packages, debug APKs, libraries, logs) are not "found" work, and a root-level empty `.git` folder or a bare mirror without a remote makes the removal guard stop until each is settled.

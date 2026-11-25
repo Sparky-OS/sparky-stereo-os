@@ -1,0 +1,117 @@
+# Preview and measure a storage cleanup
+
+**For** contributors to Storage Cleanup in KDE, use the fixture to prove what can be selected, what space an item releases and what needs to stay.
+
+**Check freshness first.** The edition uses BleachBit as the engine. The early independent measuring fixture lives in build history at `9b2a3b36`. Run the installed BleachBit controls for current proof.
+
+## BleachBit in System Settings
+
+Look for the edition's BleachBit successor before using these switches. The Debian 6.0.6-1 control rejects `--json`. The edition patch lives in `sparky-os/packages/bleachbit/patches/structured-preview.patch`. The engine's installed entry point is `/usr/bin/bleachbit`. The page runs the same executable for the person and invokes it through the fixed polkit helper for administrator use.
+
+```sh
+bleachbit --json --list-cleaners
+bleachbit --json --preview --volume / --preset
+```
+
+The first command returns BleachBit's cleaner names, their option descriptions and warnings, and flags from `[tree]` in the current account's `~/.config/bleachbit/bleachbit.ini`. The edition puts its initial user copy in `/etc/skel` and creates the administrator's file on the first housekeeping install when none exists. `--set-option cleaner.option true|false` edits this same tree through BleachBit's Options API. Reopen the catalogue to check a write. A running copy of the GTK window may still hold its prior in-memory selection.
+
+The preview exposes the cleaner and option, the path, the action label, allocated bytes, the filesystem estimate flag and an item ID. Use Linux mount IDs from the opened path for scope. Checking only the pathname prefix would include files on a nested mount. Count `st_blocks × 512` for file allocation and distinguish it from logical length or space still referenced by snapshots. At confirmation, BleachBit regenerates the commands and matches the approved IDs to the mounted volume and file identities. Temporary files have a seven-day first age and are rechecked under a write lease. A lease refusal leaves the item in place. BleachBit moves a reviewed name into a private directory on the same mount, then compares it with the still-open descriptor before unlink. If a concurrent replacement arrives, BleachBit restores it without overwriting its original name. When that name has already been taken again, the refusal reports the path of the intact staged entry. Scope-aware APT preview reads APT's configured directory and respects APT's POSIX lock. Detailed errors accompany the preview or confirmation result.
+
+Journal vacuum can remove archived journals containing the current boot. Scoped cleanup refuses it and also refuses direct cleanup of persistent and volatile journal storage and core-dump directories. The checked journal preference remains visible in the catalogue. Browser bookmark backups and locally stored mail may be in the supplied preset. Show what each chosen entry removes before confirmation.
+
+The edition's free-space notifier supplies the threshold and recovery observation. The Problems engine keeps the volume and an action to open its preview. Use a Problems action for that UI step, since a successful `repair` command normally deletes the record immediately. Clearing belongs to the existing notifier after the volume recovers. Weekly actions open a preview, and temporary files are never taken by an unattended run.
+
+## Integration traps
+
+| Symptom | Cause | Fix and how to find it |
+|---|---|---|
+| Stock BleachBit rejects the JSON command | The CLI renders human-readable summaries from the Worker | Run the new test on the extracted Debian control before applying the patch. Inspect Worker command dispatch for paths and operation IDs. |
+| German or Portuguese KCM title with an English page | Setting only `LANGUAGE` left the C locale active | Generate and use the real session locale in `LANG`. Verify both the Qt page and BleachBit's catalogue. |
+| File checkboxes appear without their labels | The Kirigami version in the rig exposes no `Format.formatByteSize` object there | Read the QML exception and use the linked KDE `KFormat` method to format each count. |
+| A mounted location opens the cleanup page but the volume selector shows the system volume | `QStorageInfo(path)` accepted the mount but `mountedVolumes()` omitted it | Remember the validated activated mount in the selector's model. Compare the same direct launcher and mounted path before and after the change. |
+| Bubblewrap can create a user namespace but cannot mount `/proc` | Docker masks system paths independently of its capabilities, seccomp and AppArmor | In an authorized disposable builder use `--cap-add SYS_ADMIN --security-opt seccomp=unconfined --security-opt apparmor=unconfined --security-opt systempaths=unconfined`. Run `bwrap --unshare-all --cap-drop ALL --ro-bind / / --proc /proc /bin/true` as root and as the build user. Record the container command, effective masks and probe status. Both passed with the fourth option. |
+| BleachBit’s test suite fails on parent process ownership in an unprivileged invocation | The Python test process was started directly by root’s `runuser`, so its parent did not have the test user’s UID | Compare the same targeted failures with both trees under the same user. Run the full suite under an ordinary unprivileged build shell and keep that shell alive until pytest exits. The eleven tests from the root report produced ten passes and one skip in both trees. Both full suites recorded 594 passes. |
+| The last name check passes but a different file is present at unlink | File leases protect an inode. The parent directory can still receive a replacement name | Hold the reviewed file open, move the name into a private directory on the same mount and unlink by that directory descriptor only after rechecking the inode and lease. Two planted replacements proved that BleachBit preserves them, including the case where the original name is occupied again before restoration. |
+| Dolphin Places does not compile at the launch delegate | The installed KJobWidgets headers require both flags and a parent widget | Read the constructor candidates in the build error. Pass Dolphin’s window as the second argument. The corrected Places translation unit compiled against those same headers. |
+| The private KWin socket exists but fake X input cannot connect | Xwayland starts after the compositor’s Wayland socket appears | Wait for the private X socket and test the connection with `xdotool getdisplaygeometry`. The rig delivered a planted keyboard token through that Xwayland connection. |
+| An installed window check exits with `BadWindow` and `X_GetWindowAttributes` during otherwise working interactions | The X11 search first enumerates windows, then `xdotool search --onlyvisible` asks X for their attributes. A transient can disappear between those requests. | Match and activate the managed window in one KWin script using `workspace.windowList()`. Wait for the intended process, caption or class and keep native fake input for interaction. Compare the failed case logs and xdotool’s visibility check, then prove the installed cases repeatedly beside the same bounded load. |
+| Fake keyboard input reaches a test window but clicking a KCM control does nothing | The one-shot XTEST probe proved keyboard delivery only. Its pointer click left the control unchanged | Use the proof rig’s persistent Wayland fake-input client. Read its acknowledgment, leave time between moving and pressing, and confirm the downstream window actually changes. A real click on the drive Properties button selected the fixture volume. |
+| ScreenShot2 cancels in a virtual rig without a render node | KWin uses the virtual QPainter backend | Use the shared-memory capture helper from the Calamares rig. To read the buffer as the same test user, launch a byte-identical copy of the installed KWin binary without its priority capabilities from the private runtime directory. The capture helper checks the virtual backend and the runtime directory before reading the compositor’s buffer. |
+| The clean desktop has no shell containment or no notification server | Installing Plasma Workspace with recommendations disabled omits the desktop containment and notification applet's audio QML dependency | Add `plasma-desktop` and `plasma-pa` to the fixture. Verify that Plasma owns the notification bus name before exercising the notifier. Look for the containment or import error in the shell log. |
+| The drive link fails to launch even though System Settings is installed | `kcmshell6` is shipped by `libkf6kcmutils-bin`. It was absent from the minimal installation | Inspect `kcm.log` or the issuer's launch error, and verify the provider with `dpkg-deb -c` or `dpkg -S`. The Storage Cleanup package depends on the binary provider. |
+| The archive gate diagnoses conflicting supplied package identities on a corrected retry | The sibling manifest still includes the discarded local binary of the same package, version and architecture | Remove that specific prior input from the retry's sibling manifest. Keep the published predecessor and the rest of the package set. |
+| The published low-space notice stays quiet with an already-full tmpfs | Its detector must see the margin cross the threshold before the legacy alert triggers | Let it sample the healthy mounted filesystem, fill the same filesystem, and wait for the normal one-minute check. Require the D-Bus Filelight action and compare the actual filesystem values before and after filling. |
+| The system polkit prompt reports an incorrect setuid mode in the container | The installed Debian polkit helper is socket-activated and has mode 0755 | Read the packaged socket and service units. Start their accept-mode Unix socket with `systemd-socket-activate --accept --inetd` and the packaged helper's `--socket-activated` argument. Match the socket unit's mode 0666. Confirm D-Bus answers, wait for the PAM prompt, and send native fake-input key events without logging the disposable credential. |
+| The low-space record disappears when its preview opens | The Problems `repair` verb considers a zero exit to be a successful repair | Give the record a named preview action. Feed the record's clear from the notifier's recovery branch. |
+| The cleanup action is still enabled after the only reviewed item disappears | The QML action kept the old checked-ID list after the result replaced the items | Take the reviewed IDs when the person confirms, reset the current selection, and pass the approved IDs to BleachBit. Inspect the post-confirmation page as well as the filesystem. |
+| APT rejects a local filename as non-absolute during an offline test | The transaction used `--no-download` for explicit local `.deb` files even though the argument passed to APT was absolute | Resolve and fetch dependencies first, disconnect the fixture container's network, then let APT handle the local filenames with its ordinary install command. Keep the transaction and network state in the evidence. |
+
+Use the edition's archive-qualified link gate for the BleachBit, KCM, Dolphin and Plasma Workspace packages. Keep one folder per source. Each holds its `.dsc` and the files it names, binary `.changes`, `.buildinfo`, the `.sparky-build.json` and the binaries it covers. Keep gate outputs and earlier attempts with the evidence. Verify the stage sums after staging the four closures.
+
+| Symptom | Cause | Fix and how to find it |
+|---|---|---|
+| The link gate and the Debian checksums pass, but the stage lacks a build record | The recipe did not initialize build provenance and the release check did not write the edition's record | Start with a clean recipe checkout. Use `repo/build-provenance.sh` and pass its Docker environment at container creation. Require provenance, run `lean.release check-debs` on the complete binary set, and check the record's `recipeCommit`, `recipeDirty`, `unrecorded` and file hashes. Compare the result with the actual lane HEAD. |
+| The second install proof needs a live Debian fetch and fails on a reset | The fixture builds its dependency set anew from the rolling suite | Prepare a reusable image from the signed published round and one dated Debian snapshot. Preserve the signed release hashes and installed versions. Create the test container with `--network none`, check its routes, and run APT with the staged local archives and dependencies already inside the image. |
+| A translator sees `system.cache` and a path in place of a description | The preview result carries internal IDs while BleachBit's catalogue carries localized display text | Join the preview to the catalogue by cleaner and option IDs. Show names, description, warning and size first, with the path as detail. If a catalogue label is its internal ID and the catalogue provides a translated description, use that text as the visible label. Run the installed page with actual generated locales and open the captures. |
+| OCR on a localized context menu returns the coordinates of a different row | Tesseract’s TSV text contains raw quotation marks. A CSV reader can swallow the next rows as a quoted field | Parse the TSV with quoting disabled. Compare the parsed coordinates to the actual capture. For compact controls, use a crop from the proof rig’s fixed display and check the visible confirmation text before sending a click. |
+| The successor build stops at quilt or at a disk reservation before qualification starts | The release container lacked `quilt`, or the archive gate reserved one GiB per source above the floor | Install the source-preparation tool in the builder. Check the mount backing the gate scratch, plus the available bytes in the container. A root-backed bind mount may appear to have a different device from Docker's overlay. Keep the actual house floor and reclaim completed lane-owned scratch before a retry. |
+| A private systemd user's manager returns `Invalid argument` with an all-clocks fake-time library | Systemd uses both real-time and monotonic event sources | Inspect the user manager journal. Keep the core limit inherited from Docker and use a virtual real-time clock with corresponding absolute calendar timer deadlines. Compare the installed timer's before and after timestamps and wait for its service to finish before reading Problems. |
+
+Run the installed Plasma cases against those binaries. Observe both Dolphin paths, real polkit approval and refusal, the Problems action and recovery, the actual Off setting and the published Filelight control. A direct page launch is useful when diagnosing a volume that disappears, and the drive's own click still needs to be exercised.
+
+## Working recipe
+
+1. Compare published package files and maintainer scripts with the build recipe.
+   Find any maintenance timer, installed preset or policy that acts on the same files.
+   Keep boot pruning, journal retention, crash retention and KIO wastebin settings with their owners.
+2. Stage the edition’s BleachBit, Storage Cleanup, Dolphin and Plasma Workspace source closures from the [build repository](https://github.com/Sparky-OS/sparky-stereo-os-build). Point `DOCKER_HOST` at the lane’s socket and install the staged binaries in the signed, frozen rig with networking disabled. Use the installed engine for the controls.
+3. On the private tmpfs, compare the actual allocated sizes and filesystem recovery. Plant a sparse file, an open and mapped temporary file, a writer that opens after preview, a protected document and a nested mount. Keep the APT lock and verify that the installed engine names each refusal and preserves its controls.
+4. Fill the fixture until the actual notifier emits a Problems entry. Compare its recorded free and total bytes with an independent filesystem sample. Keep the figures in the record’s additional detail so an updated sample preserves the generation and dismissal during the same low-space event. Open the translated page, confirm one item and check that the notifier clears the record after recovery.
+5. Keep the per-run exit code, measured rows and before and after load. Repeat the same installed interaction cases under the same CPU budget and pressure. Read the actual captures in each tested locale.
+
+## Where to look and what removal costs
+
+| Kind | Owner and usual location | Loss and scope |
+|---|---|---|
+| Completed package downloads | APT, normally root in `/var/cache/apt/archives` | Reinstallation may require another download. The fixture holds the APT-style POSIX lock and selects individual archives, leaving `partial`, startup policy, package lists and installed packages alone. A real helper must read APT's configured archive directory and use system authorization. |
+| Thumbnails | The user's XDG thumbnail cache, usually `~/.cache/thumbnails/<size>` | Generated previews return as needed. The fixture uses the `normal` bucket. Source media and stereo choices stay. The [Thumbnail Managing Standard](https://specifications.freedesktop.org/thumbnail/latest/) defines other buckets. |
+| Browser cache | The browser's own generated cache, with a fixture example of Firefox's `cache2/entries` under the user cache | The browser rebuilds it and may download data again. Profile settings, history, saved sessions, passwords, recovery files and reports stay. Discover an installed profile and test a closed and running browser before enabling an adapter for it. |
+| Application cache | The app's own generated cache, with a Mesa shader cache example under the user's XDG cache | The application will rebuild it. The fixture checks one cache bucket. App settings, games and user state stay. |
+| Application temporary files | A known producer's own directory under `/tmp`, with the same user rights in the fixture | The temporary data is gone. Require a producer record for the exact file, elapsed age and a closed, unmapped file. There is no blanket scan, no automatic temporary cleanup and no change to the `/var/tmp` rule. |
+| Trash | The user's `$XDG_DATA_HOME/Trash` and per-volume Trash under KIO | Restore is lost for the selected item. The fixture measures one regular item and its paired `.trashinfo`. The desktop should use KIO for operations, restore consistency and the existing age and size settings. See the [Trash Specification](https://specifications.freedesktop.org/trash/latest/). |
+| Rotated logs and previous journals | The service or the root-owned rotation and journal stores in `/var/log`, with volatile journals under `/run/log/journal` | Logs are diagnostic evidence. Measure representative allocated bytes without offering removal. An archived journal may still contain current-boot messages. Preserve the current start and report evidence before evaluating any owner-managed action. |
+| Crash dumps | systemd-coredump's journal and usually `/var/lib/systemd/coredump` | Removing a dump can make diagnosis impossible. The fixture plants crash evidence to prove exclusion. The retention policy stays with the crash handler. |
+| Unused Flatpak runtimes | Flatpak or OSTree in `/var/lib/flatpak` or the user installation under `$XDG_DATA_HOME/flatpak` | Runtimes may need to be downloaded again. A runtime's displayed size does not represent its unique objects. Measure an explicit per-installation Flatpak or libflatpak operation on a repository with both shared and unique objects before labeling bytes reclaimable. |
+
+## Measurement rules from the early fixture
+
+- Walk from a directory descriptor and keep it open through the operation.
+  Open each component with `O_NOFOLLOW` and require the root mount ID and device.
+  Consider regular single-link files of the expected owner.
+  The prototype pins candidate descriptors and checks that the pathname still names the previewed inode.
+- Report `st_blocks × 512` allocated bytes and keep logical size separate.
+  On the idle fixture, compare with the independent `statvfs` free-block delta times fragment size.
+  Shared blocks, filesystem snapshots, compression and concurrent filesystem activity need filesystem-specific evidence before claiming a real reclaimed size.
+- JSON preview returns stable kind and item IDs, mount-scoped paths, allocated and logical bytes, a localized loss sentence and warnings.
+  For `clean ID … < preview.json`, recheck the rule, path, inode metadata and current open-file status, and return a result for each ID.
+  A nonzero exit signals a failure even when another selected item succeeded.
+- Check descriptors and memory maps by device and inode in the fixture's PID namespace.
+  If observation fails, refuse the operation.
+  Rechecking immediately before unlink reduces the race.
+  A real implementation also needs a producer lifetime protocol or equivalent writer exclusion before enabling temporary-file deletion.
+- The application's normal user can select its own cache and Trash data.
+  A privileged action should accept only a fixed scoped operation via the system's polkit agent.
+  Keep one engine for every KDE entry point.
+  Keep broad preset options, recoverable personal data and background promises out of the fixture and the first release.
+
+## Traps
+
+| Symptom | Cause | Fix | How found |
+|---|---|---|---|
+| The edition's `/tmp` no-age rule looks incompatible with an enabled BleachBit temporary checkbox. | The tmpfiles rule governs automatic aging and the preset governs a manually invoked tool. The preset also selects operations beyond storage cleanup. | Keep the policy and preset separate from the scoped preview. Require a producer record before offering a temporary file. | The numbered r1123a conffile and both INIs show the two triggers. |
+| A 1 MiB file is expected to return 1 MiB. | Sparse logical length includes unallocated holes. | Count allocated blocks and check an independent free-block delta. | The planted 1 MiB sparse object frees 4,096 bytes. |
+| A descriptor scan would classify a mapped file as closed. | A mapping can survive closing its original descriptor. | Search the fixture process maps by device and inode as well. | The fixture drops the descriptor, keeps the mapping, and verifies that the path stays out. |
+| An old temporary filename matches but does not belong to the producer. | A naming convention says nothing about who created the file. | Require a producer record matching the file identity and revalidate it at apply time. | The second old file has the same name shape, matches the age rule and is absent from the preview. |
+| A candidate-looking name hides a mounted filesystem. | A path string can name an entry on a different mount. | Compare mount ID as well as device after opening, and keep the traversal descriptor-relative. | The nested tmpfs case gives an explicit mount warning and the foreign file remains. |
+| `tar (child): xz: Cannot exec` in the archive audit. | The minimal image's dpkg-deb could extract packages without the separate command that tar requires. | Supply a pinned decompressor in the audit environment and record its digest. | Package extraction succeeded before the source extraction failed at tar. |
+| Checksum preparation reports `Read-only file system`. | Scratch output inherited the working directory of the read-only recipe mount. | Write intermediates inside the audit container's scratch directory and keep the recipes read-only. | The audit log named the first checksum scratch file that could not be written. |

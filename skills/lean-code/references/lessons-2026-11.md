@@ -131,3 +131,10 @@ Symptom: a Debian rebuild compiles, its packages are written, and `override_dh_b
 Cause: the gate asks `len(lines) << 30` bytes for the archive's package lists (`lean/archive.py`, one gibibyte per source of `sources.json`), and `space()` reserves every request against `/` as well, since a container's overlay root and a bind mount can share backing storage; in a container the root is the host's root disk, which also holds the build container's own layer (the build dependencies: 1.7 GB for plasma-welcome).
 Fix: name in `sources.json` only the archives the package's dependency closure needs (Debian forky main and the edition's tree for a KDE program; deb-multimedia only for what builds on its FFmpeg, SparkyLinux's only for what depends on its tools), and start the build with at least the build dependencies plus one gibibyte per source plus the root floor free on the root disk.
 Found by: the gate's last line in the build log, then `ensure_space(len(lines) << 30)` and `space()` in `lean/archive.py`.
+
+## A source that builds on the edition's FFmpeg needs deb-multimedia in the gate's archive (ORDER 63, 2026-11-25)
+
+Symptom: stereo-layer 1.23.4 compiles and passes its tests, then `override_dh_builddeb` stops: "Unable to satisfy dependencies ... libavcodec63:amd64=10:9.0.2-dmo1+stereo3d15+lc1 Depends libaom3 (>= 1:3.15.3) but none of the choices are installable".
+Cause: the edition's FFmpeg is built on deb-multimedia's (`-dmo1`), whose libraries depend on deb-multimedia's codec libraries (`libaom3` with the epoch 1); a `sources.json` naming only Debian and the edition's tree cannot install `libstereo-av1` in the gate's root.
+Fix: add `{"uri": "https://www.deb-multimedia.org", "suite": "forky", "components": ["main", "non-free"], "keyring": "/archive/deb-multimedia-keyring.pgp"}`; with the weather cohort's job, the edition's tree is `file:/round` and the job runs with `NETWORK` set when the archives are online (the default is no network).
+Found by: the gate's last lines in the build log, read against the image's own apt sources, which carry deb-multimedia.

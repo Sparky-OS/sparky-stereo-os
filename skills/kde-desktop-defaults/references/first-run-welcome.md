@@ -39,9 +39,49 @@ The pages use stereo-layer's own element depth (`org.sparky.stereo`, 1.22.0) ins
 - a drawing that already shows depth by its stacking is drawn once per eye with `StereoDepth.depth`, a fraction of the person's limits (`parallax = round(depth × limit × view width / 1920)`); `StereoDepth` knows only the desktop's sunk and popped limits, not the element limit Stereo Union uses for a window's own controls;
 - words and buttons are the window's own, the same in both eyes; the window itself is at the screen while it is the active window, and flat and one layer back when it is not.
 
-**A `StereoPicture` in a Kirigami page is one view in both eyes** (stereo-layer 1.22.0): `PictureItem::updatePolish()` hands over a pair only when no ancestor clips, scales, rotates or fades the item, and both the Welcome page and Kirigami's `ColumnView` set `clip`.
-The edition's first page keeps its picture in the window's own content item (`parent: root.Window.contentItem`), over an empty `Item` that holds its place on the page, follows that place every 50 ms, and shows only while the page is the current one and stands still; the Welcome window already has an alpha buffer, so nothing else is needed.
-The engine's fix is for stereo-layer: a clip whose rectangle holds the whole item cuts nothing and should not refuse the pair.
+**A `StereoPicture` in a Kirigami page is a pair since stereo-layer 1.23.4.**
+Up to 1.23.3, `PictureItem::updatePolish()` handed over a pair only when no ancestor clipped, scaled, rotated or faded the item, and both the Welcome page and Kirigami's `ColumnView` set `clip`, so every picture in a Kirigami page was one view in both eyes.
+1.23.4 compares each clip with what it holds: the clipping item's `clipRect()` mapped to the scene (what `QQuickWindow` gives its clip node, `qquickwindow.cpp`), against the picture's rectangle, to half a device pixel.
+A clip that holds the whole picture takes nothing from it; one that cuts it, a rotation, a scale, an opacity or a window with no alpha channel still draws the left view in the scene graph, and the log (`org.sparky.stereo.layer`) now names the item and the reason once for each, where nothing was said before. `PictureItem::flatReason(item)` gives the reason.
+A page slide is such a moment: while Kirigami slides a page in or out, the page fades and its clip cuts the picture, so the picture is flat for that moment and two lines are logged once ("is not opaque", "clips it").
+The edition's first page holds its picture as an ordinary item of the page again (milestone 1 put it in the window's content item to get round the refusal).
+
+## One window at the first login, Sparky Welcome kept
+
+- **Sparky Welcome's first run is skipped by a unit condition, owned by sparky-stereo-welcome:** `/usr/lib/systemd/user/app-sparky\x2dwelcome\x2dfirst@autostart.service.d/sparky-stereo-welcome.conf` sets `ConditionPathExists=!/usr/share/plasma/plasma-welcome/first-pages/00-SparkyStereoOS.qml`, next to sparky-stereo-service-defaults' own drop-in (`SuccessExitStatus=1`). systemd's XDG autostart generator makes the unit; the journal says `skipped, unmet condition check`. Removing sparky-stereo-welcome removes the file and Sparky Welcome's first run comes back. Sparky Welcome stays installed and in the menu.
+- **Every element moves to the Welcome Center's SparkyLinux page** (`extra-pages/02-SparkyWorld.qml`) with the same address or command as Sparky Welcome's page and handler. Upgrade goes through `sparky-stereo-welcome-upgrade`, which does what the handler does: `remsu /usr/bin/sparky-aptus-upgrade`, at the first use then `spsudo /usr/lib/sparky-aptus-appcenter/bin/sparky-locale`, then the handler's own mark `/home/$USER/.sparky-welcome-first`. `spsudo` is in SparkyLinux's `sparky-su`, which neither sparky-welcome nor the app center depends on: the welcome package does.
+- **A program that is missing or fails is said on the page:** `Welcome.Utils.runCommand(cmd, (status, message) => ...)` gives -1 and "The command … could not be found." for a missing program, the exit status and its error text otherwise; the page shows it in a `Kirigami.InlineMessage`. `remsu` itself is `pkexec "$@"; exit 0`, so a refused password never reaches the page.
+- **The live session, what it started before:** the image's autostart entries (14 on the published set: Plasma's own, the hardware layer's live GPU check, SparkyLinux's APTus update check and Sparky Welcome's first run), and the packer's live-config hooks (autologin, the installer's desktop icon and guide, the live user's power and lock settings, the Welcome Center's kded module off for root only). In the ISO's state `/etc/xdg/plasma-welcomerc` kept the Welcome Center closed for the live user too, so a live session met Sparky Welcome only.
+- **The live session:** a live-config hook of sparky-stereo-welcome, `/usr/lib/live/config/1187-sparky-stereo-welcome`, writes the live user's own `~/.config/plasma-welcomerc` (`LiveEnvironment=true`, `LiveInstaller=calamares`), as the packer's `1186-sparky-stereo-live` writes that user's power and lock settings; the kded module then starts the Welcome Center in its live mode at every login of the live user, KDE's installer page first, then the edition's pages.
+
+**What opens after the upgrade, measured** (ORDER 63 and 720, milestone 2; each account's home kept from a login on the published set to a login after the upgrade):
+
+| Account | Before | After the upgrade |
+| --- | --- | --- |
+| New, on the successors | | the Welcome Center at the first login, nothing at the second |
+| Made on an installed ISO (its first run was Sparky Welcome; `/etc/xdg/plasma-welcomerc` kept the Welcome Center closed) | Sparky Welcome | the Welcome Center, once: the upgrade removes the system file and the account has no `LastSeenVersion` of its own |
+| Made after an apt install (both windows opened) | KDE's and Sparky Welcome's | nothing |
+
+Sparky Welcome's marks (`~/.config/autostart/sparky-welcome.desktop`, `~/.sparky-welcome-first`) stay in every case.
+KConfig writes no value that equals the system file's, so an account that never saw the Welcome Center while the system file existed has no `LastSeenVersion` of its own: read the person's file, not the cascade, before saying who will see it.
+
+## The touch page and its condition
+
+Measured with a fake touch screen beside the fake pointer (KWin's fake input protocol, `t:X,Y` of the rig's `fakeinput`):
+
+| Where | KDE's default (double click) | Single click |
+| --- | --- | --- |
+| Desktop icon, mouse click | selects | opens |
+| Desktop icon, tap | opens | opens |
+| Dolphin item, mouse click | selects | opens |
+| Dolphin item, tap | opens | opens |
+
+The sources agree: Dolphin's `KItemListController::onRelease()` activates on a touch release in double-click mode (`emitItemActivated = touch && !m_selectionMode`), and the desktop's `FolderView.qml` activates on a press Qt synthesized from touch (`mouse.source === Qt.MouseEventSynthesizedByQt`). The edition sets no `SingleClick`, so KDE's default (double click) holds.
+The task manager's source activates a window on a tap and opens its menu on a long touch (`Task.qml`: a `TapHandler` for the left button, one for touch screens and pens with `onLongPressed`), but in the rig one tap on an inactive window's button did nothing, two taps activated it, and a long touch (1.2 s) opened no menu, while a tap on the panel's launcher opened it. So the page does not name the task bar; a real touch screen settles it.
+
+**A page cannot run a command to decide whether it shows** (Main.qml reads `show` once, when it makes the page). The edition's plasma-welcome +stereo3d2 adds `Welcome.Distro.flag(key)`: the `[Distribution]` group of `plasma-welcomerc`, read as KConfig reads it (the person's file, then each folder of `XDG_CONFIG_DIRS`), false when no file sets it.
+`/etc/xdg/plasma-workspace/env/sparky-stereo-welcome-touch.sh` (sourced by startplasma after the hardware layer's `sparky-stereo-tablet-mode.sh`; the names sort so) puts `/usr/share/sparky-stereo-welcome/touch-screen/xdg` (a `plasma-welcomerc` with `TouchScreen=true`) in front of `XDG_CONFIG_DIRS` where the hardware layer's own folder already is, that is where `has-tablet-mode` found a touch screen of the computer's own.
+The page ships with `show: true` (every computer); `show: Welcome.Distro.flag("TouchScreen")` is the other way, one line.
 
 ## The session proof
 
@@ -52,6 +92,16 @@ The scripts are in [`stereo-proof-rig/scripts/welcome-login`](../../stereo-proof
 3. `welcome-login.sh` (inside): the person's saved 3D screen (or 2D), then two logins in one home with the real `startplasma-wayland`; KWin's own log names each window it adds; the pointer rests on a point of the Welcome window that no other window covers (from KWin's stacking order), the first page is captured, the mouse's forward button (evdev 276) turns the page, a click on the page's button opens the setting; `MOCK_PAGES=A,B` shows other pages with `plasma-welcome --pages` for pictures of pages that do not ship.
 4. `measure-welcome.py page1|page2|flat2d`: the first page's eyes against the picture's own views (PSNR), nothing else differing; the drawing's window behind measured on its inner bars against the same page on a 2D output; a 2D output showing the left view.
 5. `prove.sh OUT`: every case and every row, one row per claim, exit 1 on a row not as expected.
+
+Milestone 2 (`prove-m2.sh OUT [m1 … m8]`) adds, in the same folder:
+- `mklayer.sh BASE TAG LOGS PKG…`: one thin image layer installed by apt with the edition's tree mounted, apt's plan (`Inst`, `Remv`) kept; `mkbuilder.sh` freezes a source's build dependencies in the builder.
+- `eyes-align.py CAPTURE REGION`: pair or one view, by the horizontal shift that best aligns the two eyes (a pair with depth of its own cannot be aligned by one shift; the desktop's own layers can); proved on known-flat and known-pair captures. With `MEASURE_SCALE` and `MEASURE_ORIGIN_X` it maps KWin's logical frame to one output's device pixels (125 %, a second output); `measure-welcome.py` takes the same, and `MEASURE_MIN_DB` for a resampled picture.
+- `APP_CMD` (a program run in the first login, then both eyes), `QUIET_FIRST_RUN`, `USER_SETUP`, `SEED_HOME` (an earlier account's home), `STANDIN_PKEXEC` (a pkexec that writes what it was asked), `SCALE`, `OUTPUTS=2` and `LOGIN_LANG` in `welcome-login.sh`; the open catalogues of the Welcome Center read from `/proc/PID/maps`.
+- `page-clicks.sh`: real clicks on every button and link of a page opened with `--pages`, the address a stand-in browser receives (`m2-setup.sh`), the commands, the windows and the clipboard after each.
+- `touch-measure.sh`: a click and a tap (`fakeinput t:X,Y`; `h:X,Y` is a long touch) on a desktop icon, a Dolphin item and a task button, each read from KWin's own window list; the task buttons from KWin's `iconGeometry` (`kwin-windows-icons.py`).
+- `cond-check.sh`: the Welcome Center started with the session's own `XDG_CONFIG_DIRS` (read from plasmashell), the first page it shows told by its first line of text (`which-page.py`, references in `refs/`).
+- `unit-case.sh`: a unit under a real user manager (systemd as PID 1); `live-seed.sh`: the live user's home as the live-config hook leaves it.
+- `compare-debs.sh OLD NEW`: a successor's paths against its predecessor's; `stage.sh`: a stage as source closures with their sums.
 
 ## What was measured (ORDER 63 and 720, milestone 1, 2026-11-25)
 
@@ -69,7 +119,40 @@ Fresh logins of a new account on a 1920x1080 virtual output, Stereo KWin +stereo
 | KDE's own Welcome page, 2D output | 0 differing pixels between Debian's 6.7.4-1+b1 and the edition's +stereo3d1 |
 | Upgrade from the ISO's state | the marked `/etc/xdg/plasma-welcomerc` removed; a file without the mark kept |
 
+## What was measured (milestone 2, 2026-11-25)
+
+On the successors staged together (stereo-layer 1.23.4, plasma-welcome +stereo3d2, sparky-stereo-welcome 20261125.1, sparky-stereo-info 20261125), one rerun (`prove-m2.sh`), every row as predicted:
+
+| Case | Result |
+| --- | --- |
+| A picture under clips that hold it (a Welcome page in the ColumnView), 1.23.3 / 1.23.4 | one view, `stereoActive` false / a pair, `stereoActive` true |
+| A picture under a clip that cuts it | one view on both; 1.23.4 logs the clip once |
+| Koko's viewer, the stereo wallpaper, the installer's slideshow, published layer / 1.23.4 | a pair on both: none of them sits under a clip, so the fix changes nothing they show |
+| SparkyLinux page | the 16 addresses as Sparky Welcome's page has them; AppCenter and Upgrade ask pkexec for their programs; Upgrade's first use then spsudo's password window; About and System info their own windows; a missing program and a failed one said on the page |
+| Help Test page | the clipboard holds `stereo-display-info`'s text; the tracker's address |
+| Touch page | its two buttons open General Behavior and Virtual Keyboard; the touch table above; shown with the mark, not without it, and on every computer as shipped |
+| Sparky Welcome's first-run unit under a user manager | run on the published set, skipped on the successors |
+| Accounts before and after the upgrade | the table above |
+| Live session | the live user's `plasma-welcomerc` from the hook; the Welcome Center in its live mode, KDE's installer page first, then the edition's first page, its picture a pair |
+| Ten languages | each login's first page translated, the language's own `sparky-stereo-welcome.mo` open in the Welcome Center |
+| 125 % and two outputs | the first page's picture a pair (at 125 % each eye about 24 dB from its own view, 16 from the other: the compositor resamples it); the drawing's window behind −1/+1 device pixels, the rest at the screen |
+
 ## Traps
+
+### Milestone 2
+
+- **Symptom:** a rig session starts Sparky Welcome although its unit carries a drop-in that skips it. **Cause:** the rig's session has no systemd user manager (its bus is `dbus-run-session`'s), so startplasma starts the XDG autostart entries itself and no unit, no drop-in, applies. **Fix:** prove the unit under a real user manager (systemd as PID 1 in a throwaway container, `user@1000.service`, `libpam-systemd` and `dbus-user-session`: the welcome recipe's `tests/first-run-unit.sh`, run by the rig's `unit-case.sh`), and read the rig's session rows for what the kded module and the pages do. **Found by:** the published set and the candidate both showing Sparky Welcome in the rig, then the user manager's journal saying `skipped, unmet condition check ConditionPathExists=!…` for the candidate.
+- **Symptom:** Sparky Welcome opens at every login of a rig account that already has its mark. **Cause:** Sparky Welcome looks for its mark under `/home/$(whoami)`, and the rig's session ran with `HOME` in the case folder. **Fix:** mount the case's home folder at the image's `/home/person` (`run-case.sh`), so `HOME` and `/home/$USER` are the same folder, as on an installed system.
+- **Symptom:** a rig case gives different results from the same images, or bash prints syntax errors in the middle of a case. **Cause:** a script was edited while a run was executing it; bash reads a script by byte offset as it goes, also through a container's bind mount. **Fix:** never edit a rig script while a run uses it; if it happened, pad the edited line back to its old byte length and rerun the cases that ran meanwhile.
+- **Symptom:** a page's Kirigami button or link misses its click after an earlier click on the same page. **Cause:** an `InlineMessage` that appears ("Copied: …") pushes the centred column down. **Fix:** click what lies below a message before what makes it appear, or read the place again.
+- **Symptom:** Koko opens no file given on its command line (`Cannot call method 'openMediaViewPage' of null`). **Cause:** its gallery imports `org.kde.purpose`, which neither Debian's koko 26.04.0-1+b1 nor the edition's +stereo3d3 depends on (`${qml6:Depends}` does not bring it). **Fix in the rig:** install `qml6-module-org-kde-purpose`; not filed.
+- **Symptom:** Calamares stops at once with "Cowardly refusing to continue startup without a QML directory", then "The branding component name should match the name of the component directory". **Cause:** a configuration folder given with `-c` must hold `qml/` and `branding/`; the edition's branding folder is `sparky-stereo` with `componentName: sparky`, reached through the package's link `/etc/calamares/branding/sparky`. **Fix:** link `qml` to `/usr/share/calamares/qml` and `branding` to `/etc/calamares/branding`, and name `branding: sparky`; Calamares then runs as the session's user in debug mode and shows its slideshow during the install step.
+- **Symptom:** a rig image stops with `update-alternatives: error: cannot create symbolic link '/usr/share/images/desktop-base/desktop-background.dpkg-tmp'` configuring `sparky-artwork`. **Cause:** SparkyLinux's `sparky-artwork` makes an alternative in a folder only `desktop-base` creates, and does not depend on it. **Fix in the rig:** install `desktop-base` with it, as the image has; not filed.
+- **Symptom:** a test's D-Bus session fails with "Memory allocation failure in message bus". **Cause:** the container has no passwd entry for the user (dbus-daemon logs "Could not get password database information"). **Fix:** run as a user the container knows (`useradd`, `runuser`), as the recipes' build jobs do.
+- **Symptom:** an offscreen test window shows the picture's reason as the wrong screen's. **Cause:** the offscreen platform puts a window on the screen its place lies on, `(0, 0)` by default, whatever `setScreen()` said. **Fix:** set the window's geometry inside the screen meant.
+- **Symptom:** the task bar answers a fake touch differently from run to run (one tap activates a window in one run and not in another; a long touch opens the window's menu once, not another time) while the desktop and Dolphin answer the same every time. **Cause:** not found. **What to do:** keep such rows as notes, never as claims, and settle them on a real touch screen.
+
+### Milestone 1
 
 - **Symptom:** a fresh install opens both first-run windows, KDE's and SparkyLinux's, although the published sparky-stereo-info was meant to keep KDE's closed. **Cause:** its postinst wrote `/etc/xdg/plasma-welcomerc` only when `plasma-welcome` was already "install ok installed", and apt configured sparky-stereo-info first; its file trigger on the kded module never ran (no `trigproc` line in `/var/log/dpkg.log`). The ISO's pack step reinstalls sparky-stereo-info at the end, so an installed ISO showed only SparkyLinux's window. **Fix:** the mechanism is retired (sparky-stereo-info 20261125). **Found by:** the red login on a rig image made by apt, then `/var/log/dpkg.log`'s configure times of the two packages.
 - **Symptom:** the first page's picture is the same in both eyes, the rest of the screen a pair. **Cause:** two clipping ancestors (above). **Found by:** a page of the rig printing `stereoActive`, `stereoFailure` and each ancestor's `clip`, then the same picture in the window's content item: `stereoActive=true`.

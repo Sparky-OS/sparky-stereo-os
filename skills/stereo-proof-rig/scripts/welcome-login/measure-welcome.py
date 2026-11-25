@@ -12,17 +12,28 @@
 # KIND flat2d: CAPTURE is a 2D output's capture of the first page (1920x1080), then SOURCE and the page1 rows of the
 #   3D output. Prediction: one picture, and the source's left view where the 3D output showed the pair.
 import json
+import os
 import sys
 
 import numpy as np
 from PIL import Image
 
 
+# the least PSNR of an eye against its own view: 30 dB where the output shows the views at their own pixels; at a
+# fractional scale the compositor resamples them and MEASURE_MIN_DB lowers it (each eye stays 5 dB nearer its own view)
+MIN_DB = float(os.environ.get("MEASURE_MIN_DB", "30"))
+
+
 def welcome_frame(windows):
+    # KWin gives the frame in the desktop's logical pixels; a capture is one output in device pixels: MEASURE_SCALE (the
+    # output's scale) and MEASURE_ORIGIN_X, MEASURE_ORIGIN_Y (the output's place on the desktop) map one to the other
+    s = float(os.environ.get("MEASURE_SCALE", "1"))
+    ox, oy = float(os.environ.get("MEASURE_ORIGIN_X", "0")), float(os.environ.get("MEASURE_ORIGIN_Y", "0"))
     data = json.load(open(windows))
     for w in (data["windows"] if isinstance(data, dict) else data):
         if w["cls"] in ("org.kde.plasma-welcome", "plasma-welcome"):
-            return [int(v) for v in w["fg"]]
+            x, y, ww, hh = w["fg"]
+            return [int(round((x - ox) * s)), int(round((y - oy) * s)), int(round(ww * s)), int(round(hh * s))]
     raise SystemExit("no Welcome window in " + windows)
 
 
@@ -86,7 +97,10 @@ def page1(capture, windows, source):
     ok = (out["differing_outside_picture"] == 0
           and out["left_eye_vs_left_view_db"] > out["left_eye_vs_right_view_db"]
           and out["right_eye_vs_right_view_db"] > out["right_eye_vs_left_view_db"]
-          and out["left_eye_vs_left_view_db"] >= 30 and out["right_eye_vs_right_view_db"] >= 30)
+          and out["left_eye_vs_left_view_db"] >= MIN_DB and out["right_eye_vs_right_view_db"] >= MIN_DB
+          and out["left_eye_vs_left_view_db"] - out["left_eye_vs_right_view_db"] >= 5
+          and out["right_eye_vs_right_view_db"] - out["right_eye_vs_left_view_db"] >= 5)
+    out["min_db"] = MIN_DB
     out["verdict"] = "PASS" if ok else "FAIL"
     return out
 
@@ -101,9 +115,10 @@ def first_x(eye, rows_range, colour, tol=6):
     return xs
 
 
-def colour_span(img, row, colour, tol=3):
+def colour_span(img, row, colour, tol=3, least=10):
+    # the bars are long spans: a lone pixel of the colour on an edge resampled at a fractional scale is not one
     m = np.nonzero(np.abs(img[row] - np.array(colour)).max(axis=1) <= tol)[0]
-    return (int(m.min()), int(m.max())) if len(m) else None
+    return (int(m.min()), int(m.max())) if len(m) >= least else None
 
 
 def page2(capture, windows, sunk, plain=None):

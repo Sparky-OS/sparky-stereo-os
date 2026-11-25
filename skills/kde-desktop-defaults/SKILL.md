@@ -46,7 +46,8 @@ A notebook's built-in panel gets its first scale from its real size (125 % at le
 ## The first run: KDE's Welcome Center
 
 A new account's first login opens KDE's Welcome Center (Plasma Welcome) with the edition's pages first; its kded module opens it once, when `plasma-welcomerc` has no `LastSeenVersion`, and a value in `/etc/xdg/plasma-welcomerc` keeps it closed for everyone.
-[Where Plasma Welcome 6.7.4 takes a distribution's pages, the edition's `first-pages/` patch, a page with depth on a 3D screen, the two-login session proof and the traps](references/first-run-welcome.md).
+Sparky Welcome's own first run is skipped by a unit condition there, and every one of its elements is on the Welcome Center's SparkyLinux page.
+[Where Plasma Welcome 6.7.4 takes a distribution's pages, the edition's `first-pages/` patch and `Distro.flag()`, a page with depth on a 3D screen (a `StereoPicture` in a Kirigami page needs stereo-layer 1.23.4), one window at the first login with the upgrade cases measured, the live session, what a tap does where the mouse keeps its click setting, the session proofs and the traps](references/first-run-welcome.md).
 
 ## Account defaults and displayed release name
 

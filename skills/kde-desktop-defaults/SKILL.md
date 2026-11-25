@@ -76,7 +76,7 @@ A device's command-line tool (a headset's HeadsetControl) joined to System Setti
 
 System Settings' Colour Vision page (`sparky-stereo-colour-vision`, beside Accessibility) sets, for one choice of none, protan, deutan, tritan or monochromacy, KWin's correction through the keys KDE's Accessibility page uses, the colour-vision variant of the person's colour scheme, and on request Konsole, nano and the text console; the person's files are kept and their colours come back exactly at none.
 The look fixes two contrast failures for everyone (Oxygen Dark's negative, positive and link texts; Konsole's intense red, the root prompt).
-[Where each colour comes from, the measuring method and its control, the maps per kind, how each surface is set and kept, and the traps (KWin's tritanopia correction, gamma 2.2, nano's include, a Lean Code digest)](references/colour-vision.md).
+[Where each colour comes from, the measuring method and its control, the maps per kind, how each surface is set and kept, and the traps (KWin's tritanopia correction, gamma 2.2, nano's include, a Lean Code digest, a same-name scheme shadowing the built-in one, a hint that ranks an output, a text fix that pushes pairs together, texts in unfocused windows and a Plasma style's own colours)](references/colour-vision.md).
 
 ## A program that needs hardware: offered, not installed
 

@@ -158,6 +158,10 @@ Rows, each red first: the published set has no such output (`kscreen-doctor -o` 
   **Cause:** the recipe's `docker run` names its container `${BUILD_NAME_PREFIX}-kwin` without `--rm`, so the first build's exited container keeps the name.
   **Fix:** append its ID to the lane's `.container-ids`, `docker rm` it by that name, build again.
   **How found:** the host log's last lines.
+- **Symptom:** a proof row comparing versions fails although the right package is installed: expected `6.7.4-2+stereo3d66+lc1`, measured `4:6.7.4-2+stereo3d66+lc1`.
+  **Cause:** KWin's Debian version has the epoch 4; package file names leave it out, `dpkg-query -W` and apt's `Inst` lines print it.
+  **Fix:** compare with the epoch.
+  **How found:** the rerun's first pass, row by row against its own logs.
 - **Symptom:** `ninja: error: unknown target 'testScreencasting'`.
   **Cause:** the test is configured only when CMake finds KPipeWire (`if (TARGET K::KPipeWire)`), and `libkpipewire-dev` is not a KWin build dependency.
   **Fix:** install the edition's `libkpipewire-dev` in the test image and run `cmake .` again.

@@ -4,7 +4,7 @@
 
 **Check freshness first.**
 Written on 2026-11-24 from the reconcile of row 81, milestone 1, against the published round of that day (KWin 6.7.4-2+stereo3d64, plasma-wayland-protocols 1.21.0-1+stereo3d12, KRdp and KPipeWire 6.7.4-1+stereo3d8, KRDC 26.04.0-1+stereo3d1), and from the cast study of 2026-10-14.
-Extended on 2026-11-25 with KWin 4:6.7.4-2+stereo3d66 (staged, not published), which makes a network screen a screen like the others, and the same day with the daemon, its command and its page, `sparky-stereo-throw` 0.1.0+lc1 (staged, not published; recipe `sparky-os/packages/sparky-stereo-throw` of the build repository), proved in a loopback session with software Cast devices, and with a study of what a Cast device lets the computer set.
+Extended on 2026-11-25 with KWin 4:6.7.4-2+stereo3d66 (staged, not published), which makes a network screen a screen like the others, and the same day with the daemon, its command and its page, `sparky-stereo-throw` 0.1.0+lc1 (staged, not published; recipe `sparky-os/packages/sparky-stereo-throw` of the build repository), proved in a loopback session with software Cast devices, and with a study of what a Cast device lets the computer set; and with 0.2.0 (part C: the sound, every codec Google lists per model, the mode picker, a tighter stream server, Google's own documentation for the account route, and the kit for a real device).
 Every line below says whether it was read in the source, proved by a test or a session, proved by the study, or is planned and not run.
 
 ## The shape
@@ -28,7 +28,8 @@ Every line below says whether it was read in the source, proved by a test or a s
 | KRDC Catch (`krdc-catch`) | ships, eight catalogues, no Spanish; translates the name (pt_BR "Receber") | KRDC patches `catch-backport.patch`, `krdc-catch.po.patch`; successors in the build repository's `sparky-os/translations` |
 | KWin's headset "Throw view" strings by the names rule | ships in ten languages | KWin patches `kwin-throw-catch-names.patch`, `kwin-order46b.patch` |
 | The Cast daemon, its command, the device table and the Throw page in System Settings | `sparky-stereo-throw` 0.1.0+lc1 (staged) | [the daemon](#the-daemon-sparky-stereo-throw-010) |
-| A "Throw: <device>" sink (the sound), Throw and Catch icons, Cast Streaming (path B) | not built | |
+| The sound output "Throw: <device>", the codecs beyond H.264, the codec and mode chosen per device | `sparky-stereo-throw` 0.2.0+lc1 (staged) | [the sound and the codecs](#the-sound-and-the-codecs-020) |
+| Throw and Catch icons, the Throw shortcut, Cast Streaming (path B), AV1 (no KPipeWire encoder) | not built | |
 
 ## The virtual output, as KWin creates it (read in the source)
 
@@ -110,6 +111,23 @@ The command: `sparky-stereo-throw list | throw ID [--wait SECONDS] | stop ID | i
 The page: `kcm_sparkystereo_throw` in the Display group of System Settings, the devices with Throw, Stop Throwing and their page; `systemsettings kcm_sparkystereo_throw --args device=ID` opens a device's page directly.
 KWin gives the screencast protocol to the daemon through `org.sparky.throw.desktop` (`X-KDE-Wayland-Interfaces=zkde_screencast_unstable_v1`, its `Exec` the daemon's installed path, `NoDisplay`).
 
+## The sound and the codecs (0.2.0)
+
+**The sound** (Daniel, 2026-10-14: "must carry audio", "as a optional sink", the output named "Throw: <device>"): while a Throw runs, the daemon owns a PipeWire node `throw.<id>`, `media.class = Audio/Sink`, `node.description = "Throw: <device>"`, `node.virtual = false` (KDE's Sound page lists it), `node.always-process = true` and `node.want-driver = true` (it is processed when nothing plays into it, so the stream's sound never stops while the picture runs: silence is sound too), F32 stereo at 48 kHz (`src/audiosink.cpp`, a `pw_thread_loop`, the samples handed to the Qt thread).
+The person chooses it as any output; it never takes the default by itself: sparky-stereo-hardware's hook (`share/wireplumber/sparky-stereo-new-output.lua`) moves the default only to a `bluez_output.*` or `device.bus = usb` sink that appears after WirePlumber's first 10 seconds, which a Throw sink is not.
+The sound is encoded by libavcodec in the stream's container: FLAC, 24 bit (samples as 32-bit integers, the encoder keeps the top 24), in Matroska and MP4; Opus at 256 kbit/s in WebM, which carries Opus or Vorbis only (the page says it is compressed and why); a speaker or a group gets a Throw of the sound alone, FLAC in Ogg (`audio/ogg`).
+A reader that connects gets the current group of pictures moved to now and the sound of the last 3 seconds from that time on, so picture and sound start together.
+
+**The codecs:** `data/devices.json` lists per model every video codec of Google's "Supported Media for Google Cast" page (read 2026-11-25; the page gives no date), with profile, level and the modes it allows, in the order the daemon prefers them (AV1, HEVC, H.264, VP9, VP8 where listed; VP9 and VP8 after H.264 while our KPipeWire's libvpx encoders hold 25 frames, the trap below).
+The table's pick is the first codec this computer encodes, as KPipeWire's own `PipeWireBaseEncodedStream::suggestedEncoders()` says (H264Main from h264_vaapi, h264_nvenc, libx264 or libopenh264; HEVCMain from hevc_vaapi, hevc_nvenc or libx265; VP8 from libvpx; VP9 from libvpx-vp9 is listed by KPipeWire but gives no live picture in 6.7.4, so the daemon does not count it; KPipeWire 6.7.4 has no AV1 encoder, nor has its master branch on 2026-11-25).
+What our FFmpeg itself encodes, run in the rig (lane script `scripts/c/encoders.sh`, one second of a 1920x1080 test picture each): libx264, h264_nvenc, libx265, hevc_nvenc, libvpx, libvpx-vp9, libsvtav1 and libaom-av1 encode; av1_nvenc writes no packet on the station's NVIDIA card; the VA-API encoders were not measured there, since no VA-API render node reaches the rig. So AV1 for a Google TV Streamer waits on an AV1 encoder in KPipeWire, not on FFmpeg.
+The container follows the codec: Matroska for H.264 (row 81's review; Google's page names MP4 and WebM, not Matroska), fragmented MP4 for HEVC (`frag_keyframe+empty_moov+default_base_moof`, a fragment at least every half second), WebM for VP8 and VP9.
+The person's codec and mode for a device are kept by its identity in `sparky-stereo-throwrc [Device][<id>] Codec= Mode=` (D-Bus `SetChoice`, the command's `choose`, the device's page); a choice the device does not take is refused, and a Throw whose choice this computer cannot encode is refused with the reason, never made in another codec. A device that gets less than it can show is told why on its page (`Codecs::plan`, the sentence "It shows up to … in …; this computer has no encoder for it, so it gets … in …").
+
+**The stream's server:** it listens on this computer's address that faces the device (a UDP socket "connected" to the device names it and sends nothing), answers the device's address only (another address is closed at once), and closes a connection that sends no request line within 5 seconds. The picture and sound travel unencrypted, as the device's own player fetches them.
+
+**The kit for a real device** (lane script `scripts/c/kit/kit.sh "NAME" SECONDS RESULT_DIR`): one container on the host's network with a headless Stereo KWin +66, the staged package and its own Avahi publishing nothing; it throws KWin's capture fixture pair (moved each second, the moving mark) and a 997 Hz tone to one device given by its name, records `sparky-stereo-throw status` each second (player state, idle reason, bytes fetched), stops, checks the screen is gone, and writes `result.json` and `records.jsonl`. With `--loopback-proof` the same container gets no network, a dummy interface and one software device of that name. It installs nothing on the station and changes no setting of the device; it is run by the main session, never by a lane.
+
 ## What a Cast device lets the computer set (read at the source, 2026-11-25)
 
 Daniel's aim (2026-11-25): configure a Cast device from the PC as the Google Home app does, with the Google account from KDE's Online Accounts where a setting needs one.
@@ -133,6 +151,14 @@ Daniel's aim (2026-11-25): configure a Cast device from the PC as the Google Hom
 So the route signs in as another company's app; a desktop account (KDE's or any other) has no such client of its own. A lead from the Astra consult, the scope `cast.backdrop`, is not what glocaltokens uses.
 **KDE's Online Accounts** (kaccounts-providers at 1dbb050941, `google.provider.in` and its services): the Google provider asks for email, profile, calendar, tasks, contacts and YouTube upload, and its services are disabled; no scope reaches the Home graph, so no route gives the token today. That is work for queue row 683 (online accounts signed in once); the page says "Sign in under Online Accounts" and why the settings cannot be changed here yet. Nothing of ours asks for or keeps a Google password.
 **Generations:** the receiver and setup interfaces are the same on every Chromecast generation as the sources tell them; a speaker has no screen (`display_supported` false), so it has no Throw, only its volume and groups; the assistant and equalizer endpoints are a speaker's. How a Google TV (an Android TV with Cast built in) answers `/setup` was not found in the sources.
+
+**Google's own interfaces (read 2026-11-25, input for queue row 683):**
+- The Home APIs (developers.home.google.com/apis): SDKs for Android and iOS apps only; OAuth set up for each app, a grant per structure and per device type (`requestPermissions()`); the device types are Matter's (a speaker: OnOff, LevelControl; `GoogleTVDevice`: media, channel, level, application launcher), and the `Google*` types "are not Google-branded devices (such as Google TV)"; no device name, Wi-Fi, time zone, language, reset, ambient screen, guest mode or groups. Google's speakers and displays are hubs of these APIs, not devices they configure.
+- Device Access (the SDM API, scope `https://www.googleapis.com/auth/sdm.service`): thermostats, cameras, doorbells and the Nest Hub Max's camera; nothing of Cast.
+- The Cast sender SDK (`cast.framework.CastSession`): volume, mute, media, an app's own message namespace, ending the session; no setting and no setup.
+- Google's help: "Set up your Chromecast with a mobile device, as computers do not support the setup process" (Streaming Help answer 2998456); Wi-Fi is changed in the Google Home app on a Chromecast of the 3rd generation or older, an Ultra or an Audio, and on the TV itself on a Chromecast with Google TV or a Google TV Streamer (answer 7331010).
+
+So no Google interface lets another program change a Cast device's settings; the one Google scope a KDE Online Accounts provider (OAuth 2.0) could carry here is SDM's, which has no Cast setting.
 
 ## The Cast channel, as a recipe (proved by the cast study on loopback, 2026-10-14)
 
@@ -303,10 +329,41 @@ Red: the same session with no Throw (the published set and KWin +66 only) fails 
   **Cause:** pychromecast's `cast_channel_pb2` predates fields 8 and 9 and `CASTV2_1_2`.
   **Fix:** the test writes those frames by hand from openscreen's proto; the codec moves a joined `payload_binary` to `payload_utf8` for a STRING message.
 
+### Traps of part C (0.2.0, 2026-11-25)
+
+- **Symptom:** a VP8 or VP9 Throw shows nothing: the device fetches 0 bytes and the Throw stays "throwing"; KPipeWire's log says `Error setting option tune to value zerolatency` and `No encoder could be created`.
+  **Cause:** KPipeWire 6.7.4's `Encoder::buildEncodingOptions` gives every encoder x264's options for the Speed preference (`preset=ultrafast`, `tune=zerolatency`); libvpx and libvpx-vp9 have a `tune` option that refuses that value, so the encoder is not made; KPipeWire then says nothing on its API (no `errorFound`). Upstream's current `encoder.cpp` sets only `threads` there.
+  **Fix:** VP8 and VP9 get the NoPreference preference (no `tune`; their own realtime deadline), and the streamer fails a Throw whose encoder gives no picture within 30 seconds. Our KPipeWire's successor should carry upstream's change.
+  **How found:** loopback rows E1 and E3, then the daemon's log beside the device's empty capture, then upstream's file.
+- **Symptom:** with the tune fixed, a VP9 Throw to a still screen still gives no picture, and after 30 seconds the Throw fails ("no picture came from the encoder").
+  **Cause:** KPipeWire 6.7.4's libvpx encoders keep libvpx's default lag of 25 frames; KWin sends a frame only when the screen changes (one at the stream's start, KPipeWire repeats it once), so the encoder never gives its first frame. Upstream's VP9 encoder sets `lag-in-frames` 0 since ("frames arrive on damage").
+  With the screen moving, VP9 still gave nothing in 30 seconds (VP8 gave its picture); so 0.2.0 does not count VP9 as encodable (`Codecs::encodable`), and a VP9 choice is refused at once with that reason.
+  **Fix:** the table orders VP9 and VP8 after H.264; VP9 waits for our KPipeWire to carry upstream's VP9 settings; a picture that never comes is said by the streamer's 30-second watchdog; the loopback rows for VP8 and H.264 chosen move a window on the thrown screen.
+  **How found:** loopback row E1 failing on the watchdog after the tune fix, again with a window moving on the screen (KWin's log names the screen 57 times), then upstream's `libvpxvp9encoder.cpp`.
+- **Symptom:** in a long loopback session every page capture shows "The screen locker is broken and unlocking is not possible anymore", while the page rows pass.
+  **Cause:** KWin's screen locker locks after its idle time; a container has no logind to unlock; the page rows measured the window's caption and the device's requests, not the screen.
+  **Fix:** `kscreenlockerrc [Daemon] Autolock=false, LockOnResume=false` in the session's home before KWin starts; the page rows also fail when KWin's log shows the lock (the `"locked"` event, the greeter).
+  **How found:** opening the captures before describing them.
+- **Symptom:** a row that times a change of the picture finds the picture already changed at 0 s.
+  **Cause:** when the same device's network screen is made again, KWin puts back on it the windows that were on it before (by the screen's identity).
+  **Fix:** minimize the window before the Throw and restore it at the instant measured.
+- **Symptom:** the last frame of a captured live stream is wrong (half black, or the picture from before a change).
+  **Cause:** a live Matroska stream has no index, so `ffmpeg -sseof` lands between keyframes; "the second-to-last packet" misses a change that sent one frame.
+  **Fix:** decode the capture in order from the start and keep the last frame (`-update 1`); the stream ends whole at Stop, the muxer writes its trailer before the connection closes.
+- **Symptom:** the software device's fetch passes the server's address check in the rig but would not on a real network.
+  **Cause:** in one network namespace every address is local, so the route to a device's address starts from that same address.
+  **Fix:** the software device fetches from its own address (`source_address`), and the row from another address binds 10.81.0.3.
+- **Symptom:** in one run of the loopback proof out of several, the row on the daemon's own words in Brazilian Portuguese measures English words; `throwd-pt_BR.log` is one line, `org.sparky.Throw is already taken on the session bus`.
+  **Cause:** the scenario's restart ended the daemon, started its own copy with the language set, and at once ran `sparky-stereo-throw list`. While the copy was still starting, the command found the name without an owner, and the session bus started the installed daemon from its D-Bus service file, in the session's own language. Whichever took the name first won; in the other runs the copy won.
+  **Fix:** the language goes where a person's session puts it, in the bus's activation environment (`UpdateActivationEnvironment`, sent with `busctl --address=$DBUS_SESSION_BUS_ADDRESS`, since `dbus-send` cannot send the empty value that returns to the session's language). Then the daemon is ended, and the bus starts it again (`StartServiceByName`); anything that asks for the name in between gets the same language. Before reading words, the row checks who answers: the process that holds the name (`GetConnectionUnixProcessID`) and its `/proc/PID/environ`. A session that starts its own copy, for the log the rows read, runs the scenario only once that copy owns the name.
+  **How found:** the main session's rerun; the one-line log; then the bus's own output (the session's `setup.log`), which says `Activating service name='org.sparky.Throw' requested by ... sparky-stereo-throw list` in each restart's gap.
+  **Proof that it cannot race:** a file `activate-in-gap` beside the scenario makes every restart ask for the name while nobody owns it. The old restart, given the same ask, fails the row as that run did (English words, the copy's one-line log, the bus's line for the command). The restart through the bus passes it, and each restart's record (`throwd-<lang>.txt`) shows the ask, then `StartServiceByName` answering 2 (already running: the ask had started it, in the language), then the language of the process holding the name. A daemon the bus starts writes to the bus's own output, so the record names where its log went.
+
 ## Upstream, as searched on 2026-11-24
 
 - **KDE** (merge requests updated since 2026-10-01 in KWin, KRdp, KPipeWire, xdg-desktop-portal-kde, plasma-workspace): nothing for Cast, network displays or a networked output. Close to the work: KWin 10190 (merged, consumer-picked scale of virtual outputs), 10427 (open, only the creating stream resizes a virtual output), 10355 (merged, screencast plugin ported away from OpenGL, which the next rebase of our screencast patches meets); KRdp 290 (open, drops the zkde_screencast path for the portal only), 275 (open, scale), 239 (open, an audio sink KRdp makes the default, which our design does not do).
 - **GNOME Network Displays:** fifteen commits since 2026-10-01, all Miracast or translations; its Cast code last changed on 2026-01-23 (8c6a4de2, Christian Glombek).
+- **KPipeWire master** (read 2026-11-25, for part C): no AV1 encoder in `src/`; `encoder.cpp` no longer gives every encoder x264's preset and tune, and `libvpxvp9encoder.cpp` sets `lag-in-frames` 0 (the two traps of part C); ef110be4 (Khudoberdi Abdujalilov, 2026-06-19, "recording: Add PipeWire audio capture") records the default output's monitor or the default input for a recording and makes no sink, so it is not the Throw's "Throw: <device>" output, which stays the daemon's own.
 - **openscreen:** 43 commits under `cast/` since 2026-10-01, nearly all Cast Streaming (path B, a later milestone); for the channel, message chunking (64d7c985d1); a new mirroring app id `015B5861` (f2b951181d, Shawn Quereshi).
 
 ## Credits

@@ -3,14 +3,14 @@ metadata:
   requires-packages: plasma-desktop
 name: kde-desktop-defaults
 description: >-
-  The edition's Plasma defaults and small KDE patches: KRunner search order, the unit converter's currency rates, tasks, Ctrl+Alt+Del to System Monitor and Ctrl+Alt+Esc to log out, frozen-window recovery, formatting a removable
-  drive and running scripts from Dolphin, the look package (cursor names, wallpaper, lock screen, splash, video
-  wallpaper), Discover and its AppStream cache, sparky-stereo-look, /etc/xdg files, the KScreen KCM, a
-  built-in panel's first scale from its EDID, tablet mode (on-screen keyboard, panels that hide). Load it when a default
-  should be decided instead of left to the person, a shortcut clashes, a lock screen shows only its wallpaper, a cursor
-  theme name does not exist, a KCM page is out of order in another language, a widget shows zero not an error, a
-  video wallpaper keeps the old clip, a notebook starts at 100 %, a convertible shows no on-screen
-  keyboard, a webcam has no page, or a KDE patch needs its CI.
+  The edition's Plasma defaults and small KDE patches: KRunner search order, currency rates, tasks, Ctrl+Alt+Del to
+  System Monitor and Ctrl+Alt+Esc to log out, frozen-window recovery, formatting a removable drive and scripts in
+  Dolphin, the look package (cursor names, wallpaper, lock screen, splash, video wallpaper), Discover's AppStream
+  cache, /etc/xdg files, the KScreen KCM, a built-in panel's first scale, tablet mode, the first run in KDE's Welcome
+  Center (Plasma Welcome pages). Load it when a default should be decided instead of left to the person, a shortcut
+  clashes, a lock screen shows only its wallpaper, a cursor theme name does not exist, a widget shows zero not an
+  error, a video wallpaper keeps the old clip, a notebook starts at 100 %, a convertible shows no on-screen keyboard,
+  two first-run windows open at login, a webcam has no page, or a KDE patch needs its CI.
 ---
 
 # KDE desktop defaults
@@ -42,6 +42,12 @@ The edition carries a patch on Debian's source (each answer owns its watcher).
 
 A notebook's built-in panel gets its first scale from its real size (125 % at least for a full HD panel of about 13 to 14 inches), a computer with a touch screen of its own gets Plasma Keyboard as its virtual keyboard in the session's language, shown only in tablet mode, and in tablet mode every panel hides by itself and goes back to its own setting afterwards.
 [Where KWin chooses the first scale and from which EDID field, why a default that only some computers get is a folder in front of `XDG_CONFIG_DIRS`, the shell's two visibility modes, tablet mode in the rig, and the traps](references/convertibles-and-dense-panels.md).
+
+## The first run: KDE's Welcome Center
+
+A new account's first login opens KDE's Welcome Center (Plasma Welcome) with the edition's pages first; its kded module opens it once, when `plasma-welcomerc` has no `LastSeenVersion`, and a value in `/etc/xdg/plasma-welcomerc` keeps it closed for everyone.
+Sparky Welcome's own first run is skipped by a unit condition there, and every one of its elements is on the Welcome Center's SparkyLinux page.
+[Where Plasma Welcome 6.7.4 takes a distribution's pages, the edition's `first-pages/` patch and `Distro.flag()`, a page with depth on a 3D screen (a `StereoPicture` in a Kirigami page needs stereo-layer 1.23.4), one window at the first login with the upgrade cases measured, the live session, what a tap does where the mouse keeps its click setting, the session proofs and the traps](references/first-run-welcome.md).
 
 ## Account defaults and displayed release name
 

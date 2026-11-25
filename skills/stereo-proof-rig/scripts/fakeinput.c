@@ -9,6 +9,8 @@
  *   d:272       a double click: press, release, 90 ms, press, release (272 = BTN_LEFT)
  *   t:X,Y       a tap of one finger on a touch screen at X,Y (logical pixels): down, 80 ms, up (ORDER 567: KWin shows
  *               its on-screen keyboard only when the last input came from a touch screen or a pen)
+ *   h:X,Y       a long touch: one finger down at X,Y for 1200 ms, then up (longer than Qt's long press, 800 ms by
+ *               default: a task manager button's menu; ORDER 63/720)
  *   p:272       press a pointer button and leave it down; r:272 releases it (a drag: p:, m: steps, r:; ORDER 551c)
  *   w:VALUE     turn the wheel: one vertical axis event of VALUE (15 is one notch down, -15 one notch up, as a
  *               mouse wheel sends; row 50, FreeCAD's zoom)
@@ -147,7 +149,7 @@ static int step(struct wl_display *display, const char *a)
 			return 2;
 		}
 		org_kde_kwin_fake_input_axis(fake, WL_POINTER_AXIS_VERTICAL_SCROLL, wl_fixed_from_double(v));
-	} else if (strncmp(a, "t:", 2) == 0) {
+	} else if (strncmp(a, "t:", 2) == 0 || strncmp(a, "h:", 2) == 0) {
 		double x = 0, y = 0;
 		int used = 0;
 		if (sscanf(a + 2, "%lf,%lf%n", &x, &y, &used) != 2 || a[2 + used] != '\0') {
@@ -157,7 +159,7 @@ static int step(struct wl_display *display, const char *a)
 		org_kde_kwin_fake_input_touch_down(fake, 0, wl_fixed_from_double(x), wl_fixed_from_double(y));
 		org_kde_kwin_fake_input_touch_frame(fake);
 		wl_display_flush(display);
-		wait_ms(80);
+		wait_ms(a[0] == 'h' ? 1200 : 80);
 		org_kde_kwin_fake_input_touch_up(fake, 0);
 		org_kde_kwin_fake_input_touch_frame(fake);
 	} else if (strncmp(a, "s:", 2) == 0) {

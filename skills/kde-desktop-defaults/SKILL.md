@@ -10,8 +10,8 @@ description: >-
   Center (Plasma Welcome pages). Load it when a default should be decided instead of left to the person, a shortcut
   clashes, a lock screen shows only its wallpaper, a cursor theme name does not exist, a widget shows zero not an
   error, a video wallpaper keeps the old clip, a notebook starts at 100 %, a convertible or a Fcitx 5 session shows
-  no on-screen keyboard, two first-run windows open at login, a webcam has no page, colours collapse for colour
-  vision or a text fails contrast, or a KDE patch needs its CI.
+  no on-screen keyboard, two first-run windows open, a webcam has no page, colours collapse for colour
+  vision, a text fails contrast, or a KDE patch needs CI.
 ---
 
 # KDE desktop defaults

@@ -82,7 +82,7 @@ Registry events go in as in the existing rows (`objectAdded()` with a property f
 Measured on the first local review candidate (67bb16383): with the matching line disabled the test exits 2 (2 of 19 fail: the first row and the signal row); with the change it exits 0 (19 passed). The keep-the-first rows pass on both, as they assert the old behaviour plus the line.
 The first patch set had a fifth row for the stored message and 20 rows in all (2026-11-16: 3 failed with the match disabled).
 
-The follow-up adds `defaultCameraIndex_followsReplacement_afterDefaultIsCleared` to the monitor unit. This checks the old selection, clear and new selection inside the monitor. The registry side needs a private server. Start on cam-b, overlap two providers named `default`, then compare the surviving cam-c with a running client's and a fresh client's default. Repeat with the waiting provider removed first, and with the last provider removed. Keep a newly opened camera separate from a camera already open during the transition.
+The follow-up adds `defaultCameraIndex_followsReplacement_afterDefaultIsCleared` to the monitor unit. This checks the old selection, clear and new selection inside the monitor. The registry side needs a private server. Start on cam-b, overlap two providers named `default` on cam-b, select cam-c only after the incumbent leaves, then compare the surviving cam-c with a running client's and a fresh client's default. Repeat with the waiting provider removed first, and with the last provider removed. Keep a newly opened camera separate from a camera already open during the transition.
 
 ### The rig
 

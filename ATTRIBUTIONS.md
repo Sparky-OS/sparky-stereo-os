@@ -1652,3 +1652,15 @@ The recording comparison also uses GStreamer's element author records from `gst-
 ## Weather Icons and Advanced Weather Widget
 
 The edition's shared weather icons reach Weather Report through work by **Friedrich W. H. Kossebau** and the KDE Weather Report contributors. The second applet builds on **Petar Nedyalkov** and the Advanced Weather Widget contributors. Its installed upstream credits name **Erik Flowers** and **Bas Milius** for the bundled Weather Icons and Meteocons resources.
+
+## Plasma Online Accounts and KDE PIM account study
+
+KDE KAccounts Integration and SignOn Wallet extension, Alejandro Fiestas Olivares and the KDE contributors. The provider controllers credit Rituka Patwal and Martin Klapetek. KDE Plasma Desktop’s Attica integration credits Eckhart Wörner, Frederik Gladhorn, Dan Leinir Turthra Jensen and Harald Sitter. KDE Purpose supplies the Nextcloud and YouTube services. [KAccounts](https://github.com/KDE/kaccounts-integration), [KDE providers](https://github.com/KDE/kaccounts-providers), [Attica integration](https://github.com/KDE/plasma-desktop/tree/master/attica-kde), [Purpose](https://github.com/KDE/purpose).
+
+Nicolas Fella and KDE’s KOnlineAccounts contributors, including the Nextcloud, Mastodon and Google setup paths. Elvis Angelaccio and the KIO GDrive contributors. Bernardo Gomes Negri and the OneDrive worker contributors, including the KAccounts CMake file’s credits to Elvis Angelaccio, Nicolas Fella and Laurent Montel. Gabriel Maizo González and the KIO rclone contributors. [KOnlineAccounts](https://github.com/KDE/konlineaccounts), [KIO GDrive](https://github.com/KDE/kio-gdrive), [KIO OneDrive](https://invent.kde.org/bernardogn/kio-onedrive), [KIO rclone](https://github.com/Undead34/kio-rclone).
+
+Till Adam and the Akonadi contributors, Marc Mutz and the KMail contributors, and the KDE PIM team. The resource sources credit Grégory Oestreicher, Volker Krause and Omat Holding B.V. for DAV, Dan Vratil, Igor Poboiko and Carl Schwan for Google, Krzysztof Nowicki for EWS, Malte Zilinski for Graph, and Shashwat Jolly for Etebase. [Akonadi](https://github.com/KDE/akonadi), [KMail](https://github.com/KDE/kmail), [KDE PIM runtime](https://github.com/KDE/kdepim-runtime).
+
+Slava Aseev and the KDE Wallet contributors for the Secret Service implementation, KDE and Accounts-SSO contributors for the SignOn Wallet extension, and the Accounts-SSO, GNOME Keyring and freedesktop.org contributors for the underlying account and secret APIs. [KWallet](https://github.com/KDE/kwallet), [SignOn Wallet extension](https://github.com/KDE/signon-kwallet-extension), [Accounts-SSO](https://gitlab.com/accounts-sso), [Secret Service](https://specifications.freedesktop.org/secret-service/latest/).
+
+Martijn Schmidt and the older KF5 OneDrive worker contributors, whose account manager credits Elvis Angelaccio, and Alberto Mardegan, named in the historical Ubuntu account-plugins source’s AUTHORS file. [KF5 OneDrive worker](https://github.com/martijn-schmidt/kio-onedrive), [Ubuntu account-plugins source](https://launchpad.net/ubuntu/+source/account-plugins).

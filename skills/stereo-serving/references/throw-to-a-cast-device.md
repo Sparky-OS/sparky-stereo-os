@@ -359,6 +359,145 @@ Red: the same session with no Throw (the published set and KWin +66 only) fails 
   **How found:** the main session's rerun; the one-line log; then the bus's own output (the session's `setup.log`), which says `Activating service name='org.sparky.Throw' requested by ... sparky-stereo-throw list` in each restart's gap.
   **Proof that it cannot race:** a file `activate-in-gap` beside the scenario makes every restart ask for the name while nobody owns it. The old restart, given the same ask, fails the row as that run did (English words, the copy's one-line log, the bus's line for the command). The restart through the bus passes it, and each restart's record (`throwd-<lang>.txt`) shows the ask, then `StartServiceByName` answering 2 (already running: the ask had started it, in the language), then the language of the process holding the name. A daemon the bus starts writes to the bus's own output, so the record names where its log went.
 
+## A live stream a real receiver plays (0.3.0, part D)
+
+**What a real Chromecast did** (model name `Chromecast`, first to third generation, on a television; the kit's probe, 2026-11-25; a person at the television confirmed picture and sound for the variant that played):
+- A live stream whose pictures stop never plays. KWin sends a screen's frame only when it changes and KPipeWire 6.7.4 repeats the last one once, so a Throw of a still desktop carried a picture at 0 s, one near 0.08 s, then none while its sound went on. The receiver fetched it and reported BUFFERING at its time 0 for as long as it ran.
+- The same receiver played H.264 at a constant 30 frames a second, a still picture included.
+- How long it took to start after LOAD, still picture at 30 frames a second, by sound: 24-bit or 16-bit PCM stereo in Matroska 1 to 2 s; Dolby Digital (AC-3) 5.1 17 s; FLAC 24 bit 21 s (twice); AAC 40 s. A moving picture with FLAC: about 2 s. The start comes sooner as the data rate rises, but no single byte count explains all of them: a measured rule, not an explained one.
+- Its request: one `GET` with `Range: bytes=0-`, a `CAST-DEVICE-CAPABILITIES` header (`"hi_res_audio_supported":false`) and a Chrome 90 user agent on armv7l.
+
+So 0.3.0 keeps the picture coming (KPipeWire's `setConstantFramerate`, below) and takes 24-bit PCM, lossless and the quickest to start, as the default sound in Matroska.
+
+**The sound** is a choice on the device's page, by default the best stereo sound the stream carries that has not failed on that device: PCM 24 bit, FLAC, PCM 16 bit, Opus, AAC, Vorbis, MP3 in Matroska (no PCM or Vorbis in MP4; Opus or Vorbis only in WebM; FLAC, Opus or Vorbis in Ogg), and Dolby Digital or Dolby Digital Plus 5.1 as the person's choice (a stereo source then plays on the front speakers; nothing is upmixed; the sink "Throw: <device>" has six channels).
+A Throw that reaches PLAYING records its sound as played on that device (`SoundsPlayed=` in `sparky-stereo-throwrc [Device][<id>]`); one the device does not play within 60 seconds is ended and said with what the device reported, and its sound is recorded as failed (`SoundsFailed=`), so the next Throw takes the next one.
+
+**Every Cast message** is in the daemon's debug log (`QT_LOGGING_RULES=org.sparky.throw.debug=true`: `cast out`, `cast in`), the stream's address token taken out of any URL.
+
+**What each sender does** (read at the source, 2026-11-25):
+
+| Sender | Container and options | Picture | Sound | LOAD and after | Pacing |
+|---|---|---|---|---|---|
+| VLC 3.0.x (`modules/stream_out/chromecast`, LGPL-2.1-or-later) | Matroska or WebM through libavformat, `live=1`, `reset-ts` | H.264 (x264 veryfast, CRF 21 to 23) or VP8; 24 frames a second forced when the rate is unknown or above 30 | AAC (two channels at most), Vorbis, Opus, MP3 passed on; AC-3 and E-AC-3 only with its passthrough option; anything else, FLAC included, made MP3 320 kbit/s or Vorbis quality 4 | `streamType LIVE`, `"autoplay":"false"` (a JSON string); PLAY only when the person un-pauses; IDLE while buffering is a failed load, and a retry rebuilds the chain | its HTTP server sends at least 512 kB at a time, paces its input at 2 MB |
+| GNOME Network Displays (`src/cc`) | `matroskamux`, `webmmux` or `mp4mux` | `pipewiresrc` into `intervideosink`, the encoder reads `intervideosrc` (`timeout` G_MAXUINT64): the last frame at a constant 30 a second; x264 zerolatency, VA-API H.264, VP8 | AAC, Vorbis, Opus | | |
+| mkchromecast (MIT) | fragmented MP4 (`frag_keyframe+empty_moov`; on Wayland `mp4mux fragment-duration=1000 streamable=true`) | x11grab at a fixed `-r`; on Wayland `pipewiresrc`, `videorate` and caps at a fixed rate; key frame every 2 s | AAC (Vorbis on X11) | `stream_type LIVE`, autoplay, waits for the media session | |
+| catt (BSD-2-Clause) | the file as it is | | | `BUFFERED` | `Range`, `206`, `Content-Length`, `Access-Control-Allow-Origin: *` |
+| BigNetScreen (BigLinux and BigCommunity, GPL-3.0-or-later, read only) | mirroring: no container; its HTTP form: MPEG-TS (`video/mp2t`) | H.264 | mirroring: Opus; HTTP: AAC | mirroring: `LAUNCH 0F5096E8` ("Chrome Mirroring"), `OFFER`/`ANSWER` on `urn:x-cast:com.google.cast.webrtc`, RTP with AES-CTR-128 payloads and RTCP feedback, target delay 150 ms; HTTP: the Default Media Receiver | per-stream pacing on a shared budget |
+| the Throw 0.2.0 | Matroska `live`, `cluster_time_limit`; each reader from 0 | frames on change only: two, then none | FLAC 24 bit | `LIVE`, autoplay; BUFFERING counted as "throwing" | per packet |
+| the Throw 0.3.0 | the same | a constant rate (the last frame again) | 24-bit PCM by default, a choice per device | the same; not PLAYING in 60 s: ended and said | the same |
+
+The other transport, Cast mirroring as BigNetScreen and Chrome do it (Open Screen's `cast/streaming`), has no player buffer: its delay is the target delay, not seconds. In the Throw it would need the encoded packets into RTP instead of libavformat, AES-CTR, the OFFER and ANSWER instead of LOAD, RTCP, and Opus; it is the next part, a person's option beside the buffered stream.
+
+**A stand-in that plays at LOAD proves nothing.** The software device said PLAYING at LOAD, so 0.2.0 passed every loopback row and never played on a real one. Since 0.3.0 the rig has a device whose player is real: `fake-cast-device.py --player chromium` plays the stream in a media element of Debian's Chromium (headless, a fixed version from the snapshot) and reports PLAYING only while the element's time advances, BUFFERING while it waits, with its real `currentTime`. 0.2.0's stream fails on it as on the real device (readyState 0, BUFFERING for 40 s), and the constant streams play on it in the real device's order (PCM before FLAC before AAC). It is more lenient than the real receiver: it played two pictures with PCM sound, which is why the rig also counts the pictures a second in the stream.
+
+**The kit's probe** (`kit.sh NAME SECONDS OUT --probe VARIANTS.json`): a reference sender in the same container throws one live test stream per variant (container, picture still, moving or stopping, sound and channels, `streamType`, `autoplay`), one FFmpeg per request so each reader starts at 0, records every Cast message and the media status each second from LOAD on, stops the receiver after each variant and writes one table (`probe.tsv`, with a column a person fills: what the screen showed); `timeline.py` prints each variant's states. The tone is 997 Hz at -30 dBFS; the 5.1 test plays one channel a second in the order FL FR FC LFE BL BR.
+
+### Traps of part D (0.3.0, 2026-11-25)
+
+- **Symptom:** a Throw of a still screen is fetched by a real Chromecast and never plays (BUFFERING at time 0), while every loopback row passes.
+  **Cause:** frames on change only (two pictures, then none); the software device said PLAYING at LOAD.
+  **Fix:** KPipeWire encodes the last frame again at the mode's rate (`setConstantFramerate`); the rig's Chromium device plays the stream.
+  **How found:** the kit's runs on the real device, then the captures' picture times (`ffprobe -show_entries packet=pts_time`), then GNOME Network Displays' `intervideosrc`.
+- **Symptom:** with the constant rate on, the stream has exactly 10 pictures a second.
+  **Cause:** KPipeWire makes its repeat timer in `initialize()`, queued after `start()` had already set the rate, with a fixed 100 ms.
+  **Fix:** the timer's first interval follows the constant rate.
+  **How found:** KPipeWire's frame statistics (`QT_LOGGING_RULES=kpipewire_record_framestatistics.debug=true`: "Processed 10 frames in the last second"), exactly 10.
+- **Symptom:** the repeats stop after the first frames.
+  **Cause:** the last frame kept was one with no picture (a cursor update, an empty buffer).
+  **Fix:** in constant mode only a frame with a picture is kept for repeating.
+- **Symptom:** headless Chromium in a container exits at once; its log ends "chrome_crashpad_handler: --database is required".
+  **Cause:** a home it cannot write.
+  **Fix:** a writable `HOME`, `--disable-crash-reporter --disable-breakpad`.
+- **Symptom:** the stand-in's capture is cut at a few hundred bytes.
+  **Cause:** the Throw's server serves the newest connection of a device, and the stand-in fetched twice (its capture and its player).
+  **Fix:** the player's relay is the device's one reader and keeps the capture.
+- **Symptom:** a probe variant meant to stop its pictures sends only its header.
+  **Cause:** FFmpeg's muxer waits for the stopped video stream (`select` filter), so the sound stops too.
+  **Fix:** prove that red with the daemon's own stream (the kit's loopback proof with 0.2.0).
+- **Symptom:** the Lean Code build stops at its link gate: "/: free space ... is below root floor 12884901888".
+  **Cause:** not the house floor (1 GiB since ORDER 638, in build main's `lean/archive.py` and `lean/debhelper.py`): the published kpipewire +stereo3d8 carries its own copy of the gate in `debian/sparky-lean` (the 19 October adapter), whose `Archive()` refuses a root floor under 12 GiB; `dpkg-buildpackage` of that tree runs that copy.
+  **Fix:** make the successor with `repo/lc-successor.py --in-place`, which replaces the bundled toolkit with build main's (part D's second half, below).
+  **How found:** `grep -rn root_min_free_gib` in the unpacked source's `debian/sparky-lean` against build main's `sparky-os/lean`.
+- **Symptom:** the software device logged a CONNECT and never the LAUNCH sent 1 ms after it.
+  **Fix:** the probe sends them 50 ms apart.
+
+## As packages, and 0.3.0's own stream on a real receiver (part D's second half)
+
+**KPipeWire's successor** is `6.7.4-1+stereo3d10`, recipe `sparky-os/packages/kpipewire-constant-framerate-81d`:
+- It follows ORDER 740's `+stereo3d9` (HEVC stereo packing; staged and accepted, KRdp `+stereo3d9` depends on it), not the published `+stereo3d8`: a second, different `+stereo3d9` would collide with 740's, and a later version without 740's patch would take the HEVC packing away. `next-source.sh` takes only the `.dsc` 740 staged (its SHA-256 is in the script) and appends this patch to 740's series.
+- The published line has no `+lc1` in its versions (the 19 October adapter: a bundled toolkit in `debian/sparky-lean`, the `lc1` mark in each package's `Sparky-Lean-Code` field). `lc-successor.py --in-place` keeps that shape, so the successor is `+stereo3d10` itself, and it swaps the bundled toolkit for build main's (whose link gate has the house floor of 1 GiB).
+- `build.sh` makes the source and the packages in one container of the Lean Code migration image (a lane names its own tag of `sparky-lc-migration:20261020` in `SPARKY_BUILD_IMAGE`; the container's name prefix is `BUILD_NAME_PREFIX`), with the link gate against 740's packages and the build record from `lean.release check-debs`.
+- File by file against 740's `+9` and the published `+8`: no path left a runtime package, no `NEEDED` changed; `libKPipeWireRecord.so.6` exports two more symbols (`setConstantFramerate`, `constantFramerate`), in `libkpipewirerecord6.symbols` at `6.7.4-1+stereo3d10`, so the Throw depends on `libkpipewirerecord6 (>= 6.7.4-1+stereo3d10)`.
+- KPipeWire's clients (`apt-cache rdepends` over Debian testing and the round): the record library's `kde-spectacle`, `krdp` and `plasma-mobile`; the other libraries' `krdp` and `krfb`; the QML module's `plasma-desktop`, `plasma-workspace` and `xdg-desktop-portal-kde`. On a person's Plasma desktop (apt proof) Spectacle's program and KRdp's library and settings module link it; a person's update with the stages moves KWin `+64` to `+66` and KPipeWire `+8` to `+10` and removes nothing. The constant rate is off unless a client asks: Spectacle's recording on `+10` keeps KPipeWire's own pictures, one or two for each change of the screen (loopback row DK1).
+
+**The Throw 0.3.0** builds against it in a builder that has `+10`'s development package. A builder image made by committing a container run with `--entrypoint bash` keeps that entrypoint, and the recipe's `docker run IMAGE sh -c ...` then runs `bash sh -c ...` ("cannot execute binary file", exit 126); run the setup container with the command `bash -c ...` and no `--entrypoint` (`docker commit --change 'ENTRYPOINT []'` did not clear it).
+
+**0.3.0's own stream on a real Chromecast** (model `Chromecast`, the kit version 3, 2026-11-25; two minutes each, a 997 Hz tone at -30 dBFS):
+
+| Picture | Sound | "throw" to steady playing | playing / buffering of 120 s | behind the screen | the device's clock against the wall clock |
+|---|---|---|---|---|---|
+| still | PCM 24 bit | 3.8 s | 120 / 0 s | 3.8 s | 1.002 |
+| still | FLAC 24 bit | 45.9 s (a first PLAYING at 12 s) | 88 / 32 s | 45.4 s | 0.994 |
+| still | Dolby Digital (AC-3) 5.1 | 3.5 s | 120 / 0 s | 3.55 s | 1.000 |
+| moving | PCM 24 bit | 3.6 s | 120 / 0 s | 3.6 s | 1.001 |
+| moving | FLAC 24 bit | 40.4 s (a first PLAYING at 12 s) | 94.5 / 25.5 s | 39.8 s | 0.998 |
+| moving | AC-3 5.1, the channel test | 3.6 s | 120 / 0 s | 3.4 s | 1.000 |
+| still | Dolby Digital Plus (E-AC-3) 5.1 | 3.6 s (1.3 s after LOAD) | 75 / 0 s of 75 | 3.35 s | |
+| still | Vorbis | 48.2 s (45.3 s after LOAD, a PLAYING at time 0 first) | 38 / 37 s of 75 | 47.3 s | |
+
+The first six runs had the build before the false-start rule; the last two the final build, whose daemon recorded the starts as 1.3 s and 45.3 s after LOAD (the device's PLAYING at time 0, the third status of the Vorbis run, not counted).
+Through the kit's reference sender (45 s each), which has no group of pictures to hand over at once: E-AC-3 5.1 and Vorbis never played (PLAYING once at time 0, then buffering at 0); Opus played from 23.5 s, MP3 from 21.3 s.
+A person at the television heard the channel test of 0.3.0's own Dolby Digital (AC-3) 5.1 stream (moving screen, 120 s: playing 4.3 s after "throw", none buffering, 3.8 s behind): "all speakers one at a time", each of the six channels from its own place. The test plays into the Throw's 5.1 sink each channel a second in turn, in the sink's order FL FR FC LFE SL SR (LFE at 60 Hz), at -30 dBFS (`KIT_TONE=channels`). Part D's reference stream had been heard from more than the television's two speakers.
+So the default, 24-bit PCM stereo, starts in under 4 s and stays under 4 s behind; Dolby Digital and Dolby Digital Plus 5.1 from this daemon's stream start as fast (17 s and never from the reference stream); FLAC and Vorbis start after about 40 to 48 s and stay that far behind.
+
+**The delay a person lives with** is read from the device's own time: the status gives `readerZeroAt` (the wall clock of the stream's time 0 for the device: the streamer's clock at its start, on the epoch, plus the reader's first packet time) and `statusAt` (when the device's last MEDIA_STATUS came), and the device plays at `statusAt` what this computer had encoded at `readerZeroAt + currentTime`: it is `(statusAt - readerZeroAt) / 1000 - currentTime` seconds behind the screen, the delay of a pointer move here to the same move there, plus the television's own display delay, which nothing measures.
+The method is checked from both ends on the stand-in: the kit's clock page (`scripts/c/kit/clock.html`, the lane's) draws the wall clock as a 28-cell code across the top band; the Chromium stand-in reads it back from the pictures it plays and logs its own clock minus the code. Both gave 2.83 to 2.85 s.
+What was measured shows that the delay behind the screen is about the time the device took to start: the device starts at its time 0, and everything it waits for after that it plays late.
+
+**The hardware encoders under the constant rate** (`THROW_ROWS=cost`, loopback row CK1: a still screen for 35 s, processor and GPU sampled between 10 s and 30 s; KWin on the NVIDIA card, VA-API on the AMD card's render node; `KPIPEWIRE_FORCE_ENCODER` names the encoder; every figure contended: the station's GPUs serve its desktop and other lanes):
+
+| Encoder | Build | Pictures in the stream | A second | The daemon's processor (a core is 100 %) | KWin's | The GPU |
+|---|---|---|---|---|---|---|
+| libx264 | 0.3.0, constant rate | 932 | 31.0 | 67.6 % | 0.4 % | |
+| libx264 | 0.2.0 | 2 | | 0.6 % | 0.3 % | |
+| h264_nvenc (NVIDIA, through CDI) | 0.3.0, constant rate | 928 | 31.0 | 49.6 % | 0.4 % | NVENC 4.2 % |
+| h264_nvenc | 0.2.0 | 2 | | 0.7 % | 0.3 % | NVENC 0 % |
+| h264_vaapi (the AMD card's render node) | both | none: "could not resolve the current session render node", no encoder made; the Throw failed and said so after 30 s | | | | |
+
+So a still screen at the constant rate costs about half to two thirds of a processor core at 1920x1080 and 30 a second, against under 1 % for 0.2.0's two pictures; most of it is not the encoding (NVENC's own engine is at 4 %) but each repeated frame passing KPipeWire's filter again (the picture converted on the processor). Keeping the converted frame and handing it to the encoder again would take that away: not built.
+VA-API is not measured: our KPipeWire encodes with VA-API only on the GPU that draws the session (the `could not resolve the current session render node` line), and this rig runs KWin on the NVIDIA card or on llvmpipe, never as a loop on the AMD card; on a machine whose desktop is drawn by its AMD or Intel GPU, KPipeWire's own order picks VA-API first.
+Load average 8 to 12 during these rows (other lanes on the station): the processor shares are contended figures.
+
+**The kit, version 3** (`scripts/c/kit`, the lane's): `KIT_SOUND` (a sound's id, set with the command's `sound` verb before the Throw and cleared after), `KIT_PICTURE` (`still`, `moving`: the pair moved each second, `clock`: the clock page full screen on the Throw's screen), `KIT_TONE` (`tone`, or `channels`: the 5.1 channel test, each channel a second in the sink's order FL FR FC LFE SL SR, LFE at 60 Hz), `KIT_THROW_DIR` and `KIT_KPW_DIR` (the Throw and KPipeWire folders, the newest staged by default; `none` keeps the image's KPipeWire, for 0.2.0's red); records twice a second with the wall clock; the summary gives "throw" to the first and to steady playing, LOAD to playing, seconds playing and buffering, the delay behind the screen and the device's clock.
+
+### Traps of part D's second half (2026-11-25)
+
+- **Symptom:** a Throw whose device never really plays would sit "throwing" before the television's loading screen with nothing said, and the device's page says a sound started after 10 s while the picture came after 40 s.
+  **Cause:** a real Chromecast says PLAYING at its time 0 and then buffers there: for ever with E-AC-3 and Vorbis from the kit's reference stream, 20 to 45 s with FLAC, Opus and MP3 from it and with FLAC and Vorbis from the daemon's own stream. The daemon took that first PLAYING as playing: the sound recorded as played, the 60 s limit stopped.
+  **Fix:** the device plays once its time has run past a second; its start is the status's time less its own time. The software device's time runs from its LOAD, and its mode `false-start` (the loopback's Stuck TV) says PLAYING once at 0 and then buffers (row DP5). On the real device the final build recorded Vorbis's start at 45.3 s after LOAD past that PLAYING at time 0.
+  **How found:** the kit's records twice a second, `BUFFERING` from the first record although the daemon's first PLAYING came 10 s after LOAD; then every MEDIA_STATUS of the daemon's debug log.
+- **Symptom:** the kit's clock page shows in an ordinary window on the Throw's screen, not full screen; KWin's log: "Cannot assign KWin::Rect to KWin::RectF".
+  **Cause:** `w.frameGeometry = s.geometry` in a KWin script (a `Rect` into a `RectF`); the script had already set `fullScreen = false`.
+  **Fix:** give the geometry as `{x, y, width, height}` and set `fullScreen = true`.
+- **Symptom:** a still picture with 24-bit PCM through the reference sender sends 646 bytes and stops, with `-max_interleave_delta 0` or `500000` alike.
+  **Cause:** FFmpeg's command line holds the sound behind a picture that stops; not settled.
+  **Fix:** none yet; a sparse picture with PCM is not proved on a real device.
+- **Symptom:** the kit's daemon run played its tone at about -10 dBFS, above the -30 dBFS asked for runs on a person's television.
+  **Cause:** the daemon run's tone was written at 0.3; only the probe had -30 dBFS.
+  **Fix:** both at 0.0316 (-30 dBFS), said in `kit.txt`.
+- **Symptom:** the Throw's package build stops at `override_dh_builddeb` with "/: insufficient space: 3782213632 free, 4294967296 requested, floor 1073741824" on one day and "/mnt/build/throw-and-catch-81/build-scratch-81d/link: insufficient space: 6332747776 free, 4294967296 requested, floor 2147483648" on another, although the rerun had waited for room on `/`.
+  **Cause:** the link gate (`lean/archive.py`, `space()`) asks a gibibyte per archive source of its `sources.json` (three for KPipeWire, four for the Throw: Debian, deb-multimedia for the FFmpeg it links, the round, the local archive of the stages) on two file systems: the disk of its scratch (`SPARKY_LC_SCRATCH`), above a floor of 2 GiB, because inside the build container a bind mount is never the container's own `/`; and the container's `/`, which is the host's Docker root, above 1 GiB. The rerun waited for `/` only while `build-throw.sh` put the scratch on `/mnt/build`.
+  **Fix:** each step waits for room on every disk it writes to, the needs of paths on one file system added up (`scripts/d2/room.sh`: the gate's scratch, the build tree, Docker's root), with each step's peak measured; the rerun's scratch is on the lane's own folder on the root disk; the stage script refuses a build folder without its `.dsc`, so a failed build never touches the stage.
+  **How found:** the two lines of the gate's log, then `space()` in build main's `sparky-os/lean/archive.py`.
+- **Symptom:** a rerun stopped or killed leaves a container behind (shown as Dead for some seconds, or kept), and the next run fails its first rows with Docker's "Conflict. The container name ... is already in use".
+  **Cause:** fixed container names (`tc81-aptproof-81d`, `tc81-build-throw`, `tc81-loopback-loopback-030`), and a shell that runs its trap only after the command in the foreground ends.
+  **Fix:** every container's name carries the run's id (`TC81_RUN`, made by the rerun and passed to every script; a script run alone makes its own); the rerun runs each long step in the background and waits for it, so a signal reaches its trap at once, and the trap removes the run's containers by name (`docker ps -a` names holding the id, `docker rm -f`), the step in progress and the run's folders.
+  Stop such a run with SIGTERM on its own process (or Ctrl-C in its terminal): started with `&` from a script it ignores SIGINT, as every background job of a non-interactive shell does, and bash cannot trap a signal ignored at its start.
+  **How found:** the main session's two stopped runs (one on another row, kept by a full disk, failed three rows of the next run); the proof of the fix (a rerun stopped while its first build container ran, and while the development build's detached container ran: nothing of the run left), where the SIGINT sent to a background rerun did nothing.
+- **Symptom:** Spectacle's screen recording from the command line writes nothing in the rig.
+  **Cause:** Spectacle asks KWin which screen (`queryWindowInfo`) and waits for a click; through NVENC in the rig it also got no frame.
+  **Fix:** a click through KWin's fake input (the rig skill's `fakeinput`; KWin takes it only with its permission checks off, so the row has its own session), libx264, and a screen that changes while it records.
+
 ## Upstream, as searched on 2026-11-24
 
 - **KDE** (merge requests updated since 2026-10-01 in KWin, KRdp, KPipeWire, xdg-desktop-portal-kde, plasma-workspace): nothing for Cast, network displays or a networked output. Close to the work: KWin 10190 (merged, consumer-picked scale of virtual outputs), 10427 (open, only the creating stream resizes a virtual output), 10355 (merged, screencast plugin ported away from OpenGL, which the next rebase of our screencast patches meets); KRdp 290 (open, drops the zkde_screencast path for the portal only), 275 (open, scale), 239 (open, an audio sink KRdp makes the default, which our design does not do).

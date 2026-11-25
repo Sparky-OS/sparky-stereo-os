@@ -67,6 +67,19 @@ A touch on Kate's text in tablet mode, on a computer with a touch screen of its 
 
 In each converted language the input method is chosen on the keyboard's own bar (Fcitx 5's group is `keyboard-us` first), and the commit is checked by the preedit's highlight as well as the file.
 
+The other rows of the same run (29 rows, red and green, all as expected):
+
+| Claim | Red | Green |
+| --- | --- | --- |
+| Fcitx 5 without its keyboard addon (`[Behavior/DisabledAddons] 0=virtualkeyboard`) | no keyboard | the bar says so in the session's language, `abc` typed through KWin's fake input |
+| Fcitx 5 chosen but its program ends at once | no keyboard | the same ("Name org.fcitx.Fcitx5 does not exist" in the log) |
+| A hardware keyboard in a Japanese session (Ctrl+Space, `nihongo`, Space, Enter) | 日本語 | 日本語; a touch shows the keyboard, the first physical key hides it (Fcitx 5's own popup takes over) |
+| Outside tablet mode, ja and en | no keyboard | no keyboard |
+| A computer without a touch screen of its own | no keyboard | no keyboard; `plasma-keyboard --fcitx` ends at once |
+| The person's switch off | | no keyboard |
+| On a 3D output, over a stereo picture in Gwenview | KWin's panel: shift 0, 0 differing pixels; the picture behind unchanged in each eye | the keyboard for Fcitx 5: the same |
+| A touch on a field focused by the pointer | KWin's own keyboard shows (en) | the keyboard for Fcitx 5 does not (ja): the gap above |
+
 ## Traps met (row 71)
 
 - **Symptom:** in a Latin session (Plasma Keyboard as KWin's input method) the keyboard vanished after a test merely asked Fcitx 5 something over D-Bus. **Cause:** the call started Fcitx 5 by D-Bus activation; a Fcitx 5 started that way binds KWin's input-method protocols too (KWin's Wayland filter does not keep them to the program it started) and its popup surface takes KWin's only input panel (`InputPanelV1Window`, one at a time), so Plasma Keyboard's keys were no longer drawn. **Fix:** every call to Fcitx 5, in the keyboard and in a rig, goes without auto-start (`QDBusMessage::setAutoStartService(false)`, `busctl --auto-start=no`, `NO_AUTO_START` in GDBus): an absent Fcitx 5 then answers "no such service". **Found by:** KWin's log at the moment Fcitx 5 drew its popup (`kwin_virtualkeyboard: Replacing input panel KWin::InputPanelV1Window(... surface=A ...) with KWin::InputPanelV1Window(... surface=B ...)`), after which the rig found no rows of keys and nothing was typed. In KWin's window list Plasma Keyboard's panel has the class `kwin_wayland`, because KWin starts it on a private socket.

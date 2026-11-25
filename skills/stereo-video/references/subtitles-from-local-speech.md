@@ -67,6 +67,9 @@ The Vibe successor adds **Use the system default** and **Vibe (local)** to Autom
   **Cause found in the rig:** the GUI thread was waiting on `consumer-stopped` inside `Mlt::Consumer::run()`. An unnamed avformat thread in the stripped library was in a condition wait.
   **Fix:** isolate the export from the editor's event loop and enforce its progress deadline. Retain the full thread stack for any consumer that still stalls.
   **How found:** run repeated exports with a missing model to end each successful export before recognition; attach the container's debugger at the stall and collect `thread apply all bt`.
+  In the two-CPU desktop rig, the predecessor stalled on attempt 8.
+  The successor's renderer stalled on attempt 33 with no encoder thread left, and the editor displayed the timeout and enabled Process again.
+  A 50-second forced hold produced the same warning shortly after the 20-second deadline.
   The related [MLT PR 1366](https://github.com/mltframework/mlt/pull/1366) corrects an avformat running-state race. A stack waiting for the stopped event alone cannot identify that race.
 
 ## Run the fixed clips
@@ -85,7 +88,11 @@ A cue cannot span a pause of one second or more between sentences.
 Set these limits from the editing need before seeing model output.
 The two fixed waveforms, a 4.5-second leading-silence variant and a speech-over-music variant have both raw and Stable Timestamps server replies to replay.
 Against the synthetic waveforms, the compiled timing function retained all words and placed each cue inside those limits.
-Test real recordings separately and count which cues have verified boundaries. A fragment whose text starts or ends mid-sentence needs a word-level reference before its timing can be scored.
+The installed 26.08.1 +stereo3d15 package saved those words with a maximum endpoint error of 33 ms.
+In the Speech Editor, both Vibe routes saved the two spoken passages as frames 25–103 and 149–190 at 25 fps after a word selection and silence removal.
+Test real recordings separately and count which cues have verified boundaries.
+Two 80-second LibriVox excerpts gave 2 of 4 assessable English cues and 17 of 19 assessable Brazilian Portuguese cues within the fixed limits.
+The two clips produced 14 and 31 cues respectively. A fragment whose text starts or ends mid-sentence needs a word-level reference before its timing can be scored.
 
 Read the project's subtitle file after saving. Measure cue text and times against the reference. Keep each unsuccessful run as a separate control.
 For stereo, give the monitor different known fills in the two eyes, capture using Stereo KWin, and compare the glyph masks in the text region of a marked `.pns` pair.

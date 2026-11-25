@@ -11,8 +11,21 @@ def git(*args):
     return subprocess.check_output(["git", *args], text=True)
 
 
-def added_lines(parent, tip, path):
-    diff = git("diff", "--no-color", "--no-ext-diff", "-U0", parent, tip, "--", path)
+def changed_files(parent, tip):
+    fields = git("diff", "--name-status", "-z", "-M", parent, tip, "--", "src", "tests")
+    entries = iter(fields.rstrip("\0").split("\0")) if fields else iter(())
+    for status in entries:
+        old = next(entries)
+        new = next(entries) if status.startswith(("R", "C")) else old
+        yield status, old, new
+
+
+def changed_lines(parent, tip, old_path, path):
+    if old_path == path:
+        revisions = (parent, tip, "--", path)
+    else:
+        revisions = (parent + ":" + old_path, tip + ":" + path)
+    diff = git("diff", "--no-color", "--no-ext-diff", "-U0", *revisions)
     old = new = 0
     for line in diff.splitlines():
         hunk = re.match(r"^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@", line)
@@ -64,18 +77,17 @@ def main():
             ask(2, "MESSAGE", n, line)
     if not re.search(r"^Change-Id: I[0-9a-f]{40}$", body, re.M):
         ask(2, "MESSAGE", 1, "missing Change-Id")
-    paths = git("diff", "--name-only", "--diff-filter=AM", base, tip, "--", "src", "tests")
-    for path in paths.splitlines():
+    for status, old_path, path in changed_files(base, tip):
         filename = PurePosixPath(path)
         header = filename.suffix in (".h", ".hpp")
         if not header and filename.suffix not in (".cpp", ".cxx", ".cc"):
             continue
         production = path.startswith(args.module_dir.rstrip("/") + "/")
-        lines = git("show", tip + ":" + path).splitlines()
-        for side, n, value in added_lines(base, tip, path):
+        lines = [] if status == "D" else git("show", tip + ":" + path).splitlines()
+        for side, n, value in changed_lines(base, tip, old_path, path):
             if side == "-":
                 if re.search(r"\w*(?:Cache|Changed|Listener|[Ll]ock|[Ss]ync)\s*\(", value):
-                    ask(19, path, n, value)
+                    ask(19, old_path, n, value)
                 continue
             i = n - 1
             near = "\n".join(lines[max(0, i-1):i+5])

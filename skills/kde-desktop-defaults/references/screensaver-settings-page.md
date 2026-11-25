@@ -65,6 +65,20 @@ One job builds all four successors (`screensavers-links-96/build-job.sh`, a tabl
   **Cause:** the limits arrive a moment after the first request, later still while the window is not on an output yet. **Fix:** wait once (700 ms) for the first answer, and draw the saver again when `depth_limits` arrives or changes. **Found by:** `WAYLAND_DEBUG=client`: `depth_limits(10, 4)` 40 ms after `get_depth`.
 - **Symptom:** the preview shows one view and says it does not fit, in System Settings' default window.
   **Cause:** the page's side column was wider than the page (566 px beside the sidebar), so the rectangle reached past the window. **Fix:** a page fits about 560 px; the preview is 320 by 180. **Found by:** the page's own log line with the rectangle, the window and the page.
+- **Symptom:** at 125 % the preview's far side stands at 10.7 px where the limit is 6.7 (measured 9.0 px for a saver that should read 5.5).
+  **Cause:** at a fractional scale `QScreen::devicePixelRatio()` is the next whole number (2) while `QScreen::size()` is in the desktop's own pixels, so "size times ratio" made a 1280 px screen 2048 wide. **Fix:** the screen's size times the window's `devicePixelRatio()` (1.25). **Found by:** the page's own log line (`screen 2048`) in the rig's 125 % row.
+- **Symptom:** one move of the pointer does not end the full-screen preview.
+  **Cause:** the first motion event was taken as the place to measure from, and a window that opens under a resting pointer gets an enter event, not a motion. **Fix:** take the place from `QEvent::Enter` too. **Found by:** `WAYLAND_DEBUG=client`: `wl_pointer.enter` at the button's place, then a single `motion`.
+- **Symptom:** the rig's click lands 36 px above the button, or a row passes on one page and fails on another.
+  **Cause:** as above, window pixels against screen pixels. **Fix:** compute the click from the page's logged rectangle plus KWin's client corner (`rig/button.py`), never from a picture alone.
+- **Symptom:** the Power Management page says "The Power Management Service appears not to be running" in the rig, and the daemon says "Operation not permitted".
+  **Cause:** the daemon's file capability cannot be granted to the rig's user, and a container has no system bus. **Fix:** run a copy of the daemon (a copy has no file capability) with `DBUS_SYSTEM_BUS_ADDRESS` on a `dbus-daemon` of the container's own, with stand-ins for UPower and logind (`rig/system-bus-fixture.py`).
+- **Symptom:** plasmashell stops with "Aborting shell load: The activity manager daemon (kactivitymanagerd) is not running".
+  **Cause:** `kactivitymanagerd` is not on `PATH`. **Fix:** start `/usr/lib/x86_64-linux-gnu/libexec/kactivitymanagerd` first.
+- **Symptom:** an apt proof that adds SparkyLinux's repository plans to replace the edition's Qt with Debian's.
+  **Cause:** the station's source file for SparkyLinux is named `sparky.sources`, the same name as the round's own source in the rig image, so copying it in removed the round from apt's sources and its 1001 pin had nothing to pin. **Fix:** copy it under another name; read `apt-cache policy` of one edition package before trusting a plan.
+- **Symptom:** a container script stops with no message right after `apt-cache policy NAME | head -4 > file`.
+  **Cause:** `set -o pipefail`: `head` ends first and the writer dies of SIGPIPE. **Fix:** no `head` behind a program whose status matters.
 - **Symptom:** a button reads "Display _Monitor…".
   **Cause:** `&` is a mnemonic mark in a Qt Quick Controls button. **Fix:** `&&`, in the English and in every translation that keeps the sign.
 - **Symptom:** `make` warns that `debian/rules` has a modification time in the future, and a second build differs in file times.

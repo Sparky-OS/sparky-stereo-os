@@ -716,6 +716,19 @@ The unchanged kernel-settings package records **Sultan Alsawaf** and **Eric Naim
 The helper itself contains no copied CachyOS code. /tmp on disk follows **Debian's trixie release notes** (5.1.6 and 5.2.1, the Debian Documentation Project).
 Names above come from upstream copyright, Debian copyright or git records; contact details are omitted.
 
+### Storage cleanup study
+
+| Project | What the study reviewed | Credit |
+|---|---|---|
+| [BleachBit](https://github.com/bleachbit/bleachbit) | Cleaner definitions, preview and the system-cleaning commands used by the edition's presets | Andrew Ziem, BleachBit's author, and nodiscc, credited in the APT and journal cleaner definitions |
+| [Dolphin](https://invent.kde.org/system/dolphin) and [KIO](https://invent.kde.org/frameworks/kio) | Disk Usage Statistics, file properties and the wastebin | Felix Ernst and Méven Car, Dolphin's maintainers, Peter Penz, its original maintainer, and David Faure, credited in KIO's wastebin implementation |
+| [Filelight](https://invent.kde.org/utilities/filelight) | Disk usage by folder and by drive | Laurent Montel and Martin Sandsmark, its maintainers, Max Howell, its original author, and Harald Sitter, who ported it to Qt Quick |
+| [KDE Partition Manager](https://invent.kde.org/system/partitionmanager) | Disk and partition selection | Andrius Štikonas, its maintainer, and Volker Lanz, its former maintainer and original author |
+| [KInfoCenter](https://invent.kde.org/plasma/kinfocenter) and [System Settings](https://invent.kde.org/plasma/systemsettings) | The Block Devices module and the host for KDE settings modules | Harald Sitter, credited in Block Devices, and Ben Cooksley, named as maintainer in System Settings |
+| [Plasma Free Space Notifier](https://invent.kde.org/plasma/plasma-workspace/-/tree/master/freespacenotifier) | The existing low-space warning and its drive actions | Lukas Tinkl, Lubos Lunak, Ivo Anjo and Kai Uwe Broulik, named in the notifier's source |
+| [Sweeper](https://invent.kde.org/utilities/sweeper) | KDE's privacy cleanup and thumbnail handling | Brian S. Stephan, its maintainer, Ralf Hoelzer, its original author, and Benjamin Meyer, credited for thumbnail cleanup |
+| [KDE Linux storage guide](https://linux.kde.org/docs/free-space/) | Existing KDE routes for freeing storage | Nate Graham, who wrote the guide |
+
 ### Plasma widgets the edition forks for stereo depth
 
 Each original stays in its author's repository, where bugs and patches for it go; the edition's fork holds only the stereo variant.

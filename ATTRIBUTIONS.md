@@ -1616,6 +1616,12 @@ Dictation in the programs built on KDE's speech-to-text library, with Vibe's eng
 - **Vibe** ([github.com/thewh1teagle/vibe](https://github.com/thewh1teagle/vibe), MIT): thewh1teagle; its `vibe-server`, run unchanged through its documented local API, is the engine.
 - **whisper.cpp and ggml** ([github.com/ggml-org/whisper.cpp](https://github.com/ggml-org/whisper.cpp), [github.com/ggml-org/ggml](https://github.com/ggml-org/ggml)): Georgi Gerganov and the ggml contributors; the speech inference inside `vibe-server`.
 
+## Kdenlive's speech-to-text source audit (ORDER 74, 2026-11-25)
+
+- **Kdenlive** ([KDE's source](https://invent.kde.org/multimedia/kdenlive)). Jean-Baptiste Mardelle and Julius Künzel are named in the speech engine source headers. The audit follows their Kdenlive engine interfaces through the timeline subtitle import.
+- **Vibe** ([thewh1teagle/vibe](https://github.com/thewh1teagle/vibe), MIT). thewh1teagle provides the local server and its model and language settings.
+- **whisper.cpp and ggml** ([ggml-org/whisper.cpp](https://github.com/ggml-org/whisper.cpp), MIT). Georgi Gerganov and the ggml contributors provide the speech inference and tensor library used by Vibe.
+
 ## Stereo icons wherever the desktop draws an icon (queue row 77, milestone 1, 2026-11-22)
 
 Each eye's view of a stereo icon, given by the icon engine while the edition's Qt draws a window once per eye, builds on these projects, named from the headers of the files read. Names only; these projects do not endorse the edition.

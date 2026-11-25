@@ -40,6 +40,12 @@ Use three fresh sessions at 22, 48, 64 and 256 px per eye.
 A changing frame count comes from the movie or scene, and the captured pixels establish that the content moved.
 A temporary fixture applet can run the same item types in plasmashell. Use three item grabs to confirm that both the still and animated routes behave the same there.
 
+## Ask for the engine from a second applet
+
+The fork of Petar Nedyalkov's Advanced Weather Widget shares the existing engine through the `Kirigami.Icon` used by its `WeatherIcon.qml`. The KDE system condition-icon path supplies the freedesktop name, opts into `weatherTheme` and passes a passive hover. The ordinary fallback stays in the applet for missing theme icons. Bundled SVG themes, custom picks and the font remain the applet's existing choices. In the panel, select the KDE icon theme for a weather-name-based condition chip. The popup's condition icon theme defaults to KDE.
+
+For an offline test use a fresh applet configuration with one selected location per widget and a same-location recent `weatherCache` in its own schema. Supply day and night observations and distinct daily condition names. Verify the cache through the widget's normal startup restore, then hover a specific condition cell and compare the cropped eyes. The [machine choice and system settings](../../kde-desktop-defaults/references/weather-icon-defaults.md) cover the shared look selection.
+
 ## Keep the two times equal
 
 Use one animation instance for the packed fixture. Declare one full side-by-side surface through libstereo-declare. For a stable theme pair this declaration belongs to the flow described in [themed icons per eye](themed-icons-per-eye.md).

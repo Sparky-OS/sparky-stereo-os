@@ -30,6 +30,14 @@ The edition's free-space notifier supplies the threshold and recovery observatio
 5. To check the unattended path, set the period in a disposable account and move the fixture clock across the boundary. Plant an eligible stale temporary file, a held-open one, a personal document and current-boot evidence on the same volume. Hold a POSIX lock in the configured APT directory, verify the saved deferral and release it before the next period. The approved-ID path enforces the same protected-file rules as interactive confirmation.
 6. Open Last runs in the page and match its timestamp, volume, cleaner kinds and allocated bytes to the receipt. A failed operation and a run that cannot start each have a Problems action leading to a review. Keep per-item paths out of the publicly readable machine receipt. Use the service's private journal for individual engine diagnostics.
 
+### Explain the default selections before asking for consent
+
+Compare the two recipe presets under `sparky-os/packages/sparky-stereo-housekeeping/share` with the published package's initial user file under `/etc/skel/.config/bleachbit` and root seed under `/usr/share/sparky-stereo-housekeeping`. In the `[tree]` section, a dotted key with a true value is a selected option. Undotted group keys do not identify what a cleaner removes. Check the current scoped engine for each option's effect.
+
+The installer and the Settings page use the same localized default summary. Name recoverable data separately from things a person can lose, such as Firefox bookmark backups, Vim recovery files and local mail. The scoped engine skips journal removal, swap wiping and database compaction. The package-cache option covers obsolete downloaded packages while the separate unscoped APT autoclean command is refused. Caption the text as the defaults so it still makes sense after a person changes their selections.
+
+Both package recipes run `sparky-stereo-storage-kcm/tests/check-default-summary.py` against the repository's packages folder before building. Its `default-cleanup-summary.json` maps the actual QML messages to the selected options. The checker also compares all ten Qt and KDE catalogue pairs. To prove the gate, add `firefox.url_history = True` to a disposable copy of the account preset and run both recipes. Each should name the unmapped option and stop before producing a package. The success case uses the extracted shipped presets. Read the built Qt and KDE catalogues and open the two installed pages in three languages.
+
 | Symptom | Cause | Fix and how to find it |
 |---|---|---|
 | Calamares installs from a signed edition pool but cannot configure the installer | The test image lacks Sparky's base repositories or Desktop Base's artwork alternatives directory | Read APT's first unresolved dependency and the artwork postinst error. Load the signed Sparky core and tiamat indexes in the seed, install Desktop Base there, and disconnect the fixture before starting Calamares. |

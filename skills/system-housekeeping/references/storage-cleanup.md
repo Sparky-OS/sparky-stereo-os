@@ -2,9 +2,36 @@
 
 **For** contributors to Storage Cleanup in KDE, use the fixture to prove what can be selected, what space an item releases and what needs to stay.
 
-**Check freshness first.** Verified against the milestone fixture on 2026-11-25.
-The prototype only accepts a marked, isolated tmpfs in a container.
-The System Settings page, the installed helper and the device actions are integration work.
+**Check freshness first.** The edition's intended integration uses BleachBit as the engine. The independent `tools/storage-cleanup` program is a measuring fixture. It accepts only a marked isolated tmpfs in a container.
+
+## BleachBit in System Settings
+
+Look for the edition's BleachBit successor before using these switches. The Debian 6.0.6-1 control rejects `--json`. The edition patch lives in `sparky-os/packages/bleachbit/patches/structured-preview.patch`. The engine's installed entry point is `/usr/bin/bleachbit`. The page runs the same executable for the person and invokes it through the fixed polkit helper for administrator use.
+
+```sh
+bleachbit --json --list-cleaners
+bleachbit --json --preview --volume / --preset
+```
+
+The first command returns BleachBit's cleaner names, their option descriptions and warnings, and flags from `[tree]` in the current account's `~/.config/bleachbit/bleachbit.ini`. The edition puts its initial user copy in `/etc/skel` and creates the administrator's file on the first housekeeping install when none exists. `--set-option cleaner.option true|false` edits this same tree through BleachBit's Options API. Reopen the catalogue to check a write. A running copy of the GTK window may still hold its prior in-memory selection.
+
+The preview exposes the cleaner and option, the path, the action label, allocated bytes, the filesystem estimate flag and an item ID. Use Linux mount IDs from the opened path for scope. Checking only the pathname prefix would include files on a nested mount. Count `st_blocks × 512` for file allocation and distinguish it from logical length or space still referenced by snapshots. At confirmation, BleachBit regenerates the commands and matches the approved IDs to the mounted volume and file identities. Temporary files have a seven-day first age and are rechecked under a write lease. A lease refusal leaves the item in place. Scope-aware APT preview reads APT's configured directory and respects APT's POSIX lock. Detailed errors accompany the preview or confirmation result.
+
+Journal vacuum can remove archived journals containing the current boot. Scoped cleanup refuses it and also refuses direct cleanup of persistent and volatile journal storage and core-dump directories. The checked journal preference remains visible in the catalogue. Browser bookmark backups and locally stored mail may be in the supplied preset. Show what each chosen entry removes before confirmation.
+
+The edition's free-space notifier supplies the threshold and recovery observation. The Problems engine keeps the volume and an action to open its preview. Use a Problems action for that UI step, since a successful `repair` command normally deletes the record immediately. Clearing belongs to the existing notifier after the volume recovers. Weekly actions open a preview, and temporary files are never taken by an unattended run.
+
+## Integration traps
+
+| Symptom | Cause | Fix and how to find it |
+|---|---|---|
+| Stock BleachBit rejects the JSON command | The CLI renders human-readable summaries from the Worker | Run the new test on the extracted Debian control before applying the patch. Inspect Worker command dispatch for paths and operation IDs. |
+| German or Portuguese KCM title with an English page | Setting only `LANGUAGE` left the C locale active | Generate and use the real session locale in `LANG`. Verify both the Qt page and BleachBit's catalogue. |
+| File checkboxes appear without their labels | The Kirigami version in the rig exposes no `Format.formatByteSize` object there | Read the QML exception and use the linked KDE `KFormat` method to format each count. |
+| The package's main binary is removed by Lean Code | The archive link gate requires a working namespace runner. The default container disallowed user namespaces, and the explicit namespace probe could create one but could not mount `/proc` | Run the exact bubblewrap preflight and retain its exit before scheduling the package build. Use the edition's authorized namespace runner for qualification. |
+| The low-space record disappears when its preview opens | The Problems `repair` verb considers a zero exit to be a successful repair | Give the record a named preview action. Feed the record's clear from the notifier's recovery branch. |
+
+The scoped BleachBit feature and the page were exercised in a container. Drive paths in an installed edition Plasma session and package qualification need their own proof.
 
 ## Working recipe
 

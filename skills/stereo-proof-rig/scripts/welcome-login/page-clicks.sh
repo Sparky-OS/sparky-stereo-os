@@ -26,10 +26,13 @@ try:
 except Exception as e:
     print('unreadable: %s' % e)
 "; }
-closeall() { for n in plasma-welcome yad systemsettings kcmshell6; do for p in $(pgrep -x $n); do kill -TERM "$p"; done; done; sleep 2; }
+closeall() { for n in plasma-welcome yad systemsettings kcmshell6 variety; do for p in $(pgrep -x $n); do kill -TERM "$p"; done; done; sleep 2; }
 for page in $(echo "$PAGES" | tr ',' ' '); do
 	closeall
-	plasma-welcome --pages "$page" > "$OUT/welcome-$page.log" 2>&1 &
+	# the session's own XDG_CONFIG_DIRS (read from plasmashell, a child of startplasma after its env scripts), as kded's
+	# children have it: the touch page reads the hardware layer's mark from it
+	dirs=$(tr '\0' '\n' < /proc/$(pgrep -x plasmashell | head -1)/environ | sed -n 's/^XDG_CONFIG_DIRS=//p')
+	XDG_CONFIG_DIRS=$dirs plasma-welcome --pages "$page" > "$OUT/welcome-$page.log" 2>&1 &
 	sleep 7; win "$page-open"; shot "$page-open"
 	set -- $(frame "$page-open"); fx=${1:-0}; fy=${2:-0}
 	echo "$page frame $*" >> "$OUT/marks.txt"
@@ -51,8 +54,8 @@ print('; '.join('%s|%s' % (w['cls'], w['caption']) for w in after if (w['cls'], 
 ")
 		printf '%s\t%s\turl=%s\tpkexec=%s\twindows=%s\tclipboard=%s\n' "$page" "$name" "$url" "$cmd" "$new" "$(clip)" >> "$OUT/results.tsv"
 		# close what the click opened, keep the Welcome window
-		# and spsudo with the Upgrade helper (comm sparky-stereo-w), which would ask for the password again
-		for n in yad systemsettings kcmshell6 spsudo sparky-stereo-w; do for q in $(pgrep -x $n); do kill -TERM "$q"; done; done; sleep 1.5
+		# and spsudo with the Upgrade helper (comm sparky-stereo-w), which would ask for the password again; and Stereo Variety
+		for n in yad systemsettings kcmshell6 spsudo sparky-stereo-w variety; do for q in $(pgrep -x $n); do kill -TERM "$q"; done; done; sleep 1.5
 	done
 done
 closeall

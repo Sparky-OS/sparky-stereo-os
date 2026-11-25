@@ -81,7 +81,28 @@ The task manager's source activates a window on a tap and opens its menu on a lo
 
 **A page cannot run a command to decide whether it shows** (Main.qml reads `show` once, when it makes the page). The edition's plasma-welcome +stereo3d2 adds `Welcome.Distro.flag(key)`: the `[Distribution]` group of `plasma-welcomerc`, read as KConfig reads it (the person's file, then each folder of `XDG_CONFIG_DIRS`), false when no file sets it.
 `/etc/xdg/plasma-workspace/env/sparky-stereo-welcome-touch.sh` (sourced by startplasma after the hardware layer's `sparky-stereo-tablet-mode.sh`; the names sort so) puts `/usr/share/sparky-stereo-welcome/touch-screen/xdg` (a `plasma-welcomerc` with `TouchScreen=true`) in front of `XDG_CONFIG_DIRS` where the hardware layer's own folder already is, that is where `has-tablet-mode` found a touch screen of the computer's own.
-The page ships with `show: true` (every computer); `show: Welcome.Distro.flag("TouchScreen")` is the other way, one line.
+The page ships with `show: Welcome.Distro.flag("TouchScreen")`, shown only where the hardware layer found a touch screen of the computer's own, because Daniel chose it (2026-11-25, asked whether it shows on every computer: "Only with a touch screen"); `show: true` (every computer) is the other way, one line.
+
+## Pages that explain a default: written from the packages, not from the plan
+
+Three pages after KDE's own and before the SparkyLinux page (Daniel, 2026-11-25: "pick the ones you think are valuable enought to be there"), each built like Point, Then Type: a few plain sentences, why it is so, how to change it, a button to its own setting.
+Plasma Welcome orders a folder's pages by file name (`QDir::Name` in `App::distroPages()`), so they are `02-Your3DDepth.qml`, `03-ChangingWallpaper.qml` and `04-WindowsKeysAndSessions.qml`, after the touch page's `01` and before `05-SparkyWorld.qml` and `06-HelpTest.qml`.
+
+**Reconcile each sentence against the published package before writing it.** What a default does on the image is what the published (or staged) package does, not what a design says it will do:
+
+| Page | What ships (read in r1123a, 2026-11-25) | The button |
+| --- | --- | --- |
+| Your 3D Depth, Set Once | one setting, `kwinrc [StereoDepth] SunkLimit, PoppedLimit`, on Stereo KWin's 3D Depth page under Display; the contract's own words ("one separation setting, centralized, tailored to the screen, not to the element size") and nothing more | `kcm_kwinstereodepth` |
+| A Wallpaper That Changes by Itself | Variety 0.9.2-1+stereo3d1: every 300 s once it runs; it starts only when opened, then writes its own autostart entry; its sources at first are folders of the computer, every online source unticked (`Options.py` adds unknown sources as `False`); no rule for a metered connection | `variety --preferences` |
+| Keys and Sessions You Know from Windows | Ctrl+Alt+Del, Ctrl+Shift+Esc, Ctrl+Esc to System Monitor (sparky-stereo-look's kglobalaccel entry); Ctrl+Alt+Esc to the logout screen (plasma-workspace +stereo3d6 and later); `ksmserverrc loginMode=emptySession`, `confirmLogout=false` | `kcm_keys`, `kcm_smserver` |
+
+The wallpaper page describes Variety as it is published. The edition's own Variety defaults (on at login, every place Debian and KDE put wallpapers, online sources on, nothing downloaded on a metered connection) are not built yet, and the page's sentences change with the package that brings them.
+
+**Names in each language come from where the person sees them:** KDE's page names from their desktop entries on the image (`Name[pt_BR]=` of `kcm_keys.desktop` and the others), a program's own labels from its catalogues (Variety's in Polish and Traditional Chinese are partly English, so the page quotes them in English there), key names from Qt's `qtbase_LANG.qm` (`QShortcut` context: de Strg, Entf, Umschalt; fr Suppr, Échap, Maj; es Control, Suprimir, Escape, Mayúsculas).
+
+**A page about a program that may be missing** gets the same kind of condition as the touch page: `sparky-stereo-welcome-variety.sh` puts `/usr/share/sparky-stereo-welcome/variety/xdg` (a `plasma-welcomerc` with `Variety=true`) in front of `XDG_CONFIG_DIRS` when `${SPARKY_STEREO_VARIETY:-/usr/bin/variety}` is executable; the page has `show: Welcome.Distro.flag("Variety")`. KConfig merges the `[Distribution]` group of every folder, so the touch and Variety marks stand together.
+
+**A drawing about depth needs something inside each part that moves sideways.** A sunk element's edges keep their 2D place and a vertical gradient has nothing to shift, so the depth page's wallpaper has a sun and a row of hills; the rig measures each part's shift between the eyes (`eyes-align.py` on a region): sun 10 (the sunk limit), the window's lines 0, the menu −4 (the popped limit), at KWin's default limits.
 
 ## The session proof
 
@@ -93,7 +114,7 @@ The scripts are in [`stereo-proof-rig/scripts/welcome-login`](../../stereo-proof
 4. `measure-welcome.py page1|page2|flat2d`: the first page's eyes against the picture's own views (PSNR), nothing else differing; the drawing's window behind measured on its inner bars against the same page on a 2D output; a 2D output showing the left view.
 5. `prove.sh OUT`: every case and every row, one row per claim, exit 1 on a row not as expected.
 
-Milestone 2 (`prove-m2.sh OUT [m1 … m8]`) adds, in the same folder:
+Milestone 2 (`prove-m2.sh OUT [m1 … m9]`; m9, the depth, wallpaper and Windows keys pages, came with 20261125.2) adds, in the same folder:
 - `mklayer.sh BASE TAG LOGS PKG…`: one thin image layer installed by apt with the edition's tree mounted, apt's plan (`Inst`, `Remv`) kept; `mkbuilder.sh` freezes a source's build dependencies in the builder.
 - `eyes-align.py CAPTURE REGION`: pair or one view, by the horizontal shift that best aligns the two eyes (a pair with depth of its own cannot be aligned by one shift; the desktop's own layers can); proved on known-flat and known-pair captures. With `MEASURE_SCALE` and `MEASURE_ORIGIN_X` it maps KWin's logical frame to one output's device pixels (125 %, a second output); `measure-welcome.py` takes the same, and `MEASURE_MIN_DB` for a resampled picture.
 - `APP_CMD` (a program run in the first login, then both eyes), `QUIET_FIRST_RUN`, `USER_SETUP`, `SEED_HOME` (an earlier account's home), `STANDIN_PKEXEC` (a pkexec that writes what it was asked), `SCALE`, `OUTPUTS=2` and `LOGIN_LANG` in `welcome-login.sh`; the open catalogues of the Welcome Center read from `/proc/PID/maps`.
@@ -102,6 +123,7 @@ Milestone 2 (`prove-m2.sh OUT [m1 … m8]`) adds, in the same folder:
 - `cond-check.sh`: the Welcome Center started with the session's own `XDG_CONFIG_DIRS` (read from plasmashell), the first page it shows told by its first line of text (`which-page.py`, references in `refs/`).
 - `unit-case.sh`: a unit under a real user manager (systemd as PID 1); `live-seed.sh`: the live user's home as the live-config hook leaves it.
 - `compare-debs.sh OLD NEW`: a successor's paths against its predecessor's; `stage.sh`: a stage as source closures with their sums.
+- `m9-setup.sh`: with `VARIETY_RAN=1` the account has started Variety before (its `~/.config/variety/.firstrun`), so its button opens Preferences rather than Variety's first questions; `refs/text-wallpaper.png` tells the wallpaper page by its first line.
 
 ## What was measured (ORDER 63 and 720, milestone 1, 2026-11-25)
 
@@ -137,7 +159,17 @@ On the successors staged together (stereo-layer 1.23.4, plasma-welcome +stereo3d
 | Ten languages | each login's first page translated, the language's own `sparky-stereo-welcome.mo` open in the Welcome Center |
 | 125 % and two outputs | the first page's picture a pair (at 125 % each eye about 24 dB from its own view, 16 from the other: the compositor resamples it); the drawing's window behind −1/+1 device pixels, the rest at the screen |
 
+**20261125.2 (2026-11-25), the same rerun whole, 122 rows, every one as predicted:** the touch page shown where the hardware layer says a touch screen is there, not where it says none, not on the rig; the three new pages' buttons open 3D Depth, Variety's "Welcome to Variety!" on a new account or "Variety Preferences" once Variety has run, Shortcuts and Desktop Session; the depth drawing's sun at 10, the window's lines at 0 and the menu at −4 at KWin's default limits, the keys page flat; the wallpaper page shown where Variety is installed and not where it is not; each page's heading translated in pt_BR, de_DE and ja_JP.
+
 ## Traps
+
+### The pages of 2026-11-25 (20261125.2)
+
+- **Symptom:** the wallpaper page's button opens "Welcome to Variety!", not Variety's Preferences. **Cause:** Variety's first start (no `~/.config/variety/.firstrun`) asks its welcome and privacy questions first, then writes its autostart entry and opens Preferences (`VarietyWindow.first_run`). **Fix:** not a fault; the page says so, and the rig proves both accounts, a new one and one that started Variety before (`m9-setup.sh`, `VARIETY_RAN=1`).
+- **Symptom:** a drawing's sunk part shows no depth, or half of it at one edge. **Cause:** the edition's Qt Quick keeps a sunk element's edges at their 2D place, and a fill that only changes from top to bottom has nothing that moves sideways. **Fix:** give the part a picture of its own inside it (the depth page's sun and hills) and measure inside it.
+- **Symptom:** `build-script-packages.sh` on a `git worktree` stops with `fatal: not a git repository: …/.git/worktrees/NAME`. **Cause:** a worktree's `.git` is a file pointing into the main clone, which the build container does not mount. **Fix:** a standalone `git clone --shared` checked out at the commit.
+- **Symptom:** removing that scratch clone is refused ("commits on no remote"). **Cause:** a `--shared` clone carries the source clone's branches, and the cleanup guard counts them. **Fix:** bundle the branch into the lane folder first, then remove the clone.
+- **Symptom:** Variety's tray icon or a program's Recommends are missing from a rig image although the ISO has them. **Cause:** `mklayer.sh` installs with `--no-install-recommends`, while the ISO installs the desktop meta with its Recommends (`rootfs.sh`). **Fix:** name such a Recommends in the layer (`gir1.2-ayatanaappindicator3-0.1` beside `variety`).
 
 ### Milestone 2
 

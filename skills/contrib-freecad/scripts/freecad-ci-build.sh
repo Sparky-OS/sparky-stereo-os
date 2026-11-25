@@ -59,6 +59,8 @@ export DEBIAN_FRONTEND=noninteractive
 printf '#!/bin/sh\nexec "$@"\n' > /usr/local/bin/sudo && chmod 755 /usr/local/bin/sudo
 bash /src/package/ubuntu/install-apt-packages.sh > /build/apt.log 2>&1 || { echo "apt packages: FAILED (see apt.log)"; exit 2; }
 apt-get install -y -qq --no-install-recommends clang-tidy curl ca-certificates xvfb xauth >> /build/apt.log 2>&1 || exit 2
+# the downloaded packages stay in the container's layer, on the host's Docker disk, until cleaned
+apt-get clean
 echo "apt packages: installed; clang-tidy $(clang-tidy --version | grep -o 'version [0-9.]*')"
 # CMake 4.2.3, as the job's setup-cmake step, checked against Kitware's published SHA-256
 cd /tmp && curl -sSfLO https://github.com/Kitware/CMake/releases/download/v4.2.3/cmake-4.2.3-linux-x86_64.tar.gz \
@@ -69,7 +71,14 @@ chown "$OWNER" /build
 as_owner() { setpriv --reuid="${OWNER%:*}" --regid="${OWNER#*:}" --clear-groups -- env HOME=/build/home "$@"; }
 mkdir -p /build/home && chown "$OWNER" /build/home
 status=0
-if as_owner cmake -S /src -B /build/release -G Ninja --preset release -DFREECAD_USE_EXTERNAL_COIN_PIVY=ON \
+# FreeCAD's configure writes into its source tree (src/3rdParty/Clipper2 configure_file), so it
+# builds a copy, never the read-only checkout
+rm -rf /build/src && as_owner cp -a /src/. /build/src || { echo "source copy: FAILED"; exit 2; }
+# a cache made for another source folder is refused by CMake ("does not match the source")
+if [ -f /build/release/CMakeCache.txt ] && ! grep -qx 'CMAKE_HOME_DIRECTORY:INTERNAL=/build/src' /build/release/CMakeCache.txt; then
+    rm -rf /build/release
+fi
+if as_owner cmake -S /build/src -B /build/release -G Ninja --preset release -DFREECAD_USE_EXTERNAL_COIN_PIVY=ON \
         -DFREECAD_USE_EXTERNAL_PYCXX=ON -DFREECAD_USE_EXTERNAL_JSON=ON > /build/configure.log 2>&1; then
     echo "configure: PASS"
 else
@@ -105,14 +114,14 @@ for line in diff.splitlines():
         start, count = int(m.group(1)), int(m.group(2) or 1)
         if count:
             files[name].append([start, start + count - 1])
-print(json.dumps([{"name": "/src/" + n, "lines": l} for n, l in files.items() if l]))
+print(json.dumps([{"name": "/build/src/" + n, "lines": l} for n, l in files.items() if l]))
 PY
     mapfile -t tidyfiles < <(python3 -c 'import json,sys; [print(e["name"]) for e in json.load(open(sys.argv[1]))]' /build/tidy-lines.json)
     if [ ${#tidyfiles[@]} -gt 0 ]; then
         # clang_tidy.py runs "clang-tidy -p build" in its working folder and writes its fixes there
         mkdir -p /build/tidy-cwd && ln -sfn /build/release /build/tidy-cwd/build && chown -R "$OWNER" /build/tidy-cwd
         cd /build/tidy-cwd
-        if as_owner env RUNNER_WORKSPACE=/build python3 /src/tools/lint/clang_tidy.py --files "${tidyfiles[@]}" \
+        if as_owner env RUNNER_WORKSPACE=/build python3 /build/src/tools/lint/clang_tidy.py --files "${tidyfiles[@]}" \
                 --line-filter "$(cat /build/tidy-lines.json)" --clang-style file \
                 --log-dir /build/tidy --report-file /build/tidy/report.md > /build/clang-tidy.log 2>&1; then
             echo "clang-tidy: PASS (no errors; warnings in tidy/clang-tidy.log)"

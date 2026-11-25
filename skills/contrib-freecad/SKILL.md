@@ -60,7 +60,7 @@ Every rule with its clause, line and revision: [FreeCAD's rules, as read](refere
 | Size | about 400 to 500 changed lines per PR; a larger one says why | contributing-changes.md |
 | Python API | a break avoided, or described with its replacement and the affected addons listed | CONTRIBUTING 5.10 |
 | UI | before and after pictures; the Design Working Group told (a bot links its recorded Discord thread on PRs marked for UI/UX review) | CONTRIBUTING 5.12; PR template; pull requests 32030, 32489 |
-| Text | FEP-0007: Title Case commands, sentence case labels, tooltips in the third person; `.ts` files are Crowdin's | gui-and-translations.md |
+| Text | FEP-0007 (Active): Title Case commands, sentence case labels, tooltips in the third person, an ellipsis `…` only where the action asks for more input; `.ts` files are Crowdin's | FEP-0007; gui-and-translations.md |
 
 After the pull request: maintainers self-assign; reviews end in labels (`Approved: Code Quality`, `Approved: UI/UX`, `Approved: Tested`, `Approved: CI`); a tester's "Tested" review for GUI fixes; the Monday merge meeting on Jitsi is open to authors; a fix labelled `backport releases/FreeCAD-26-3` gets its backport PR from a bot.
 A first contribution's CI waits for a maintainer to start it.

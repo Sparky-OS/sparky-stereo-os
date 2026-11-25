@@ -83,7 +83,7 @@ Walk each finding against the table: the program finds places to read, the contr
 | R9 | note | more than 500 changed lines | contributing-changes.md, "Keep PRs small and structured" | split into coherent PRs, or say why not |
 | R10 | note | lines added in Quarter, `src/3rdParty`, QSint or navlib | Benjamin Nauck on 30634; `.pre-commit-config.yaml` excludes Quarter | the smallest hook, in a commit of its own |
 | R11 | must | a file whose line endings changed (CRLF to LF, or mixed) | AGENTS.md "Preserve ... existing line endings"; Kacper Donat on 28941 | keep the file's own endings |
-| R12 | note | an ellipsis in a menu text | gui-and-translations.md (FEP-0007): the ellipsis only where the action asks for missing input | no ellipsis for "open settings" |
+| R12 | must | an ellipsis in a menu text | FEP-0007 (Active, 1.0.2): "Use an ellipsis **only** when the action requires further user input"; "Do **not** use ellipses merely because an action opens a dialog"; "the single ellipsis character `…` (not three dots `...`)" | no ellipsis for "open settings"; `…` where input is asked |
 | R13 | note | a method added to a Python binding | CONTRIBUTING 5.10; mnesarco on 30631 | describe the API change, search the addons |
 | R14 | must | an AI co-author trailer or tool branding in a message | AGENTS.md lines 40 and 41 | `Assisted-by:` only |
 | R15 | must | words of another product in code, comments or messages (a distribution's name, its library, its settings module, a Debian patch header) | CONTRIBUTING 5.4 and 5.5 | keep it in the distribution's own patch; the offer carries only what FreeCAD needs |
@@ -100,7 +100,8 @@ What no search finds, walk by hand: each commit builds and its tests pass (build
 
 On `main` against itself: `review-diff: 0 findings`, exit 0.
 On a commit made to break three rules (a header with `#ifndef GUI_KNOWNBADEXAMPLE_H`, a `std::fprintf(stderr, ...)`, the subject "the example of a report"): exactly three findings, R1, R4 and R8, exit 1.
-On the edition's four FreeCAD stereo patches as commits on the 1.1.3 tag: 66 findings, 52 on must rules ([the worked example](stereo-view-review-2026-11.md)).
+FreeCAD's own checks pass that same commit (`freecad-checks.sh`: every pre-commit hook, version sync, file case, Qt connections and codespell, exit 0): what reviewers ask is not what the CI checks, which is why this walk exists.
+On the edition's four FreeCAD stereo patches as commits on the 1.1.3 tag: 66 findings, 53 on must rules ([the worked example](stereo-view-review-2026-11.md)).
 
 ## Traps (symptom, cause, fix, how found)
 

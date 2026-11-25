@@ -63,7 +63,7 @@ docker commit -c 'ENV PATH=/opt/fc-lint/bin:/usr/local/sbin:/usr/local/bin:/usr/
 bash scripts/freecad-ci-build.sh --image UBUNTU_26_04 --build DIR [--target Gui_tests_run]... [--tidy-base BASE] CHECKOUT
 ```
 
-The Ubuntu job's steps in one container: the same apt script, CMake 4.2.3 checked against Kitware's published SHA-256 (`5bb505d5...ef650c23` for `cmake-4.2.3-linux-x86_64.tar.gz`), the release preset with the job's three options into `DIR/release`, the named test targets built with `-j4` and run under xvfb, and clang-tidy on the lines changed since `--tidy-base` through `tools/lint/clang_tidy.py`.
+The Ubuntu job's steps in one container: the same apt script, CMake 4.2.3 checked against Kitware's published SHA-256 (`5bb505d5...ef650c23` for `cmake-4.2.3-linux-x86_64.tar.gz`), a copy of the checkout in `DIR/src` (FreeCAD's configure writes into its source tree), the release preset with the job's three options into `DIR/release`, the named test targets built with `-j4` and run under xvfb, and clang-tidy on the lines changed since `--tidy-base` through `tools/lint/clang_tidy.py`.
 The checkout needs the revision checked out and three submodules (`git submodule update --init --depth 1 src/3rdParty/GSL src/3rdParty/OndselSolver src/Mod/AddonManager`); Coin and Pivy come from the system, as in the job.
 `APT_PREPARE` names a host file to run before apt (a site's apt policy).
 
@@ -73,7 +73,9 @@ The checkout needs the revision checked out and three submodules (`git submodule
 | --- | --- | --- |
 | `freecad-checks.sh --all-files` on unchanged `main` 8861f26a7c | 0 | every hook Passed (whitespace, end of file, YAML, large files, mixed line endings, Black, clang-format, version push); version sync and file case PASS; 68 s with an empty hook cache |
 | `freecad-checks.sh` on four commits over the 1.1.3 tag (1.1.3's hooks: clang-format v21.1.5), lint tools from `main` | 1 | pre-commit FINDINGS: clang-format rewrites 31 hunks in 8 files; Qt connections, codespell and file case PASS; version sync SKIPPED (1.1.3 has none) |
-| `freecad-ci-build.sh` on unchanged `main`, target `Gui_tests_run` | see below | |
+| `freecad-checks.sh` on a commit made to break three of the review's rules (an `#ifndef` guard, `fprintf(stderr)`, a subject without prefix) | 0 | every check passes: the CI does not see what the reviewers ask; `review-diff.py` finds the three |
+| `freecad-ci-build.sh` on unchanged `main`, target `Gui_tests_run` | 0 | configure PASS (CMake 4.2.3, GCC 15.2.0, Qt 6.10.2, Python 3.14.4, Coin 4.0.6 from Ubuntu 26.04), 852 build steps PASS, `Gui_tests_run` 347 tests in 27 suites PASS; 23 minutes with 4 cores, 8 of them for apt; two earlier runs failed on the traps below (the read-only source, then a cache made for another source folder) |
+| clang-tidy through `--tidy-base` | not run | the step is written and its interfaces read (`tools/lint/clang_tidy.py`); not yet run on a change |
 
 ## Traps (symptom, cause, fix, how found)
 
@@ -98,6 +100,16 @@ The checkout needs the revision checked out and three submodules (`git submodule
 - **Symptom: the Developers Handbook says pre-commit covers three folders, but clang-format rewrites `src/Gui` files.**
   Cause: the handbook page (2026-04-14) is older than the configuration, which covers `src/Gui` and most modules.
   Fix: read `.pre-commit-config.yaml`'s `files` and `exclude` at the revision.
+- **Symptom: `CMake Error: Could not open file for write in copy operation .../src/3rdParty/Clipper2/Clipper2Lib/include/clipper2/clipper.version.h.tmp` and "Read-only file system", configure incomplete.**
+  Cause: FreeCAD's configure writes into its source tree (`src/3rdParty/Clipper2/CMakeLists.txt`, line 39, `configure_file`), so a checkout mounted read-only cannot be configured.
+  Fix: build a copy (the build tier copies the checkout into its build folder first).
+  How found: the first CMake error in `configure.log`; the other "Could NOT find" lines (MEDFile, freetype's config, Cups, ifcopenshell) are optional packages and do not stop it.
+- **Symptom: `CMake Error: The source "/build/src/CMakeLists.txt" does not match the source "/src/CMakeLists.txt" used to generate cache.`**
+  Cause: a build folder kept from a run that configured another source path.
+  Fix: the build tier removes a cache whose `CMAKE_HOME_DIRECTORY` is not its source copy.
+- **Symptom: the root disk loses gigabytes during the build tier although the build folder is elsewhere.**
+  Cause: the apt step's downloaded packages (1.3 GB) and installed packages (about 5 GB) stay in the container's layer, on the Docker daemon's disk.
+  Fix: `apt-get clean` right after the installs (the script does); give the Docker disk room for about 5 GB.
 - **Symptom: clang-tidy through `tools/lint/clang_tidy.py` finds no compile database, or cannot write `clang-tidy.yaml`.**
   Cause: the script runs `clang-tidy -p build` in its working folder and writes its fixes there.
   Fix: run it from a writable folder holding a `build` link to the build directory, with absolute file paths (the build tier does).

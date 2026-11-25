@@ -26,7 +26,7 @@ ASSISTED_FORM = re.compile(r"^[A-Za-z][\w.+ -]*\S \([^()]+\)$|^[A-Za-z][\w.+-]*-
 SUBJECT = re.compile(r"^[A-Z][A-Za-z0-9 _/+.-]*: [A-Z]")
 NOUN_START = re.compile(r"^[^:]+: (The|A|An|the|a|an) ")
 
-MUST = {"R1", "R2", "R3", "R4", "R6", "R7", "R8", "R11", "R14", "R15", "R17", "R18", "R19"}
+MUST = {"R1", "R2", "R3", "R4", "R6", "R7", "R8", "R11", "R12", "R14", "R15", "R17", "R18", "R19"}
 
 
 def git(repo, *args, binary=False):
@@ -116,7 +116,7 @@ def main():
                 # R16 string messages to views were migrated to methods (#32116, #30632, #30633)
                 if re.search(r'strcmp\("[^"]+",\s*pMsg\)', l):
                     find("R16", where, l.strip()[:90])
-                # R12 FEP-0007: no ellipsis in a menu text unless it asks for missing input
+                # R12 FEP-0007 (Active): an ellipsis only where the action asks for more input, and the single character, never three dots
                 if re.search(r'(sMenuText|setText)\s*=?\s*\(?\s*QT_TR_NOOP\("[^"]*(\.\.\.|…)"', l) or \
                         re.search(r'sMenuText\s*=\s*QT_TR_NOOP\("[^"]*(\.\.\.|…)"', l):
                     find("R12", where, l.strip()[:90])

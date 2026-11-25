@@ -359,6 +359,67 @@ Red: the same session with no Throw (the published set and KWin +66 only) fails 
   **How found:** the main session's rerun; the one-line log; then the bus's own output (the session's `setup.log`), which says `Activating service name='org.sparky.Throw' requested by ... sparky-stereo-throw list` in each restart's gap.
   **Proof that it cannot race:** a file `activate-in-gap` beside the scenario makes every restart ask for the name while nobody owns it. The old restart, given the same ask, fails the row as that run did (English words, the copy's one-line log, the bus's line for the command). The restart through the bus passes it, and each restart's record (`throwd-<lang>.txt`) shows the ask, then `StartServiceByName` answering 2 (already running: the ask had started it, in the language), then the language of the process holding the name. A daemon the bus starts writes to the bus's own output, so the record names where its log went.
 
+## A live stream a real receiver plays (0.3.0, part D)
+
+**What a real Chromecast did** (model name `Chromecast`, first to third generation, on a television; the kit's probe, 2026-11-25; a person at the television confirmed picture and sound for the variant that played):
+- A live stream whose pictures stop never plays. KWin sends a screen's frame only when it changes and KPipeWire 6.7.4 repeats the last one once, so a Throw of a still desktop carried a picture at 0 s, one near 0.08 s, then none while its sound went on. The receiver fetched it and reported BUFFERING at its time 0 for as long as it ran.
+- The same receiver played H.264 at a constant 30 frames a second, a still picture included.
+- How long it took to start after LOAD, still picture at 30 frames a second, by sound: 24-bit or 16-bit PCM stereo in Matroska 1 to 2 s; Dolby Digital (AC-3) 5.1 17 s; FLAC 24 bit 21 s (twice); AAC 40 s. A moving picture with FLAC: about 2 s. The start comes sooner as the data rate rises, but no single byte count explains all of them: a measured rule, not an explained one.
+- Its request: one `GET` with `Range: bytes=0-`, a `CAST-DEVICE-CAPABILITIES` header (`"hi_res_audio_supported":false`) and a Chrome 90 user agent on armv7l.
+
+So 0.3.0 keeps the picture coming (KPipeWire's `setConstantFramerate`, below) and takes 24-bit PCM, lossless and the quickest to start, as the default sound in Matroska.
+
+**The sound** is a choice on the device's page, by default the best stereo sound the stream carries that has not failed on that device: PCM 24 bit, FLAC, PCM 16 bit, Opus, AAC, Vorbis, MP3 in Matroska (no PCM or Vorbis in MP4; Opus or Vorbis only in WebM; FLAC, Opus or Vorbis in Ogg), and Dolby Digital or Dolby Digital Plus 5.1 as the person's choice (a stereo source then plays on the front speakers; nothing is upmixed; the sink "Throw: <device>" has six channels).
+A Throw that reaches PLAYING records its sound as played on that device (`SoundsPlayed=` in `sparky-stereo-throwrc [Device][<id>]`); one the device does not play within 60 seconds is ended and said with what the device reported, and its sound is recorded as failed (`SoundsFailed=`), so the next Throw takes the next one.
+
+**Every Cast message** is in the daemon's debug log (`QT_LOGGING_RULES=org.sparky.throw.debug=true`: `cast out`, `cast in`), the stream's address token taken out of any URL.
+
+**What each sender does** (read at the source, 2026-11-25):
+
+| Sender | Container and options | Picture | Sound | LOAD and after | Pacing |
+|---|---|---|---|---|---|
+| VLC 3.0.x (`modules/stream_out/chromecast`, LGPL-2.1-or-later) | Matroska or WebM through libavformat, `live=1`, `reset-ts` | H.264 (x264 veryfast, CRF 21 to 23) or VP8; 24 frames a second forced when the rate is unknown or above 30 | AAC (two channels at most), Vorbis, Opus, MP3 passed on; AC-3 and E-AC-3 only with its passthrough option; anything else, FLAC included, made MP3 320 kbit/s or Vorbis quality 4 | `streamType LIVE`, `"autoplay":"false"` (a JSON string); PLAY only when the person un-pauses; IDLE while buffering is a failed load, and a retry rebuilds the chain | its HTTP server sends at least 512 kB at a time, paces its input at 2 MB |
+| GNOME Network Displays (`src/cc`) | `matroskamux`, `webmmux` or `mp4mux` | `pipewiresrc` into `intervideosink`, the encoder reads `intervideosrc` (`timeout` G_MAXUINT64): the last frame at a constant 30 a second; x264 zerolatency, VA-API H.264, VP8 | AAC, Vorbis, Opus | | |
+| mkchromecast (MIT) | fragmented MP4 (`frag_keyframe+empty_moov`; on Wayland `mp4mux fragment-duration=1000 streamable=true`) | x11grab at a fixed `-r`; on Wayland `pipewiresrc`, `videorate` and caps at a fixed rate; key frame every 2 s | AAC (Vorbis on X11) | `stream_type LIVE`, autoplay, waits for the media session | |
+| catt (BSD-2-Clause) | the file as it is | | | `BUFFERED` | `Range`, `206`, `Content-Length`, `Access-Control-Allow-Origin: *` |
+| BigNetScreen (BigLinux and BigCommunity, GPL-3.0-or-later, read only) | mirroring: no container; its HTTP form: MPEG-TS (`video/mp2t`) | H.264 | mirroring: Opus; HTTP: AAC | mirroring: `LAUNCH 0F5096E8` ("Chrome Mirroring"), `OFFER`/`ANSWER` on `urn:x-cast:com.google.cast.webrtc`, RTP with AES-CTR-128 payloads and RTCP feedback, target delay 150 ms; HTTP: the Default Media Receiver | per-stream pacing on a shared budget |
+| the Throw 0.2.0 | Matroska `live`, `cluster_time_limit`; each reader from 0 | frames on change only: two, then none | FLAC 24 bit | `LIVE`, autoplay; BUFFERING counted as "throwing" | per packet |
+| the Throw 0.3.0 | the same | a constant rate (the last frame again) | 24-bit PCM by default, a choice per device | the same; not PLAYING in 60 s: ended and said | the same |
+
+The other transport, Cast mirroring as BigNetScreen and Chrome do it (Open Screen's `cast/streaming`), has no player buffer: its delay is the target delay, not seconds. In the Throw it would need the encoded packets into RTP instead of libavformat, AES-CTR, the OFFER and ANSWER instead of LOAD, RTCP, and Opus; it is the next part, a person's option beside the buffered stream.
+
+**A stand-in that plays at LOAD proves nothing.** The software device said PLAYING at LOAD, so 0.2.0 passed every loopback row and never played on a real one. Since 0.3.0 the rig has a device whose player is real: `fake-cast-device.py --player chromium` plays the stream in a media element of Debian's Chromium (headless, a fixed version from the snapshot) and reports PLAYING only while the element's time advances, BUFFERING while it waits, with its real `currentTime`. 0.2.0's stream fails on it as on the real device (readyState 0, BUFFERING for 40 s), and the constant streams play on it in the real device's order (PCM before FLAC before AAC). It is more lenient than the real receiver: it played two pictures with PCM sound, which is why the rig also counts the pictures a second in the stream.
+
+**The kit's probe** (`kit.sh NAME SECONDS OUT --probe VARIANTS.json`): a reference sender in the same container throws one live test stream per variant (container, picture still, moving or stopping, sound and channels, `streamType`, `autoplay`), one FFmpeg per request so each reader starts at 0, records every Cast message and the media status each second from LOAD on, stops the receiver after each variant and writes one table (`probe.tsv`, with a column a person fills: what the screen showed); `timeline.py` prints each variant's states. The tone is 997 Hz at -30 dBFS; the 5.1 test plays one channel a second in the order FL FR FC LFE BL BR.
+
+### Traps of part D (0.3.0, 2026-11-25)
+
+- **Symptom:** a Throw of a still screen is fetched by a real Chromecast and never plays (BUFFERING at time 0), while every loopback row passes.
+  **Cause:** frames on change only (two pictures, then none); the software device said PLAYING at LOAD.
+  **Fix:** KPipeWire encodes the last frame again at the mode's rate (`setConstantFramerate`); the rig's Chromium device plays the stream.
+  **How found:** the kit's runs on the real device, then the captures' picture times (`ffprobe -show_entries packet=pts_time`), then GNOME Network Displays' `intervideosrc`.
+- **Symptom:** with the constant rate on, the stream has exactly 10 pictures a second.
+  **Cause:** KPipeWire makes its repeat timer in `initialize()`, queued after `start()` had already set the rate, with a fixed 100 ms.
+  **Fix:** the timer's first interval follows the constant rate.
+  **How found:** KPipeWire's frame statistics (`QT_LOGGING_RULES=kpipewire_record_framestatistics.debug=true`: "Processed 10 frames in the last second"), exactly 10.
+- **Symptom:** the repeats stop after the first frames.
+  **Cause:** the last frame kept was one with no picture (a cursor update, an empty buffer).
+  **Fix:** in constant mode only a frame with a picture is kept for repeating.
+- **Symptom:** headless Chromium in a container exits at once; its log ends "chrome_crashpad_handler: --database is required".
+  **Cause:** a home it cannot write.
+  **Fix:** a writable `HOME`, `--disable-crash-reporter --disable-breakpad`.
+- **Symptom:** the stand-in's capture is cut at a few hundred bytes.
+  **Cause:** the Throw's server serves the newest connection of a device, and the stand-in fetched twice (its capture and its player).
+  **Fix:** the player's relay is the device's one reader and keeps the capture.
+- **Symptom:** a probe variant meant to stop its pictures sends only its header.
+  **Cause:** FFmpeg's muxer waits for the stopped video stream (`select` filter), so the sound stops too.
+  **Fix:** prove that red with the daemon's own stream (the kit's loopback proof with 0.2.0).
+- **Symptom:** the Lean Code build stops at its link gate: "/: free space ... is below root floor 12884901888".
+  **Cause:** the gate's own 12 GiB floor on `/`, fixed in `lean.debhelper`.
+  **Fix:** free `/` or build on a machine with room; for development, CMake builds with no packaging.
+- **Symptom:** the software device logged a CONNECT and never the LAUNCH sent 1 ms after it.
+  **Fix:** the probe sends them 50 ms apart.
+
 ## Upstream, as searched on 2026-11-24
 
 - **KDE** (merge requests updated since 2026-10-01 in KWin, KRdp, KPipeWire, xdg-desktop-portal-kde, plasma-workspace): nothing for Cast, network displays or a networked output. Close to the work: KWin 10190 (merged, consumer-picked scale of virtual outputs), 10427 (open, only the creating stream resizes a virtual output), 10355 (merged, screencast plugin ported away from OpenGL, which the next rebase of our screencast patches meets); KRdp 290 (open, drops the zkde_screencast path for the portal only), 275 (open, scale), 239 (open, an audio sink KRdp makes the default, which our design does not do).

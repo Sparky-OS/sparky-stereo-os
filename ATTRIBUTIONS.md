@@ -728,6 +728,8 @@ Names above come from upstream copyright, Debian copyright or git records; conta
 | [Plasma Free Space Notifier](https://invent.kde.org/plasma/plasma-workspace/-/tree/master/freespacenotifier) | The existing low-space warning and its drive actions | Lukas Tinkl, Lubos Lunak, Ivo Anjo and Kai Uwe Broulik, named in the notifier's source |
 | [Sweeper](https://invent.kde.org/utilities/sweeper) | KDE's privacy cleanup and thumbnail handling | Brian S. Stephan, its maintainer, Ralf Hoelzer, its original author, and Benjamin Meyer, credited for thumbnail cleanup |
 | [KDE Linux storage guide](https://linux.kde.org/docs/free-space/) | Existing KDE routes for freeing storage | Nate Graham, who wrote the guide |
+| [Trash Specification](https://specifications.freedesktop.org/trash/latest/) and [Thumbnail Managing Standard](https://specifications.freedesktop.org/thumbnail/latest/) | The standard item/restore metadata pair and generated thumbnails | Mikhail Ramendik, David Faure, Alexander Larsson and Ryan Lortie for Trash. Jens Finke and Olivier Sessink for thumbnails. |
+| [APT](https://manpages.debian.org/testing/apt/apt-get.8.en.html), [systemd](https://www.freedesktop.org/software/systemd/man/latest/journalctl.html), [Flatpak](https://docs.flatpak.org/en/latest/flatpak-command-reference.html), [Firefox](https://searchfox.org/firefox-main/source/netwerk/cache2/CacheFileIOManager.cpp) and [Mesa](https://docs.mesa3d.org/envvars.html) | The cleanup study's archive, journal, runtime and cache ownership rules | The corresponding project developers and documentation contributors |
 
 ### Plasma widgets the edition forks for stereo depth
 

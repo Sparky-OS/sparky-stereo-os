@@ -42,6 +42,10 @@ Packages: `sparky-stereo-colour-vision` (the switch) and `sparky-stereo-look` (t
 | nano | `~/.config/nano/nanorc`, only when neither `~/.nanorc` nor that file exists | a file of theirs is never written; the page gives the lines |
 | Console | one line, `~/.config/sparky-stereo/colour-vision`, read by `/etc/profile.d` at a console login | |
 
+## A look's colours made readable: both offered, ours the default
+
+When the edition brings another author's colours to 4.5:1, the author's own stay selectable (Daniel, 2026-11-25, on QPlatinum: "offer both, our is default"). The readable scheme keeps the plain name and is what the look applies; the author's file ships beside it unchanged but for its name, `NAME (AUTHOR's original colours)` in ten languages, and two keys with the author as the KDE Store gives the name (`X-KDE-PluginInfo-Author`, `X-KDE-PluginInfo-Website`; KColorScheme ignores them). The file name gets a suffix (`QPlatinum3Original.colors`), since KDE identifies a scheme by its file name. Debian's or KDE's own scheme already stays selectable when the edition ships a corrected copy under a new name (Sparky Stereo Oxygen beside Oxygen, Konsole's "Breeze (KDE's original colours)"). Check the author's own instructions before changing a scheme: QPlatinum's README asks that four accent shades (View Hover and Focus, Button Focus and Hover) stay distinct, and the fix leaves every Decoration key alone.
+
 ## Traps
 
 - **Symptom:** the replica of KWin's correction misses the captured colours by up to 6 levels. **Cause:** the study's replica linearised with the piecewise sRGB curve; KWin's virtual output runs the effect in gamma 2.2 light. **Fix:** compute the replica in both; gamma 2.2 matched every one of 38 swatches to the level. **How found:** swatches captured with the effect on, against both replicas.

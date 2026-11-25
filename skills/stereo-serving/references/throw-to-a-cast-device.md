@@ -152,6 +152,14 @@ So the route signs in as another company's app; a desktop account (KDE's or any 
 **KDE's Online Accounts** (kaccounts-providers at 1dbb050941, `google.provider.in` and its services): the Google provider asks for email, profile, calendar, tasks, contacts and YouTube upload, and its services are disabled; no scope reaches the Home graph, so no route gives the token today. That is work for queue row 683 (online accounts signed in once); the page says "Sign in under Online Accounts" and why the settings cannot be changed here yet. Nothing of ours asks for or keeps a Google password.
 **Generations:** the receiver and setup interfaces are the same on every Chromecast generation as the sources tell them; a speaker has no screen (`display_supported` false), so it has no Throw, only its volume and groups; the assistant and equalizer endpoints are a speaker's. How a Google TV (an Android TV with Cast built in) answers `/setup` was not found in the sources.
 
+**Google's own interfaces (read 2026-11-25, input for queue row 683):**
+- The Home APIs (developers.home.google.com/apis): SDKs for Android and iOS apps only; OAuth set up for each app, a grant per structure and per device type (`requestPermissions()`); the device types are Matter's (a speaker: OnOff, LevelControl; `GoogleTVDevice`: media, channel, level, application launcher), and the `Google*` types "are not Google-branded devices (such as Google TV)"; no device name, Wi-Fi, time zone, language, reset, ambient screen, guest mode or groups. Google's speakers and displays are hubs of these APIs, not devices they configure.
+- Device Access (the SDM API, scope `https://www.googleapis.com/auth/sdm.service`): thermostats, cameras, doorbells and the Nest Hub Max's camera; nothing of Cast.
+- The Cast sender SDK (`cast.framework.CastSession`): volume, mute, media, an app's own message namespace, ending the session; no setting and no setup.
+- Google's help: "Set up your Chromecast with a mobile device, as computers do not support the setup process" (Streaming Help answer 2998456); Wi-Fi is changed in the Google Home app on a Chromecast of the 3rd generation or older, an Ultra or an Audio, and on the TV itself on a Chromecast with Google TV or a Google TV Streamer (answer 7331010).
+
+So no Google interface lets another program change a Cast device's settings; the one Google scope a KDE Online Accounts provider (OAuth 2.0) could carry here is SDM's, which has no Cast setting.
+
 ## The Cast channel, as a recipe (proved by the cast study on loopback, 2026-10-14)
 
 1. Find the device: DNS-SD browse of `_googlecast._tcp`; the TXT keys `fn` (friendly name), `md` (model name), `id` (the device's identity); a service on a port other than 8009 is a cast group.

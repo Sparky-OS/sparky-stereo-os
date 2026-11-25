@@ -9,6 +9,7 @@ Grep upstream's own tree, never our patch.
 FreeCAD 1.1.3 has a View, Stereo menu (red/cyan, quad buffer, interleaved rows and columns, off) that sets Quarter's `SoRenderManager` stereo mode; upstream removed it on 2026-06-09 (pull request 30634, "Remove stereo views": the views did not work and nobody fixed them; issues 21496 and 27816), keeping Quarter's code.
 Its quad-buffer entry draws nothing on the edition, and on any Qt 6 desktop: the viewport is a `QOpenGLWidget`, which renders into framebuffer objects, never into `GL_BACK_LEFT` and `GL_BACK_RIGHT` (Mesa logs `GL_INVALID_OPERATION` for the draw buffer), and its format never asks for stereo buffers.
 So it is a scene where we add the cameras: fitted to the person's limits, no separation setting; FreeCAD's own "eye to eye distance" preference is not offered.
+Offering this to FreeCAD's `main` follows [contrib-freecad](../../contrib-freecad/SKILL.md), whose worked example reads these patches against FreeCAD's rules and reviewers.
 
 ## The route
 

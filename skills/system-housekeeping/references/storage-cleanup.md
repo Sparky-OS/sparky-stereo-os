@@ -2,7 +2,7 @@
 
 **For** contributors to Storage Cleanup in KDE, use the fixture to prove what can be selected, what space an item releases and what needs to stay.
 
-**Check freshness first.** The edition's intended integration uses BleachBit as the engine. The independent `tools/storage-cleanup` program is a measuring fixture. It accepts only a marked isolated tmpfs in a container.
+**Check freshness first.** The edition uses BleachBit as the engine. The early independent measuring fixture lives in build history at `9b2a3b36`. Run the installed BleachBit controls for current proof.
 
 ## BleachBit in System Settings
 
@@ -34,6 +34,7 @@ The edition's free-space notifier supplies the threshold and recovery observatio
 | The last name check passes but a different file is present at unlink | File leases protect an inode. The parent directory can still receive a replacement name | Hold the reviewed file open, move the name into a private directory on the same mount and unlink by that directory descriptor only after rechecking the inode and lease. Two planted replacements proved that BleachBit preserves them, including the case where the original name is occupied again before restoration. |
 | Dolphin Places does not compile at the launch delegate | The installed KJobWidgets headers require both flags and a parent widget | Read the constructor candidates in the build error. Pass Dolphin’s window as the second argument. The corrected Places translation unit compiled against those same headers. |
 | The private KWin socket exists but fake X input cannot connect | Xwayland starts after the compositor’s Wayland socket appears | Wait for the private X socket and test the connection with `xdotool getdisplaygeometry`. The rig delivered a planted keyboard token through that Xwayland connection. |
+| An installed window check exits with `BadWindow` and `X_GetWindowAttributes` during otherwise working interactions | The X11 search first enumerates windows, then `xdotool search --onlyvisible` asks X for their attributes. A transient can disappear between those requests. | Match and activate the managed window in one KWin script using `workspace.windowList()`. Wait for the intended process, caption or class and keep native fake input for interaction. Compare the failed case logs and xdotool’s visibility check, then prove the installed cases repeatedly beside the same bounded load. |
 | Fake keyboard input reaches a test window but clicking a KCM control does nothing | The one-shot XTEST probe proved keyboard delivery only. Its pointer click left the control unchanged | Use the proof rig’s persistent Wayland fake-input client. Read its acknowledgment, leave time between moving and pressing, and confirm the downstream window actually changes. A real click on the drive Properties button selected the fixture volume. |
 | ScreenShot2 cancels in a virtual rig without a render node | KWin uses the virtual QPainter backend | Use the shared-memory capture helper from the Calamares rig. To read the buffer as the same test user, launch a byte-identical copy of the installed KWin binary without its priority capabilities from the private runtime directory. The capture helper checks the virtual backend and the runtime directory before reading the compositor’s buffer. |
 | The clean desktop has no shell containment or no notification server | Installing Plasma Workspace with recommendations disabled omits the desktop containment and notification applet's audio QML dependency | Add `plasma-desktop` and `plasma-pa` to the fixture. Verify that Plasma owns the notification bus name before exercising the notifier. Look for the containment or import error in the shell log. |
@@ -63,27 +64,10 @@ Run the installed Plasma cases against those binaries. Observe both Dolphin path
 1. Compare published package files and maintainer scripts with the build recipe.
    Find any maintenance timer, installed preset or policy that acts on the same files.
    Keep boot pruning, journal retention, crash retention and KIO wastebin settings with their owners.
-2. Use the [build repository](https://github.com/Sparky-OS/sparky-stereo-os-build) checkout with the milestone's `tools/storage-cleanup` code.
-   Point `DOCKER_HOST` at the authorized isolated Docker socket.
-   Set `CLEANUP_FIXTURE_STAGE` to an existing writable directory and `CLEANUP_FIXTURE_CONTAINER_IDS` to a file for full container IDs.
-   Use an allowed private mount and PID namespace.
-3. Run the following from the build checkout.
-   The default output is a new UTC-stamped child of the stage directory.
-   A passing run writes 47 measured verdicts, one cross-mount verdict and one unmarked-root verdict, all `PASS`.
-   It also writes both preview formats, a failure receipt, the protected-file inventory and start and end load averages.
-
-   ```sh
-   tools/storage-cleanup/rerun.sh
-   ```
-
-4. Check `measured.tsv` before describing a byte count.
-   The fixture independently reads free blocks before and after applying each selected item.
-   The sparse control has a logical size of 1 MiB and only 4,096 bytes allocated.
-   An old open temporary file, a memory-mapped file, an ordinary personal temporary file, a matching name with no producer record and a document stay out of the preview.
-   A valid item made unwritable after preview returns a reason and exit status 1.
-5. Read `foreign.tsv` and `unmarked.tsv`.
-   A nested tmpfs under a candidate-looking name generates a mount warning and keeps its planted file.
-   An unmarked tmpfs refuses preview.
+2. Stage the edition’s BleachBit, Storage Cleanup, Dolphin and Plasma Workspace source closures from the [build repository](https://github.com/Sparky-OS/sparky-stereo-os-build). Point `DOCKER_HOST` at the lane’s socket and install the staged binaries in the signed, frozen rig with networking disabled. Use the installed engine for the controls.
+3. On the private tmpfs, compare the actual allocated sizes and filesystem recovery. Plant a sparse file, an open and mapped temporary file, a writer that opens after preview, a protected document and a nested mount. Keep the APT lock and verify that the installed engine names each refusal and preserves its controls.
+4. Fill the fixture until the actual notifier emits a Problems entry. Compare its recorded free and total bytes with an independent filesystem sample. Keep the figures in the record’s additional detail so an updated sample preserves the generation and dismissal during the same low-space event. Open the translated page, confirm one item and check that the notifier clears the record after recovery.
+5. Keep the per-run exit code, measured rows and before and after load. Repeat the same installed interaction cases under the same CPU budget and pressure. Read the actual captures in each tested locale.
 
 ## Where to look and what removal costs
 
@@ -99,7 +83,7 @@ Run the installed Plasma cases against those binaries. Observe both Dolphin path
 | Crash dumps | systemd-coredump's journal and usually `/var/lib/systemd/coredump` | Removing a dump can make diagnosis impossible. The fixture plants crash evidence to prove exclusion. The retention policy stays with the crash handler. |
 | Unused Flatpak runtimes | Flatpak or OSTree in `/var/lib/flatpak` or the user installation under `$XDG_DATA_HOME/flatpak` | Runtimes may need to be downloaded again. A runtime's displayed size does not represent its unique objects. Measure an explicit per-installation Flatpak or libflatpak operation on a repository with both shared and unique objects before labeling bytes reclaimable. |
 
-## Engine rules
+## Measurement rules from the early fixture
 
 - Walk from a directory descriptor and keep it open through the operation.
   Open each component with `O_NOFOLLOW` and require the root mount ID and device.

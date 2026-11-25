@@ -1,0 +1,60 @@
+# Colour vision: the surfaces, the measurements, the maps and the one switch
+
+Written on 2026-11-25 from queue row 68 (the accessibility study of 2026-10-14, section 1, accepted by Daniel: "The two contrast failures are fixed for everyone, and the hues become a switch").
+Packages: `sparky-stereo-colour-vision` (the switch) and `sparky-stereo-look` (the two fixes for everyone).
+
+## Where each colour comes from
+
+| Surface | Source of its colours |
+| --- | --- |
+| KDE programs | the colour scheme named by `kdeglobals` `[General] ColorScheme`; applying a scheme copies its groups into `~/.config/kdeglobals`, and Plasma's start (`startkde/startplasma.cpp`, `ColorSchemeHash`) applies it again at login when the scheme file's SHA-1 changed, so a corrected scheme file reaches every account that uses it |
+| The edition's default look | `sparky-stereo-look`, `/usr/share/color-schemes/SparkyStereoOxygenDark.colors` (Oxygen Dark with the title bar and the three texts readable); Debian's `OxygenDark.colors` (kde-style-oxygen-qt6) stays selectable |
+| Konsole | its schemes are built into `libkonsoleprivate` (Konsole 26.08.3 installs nothing under `/usr/share/konsole`); `ColorSchemeManager::findColorSchemePath` looks in `XDG_DATA_DIRS/konsole/NAME.colorscheme` first, so a file there of the same name wins, and a person's own copy in `~/.local/share/konsole` wins over that; the default profile's scheme is `Breeze` and bold text takes the intense colours (`Profile.cpp`, `BoldIntense` true) |
+| The bash prompt, GCC, ls, grep, nano's named colours | palette indices: they follow Konsole's scheme or the console's palette (`01;31` root, `01;32` user, `01;34` path in `/etc/skel/.bashrc` of `sparky-stereo-console`) |
+| nano's `#rgb` colours | `/etc/nanorc` of `sparky-stereo-console` (`#804`, `#444`, `#222`): fixed colours that follow no palette |
+| The Linux console | the kernel's defaults (`/sys/module/vt/parameters/default_{red,grn,blu}`), set per login with `ESC ] P n rrggbb` (console_codes(4)) |
+| KWin's Colorblindness Correction | `kwinrc` `[Plugins] colorblindnesscorrectionEnabled`, `[Effect-colorblindnesscorrection] Mode` (0 protanopia, 1 deuteranopia, 2 tritanopia, 3 monochrome) and `Intensity`; KDE's Accessibility page writes these keys (`kcmaccessibilitycolorblindnesscorrection.kcfg`) and calls `org.kde.KWin /Effects` `loadEffect` or `unloadEffect`, then `reconfigureEffect` |
+
+## The measuring method, and its control
+
+- Simulation: Machado, Oliveira and Fernandes 2009, the matrices tabulated on the authors' page (severity 1.0 for the dichromacies, 0.6 for the anomalies), applied to linear RGB and clipped; monochromacy is the relative luminance.
+- Distance: CIEDE2000 between the two colours as the person receives them; below 5 collapsed, 5 to 11 weak.
+- Contrast: WCAG 2.2, (L1 + 0.05) / (L2 + 0.05); 4.5:1 for text (1.4.3).
+- KWin's correction: its 6.7.4 source (`colorblindnesscorrection.cpp` 48-89, `shaders/colorblindnesscorrection.frag`), in linear light; the study's "KWin" columns are the effect's output seen by the person with the deficiency it corrects.
+- **The control:** before trusting the implementation, recompute the study's `results.json` from its own colours: 2024 values (184 pairs on 25 surfaces) and every contrast, largest difference 0.00, and only under that reading of the KWin columns.
+- **Captures:** a test window (Kirigami's View colours as swatches and bold text) in a virtual Stereo KWin session, read back from ScreenShot2, 2D and on a 3D output (each eye apart).
+
+## The maps, and what each achieves
+
+- One map per kind, because KWin's correction is on with the switch: the tritan console palette kept green and cyan apart on its own and collapsed them (3.2) once KWin's tritanopia correction ran.
+- Targets: every text role at 4.5:1 or more on its own background, and no pair that carries meaning below 7 (a margin over the study's line of 5) as that kind sees it, with the correction on and off; the monochromacy console palette reaches 5, the margin of 7 cannot be had there.
+- The study's v2 maps, measured the same way, collapsed pairs for monochromacy (the console, Konsole's ls and grep colours, Oxygen and QPlatinum3) and left Konsole's root prompt at 3.6:1; the tuned maps collapse none on the edition's looks, the console and Konsole.
+- A colour scheme's variant keeps the person's scheme and moves only the colours that carry meaning (negative, neutral, positive, link, visited), all together by one shared step towards white or black until each reaches 4.5:1 on its group's backgrounds: moving each colour on its own put them at one lightness and collapsed them for monochromacy.
+- Some schemes leave too little room: the variants of Breeze Light and Classic, Krita's own schemes and QPlatinum CDE keep named pairs close; the package ships these limits and the page names the pairs.
+
+## How the one switch sets each surface, and keeps the person's files
+
+| Surface | What the switch writes | The person's own |
+| --- | --- | --- |
+| KWin | KDE's own keys, then KWin's D-Bus calls, so KDE's page shows the same choice; a user path unit runs `sparky-stereo-colour-vision sync` when `kwinrc` changes, so a choice made on KDE's page sets the rest | the strength (`Intensity`) stays theirs |
+| Colour scheme | `plasma-apply-colorscheme` with the variant (shipped for the look's own scheme, made in `~/.local/share/color-schemes` for any other) | the colour groups and keys of `kdeglobals` are snapshotted and written back exactly at none, unless the person chose another scheme meanwhile |
+| Konsole | a profile of its own whose `Parent=` is the person's default profile and which sets only `ColorScheme`; `konsolerc` `DefaultProfile` names it | no profile of theirs is written; `DefaultProfile` comes back as it was |
+| nano | `~/.config/nano/nanorc`, only when neither `~/.nanorc` nor that file exists | a file of theirs is never written; the page gives the lines |
+| Console | one line, `~/.config/sparky-stereo/colour-vision`, read by `/etc/profile.d` at a console login | |
+
+## Traps
+
+- **Symptom:** the replica of KWin's correction misses the captured colours by up to 6 levels. **Cause:** the study's replica linearised with the piecewise sRGB curve; KWin's virtual output runs the effect in gamma 2.2 light. **Fix:** compute the replica in both; gamma 2.2 matched every one of 38 swatches to the level. **How found:** swatches captured with the effect on, against both replicas.
+- **Symptom:** KWin's tritanopia correction makes VGA red and magenta one colour on the screen (both 170,0,255), and green and cyan one colour (both 0,180,0). **Cause:** the shader adds its correction to green and blue only, and the blue channel saturates or empties. **How found:** the swatch capture; the study's replica predicted 0.0 for those pairs.
+- **Symptom:** an "effect off" control shows the effect. **Cause:** `loadEffect` loads the effect whatever `colorblindnesscorrectionEnabled` says. **Fix:** `unloadEffect` for off, as KDE's page does.
+- **Symptom:** a shipped variant is never used. **Cause:** it recorded the SHA-256 of the authored scheme, and the installed scheme is its Lean Code form (comments stripped). **Fix:** a digest of groups, keys and values, comments and blank lines left out.
+- **Symptom:** the study's "include a palette from /etc/nanorc" cannot work. **Cause:** nanorc(5) of nano 9.3: an included file "may contain only the above commands, from syntax to icolor". **Fix:** a per-person `~/.config/nano/nanorc`, which nano reads only when there is no `~/.nanorc`.
+- **Symptom:** a variant's name stays English in the page in Japanese. **Cause:** the shipped variants were generated before any catalogue was compiled. **Fix:** compile the `.po` files with `msgfmt` into a temporary folder first and point gettext there.
+- **Symptom:** in the rig, `/usr/lib/qt6/bin/qml` does not exist. **Cause:** the `qml` runtime is in `qml-qt6`, not in `qt6-declarative-dev-tools`. **Fix:** a ten-line `QQmlApplicationEngine` launcher built against the same Qt.
+- **Symptom:** KDE's Accessibility page captured on Zoom & Magnifier. **Cause:** it always opens on its first sub-page and takes no argument. **Fix:** a fake-input click on "Color Blindness Correction"; its combobox's popup items are clicked, not chosen by keys.
+- **Symptom:** a successor of `sparky-stereo-look` built from build main does not install over the published tree. **Cause:** build main's look already needs packages of the Oxygen suite (row 59) that the tree does not have. **How found:** build main's own look as the control fails the same way.
+
+## Credits
+
+The correction effect: Fushan Wen (2023), the monochrome mode by Lea B., later fixes by Xaver Hugl, Vlad Zahorodnii, Thomas Duckworth and Kai Uwe Broulik; the algorithm as the shader's README names it, daltonize.org.
+The method: Gustavo M. Machado, Manuel M. Oliveira and Leandro A. F. Fernandes; CIEDE2000 as Gaurav Sharma, Wencheng Wu and Edul N. Dalal set it out; WCAG 2.2 of the W3C; the hues of Masataka Okabe and Kei Ito.

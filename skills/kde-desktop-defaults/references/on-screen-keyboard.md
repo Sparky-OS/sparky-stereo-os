@@ -34,6 +34,16 @@ How to see it working, in a session: `busctl --user tree org.fcitx.Fcitx5.Virtua
 - **Windows are not moved clear of the keys.** KWin's own input panel tells the focused text field the rectangle it covers (text-input's `input_panel_state`); a layer surface does not, and an exclusive zone would resize maximized windows (and stereo windows with them), so the keyboard covers the bottom of the screen and a field there stays behind it (no design yet for this).
 - **Plasma Keyboard's long-press accents** (its diacritics overlay) belong to its input-method mode and are not offered in Fcitx 5 mode, where Fcitx 5's engine decides what a key gives.
 
+## Upstream's reworked keyboard (master, for Plasma 6.9)
+
+Read and run on 2026-11-25, master 2af42e6 (newest tag v6.8.3; none of this is in a release yet):
+
+- **Merge request 109** (Devin Lin, merged 2026-10-14, "Introduce new input engine and framework to replace Qt VKBD"): Qt Virtual Keyboard is no longer a dependency; the keyboard has its own engine (`virtualkeyboard/`: input engine, keyboard controller, text composers, a word-candidate model) and layout packages under `keyboardpackages`. It still runs only as KWin's input method (`zwp_input_method_v1`; otherwise "Cannot run plasma-keyboard standalone"), and physical keys it grabs are used only for its accent overlay and keyboard navigation, every other key is forwarded unconverted.
+- **Merge request 113** (Devin Lin, merged 2026-11-13, "Add Chinese, Japanese and Korean layouts and text composers"): Japanese on Anthy (Romaji, twelve-key and desktop layouts), Korean on libhangul (Dubeolsik, composition only, no Hanja), Chinese on libpinyin (Pinyin) and libchewing (Zhuyin). Nothing they learn is kept: no `anthy_commit_segment`, no `pinyin_train`/`pinyin_save`, Chewing's user database is `":memory:"`. They are not Fcitx 5's engines (Mozc, Fcitx 5's own libime Pinyin) and read none of the person's Fcitx 5 settings.
+- **On the edition's stack** (Plasma 6.7.4, Frameworks 6.32, Qt 6.11.2): configure stops at `find_package(PlasmaQuick 6.7.90)`; with that floor lowered to 6.7.4 it configures, builds and installs, with Debian's `libpinyin15-dev`, `libchewing3-dev`, `libhangul-dev`, `libanthy-dev` and `libanthyinput-dev` and the edition's `qt6-multimedia-dev`. As KWin's input method in a session: 한국어 and 中文 typed by touch; Japanese left `nihongo` unconverted with Debian's Anthy (master prefers anthy-unicode, which Debian does not package; its own Anthy tests fail the same way).
+- **Its layout choice:** with no layout enabled it shows the American English desktop layout; `enabledLocales` is dropped (`KeyboardPanel.qml` calls `layoutIdsForLocales`, which no class defines), so only the settings page's "enabled layouts" list (`enabledKeyboardLayoutIds`) chooses one.
+- **For the bridge:** its Qt Virtual Keyboard parts do not apply to master; master's text-composer interface (keys in, preedit and candidates set asynchronously, `selectCandidate`) fits a Fcitx 5 composer, with a non-input-method backend and the layer window kept from the bridge.
+
 ## The defaults, and where each one lives
 
 | Default | Where | Why there |

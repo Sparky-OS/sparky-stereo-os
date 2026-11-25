@@ -84,6 +84,11 @@ Newcomers in Linus Tech Tips' Linux challenge and in Diolinux's videos struggled
 - KConfig reads the system's files before the person's own, so a value in the person's configuration wins over one under `/etc/xdg` ([KConfig's entry options](https://invent.kde.org/frameworks/kconfig/-/blob/master/docs/options.md): "Typically, the system administrator might set global defaults, and a user might override them in their local configuration files").
   The tests below check both cases.
 
+## Weather Icons
+
+Appearance & Style → Themes → Weather Icons lets the person choose the look, panel colour, shade and hover animation. The hardware package sets the choice shown by Automatic.
+[The default writer, protected files, machine fixtures and live Apply proof](references/weather-icon-defaults.md).
+
 ## Session, menu, sound and battery defaults
 
 [ORDER 668](references/session-menu-battery-defaults.md) records each reader, first-account delivery, saved-choice preservation, installed fresh-login recipe and traps.

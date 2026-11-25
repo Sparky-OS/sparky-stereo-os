@@ -1,13 +1,14 @@
 ---
 name: upstream-outreach
 description: >-
-  Evidence-based contact with another project before and after a merge request: the heads-up to the maintainer, AI
+  Evidence-based contact with a project before and after a merge request: the heads-up to the maintainer, AI
   assistance said once up front, one small ask, the project's rules and code of conduct first, which route (Debian, the
-  edition's organization, any other upstream), the right person from the project's own records, prove an absence by
+  edition's organization, other upstreams), the right person from the project's records, prove an absence by
   running the program, the report carries the fix and the test, one finding at a time, a vulnerability through the
-  private route, facts without a severity, Discourse first-post holds, one knock, the one list of merges. Load it when a workshop's call for participation asks for a position statement, when a
-  maintainer answered with questions, a thread turned to the tool instead of the code, a pull request was closed with
-  the change landed as the maintainer's own commit, a company has not answered, a report or a heads-up must be drafted,
+  private route, facts without a severity, the project's release cycle, Discourse first-post holds, one knock, the one
+  list of merges. Load it when a workshop's call asks for a position statement, a change is due in a freeze or late
+  -rc, a maintainer answered with questions, a thread turned to the tool instead of the code, a pull request was closed and
+  its change landed as the maintainer's commit, a company has not answered, a report or a heads-up must be drafted,
   names from a transcript must be verified, a sent copy must be checked, or an AppImage must enter an app center.
 ---
 
@@ -22,7 +23,7 @@ description: >-
 
 **Check freshness first.**
 Written on 2026-10-14, after the edition's first proposal to a project that had declined AI-assisted text.
-Absence claims, the one list of merges and Discourse's first-post holds added on 2026-11-02.
+Absence claims, the one list of merges and Discourse's first-post holds added on 2026-11-02; knowing the project's release cycle added on 2026-11-25.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; [`ai-partners`](../ai-partners/SKILL.md) has the upstream manners this builds on.
 
 ## The rule: a heads-up before the merge request
@@ -70,6 +71,18 @@ A `contrib-<project>` skill declares the packages that make it relevant (`metada
 - **Search for an earlier finding first.**
   "Be Aware, the Code is Open, Someone May Have Already Found What You Did": other people and other tools read the same code at the same time.
   The search is [`search-upstream-first`](../search-upstream-first/SKILL.md): the default branch, the merge requests and the issues, and the project's private route when it has one, since a fix may be waiting there.
+- **Know where the project is in its release cycle, and say which release the change is for.**
+  In its stabilization weeks or a freeze a project takes only some fixes; being a fix is not enough, and new work, new tests and cleanups wait for the next cycle.
+  Read the project's own page on its cycle each time, since its dates move:
+  - The Linux kernel: `Documentation/process/2.Process.rst` ("The big picture"), `howto.rst` ("Mainline tree") and the subsystem's maintainer profile; the rules with their sections are in [contrib-kernel, where a change goes in the cycle](../contrib-kernel/SKILL.md#where-a-change-goes-in-the-cycle).
+  - Qt: [QUIP 16, Branch policy](https://contribute.qt-project.org/quips/16): new features, refactoring and risky changes go to `dev` and are not cherry-picked to the stable branches, and close to a feature freeze "the release team may impose tighter control"; the [Branch Guidelines](https://wiki.qt.io/Branch_Guidelines), "Where to push a change?", list the fixes that may be picked down.
+  - KDE: [Schedules](https://community.kde.org/Schedules) links the release schedules of Plasma, Frameworks and Gear, so that teams know "when it would be a good time to add a new feature or when it's time to focus on cleaning up any bugs"; the final dates are decided on the release-team list.
+  - Debian: the [freeze timeline and policy](https://release.debian.org/testing/freeze_policy.html) of the release in preparation (for forky, read on 2026-11-25, all four milestones still "TBA"), and the Developer's Reference, 4.6.4.1: "If you want to develop new stuff for after the freeze, upload to experimental instead."
+
+  **Symptom:** a pull request sent in a project's stabilization weeks, with new tests and fixes for long-standing bugs, is taken only under protest or held for the next cycle.
+  **Cause:** "it is a fix" was taken as enough, and the project's cycle was not read before sending.
+  **Fix:** read the cycle page, sort the changes by the release they are for, and name the target in the submission where the project has a way to (the kernel's `[PATCH net]` and `[PATCH net-next]`, Qt's `Pick-to:` footer, Debian's upload to experimental).
+  **How found:** Linus Torvalds's reply of 2026-11-24 on the kernel list ([lore](https://lore.kernel.org/r/CAHk-=whyUfwzMDMTpih8Xs1MxmhwTCDAc_YwUSZG79vXFMLU=Q@mail.gmail.com)), read with the kernel's own documents; each project's page above was then read at its source (ORDER 880).
 - **Prove an absence by running the program, never by code search alone.** A claim that a program does not do something, made in public, is the most expensive kind to get wrong.
   On 2026-09-18 the edition's first report to Kodi ([xbmc/xbmc#29337](https://github.com/xbmc/xbmc/issues/29337)) said Kodi never reads the H.264 frame packing SEI, because GitHub's code search found no `AV_FRAME_DATA_STEREO3D`, `AV_PKT_DATA_STEREO3D` or `frame_packing` in its tree.
   Kodi does read it: `DVDVideoCodecFFmpeg.cpp` takes `stereo_mode` from the decoded frame's metadata, which FFmpeg's H.264 decoder fills from the SEI, and a container test of Kodi 21.2 logged `autodetected stereo mode for movie mode left_right` minutes after the report went out.

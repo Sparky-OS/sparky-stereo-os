@@ -1,18 +1,19 @@
 #!/bin/bash
 # prove-m2.sh OUT [STEP ...]: ORDER 63/720 milestone 2, every case in a fresh container, one row per claim in OUT/rows.tsv
 # (step, row, claim, expected, measured, PASS or FAIL, evidence), the load at start and end in OUT/load.txt; exits 1 when
-# a row is not as expected. STEP: m1 m2 m3 m4 m5 m6 m7 m8 (all when none is named). Cases run one after another.
+# a row is not as expected. STEP: m1 m2 m3 m4 m5 m6 m7 m8 m9 (all when none is named). Cases run one after another.
 # Images: kw63-rig:published (the published set by apt), kw63-rig:published-iso (the ISO's state), kw63-rig:published-apps
 # (published, with Koko, the stereo wallpaper, Calamares and Dolphin), kw63-rig:layer1233 (that, with stereo-layer
-# 1.23.3, the staged layer), kw63-rig:candidate (published-apps with the successors), kw63-rig:candidate-iso (the
-# ISO's state with the successors).
+# 1.23.3, the staged layer), kw63-rig:published-variety (published-apps with Stereo Variety and its indicator library, as
+# the ISO installs the desktop meta with its Recommends), kw63-rig:candidate (published-variety with the successors),
+# kw63-rig:candidate-iso (the ISO's state with the successors), kw63-rig:candidate-lang (candidate with ten locales).
 # Environment: DOCKER_HOST, RENDER_GROUP, CONTAINER_IDS, FAKEINPUT_DIR, RIG_SCRIPTS, PICS (the folder of the first
 # page's any-screen.pns).
 set -uo pipefail
 HERE=$(cd "$(dirname "$0")" && pwd)
 OUT=$(mkdir -p "${1:?output folder}" && cd "$1" && pwd); shift
 [ -z "$(ls -A "$OUT")" ] || { echo "$OUT is not empty" >&2; exit 1; }
-STEPS=${*:-m1 m2 m3 m4 m5 m6 m7 m8}
+STEPS=${*:-m1 m2 m3 m4 m5 m6 m7 m8 m9}
 : "${PICS:?}" "${RIG_SCRIPTS:?}" "${TESTS:?the welcome recipe tests folder}" "${HTTPS_ONLY_APT:?}" "${REPO:?}"
 # M7: TREE (the build clone), APTCONF (the published apt configuration of sparky-stereo-apt), PLAN (apt's plan of the
 # candidate over the published set, mklayer.sh's plan.txt)
@@ -41,6 +42,8 @@ opened() { # the first-run windows KWin added in a login (or only the class name
 	[ -n "${2:-}" ] && { case " $s " in *" $2 "*) s=$2 ;; *) s= ;; esac; }
 	echo "${s:-none}"
 }
+# a field of page-clicks.sh's results ($R): field PAGE NAME FIELD
+field() { awk -F'\t' -v p="$1" -v n="$2" -v f="$3" '$1 == p && $2 == n { for (i = 3; i <= NF; i++) if (index($i, f "=") == 1) print substr($i, length(f) + 2) }' "$R" | head -1; }
 PAGES_MOUNT="$HERE/m1-pages:/usr/share/plasma/plasma-welcome/extra-pages:ro $PICS:/diag:ro"
 
 if [[ " $STEPS " == *" m1 "* ]]; then
@@ -74,7 +77,7 @@ fi
 if [[ " $STEPS " == *" m2 "* ]]; then
 	# M2: real clicks on every button and link of the three new pages (a stand-in browser records addresses, a stand-in
 	# pkexec the commands that ask for root); and a program that is missing is said on the page
-	SP=02-SparkyWorld.qml; HP=03-HelpTest.qml; TP=01-TouchAndTabletMode.qml
+	SP=05-SparkyWorld.qml; HP=06-HelpTest.qml; TP=01-TouchAndTabletMode.qml
 	clicks="$SP:home:190,228 $SP:forums:465,228 $SP:wiki:190,266 $SP:git:465,266 $SP:donate:190,304 $SP:sponsors:465,304"
 	clicks="$clicks $SP:appcenter:190,342 $SP:about:190,380 $SP:system:465,380"
 	clicks="$clicks $SP:facebook:86,440 $SP:x:148,440 $SP:mewe:199,440 $SP:telegram:274,440 $SP:reddit:350,440 $SP:patreon:421,440"
@@ -82,10 +85,10 @@ if [[ " $STEPS " == *" m2 "* ]]; then
 	# Upgrade last: the rig stops its password window, the helper then fails, and the page says so above the buttons
 	clicks="$clicks $SP:upgrade:465,342"
 	clicks="$clicks $HP:report:317,364 $HP:copy:327,330 $TP:general:112,229 $TP:keyboard:296,229"
-	run m2-clicks kw63-rig:candidate QUIET_FIRST_RUN=1 LOGINS=1 WAIT=10 AFTER=4 STANDIN_PKEXEC=1 USER_SETUP=/lane/m2-setup.sh APP_WAIT=230 \
+	# a session where the hardware layer says a touch screen is there, so the touch page shows (Daniel, 2026-11-25)
+	run m2-clicks kw63-rig:candidate QUIET_FIRST_RUN=1 LOGINS=1 WAIT=10 AFTER=4 STANDIN_PKEXEC=1 USER_SETUP=/lane/m2-setup.sh APP_WAIT=230 SPARKY_STEREO_HAS_TABLET_MODE=/bin/true \
 		"PAGES=$SP,$HP,$TP" "CLICKS=$clicks" "APP_CMD=bash /lane/page-clicks.sh"
 	R=$OUT/m2-clicks/clicks/results.tsv
-	field() { awk -F'\t' -v p="$1" -v n="$2" -v f="$3" '$1 == p && $2 == n { for (i = 3; i <= NF; i++) if (index($i, f "=") == 1) print substr($i, length(f) + 2) }' "$R" | head -1; }
 	for spec in home=https://sparkylinux.org/ forums=https://forum.sparkylinux.org/ wiki=https://wiki.sparkylinux.org/ \
 		git=https://github.com/sparkylinux donate=https://sparkylinux.org/donate/ sponsors=https://sparkylinux.org/sponsoring/ \
 		facebook=https://www.facebook.com/groups/SparkyLinux/ x=https://x.com/SparkyLinux mewe=https://mewe.com/join/sparkylinux \
@@ -142,18 +145,16 @@ print('menu' if new or any(w['active'] and w['cls'] in ('plasmashell', 'org.kde.
 		row m3 task-click-$click "task bar, a mouse click on an inactive window's button: the active window ($click)" "org.kde.dolphin" "$(active $T/tm-click.json)" "$T/tm-click.png"
 		note m3 task-hold-$click "task bar, a long touch on an inactive window's button ($click)" "$(menu $T/tm-click.json $T/tm-hold.json)" "$T/tm-hold.png"
 	done
-	# the touch page's condition, the other way: shown only where the hardware layer found a touch screen of its own
-	for found in true false; do
-		RUN_MOUNTS="$HERE/m3-pages:/usr/share/plasma/plasma-welcome/extra-pages:ro" run m3-cond-$found kw63-rig:candidate QUIET_FIRST_RUN=1 LOGINS=1 \
-			WAIT=10 AFTER=4 SPARKY_STEREO_HAS_TABLET_MODE=/bin/$found APP_WAIT=14 PAGES=01-TouchAndTabletMode.qml,03-HelpTest.qml "APP_CMD=bash /lane/cond-check.sh"
+	# the touch page as shipped (Daniel, 2026-11-25: "Only with a touch screen"): shown where the hardware layer says a touch
+	# screen of the computer's own is there, not where it says none, and not on the rig's own machine (no touch screen)
+	for found in true false shipped; do
+		if [ $found = shipped ]; then ov=; else ov=SPARKY_STEREO_HAS_TABLET_MODE=/bin/$found; fi
+		run m3-cond-$found kw63-rig:candidate QUIET_FIRST_RUN=1 LOGINS=1 WAIT=10 AFTER=4 $ov APP_WAIT=14 \
+			PAGES=01-TouchAndTabletMode.qml,06-HelpTest.qml "APP_CMD=bash /lane/cond-check.sh"
 		C=$OUT/m3-cond-$found/cond
-		row m3 cond-mark-$found "the hardware layer says $found: the touch mark in the session's XDG_CONFIG_DIRS" "$([ $found = true ] && echo yes || echo no)" "$(grep -q sparky-stereo-welcome/touch-screen/xdg $C/xdg-config-dirs.txt && echo yes || echo no)" "$C/xdg-config-dirs.txt"
-		row m3 cond-page-$found "the first page shown with the flag condition" "$([ $found = true ] && echo touch || echo help)" "$(python3 $HERE/which-page.py $C/first.png $C/windows.json $HERE/refs)" "$C/first.png"
+		row m3 cond-mark-$found "hardware layer $([ $found = shipped ] && echo 'on the rig, unchanged' || echo "says $found"): the touch mark in the session's XDG_CONFIG_DIRS" "$([ $found = true ] && echo yes || echo no)" "$(grep -q sparky-stereo-welcome/touch-screen/xdg $C/xdg-config-dirs.txt && echo yes || echo no)" "$C/xdg-config-dirs.txt"
+		row m3 cond-page-$found "the first page shown of Touch, Help Test" "$([ $found = true ] && echo touch || echo help)" "$(python3 $HERE/which-page.py $C/first.png $C/windows.json $HERE/refs)" "$C/first.png"
 	done
-	# as shipped (show: true): shown where the hardware layer found no touch screen too
-	run m3-cond-shipped kw63-rig:candidate QUIET_FIRST_RUN=1 LOGINS=1 WAIT=10 AFTER=4 SPARKY_STEREO_HAS_TABLET_MODE=/bin/false APP_WAIT=14 \
-		PAGES=01-TouchAndTabletMode.qml,03-HelpTest.qml "APP_CMD=bash /lane/cond-check.sh"
-	row m3 cond-page-shipped "as shipped, no touch screen found: the first page shown" "touch" "$(python3 $HERE/which-page.py $OUT/m3-cond-shipped/cond/first.png $OUT/m3-cond-shipped/cond/windows.json $HERE/refs)" "$OUT/m3-cond-shipped/cond/first.png"
 fi
 
 if [[ " $STEPS " == *" m4 "* ]]; then
@@ -172,7 +173,7 @@ if [[ " $STEPS " == *" m4 "* ]]; then
 	done
 	# M4 c: an account made before the upgrade (ISO's state, then apt), at its next login after it
 	for base in iso apt; do
-		src=$([ $base = iso ] && echo published-iso || echo published-apps)
+		src=$([ $base = iso ] && echo published-iso || echo published-variety)
 		dst=$([ $base = iso ] && echo candidate-iso || echo candidate)
 		run m4-$base-before kw63-rig:$src LOGINS=1 WAIT=45
 		RUN_MOUNTS="$OUT/m4-$base-before/home:/seed:ro" run m4-$base-after kw63-rig:$dst LOGINS=1 WAIT=45 SEED_HOME=/seed
@@ -235,6 +236,56 @@ if [[ " $STEPS " == *" m8 "* ]]; then
 	MEASURE_ORIGIN_X=$ox python3 $HERE/measure-welcome.py page2 $D/page2-$on.png $D/windows-page2.json 10 $D2/page2-$on.png > $D/page2.json
 	row m8 page1-two "two outputs: the first page's picture a pair on the output it opens on ($on)" "PASS" "$(python3 -c "import json; print(json.load(open('$D/page1.json'))['verdict'])" 2>/dev/null)" "$D/page1.json"
 	row m8 page2-two "two outputs: the drawing's window behind -1/+1, the rest at the screen" "PASS" "$(python3 -c "import json; print(json.load(open('$D/page2.json'))['verdict'])" 2>/dev/null)" "$D/page2.json"
+fi
+
+if [[ " $STEPS " == *" m9 "* ]]; then
+	# M9: the three pages of 2026-11-25 (Daniel: "pick the ones you think are valuable enought to be there"): a real click on
+	# each button, Variety's on a new account (its first start) and on one that started it before; the depth page's drawing
+	# at the rig's limits (KWin's 10 sunk, 4 popped), the keys page flat; the wallpaper page's condition; the pages in four
+	# languages
+	DP=02-Your3DDepth.qml; WP=03-ChangingWallpaper.qml; KP=04-WindowsKeysAndSessions.qml
+	for ran in 0 1; do
+		run m9-clicks-ran$ran kw63-rig:candidate QUIET_FIRST_RUN=1 LOGINS=1 WAIT=10 AFTER=4 USER_SETUP=/lane/m9-setup.sh VARIETY_RAN=$ran \
+			APP_WAIT=90 "PAGES=$DP,$WP,$KP" "CLICKS=$DP:depth:93,338 $WP:variety:128,302 $KP:shortcuts:94,338 $KP:session:267,338" \
+			"APP_CMD=bash /lane/page-clicks.sh"
+	done
+	R=$OUT/m9-clicks-ran0/clicks/results.tsv
+	row m9 depth-open "depth page, Open 3D Depth: the window" "systemsettings|3D Depth — System Settings" "$(field $DP depth windows)" "$R"
+	row m9 variety-first "wallpaper page, Open Variety's Preferences, Variety's first start: the window" "variety|Welcome to Variety!" "$(field $WP variety windows)" "$R"
+	row m9 keys-shortcuts "keys page, Open Shortcuts: the window" "systemsettings|Shortcuts — System Settings" "$(field $KP shortcuts windows)" "$R"
+	row m9 keys-session "keys page, Open Desktop Session: the window" "systemsettings|Desktop Session — System Settings" "$(field $KP session windows)" "$R"
+	R=$OUT/m9-clicks-ran1/clicks/results.tsv
+	row m9 variety-again "wallpaper page, Open Variety's Preferences, Variety started before: the window" "variety|Variety Preferences" "$(field $WP variety windows)" "$R"
+	# the drawing: each part's shift between the eyes and whether it then aligns completely (eyes-align.py), on the frame
+	C=$OUT/m9-clicks-ran0/clicks
+	read -r fx fy < <(python3 -c "import json,sys; print(*[int(v) for v in [w for w in json.load(open(sys.argv[1]))['windows'] if w['cls'] == 'org.kde.plasma-welcome'][0]['fg'][:2]])" "$C/$DP-open.json" 2>/dev/null || echo 0 0)
+	part() { python3 "$HERE/eyes-align.py" "$C/$DP-open.png" "$((fx + $1)),$((fy + $2)),$3,$4" 2>/dev/null | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['best_shift'], d['verdict'])" 2>/dev/null || echo none; }
+	row m9 depth-sun "depth page's drawing: the wallpaper's sun, its shift (the sunk limit, 10)" "10 one view" "$(part 405 383 45 35)" "$C/$DP-open.png"
+	row m9 depth-window "depth page's drawing: the window's lines, its shift (the screen)" "0 one view" "$(part 240 430 80 40)" "$C/$DP-open.png"
+	row m9 depth-menu "depth page's drawing: the menu, its shift (the popped limit, 4)" "-4 one view" "$(part 335 445 70 45)" "$C/$DP-open.png"
+	row m9 keys-flat "keys page: its window the same in both eyes" "one view" "$(verdict $C/$KP-open.png window:org.kde.plasma-welcome:$C/$KP-open.json)" "$C/$KP-open.png"
+	# the wallpaper page's condition: shown where Variety is installed, not where it is not (the env script's own test,
+	# pointed at a program that is not there)
+	for has in installed missing; do
+		if [ $has = missing ]; then ov=SPARKY_STEREO_VARIETY=/nonexistent/variety; else ov=; fi
+		run m9-cond-$has kw63-rig:candidate QUIET_FIRST_RUN=1 LOGINS=1 WAIT=10 AFTER=4 $ov APP_WAIT=14 \
+			PAGES=$WP,06-HelpTest.qml "APP_CMD=bash /lane/cond-check.sh"
+		C=$OUT/m9-cond-$has/cond
+		row m9 cond-mark-$has "Variety $has: the wallpaper mark in the session's XDG_CONFIG_DIRS" "$([ $has = installed ] && echo yes || echo no)" "$(grep -q sparky-stereo-welcome/variety/xdg $C/xdg-config-dirs.txt && echo yes || echo no)" "$C/xdg-config-dirs.txt"
+		row m9 cond-page-$has "Variety $has: the first page shown of Wallpaper, Help Test" "$([ $has = installed ] && echo wallpaper || echo help)" "$(python3 $HERE/which-page.py $C/first.png $C/windows.json $HERE/refs)" "$C/first.png"
+	done
+	# the three pages in four languages, each heading against the English one
+	for lang in en_US pt_BR de_DE ja_JP; do
+		run m9-lang-$lang kw63-rig:candidate-lang LOGIN_LANG=$lang.UTF-8 QUIET_FIRST_RUN=1 LOGINS=1 WAIT=10 AFTER=4 APP_WAIT=40 \
+			"PAGES=$DP,$WP,$KP" "APP_CMD=bash /lane/page-clicks.sh"
+	done
+	E=$OUT/m9-lang-en_US/clicks
+	for lang in pt_BR de_DE ja_JP; do
+		C=$OUT/m9-lang-$lang/clicks
+		for pg in $DP $WP $KP; do
+			row m9 heading-${pg%%-*}-$lang "$lang: the heading of $pg is not the English one" "translated" "$(python3 $HERE/heading-differs.py $E/$pg-open.png $E/$pg-open.json $C/$pg-open.png $C/$pg-open.json 2>/dev/null || echo none)" "$C/$pg-open.png"
+		done
+	done
 fi
 
 echo "end $(date -u +%FT%TZ) load $(cut -d' ' -f1-3 /proc/loadavg)" >> "$OUT/load.txt"

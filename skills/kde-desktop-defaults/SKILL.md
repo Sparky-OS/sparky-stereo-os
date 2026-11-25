@@ -9,8 +9,9 @@ description: >-
   cache, /etc/xdg files, the KScreen KCM, a built-in panel's first scale, tablet mode, the first run in KDE's Welcome
   Center (Plasma Welcome pages). Load it when a default should be decided instead of left to the person, a shortcut
   clashes, a lock screen shows only its wallpaper, a cursor theme name does not exist, a widget shows zero not an
-  error, a video wallpaper keeps the old clip, a notebook starts at 100 %, a convertible shows no on-screen keyboard,
-  two first-run windows open at login, a webcam has no page, colours collapse for colour vision or a text fails contrast, or a KDE patch needs its CI.
+  error, a video wallpaper keeps the old clip, a notebook starts at 100 %, a convertible or a Fcitx 5 session shows
+  no on-screen keyboard, two first-run windows open at login, a webcam has no page, colours collapse for colour
+  vision or a text fails contrast, or a KDE patch needs its CI.
 ---
 
 # KDE desktop defaults
@@ -42,6 +43,12 @@ The edition carries a patch on Debian's source (each answer owns its watcher).
 
 A notebook's built-in panel gets its first scale from its real size (125 % at least for a full HD panel of about 13 to 14 inches), a computer with a touch screen of its own gets Plasma Keyboard as its virtual keyboard in the session's language, shown only in tablet mode, and in tablet mode every panel hides by itself and goes back to its own setting afterwards.
 [Where KWin chooses the first scale and from which EDID field, why a default that only some computers get is a folder in front of `XDG_CONFIG_DIRS`, the shell's two visibility modes, tablet mode in the rig, and the traps](references/convertibles-and-dense-panels.md).
+
+## The on-screen keyboard with Fcitx 5 (Japanese, Korean, Chinese)
+
+KWin runs one input method: Plasma Keyboard in other sessions, Fcitx 5 in the edition's Japanese, Korean and Chinese sessions, where until row 71 no on-screen keyboard showed.
+Plasma Keyboard 6.7.4-2+stereo3d1 runs a second time as Fcitx 5's own keyboard (`plasma-keyboard --fcitx`, through Fcitx 5's `org.fcitx.Fcitx5.VirtualKeyboardBackend1`): it shows when KWin would show a keyboard, Fcitx 5's engines convert its keys, and a bar above them holds the preedit, the candidates chosen by a touch and the input method switch; when Fcitx 5 does not answer it says so and types plain text.
+[How the pieces fit, the bridge part by part, how to see it working, the defaults, each language typed in the session rig, the keyboard on a 3D output, and the traps](references/on-screen-keyboard.md).
 
 ## The first run: KDE's Welcome Center
 

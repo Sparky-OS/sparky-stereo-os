@@ -1,0 +1,4 @@
+#!/bin/sh
+# Fcitx 5 chosen as KWin's input method but unable to run: the program KWin starts ends at once
+echo "fcitx5 stand-in: exiting, as a broken or removed Fcitx 5 would" >&2
+exit 1

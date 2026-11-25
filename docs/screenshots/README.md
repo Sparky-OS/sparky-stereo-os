@@ -104,4 +104,13 @@ The nearest rock 23 px apart, the far mountains 1 px, the panel 0 px.
 The Earth in front of the screen (+11 px) and the stars behind it (-12 px), the side panel flat.
 This shot predates fixes made since; the menu-over-menu picture shows Marble today.
 
+## FreeCAD's EngineBlock example
+
+<img src="freecad-engineblock-pair-side-by-side.png" width="99%" alt="FreeCAD 1.1.3 with its EngineBlock example, the two eyes side by side">
+
+[Download the marked pair (PNG with sTER, .pns)](https://raw.githubusercontent.com/Sparky-OS/sparky-stereo-os/main/docs/screenshots/freecad-engineblock-pair.pns)
+
+FreeCAD 1.1.3 in the edition's build: the 3D view is drawn with two parallel cameras and handed to the desktop as a pair, the depth fitted to the person's limits.
+Both eyes are shown side by side, as the program hands them over.
+
 Back to [the front page](../../README.md#seen-in-3d).

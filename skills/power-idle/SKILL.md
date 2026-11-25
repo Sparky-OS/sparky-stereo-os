@@ -49,6 +49,7 @@ The accepted timeline, in seconds, is:
 
 The desktop/AC GL-show boundary is 8100 seconds.
 The show itself is a separate component; configuration and screen-off proof do not prove it ran.
+Its switch and its two times are edited on Screen Locking and on the Screensavers page, one file for both (`stereoshowrc`): [kde-desktop-defaults, the Screensavers page](../kde-desktop-defaults/references/screensaver-settings-page.md).
 Independent idle locking is disabled; lock-before-off and lock-on-resume remain enabled.
 Dimming remains gated by brightness hardware.
 The power button uses native Shutdown everywhere; native session management asks programs to save.

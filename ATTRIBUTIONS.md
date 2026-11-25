@@ -1136,6 +1136,7 @@ Plasma Keyboard as the on-screen keyboard of Fcitx 5 (plasma-keyboard 6.7.4-2+st
 - **LayerShellQt** ([invent.kde.org/plasma/layer-shell-qt](https://invent.kde.org/plasma/layer-shell-qt)): Aleix Pol Gonzalez, on Drew DeVault's layer-shell protocol: the keyboard's window, at the bottom of the screen, that never takes the keyboard focus.
 - **KWin**: the `org.kde.kwin.VirtualKeyboard` interface whose touch, pen and tablet-mode rule decides when the keyboard shows, and the fake input protocol (`fake-input.xml`, Martin Gräßlin, 2015) through which the keys type plain text when Fcitx 5 does not answer.
 - **libxkbcommon** (the xkbcommon project): the conversion of characters to X keysyms that Fcitx 5 reads.
+- **Plasma Keyboard's reworked engine**, cited and measured, not carried: Devin Lin's merge requests 109 ("Introduce new input engine and framework to replace Qt VKBD") and 113 ("Add Chinese, Japanese and Korean layouts and text composers") with the layout and settings work after them, and commits since 6.7.4 by Kristen McWilliam, Jakob Petsovits, Ryan Brue and Maximilian Meßmann.
 These projects do not endorse the edition.
 
 ## The desktop's loading screen (ORDER 571, 2026-11-15)

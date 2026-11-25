@@ -10,7 +10,7 @@ description: >-
   Center (Plasma Welcome pages). Load it when a default should be decided instead of left to the person, a shortcut
   clashes, a lock screen shows only its wallpaper, a cursor theme name does not exist, a widget shows zero not an
   error, a video wallpaper keeps the old clip, a notebook starts at 100 %, a convertible shows no on-screen keyboard,
-  two first-run windows open at login, a webcam has no page, or a KDE patch needs its CI.
+  two first-run windows open at login, a webcam has no page, colours collapse for colour vision or a text fails contrast, or a KDE patch needs its CI.
 ---
 
 # KDE desktop defaults
@@ -64,6 +64,12 @@ Kamoso (our build) and Qt Multimedia's camera (our build, ORDER 582) follow the 
 The Qt side: [the default camera in Qt programs](../contrib-qt/references/default-camera-in-qt-programs.md).
 [Where each setting lives, which programs follow, a virtual camera in the rig, and the traps with their symptoms](references/camera-page.md).
 A device's command-line tool (a headset's HeadsetControl) joined to System Settings, the system tray and a user service, with its proof in a Plasma login: [the recipe and the traps](references/device-tool-in-kde.md).
+
+## Colour vision: the one switch, and contrast fixed for everyone
+
+System Settings' Colour Vision page (`sparky-stereo-colour-vision`, beside Accessibility) sets, for one choice of none, protan, deutan, tritan or monochromacy, KWin's correction through the keys KDE's Accessibility page uses, the colour-vision variant of the person's colour scheme, and on request Konsole, nano and the text console; the person's files are kept and their colours come back exactly at none.
+The look fixes two contrast failures for everyone (Oxygen Dark's negative, positive and link texts; Konsole's intense red, the root prompt).
+[Where each colour comes from, the measuring method and its control, the maps per kind, how each surface is set and kept, and the traps (KWin's tritanopia correction, gamma 2.2, nano's include, a Lean Code digest)](references/colour-vision.md).
 
 ## A program that needs hardware: offered, not installed
 

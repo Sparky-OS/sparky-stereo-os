@@ -9,7 +9,7 @@ description: >-
   internal format; renderer profiles, FFmpeg's stereo3d filter and metadata filters, eye order and subtitles; Throw to a
   Chromecast or Cast device as a KWin output. Load it when a TV fed over the network shows two squeezed pictures, never
   switches to 3D, swaps the eyes, loses the mark in a transcode, a device profile is outranked by the generic one, or a
-  thrown output offers no 3D formats.
+  thrown output offers no 3D formats or a format chosen while throwing never reaches the stream.
 ---
 
 # Serving stereo to another device
@@ -114,7 +114,7 @@ The service listens on the network and accepts a URL from any device on it; whet
 - **VLC Stereo**: its renderer output (Chromecast and UPnP) and its stream output (`sout`).
 - **PeerTube**: transcoding profiles for 3D uploads (our merged #7816).
 - **Kdenlive, HandBrake and FFmpeg presets** that export for a named device: same rule, the device's format.
-- **Throw to a Cast device** (queue row 81, `sparky-stereo-throw`): the device is one more of Stereo KWin's outputs, made by the screencast protocol's version 7 request, so its frame is that output's own 3D format at the device's raster; the daemon finds the device, speaks the Cast channel and serves the output's stream. What ships, the channel as a recipe, the software receiver as the fixture, the device table, the loopback proof and four traps (the first: such an output has no 3D formats yet): [`references/throw-to-a-cast-device.md`](references/throw-to-a-cast-device.md).
+- **Throw to a Cast device** (queue row 81, `sparky-stereo-throw`): the device is one more of Stereo KWin's outputs, made by the screencast protocol's version 7 request, so its frame is that output's own 3D format at the device's raster; the daemon finds the device, speaks the Cast channel and serves the output's stream. What ships, how KWin +stereo3d66 makes such an output a screen like the others (its 3D formats, eye swap and kept choice, its stream per format, "Throw to" in the window menu) and the tests that hold each, the channel as a recipe, the software receiver as the fixture, the device table, the loopback proof and the traps met: [`references/throw-to-a-cast-device.md`](references/throw-to-a-cast-device.md).
 - **Not this skill:**
   - The phone headset over KRdp (Flat Headset): it is one of Stereo KWin's outputs, see [`3d-to-vr`](../3d-to-vr/SKILL.md).
   - Anything a program hands the desktop: see [`sparky-stereo`](../sparky-stereo/SKILL.md).

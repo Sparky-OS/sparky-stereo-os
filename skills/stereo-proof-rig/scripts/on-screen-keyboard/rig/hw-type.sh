@@ -1,6 +1,6 @@
 #!/bin/bash
-# hw-type.sh: inside a rig session (kb-login.sh STEP=hw-type.sh) in a Japanese session: a hardware keyboard types through
-# Fcitx 5 as before. Kate opens a file; a mouse click gives its text the focus (no on-screen keyboard: the last input is the
+# hw-type.sh: inside a rig session (kb-login.sh STEP=hw-type.sh) in a Japanese, Korean or Chinese session (HW_LANG): a
+# hardware keyboard types through Fcitx 5 as before. Kate opens a file; a mouse click gives its text the focus (no on-screen keyboard: the last input is the
 # mouse); Ctrl+Space turns Mozc on (Fcitx 5's trigger key); "nihongo", Space and Enter come from KWin's fake keyboard
 # (evdev keys); the file is read back. Then the same after the on-screen keyboard was shown by a touch: the first physical
 # key leaves Fcitx 5's keyboard mode and the on-screen keyboard hides. Env: CASE, LANE, RIG, FAKEINPUT, SESSION_LOG.
@@ -25,16 +25,23 @@ ws = json.load(sys.stdin)['windows'] or []
 vis = [w for w in ws if not w.get('hidden') and not w.get('deleted')]
 print('layer' if any('plasma-keyboard' in (w.get('cls') or '') or 'plasma.keyboard' in (w.get('cls') or '') for w in vis)
       else 'panel' if any(w.get('inputMethod') for w in vis) else 'no')"; }
-# 1. the mouse and the hardware keyboard only
+# 1. the mouse and the hardware keyboard only: Ctrl+Space turns the language's engine on (Fcitx 5's trigger key), then the
+# word's evdev keys and the engine's own way to finish it (HW_LANG: ja Mozc "nihongo" Space Enter, ko Hangul Dubeolsik
+# "gksrnrdj" Enter, zh_CN Pinyin "zhongwen" Space)
 run "m:$cg s:400 b:272 s:2000"
 echo "keyboard after the click: $(kb)" >> "$CASE/hw.txt"
 run "k:29+57 s:800"
-for k in 49 23 35 24 49 34 24; do run "k:$k s:150"; done
-run "k:57 s:800"
-run "k:28 s:1500"
+case "${HW_LANG:-ja}" in
+ja) keys="49 23 35 24 49 34 24"; finish="57 28" ;;
+ko) keys="34 37 31 19 49 19 32 36"; finish="28" ;;
+zh_CN) keys="44 35 24 49 34 17 18 49"; finish="57" ;;
+esac
+for k in $keys; do run "k:$k s:150"; done
+for k in $finish; do run "k:$k s:1200"; done
 sleep 3
 cp "$CASE/typed.txt" "$CASE/typed-hardware.txt"
 echo "typed with the hardware keyboard: $(cat "$CASE/typed-hardware.txt" | head -c 200)" >> "$CASE/hw.txt"
+[ "${HW_LANG:-ja}" = ja ] || { exec 3>&- 4<&-; for p in $(pgrep -x kate); do kill -TERM "$p"; done; cat "$CASE/hw.txt"; exit 0; }
 # 2. a touch shows the on-screen keyboard; the first physical key hides it
 run "t:1900,30 s:800"
 run "t:$cg s:3000"

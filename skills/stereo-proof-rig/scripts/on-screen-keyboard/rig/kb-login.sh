@@ -6,7 +6,8 @@
 #      MODE (2d or 3d: the output's plain mode or its side by side 3D twin), TOUCH_SCREEN (1: the computer has a touch screen
 #      and a built-in panel, read by the hardware layer from a sysfs fixture; 0: a desktop without one), TABLET (on or auto:
 #      kwinrc [Input] TabletMode as General Behavior writes it), STEP (type, or a script under LANE run in the session),
-#      USER_SETUP (a script run as the person before the login), W, H.
+#      USER_SETUP (a script run as the person before the login), W, H, OUTPUTS (virtual outputs side by side, 1 or 2),
+#      SCALE (the scale set on every output with the screen, as Display Settings sets it: 1.25, 1.5).
 set -uo pipefail
 CASE=${CASE:?}; RIG=${RIG:?}; LANE=${LANE:?}; mkdir -p "$CASE"
 export HOME=${RIG_HOME:-/home/person}; find "$HOME" -mindepth 1 -delete
@@ -16,7 +17,7 @@ export LANG=${LOGIN_LANG:-C.UTF-8}
 W=${W:-1920}; H=${H:-1080}; MODE=${MODE:-2d}
 # 1. the person's saved screen, made the way Display Settings makes it
 dbus-run-session -- bash -c '
-KWIN_VIRTUAL_STEREO_MODES=1 kwin_wayland --virtual --socket=setup --width '"$W"' --height '"$H"' > "$XDG_RUNTIME_DIR/setup.log" 2>&1 & k=$!
+KWIN_VIRTUAL_STEREO_MODES=1 kwin_wayland --virtual --socket=setup --width '"$W"' --height '"$H"' --output-count '"${OUTPUTS:-1}"' > "$XDG_RUNTIME_DIR/setup.log" 2>&1 & k=$!
 for i in $(seq 100); do [ -S "$XDG_RUNTIME_DIR/setup" ] && break; sleep 0.1; done; sleep 1.5
 args=($(WAYLAND_DISPLAY=setup kscreen-doctor -j 2>/dev/null | python3 -c "
 import json, sys
@@ -28,7 +29,9 @@ for o in json.load(sys.stdin)[\"outputs\"]:
     else:
         mode = [m for m in o[\"modes\"] if not m.get(\"stereo3D\")][0][\"id\"]
     print(\"output.%s.mode.%s\" % (o[\"name\"], mode))
-" "'"$MODE"'"))
+    if sys.argv[2] != \"1\":
+        print(\"output.%s.scale.%s\" % (o[\"name\"], sys.argv[2]))
+" "'"$MODE"'" "'"${SCALE:-1}"'"))
 WAYLAND_DISPLAY=setup kscreen-doctor "${args[@]}" > "$XDG_RUNTIME_DIR/kd.log" 2>&1; sleep 1.5
 WAYLAND_DISPLAY=setup kscreen-doctor -o 2>/dev/null | sed "s/\x1b\[[0-9;]*m//g" | grep -E "Output:|Modes|Scale" > "'"$CASE"'/outputs.txt"
 kill -TERM $k; wait $k 2>/dev/null'
@@ -74,7 +77,7 @@ export SPARKY_STEREO_SYSFS=$SYSFS
 mkdir -p "$XDG_RUNTIME_DIR/shim"
 cat > "$XDG_RUNTIME_DIR/shim/kwin_wayland" <<SH
 #!/bin/sh
-exec env -u LIBGL_ALWAYS_SOFTWARE -u __EGL_VENDOR_LIBRARY_FILENAMES /usr/bin/kwin_wayland "\$@" --virtual --width $W --height $H
+exec env -u LIBGL_ALWAYS_SOFTWARE -u __EGL_VENDOR_LIBRARY_FILENAMES /usr/bin/kwin_wayland "\$@" --virtual --width $W --height $H --output-count ${OUTPUTS:-1}
 SH
 chmod +x "$XDG_RUNTIME_DIR/shim/kwin_wayland"
 [ -n "${SHIM_DIR:-}" ] && cp -a "$SHIM_DIR"/. "$XDG_RUNTIME_DIR/shim/"

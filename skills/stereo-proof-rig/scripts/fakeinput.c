@@ -14,6 +14,10 @@
  *   p:272       press a pointer button and leave it down; r:272 releases it (a drag: p:, m: steps, r:; ORDER 551c)
  *   w:VALUE     turn the wheel: one vertical axis event of VALUE (15 is one notch down, -15 one notch up, as a
  *               mouse wheel sends; row 50, FreeCAD's zoom)
+ *   td:X,Y      one finger down at X,Y and left down; tm:X,Y moves it; tu lifts it (a long press that slides to a
+ *               key's alternative: td:, s:, tm:, tu; row 71)
+ *   sw:X1,Y1,X2,Y2,MS  a swipe: down at X1,Y1, twenty moves to X2,Y2 over MS milliseconds, up (a list scrolled by
+ *               touch; row 71)
  * fakeinput --serve IN ACK: stay connected (KWin's fake input device, and with it the seat's pointer, lives only
  * while the client is connected) and run each line read from IN as steps, writing "ok" to ACK after each line, or
  * "error" when a step is malformed (ORDER 441: a line that was one comma-joined token used to run only its first
@@ -21,7 +25,8 @@
  * Steps are separated by white space; a comma belongs to a step (m:X,Y) and never separates steps.
  * Each step is printed with its CLOCK_MONOTONIC time in milliseconds (ORDER 249: the clock of the probe).
  * First written for ORDER 207 (queue/vlc-eye-swap-merge-207/tools/fakeinput.c); the d: step and the times for ORDER 249.
- * Build: wayland-scanner client-header/private-code fake-input.xml, then cc fakeinput.c fake-input-protocol.c -lwayland-client
+ * Build: wayland-scanner client-header/private-code fake-input.xml, then cc fakeinput.c fake-input-protocol.c -lwayland-client -lm
+ * (-lm: wayland-util.h's inline wl_fixed_from_double calls round() in libwayland 1.26; row 71)
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -160,6 +165,42 @@ static int step(struct wl_display *display, const char *a)
 		org_kde_kwin_fake_input_touch_frame(fake);
 		wl_display_flush(display);
 		wait_ms(a[0] == 'h' ? 1200 : 80);
+		org_kde_kwin_fake_input_touch_up(fake, 0);
+		org_kde_kwin_fake_input_touch_frame(fake);
+	} else if (strncmp(a, "td:", 3) == 0 || strncmp(a, "tm:", 3) == 0) {
+		double x = 0, y = 0;
+		int used = 0;
+		if (sscanf(a + 3, "%lf,%lf%n", &x, &y, &used) != 2 || a[3 + used] != '\0') {
+			fprintf(stderr, "fakeinput: malformed step %s\n", a);
+			return 2;
+		}
+		if (a[1] == 'd')
+			org_kde_kwin_fake_input_touch_down(fake, 0, wl_fixed_from_double(x), wl_fixed_from_double(y));
+		else
+			org_kde_kwin_fake_input_touch_motion(fake, 0, wl_fixed_from_double(x), wl_fixed_from_double(y));
+		org_kde_kwin_fake_input_touch_frame(fake);
+	} else if (strcmp(a, "tu") == 0) {
+		org_kde_kwin_fake_input_touch_up(fake, 0);
+		org_kde_kwin_fake_input_touch_frame(fake);
+	} else if (strncmp(a, "sw:", 3) == 0) {
+		double x1 = 0, y1 = 0, x2 = 0, y2 = 0;
+		unsigned long ms = 0;
+		int used = 0;
+		if (sscanf(a + 3, "%lf,%lf,%lf,%lf,%lu%n", &x1, &y1, &x2, &y2, &ms, &used) != 5 || a[3 + used] != '\0') {
+			fprintf(stderr, "fakeinput: malformed step %s\n", a);
+			return 2;
+		}
+		org_kde_kwin_fake_input_touch_down(fake, 0, wl_fixed_from_double(x1), wl_fixed_from_double(y1));
+		org_kde_kwin_fake_input_touch_frame(fake);
+		wl_display_flush(display);
+		for (int i = 1; i <= 20; i++) {
+			wait_ms(ms / 20);
+			org_kde_kwin_fake_input_touch_motion(fake, 0, wl_fixed_from_double(x1 + (x2 - x1) * i / 20),
+							     wl_fixed_from_double(y1 + (y2 - y1) * i / 20));
+			org_kde_kwin_fake_input_touch_frame(fake);
+			wl_display_flush(display);
+		}
+		wait_ms(30);
 		org_kde_kwin_fake_input_touch_up(fake, 0);
 		org_kde_kwin_fake_input_touch_frame(fake);
 	} else if (strncmp(a, "s:", 2) == 0) {

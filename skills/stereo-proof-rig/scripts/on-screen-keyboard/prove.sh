@@ -1,23 +1,28 @@
 #!/bin/bash
 # A core limit of exactly 1 suppresses the piped core helper; a zero limit does not.
-# prove.sh OUT: row 71's proof, one rerun. Every case is one fresh container and one new account's login on a 1920x1080
-# virtual output of Stereo KWin (on the NVIDIA card), on a computer with a touch screen of its own (the hardware layer
-# reads a sysfs fixture) in tablet mode unless the case says otherwise. RED is the published set (r1123a) with Gwenview,
-# GREEN the same with the staged packages installed by apt. One row per claim in OUT/rows.tsv and OUT/rows.jsonl; the
-# exit status is 1 when a row is not as expected. The load average is written at the start and the end.
+# prove.sh OUT: row 71's proof, one rerun (milestone 1's rows and the second round's). Every case is one fresh container
+# and one new account's login on a 1920x1080 virtual output of Stereo KWin (on the NVIDIA card), on a computer with a
+# touch screen of its own (the hardware layer reads a sysfs fixture) in tablet mode unless the case says otherwise.
+# RED is the published set (r1123a) with Gwenview and the programs the rows type into (Konsole, zenity, the Stereo
+# Browser, Qt's qml tool); STAGED that with the staged set this round starts from (Plasma Keyboard 6.7.4-2+stereo3d1,
+# sparky-stereo-hardware 0.1.42 and KWin 6.7.4-2+stereo3d66 of row 81's stage); GREEN the red image with this round's
+# packages (KWin +stereo3d67, Plasma Keyboard +stereo3d2, sparky-stereo-hardware 0.1.42), all installed by apt. One row
+# per claim in OUT/rows.tsv and OUT/rows.jsonl; the exit status is 1 when a row is not as expected. The load average is
+# written at the start and the end.
 # Environment: DOCKER_HOST (the lane's socket), RENDER_GROUP, CONTAINER_IDS, FAKEINPUT_DIR (the built fake input client),
-# RIG_SCRIPTS (the skills' stereo-proof-rig/scripts), RED_IMAGE, GREEN_IMAGE; PARTS (optional: a space-separated subset of
-# typing refuse absent hardware defaults retouch settings 3d).
+# RIG_SCRIPTS (the skills' stereo-proof-rig/scripts), RED_IMAGE, STAGED_IMAGE, GREEN_IMAGE; PARTS (optional: a
+# space-separated subset of typing refuse absent hardware defaults retouch settings 3d filter inview 3dmoved readable
+# hardware2 pages programs scales twoscreens polish).
 set -u
 HERE=$(cd "$(dirname "$0")" && pwd)
 RIGD=$HERE/rig
 OUT=${1:?an output folder that does not exist yet}
 [ -e "$OUT" ] && { echo "$OUT exists: give a new folder" >&2; exit 2; }
 mkdir -p "$OUT"; OUT=$(cd "$OUT" && pwd)
-: "${DOCKER_HOST:?}" "${RENDER_GROUP:?}" "${CONTAINER_IDS:?}" "${FAKEINPUT_DIR:?}" "${RIG_SCRIPTS:?}" "${RED_IMAGE:?}" "${GREEN_IMAGE:?}"
+: "${DOCKER_HOST:?}" "${RENDER_GROUP:?}" "${CONTAINER_IDS:?}" "${FAKEINPUT_DIR:?}" "${RIG_SCRIPTS:?}" "${RED_IMAGE:?}" "${STAGED_IMAGE:?}" "${GREEN_IMAGE:?}"
 export DOCKER_HOST RENDER_GROUP CONTAINER_IDS FAKEINPUT_DIR RIG_SCRIPTS
-PARTS=${PARTS:-typing refuse absent hardware defaults retouch settings 3d}
-{ echo "start $(date -u +%FT%TZ) loadavg $(cut -d' ' -f1-3 /proc/loadavg)"; echo "red $RED_IMAGE $(docker image inspect -f '{{.Id}}' "$RED_IMAGE")"; echo "green $GREEN_IMAGE $(docker image inspect -f '{{.Id}}' "$GREEN_IMAGE")"; } > "$OUT/run.txt"
+PARTS=${PARTS:-typing refuse absent hardware defaults retouch settings 3d filter inview 3dmoved readable hardware2 pages programs scales twoscreens polish}
+{ echo "start $(date -u +%FT%TZ) loadavg $(cut -d' ' -f1-3 /proc/loadavg)"; for v in RED STAGED GREEN; do i=${v}_IMAGE; echo "$v ${!i} $(docker image inspect -f '{{.Id}}' "${!i}")"; done; } > "$OUT/run.txt"
 want() { case " $PARTS " in *" $1 "*) return 0 ;; esac; return 1; }
 case_() { # case_ IMAGE DIR VAR=VALUE...
 	local img=$1 dir=$2; shift 2
@@ -128,13 +133,17 @@ if want defaults; then
 fi
 
 if want retouch; then
-	case_ "$GREEN_IMAGE" green/retouch-en LOGIN_LANG=en_US.UTF-8 LANG_CASE=en STEP=retouch.sh
-	case_ "$GREEN_IMAGE" green/retouch-ja LOGIN_LANG=ja_JP.UTF-8 LANG_CASE=ja STEP=retouch.sh
-	en=$(sed -n 's/^keyboard after a touch on the same field: //p' "$OUT/green/retouch-en/retouch.txt"); ja=$(sed -n 's/^keyboard after a touch on the same field: //p' "$OUT/green/retouch-ja/retouch.txt")
-	# the known gap: KWin tells a keyboard that is not its input method nothing of a touch on a field that already has the focus
-	ok=0; [ "$en" = panel ] && [ "$ja" = no ] && ok=1
-	row "4 (gap)" "a field that has the focus from the pointer, then touched: KWin's own keyboard shows (en); Fcitx 5's keyboard does not (ja), a KWin change is needed" \
-		"en: $en" "ja: $ja" "$ok" "green/retouch-en/retouch.txt, green/retouch-ja/retouch.txt"
+	# milestone 1's gap (its row "4 (gap)"), closed in KWin +stereo3d67: red is the staged set it was found on
+	for d in staged green; do
+		img=$STAGED_IMAGE; [ $d = green ] && img=$GREEN_IMAGE
+		case_ "$img" $d/retouch-en LOGIN_LANG=en_US.UTF-8 LANG_CASE=en STEP=retouch.sh
+		case_ "$img" $d/retouch-ja LOGIN_LANG=ja_JP.UTF-8 LANG_CASE=ja STEP=retouch.sh
+	done
+	rt() { sed -n 's/^keyboard after a touch on the same field: //p' "$OUT/$1/retouch.txt" 2>/dev/null; }
+	se=$(rt staged/retouch-en); sj=$(rt staged/retouch-ja); ge=$(rt green/retouch-en); gj=$(rt green/retouch-ja)
+	ok=0; [ "$se" = panel ] && [ "$sj" = no ] && [ "$ge" = panel ] && [ "$gj" = layer ] && ok=1
+	row 2 "a field that has the focus from the pointer, then touched: the keyboard shows in ja as KWin's own does in en (milestone 1's gap)" \
+		"staged: en $se, ja $sj" "en $ge, ja $gj" "$ok" "staged/retouch-ja/retouch.txt, green/retouch-ja/retouch.txt, green/retouch-en/retouch.txt"
 fi
 
 if want settings; then
@@ -162,6 +171,165 @@ print(k.get("disparity_px"), k.get("differing_at_disparity"), (b.get("left") or 
 	ok=0; [ "$rbl" = 0 ] && [ "$rbr" = 0 ] && [ "$gbl" = 0 ] && [ "$gbr" = 0 ] && [ "$rp" = 1 ] && [ "$gp" = 1 ] && ok=1
 	row 6 "the stereo window behind is as it was (differing pixels outside the keyboard and Kate, each eye) and still a pair" \
 		"en: $rbl / $rbr px, pair $rp" "ja: $gbl / $gbr px, pair $gp" "$ok" "green/3d-ja/measure.json, red/3d-en/measure.json"
+fi
+
+# ---- the second round (CONTINUATION-2): red is the staged set where a row is about KWin +stereo3d67 or Plasma Keyboard
+# +stereo3d2, the published set where it is about the published keyboard; the Latin session is the control throughout
+jv() { python3 -c 'import json,sys
+try: d = json.load(open(sys.argv[1]))
+except Exception: print("no-result"); sys.exit()
+for k in sys.argv[2].split("."):
+    d = d.get(k) if isinstance(d, dict) else None
+print(json.dumps(d, ensure_ascii=False))' "$OUT/$1" "$2"; }
+img_of() { case $1 in red) echo "$RED_IMAGE" ;; staged) echo "$STAGED_IMAGE" ;; green) echo "$GREEN_IMAGE" ;; esac; }
+
+if want inview; then
+	# KWin's rule for its own panel, measured first on the published set: a window in the lower half is moved up, a
+	# maximized one shortened, to end where the keys begin; a full-screen window is left as it is. Kate and a GTK 4 dialog.
+	for mode in lower max; do
+		for d in staged green; do
+			case_ "$(img_of $d)" $d/inview-$mode-ja LOGIN_LANG=ja_JP.UTF-8 LANG_CASE=ja INVIEW=$mode
+			case_ "$(img_of $d)" $d/inview-$mode-en LOGIN_LANG=en_US.UTF-8 LANG_CASE=en INVIEW=$mode
+		done
+		v() { echo "kbd $(jv $1/result.json keyboard.kind) clear $(jv $1/result.json inview.clear_of_keyboard) typed $(jv $1/result.json inview.typed_in_file)"; }
+		ok=0
+		[ "$(jv green/inview-$mode-ja/result.json inview.clear_of_keyboard)" = true ] && [ "$(jv green/inview-$mode-ja/result.json inview.typed_in_file)" = true ] \
+			&& [ "$(jv green/inview-$mode-en/result.json inview.clear_of_keyboard)" = true ] && [ "$(jv staged/inview-$mode-en/result.json inview.clear_of_keyboard)" = true ] \
+			&& [ "$(jv staged/inview-$mode-ja/result.json inview.clear_of_keyboard)" != true ] && ok=1
+		row 3 "Kate, the field at the bottom of a window $([ $mode = lower ] && echo 'in the lower half (moved up)' || echo 'maximized (shortened)'): in ja the window ends where the keys begin, as with KWin's own keyboard in en" \
+			"staged: ja $(v staged/inview-$mode-ja); en $(v staged/inview-$mode-en)" "ja $(v green/inview-$mode-ja); en $(v green/inview-$mode-en)" "$ok" \
+			"green/inview-$mode-ja/inview-before.png, green/inview-$mode-ja/result.json, staged/inview-$mode-ja/inview-before.png"
+	done
+	case_ "$GREEN_IMAGE" green/inview-full-ja LOGIN_LANG=ja_JP.UTF-8 LANG_CASE=ja INVIEW=full
+	case_ "$GREEN_IMAGE" green/inview-full-en LOGIN_LANG=en_US.UTF-8 LANG_CASE=en INVIEW=full
+	gj=$(jv green/inview-full-ja/result.json inview); ge=$(jv green/inview-full-en/result.json inview)
+	ok=0; [ "$(jv green/inview-full-ja/result.json keyboard.shown)" = true ] && [ "$(jv green/inview-full-ja/result.json inview.clear_of_keyboard)" = false ] \
+		&& [ "$(jv green/inview-full-en/result.json inview.clear_of_keyboard)" = false ] && ok=1
+	row 3 "Kate full screen: KWin leaves a full-screen window as it is for either keyboard (its own rule); the keyboard shows over it in ja as in en" \
+		"en: kbd $(jv green/inview-full-en/result.json keyboard.kind), clear $(jv green/inview-full-en/result.json inview.clear_of_keyboard)" \
+		"ja: kbd $(jv green/inview-full-ja/result.json keyboard.kind), clear $(jv green/inview-full-ja/result.json inview.clear_of_keyboard)" "$ok" "green/inview-full-ja/inview-before.png"
+	case_ "$STAGED_IMAGE" staged/inview-zenity-ja LOGIN_LANG=ja_JP.UTF-8 LANG_CASE=ja INVIEW=lower TARGET=zenity
+	case_ "$GREEN_IMAGE" green/inview-zenity-ja LOGIN_LANG=ja_JP.UTF-8 LANG_CASE=ja INVIEW=lower TARGET=zenity
+	case_ "$GREEN_IMAGE" green/inview-zenity-en LOGIN_LANG=en_US.UTF-8 LANG_CASE=en INVIEW=lower TARGET=zenity
+	ok=0; [ "$(jv green/inview-zenity-ja/result.json inview.clear_of_keyboard)" = true ] && [ "$(jv green/inview-zenity-ja/result.json ok)" = true ] \
+		&& [ "$(jv green/inview-zenity-en/result.json inview.clear_of_keyboard)" = true ] && [ "$(jv staged/inview-zenity-ja/result.json inview.clear_of_keyboard)" != true ] && ok=1
+	row 3 "a GTK 4 dialog (zenity) at the bottom of the screen: in ja it is moved clear of the keys and the entry typed into, as in en" \
+		"staged ja: clear $(jv staged/inview-zenity-ja/result.json inview.clear_of_keyboard), typed $(jv staged/inview-zenity-ja/result.json typed)" \
+		"ja: clear $(jv green/inview-zenity-ja/result.json inview.clear_of_keyboard), typed $(jv green/inview-zenity-ja/result.json typed); en: clear $(jv green/inview-zenity-en/result.json inview.clear_of_keyboard)" \
+		"$ok" "green/inview-zenity-ja/inview-before.png, green/inview-zenity-ja/result.json"
+	ok=0; ev=$(grep -h -c 'input_panel_state(' "$OUT/green/inview-lower-ja/kate-wl.log" 2>/dev/null); [ "${ev:-0}" -gt 0 ] && ok=1
+	row 3 "what the client is told in ja: Kate (text-input v2) receives input_panel_state as from KWin's own panel (en)" \
+		"staged ja: $(grep -h -c 'input_panel_state(' "$OUT/staged/inview-lower-ja/kate-wl.log" 2>/dev/null) events; green en: $(jv green/inview-lower-en/result.json inview.input_panel_states)" \
+		"ja: $ev events, $(jv green/inview-lower-ja/result.json inview.input_panel_states)" "$ok" "green/inview-lower-ja/kate-wl.log, green/inview-lower-en/kate-wl.log"
+fi
+
+if want filter; then
+	# KWin merge request 9601 (backported in +stereo3d67): only KWin's own input method binds the input-method protocols.
+	# Fcitx 5 says which it got in its self-diagnosis ("Using Wayland native input method protocol: 1" when it bound
+	# zwp_input_method_v1); KWin's own keyboard (its panel's pid is KWin's, which starts it on a private socket) types on
+	for d in staged green; do case_ "$(img_of $d)" $d/filter-en LOGIN_LANG=en_US.UTF-8 LANG_CASE=en STEP=step-fcitx-activated.sh; done
+	nat() { grep -h -o 'Using Wayland native input method protocol: [01]' "$OUT/$1/filter-en/container.log" 2>/dev/null | tail -1 | grep -o '[01]$'; }
+	po() { python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print(d.get("program"), d.get("ok"))' "$OUT/$1/filter-en/panel-owner.txt" 2>/dev/null; }
+	sn=$(nat staged); gn=$(nat green); sp=$(po staged); gp=$(po green)
+	# a second witness: the input-method globals offered to an ordinary client (Kate, in the in-view cases)
+	og() { jv $1/inview-lower-ja/result.json inview.offered_input_method_globals 2>/dev/null; }
+	ok=0; [ "$sn" = 1 ] && [ "$gn" = 0 ] && [ "$gp" = "kwin_wayland True" ] && ok=1
+	row "2, 7" "en: a Fcitx 5 started by D-Bus activation behind KWin's back no longer binds KWin's input-method protocol; KWin's own keyboard types (KWin MR 9601, backported)" \
+		"Fcitx 5's native input method protocol: $sn; panel and typed: $sp; globals offered to Kate: $(og staged)" "protocol: $gn; panel and typed: $gp; globals offered to Kate: $(og green)" "$ok" "staged/filter-en/container.log, green/filter-en/container.log, */filter-en/panel-owner.txt, */inview-lower-ja/kate-wl.log"
+fi
+
+if want 3dmoved; then
+	case_ "$STAGED_IMAGE" staged/3dmoved-ja LOGIN_LANG=ja_JP.UTF-8 LANG_CASE=ja MODE=3d STEP=step3-3d-moved.sh
+	case_ "$GREEN_IMAGE" green/3dmoved-ja LOGIN_LANG=ja_JP.UTF-8 LANG_CASE=ja MODE=3d STEP=step3-3d-moved.sh
+	case_ "$GREEN_IMAGE" green/3dmoved-en LOGIN_LANG=en_US.UTF-8 LANG_CASE=en MODE=3d STEP=step3-3d-moved.sh
+	for d in staged/3dmoved-ja green/3dmoved-ja green/3dmoved-en; do python3 -I "$RIGD/measure-moved.py" "$OUT/$d" > "$OUT/$d/measure.json" 2>> "$OUT/cases.log"; done
+	mv_() { echo "moved $(jv $1/measure.json moved), clear $(jv $1/measure.json clear_of_keyboard), pair kept $(jv $1/measure.json pair_kept), disparity $(jv $1/measure.json picture_before.disparity_px) -> $(jv $1/measure.json picture_after.disparity_px)"; }
+	ok=0; [ "$(jv green/3dmoved-ja/measure.json moved)" = true ] && [ "$(jv green/3dmoved-ja/measure.json clear_of_keyboard)" = true ] \
+		&& [ "$(jv green/3dmoved-en/measure.json moved)" = true ] && [ "$(jv staged/3dmoved-ja/measure.json moved)" = false ] && ok=1
+	row 3 "a declared stereo window holding a field, in the lower half of a 3D output: moved clear of the keys in ja as in en" \
+		"staged ja: $(mv_ staged/3dmoved-ja)" "ja: $(mv_ green/3dmoved-ja); en: $(mv_ green/3dmoved-en)" "$ok" "green/3dmoved-ja/before.png, green/3dmoved-ja/after2.png"
+	ok=0; [ "$(jv green/3dmoved-ja/measure.json pair_kept)" = true ] && [ "$(jv green/3dmoved-en/measure.json pair_kept)" = true ] && ok=1
+	row "3, 6" "after the move its 3D area is still a correct pair: red left view, blue right view, the same size and disparity, where the window now is" \
+		"(not moved on the staged set)" "ja: $(jv green/3dmoved-ja/measure.json pair_checks); en: $(jv green/3dmoved-en/measure.json pair_checks)" "$ok" "green/3dmoved-ja/measure.json, green/3dmoved-en/measure.json"
+fi
+
+if want readable; then
+	case_ "$STAGED_IMAGE" staged/refuse LOGIN_LANG=ja_JP.UTF-8 LANG_CASE=ja-plain USER_SETUP=/lane/setup-fcitx-refuses.sh
+	[ -d "$OUT/green/refuse" ] || case_ "$GREEN_IMAGE" green/refuse LOGIN_LANG=ja_JP.UTF-8 LANG_CASE=ja-plain USER_SETUP=/lane/setup-fcitx-refuses.sh
+	python3 -I "$RIGD/contrast.py" --control > "$OUT/contrast-control.json"; cc=$?
+	for d in staged green; do
+		fr=$(jv $d/refuse/result.json keyboard.window.fg | tr -d '[] ')
+		python3 -I "$RIGD/contrast.py" "$OUT/$d/refuse/keys.png" "$fr" > "$OUT/$d/refuse/contrast.json" 2>> "$OUT/cases.log"
+	done
+	sr=$(jv staged/refuse/contrast.json ratio); gr=$(jv green/refuse/contrast.json ratio)
+	ok=0; [ "$cc" = 0 ] && python3 -c 'import sys; sys.exit(0 if float(sys.argv[1]) < 4.5 <= float(sys.argv[2]) else 1)' "$sr" "$gr" 2>/dev/null && ok=1
+	row 4 "the sentence \"Fcitx 5 does not answer\" is readable: contrast 4.5:1 or more on the bar (WCAG 2.x; the measure proved on its control)" \
+		"staged: $sr:1, glyph $(jv staged/refuse/contrast.json glyph) on $(jv staged/refuse/contrast.json background)" "$gr:1, glyph $(jv green/refuse/contrast.json glyph) on $(jv green/refuse/contrast.json background)" "$ok" \
+		"staged/refuse/keys.png, green/refuse/keys.png, contrast-control.json"
+fi
+
+if want hardware2; then
+	for c in ko zh_CN; do
+		loc=ko_KR; exp=한국어; [ $c = zh_CN ] && { loc=zh_CN; exp=中文; }
+		case_ "$RED_IMAGE" red/hardware-$c LOGIN_LANG=$loc.UTF-8 LANG_CASE=$c HW_LANG=$c STEP=hw-type.sh
+		case_ "$GREEN_IMAGE" green/hardware-$c LOGIN_LANG=$loc.UTF-8 LANG_CASE=$c HW_LANG=$c STEP=hw-type.sh
+		rh=$(head -c 200 "$OUT/red/hardware-$c/typed-hardware.txt" 2>/dev/null); gh=$(head -c 200 "$OUT/green/hardware-$c/typed-hardware.txt" 2>/dev/null)
+		ok=0; [ "$rh" = "$exp" ] && [ "$gh" = "$exp" ] && ok=1
+		row 5 "$c: a hardware keyboard types through Fcitx 5 as before (the keys of $exp, then $([ $c = ko ] && echo Enter || echo Space))" "typed $rh" "typed $gh" "$ok" "red/hardware-$c/hw.txt, green/hardware-$c/hw.txt"
+	done
+fi
+
+if want pages; then
+	case_ "$GREEN_IMAGE" green/pages-ja LOGIN_LANG=ja_JP.UTF-8 LANG_CASE=ja-pages
+	case_ "$GREEN_IMAGE" green/swipe-zh_CN LOGIN_LANG=zh_CN.UTF-8 LANG_CASE=zh_CN-swipe
+	p1=$(jv green/pages-ja/result.json page1); p2=$(jv green/pages-ja/result.json page2)
+	ok=0; [ "$(jv green/pages-ja/result.json ok)" = true ] && [ "$p1" != "$p2" ] && [ "$p2" != null ] && ok=1
+	row 5 "ja (Mozc hands a page at a time): the bar's \"›\" turns to Fcitx 5's next page by touch and a candidate there is committed" "no keyboard (published)" \
+		"page 1 $p1; page 2 $p2; typed $(jv green/pages-ja/result.json typed)" "$ok" "green/pages-ja/page2.png, green/pages-ja/result.json"
+	ok=0; [ "$(jv green/swipe-zh_CN/result.json ok)" = true ] && ok=1
+	row 5 "zh_CN (Pinyin hands all candidates): the bar's row swiped by touch, a later candidate committed" "no keyboard (published)" \
+		"$(jv green/swipe-zh_CN/result.json visible_before) visible of $(jv green/swipe-zh_CN/result.json all_candidates | python3 -c 'import json,sys; print(len(json.load(sys.stdin) or []))' 2>/dev/null); swiped to index $(jv green/swipe-zh_CN/result.json swiped_index), typed $(jv green/swipe-zh_CN/result.json typed)" \
+		"$ok" "green/swipe-zh_CN/swiped.png, green/swipe-zh_CN/result.json"
+fi
+
+if want programs; then
+	for t in konsole zenity systemsettings browser; do
+		case_ "$GREEN_IMAGE" green/prog-$t-ja LOGIN_LANG=ja_JP.UTF-8 LANG_CASE=ja TARGET=$t
+		case_ "$GREEN_IMAGE" green/prog-$t-en LOGIN_LANG=en_US.UTF-8 LANG_CASE=en TARGET=$t
+		pv() { echo "kbd $(jv $1/result.json keyboard.kind), typed $(jv $1/result.json typed), field change $(jv $1/result.json field_change_px), ok $(jv $1/result.json ok)"; }
+		ok=0; [ "$(jv green/prog-$t-ja/result.json ok)" = true ] && [ "$(jv green/prog-$t-en/result.json ok)" = true ] && ok=1
+		case $t in konsole) n="Konsole (a line read by bash)" ;; zenity) n="a GTK 4 program's field (zenity's entry)" ;; systemsettings) n="System Settings' search field" ;; browser) n="the Stereo Browser's address field" ;; esac
+		row 5 "ja: $n typed into by touch as in en" "en: $(pv green/prog-$t-en)" "ja: $(pv green/prog-$t-ja)" "$ok" "green/prog-$t-ja/finished.png, green/prog-$t-ja/result.json"
+	done
+fi
+
+if want scales; then
+	for sc in 1.25 1.5; do
+		case_ "$GREEN_IMAGE" green/scale$sc-ja LOGIN_LANG=ja_JP.UTF-8 LANG_CASE=ja SCALE=$sc
+		case_ "$GREEN_IMAGE" green/scale$sc-en LOGIN_LANG=en_US.UTF-8 LANG_CASE=en SCALE=$sc
+		ok=0; [ "$(jv green/scale$sc-ja/result.json ok)" = true ] && [ "$(jv green/scale$sc-en/result.json ok)" = true ] && ok=1
+		row 5 "at $(python3 -c "print(int(float('$sc')*100))") %: the keyboard shows on a touch and the sentence is typed, ja as en" \
+			"en: kbd $(jv green/scale$sc-en/result.json keyboard.kind), typed $(jv green/scale$sc-en/result.json typed)" "ja: kbd $(jv green/scale$sc-ja/result.json keyboard.kind), typed $(jv green/scale$sc-ja/result.json typed)" "$ok" \
+			"green/scale$sc-ja/keys.png, green/scale$sc-ja/outputs.txt"
+	done
+fi
+
+if want twoscreens; then
+	case_ "$GREEN_IMAGE" green/twoscreens-ja LOGIN_LANG=ja_JP.UTF-8 LANG_CASE=ja OUTPUTS=2 STEP=twoscreens.sh
+	case_ "$GREEN_IMAGE" green/twoscreens-en LOGIN_LANG=en_US.UTF-8 LANG_CASE=en OUTPUTS=2 STEP=twoscreens.sh
+	tj=$(tr '\n' ' ' < "$OUT/green/twoscreens-ja/twoscreens.txt" 2>/dev/null); te=$(tr '\n' ' ' < "$OUT/green/twoscreens-en/twoscreens.txt" 2>/dev/null)
+	okf() { grep -q '^second: keyboard [a-z]* on Virtual-1 ' "$OUT/$1/twoscreens.txt" 2>/dev/null && grep -q '^first: keyboard [a-z]* on Virtual-0 ' "$OUT/$1/twoscreens.txt" 2>/dev/null; }
+	ok=0; okf green/twoscreens-ja && okf green/twoscreens-en && ok=1
+	row 5 "two screens: a touch on the field of a window on the second screen brings the keyboard there, back on the first with a touch there, ja as en" "en: $te" "ja: $tj" "$ok" \
+		"green/twoscreens-ja/second-screen.png, green/twoscreens-ja/first-screen.png, green/twoscreens-ja/twoscreens.txt"
+fi
+
+if want polish; then
+	case_ "$RED_IMAGE" red/pl-long LOGIN_LANG=pl_PL.UTF-8 LANG_CASE=pl-long
+	case_ "$GREEN_IMAGE" green/pl-long LOGIN_LANG=pl_PL.UTF-8 LANG_CASE=pl-long
+	ok=0; [ "$(jv red/pl-long/result.json ok)" = true ] && [ "$(jv green/pl-long/result.json ok)" = true ] && ok=1
+	row 6 "pl: \"Dzień dobry\" typed with its diacritic by the keyboard's own long press (n held, the finger slides to ń), published and this round" \
+		"typed $(jv red/pl-long/result.json typed)" "typed $(jv green/pl-long/result.json typed)" "$ok" "red/pl-long/typed.png, green/pl-long/typed.png"
 fi
 
 echo "end $(date -u +%FT%TZ) loadavg $(cut -d' ' -f1-3 /proc/loadavg)" >> "$OUT/run.txt"

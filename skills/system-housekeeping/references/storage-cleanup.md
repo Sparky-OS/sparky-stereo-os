@@ -25,7 +25,7 @@ The edition's free-space notifier supplies the threshold and recovery observatio
 
 1. In the edition's Calamares settings, inspect `packagechooserq@storagecleanup`. The module loads `StorageCleanup.qml` from the branding and writes `packagechooser_storagecleanup` when the person leaves the page. Its first value is Manually. The three automatic choices are weekly, every two weeks, and monthly. Each describes the consent before the person makes the choice.
 2. Follow `contextualprocess@storagecleanup` in the execution sequence after the account and target packages exist. It invokes the fixed schedule helper in the target with the username Calamares created. The helper stores the system schedule in `/etc/sparky-storage-cleanup.conf` and writes the account's `sparky-storage-cleanuprc` as that account. Keep the period out of `/etc/skel`. An absent choice writes no consent and an absent schedule is manual. The live system skips scheduled work.
-3. In System Settings, set the period and what happens when due. Reminder mode opens the existing review. Upgrades from 0.1.0 keep both weekly review behaviors, including the cache-only route. Administrator schedule changes use the existing polkit entry point.
+3. In System Settings, set the period and what happens when due. Reminder mode opens the existing review. Upgrades from 0.1.0 keep both weekly review behaviors, including the cache-only route. The package reloads active user managers and keeps a forwarding command for an old service still loaded at upgrade. Administrator schedule and minimum-age changes use the existing polkit entry point. The administrator's manual and scheduled previews get the same age.
 4. System and user timers check once per hour and at manager startup. The helper calculates boundaries from the choice date in UTC. Weekly and two-week schedules use seven and fourteen days. A monthly boundary clamps to the last day of a short month. One pass covers missed boundaries and runs on the first check after the target becomes active. The last recorded boundary prevents a duplicate pass.
 5. To check the unattended path, set the period in a disposable account and move the fixture clock across the boundary. Plant an eligible stale temporary file, a held-open one, a personal document and current-boot evidence on the same volume. Hold a POSIX lock in the configured APT directory, verify the saved deferral and release it before the next period. The approved-ID path enforces the same protected-file rules as interactive confirmation.
 6. Open Last runs in the page and match its timestamp, volume, cleaner kinds and allocated bytes to the receipt. A failed operation and a run that cannot start each have a Problems action leading to a review. Keep per-item paths out of the publicly readable machine receipt. Use the service's private journal for individual engine diagnostics.
@@ -87,6 +87,8 @@ Run the installed Plasma cases against those binaries. Observe both Dolphin path
 5. Keep the per-run exit code, measured rows and before and after load. Repeat the same installed interaction cases under the same CPU budget and pressure. Read the actual captures in each tested locale.
 
 ## Where to look and what removal costs
+
+These are the candidate locations and exclusions recorded by the early measuring fixture. The packaged BleachBit rules and consent flow are documented above.
 
 | Kind | Owner and usual location | Loss and scope |
 |---|---|---|

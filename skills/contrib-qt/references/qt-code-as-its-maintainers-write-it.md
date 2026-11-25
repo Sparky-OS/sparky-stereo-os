@@ -219,8 +219,11 @@ qtmultimedia `dev` 766f608; "backend" is `src/multimedia/pipewire`, "module" is 
 - **Symptom: a reviewer asks whether a session has one Metadata object, and the code selects it by name.**
   Fact: a session with WirePlumber 0.5.19 lists nine (`settings`, `sm-settings`, `default`, `filters`, `route-settings` and four more); a second object named `default` can exist, since any client can create one through the `metadata` factory; ids differ from session to session.
   PipeWire's own clients select by `metadata.name` (`pw-metadata`, `module-combine-stream.c`, the GStreamer device provider), and an object made without a name is named `default` (`module-metadata.c`).
-  So: select by name, keep the bound object's id, match its removal by id, and ignore a second one with a warning.
-  How found: `pw-cli ls Metadata` in the private session, and the sources.
+  Select by name and track removal by global id. Exercise both removal orders when two objects share the name.
+  The local patch set 2 candidate for change 792002 warned and discarded the second announcement. When the first object disappeared, a running application fell back to the first camera even though the surviving object named another.
+  To check the handover, start the application on the first provider, announce the replacement, and remove the first provider. Read the surviving value with `pw-dump`, then compare `QMediaDevices::defaultVideoInput()` and a newly constructed `QCamera` in both the running application and a fresh one. Keep the original open camera separate in the measurements.
+  In a three-camera session the first provider selected cam-b and WirePlumber's surviving object selected cam-c. A hotplug triggered another list update. Both queries returned cam-a in the running application and cam-c in the fresh one.
+  A backend that promises to follow the session must be able to bind the surviving object after the current one disappears.
 - **Symptom: the three last lines of a Gerrit suggestion are indented four columns less than the rest, and its empty line holds spaces.**
   Cause: the suggestion was typed in the web editor.
   Fix: apply what it means (here: the lambda's body one level deeper), and check the result with clang-format, which gave the same form.

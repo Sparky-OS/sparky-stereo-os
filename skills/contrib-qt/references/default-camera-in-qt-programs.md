@@ -47,6 +47,7 @@ Check freshness first: written on 2026-11-15 from Qt Multimedia 6.11.2 (`qt6-mul
 ## The PipeWire camera backend follows the session's default (ORDER 625, 2026-11-16)
 
 Written from qtmultimedia `dev` 5d5bb219c3, qtbase `dev` 49df9da9, PipeWire 1.6.9 and WirePlumber 0.5.19; the change is commit f22e69f8ca on a branch, not on Gerrit when this was written.
+Corrected on 2026-11-25 (ORDER 879) after the maintainer's review of the change as Gerrit 792002: the recipe below describes the local review candidate, and [Qt code as its maintainers write it](qt-code-as-its-maintainers-write-it.md) has what the review taught.
 Check freshness first: the PipeWire camera files change every week; search Gerrit before anything else (step 1).
 
 ### Where the change goes: the lesson of Gerrit 789011
@@ -61,12 +62,12 @@ So: before choosing where a Qt change goes, read which layer the maintainer is b
 1. **Search first.** Gerrit's REST API with the account's token: `q=project:qt/qtmultimedia dir:src/multimedia/pipewire after:2026-10-01` lists every change on the folder (the form `path:^src/.*` answers an error page, not JSON), then `status:open` with the subject words, then `message:QTBUG-N`. Jira answers anonymously (see above).
 2. **Mirror the audio side**, which already follows `default.audio.source` and `default.audio.sink`:
    - `QCameraContextManager::objectAdded()` sends a `Metadata` global named `default` to `startListenDefaultMetadataObject()`: `bindMetadata()` on the existing registry and `pw_metadata_add_listener()`, the same names as `QAudioContextManager`; no second loop, no second registry.
-   - `handleDefaultMetadataObjectEvent()` takes subject `PW_ID_CORE`, key `default.video.source`, type `Spa:String:JSON`, reads the name with the module's own `jsonParseObjectName()`, and calls `QCameraDeviceMonitor::setDefaultVideoSource(name)` (or `NoDefaultDevice` for a cleared key), which emits `camerasChanged()`.
-   - When that metadata global is removed (WirePlumber stops or restarts), the listener goes, the default becomes `NoDefaultDevice`, and the next `default` global is followed again.
-   - `cameraDevices()` calls `syncRegistry()` twice: the first roundtrip brings the globals, the second the first values of the metadata bound while they arrived (the audio monitor's `getDeviceLists()` syncs twice too). Then it builds the list and marks `defaultCameraIndex(ids)`.
-   - `defaultCameraIndex()` matches the camera node whose `node.name` is the session's name, so V4L2 and libcamera nodes are the same case; no device paths.
-   - `QCameraDevice::operator==` compares ids only, and `QPlatformVideoDevices::updateVideoInputsCache()` uses it, so a default that moved alone was dropped and the stale `isDefault` stayed in the cache. `QtPipeWire::QCameraDevices::updateVideoInputs()` compares id and `isDefault` (the audio monitor's comparison) and calls the base class's `onVideoInputsChanged()` when they differ.
-   - When the session names no default, or a node that is not a listed camera, the first camera stays and `qt.multimedia.pipewire.camera.devicemonitor` says why at info level, once per reason (again after the default was followed and lost again).
+   - `handleDefaultMetadataObjectEvent()` takes subject `PW_ID_CORE`, key `default.video.source`, type `Spa:String:JSON`, reads the name with `jsonParseObjectName()` in the shared PipeWire support files, and calls `QCameraDeviceMonitor::setDefaultVideoSource(name)` (`std::nullopt` for a removed key or a cleared subject), which emits `camerasChanged()`. The event's key, type and value can each be a null pointer, so the record keeps them as `std::optional<std::string_view>`.
+   - Keep the compatible global ids for metadata named `default`. When the bound id disappears, detach the listener, clear its value and bind the surviving id if one was already announced. When a waiting id disappears first, keep the incumbent. The audio twin supplies the listener pattern. Exercise these lifetimes independently in the camera backend.
+   - `cameraDevices()` calls `syncRegistry()` once, as before the change, builds the list and then marks `defaultCameraIndex(ids)`. The first form synced twice; measured on 2026-11-25, one sync gives the session's default in the first list in 30 of 30 fresh starts, because each camera's format enumeration makes its own roundtrip after the metadata is bound.
+   - `defaultCameraIndex()` matches the camera node whose `node.name` is the session's name, so V4L2 and libcamera nodes are the same case; no device paths. It asserts a list that is not empty.
+   - `QCameraDevice::operator==` compares ids only, and `QPlatformVideoDevices::updateVideoInputsCache()` uses it, so a default that moved alone was dropped and the stale `isDefault` stayed in the cache. `QtPipeWire::QCameraDevices::updateVideoInputs()` compares id and `isDefault` (the audio monitor's comparison) and calls the base class's `onVideoInputsChanged()` when they differ, and also when nothing was cached yet, as `updateVideoInputsCache()` did.
+   - When the session names no default, or a node that is not a listed camera, the first camera stays and `qt.multimedia.pipewire.camera.devicemonitor` says why at info level each time the list is built. The first form kept the last message to say it once; the review asked for no such state.
 3. **Which key.** `default.video.source` is WirePlumber's live pick, as `default.audio.source` is for audio; it follows `default.configured.video.source` (the person's own choice) whenever that camera is present, and moves to another camera while it is away.
 4. **"Connect without a target" cannot be reached from this layer.** `QCamera(QObject *)` is `QCamera(QMediaDevices::defaultVideoInput())` and `QCameraPrivate::init()` replaces a null device with the same call (`src/multimedia/camera/qcamera.cpp`), so the platform camera always gets a device; `QPipeWireCamera::startStream()` connects with `target.object` set to that node's serial. What the session would link a target-less stream to was measured anyway (rig case 9): WirePlumber links a stream with `media.type=Video`, `media.category=Capture`, `media.role=Camera` and no target to `default.video.source`, the same camera the layer now reports.
 5. **Red and green from one commit.** Export the commit twice with `git archive COMMIT | tar -x -C DIR` (no extra worktrees in a shared clone), disable the matching line in one copy with `sed`, check with `diff -r` that it is the only difference, and run the same test in both builds; read the exit codes directly.
@@ -74,12 +75,14 @@ So: before choosing where a Qt change goes, read which layer the maintainer is b
 ### The test rows (`tst_qpipewire_cameradevicemonitor`, in its own style)
 
 Registry events go in as in the existing rows (`objectAdded()` with a property fixture), plus `setDefaultVideoSource()`; three cameras, `cam_a` and `cam_c` through V4L2 and `cam_b` through libcamera.
-- `defaultCameraIndex_isDefaultVideoSource_matchedByNodeName`: the libcamera node named as default is index 1.
-- `setDefaultVideoSource_change_movesDefaultCameraAndEmitsCamerasChanged`: two changes, two signals; the same name again is no change.
-- `defaultCameraIndex_isFirst_withoutDefaultVideoSource` and `..._whenDefaultVideoSourceIsNoListedCamera`: index 0 and the log line (`QTest::ignoreMessage`).
-- `defaultCameraIndex_saysOnceWhyItKeepsTheFirst`: a counting message handler chained to Qt Test's.
+- `defaultCameraIndex_returnsDefaultVideoSource_matchedByNodeName`: the libcamera node named as default is index 1.
+- `setDefaultVideoSource_emitsCamerasChanged_whenTheNameChanges`: two changes, two signals; the same name again is no change; removing the name is one more.
+- `defaultCameraIndex_returnsFirstCamera_withoutDefaultVideoSource` and `..._whenDefaultVideoSourceIsNotListed`: index 0 and the log line (`QTest::ignoreMessage`, once for each call).
 
-Measured on 2026-11-16: with the matching line disabled the test exits 3 (3 of 20 fail: the first, the second and the last row); with the change it exits 0 (20 passed). The keep-the-first rows pass on both, as they assert the old behaviour plus the line.
+Measured on the first local review candidate (67bb16383): with the matching line disabled the test exits 2 (2 of 19 fail: the first row and the signal row); with the change it exits 0 (19 passed). The keep-the-first rows pass on both, as they assert the old behaviour plus the line.
+The first patch set had a fifth row for the stored message and 20 rows in all (2026-11-16: 3 failed with the match disabled).
+
+The follow-up adds `defaultCameraIndex_followsReplacement_afterDefaultIsCleared` to the monitor unit. This checks the old selection, clear and new selection inside the monitor. The registry side needs a private server. Start on cam-b, overlap two providers named `default` on cam-b, select cam-c only after the incumbent leaves, then compare the surviving cam-c with a running client's and a fresh client's default. Repeat with the waiting provider removed first, and with the last provider removed. Keep a newly opened camera separate from a camera already open during the transition.
 
 ### The rig
 

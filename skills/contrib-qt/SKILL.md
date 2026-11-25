@@ -4,9 +4,10 @@ description: >-
   Contribute a Qt module change through Gerrit: the CLA and the verified author email, the commit-msg hook and
   Change-Id, git push HEAD:refs/for/dev with reviewers, Pick-to and Task-number, the ChangeLog line (QUIP 17), licence
   headers and licenseRule.json, the Sanity Bot, a reviewer's own patch set, searching Gerrit for a file's changes and a
-  QTBUG. Load it with upstream-outreach for a qtbase, qtdeclarative, qtmultimedia or qtwayland change, a plugin that
-  cannot load its library (libMyStyle.so, RUNPATH, RPATH_SET could not write new RPATH), a style plugin fix, or a reply
-  on codereview.qt-project.org.
+  QTBUG, the forms a Qt reviewer expects and the pre-upload check that searches a diff for each. Load it with
+  upstream-outreach for a qtbase, qtdeclarative, qtmultimedia or qtwayland change, a plugin that cannot load its library
+  (libMyStyle.so, RUNPATH, RPATH_SET could not write new RPATH), a style plugin fix, review comments to answer ("why do
+  we need to sync twice", "(repeats)", "should be string_view"), or a reply on codereview.qt-project.org.
 ---
 
 # Contributing to Qt
@@ -72,6 +73,19 @@ Re-read the Gerrit setup guide and the active change before every round.
 
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (4 entries).
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
+
+## Qt code as its maintainers write it
+
+Before the first line, [read the newest files, build the module’s idioms table and read the reviewer’s last twenty changes](references/qt-code-as-its-maintainers-write-it.md). Before uploading, walk that page’s code searches and runtime checks against the parent of each change. The worked example comes from Tim Blechmann’s review of Qt Multimedia change 792002.
+Read it before the first line of a change and walk its check before every upload:
+
+1. Read the reviewer's last twenty commits in the folder (`git log -20 --author='NAME' -- DIR`), newest first, and write in the forms of the newest files, not of the file you copy from.
+2. Count the two forms before choosing one (`git grep -c`): views against `const char *`, `std::optional` against a sentinel, the module's `ranges::` helpers against `std::find`.
+3. Read every helper the change stops calling, and keep each case it handled.
+4. Measure every sentence about another program's behaviour before it enters a comment, the commit message or an answer.
+5. The commit message says what was wrong and what changes for the design; the identifiers stay in the diff.
+6. Walk the page's check against `git diff BASE`, then run the tests red and green, the changed test twenty times.
+7. On Gerrit, upload the patch set first, then answer each thread: "Done." where the point is taken, the fact where a question was asked, the reason where the code stays.
 
 ## The default camera in Qt programs
 

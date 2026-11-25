@@ -63,6 +63,10 @@ The Vibe successor adds **Use the system default** and **Vibe (local)** to Autom
   **Cause:** the server sends padded segment boundaries. Even with Stable Timestamps some Whisper word times can precede their VAD window.
   **Fix:** use timed words and Vibe's own VAD when available. Bound them to the voice-activity window and trim clearly measured quiet edges in the same exported WAV.
   **How found:** the real English verbose JSON returned words beginning at 4.63 seconds for the segment beginning at 6.03 seconds, while the second sentence's PCM started at 6.014 seconds.
+- **Symptom:** the renderer exits immediately for the Full project selection.
+  **Cause:** the generic Qt CLI parser treats the signed track value `-1` as an option.
+  **Fix:** dispatch the renderer's internal speech-audio mode before generic CLI parsing and validate its positional arguments in that mode.
+  **How found:** direct calls to the same installed renderer failed with `-1` and produced a WAV with track zero.
 - **Symptom:** Automatic Subtitling freezes with “Starting audio export” and a zero-byte WAV.
   **Cause found in the rig:** the GUI thread was waiting on `consumer-stopped` inside `Mlt::Consumer::run()`. An unnamed avformat thread in the stripped library was in a condition wait.
   **Fix:** isolate the export from the editor's event loop and enforce its progress deadline. Retain the full thread stack for any consumer that still stalls.
@@ -80,7 +84,7 @@ Install the engines' fixtures before disabling the rig network. Use a fresh Kden
 In the staged predecessor, VOSK's Python venv took 5.38 seconds and 45,025,649 bytes. Python Whisper CPU's venv took 41.47 seconds and 2,274,070,185 bytes.
 Processing to subtitle import took 3.99 seconds with VOSK and 5.88 seconds with Python Whisper.
 The model sizes were 70,898,967 installed bytes for VOSK and 75,571,315 bytes for Whisper tiny.en.
-The Vibe successor imported both English cues with small in 4.90 seconds and both Brazilian Portuguese cues with medium-q8_0 in 13.49 seconds.
+The first Vibe-enabled package (+stereo3d14) imported both English cues with small in 4.90 seconds and both Brazilian Portuguese cues with medium-q8_0 in 13.49 seconds.
 The models occupied 487,601,967 and 823,369,779 bytes. Kdenlive created no Python environment for either Vibe job.
 The two saved projects contained the expected words. The old segment-based route missed the PCM by up to 1.20 seconds.
 The follow-up gates both directions separately. Cue starts may be at most 0.30 seconds early or 0.15 seconds late. Ends may be at most 0.15 seconds early or 0.30 seconds late.
@@ -98,9 +102,14 @@ Read the project's subtitle file after saving. Measure cue text and times agains
 For stereo, give the monitor different known fills in the two eyes, capture using Stereo KWin, and compare the glyph masks in the text region of a marked `.pns` pair.
 Use a capture without a subtitle and an artificially shifted glyph mask to check the comparison itself.
 
-On the isolated Stereo KWin output, the English subtitle occupied the same 236 bright glyph pixels in both eyes over independently coloured views.
-The best measured displacement was zero in both axes, with 1.0 intersection over union.
-A five-pixel horizontal shift registered as five pixels, and the capture without a subtitle gave zero glyph pixels.
+On the isolated Stereo KWin output, +stereo3d15 showed the same English caption over independently coloured views.
+The eye masks had zero measured displacement and 99.54% intersection over union.
+A five-pixel horizontal shift registered as five pixels. Both the pre-import capture and the capture during the timed pause gave empty masks.
+
+- **Symptom:** both eye masks match, but the expected sentence is missing.
+  **Cause:** a white pointer tooltip shares the same coordinates in both eyes. The corrected caption also ends before the older capture frame.
+  **Fix:** fit the Project Monitor, seek to a frame inside the measured cue, move the pointer outside the monitor and verify the actual sentence in both eyes. Seek into the pause for a second control.
+  **How found:** opening the marked pair exposed a short white overlay where the sentence should be. Seeking to the spoken range on the larger monitor exposed the subtitle and gave a 331-pixel glyph span in each eye.
 
 - **Symptom:** the virtual compositor starts but ScreenShot2 cancels every capture.
   **Cause:** it has no render node and falls back to a compositor without the stereo capture path.

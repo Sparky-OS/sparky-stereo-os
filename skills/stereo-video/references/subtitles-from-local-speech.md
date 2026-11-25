@@ -2,7 +2,7 @@
 
 Source reconciliation on 2026-11-25 covered Kdenlive 26.08.1, including the edition's `26.08.1-1+stereo3d13+lc1` source.
 The staged predecessor has VOSK and Python Whisper.
-The Vibe successor adds **Use the system default** and **Vibe (local)** to Automatic Subtitling.
+The Vibe successor adds **Use the system default** and **Vibe (local)** to Automatic Subtitling and the Speech Editor.
 
 ## Trace the two entry points
 
@@ -24,9 +24,17 @@ The Vibe successor adds **Use the system default** and **Vibe (local)** to Autom
 5. Follow the [Vibe dictation recipe](../../stereo-integrations/references/partners.md) for the private, per-job `vibe-server` lifecycle.
    Start the server with the model on loopback and an ephemeral port, read that child's ready line and release the child on completion, cancellation or failure.
    Its store is at `$XDG_DATA_HOME/github.com.thewh1teagle.vibe/app_config.json`; the language comes from `transcription.modelOptions.lang`.
-   Request `response_format=srt` and pass the timed file to Kdenlive's own subtitle importer. Omit `language` for automatic detection.
+   Request `response_format=verbose_json` and `word_timestamps=true`. Omit `language` for automatic detection.
+   Vibe 3.3.5 returns seconds in `segments[].words[]` as `text`, `start` and `end`.
+   The local Silero file `ggml-silero-v6.2.0.bin` lives in Vibe's `models_folder`, or in its app data directory by default.
+   If present, pass its path as `vad_model` with `stable_timestamps=true`. Vibe's own settings are where the person acquires that file.
+   The timeline builds SRT from the corrected cue extents and imports it through the existing subtitle model.
+   The Speech Editor places the same words into the shared editor format. An anchor such as `2#1.24:1.53` stores the clip ID followed by the word boundaries in seconds, including the selected clip zone offset.
+   Speech regions and their quiet gaps are stored as editor blocks. Removing non-speech zones and saving an edited playlist use Kdenlive's existing actions.
 6. Carry [Erich Seifert's autosave fix](https://invent.kde.org/multimedia/kdenlive/-/merge_requests/1097) in the inherited speech dialog before extending it.
    The dialog releases the XML read lock before its event processing can deliver an autosave callback.
+   The follow-up moves the MLT consumer into the existing `kdenlive_render` process. Track settings and zone selection come from the exported timeline scene.
+   The editor's timer watches bytes written and kills an unresponsive renderer after 20 seconds without audio.
 
 ## Traps
 
@@ -52,9 +60,14 @@ The Vibe successor adds **Use the system default** and **Vibe (local)** to Autom
   **Fix:** use the medium-q8_0 fixture for the Brazilian Portuguese proof and record its checksum.
   **How found:** post the same Portuguese PCM fixture to the same packaged server with each model and compare the SRT to the spoken words.
 - **Symptom:** a cue starts before the generated PCM is active.
-  **Cause:** the server sends segment boundaries with padding. The tested word granularity and maximum segment length did not move the English boundaries.
-  **Fix:** record the difference to the PCM reference and the tolerance before the editor run. Keep subtitle times from the selected server.
-  **How found:** compare the real server's SRT and verbose JSON with the measured onset and end of the fixtures.
+  **Cause:** the server sends padded segment boundaries. Even with Stable Timestamps some Whisper word times can precede their VAD window.
+  **Fix:** use timed words and Vibe's own VAD when available. Bound them to the voice-activity window and trim clearly measured quiet edges in the same exported WAV.
+  **How found:** the real English verbose JSON returned words beginning at 4.63 seconds for the segment beginning at 6.03 seconds, while the second sentence's PCM started at 6.014 seconds.
+- **Symptom:** Automatic Subtitling freezes with “Starting audio export” and a zero-byte WAV.
+  **Cause found in the rig:** the GUI thread was waiting on `consumer-stopped` inside `Mlt::Consumer::run()`. An unnamed avformat thread in the stripped library was in a condition wait.
+  **Fix:** isolate the export from the editor's event loop and enforce its progress deadline. Retain the full thread stack for any consumer that still stalls.
+  **How found:** run repeated exports with a missing model to end each successful export before recognition; attach the container's debugger at the stall and collect `thread apply all bt`.
+  The related [MLT PR 1366](https://github.com/mltframework/mlt/pull/1366) corrects an avformat running-state race. A stack waiting for the stopped event alone cannot identify that race.
 
 ## Run the fixed clips
 
@@ -66,7 +79,13 @@ Processing to subtitle import took 3.99 seconds with VOSK and 5.88 seconds with 
 The model sizes were 70,898,967 installed bytes for VOSK and 75,571,315 bytes for Whisper tiny.en.
 The Vibe successor imported both English cues with small in 4.90 seconds and both Brazilian Portuguese cues with medium-q8_0 in 13.49 seconds.
 The models occupied 487,601,967 and 823,369,779 bytes. Kdenlive created no Python environment for either Vibe job.
-The two saved projects contained the expected words. The largest PCM to subtitle boundary error was 1.20 seconds.
+The two saved projects contained the expected words. The old segment-based route missed the PCM by up to 1.20 seconds.
+The follow-up gates both directions separately. Cue starts may be at most 0.30 seconds early or 0.15 seconds late. Ends may be at most 0.15 seconds early or 0.30 seconds late.
+A cue cannot span a pause of one second or more between sentences.
+Set these limits from the editing need before seeing model output.
+The two fixed waveforms, a 4.5-second leading-silence variant and a speech-over-music variant have both raw and Stable Timestamps server replies to replay.
+Against the synthetic waveforms, the compiled timing function retained all words and placed each cue inside those limits.
+Test real recordings separately and count which cues have verified boundaries. A fragment whose text starts or ends mid-sentence needs a word-level reference before its timing can be scored.
 
 Read the project's subtitle file after saving. Measure cue text and times against the reference. Keep each unsuccessful run as a separate control.
 For stereo, give the monitor different known fills in the two eyes, capture using Stereo KWin, and compare the glyph masks in the text region of a marked `.pns` pair.

@@ -1620,6 +1620,8 @@ Dictation in the programs built on KDE's speech-to-text library, with Vibe's eng
 
 - **Kdenlive** ([KDE's source](https://invent.kde.org/multimedia/kdenlive)). Jean-Baptiste Mardelle and Julius Künzel are named in the speech engine source headers. The timeline uses their engine interfaces and subtitle import. Erich Seifert contributed the autosave fix carried from [Kdenlive !1097](https://invent.kde.org/multimedia/kdenlive/-/merge_requests/1097).
 - **Vibe** ([thewh1teagle/vibe](https://github.com/thewh1teagle/vibe), MIT). thewh1teagle provides the local server and its model and language settings.
+- **Silero VAD** ([Silero Team](https://github.com/snakers4/silero-vad), MIT) supplies the voice-activity model used by the Vibe server's Stable Timestamps mode.
+- **LibriVox** ([public-domain recordings](https://librivox.org/pages/public-domain/)). Alice Elizabeth Still read “The North Wind and the Sun” from Aesop's Fables. Rennê Luduvico read “Um Apólogo” by Machado de Assis.
 - **whisper.cpp and ggml** ([ggml-org/whisper.cpp](https://github.com/ggml-org/whisper.cpp), MIT). Georgi Gerganov and the ggml contributors provide the speech inference and tensor library used by Vibe.
 - **VOSK and Whisper** supplied the packaged comparison engines. The VOSK small en-us model comes from Alpha Cephei, and Whisper tiny.en comes from OpenAI. [VOSK models](https://alphacephei.com/vosk/models), [Whisper model card](https://github.com/openai/whisper/blob/main/model-card.md).
 - **eSpeak NG** synthesises the English and Brazilian Portuguese test fixtures. Reece H. Dunn maintains eSpeak NG, which builds on Jonathan Duddington's eSpeak. [eSpeak NG manual](https://github.com/espeak-ng/espeak-ng/blob/master/src/espeak-ng.1.ronn#author).

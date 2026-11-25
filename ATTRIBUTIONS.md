@@ -721,6 +721,7 @@ Names above come from upstream copyright, Debian copyright or git records; conta
 | Project | What the study reviewed | Credit |
 |---|---|---|
 | [BleachBit](https://github.com/bleachbit/bleachbit) | Cleaner definitions, command worker, GTK presets and the system-cleaning operations used by Storage Cleanup | Andrew Ziem, BleachBit's author, nodiscc, credited in the APT and journal cleaner definitions, and Fabio Fantoni and the Debian Python Team, credited in the packaging |
+| [Calamares](https://calamares.io/) | Branded choice and contextual target job for the cleanup period | Adriaan de Groot and Anke Boersma, credited in the chooser source, and Paweł “pavroo” Pijanowski for SparkyLinux’s installer settings |
 | [Dolphin](https://invent.kde.org/system/dolphin) and [KIO](https://invent.kde.org/frameworks/kio) | Disk Usage Statistics, file properties and the wastebin | Felix Ernst and Méven Car, Dolphin's maintainers, Peter Penz, its original maintainer, and David Faure, credited in KIO's wastebin implementation |
 | [Filelight](https://invent.kde.org/utilities/filelight) | Disk usage by folder and by drive | Laurent Montel and Martin Sandsmark, its maintainers, Max Howell, its original author, and Harald Sitter, who ported it to Qt Quick |
 | [KDE Partition Manager](https://invent.kde.org/system/partitionmanager) | Disk and partition selection | Andrius Štikonas, its maintainer, and Volker Lanz, its former maintainer and original author |

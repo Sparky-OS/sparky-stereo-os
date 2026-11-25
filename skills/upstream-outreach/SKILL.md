@@ -143,6 +143,22 @@ A `contrib-<project>` skill declares the packages that make it relevant (`metada
   Write or edit a first post in the forum's editor for a while instead of pasting it at once, keep it to two links (the rest go in a reply once it is released) and the mentions to the people who must see it, and never post it again while it is held.
   The limits lift as the account's trust level rises with ordinary reading and posting.
 
+## Before the first line, and when the review comes
+
+For a change offered to any project, three habits that cost an hour and save a round of review (ORDER 879, from a maintainer's fifteen comments on a first patch set):
+
+- **Read the neighbouring code and the maintainer's last twenty commits in that folder before the first line.**
+  `git log -20 --format='%h %ad %s' --date=short --author='NAME' -- DIR`, each diff read, newest first.
+  A folder holds one person's code of several years, and new code is judged by how that person writes today: date the file you copy from (`git log --reverse --format=%ad --date=short -- FILE | head -1`), and where two forms exist, count both (`git grep -c`) and take the folder's.
+- **A commit message says what changes for the design.**
+  What was wrong, what the change does about it, and why that is right, for a reader who will never open the diff; the walk through the functions stays in the diff.
+- **An answer to a review comment is "Done." or a fact.**
+  "Done." where the point is taken, after the new version is uploaded; the measurement where a question was asked or a point does not hold; the reason, in one line, where the code stays.
+  No apology, no thanks for each comment, and nothing about how the first form came about: the reviewer is a colleague reading many changes.
+  A comment marked as repeating is the author's to find everywhere else in the change.
+
+Each project's own version of this lives in its `contrib-<project>` skill; for Qt it is [Qt code as its maintainers write it](../contrib-qt/references/qt-code-as-its-maintainers-write-it.md), with a check that searches a diff rule by rule.
+
 ## After sending
 
 - **One knock at most.** If nothing comes back, wait; a later note carries new value (a result, a fix, a release), never a bare reminder.

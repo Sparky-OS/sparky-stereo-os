@@ -48,6 +48,16 @@ PLANS = {
     # a Japanese session whose Fcitx 5 does not answer (its keyboard addon off, or the program gone): the keyboard says so
     # and its keys type plain text through KWin's fake input
     "ja-plain": {"layout": FCX + "/fallback/main.qml", "keys": "abc", "expect": "abc"},
+    # upstream's reworked keyboard as KWin's input method, converting by itself (the smoke for Daniel's lead of 2026-11-25);
+    # the key finder reads key positions from a 6.7 layout of the same rows (mounted at /hint)
+    "ja-upstream": {"layout": "/hint/fallback.qml", "keys": "nihongo  ", "finish": ["candidate", "enter"], "expect": "日本語"},
+    "zh_CN-upstream": {"layout": "/hint/fallback.qml", "keys": "zhongwen", "finish": ["candidate"], "expect": "中文"},
+    "ko-upstream": {"layout": "/hint/ko.qml", "keys": "gksrnrdj", "finish": ["enter"], "expect": "한국어"},
+    "show-only": {"layout": "/hint/fallback.qml", "keys": "", "expect": ""},
+    # the same with upstream's own layout files as the key finder's hint, and the first candidate of upstream's strip touched
+    "ja-upstream2": {"layout": "/usr/share/plasma/keyboard/keyboardpackages/org.kde.plasma.keyboard.ja_JP/contents/layouts/Romaji.qml",
+                     "keys": "nihongo ", "finish": ["touch:35,730", "enter"], "expect": "日本語"},
+    "zh_CN-upstream2": {"layout": "/hint/fallback.qml", "keys": "zhongwen", "finish": ["touch:35,730"], "expect": "中文"},
 }
 plan = PLANS[LANGC]
 
@@ -267,6 +277,10 @@ if win is not None:
                     touch.run("t:%d,%d s:1500" % (buttons[1]["x"], buttons[1]["y"]))
             elif action == "enter":
                 touch.run("t:%d,%d s:1500" % keys["EnterKey"])
+            elif action.startswith("touch:"):
+                # a fixed place read from an earlier capture (upstream's candidate strip, which the bar finder does not read)
+                touch.run("t:%s s:1500" % action.split(":", 1)[1])
+                shot("touched")
         shot("finished")
     time.sleep(3)
     typed = read_doc()

@@ -47,7 +47,7 @@ Check freshness first: written on 2026-11-15 from Qt Multimedia 6.11.2 (`qt6-mul
 ## The PipeWire camera backend follows the session's default (ORDER 625, 2026-11-16)
 
 Written from qtmultimedia `dev` 5d5bb219c3, qtbase `dev` 49df9da9, PipeWire 1.6.9 and WirePlumber 0.5.19; the change is commit f22e69f8ca on a branch, not on Gerrit when this was written.
-Corrected on 2026-11-25 (ORDER 879) after the maintainer's review of the change as Gerrit 792002: the recipe and the test rows below describe its second patch set, and [Qt code as its maintainers write it](qt-code-as-its-maintainers-write-it.md) has what the review taught.
+Corrected on 2026-11-25 (ORDER 879) after the maintainer's review of the change as Gerrit 792002: the recipe below describes the local review candidate, and [Qt code as its maintainers write it](qt-code-as-its-maintainers-write-it.md) has what the review taught.
 Check freshness first: the PipeWire camera files change every week; search Gerrit before anything else (step 1).
 
 ### Where the change goes: the lesson of Gerrit 789011
@@ -62,8 +62,8 @@ So: before choosing where a Qt change goes, read which layer the maintainer is b
 1. **Search first.** Gerrit's REST API with the account's token: `q=project:qt/qtmultimedia dir:src/multimedia/pipewire after:2026-10-01` lists every change on the folder (the form `path:^src/.*` answers an error page, not JSON), then `status:open` with the subject words, then `message:QTBUG-N`. Jira answers anonymously (see above).
 2. **Mirror the audio side**, which already follows `default.audio.source` and `default.audio.sink`:
    - `QCameraContextManager::objectAdded()` sends a `Metadata` global named `default` to `startListenDefaultMetadataObject()`: `bindMetadata()` on the existing registry and `pw_metadata_add_listener()`, the same names as `QAudioContextManager`; no second loop, no second registry.
-   - `handleDefaultMetadataObjectEvent()` takes subject `PW_ID_CORE`, key `default.video.source`, type `Spa:String:JSON`, reads the name with the module's own `jsonParseObjectName()`, and calls `QCameraDeviceMonitor::setDefaultVideoSource(name)` (`std::nullopt` for a removed key or a cleared subject), which emits `camerasChanged()`. The event's key, type and value can each be a null pointer, so the record keeps them as `std::optional<std::string_view>`.
-   - When that metadata global is removed (WirePlumber stops or restarts), the listener goes, the default becomes `std::nullopt`, and the next `default` global is followed again. The object is selected by its `metadata.name` and its removal is matched by the id that was bound.
+   - `handleDefaultMetadataObjectEvent()` takes subject `PW_ID_CORE`, key `default.video.source`, type `Spa:String:JSON`, reads the name with `jsonParseObjectName()` in the shared PipeWire support files, and calls `QCameraDeviceMonitor::setDefaultVideoSource(name)` (`std::nullopt` for a removed key or a cleared subject), which emits `camerasChanged()`. The event's key, type and value can each be a null pointer, so the record keeps them as `std::optional<std::string_view>`.
+   - Keep the compatible global ids for metadata named `default`. When the bound id disappears, detach the listener, clear its value and bind the surviving id if one was already announced. When a waiting id disappears first, keep the incumbent. The audio twin supplies the listener pattern. Exercise these lifetimes independently in the camera backend.
    - `cameraDevices()` calls `syncRegistry()` once, as before the change, builds the list and then marks `defaultCameraIndex(ids)`. The first form synced twice; measured on 2026-11-25, one sync gives the session's default in the first list in 30 of 30 fresh starts, because each camera's format enumeration makes its own roundtrip after the metadata is bound.
    - `defaultCameraIndex()` matches the camera node whose `node.name` is the session's name, so V4L2 and libcamera nodes are the same case; no device paths. It asserts a list that is not empty.
    - `QCameraDevice::operator==` compares ids only, and `QPlatformVideoDevices::updateVideoInputsCache()` uses it, so a default that moved alone was dropped and the stale `isDefault` stayed in the cache. `QtPipeWire::QCameraDevices::updateVideoInputs()` compares id and `isDefault` (the audio monitor's comparison) and calls the base class's `onVideoInputsChanged()` when they differ, and also when nothing was cached yet, as `updateVideoInputsCache()` did.
@@ -79,8 +79,10 @@ Registry events go in as in the existing rows (`objectAdded()` with a property f
 - `setDefaultVideoSource_emitsCamerasChanged_whenTheNameChanges`: two changes, two signals; the same name again is no change; removing the name is one more.
 - `defaultCameraIndex_returnsFirstCamera_withoutDefaultVideoSource` and `..._whenDefaultVideoSourceIsNotListed`: index 0 and the log line (`QTest::ignoreMessage`, once for each call).
 
-Measured on 2026-11-25 on the second patch set: with the matching line disabled the test exits 2 (2 of 19 fail: the first row and the signal row); with the change it exits 0 (19 passed). The keep-the-first rows pass on both, as they assert the old behaviour plus the line.
+Measured on the first local review candidate (67bb16383): with the matching line disabled the test exits 2 (2 of 19 fail: the first row and the signal row); with the change it exits 0 (19 passed). The keep-the-first rows pass on both, as they assert the old behaviour plus the line.
 The first patch set had a fifth row for the stored message and 20 rows in all (2026-11-16: 3 failed with the match disabled).
+
+The follow-up adds `defaultCameraIndex_followsReplacement_afterDefaultIsCleared` to the monitor unit. This checks the old selection, clear and new selection inside the monitor. The registry side needs a private server. Start on cam-b, overlap two providers named `default`, then compare the surviving cam-c with a running client's and a fresh client's default. Repeat with the waiting provider removed first, and with the last provider removed. Keep a newly opened camera separate from a camera already open during the transition.
 
 ### The rig
 

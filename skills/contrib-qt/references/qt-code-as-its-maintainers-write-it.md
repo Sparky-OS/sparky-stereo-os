@@ -31,10 +31,10 @@ A raw copy of any wiki page comes with `curl 'https://wiki.qt.io/index.php?title
    Read those twenty diffs, newest first.
    A clone made with `--depth` hides them: `git fetch --unshallow` first (qtmultimedia's full history is about 60 MB).
 2. **Mirror the structure of the nearest twin, and write it in the forms of the newest files.**
-   A folder holds code of several years by one person, and the reviewer judges new code by how he writes today.
+   A folder holds code of several years by one person, and the newest additions show which forms coexist.
    The file you copy from may be the oldest one: date it with `git log --reverse --format='%ad %s' --date=short -- FILE | head -1`.
 3. **Count before you choose a form.**
-   For each choice between two forms (a `const char *` or a view, `std::find` or the module's ranges helper, a sentinel or `std::optional`), `git grep -c` both in the folder and take the one the folder uses.
+   For each choice between two forms (a `const char *` or a view, `std::find` or the module's ranges helper, a sentinel or `std::optional`), `git grep -c` both in the folder and read the exceptions in their functions.
    The counts of 2026-11-25 are in the table below.
 4. **Read every helper you replace.**
    When the change stops calling a function of the module and does the work itself, open that function and list each case it handled.
@@ -42,6 +42,60 @@ A raw copy of any wiki page comes with `curl 'https://wiki.qt.io/index.php?title
    A sentence such as "one more roundtrip is needed" is an experiment, not a comment.
 6. **Write the commit message last, for a reader who will never open the diff** ([the message](#the-commit-message)).
 7. **Run the [pre-upload check](#the-pre-upload-check)** on the diff, then the module's tests red and green ([preparing a change on dev](preparing-a-change-on-dev.md)).
+
+### Read the folder and build its idioms table
+
+Run this in the module clone. Set `dir` to the affected directory, for example `src/corelib/io` in qtbase, `src/qml` in qtdeclarative or `src/client` in qtwayland. Record the SHA, folder, author, matching line count and counterexample. Open the newest files in full, including their tests. Read the *whole changes* by the reviewer to see why their code takes that form.
+
+```sh
+base=$(git rev-parse HEAD)
+dir=src/multimedia/pipewire
+git shortlog -sn "$base" -- "$dir"
+reviewer='Tim Blechmann'
+git log --diff-filter=A -5 --format='%h %as %s' --name-only "$base" -- "$dir"
+git log -20 --author="$reviewer" --format=%H "$base" -- "$dir" |
+    while read -r change; do git show --format=medium "$change"; done
+pattern='std::optional<'
+git grep -nIE "$pattern" "$base" -- "$dir"
+git grep -nIE "$pattern" "$base" -- "$dir" | wc -l
+```
+
+At 766f60872 these are **matching source lines** in the PipeWire folder. Re-run both sides using the same scope. A count of zero calls for reading the available helper and the toolchain requirements.
+
+| First pattern | Lines | Comparison pattern | Lines |
+| --- | ---: | --- | ---: |
+| `std::optional<` | 135 | `return -1;` | 0 |
+| `std::string_view` | 57 | `optional<std::string_view>` (subset) | 30 |
+| `ranges::(find\|find_if\|equal\|sort\|all_of\|any_of\|none_of\|copy\|transform\|for_each)\(` | 10 | Same expression starting with `std::` | 2 |
+| `Q_EMIT ` | 9 | `^[[:space:]]*emit ` | 5 |
+| `qCDebug\(` | 37 | `qCWarning\(` / `qCInfo\(` | 19 / 1 |
+
+The new camera portal client (884ce91ab), the camera implementation (5a93ce909) and the video stream (71e3a2f08) illustrate the difference between folder and module scope. Public API compatibility, a C callback signature or a nullable input can determine the choice even when a different spelling has a larger count.
+
+### Which rules apply across Qt
+
+The six wiki documents in the source table were checked at revisions 46202, 46200, 45266, 43870, 46897 and 44544 respectively. A permanent link is `https://wiki.qt.io/index.php?oldid=REVISION`. Use the live page when preparing the next change.
+
+| Source | Decision it supports |
+| --- | --- |
+| Coding Conventions and Qt Coding Style | Check the supported language level, source and binary compatibility, includes and lambda indentation. Check the file and the module's formatter configuration before changing layout. |
+| API Design Principles | Write the caller's example first. Compare neighbouring APIs for a minimal interface, predictable names and clear semantics. For a property, check its initial value, its notification and the behaviour of a value already obtained. |
+| Things To Look Out For In Reviews | Read the whole list, then walk the applicable API, documentation, tests, ownership, container, logging and commit sections. Its introduction describes it as a staging area for guidance. Individual items can have explicit exceptions. |
+| Commit Policy and Review Policy | Give a self-contained reason for each logical change. Separate preparatory refactors. Leave the prescribed review time after each patch set and let reviewers inspect material changes again. |
+| [QUIP 12](https://code.qt.io/cgit/meta/quips.git/tree/quip-0012-Code-of-Conduct.rst?id=f396c4d), revised 2026-03-08 | Conduct in review. Answer the technical point and preserve a colleague's contribution. |
+| [QUIP 16](https://code.qt.io/cgit/meta/quips.git/tree/quip-0016-branch-policy.rst?id=c6359c1), revised 2026-10-18 | Select the branch and check backport eligibility. Refactoring belongs on dev. |
+| [QUIP 17](https://code.qt.io/cgit/meta/quips.git/tree/quip-0017-Change-log-creation.rst?id=f396c4d), revised 2026-03-08 | Give significant user-visible changes a change-log entry. Here it belongs on the camera change. The internal parser move has its own message. |
+
+Select other QUIPs by what the diff touches. The filenames below link through the [QUIP tree at c6359c1](https://code.qt.io/cgit/meta/quips.git/tree/?id=c6359c1).
+
+| Change surface | QUIP (last revision of the document) |
+| --- | --- |
+| New third-party code or attribution | 4 (2026-06-07), 7 (2026-10-18) |
+| Public API, source compatibility or a new nodiscard annotation | 10 (2026-03-08), 6 and 19 (2026-10-18) |
+| New source files, security-sensitive headers or a blacklisted test | 18 and 23 (2026-03-08), 24 (2026-10-18) |
+| Examples or documentation | 13 (2026-06-23), 21 (2026-10-18), 25 (2026-03-08) |
+
+The ranges wrapper, log-category levels, include groups and camera test names below describe Qt Multimedia. Tim Blechmann requested a more explicit member name, a `void` internal handler and immediate fallback logging in change 792002. Those review decisions carry over when the new code has the same constraints.
 
 ## The rules
 
@@ -65,20 +119,20 @@ Each rule gives its source: Qt's document, the module's practice with the file o
 
 ### Types and signatures
 
-- **A string from a C API is a `std::string_view`; one that can be absent is a `std::optional<std::string_view>`.**
+- **In this callback, borrow present C strings with a view and preserve null as an absent optional.**
   The backend has 57 uses of `std::string_view`, 30 of them `std::optional<std::string_view>` (every getter of `qpipewire_propertydict_p.h`, added by commit 1a5552789), and one struct with `const char *` members, the oldest one, which the review asked not to copy: "all those members should be string_view".
   A view cannot be made from a null pointer, so check what the C API sends before choosing between the two ([the trap](#traps-symptom-cause-fix-how-found)).
-- **No sentinel values: `std::optional`, or a precondition that is asserted.**
+- **For this index the reviewer asked for an optional or an asserted precondition.**
   The backend has 135 uses of `std::optional` and no `return -1`.
   The review: "either return a `std::optional` or assert".
   `Q_ASSERT` states a precondition 42 times in the backend.
 - **A handler that reports nothing returns `void`;** `int` stays at the C callback that the library defines.
   The backend has nine `void` handlers and one member function returning `int`, again the one that was copied: "returning 0 in all codepaths? consider returning void".
-- **`std::variant` only where both alternatives are stored.**
+- **Check whether a parameter needs a variant.**
   A parameter that is a value or nothing is `std::optional`: "the variant only seems to be used in this function signature and doesn't seem to be stored".
 - **`std::optional` in the pointer-like form.**
   Things To Look Out For In Reviews, std::optional 1 and 2: "Don't use value(), has_value(), use pointer-compatible subset: if (opt), *opt, opt->foo"; "Avoid the default constructor, explicitly use std::nullopt."
-- **`Q_EMIT`, `Q_SIGNALS` and `Q_SLOTS`, never the lower-case keywords,** in sources and private headers.
+- **Prefer the module’s uppercase signal macros in new code.** The same maintainer also added lowercase emissions to the camera backend. Check whether the target disables the keywords.
   Commit 7a907ff8c (2026-09-30): "qt's pseudokeywords can clash with application code, e.g. libcamera."
   `src/multimedia` has 229 `Q_EMIT` against 5 `emit` in code; test classes keep `private slots:` (112 against 6).
 
@@ -98,7 +152,7 @@ Each rule gives its source: Qt's document, the module's practice with the file o
   No member in `src/multimedia` stores a reported message.
   Where once per process is needed, the module uses a function-local `std::once_flag` (`video/qeglimagefunctions.cpp`).
   Measured without the stored message: the line appears once in a freshly started program and once more at each later rebuild of the camera list.
-- **The levels the module uses are debug and warning.**
+- **Debug and warning predominate in this module.**
   `src/multimedia` has 253 `qCDebug`, 177 `qCWarning` and one `qCInfo`.
   A new `qCInfo` will be read as a choice: be ready to say why the line must show by default.
 - **No `Q_UNLIKELY` or `Q_UNLIKELY_BRANCH` on the way to a warning.**
@@ -119,7 +173,7 @@ Each rule gives its source: Qt's document, the module's practice with the file o
   Coding Conventions, Lambdas: "Place the capture-list, parameter list, return type, and opening brace on the first line, the body indented on the following lines, and the closing brace on a new line."
 - **`clang-format` on the touched lines only, and only where the neighbouring file is clean under it.**
   Qt Coding Style: "clang-format cannot be configured to correctly reproduce the Qt style, so unless a module was developed with clang-format from the get-go, it's best to disable git-clang-format."
-  A module tree has no format file of its own; the file is in qt5.git.
+  This qtmultimedia revision has no format file of its own; the file is in qt5.git.
   With clang-format 21.1.8 and that file, 24 of the backend's 54 files would change (552 lines), while the two newest camera files change by 0 lines: in those the tool's output is the maintainer's form.
 - **Includes:** the module's private headers as `<QtMultimedia/private/x_p.h>` in alphabetical order, then QtCore, then the library's own headers (`pipewire/`, `spa/`), then the standard library, each group after an empty line.
   Things To Look Out For In Reviews, Includes 2 and 3, asks for groups, alphabetical order and "Include everything the file needs"; where its order of groups differs from the folder's, the folder wins (all nine backend sources with both kinds put the library's headers first).
@@ -150,34 +204,36 @@ Each rule gives its source: Qt's document, the module's practice with the file o
 
 ## The pre-upload check
 
-Walk these against the diff before the tests are run again, and write the result of each in the hand-back.
-`BASE` is the commit the change sits on, and `D` is `git diff BASE -- src tests`.
+Use the parent of the proposed commit as the base, including when an earlier commit in the series moved a helper. Run the [line search](../scripts/review-diff.py) from the module's Git tree. It prints the rule, path, line and excerpt. Supply the production directory whose conventions you measured. The PipeWire-specific checks select matching API and member names.
 
-| # | Rule | Search | A hit means |
-| --- | --- | --- | --- |
-| 1 | The message is about the design | `git log -1 --format=%b \| grep -n -E '[a-z]\(\)\|m_[a-z]\|operator'` | Each identifier named in the body: is it public API the reader knows, or the implementation retold |
-| 2 | The message's form | `git log -1 --format=%B \| awk 'length > 72'`; `git log -1 --format=%B \| tail -1` | A long line; a last line that is not `Change-Id:` |
-| 3 | Drive-by changes are named | `git diff --stat BASE` | A file outside the subject that the message does not mention |
-| 4 | No C strings kept | `D \| grep -n -E '^\+\s+const char \*\w+;'` | A member to turn into a view |
-| 5 | No sentinel | `D \| grep -n -E '^\+.*(return -1;\|== -1\|!= -1\|npos)'` | A result to turn into `std::optional` or an asserted precondition |
-| 6 | No handler that returns a constant | `D \| grep -n -E '^\+\s+return 0;'` | A function, other than a C callback, whose every path returns the same status |
-| 7 | No variant as a parameter | `D \| grep -n -E '^\+.*std::variant'` | A variant that nothing stores |
-| 8 | `std::optional` in the pointer-like form | `D \| grep -n -E '^\+.*\.(has_value\|value)\(\)\|^\+\s+std::optional<[^>]+> \w+;'` | `value()`, `has_value()`, or a local optional made without `std::nullopt` (a member declaration is not a hit) |
-| 9 | The module's ranges | `D \| grep -n -E '^\+.*std::(find\|find_if\|equal\|sort\|all_of\|any_of\|none_of\|copy\|transform\|for_each)\('` | An algorithm to write as `ranges::` |
-| 10 | No hand-written search | `D \| grep -n -A3 -E '^\+\s+for \(.*:'` | A loop whose body is `if (...) return` or `continue` |
-| 11 | No stored "already said" | `D \| grep -n -i -E '^\+.*(reported\|warned\|alreadyLogged\|mutable )'` | State kept for a log line |
-| 12 | Log levels | `D \| grep -n -E '^\+.*q(C)?Info'` | A level the module barely uses |
-| 13 | No likely or unlikely before a warning | `D \| grep -n -B2 -E '^\+.*q(C)?(Warning\|Critical\|Fatal)' \| grep UNLIKELY` | The macro to remove |
-| 14 | Upper-case signal macros | `D \| grep -n -E '^\+\s+emit \|^\+\s*(signals\|public slots\|private slots):'` | A lower-case keyword outside a test class |
-| 15 | Every comment earns its place | `D \| grep -n -E '^\+\s*//'` | Read each: does it say why, or repeat the line under it |
-| 16 | Names | `D \| grep -E '^\+' \| grep -o -E '\bm_[A-Za-z]+' \| sort -u`, then the same on `BASE`'s files to see which are new | A new member whose name is shorter than what it holds |
-| 17 | Includes | `D \| grep -n -E '^\+#include'` | A header of a neighbouring part; a group out of the file's order |
-| 18 | Layout | clang-format with qt5.git's file on the changed lines only (`--lines=A:B` per hunk of `git diff -U0 BASE`) | A difference in a file that was clean on BASE |
-| 19 | Nothing lost | `D \| grep -n -E '^-.*\w+\(.*\);'` | A call that was replaced: open the function and list its cases |
-| 20 | Test names and order | `git diff BASE -- tests \| grep -n -E '^\+\s+void \w+\(\);'`; `git diff BASE -- tests \| grep -n -E '^\+\s+QCOMPARE'` | A row not named as its neighbours; an expected value in the first place |
-| 21 | Stable tests | the changed test binary twenty times | A run that fails |
-| 22 | Claims | `D \| grep -n -i -E '^\+\s*//.*(roundtrip\|server\|session\|daemon\|always\|never)'` and the same words in the message | A sentence about another program with no run behind it |
-| 23 | The patch set you amend is the newest | fetch `refs/changes/NN/NUMBER/*` from Gerrit (it needs the account) | A patch set uploaded by a reviewer |
+```sh
+tip=$(git rev-parse HEAD)
+base=$(git rev-parse "$tip^")
+python3 "$contrib_qt/scripts/review-diff.py" "$base" "$tip" --module-dir "$dir"
+git diff --check "$base" "$tip"
+git diff --stat "$base" "$tip"
+git log -1 --format=%B "$tip"
+```
+
+Walk each candidate against the surrounding function and the cases below. The program finds places to read. A reviewer decides whether any of them need a change. Walk rows 3, 18, 20, 21 and 23 separately.
+
+| # | Evidence to inspect | Decision |
+| --- | --- | --- |
+| 1–3 | Message identifiers, prose line lengths, Change-Id and whole diffstat | Describe the old and new behaviour. Public API names or an ownership invariant can explain the reason. Read the whole footer block. Distinguish review trailers added after integration. Check every changed file for a prerequisite. |
+| 4 | Raw string-pointer fields in changed headers | Consult the producer's nullability and lifetime contract. Make an owning copy before queued delivery. |
+| 5–7 | Empty-container sentinels, index casts at the caller, integer member handlers returning only zero, a variant in a function signature | Prove the precondition at every caller. Preserve mandated ABI return types at C callbacks. Ask which variant alternatives actually need to be stored. |
+| 8–10 | Presence-only conditions, standard iterator pairs in a module with a range wrapper, range loops next to return or continue | Check optional construction and unwrapping by hand. Confirm the wrapper exists and preserves the range. Some loops build results, manage resources or return different representations. |
+| 11–13 | Reported-message fields, info-level logging, cold branches before logging | Trace where the message is emitted and repeated, and run with the default category settings. Absence of an optional session choice can be routine and still warrant an explanation. |
+| 14–17 | Signal keywords where disabled, a comparison comment beside the comparison, source/sink member names, a camera include from the audio implementation | Check build flags as well as local spelling, read every comment for a reason, compare names to the domain, and trace each include to the symbol it supplies. The name and include searches here are specific to this backend. |
+| 18 | For each changed C++ file get new-line ranges from `git diff -U0 "$base" "$tip" -- "$file"`. Run the same clang-format version with the module's style on its parent copy, and with one `--lines=FIRST:LAST` for each added range on its new copy. | Compare actual statements on adjacent nesting levels. On an existing clean parent an indentation shift can pinpoint a misplaced callback body. A new file has no clean-parent control. Read its layout against neighbouring files and the written conventions. A wrap or a dirty baseline alone is insufficient. |
+| 19 | Removed cache, notification, lock and listener calls | Open the removed helper in the base, including its first-use and failure paths. Compare the replacements with a client already subscribed and a client that has never queried the value. |
+| 20 | `git diff "$base" "$tip" -- tests`; inspect new slots and each `QCOMPARE` | Compare names with neighbouring test functions. Exclude Qt Test's lifecycle slots. Check actual then expected, and what a mutation makes fail. |
+| 21 | Run each changed test function repeatedly on the final commit | Record the total and the named failures on a known bad implementation. Twenty consecutive runs was the local control for this change. |
+| 22 | Adjacent identical synchronizations across the hunk boundary, and each claim about a server or session in comments and the message | Compare one call with two. Record the first observable value in fresh and running clients. Source-trace older versions separately. |
+| 23 | Confirm the latest patch set on Gerrit immediately before upload | An anonymous refusal leaves this check open for the uploader. |
+| 24 | A metadata object selected by a property lookup | Enumerate distinct names, duplicate names and ids. Remove the bound and unbound objects in opposite orders. Compare the surviving provider's value with the public API. |
+
+On change 792002 this walk found all thirteen code comments in Tim Blechmann's review. The original walk identified eleven directly from code or the message. It had no specific question for provider identity or for the unsigned use of the index. The revised check includes both. Twenty integrated changes by the same author touching the directory supplied a second control. Identifiers in messages, loop exits, equivalent lock replacements and formatter wrapping all occurred in accepted code. Read these in context before requesting changes.
 
 ## The counts of 2026-11-25
 
@@ -199,7 +255,7 @@ qtmultimedia `dev` 766f608; "backend" is `src/multimedia/pipewire`, "module" is 
 ## Traps (symptom, cause, fix, how found)
 
 - **Symptom: six of fifteen review comments land on lines copied from the file next door.**
-  Cause: the audio context manager, which the camera change mirrored, is the backend's oldest code (2025); the same author's camera files are of August to November 2026 and use views, `std::optional`, `void` handlers and the ranges helpers.
+  How the forms arose is an inference from history. The camera change mirrored the backend’s older audio context manager (2025); the same author's camera files are of August to November 2026 and use views, `std::optional`, `void` handlers and the ranges helpers.
   Fix: mirror the structure of the twin, and write each line in the form of the newest files (recipe steps 1 to 3).
   How found: the review itself, then `git log --reverse` on both files and the counts above.
 - **Symptom: "why do we need to sync twice here?"**
@@ -223,18 +279,18 @@ qtmultimedia `dev` 766f608; "backend" is `src/multimedia/pipewire`, "module" is 
   The local patch set 2 candidate for change 792002 warned and discarded the second announcement. When the first object disappeared, a running application fell back to the first camera even though the surviving object named another.
   To check the handover, start the application on the first provider, announce the replacement, and remove the first provider. Read the surviving value with `pw-dump`, then compare `QMediaDevices::defaultVideoInput()` and a newly constructed `QCamera` in both the running application and a fresh one. Keep the original open camera separate in the measurements.
   In a three-camera session the first provider selected cam-b and WirePlumber's surviving object selected cam-c. A hotplug triggered another list update. Both queries returned cam-a in the running application and cam-c in the fresh one.
-  A backend that promises to follow the session must be able to bind the surviving object after the current one disappears.
+  Fix: retain compatible global ids in announcement order. Keep the incumbent listener until its own id disappears, detach, clear its value, then bind the survivor. Removing only a waiting provider preserves the incumbent. Removing the last one clears the selection. Re-run all three orders through the public API. Copying the audio listener also copied its assumption about a single provider.
 - **Symptom: the three last lines of a Gerrit suggestion are indented four columns less than the rest, and its empty line holds spaces.**
   Cause: the suggestion was typed in the web editor.
-  Fix: apply what it means (here: the lambda's body one level deeper), and check the result with clang-format, which gave the same form.
+  Fix: apply what it means (here: the lambda's body one level deeper), and check the result with clang-format, which gave the same form. How found: diff the proposed callback against the base and the formatter result.
 - **Symptom: clang-format wants to change lines the change did not write.**
   Cause: the folder was formatted over the years by different versions of the tool.
-  Fix: run it on the same file as it is on the base first; if that file is clean, the tool is the form for it; leave a line of the base alone when the change only renames something on it.
+  Fix: run it on the same file as it is on the base first; if that file is clean, the tool is the form for it; leave a line of the base alone when the change only renames something on it. How found: format both revisions with the same version and configuration.
 - **Symptom: `git ls-remote https://codereview.qt-project.org/qt/qtmultimedia 'refs/changes/02/792002/*'` answers "could not read Username".**
   Cause: Qt's Gerrit serves patch sets only to an account.
-  Fix: whoever holds the account fetches the newest patch set before the amended one is uploaded (check 23); a contributor without it says in the hand-back that this was not done.
+  Fix: whoever holds the account fetches the newest patch set before the amended one is uploaded (check 23); a contributor without it says in the hand-back that this was not done. How found: compare the anonymous Gerrit response with the local change refs.
 - **Symptom: a comment on `/COMMIT_MSG` names line 29, and the message has 28 lines.**
-  Cause: Gerrit's view of the message starts with six lines of header (parent, author, dates), so line 29 is line 23 of the message.
+  Cause: Gerrit's view of the message starts with six lines of header (parent, author, dates), so line 29 is line 23 of the message. Fix and check: inspect the Gerrit header and count from the subject before editing the cited paragraph.
 
 ## Perks
 

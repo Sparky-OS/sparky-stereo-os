@@ -76,7 +76,7 @@ Read the traps before a change to this part, and add the next lesson there as yo
 
 ## Qt code as its maintainers write it
 
-[Qt code as its maintainers write it](references/qt-code-as-its-maintainers-write-it.md): the rules a Qt reviewer applies, each with Qt's document, the module's own commit or the count behind it, a pre-upload check of 23 searches over a diff, the counts of the PipeWire backend, and nine traps (ORDER 879, from Tim Blechmann's review of change 792002).
+Before the first line, [read the newest files, build the module’s idioms table and read the reviewer’s last twenty changes](references/qt-code-as-its-maintainers-write-it.md). Before uploading, walk that page’s code searches and runtime checks against the parent of each change. The worked example comes from Tim Blechmann’s review of Qt Multimedia change 792002.
 Read it before the first line of a change and walk its check before every upload:
 
 1. Read the reviewer's last twenty commits in the folder (`git log -20 --author='NAME' -- DIR`), newest first, and write in the forms of the newest files, not of the file you copy from.

@@ -10,7 +10,7 @@ description: >-
   width, a video crashes KWin switching between ARGB and NV12, a Vulkan swapchain errors with NATIVE_WINDOW_IN_USE, a
   toolkit lacks stereo, a canvas or video looks pixelated or black in the stereo browser, the browser's video is
   green on NVIDIA, a gl-stereo layer change needs the saver receipts again, the saver list says "Not offered", QWidget
-  painting must be measured, a program dies with "invalid object", or memcheck reads a freed QPlatformTextureList in rhiFlush.
+  painting must be measured, or a program dies with "invalid object".
 ---
 
 # Native Linux programs

@@ -84,3 +84,15 @@ A five-pixel horizontal shift registered as five pixels, and the capture without
   **Cause:** Qt reported the position in the client window's coordinate system.
   **Fix:** activate standard accessible buttons directly and locate menu text in the rig capture before sending pointer clicks.
   **How found:** the trace clicked Sequence at x=230, y=13 while the capture placed it at x=497, y=103.
+- **Symptom:** the subtitle dialog shows terminal colour escapes mixed into a refused-model diagnostic.
+  **Cause:** the packaged server writes colour-formatted tracing output to stderr even as a child process.
+  **Fix:** remove terminal sequences and show the final diagnostic in the dialog.
+  **How found:** open the installed-editor refusal capture from a corrupt model file, then run the native refusal and a coloured fixture again.
+- **Symptom:** the virtual compositor cannot start and the shell reports Operation not permitted.
+  **Cause:** the installed executable's scheduling capability exceeds the disposable container's capability set.
+  **Fix:** use a byte-identical test copy without the capability and confirm which compositor PID answers the private session bus.
+  **How found:** the copy and original had the same SHA-256 and the copy announced its private socket.
+- **Symptom:** an older package gate offers a Debian Qt version even though Graphics requires the edition's exact runtime.
+  **Cause:** both archives have candidates and the newer Debian candidate wins without explicit matching inputs. A dated Debian index can also lack Frameworks 6.32 for the edition's KIO.
+  **Fix:** use the matching signed edition Qt binaries and a qualified Debian index with the necessary Frameworks version.
+  **How found:** the package solver first reported the exact Qt conflict and then identified the unsatisfied Frameworks dependency.

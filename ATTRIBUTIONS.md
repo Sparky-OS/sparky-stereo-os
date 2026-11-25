@@ -516,6 +516,7 @@ Their living successors, which we make stereo: the QML Flip Switch and Cover Swi
 **Credit**: The Qt Company and the Qt Project's contributors; Qt Multimedia's copyright holders also include Research In Motion and Jolla.
 Qt SVG's colour work builds on its developers' own, most of all **Hatem ElKharashy** and **Robert Löhning**, whose `resolveColor()` test our change extends.
 Our first Qt change was reviewed within hours by **Tim Blechmann**, with **Artem Dyomin, Nils Petter Skålerud and Jøger Hansegård** as reviewers.
+The edition's qt6-base +stereo3d24 carries **David Edmundson**'s Wayland change d6d2a75cdbfe (a subsurface that moves asks for its parent's next frame instead of exposing it at once), reviewed by **David Redondo**, and places a stereo `QOpenGLWidget`'s own window with the technique of Qt's own `QWindowContainer` (queue row 863).
 
 ### 2.8a The browser: Waterfox and Mozilla's Gecko
 

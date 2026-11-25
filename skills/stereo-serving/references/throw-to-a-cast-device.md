@@ -4,8 +4,8 @@
 
 **Check freshness first.**
 Written on 2026-11-24 from the reconcile of row 81, milestone 1, against the published round of that day (KWin 6.7.4-2+stereo3d64, plasma-wayland-protocols 1.21.0-1+stereo3d12, KRdp and KPipeWire 6.7.4-1+stereo3d8, KRDC 26.04.0-1+stereo3d1), and from the cast study of 2026-10-14.
-Extended on 2026-11-25 with KWin 4:6.7.4-2+stereo3d66 (staged, not published), which makes a network screen a screen like the others.
-The daemon is not built yet: every line below says whether it was read in the source, proved by a test, proved by the study, or is planned and not run.
+Extended on 2026-11-25 with KWin 4:6.7.4-2+stereo3d66 (staged, not published), which makes a network screen a screen like the others, and the same day with the daemon, its command and its page, `sparky-stereo-throw` 0.1.0+lc1 (staged, not published; recipe `sparky-os/packages/sparky-stereo-throw` of the build repository), proved in a loopback session with software Cast devices, and with a study of what a Cast device lets the computer set.
+Every line below says whether it was read in the source, proved by a test or a session, proved by the study, or is planned and not run.
 
 ## The shape
 
@@ -27,7 +27,8 @@ The daemon is not built yet: every line below says whether it was read in the so
 | KRdp's phone headset Throw (discovery, approval, the v7 request with the split-eye flag) | ships | KRdp patches `Pass-validated-phone-panel-descriptors-and-millihert.patch`, `phone-throw-8a3a79dbfca1.patch` |
 | KRDC Catch (`krdc-catch`) | ships, eight catalogues, no Spanish; translates the name (pt_BR "Receber") | KRDC patches `catch-backport.patch`, `krdc-catch.po.patch`; successors in the build repository's `sparky-os/translations` |
 | KWin's headset "Throw view" strings by the names rule | ships in ten languages | KWin patches `kwin-throw-catch-names.patch`, `kwin-order46b.patch` |
-| A Cast daemon, a Cast device table, a "Throw: <device>" sink, Throw and Catch icons | not built | |
+| The Cast daemon, its command, the device table and the Throw page in System Settings | `sparky-stereo-throw` 0.1.0+lc1 (staged) | [the daemon](#the-daemon-sparky-stereo-throw-010) |
+| A "Throw: <device>" sink (the sound), Throw and Catch icons, Cast Streaming (path B) | not built | |
 
 ## The virtual output, as KWin creates it (read in the source)
 
@@ -88,6 +89,51 @@ Prediction for the anaglyph rows: the eye colours to linear light with a 2.2 gam
    Measured on 2026-11-25 (lane scripts `rig66/`, 21 rows): +65 fails the formats after the switches (only the 2D mode), the eleven format rows and the kept choice, and passes the rest (the Throw, the 2D frame, the pair in ScreenShot2, the screen gone after the stream, another device in 2D); +66 passes all 21, each format's frame `new`.
    The window menu on +65: "Move to Screen" lists Screen 1 (Virtual-0), Screen 2 (Virtual-1) and Screen 3 (Virtual-cast-proof), no "Throw to". On +66: "Move to Screen" lists the two local screens, "Throw to" lists "Living room TV".
 
+## The daemon (sparky-stereo-throw 0.1.0)
+
+One engine: the daemon `sparky-stereo-throwd` (in `/usr/lib/x86_64-linux-gnu/libexec`) is the only program of ours that speaks Cast; the command `sparky-stereo-throw` and the page talk to it over the session bus (`org.sparky.Throw`, `/org/sparky/Throw`).
+It is a user service (`sparky-stereo-throw.service`, part of the graphical session) and D-Bus activatable (`org.sparky.Throw.service` names the executable and the unit).
+
+| Piece | What it does | Source file |
+|---|---|---|
+| Discovery | KDNSSD `ServiceBrowser("_googlecast._tcp")`, TXT `id`, `fn`, `md`; refuses to start, said, when Avahi is not running | `src/discovery.cpp` |
+| The device table | `data/devices.json` (installed in `/usr/share/sparky-stereo-throw`): per model name, the generation words, video or sound only, codec, level, mode; a model not in it gets the unknown row (the first Chromecast's limits) and the person is told once per device (`sparky-stereo-throwrc [Device][id] ToldUnknownModel`) | `src/devicetable.cpp` |
+| The network screen | the v7 request: name the device's `id`, description its name, the table's mode in millihertz, scale 1, not a headset, the pointer embedded | `src/networkscreen.cpp` |
+| The stream | KPipeWire's `PipeWireEncodedStream` (H.264 Main, `Speed`, the table's frame rate) on the screen's node; libavformat Matroska with `live=1`, `cluster_time_limit=1000`, `write_crc32=0` into a custom AVIO context on a small HTTP server, one random path per Throw; a reader gets the current group of pictures first, then live packets | `src/streamer.cpp` |
+| The channel | CASTv2 over TLS (no peer verification, as the public senders), a hand-written `CastMessage` codec (fields 1 to 9 of openscreen's `cast_channel.proto`, chunks joined), heartbeat every 5 s, three missed PONGs and the device is gone | `src/castmessage.cpp`, `src/castchannel.cpp` |
+| A Throw | the mode (the table's, or `[Device][id] Mode=WxH@Hz`), the screen, the stream, LAUNCH `CC1AD845`, CONNECT to its transport, LOAD `video/x-matroska` `LIVE`, a 20 s fetch timeout; states `starting`, `throwing`, `stopped`, `failed`, the last one kept for the page until the next Throw | `src/throwsession.cpp` |
+| Saying it | KNotification events `throwStarted`, `throwEnded`, `throwFailed` (high), `unknownModel`; every failure kept in the problems engine under `throw:<id>` until a Throw to that device works | `src/tell.cpp` |
+| The read side and the volume | `DeviceInfo(id)`: `/setup/eureka_info?params=device_info,name` and `build_info` on HTTPS 8443, then HTTP 8008, the retry with an empty `Host` on 403 (pychromecast's way), and the receiver's `GET_STATUS` on a channel of its own; `SetVolume(id, level, muted)`: `SET_VOLUME` read back from the `RECEIVER_STATUS` with the same request id | `src/daemon.cpp` |
+
+The D-Bus methods: `Devices()` (JSON, ordered by the devices' names), `Throw(id)`, `Stop(id)`, `DeviceInfo(id)` (answered when the device has answered), `SetVolume(id, level, muted)` (level below 0 leaves it, muted -1 leaves it); signals `DevicesChanged`, `StateChanged(id, state, detail)`.
+The command: `sparky-stereo-throw list | throw ID [--wait SECONDS] | stop ID | info ID | volume ID LEVEL|- [mute|unmute]`; `--wait` exits 0 when the device plays, 1 on a failure with its reason, 3 on the timeout.
+The page: `kcm_sparkystereo_throw` in the Display group of System Settings, the devices with Throw, Stop Throwing and their page; `systemsettings kcm_sparkystereo_throw --args device=ID` opens a device's page directly.
+KWin gives the screencast protocol to the daemon through `org.sparky.throw.desktop` (`X-KDE-Wayland-Interfaces=zkde_screencast_unstable_v1`, its `Exec` the daemon's installed path, `NoDisplay`).
+
+## What a Cast device lets the computer set (read at the source, 2026-11-25)
+
+Daniel's aim (2026-11-25): configure a Cast device from the PC as the Google Home app does, with the Google account from KDE's Online Accounts where a setting needs one.
+
+| Interface | Reads or changes | Without the account? | Source | Proved how |
+|---|---|---|---|---|
+| DNS-SD `_googlecast._tcp` | identity, name, model, address, port (a group on another port) | yes | pychromecast discovery; openscreen | run against the software receiver (rows D1 to D4) |
+| CASTv2 receiver namespace | `GET_STATUS` (volume level, muted, control type `attenuation`, `fixed` or `master`, running apps); `SET_VOLUME` (level, muted); `LAUNCH`, `STOP` | yes | pychromecast `controllers/receiver.py`; openscreen | run against the software receiver (I3, V1, V2, T3, T4) |
+| CASTv2 multizone namespace | `GET_STATUS`, `GET_CASTING_GROUPS`: the groups a speaker is in | yes, read only | pychromecast `controllers/multizone.py` | read only |
+| `/setup/eureka_info?params=device_info,name` (HTTPS 8443, then HTTP 8008) | name, model, maker, whether it has a screen (`capabilities.display_supported`) | yes in pychromecast's daily use, though GHLocalApi's specification marks every endpoint with the token | pychromecast 14.1.1 `dial.py`; GHLocalApi `GHLocalApi.openapi3.json` (global `security`) | run against the software receiver (I1); real devices read only |
+| `eureka_info?params=build_info` | the firmware (`cast_build_revision`) | not settled: no public sender reads it without the token | GHLocalApi | the software receiver only (I2); the page says "not given by the device" when it is missing |
+| `eureka_info?params=multizone` | the groups | yes | pychromecast `dial.py` (`get_multizone_status`) | read only |
+| `/setup/set_eureka_info` | name, locale, time zone, opt-ins | no: `cast-local-authorization-token` | GHLocalApi | read only |
+| `/setup/reboot` | restart, factory reset | no: the token | GHLocalApi | read only |
+| `/setup/scan_wifi`, `scan_results`, `configured_networks`, `connect_wifi`, `forget_wifi` | Wi-Fi | no: the token | GHLocalApi | read only |
+| `/setup/bluetooth/*` | pairing a speaker | no: the token | GHLocalApi | read only |
+| `/setup/assistant/*`, `user_eq/set_equalizer`, `supported_locales`, `supported_timezones` | alarms, night mode, do not disturb, equalizer, the lists | no: the token | GHLocalApi | read only |
+| Ambient screen and photos, guest mode, creating groups, setup of a new device over Bluetooth Low Energy | | | none of the sources read | not found |
+
+**The token's only open route** (glocaltokens' `client.py` and `const.py`): an Android master token through gpsoauth (the person's password, or a cookie taken from a browser sign-in), then an access token asked as Google's own Android Home app (its package `com.google.android.apps.chromecast.app` and signing hash, service `oauth2:https://www.google.com/accounts/OAuthLogin`), then Google's Foyer `GetHomeGraph` over gRPC (`googlehomefoyer-pa.googleapis.com`), whose answer carries each device's `local_auth_token`.
+So the route signs in as another company's app; a desktop account (KDE's or any other) has no such client of its own. A lead from the Astra consult, the scope `cast.backdrop`, is not what glocaltokens uses.
+**KDE's Online Accounts** (kaccounts-providers at 1dbb050941, `google.provider.in` and its services): the Google provider asks for email, profile, calendar, tasks, contacts and YouTube upload, and its services are disabled; no scope reaches the Home graph, so no route gives the token today. That is work for queue row 683 (online accounts signed in once); the page says "Sign in under Online Accounts" and why the settings cannot be changed here yet. Nothing of ours asks for or keeps a Google password.
+**Generations:** the receiver and setup interfaces are the same on every Chromecast generation as the sources tell them; a speaker has no screen (`display_supported` false), so it has no Throw, only its volume and groups; the assistant and equalizer endpoints are a speaker's. How a Google TV (an Android TV with Cast built in) answers `/setup` was not found in the sources.
+
 ## The Cast channel, as a recipe (proved by the cast study on loopback, 2026-10-14)
 
 1. Find the device: DNS-SD browse of `_googlecast._tcp`; the TXT keys `fn` (friendly name), `md` (model name), `id` (the device's identity); a service on a port other than 8009 is a cast group.
@@ -105,7 +151,8 @@ Prediction for the anaglyph rows: the eye colours to linear light with a 2.2 gam
 Run it in a throwaway Debian testing container with `--network none` after the packages are installed, and never on a network that has a real Cast device: nothing in it browses DNS-SD, the sender connects by address.
 Expected (`check.txt` of the study): nine `PASS` lines in order, "device authentication challenge from this sender: none", `RESULT: PASS`; a `LAUNCH` of any other app id is answered with `LAUNCH_ERROR`, which is the red control.
 Not rerun since the study.
-Planned for the core (not built): the receiver also fetches the URL it is told to `LOAD` and hands the bytes to `ffprobe`.
+Its successor for the daemon's proof is the package's `tests/fake-cast-device.py`: the same namespaces on the device's own address, `LOAD` fetched with `ffmpeg -c copy` into `capture-N.mkv` and handed to `ffprobe`, `SET_VOLUME` held and answered, and the device's setup interface on 8008 and 8443 (`eureka_info` with `name`, `device_info` and `build_info`; any other `/setup` path answers 401, and every request is logged with whether it carried a token).
+Its modes make the failures: `launch-error` (answers `LAUNCH_ERROR` `NOT_FOUND`), `load-failed`, `no-pong` (stops answering the heartbeat).
 
 ## The device table
 
@@ -121,11 +168,16 @@ One row per model name (`md`), as data the daemon reads, from Google's "Supporte
 
 The level limits behind the first rows are ITU-T H.264 (V16, 06/2026) Table A-6: level 4.1 allows 8 192 macroblocks a frame and 245 760 a second, and 1920x1080 is coded as 1920x1088, 8 160 macroblocks, so 30.1 frames a second at most; level 4.2 allows 522 240 a second, 64 frames of 1080p.
 A model not in the table is a fact to say, never a guess to hide: the study proposes the first generation's limits for it, and the person is told which limits were used.
+The stream is H.264 only in 0.1.0, so a row's mode is what its H.264 level allows: the Chromecast Ultra lists 4K only in HEVC and VP9, and its H.264 High 4.2 gives 1080p, so `devices.json` throws to it at 1920x1080 at 30 Hz, not at the 3840x2160 of the table above; the Google TV Streamer's H.264 level 5.2 gives 3840x2160 at 30 Hz.
+The model name `Chromecast` does not tell the generations apart, so it takes the first generation's limits.
 
-## The loopback proof (planned, not run)
+## The loopback proof (run 2026-11-25)
 
-In containers with `--network none`, both ends in one network namespace: a stand-in DNS-SD responder that announces one `_googlecast._tcp` service on 127.0.0.1, the software receiver, a headless Stereo KWin of the published round, the daemon.
-Rows, each red first: the published set has no such output (`kscreen-doctor -o` before and after); a receiver that answers `LAUNCH_ERROR` is said, not retried in silence; the stream read back by `ffprobe` (codec, profile, level, size, rate) against the device table, first generation 1080p30 and Ultra 4K; a model with no HEVC never offered HEVC; the output listed while thrown and gone after the receiver closes the channel; a declared stereo window on the output in its half side by side mode, the left eye's marker in the left half and the right eye's in the right half of a frame of the stream, and one view when the output is 2D (KWin +stereo3d66 gives this; its own tests and the installed-package session above hold it without the daemon).
+One container, `--network none`, `--cap-add NET_ADMIN` (the dummy interface) and `--cap-add SYS_NICE` (KWin's file capability), the NVIDIA card through CDI; a dummy interface `dummy0` with 10.81.0.1 to .5, a system bus and Avahi bound to `dummy0` only; five software devices as uid 1000, each announced with `avahi-publish -a -R` (its host name and address) and `avahi-publish -s -H` (the service with `id`, `fn`, `md`, `ca`); then the person's session: a session bus, a stand-in notification server, PipeWire, WirePlumber, `kwin_wayland --virtual` at 1280x1440 (tall, so that a device's page, sized to the screen by a KWin script, shows whole in one capture), the daemon, `tests/loopback/scenario.py`.
+The devices: Living room TV (Chromecast, plays), Bedroom TV (Chromecast Ultra, refuses to launch the player), Study screen (a model not in the table), Hall TV (Chromecast, stops answering the heartbeat), Den TV (Google TV Streamer, 4K).
+The rows (lane script `scripts/b/run-loopback.sh`; 31, and 32 with the installed package): the five devices found and named, the table's rows, the list ordered by name; the Throw, its network screen at the table's mode, `LAUNCH` and `LOAD` as the device logged them, Stop removing the screen and the device told; the stream the device fetched read by `ffprobe` (H.264 Main, 1920x1080, 30 frames a second at most, level 4.1 at most); the pair on the thrown screen (half side by side: the last frame of the device's capture, left half the left eye's red, right half the right eye's blue; the next Throw comes back in that format; 2D one view); each failure said, its screen removed and kept in the problems engine; what the person is told, read from a stand-in notification server on the session bus (`tests/loopback/notifications.py`); the unknown model at the first generation's limits, told once; the 4K device; the read side and the volume without a token; the page captured in English and in Brazilian Portuguese; with the installed package, the daemon started by the session bus from its service file and KWin's permission check on.
+The stream's side by side frame (the last frame of the device's capture, through `ffmpeg -sseof`) is kept marked: `mark_pns.py` of skill stereo-proof-rig writes PNG's `sTER` (mode 1, left eye first) and reads it back; the 2D frame stays a plain PNG; no red-cyan copy is made.
+Red: the same session with no Throw (the published set and KWin +66 only) fails every row, the rows of an absence included, since each also measures its presence (the device listed, the screen made, the setup interface asked); the daemon without B11's two methods on the bus fails the read side, volume and device page rows only (C2, C3, I1 to I4, V1, V2).
 
 ## Traps
 
@@ -202,6 +254,55 @@ Rows, each red first: the published set has no such output (`kscreen-doctor -o` 
   **Cause:** `std::ranges::find_if(output->modes(), ...)` on a list returned by value.
   **Fix:** keep the list in a variable first.
 
+### Traps of the daemon (part B, 2026-11-25)
+
+- **Symptom:** a device on a still screen gets nothing: its fetch ends with "Stream ends prematurely at 0", while a Throw with a window moving on the screen plays.
+  **Cause:** KWin sends one frame when the stream starts (`OutputScreenCastSource::resume` emits `frame()`) and then frames on damage only; KPipeWire repeats the last frame once, 2 frame intervals later, only to flush its encoder (`m_frameRepeatTimer`, single shot). Both are encoded before the device connects, and a reader that waits for the next keyframe waits for ever.
+  **Fix:** the streamer keeps the current group of pictures (the last keyframe and every packet after it; libx264's group is libavcodec's default of 12 frames, VAAPI's 100) and gives it to a reader at once, then the live packets; a group past 32 MiB is let go and a keyframe asked for.
+  **How found:** loopback row T5 failed on one run and passed on another; the device's log had `fetch-end` with no bytes and the daemon's had no "first keyframe" line for the first Throw, while the second Throw (the fixture window moving) had it at once.
+- **Symptom:** the page's failure line is gone after a Throw failed; the page and the command show the device idle.
+  **Cause:** the daemon deleted a finished session, and `Devices()` read the state from the live session only.
+  **Fix:** the last state and its detail are kept per device until the next Throw to it.
+  **How found:** loopback row F4.
+- **Symptom:** `Cannot start recording on a stream without a node ID`.
+  **Cause:** KPipeWire 6.7.4's recorder checks the node id even when the object serial (which the protocol says to prefer) is set.
+  **Fix:** set both, `setNodeId(node)` always.
+- **Symptom:** undefined references to `PipeWireBaseEncodedStream` at link time.
+  **Fix:** link `K::KPipeWireRecord` beside `K::KPipeWire`; the proof image needs `libkpipewirerecord6`.
+- **Symptom:** `kwin_wayland: Operation not permitted` at the start of a session in a container.
+  **Cause:** KWin's postinst gives the binary the file capability `cap_sys_nice`; a container without it cannot execute it.
+  **Fix:** `--cap-add SYS_NICE`.
+- **Symptom:** the Google TV Streamer's row finds no stream on a loaded machine.
+  **Cause:** software H.264 at 3840x2160 takes seconds for its first keyframe when the machine is busy (load 24 to 28 on the station's other lanes).
+  **Fix:** the row waits for the daemon's "first keyframe" line (90 s at most), then reads 4 s.
+- **Symptom:** the page in Brazilian Portuguese shows English sentences, while System Settings' list of pages is translated.
+  **Cause:** the image's environment sets `LC_ALL=C.UTF-8` and has no other locale, so gettext translates nothing; the pages' names come from their JSON metadata, which Qt translates by `LANGUAGE` (skill stereo-proof-rig, lessons-2026-11).
+  **Fix:** `locales` with the locale generated, and `LANG`, `LC_ALL` and `LANGUAGE` set together for the page; the page's QML names its domain (`i18ndc("sparky-stereo-throw", ...)`), so the daemon, the command and the page share one catalogue and the capture shows that it is read.
+- **Symptom:** a sentence of the device table (a model's generation words) is English in every language.
+  **Cause:** it is data, not code, so no extraction sees it.
+  **Fix:** the table's words are in the translation table under their own context and the daemon translates them when it describes a device; a product's own name stays as it is.
+- **Symptom:** the page's icons and its icon-only Details button are blank in the proof's captures.
+  **Cause:** a bare session has no KDE platform theme, so Qt does not use Breeze even with `breeze-icon-theme` installed.
+  **Fix:** none needed for the proof (a desktop session has the theme); say it when describing a capture.
+- **Symptom:** the package build stops at once: `copy-recipe: No such file or directory: 'git'`; with git added, at `No such file or directory: 'dch'`.
+  **Cause:** the edition's `build.sh` copies the recipe as git tracks it, and `lean.debian_prepare` writes the `+lc1` changelog entry with `dch`; a builder image made from the package's Build-Depends has neither.
+  **Fix:** the builder image carries `git` and `devscripts`, beside the Lean Code stages' `node-acorn`, `nodejs` and `python3-yaml` (lane script `scripts/b/make-throw-builder.sh`).
+- **Symptom:** `dpkg-shlibdeps: error: no dependency information found for /usr/lib/x86_64-linux-gnu/sparky-stereo-problems/libsparky-stereo-problems.so.0`.
+  **Cause:** the problems engine keeps its C library in a private folder and ships no shlibs file.
+  **Fix:** `override_dh_shlibdeps: dh_shlibdeps -l$(shell pkg-config --variable=libdir sparky-stereo-problems) -- --ignore-missing-info`, with the engine named in Depends (as `sparky-stereo-cec`'s build does).
+- **Symptom:** the link gate cannot resolve `kwin-wayland (>= 4:6.7.4-2+stereo3d66+lc1)`.
+  **Cause:** +66 is staged, not published.
+  **Fix:** a flat local archive of the +66 runtime packages in the gate's archive folder, signed with a throwaway key made in a container (`dpkg-scanpackages`, a Release written by hand with the SHA256 of `Packages` and `Packages.gz` because no image had `apt-ftparchive`, `gpg --clearsign` for `InRelease`), and its entry in `sources.json` with suite `./` (the lane's `scripts/b/make-link-archive.sh`).
+- **Symptom:** the red session (no Throw installed) passes four rows: no screen before the Throw, the screen gone after a failure (twice), no token sent.
+  **Cause:** each row checked an absence, which holds on a system without the feature; a page row that checked only "a capture was taken" would pass the same way.
+  **Fix:** every row of an absence measures its presence too (the device listed, the screen made for that Throw by the daemon's log, the setup interface asked), and the page rows read the window's caption and the device's own log; the red session then fails every row.
+  **How found:** the red session's rows, read before the green one was trusted.
+- **Symptom:** the daemon's notices never reach anything in the proof's container (`kf.notifications: Failed to notify "The name org.freedesktop.Notifications was not provided"`).
+  **Fix:** a stand-in notification server on the session bus (`tests/loopback/notifications.py`, the Desktop Notifications Specification's four methods) that logs each `Notify`; the rows read what the person would be told.
+- **Symptom:** a chunked message written with pychromecast's generated module cannot carry `continued` or `remaining_length`.
+  **Cause:** pychromecast's `cast_channel_pb2` predates fields 8 and 9 and `CASTV2_1_2`.
+  **Fix:** the test writes those frames by hand from openscreen's proto; the codec moves a joined `payload_binary` to `payload_utf8` for a STRING message.
+
 ## Upstream, as searched on 2026-11-24
 
 - **KDE** (merge requests updated since 2026-10-01 in KWin, KRdp, KPipeWire, xdg-desktop-portal-kde, plasma-workspace): nothing for Cast, network displays or a networked output. Close to the work: KWin 10190 (merged, consumer-picked scale of virtual outputs), 10427 (open, only the creating stream resizes a virtual output), 10355 (merged, screencast plugin ported away from OpenGL, which the next rebase of our screencast patches meets); KRdp 290 (open, drops the zkde_screencast path for the portal only), 275 (open, scale), 239 (open, an audio sink KRdp makes the default, which our design does not do).
@@ -211,3 +312,4 @@ Rows, each red first: the published set has no such output (`kscreen-doctor -o` 
 ## Credits
 
 GNOME Network Displays (Benjamin Berg, Christian Glombek, Anupam Kumar, whose commits brought its Chromecast media factory, and the contributor credited in its NEWS for the Chromecast protocol, @kyteinsky), pychromecast (Paulus Schoutsen, Erik Montnemery), the Open Screen Library (The Chromium Authors; Taesun Yeoum for message chunking), KRdp and KPipeWire (Aleix Pol Gonzalez, Arjen Hiemstra and the KDE contributors), and the edition's phone headset work that made the v7 request.
+For the study of what a device lets the computer set: GHLocalApi (the community documentation of the Google Home local API, `rithvikvibhu/GHLocalApi`), glocaltokens (`leikoilja/glocaltokens`, the route to the local tokens), kaccounts-providers (KDE's Online Accounts providers), and Astra, the edition's partner for Android, whose answer was a lead checked against those sources.

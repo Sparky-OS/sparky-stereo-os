@@ -73,6 +73,12 @@ One job builds all four successors (`screensavers-links-96/build-job.sh`, a tabl
   **Cause:** a roundtrip on the default queue dispatches the toolkit's own events. **Fix:** bind on a queue of your own (`wl_proxy_create_wrapper`, `wl_display_roundtrip_queue`), then move each bound proxy to the default queue (`wl_proxy_set_queue(proxy, NULL)`), or its events (a buffer's `release`) are never dispatched and the fourth frame never shows.
 - **Symptom:** a gl-stereo rebuild stops at "untested layer binary".
   **Not met here, and how it was avoided:** before touching gl-stereo, rebuild its published source unchanged in the builder you will use and compare the layer's SHA-256 with the receipts'; when they are equal, a change that leaves `gl-stereo.c` and its includes alone keeps the receipts (0.4.6 built this way, layer f83c52ca..., no requalification).
+- **Symptom:** the link gate refuses PowerDevil's successor: `sparky-stereo-graphics Depends libqt6gui6 (= 6.11.2+dfsg-5+stereo3d23+lc1) but none of the choices are installable`; with that solved, `previous edition dependency qualification failed; provide the matching previous sibling snapshot` for the published build.
+  **Cause:** Debian's Qt in the archive was newer than ours (6.11.2+dfsg-8), and the gate applies only the pins that a supplied package ships: without the edition's policy package among them APT's candidate is Debian's, and an exact dependency takes the candidate only.
+  **Fix:** put the published `sparky-stereo-apt` among the siblings, and again beside the previous packages (a folder of copies given as `SPARKY_LC_PREVIOUS_DIR`); SparkyLinux's own repository goes into `sources.json`, because the policy package depends on its `sparky-apt`.
+  **Found by:** `case-*/policy-attempts.json` in the gate's scratch (`"enabled": []` before, the two preferences files after) and `apt-cache policy libqt6gui6` in the builder.
+- **Symptom:** a build script stops with "unexpected EOF while looking for matching `'`" at a line that has no quote.
+  **Cause:** an apostrophe inside `"${VAR:?the gate's folder}"`: bash reads a single quote in a parameter expansion's word as the start of a string, also inside double quotes. **Fix:** no apostrophe there; `bash -n` the script before the first run.
 - **Symptom:** the image for a page's build stops with "Packages were downgraded and -y was used without --allow-downgrades".
   **Cause:** the edition's 1001 pin replaces newer Debian builds with ours. **Fix:** `--allow-downgrades` on that install.
 

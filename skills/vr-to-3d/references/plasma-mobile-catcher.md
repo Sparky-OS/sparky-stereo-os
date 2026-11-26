@@ -22,9 +22,7 @@ Use a stock arm64 handset first, then run the same receiver proof with the hands
    Use a Unix QMP socket for `screendump` and a socket-backed serial console, without any GUI on the host.
    Record the start clock, kernel/root readiness, graphical target and first visible Plasma Mobile frame.
    Confirm the process, active session and framebuffer before counting the shell as up.
-5. For the Mobian sunxi image, disable the VM's nonexistent USB-gadget jobs and the upstream image's swap and device waits for this disposable session.
-   If the greeter cannot start with virtual DRM, use greetd's `initial_session` with the image's `startplasmamobile` and guest llvmpipe.
-   Keep graphical provisioning and the phone image in the isolated guest.
+5. For the Mobian sunxi image, disable the VM's nonexistent USB-gadget jobs and the upstream image's swap and device waits for this disposable session. If the greeter keeps exiting, use greetd's `initial_session` with a fresh runfile and the installed Plasma Mobile desktop entry's D-Bus wrapper. The virtual GPU worked with `KWIN_COMPOSE=Q QT_QUICK_BACKEND=software`. Keep graphical provisioning and the phone image in the isolated guest.
 
 ## Exercise the existing KDE Connect route
 
@@ -32,7 +30,7 @@ Set the guest's default RDP handler to the stock KRDC executable with fullscreen
 Pair the one identified phone and one identified rig over the isolated link.
 The KDE Connect object's `requestVirtualMonitor` invokes the same action as **Use device as an external monitor**.
 Record its acceptance, the new KWin output, the receiving process and the first advancing frame on the phone.
-A virtual KWin already has an output before the request, so retain the before and after output lists.
+A virtual KWin already has an output before the request, so retain the before and after output IDs. In authentication-first versions of KRdp, the RDP client starts ahead of the new output. Handle the test server's certificate in the client, then wait for the authenticated session to create its output.
 
 The [upstream KDE Connect plugin](https://github.com/KDE/kdeconnect-kde/blob/master/plugins/virtualmonitor/virtualmonitorplugin.cpp) advertises resolution and scale from its primary screen.
 Its receiver dispatches an RDP URL through the configured scheme handler.
@@ -81,6 +79,8 @@ Use a physical device to qualify hardware decoding, lens alignment and continuou
   The graphical target only confirms its unit transaction.
   Check the greetd journal and framebuffer, then run the installed Plasma Mobile session through greetd on the disposable overlay.
   The virtio GPU lacks the physical phone's device-tree properties. The screenshot showed the missing property and the journal showed the greeter exiting before opening a session.
+- **The installed shell starts slowly and the first capture is black.**
+  KWin, the Xwayland software fallback and the Plasma Mobile startup services finish at different times under TCG. Use the installed desktop entry's D-Bus wrapper, KWin QPainter and Qt Quick's software backend, then check the active shell and a complete frame. The serial samples showed KWin starting before Xwayland, the Plasma service starting near 2½ minutes, and the first framebuffer still black at that point.
 - **The observer misses a target reported by systemd.**
   The serial status lines insert ANSI colour codes around the target name.
   Strip those codes before matching and keep the original log as evidence.
@@ -89,6 +89,22 @@ Use a physical device to qualify hardware decoding, lens alignment and continuou
   The selected KRdp build requires the deb-multimedia epoch of the UPnP library.
   Include the signed multimedia source and keep the edition's packages pinned first.
   The isolated apt solve reported no candidate for the required epoch.
+- **The serial log stops partway through the kernel banner.**
+  The controller connected to the serial socket without consuming output.
+  Drain each socket while the guest writes to it and keep QEMU's serial logfile.
+  Both kernels continued when the controller started reading from the socket.
+- **The desktop guest reaches a login prompt and the debug shell never appears.**
+  A container-export root runs `console-getty.service` on the desktop guest's serial console.
+  Give that service a shell override only on the disposable rig disk.
+  The serial log identified the getty unit and the prepared disk reached a root prompt.
+- **Configuring the phone link fails with `ip: command not found`.**
+  The image's minimal installation omits iproute2.
+  Include it in the offline apt closure and install that closure before configuring the virtual NIC.
+  The virtio driver logged the NIC renaming while the guest script failed on the missing executable.
+- **Setting the RDP handler fails with `xdg-mime: No such file or directory`.**
+  The image omits xdg-utils.
+  Write the test user's `mimeapps.list` directly and refresh KDE's service cache.
+  The serial log showed the stock client packages had installed successfully before the handler command failed.
 - **The staged KWin source reaches the arm64 dependency check and exits before compilation.**
   The studied archive supplies Stereo Policy development libraries for amd64.
   Provision the arm64 build dependency and matching Plasma/Qt stack before retrying.

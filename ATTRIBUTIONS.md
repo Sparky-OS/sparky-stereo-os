@@ -202,6 +202,8 @@ By name, the Debian maintainers of the packages we carry with our patches, as th
 - The distribution this edition belongs to: a Debian-based system that follows Debian closely, ready to use out of the box, with its own repositories, keyring and tools.
 - **sparkybackup**, which makes a live ISO from a running system: the way Sparky builds its images, and the way this edition will build its own.
 - The Sparky look: the Plymouth theme `sparky-lines`, Daniel's edit of the theme of Debian 8 "Jessie", with his own background and Sparky logo; the edition's SPARKYOS / POWERED BY DEBIAN / STEREO 3D EDITION wordmark is built from that logo's exact pixels (provenance in section 12).
+- That theme's background without its logo (**Juliette Taka Belin** and **Aurélien Couderc**'s Debian 8 "Jessie" lines theme, edited by Paweł and Daniel) is also the background of Kubabbar Glass's loading screen, which shows the Sparky logo of the edition's artwork package where it is installed.
+- Daniel's Sparky Black look (2019, "a simple mix of various themes, glowglass + oxygen"): its Plasma style's translucency levels are the ones both stereo looks carry, Sparky Stereo Oxygen and Kubabbar Glass (queue row 125).
 
 **Paweł "pavroo" Pijanowski**, the creator and maintainer of SparkyLinux:
 - Built SparkyLinux and has kept it going, year after year, as a free and community-minded Debian derivative.

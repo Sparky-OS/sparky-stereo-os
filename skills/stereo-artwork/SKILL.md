@@ -69,6 +69,7 @@ Written on 2026-10-14, when the edition took two default looks: Oxygen, and a cl
 - **Tell the creators.** The people who made a look are the right ones to see what we do with it and to help: one short note each, in their own venue (an issue on their repository, a message on their store page).
 - **The glass is KWin's Translucency effect, plain alpha with no blur.** In KWin 6 its id is `translucency`: `[Plugins] translucencyEnabled=true` and `[Effect-translucency]`. The old `kwin4_effect_translucency` names are ignored without a warning. The edition's values: inactive windows and dialogs at 91 %, full-screen windows opaque so a film on one screen does not fade when the mouse moves to another. Check a running session with `qdbus6 org.kde.KWin /Effects org.kde.kwin.Effects.isEffectLoaded translucency`.
 - **On a stereo desktop the glass meets the depth rules:** sunk inactive windows and floating dialogs are the translucent ones, so the layers read as glass at their depths; on a 2D screen the look renders as it always did.
+- **A look's translucency is numbers in its Plasma style's SVGs**, per surface and per panel edge, plus KWin's window values. To carry one look's levels into another, measure them as KSvg draws them and in a real login, write them into the other look's generator, keep its Opaque variants, and bring its texts back to 4.5:1 over the new surfaces: [a look's translucency, measured and transplanted](references/look-translucency.md) (the recipe, the scripts, Sparky Black's levels and the traps).
 
 ## Deliverables
 

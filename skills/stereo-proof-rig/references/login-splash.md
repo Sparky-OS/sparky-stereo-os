@@ -70,3 +70,34 @@ A rig bootstrap can create a preference or source file without installing its ow
 Installing that package later with confold correctly preserves the local file, which can hide a new distributor default from the test.
 For an upgrade proof install the actual published predecessor first, check that its shipped pin is unmodified, then upgrade it.
 Keep the local frozen source separate or use apt's Dir::Etc::sourceparts override for an isolated policy query.
+
+## A theme's loading screen with the logo optional and the system's name from os-release (queue row 125)
+
+Kubabbar Glass's loading screen shows the Sparky logo only where the edition's artwork package installs it (`/usr/share/pixmaps/sparkyos.png`), the theme's name, and the system's name and version read from the running system, so a distribution without the logo shows the theme's name in its place.
+
+- **The system's name** comes from KCoreAddons' `KOSRelease` singleton (`import org.kde.coreaddons`, KF 6.11 and later): `KOSRelease.name` and `KOSRelease.version`. QML's XMLHttpRequest cannot read a local file unless the process sets `QML_XHR_ALLOW_FILE_READ`, which KSplash does not.
+  When neither `/etc/os-release` nor `/usr/lib/os-release` can be read, `KOSRelease` gives the specification's defaults (name `Linux`, id `linux`, pretty name `Linux`, no version) and has no flag that says so (an upstream TODO in `src/lib/util/kosrelease.cpp`): treat exactly those defaults as "not read" and show the theme's name alone.
+- **A logo at another package's path:** an `Image` whose `visible` follows `status === Image.Ready`, inside a `Column`, which closes the gap when the file is missing (Qt logs one "Cannot open" line). A one-colour white logo on a light window is drawn with `MultiEffect { colorization: 1.0; colorizationColor: TEXT }` (measured on the capture: 46,51,43 on the window's 205,205,202).
+- **The boot splash's background** keeps its shape: `fillMode: Image.PreserveAspectCrop`, the boot splash's own cover rule (sparky-stereo-plymouth `gen-theme.py`).
+- **Depth:** one `StereoDepth.depth` on the window; the logo, the texts and the boxes inside it follow it undeclared; the background is undeclared and stays at the screen.
+- **The look package Depends on every QML module the splash imports** (`qml6-module-qtquick`, `qml6-module-qtquick-effects`, `qml6-module-org-kde-coreaddons`, `libstereo-layer1`): a module that fails to load leaves KSplash with its fallback package or nothing.
+
+The cases, each a fresh login with `RUN_MOUNTS` (read only):
+
+| Case | Mount |
+|---|---|
+| no logo | an empty folder over the logo's folder |
+| another system | a file over `/etc/os-release` |
+| os-release unreadable | a file of mode 000 owned by the run's user over both `/etc/os-release` and `/usr/lib/os-release`: a reader that is not root gets EACCES and `KOSRelease` logs "Failed to open os-release file!" |
+| before the packages exist | the clone's theme folders over the installed ones |
+
+`CARD=nvidia RENDER_GROUP=N` runs KWin on the NVIDIA card through CDI and the session's programs on Mesa's software renderer, for a station whose AMD card drives the person's screens.
+
+[`splash_regions.py`](../scripts/login-splash/splash_regions.py) `PLAIN PAIR window|middle POPPED OUT.json` finds the window (or the middle of a look without one) in the plain capture, writes the regions for `measure-regions.py` (the window's left and top border edges, the logo and name; the middle and the top strip) with the predicted disparity, and prints how many pixels differ between the eyes outside it (the background at the screen: 0 expected).
+
+Measured on Kubabbar Glass 20261126 in fresh 1920x1080 logins (right minus left, device pixels): the window, its logo and its name at -4 with the person's popped limit unsaved (KWin's default 4), -8 at a popped limit of 8, -4 at 125 % and 150 %; the menu bar look's middle at -4 and its strip at 0; no vertical difference; outside the window 0 of about 1.9 million pixels differ between the eyes.
+
+Traps:
+
+- **Symptom:** `measure-regions.py` stops with "operands could not be broadcast together" for a strip at the top of the screen. **Cause:** it searches three rows above the box, and the box started at row 0. **Fix:** start the box at row 4.
+- **Symptom:** `bash -n` stops on a script at the end of a file. **Cause:** an apostrophe inside `${VAR:?message}` again (this page's earlier trap). **Fix:** a message without one.

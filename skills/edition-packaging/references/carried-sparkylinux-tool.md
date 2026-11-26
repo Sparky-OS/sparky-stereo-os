@@ -4,6 +4,7 @@ A recorded edition decision may authorize a stereo version of an unchanged packa
 Keep the original published package and source pinned by version, revision, URL and SHA256; never rewrite the upstream archive.
 For the display-name decision, sparky-about 0.1.49 and sparky-system 0.1.9 become +stereo3d1+lc1.
 This permission covers one OSCODE assignment in each tool, not a general rewrite or an upstream submission.
+A second recorded decision, the edition's own browser as the default, puts `sparky-stereo-browser` first in sparky-about's Recommends (0.1.49+stereo3d2+lc1) through the builder's optional `recommendsFirst` field in `upstream.json`; every upstream alternative stays after it, and a recipe without the field builds as before ([publication round](publication-round.md#a-recommends-with-alternatives-that-leave-out-the-editions-own-provider)).
 
 ## Recipe
 

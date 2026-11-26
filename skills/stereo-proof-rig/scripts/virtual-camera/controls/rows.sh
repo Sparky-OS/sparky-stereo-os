@@ -145,42 +145,61 @@ row_before_upgrade() {
 	row red-reproduced-0.1.2-two-problems $? "apply: $(echo "$out" | tr '\n' '|'); problems: [$p]"
 	sparky-stereo-problems list | head -8 >"$RUN/problems-0.1.2.txt"
 	echo "$idT $idI" >"$RUN/imac-ids"
-	# the A10: a reset saves sharpness at the clamped default (100) and the moving temperature
+	# the A10 as the main session ran it (2026-11-26): automatic white balance off, the temperature 3000, automatic on again; then a
+	# reset (sharpness to the clamped default 100). The store holds the person's 3000, and the next plug-in refuses it with a problem.
 	replug 31 cam-a10 "EasyCamera"
+	CLI control cam-a10 white_balance_automatic 0
+	CLI control cam-a10 white_balance_temperature 3000
+	CLI control cam-a10 white_balance_automatic 1
 	CLI reset cam-a10
 	s=$(store EasyCamera)
 	echo "$s" >"$RUN/store-a10-0.1.2.json"
-	echo "$s" | jq_ "sorted(d['names'].values())" | grep -q "'sharpness'"
-	row red-reproduced-0.1.2-a10-reset-saves-sharpness $? "store: $s"
+	echo "$s" | jq_ "d['controls'].get('$(cid cam-a10 white_balance_temperature)')=='3000' and 'sharpness' in d['names'].values()" | grep -q True
+	row red-reproduced-0.1.2-a10-store-holds-3000-and-sharpness $? "store: $s"
+	replug 31 cam-a10 "EasyCamera"
+	out=$(CLI apply cam-a10 2>&1)
+	p=$(problems EasyCamera)
+	[ "$(echo $p | wc -w)" = 1 ]
+	row red-reproduced-0.1.2-a10-temperature-refused-with-a-problem $? "apply: $(echo "$out" | grep -v journal | tr '\n' '|'); problems: [$p]"
 }
 
 row_after_upgrade() {
-	local idT idI s out rc p
+	local idT idI s out rc p idT10
 	read -r idT idI <"$RUN/imac-ids"
 	# the unit applies the saved choice when the camera appears (at login it is already there): the same call
 	replug 30 cam-imac "FaceTime HD Camera"
 	out=$(CLI apply cam-imac 2>&1)
 	rc=$?
 	echo "$out" >"$RUN/apply-after-upgrade.txt"
-	row upgrade-apply-succeeds $rc "exit $rc: $(echo "$out" | tr '\n' '|')"
+	row upgrade-apply-succeeds $rc "exit $rc: $(echo "$out" | grep -v journal | tr '\n' '|')"
 	s=$(store FaceTime)
 	echo "$s" >"$RUN/store-after-upgrade.json"
-	echo "$s" | jq_ "'$idT' not in d['controls'] and '$idI' not in d['controls'] and d.get('version')=='2' and '$(cid cam-imac brightness)' in d['controls']" | grep -q True
-	row upgrade-store-cleaned-once $? "store: $s"
-	echo "$out" | grep -q "removed the saved value .* of white_balance_temperature" && echo "$out" | grep -q "removed the saved value of iris_relative"
-	row upgrade-each-removal-logged $? "$(echo "$out" | grep removed | tr '\n' '|')"
+	echo "$s" | jq_ "'$idT' in d['controls'] and '$idI' not in d['controls'] and d.get('version')=='2' and '$(cid cam-imac brightness)' in d['controls']" | grep -q True
+	row upgrade-imac-temperature-kept-iris-removed $? "store: $s"
+	echo "$out" | grep -q "removed the saved value 88 of iris_relative: not a setting: a motion control" && echo "$out" | grep -q "white_balance_temperature is inactive now; its saved value 5547 waits for it"
+	row upgrade-journal-says-only-what-is-known $? "$(echo "$out" | grep -E 'removed|inactive now' | tr '\n' '|')"
+	echo "$out" | grep -q "saved while the control was inactive"
+	[ $? != 0 ]
+	row upgrade-journal-no-unmeasured-claim $? "no line says a value was saved while inactive"
 	p=$(problems FaceTime)
 	[ -z "$p" ]
 	row upgrade-problems-cleared $? "problems: [$p]"
 	out=$(CLI apply cam-imac 2>&1)
 	echo "$out" | grep -q removed
 	[ $? != 0 ]
-	row upgrade-cleaned-only-once $? "second apply: $(echo "$out" | tr '\n' '|')"
+	row upgrade-cleaned-only-once $? "second apply: $(echo "$out" | grep -v journal | tr '\n' '|')"
+	# the A10's case: the person's 3000 kept and waiting, the sharpness at the default removed, no problem
+	idT10=$(cid cam-a10 white_balance_temperature)
 	replug 31 cam-a10 "EasyCamera"
 	out=$(CLI apply cam-a10 2>&1)
+	rc=$?
 	s=$(store EasyCamera)
-	echo "$s" | jq_ "'sharpness' not in d['names'].values() and 'white_balance_temperature' not in d['names'].values() and d.get('version')=='2'" | grep -q True
-	row upgrade-a10-entry-cleaned $? "store: $s; $(echo "$out" | grep removed | tr '\n' '|')"
+	echo "$s" >"$RUN/store-a10-after-upgrade.json"
+	echo "$s" | jq_ "d['controls'].get('$idT10')=='3000' and 'sharpness' not in d['names'].values() and d.get('version')=='2'" | grep -q True && [ "$rc" = 0 ] && [ -z "$(problems EasyCamera)" ]
+	row upgrade-a10-manual-temperature-kept-waiting $? "exit $rc; store: $s; problems [$(problems EasyCamera)]; $(echo "$out" | grep -E 'removed|inactive now' | tr '\n' '|')"
+	out=$(CLI control cam-a10 white_balance_automatic 0 2>&1)
+	[ "$(cval cam-a10 white_balance_temperature)" = 3000 ] && store EasyCamera | jq_ "d['controls'].get('$idT10')" | grep -qx 3000
+	row upgrade-a10-temperature-applies-when-active-again $? "after automatic white balance off: temperature $(cval cam-a10 white_balance_temperature); $(echo "$out" | tr '\n' '|')"
 }
 
 row_refusal() {
@@ -416,6 +435,126 @@ row_who() {
 	who_gets saved "YUYV 1280x720"
 }
 
+row_a10manual() {
+	# 0.1.3's own rule on the A10's case: a manual temperature set while the control was active is kept, waits under automatic
+	# white balance without a problem, and is set again as soon as automatic white balance is off (command and page)
+	clear_all
+	replug 31 cam-a10 "EasyCamera"
+	local idT idW s out rc
+	idT=$(cid cam-a10 white_balance_temperature)
+	idW=$(cid cam-a10 white_balance_automatic)
+	CLI control cam-a10 white_balance_automatic 0
+	CLI control cam-a10 white_balance_temperature 3000
+	CLI control cam-a10 white_balance_automatic 1
+	s=$(store EasyCamera)
+	echo "$s" | jq_ "d['controls'].get('$idT')=='3000'" | grep -q True
+	row a10-manual-temperature-saved-while-active-is-kept $? "store: $s"
+	replug 31 cam-a10 "EasyCamera"
+	out=$(CLI apply cam-a10 2>&1)
+	rc=$?
+	[ "$rc" = 0 ] && [ -z "$(problems EasyCamera)" ] && echo "$out" | grep -q "white_balance_temperature is inactive now; its saved value 3000 waits for it"
+	row a10-manual-temperature-waits-without-a-problem $? "exit $rc; $(echo "$out" | grep -v journal | tr '\n' '|') problems [$(problems EasyCamera)]"
+	CLI control cam-a10 white_balance_automatic 0 >"$RUN/a10-active-again.txt" 2>&1
+	[ "$(cval cam-a10 white_balance_temperature)" = 3000 ]
+	row a10-manual-temperature-applies-when-active-again $? "temperature after automatic off: $(cval cam-a10 white_balance_temperature); $(tr '\n' '|' <"$RUN/a10-active-again.txt")"
+	CLI control cam-a10 white_balance_automatic 1 >/dev/null 2>&1
+	replug 31 cam-a10 "EasyCamera"
+	KCM load current=cam-a10 "set=$idW:0" controls | grep '^controls' | cut -d' ' -f2- | python3 -c "
+import json,sys
+t={c['name']:c for c in json.load(sys.stdin)}['white_balance_temperature']
+print('inactive', t['inactive'], 'value', t['value']); sys.exit(0 if (not t['inactive'] and t['value']==3000) else 1)" >"$RUN/page-a10-active-again.txt"
+	row page-a10-temperature-applies-when-active-again $? "$(cat "$RUN/page-a10-active-again.txt")"
+}
+
+row_sentence() {
+	clear_all
+	replug 33 cam-modes "Virtual camera modes"
+	local en pt
+	en=$(QT_QUICK_BACKEND=software KCM load followers "grab=$RUN/page-en.png" | grep -E '^(followers|grab)' | tr '\n' '|')
+	echo "$en" | grep -q "follow this default camera; they choose their own picture size and frame rate" && echo "$en" | grep -q "grab .* saved"
+	row sentence-on-the-page-english $? "$en"
+	pt=$(LANGUAGE=pt_BR LANG=pt_BR.UTF-8 LC_ALL=pt_BR.UTF-8 QT_QUICK_BACKEND=software KCM load followers "grab=$RUN/page-pt_BR.png" | grep -E '^(followers|grab)' | tr '\n' '|')
+	echo "$pt" | grep -q "seguem esta câmera padrão; eles escolhem o próprio tamanho de imagem" && echo "$pt" | grep -q "grab .* saved"
+	row sentence-on-the-page-portuguese $? "$pt"
+}
+
+row_notfound() {
+	# every verb that takes a NAME, for a camera that is not there: said, never answered
+	clear_all
+	local cmd out rc bad="" took start
+	for cmd in "formats cam-absent" "best cam-absent" "mode cam-absent" "controls cam-absent" "control cam-absent brightness" "reset cam-absent" \
+		"save cam-absent" "packing cam-absent mono" "apply cam-absent" "default cam-absent"; do
+		start=$(date +%s%N)
+		# shellcheck disable=SC2086
+		out=$(CLI $cmd 2>&1)
+		rc=$?
+		took=$((($(date +%s%N) - start) / 1000000))
+		if [ "$rc" = 0 ] || ! echo "$out" | grep -q "No camera called cam-absent is present."; then bad="$bad [$cmd: exit $rc: $(echo "$out" | head -c 80)]"; fi
+		echo "$cmd: exit $rc after $took ms: $out" >>"$RUN/notfound.txt"
+	done
+	[ -z "$bad" ]
+	row notfound-every-verb-says-so $? "${bad:-10 verbs exit non-zero with the sentence; times in notfound.txt}"
+}
+
+row_restart() {
+	# the camera's node is made again while a command asks for it: the command waits for PipeWire's answer instead of saying nothing
+	clear_all
+	replug 33 cam-modes "Virtual camera modes"
+	unplug 33 cam-modes
+	# a pw-dump in front of the real one for this row only, so the node comes back only after the command has asked PipeWire once
+	mkdir -p "$RUN/bin-restart"
+	printf '#!/bin/sh\necho "$$" >>"%s/pw-dump-calls.log"\nexec /usr/bin/pw-dump "$@"\n' "$RUN" >"$RUN/bin-restart/pw-dump"
+	chmod +x "$RUN/bin-restart/pw-dump"
+	rm -f "$RUN/pw-dump-calls.log"
+	(PATH=$RUN/bin-restart:$PATH CLI formats cam-modes >"$RUN/restart-formats.json" 2>"$RUN/restart-formats.err"; echo $? >"$RUN/restart-formats.rc") &
+	local pid=$! rc n
+	waitfor 20 test -s "$RUN/pw-dump-calls.log"
+	plug 33 cam-modes "Virtual camera modes"
+	wait "$pid"
+	echo "pw-dump calls by the command: $(wc -l <"$RUN/pw-dump-calls.log")" >>"$RUN/restart-formats.err"
+	rc=$(cat "$RUN/restart-formats.rc")
+	n=$(python3 -c "import json,sys; print(sum(len(f['sizes']) for f in json.load(open(sys.argv[1]))))" "$RUN/restart-formats.json" 2>/dev/null)
+	[ "$rc" = 0 ] && [ "$n" = 7 ]
+	row restart-command-waits-for-the-node $? "exit $rc, $n sizes; $(head -c 120 "$RUN/restart-formats.err")"
+}
+
+row_gone() {
+	# PipeWire lists the camera, its device opens and does not answer (going away or still starting): said, never an empty answer
+	clear_all
+	replug 33 cam-modes "Virtual camera modes"
+	touch "$VCAM_ROOT/video33.gone"
+	local v out rc bad=""
+	for v in formats mode controls best; do
+		out=$(CLI "$v" cam-modes 2>&1)
+		rc=$?
+		echo "$v: exit $rc: $out" >>"$RUN/gone.txt"
+		if [ "$rc" = 0 ] || ! echo "$out" | grep -q "is not connected any more"; then bad="$bad [$v: exit $rc: $(echo "$out" | tr '\n' ' ' | head -c 80)]"; fi
+	done
+	rm -f "$VCAM_ROOT/video33.gone"
+	out=$(CLI formats cam-modes 2>&1)
+	rc=$?
+	[ -z "$bad" ] && [ "$rc" = 0 ]
+	row gone-device-said-not-answered-empty $? "${bad:-formats, mode, controls and best exit non-zero with the sentence}; answering again: exit $rc"
+}
+
+row_retry() {
+	# the unit meets a camera whose device does not answer yet: it tries again at its next pass, and applies when it answers
+	clear_all
+	unplug 33 cam-modes
+	touch "$VCAM_ROOT/video33.gone"
+	plug 33 cam-modes "Virtual camera modes"
+	LD_PRELOAD=$SHIM sparky-stereo-camera watch >"$RUN/retry-watch.log" 2>&1 &
+	local pid=$! m
+	waitfor 20 grep -q "camera cam-modes:" "$RUN/retry-watch.log"
+	rm -f "$VCAM_ROOT/video33.gone"
+	waitfor 20 sh -c "LD_PRELOAD=$SHIM sparky-stereo-camera mode cam-modes 2>/dev/null | grep -q '\"width\": 2592'"
+	m=$(modeof cam-modes)
+	kill "$pid" 2>/dev/null
+	wait "$pid" 2>/dev/null
+	[ "$m" = "MJPG 2592 1944 15" ]
+	row retry-unit-applies-once-the-device-answers $? "mode $m; $(grep cam-modes "$RUN/retry-watch.log" | tr '\n' '|' | head -c 300)"
+}
+
 case $PHASE in
 stop)
 	. "$ENVFILE" 2>/dev/null
@@ -440,6 +579,6 @@ esac
 start_session
 PLUGIN=$(dpkg -L sparky-stereo-camera | grep 'kcm_sparkystereo_camera.so$')
 echo "== $(date -u +%FT%TZ) phase $PHASE, sparky-stereo-camera $(dpkg-query -W -f='${Version}' sparky-stereo-camera), plugin $PLUGIN" | tee -a "$ROWS"
-[ $# = 0 ] && set -- imac refusal flags cluster a10 modes page vaio watch who
+[ $# = 0 ] && set -- imac refusal flags cluster a10 a10manual modes page sentence vaio watch notfound restart gone retry who
 for r in "$@"; do "row_$r"; done
 echo "== $(date -u +%FT%TZ) done: $(grep -c '^PASS' "$ROWS") PASS, $(grep -c '^FAIL' "$ROWS") FAIL, $(grep -c '^GAP' "$ROWS") GAP" | tee -a "$ROWS"

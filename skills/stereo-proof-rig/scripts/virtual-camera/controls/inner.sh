@@ -25,6 +25,7 @@ for n in 30 31 32 33 34 35; do ln -sf "/nonexistent-camera-$n" "/dev/video$n"; d
 case $MODE in
 red | upgrade) install_deb /deb012/sparky-stereo-camera_0.1.2+lc1_amd64.deb ;;
 green) install_deb "$(ls /deb013/sparky-stereo-camera_0.1.3+lc1_amd64.deb)" ;;
+prev) install_deb "$(ls /debprev/sparky-stereo-camera_0.1.3+lc1_amd64.deb)" ;;
 esac
 if [ "$MODE" = upgrade ]; then
 	as_user bash /rig/rows.sh before-upgrade

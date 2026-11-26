@@ -17,6 +17,7 @@
 //       inactive readonly writeonly volatile update slider grabbed exec layout dynarray whichminmax disabled (the V4L2 flag),
 //       master=NAME:MANUAL (inactive while NAME is not MANUAL; a set then answers EACCES, as uvc_ctrl_is_accessible),
 //       auto=N (the reading while inactive under its master: the value the automatic mode chose; it moves by itself)
+// $VCAM_ROOT/videoN.gone makes the camera answer ENODEV to every ioctl but QUERYCAP (going away or still starting)
 #define _GNU_SOURCE
 #include <dlfcn.h>
 #include <errno.h>
@@ -373,6 +374,14 @@ int ioctl(int fd, unsigned long req, ...)
     if (getenv("VCAM_TRACE") && d) fprintf(stderr, "vcam: ioctl %lx\n", req);
     if (!d)
         return real_ioctl(fd, req, arg);
+    // $VCAM_ROOT/videoN.gone: the camera is going away or still starting (a USB reset): it opens and answers QUERYCAP, and every
+    // other ioctl answers ENODEV, as uvcvideo does for a device marked disconnected
+    char gone[512];
+    snprintf(gone, sizeof gone, "%s/video%d.gone", getenv("VCAM_ROOT"), d->num);
+    if (req != VIDIOC_QUERYCAP && access(gone, F_OK) == 0) {
+        errno = ENODEV;
+        return -1;
+    }
     switch (req) {
     case VIDIOC_QUERYCAP: {
         struct v4l2_capability *c = arg;

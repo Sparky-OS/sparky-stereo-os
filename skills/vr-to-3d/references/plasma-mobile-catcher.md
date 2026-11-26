@@ -303,3 +303,23 @@ KRDC's RDP view credits Arend van Beelen jr., Urs Wolfer and AceLan Kao.
 Plasma Mobile's startup file names Aleix Pol, Bhushan Shah and Jonah Brüchert.
 The FreeRDP H.264 backend names Marc-André Moreau and Mike McDonald.
 The receiver also builds on Bastien Nocera's iio-sensor-proxy, the Mobian team and Fabrice Bellard and the QEMU contributors.
+
+## Verify the Flat Headset presentation
+
+Build the renderer against the same recorded Flat Headset source as the handset. For the fitted Shinecon profile, compare every rendered pixel with Android's original fragment shader under software EGL and exercise both orientations of the source texture. Repeat at the rig's panel raster and at two wider display rasters.
+
+For a viewer QR profile, parse the full Cardboard `DeviceParams` URL and derive the projection from the screen's actual physical width and height. Compare the software rasterizer with GLES drawing the corresponding Cardboard mesh. Cover the blocked areas as well as the visible pixels. For uncorrected, compare input and output bytes. Counterchecks use a different viewer's data, a changed fitted coefficient and optical correction before fitting.
+
+Fit the two full eyes into equal panel halves. Apply optics to the fitted panel, and clamp each optical sample to its own eye. Apply the same camera-cutout mask to each edge of each eye and draw the centre line and arrow on top. Keep the display guide out of the fit comparison. The guide should remain straight under both optical profiles.
+
+Encode a chart with solid marks using H.264 under the actual wire dimensions. Ask the decoder for its pixels and predict the destination rectangles independently for both eyes. Compare the entire output with tolerance zero. Shift one eye by a single pixel and mask one extra edge pixel in separate controls. The larger boundary heuristic from a live colour-gradient chart is useful to bring up the rig. The encoded comparison is the geometric gate.
+
+Read the Android waiting catalogue and use its named local files. Require PNG `sTER` mode 1 for the still and left-first side-by-side stereo metadata for the movie. Motion uses the hardware-only branch, and Reduce motion selects the still directly. Check separate connecting and reconnect clips, loop restart and the first desktop frame ending the wait. The original `e90e0194` release catalogue is empty. The Android debug scene files provide marked inputs without manufacturing production artwork.
+
+### Traps from the presentation proof
+
+- **The Cardboard comparison rejects four pixels.** The inclusive software triangles and GLES use different ownership at a raster edge. Inspect the coordinates and require all disagreements in coverage within one pixel of that edge. Keep the one-level RGB bound on every pixel covered by both renderers. Keep the full-resolution fit comparison exact.
+- **The H.264 file decodes no frame and FFmpeg reports “File exists”.** The original chart command declared stereo both in Matroska and the H.264 packing SEI. On the tested FFmpeg 9 graph the two marks collide. The chart only needs one mark, so declare it once through Matroska stream metadata. Confirm the single left-first side datum with ffprobe before running the pixel checks.
+- **The standalone renderer proof passes and the Catch app fails to compile.** The KDE project applies `-fno-exceptions`. The carried profile parser and Cardboard inverse rejection use exceptions on invalid data. Enable exceptions on those C++ source files and the one caller that catches the error. Rebuild the actual Catch target with `WITH_CATCH=ON`.
+- **A decoder error arrives even though the scene has the correct stereo mark.** The isolated rig provides no video-decoder device. Confirm the decoded still and that the marked clip reaches the hardware availability check. Use an explicitly injected proof decoder to measure loop behavior in a disposable process. The release should explain the missing hardware without picking the still automatically.
+- **The locale patch applies to the earlier reference folder and fails when quilt reapplies the accepted source.** The row 927 source ends each catalogue with the first-picture notice. Use that appended message as context and verify all nine translated catalogues with `msgfmt -c` after extracting the exact new descriptor.

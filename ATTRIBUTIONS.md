@@ -359,7 +359,7 @@ He wrote to **Vadim Asadov**, CEO of iZ3D, the San Diego company behind the 22" 
 Vadim answered the business case honestly, and then **gifted Daniel a full "iZ3D All Outputs" licence** (2 February 2011).
 That licence is how Max Payne played in anaglyph stereo on an ordinary monitor, years before Daniel touched a 3D television, and it is where this edition began.
 
-After iZ3D closed, Vadim and his team gave the driver's source to the community under the MIT licence, kept at [bo3b/iZ3D](https://github.com/bo3b/iZ3D) by **Bo3b Johnson**, and carried forward by [wiz3D](https://github.com/effcol/wiz3D) (**Eff**, effcol).
+After iZ3D closed, Vadim and his team gave the driver's source to the community under the MIT licence, kept at [bo3b/iZ3D](https://github.com/bo3b/iZ3D) by **Bo3b Johnson**, and carried forward by [wiz3D](https://github.com/Stereopticon-Org/wiz3D) (**Eff**, effcol).
 Daniel owes Vadim one, and says so here, by name.
 
 ### 1.2 Joe Penna

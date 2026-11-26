@@ -2,6 +2,7 @@
 
 **For anyone who changes what an installed system does at its first start, or what it installs for hardware:** how to decide Secure Boot from the firmware, a signing step that does nothing where nothing needs a signature, a vendor driver only where its card is, a known machine's firmware table and masked event as table entries, and how each was proved without the machine.
 Written 2026-11-25 from five breakage rows found on two installed Intel Macs (a MacBookPro9,2 and an iMac14,1).
+Extended 2026-11-26 after a real machine (an AMD laptop with i386 enabled) showed a driver removal that installed a package of another architecture: an apt plan is judged by every kind of line (step 8).
 Nothing in it was run on those machines: what only they can show is listed at the end.
 
 ## Working recipe
@@ -31,8 +32,9 @@ Nothing in it was run on those machines: what only they can show is listed at th
 4. **A vendor's driver only where its card is, settled once.**
    The image carries the driver so a machine with the card works at once; a machine without it is settled at its first start, not in the installer (one step then also serves machines already installed, and a disk started on another computer).
    - Read the bus from sysfs: a PCI device with `vendor` 0x10de and `class` 0x03xxxx. The HDMI audio function of a card (class 0x0403) is not a card. A bus that cannot be read is not "no card".
-   - Purge the driver's own packages by name (the driver, its modules, its locks and repository package), reading apt's plan first: a plan that would take anything that is not the vendor's, or a vendor package the person installed by name, removes nothing and is kept as a problem that names the package.
-   - Then purge what is left of the driver: installed, the vendor's by name, installed automatically, and removable alone. Do not count on `apt autoremove`'s list (see the traps). Never run an autoremove.
+   - Purge the driver's own packages by name (the driver, its modules, its locks and repository package), reading apt's plan first, every kind of line (step 8): a plan that would take anything that is not the vendor's, or a vendor package the person installed by name, or would install anything at all, removes nothing and is kept as a problem that names the package.
+   - Then purge what is left of the driver: installed, the vendor's by name, installed automatically, and removable alone, which means its plan alone takes only the vendor's packages and installs nothing (a package whose removal would install something stays, and nothing is said). Do not count on `apt autoremove`'s list (see the traps). Never run an autoremove.
+   - Tell the person what left, counted by name: the installed list (`dpkg-query -W -f '${binary:Package}'`) before against after, never the number of installed packages, in which one that left and one that came cancel out.
    - Keep the firmware the free driver needs, so a card that appears has a picture at once.
    - Do it once (a mark), record the cards seen, and after that remove nothing: a card that leaves takes nothing with it.
    - A card present with no driver at that first settling is left alone, and that is right only because the image always installs the driver: its absence is then the person's doing. An image that did not carry the driver would have to install it there.
@@ -49,6 +51,13 @@ Nothing in it was run on those machines: what only they can show is listed at th
    Prove it with `systemd-analyze critical-chain multi-user.target` on a first start, never by reading the unit files.
 7. **Name the boot option file so it is read last.**
    `grub-mkconfig` reads `/etc/default/grub.d/*.cfg` in the shell's order. A file that adds an option only when it is not on the line yet must come after any file a person made by hand, which appends without looking: `zz-NAME.cfg`, not `40-NAME.cfg`.
+8. **Judge an apt plan by every kind of line, never by one kind or by its exit status.**
+   - Simulate first (`apt-get -s`, with `-o Debug::NoLocking=true` where another apt run may hold the locks) and read the `Inst`, `Remv` and `Purg` lines.
+   - A purge plan may remove only what it is for and install nothing. An `Inst` line in a purge is a package of another architecture coming in, or an alternative of a dependency taking the purged package's place.
+   - An install plan installs what it needs and may remove only the vendor's own packages (NVIDIA's `nvidia-kernel-support` stands in for Debian's `nvidia-detect`, for one). A plan for libraries removes nothing at all, and the real installation runs with `--no-remove` as the second guard (apt-get(8): "If any packages are to be removed apt-get immediately aborts without prompting"): `apt-get -y` removes without asking.
+   - Read an `Inst` line with its architecture: apt names a foreign package `NAME:ARCH` and puts every line's architecture last, `(VERSION ORIGIN [ARCH])`.
+   - A step with no simulation at all (a purge of a lock, an installation run by hand) gets one.
+9. **Say what a failure really was.** An installation that failed at its download leaves apt and dpkg in order: `dpkg --audit` is empty and apt printed `E: Failed to fetch` and `E: Unable to fetch some archives`. Say "the download failed: check the connection, then Repair". Keep "apt and dpkg may be half done" for a run that stopped inside dpkg, when `dpkg --audit` names something.
 
 ## Proving it without the machine
 
@@ -65,6 +74,15 @@ Nothing in it was run on those machines: what only they can show is listed at th
   Measure a start by when `multi-user.target` was reached (`systemctl show -p ActiveEnterTimestampMonotonic`), in pairs, published against new, alternated, with the host's load written at each; "Startup finished" also counts background jobs and is not what a person waits for.
 - **A firmware table:** `-smbios type=1,product=MODEL` gives the DMI name (double a comma: `MacBookPro9,,2`), and `-acpitable file=X.aml` adds a table that does what the faulty method does. A device with a method `_INI` that does the `Notify` to the missing name gives the same two lines the real machine logs, `ACPI BIOS Error (bug): Could not resolve symbol [...], AE_NOT_FOUND` and `ACPI Error: Aborting method ... due to previous error`; with the package's table in the early archive (built exactly as the hook builds it) both are gone and the upgrade line is there.
 - **A window and its button, in the guest:** Xvfb, the program started as a person starts it (root, the language from a locale file), a wait for the drawn dialog and not for the first window of its class (see the traps), a picture before the click and one after, the click at the place an earlier picture of the same screen size and language shows; the same switch from a person's account through polkit, refused without an authorization and done with a rule that answers yes for that one action and that one account, standing for the agent. Look at the pictures: a long sentence cut at the window's edge shows only there.
+- **A real machine's state, in a guest:** build it from the published guest with the network, then start it without one. For the A10's: i386 enabled (Steam's or the person's), the vendor's driver removed by hand except what that machine kept, Debian's `glx-diversions`, `glx-alternative-mesa` and `update-glx` (left by a Debian NVIDIA driver installed once: a package in config-files state, `nvidia-support`, is the trace).
+  Put the foreign copy apt would fetch (`apt-get download nvidia-installer-cleanup:i386`) in the guest's apt cache. With the index present, apt takes the cached file, so the swap really happens offline.
+  Start it once with the old package (red: apt's history in the guest shows `Install: ...:i386`) and once with the new (green: no `Install:` line, and the notice's count equals what left).
+  Read the guest's apt history only from this start's entries (`Start-Date` after the boot time): the image's own build is in the same file.
+- **A program's window in the person's language, without a display:** keep the machine-read file in English and add a key line after each line that has a sentence (`say<TAB>KEY<TAB>FIELD<TAB>ARG...`). Render at display time. Then test four things:
+  - the English rendering equals the file without its key lines, byte for byte, on every fixture;
+  - each translated window holds no English sentence whole, matched with its arguments as wildcards (a brand at its start, "NVIDIA ", stays in every language);
+  - every language has every number;
+  - every message has as many `%s` as English.
 - **A masked event:** `acpi_mask_gpe=0x06` gives `ACPI: Masking GPE 0x6.` and `/sys/firmware/acpi/interrupts/gpe06` ending in `masked`. The storm itself needs the machine.
 - **A one-line kernel fix without a kernel build:** take the function's own text (from its definition line to the first line that is exactly `}`), include it in a user-space file whose `snprintf` has the kernel's check (`vsnprintf()` warns and returns 0 for a size above `INT_MAX`), and compare what the measuring pass counts with what is printed.
 
@@ -74,6 +92,30 @@ Nothing in it was run on those machines: what only they can show is listed at th
   **Cause:** efivarfs is a module in Debian's kernel configuration and nothing loaded it; BusyBox `insmod` reads no compressed module.
   **Fix:** decompress the module into the boot image, `insmod` it, `mount -t efivarfs efivarfs /sys/firmware/efi/efivars`.
   **Found by:** printing the number of files in `efivars` (0) beside the state.
+- **Symptom:** on a real machine the driver's removal said "NVIDIA's driver was removed (2 packages)", and apt's history shows a second run: `Install: nvidia-installer-cleanup:i386`, `Purge: nvidia-installer-cleanup:amd64`.
+  **Cause:** a purge that installs. Debian's `glx-diversions` (left there by a Debian NVIDIA driver installed once) pre-depends on `nvidia-installer-cleanup`, which is `Multi-Arch: foreign`. With i386 enabled, apt satisfies the pre-dependency with the i386 copy once the amd64 one goes. The Multiarch specification allows it: "if it is not available, the package manager may automatically install any available package, regardless of architecture".
+  The step read the plan by its `Remv` and `Purg` lines only, and counted installed packages before and after, so the swap cancelled out.
+  **Fix:** recipe step 8. A purge plan with an `Inst` line is refused (the driver's own packages) or the package stays (a leftover whose removal alone would install). The count is by name.
+  **Found by:** the main session on the real machine, reading `/var/log/apt/history.log`, then `apt-get -s purge nvidia-installer-cleanup:i386`, which names the holder: `Purg nvidia-installer-cleanup:i386 [glx-diversions:amd64 ]`. `apt-cache rdepends --installed` does not show it. A guest could not show this: no guest had i386 or `glx-diversions`, and the edition's image lists neither.
+- **Symptom:** building the A10's state stops at its own guard: "the hand removal would install something".
+  **Cause:** removing NVIDIA's `nvidia-kernel-support` brings Debian's `nvidia-detect` (550) in, as the published hardware package depends on it; the A10 had it, marked manual.
+  **Fix:** allow exactly that install in the state's build, mark it manual, and refuse any other.
+- **Symptom:** the foreign copy put in a guest's apt cache is gone when the guest starts.
+  **Cause:** the image's last step runs `apt-get clean`.
+  **Fix:** keep the file in a folder of the rig's own and copy it into `/var/cache/apt/archives` after the clean.
+- **Symptom:** in the guest the old step's second purge fails, `E: Failed to fetch ... nvidia-installer-cleanup_20240109%2b1_i386.deb  Temporary failure resolving`, although the file was in apt's cache with the right name and hash when the guest started.
+  **Cause:** Debian's container images ship `/etc/apt/apt.conf.d/docker-clean`, owned by no package. It is a dpkg post-invoke that empties apt's archive cache after every dpkg run, so the step's first purge (the locks) deleted the copy the second needed. A machine installed from the ISO has no such file.
+  **Fix:** remove `docker-clean` in the image's last step, then start again.
+  **Found by:** the unit's journal in the guest (`Ign:1`, then `Err:1` for the i386 file), and `ls /var/cache/apt/archives` in the image beside `ls /etc/apt/apt.conf.d`.
+- **Symptom:** in a probe container from the guest image, NVIDIA's i386 libraries cannot be installed: `libegl1:i386 : Depends: libegl-mesa0:i386 but it is not going to be installed`.
+  **Cause:** the edition's Mesa comes from the guest's `file:/repo` source, which exists only while an image is built (the published round, mounted read only).
+  **Fix:** mount the published round at `/repo` in every container that runs apt from the guest image.
+- **Symptom:** a translated message shows its arguments in the wrong places, or a translation cannot put them in its own order.
+  **Cause:** the setup fills `%s` with bash's `printf`, which has no positional arguments (`%1$s`).
+  **Fix:** every translation keeps the English order of its arguments; the test counts the `%s` of each against English.
+- **Symptom:** under `set -e` a loop ends the program although nothing failed.
+  **Cause:** `[[ test ]] && command` as the last line of the loop's body: a false test leaves the loop's status non-zero.
+  **Fix:** `if [[ test ]]; then command; fi`.
 - **Symptom:** libraries of the vendor's driver stay after the driver is purged, although nothing depends on them.
   **Cause:** apt does not call them unneeded: `nvidia-vulkan-icd` provides `vulkan-icd`, which other packages name as an alternative, and it holds the rest.
   **Fix:** list what is left by name, automatic mark and a plan of its own, as above.

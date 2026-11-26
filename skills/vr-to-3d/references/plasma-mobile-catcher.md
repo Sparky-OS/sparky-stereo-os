@@ -252,6 +252,18 @@ Removing the KDE Connect pair while RDP was receiving AVC revoked the active out
 
 
 
+## Measure eye margins at full resolution
+
+The paired rig's `equal_eye_margins` samples every fourth pixel and allows 8 pixels either way, so it printed `0, 0, 3, 3` for a picture that reaches the edge (the last sample sits three pixels short), and a real margin of up to 8 pixels would pass (row 124, main session's review, 2026-11-26).
+Read every pixel of both eyes: the five links measured `0, 0, 0, 0` (native) and `0, 220, 0, 220` (each packed link on a 1280x800 panel) in both eyes.
+A colour threshold also moves with the encoder: one rerun read `4, 222, 4, 222` for `tb-half-720`, equal in both eyes, where the others read `0, 220, 0, 220`, because a compressed half-height frame blurs the colour edge.
+So a margin check with tolerance 0 measures geometry the chart places and H.264 keeps (marks, the marker), never where a colour fades.
+
+## A second Throw that gets no picture
+
+KPipeWire on the PC can answer a second Throw in one KWin session with "Stream error: no more input formats" and "PipeWire remote error: -32 no more input formats" after KRdp's "Video stream initialized with H.264 enabled"; the phone then shows nothing and Catch says nothing (queue row 927, seen in row 924's and row 124's reruns on 2026-11-26).
+A red row with this line in the PC log is that fault, not the receiver: read `*-pc.log` before blaming Catch.
+
 ## Credits
 
 The KDE Connect virtual-monitor source names Aleix Pol i Gonzalez and Fabian Arndt, and the downstream protocol-v2 history names Fabian Druschke.

@@ -57,6 +57,21 @@ The stereo proof rig ([the rig](../../stereo-proof-rig/SKILL.md)): Stereo KWin's
 - Red rows: the published packages show no step; `ElementLimit=0` gives equal eyes; a 2D output gives the same pixels as the published build.
 - A second, measuring scale (a larger `ElementLimit`) makes every share whole pixels; it is a measuring scale only, never a default.
 
+Measured in row 121 (KWin's virtual output in its 3D twin mode, 1920 wide, the NVIDIA card through CDI; left eye minus right eye, in pixels of one view; every match exact):
+
+| Case | Published round | Qt +25, KWin +69, Okular +1 |
+|---|---|---|
+| Okular, two pages, `ElementLimit=1` | paper 0, desk 0 | paper 0, desk -1, title bar 0 |
+| Print preview, two pages | paper 0, desk 0 | paper 0, desk -1, title bar 0 |
+| Both at `ElementLimit=12` (measuring scale) | desk 0 | desk -12, paper 0 |
+| `ElementLimit=0` | equal eyes | equal eyes |
+| A page scrolled under the toolbar | cut at the window's plane | cut at the window's plane, its edge on the same column in both eyes |
+| Okular presentation mode | equal eyes | equal eyes |
+| A window behind the active one | flat inside (the whole window at -2) | flat inside (paper, desk and title bar at -2) |
+| A 2D output | baseline | the same pixels as the published build |
+
+The client's `WAYLAND_DEBUG` log carries the chain: `kde_stereo_depth_v1.depth_state(1, 0)` and `element_limit(1.00000000)` (12 and 0 at those settings); the window behind the active one hears `depth_state(0, 0)`.
+
 ## Traps
 
 - **Symptom:** the page's left edge looks a step deeper than its right edge in one eye (the paper one column wider on one side). **Cause:** the desk is drawn moved with everything the widget paints, the paper too; where the paper's shift differs from the desk's, a strip beside the page shows paper at the desk's depth, a part of the desk the program never drew because the paper covered it. **Fix:** after the desk and before the paper, the strip continues the desk from the column just outside the page (one extra pass per column of the strip, the column shifted into place), so the page's edge is at the page's depth in both eyes. **Found by:** the unit test `paintRectsAtTheirDepth` (the column beside the page white instead of grey).

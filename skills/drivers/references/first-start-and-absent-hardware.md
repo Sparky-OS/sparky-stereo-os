@@ -64,6 +64,7 @@ Nothing in it was run on those machines: what only they can show is listed at th
   Drive the guest from a timer and a `Type=exec` service that waits until `systemd-analyze time` answers: `blame` and `critical-chain` refuse until the start has finished, and a oneshot in the start's own jobs would keep it from finishing.
   Measure a start by when `multi-user.target` was reached (`systemctl show -p ActiveEnterTimestampMonotonic`), in pairs, published against new, alternated, with the host's load written at each; "Startup finished" also counts background jobs and is not what a person waits for.
 - **A firmware table:** `-smbios type=1,product=MODEL` gives the DMI name (double a comma: `MacBookPro9,,2`), and `-acpitable file=X.aml` adds a table that does what the faulty method does. A device with a method `_INI` that does the `Notify` to the missing name gives the same two lines the real machine logs, `ACPI BIOS Error (bug): Could not resolve symbol [...], AE_NOT_FOUND` and `ACPI Error: Aborting method ... due to previous error`; with the package's table in the early archive (built exactly as the hook builds it) both are gone and the upgrade line is there.
+- **A window and its button, in the guest:** Xvfb, the program started as a person starts it (root, the language from a locale file), a wait for the drawn dialog and not for the first window of its class (see the traps), a picture before the click and one after, the click at the place an earlier picture of the same screen size and language shows; the same switch from a person's account through polkit, refused without an authorization and done with a rule that answers yes for that one action and that one account, standing for the agent. Look at the pictures: a long sentence cut at the window's edge shows only there.
 - **A masked event:** `acpi_mask_gpe=0x06` gives `ACPI: Masking GPE 0x6.` and `/sys/firmware/acpi/interrupts/gpe06` ending in `masked`. The storm itself needs the machine.
 - **A one-line kernel fix without a kernel build:** take the function's own text (from its definition line to the first line that is exactly `}`), include it in a user-space file whose `snprintf` has the kernel's check (`vsnprintf()` warns and returns 0 for a size above `INT_MAX`), and compare what the measuring pass counts with what is printed.
 
@@ -118,6 +119,35 @@ Nothing in it was run on those machines: what only they can show is listed at th
 - **Symptom:** the Lean Code link gate cannot resolve a dependency on a package of the edition.
   **Cause:** its archive list holds only the public archives.
   **Fix:** add the published edition repository as a `file:` archive with its public key. A native script package is rebuilt from its retained source in an image that has its build dependencies.
+- **Symptom:** a step started by a unit fails, the kept problem says "its output says why", and the run's log holds one line.
+  **Cause:** the setup's `ERR` trap printed to wherever the failing command's output was pointed, and the facts are gathered as `run COMMAND >FILE`; the error text went into the facts file.
+  **Fix:** keep the run's own output on a descriptor of its own (`exec 8>&1`, again after the `tee` redirection) and let the trap write there (`exec >&8 2>&8` first).
+  **Found by:** making one fact-gathering command fail in the guest (a stand-in `lsusb` that exits 1) and counting the log's lines and its `ERROR` lines.
+- **Symptom:** in the guest `lsusb` exits 1 and a service that lists USB devices fails, in the published set too.
+  **Cause:** the guest has no USB controller at all, which no real computer of the last twenty years is.
+  **Fix:** `-device qemu-xhci`. A unit that fails only for that is the rig's, not a finding; say it once.
+- **Symptom:** apt in the guest says `Failed to fetch file:/repo/pool/... File not found`, although the files were copied into the guest.
+  **Cause:** the guest got the repository's index only (its packages are gigabytes), and `/repo` in the exported root is the empty folder the container's mount point left, not the copy.
+  **Fix:** carry the few packages a step installs in on the second disk, at their pool path, and make `/repo` a link to the guest's copy before the step runs.
+- **Symptom:** in the picture of the plan's window the sentence about the correction ends at the window's right edge.
+  **Cause:** `yad --text-info` does not wrap unless told; the package's other windows had `--wrap`, the plan's did not.
+  **Fix:** `--wrap`. A picture of the window is the only test that shows this: the log has the whole sentence.
+- **Symptom:** `xdotool getwindowgeometry` of the window found by class gives 10x10.
+  **Cause:** the first window of yad's class is GTK's leader window, which exists before the dialog is drawn; `xdotool search --class yad` returns it at once.
+  **Fix:** wait for a visible window as wide as the dialog (`xdotool search --onlyvisible --class yad`, then `getwindowgeometry --shell` and its `WIDTH`), twenty minutes at most, and only then take the picture or click; the button's place comes from a picture of the same screen size and language.
+- **Symptom:** a start that presses a window's button never ends; the guest idles at about 5 % of a core and its results disk stops changing.
+  **Cause:** the click was sent four seconds after the leader window appeared, while the plan was still being worked out (under emulation at a host load of 50 the plan came about ten minutes later), so it hit an empty screen. When the wait ran out the scenario sent Return, and Return answers the plan window's default button, which is "install" (yad's answer 0): the setup started a terminal for an installation the guest cannot download, and `wait $pid` had no bound.
+  **Fix:** the wait above; a picture before the click; the click sent again (three times at most) when nothing happens; never a key to the plan's window (Escape where it must close, which is Cancel's 252); every wait for the program bounded (`ended PID SECONDS`, which stops it and says so). Prove the waiting with a real yad window in Xvfb started 25 s late: the old way took the 10x10 window at 6 s and its click did nothing, the new one took the 760x500 dialog at 26 s and the click gave the button's code.
+  **Found by:** reading the guest's second disk while it ran (see the perks), whose button log had no `--off` line and ended with `GdkWindow ... unexpectedly destroyed` at the wait's 600 s mark; qemu's CPU time over ten minutes (idle); the program's own table of yad's answers (`plan_answer`).
+- **Symptom:** the scenario's own line says `The name org.freedesktop.NetworkManager was not provided by any .service files`, yet the step then says the connection is metered.
+  **Cause:** the Python stand-in for NetworkManager takes its name more than four seconds after it starts under emulation; the scenario asked after a fixed sleep, the unit asked later.
+  **Fix:** wait for the name itself (`busctl status NAME` in a loop) before anything asks.
+- **Symptom:** the dependency table says a tool the new scripts call is NOT INSTALLED (`nm-online` in a guest without NetworkManager).
+  **Cause:** the step calls it only when it is there (`command -v nm-online`); without NetworkManager there is no metered state to ask about, and the step goes on as before.
+  **Fix:** report a guarded tool as such, not as a missing Depends; a Depends is owed only for a tool called without a guard.
+- **Symptom:** in a plain container of the guest image Xvfb aborts at start, `double free or corruption (out)`, whatever its options; in the emulated guest the same image's Xvfb works.
+  **Cause:** not found here. It happens only while Xvfb loads Mesa's GLX on the host's processor (`-extension GLX` makes it run).
+  **Fix for a test that only needs a display:** `Xvfb ... -extension GLX`; the scenarios in the guest keep GLX. Start every such container with `--ulimit core=1`, so the abort does not reach the host's crash handler.
 - **Symptom:** a harness refuses a test script that removes `"$T/sys"`.
   **Cause:** an empty variable would make it `/sys`.
   **Fix:** `"${T:?}/sys"`, in tests too.
@@ -127,6 +157,8 @@ Nothing in it was run on those machines: what only they can show is listed at th
 - "The memory tests twice" in GRUB's menu is Debian's `memtest86+`: one entry for the screen and one for a serial console (`GRUB_MEMTEST_DISABLE_SERIAL=true` hides the second).
 - A file in `/etc/sudoers.d` with mode 0644 works but `visudo -c` calls it out; the mode sudoers(5) asks for is 0440. Check who owns the file before changing it.
 - The firmware of an Intel Mac before the T2 chip has EFI variables and no `SecureBoot` among them: state `unsupported`, never `off`.
+- A guest's second disk can be read while the guest runs, without mounting and without stopping it: `debugfs -c -R 'ls -l /out' io.raw` and `debugfs -c -R 'cat /out/FILE' io.raw` (`-c` opens it read only, in catastrophic mode). This is how a start that seems slow is told from one that hangs: compare the files' times with qemu's CPU time (`ps -o time -p PID`) a few minutes apart.
+- A stopped start-path job: `docker stop` on the job's own container by name ends `docker run`, and the script's own trap then records the container and removes it. A signal to the waiting script runs its trap only after `docker run` returns.
 
 ## Not proven here (the real machines only)
 

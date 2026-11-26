@@ -242,6 +242,15 @@ FreeRDP reported an AVC update to a `1280×800` surface.
 The marked native image held both eyes, and the frozen, reversed and unequal controls each failed their corresponding positive picture check.
 The wrong pin refused RDP after mutual control identity was accepted, and the paired desktop output disappeared when Catch closed.
 
+For the four packed links, the PC capture stayed `2560×720`, and the received surfaces matched the four advertised sizes in the table.
+The receiver restored equal fitted margins in both eyes.
+Removing the KDE Connect pair while RDP was receiving AVC revoked the active output lease.
+
+- **The change detector reports progress while the chart marker has still to appear.** A whole-frame inequality can count unrelated pixels.
+  Sample both eyes at locations predicted by the chart marker and wait for the requested marker before timing the frozen interval.
+  The rejected capture had the same marker values as the baseline, while the actual progress and freeze captures had the bright value in both eyes.
+
+
 
 ## Credits
 

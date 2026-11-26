@@ -22,6 +22,8 @@ description: >-
 4. Return source/binary hashes, dependency resolution and runtime evidence. Separate local candidate, [repository publication](references/repository.md) and [ISO inclusion](references/iso.md).
 5. A fix that upstream made on its stable branch after the release a patched package was built on is carried as upstream's own commit, as [carrying a stable-branch fix](references/carrying-upstream-stable-fixes.md) says.
 6. A staged recipe that waited while a shared tool moved is redone on the new main as [rebasing a staged recipe](references/rebasing-a-staged-recipe.md) says.
+   When deb-multimedia moves its FFmpeg to a new base, the edition's series follows the same day: [rebasing the edition's FFmpeg onto a new deb-multimedia build](references/rebasing-ffmpeg-onto-a-new-deb-multimedia-build.md) (the patches carried by git's three-way merges, the published enum values kept, the source from inputs named by sum).
+   A stage that holds packages without their sources, buildinfo, changes or records is made whole as [making a stage whole after the fact](references/making-a-stage-whole-after-the-fact.md) says: sources regenerated until their sums equal the records', rebuilds compared member by member.
 7. A package that downloads licensed data during installation follows [licensed data at install time](references/licensed-data-at-install.md): inspect consent, declare the download once, keep the data off the ISO and test refusal and retry.
    To audit completion, optional steps, swap and first login together, see [the installer ends truthfully](references/the-installer-ends-truthfully.md).
    Separately selectable processing weights use [installed model profiles](references/installed-model-profiles.md), with publisher pins, ownership-aware purge and the shared consent route.
@@ -190,6 +192,7 @@ Players and tools from deb-multimedia (VLC, mpv, OBS, HandBrake) link against it
 So our stereo patches for FFmpeg and mpv go on deb-multimedia's source packages (`10:…-dmoN+stereo3dM`), with identical sonames, not on Debian's.
 Offer them to deb-multimedia in the agreed order, and upstream as before.
 The recipe for adding a fix to that FFmpeg, with the traps met: [rebuilding deb-multimedia's FFmpeg as ours](references/rebuilt-ffmpeg.md).
+When deb-multimedia's build moves past ours, a clean link gate takes its libraries over ours; the rebase and its traps: [rebasing onto a new deb-multimedia build](references/rebasing-ffmpeg-onto-a-new-deb-multimedia-build.md).
 A test image that installs from our repository needs deb-multimedia's source and our pin, as [the repository](references/repository.md#the-repository-sits-on-deb-multimedia) says.
 
 ## A publication round

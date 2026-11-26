@@ -192,6 +192,7 @@ A JPEG XL pair is marked by the JXLStereo property in the file's XMP (stereo-lay
 ## An editor's canvas per eye (GIMP)
 
 The edition's GIMP shows a stereo image's canvas per eye: each eye rendered by GIMP's own render code from its own content, both handed to Stereo KWin through GTK 3's stereo area under the canvas items, so guides, selections and tools' outlines stay at the screen in both eyes. The route, the proof (every sample of each eye against single-eye controls, overlays judged as one picture over both eyes) and the traps: [an editor's canvas per eye](references/an-editors-canvas-per-eye.md).
+Depth layers (Daniel's design): a layer group at one depth with three decimals, each eye's picture with the layer moved by half the value, the pop (8) and sink (7) keys held while the pointer moves, XCF as a group with its parasite, MPO, JPS and PNS from each eye's picture; the model is libstereo-policy's `stereo-depth.h`, for Krita too: [Depth layers](references/an-editors-canvas-per-eye.md#depth-layers-milestone-2-queue-row-148).
 
 ## Lessons from the lanes, October to November 2026
 

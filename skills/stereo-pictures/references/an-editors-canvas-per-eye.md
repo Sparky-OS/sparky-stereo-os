@@ -1,7 +1,7 @@
 # An editor's canvas per eye: GIMP 3.2 through GTK 3's stereo area
 
 Written on 2026-11-26 (queue row 137 with row 148, the stereo GIMP's milestone 1).
-The stereo area itself is [GTK 4 and GTK 3 and GtkGLArea](../../stereo-window-3d-area/references/gtk-glarea.md); what is left for GIMP (the depth layers, the deep canvas) is in [GTK pieces still to build](../../stereo-window-3d-area/references/gtk-glarea-plans.md).
+The stereo area itself is [GTK 4 and GTK 3 and GtkGLArea](../../stereo-window-3d-area/references/gtk-glarea.md); the depth layers are below ([Depth layers](#depth-layers-milestone-2-queue-row-148)); what is left for GIMP (the deep canvas) is in [GTK pieces still to build](../../stereo-window-3d-area/references/gtk-glarea-plans.md).
 
 ## What the person sees
 
@@ -76,3 +76,40 @@ From the installed packages (gimp 3.2.8-1+stereo3d1+lc1 on gtk+3.0 3.24.52-3+ste
 - **On the first route also:** a side-by-side picture (798 x 298) and a top-and-bottom picture (398 x 595) in an edit mode, each eye in both halves; 400 % after scrolling, both eyes in step; the Rectangle Select tool's 1,815 frame and handle samples one overlay over both eyes; one `create` and one `set_content` for the stereo image, destroyed with Enable 3D off, none for a 2D image; Display Settings starts `kcmshell6 kcm_kscreen`; the 2D image equal to Debian's GIMP with the same plug-in in every sample of the screen; the swapped controls fail (red row).
 - **llvmpipe under Wayland and zink under X11:** the left view with its guides equals the left control in every sample, and the reason is in the log: "The OpenGL context (llvmpipe ...) cannot export its picture as a dma-buf" and "GTK 3 draws an X11 window that holds an OpenGL area black with Mesa's zink (zink Vulkan 1.4(NVIDIA GeForce RTX 3060 ...))".
 - **Cost, as information:** GIMP's own processor time for 20 zoom redraws on Wayland with NVIDIA's EGL (development build, machine load about 25): 3D on 0.98 and 0.93 s, Enable 3D off 0.53 and 0.54 s, a 2D image 0.54 and 0.52 s; the stereo canvas costs about 1.8 times the 2D canvas's processor time for the same work, and nothing with Enable 3D off.
+
+## Depth layers (milestone 2, queue row 148)
+
+Daniel's design (2026-10-15): "we'll add a special layer type that group other layers in one depth value the artist sets, with 0.000 precision ... the same 2D movement you do with the mouse + a handy key pressed at the same time make it "pop", other make it sink".
+Built in gimp 3.2.8-1+stereo3d2 on stereo-layer 1.24.0.
+
+### What the person sees
+
+- Layer > New Depth Layer puts the selected layers into a depth layer at 0.000 (a layer group with a value).
+- The Layers dock shows a Depth row (pixels of separation, three decimals, never clamped) for the depth layer the selected layer is in; the row is hidden otherwise, so a 2D document's window is as before.
+- Holding 8 (pop) or 7 (sink) over the canvas turns the pointer's movement into depth, 0.1 pixel of separation for each pixel moved, with the tool's drag or without it; the tool does not see that movement; one undo step a gesture. From the Layer menu each moves the depth by one pixel. Both are ordinary actions (`layers-depth-pop`, `layers-depth-sink`), rebindable in Keyboard Shortcuts.
+- Each eye sees every depth layer moved by half its value, the left eye to the left for a positive value (behind the screen); layers in no depth layer stay at the screen; a depth layer inside another is at its own value, never the sum.
+- With the eye layers "Left eye" and "Right eye" too, each eye shows its own eye layer under the depth layers. A picture in a packed editing mode keeps its depth layers at the screen and the status bar says so.
+- XCF keeps the value as the group's persistent parasite `gimp-depth-layer` ("12.000"): Debian's GIMP opens a plain layer group and loses nothing, and saving it there keeps the value.
+- The stereo pictures plug-in (0.3.0) exports MPO, JPS and PNS of an image with depth layers from each eye's picture as the canvas shows it (`gimp-depth-layer-new-from-eye`).
+
+### The model, shared
+
+libstereo-policy's `stereo-depth.h` holds what GIMP and later Krita share: `stereo_depth_parse()` and `stereo_depth_format()` (three decimals in the C locale whatever the program's locale, by integer arithmetic), `stereo_depth_eye_shift()` (-s/2 left, +s/2 right), and `stereo_depth_shift_rgba()` (8, 16-bit or float RGBA; a whole move copies the samples, a fractional one resamples premultiplied samples with a Lanczos window of three lobes, the edition's choice: no recorded design names a kernel).
+
+### Each eye's picture: the route
+
+GIMP's image graph composites each layer over the layers below it (`GimpFilterStack`), and a normal group's content is its own projection buffer, rendered once for 2D. So an eye cannot be a property of the image's graph: everything above a moved layer differs between the eyes.
+`GimpEyeProjectable` (one per eye) builds the eye's own chain: for each visible layer, bottom first, a copy of its mode node (same operation, every property copied) fed by the eye's picture below, while the layer's content and mask come from the image's graph as they are (the producers of the mode node's `aux` and `aux2`, fanned out), moved by `gimp:depth-shift` when the layer is at a depth. A group whose layers are all at one depth is moved as one picture (its projection, one resampling); a group holding layers at another depth, and every pass-through group, is composited again from its layers. So every layer mode, opacity, mask and effect is GIMP's own. The chain is made again when a walk of the layer tree describes a different structure (layers, visibility, mode properties, producers, depths), and every image change reaches the eye widened by the largest move plus the window's reach.
+The display's stereo module shows an image with depth layers as a third kind: each eye's source is its `GimpProjection`, whose updates redraw the canvas.
+
+### Traps
+
+- **Each eye flat, `cannot add interface type 'GimpProjectable' to type 'GimpEyeProjectable' which does not conform to prerequisite 'GimpViewable'`** (first `'GimpObject'` for a GObject parent). Cause: the interface's prerequisite. Fix: derive the projectable from `GimpViewable`. Found in GIMP's log of the first desktop run.
+- **A new PDB procedure missing (`procedure_exists` false) and "no previous declaration for register_..._procs".** Cause: the build runs pdbgen, which writes `app/pdb/*-cmds.c` and `internal-procs.[ch]` again from `pdb/groups/*.pdb`; hand edits vanish. Fix: a `pdb/groups/NAME.pdb` listed in `pdb/groups.pl` and `pdb/meson.build`; `%exports = (app => [@procs], lib => [])` keeps libgimp's API (and Debian's symbols file) unchanged; meson wants the generated file to exist when it configures, so a one-line stub (`#include "stamp-pdbgen.h"`) goes first. The patch carries what pdbgen writes.
+- **`GeglOperationFilterClass` unknown in a new operation.** `#include <gegl-plugin.h>`, as GIMP's other operations do.
+- **`G_DECLARE_FINAL_TYPE` over an old-style parent** (`GimpItemUndo`) does not compile: its autoptr chain needs the parent's. Use the classic macros for the undo type.
+- **(rig) the image's place stretched to 634 rows.** The dense rule counted rows over the whole screen, where the Layers dock's thumbnails also differ. Fix: rows counted inside the dense columns only; a depth layer's controls differ only around its content, so the place comes from a control and the same image with its background inverted (`--place-from`).
+- **(rig) a held key.** The fake input client's key step presses and releases at once, and KWin's fake devices live only while the client is connected: `kp:CODE` and `kr:CODE` in one connection, with the pointer's moves between them.
+- **(rig) a build "passing" with errors.** A filter on "error" matched every "GError" in the log and a pipe to `tail` hid the exit status: filter on `": error:"` and keep the status.
+- **(plug-in) a constant shadowed.** The plug-in already had `DEPTH_PARASITE` (round 1's mode depth) further down the module; the depth layer's parasite name is `DEPTH_LAYER_PARASITE`.
+- **(packaging) `previous edition dependency qualification failed ... conflicting supplied package: libstereo-av-dev-lc-hr; provide one authoritative edition snapshot`** from the link gate of stereo-layer 1.24.0. Cause: the gate's "previous" packages were the staged 1.23.4 while its sibling snapshot (the published round) carries the published 1.22.0: two versions of the same packages. Fix: the gate compares with the published build (the round's pool), whatever staged version the source follows. Found in the build log, at the end of `override_dh_builddeb`.

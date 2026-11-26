@@ -194,6 +194,30 @@ The subsequent milestone supplies the approved KDE Connect receiver handoff and 
 - **The long stock test leaves QEMU showing the previous screen.** KScreen's `--dpms show` found the Bochs output off even with the Catch surface mapped. Wake the guest display with `kscreen-doctor --dpms on` before checking Catch. In this disposable fixture, disable automatic locking before starting the guest session.
 - **Injected input leaves the visible Catch button idle.** The QEMU screenshots kept the ready label and the guest had no SSDP listener. Launch the unchanged Qt app with accessibility enabled and call its Catch button's AT-SPI action in the guest. The status changed to waiting and the actual UDP 1900 listener appeared.
 
+## Reuse the current KDE Connect pair
+
+Start Catch in the phone's own Plasma Mobile session after both devices have paired.
+Use the current KDE Connect session certificate as the Headset:1 identity.
+On the receiver, require a TLS client certificate and check it against the live KDE Connect store before sending the panel descriptor or acting on a control message.
+On the computer, run KRdp's existing paired discovery and panel owner. The phone's certificate must match the pairing. The RDP client then verifies the separate RDP pin received over that authenticated control connection.
+Unpair during a stream and check that the control socket closes, the RDP session ends and the panel output disappears.
+
+Report native pixels, mHz and physical dimensions from the active KScreen output. The native descriptor stays version 1. Each packed link uses version 2 with the same `linkFormat` as Android:
+
+| Link | RDP raster for the fixed 720p links | Unpacking |
+| --- | --- | --- |
+| `native` | Native panel raster | Split horizontally at the midpoint. |
+| `sbs-720` | 2560×720 | Split horizontally into two 1280×720 eyes. |
+| `sbs-half-720` | 1280×720 | Split horizontally and restore the eye width in the output fit. |
+| `tb-half-720` | 1280×720 | Split vertically and restore the eye height in the output fit. |
+| `tb-720` | 1280×1440 | Split vertically into two 1280×720 eyes. |
+
+Use the shared Android link labels when preparing the package catalogues. Verify the installed button and refusal separately from the archive checks. The deliberately wrong pin belongs in a separate fixture executable built with `CATCH_PROOF`. Release packages leave that switch off.
+
+- **A cross build asks to replace the build machine's Perl.** APT resolves unqualified Lean Code tool dependencies for the arm64 target, so `perl:arm64` requests `perl-base:arm64` alongside the conflicting amd64 installation. Check the solver's dependency chain. A native arm64 QEMU build can install the tools required by the unchanged source descriptor.
+- **The headless arm64 build guest enters emergency mode with the root filesystem mounted.** A boot built from only the Mobian root partition lacks the image's separate boot partition. The serial log shows the missing device and failed `boot.mount`. Use a disposable root copy, disable the fstab generator for the build, and mount the build inputs explicitly.
+- **The archive builder cannot create its offline disk.** `mkfs.ext4` comes from e2fsprogs. Check for it before downloading the SDK. The later device test already needs its own matching QEMU tools and uses the signed offline dependency pack.
+
 ## Credits
 
 The KDE Connect virtual-monitor source names Aleix Pol i Gonzalez and Fabian Arndt, and the downstream protocol-v2 history names Fabian Druschke.

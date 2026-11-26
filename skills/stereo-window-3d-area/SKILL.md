@@ -78,7 +78,7 @@ GtkGLArea draws into a framebuffer of its own and appends one texture to the sce
 GTK composites an offloaded picture itself whenever the subsurface cannot be used; for a stereo area that would show both eyes flat, so the area draws a clip of the left view as its fallback and tells the program (`stereo-shown`, `stereo-error`) and the log, once.
 The recipe, the proof cases and the traps (no dma-buf from llvmpipe, a blit that obeys the scissor, the decision that comes a frame late, a dma-buf export that writes no descriptor with zink on NVIDIA) are in [GTK 4 and GtkGLArea](references/gtk-glarea.md).
 A GTK 4 program that shows decoded pictures or video frames, with no GL area (HandBrake's preview), uses libstereo-gtk's media area, unpacker and file menu: [GTK 4 pictures and video](references/gtk-media-area.md).
-X11 is the same area as a child window declared with libstereo-declare (milestone 2). GIMP 3.2's canvas is cairo, not GL; a GL player (Celluloid) and deep colour are plans in [GTK pieces still to build](references/gtk-glarea-plans.md).
+X11 is the same area as a child window declared with libstereo-declare, drawn with OpenGL on the window itself (milestone 3: no readback). The same page has a real player (Celluloid renders once per eye from libmpv, keeps a film's correction with its resume position and saves it into the file when asked) and the area's depth and colour state (8 to 16 bits and floats, Rec. 2100 PQ and linear, with the test that tells what KWin received from what the output got). GIMP 3.2's canvas is cairo, not GL: its plan, and what milestone 3 left, are in [GTK pieces still to build](references/gtk-glarea-plans.md).
 
 ## X11 programs
 

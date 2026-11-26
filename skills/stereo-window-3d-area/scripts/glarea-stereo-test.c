@@ -21,10 +21,28 @@
  *   --hide-after S    the area is hidden after S seconds and shown again S seconds later
  *   --toggle-after S  the property "stereo" goes off after S seconds and on again S seconds later
  *   --report FILE  writes the state after the quit-after time: stereo-shown, the error, the eyes the render handler saw
+ *   --view-size WxH   each view of a stereo area is rendered at this size (gtk_gl_area_set_stereo_view_size)
+ *   --bench        the area is rendered again at every frame of the frame clock; the report gains the frames drawn,
+ *                  the time they took and the processor time of the program (user and system) over them
+ *   --x11-sibling  on X11, a plain green X window, 120x80, is mapped over the lower right corner of the area, as a
+ *                  child of the toplevel's X window (a sibling of the area's own child window)
+ *   --scrolled     the area sits in a scrolled window half its size, so half of it is scrolled out
+ *   --format NAME  the format of the area's picture: u8 (the default), u10, u16, f16 or f32 (GtkGLArea:format)
+ *   --color-state NAME   srgb, srgb-linear, rec2100-pq, rec2100-linear or rec2100-hlg (GtkGLArea:color-state)
+ *   --patch R,G,B  (several) instead of the LEFT and RIGHT pictures the area draws a green frame, an eye tag (red in
+ *                  the left view, blue in the right, white in a 2D area), the patches side by side over its lower half,
+ *                  each with these encoded values, and over them a ramp of 256 steps over 1/256 of the range from 0.5;
+ *                  the report gains, for each view drawn, the number of different values the ramp holds in the area's own framebuffer
  */
 #include <gtk/gtk.h>
+#ifdef GDK_WINDOWING_X11
+#include <gdk/x11/gdkx.h>
+#include <X11/Xlib.h>
+#endif
 #include <epoxy/gl.h>
 #include <dlfcn.h>
+#include <sys/resource.h>
+#include <glib-unix.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,6 +54,14 @@ static double opt_opacity = 1.0;
 static int opt_grow, opt_toggle, opt_offload, opt_hide, opt_overlay, opt_two;
 static int opt_frame = 7, opt_w = 480, opt_h = 270, opt_quit = 0;
 static const char *opt_report;
+static int opt_view_w, opt_view_h, opt_bench, opt_sibling, opt_scrolled;
+static const char *opt_format, *opt_color_state;
+static float patches[16][3];
+static int n_patches, ramp_levels[3] = { -1, -1, -1 };
+static char ramp_note[80];
+static gint64 bench_start, bench_end;
+static double bench_cpu_start, bench_cpu_end;
+static int bench_frames;
 static EyeFunc get_eye;
 static int eyes_seen[3];
 static int renders;
@@ -87,6 +113,31 @@ render (GtkGLArea *area, GdkGLContext *context, gpointer data)
   const char *tag = "MONO";
   char number[16];
 
+  /* an area that asks for stereo draws into the framebuffer GTK set the viewport for: the view's own size */
+  if (eye != 0)
+    {
+      int viewport[4];
+
+      glGetIntegerv (GL_VIEWPORT, viewport);
+      w = viewport[2];
+      h = viewport[3];
+    }
+
+  if (opt_bench && eye != 2)
+    {
+      struct rusage usage;
+
+      getrusage (RUSAGE_SELF, &usage);
+      bench_end = g_get_monotonic_time ();
+      bench_cpu_end = usage.ru_utime.tv_sec + usage.ru_stime.tv_sec + (usage.ru_utime.tv_usec + usage.ru_stime.tv_usec) / 1e6;
+      /* the first frames set the windows up: the count starts at the thirtieth */
+      if (++bench_frames == 30)
+        {
+          bench_start = bench_end;
+          bench_cpu_start = bench_cpu_end;
+        }
+    }
+
   eyes_seen[eye]++;
   renders++;
   if (!renderer[0])
@@ -99,6 +150,94 @@ render (GtkGLArea *area, GdkGLContext *context, gpointer data)
       b = left ? 0 : 1;
       g = 0;
       tag = eye == 1 ? "LEFT" : "RIGHT";
+    }
+
+  if (n_patches > 0)
+    {
+      int frame = 4, tag = h / 6, i;
+      int step = (w - 2 * frame) / 256 > 0 ? (w - 2 * frame) / 256 : 1;
+
+      glEnable (GL_SCISSOR_TEST);
+      rect (0, 0, w, h, 0, 1, 0);
+      rect (frame, frame, w - 2 * frame, h - 2 * frame, 0, 0, 0);
+      for (i = 0; i < n_patches; i++)
+        {
+          int x0 = frame + tag + i * (w - 2 * frame - tag) / n_patches;
+          int x1 = frame + tag + (i + 1) * (w - 2 * frame - tag) / n_patches;
+
+          rect (x0, frame, x1 - x0, h / 2 - frame, patches[i][0], patches[i][1], patches[i][2]);
+        }
+      rect (frame, frame, tag, tag, eye == 2 ? 0 : 1, eye == 0 ? 1 : 0, eye == 1 ? 0 : 1);
+      for (i = 0; i < 256 && frame + (i + 1) * step <= w - frame; i++)
+        {
+          float v = 0.5f + i / 65536.0f;
+
+          rect (frame + i * step, h / 2, step, h / 2 - frame, v, v, v);
+        }
+      glDisable (GL_SCISSOR_TEST);
+
+      /* what the ramp holds in the framebuffer the program drew into, read back in a type that keeps its depth: the
+       * type of the area's format first, then the others (OpenGL ES reads a framebuffer only in its own type) */
+      if (ramp_levels[eye] < 0)
+        {
+          static const struct { GLenum type; const char *name; int bytes; } types[] = {
+            { GL_FLOAT, "float", 16 }, { GL_UNSIGNED_SHORT, "16-bit", 8 },
+            { GL_UNSIGNED_INT_2_10_10_10_REV, "10-bit", 4 }, { GL_UNSIGNED_BYTE, "8-bit", 4 },
+          };
+          int order[4] = { 0, 1, 2, 3 };
+          guchar *row = g_malloc0 (16 * (gsize) w);
+          int fb = 0, t;
+
+          if (opt_format && !strcmp (opt_format, "u16")) { order[0] = 1; order[1] = 0; }
+          else if (opt_format && !strcmp (opt_format, "u10")) { order[0] = 2; order[1] = 0; order[2] = 1; }
+          else if (!opt_format || !strcmp (opt_format, "u8")) { order[0] = 3; order[1] = 0; order[2] = 1; order[3] = 2; }
+          glGetIntegerv (GL_FRAMEBUFFER_BINDING, &fb);
+          glBindFramebuffer (GL_READ_FRAMEBUFFER, fb);
+          glReadBuffer (GL_COLOR_ATTACHMENT0);
+          glPixelStorei (GL_PACK_ALIGNMENT, 1);
+          ramp_levels[eye] = 0;
+          g_strlcpy (ramp_note, "(the framebuffer could not be read)", sizeof ramp_note);
+          for (t = 0; t < 4; t++)
+            {
+              int levels = 0, bytes = types[order[t]].bytes;
+              guchar last[4] = { 0 };
+
+              while (glGetError () != GL_NO_ERROR)
+                ;
+              /* the ramp is the upper half of the picture: OpenGL's rows count from the bottom */
+              glReadPixels (0, 3 * h / 4, w, 1, GL_RGBA, types[order[t]].type, row);
+              if (glGetError () != GL_NO_ERROR)
+                continue;
+              for (i = frame; i < frame + 256 * step && i < w - frame; i++)
+                {
+                  guchar red[4] = { 0 };
+
+                  /* the red sample of the pixel: the first quarter of a float or 16-bit pixel, the low ten bits of a
+                   * 10-bit one, the first byte of an 8-bit one */
+                  if (types[order[t]].type == GL_UNSIGNED_INT_2_10_10_10_REV)
+                    {
+                      guint32 v;
+
+                      memcpy (&v, row + 4 * i, 4);
+                      v &= 0x3ff;
+                      memcpy (red, &v, 4);
+                    }
+                  else
+                    memcpy (red, row + (gsize) bytes * i, bytes / 4);
+                  if (levels == 0 || memcmp (red, last, 4))
+                    {
+                      memcpy (last, red, 4);
+                      levels++;
+                    }
+                }
+              ramp_levels[eye] = levels;
+              g_snprintf (ramp_note, sizeof ramp_note, "(read as %s, %s)", types[order[t]].name,
+                          epoxy_is_desktop_gl () ? "OpenGL" : "OpenGL ES");
+              break;
+            }
+          g_free (row);
+        }
+      return TRUE;
     }
 
   glEnable (GL_SCISSOR_TEST);
@@ -169,12 +308,66 @@ finish (gpointer data)
     fprintf (f, "api: no\n");
   fprintf (f, "renderer: %s\nstereo: %d\nstereo-shown: %d\nstereo-error: %s\nrenders: %d\neyes-seen: none=%d left=%d right=%d\n",
            renderer, stereo, shown, error ? error->message : "none", renders, eyes_seen[0], eyes_seen[1], eyes_seen[2]);
+  if (g_object_class_find_property (G_OBJECT_GET_CLASS (area), "format"))
+    {
+      GdkMemoryFormat format;
+      GdkColorState *state = NULL;
+      GEnumClass *formats = g_type_class_ref (GDK_TYPE_MEMORY_FORMAT);
+      const GError *area_error = gtk_gl_area_get_error (GTK_GL_AREA (area));
+
+      g_object_get (area, "format", &format, "color-state", &state, NULL);
+      fprintf (f, "format: %s\ncolor-state-asked: %s\nerror: %s\n", g_enum_get_value (formats, format)->value_nick,
+               opt_color_state ? opt_color_state : "srgb", area_error ? area_error->message : "none");
+      g_clear_pointer (&state, gdk_color_state_unref);
+      g_type_class_unref (formats);
+    }
+  if (n_patches > 0)
+    fprintf (f, "ramp-levels: none=%d left=%d right=%d %s\n", ramp_levels[0], ramp_levels[1], ramp_levels[2], ramp_note);
+  if (opt_bench && bench_frames > 30)
+    fprintf (f, "bench-frames: %d\nbench-wall-ms: %.1f\nbench-cpu-ms: %.1f\n", bench_frames - 30,
+             (bench_end - bench_start) / 1000.0, (bench_cpu_end - bench_cpu_start) * 1000.0);
   if (f != stdout)
     fclose (f);
   g_clear_error (&error);
   g_application_quit (g_application_get_default ());
   return G_SOURCE_REMOVE;
 }
+
+static gboolean
+bench_tick (GtkWidget *widget, GdkFrameClock *clock, gpointer data)
+{
+  gtk_gl_area_queue_render (GTK_GL_AREA (widget));
+  return G_SOURCE_CONTINUE;
+}
+
+#ifdef GDK_WINDOWING_X11
+static gboolean
+map_sibling (gpointer data)
+{
+  GtkWidget *area = data;
+  GtkNative *native = gtk_widget_get_native (area);
+  GdkSurface *surface = gtk_native_get_surface (native);
+  graphene_rect_t bounds;
+  double nx, ny;
+
+  if (GDK_IS_X11_SURFACE (surface) && gtk_widget_compute_bounds (area, GTK_WIDGET (native), &bounds))
+    {
+      Display *dpy = gdk_x11_display_get_xdisplay (gdk_surface_get_display (surface));
+      XSetWindowAttributes attributes = { 0, };
+      Window sibling;
+
+      gtk_native_get_surface_transform (native, &nx, &ny);
+      attributes.background_pixel = 0xff00ff00;
+      sibling = XCreateWindow (dpy, gdk_x11_surface_get_xid (surface),
+                               (int) (bounds.origin.x + nx + bounds.size.width) - 60,
+                               (int) (bounds.origin.y + ny + bounds.size.height) - 40,
+                               120, 80, 0, CopyFromParent, InputOutput, CopyFromParent, CWBackPixel, &attributes);
+      XMapRaised (dpy, sibling);
+      XFlush (dpy);
+    }
+  return G_SOURCE_REMOVE;
+}
+#endif
 
 static void
 activate (GApplication *app, gpointer data)
@@ -204,7 +397,61 @@ activate (GApplication *app, gpointer data)
   g_signal_connect (area, "render", G_CALLBACK (render), NULL);
   if (opt_stereo && g_object_class_find_property (G_OBJECT_GET_CLASS (area), "stereo"))
     g_object_set (area, "stereo", TRUE, NULL);
-  if (opt_overlay)
+  if (opt_view_w > 0 && g_object_class_find_property (G_OBJECT_GET_CLASS (area), "stereo-view-width"))
+    g_object_set (area, "stereo-view-width", opt_view_w, "stereo-view-height", opt_view_h, NULL);
+  if (opt_format && g_object_class_find_property (G_OBJECT_GET_CLASS (area), "format"))
+    {
+      static const struct { const char *name; GdkMemoryFormat format; } formats[] = {
+        { "u8", GDK_MEMORY_R8G8B8A8_PREMULTIPLIED }, { "u10", GDK_MEMORY_ABGR2101010_PREMULTIPLIED },
+        { "u16", GDK_MEMORY_R16G16B16A16_PREMULTIPLIED }, { "f16", GDK_MEMORY_R16G16B16A16_FLOAT_PREMULTIPLIED },
+        { "f32", GDK_MEMORY_R32G32B32A32_FLOAT_PREMULTIPLIED },
+      };
+
+      for (gsize i = 0; i < G_N_ELEMENTS (formats); i++)
+        if (!strcmp (formats[i].name, opt_format))
+          g_object_set (area, "format", formats[i].format, NULL);
+    }
+  if (opt_color_state && g_object_class_find_property (G_OBJECT_GET_CLASS (area), "color-state"))
+    {
+      GdkColorState *state = NULL;
+
+      if (!strcmp (opt_color_state, "srgb-linear"))
+        state = gdk_color_state_ref (gdk_color_state_get_srgb_linear ());
+      else if (!strcmp (opt_color_state, "rec2100-pq"))
+        state = gdk_color_state_ref (gdk_color_state_get_rec2100_pq ());
+      else if (!strcmp (opt_color_state, "rec2100-linear"))
+        state = gdk_color_state_ref (gdk_color_state_get_rec2100_linear ());
+      else if (!strcmp (opt_color_state, "rec2100-hlg"))
+        {
+          /* ITU-T H.273: colour primaries 9 (Rec. 2020), transfer characteristics 18 (hybrid log-gamma), RGB, full range */
+          GdkCicpParams *cicp = gdk_cicp_params_new ();
+
+          gdk_cicp_params_set_color_primaries (cicp, 9);
+          gdk_cicp_params_set_transfer_function (cicp, 18);
+          gdk_cicp_params_set_matrix_coefficients (cicp, 0);
+          gdk_cicp_params_set_range (cicp, GDK_CICP_RANGE_FULL);
+          state = gdk_cicp_params_build_color_state (cicp, NULL);
+          g_object_unref (cicp);
+        }
+      if (state != NULL)
+        {
+          g_object_set (area, "color-state", state, NULL);
+          gdk_color_state_unref (state);
+        }
+    }
+  if (opt_bench)
+    gtk_widget_add_tick_callback (area, bench_tick, NULL, NULL);
+  if (opt_scrolled)
+    {
+      GtkWidget *scrolled = gtk_scrolled_window_new ();
+
+      gtk_widget_set_size_request (scrolled, opt_w / 2, opt_h);
+      gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled), GTK_POLICY_ALWAYS, GTK_POLICY_NEVER);
+      gtk_widget_set_halign (scrolled, GTK_ALIGN_CENTER);
+      gtk_scrolled_window_set_child (GTK_SCROLLED_WINDOW (scrolled), area);
+      gtk_box_append (GTK_BOX (area_row), scrolled);
+    }
+  else if (opt_overlay)
     {
       GtkWidget *overlay = gtk_overlay_new ();
       GtkWidget *tag = gtk_label_new ("OVERLAY");
@@ -250,6 +497,12 @@ activate (GApplication *app, gpointer data)
     g_timeout_add_seconds (opt_hide, hide_now, area);
   if (opt_quit > 0)
     g_timeout_add_seconds (opt_quit, finish, area);
+  /* SIGTERM ends the program as the quit-after time does, with its report */
+  g_unix_signal_add (SIGTERM, finish, area);
+#ifdef GDK_WINDOWING_X11
+  if (opt_sibling)
+    g_timeout_add_seconds (2, map_sibling, area);
+#endif
 }
 
 int
@@ -266,6 +519,17 @@ main (int argc, char **argv)
       else if (!strcmp (argv[i], "--frame") && i + 1 < argc) opt_frame = atoi (argv[++i]);
       else if (!strcmp (argv[i], "--size") && i + 1 < argc) sscanf (argv[++i], "%dx%d", &opt_w, &opt_h);
       else if (!strcmp (argv[i], "--two")) opt_two = TRUE;
+      else if (!strcmp (argv[i], "--view-size") && i + 1 < argc) sscanf (argv[++i], "%dx%d", &opt_view_w, &opt_view_h);
+      else if (!strcmp (argv[i], "--bench")) opt_bench = TRUE;
+      else if (!strcmp (argv[i], "--x11-sibling")) opt_sibling = TRUE;
+      else if (!strcmp (argv[i], "--scrolled")) opt_scrolled = TRUE;
+      else if (!strcmp (argv[i], "--format") && i + 1 < argc) opt_format = argv[++i];
+      else if (!strcmp (argv[i], "--color-state") && i + 1 < argc) opt_color_state = argv[++i];
+      else if (!strcmp (argv[i], "--patch") && i + 1 < argc && n_patches < 16)
+        {
+          sscanf (argv[++i], "%f,%f,%f", &patches[n_patches][0], &patches[n_patches][1], &patches[n_patches][2]);
+          n_patches++;
+        }
       else if (!strcmp (argv[i], "--overlay")) opt_overlay = TRUE;
       else if (!strcmp (argv[i], "--offload")) opt_offload = TRUE;
       else if (!strcmp (argv[i], "--grow-after") && i + 1 < argc) opt_grow = atoi (argv[++i]);

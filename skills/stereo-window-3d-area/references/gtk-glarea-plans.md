@@ -1,8 +1,17 @@
-# GTK pieces still to build: GIMP (GTK 3), a GL player, deep colour
+# GTK pieces still to build: GIMP (GTK 3), and what milestone 3 left
 
 Written on 2026-11-08 (ORDER 137, milestone 2), from the sources of GIMP 3.2.6, Celluloid 0.29 and GTK 4.24.1.
 Plans, not builds.
-The built part is in [GTK 4 and GtkGLArea](gtk-glarea.md).
+The built part is in [GTK 4 and GtkGLArea](gtk-glarea.md): since milestone 3 (2026-11-25) that includes the GL player (Celluloid) and the area's depth and colour state, whose plans below are kept as the record of what was decided before building.
+
+## What milestone 3 left, each with its exact case
+
+- **A 2D widget over an X11 stereo area** (`glarea-stereo-test --stereo --overlay` on X11: the label is hidden). KWin places a declared child below its parent's surface and cuts it under its siblings; GDK needs the area as a subsurface on X11 (a `GdkSubsurface` over the child window) so that GSK cuts the hole in the toplevel.
+- **A 16 bit integer stereo area on a driver that exports no 16 bit dma-buf** (NVIDIA's EGL and zink on NVIDIA: `--format u16 --stereo` says "cannot export its picture as a dma-buf"). The way that keeps every bit there is shared memory: `wl_shm` has `ABGR16161616`, and GDK's subsurface writes shared memory only as 8 bit cairo pictures behind a debug flag (`_gdk_wayland_shm_texture_get_wl_buffer`). The same route would give a software renderer its stereo area.
+- **Luminances and mastering data.** A `GdkColorState` carries primaries, transfer function, matrix and range, nothing else, so a PQ picture reaches KWin without its peak and KWin makes room for 10000 cd/m²: the reference white is shown at about half (measured: 110 cd/m² on a 1000 cd/m² output). It needs a GDK API (the luminances of the protocol's `set_luminances`, the mastering display and content light levels) carried by the texture to `gdkwaylandcolor.c`. Upstream has none.
+- **Hybrid log-gamma on a stereo area.** GTK builds the state (CICP 9/18) and converts it itself for a plain area; KWin lists no HLG transfer function, so the pair cannot be described: owed by KWin.
+- **A colour state on X11.** An X window has no description; a stereo area with a state other than sRGB says so.
+- **What this changes for the GTK 3 and GIMP plan below:** the X11 child route without a readback, the view size and the format and colour state are the same three pieces a GTK 3 stereo area needs, and GDK 3 has none of GDK 4's colour states, so a deep GIMP canvas needs its own description path (the `wp_color_management` requests made directly on the subsurface's `wl_surface`, with gamma 2.2 for sRGB on KWin, as `stereo3d-gdk-wayland-subsurface-color-description` does in GDK 4).
 
 ## GIMP 3.2: the canvas is cairo, not GL
 

@@ -309,6 +309,7 @@ For optional world-fixed reprojection, qualify a timestamped sensor backend and 
 Release sensor claims and power inhibitors when the connection ends; never promise to disable thermal protection.
 
 Use an emulated arm64 Plasma Mobile session before a physical phone window.
+Follow the [Plasma Mobile Catch guest recipe](../vr-to-3d/references/plasma-mobile-catcher.md) for the signed image and stock virtual-monitor route.
 Separate source audit, guest boot, pixel/transport proof and real-device performance in the report.
 A receiver-only phone does not need a local streaming server; rebuilding Stereo KWin does require matching private-API plugins, including Plasma Mobile's task switcher.
 Debian/Mobian packages and Alpine-based postmarketOS packages need separate native builds.

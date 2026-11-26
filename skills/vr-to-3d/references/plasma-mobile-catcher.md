@@ -224,6 +224,25 @@ Use the shared Android link labels when preparing the package catalogues. Verify
 
 Use the FreeRDP graphics client's surface creation record to check the received raster. An AVC wire update then gives the received codec, and the marked capture gives the eyes, layout and margins. Check the same chart with a deliberately frozen frame, reversed eye order and unequal margins before crediting the positive captures. [FreeRDP graphics client](https://github.com/FreeRDP/FreeRDP/blob/3.33.1/channels/rdpgfx/client/rdpgfx_main.c)
 
+
+- **The imported CMake tree recompiles at the start of packaging.** The native binary sequence reconfigured the imported tree and requested C++ compilation again.
+  Finish the build first and verify its source descriptor digest, release cache and AArch64 executable in the native guest.
+  Run the package's configured test target, then use Debhelper's completed-build stamp to proceed through normal binary packaging, dependency resolution and Lean Code.
+  The native logs distinguish the first repeated C++ compile from the successful packaging run.
+- **The Catch dropdown has only `SetFocus` in AT-SPI or ignores the QEMU input event.** Use the proof rig's Wayland client in the disposable handset session and get the chooser geometry from AT-SPI.
+  Click to open the popup, invoke `Press` on the menu item with the intended translated label, then read the chooser value back.
+  The accessibility probe showed the `Press` action on the open menu item and the updated value after activation.
+- **The changed-pin fixture reports a JSON syntax error on `{`.** Its descriptor is formatted across lines.
+  Decode the complete document beginning at the opening brace and compare it with the handset's native KScreen values before starting the connection.
+
+Keep compositor input permissions scoped to the test handset session. [Stereo proof rig](../../stereo-proof-rig/SKILL.md)
+
+On the weekly Mobian arm64 fixture dated 2026-11-22, the paired native Catch reproduced `1280×800`, `74994` mHz, scale `1` and `325×203` mm on the PC output.
+FreeRDP reported an AVC update to a `1280×800` surface.
+The marked native image held both eyes, and the frozen, reversed and unequal controls each failed their corresponding positive picture check.
+The wrong pin refused RDP after mutual control identity was accepted, and the paired desktop output disappeared when Catch closed.
+
+
 ## Credits
 
 The KDE Connect virtual-monitor source names Aleix Pol i Gonzalez and Fabian Arndt, and the downstream protocol-v2 history names Fabian Druschke.

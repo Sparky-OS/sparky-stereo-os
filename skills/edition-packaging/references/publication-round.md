@@ -1018,3 +1018,9 @@ The whole-pool rerun must provision the same original when that bootstrap versio
 
 ### Case e's base phase never reads the pool
 `e-base.sh` installs the published edition from `/base` only; the pool is read first by `e-upgrade.sh`. When the take changes while the base installs, let the base finish and commit, and rebuild only the pool's index before the upgrade phase; stopping the base costs its whole install again.
+
+### A new hard dependency on one alternative of a virtual the kernel decides
+- **Symptom:** case e simulates hundreds of upgrades and no removal, but keeps back `sparky-stereo-cushion-swap` and a package that requires its new version; a fresh install (case b) of the same pool passes.
+- **Cause:** the new version Depends on `initramfs-tools`; the edition's kernel names `dracut | initramfs-tools | linux-initramfs-tool`, dracut first, so the published edition installed with apt has dracut, which conflicts with initramfs-tools; `dist-upgrade` will not remove dracut, so it keeps the upgrade back.
+- **Fix:** none in a preparation (it changes a package): name both rulings for the coordinator, a successor that accepts the alternative the kernel installs (or the kernel's order changed on purpose, with the boot proof), or a hold that follows every taken package requiring the new version. Before the proofs, compare every new `Depends` of the take with the alternatives the published kernel and metas name for the same virtual.
+- **How found:** `apt-get -s install PACKAGE` in a container from the committed case e base, with the candidate source added (`edition /cand; update_edition` of the proof library), printed `Remv dracut [linux-image-... plymouth]`.

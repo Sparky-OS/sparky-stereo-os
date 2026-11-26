@@ -281,6 +281,9 @@ Check that KRdp selected H.264, Catch exposes the message without another button
 Check that the virtual output disappears and Catch stops advertising after the deadline.
 Run the five positive links on the same desktop to verify that a decoded picture cancels the timer.
 
+- **The notice test stops before RDP and Plasma logs `starting invalid corona`.** The minimal PC rig has Plasma Workspace without the desktop shell assets. Add `plasma-desktop` and use the private Wayland environment for D-Bus activation. Check `GetServerInformation` on `org.freedesktop.Notifications` before arming Catch. The repaired fixture reported Plasma 6.7.4 and protocol 1.2.
+- **The notification daemon is present and the applet's PulseAudio QML import fails.** The default Plasma notification applet imports `org.kde.plasma.private.volume`. Install the matching `plasma-pa` package inside the fixture. The shell log named the missing module and the package installed its `qmldir`. Keep the KPipeWire QML package at the same version as its exact-version libraries.
+
 ### Keep an offline guest installation
 
 - **Symptom.** The serial fixture times out during package installation under load.

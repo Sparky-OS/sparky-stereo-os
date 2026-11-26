@@ -955,3 +955,51 @@ Keep that original-only archive evidence separate from the candidate's solver vi
 Retain the complete first verification output, then rerun the unchanged verifier with the authenticated original available.
 The whole-pool rerun must provision the same original when that bootstrap version remains installed.
 **How found:** the verifier's download error named the old bootstrap version, the installed readback confirmed it, and its signed historical Packages record bound the recovered archive.
+
+## Lessons from the preparation after r1123a (queue row 933, 26 November 2026)
+
+### The take list reads both journal forms
+- **Symptom:** a take list built from the journal's `- TIME, NAME: ... ACCEPTED` lines misses accepted stages, among them a console, a dpkg-stereo and a libXext that waited for "a later round".
+- **Cause:** acceptances are also written as section headings (`## TIME  813 ACCEPTED and staged: ...`); the bulleted form is only one of two.
+- **Fix:** match both (`^(?:- |## )TIME`) and list every acceptance since the published round froze; then rule each one by name.
+- **How found:** the parser saw no acceptance between 19 and 23 November; a plain `grep -n ACCEPTED` over those lines showed the headings.
+
+### A row marked published is not proof that its package is
+- **Symptom:** a staged-looking generation (an accepted milestone) is newer than every published record, yet its row is set `published`.
+- **Cause:** the round's "rows set published" step matched rows against the pool by script, and a row whose package never entered the pool was set published anyway.
+- **Fix:** for every accepted generation newer than the published index, read its row status and the published index together; a mismatch goes to the coordinator, never silently into or out of the take.
+- **How found:** the published inventory had no record of that source at all, while the journal had its acceptance with a closure check.
+
+### An edition package's changelog has one entry; prove succession by its recipe commit
+- **Symptom:** the winner's `debian/changelog` does not contain the predecessor's version for the console, the boot package, the looks and other native edition packages, so a changelog containment test says "not carried".
+- **Cause:** their recipes write a fresh one-entry changelog; their history lives in the build tree.
+- **Fix:** read `recipeCommit` from both build records and require `git merge-base --is-ancestor PREDECESSOR WINNER`; a commit from before a history rewrite is first mapped through the commit map the rewrite kept. A held generation's commit that is not in main at all is evidence that its work is not in the winner.
+- **How found:** every "not carried" row of the changelog test came from a native package; the build records' commits, mapped, were all ancestors.
+
+### A held branch's patch inside an accepted successor
+- **Symptom:** an accepted package (kpipewire +stereo3d10, row 81) is the newest generation, but its patch series carries the patch of a predecessor whose branch is held (row 740's `order740-hevc-packing.patch`).
+- **Cause:** the successor's recipe takes the held predecessor's source as its base.
+- **Fix:** read the winner's `debian/patches/series` against each held predecessor's; when a held patch is inside, name it first among the disagreements with what holding the winner would cost (here the Throw package requires the winner's library version), and let the coordinator rule.
+- **How found:** the succession table showed the held predecessor's changelog entry inside the winner; the series showed the patch.
+
+### translations-shipped.py: a missing SOURCES row, and old gaps beside new ones
+- **Symptom:** exit 2 (`not in SOURCES, so no package to look in`), and dozens of `FAIL` lines for packages the round does not even take.
+- **Cause:** new catalogue patches were added to `sparky-os/translations` without a SOURCES row; the test also reports every published package that never carried a later catalogue backfill.
+- **Fix:** add the rows (a test-table change, committed on the lane branch), then run the test twice, once with the take as `--cohort` and once with an empty cohort over the published tree, and compare per patch: a taken package fails the round only when it lacks strings the published one had or its own new sentences; an equal shortfall is an older gap, reported.
+- **How found:** comparing the two runs left exactly one failing taken package, the live captions adapter with 60 of 300 strings.
+- A package the test does not cover (no registered patch or JSON catalogue) is read directly: `dpkg-deb -c` for `.mo`, `.qm` and `lang/*.json`. Kaption and captiond shipped none.
+
+### A removed HR blob is read through the lc manifest's `sha_hr`
+- **Symptom:** the file-by-file comparison leaves `usr/share/dpkg-stereo/hr/PKG/ARCH/HASH.xz` lines as removed paths needing explanation.
+- **Cause:** HR blobs are named by content; a changed authored file gets a new name, and a file that is no longer projected needs no HR copy.
+- **Fix:** in the published package's `usr/share/dpkg-stereo/lc/PKG/ARCH.json`, find the entry whose `sha_hr` is HASH; the successor's manifest must list that `path` again (renamed by content), or its entry must say `unchanged` (shipped whole), or the authored file itself left for a reason the successor's changelog or recipe history gives.
+- **How found:** 59 of 78 unexplained removals resolved this way; the remaining 14 were read one by one (a list moved to System Settings, `/etc` files shipped as defaults so a person's edit is kept, a check moved into the Problems engine, a README compressed by `dh_compress`).
+
+### Repairing a standalone source's missing buildinfo and changes
+- **Symptom:** `requalify-script.sh` stops in `dpkg-buildpackage` with `unmet build dependencies: build-essential:native node-acorn nodejs python3-yaml`; after that is fixed, the repaired record says `recipeDirty: true`; then `metadata.py` reports `not bound by stage SHA256SUMS` for copies of the originals.
+- **Cause:** the reconcile Dockerfile lacks the standalone source's build dependencies; the record reads the clone's dirty state (an uncommitted test change); `metadata.py` walks the whole repair folder.
+- **Fix:** add those four packages to the builder image; run every build step from a clean checkout of the frozen commit (commit lane changes on the lane branch first, then `git checkout --detach FROZEN`); keep the originals for comparison outside the repair folder.
+- **How found:** the first container's log, the record's fields, and the closure check's message, in that order. The repair gave equal payloads and controls for both sources; one pair of archives came out byte-identical, the other only member-equal.
+
+### An index-only candidate tree for check-installable.py
+`check-installable.py --unsigned` reads only `dists/` and simulates, so a preparation without a signed tree can give it one: the published binary indexes with each pool binary replacing the record of the same Package and Architecture, and a Release that keeps the published Origin, Label and Codename (a few lines of Python; row 933 kept one beside its report).

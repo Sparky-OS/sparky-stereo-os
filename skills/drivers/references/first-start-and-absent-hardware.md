@@ -35,6 +35,7 @@ Nothing in it was run on those machines: what only they can show is listed at th
    - Then purge what is left of the driver: installed, the vendor's by name, installed automatically, and removable alone. Do not count on `apt autoremove`'s list (see the traps). Never run an autoremove.
    - Keep the firmware the free driver needs, so a card that appears has a picture at once.
    - Do it once (a mark), record the cards seen, and after that remove nothing: a card that leaves takes nothing with it.
+   - A card present with no driver at that first settling is left alone, and that is right only because the image always installs the driver: its absence is then the person's doing. An image that did not carry the driver would have to install it there.
    - A card the machine has not shown before gets the driver through the hardware setup, kept and said by the problems engine; nothing is downloaded on a metered connection; the person's earlier choice of the free driver is kept in a file and respected.
    - Every helper of the driver (32-bit libraries, services) asks for a card before it keeps a problem or installs anything.
 5. **A known machine's correction is a table entry of a reviewed kind, never a command.**
@@ -42,8 +43,12 @@ Nothing in it was run on those machines: what only they can show is listed at th
    - `kernel-option`: one `name=value`, added by a file of the package in `/etc/default/grub.d/` that asks the table at `update-grub` time.
    - Match on the DMI product name only, apply only when not yet in place (`update-initramfs -u -k all`, `update-grub`), tell the session that it takes effect at the next restart, list each correction with what it does, and give the person a switch.
    - Search the kernel first: `grep -rn 'MODEL' drivers/acpi drivers/platform arch` in the tree you ship and in mainline. A quirk in the engine comes first; the table carries what cannot be fixed there.
-6. **Do not hold the start.**
-   A target waits for every unit it wants that has default dependencies. A oneshot that purges packages or writes boot images at the first start gets `DefaultDependencies=no` (with `After=sysinit.target local-fs.target`, `Conflicts=` and `Before=shutdown.target`) or `Type=exec`. A unit ordered `After=` a oneshot still waits for it to finish, which is how the signing step runs after the driver's removal.
+6. **Do not hold the start, anywhere in the chain.**
+   A target waits for every unit it wants that has default dependencies. A oneshot that purges packages or writes boot images at the first start gets `DefaultDependencies=no` (with `After=basic.target`, `Conflicts=` and `Before=shutdown.target` written out).
+   A unit ordered `After=` that oneshot waits for it to finish, which is how the signing step runs after the driver's removal; so every unit ordered after it needs `DefaultDependencies=no` too, `Type=exec` or not, or the target waits for the whole chain through it.
+   Prove it with `systemd-analyze critical-chain multi-user.target` on a first start, never by reading the unit files.
+7. **Name the boot option file so it is read last.**
+   `grub-mkconfig` reads `/etc/default/grub.d/*.cfg` in the shell's order. A file that adds an option only when it is not on the line yet must come after any file a person made by hand, which appends without looking: `zz-NAME.cfg`, not `40-NAME.cfg`.
 
 ## Proving it without the machine
 
@@ -55,6 +60,9 @@ Nothing in it was run on those machines: what only they can show is listed at th
 - **Module loading:** in the same guests, `insmod` a module DKMS signed with its own key and the same module with its signature cut off (the trailer is `~Module signature appended~\n`, the 4 bytes before it hold the signature's length, 12 bytes of header precede those). Without Secure Boot the unsigned one loads. With it both are refused until the DKMS certificate is in the variables (`--add-db` again stands for the enrolment), then the signed one loads.
 - **What the first start costs:** an image with the real dkms, the shipped kernel's headers and two small DKMS modules, every signature cut off and DKMS's key removed (how an ISO built in a chroot leaves them); run the step in a fresh container per case under `/usr/bin/time`, with a firmware tree in each state. Only the firmware is a fixture there.
 - **A card that is not there:** a sysfs fixture folder, passed by an environment variable, for the detection; an image with the published driver set as the image build installs it, for the real apt. Judge on apt's `Inst`, `Remv` and `Purg` lines and on the difference of the installed list: nothing that is not the vendor's leaves, nothing comes in, `apt-get check` passes. Run one case on the real `/sys` too.
+- **The start itself, under a real systemd, without privileges:** install the published set into a container (systemd as init, the shipped kernel, initramfs-tools, GRUB's menu tools), `docker export` it into `mke2fs -t ext4 -d ROOT disk.raw` inside another container, and start QEMU with `-kernel`, the boot image the guest itself wrote last, `root=/dev/vda rw` and the disk behind a qcow2 layer. A second small ext4 disk carries each start's script in and its results out (`mke2fs -d` to make it, `debugfs -R "rdump /out DIR"` to read it); the guest copies its boot image and `grub.cfg` there, so the next start uses what `update-initramfs` and `update-grub` really wrote. Nothing is mounted on the host.
+  Drive the guest from a timer and a `Type=exec` service that waits until `systemd-analyze time` answers: `blame` and `critical-chain` refuse until the start has finished, and a oneshot in the start's own jobs would keep it from finishing.
+  Measure a start by when `multi-user.target` was reached (`systemctl show -p ActiveEnterTimestampMonotonic`), in pairs, published against new, alternated, with the host's load written at each; "Startup finished" also counts background jobs and is not what a person waits for.
 - **A firmware table:** `-smbios type=1,product=MODEL` gives the DMI name (double a comma: `MacBookPro9,,2`), and `-acpitable file=X.aml` adds a table that does what the faulty method does. A device with a method `_INI` that does the `Notify` to the missing name gives the same two lines the real machine logs, `ACPI BIOS Error (bug): Could not resolve symbol [...], AE_NOT_FOUND` and `ACPI Error: Aborting method ... due to previous error`; with the package's table in the early archive (built exactly as the hook builds it) both are gone and the upgrade line is there.
 - **A masked event:** `acpi_mask_gpe=0x06` gives `ACPI: Masking GPE 0x6.` and `/sys/firmware/acpi/interrupts/gpe06` ending in `masked`. The storm itself needs the machine.
 - **A one-line kernel fix without a kernel build:** take the function's own text (from its definition line to the first line that is exactly `}`), include it in a user-space file whose `snprintf` has the kernel's check (`vsnprintf()` warns and returns 0 for a size above `INT_MAX`), and compare what the measuring pass counts with what is printed.
@@ -82,9 +90,25 @@ Nothing in it was run on those machines: what only they can show is listed at th
 - **Symptom:** a test "passes" on the published side.
   **Cause:** it counted language names from a list that lacked a language, so two wrong numbers agreed.
   **Fix:** when a required language is added, the list of names in a test gains it and the counts change.
-- **Symptom:** the first start reaches the login a minute late.
-  **Cause:** a oneshot wanted by `multi-user.target` with default dependencies holds the target.
-  **Fix:** recipe step 6.
+- **Symptom:** the first start reaches `multi-user.target` only when the driver's removal has ended (20 minutes in an emulated guest), although the removal's own unit has `DefaultDependencies=no`.
+  **Cause:** two `Type=exec` units wanted by the target were ordered after the removal; the target waits for every wanted unit with default dependencies to start, and they could not start before the removal ended.
+  **Fix:** `DefaultDependencies=no` on every unit of the chain (recipe step 6). After it the target was reached 34 s into user space while the removal ran on for 25 minutes.
+  **Found by:** `systemd-analyze critical-chain multi-user.target` in the guest: the target hung under `sparky-stereo-known-machines.service @20min 5.474s`.
+- **Symptom:** a guest assembled in a container gets no kernel option from the table, and the tool says nothing is behind.
+  **Cause:** there is no `/boot/grub/grub.cfg`: no installer ever ran `update-grub`, and the tool writes no menu where there is none.
+  **Fix:** one start of each guest runs the real `update-grub` first, as an installed machine has it.
+- **Symptom:** an older test of the table starts writing boot images in its container.
+  **Cause:** it called `--apply` on a fixture of a machine that now has a correction.
+  **Fix:** matching tests ask with `--list`; `--apply` is tested with doubles and in the guest.
+- **Symptom:** at an early start a new card's driver would be downloaded on a metered connection.
+  **Cause:** NetworkManager has not said yet what the connection is; its `Metered` property is still unknown.
+  **Fix:** `nm-online -q -t 60` before the question.
+- **Symptom:** the image list's test or reader shows one package more than the list has.
+  **Cause:** the generator writes the count into the list's first line; a hand edit left the old number.
+  **Fix:** run the generator on a copy and take its file for the list you changed.
+- **Symptom:** a harness refuses `docker run ... sh -c '... rm -rf ...'`.
+  **Cause:** it cannot read a removal inside a quoted script.
+  **Fix:** give the removal as the container's own command with a literal path (`docker run ... IMAGE rm -rf /d/NAME`).
 - **Symptom:** a kernel option appears twice on the kernel line, or other scripts of `/etc/grub.d` slow down.
   **Cause:** files of `/etc/default/grub.d` are sourced more than once (the memory tester's script sources them for every value it reads).
   **Fix:** add an option only when it is not on the line yet.
@@ -106,4 +130,4 @@ Nothing in it was run on those machines: what only they can show is listed at th
 
 ## Not proven here (the real machines only)
 
-That the MacBookPro9,2's `_Q80` stops logging with the table as the package places it, that the iMac14,1's processor load falls with the option as the package sets it, a real NVIDIA card appearing (the udev event, the download, the restart), MokManager's own enrolment of the DKMS key, and the time of the removal on a machine with a slow disk.
+That the MacBookPro9,2's `_Q80` stops logging with the table as the package places it, that the iMac14,1's processor load falls with the option as the package sets it, a real NVIDIA card appearing (the kernel's own udev event, the download, the restart), MokManager's own enrolment of the DKMS key, GRUB itself reading the menu it was given (the guests take the kernel line from the written `grub.cfg`), and the time of the removal on a real disk (about a minute in a container, 25 minutes emulated).

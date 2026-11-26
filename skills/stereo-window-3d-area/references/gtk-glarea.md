@@ -206,7 +206,7 @@ The device-free witness reported QPainter through KWin supportInformation and ev
 
 ## GTK 3
 
-Milestone 4 (queue row 137, 2026-11-26): the same stereo area in GTK 3.24.52, Debian's gtk+3.0 3.24.52-3 with the edition's patches (+stereo3d1), so GTK 3 programs that draw with OpenGL can be shown per eye; GIMP 3.2's cairo canvas is the next milestone ([plans](gtk-glarea-plans.md)).
+Milestone 4 (queue row 137, 2026-11-26): the same stereo area in GTK 3.24.52, Debian's gtk+3.0 3.24.52-3 with the edition's patches (+stereo3d1), so GTK 3 programs that draw with OpenGL can be shown per eye. GIMP 3.2's cairo canvas uses it since GIMP's milestone 1 ([an editor's canvas per eye](../../stereo-pictures/references/an-editors-canvas-per-eye.md)); its depth layers and deep canvas are [planned](gtk-glarea-plans.md).
 
 ### The route
 

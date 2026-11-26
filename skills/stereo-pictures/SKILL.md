@@ -189,6 +189,10 @@ Check both the bytes and a reader round trip: an unmarked `.jps` can reopen corr
 A program that plays an animated pair reads it through the layer's `Stereo::AnimatedPicture`: one clock, both views from one frame, the file's frames, delays and loop count, 16 bits kept, and a reason instead of an empty picture ([read an animated pair](references/animated-stereo-icons.md#read-an-animated-pair-one-clock-one-frame-a-reason)).
 A JPEG XL pair is marked by the JXLStereo property in the file's XMP (stereo-layer reads it in every top-level `xml ` box and every `brob` box that wraps one, attribute and element form, the orientation applied first).
 
+## An editor's canvas per eye (GIMP)
+
+The edition's GIMP shows a stereo image's canvas per eye: each eye rendered by GIMP's own render code from its own content, both handed to Stereo KWin through GTK 3's stereo area under the canvas items, so guides, selections and tools' outlines stay at the screen in both eyes. The route, the proof (every sample of each eye against single-eye controls, overlays judged as one picture over both eyes) and the traps: [an editor's canvas per eye](references/an-editors-canvas-per-eye.md).
+
 ## Lessons from the lanes, October to November 2026
 
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 6 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (13 entries).

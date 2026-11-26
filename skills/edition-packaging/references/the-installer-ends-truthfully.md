@@ -140,3 +140,35 @@ The availability item is a single root-kept record on the Problems page.
 | One successful installed Plasma login was followed by sddm refusing another start. | The fixture deliberately restarted SDDM while the previous seat was closing. Once the old user manager was gone, the next clean start hit the system unit's start-rate limit. | End the old guest user manager, clear only SDDM's system-unit start budget, then measure the new session and the new user manager's failed units. |
 | A resumed guest passed the pressure test and refused ordinary console poweroff. | The serial output named the still logged-in Plasma session as an inhibitor. The hibernation evidence preceded the shutdown request. | Use `systemctl poweroff -i` for cleanup inside the disposable guest after evidence has been read. |
 | The attached Calamares build log ended during compilation. | The attachment exited 143. The source and binary outputs, complete build record and payload verification were independently present in the output directory. | Validate the source closure and staged binaries before treating an attach error as a build error. Retain the incomplete attachment log and the successful qualification evidence. |
+
+## Boot checks, translated repair outcomes and Btrfs
+
+A package that enables a boot check needs the usual debhelper maintainer-script lifecycle.
+Use `deb-systemd-helper unmask`, `was-enabled` and `enable` or `update-state` on configure, then the matching stop, mask, purge and unmask paths.
+A preset describes a policy. The package lifecycle creates the effective enablement link and respects recorded administrator choices.
+Check a fresh install and the real upgrade. Reboot both and read the unit journal for the new boot.
+Check dependencies and triggers separately. A static path can be active because a daemon wants it, and the service it triggers is normally inactive while idle.
+
+The Problems page already knows its language and the repair command's exit status.
+For a repair with specific outcomes, put a package-and-key mapping in the existing problem record's `repair_feedback` data.
+Render the catalogue from that mapping in the page, with the technical diagnostic in the journal.
+Use real locales and exercise both a refusal and a successful authorized click. An ordinary repair continues using the Problems page's generic text.
+The engine and authorization path can stay the same.
+
+On single-device Btrfs, use a root-owned separate subvolume for the swap file, outside the root's snapshot contents.
+Prepare the file with `btrfs filesystem mkswapfile`. Its no-CoW file has compression off.
+Run `btrfs inspect-internal map-swapfile -r` to validate the allocation and get the device page offset. Write the filesystem UUID and that offset to the initramfs resume file.
+Use a fresh install and an installed-system repair as separate paths. Keep the file off in fstab and require an actual resume from it.
+[Upstream Btrfs swapfile documentation](https://btrfs.readthedocs.io/en/latest/Swapfile.html)
+
+For the occupied shared area, add test-only preparation after Cushion Swap's sleep preparation hook. Have a real process page its anonymous memory out after the hook enabled the file.
+Keep the memory process and the witness alive across S4. Record used KiB before sleep and classify the release after the resume hook has finished.
+An empty file can switch off with the empty-file message. A positive read-back must report a number greater than zero. A deferral keeps the file active and reports the headroom reason once.
+
+| Symptom | Cause and how it was found | Fix |
+| --- | --- | --- |
+| The capability service was preset enabled after an upgrade, but its installed enablement state was disabled. | The maintainer script restarted the service without registering enablement through Debian's service lifecycle. The A10 showed the inactive enablement state. | Use the debhelper helper pattern and prove the new boot in both package-install paths. |
+| A refusal showed a generic command error and a successful repair showed only the title. | The engine keeps the failed command output as evidence and discards successful stdout. The privileged process cannot determine the page's language from its own sanitized environment. | Carry the result mapping on the existing Problems record. Render by the page's language and retain the technical cause in the journal. |
+| The kernel completed resume while the proof still found active swap. | The first serial sample preceded completion of the service's ExecStopPost. The journal had thawed the user slice and had no release line yet. | Wait for the resume hook's result, then read the swap table and the journal. |
+| A good resume failed the older rerun when the shared file was empty. | The judge recognized only the occupied release wording. A replay compared the actual release line with the predicate. | Accept both successful release lines, and require a positive amount in the separate occupied test. |
+| The serial console could start the hibernation witness but hibernate was refused. | Logind named the guest's other graphical login in the inhibitor diagnostic. | Request hibernate with `-i` only from the disposable serial-controlled guest proof. |

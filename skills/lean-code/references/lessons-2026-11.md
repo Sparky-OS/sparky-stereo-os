@@ -138,3 +138,10 @@ Symptom: stereo-layer 1.23.4 compiles and passes its tests, then `override_dh_bu
 Cause: the edition's FFmpeg is built on deb-multimedia's (`-dmo1`), whose libraries depend on deb-multimedia's codec libraries (`libaom3` with the epoch 1); a `sources.json` naming only Debian and the edition's tree cannot install `libstereo-av1` in the gate's root.
 Fix: add `{"uri": "https://www.deb-multimedia.org", "suite": "forky", "components": ["main", "non-free"], "keyring": "/archive/deb-multimedia-keyring.pgp"}`; with the weather cohort's job, the edition's tree is `file:/round` and the job runs with `NETWORK` set when the archives are online (the default is no network).
 Found by: the gate's last lines in the build log, read against the image's own apt sources, which carry deb-multimedia.
+
+## A program that shows its own installed source (row 137 with row 148, 2026-11-26)
+
+Symptom: the edition's GIMP 3.2.8 against Debian's package, file by file (`dpkg-deb -c`): `goat-exercise-c.c` 10322 to 9835 bytes and `goat-exercise-py3.py` 7162 to 6128 under `/usr/lib/x86_64-linux-gnu/gimp/3.0/extensions/org.gimp.extension.goat-exercises/`. The Goat Exercises open their own installed file and show it in their dialog, so the person read the code without its comments.
+Cause: the Python check knew `open(__file__)` but not GIMP's `open(os.path.realpath(__file__), 'r')`, and no rule can see in a C file that its own compiled program reads it (`PLUG_IN_SOURCE`); `lean.debian_prepare --preserve-source "extensions/*"` keeps only the source tree, not the installed copy, and Debian builds pass no payload plan to `release.build_tree`.
+Fix: toolkit 0.1.33: `consumers.py` keeps `/usr/lib/*/gimp/*/extensions/*/goat-exercise-*` whole with its reason, and the self-read check also matches `os.path.realpath`/`os.path.abspath` around `__file__` and `Path(__file__).read_text/read_bytes/open`. An installed system keeps projecting Debian's own GIMP that way until its dpkg-stereo carries 0.1.33.
+Found by: comparing every rebuilt package with Debian's, file by file, and reading why the four size changes outside the catalogues were there.

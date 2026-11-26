@@ -7,6 +7,8 @@ The built parts are in [GTK 4 and GTK 3 and GtkGLArea](gtk-glarea.md); GIMP's ca
 
 Each eye is rendered by GIMP's own render code into a render cache of its own, from that eye's sources (an eye layer, or the eye's view of a packed picture in both halves), and the two pictures go up as textures into one stereo GtkGLArea that lies under the canvas items (GimpCanvas's underlay). The eye's sources are a list (`GimpDisplayShellEyeSource`: a buffer in image coordinates, its abyss, the part of the image it fills), which is where the depth layers plug in.
 
+**Upstream to watch:** GIMP's master merged its own MPO loader on 2026-06-13 (merge request 2852, "plug-ins: Add initial MPO loading support"); GIMP 3.2.8 has none. When the edition moves to GIMP 3.4, read how that loader opens a pair (one image, layers and their names) against the canvas's model (top-level "Left eye" and "Right eye" layers) and the stereo pictures plug-in's own MPO procedure, which then both claim the type.
+
 ## GIMP, milestone 2: the depth layers (queue row 148)
 
 Daniel's design (2026-10-15 ~22:40): "we'll add a special layer type that group other layers in one depth value the artist sets, with 0.000 precision ... the same 2D movement you do with the mouse + a handy key pressed at the same time make it "pop", other make it sink". A depth layer holds other layers at one depth; layers in no depth layer are at the screen (0); no nesting that adds up; two keys, not one key with a drag direction; the engine in a library that GIMP (C) and Krita (Qt) both call; a tool has no limits (unclamped, remembered, no forced warning); each eye gets the layer shifted by half the value, opposite ways (the doubling rule, never cameras); modes 1 and 2 stay.

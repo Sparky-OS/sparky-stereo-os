@@ -12,6 +12,7 @@ Use a stock arm64 handset first, then run the same receiver proof with the hands
    Retain the signed compressed image and use a fresh writable overlay for each test. [Mobian verification instructions](https://wiki.debian.org/Mobian/Verify)
 2. Put QEMU, the desktop rig and the phone in a disposable container with `--network none`.
    For two guests, link their virtual NICs with QEMU's socket backend bound to container loopback and configure a private, two-address subnet without a default route.
+   A native desktop rig can use a disposable `veth` pair and relay ordinary Ethernet frames to QEMU's Unix datagram NIC. Use the same two-address subnet and complete packet checksums.
    Leave out host forwards and host render nodes.
    Install guest client packages from an offline disk built from the guest's own signed apt sources.
 3. On an x86-64 host, run `qemu-system-aarch64 -M virt -accel tcg,thread=multi -cpu max` with a matching Debian generic arm64 kernel and disposable initramfs.
@@ -112,6 +113,20 @@ Use a physical device to qualify hardware decoding, lens alignment and continuou
   Check that the desktop daemon actually answers its `devices` method. A listening socket and a D-Bus name show that startup has reached those registrations. The first-run logs showed the session's autostart service appearing after the explicit early launch.
 - **A reachable peer is absent from `kdeconnect-cli --list-available`.**
   That view requires pairing. Query reachable devices with `devices(true, false)` before asking for a pair. In the isolated rig, the PC daemon returned one ID while the paired-only CLI returned zero.
+- **A phone pairs and the PC reports that it lacks an RDP client.**
+  KDE Connect 25.04.2 advertises `supports_vnc` even after stock KRDC is installed. Use an RDP-capable version of the virtual-monitor plugin on the phone. The release tag and the PC's `lastError` identify the version boundary. [Aleix Pol's RDP change](https://github.com/KDE/kdeconnect-kde/commit/e1bf5239d371d2e650827a4e174fa9c06902245c)
+- **The PC reports that KRdp is missing even though the package is installed.**
+  The released plugin gives its `krdpserver --help` preflight three seconds. The installed program took 6–11 seconds on the TCG desktop. Run the exact PC packages on the container's native CPU and keep the ARM handset in QEMU. The native Wayland help invocation took under half a second.
+- **KWin fails to execute in the native rig container.**
+  The edition's executable has `cap_sys_nice` outside the container's capability bounding set. Clear that file capability only in the disposable rig and run KWin as the lab user. `getcap` and the failed `exec` exposed the cause.
+- **HTTP reaches the native rig and the KDE Connect peer list stays empty.**
+  The published LAN backend drops UDP identity packets sourced from loopback. Give the PC and guest distinct addresses. An isolated `veth` with QEMU's Unix datagram NIC keeps the two addresses visible to the ordinary LAN protocol. The independent HTTP check and the inspected `sender.isLoopback()` branch distinguish the failure from a broken transport. [LAN source](https://github.com/KDE/kdeconnect-kde/blob/v26.04.3/core/backends/lan/lanlinkprovider.cpp)
+- **ARP works through a packet relay and TCP stays in `SYN-RECV`.**
+  Use `ETH_P_ALL` when binding the packet socket, then disable TX checksum offload on the native veth endpoint. QEMU needs the complete on-wire frame at the Unix datagram socket. The desktop's TCP state and the guest's HTTP 200 after the offload change exposed the difference.
+- **The virtual-monitor action launches KRDC and its first connection is refused.**
+  Cold start in TCG outlasted the PC's 45-second client window. Start the stock client once on the empty guest desktop and wait for its ready log before timing the end-to-end request. The cold and warm logs show when FreeRDP tried the TCP endpoint.
+- **FreeRDP logs a host-key warning while the handset still shows its wallpaper.**
+  Each isolated PC session generates a new certificate, and FreeRDP logs the warning before its verification callback. For an automated run, obtain the exact certificate from the rig out of band, verify its digest and put only that certificate in the guest's endpoint-specific FreeRDP trust file. Use a read of the current rig certificate and the client's trace to distinguish a pending verifier from a refusal. [FreeRDP TLS source](https://github.com/FreeRDP/FreeRDP/blob/3.33.1/libfreerdp/crypto/tls.c)
 - **The staged KWin source reaches the arm64 dependency check and exits before compilation.**
   The studied archive supplies Stereo Policy development libraries for amd64.
   Provision the arm64 build dependency and matching Plasma/Qt stack before retrying.

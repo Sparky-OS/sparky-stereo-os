@@ -34,7 +34,7 @@ Jeromy Streets, author of KDE's video wallpaper plugin, which he moved into our 
 
 > "That's such a lovely story about the original team giving you access to the All Outputs license back in the day, and here you are contributing back to the open source code today!"
 
-effcol, maintainer of wiz3D, the open continuation of iZ3D's stereo driver ([wiz3D #32](https://github.com/effcol/wiz3D/issues/32)).
+effcol, maintainer of wiz3D, the open continuation of iZ3D's stereo driver ([wiz3D #32](https://github.com/Stereopticon-Org/wiz3D/issues/32)).
 
 > "It's really quite remarkable how much physical pop/push you appear to get with only a few pixels."
 

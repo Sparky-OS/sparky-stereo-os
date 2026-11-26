@@ -91,6 +91,11 @@ The steps, the guest for a published kernel, and the traps are in [references/ed
 What a kernel's EDID parser makes of one declaration (a sink that sets 3D_present with no mandatory timing, one 3D format on one VIC, a reserved bit, a shipped device's EDID from linuxhw/EDID) needs no VKMS patch: build the EDID from HDMI® 1.4a Table 8-16, pass `edid-decode --check`, boot the kernel package's own `bochs` driver in QEMU with `-device bochs-display,edid=on`, write the file to the connector's debugfs `edid_override`, `echo detect` to its sysfs `status`, and read the parser's stereo modes from the `Rejected mode ... (NO_STEREO)` lines of `drm.debug=0x4`, which that connector drops for want of `stereo_allowed`.
 The recipe, the edid-decode failures and their fixes, the Debian 14 kernel package split, and the facts measured on two kernels are in [references/edid-for-a-claim.md](references/edid-for-a-claim.md).
 
+## USB-C glasses on VKMS, no HDMI 3D mode needed
+
+Glasses announce a plain mode two eyes wide and KWin makes the twin, so their proof needs no stereo mode from the kernel: the edition's published kernel, one DisplayPort connector reading the glasses' real EDID, a root image exported for 9p, scale 1 before the clients, and the address-coded client [`src/glasses-sbs.c`](../../tools/vkms-stereo-bench/src/glasses-sbs.c) whose every sample says its eye and place.
+The recipe, the expectations and the traps are in [`drivers`](../drivers/references/usb-c-sbs-glasses.md#recipe-the-proof-per-pair-of-glasses-in-a-vkms-guest).
+
 ## The output's eye flip on every 3D mode, and an old lane's open points
 
 Every 3D mode of one output (anaglyph, rows, columns, checkerboard, half side by side, top and bottom, side by side full, frame packing, frame sequential) with the eye swap off and on, each against a model that the other swap must fail, in one guest run of about four minutes: [references/eye-order-matrix.md](references/eye-order-matrix.md) has the recipe, the traps and how to reconcile an old report's open points against what ships; the scripts are in `tools/vkms-stereo-bench/eyeorder`.

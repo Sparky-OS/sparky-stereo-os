@@ -1009,3 +1009,12 @@ The whole-pool rerun must provision the same original when that bootstrap versio
 - **Cause:** the first stop came from an accepted Debian-source rebuild (anacron `2.3-52+stereo3d1`) that never went through Lean Code: no `Sparky-Lean-Code` field, no `-lc-hr` companion, no `+lc1`; the second is the gate's own rule, a marked package must be given with its HR companion.
 - **Fix:** list every primary's `Sparky-Lean-Code` field before the gate (`dpkg-deb -f DEB Sparky-Lean-Code`, skipping `-dbgsym` and `-lc-hr`); hold an unmarked one as a qualification gap (its lc1 source is made with `lean.debian_prepare`, as the Kamoso case above says), then run the gate on every remaining archive, companions included.
 - **How found:** the two stops in that order, then the field listing, which named one package of 432.
+
+### A library successor that breaks an edition package pinned to Debian's version
+- **Symptom:** case b (a fresh install of `sparky-stereo` and the developer tasks) stops at once: `Reached two conflicting assignments: pipewire-bluez5-codec-aac ... Depends libspa-0.2-bluetooth (= 1.6.9-2)`, while every closure, version and translation check of the take passed.
+- **Cause:** an accepted PipeWire rebuild (`1.6.9-2+stereo3d1+lc1`) replaces `libspa-0.2-bluetooth`; the edition's own published AAC codec was built against Debian's library and names it at an exact version; `sparky-stereo-hardware-support` Depends on the codec, so the whole edition cannot install.
+- **Fix:** hold the library's source and every taken package that requires its version (Kamoso here), keep the published codec, and name the owed successor: the codec rebuilt against the new library, in the same round as it. Search the published index for every `(= VERSION)` relation on a binary the take replaces before the proofs: `grep -B20 '(= OLD_VERSION)' Packages` over the published binary indexes.
+- **How found:** the solver's chain in `e1-install.log`, then the codec's record in the published index (`+lc1`: ours, not deb-multimedia's).
+
+### Case e's base phase never reads the pool
+`e-base.sh` installs the published edition from `/base` only; the pool is read first by `e-upgrade.sh`. When the take changes while the base installs, let the base finish and commit, and rebuild only the pool's index before the upgrade phase; stopping the base costs its whole install again.

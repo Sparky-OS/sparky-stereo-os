@@ -32,7 +32,7 @@ Pair the one identified phone and one identified rig over the isolated link.
 KDE Connect's daemon `devices(true, false)` query includes reachable peers before pairing. Use its `customDevices` property to name the one guest peer explicitly on an isolated two-address link.
 The KDE Connect object's `requestVirtualMonitor` invokes the same action as **Use device as an external monitor**.
 Record its acceptance, the new KWin output, the receiving process and the first advancing frame on the phone.
-A virtual KWin already has an output before the request, so retain the before and after output IDs. In authentication-first versions of KRdp, the RDP client starts ahead of the new output. Handle the test server's certificate in the client, then wait for the authenticated session to create its output.
+A virtual KWin already has an output before the request, so retain the before and after output names and UUIDs. In authentication-first versions of KRdp, the RDP client starts ahead of the new output. Handle the test server's certificate in the client, then wait for the authenticated session to create its output.
 
 The [upstream KDE Connect plugin](https://github.com/KDE/kdeconnect-kde/blob/master/plugins/virtualmonitor/virtualmonitorplugin.cpp) advertises resolution and scale from its primary screen.
 Its receiver dispatches an RDP URL through the configured scheme handler.
@@ -133,6 +133,10 @@ Use a physical device to qualify hardware decoding, lens alignment and continuou
   Provide a render node through the container's configured GPU device interface and verify that the virtual KWin session reports OpenGL.
   If the node has mode 0660, grant its group to the disposable PC test account inside the container. Do not change permission bits on the host node.
   Keep the PC in virtual-output mode and the emulated handset on Bochs. [KWin screencast manager](https://github.com/KDE/kwin/blob/v6.7.4/src/plugins/screencast/screencastmanager.cpp) [KWin virtual backend](https://github.com/KDE/kwin/blob/v6.7.4/src/backends/virtual/virtual_backend.cpp)
+- **PipeWire reports `target not found` after the virtual output appeared.**
+  Compare KScreen output names before and after the request, and check which output the chart setup disabled.
+  In this case the numeric position 1 changed from the baseline to the streamed output. Disabling that position removed the stream and KRdp sent zero frames.
+  Place the chart on the negotiated output by disabling the baseline with its name, for example `kscreen-doctor output.Virtual-0.disable`. [KScreen command syntax](https://github.com/KDE/libkscreen/blob/v6.7.4/src/doctor/main.cpp)
 - **The staged KWin source reaches the arm64 dependency check and exits before compilation.**
   The studied archive supplies Stereo Policy development libraries for amd64.
   Provision the arm64 build dependency and matching Plasma/Qt stack before retrying.

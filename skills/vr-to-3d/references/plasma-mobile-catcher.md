@@ -264,9 +264,40 @@ So a margin check with tolerance 0 measures geometry the chart places and H.264 
 KPipeWire on the PC can answer a second Throw in one KWin session with "Stream error: no more input formats" and "PipeWire remote error: -32 no more input formats" after KRdp's "Video stream initialized with H.264 enabled"; the phone then shows nothing and Catch says nothing (queue row 927, seen in row 924's and row 124's reruns on 2026-11-26).
 A red row with this line in the PC log is that fault, not the receiver: read `*-pc.log` before blaming Catch.
 
+### Check the format list and first picture
+
+- **Symptom.** KRdp selects H.264, then KPipeWire reports `no more input formats` and the phone stays on its waiting view.
+- **Cause.** The 6.7.4 KPipeWire source builds the PipeWire format parameters into 4,096 bytes. NVIDIA's DMA-BUF modifier lists can require more space. The builder reports its full required size, but returns null for objects that cannot fit. KPipeWire removes those objects. If the omitted objects include BGRx and BGRA, the producer and consumer cannot agree on a format.
+- **Fix.** Carry Zhongli Wu's upstream buffer-resizing change and keep the packaged release's `buildFormat` signature. Rebuild the complete list into the grown buffer before publishing it, including on renegotiation. [KDE bug 524881](https://bugs.kde.org/show_bug.cgi?id=524881) · [KPipeWire change](https://invent.kde.org/plasma/kpipewire/-/commit/71ba11ff887c6eb900b5541b4a8d7bf74bd3ae28)
+- **How the format loss was measured.** Compile the exact packaged builder against PipeWire's headers. Put BGRx and BGRA last, run a no-modifier control with nine offers, then add 13 modifiers to each format at 74,994 mHz. The requested buffer reaches 5,328 bytes. The published +8 and staged +9 submitted 13 objects with neither BGRx nor BGRA. The backport submitted all 18 including two offers for each of those formats. This control proves the capacity and ordering fault using an explicit offer list. Count actual RDP failures separately.
+- **How to trace a running stream.** Record the input format objects as the KRdp process calls `pw_stream_connect` and `pw_stream_update_params`. Log object sizes, format names and modifier counts. Compare the offer with KWin's format list and the first received AVC frame. Reuse the compositor for repeated Throws, label each link and count all attempts. A shell or desktop startup failure belongs outside that count.
+
+The installed package replay used one virtual KWin session and eight circuits through native, full side by side, half side by side, half top-and-bottom and full top-and-bottom. A pinned FreeRDP client on the private loopback recorded the first AVC update. Published +8 failed negotiation 5 times in 40 and staged +9 failed 3 times in 40. The +11 backport sent AVC on all 40 attempts with the same KRdp +11 server used in the staged run. In the actual red trace neither BGRx nor BGRA was present. Each long modifier list carried 14 values including the repeated default.
+
+The KRDC controller's first-picture timer starts after the approved RDP session starts and stops on the first decoded image. On expiry the app closes its listener, releases the session and tells the person to start the Throw again. The final control message goes over the still-paired TLS connection. The desktop discovery client accepts it while the approved lease is active and uses the same sentence in its notification. The package catalogues carry the same sentence in the edition's languages.
+
+For the installed timeout control, keep the RDP graphics negotiation and pairing active and withhold the PipeWire producer in the disposable PC.
+Check that KRdp selected H.264, Catch exposes the message without another button press, and the private Plasma notification service receives the same message.
+Check that the virtual output disappears and Catch stops advertising after the deadline.
+Run the five positive links on the same desktop to verify that a decoded picture cancels the timer.
+
+- **The notice test stops before RDP and Plasma logs `starting invalid corona`.** The minimal PC rig has Plasma Workspace without the desktop shell assets. Add `plasma-desktop` and use the private Wayland environment for D-Bus activation. Check `GetServerInformation` on `org.freedesktop.Notifications` before arming Catch. The repaired fixture reported Plasma 6.7.4 and protocol 1.2.
+- **The notification daemon is present and the applet's PulseAudio QML import fails.** The default Plasma notification applet imports `org.kde.plasma.private.volume`. Install the matching `plasma-pa` package inside the fixture. The shell log named the missing module and the package installed its `qmldir`. Keep the KPipeWire QML package at the same version as its exact-version libraries.
+
+### Keep an offline guest installation
+
+- **Symptom.** The serial fixture times out during package installation under load.
+- **Cause.** A timed-out serial reader leaves the installation running. In one run the shell later printed the expected package versions and its successful exit marker.
+- **Fix.** Wait for a successful `dpkg --audit` and `sync` in the isolated guest. Pause QEMU, copy its guest-only QCOW2 overlay and resume QEMU. Save the overlay checksum. Use a throwaway child overlay with the same verified distribution image as its backing file for the next boot.
+- **How found.** The end of the serial log showed the original command exiting zero after the host timed out. The checkpoint proof reran the package query and confirmed KRDC, KDE Connect, Plasma Mobile and KWin versions before the copy.
+
+- **The session has a working private link and a black framebuffer before pairing.** Read the phone's user journal for the Plasma startup services. In the loaded QEMU run, `plasma-kded6` and `plasma-ksmserver` hit their 90-second startup limits just before the shell started. Give the disposable TCG guest's user services more startup time and then recheck a visible shell. Keep the production first-picture deadline tied to RDP approval.
+- **The full-system arm64 C++ build advances slowly after configuration.** Preserve a guest-only configured root. If the copy was taken while QEMU was paused, repair a disposable copy with `e2fsck` before reuse. Build the unchanged source with the guest's headers and an AArch64 cross compiler. Verify the source descriptor, an AArch64 ELF and `CATCH_PROOF=OFF` before importing the objects into the native package step. The compiler and descriptor records distinguish the release build from the separate wrong-pin executable.
+
 ## Credits
 
 The KDE Connect virtual-monitor source names Aleix Pol i Gonzalez and Fabian Arndt, and the downstream protocol-v2 history names Fabian Druschke.
+Zhongli Wu authored the upstream format-buffer fix.
 Arjen Hiemstra developed KRdp and KRDC's FreeRDP session.
 KRDC's RDP view credits Arend van Beelen jr., Urs Wolfer and AceLan Kao.
 Plasma Mobile's startup file names Aleix Pol, Bhushan Shah and Jonah Brüchert.

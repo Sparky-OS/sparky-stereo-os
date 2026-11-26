@@ -41,6 +41,11 @@ The edition's native panel path instead acquires a lease through the existing KR
 The independently launched Kirigami Catch frontend has a pin callback and per-eye fitting.
 Keep the two calls distinct when reporting results.
 
+The proven stock comparison used Debian KDE Connect 26.08.3 and KRdp 6.7.4 on the virtual PC, with KDE Connect 26.08.3 and KRDC 26.04.0 on the Mobian arm64 guest.
+The same test compositor ran OpenGL in virtual-output mode.
+It created a 1280×800 output at scale 1 and 60 Hz and delivered a changing two-colour chart fullscreen over H.264.
+The source order change reached the screen and failed the left-first classifier.
+
 Use a source with different, changing identifiers in the two eyes.
 The swapped control must arrive on screen and fail left-first identity.
 A frozen frame with valid labels must fail progress.
@@ -137,6 +142,16 @@ Use a physical device to qualify hardware decoding, lens alignment and continuou
   Compare KScreen output names before and after the request, and check which output the chart setup disabled.
   In this case the numeric position 1 changed from the baseline to the streamed output. Disabling that position removed the stream and KRdp sent zero frames.
   Place the chart on the negotiated output by disabling the baseline with its name, for example `kscreen-doctor output.Virtual-0.disable`. [KScreen command syntax](https://github.com/KDE/libkscreen/blob/v6.7.4/src/doctor/main.cpp)
+- **The published PC removes its virtual output roughly 45 seconds after the listener starts.**
+  Inspect the PC build's `phone-throw-virtualmonitor.patch` and the guest stock plugin version.
+  The downstream timer clears on its `clientConnected` control packet. The stock phone plugin hands the URL to KRDC and has no matching acknowledgement.
+  Preserve that run as a compatibility control. The stock KDE Connect and KRdp pair gives a separate way to exercise the upstream protocol on the same virtual desktop.
+  For an edition fix, count the authenticated KRdp session on the generic route and verify the structured acknowledgement separately. [Stock plugin v26.08.3](https://raw.githubusercontent.com/KDE/kdeconnect-kde/v26.08.3/plugins/virtualmonitor/virtualmonitorplugin.cpp)
+- **Suppressing late-frame drops still leaves the handset without the chart.**
+  The published PC logged 73 late drops in one warm run.
+  A diagnostic using the shipped KRdp setting `KRDP_KEEP_LATE_FRAMES=1` reduced that count to zero, and the same deadline still closed the connection before the chart appeared.
+  Compare the published route with the upstream KDE Connect and KRdp pair while holding the KWin session, renderer and handset fixture fixed.
+  Use the stock comparison to prove display delivery and keep the edition's compatibility failure visible.
 - **The staged KWin source reaches the arm64 dependency check and exits before compilation.**
   The studied archive supplies Stereo Policy development libraries for amd64.
   Provision the arm64 build dependency and matching Plasma/Qt stack before retrying.

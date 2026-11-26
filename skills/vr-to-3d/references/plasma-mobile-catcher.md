@@ -326,10 +326,36 @@ Read the Android waiting catalogue and use its named local files. Require PNG `s
 
 - **The AArch64 build aborts in the Catch automatic MOC step with allocator corruption.** The raw user-mode SDK configured and built the RDP session first. The failure was in its code-generation phase. Verify the exact Qt tools package version on both architectures and run matching host `moc` and `rcc` for generation. Keep ARM libraries and headers in the signed SDK. Verify that `readelf` identifies the linked executable as AArch64 and that its source descriptor hash matches the other architecture's. This qualifies the executable build. The distribution package still has its own native Lean Code and payload gates.
 
+### Build the shared arm64 source and check the installed package
+
+Check the amd64 source descriptor against its build record and use its SHA-256 as the expected value for the whole build.
+Start an offline arm64 build guest using a signed SDK that carries that descriptor, its source members, the required packages and the previous arm64 package.
+Run the Debian package configuration in the guest, then preserve its configured root if cross-building the objects.
+The extracted root carries the native build configuration, compiler flags and recorded package set.
+Match the host Qt tool version to the guest's installed tool version before using host MOC or RCC.
+Import only objects from the expected descriptor and check the AArch64 ELF and release configuration before running native debhelper.
+The package closure also has the build information, changes manifest, provenance record and debug package.
+Verify the binary package metadata and the ELF architecture separately.
+Compare every file, directory and symlink in the result with its architecture's predecessor.
+Keep the descriptor and its source members once for both architectures.
+
+### Diagnose the stock phone start
+
+Time the serial login, active Plasma shell, Catch process and first visible frame separately.
+The initial login may create the user bus even if the session later shuts down before showing Catch.
+Read the greetd and handset user journals and inspect the virtual framebuffer when the expected user unit does not become active.
+In a loaded one-vCPU guest, the session stopped Plasma Wayland and its user bus before Catch ran, and greetd restarted repeatedly.
+A two-vCPU guest with the tested QEMU CPU model reached the active shell after about 13 minutes and registered the Catch controls after a further five minutes.
+Check the running executable against the intended hash and allow QEMU time to paint the first frame after the shell is active.
+A successful accessibility check establishes that the controls exist.
+Use the same virtual display wake and lock configuration as the paired rig to prove they painted on the panel.
+
 ### Locate a live capability error
 
 An unavailable decoder for a local waiting clip and an unavailable decoder for an approved Throw are different events.
 Check the active transport's decoder for the approved codec.
+Read the negotiated mode in the sender.
+KRdp's `VideoStream` selects AVC from the RDPGFX capabilities. Its `HeadsetChannel` negotiates HEVC separately.
 FreeRDP's H.264 context constructor initializes its backend and can return null before the receiver starts.
 The current paired offer carries the panel, NLA endpoint and certificate fingerprint.
 The head-fixed Flat Headset path runs without continuous pose.

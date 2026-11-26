@@ -194,6 +194,76 @@ The subsequent milestone supplies the approved KDE Connect receiver handoff and 
 - **The long stock test leaves QEMU showing the previous screen.** KScreen's `--dpms show` found the Bochs output off even with the Catch surface mapped. Wake the guest display with `kscreen-doctor --dpms on` before checking Catch. In this disposable fixture, disable automatic locking before starting the guest session.
 - **Injected input leaves the visible Catch button idle.** The QEMU screenshots kept the ready label and the guest had no SSDP listener. Launch the unchanged Qt app with accessibility enabled and call its Catch button's AT-SPI action in the guest. The status changed to waiting and the actual UDP 1900 listener appeared.
 
+## Reuse the current KDE Connect pair
+
+Start Catch in the phone's own Plasma Mobile session after both devices have paired.
+Use the current KDE Connect session certificate as the Headset:1 identity.
+On the receiver, require a TLS client certificate and check it against the live KDE Connect store before sending the panel descriptor or acting on a control message.
+On the computer, run KRdp's existing paired discovery and panel owner. The phone's certificate must match the pairing. The RDP client then verifies the separate RDP pin received over that authenticated control connection.
+Unpair during a stream and check that the control socket closes, the RDP session ends and the panel output disappears.
+
+Report native pixels, mHz and physical dimensions from the active KScreen output. The native descriptor stays version 1. Each packed link uses version 2 with the same `linkFormat` as Android:
+
+| Link | RDP raster for the fixed 720p links | Unpacking |
+| --- | --- | --- |
+| `native` | Native panel raster | Split horizontally at the midpoint. |
+| `sbs-720` | 2560×720 | Split horizontally into two 1280×720 eyes. |
+| `sbs-half-720` | 1280×720 | Split horizontally and restore the eye width in the output fit. |
+| `tb-half-720` | 1280×720 | Split vertically and restore the eye height in the output fit. |
+| `tb-720` | 1280×1440 | Split vertically into two 1280×720 eyes. |
+
+Use the shared Android link labels when preparing the package catalogues. Verify the installed button and refusal separately from the archive checks. The deliberately wrong pin belongs in a separate fixture executable built with `CATCH_PROOF`. Release packages leave that switch off.
+
+- **A cross build asks to replace the build machine's Perl.** APT resolves unqualified Lean Code tool dependencies for the arm64 target, so `perl:arm64` requests `perl-base:arm64` alongside the conflicting amd64 installation. Check the solver's dependency chain. A native arm64 QEMU build can install the tools required by the unchanged source descriptor.
+- **The headless arm64 build guest enters emergency mode with the root filesystem mounted.** A boot built from only the Mobian root partition lacks the image's separate boot partition. The serial log shows the missing device and failed `boot.mount`. Use a disposable root copy, disable the fstab generator for the build, and mount the build inputs explicitly.
+- **The archive builder cannot create its offline disk.** `mkfs.ext4` comes from e2fsprogs. Check for it before downloading the SDK. The later device test already needs its own matching QEMU tools and uses the signed offline dependency pack.
+
+- **The configured arm64 build outlasts the serial controller.** The compiler can remain busy after its last printed target. Inspect the compiler or emulator CPU and the next build target before deciding where it stopped. Use a longer build-specific deadline and a separate disk checkpoint after CMake configures the source. Replay the ext4 journal on a disposable copy before reusing the checkpoint.
+- **An AArch64 command exits 182 in PRoot.** Direct QEMU user mode printed `arm64` for `dpkg --print-architecture`. Verbose PRoot logged its seccomp acceleration and then exited 182 for the identical command. Set `PROOT_NO_SECCOMP=1` for the disposable PRoot build and repeat `dpkg --print-architecture` before starting CMake.
+- **The compiler runs much slower than the Qt code generators under emulation.** Keep the native arm64 sysroot and run the signed Debian amd64-host AArch64 compiler through CMake's C++ compiler launcher. Compile a known translation unit and confirm `Machine: AArch64` with `readelf -h` before letting it compile the tree. Record both compiler versions and the source descriptor hash across the transfer to the native package build.
+
+Use the FreeRDP graphics client's surface creation record to check the received raster. An AVC wire update then gives the received codec, and the marked capture gives the eyes, layout and margins. Check the same chart with a deliberately frozen frame, reversed eye order and unequal margins before crediting the positive captures. [FreeRDP graphics client](https://github.com/FreeRDP/FreeRDP/blob/3.33.1/channels/rdpgfx/client/rdpgfx_main.c)
+
+
+- **The imported CMake tree recompiles at the start of packaging.** The native binary sequence reconfigured the imported tree and requested C++ compilation again.
+  Finish the build first and verify its source descriptor digest, release cache and AArch64 executable in the native guest.
+  Run the package's configured test target, then use Debhelper's completed-build stamp to proceed through normal binary packaging, dependency resolution and Lean Code.
+  The native logs distinguish the first repeated C++ compile from the successful packaging run.
+- **The Catch dropdown has only `SetFocus` in AT-SPI or ignores the QEMU input event.** Use the proof rig's Wayland client in the disposable handset session and get the chooser geometry from AT-SPI.
+  Click to open the popup, invoke `Press` on the menu item with the intended translated label, then read the chooser value back.
+  The accessibility probe showed the `Press` action on the open menu item and the updated value after activation.
+- **The changed-pin fixture reports a JSON syntax error on `{`.** Its descriptor is formatted across lines.
+  Decode the complete document beginning at the opening brace and compare it with the handset's native KScreen values before starting the connection.
+
+Keep compositor input permissions scoped to the test handset session. [Stereo proof rig](../../stereo-proof-rig/SKILL.md)
+
+On the weekly Mobian arm64 fixture dated 2026-11-22, the paired native Catch reproduced `1280×800`, `74994` mHz, scale `1` and `325×203` mm on the PC output.
+FreeRDP reported an AVC update to a `1280×800` surface.
+The marked native image held both eyes, and the frozen, reversed and unequal controls each failed their corresponding positive picture check.
+The wrong pin refused RDP after mutual control identity was accepted, and the paired desktop output disappeared when Catch closed.
+
+For the four packed links, the PC capture stayed `2560×720`, and the received surfaces matched the four advertised sizes in the table.
+The receiver restored equal fitted margins in both eyes.
+Removing the KDE Connect pair while RDP was receiving AVC revoked the active output lease.
+
+- **The change detector reports progress while the chart marker has still to appear.** A whole-frame inequality can count unrelated pixels.
+  Sample both eyes at locations predicted by the chart marker and wait for the requested marker before timing the frozen interval.
+  The rejected capture had the same marker values as the baseline, while the actual progress and freeze captures had the bright value in both eyes.
+
+
+
+## Measure eye margins at full resolution
+
+The paired rig's `equal_eye_margins` samples every fourth pixel and allows 8 pixels either way, so it printed `0, 0, 3, 3` for a picture that reaches the edge (the last sample sits three pixels short), and a real margin of up to 8 pixels would pass (row 124, main session's review, 2026-11-26).
+Read every pixel of both eyes: the five links measured `0, 0, 0, 0` (native) and `0, 220, 0, 220` (each packed link on a 1280x800 panel) in both eyes.
+A colour threshold also moves with the encoder: one rerun read `4, 222, 4, 222` for `tb-half-720`, equal in both eyes, where the others read `0, 220, 0, 220`, because a compressed half-height frame blurs the colour edge.
+So a margin check with tolerance 0 measures geometry the chart places and H.264 keeps (marks, the marker), never where a colour fades.
+
+## A second Throw that gets no picture
+
+KPipeWire on the PC can answer a second Throw in one KWin session with "Stream error: no more input formats" and "PipeWire remote error: -32 no more input formats" after KRdp's "Video stream initialized with H.264 enabled"; the phone then shows nothing and Catch says nothing (queue row 927, seen in row 924's and row 124's reruns on 2026-11-26).
+A red row with this line in the PC log is that fault, not the receiver: read `*-pc.log` before blaming Catch.
+
 ## Credits
 
 The KDE Connect virtual-monitor source names Aleix Pol i Gonzalez and Fabian Arndt, and the downstream protocol-v2 history names Fabian Druschke.

@@ -276,12 +276,20 @@ The installed package replay used one virtual KWin session and eight circuits th
 
 The KRDC controller's first-picture timer starts after the approved RDP session starts and stops on the first decoded image. On expiry the app closes its listener, releases the session and tells the person to start the Throw again. The final control message goes over the still-paired TLS connection. The desktop discovery client accepts it while the approved lease is active and uses the same sentence in its notification. The package catalogues carry the same sentence in the edition's languages.
 
+For the installed timeout control, keep the RDP graphics negotiation and pairing active and withhold the PipeWire producer in the disposable PC.
+Check that KRdp selected H.264, Catch exposes the message without another button press, and the private Plasma notification service receives the same message.
+Check that the virtual output disappears and Catch stops advertising after the deadline.
+Run the five positive links on the same desktop to verify that a decoded picture cancels the timer.
+
 ### Keep an offline guest installation
 
 - **Symptom.** The serial fixture times out during package installation under load.
 - **Cause.** A timed-out serial reader leaves the installation running. In one run the shell later printed the expected package versions and its successful exit marker.
 - **Fix.** Wait for a successful `dpkg --audit` and `sync` in the isolated guest. Pause QEMU, copy its guest-only QCOW2 overlay and resume QEMU. Save the overlay checksum. Use a throwaway child overlay with the same verified distribution image as its backing file for the next boot.
 - **How found.** The end of the serial log showed the original command exiting zero after the host timed out. The checkpoint proof reran the package query and confirmed KRDC, KDE Connect, Plasma Mobile and KWin versions before the copy.
+
+- **The session has a working private link and a black framebuffer before pairing.** Read the phone's user journal for the Plasma startup services. In the loaded QEMU run, `plasma-kded6` and `plasma-ksmserver` hit their 90-second startup limits just before the shell started. Give the disposable TCG guest's user services more startup time and then recheck a visible shell. Keep the production first-picture deadline tied to RDP approval.
+- **The full-system arm64 C++ build advances slowly after configuration.** Preserve a guest-only configured root. If the copy was taken while QEMU was paused, repair a disposable copy with `e2fsck` before reuse. Build the unchanged source with the guest's headers and an AArch64 cross compiler. Verify the source descriptor, an AArch64 ELF and `CATCH_PROOF=OFF` before importing the objects into the native package step. The compiler and descriptor records distinguish the release build from the separate wrong-pin executable.
 
 ## Credits
 

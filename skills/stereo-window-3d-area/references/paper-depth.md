@@ -53,7 +53,7 @@ The stereo proof rig ([the rig](../../stereo-proof-rig/SKILL.md)): Stereo KWin's
 - The desk's shift against the page's, from colour-keyed marks: a desk mark and a page mark measured in each eye; the page's own content moves with the page.
 - A page scrolled under the toolbar: the page's edge at the toolbar in both eyes at the same column.
 - Presentation mode, a page filling the output: equal eyes.
-- A background window: equal eyes.
+- A background window: flat inside, its paper, desk and title bar at one level (Stereo KWin moves the whole window, so its eyes are not equal).
 - Red rows: the published packages show no step; `ElementLimit=0` gives equal eyes; a 2D output gives the same pixels as the published build.
 - A second, measuring scale (a larger `ElementLimit`) makes every share whole pixels; it is a measuring scale only, never a default.
 

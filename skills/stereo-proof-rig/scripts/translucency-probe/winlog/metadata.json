@@ -1,0 +1,1 @@
+{"KPlugin": {"Id": "probewinlog", "Name": "probewinlog", "Description": "Prints every window once, with its kind and frame, for the translucency rig"}, "X-Plasma-API": "javascript", "KPackageStructure": "KWin/Script"}

@@ -25,7 +25,7 @@ N=${OUTPUTS:-1}; W=${W:-1920}; H=${H:-1080}
 read -r -a MODEA <<< "${MODES:-3d}"
 # 1. the person's saved screens, made the way Display Settings makes them
 dbus-run-session -- bash -c '
-KWIN_VIRTUAL_STEREO_MODES=1 kwin_wayland --virtual --socket=setup --output-count '"$N"' --width '"$W"' --height '"$H"' > "$XDG_RUNTIME_DIR/setup.log" 2>&1 & k=$!
+KWIN_VIRTUAL_STEREO_MODES=1 env -u LIBGL_ALWAYS_SOFTWARE -u __EGL_VENDOR_LIBRARY_FILENAMES kwin_wayland --virtual --socket=setup --output-count '"$N"' --width '"$W"' --height '"$H"' > "$XDG_RUNTIME_DIR/setup.log" 2>&1 & k=$!
 for i in $(seq 100); do [ -S "$XDG_RUNTIME_DIR/setup" ] && break; sleep 0.1; done; sleep 1.5
 args=($(WAYLAND_DISPLAY=setup kscreen-doctor -j 2>/dev/null | python3 -c "
 import json, sys
@@ -72,10 +72,12 @@ if [ -n "${HOLD:-}" ]; then
 	sed "s#^Exec=.*#Exec=sh -c 'sleep $HOLD; exec /usr/bin/plasmashell'#" /etc/xdg/autostart/org.kde.plasmashell.desktop > "$HOME/.config/autostart/org.kde.plasmashell.desktop"
 fi
 # 3. KWin on the virtual outputs: kwin_wayland_wrapper starts kwin_wayland from PATH and adds its own arguments
+# KWin draws on the card the container was given; with CARD=nvidia (run-case.sh) the session's programs keep Mesa's
+# software renderer and KWin alone leaves it
 mkdir -p "$XDG_RUNTIME_DIR/shim"
 cat > "$XDG_RUNTIME_DIR/shim/kwin_wayland" <<SH
 #!/bin/sh
-exec /usr/bin/kwin_wayland "\$@" --virtual --output-count $N --width $W --height $H
+exec env -u LIBGL_ALWAYS_SOFTWARE -u __EGL_VENDOR_LIBRARY_FILENAMES /usr/bin/kwin_wayland "\$@" --virtual --output-count $N --width $W --height $H
 SH
 chmod +x "$XDG_RUNTIME_DIR/shim/kwin_wayland"
 export PATH=$XDG_RUNTIME_DIR/shim:$PATH KWIN_VIRTUAL_STEREO_MODES=1 KWIN_SCREENSHOT_NO_PERMISSION_CHECKS=1 KWIN_WAYLAND_NO_PERMISSION_CHECKS=1

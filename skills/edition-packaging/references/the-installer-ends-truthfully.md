@@ -151,8 +151,8 @@ Check dependencies and triggers separately. A static path can be active because 
 
 The Problems page already knows its language and the repair command's exit status.
 For a repair with specific outcomes, put a package-and-key mapping in the existing problem record's `repair_feedback` data.
-Render the catalogue from that mapping in the page, with the technical diagnostic in the journal.
-Use real locales and exercise both a refusal and a successful authorized click. An ordinary repair continues using the Problems page's generic text.
+Render the catalogue from that mapping as soon as the action finishes and when the page reloads a retained refusal. Keep the technical diagnostic in the journal.
+Use real locales and exercise both a refusal and a successful authorized click. Close and reopen the page to verify that the instruction remains visible. An ordinary repair continues using the Problems page's generic text.
 The engine and authorization path can stay the same.
 
 On single-device Btrfs, use a root-owned separate subvolume for the swap file, outside the root's snapshot contents.
@@ -175,5 +175,7 @@ An empty file can switch off with the empty-file message. A positive read-back m
 | The GUI authorized a repair, but the new Btrfs subvolume then failed the writable-mode check. | Starting the first build with umask 000 reproduced the interactive refusal on a missing /swap. The direct console test with the ordinary umask had passed. | Set a private umask in the repair and mode 0700 on the subvolume it creates. Validate existing subvolumes without changing their ownership or permissions. |
 | The Problems page showed exit 127 before a repair could start. | The test had launched the GUI through a transient system service with the desktop UID. It had no graphical polkit agent in that authorization context. | Launch the test page through the existing desktop user's systemd manager, then authorize the actual action in the guest. |
 | OCR could see the Hibernation title but missed the clicked Repair button on the next launch. | The guest screenshot showed the mouse pointer across the button text. | Park the pointer away from the window before reading OCR and select the button anchored to the actual hibernation item. |
+| Reopening Problems replaced the translated repair instructions with a generic exit number. | The screenshot of the reopened German page showed status 40. The reload code read the retained status but did not use the record's catalogue mapping. | Resolve the retained status through the same catalogue helper as the immediate result and exercise both views. |
+| The offline Btrfs guest showed a language package download error above the hibernation problem. | An installed-seed screenshot showed the deferred apt job using the disconnected live proxy. | In the GUI fixture, record the unrelated language task's failures before clearing them and stopping its triggers. Keep the hibernation and repair paths active. |
 | The old hibernation policy remained available immediately after the fixture removed its swap file. | The running logind still had its earlier generator environment. Restarting it by itself returned the guest to the greeter. | In a disposable test guest, tear down the old session before refreshing logind and start a fresh session for the page. Test the repaired setting on the subsequent ordinary boot. |
 | The initramfs builder warned that the configured UUID did not match an active swap device. | The new Btrfs area was a noauto file. The on-disk config, physical offset and final package output supplied better evidence than the generic builder warning. | Read the same UUID and physical page offset from the installed file and require a real S4 cycle with a preserved witness. |

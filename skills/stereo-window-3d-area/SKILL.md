@@ -157,6 +157,12 @@ A QML scene of its own (a splash, a layer-shell window, a program's own items) g
 Plain QML cannot set `_q_stereo_depth` or `_q_stereo_parallax`, because Qt Quick hears only dynamic property changes.
 The desktop's loading screen is the first user: [kde-desktop-defaults, the loading screen](../kde-desktop-defaults/references/loading-screen.md).
 
+## Rectangles inside one widget at their own depth (paper depth)
+
+A widget that paints several surfaces itself (a document viewer's desk and its pages) declares rectangles at their own depth with `_q_stereo_depth_rects`, in steps of the person's element limit, which Stereo KWin hands out (`element_limit`, version 7 of `kde_stereo_content_v1`); the edition's Qt Widgets then paints the window once per eye whatever style draws it.
+Okular's page view and Qt's print preview put the desk one step behind the window and the paper at its plane.
+[The design, the chain, how a program declares, the study of Calligra Words and LibreOffice, the proof and the traps](references/paper-depth.md) (queue row 121).
+
 ## Lessons from the lanes, October to November 2026
 
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 11 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (21 entries; the last eight are a 3D area in a scroll area in a dock, from Stereo Werkkzeug's preview).

@@ -177,6 +177,7 @@ By name, the Debian maintainers of the packages we carry with our patches, as th
 | Krita | Debian Qt/KDE Maintainers; Pino Toscano |
 | KScreen, libkscreen, Spectacle, KInfoCenter, KImageFormats | Debian Qt/KDE Maintainers; Aurélien Couderc, Patrick Franz; Scarlett Moore (KScreen) |
 | plasma-wayland-protocols | Debian Qt/KDE Maintainers; Aurélien Couderc, Pino Toscano |
+| Okular | Debian Qt/KDE Maintainers; Aurélien Couderc, Patrick Franz |
 | Haruna, MpvQt | Debian KDE Extras Team; Aurélien Couderc (Haruna), Scarlett Moore (MpvQt) |
 | digiKam, Showfoto | Debian KDE Extras Team; Steve M. Robbins |
 | Kdenlive, MLT | Patrick Matthäi |
@@ -258,6 +259,8 @@ Names come from their source copyright headers and Debian copyright records.
 
 The independent filesystem checks use `blkid` from [util-linux](https://github.com/util-linux/util-linux).
 Its command and library copyright records name Andreas Dilger, Andries Brouwer, Theodore Ts'o, Kay Sievers, Karel Zak, Bastian Friedrich, Corentin Chary, Mike Hommey, Andrew Nayenko, Jeroen Oortwijn, Jiro SEKIBA, Philipp Marek, Milan Broz, Alejandro Martinez Ruiz, Eric Sandeen, Rolf Fokkens and Zeeshan Ali (Khattak), alongside Red Hat and the util-linux contributors.
+
+- **Okular** ([graphics/okular](https://invent.kde.org/graphics/okular), GPL-2.0-or-later): the edition's build puts the page view's desk one step behind the window and its paper at the window's plane (queue row 121). Its page view (`part/pageview.cpp`) is by Enrico Ros, Albert Astals Cid, Wilco Greven, Christophe Devriese, Laurent Montel, Dirk Mueller and Klarälvdalens Datakonsult AB (KDAB), as the file names them, with every Okular contributor since.
 
 ### 0.3.2 Stereo icon authoring study and first helper
 
@@ -512,6 +515,7 @@ Their living successors, which we make stereo: the QML Flip Switch and Cover Swi
 
 **Source**: [libraries/plasma-wayland-protocols](https://invent.kde.org/libraries/plasma-wayland-protocols) **License**: LGPL-2.1-or-later **What we changed**: `kde-stereo-content-v1`, the one declaration a program makes for a window or a subsurface, and `libstereo-declare` beside it.
 **Credit**: Aleix Pol Gonzalez, David Edmundson, Marco Martin, Martin Flöser, Oleg Chernovskiy and Pier Luigi Fiorini.
+Version 7 of `kde-stereo-content-v1` tells a surface the person's element limit, the step of depth inside a window (queue row 121); Stereo KWin sends it from the option it reads beside the sunk and popped limits, in `options.cpp` by **Matthias Ettrich**, **Lubos Lunak** and **Martin Gräßlin**, and the surface code of **Martin Gräßlin** and **Vlad Zahorodnii**.
 
 ### 2.8 Qt
 
@@ -519,6 +523,7 @@ Their living successors, which we make stereo: the QML Flip Switch and Cover Swi
 **Credit**: The Qt Company and the Qt Project's contributors; Qt Multimedia's copyright holders also include Research In Motion and Jolla.
 Qt SVG's colour work builds on its developers' own, most of all **Hatem ElKharashy** and **Robert Löhning**, whose `resolveColor()` test our change extends.
 Our first Qt change was reviewed within hours by **Tim Blechmann**, with **Artem Dyomin, Nils Petter Skålerud and Jøger Hansegård** as reviewers.
+Paper depth (queue row 121) lets a widget declare rectangles inside it at their own depth, drawn per eye in Qt Widgets' repaint path (The Qt Company's `qwidget.cpp`, `qwidgetrepaintmanager.cpp` and `qwidgetwindow.cpp`, with Intel Corporation among `qwidget.cpp`'s holders), and gives every Qt program's print preview (The Qt Company's `QPrintPreviewWidget`) its desk one step behind the window and its paper at the window's plane.
 The edition's qt6-base +stereo3d24 carries **David Edmundson**'s Wayland change d6d2a75cdbfe (a subsurface that moves asks for its parent's next frame instead of exposing it at once), reviewed by **David Redondo**, and places a stereo `QOpenGLWidget`'s own window with the technique of Qt's own `QWindowContainer` (queue row 863).
 
 ### 2.8a The browser: Waterfox and Mozilla's Gecko
@@ -717,7 +722,7 @@ Existing KWin, libkscreen, Qt and FFmpeg credits above also apply.
 | [BleachBit](https://www.bleachbit.org/) and its [CleanerML](https://github.com/bleachbit/cleanerml) cleaners | The cleaner format and the engine of the "System mail" cleaner (local mailboxes, dead letters and the queues of removed mail programs), written in CleanerML's style and meant to be offered back; its translations join BleachBit's own gettext catalogs | Andrew Ziem, the author, and BleachBit's contributors, among them nodiscc (named in the cleaners' copyright headers), XhmikosR and Tobias-B-Besemer (from the repository's contributor list); Debian's bleachbit maintainers for the package |
 
 
-Power/idle credits also build on KWin's existing output and workspace code: **Xaver Hugl**, **Matthias Ettrich**, **Luboš Luňák**, **Vlad Zahorodnii** and **Natalie Clarius**, as named in those files' SPDX records.
+Power/idle credits also build on KWin's existing output and workspace code: **Xaver Hugl**, **Matthias Ettrich**, **Lubos Lunak**, **Vlad Zahorodnii** and **Natalie Clarius**, as named in those files' SPDX records.
 The DPMS protocol is by **Martin Flöser**, as `plasma-wayland-protocols/src/protocols/dpms.xml` records.
 Linux's VT and sysctl interfaces remain the Linux contributors' work.
 The unchanged kernel-settings package records **Sultan Alsawaf** and **Eric Naim** for the CachyOS kernel topics expressed as settings; those credits stay with the values.

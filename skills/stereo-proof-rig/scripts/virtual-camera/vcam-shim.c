@@ -1,8 +1,22 @@
 // A virtual V4L2 camera for the rig, in user space: preload it and /dev/videoN opens a fake descriptor whose V4L2 ioctls
 // this file answers, with the kernel's own structures (linux/videodev2.h). No module, no device node, no real camera.
-// The camera is described by $VCAM_ROOT/videoN.cfg (see vcam-A.cfg); removing the file is unplugging the camera, and a plugged
-// camera starts at its defaults (the values live in $VCAM_ROOT/videoN.state, which the shim erases when it is opened new).
+// The camera is described by $VCAM_ROOT/videoN.cfg; removing the file is unplugging the camera, and a plugged camera starts at
+// its defaults (the values live in $VCAM_ROOT/videoN.state, which a test removes to replug). Every mode and control set by any
+// process is appended to $VCAM_ROOT/videoN.log with the process name, so a test reads what a program asked the camera for.
 // Build: cc -shared -fPIC -O1 -o vcam-shim.so vcam-shim.c -ldl
+//
+// videoN.cfg, one line each:
+//   card TEXT | bus TEXT | busy (set-format answers EBUSY: another program streams)
+//   format FOURCC DESCRIPTION            the formats in the driver's order; MJPG is flagged compressed
+//   size WxH [R1,R2,...]                 a size of the last format, its frame rates (the format's "rate" lines when none)
+//   rate R                               a frame rate of the last format
+//   ctrl NAME TYPE MIN MAX STEP DEFAULT [OPTION...] [MENUITEM...]
+//     TYPE: int bool menu button int64 u8 (u8 is an array: HAS_PAYLOAD)
+//     OPTION: id=0xHEX (else a standard name gets the kernel's id, others a private one), value=N (the reading at plug-in),
+//       refuse (every set answers ERANGE), clamp (an integer out of range is clamped and rounded as uvcvideo does, not refused),
+//       inactive readonly writeonly volatile update slider grabbed exec layout dynarray whichminmax disabled (the V4L2 flag),
+//       master=NAME:MANUAL (inactive while NAME is not MANUAL; a set then answers EACCES, as uvc_ctrl_is_accessible),
+//       auto=N (the reading while inactive under its master: the value the automatic mode chose; it moves by itself)
 #define _GNU_SOURCE
 #include <dlfcn.h>
 #include <errno.h>
@@ -16,8 +30,9 @@
 #include <unistd.h>
 
 #define MAXFD 64
-#define MAXCTRL 24
-#define MAXFMT 6
+#define MAXCTRL 48
+#define MAXFMT 8
+#define MAXSIZE 12
 
 struct ctrl {
     char name[64];
@@ -27,13 +42,18 @@ struct ctrl {
     char menu[8][48];
     int nmenu;
     int refuse; // the driver answers ERANGE to every set
+    int clamp; // out of range: clamped like uvcvideo's uvc_ctrl_clamp
+    char master[64];
+    int manual; // the master's value that makes this control active
+    int hasauto, autoval;
     int value;
 };
 struct fmt {
     __u32 fourcc;
     char desc[32];
     int nsizes;
-    int w[8], h[8];
+    int w[MAXSIZE], h[MAXSIZE];
+    int srates[MAXSIZE][6], nsrates[MAXSIZE];
     int nrates;
     int rates[6];
 };
@@ -48,6 +68,7 @@ struct dev {
     int nctrls;
     __u32 curfmt, curw, curh;
     int fps;
+    unsigned reads;
 };
 static struct dev devs[MAXFD];
 static int ndevs;
@@ -59,6 +80,28 @@ static int (*real_close)(int);
 static __u32 cc(const char *s) { return s[0] | s[1] << 8 | s[2] << 16 | (__u32)s[3] << 24; }
 
 static void statepath(int num, char *out, size_t n) { snprintf(out, n, "%s/video%d.state", getenv("VCAM_ROOT"), num); }
+
+static void logline(struct dev *d, const char *fmt, ...)
+{
+    char p[512], comm[64] = "?";
+    snprintf(p, sizeof p, "%s/video%d.log", getenv("VCAM_ROOT"), d->num);
+    FILE *c = fopen("/proc/self/comm", "r");
+    if (c) {
+        if (fgets(comm, sizeof comm, c))
+            comm[strcspn(comm, "\n")] = 0;
+        fclose(c);
+    }
+    FILE *f = fopen(p, "a");
+    if (!f)
+        return;
+    fprintf(f, "%s %d ", comm, (int)getpid());
+    va_list ap;
+    va_start(ap, fmt);
+    vfprintf(f, fmt, ap);
+    va_end(ap);
+    fputc('\n', f);
+    fclose(f);
+}
 
 static void save_state(struct dev *d)
 {
@@ -73,6 +116,30 @@ static void save_state(struct dev *d)
     fclose(f);
 }
 
+static const struct {
+    const char *name;
+    __u32 id;
+} standard[] = {
+    {"brightness", V4L2_CID_BRIGHTNESS}, {"contrast", V4L2_CID_CONTRAST}, {"saturation", V4L2_CID_SATURATION}, {"hue", V4L2_CID_HUE},
+    {"auto_exposure", V4L2_CID_EXPOSURE_AUTO}, {"white_balance_automatic", V4L2_CID_AUTO_WHITE_BALANCE}, {"gamma", V4L2_CID_GAMMA},
+    {"sharpness", V4L2_CID_SHARPNESS}, {"exposure_time_absolute", V4L2_CID_EXPOSURE_ABSOLUTE}, {"power_line_frequency", V4L2_CID_POWER_LINE_FREQUENCY},
+    {"white_balance_temperature", V4L2_CID_WHITE_BALANCE_TEMPERATURE}, {"exposure_dynamic_framerate", V4L2_CID_EXPOSURE_AUTO_PRIORITY},
+    {"gain", V4L2_CID_GAIN}, {"backlight_compensation", V4L2_CID_BACKLIGHT_COMPENSATION}, {"rotate", V4L2_CID_ROTATE},
+    {"focus_absolute", V4L2_CID_FOCUS_ABSOLUTE}, {"focus_automatic_continuous", V4L2_CID_FOCUS_AUTO}, {"focus_relative", V4L2_CID_FOCUS_RELATIVE},
+    {"pan_relative", V4L2_CID_PAN_RELATIVE}, {"tilt_relative", V4L2_CID_TILT_RELATIVE}, {"zoom_relative", V4L2_CID_ZOOM_RELATIVE},
+    {"iris_relative", V4L2_CID_IRIS_RELATIVE}, {"zoom_continuous", V4L2_CID_ZOOM_CONTINUOUS}, {"pan_speed", V4L2_CID_PAN_SPEED},
+    {"tilt_speed", V4L2_CID_TILT_SPEED}, {"pan_reset", V4L2_CID_PAN_RESET}, {"do_white_balance", V4L2_CID_DO_WHITE_BALANCE},
+};
+
+static void parse_rates(const char *s, int *out, int *n)
+{
+    *n = 0;
+    char buf[64];
+    snprintf(buf, sizeof buf, "%s", s);
+    for (char *t = strtok(buf, ","); t && *n < 6; t = strtok(NULL, ","))
+        out[(*n)++] = atoi(t);
+}
+
 static int load_cfg(struct dev *d, const char *path)
 {
     FILE *f = fopen(path, "r");
@@ -82,7 +149,8 @@ static int load_cfg(struct dev *d, const char *path)
     struct fmt *cf = NULL;
     while (fgets(line, sizeof line, f)) {
         line[strcspn(line, "\n")] = 0;
-        char *a = strtok(line, " ");
+        char *save = NULL;
+        char *a = strtok_r(line, " ", &save);
         if (!a || a[0] == '#')
             continue;
         if (!strcmp(a, "card")) snprintf(d->card, sizeof d->card, "%.63s", line + 5);
@@ -91,38 +159,54 @@ static int load_cfg(struct dev *d, const char *path)
         else if (!strcmp(a, "format") && d->nfmts < MAXFMT) {
             cf = &d->fmts[d->nfmts++];
             memset(cf, 0, sizeof *cf);
-            cf->fourcc = cc(strtok(NULL, " "));
-            snprintf(cf->desc, sizeof cf->desc, "%s", strtok(NULL, " "));
-        } else if (!strcmp(a, "size") && cf && cf->nsizes < 8) {
-            sscanf(strtok(NULL, " "), "%dx%d", &cf->w[cf->nsizes], &cf->h[cf->nsizes]);
+            cf->fourcc = cc(strtok_r(NULL, " ", &save));
+            snprintf(cf->desc, sizeof cf->desc, "%s", strtok_r(NULL, " ", &save));
+        } else if (!strcmp(a, "size") && cf && cf->nsizes < MAXSIZE) {
+            sscanf(strtok_r(NULL, " ", &save), "%dx%d", &cf->w[cf->nsizes], &cf->h[cf->nsizes]);
+            const char *r = strtok_r(NULL, " ", &save);
+            if (r) parse_rates(r, cf->srates[cf->nsizes], &cf->nsrates[cf->nsizes]);
             cf->nsizes++;
-        } else if (!strcmp(a, "rate") && cf && cf->nrates < 6) cf->rates[cf->nrates++] = atoi(strtok(NULL, " "));
+        } else if (!strcmp(a, "rate") && cf && cf->nrates < 6) cf->rates[cf->nrates++] = atoi(strtok_r(NULL, " ", &save));
         else if (!strcmp(a, "ctrl") && d->nctrls < MAXCTRL) {
-            // ctrl NAME TYPE MIN MAX STEP DEFAULT [refuse|inactive|readonly|MENUITEM,...]
             struct ctrl *c = &d->ctrls[d->nctrls];
             memset(c, 0, sizeof *c);
-            snprintf(c->name, sizeof c->name, "%s", strtok(NULL, " "));
-            char *t = strtok(NULL, " ");
+            snprintf(c->name, sizeof c->name, "%s", strtok_r(NULL, " ", &save));
+            char *t = strtok_r(NULL, " ", &save);
             c->type = !strcmp(t, "int") ? V4L2_CTRL_TYPE_INTEGER : !strcmp(t, "bool") ? V4L2_CTRL_TYPE_BOOLEAN
-                : !strcmp(t, "menu") ? V4L2_CTRL_TYPE_MENU : V4L2_CTRL_TYPE_BUTTON;
-            c->min = atoi(strtok(NULL, " "));
-            c->max = atoi(strtok(NULL, " "));
-            c->step = atoi(strtok(NULL, " "));
-            c->def = c->value = atoi(strtok(NULL, " "));
-            if (c->type == V4L2_CTRL_TYPE_BUTTON) c->flags |= V4L2_CTRL_FLAG_WRITE_ONLY;
-            c->id = V4L2_CID_BASE + 0x400 + d->nctrls;
-            // a control named like a standard one gets the kernel's own id, so a page can show the standard name
-            static const struct { const char *name; __u32 id; } standard[] = {
-                {"brightness", V4L2_CID_BRIGHTNESS}, {"contrast", V4L2_CID_CONTRAST}, {"auto_exposure", V4L2_CID_EXPOSURE_AUTO},
-                {"white_balance_automatic", V4L2_CID_AUTO_WHITE_BALANCE}, {"sharpness", V4L2_CID_SHARPNESS},
-                {"exposure_time_absolute", V4L2_CID_EXPOSURE_ABSOLUTE}, {"power_line_frequency", V4L2_CID_POWER_LINE_FREQUENCY},
-            };
+                : !strcmp(t, "menu") ? V4L2_CTRL_TYPE_MENU : !strcmp(t, "int64") ? V4L2_CTRL_TYPE_INTEGER64
+                : !strcmp(t, "u8") ? V4L2_CTRL_TYPE_U8 : V4L2_CTRL_TYPE_BUTTON;
+            c->min = atoi(strtok_r(NULL, " ", &save));
+            c->max = atoi(strtok_r(NULL, " ", &save));
+            c->step = atoi(strtok_r(NULL, " ", &save));
+            c->def = c->value = atoi(strtok_r(NULL, " ", &save));
+            if (c->type == V4L2_CTRL_TYPE_BUTTON) c->flags |= V4L2_CTRL_FLAG_WRITE_ONLY | V4L2_CTRL_FLAG_EXECUTE_ON_WRITE;
+            if (c->type == V4L2_CTRL_TYPE_U8) c->flags |= V4L2_CTRL_FLAG_HAS_PAYLOAD;
+            c->id = V4L2_CID_USER_BASE + 0x1000 + d->nctrls; // a private id
             for (unsigned k = 0; k < sizeof standard / sizeof *standard; k++)
                 if (!strcmp(c->name, standard[k].name)) c->id = standard[k].id;
-            for (char *o; (o = strtok(NULL, " "));) {
-                if (!strcmp(o, "refuse")) c->refuse = 1;
+            for (char *o; (o = strtok_r(NULL, " ", &save));) {
+                if (!strncmp(o, "id=", 3)) c->id = strtoul(o + 3, NULL, 0);
+                else if (!strncmp(o, "value=", 6)) c->value = atoi(o + 6);
+                else if (!strncmp(o, "auto=", 5)) { c->hasauto = 1; c->autoval = atoi(o + 5); }
+                else if (!strncmp(o, "master=", 7)) {
+                    char *colon = strchr(o + 7, ':');
+                    if (colon) { *colon = 0; c->manual = atoi(colon + 1); }
+                    snprintf(c->master, sizeof c->master, "%s", o + 7);
+                }
+                else if (!strcmp(o, "refuse")) c->refuse = 1;
+                else if (!strcmp(o, "clamp")) c->clamp = 1;
                 else if (!strcmp(o, "inactive")) c->flags |= V4L2_CTRL_FLAG_INACTIVE;
                 else if (!strcmp(o, "readonly")) c->flags |= V4L2_CTRL_FLAG_READ_ONLY;
+                else if (!strcmp(o, "writeonly")) c->flags |= V4L2_CTRL_FLAG_WRITE_ONLY;
+                else if (!strcmp(o, "volatile")) c->flags |= V4L2_CTRL_FLAG_VOLATILE;
+                else if (!strcmp(o, "update")) c->flags |= V4L2_CTRL_FLAG_UPDATE;
+                else if (!strcmp(o, "slider")) c->flags |= V4L2_CTRL_FLAG_SLIDER;
+                else if (!strcmp(o, "grabbed")) c->flags |= V4L2_CTRL_FLAG_GRABBED;
+                else if (!strcmp(o, "exec")) c->flags |= V4L2_CTRL_FLAG_EXECUTE_ON_WRITE;
+                else if (!strcmp(o, "layout")) c->flags |= V4L2_CTRL_FLAG_MODIFY_LAYOUT;
+                else if (!strcmp(o, "dynarray")) c->flags |= V4L2_CTRL_FLAG_DYNAMIC_ARRAY | V4L2_CTRL_FLAG_HAS_PAYLOAD;
+                else if (!strcmp(o, "whichminmax")) c->flags |= V4L2_CTRL_FLAG_HAS_WHICH_MIN_MAX;
+                else if (!strcmp(o, "disabled")) c->flags |= V4L2_CTRL_FLAG_DISABLED;
                 else if (c->nmenu < 8) snprintf(c->menu[c->nmenu++], 48, "%s", o);
             }
             d->nctrls++;
@@ -132,7 +216,7 @@ static int load_cfg(struct dev *d, const char *path)
     d->curfmt = d->fmts[0].fourcc;
     d->curw = d->fmts[0].w[0];
     d->curh = d->fmts[0].h[0];
-    d->fps = d->fmts[0].rates[0];
+    d->fps = d->fmts[0].nsrates[0] ? d->fmts[0].srates[0][0] : d->fmts[0].rates[0];
     return 0;
 }
 
@@ -151,6 +235,26 @@ static struct dev *find(int fd)
         if (devs[i].fd == fd)
             return &devs[i];
     return NULL;
+}
+
+static void load_state(struct dev *d)
+{
+    char sp[512];
+    statepath(d->num, sp, sizeof sp);
+    FILE *f = fopen(sp, "r");
+    if (!f)
+        return;
+    char l[256], n[64];
+    int v;
+    while (fgets(l, sizeof l, f)) {
+        if (sscanf(l, "ctrl %63s %d", n, &v) == 2)
+            for (int i = 0; i < d->nctrls; i++)
+                if (!strcmp(d->ctrls[i].name, n)) d->ctrls[i].value = v;
+        unsigned a, b, c2;
+        int r;
+        if (sscanf(l, "fmt %u %u %u %d", &a, &b, &c2, &r) == 4) { d->curfmt = a; d->curw = b; d->curh = c2; d->fps = r; }
+    }
+    fclose(f);
 }
 
 static int vopen(const char *path, int flags, int mode, int *handled)
@@ -188,21 +292,7 @@ static int vopen(const char *path, int flags, int mode, int *handled)
     d->fd = fd;
     d->num = num;
     load_cfg(d, cfg);
-    char sp[512];
-    statepath(num, sp, sizeof sp);
-    FILE *f = fopen(sp, "r");
-    if (f) { // the values the camera holds since it was plugged
-        char l[256], n[64];
-        int v;
-        while (fgets(l, sizeof l, f)) {
-            if (sscanf(l, "ctrl %63s %d", n, &v) == 2)
-                for (int i = 0; i < d->nctrls; i++)
-                    if (!strcmp(d->ctrls[i].name, n)) d->ctrls[i].value = v;
-            unsigned a, b, c2; int r;
-            if (sscanf(l, "fmt %u %u %u %d", &a, &b, &c2, &r) == 4) { d->curfmt = a; d->curw = b; d->curh = c2; d->fps = r; }
-        }
-        fclose(f);
-    }
+    load_state(d);
     (void)flags; (void)mode;
     return fd;
 }
@@ -240,6 +330,35 @@ static struct ctrl *byid(struct dev *d, __u32 id)
     return NULL;
 }
 
+static struct ctrl *byname(struct dev *d, const char *name)
+{
+    for (int i = 0; i < d->nctrls; i++)
+        if (!strcmp(d->ctrls[i].name, name)) return &d->ctrls[i];
+    return NULL;
+}
+
+// whether a control is inactive now: its static flag, or its master not in the manual value (uvcvideo's master/slave mappings)
+static int inactive_now(struct dev *d, struct ctrl *c)
+{
+    if (c->flags & V4L2_CTRL_FLAG_INACTIVE)
+        return 1;
+    struct ctrl *m = c->master[0] ? byname(d, c->master) : NULL;
+    return m && m->value != c->manual;
+}
+
+static int rates_of(struct dev *d, __u32 fourcc, __u32 w, __u32 h, const int **out)
+{
+    for (int i = 0; i < d->nfmts; i++)
+        if (d->fmts[i].fourcc == fourcc)
+            for (int s = 0; s < d->fmts[i].nsizes; s++)
+                if ((int)w == d->fmts[i].w[s] && (int)h == d->fmts[i].h[s]) {
+                    if (d->fmts[i].nsrates[s]) { *out = d->fmts[i].srates[s]; return d->fmts[i].nsrates[s]; }
+                    *out = d->fmts[i].rates;
+                    return d->fmts[i].nrates;
+                }
+    return 0;
+}
+
 int ioctl(int fd, unsigned long req, ...)
 {
     init();
@@ -261,6 +380,7 @@ int ioctl(int fd, unsigned long req, ...)
         snprintf((char *)c->driver, sizeof c->driver, "uvcvideo");
         snprintf((char *)c->card, sizeof c->card, "%.31s", d->card);
         snprintf((char *)c->bus_info, sizeof c->bus_info, "%.31s", d->bus);
+        c->version = 0x070304;
         c->capabilities = V4L2_CAP_VIDEO_CAPTURE | V4L2_CAP_STREAMING | V4L2_CAP_DEVICE_CAPS;
         c->device_caps = V4L2_CAP_VIDEO_CAPTURE | V4L2_CAP_STREAMING;
         return 0;
@@ -288,34 +408,58 @@ int ioctl(int fd, unsigned long req, ...)
     }
     case VIDIOC_ENUM_FRAMEINTERVALS: {
         struct v4l2_frmivalenum *s = arg;
-        for (int i = 0; i < d->nfmts; i++)
-            if (d->fmts[i].fourcc == s->pixel_format) {
-                if ((int)s->index >= d->fmts[i].nrates) { errno = EINVAL; return -1; }
-                s->type = V4L2_FRMIVAL_TYPE_DISCRETE;
-                s->discrete.numerator = 1;
-                s->discrete.denominator = d->fmts[i].rates[s->index];
-                return 0;
-            }
-        errno = EINVAL;
-        return -1;
+        const int *rates = NULL;
+        int n = rates_of(d, s->pixel_format, s->width, s->height, &rates);
+        if ((int)s->index >= n) { errno = EINVAL; return -1; }
+        s->type = V4L2_FRMIVAL_TYPE_DISCRETE;
+        s->discrete.numerator = 1;
+        s->discrete.denominator = rates[s->index];
+        return 0;
     }
     case VIDIOC_G_FMT: {
         struct v4l2_format *f = arg;
         f->fmt.pix.width = d->curw; f->fmt.pix.height = d->curh; f->fmt.pix.pixelformat = d->curfmt;
         f->fmt.pix.field = V4L2_FIELD_NONE;
+        f->fmt.pix.bytesperline = d->curw * 2;
+        f->fmt.pix.sizeimage = d->curw * d->curh * 2;
         return 0;
     }
+    case VIDIOC_TRY_FMT:
     case VIDIOC_S_FMT: {
         struct v4l2_format *f = arg;
-        if (d->busy) { errno = EBUSY; return -1; }
+        if (req == VIDIOC_S_FMT && d->busy) { errno = EBUSY; return -1; }
+        int fi = -1;
         for (int i = 0; i < d->nfmts; i++)
-            if (d->fmts[i].fourcc == f->fmt.pix.pixelformat)
-                for (int s = 0; s < d->fmts[i].nsizes; s++)
-                    if ((int)f->fmt.pix.width == d->fmts[i].w[s] && (int)f->fmt.pix.height == d->fmts[i].h[s]) {
-                        d->curfmt = d->fmts[i].fourcc; d->curw = d->fmts[i].w[s]; d->curh = d->fmts[i].h[s];
-                        save_state(d);
-                        return 0;
-                    }
+            if (d->fmts[i].fourcc == f->fmt.pix.pixelformat) fi = i;
+        if (req == VIDIOC_TRY_FMT) {
+            // a driver adjusts what it is asked for: an unknown format to its first, a size to the nearest it has
+            if (fi < 0) fi = 0;
+            int best = 0;
+            long bd = -1;
+            for (int s = 0; s < d->fmts[fi].nsizes; s++) {
+                long dw = (long)d->fmts[fi].w[s] - f->fmt.pix.width, dh = (long)d->fmts[fi].h[s] - f->fmt.pix.height;
+                long dist = dw * dw + dh * dh;
+                if (bd < 0 || dist < bd) { bd = dist; best = s; }
+            }
+            f->fmt.pix.pixelformat = d->fmts[fi].fourcc;
+            f->fmt.pix.width = d->fmts[fi].w[best];
+            f->fmt.pix.height = d->fmts[fi].h[best];
+            f->fmt.pix.field = V4L2_FIELD_NONE;
+            f->fmt.pix.bytesperline = f->fmt.pix.width * 2;
+            f->fmt.pix.sizeimage = f->fmt.pix.width * f->fmt.pix.height * 2;
+            return 0;
+        }
+        if (fi >= 0)
+            for (int s = 0; s < d->fmts[fi].nsizes; s++)
+                if ((int)f->fmt.pix.width == d->fmts[fi].w[s] && (int)f->fmt.pix.height == d->fmts[fi].h[s]) {
+                    d->curfmt = d->fmts[fi].fourcc; d->curw = d->fmts[fi].w[s]; d->curh = d->fmts[fi].h[s];
+                    f->fmt.pix.field = V4L2_FIELD_NONE;
+                    f->fmt.pix.bytesperline = d->curw * 2;
+                    f->fmt.pix.sizeimage = d->curw * d->curh * 2;
+                    save_state(d);
+                    logline(d, "S_FMT %.4s %ux%u", (char *)&d->curfmt, d->curw, d->curh);
+                    return 0;
+                }
         errno = EINVAL; // a real driver would adjust to the nearest size; the rig's camera is strict so a test can tell
         return -1;
     }
@@ -329,34 +473,50 @@ int ioctl(int fd, unsigned long req, ...)
     case VIDIOC_S_PARM: {
         struct v4l2_streamparm *p = arg;
         if (d->busy) { errno = EBUSY; return -1; }
-        int want = p->parm.capture.timeperframe.numerator ? p->parm.capture.timeperframe.denominator / p->parm.capture.timeperframe.numerator : 0;
-        for (int i = 0; i < d->nfmts; i++)
-            if (d->fmts[i].fourcc == d->curfmt)
-                for (int r = 0; r < d->fmts[i].nrates; r++)
-                    if (d->fmts[i].rates[r] == want) { d->fps = want; save_state(d); p->parm.capture.timeperframe.denominator = want; return 0; }
+        const __u32 num = p->parm.capture.timeperframe.numerator, den = p->parm.capture.timeperframe.denominator;
+        const int *rates = NULL;
+        int n = rates_of(d, d->curfmt, d->curw, d->curh, &rates);
+        for (int r = 0; r < n; r++)
+            if (num && (den + num / 2) / num == (__u32)rates[r]) {
+                d->fps = rates[r];
+                save_state(d);
+                logline(d, "S_PARM %d", d->fps);
+                p->parm.capture.timeperframe.numerator = 1;
+                p->parm.capture.timeperframe.denominator = rates[r];
+                p->parm.capture.capability = V4L2_CAP_TIMEPERFRAME;
+                return 0;
+            }
         errno = EINVAL;
         return -1;
     }
+    case VIDIOC_QUERYCTRL:
+        errno = EINVAL; // the old interface: answered as an empty list (PipeWire's props), the extended one below is the camera's
+        return -1;
     case VIDIOC_QUERY_EXT_CTRL: {
         struct v4l2_query_ext_ctrl *q = arg;
         __u32 want = q->id & ~(V4L2_CTRL_FLAG_NEXT_CTRL | V4L2_CTRL_FLAG_NEXT_COMPOUND);
+        int compound = q->id & V4L2_CTRL_FLAG_NEXT_COMPOUND;
         struct ctrl *c = NULL;
-        if (q->id & V4L2_CTRL_FLAG_NEXT_CTRL) {
-            for (int i = 0; i < d->nctrls; i++)
-                if (d->ctrls[i].id > want && (!c || d->ctrls[i].id < c->id)) c = &d->ctrls[i];
+        if (q->id & (V4L2_CTRL_FLAG_NEXT_CTRL | V4L2_CTRL_FLAG_NEXT_COMPOUND)) {
+            for (int i = 0; i < d->nctrls; i++) {
+                int isc = d->ctrls[i].type >= V4L2_CTRL_COMPOUND_TYPES;
+                if ((!isc || compound) && d->ctrls[i].id > want && (!c || d->ctrls[i].id < c->id)) c = &d->ctrls[i];
+            }
         } else
             c = byid(d, want);
         if (!c) { errno = EINVAL; return -1; }
         memset(q, 0, sizeof *q);
         q->id = c->id; q->type = c->type; q->minimum = c->min; q->maximum = c->max; q->step = c->step;
-        q->default_value = c->def; q->flags = c->flags; q->elem_size = 4; q->elems = 1;
+        q->default_value = c->def; q->flags = c->flags | (inactive_now(d, c) ? V4L2_CTRL_FLAG_INACTIVE : 0);
+        q->elem_size = c->type == V4L2_CTRL_TYPE_U8 ? 1 : 4; q->elems = c->type == V4L2_CTRL_TYPE_U8 ? 4 : 1;
+        if (c->type == V4L2_CTRL_TYPE_U8) { q->nr_of_dims = 1; q->dims[0] = 4; }
         snprintf(q->name, sizeof q->name, "%.31s", c->name);
         return 0;
     }
     case VIDIOC_QUERYMENU: {
         struct v4l2_querymenu *m = arg;
         struct ctrl *c = byid(d, m->id);
-        if (!c || (int)m->index >= c->nmenu) { errno = EINVAL; return -1; }
+        if (!c || (int)m->index >= c->nmenu || !strcmp(c->menu[m->index], "-")) { errno = EINVAL; return -1; }
         snprintf((char *)m->name, sizeof m->name, "%s", c->menu[m->index]);
         return 0;
     }
@@ -365,7 +525,9 @@ int ioctl(int fd, unsigned long req, ...)
         for (__u32 i = 0; i < e->count; i++) {
             struct ctrl *c = byid(d, e->controls[i].id);
             if (!c) { e->error_idx = i; errno = EINVAL; return -1; }
-            e->controls[i].value = c->value;
+            if (c->flags & V4L2_CTRL_FLAG_WRITE_ONLY) { e->error_idx = i; errno = EACCES; return -1; }
+            // while its master is automatic the reading is what the automatic mode chose, and it moves
+            e->controls[i].value = (c->hasauto && inactive_now(d, c)) ? c->autoval + (int)(d->reads++ % 7) * 10 : c->value;
         }
         return 0;
     }
@@ -375,9 +537,19 @@ int ioctl(int fd, unsigned long req, ...)
             struct ctrl *c = byid(d, e->controls[i].id);
             if (!c) { e->error_idx = i; errno = EINVAL; return -1; }
             if (c->flags & V4L2_CTRL_FLAG_READ_ONLY) { e->error_idx = i; errno = EACCES; return -1; }
-            if (c->flags & V4L2_CTRL_FLAG_INACTIVE) { e->error_idx = i; errno = EACCES; return -1; }
-            if (c->refuse || (c->type != V4L2_CTRL_TYPE_BUTTON && (e->controls[i].value < c->min || e->controls[i].value > c->max))) { e->error_idx = i; errno = ERANGE; return -1; }
-            if (c->type != V4L2_CTRL_TYPE_BUTTON) c->value = e->controls[i].value;
+            if (c->flags & V4L2_CTRL_FLAG_GRABBED) { e->error_idx = i; errno = EBUSY; return -1; }
+            if (inactive_now(d, c)) { e->error_idx = i; errno = EACCES; logline(d, "S_CTRL %s refused inactive", c->name); return -1; }
+            int v = e->controls[i].value;
+            if (c->type == V4L2_CTRL_TYPE_INTEGER && c->clamp) {
+                int step = c->step > 0 ? c->step : 1;
+                v = c->min + (v - c->min + step / 2) / step * step;
+                v = v < c->min ? c->min : v > c->max ? c->max : v;
+            }
+            if (c->refuse || (c->type != V4L2_CTRL_TYPE_BUTTON && (v < c->min || v > c->max))) {
+                e->error_idx = i; errno = ERANGE; logline(d, "S_CTRL %s %d refused range", c->name, e->controls[i].value); return -1;
+            }
+            if (c->type != V4L2_CTRL_TYPE_BUTTON) c->value = v;
+            logline(d, "S_CTRL %s %d", c->name, v);
         }
         save_state(d);
         return 0;

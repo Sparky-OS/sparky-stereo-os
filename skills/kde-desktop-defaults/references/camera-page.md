@@ -40,6 +40,8 @@ Round 2 (2026-11-15): our Kamoso `26.04.0-1+stereo3d1` carries one patch (DEP-3 
 - **`kill $!` of a shell function leaves its program running** (the unit's `watch` loop stayed alive between two runs and applied the saved values "before the unit ran"). Start the program directly (`env LD_PRELOAD=... sparky-stereo-camera watch &`) so `$!` is its PID, and list `pidof sparky-stereo-camera` before handing back.
 - **`kwin_wayland` exits "Operation not permitted" and every capture is `Cancelled`.** The container lacks `--cap-add SYS_NICE` and a render node (`--device /dev/dri/renderD128 --group-add RENDER_GID`): see [the proof rig](../../stereo-proof-rig/SKILL.md).
 
+From 0.1.3 (ORDER 678 and 682) the store keeps only settings and the apply step sets governing controls first: [camera controls](camera-controls.md) has the rule for every V4L2 flag, the clean-up of an older store, the best mode and its rig rows. Item 4 above (the controls that differ from the driver's default) describes 0.1.0 to 0.1.2.
+
 ## Where the page is proved
 
 `tests/rig-proof.sh` in the package runs the engine against a private PipeWire and WirePlumber, virtual cameras and a user-space V4L2 device ([the virtual camera recipe](../../stereo-proof-rig/SKILL.md#a-virtual-camera-without-a-camera)). Rows: `default persist modes controls two held replug`; each prints PASS or FAIL with the value read, and the script exits 1 when any failed. The page itself was driven with real pointer clicks (the fake input client of the proof rig): click a camera's radio button and Apply, then read the session's default.

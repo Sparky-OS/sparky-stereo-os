@@ -1165,6 +1165,13 @@ The Camera page of System Settings and its command build on other people's work,
 - **Kamoso** ([invent.kde.org/multimedia/kamoso](https://invent.kde.org/multimedia/kamoso), GPL 2.0 or later): Aleix Pol and Alex Fiestas, with the Kamoso contributors; read for how a KDE program lists a camera through GStreamer's device monitor, and measured not to follow the session's default. No code is copied.
 - **v4l-utils** (`v4l2-ctl`) and **cameractrls**: read for how a camera's controls are listed and which kinds exist. No code is copied.
 - **The edition's stereo layer** (`Stereo::FileChoiceList`): the packings of a two-lens camera, their ids and their translated names are the layer's; lane 569's known machines table is what the page reads to say that a camera has a kernel correction.
+
+Version 0.1.3 (ORDER 678 and 682, 2026-11-26), which saves only settings, applies a governing control first and starts a camera at its best mode, follows:
+
+- **The Linux kernel's V4L2 control documentation and framework** (`vidioc-queryctrl.rst`, `ext-ctrls-camera.rst`, the driver API's `v4l2-controls.rst` and `v4l2-ctrls-core.c`, GPL 2.0 and GFDL): Hans Verkuil's control framework and its auto clusters; the rule for every control flag is tied to these clauses.
+- **uvcvideo** (`drivers/media/usb/uvc/uvc_ctrl.c`): Laurent Pinchart and the media subsystem's contributors; read for how a UVC camera flags its controls (write-only, inactive under its automatic control) and refuses a governed value.
+- **v4l-utils' qv4l2** (Hans Verkuil): reading the other controls again after a control flagged UPDATE. **cameractrls** (soyersoyer, LGPL 3.0 or later): saving a preset only from controls that are neither inactive nor read-only, and its list of controls that move at a speed. **guvcview** (Paulo Assis): read for comparison. No code is copied.
+- **PipeWire's V4L2 source** (`spa/plugins/v4l2`, Wim Taymans and the PipeWire contributors) and **Qt Multimedia's camera code** (The Qt Company): read and measured for the mode a program gets when it asks for none.
 These projects do not endorse the edition.
 
 ## Two views on Vulkan, followed and told (ORDER 573 and 574, 2026-11-15)

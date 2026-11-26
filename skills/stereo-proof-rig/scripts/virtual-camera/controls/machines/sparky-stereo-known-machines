@@ -1,0 +1,4 @@
+#!/bin/sh
+# Stands in front of the real command in the rig's PATH: the real sparky-stereo-known-machines of the build tree with the fixture's
+# table and sysfs (KM_TABLE, KM_SYSFS), so the page reads the very output the command gives on a machine.
+exec python3 -I /hw/bin/sparky-stereo-known-machines --table "${KM_TABLE:?}" --sysfs-root "${KM_SYSFS:?}" "$@"

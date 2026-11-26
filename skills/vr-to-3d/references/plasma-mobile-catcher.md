@@ -323,3 +323,13 @@ Read the Android waiting catalogue and use its named local files. Require PNG `s
 - **The standalone renderer proof passes and the Catch app fails to compile.** The KDE project applies `-fno-exceptions`. The carried profile parser and Cardboard inverse rejection use exceptions on invalid data. Enable exceptions on those C++ source files and the one caller that catches the error. Rebuild the actual Catch target with `WITH_CATCH=ON`.
 - **A decoder error arrives even though the scene has the correct stereo mark.** The isolated rig provides no video-decoder device. Confirm the decoded still and that the marked clip reaches the hardware availability check. Use an explicitly injected proof decoder to measure loop behavior in a disposable process. The release should explain the missing hardware without picking the still automatically.
 - **The locale patch applies to the earlier reference folder and fails when quilt reapplies the accepted source.** The row 927 source ends each catalogue with the first-picture notice. Use that appended message as context and verify all nine translated catalogues with `msgfmt -c` after extracting the exact new descriptor.
+
+### Locate a live capability error
+
+An unavailable decoder for a local waiting clip and an unavailable decoder for an approved Throw are different events.
+Check the active transport's decoder for the approved codec.
+FreeRDP's H.264 context constructor initializes its backend and can return null before the receiver starts.
+The current paired offer carries the panel, NLA endpoint and certificate fingerprint.
+The head-fixed Flat Headset path runs without continuous pose.
+When a mode explicitly requires pose, a Qt Sensors connection is only a backend check.
+Confirm that it starts and supplies a first reading within the mode's deadline. [FreeRDP H.264 backend](https://github.com/FreeRDP/FreeRDP/blob/3.33.1/libfreerdp/codec/h264.c#L842-L951) [Qt Sensors lifecycle](https://doc.qt.io/qt-6/qsensor.html#start)

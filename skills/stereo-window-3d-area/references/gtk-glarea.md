@@ -265,23 +265,26 @@ Where each depth stops, measured with the ramp of 256 steps over 1/256 of the ra
 
 ### X11: the two ways, timed
 
-The same work as GTK 4's table (two 1920x1080 views rendered and handed over at every frame for ten seconds, in an area shown at 960x540, `GDK_X11_STEREO_READBACK=0` and `=1`), on the edition's GTK 3, load 7 to 9 on 12 threads:
+The same work as GTK 4's table (two 1920x1080 views rendered and handed over at every frame for ten seconds, in an area shown at 960x540, `GDK_X11_STEREO_READBACK=0` and `=1`), on the edition's GTK 3, in three whole runs of the proof one after the other (loads 7 to 17 on 12 threads):
 
 | Client route | Way | Frames a second | Processor ms a frame |
 |---|---|---|---|
-| zink on the RTX 3060 | OpenGL | 59.5 | 4.26 |
-| | readback | 56.7 | 13.18 |
-| NVIDIA's own GLX | OpenGL | 58.9 | 4.65 |
-| | readback | 44.9 | 17.42 |
-| llvmpipe | OpenGL | 19.3 | 151.23 |
-| | readback | 22.6 | 83.70 |
+| zink on the RTX 3060 | OpenGL | 59.7 to 59.9 | 3.05 to 3.82 |
+| | readback | 59.1 to 59.4 | 11.42 to 12.11 |
+| NVIDIA's own GLX | OpenGL | 59.6 to 59.9 | 4.86 to 4.97 |
+| | readback | 33.7 to 45.7 | 17.22 to 21.72 |
+| llvmpipe | OpenGL | 14.3 to 19.9 | 144.9 to 154.7 |
+| | readback | 18.2 to 24.8 | 83.0 to 86.5 |
 
-So GTK 3 keeps GTK 4's defaults: OpenGL on a graphics card (a third to a quarter of the readback's processor a frame), the readback on a software renderer (about half the processor of the OpenGL way there).
+So GTK 3 keeps GTK 4's defaults: OpenGL on a graphics card (a quarter to a third of the readback's processor a frame, and the display's rate where the readback drops to 34 to 46 frames a second on NVIDIA's GLX), the readback on a software renderer (a little more than half the processor of the OpenGL way there).
+The proof's rows judge the processor a frame, as GTK 4's do: OpenGL at most a third of the readback's on both graphics card routes, the readback below OpenGL on llvmpipe.
 
 ### The proof
 
-`m4/rerun.sh` of the lane (the edition's private record) runs each case in a fresh headless Stereo KWin from installed packages: `gtk137-m4rig:pub` (the published round with Debian's gtk+3.0) and `gtk137-m4rig:new` (the same with the staged gtk+3.0 installed by apt). The test program is `scripts/glarea-stereo-test3.c`, the GTK 4 program's twin (the same pictures, options and report, plus `--headerbar`); it looks the stereo API up at run time, so one binary is the test on the edition's GTK 3 and the control on Debian's. The judges are the GTK 4 page's (`check_eyes.py`, `check_colour.py`, `kwin_received.py`, `check_output.py`) and three of milestone 4: `check_two.py` (two areas in one window), `check_shift.py` (a scene drawn with a camera for each eye: the right view is the left one moved sideways, the rest identical) and `check_lit.py` (whether a window's own widgets reached the output).
+The proof (129 rows, 117 that must hold and 12 that must fail, as expected in each of three whole runs in a row, about ten minutes each) runs each case in a fresh headless Stereo KWin from installed packages: `gtk137-m4rig:pub` (the published round with Debian's gtk+3.0) and `gtk137-m4rig:new` (the same with the staged gtk+3.0 installed by apt). The test program is `scripts/glarea-stereo-test3.c`, the GTK 4 program's twin (the same pictures, options and report, plus `--headerbar`); it looks the stereo API up at run time, so one binary is the test on the edition's GTK 3 and the control on Debian's. The judges are the GTK 4 page's (`check_eyes.py`, `check_colour.py`, `kwin_received.py`, `check_output.py`) and three of milestone 4: `check_two.py` (two areas in one window), `check_shift.py` (a scene drawn with a camera for each eye: the right view is the left one moved sideways, the rest identical) and `check_lit.py` (whether a window's own widgets reached the output).
 A desktop without stereo is a compositor without the declaration in the same container: weston's headless backend for Wayland, Xvfb for X11.
+gtk3-demo's OpenGL Area has a Stereo check button (`GTK_DEMO_GLAREA_STEREO=1` starts it on): its triangle's right view is the left one moved 23 samples, the rest of the window identical in both eyes. Debian's demo with the same variable stays 2D (a red row); the edition's demo is not the same window as Debian's, because of the button.
+The real GTK 3 GL program is GStreamer's GTK 3 video sink (`gtkglsink`, package gstreamer1.0-gtk3), the sink GTK 3 players show video through: `gst-launch-1.0 videotestsrc pattern=colors ! video/x-raw,width=640,height=360 ! glsinkbin sink=gtkglsink` plays on the edition's GTK 3 the same picture as on Debian's, pixel for pixel. It does not ask for stereo yet; GStreamer carries a frame's multiview packing, so the sink is where a stereo video would next render one view per eye.
 GTK's own suite is run the way Debian's build runs it (X11 under Xvfb through `debian/tests/run-with-display`, a session bus, `LIBGL_ALWAYS_SOFTWARE=1`, `--timeout-multiplier 4`, Debian's fuzzy and ignored reftests), before and after the patches; `testsuite/gtk/glarea.c` is new.
 
 ### Traps

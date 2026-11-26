@@ -49,6 +49,27 @@ Set the guest up as the installer leaves a machine, then run the same cycle:
   With a 25 s delay the RTC woke the guest 0.5 s early, systemd-sleep took it for a wake by the user and returned without hibernating: use at least 40 s in a VM.
 - Traps: `systemctl hibernate` over ssh as the session user is refused by polkit (`Access denied ... interactive authentication`): use `sudo` or the PowerDevil call; `journalctl -S -3min` spans boots of a disposable guest, so read `-b 0` or a named boot; a guest that went through virtio-fs gets `hibernation exit` and the problems engine's notice `The system service System Hibernate (systemd-hibernate.service) failed ... exit status 1`, which does not name the device.
 
+## A guest made from a container image, with no root and no network (row 933)
+
+When the system to prove exists as a Docker image (a round's case e base: the published edition installed with apt, so with dracut), make the VM from it without root or loop devices:
+
+- Prepare it in a container from that image: the boot loader's binaries (`grub-pc-bin`), the package under test copied in, an agent script and its unit enabled, `systemctl set-default multi-user.target`, an fstab line for the root UUID, and a generic image for the first, direct boot (`dracut --no-hostonly --force OUT KVER`, or initramfs-tools' own image, which is generic).
+- `docker export NAME | mke2fs -F -t ext4 -U UUID -E offset=1048576,nodiscard -d - disk.raw 40960M` writes the file system straight into the disk file 1 MiB in, owners from the tar headers; then `sfdisk --wipe never --wipe-partitions never` writes the label. A swap disk is `truncate` plus `mkswap -U`.
+- Boot 1 is `-kernel/-initrd/-append root=UUID=...`; the agent runs `grub-install --target=i386-pc /dev/vda` and the work; later boots are SeaBIOS and GRUB from the disk (`bootindex=0` only on those: with `-kernel` QEMU takes index 0 and refuses the disk's).
+- The agent drives every phase with no network: a phase file on the disk, `systemctl hibernate` from inside its own process (the process is the witness: after the resume it goes on), the next start of QEMU by the harness after each power-off. Fix a built disk in place with `debugfs -w 'disk.raw?offset=1048576'` (`write`, `sif mode`, `sif uid`), then `e2fsck -fn` on the same name.
+
+Traps met:
+- Symptom: GRUB boots nothing and the serial console stays empty, or `update-grub` printed nothing and left no `grub.cfg`.
+  Cause: the case e base was installed in a container, where the proof library diverts `/usr/sbin/grub-mkconfig` (and `os-prober`) to an `exit 0` stub, as the image build does.
+  Fix: in the guest, `rm /usr/sbin/grub-mkconfig; dpkg-divert --local --rename --remove /usr/sbin/grub-mkconfig` before anything runs `update-grub`.
+  Found by: `debugfs -R 'cat /var/lib/dpkg/diversions'` on the run's overlay, copied to raw with `qemu-img convert`.
+- Symptom: the agent's lines stop midway with no error, and the console shows a login banner.
+  Cause: a getty opened the kernel console port (ttyS0) and hung it up; the agent's later writes failed, and a program under `set -e` that wrote there stopped.
+  Fix: a second serial port for the agent only (`-chardev file,id=agt,path=agent.log -serial chardev:agt`, `/dev/ttyS1` in the guest) and a copy in a file on the guest disk.
+- Symptom: `dpkg -i` in the agent says "dpkg frontend lock was locked by /usr/bin/apt-get".
+  Fix: `apt-get -o DPkg::Lock::Timeout=900 install ./PACKAGE.deb`, which also prints apt's plan.
+- Set the guest's console to `loglevel=7` if the going-down side's `PM: Image saving done` must be on the serial log: at 6 the kernel's KERN_INFO hibernation lines stay off the console, and the resumed journal never has them.
+
 ## Secure Boot and the kernel-soul bench
 
 The bench in `tools/hibernate-bench` runs the signed edition kernel under OVMF Secure Boot with a software TPM.

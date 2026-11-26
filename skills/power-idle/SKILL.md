@@ -128,6 +128,13 @@ Debian resumes from it with no `resume=` on the kernel command line, so a check 
 Measure the kernel's offset after boot; without the hook it is 0.
 A swap partition the installer made can sit in no fstab line and must still work.
 
+**With dracut** (the edition's kernel depends on `dracut | initramfs-tools`, so a system installed with apt has dracut, and Debian's dracut Conflicts with initramfs-tools) that file is never read.
+dracut 112 builds a systemd initramfs: resume is `systemd-hibernate-resume-generator`, which reads `resume=` and `resume_offset=` from `/proc/cmdline` only (and, on UEFI, the `HibernateLocation` variable systemd-sleep writes); dracut's own `/etc/cmdline.d` and `kernel_cmdline=` are read by dracut's shell scripts, not by systemd's generators.
+So the resume area goes on the kernel command line: Cushion Swap's repair writes `/etc/default/grub.d/zz-cushion-swap-resume.cfg` (the same `RESUME=` and `RESUME_OFFSET=` lines, added to `GRUB_CMDLINE_LINUX` unless a `resume=` or `noresume` is already there) and runs `update-grub`; a system without `update-grub` is told so, never given a file nobody reads.
+dracut's `resume` module leaves itself out of a strict host-only image while `/sys/power/resume` is `0:0`, which is every system that never hibernated: name it in `add_dracutmodules` (`/usr/lib/dracut/dracut.conf.d/`), which takes a module whose check returns 255.
+Read which generator is installed from dpkg (`dpkg-query -W -f='${Package} ${db:Status-Status}\n' initramfs-tools dracut`), not from the files left in `/etc/initramfs-tools`, which a removed package keeps.
+Measured in VMs (row 933, kernel 7.3.4-stereo3d18, dracut 112-8 and initramfs-tools 0.151): a swap file and a swap disk each hibernated and resumed on both generators (same boot id, witness alive); on dracut the kernel's `/sys/power/resume` and `resume_offset` came from the command line the repair's file wrote. Recipe and traps: references/hibernate-in-a-vm.md.
+
 While a hibernation uses the area, nothing may switch it off: hold retraction from the unit's switch-on until the sleep hook runs, with a timeout for a hibernation that never started.
 A systemd generator's stderr reaches neither dmesg nor the journal (systemd.generator(7)), so write its decisions to `/dev/kmsg`.
 PowerDevil can keep an old CanHibernate answer while logind's has changed; ask logind when you prove an offer.

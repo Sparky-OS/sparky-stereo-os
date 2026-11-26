@@ -124,7 +124,7 @@ The recipe, the identity table and its checker, the proof per pair of glasses, t
 
 ## Lessons from the lanes, October to November 2026
 
-[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 11 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (58 entries).
+[Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 26 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (62 entries).
 Read the traps before a change to this part, and add the next lesson there as you work ([ai-partners, skills as you go](../ai-partners/SKILL.md#skills-as-you-go)).
 
 HDMI®, HDMI® High-Definition Multimedia Interface and the HDMI® Logo are trademarks or registered trademarks of HDMI Licensing Administrator, Inc.

@@ -87,6 +87,7 @@ Munt (MT-32), libADLMIDI and libOPNMIDI (FM synthesis) and DOSBox Staging are no
 A headset microphone needs a SCO link, which is separate from A2DP.
 When voice fails, find the refusing layer before changing a codec or a profile: the controller's buffers, the kernel's decision, the connect, the USB alternate settings, then the profile.
 The commands, the two-machine test (a disposable gateway VM with the adapter, a real headset-side machine, a known tone as its microphone) and the traps are in [references/bluetooth-voice-dongles.md](references/bluetooth-voice-dongles.md); `bench/tone-check.py` and `bench/pwctl.py` are the checker and the card helper.
+For the CSR clone whose SCO the kernel disables (0a12:0001, LMP subversion 0x2312), the same page has the kernel series that gives it a voice setting and its proof without the device: KUnit on `hci_cc_read_buffer_size()` and a virtual USB clone in a VM.
 
 ## Standards
 

@@ -216,7 +216,7 @@ GTK 3 has no scene graph and no offload: it draws a whole window into one 8 bit 
 2. **Wayland:** the pair is a texture exported as a dma-buf from the area's own context (`EGL_MESA_image_dma_buf_export`, the opaque form of its fourcc where the compositor lists it: XB24, XB30, XB48, XB4H), attached to a `wl_subsurface` placed **below** the window's surface (`wl_subsurface_place_below`), sized to one view with `wp_viewport.set_destination` (the declaration's version 2: a declared surface is one view), its colour described with `wp_color_management_v1` on its own `wl_surface`, and declared with libstereo-declare's `stereo_declare_wayland_format(surface, STEREO_SBS_FULL)`. The subsurface stays synchronized, so what is committed on it shows with the window's frame GDK is painting;
 3. **X11:** the pair is drawn on a child X window of the toplevel twice a view wide, declared with `stereo_declare_x11_child()` and placed with `stereo_declare_x11_child_place()` below the window's own surface when the window has an alpha channel: with the area's own GLX context (`glXMakeContextCurrent` on the child, `glDrawBuffer(GL_BACK)`, one blit, swap, the context's drawables restored) on a graphics card, through memory (`glReadPixels`, `XPutImage`) on a software renderer; `GDK_X11_STEREO_READBACK=0` or `=1` chooses, as in GTK 4;
 4. the window keeps a **hole** where the area lies: the area clears its rectangle with `CAIRO_OPERATOR_CLEAR`, and GtkWindow subtracts it from the opaque region it gives the compositor (`_gtk_window_set_stereo_hole()`), so the window's own widgets drawn over the area (a `GtkOverlay` label) stay over it, in both eyes;
-5. an area that cannot do this says why (`stereo-error`, one log line) and renders its left view alone into the window, until stereo is asked again.
+5. an area that cannot do this says why (`stereo-error`, one log line) and renders its left view alone into the window, until stereo is asked again. Every failure that can be known before the views are rendered is found when the pair is prepared (the dma-buf export, a colour state the compositor cannot be told, a depth or a colour state an X window cannot hold), so such an area never renders a right view.
 
 The Wayland globals (`wl_subcompositor`, `wp_viewporter`, `zwp_linux_dmabuf_v1` version 3 for its format and modifier list, `wp_color_manager_v1`) and libstereo-declare's own objects are bound on an event queue of the area's own (`wl_display_create_queue`, a proxy wrapper for the registry), so the area can wait for the compositor's answers (a buffer created, an image description ready) inside the draw without dispatching GDK's events. GDK 3 already lets a program add its own surfaces (`gdk_wayland_window_add_frame_callback_surface`, since 3.24.25); nothing in GDK's Wayland backend changes.
 
@@ -253,6 +253,31 @@ The colour state is ITU-T H.273 code points, and the Wayland side maps each to t
 
 On X11 a colour state other than sRGB, or a format deeper than the window's visual, is said and the left view shown alone: an X window has no colour description, and its visual holds 8 bits a channel.
 
+Where each depth stops, measured with the ramp of 256 steps over 1/256 of the range from 0.5 (counted where it is rendered, then in each eye's buffer at a virtual HDR output, Rec. 2020 PQ at 1000 cd/m², through milestone 3's private KWin):
+
+| Area format | Ramp values rendered | Pair | At the HDR output | Where the chain stops short of 16 bits |
+|---|---|---|---|---|
+| 10 bit | 5 | XB30 | 5 | nowhere before the output: 10 bits arrive |
+| half float | 8 | XB4H | 8 | the format itself (11 bits of mantissa at 0.5) |
+| float | 256 | XB4H | 8 | the pair: no dma-buf format is deeper than half float, and the output's buffer is half float too |
+| 16 bit integer | 256 | none on NVIDIA | | the export: NVIDIA's EGL and zink on NVIDIA export no 16 bit dma-buf, and the area says so |
+| 12 bit | (in 16 bit or float) | | | as for 16 bit integer or float: no 12 bit format exists in GL or dma-buf |
+
+### X11: the two ways, timed
+
+The same work as GTK 4's table (two 1920x1080 views rendered and handed over at every frame for ten seconds, in an area shown at 960x540, `GDK_X11_STEREO_READBACK=0` and `=1`), on the edition's GTK 3, load 7 to 9 on 12 threads:
+
+| Client route | Way | Frames a second | Processor ms a frame |
+|---|---|---|---|
+| zink on the RTX 3060 | OpenGL | 59.5 | 4.26 |
+| | readback | 56.7 | 13.18 |
+| NVIDIA's own GLX | OpenGL | 58.9 | 4.65 |
+| | readback | 44.9 | 17.42 |
+| llvmpipe | OpenGL | 19.3 | 151.23 |
+| | readback | 22.6 | 83.70 |
+
+So GTK 3 keeps GTK 4's defaults: OpenGL on a graphics card (a third to a quarter of the readback's processor a frame), the readback on a software renderer (about half the processor of the OpenGL way there).
+
 ### The proof
 
 `m4/rerun.sh` of the lane (the edition's private record) runs each case in a fresh headless Stereo KWin from installed packages: `gtk137-m4rig:pub` (the published round with Debian's gtk+3.0) and `gtk137-m4rig:new` (the same with the staged gtk+3.0 installed by apt). The test program is `scripts/glarea-stereo-test3.c`, the GTK 4 program's twin (the same pictures, options and report, plus `--headerbar`); it looks the stereo API up at run time, so one binary is the test on the edition's GTK 3 and the control on Debian's. The judges are the GTK 4 page's (`check_eyes.py`, `check_colour.py`, `kwin_received.py`, `check_output.py`) and three of milestone 4: `check_two.py` (two areas in one window), `check_shift.py` (a scene drawn with a camera for each eye: the right view is the left one moved sideways, the rest identical) and `check_lit.py` (whether a window's own widgets reached the output).
@@ -267,6 +292,7 @@ GTK's own suite is run the way Debian's build runs it (X11 under Xvfb through `d
 - **The window would hide the subsurface below it.** GtkWindow tells the compositor its content is opaque (`update_opaque_region()`); a compositor draws an opaque region without blending, so the hole would show black. Fix: the window subtracts every stereo area's rectangle from its opaque region.
 - **GTK 3's X11 window on zink shows nothing but its GL area (Debian's GTK 3 too).** Symptom: under Xwayland with Mesa's zink on NVIDIA's Vulkan driver, the capture of a window with a plain GtkGLArea is black but for the area (lit share 0.127 against 0.287 on NVIDIA's own GLX). Not the stereo patch: Debian's 3.24.52-3 shows the same. The stereo rows on X11 that look at the window's widgets run on NVIDIA's GLX and llvmpipe; the fault is in the lane's unfiled failures.
 - **A dma-buf the compositor refuses ends the connection.** `zwp_linux_buffer_params_v1.create_immed` with a format or modifier the compositor does not take is a protocol error; use `create` and wait for `created` or `failed` on the area's own queue, and choose the fourcc from the compositor's `modifier` events (version 3) first.
+- **A view rendered that can never be shown.** Symptom: on llvmpipe the area said why and showed its left view, but its render handler had drawn a right view once (`eyes-seen: left=2 right=1`, a row of the first whole run). Cause: the dma-buf export was tried when the pair was handed over, after both views were rendered. Fix: the export, and every other failure known in advance, is tried when the pair is prepared, before the first view (then `left=1 right=0`). Found by the row that asked the right view never to be rendered.
 - **GTK's notify test sets 0 on every integer property.** A setter that turns 0 into -1 changes nothing and emits no notify, which the test counts as a missing notify (`gtk:notify` aborted). Keep the value as given and read anything up to 0 as "the area's own size".
 - **GTK's defaultvalue test wants a boxed property's default to be NULL.** `color-state` defaults to sRGB's state; it is listed with GTK 3's other boxed defaults (GtkColorButton's `rgba`).
 - **A test picture with snow is never the same twice.** `videotestsrc pattern=smpte` has a block of random noise; compare GTK builds with `pattern=colors`.

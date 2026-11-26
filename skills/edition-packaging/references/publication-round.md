@@ -1003,3 +1003,9 @@ The whole-pool rerun must provision the same original when that bootstrap versio
 
 ### An index-only candidate tree for check-installable.py
 `check-installable.py --unsigned` reads only `dists/` and simulates, so a preparation without a signed tree can give it one: the published binary indexes with each pool binary replacing the record of the same Package and Architecture, and a Release that keeps the published Origin, Label and Codename (a few lines of Python; row 933 kept one beside its report).
+
+### The Lean gate over a whole pool, and an accepted package without the mark
+- **Symptom:** `python3 -m lean.release check-debs POOL/*.deb` stops with `No such file or directory: .../usr/share/dpkg-stereo/lc/NAME-dbgsym/amd64.json`; given only the primaries it stops with `matching HR documentation package is missing`.
+- **Cause:** the first stop came from an accepted Debian-source rebuild (anacron `2.3-52+stereo3d1`) that never went through Lean Code: no `Sparky-Lean-Code` field, no `-lc-hr` companion, no `+lc1`; the second is the gate's own rule, a marked package must be given with its HR companion.
+- **Fix:** list every primary's `Sparky-Lean-Code` field before the gate (`dpkg-deb -f DEB Sparky-Lean-Code`, skipping `-dbgsym` and `-lc-hr`); hold an unmarked one as a qualification gap (its lc1 source is made with `lean.debian_prepare`, as the Kamoso case above says), then run the gate on every remaining archive, companions included.
+- **How found:** the two stops in that order, then the field listing, which named one package of 432.

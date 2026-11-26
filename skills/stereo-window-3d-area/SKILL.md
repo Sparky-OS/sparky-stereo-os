@@ -3,7 +3,7 @@ metadata:
   requires-packages: qt6-base-dev
 name: stereo-window-3d-area
 description: >-
-  Stereo content in an ordinary Qt, KDE or GTK 4 window, and depth of the desktop's own elements: a declared
+  Stereo content in an ordinary Qt, KDE, GTK 4 or GTK 3 window, and depth of the desktop's own elements: a declared
   subsurface under a hole in the window, Stereo Union's depth values, the levels sunk, screen and popped within the person's
   limits, menus, popups, tooltips, select lists, notifications and dialogs at depth (xdg_popup), the 10 px popup
   border, KWin's effects with their own depth, the boot splash at the person's limits, a 3D area at a fractional
@@ -72,13 +72,14 @@ Worked examples:
   A window whose element depth Qt Quick draws as a pair inside Qt's own frame stayed flat until ORDER 583; that case, and Qt on xcb, are in [native-linux, a Qt window with depth that stays flat](../native-linux/references/qt-window-depth-flat.md).
 - Qt Widgets forced an 8-bit alpha on every translucent window, so a 2D part over a deeper 3D area was 8 bits; our Qt keeps the alpha and depth the window asks for (10/10/10/2 or 16/16/16/16), and a window that asks for nothing stays 8/8/8/8 ([Sparky-OS/qtbase `stereo3d-alpha`](https://github.com/Sparky-OS/qtbase/tree/stereo3d-alpha)). Deep content in its own layer, as Krita does, is still the pattern ([`deep-colour`](../deep-colour/SKILL.md)).
 
-## GTK 4 (GtkGLArea, Wayland)
+## GTK 4 and GTK 3 (GtkGLArea)
 
 GtkGLArea draws into a framebuffer of its own and appends one texture to the scene graph, so a stereo GtkGLArea is the same pattern with GTK's own subsurface: each eye is rendered by the program's unchanged render handler (the signal is emitted once per eye, `gtk_gl_area_get_current_eye()` says which), the two views are copied side by side into one opaque texture, and that texture goes on a `GdkSubsurface` (the path `GtkGraphicsOffload` takes) declared with `kde_stereo_content_v1` version 2, so the area keeps its size.
 GTK composites an offloaded picture itself whenever the subsurface cannot be used; for a stereo area that would show both eyes flat, so the area draws a clip of the left view as its fallback and tells the program (`stereo-shown`, `stereo-error`) and the log, once.
 The recipe, the proof cases and the traps (no dma-buf from llvmpipe, a blit that obeys the scissor, the decision that comes a frame late, a dma-buf export that writes no descriptor with zink on NVIDIA) are in [GTK 4 and GtkGLArea](references/gtk-glarea.md).
 A GTK 4 program that shows decoded pictures or video frames, with no GL area (HandBrake's preview), uses libstereo-gtk's media area, unpacker and file menu: [GTK 4 pictures and video](references/gtk-media-area.md).
-X11 is the same area as a child window declared with libstereo-declare, drawn with OpenGL on the window itself (milestone 3: no readback). The same page has a real player (Celluloid renders once per eye from libmpv, keeps a film's correction with its resume position and saves it into the file when asked) and the area's depth and colour state (8 to 16 bits and floats, Rec. 2100 PQ and linear, with the test that tells what KWin received from what the output got). GIMP 3.2's canvas is cairo, not GL: its plan, and what milestone 3 left, are in [GTK pieces still to build](references/gtk-glarea-plans.md).
+X11 is the same area as a child window declared with libstereo-declare, drawn with OpenGL on the window itself (milestone 3: no readback). The same page has a real player (Celluloid renders once per eye from libmpv, keeps a film's correction with its resume position and saves it into the file when asked) and the area's depth and colour state (8 to 16 bits and floats, Rec. 2100 PQ and linear, with the test that tells what KWin received from what the output got). GTK 3 (3.24.52, milestone 4) has the same API under the same names (GDK 3 gains `GdkMemoryFormat`, `GdkColorState` and `GdkCicpParams`); having no offload, its area gives the compositor its pair itself: a dma-buf on a subsurface below the window on Wayland, described with `wp_color_management_v1`, a declared child below the window on X11, and the window keeps a hole there so its widgets drawn over the area stay over it ([GTK 3](references/gtk-glarea.md#gtk-3)).
+GIMP 3.2's canvas is cairo, not GL: its plan, with what milestone 4 built for it, and what is left, are in [GTK pieces still to build](references/gtk-glarea-plans.md).
 
 ## X11 programs
 

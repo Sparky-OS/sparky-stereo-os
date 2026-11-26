@@ -1,6 +1,6 @@
-# GTK 4: a GtkGLArea as a declared 3D area inside an ordinary window
+# GTK 4 and GTK 3: a GtkGLArea as a declared 3D area inside an ordinary window
 
-Written on 2026-11-07 (ORDER 137, milestone 1: GTK 4.24.1 on Wayland); milestone 3 (2026-11-25) added the X11 route without the readback, views with a size of their own, a real player and depth and colour state.
+Written on 2026-11-07 (ORDER 137, milestone 1: GTK 4.24.1 on Wayland); milestone 3 (2026-11-25) added the X11 route without the readback, views with a size of their own, a real player and depth and colour state; milestone 4 (2026-11-26) the same area in GTK 3.24.52, at the end of this page: [GTK 3](#gtk-3).
 The general rules are in [SKILL.md](../SKILL.md); this page is what GTK needs on top of them.
 
 ## The route
@@ -203,3 +203,71 @@ A screenshot of an HDR output is KWin's conversion to sRGB: it shows the SDR num
 The stereo-layer order742 branch adds a GTK file-choice menu on the shared C input list and store, and a prototype media area taking two native GdkTextures. It uses a SHM subsurface on Wayland or a declared X11 child; the ordinary window masks only the media rectangle. Its source compiles, but no both-eye capture qualified it and neither HandBrake preview path uses it yet. Keep it as a draft until the two-eye, geometry, controls, resize and lifecycle checks pass.
 
 The device-free witness reported QPainter through KWin supportInformation and every ScreenShot2 call was Cancelled. This repeats the cause in the proof-rig November lesson: stereo captures require EGL and a render node. HOUSE-RULES requires a brief to name a device before a lane may pass it to Docker. Do not count the successful child declaration as a visual result or use a host display to get past that boundary.
+
+## GTK 3
+
+Milestone 4 (queue row 137, 2026-11-26): the same stereo area in GTK 3.24.52, Debian's gtk+3.0 3.24.52-3 with the edition's patches (+stereo3d1), so GTK 3 programs that draw with OpenGL can be shown per eye; GIMP 3.2's cairo canvas is the next milestone ([plans](gtk-glarea-plans.md)).
+
+### The route
+
+GTK 3 has no scene graph and no offload: it draws a whole window into one 8 bit buffer, cairo first, and a GtkGLArea's framebuffer is copied into it (`gdk_cairo_draw_from_gl()`, gtk/gtkglarea.c). So a stereo area gives the compositor its picture itself, on a surface of its own, from its draw handler:
+
+1. each view is rendered into the area's own framebuffer at the view's size (the program's render handler unchanged, `gtk_gl_area_get_current_eye()` says which camera), and copied with `glBlitFramebuffer` into its half of one pair, left first;
+2. **Wayland:** the pair is a texture exported as a dma-buf from the area's own context (`EGL_MESA_image_dma_buf_export`, the opaque form of its fourcc where the compositor lists it: XB24, XB30, XB48, XB4H), attached to a `wl_subsurface` placed **below** the window's surface (`wl_subsurface_place_below`), sized to one view with `wp_viewport.set_destination` (the declaration's version 2: a declared surface is one view), its colour described with `wp_color_management_v1` on its own `wl_surface`, and declared with libstereo-declare's `stereo_declare_wayland_format(surface, STEREO_SBS_FULL)`. The subsurface stays synchronized, so what is committed on it shows with the window's frame GDK is painting;
+3. **X11:** the pair is drawn on a child X window of the toplevel twice a view wide, declared with `stereo_declare_x11_child()` and placed with `stereo_declare_x11_child_place()` below the window's own surface when the window has an alpha channel: with the area's own GLX context (`glXMakeContextCurrent` on the child, `glDrawBuffer(GL_BACK)`, one blit, swap, the context's drawables restored) on a graphics card, through memory (`glReadPixels`, `XPutImage`) on a software renderer; `GDK_X11_STEREO_READBACK=0` or `=1` chooses, as in GTK 4;
+4. the window keeps a **hole** where the area lies: the area clears its rectangle with `CAIRO_OPERATOR_CLEAR`, and GtkWindow subtracts it from the opaque region it gives the compositor (`_gtk_window_set_stereo_hole()`), so the window's own widgets drawn over the area (a `GtkOverlay` label) stay over it, in both eyes;
+5. an area that cannot do this says why (`stereo-error`, one log line) and renders its left view alone into the window, until stereo is asked again.
+
+The Wayland globals (`wl_subcompositor`, `wp_viewporter`, `zwp_linux_dmabuf_v1` version 3 for its format and modifier list, `wp_color_manager_v1`) and libstereo-declare's own objects are bound on an event queue of the area's own (`wl_display_create_queue`, a proxy wrapper for the registry), so the area can wait for the compositor's answers (a buffer created, an image description ready) inside the draw without dispatching GDK's events. GDK 3 already lets a program add its own surfaces (`gdk_wayland_window_add_frame_callback_surface`, since 3.24.25); nothing in GDK's Wayland backend changes.
+
+### The API: GTK 4's names
+
+`gtk_gl_area_set_stereo()` (property `stereo`), `stereo-shown`, `stereo-error` (a `GError`), `gtk_gl_area_get_current_eye()` with `GtkGLAreaEye` (NONE, LEFT, RIGHT), `gtk_gl_area_set_stereo_view_size()` (`stereo-view-width`, `stereo-view-height`; -1, or any value up to 0, is the area's own size), `gtk_gl_area_set_format()` and `gtk_gl_area_set_color_state()` (`format`, `color-state`).
+GDK 3 had no `GdkMemoryFormat` or `GdkColorState`: the patch adds them under GTK 4's names and values, the five formats an area renders in (`R8G8B8A8_PREMULTIPLIED` 2, `R16G16B16A16_PREMULTIPLIED` 10, `R16G16B16A16_FLOAT_PREMULTIPLIED` 13, `R32G32B32A32_FLOAT_PREMULTIPLIED` 16, `ABGR2101010_PREMULTIPLIED` 68), the four colour state getters (sRGB, linear sRGB, Rec. 2100 PQ, Rec. 2100 linear) and `GdkCicpParams` for any other, so a program says the same in both toolkits.
+
+### Depth and colour state in GDK 3
+
+GTK 3 converts no colours: a colour state is handed on, never applied. So the depth and the colour state reach the compositor only on the area's own surface, which a stereo area has; a plain area with another format or colour state is drawn into the 8 bit window with its values as written, and GTK says so once in its log.
+The colour state is ITU-T H.273 code points, and the Wayland side maps each to the protocol's names (color-management-v1.xml); a code point the protocol has no name for, or a name the compositor does not list, is said:
+
+| H.273 colour primaries | `wp_color_manager_v1` primaries | H.273 transfer characteristics | transfer function |
+|---|---|---|---|
+| 1 (BT.709, sRGB) | srgb | 1, 6, 14, 15 (BT.709, BT.601, BT.2020) | bt1886 (the display curve those assume) |
+| 4 (BT.470 M) | pal_m | 4 (BT.470 M) | gamma22 |
+| 5 (BT.470 B, G; BT.601 625) | pal | 5 (BT.470 B, G) | gamma28 |
+| 6, 7 (SMPTE 170M, 240M) | ntsc | 7 (SMPTE 240M) | st240 |
+| 8 (illuminant C) | generic_film | 8 (linear) | ext_linear |
+| 9 (BT.2020, BT.2100) | bt2020 | 9, 10 (logarithmic) | log_100, log_316 |
+| 10 (SMPTE ST 428-1) | cie1931_xyz | 11 (IEC 61966-2-4) | xvycc |
+| 11 (SMPTE RP 431-2) | dci_p3 | 13 (sRGB) | srgb, or gamma22 where the compositor does not list srgb (KWin does not) |
+| 12 (SMPTE EG 432-1) | display_p3 | 16 (PQ), 17 (ST 428-1), 18 (HLG) | st2084_pq, st428, hlg |
+| 22 (EBU 3213) | none: said | 12 (BT.1361) | none: said |
+
+| Format | Views rendered in | Pair to the compositor |
+|---|---|---|
+| 8 bit | `GL_RGBA8` (`GL_RGB8` without alpha, as before) | XB24 |
+| 10 bit | `GL_RGB10_A2` | XB30 |
+| 16 bit (also 12) | `GL_RGBA16` | XB48 where the driver exports one; NVIDIA's EGL and zink on NVIDIA do not, and the area says so |
+| half float | `GL_RGBA16F` | XB4H |
+| float | `GL_RGBA32F` | half float, XB4H: no dma-buf format is deeper |
+
+On X11 a colour state other than sRGB, or a format deeper than the window's visual, is said and the left view shown alone: an X window has no colour description, and its visual holds 8 bits a channel.
+
+### The proof
+
+`m4/rerun.sh` of the lane (the edition's private record) runs each case in a fresh headless Stereo KWin from installed packages: `gtk137-m4rig:pub` (the published round with Debian's gtk+3.0) and `gtk137-m4rig:new` (the same with the staged gtk+3.0 installed by apt). The test program is `scripts/glarea-stereo-test3.c`, the GTK 4 program's twin (the same pictures, options and report, plus `--headerbar`); it looks the stereo API up at run time, so one binary is the test on the edition's GTK 3 and the control on Debian's. The judges are the GTK 4 page's (`check_eyes.py`, `check_colour.py`, `kwin_received.py`, `check_output.py`) and three of milestone 4: `check_two.py` (two areas in one window), `check_shift.py` (a scene drawn with a camera for each eye: the right view is the left one moved sideways, the rest identical) and `check_lit.py` (whether a window's own widgets reached the output).
+A desktop without stereo is a compositor without the declaration in the same container: weston's headless backend for Wayland, Xvfb for X11.
+GTK's own suite is run the way Debian's build runs it (X11 under Xvfb through `debian/tests/run-with-display`, a session bus, `LIBGL_ALWAYS_SOFTWARE=1`, `--timeout-multiplier 4`, Debian's fuzzy and ignored reftests), before and after the patches; `testsuite/gtk/glarea.c` is new.
+
+### Traps
+
+- **The picture reaches the compositor upside down (Wayland only).** Symptom: both eyes right and at the right place, but 8 % of the samples wrong: the tag LEFT mirrored at the bottom of the area. Cause: a dma-buf's first row is the top of the picture, OpenGL's first row the bottom, and the pair was copied in OpenGL's order. Fix: on Wayland the copy into the pair turns each view over (the destination rows of `glBlitFramebuffer` swapped); X11 keeps OpenGL's order, its blit and its readback turn it themselves. Found by looking at the first capture's area.
+- **A widget over an X11 stereo area is hidden although the child is placed below the window.** Symptom: `_KDE_NET_WM_STEREO_CONTENT_CHILD_PLACE` ends in 1, the area shows, the label drawn over it does not (0 yellow samples), with a window that has an alpha channel. Cause: GTK 4's X11 route puts the declared child in an undeclared frame window one view wide; only the declared child is redirected, so the frame is part of the toplevel's own picture and covers the window's pixels there, label included. Fix: below the window there is no frame; the child is a child of the toplevel itself. Found by asking which X window was in the toplevel's picture over the area (`x11_tree.py`), after the plain area's window showed the label (2209 samples) and the Wayland area too.
+- **A window without an alpha channel hides what lies below it.** The hole needs a window whose visual has alpha: on X11 GTK 3 gives one to a window with client-side decorations (a header bar) on a compositing window manager. A window without one keeps the child above it, and GTK says in its log that a widget drawn over the area is hidden by it.
+- **The window would hide the subsurface below it.** GtkWindow tells the compositor its content is opaque (`update_opaque_region()`); a compositor draws an opaque region without blending, so the hole would show black. Fix: the window subtracts every stereo area's rectangle from its opaque region.
+- **GTK 3's X11 window on zink shows nothing but its GL area (Debian's GTK 3 too).** Symptom: under Xwayland with Mesa's zink on NVIDIA's Vulkan driver, the capture of a window with a plain GtkGLArea is black but for the area (lit share 0.127 against 0.287 on NVIDIA's own GLX). Not the stereo patch: Debian's 3.24.52-3 shows the same. The stereo rows on X11 that look at the window's widgets run on NVIDIA's GLX and llvmpipe; the fault is in the lane's unfiled failures.
+- **A dma-buf the compositor refuses ends the connection.** `zwp_linux_buffer_params_v1.create_immed` with a format or modifier the compositor does not take is a protocol error; use `create` and wait for `created` or `failed` on the area's own queue, and choose the fourcc from the compositor's `modifier` events (version 3) first.
+- **GTK's notify test sets 0 on every integer property.** A setter that turns 0 into -1 changes nothing and emits no notify, which the test counts as a missing notify (`gtk:notify` aborted). Keep the value as given and read anything up to 0 as "the area's own size".
+- **GTK's defaultvalue test wants a boxed property's default to be NULL.** `color-state` defaults to sRGB's state; it is listed with GTK 3's other boxed defaults (GtkColorButton's `rgba`).
+- **A test picture with snow is never the same twice.** `videotestsrc pattern=smpte` has a block of random noise; compare GTK builds with `pattern=colors`.
+- **gtk-update-icon-cache is not a gtk+3.0 package in Debian testing** (it comes from gtk4); Debian's own binaries of 3.24.52-3 for the link gate and the file comparison are the other ten.

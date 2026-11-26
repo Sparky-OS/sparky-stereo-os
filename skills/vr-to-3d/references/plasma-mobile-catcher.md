@@ -333,3 +333,5 @@ The current paired offer carries the panel, NLA endpoint and certificate fingerp
 The head-fixed Flat Headset path runs without continuous pose.
 When a mode explicitly requires pose, a Qt Sensors connection is only a backend check.
 Confirm that it starts and supplies a first reading within the mode's deadline. [FreeRDP H.264 backend](https://github.com/FreeRDP/FreeRDP/blob/3.33.1/libfreerdp/codec/h264.c#L842-L951) [Qt Sensors lifecycle](https://doc.qt.io/qt-6/qsensor.html#start)
+
+- **The AArch64 build aborts in the Catch automatic MOC step with allocator corruption.** The raw user-mode SDK configured and built the RDP session first. The failure was in its code-generation phase. Verify the exact Qt tools package version on both architectures and run matching host `moc` and `rcc` for generation. Keep ARM libraries and headers in the signed SDK. Verify that `readelf` identifies the linked executable as AArch64 and that its source descriptor hash matches the other architecture's. This qualifies the executable build. The distribution package still has its own native Lean Code and payload gates.

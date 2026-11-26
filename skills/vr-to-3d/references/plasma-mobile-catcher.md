@@ -218,6 +218,12 @@ Use the shared Android link labels when preparing the package catalogues. Verify
 - **The headless arm64 build guest enters emergency mode with the root filesystem mounted.** A boot built from only the Mobian root partition lacks the image's separate boot partition. The serial log shows the missing device and failed `boot.mount`. Use a disposable root copy, disable the fstab generator for the build, and mount the build inputs explicitly.
 - **The archive builder cannot create its offline disk.** `mkfs.ext4` comes from e2fsprogs. Check for it before downloading the SDK. The later device test already needs its own matching QEMU tools and uses the signed offline dependency pack.
 
+- **The configured arm64 build outlasts the serial controller.** The compiler can remain busy after its last printed target. Inspect the compiler or emulator CPU and the next build target before deciding where it stopped. Use a longer build-specific deadline and a separate disk checkpoint after CMake configures the source. Replay the ext4 journal on a disposable copy before reusing the checkpoint.
+- **An AArch64 command exits 182 in PRoot.** Direct QEMU user mode printed `arm64` for `dpkg --print-architecture`. Verbose PRoot logged its seccomp acceleration and then exited 182 for the identical command. Set `PROOT_NO_SECCOMP=1` for the disposable PRoot build and repeat `dpkg --print-architecture` before starting CMake.
+- **The compiler runs much slower than the Qt code generators under emulation.** Keep the native arm64 sysroot and run the signed Debian amd64-host AArch64 compiler through CMake's C++ compiler launcher. Compile a known translation unit and confirm `Machine: AArch64` with `readelf -h` before letting it compile the tree. Record both compiler versions and the source descriptor hash across the transfer to the native package build.
+
+Use the FreeRDP graphics client's surface creation record to check the received raster. An AVC wire update then gives the received codec, and the marked capture gives the eyes, layout and margins. Check the same chart with a deliberately frozen frame, reversed eye order and unequal margins before crediting the positive captures. [FreeRDP graphics client](https://github.com/FreeRDP/FreeRDP/blob/3.33.1/channels/rdpgfx/client/rdpgfx_main.c)
+
 ## Credits
 
 The KDE Connect virtual-monitor source names Aleix Pol i Gonzalez and Fabian Arndt, and the downstream protocol-v2 history names Fabian Druschke.

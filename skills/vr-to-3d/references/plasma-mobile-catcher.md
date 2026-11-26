@@ -18,16 +18,17 @@ Use a stock arm64 handset first, then run the same receiver proof with the hands
    Load virtio PCI and block, ext4, virtio GPU, input and network dependencies in module order.
    Mount the image's root partition and switch to its native init.
    The sunxi image's device-specific boot chain stays on the read-only image.
-4. The initial display device is `-device virtio-gpu-pci`.
+4. Start with `-device bochs-display` and include the generic kernel's `bochs` DRM module in the initramfs. This produced a 1280×800 Plasma Mobile welcome screen without a host render node.
    Use a Unix QMP socket for `screendump` and a socket-backed serial console, without any GUI on the host.
    Record the start clock, kernel/root readiness, graphical target and first visible Plasma Mobile frame.
    Confirm the process, active session and framebuffer before counting the shell as up.
-5. For the Mobian sunxi image, disable the VM's nonexistent USB-gadget jobs and the upstream image's swap and device waits for this disposable session. If the greeter keeps exiting, use greetd's `initial_session` with a fresh runfile and the installed Plasma Mobile desktop entry's D-Bus wrapper. The virtual GPU worked with `KWIN_COMPOSE=Q QT_QUICK_BACKEND=software`. Keep graphical provisioning and the phone image in the isolated guest.
+5. For the Mobian sunxi image, disable the VM's nonexistent USB-gadget jobs and the upstream image's swap and device waits for this disposable session. If the greeter keeps exiting, use greetd's `initial_session` with a fresh runfile and the installed Plasma Mobile desktop entry's D-Bus wrapper. The tested Bochs configuration uses `KWIN_COMPOSE=Q QT_QUICK_BACKEND=software`. Keep graphical provisioning and the phone image in the isolated guest.
 
 ## Exercise the existing KDE Connect route
 
 Set the guest's default RDP handler to the stock KRDC executable with fullscreen requested.
 Pair the one identified phone and one identified rig over the isolated link.
+KDE Connect's daemon `devices(true, false)` query includes reachable peers before pairing. Use its `customDevices` property to name the one guest peer explicitly on an isolated two-address link.
 The KDE Connect object's `requestVirtualMonitor` invokes the same action as **Use device as an external monitor**.
 Record its acceptance, the new KWin output, the receiving process and the first advancing frame on the phone.
 A virtual KWin already has an output before the request, so retain the before and after output IDs. In authentication-first versions of KRdp, the RDP client starts ahead of the new output. Handle the test server's certificate in the client, then wait for the authenticated session to create its output.
@@ -80,7 +81,9 @@ Use a physical device to qualify hardware decoding, lens alignment and continuou
   Check the greetd journal and framebuffer, then run the installed Plasma Mobile session through greetd on the disposable overlay.
   The virtio GPU lacks the physical phone's device-tree properties. The screenshot showed the missing property and the journal showed the greeter exiting before opening a session.
 - **The installed shell starts slowly and the first capture is black.**
-  KWin, the Xwayland software fallback and the Plasma Mobile startup services finish at different times under TCG. Use the installed desktop entry's D-Bus wrapper, KWin QPainter and Qt Quick's software backend, then check the active shell and a complete frame. The serial samples showed KWin starting before Xwayland, the Plasma service starting near 2½ minutes, and the first framebuffer still black at that point.
+  KWin, Xwayland and Plasma Mobile's startup services finish at different times under TCG. Wait for the first visible pixels after the shell service is active. On the Bochs run, the first sample at active shell was black, KScreen showed the connected 1280×800 mode, and the delayed capture showed the first-run screen.
+- **QEMU's VirGL startup reports that there is no render node.**
+  `egl-headless` needs a DRM render node. A device-free container can use `bochs-display` with the matching guest kernel module. Read QEMU's EGL error separately from the guest's kernel and framebuffer logs.
 - **The observer misses a target reported by systemd.**
   The serial status lines insert ANSI colour codes around the target name.
   Strip those codes before matching and keep the original log as evidence.
@@ -105,6 +108,10 @@ Use a physical device to qualify hardware decoding, lens alignment and continuou
   The image omits xdg-utils.
   Write the test user's `mimeapps.list` directly and refresh KDE's service cache.
   The serial log showed the stock client packages had installed successfully before the handler command failed.
+- **KDE Connect exposes its D-Bus name and a query can still time out during startup.**
+  Check that the desktop daemon actually answers its `devices` method. A listening socket and a D-Bus name show that startup has reached those registrations. The first-run logs showed the session's autostart service appearing after the explicit early launch.
+- **A reachable peer is absent from `kdeconnect-cli --list-available`.**
+  That view requires pairing. Query reachable devices with `devices(true, false)` before asking for a pair. In the isolated rig, the PC daemon returned one ID while the paired-only CLI returned zero.
 - **The staged KWin source reaches the arm64 dependency check and exits before compilation.**
   The studied archive supplies Stereo Policy development libraries for amd64.
   Provision the arm64 build dependency and matching Plasma/Qt stack before retrying.

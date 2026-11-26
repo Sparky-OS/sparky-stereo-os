@@ -76,7 +76,8 @@ A device's command-line tool (a headset's HeadsetControl) joined to System Setti
 
 System Settings has a Screensavers page (`sparky-stereo-screensavers`, in Appearance beside Wallpaper): the list of every screensaver the edition ships, the stereo catalogue's and XScreenSaver's 2D ones, a small live preview of the selected one, a full-screen preview, which savers the show rotates through and its times; Display & Monitor, Power Management, Screen Locking and Wallpaper each have a button to it, and the "Stereo Screensavers" launcher opens it.
 The layout is the one of KDE's retired Screen Saver module (kde-workspace 4.11).
-[Where each value lives, how a saver is hosted as a preview in a settings page (a helper on a private display, the pair as a declared surface above the System Settings window, the person's depth limits at the size shown), how a page links to another, how to add a saver to the list, and the traps](references/screensaver-settings-page.md).
+Every text the page colours itself stands at 4.5:1 or more in any colour scheme: a dim text keeps the scheme's colour where that can be read and is moved towards the normal text by the smallest step where it cannot.
+[Where each value lives, how a saver is hosted as a preview in a settings page (a helper on a private display, the pair as a declared surface above the System Settings window, the person's depth limits at the size shown), how a page links to another, how to add a saver to the list, how every text of a page is measured on a capture (the page's text report, the control, the looks, the states, the red side), and the traps (a dim text on a new page, a preview the scroll bar cuts in a real KDE session, a click before the window is there, a row that depends on the frame caught, fixed sleeps, a meta apt cannot plan)](references/screensaver-settings-page.md).
 
 ## Colour vision: the one switch, and contrast fixed for everyone
 

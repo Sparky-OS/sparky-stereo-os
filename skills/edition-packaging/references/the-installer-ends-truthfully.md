@@ -31,6 +31,46 @@ An essential failure still stops the installer with its own error.
    These controls cover archive inspection.
    A production publication gate and a complete guest installer run require their own tests.
 
+## Optional download and publication
+
+Use the selected provider's `Sparky-Install-Download-Size` and `Sparky-Install-Download-Source` fields in the graphical notice.
+Read NetworkManager before contacting the archive on the optional step's behalf.
+A metered link holds the download and gives the later install command.
+The connected case shows the size and source before consent, then runs the provider's own licence and download flow in the new root.
+
+After a failed transfer, check whether this step introduced an unconfigured package.
+Remove the package it introduced and report the optional loss.
+Preserve a package already present and show how to finish its configuration.
+Check dpkg's audit, the actual installed data and the next Calamares job in the test.
+Report a failed cleanup with its own cause.
+
+Use `Sparky-Install-Download-Requires` in the consumer's binary control.
+Check selected binaries of the matching architecture before copying pool files or signing metadata.
+A replacement provider must carry valid size and source fields.
+The historical settings fixture also exercises a consumer which had the font module before the explicit field was introduced.
+
+## Choose swap in the partition module
+
+For a fresh automatic install, calculate the plan from the system disk selected on Calamares's partition page.
+Show the file or partition sizes there and again on the summary page.
+Keep the person's other choices available.
+For drives above 256 GB the normal plan reserves a hibernation partition and a separate Cushion Swap file.
+At 256 GB or less a single RAM-sized file serves both jobs.
+Leave 20 GiB after the installation and its swap allocations.
+If the selected disk lacks room, show the smaller swap area and say hibernation needs more space.
+
+Write the Debian initramfs resume setting during the fstab job.
+A partition has its swap UUID, and a file has its backing filesystem UUID and physical offset in kernel pages.
+Reuse Cushion Swap's initramfs offset hook.
+Keep the dedicated partition out of normal swap use.
+The adopted file's `noauto` fstab line also stops the GPT auto-generator from claiming the partition.
+Inspect `/run/systemd/generator.late` as well as the normal generator directory when tracing an unexpected swap unit.
+
+For a machine that is already installed, expose the repair through the Problems page or the no-area notification.
+Authenticate the action through the engine's polkit entry point.
+The repair checks free space and the existing area's provenance before preparing a file, writes the resume settings and regenerates the initramfs when needed.
+The availability item is a single root-kept record on the Problems page.
+
 ## What the installer run must establish
 
 - Boot the published set and the successor in separate disposable guests, complete Calamares and keep the final page and the optional step's log.
@@ -41,6 +81,8 @@ An essential failure still stops the installer with its own error.
 - Record the swap selected on the partition page, the resulting fstab and the initramfs resume configuration.
   For a swap file, verify the filesystem UUID and first-page offset.
   Follow the [hibernate guest proof](../../power-idle/references/hibernate-in-a-vm.md) to check that the image is written, the memory witness survives a new VM start, and swap stays off at boot.
+  Compare `/proc/swaps` and both logind capability replies after boot, after resume and under memory pressure.
+  Confirm which area each operation used.
 - Read `systemctl --user --failed` after each of three installed logins and verify the keyboard setter still runs in the live session.
   Read target package ownership too, so a removed live package and a retained package with a working condition are distinguishable.
 
@@ -69,3 +111,22 @@ An essential failure still stops the installer with its own error.
 - **A slim Debian inspection container may have `tar` but omit the `xz` program.**
   Use Python's `tarfile` with LZMA support to read source members directly and keep the source archive mounted read-only.
   The first source extraction reported `xz: Cannot exec: No such file or directory`.
+
+## Traps found by running the installer and the guest
+
+| Symptom | Cause and how it was found | Fix |
+| --- | --- | --- |
+| An archive solve omitted libdav1d and the live guest later lacked a formatter. | The resolver used Debian and SparkyLinux alone. The first Calamares job log also named an absent `mkfs.ext4`. | Include the signed deb-multimedia companion of the tested round and explicitly install `e2fsprogs` in a minimal live root. |
+| GRUB's EFI helper could not download packages. | A build-only CA path survived in the guest's apt config. The HTTPS error and the missing mounted CA file identified it. | Point the installed root at its own CA bundle and include the EFI tools in the live root. |
+| A full published run reached the language job and stopped. | Apt history showed the language task was installed as an automatic live-settings dependency and removed by the installer. | Select the actual language task, edition keyring and language tools explicitly when assembling the rig. |
+| A finished ISO and its manifest were present after the packer returned an error. | The host script was edited while the interpreter was still reading it. The listed outputs passed their checksums and the guest booted from them. | Copy the driver and any mounted pack script before starting a long build. |
+| KVM probed successfully as root and failed for the normal runner. | The KVM device's access was restricted to its group. Testing the numeric UID separately found it. | Pass only the KVM device and its group to the disposable runner. |
+| Serial commands and evidence lost characters on the accelerated guest. | The emulated UART dropped parts of a burst. Whole-file checksums and a broken base64 frame exposed it. | Pace console commands and transfer logs through the private guest fixture channel with verified hashes. |
+| The next connection case failed writing apt's cache. | Completed writable overlays accumulated in the live fixture's `/run` tmpfs. Apt reported ENOSPC and `df` traced it to that mount. | Read back the result, then unmount and clear each overlay before starting another. Size the fixture's tmpfs for a single complete target. |
+| The optional outcome was unreadable behind a progress dialog. | An image of the metered case showed Qt showing the progress dialog again after the outcome opened. | Reset the progress dialog before opening the next message. |
+| A guest with no fstab swap line booted with its hibernation partition active and Cushion Swap had no area. | The GPT generator's output contained a late `swap.target.wants` entry. Cushion Swap's status and fstab inspection identified the missing file. | Give Cushion Swap its own adopted `noauto` file. Re-run the generator to show that it stands down. |
+| A complete hibernation left the dedicated partition active. | The marker and kernel log proved resume. The pageout control left ordinary swap pages in the partition, while the daemon's area was the separate file. | Switch off the area that hibernation activated once its pages fit back in memory. Keep an explicit problem when a dedicated area cannot be released safely. |
+| The first pageout control stopped before writing a hibernation image. | The sleep unit journal showed that Python omitted the `mmap.MADV_PAGEOUT` constant. | In a Linux fixture use the documented ABI value, then require a minimum of resident swap data before proceeding. |
+| The repaired swap file resumed correctly and remained active with 32 KiB in use. | QEMU recorded a shutdown and the witness survived. The old resume hook delayed release of its own occupied file. | Apply the same safe release to a shared file activated for hibernation. Keep the daemon's normal retraction when the system still needs that area. |
+| The repair authenticated and then returned status 1 without creating a file. | The Problems record retained the exception from `Path.open()`, which does not take an `opener` argument. | Use the builtin `open()` with an owner-only file mode, then exercise the actual Repair button again. |
+| A missing area still took processor time. | The service sampled PSI and ran calibration with no area. Compare `CPUUsageNSec` for the same PID over a fixed observation window. | Write the one outcome and wait for a real settings event. Verify that an fstab edit wakes the service. |

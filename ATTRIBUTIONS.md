@@ -515,7 +515,7 @@ Their living successors, which we make stereo: the QML Flip Switch and Cover Swi
 
 **Source**: [libraries/plasma-wayland-protocols](https://invent.kde.org/libraries/plasma-wayland-protocols) **License**: LGPL-2.1-or-later **What we changed**: `kde-stereo-content-v1`, the one declaration a program makes for a window or a subsurface, and `libstereo-declare` beside it.
 **Credit**: Aleix Pol Gonzalez, David Edmundson, Marco Martin, Martin Flöser, Oleg Chernovskiy and Pier Luigi Fiorini.
-Version 7 of `kde-stereo-content-v1` tells a surface the person's element limit, the step of depth inside a window (queue row 121); Stereo KWin sends it from the option it reads beside the sunk and popped limits, in `options.cpp` by **Matthias Ettrich**, **Lubos Lunak** and **Martin Gräßlin**, and the surface code of **Martin Gräßlin** and **Vlad Zahorodnii**.
+Version 7 of `kde-stereo-content-v1` tells a surface the person's element limit, the step of depth inside a window (queue row 121); Stereo KWin sends it from the option it reads beside the sunk and popped limits, in `options.cpp` by **Matthias Ettrich**, **Luboš Luňák** and **Martin Gräßlin**, and the surface code of **Martin Gräßlin** and **Vlad Zahorodnii**.
 
 ### 2.8 Qt
 
@@ -722,7 +722,7 @@ Existing KWin, libkscreen, Qt and FFmpeg credits above also apply.
 | [BleachBit](https://www.bleachbit.org/) and its [CleanerML](https://github.com/bleachbit/cleanerml) cleaners | The cleaner format and the engine of the "System mail" cleaner (local mailboxes, dead letters and the queues of removed mail programs), written in CleanerML's style and meant to be offered back; its translations join BleachBit's own gettext catalogs | Andrew Ziem, the author, and BleachBit's contributors, among them nodiscc (named in the cleaners' copyright headers), XhmikosR and Tobias-B-Besemer (from the repository's contributor list); Debian's bleachbit maintainers for the package |
 
 
-Power/idle credits also build on KWin's existing output and workspace code: **Xaver Hugl**, **Matthias Ettrich**, **Lubos Lunak**, **Vlad Zahorodnii** and **Natalie Clarius**, as named in those files' SPDX records.
+Power/idle credits also build on KWin's existing output and workspace code: **Xaver Hugl**, **Matthias Ettrich**, **Luboš Luňák**, **Vlad Zahorodnii** and **Natalie Clarius**, as named in those files' SPDX records.
 The DPMS protocol is by **Martin Flöser**, as `plasma-wayland-protocols/src/protocols/dpms.xml` records.
 Linux's VT and sysctl interfaces remain the Linux contributors' work.
 The unchanged kernel-settings package records **Sultan Alsawaf** and **Eric Naim** for the CachyOS kernel topics expressed as settings; those credits stay with the values.

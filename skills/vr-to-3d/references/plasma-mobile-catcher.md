@@ -324,6 +324,8 @@ Read the Android waiting catalogue and use its named local files. Require PNG `s
 - **A decoder error arrives even though the scene has the correct stereo mark.** The isolated rig provides no video-decoder device. Confirm the decoded still and that the marked clip reaches the hardware availability check. Use an explicitly injected proof decoder to measure loop behavior in a disposable process. The release should explain the missing hardware without picking the still automatically.
 - **The locale patch applies to the earlier reference folder and fails when quilt reapplies the accepted source.** The row 927 source ends each catalogue with the first-picture notice. Use that appended message as context and verify all nine translated catalogues with `msgfmt -c` after extracting the exact new descriptor.
 
+- **The AArch64 build aborts in the Catch automatic MOC step with allocator corruption.** The raw user-mode SDK configured and built the RDP session first. The failure was in its code-generation phase. Verify the exact Qt tools package version on both architectures and run matching host `moc` and `rcc` for generation. Keep ARM libraries and headers in the signed SDK. Verify that `readelf` identifies the linked executable as AArch64 and that its source descriptor hash matches the other architecture's. This qualifies the executable build. The distribution package still has its own native Lean Code and payload gates.
+
 ### Locate a live capability error
 
 An unavailable decoder for a local waiting clip and an unavailable decoder for an approved Throw are different events.
@@ -333,5 +335,3 @@ The current paired offer carries the panel, NLA endpoint and certificate fingerp
 The head-fixed Flat Headset path runs without continuous pose.
 When a mode explicitly requires pose, a Qt Sensors connection is only a backend check.
 Confirm that it starts and supplies a first reading within the mode's deadline. [FreeRDP H.264 backend](https://github.com/FreeRDP/FreeRDP/blob/3.33.1/libfreerdp/codec/h264.c#L842-L951) [Qt Sensors lifecycle](https://doc.qt.io/qt-6/qsensor.html#start)
-
-- **The AArch64 build aborts in the Catch automatic MOC step with allocator corruption.** The raw user-mode SDK configured and built the RDP session first. The failure was in its code-generation phase. Verify the exact Qt tools package version on both architectures and run matching host `moc` and `rcc` for generation. Keep ARM libraries and headers in the signed SDK. Verify that `readelf` identifies the linked executable as AArch64 and that its source descriptor hash matches the other architecture's. This qualifies the executable build. The distribution package still has its own native Lean Code and payload gates.

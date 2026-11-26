@@ -13,7 +13,7 @@ Use a stock arm64 handset first, then run the same receiver proof with the hands
 2. Put QEMU, the desktop rig and the phone in a disposable container with `--network none`.
    For two guests, link their virtual NICs with QEMU's socket backend bound to container loopback and configure a private, two-address subnet without a default route.
    A native desktop rig can use a disposable `veth` pair and relay ordinary Ethernet frames to QEMU's Unix datagram NIC. Use the same two-address subnet and complete packet checksums.
-   Leave out host forwards and host render nodes.
+   Use no host forwards. Keep the handset on a software display. Use an explicitly assigned renderer for the native desktop only if its virtual KWin needs a render node for screencasting.
    Install guest client packages from an offline disk built from the guest's own signed apt sources.
 3. On an x86-64 host, run `qemu-system-aarch64 -M virt -accel tcg,thread=multi -cpu max` with a matching Debian generic arm64 kernel and disposable initramfs.
    Load virtio PCI and block, ext4, virtio GPU, input and network dependencies in module order.
@@ -127,6 +127,12 @@ Use a physical device to qualify hardware decoding, lens alignment and continuou
   Cold start in TCG outlasted the PC's 45-second client window. Start the stock client once on the empty guest desktop and wait for its ready log before timing the end-to-end request. The cold and warm logs show when FreeRDP tried the TCP endpoint.
 - **FreeRDP logs a host-key warning while the handset still shows its wallpaper.**
   Each isolated PC session generates a new certificate, and FreeRDP logs the warning before its verification callback. For an automated run, obtain the exact certificate from the rig out of band, verify its digest and put only that certificate in the guest's endpoint-specific FreeRDP trust file. Use a read of the current rig certificate and the client's trace to distinguish a pending verifier from a refusal. [FreeRDP TLS source](https://github.com/FreeRDP/FreeRDP/blob/3.33.1/libfreerdp/crypto/tls.c)
+- **RDP authenticates and immediately disconnects before a new KScreen output appears.**
+  Run KRdp with a client-side Wayland protocol trace in the disposable PC session and inspect the virtual-output request.
+  KWin replied `Unsupported compositing type` when its virtual backend had started with QPainter. Its screencast manager requires OpenGL.
+  Provide a render node through the container's configured GPU device interface and verify that the virtual KWin session reports OpenGL.
+  If the node has mode 0660, grant its group to the disposable PC test account inside the container. Do not change permission bits on the host node.
+  Keep the PC in virtual-output mode and the emulated handset on Bochs. [KWin screencast manager](https://github.com/KDE/kwin/blob/v6.7.4/src/plugins/screencast/screencastmanager.cpp) [KWin virtual backend](https://github.com/KDE/kwin/blob/v6.7.4/src/backends/virtual/virtual_backend.cpp)
 - **The staged KWin source reaches the arm64 dependency check and exits before compilation.**
   The studied archive supplies Stereo Policy development libraries for amd64.
   Provision the arm64 build dependency and matching Plasma/Qt stack before retrying.

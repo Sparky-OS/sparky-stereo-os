@@ -157,6 +157,43 @@ Use a physical device to qualify hardware decoding, lens alignment and continuou
   Provision the arm64 build dependency and matching Plasma/Qt stack before retrying.
   The arm64 apt solve and `dpkg-buildpackage -a arm64` identify a missing dependency, which gives no result about the compiler or linker.
 
+## Keep the generic session through the deadline
+
+The stock phone's KDE Connect sends the URL to KRDC. It cannot send the edition's structured `clientConnected` message.
+Use the authenticated KRdp backend start on the PC to establish the generic session. The published KRdp creates the backend at the RDP activation state, and a completed screencast startup emits the session-start record.
+The listener's readiness probe only establishes that the socket accepts a connection.
+Scope the startup record to the child using a fresh, local prefix and a complete Qt message record. Keep the explicit session-ID acknowledgement for a structured panel.
+An unclaimed generic server still expires after 45 seconds and reports the reason.
+
+For the installed test, pair the stock phone again, request the monitor, and log KRdp and the KScreen output.
+Keep the chart advancing for at least another minute after its first capture.
+Pause the chart process so the same image stays visible and the progress check fails. Resume it before reversing the eyes.
+Close KRDC, confirm that KWin removes the output, then stop the server from KDE Connect.
+Run an unclaimed request and verify that the listener goes away at the deadline.
+
+Run the compatibility check with an installed executable that takes ten seconds to answer, an absent executable, and an installed executable that times out or exits unsuccessfully.
+The executable's absence, the duration of a timeout and the nonzero exit code have different meanings.
+Check `lastError` on the virtual-monitor interface, which is the value the generic action exposes to the person.
+
+- **A working stock receiver goes dark at 45 seconds.** The old plugin waited for a structured acknowledgement on a generic RDP URL. Compare the KRdp activation and KScreen output timestamps with the plugin deadline. Use the authenticated backend-start record for the generic route. With the fixed package, the H.264 chart was still advancing 110 seconds after the request was accepted. Unclaimed listeners continued to expire.
+- **An installed sender is reported missing.** The old three-second compatibility check treated a slow help response as absence. Delay the installed executable's response by ten seconds and read the action's error again. Give a started child 15 seconds, then report its measured timeout or exit status.
+- **The build rejects the old LC source's Build-Depends layout.** The six Lean Code tools sit at the end of the last continuation line. Use the catalogue recipe's `--build-depends-at-end` path with multiline parsing and compare it against the signed descriptor's unpacked control file. The default prefix assertion pointed to the older source layout.
+- **Source preparation cannot start `dch`.** The build image needs Debian's devscripts for the Lean Code changelog step. The source conversion and patch application had already reached `lean.debian_prepare` when it reported the missing executable.
+- **The compiled plugin rejects the record comparison.** KDE Connect compiles with `QT_USE_QSTRINGBUILDER`, so concatenation passed directly into `QByteArray::contains` yields a lazy builder. Materialize the complete record as a `QByteArray` before passing it to the comparison. The native compile exposed this even though the patch applied cleanly.
+
+## Check the authenticated receiver before testing layouts
+
+Install the published arm64 Kirigami Catch and the signed dependency closure on the same guest after the generic stock-client test.
+Use the current paired KRdp owner and matching KPipeWire packages on the PC.
+Verify the app's Headset:1 advertisement and compare the certificate identity it advertises to the live KDE Connect pair.
+The published Catch generates a separate panel certificate. The paired sender requires a matching certificate in its actual pairing store before it can connect or acquire a lease.
+Keep both identities intact. With published arm64 KRDC `4:26.04.0-1+stereo3d1+lc1` and staged KRdp `6.7.4-1+stereo3d11`, discovery fetched the real advertisement and reported “Pair this headset with this computer in KDE Connect before connecting.”
+The receiver's local Wayland mode was 1280×800 at 74.994 Hz, scale 1. The refusal preceded panel output, changed-pin proof, H.264, all five wire layouts, wrong-eye and frozen-frame controls and normal lease release.
+The subsequent milestone supplies the approved KDE Connect receiver handoff and the common panel descriptor before repeating those rows.
+
+- **The long stock test leaves QEMU showing the previous screen.** KScreen's `--dpms show` found the Bochs output off even with the Catch surface mapped. Wake the guest display with `kscreen-doctor --dpms on` before checking Catch. In this disposable fixture, disable automatic locking before starting the guest session.
+- **Injected input leaves the visible Catch button idle.** The QEMU screenshots kept the ready label and the guest had no SSDP listener. Launch the unchanged Qt app with accessibility enabled and call its Catch button's AT-SPI action in the guest. The status changed to waiting and the actual UDP 1900 listener appeared.
+
 ## Credits
 
 The KDE Connect virtual-monitor source names Aleix Pol i Gonzalez and Fabian Arndt, and the downstream protocol-v2 history names Fabian Druschke.

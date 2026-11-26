@@ -115,6 +115,13 @@ The recipe, with build 17's measurements and its traps, is in [a security build 
 - **A test "without firmware" removes the GPU's whole firmware folder.** For nouveau on an RTX 3060 that is `nvidia/ga106`, then rebuild the initramfs: the log says `acr: firmware unavailable`, `gr: firmware unavailable` and `sec2: firmware unavailable`.
   Renaming only the GSP firmware link is not "no firmware": nouveau then takes its own Ampere path with the ACR, GR and SEC2 firmware, the GR engine comes up, and the code path without a GR engine never runs ([the 2026-10-03 test of the NULL-pointer fixes](https://github.com/danielcamposramos/sony-bravia-linux/tree/main/docs/upstream/nouveau-null-v3-test-2026-10-03); the fixes themselves are in [`search-upstream-first`](../search-upstream-first/SKILL.md)).
 
+## USB-C side by side glasses
+
+USB-C glasses (XREAL, VITURE, Rokid, RayNeo) are DisplayPort monitors over DP Alt Mode on the GPU's own driver; in their 3D mode most announce one mode two eyes wide.
+Stereo KWin chooses the side by side (full) twin of that mode by itself for glasses it knows by their EDID identity (PnP ID and product code, never the name), and the person can turn the option on or off per output.
+An entry needs a real EDID from a public record or an owner, each mode's EDID recorded as its own state, and its proof in a VKMS guest on the edition's own kernel, red on the KWin without it.
+The recipe, the identity table and its checker, the proof per pair of glasses, the traps and the glasses known so far: [references/usb-c-sbs-glasses.md](references/usb-c-sbs-glasses.md).
+
 ## Lessons from the lanes, October to November 2026
 
 [Lessons from the lanes](references/lessons-2026-11.md) keeps what the lanes of 25 October to 11 November 2026 learned on this part: the recipes that worked, each trap with its symptom, its cause, its fix and how the cause was found, the perks and the measured facts (58 entries).

@@ -72,6 +72,13 @@ The Qt side: [the default camera in Qt programs](../contrib-qt/references/defaul
 [Where each setting lives, which programs follow, a virtual camera in the rig, and the traps with their symptoms](references/camera-page.md).
 A device's command-line tool (a headset's HeadsetControl) joined to System Settings, the system tray and a user service, with its proof in a Plasma login: [the recipe and the traps](references/device-tool-in-kde.md).
 
+## The Screensavers page
+
+System Settings has a Screensavers page (`sparky-stereo-screensavers`, in Appearance beside Wallpaper): the list of every screensaver the edition ships, the stereo catalogue's and XScreenSaver's 2D ones, a small live preview of the selected one, a full-screen preview, which savers the show rotates through and its times; Display & Monitor, Power Management, Screen Locking and Wallpaper each have a button to it, and the "Stereo Screensavers" launcher opens it.
+The layout is the one of KDE's retired Screen Saver module (kde-workspace 4.11).
+Every text the page colours itself stands at 4.5:1 or more in any colour scheme: a dim text keeps the scheme's colour where that can be read and is moved towards the normal text by the smallest step where it cannot.
+[Where each value lives, how a saver is hosted as a preview in a settings page (a helper on a private display, the pair as a declared surface above the System Settings window, the person's depth limits at the size shown), how a page links to another, how to add a saver to the list, how every text of a page is measured on a capture (the page's text report, the control, the looks, the states, the red side), and the traps (a dim text on a new page, a preview the scroll bar cuts in a real KDE session, a click before the window is there, a row that depends on the frame caught, fixed sleeps, a meta apt cannot plan)](references/screensaver-settings-page.md).
+
 ## Colour vision: the one switch, and contrast fixed for everyone
 
 System Settings' Colour Vision page (`sparky-stereo-colour-vision`, beside Accessibility) sets, for one choice of none, protan, deutan, tritan or monochromacy, KWin's correction through the keys KDE's Accessibility page uses, the colour-vision variant of the person's colour scheme, and on request Konsole, nano and the text console; the person's files are kept and their colours come back exactly at none.

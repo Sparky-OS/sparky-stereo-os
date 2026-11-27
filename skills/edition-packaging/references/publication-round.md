@@ -270,6 +270,20 @@ Trap:
 - **Fix:** retain the exact proved pool and, only with explicit permission, a separate late-stage add/leave-out list; otherwise repeat the proof with the new pool. Check each late descriptor, component hash, binary Source field and listed build-record hash in place. A descriptor stored in the source subfolder may be checksum-covered separately from an architecture's binary build record; state which record actually names it.
 - **How found:** compare the frozen index hash and transaction targets with the late binaries' Source versions and the time of the coordinator's exception. Resolve relocated source metadata only inside that stage's known source folder and require the exact recorded hash.
 
+#### Qualify the pool after late acceptances
+
+1. Verify the late stage's SHA256SUMS, then cross-check its descriptor, source components, .buildinfo, .changes and build record. Compare the source version with both the published and prepared versions using dpkg. Compare binary names, architectures, exact dependency relations and installed members against the generation the stage would displace. Record the function of every removed member. An unchanged orig archive can serve the replacement once its hash agrees with both descriptors.
+2. Regenerate the metas from the merged build commit and the revised package catalog. Compare each meta's payload members and control relations with the prepared binary. Account for changes to Depends, Recommends and architecture coverage as well as version and receipt changes.
+3. Update the take list, leave-out list and manifest from the same selection. Retain each displaced archive with its checksum. Regenerate the pool sums, APT indexes and candidate tree. Run `make-only-ours.py` on the resulting candidate and compare its outputs with the files in the selected APT policy package. A difference requires a qualified policy successor and another index refresh.
+4. Verify installability against live Debian. If the scan is focused, record the changed package identities and their reverse-dependency coverage. Attribute residual failures on the same signed archive inputs. Run case e from the recorded published base, check the exact Inst versions and zero kept back, and measure each Remv. Bind both checks to the final pool hash.
+
+Trap:
+
+- **Symptom:** a later acceptance passes its receipt checks but makes an accepted settings page uninstallable when selected for the prepared pool.
+- **Cause:** the fix was built on the published branch. The prepared pool already held a newer version of the same source with a different feature and an exact-version companion. The settings page required the prepared generation and explicitly broke older companions.
+- **Fix:** qualify a source successor containing both accepted changes before selecting it. Compare the settings page's dependency and the old and new installed paths, then repeat the checks on the combined candidate.
+- **How found:** dpkg version comparison and binary control fields exposed the impossible dependency. The payload comparison showed the older package removed the new feature's helper and took back the launcher the settings page now owned. The newer package's launcher still lacked the late fix.
+
 ### Reused source components keep the selected generation's identity
 
 An upstream orig archive can be shared by an old held descriptor and its accepted successor.

@@ -30,6 +30,7 @@ Core skills are `sparky-stereo`, `working-practices`, `ai-partners`, `making-ski
 | Orca, AT-SPI, slow keys or magnification in a stereo session | [stereo-proof-rig](stereo-proof-rig/references/accessibility-in-a-stereo-session.md) |
 | A 2D source copied onto a 3D target, a replica or a Catch phone monitor | [stereo-proof-rig](stereo-proof-rig/SKILL.md#a-2d-source-copied-onto-a-3d-target) |
 | Kernel/display driver or virtual display modes; the edition kernel's configuration, DKMS modules on a new kernel | [drivers](drivers/SKILL.md), [vkms-stereo](vkms-stereo/SKILL.md) |
+| The first messages after GRUB say pcspkr is already registered, IMA cannot allocate sha384, or VMX is unsupported | [Read the first kernel messages](drivers/references/first-kernel-messages.md) |
 | A USB camera produces no YUYV frames, bulk payloads cross URB boundaries | [drivers](drivers/SKILL.md), its [camera diagnosis and KUnit reference](drivers/references/usb-camera-one-format.md) |
 | A QEMU or SPICE VM viewer and its pointer/mode changes | [stereo-vm](stereo-vm/SKILL.md) |
 | VR content on a TV or stereo spectator | [vr-to-3d](vr-to-3d/SKILL.md) |

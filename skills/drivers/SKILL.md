@@ -4,11 +4,11 @@ metadata:
 name: drivers
 description: >-
   Kernel/display drivers for stereo and deep colour: HDMI 3D modes declared by EDID
-  (amdgpu, NVIDIA, nouveau, VC4), USB-C 3D glasses, the edition's kernel configuration, DKMS (NVIDIA, ZFS, signing, MOK enrolment), udev rules for wheels (umockdev), HDMI-CEC, VRAM protection, Intel Macs, kernel patches/CVEs. Load it when a 3D mode is missing, the TV never switches to 3D, a DKMS build fails on a new kernel,
+  (amdgpu, NVIDIA, nouveau, VC4), USB-C 3D glasses, kernel config, DKMS (NVIDIA, ZFS, MOK), wheel udev rules, HDMI-CEC, VRAM, Intel Macs, kernel patches. Load it when a 3D mode is missing, the TV never switches to 3D, a DKMS build fails on a new kernel,
   dkms says openssl not found, modprobe says Key was rejected by service, ConditionFirstBoot never fires, nouveau
   reports firmware unavailable, amdgpu hangs with a page fault, ring timeout and a device coredump or repeats an IP
   block soft reset, virtio-gpu stereo oopses, USB camera YUYV fails, a
-  Broadcom Wi-Fi card (BCM4360, wl) has no driver, or a udev chmod hides its failure. Also for Logitech HID++/UVC/Litra OpenLogi offers.
+  Broadcom Wi-Fi card (BCM4360, wl) has no driver, or early boot reports a duplicate pcspkr, IMA hash failure or unsupported VMX. Also for Logitech HID++/UVC/Litra OpenLogi offers.
 ---
 
 # Drivers: 3D modes and deep colour in the kernel
@@ -22,6 +22,7 @@ description: >-
 For [a USB camera that delivers nothing in one format](references/usb-camera-one-format.md), start with descriptors, probe values, usbmon and payload arithmetic; then test the actual decoder in KUnit before a person's camera comparison.
 For [a closed Wi-Fi driver from the ISO](references/closed-wifi-driver-from-the-iso.md) (Broadcom's `wl`: the licence shown from the package file, the disk's driver pool, DKMS on the edition's kernel with signing, each step verified and each failure kept), start with the recipe and the table of failures; for a card a free driver drives too (`b43` on a BCM4331), its swap and way back, the NetworkManager settings that follow the card under either driver (matched on its permanent addresses, never on a driver) and their proof with simulated radios in a guest, the saved profiles after a rename and the applet's speed 0, read its later sections.
 For [the first start and hardware that is not there](references/first-start-and-absent-hardware.md) (Secure Boot decided from the firmware's own state, a signing step that builds nothing where nothing needs a signature, NVIDIA's driver only where its card is, an apt plan judged by every kind of line (a purge that installs an i386 copy is refused), a known machine's firmware table and masked event as table entries, and the guests and fixtures that prove each without the machine), start with its table of firmware states.
+For [kernel messages after GRUB](references/first-kernel-messages.md), compare the running boot with the published kernel, module aliases and defaults before changing anything.
 For [an Intel Mac on the bench](references/intel-mac-on-the-bench.md), start with the stick's layout against Apple's firmware, then the devices that need more than the kernel (Broadcom wl for the Wi-Fi chip, with its licence), the read-only readings in order and the traps; nothing in it was run on the machine.
 
 For [Logitech HID++ receivers/devices, UVC cameras and Litra lights](references/logitech-detection.md), use sourced identifiers and an explicit app center offer; the table and tests distinguish metadata, simulated protocol and physical-device proof.

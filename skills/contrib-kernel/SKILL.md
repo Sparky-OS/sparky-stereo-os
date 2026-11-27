@@ -99,6 +99,10 @@ A series in review adds `agents/skills/` to the tree: Sasha Levin's v1 to v4 (Oc
 
 The traps of preparing a patch on top of such a series (a shallow clone, checkpatch's Python helpers, get_maintainer's history counts, lore searched with a plain client) are in [lessons from the lanes](references/lessons-2026-11.md).
 
+## An RFC series for DRM core
+
+To turn patches a distribution carries into an RFC for the DRM core (reconcile, search upstream, rebase onto drm-misc-next by content, KUnit parsed, every commit built alone with W=1, checkpatch, get_maintainer, an IGT companion on VKMS that goes red without the series, DRM's rule for new uAPI, the cover letter and the send checklist), follow [an RFC series for DRM core](references/rfc-series-for-drm-core.md).
+
 ## The edition's own practice
 
 - The edition's kernel is a fork that ships everything it can, with the stereo work on top; its patches are clean, additive commits rebased onto upstream, so upstream updates slip in easily.

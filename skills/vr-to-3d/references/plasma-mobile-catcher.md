@@ -349,6 +349,12 @@ A two-vCPU guest with the tested QEMU CPU model reached the active shell after a
 Check the running executable against the intended hash and allow QEMU time to paint the first frame after the shell is active.
 A successful accessibility check establishes that the controls exist.
 Use the same virtual display wake and lock configuration as the paired rig to prove they painted on the panel.
+If a standalone probe registers controls and the framebuffer stays black, repeat through the private paired rig on the stock guest.
+Wait for the stock welcome screen after waking its virtual panel.
+Check the installed package version, run a paired Throw and capture its native chart before closing Catch.
+Compare the white alignment line at the centre of the paired chart with a capture from the predecessor.
+The positive arm64 run had 280 white centre-line rows out of 280. The predecessor had zero.
+Check the left-first `sTER` mark and confirm that closing Catch releases the virtual output.
 
 ### Locate a live capability error
 
@@ -359,5 +365,7 @@ KRdp's `VideoStream` selects AVC from the RDPGFX capabilities. Its `HeadsetChann
 FreeRDP's H.264 context constructor initializes its backend and can return null before the receiver starts.
 The current paired offer carries the panel, NLA endpoint and certificate fingerprint.
 The head-fixed Flat Headset path runs without continuous pose.
+The StereoDroidVR reference uses `TrackingReason::NoSensor` in the KRdp `StereoPose` channel and maps it to `stereopose_no_sensor` on Android.
+The native Flat Headset packages do not negotiate that channel.
 When a mode explicitly requires pose, a Qt Sensors connection is only a backend check.
 Confirm that it starts and supplies a first reading within the mode's deadline. [FreeRDP H.264 backend](https://github.com/FreeRDP/FreeRDP/blob/3.33.1/libfreerdp/codec/h264.c#L842-L951) [Qt Sensors lifecycle](https://doc.qt.io/qt-6/qsensor.html#start)

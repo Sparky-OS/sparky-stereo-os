@@ -1,7 +1,7 @@
 # An editor's canvas per eye: GIMP 3.2 through GTK 3's stereo area
 
 Written on 2026-11-26 (queue row 137 with row 148, the stereo GIMP's milestone 1).
-The stereo area itself is [GTK 4 and GTK 3 and GtkGLArea](../../stereo-window-3d-area/references/gtk-glarea.md); the depth layers are below ([Depth layers](#depth-layers-milestone-2-queue-row-148)); what is left for GIMP (the deep canvas) is in [GTK pieces still to build](../../stereo-window-3d-area/references/gtk-glarea-plans.md).
+The stereo area itself is [GTK 4 and GTK 3 and GtkGLArea](../../stereo-window-3d-area/references/gtk-glarea.md); the depth layers are below ([Depth layers](#depth-layers-milestone-2-queue-row-148)); the deep and HDR canvas (milestone 3) is [an editor's deep and HDR canvas](../../deep-colour/references/an-editors-deep-canvas.md); what is left is in [GTK pieces still to build](../../stereo-window-3d-area/references/gtk-glarea-plans.md).
 
 ## What the person sees
 

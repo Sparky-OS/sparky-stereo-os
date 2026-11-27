@@ -37,11 +37,13 @@ Any one link that drops to 8 bits drops the whole picture to 8 bits, so every la
 | Mesa | Window configs with 10/10/10/2 and 16/16/16/16 (unorm and half float), with alpha | 177 window-capable EGL configs on Wayland with our Mesa |
 | Qt | The program's requested `QSurfaceFormat` kept, alpha included. Qt Widgets forced an 8-bit alpha on every translucent window; our Qt keeps the alpha and depth the window asks for (10/10/10/2 or 16/16/16/16), and a window that asks for nothing stays 8/8/8/8 | [`stereo3d-alpha`](https://github.com/Sparky-OS/qtbase/tree/stereo3d-alpha); see [`stereo-window-3d-area`](../stereo-window-3d-area/SKILL.md) |
 | A layer in the compositor's shared memory (`wl_shm`) | A deep buffer format: `XR30` for 10 bits, then `XB48` (16-bit integer) when no half-float format is offered | Qt Multimedia's video layer in the edition |
+| A GTK 3 program | A plain `GtkGLArea` whose format, colour state or luminances its 8-bit sRGB window cannot hold goes on a surface of its own, described; `wl_shm` memory where no dma-buf carries the depth | GTK 3 +stereo3d2 ([gtk-glarea.md, GTK 3](../stereo-window-3d-area/references/gtk-glarea.md#a-plain-areas-deep-picture-the-memory-way-luminances-stereo3d2)) |
 | The program | Its canvas or video at the source's depth, not converted to 8-bit RGBA on the way | Krita: a 16-bit canvas on Wayland ([`sparky/deep-colour-canvas`](https://invent.kde.org/danielcamposramos/krita/-/tree/sparky/deep-colour-canvas)), and its main window at 16/16/16/16 in a stereo session with the Qt fix above ([`sparky/stereo-canvas-wayland`](https://invent.kde.org/danielcamposramos/krita/-/tree/sparky/stereo-canvas-wayland)); MpvQt's video layer at 10 bits or half float ([`stereo3d`](https://invent.kde.org/danielcamposramos/mpvqt/-/tree/stereo3d)) |
 
 What Krita taught: it forced X11, where under Xwayland it got only 8 bits, and offered only 8 and 10.
 On Wayland with a 16-bit format, a ramp that held 1 level at 8 bits holds 249 at 16 in the same band.
 Each canvas in its own layer, in its own deep format, stays the pattern: the layer's depth does not depend on the window's.
+GIMP's canvas follows it since its milestone 3: an image deeper than 8 bits, with code points or wider than sRGB, goes through a GtkGLArea of its own in floats, described to the compositor, never tone-mapped by GIMP ([an editor's deep and HDR canvas](references/an-editors-deep-canvas.md): the route, the ramp counted where rendered and at a virtual HDR output, the traps, among them cairo clamping floats above 1.0).
 
 ## Proof for this kind of work
 

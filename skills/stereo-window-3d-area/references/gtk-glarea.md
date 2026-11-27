@@ -263,6 +263,36 @@ Where each depth stops, measured with the ramp of 256 steps over 1/256 of the ra
 | 16 bit integer | 256 | none on NVIDIA | | the export: NVIDIA's EGL and zink on NVIDIA export no 16 bit dma-buf, and the area says so |
 | 12 bit | (in 16 bit or float) | | | as for 16 bit integer or float: no 12 bit format exists in GL or dma-buf |
 
+### A plain area's deep picture, the memory way, luminances (+stereo3d2)
+
+Queue row 137, GIMP milestone 3 (2026-11-26): gtk+3.0 3.24.52-3+stereo3d2, so that GIMP's 2D canvas can be deep and HDR too ([an editor's deep and HDR canvas](../../deep-colour/references/an-editors-deep-canvas.md)).
+
+- **A plain area on a surface of its own.** An area that does not ask for stereo and whose format is deeper than 8 bits, whose colour state is not sRGB, or which carries luminances or mastering data takes the stereo area's kind of surface with one picture and nothing declared (`gtk_gl_area_stereo_new (area, context, 1, ...)`); the window keeps its hole over it. `surface-shown` says it is there; `surface-error` (a `GError`) says why not (an X window, a compositor without colour management), and the area is then drawn into its window as before. A plain 8 bit sRGB area is unchanged. The stereo protocol and libstereo-declare are a stereo area's alone: a plain area works on any compositor with `wl_subcompositor`, `wp_viewporter` and colour management.
+- **The memory way.** Where no dma-buf carries the picture (the export fails, or the compositor takes no dma-buf of that format and modifier), the area reads its picture back each frame (`glReadPixels` in the picture's own type; on OpenGL ES a half float picture is read as floats and converted) into a `wl_shm` buffer of a format the compositor lists: XBGR16161616 (or ABGR), XBGR2101010, XBGR16161616F, XBGR8888, or XRGB8888 with red and blue exchanged; the pair's first row is already the top. Every bit is kept, at one copy a frame. A picture no way carries fails as a format (`GDK_GL_ERROR_UNSUPPORTED_FORMAT`), so a program can take a lower depth. `GDK_WAYLAND_GL_AREA_MEMORY=1` always takes memory, `=0` never; `G_MESSAGES_DEBUG=Gtk` prints the way and why.
+- **Luminances and mastering data.** `gtk_gl_area_set_luminances (area, min, max, reference)`, `gtk_gl_area_set_mastering_display (area, primaries[8] or NULL, min, max)` and `gtk_gl_area_set_content_light_levels (area, max_cll, max_fall)` (cd/m², CIE 1931 xy; -1 unsets) go into the surface's description as `set_luminances`, `set_mastering_display_primaries`, `set_mastering_luminance`, `set_max_cll` and `set_max_fall` (color-management-v1.xml; SMPTE ST 2086, CTA-861-H), after checking the features the compositor lists (`set_luminances`, `set_mastering_display_primaries`) and the protocol's rules (the maximum and the reference above the minimum: the protocol raises `invalid_luminance` otherwise). On X11 they are an error like a colour state.
+
+Measured (GTK's test program, `glarea-stereo-test3 --format ... --color-state ... --luminances ... --mastering ... --light-levels ...`, in the development build; NVIDIA's EGL unless said):
+
+| Case | KWin received | Result |
+|---|---|---|
+| plain, 16 bit, sRGB | `wl_shm` XB48 480x270, sRGB primaries, gamma 2.2 | `surface-shown` 1, patches exact, the ramp 256 values where rendered |
+| stereo, 16 bit, sRGB | `wl_shm` XB48 960x270, declared 3 | both views 256 values where rendered; each eye's buffer at the HDR output 8 values (its half float) |
+| plain, half float, Rec. 2100 PQ | dma-buf XB4H, bt2020, st2084_pq | at the HDR output white 0.5171 (about 110 cd/m²: KWin's room for PQ's 10000) |
+| the same with luminances 0.005/10000/203, mastering BT.2020 0.005 to 1000, MaxCLL 1000, MaxFALL 400 | the same and every one of those requests | white 0.5806, PQ's 203 cd/m², within 0.0001 |
+| zink on NVIDIA, plain, 16 bit | `wl_shm` XB48 | 256 values where rendered |
+| llvmpipe, stereo, 8 bit | `wl_shm` XRGB8888 | shown per eye (it was the honest failure before) |
+| llvmpipe, plain, half float | nothing | `surface-error`: no dma-buf export, and the compositor lists no `wl_shm` XB4H |
+| X11, plain, 16 bit | nothing | `surface-error`: an X window has no colour description and holds 8 bits a channel |
+| the red row: no luminances, judged as if their peak had been said | | fails (white 0.5171 against 0.5807) |
+
+GTK's own suite: `glarea` (with `/glarea/volume` and `/glarea/plain-deep-x11`, which runs under Xvfb as Debian's build runs the suite), `notify`, `defaultvalue` and `objects-finalize` pass.
+
+Traps:
+- **`wl_shm` lists its formats only after the bind.** One round trip sees the globals; the formats come with the second (the globals are read with two, which the area already did for the dma-buf list).
+- **KWin lists no half float `wl_shm` format** (6.7.4: ARGB/XRGB8888, the 2101010 four, ABGR/XBGR16161616, BGR888, RGB888): a half float picture on a software renderer has no way to KWin. The area says so; a program steps down to 16 bit integer.
+- **XRGB8888 is `wl_shm` format 1, not a fourcc.** wl_shm's codes are drm_fourcc.h's except ARGB8888 (0) and XRGB8888 (1).
+- **A failed dma-buf export can leave its EGL image behind.** The memory way destroys it before making its own buffer.
+
 ### X11: the two ways, timed
 
 The same work as GTK 4's table (two 1920x1080 views rendered and handed over at every frame for ten seconds, in an area shown at 960x540, `GDK_X11_STEREO_READBACK=0` and `=1`), on the edition's GTK 3, in three whole runs of the proof one after the other (loads 7 to 17 on 12 threads):

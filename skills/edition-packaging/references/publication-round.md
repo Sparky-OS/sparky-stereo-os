@@ -1031,6 +1031,9 @@ An inherited failure still needs its owning fix before publication.
 - **The first profile can spend minutes indexing before it runs an install simulation.** The static checker was walking thousands of literal package selectors for every external package.
   Timing the original and indexed matchers over the same 900 Debian entries with the published pins produced identical decisions and cut that step from 3.244 seconds to 0.026 seconds.
   The indexed matcher preserves pin-record order and keeps the existing glob and regular expression matcher. APT still runs every requested simulation.
+- **A collateral row can say the candidate is from another archive even when the edition introduced the failure.** The report attributes only the direct exact relations that triggered the query.
+  Exact-version APT simulations passed on the published tree for 29 candidate-only arm64 rows. The candidate's full solver paths led to the newly preferred edition Kirigami data package in 27 of them.
+  Compare the exact target and read the full conflicting assignments before attributing the failure. If two archives offer the same package and architecture, preserve a separate exact-version solver log for each.
 
 When Debian replaces a shared-library package, read the first hard dependency the solver cannot satisfy and identify its new provider from today's signed index.
 Check the successor's source and development package as well as the new runtime name.

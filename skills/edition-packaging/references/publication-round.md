@@ -925,6 +925,62 @@ When copying an isolated apt universe to a different scratch path, rename its lo
 Otherwise apt ignores the copied local Packages and says the edition metas cannot be located, even though the public indexes are present.
 Keep the signed public index bytes unchanged, update the private local URI/list names together, and read the solver's complete lines before attributing that setup failure to a package.
 
+### Prepare both link-gate views and check a small cohort
+
+1. Start with the signed InRelease used by the accepted live proof.
+   Read the timestamps in the Debian Snapshot calendar and fetch the testing InRelease from each relevant capture.
+   Verify its signature and compare the full signed file's SHA-256 with the proof.
+   Bind every Packages file to its signed SHA-256 and size.
+2. Take the predecessor cutoff from the record of publication.
+   Require both the Debian Snapshot capture and its signed Date to fall at or before that instant.
+   For deb-multimedia, SparkyLinux and any vendor archive, check the published round's retained archive evidence first.
+   Verify its checksum manifest, reauthenticate the selected InRelease and Packages with the archive key, and record their signed dates.
+   Keep the official-mirror, retained-baseline and archive-search results with their hashes.
+   Use the checked mixed-view policy only for an archive whose dated signed copy those searches could not find and whose indexes are unrelated to the solver failure.
+3. Give the candidate and predecessor source lists the same archive order, suites, components, architecture restrictions and keys.
+   Verify the fingerprints of retained public keyrings against the installed public keyrings.
+   Keep the dated Debian and third-party indexes under their original repository URIs so APT still knows where to obtain the payload files.
+   Supply both retained Archive contexts through `--archive-view` and `--previous-archive-view`.
+   Each context needs `metadata.json` with its exact source configuration and key hashes, and the saved `state/lists` files with their sizes and hashes.
+   A prior round's exported `archive-view.json` gives the evidence identities for reconstructing a context.
+   The retained-context loader reads `metadata.json`, checks the signed indexes again and uses those bytes to solve.
+   Put one official argument per line in the round's link argument file and check that its paths agree with the source and context files before handing it back.
+4. Run `PYTHONPATH=sparky-os python3 -m lean.release check-diversions POOL` from the frozen build checkout.
+   Keep its report with the round. A refusal names the archive, the unsupported preinst and the payload paths at risk.
+   Inspect additions with unresolved source paths before proceeding.
+5. Run the gate from the frozen build commit on the changed native binary identities and their exact HR companions.
+   Give it the complete applicable sibling list from each candidate and published index so each target can solve against its own edition.
+   Copy the tested packages by reading the files and verify the copies against the index.
+   Sign the disposable subset with a throwaway key and keep it outside the public source lists so predecessor qualification can check for candidate contamination.
+   Run with read-only access to the frozen pool and live tree.
+   Record wall time, sampled scratch high-water mark, the gate's exit status and every solver or setup refusal.
+   Preserve the small result and signed view inputs before releasing generated roots and caches.
+
+Traps met while preparing the views:
+
+- **Capture date.** A capture near publication can contain a Release from after publication.
+  The next snapshot after midnight had an InRelease signed several minutes after the round was already online.
+  Comparing both timestamps with the recorded cutoff selected the previous capture.
+- **Retained evidence.** The current mirrors and an archive search can leave a dated view looking unavailable while the prior round holds signed files that meet the cutoff.
+  The retained supply-chain archive evidence supplied all three examined third-party indexes.
+  The proof's later local indexes had signed dates beyond the cutoff.
+  Keep the searches for each cutoff and use the authenticated retained bytes whenever they qualify.
+- **Disposable signature.** Generating Release inside the tree can make the indexer hash a partially written Release.
+  Generate it beside the tree, move it into place and sign it there.
+  For a cleartext signature use a real output path with `sqv` and check the signed Packages hash and size.
+  The comparison of generated and verified Release fields exposed the self-entry and a final line-ending difference.
+- **A data-only root reports a conffile collision.** The `sparky-stereo` desktop meta's gate run exposed a collision between the Debian conffile and the edition symlink at `/etc/initramfs-tools/update-initramfs.conf`.
+  The exact boot preinst used a literal variable and moved the owning package's pending `.dpkg-new`. The parser supported only the literal loop and direct commands at the time.
+  A disposable two-archive `dpkg --unpack` established the diversion, the symlink and both retained conffile hashes.
+  Keep the measured package script and extend the gate with the exact script form and a [dpkg-divert oracle test](../../lean-code/references/diverted-files.md#diversions-in-the-link-and-start-gate).
+- **An unmodelled preinst may still ship the source name.** The link gate originally found the collision only when assembling the large meta root.
+  Comparing each unmodelled script's diversion sources with its data members identified the collision risk in seconds.
+  Run `check-diversions` before starting the long gate. The command records modelled and unmodelled scripts with reasons and exits nonzero on payload overlap or an unresolved addition.
+  An unmodelled script gains no filesystem operation from this check. The qualified link run still checks collisions in each assembled root.
+- **A signed download ends early.** The Chinese LibreOffice help archives returned HTTP 200 and the expected Content-Length from Debian Snapshot, then closed after only part of the body. The gate refused the size and SHA-256 mismatch. A separate HTTPS request reproduced the truncation while Debian's mirror supplied the exact bytes.
+  Verify the full size, SHA-256 and package identity against the frozen signed Packages entry before placing either archive at its SHA-256 name in the gate's disposable cache.
+  Resume at the first refused input with the same build, views, sibling lists and options. Keep the initial completed verdicts and both transport records. The gate checks the cached bytes and archive identity again.
+
 ### Zero removals and a caller's shell mode
 
 Symptom: a fresh task plan resolves thousands of installs and zero removals, then the wrapper exits without a FAIL verdict before installing anything.

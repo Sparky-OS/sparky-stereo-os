@@ -110,7 +110,31 @@ The 9's Qt scroll bars always show (Kvantum `transient_scrollbar=false`), so its
 ## A second lab's reading of the languages
 
 `tools/language_packets.py RECIPE OUT` writes every translated text of the 9 (its strings module, the helpers' catalogues, the colour schemes, the autostart entry, every metadata file; 28 distinct texts on 2026-11-27) as `strings.json` and three packets (`pl, pt_BR, fr`; `de, es`; `ja, ko, zh_CN, zh_TW`), each the reading's instructions and every English source beside its translation.
-A lane sends each packet word for word to another lab's model through ACIG (`ask_cloud` or `consult_partner`, never `ask_chatgpt`), keeps the question and the answer, and fixes or answers each finding; a Claude model is not a second lab, and neither is a local model.
+When Claude wrote the strings, a GPT lane can read the packets itself and record its model and findings.
+A Claude lane seeking a second lab can use ACIG's `ask_cloud` or `consult_partner` and keep each packet and response.
+Compare all four regenerated files with the milestone hand-back before reviewing, then follow each ID through the generator or helper catalogue to the package that installs it.
+
+Read KDE's terms from a disposable Debian testing container with Plasma Desktop, Plasma Workspace, System Settings, KWin, Breeze and SDDM installed.
+Record the Debian package and version, the catalogue, the English msgid, its context and the localized term.
+For gettext, use `msgunfmt /usr/share/locale/LOCALE/LC_MESSAGES/DOMAIN.mo` or Python's `gettext.GNUTranslations`.
+For SDDM, use Qt 6's `lconvert -i /usr/share/sddm/translations-qt6/LOCALE.qm -of ts` and read the `TextConstants` context.
+Start with Breeze's `Scrollbars` and `Drag windows from titlebar, menubar and toolbars` (`breeze_style_config.mo`), the actual applet's `Show full application menu` and `Unpin from Task Manager`, and `Global Theme Tool` from `kcm_lookandfeel.mo`.
+For the greeter, use `Username` from SDDM's own catalogue.
+The KDE SDDM configuration module's `Remove login screen theme` in `kcm_sddm.mo` gives the term used in System Settings.
+
+Keep a finding per changed message and language with the original, correction and reason.
+Row 951 found terms that differed from their controls, places where a user action sounded like an automatic action, ambiguous software exit codes, and punctuation that would break or leave stray spaces.
+When two catalogues differ, use the one for the actual control.
+For example, the Plasma Task Manager applet supplies the term for the dock's embedded applet, and the greeter's own identifier label governs its prompt.
+Keep the placeholders in their original order, regenerate the metadata and compare every English string with the saved packets.
+Read the rebuilt binary package against its staged predecessor and include one fresh rig session per affected locale.
+
+- **Symptom:** a UI description uses a plausible translation that the person cannot match to the adjacent control. **Cause:** the translation came from a general term or a different KDE surface. **Fix:** read the owning catalogue and use its term in the fitting grammatical form. **Found by:** the Korean scroll arrows said `스크롤 막대`, while Breeze's scrollbar configuration says `스크롤바`.
+- **Symptom:** the Japanese or Chinese global theme description has a gap after a full-width sentence stop. **Cause:** the menu bar generator joined every locale's description and layout sentence with an ASCII space. **Fix:** join Japanese and both Chinese variants directly. **Found by:** comparing the generated descriptions with their two source strings.
+- **Symptom:** a CJK session draws boxes where the changed words belong. **Cause:** a minimal theme rig can lack CJK fonts even with complete catalogues. **Fix:** install the verified Debian testing `fonts-noto-cjk` package in the proof image and generate each requested glibc locale with `localedef`. **Found by:** checking `fc-list :lang=ja` and `locale -a` in the unmodified milestone 3 image.
+- **Symptom:** a device-free run stops before KWin can open its Wayland socket, with `Operation not permitted` from `env`. **Cause:** the packaged KWin executable requests its scheduling capability at exec. **Fix:** give the container `SYS_NICE` as the login rig does and select the virtual QPainter compositor for 2D captures. **Found by:** the failed login's session log and the success of the same fixture with the rig's capability.
+
+- **Symptom:** the login succeeds with QPainter and every ScreenShot2 request returns `Cancelled`. **Cause:** ScreenShot2 needs KWin's EGL backend. **Fix:** in a device-free 2D run, use the guarded QPainter capture from `sparky-pjeoffice/tests/rig/capture-qpainter.py`. It reads the sole matching XRGB8888 output buffer of the private virtual compositor and records its hash. **Found by:** the ScreenShot2 error on the same installed German greeter whose prompt was visible in the buffer capture.
 
 ## A variant's menu bar layout
 

@@ -178,6 +178,7 @@ By name, the Debian maintainers of the packages we carry with our patches, as th
 | KScreen, libkscreen, Spectacle, KInfoCenter, KImageFormats | Debian Qt/KDE Maintainers; Aurélien Couderc, Patrick Franz; Scarlett Moore (KScreen) |
 | plasma-wayland-protocols | Debian Qt/KDE Maintainers; Aurélien Couderc, Pino Toscano |
 | Okular | Debian Qt/KDE Maintainers; Aurélien Couderc, Patrick Franz |
+| Calligra | Debian Qt/KDE Maintainers; Pino Toscano |
 | Haruna, MpvQt | Debian KDE Extras Team; Aurélien Couderc (Haruna), Scarlett Moore (MpvQt) |
 | digiKam, Showfoto | Debian KDE Extras Team; Steve M. Robbins |
 | Kdenlive, MLT | Patrick Matthäi |
@@ -261,6 +262,7 @@ The independent filesystem checks use `blkid` from [util-linux](https://github.c
 Its command and library copyright records name Andreas Dilger, Andries Brouwer, Theodore Ts'o, Kay Sievers, Karel Zak, Bastian Friedrich, Corentin Chary, Mike Hommey, Andrew Nayenko, Jeroen Oortwijn, Jiro SEKIBA, Philipp Marek, Milan Broz, Alejandro Martinez Ruiz, Eric Sandeen, Rolf Fokkens and Zeeshan Ali (Khattak), alongside Red Hat and the util-linux contributors.
 
 - **Okular** ([graphics/okular](https://invent.kde.org/graphics/okular), GPL-2.0-or-later): the edition's build puts the page view's desk one step behind the window and its paper at the window's plane (queue row 121). Its page view (`part/pageview.cpp`) is by Enrico Ros, Albert Astals Cid, Wilco Greven, Christophe Devriese, Laurent Montel, Dirk Mueller and Klarälvdalens Datakonsult AB (KDAB), as the file names them, with every Okular contributor since.
+- **Calligra Words** ([office/calligra](https://invent.kde.org/office/calligra)), row 121. The Words canvas credits Reginald Stadlbauer, David Faure, Thomas Zander, Inge Wallin and Boudewijn Rempt. The shared canvas paint also credits Marijn Kruisselbrink. Words' About data lists Carl Schwan, Pierre Ducroquet and C. Boemann as maintainers. The stereo canvas uses the view map by Thomas Zander.
 
 ### 0.3.2 Stereo icon authoring study and first helper
 

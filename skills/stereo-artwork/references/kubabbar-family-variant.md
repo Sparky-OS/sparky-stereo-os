@@ -134,6 +134,8 @@ Read the rebuilt binary package against its staged predecessor and include one f
 - **Symptom:** a CJK session draws boxes where the changed words belong. **Cause:** a minimal theme rig can lack CJK fonts even with complete catalogues. **Fix:** install the verified Debian testing `fonts-noto-cjk` package in the proof image and generate each requested glibc locale with `localedef`. **Found by:** checking `fc-list :lang=ja` and `locale -a` in the unmodified milestone 3 image.
 - **Symptom:** a device-free run stops before KWin can open its Wayland socket, with `Operation not permitted` from `env`. **Cause:** the packaged KWin executable requests its scheduling capability at exec. **Fix:** give the container `SYS_NICE` as the login rig does and select the virtual QPainter compositor for 2D captures. **Found by:** the failed login's session log and the success of the same fixture with the rig's capability.
 
+- **Symptom:** the login succeeds with QPainter and every ScreenShot2 request returns `Cancelled`. **Cause:** ScreenShot2 needs KWin's EGL backend. **Fix:** in a device-free 2D run, use the guarded QPainter capture from `sparky-pjeoffice/tests/rig/capture-qpainter.py`. It reads the sole matching XRGB8888 output buffer of the private virtual compositor and records its hash. **Found by:** the ScreenShot2 error on the same installed German greeter whose prompt was visible in the buffer capture.
+
 ## A variant's menu bar layout
 
 A second Look and Feel (`kubabbar-glass-9-menubar`) with the variant's defaults and a `contents/layouts/org.kde.plasma.desktop-layout.js`, made from the family's menu bar layout by `tools/make_login9.py` (which refuses to run when the family's layout changed under it).

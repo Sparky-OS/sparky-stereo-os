@@ -19,6 +19,16 @@ The package, baseline and workload instrumentation were exercised on build 18 on
    Verify the generated default still selects the original kernel after installation before setting `grub-reboot` to the exact submenu entry for a single boot.
    Recheck the boot ID, kernel and one-time entry after every reboot, and compare the final package, DKMS, boot and output baseline after removal.
 
+### Verify native DKMS insertion
+
+On the target kernel, save the build logs and a copy of `/proc/modules` before attempting any loads.
+Check `/usr/sbin/modinfo -k "$(uname -r)" MODULE` for the installed path, vermagic and signer.
+Use `sudo /usr/sbin/modprobe -v MODULE` for each module under test.
+Keep its exact result and read back the module name in `/proc/modules`, which uses underscores for hyphens.
+An entry present before the command shows the boot had already loaded it.
+Save the final module list and relevant kernel messages before rebooting to the original flavour.
+An insertion check covers module initialization on the bench. An attached device needs its own test.
+
 ## Workload protocol
 
 Use the same machine, firmware, application and driver builds, input hashes, sample durations, output, sink and buffering across kernels.

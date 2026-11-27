@@ -137,3 +137,28 @@ Refresh the tablet subtrees after changing their transforms in that hook.
 When the browser changed its projection during a capture, updating the tablet before that hook could put one frame's tablet at the prior frame's plane.
 Keep the WebXR frame loop running while capturing the compositor's pair. Stopping the loop stopped valid immersive submissions and produced a damaged capture.
 Read the predicted probe positions on either side of the capture and verify they stayed within half a pixel.
+
+### Aligning captured arms to the fitted rig
+
+The released 100STYLE BVH skeleton extends its arms along X in the unrotated pose.
+The fitted MPFB game-engine rig lowers the upper arms and already bends the forearms.
+Applying the capture's world rotation directly to those fitted bind orientations bent the arms a second time.
+
+Read the BVH child offsets and wrist endpoints.
+After converting them to the target basis, find the shortest rotation from each fitted arm segment to its source rest direction.
+Apply that rotation to the fitted bind orientation before the captured world rotation.
+Recover local rotations relative to the new parent pose as before.
+This transports the fitted roll and keeps its bone lengths.
+Apply MPFB's bilateral hand-scale and finger length and diameter targets to the individual fitted body before adding the game rig and clothes.
+For a regression check, decode every exported clip and measure the posed segment against the captured segment at every sample.
+Keep front walk and idle stills from the same sampling fraction and camera for each figure.
+
+### Giving the crowd the hall layout
+
+Calculate ground footprints from the installed props, furniture and door assemblies after updating their scene transforms.
+Expand the rectangles by a person’s clearance and connect corners with visible straight segments.
+Choose a route to the current goal, then steer each step against the footprints and nearby people.
+Use the measured movement to blend the walking animation.
+When an agent makes no progress for three quarters of a second, release its queue slot and select another reachable goal.
+Measure stalled movement only while the agent has a destination, because serving, pausing and conversations intentionally stand still.
+Record every visitor’s trajectory and check that the same seed and inputs reproduce the same positions and states.

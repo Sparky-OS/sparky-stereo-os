@@ -977,6 +977,9 @@ Traps met while preparing the views:
   Comparing each unmodelled script's diversion sources with its data members identified the collision risk in seconds.
   Run `check-diversions` before starting the long gate. The command records modelled and unmodelled scripts with reasons and exits nonzero on payload overlap or an unresolved addition.
   An unmodelled script gains no filesystem operation from this check. The qualified link run still checks collisions in each assembled root.
+- **A signed download ends early.** The Chinese LibreOffice help archives returned HTTP 200 and the expected Content-Length from Debian Snapshot, then closed after only part of the body. The gate refused the size and SHA-256 mismatch. A separate HTTPS request reproduced the truncation while Debian's mirror supplied the exact bytes.
+  Verify the full size, SHA-256 and package identity against the frozen signed Packages entry before placing either archive at its SHA-256 name in the gate's disposable cache.
+  Resume at the first refused input with the same build, views, sibling lists and options. Keep the initial completed verdicts and both transport records. The gate checks the cached bytes and archive identity again.
 
 ### Zero removals and a caller's shell mode
 

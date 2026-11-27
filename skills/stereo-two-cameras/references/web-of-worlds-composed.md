@@ -57,11 +57,14 @@ A free figure is not a free licence. CGTrader's Royalty Free licence (section 20
    Use the world's HTTPS origin as WebAuthn's expected origin and its hostname as the relying party ID.
    Serve the provider and the archive on loopback and test the exact Node version the host uses.
    The test service holds the signing key and grants in memory and has no real accounts.
-4. Make Apache authorize the member door's path before forwarding the client status.
-   Install a dedicated test CA for this demonstration and offer a shared PKCS#12 client identity to visitors.
-   Keep its signing key out of the release.
-   Run `apache2ctl configtest` before reloading, then test the static site, both client-certificate controls and the undo.
-   Location-level client authentication depends on TLS renegotiation or, in TLS 1.3, post-handshake authentication. [Apache mod_ssl](https://httpd.apache.org/docs/2.4/mod/mod_ssl.html).
+4. Put the client-certificate door on an optional, dedicated Apache TLS listener.
+   Request the test client certificate in that listener's handshake.
+   Leave the site's existing TLS policy in place.
+   When the listener is disabled, describe the local test rig on the key and its help page.
+   Use the site's existing server certificate and a dedicated CA for the shared test client identity.
+   Keep the CA signing key out of the release.
+   Test both the no-certificate refusal and accepted identity with default browser TLS.
+   Run `apache2ctl configtest` before reloading and verify that undo closes the listener. [Apache mod_ssl](https://httpd.apache.org/docs/2.4/mod/mod_ssl.html).
 5. Build the static release from a clean checkout with its nested imports, WebAssembly worker and every procedure the world fetches.
    Generate the lobby QR from the configured world address.
    Check the release hashes before installation and run the world against the public path in the fixture before publication.
@@ -95,3 +98,33 @@ A free figure is not a free licence. CGTrader's Royalty Free licence (section 20
   Keep both rows and tell visitors about the browser requirement.
 - **Symptom:** an ImageBitmap or OffscreenCanvas transfer fires `messageerror` in the other site's Gecko process. **Fix:** show the error and send camera frames as bytes in an ArrayBuffer over the existing MessagePort. **Found by:** the echo probe and the camera frame counter.
 - **Symptom:** a loopback HTTPS world opens in Chromium while Gecko reports an insecure certificate. **Cause:** the fixture presented its self-signed CA as the server certificate. **Fix:** trust a test CA and give Apache a separate signed leaf with every fixture host in its SAN. **Found by:** the same world opening immediately in Gecko with the leaf and the trusted CA.
+
+### Constraining the service drawings in flat WebXR
+
+The flat device supplies parallel eye transforms and horizontally shifted perspective matrices.
+The edition's compositor sends the depth limits to the browser.
+In the tested build a page can read the eye matrices, and the compositor's numeric limits are available to the rig through the Wayland trace.
+
+1. In the shared eye coordinates, compute the zero-disparity distance from the eye baseline and the two projection offsets.
+   With horizontal focal coefficient \(f_x\), baseline \(b\), and left and right offsets \(o_L\) and \(o_R\), the distance is \(f_x b / (o_L - o_R)\).
+   Check for equal eye orientations and view sizes, a horizontal baseline, and a finite plane in front of the eyes.
+2. Project every service primitive onto that plane along the midpoint eye's viewing rays.
+   Apply the same vertex transform to the shell, label, panels, feeds, path lines and markers.
+   For these parallel eye transforms the projection preserves homogeneous clip W.
+   Keep the original clip depth for room occlusion and ordering, and keep the declared positions for proximity and input.
+   The zero-disparity plane holds all the drawn pixels inside any nonnegative sunk and popped limits.
+3. Capture both eyes and compare surface probes and the projected bounds of every declared vertex against the compositor's actual announced limits.
+   Keep measurements for the original placements.
+   Where the device supplies no shared plane, tell the person that the service drawings are available in 2D.
+
+The recorded service markers matched the browser's geometry while exceeding the popped limit before this change.
+Moving the same panels farther in a second placement still exceeded the limit because the browser's eye transforms could change.
+Constrain the drawings from the current session matrices and leave separation and the screen-plane setting with the display system.
+
+### Sending a certificate during the first handshake
+
+A member door that succeeds with a TLS 1.2 test profile and fails with Apache AH10158 in default browser profiles is requesting the certificate too late for those TLS 1.3 clients.
+The dedicated virtual host on a separate port moves the certificate request to the handshake.
+Its proxy sends the verified result to the application and the regular API strips those headers.
+Credentialed cross-origin responses name the exact world origin.
+The same restore proof verifies both virtual-host configurations and the optional port.

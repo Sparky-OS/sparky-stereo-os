@@ -106,7 +106,7 @@ The edition's compositor sends the depth limits to the browser.
 In the tested build a page can read the eye matrices, and the compositor's numeric limits are available to the rig through the Wayland trace.
 
 1. In the shared eye coordinates, compute the zero-disparity distance from the eye baseline and the two projection offsets.
-   With horizontal focal coefficient \(f_x\), baseline \(b\), and left and right offsets \(o_L\) and \(o_R\), the distance is \(f_x b / (o_L - o_R)\).
+   With horizontal focal coefficient `fx`, baseline `b`, and horizontal offsets `left` and `right`, the distance is `fx * b / (left - right)`.
    Check for equal eye orientations and view sizes, a horizontal baseline, and a finite plane in front of the eyes.
 2. Project every service primitive onto that plane along the midpoint eye's viewing rays.
    Apply the same vertex transform to the shell, label, panels, feeds, path lines and markers.
@@ -128,3 +128,6 @@ The dedicated virtual host on a separate port moves the certificate request to t
 Its proxy sends the verified result to the application and the regular API strips those headers.
 Credentialed cross-origin responses name the exact world origin.
 The same restore proof verifies both virtual-host configurations and the optional port.
+If the dedicated door handshakes successfully but answers HTTP 404, check the proxy destination path.
+The Debian 12 fixture returned 404 when a literal destination was used with ProxyPassMatch.
+An anchored door expression and its full match `$0` produced the expected upstream path and restored HTTP 200.

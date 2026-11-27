@@ -338,6 +338,9 @@ The package closure also has the build information, changes manifest, provenance
 Verify the binary package metadata and the ELF architecture separately.
 Compare every file, directory and symlink in the result with its architecture's predecessor.
 Keep the descriptor and its source members once for both architectures.
+The TCG guest can take more than three hours to run the archive checks for the candidate and predecessor.
+Give the native observer time for both checks and record the guest command's exit status separately from the observer's status.
+The lane's native launcher exposes `PM124_GUEST_BUILD_TIMEOUT` for this deadline.
 
 ### Diagnose the stock phone start
 

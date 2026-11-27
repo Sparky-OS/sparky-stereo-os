@@ -135,4 +135,5 @@ An anchored door expression and its full match `$0` produced the expected upstre
 Read the eyes for the service and tablet placement in the same scene render hook, after three.js updates its XR camera.
 Refresh the tablet subtrees after changing their transforms in that hook.
 When the browser changed its projection during a capture, updating the tablet before that hook could put one frame's tablet at the prior frame's plane.
-Freeze the frame before reading its projection and capturing the compositor's pair, so the prediction and both images describe the same submission.
+Keep the WebXR frame loop running while capturing the compositor's pair. Stopping the loop stopped valid immersive submissions and produced a damaged capture.
+Read the predicted probe positions on either side of the capture and verify they stayed within half a pixel.

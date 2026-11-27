@@ -4,13 +4,13 @@ metadata:
 name: kde-desktop-defaults
 description: >-
   Plasma defaults and small KDE patches: KRunner search and currency rates, task management, Ctrl+Alt+Del,
-  Ctrl+Alt+Esc, Leave's one-time UEFI restart, frozen-window recovery, Dolphin drive formatting and scripts,
-  cursor themes, wallpapers, lock and splash screens, Discover's AppStream cache, /etc/xdg, first scale on
-  built-in panels, tablet mode, Fcitx 5, KDE Welcome and account defaults. Load it when a default needs a
-  decision, a shortcut clashes, a firmware restart action is absent or refused, a lock screen shows only
-  its wallpaper, a video wallpaper keeps the old clip, an applet reports zero without an error, a notebook
-  starts at the wrong scale, two Welcome windows open, a webcam needs a page, colour vision or contrast
-  needs checking, or a KDE patch needs CI.
+  Ctrl+Alt+Esc, Leave's one-time UEFI restart, System Monitor's Overview, frozen-window recovery, Dolphin
+  drive formatting and scripts, cursor themes, wallpapers, lock and splash screens, Discover's AppStream cache,
+  /etc/xdg, first scale on built-in panels, tablet mode, Fcitx 5, KDE Welcome and account defaults. Load it
+  when a default needs a decision, a shortcut clashes, a firmware restart action is absent or refused, System
+  Monitor shows every GPU as one pie, a lock screen shows only its wallpaper, a video wallpaper keeps the old
+  clip, an applet reports zero without an error, a notebook starts at the wrong scale, two Welcome windows
+  open, a webcam needs a page, colour vision or contrast needs checking, or a KDE patch needs CI.
 ---
 
 # KDE desktop defaults
@@ -85,6 +85,11 @@ System Settings has a Screensavers page (`sparky-stereo-screensavers`, in Appear
 The layout is the one of KDE's retired Screen Saver module (kde-workspace 4.11).
 Every text the page colours itself stands at 4.5:1 or more in any colour scheme: a dim text keeps the scheme's colour where that can be read and is moved towards the normal text by the smallest step where it cannot.
 [Where each value lives, how a saver is hosted as a preview in a settings page (a helper on a private display, the pair as a declared surface above the System Settings window, the person's depth limits at the size shown), how a page links to another, how to add a saver to the list, how every text of a page is measured on a capture (the page's text report, the control, the looks, the states, the red side), and the traps (a dim text on a new page, a preview the scroll bar cuts in a real KDE session, a click before the window is there, a row that depends on the frame caught, fixed sleeps, a meta apt cannot plan)](references/screensaver-settings-page.md).
+
+## System Monitor's Overview fits the computer
+
+At a person's first login `sparky-stereo-systemmonitor` reads the computer's graphics cards (in ksystemstats' order, with what each driver reports of usage, video memory, temperature and power) and its processor threads, writes Overview presets into the person's System Monitor folder (one GPU, or every GPU with two or more; the processor's threads in one chart or a chart each, each thread labelled `Thread N` by its own sensor label, never KDE's facegrid, whose cells share one configuration group), titled short enough for the sidebar at 11 pt (`2 GPUs, threads`), and makes the computer's own the start page, KDE's Overview one tick away in Edit Pages; the person's later choice is never written again, and a sensor a driver does not report is named, never shown as zero.
+[Where pages and choices live, the sensor names per driver, the probe, the rig with a real System Monitor read through AT-SPI and umockdev, the bench, and the traps](references/system-monitor-overview-presets.md).
 
 ## Colour vision: the one switch, and contrast fixed for everyone
 

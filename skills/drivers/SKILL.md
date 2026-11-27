@@ -8,7 +8,7 @@ description: >-
   dkms says openssl not found, modprobe says Key was rejected by service, ConditionFirstBoot never fires, nouveau
   reports firmware unavailable, amdgpu hangs with a page fault, ring timeout and a device coredump or repeats an IP
   block soft reset, virtio-gpu stereo oopses, USB camera YUYV fails, a
-  Broadcom Wi-Fi card (BCM4360, wl) has no driver, or early boot reports a duplicate pcspkr, IMA hash failure or unsupported VMX. Also for Logitech HID++/UVC/Litra OpenLogi offers.
+  Broadcom Wi-Fi card (BCM4360, wl) has no driver, or early boot reports a duplicate pcspkr, IMA hash failure or unsupported VMX. Also for OpenLogi and PREEMPT_RT benchmarks.
 ---
 
 # Drivers: 3D modes and deep colour in the kernel
@@ -85,6 +85,8 @@ Traps measured on the way:
 Base, x86-64-v3 and PREEMPT_RT carry the same accepted edition fixes and optimizations, including stereo, HDR/deep-colour, virtual displays, input and hardware support. RT is an optional kernel for latency-sensitive workloads, not a reduced-feature audio edition. Compare the retained patch lists and hashes before building a release; an older flavour build is not an acceptable reason to omit an accepted fix. Keep required scheduling/ISA differences explicit. Where RT makes a driver or optimization incompatible, record the exact restriction, affected hardware and test evidence instead of silently dropping it or promising identical hardware support.
 
 Qualify each flavour's final packages, boot, Secure Boot, hibernation and DKMS independently. Measure latency/jitter and missed deadlines for the actual audio/video, robotics or inference pipeline before claiming an RT benefit; kernel scheduling alone does not qualify GPU execution or application timing. Preserve the user's kernel choice and the working fallback.
+
+For [measuring kernel flavours on a real machine](references/kernel-flavour-measurement.md), reconcile the published payloads and boot baseline first, then collect PipeWire, mpv, Wayland presentation, scheduler and CPU inference counters under matched conditions.
 
 Kernel review is slow and careful, and a subsystem owes nobody a merge.
 Plan for it:

@@ -8,7 +8,8 @@ description: >-
   passthrough (AC-3, DTS, bitstream over HDMI), virtual surround filter chains, RNNoise, MIDI and emulators, and the
   sound defaults package (rates from the devices, resampler quality, dither). Load it when a stream is missing from the
   Sound page, a loopback or virtual sink disappears, the rate is stuck at 48000, passthrough fails, VLC's PipeWire
-  output plays silence until a seek, a game or emulator has no MIDI, or a player or the sound system resamples.
+  output plays silence until a seek, a game or emulator has no MIDI, a player or the sound system resamples, or apt
+  keeps PipeWire back after Debian moved it (the AAC Bluetooth codec's exact libspa pin).
 ---
 
 # Audio on Sparky Stereo OS
@@ -81,6 +82,11 @@ The ORDER 21 engine candidate adds automatic per-stream headphone insertion, opt
 FluidSynth and the FluidR3 and TimGM6mb soundfonts are in Debian; the MuseScore General and OPL3 soundfonts are too.
 Munt (MT-32), libADLMIDI and libOPNMIDI (FM synthesis) and DOSBox Staging are not, and require an archive and licence audit before edition packaging; MT-32 ROMs are the user's own. Debian already supplies a FluidSynth user service. The ORDER 21 table records the configuration and role entries still needed.
 **Implemented and container-tested, awaiting review/publication (ORDER 735):** an idle-closing FluidSynth renderer, per-person font choice, bank-free emulator packages and optional app-center entries. See [MIDI out of the box](references/midi-out-of-the-box.md) for the route, proof boundaries, personal ROM requirements and traps.
+
+## The AAC Bluetooth codec (our plugin beside Debian's PipeWire)
+
+Debian builds PipeWire without Fraunhofer's AAC library, so the edition builds the one plugin, `pipewire-bluez5-codec-aac`, from PipeWire's own source against deb-multimedia's `libfdk-aac2`, pinned to the exact `libspa-0.2-bluetooth` it was built with.
+The day Debian testing moves PipeWire, apt keeps PipeWire back on every installed edition until the codec is rebuilt: `watch-exact-pins.sh` sees it the same day, and [aac-codec](references/aac-codec.md) has the rebuild, the codec's own checks without a Bluetooth device (load, a tone through encode and decode, the decoder's buffer bound) and the traps.
 
 ## Bluetooth voice (HFP) and dongles
 

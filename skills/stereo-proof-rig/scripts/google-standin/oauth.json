@@ -1,0 +1,1 @@
+{"installed": {"client_id": "299000000000-rig.apps.googleusercontent.com", "project_id": "drivesync-rig-299", "auth_uri": "https://accounts.google.com/o/oauth2/auth", "token_uri": "https://oauth2.googleapis.com/token", "client_secret": "rig-public-desktop-secret", "redirect_uris": ["http://127.0.0.1"]}}

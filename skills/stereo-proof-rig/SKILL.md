@@ -96,6 +96,10 @@ Reconcile the ordinary 2D source against a 3D mode, an anaglyph twin, the native
 Read both actual outputs and count display passes separately from a phone stream's paints: [four-case baseline recipe](references/2d-source-3d-replica.md).
 An attractive ScreenShot2 pair does not prove which eye buffers a replica consumed.
 
+## A program of an online service, without its account
+
+A program that signs in to a service (DriveSync and Google Drive) is proved in a real Plasma login with no network: the service's host names point at a local stand-in that speaks its protocol, the system store trusts a test authority, a stand-in NetworkManager gives the metered state, KDE Wallet is unlocked as pam_kwallet does, and AT-SPI with KWin's fake input drives the window: [`scripts/google-standin`](scripts/google-standin/README.md).
+
 ## A virtual camera without a camera
 
 A page, a player or a portal that lists cameras is proved with no real camera and no kernel module in `scripts/virtual-camera/`:

@@ -303,6 +303,7 @@ KRDC's RDP view credits Arend van Beelen jr., Urs Wolfer and AceLan Kao.
 Plasma Mobile's startup file names Aleix Pol, Bhushan Shah and Jonah Brüchert.
 The FreeRDP H.264 backend names Marc-André Moreau and Mike McDonald.
 The receiver also builds on Bastien Nocera's iio-sensor-proxy, the Mobian team and Fabrice Bellard and the QEMU contributors.
+Armin Novak's November 2026 work on FreeRDP's codec availability check (`freerdp_codec_supported`) is the upstream side of the missing-decoder case.
 
 ## Verify the Flat Headset presentation
 
@@ -345,6 +346,8 @@ Keep a reader attached to the guest serial socket during the build.
 When the paused reader's socket queue filled, the serial log ended partway through the `dpkg-genbuildinfo` line even though the archive check had passed.
 Preserve the VM while replacing an expired observer and resume reading the serial socket.
 Wait for the guest exit marker, then verify sync and unmount before extracting the closure.
+A successor whose `debian/control` is unchanged does not need a new SDK download: unpack the verified SDK image (`debugfs -R "rdump / DIR"`), replace its source kit and its previous package, rescan the pool with `dpkg-scanpackages --multiversion`, sign a fresh `InRelease` with a one-day key and make the image again; check first that the two sources' `control` files are identical.
+On a loaded station (load about 25 on 12 threads) with four threads, the configure stage took 38 minutes, the cross-compiled objects 8 minutes and the native package with its archive check 72 minutes.
 
 ### Diagnose the stock phone start
 
@@ -362,6 +365,37 @@ Check the installed package version, run a paired Throw and capture its native c
 Compare the white alignment line at the centre of the paired chart with a capture from the predecessor.
 The positive arm64 run had 280 white centre-line rows out of 280. The predecessor had zero.
 Check the left-first `sTER` mark and confirm that closing Catch releases the virtual output.
+
+### Say a missing decoder on both screens
+
+A Throw's picture is H.264, and a Linux phone's FreeRDP can lack the decoder (an FFmpeg built without H.264).
+FreeRDP 3.33.1 then only warns "Failed to create h264 codec context" (libfreerdp/core/codecs.c) and still offers AVC from its settings (channels/rdpgfx/client/rdpgfx_main.c), so the phone accepts a picture it can never show and the first-picture deadline ends it with "Start the Throw again", which cannot help.
+Catch therefore makes FreeRDP's own H.264 context, `h264_context_new(FALSE)`, when the approved Throw arrives and before the RDP session starts.
+Without one it sends `{"action":"capability-missing","capability":"h264-decoder"}` on the paired control connection (no text of its own), stops listening and draws the sentence in both eyes; Escape leaves the same sentence in the window.
+KRdp's discovery keeps a failed problem in the person's store of `sparky-stereo-problems` (key `catch-capability:IDENTITY`, the time and the phone's KDE Connect name as arguments) and closes the connection, which releases the lease; the engine's notifier tells the person in their language.
+
+1. Make the condition with a test preload that answers `avcodec_find_decoder` and `avcodec_find_decoder_by_name` with no decoder for `h264` only. Debian's FreeRDP 3.33.1 decodes H.264 only through libavcodec (its build configuration says `WITH_OPENH264=OFF`, `WITH_VIDEO_FFMPEG=ON`), so this is the state of a phone whose FFmpeg lacks the decoder. Have the preload print one line, and wait for it in the phone log before judging a row: it proves the lookup happened under the fixture.
+2. Red on the predecessors: the phone starts the approved session, FreeRDP prints its warning, and neither screen names the decoder; read the problems store too.
+3. Green on the successors: the refusal arrives before any RDP session ("Starting approved Throw" absent), the two eyes are pixel-equal outside the centre guide, the PC's record carries the expected title and text with its two arguments, the lease is released and the notifier posts the title.
+4. Run the green row in each of the ten languages: Catch with `LANG` set to a UTF-8 locale the guest has and `LANGUAGE` to the language, the button found by its translated label ("Catch (receber)"), and the PC's record rendered with `LC_ALL=LANGUAGE.UTF-8 sparky-stereo-problems list --json`.
+
+- **Symptom.** A refusal is told once, and after the person dismisses it the next refusal says nothing. **Cause.** A problem kept again with the same message keeps its first time, its id and its hide (sparky-stereo-problems README). **Fix.** Put the time in the message's arguments, as KWin's Xwayland notice does. **How found.** The engine's README, before writing the call.
+- **Symptom.** The capability row cannot press Catch in German. **Cause.** The accessibility driver looked for the English label; the button reads "Catch (empfangen)" there. **Fix.** Pass the translated label from the package's own catalogue. **How found.** The catalogues list `Catch` with the meaning in parentheses, Daniel's rule of 2026-11-20.
+- **Symptom.** The phone's translated sentence never appears. **Cause.** The guest runs Catch with `LANG=C.UTF-8`, where glibc's gettext ignores `LANGUAGE`. **Fix.** Set `LANG` to a UTF-8 locale `locale -a` lists in the guest.
+- **Symptom.** The refusal passes the both-eyes comparison and still ends mid-sentence ("or OpenH264," in English, "Instale o FFmpeg com o" in pt_BR). **Cause.** Catch drew a sentence without a picture in the quarter-height strip meant for a caption under the waiting clip, and `drawText` cuts what does not fit. **Fix.** A sentence shown alone gets the eye's height (8 % to 92 %) and a font that shrinks until the sentence fits. **How found.** Looking at the captures: equal eyes said nothing about a cut, so the rig now also checks that the text block stands centred in its box with space to both edges, and that check fails on the cut captures.
+- **Symptom.** The both-eyes check fails in one language and passes in the next, with a few hundred differing pixels on one line of text ("albo OpenH264 dla FreeRDP, a" in Polish), though the eyes read the same. **Cause.** The sentence was drawn twice, once per eye, from a box at `width * (eye * 0.5 + 0.035)`, a fractional position (44.8 and 684.8 on a 1280-pixel panel), so a centred line could round to another sub-pixel position in one eye. **Fix.** Lay the sentence out once into an image of the box's size in device pixels and copy it into each eye at whole device pixels. **How found.** The difference's bounding box covered one text line only; a native harness that renders the ten languages at seven panel sizes gave unequal eyes in 23 of 70 renderings before the change and in none after.
+- **Upstream.** FreeRDP's default branch (Armin Novak, November 2026) asks `freerdp_codec_supported(context, FREERDP_CODEC_AVC420, FALSE)` before offering AVC. With such a client KRdp falls back to its progressive codec, so the phone would get a picture on a path nobody chose; the check at the control connection stays the edition's answer.
+
+The tracked mode's sensor (StereoDroidVR, row 762) is a separate capability: the head-fixed Flat Headset needs none.
+On Plasma Mobile the standard sensor service, iio-sensor-proxy 3.9, exposes accelerometer orientation and tilt, ambient light, proximity and a compass, and no gyroscope, rotation vector or quaternion ([its D-Bus interface](https://hadess.pages.freedesktop.org/iio-sensor-proxy/gdbus-net.hadess.SensorProxy.html)), so a tracked Catch needs another sensor source before its "no sensor" sentence has a mode to belong to.
+
+### Make the row 927 red steady
+
+KPipeWire 6.7.4 builds its format offers in `QHash` order, and Qt seeds every process at random, so the 4096-byte buffer drops a different set of formats each time.
+The published and staged packages fail only when both BGRx and BGRA land past the buffer: 1 to 3 streams in 40, and 0 in another run, so a red expectation of "some failures" fails by luck.
+
+- **Symptom.** `QT_HASH_SEED=0` makes the order the same in every process and the red still passes. **Cause.** Seed 0's order is BGR, GRAY8, ABGR, RGBA, RGBx, BGRx, RGB, xBGR, BGRA: the buffer drops xBGR and BGRA and keeps BGRx. Qt accepts no other value ("QT_HASH_SEED: forced seed value is not 0; ignored"; QHashSeed documentation). **Fix.** A test preload that answers `QHashSeed::globalSeed()` (exported from QtCore under `Qt_6`, imported by `libKPipeWire.so.6`) with a chosen value. **How found.** A trace of the offered formats per stream (`pw_stream_connect` preload), then one native stream per seed until the order lost both: seed 82 gives RGB, xBGR, RGBA, ABGR, RGBx, GRAY8, BGR.
+- With seed 82 the published and staged packages fail 40 of 40 and the fixed packages deliver 40 of 40, one offer order each; under Qt's random seeds the fixed packages deliver 40 of 40 across 40 orders.
 
 ### Locate a live capability error
 

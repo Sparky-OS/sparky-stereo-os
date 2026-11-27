@@ -966,6 +966,13 @@ Traps met while preparing the views:
   Generate it beside the tree, move it into place and sign it there.
   For a cleartext signature use a real output path with `sqv` and check the signed Packages hash and size.
   The comparison of generated and verified Release fields exposed the self-entry and a final line-ending difference.
+- **A data-only root reports a conffile collision.** The gate recognized neither the local variable nor the pending-conffile move in the boot package's diversion preinst.
+  It reported the collision between the Debian conffile and the edition symlink while assembling the desktop meta's filesystem.
+  Reproduce the gate error with the two exact archives and compare a fresh `dpkg --unpack` in a disposable container.
+  Read the actual diversion and hash both conffiles, including any `.dpkg-new` names while the packages are unpacked.
+  The real unpack kept both exact conffiles and installed the intended symlink.
+  Record the gate refusal as an unmodeled diversion before choosing a supported representation and rerunning the gate.
+  Keep the gate's collision checks and the fresh dpkg control together.
 
 ### Zero removals and a caller's shell mode
 

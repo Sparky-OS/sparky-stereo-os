@@ -242,6 +242,11 @@ They credit the original work; they do not replace each project's full contribut
 | [KPMcore](https://invent.kde.org/system/kpmcore) | Filesystem creation, labels and command execution | Volker Lanz, Andrius Štikonas, Teo Mrnjavac, Pali Rohár, Shubham Jangra, Arnaud Ferraris, Gaël PORTAY, Yuri Chornoivan, Chantara Tith, Huzaifa Faruqui, Caio Jordão Carvalho and David Edmundson |
 | [KIO](https://invent.kde.org/frameworks/kio) | Places actions and application and terminal launch jobs | David Faure, Kevin Ottens, Rafael Fernández López, Kai Uwe Broulik, Harald Sitter, and the KIO contributors |
 
+The one-time UEFI restart builds on Plasma Workspace's Leave and session code by **Matthias Ettrich**, **Urs Wolfer**, **Martin Graesslin**, **David Edmundson**, **Aleix Pol Gonzalez** and **Marco Martin**. The session runner credits **Aaron Seigo** and **Natalie Clarius**. Kicker's system entries credit **Eike Hein**.
+The existing [Desktop Session KCM](https://invent.kde.org/plasma/plasma-desktop/-/tree/master/kcms/ksmserver) names **Oswald Buddenhagen**, **Kurt Granroth**, **Kevin Ottens** and **Carl Schwan**.
+**Kai Uwe Broulik** aligned the Leave notice with UEFI terminology and **Nikolay Kochulin** added the scheduled bootloader notices.
+The [systemd-logind interface](https://www.freedesktop.org/software/systemd/man/latest/org.freedesktop.login1.html) supplies the firmware capability and setter, with the permission work by [**Lennart Poettering**](https://github.com/systemd/systemd/commit/c78e6f9e7b29656faf130e697a74e7f30ccaf6a2) and the related systemctl integration by [**Jan Janssen**](https://github.com/systemd/systemd/commit/a4921cf4e2acde70eeaa0da8f040da6a058206b4).
+
 The unit converter's currency change is credited in section 6, with Plasma Add-ons.
 Plasma's search proof also uses [KRunner](https://invent.kde.org/frameworks/krunner), [Milou](https://invent.kde.org/plasma/milou) and [KUnitConversion](https://invent.kde.org/frameworks/kunitconversion).
 Task recovery uses [KGlobalAccel](https://invent.kde.org/frameworks/kglobalaccel), [System Monitor](https://invent.kde.org/plasma/plasma-systemmonitor) and KWin.

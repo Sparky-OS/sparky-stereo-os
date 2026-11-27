@@ -32,6 +32,7 @@ On a UEFI machine, read login1's capability for the active desktop user.
 The Leave screen offers the firmware action when that reply is `yes` and the session can restart.
 Kickoff and KRunner open the same explicit confirmation.
 [The package paths, virtual firmware reboot, authorization denial, and hardware proof with the current boot preserved](references/firmware-restart.md).
+Restart Options' second entry, Restart for anti-cheat games, starts sparky-stereo-boot's anti-cheat start once, after a confirmation that lists what Easy Anti-Cheat would not accept on this computer ([the same reference](references/firmware-restart.md#the-second-choice-restart-for-anti-cheat-games-row-190)).
 
 ## A program sent to a GPU that dies at start
 

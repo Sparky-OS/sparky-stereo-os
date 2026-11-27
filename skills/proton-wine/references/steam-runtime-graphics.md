@@ -58,9 +58,32 @@ Valve's October 2026 beta and November 11 public client update moved the Linux c
 Valve still requires the two graphics and library architectures on x86-64.
 The client runtime and the game runtimes have separate version identifiers. [Valve's client requirements](https://github.com/ValveSoftware/steam-for-linux/blob/master/README.beta.md), [November 11 client release notes](https://steamcommunity.com/app/593110/announcements/detail/)
 
+## Check the installed package fixes
+
+Use fresh disposable prefixes with the published packages and the successor packages.
+Install each set through dpkg or APT.
+Command paths, DLLs and state should come from the packages on both runs.
+
+- Run `gl-stereo-run -- ./run --filesystem="$PROBES:ro" -- "$PROBES/gl-quad" auto`.
+  Run it again with `unsupported`.
+  The fixed launcher supplies both declaration and interposer preloads.
+  The stereo fixture checks one full side-by-side declaration and double-width geometry.
+  The unsupported fixture checks that no stereo visual appears.
+  Keep the single-preload command as the exit-127 control.
+- Run `dxvk-setup install --yes` in a disposable prefix.
+  The D3D9 entry should be a regular file with the hash of the installed PE DLL.
+  The native override should load it under the outer Wine and the runtime's Wine and the probe should return a zero Present HRESULT in both.
+  Uninstall and compare the original D3D9 entry with the pre-install copy.
+- Run the same probe through `wiz3d-launch --no-fallback --`.
+  The launcher owns the prefix-local injector payload during the run.
+  The Windows drive gives the game and the outer declaration helper a shared location for the state file.
+  Check that Wine loads `d3d9_real.dll` and `S3DWrapperD3D9.dll`, the swapchain doubles its width and one full side-by-side declaration appears.
+  After exit check that the previous D3D9 entry is restored.
+
 ## Test an i386 D3D9 program
 
 Use a disposable Wine prefix under the shared home, an existing PE32 D3D9 fixture that calls `CreateDevice`, `Clear` and `Present`, and private Xvfb with continuous root properties.
+The diagnostic copies below reproduced the causes on the original packages before the package fixes.
 Record the HRESULT of each call, the loaded DLLs with `WINEDEBUG=+loaddll`, DXVK's device log, and the X11 declaration.
 The r1123a comparison used Wine `10.0~repack-12+stereo3d8+lc1`, DXVK `2.7.1-4+stereo3d5+lc1`, and wiz3D `0.3.1+stereo3d6+lc1`.
 

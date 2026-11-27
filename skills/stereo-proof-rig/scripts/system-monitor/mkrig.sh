@@ -4,6 +4,7 @@
 # Adapted from skills/stereo-proof-rig/scripts/welcome-login/mkrig.sh: Debian testing pinned by digest, the edition's
 # signed tree mounted at /repo, deb-multimedia, the edition's pins from the published sparky-stereo-apt.
 # APT_CONF_DIR: sparky-stereo, sparky-stereo-only-ours, sparky-stereo-deb-multimedia.sources.
+# The ten languages' locales and Noto Sans CJK are in the image: the sidebar's titles are measured on screen in each.
 # Environment: DOCKER_HOST, BASE_IMAGE (by digest or a lane tag of one), HTTPS_ONLY_APT, LOGS, CONTAINER_IDS.
 set -euo pipefail
 TAG=${1:?tag}; REPO=$(cd "${2:?repo tree}" && pwd); CONF=$(cd "${3:?apt configuration}" && pwd); EXTRA=${4:-}
@@ -32,10 +33,10 @@ cp /aptconf/sparky-stereo-deb-multimedia.sources /etc/apt/sources.list.d/
 sh /run/https-only-apt.sh
 apt-get -y update > /logs/update2.txt 2>&1
 apt-get -y -o Acquire::Retries=5 dist-upgrade > /logs/dist-upgrade.txt 2>&1
-PKGS="kwin-wayland kwin-common qt6-wayland breeze-icon-theme qml6-module-org-kde-desktop qml6-module-org-kde-kquickcontrols udev gcc libc6-dev libwayland-dev libwayland-bin plasma-systemmonitor ksystemstats libksysguard-bin plasma-integration breeze kded6 libkf6config-bin qdbus-qt6 dbus-bin dbus-daemon dbus-x11 dbus-user-session at-spi2-core python3-pyatspi gir1.2-atspi-2.0 python3-gi python3-pil python3-numpy umockdev lm-sensors pciutils wayland-utils xwayland fonts-noto-core fonts-dejavu-core locales libgl1-mesa-dri libegl-mesa0 mesa-vulkan-drivers procps psmisc sparky-stereo-problems ${EXTRA_PACKAGES:-}"
+PKGS="kwin-wayland kwin-common qt6-wayland breeze-icon-theme qml6-module-org-kde-desktop qml6-module-org-kde-kquickcontrols udev gcc libc6-dev libwayland-dev libwayland-bin plasma-systemmonitor ksystemstats libksysguard-bin plasma-integration breeze kded6 libkf6config-bin qdbus-qt6 dbus-bin dbus-daemon dbus-x11 dbus-user-session at-spi2-core python3-pyatspi gir1.2-atspi-2.0 python3-gi python3-pil python3-numpy umockdev lm-sensors pciutils wayland-utils xwayland fonts-noto-core fonts-noto-cjk fonts-dejavu-core locales libgl1-mesa-dri libegl-mesa0 mesa-vulkan-drivers procps psmisc sparky-stereo-problems ${EXTRA_PACKAGES:-}"
 apt-get -y -o Acquire::Retries=5 --no-install-recommends install $PKGS > /logs/install.txt 2>&1 || { tail -40 /logs/install.txt; exit 1; }
 if [ -d /extra ]; then apt-get -s --no-install-recommends install /extra/*.deb > /logs/extra-simulate.txt 2>&1; apt-get -y --no-install-recommends install /extra/*.deb > /logs/extra.txt 2>&1 || { tail -30 /logs/extra.txt; exit 1; }; fi
-sed -i "s/^# *\(en_US.UTF-8\)/\1/; s/^# *\(pt_BR.UTF-8\)/\1/; s/^# *\(de_DE.UTF-8\)/\1/" /etc/locale.gen; locale-gen > /logs/locale-gen.txt 2>&1
+for l in en_US pl_PL pt_BR fr_FR de_DE es_ES ja_JP ko_KR zh_CN zh_TW; do sed -i "s/^# *\($l.UTF-8\)/\1/" /etc/locale.gen; done; locale-gen > /logs/locale-gen.txt 2>&1
 useradd -m -u 1000 -s /bin/bash person 2>/dev/null || true
 rm -f /etc/apt/sources.list.d/sparky-stereo.sources
 dpkg-query -W -f "\${Package} \${Version}\n" > /logs/packages.txt

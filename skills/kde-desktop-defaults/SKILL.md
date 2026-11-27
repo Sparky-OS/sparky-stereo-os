@@ -88,7 +88,7 @@ Every text the page colours itself stands at 4.5:1 or more in any colour scheme:
 
 ## System Monitor's Overview fits the computer
 
-At a person's first login `sparky-stereo-systemmonitor` reads the computer's graphics cards (in ksystemstats' order, with what each driver reports of usage, video memory, temperature and power) and its processor threads, writes four Overview presets into the person's System Monitor folder (one GPU or every GPU, few or many threads), and makes the computer's own the start page, KDE's Overview one tick away in Edit Pages; the person's later choice is never written again, and a sensor a driver does not report is named, never shown as zero.
+At a person's first login `sparky-stereo-systemmonitor` reads the computer's graphics cards (in ksystemstats' order, with what each driver reports of usage, video memory, temperature and power) and its processor threads, writes Overview presets into the person's System Monitor folder (one GPU, or every GPU with two or more; the processor's threads in one chart or a chart each, each thread labelled `Thread N` by its own sensor label, never KDE's facegrid, whose cells share one configuration group), titled short enough for the sidebar at 11 pt (`2 GPUs, threads`), and makes the computer's own the start page, KDE's Overview one tick away in Edit Pages; the person's later choice is never written again, and a sensor a driver does not report is named, never shown as zero.
 [Where pages and choices live, the sensor names per driver, the probe, the rig with a real System Monitor read through AT-SPI and umockdev, the bench, and the traps](references/system-monitor-overview-presets.md).
 
 ## Colour vision: the one switch, and contrast fixed for everyone

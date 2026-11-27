@@ -35,7 +35,8 @@ for i in $(seq 100); do [ -S "$XDG_RUNTIME_DIR/sm" ] && break; sleep 0.1; done
 under ksystemstats --remain > "$CASE/ksystemstats.log" 2>&1 & ks=$!
 for i in $(seq 100); do gdbus call --session -d org.freedesktop.DBus -o /org/freedesktop/DBus -m org.freedesktop.DBus.NameHasOwner org.kde.ksystemstats1 2>/dev/null | grep -q true && break; sleep 0.1; done
 sleep 2
-kstatsviewer --list 2>/dev/null | grep -E '^(gpu|memory|cpu/(all|cpu[0-9]+)/usage)' > "$CASE/sensors.txt"
+kstatsviewer --list 2>/dev/null > "$CASE/sensors-all.txt"
+grep -E '^(gpu|memory|cpu/(all|cpu[0-9]+)/usage)' "$CASE/sensors-all.txt" > "$CASE/sensors.txt"
 ids=$(grep -o -E '^gpu/gpu[0-9]+/(name|usage|usedVram|totalVram|temperature|power1?)\b' "$CASE/sensors.txt" | sort -u)
 [ -n "$ids" ] && timeout 8 kstatsviewer --details $ids > "$CASE/sensor-values.txt" 2>/dev/null
 [ -n "${SEED:-}" ] && bash "$SEED" > "$CASE/seed.log" 2>&1
@@ -44,8 +45,16 @@ if [ "${HOOK:-1}" = 1 ]; then
 	under $EXPLAIN_CMD > "$CASE/explain.txt" 2>&1
 	under $HOOK_CMD >> "$CASE/hook.txt" 2>&1; echo "hook exit $?" >> "$CASE/hook.txt"
 fi
+# POST_HOOK: a script run as the person after the hook (the title measurement shows every preset in the sidebar)
+[ -n "${POST_HOOK:-}" ] && bash "$POST_HOOK" > "$CASE/post-hook.log" 2>&1
+# FONT_PT: the person's general font size, as a fresh account made from SparkyLinux's /etc/skel/.config/kdeglobals has it
+# (Noto Sans 11; KDE's own default is 10)
+[ -n "${FONT_PT:-}" ] && kwriteconfig6 --file kdeglobals --group General --key font "Noto Sans,${FONT_PT},-1,5,50,0,0,0,0,0"
 for n in $(seq "${STARTS:-1}"); do
 	S=$CASE/start$n; mkdir -p "$S"
+	# LOAD=N: N busy loops while System Monitor starts and is read (the station was loaded so when 0.1.0's thread grid
+	# showed one name twice; the container's --cpus bounds them)
+	busy=""; for i in $(seq "${LOAD:-0}"); do sh -c 'while :; do :; done' & busy="$busy $!"; done
 	WAYLAND_DISPLAY=sm QT_QPA_PLATFORM=wayland XDG_CURRENT_DESKTOP=KDE KDE_FULL_SESSION=true KDE_SESSION_VERSION=6 \
 		QT_QUICK_CONTROLS_STYLE=org.kde.desktop QT_LINUX_ACCESSIBILITY_ALWAYS_ON=1 LIBGL_ALWAYS_SOFTWARE=1 \
 		setsid plasma-systemmonitor ${APP_ARGS:-} > "$S/app.log" 2>&1 & app=$!
@@ -57,6 +66,9 @@ for n in $(seq "${STARTS:-1}"); do
 	# which ksystemstats served the page: every process, whether umockdev is preloaded in it, gpu0's name now
 	for p in $(ps -eo pid,comm | awk '$2=="ksystemstats" {print $1}'); do echo "pid $p ppid $(ps -o ppid= -p $p) umockdev $(tr '\0' '\n' < /proc/$p/environ 2>/dev/null | grep -c umockdev)"; done > "$S/ksystemstats-ps.txt"
 	timeout 4 kstatsviewer gpu/gpu0/name >> "$S/ksystemstats-ps.txt" 2>/dev/null
+	[ -n "$busy" ] && kill $busy 2>/dev/null
+	# each card's name as System Monitor shows it (the Name sensor's value: nvidia-smi's name for an NVIDIA card)
+	for g in $(grep -o -E '^gpu/gpu[0-9]+ ' "$CASE/sensors.txt"); do timeout 4 kstatsviewer "$g/name"; done > "$S/card-names.txt" 2>/dev/null
 	[ -n "${ACT:-}" ] && [ "$n" = 1 ] && { case "$ACT" in *.sh) bash "$ACT" "$S" ;; *) python3 "$ACT" "$S" ;; esac > "$S/act.txt" 2>&1; sleep 2; }
 	kill -TERM "$app" 2>/dev/null; wait "$app" 2>/dev/null
 	cp "$HOME/.config/systemmonitorrc" "$S/systemmonitorrc" 2>/dev/null

@@ -347,7 +347,7 @@ When the paused reader's socket queue filled, the serial log ended partway throu
 Preserve the VM while replacing an expired observer and resume reading the serial socket.
 Wait for the guest exit marker, then verify sync and unmount before extracting the closure.
 A successor whose `debian/control` is unchanged does not need a new SDK download: unpack the verified SDK image (`debugfs -R "rdump / DIR"`), replace its source kit and its previous package, rescan the pool with `dpkg-scanpackages --multiversion`, sign a fresh `InRelease` with a one-day key and make the image again; check first that the two sources' `control` files are identical.
-On a loaded station (load about 25 on 12 threads) with four threads, the configure stage took 38 minutes, the cross-compiled objects 8 minutes and the native package with its archive check 72 minutes.
+With four threads on a shared station, two runs of the same recipe took 38 and 17 minutes for the configure stage, 8 minutes each for the cross-compiled objects and 72 and 99 minutes for the native package with its archive check.
 
 ### Diagnose the stock phone start
 

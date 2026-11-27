@@ -3,15 +3,14 @@ metadata:
   requires-packages: plasma-desktop
 name: kde-desktop-defaults
 description: >-
-  The edition's Plasma defaults and small KDE patches: KRunner search order, currency rates, tasks, Ctrl+Alt+Del to
-  System Monitor and Ctrl+Alt+Esc to log out, frozen-window recovery, formatting a removable drive and scripts in
-  Dolphin, the look package (cursor names, wallpaper, lock screen, splash, video wallpaper), Discover's AppStream
-  cache, /etc/xdg files, the KScreen KCM, a built-in panel's first scale, tablet mode, the first run in KDE's Welcome
-  Center (Plasma Welcome pages). Load it when a default should be decided instead of left to the person, a shortcut
-  clashes, a lock screen shows only its wallpaper, a cursor theme name does not exist, a widget shows zero not an
-  error, a video wallpaper keeps the old clip, a notebook starts at 100 %, a convertible or a Fcitx 5 session shows
-  no on-screen keyboard, two first-run windows open, a webcam has no page, colours collapse for colour
-  vision, a text fails contrast, or a KDE patch needs CI.
+  Plasma defaults and small KDE patches: KRunner search and currency rates, task management, Ctrl+Alt+Del,
+  Ctrl+Alt+Esc, Leave's one-time UEFI restart, frozen-window recovery, Dolphin drive formatting and scripts,
+  cursor themes, wallpapers, lock and splash screens, Discover's AppStream cache, /etc/xdg, first scale on
+  built-in panels, tablet mode, Fcitx 5, KDE Welcome and account defaults. Load it when a default needs a
+  decision, a shortcut clashes, a firmware restart action is absent or refused, a lock screen shows only
+  its wallpaper, a video wallpaper keeps the old clip, an applet reports zero without an error, a notebook
+  starts at the wrong scale, two Welcome windows open, a webcam needs a page, colour vision or contrast
+  needs checking, or a KDE patch needs CI.
 ---
 
 # KDE desktop defaults
@@ -26,6 +25,13 @@ description: >-
 Written on 2026-10-10 from the accepted Plasma 6.7.4 work; published on 2026-10-23; the principle behind the defaults added on 2026-11-02.
 Check the edition's current package versions and KDE release before carrying these changes.
 The general [`sparky-stereo`](../sparky-stereo/SKILL.md) skill comes first; packages follow [`edition-packaging`](../edition-packaging/SKILL.md), and build storage [`system-housekeeping`](../system-housekeeping/SKILL.md).
+
+## Restart to UEFI setup from Leave
+
+On a UEFI machine, read login1's capability for the active desktop user.
+The Leave screen offers the firmware action when that reply is `yes` and the session can restart.
+Kickoff and KRunner open the same explicit confirmation.
+[The package paths, virtual firmware reboot, authorization denial, and hardware proof with the current boot preserved](references/firmware-restart.md).
 
 ## A program sent to a GPU that dies at start
 

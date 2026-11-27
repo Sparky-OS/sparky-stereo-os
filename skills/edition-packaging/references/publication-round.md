@@ -1040,6 +1040,34 @@ Check the successor's source and development package as well as the new runtime 
 Rebuild the owning edition source with its existing patches and let the shlibs machinery emit the rebuilt binary's dependencies.
 Compare all output binaries with their predecessors, retain the whole source closure and Lean Code evidence, and repeat the exact install and live full upgrade before the round takes it.
 
+### An architecture-independent data package overrides a native cohort
+
+- **Symptom.** Exact Debian Kirigami dependencies fail on arm64 after the edition adds `libkirigami-data`. KRDC fails with the same data mismatch.
+- **Cause.** The edition's data at priority 1001 outranks the Debian data required by the only native libraries on arm64.
+- **Fix.** Regenerate `sparky-stereo-only-ours` with `make-only-ours.py` from the candidate's architecture indexes. Use the generated architecture selectors to prefer edition data where its native binaries ship. Check the preferences extracted from the resulting package against the preferences used in the proof. Take an architecture-specific successor with its own complete source closure and preserve another architecture's existing source closure if that binary is still taken.
+- **How found.** On 27 November 2026, exact APT simulations using the same signed public indexes passed 30 of 32 arm64 requests with the regenerated pin, including all 27 Kirigami regressions. Both exact edition amd64 controls also passed. A metadata model of a matching arm64 edition build passed 16 of the 32 exact requests and left Debian's exact Kirigami requests blocked. The model measured version selection without compiling an arm64 binary.
+
+### Foreign test packages and LLVM OpenCL twins
+
+- **Symptom.** `libglib2.0-tests:i386` fails in an amd64 universe, or APT rejects an amd64 plus i386 pair of `mesa-opencl-icd` at identical versions.
+- **Cause.** The GLib tests pull in the Python D-Bus stack, whose amd64 and i386 packages conflict. The two Mesa ICDs pull in conflicting `libclang-cpp21` packages.
+- **Fix.** Ask for the GLib test package in a native i386 universe and each OpenCL ICD on its own. Check the supported paths that use foreign-architecture packages and their dependencies. The checker retains the failing solve and marks it designed only for the named conflict. An individual install failure or a twin at mismatched versions still needs its own repair.
+- **How found.** On 27 November 2026, the native GLib i386 simulation and the separate ICD requests passed. The archive's reverse dependencies and the Steam, Wine32, DXVK Wine32 and Lutris simulations showed no dependency on the two OpenCL ICDs together. The i386 GLib build recipe states which libraries those gaming routes need.
+
+### A legacy NVIDIA package resolves only after the hardware setup's policy transaction
+
+- **Symptom.** The base profile cannot satisfy the EGL epoch on NVIDIA 580. A CUDA profile can still select the 615 dependencies.
+- **Cause.** The base omits NVIDIA's archive. The general CUDA profile loads the open-driver lock and the CUDA repository, and the 580 route adds a separate lock ahead of the open lock.
+- **Fix.** Read the exact legacy lock package and replay each rejected exact-version request with both preferences files active. For the legacy DKMS request, also check that APT selects the edition's matching `nvidia-kernel-support`. Count a failure as designed only after that exact solve passes.
+- **How found.** The NVIDIA Hardware Setup performs the lock and archive installation before the driver transaction. The round's 27 November 2026 controls selected NVIDIA's EGL packages at `1:1.0.6-1` and the edition's 580 kernel support with the legacy lock active.
+
+### A runtime transition changes the generated dependency name
+
+- **Symptom.** The installed edition's ananicy-cpp still requires `libspdlog1.15-fmt11` after testing replaces the provider.
+- **Cause.** The old binary carries the dependency chosen by shlibs at build time. The new Debian package `libspdlog1.17` provides the fmt-specific dependency `libspdlog1.17-fmt12`.
+- **Fix.** Rebuild with today's development packages and the source's existing recipe. Inspect the emitted `Depends` with `dpkg-deb -f` and the binary's `NEEDED` entries with `readelf -d`. Supply the recipe's signed Lean archive configuration and each edition-only dependency as a checked sibling for the link gate.
+- **How found.** The exact archived package failed under APT. The 27 November 2026 rebuild linked `libspdlog.so.1.17` and `libfmt.so.12`, and the rebuilt archive and its companions passed the Lean release and signed-archive link checks.
+
 ### The Lean gate over a whole pool, and an accepted package without the mark
 - **Symptom:** `python3 -m lean.release check-debs POOL/*.deb` stops with `No such file or directory: .../usr/share/dpkg-stereo/lc/NAME-dbgsym/amd64.json`; given only the primaries it stops with `matching HR documentation package is missing`.
 - **Cause:** the first stop came from an accepted Debian-source rebuild (anacron `2.3-52+stereo3d1`) that never went through Lean Code: no `Sparky-Lean-Code` field, no `-lc-hr` companion, no `+lc1`; the second is the gate's own rule, a marked package must be given with its HR companion.

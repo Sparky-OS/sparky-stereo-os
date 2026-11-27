@@ -40,3 +40,55 @@ It shows, in today's browsers and on the edition, what a "spatial browser" is sa
 ## Licences to read before a figure ships
 
 A free figure is not a free licence. CGTrader's Royalty Free licence (section 20.5) belongs only to whoever downloaded the model and cannot be transferred; 21A.2 and 21A.3 allow a game or a virtual world to carry it in its own format with extraction prevented. Renderpeople's terms (4.2 b, 4.3 b) forbid passing on the 3D data or data based on it, and making it available as individual files. Keep such a figure out of the repository and let the publisher download it under their own licence ([reading a marketplace's licence](reading-an-asset-marketplace-licence.md)).
+
+## Publishing under an Apache path
+
+1. Keep one machine-readable list of full base URLs for the world, authorization provider, archive, WebAuthn, member door, services and intranet.
+   The rig can keep its reserved `.test` names.
+   A service on a Pages project has a path as part of its base address.
+   Use that path to resolve its page and assets, and use the URL's origin alone for `postMessage`.
+   Use one site per service, all distinct from the world's site, when demonstrating process isolation.
+2. Allow the world origin in each service's receiver, and require the sender to be its parent frame.
+   Read the same address file next to each service module.
+   Install the message listener synchronously and let the handler await the address.
+   This works even when the world sends its first message from the iframe's load handler.
+3. Put the OAuth and WebAuthn endpoints behind an HTTPS reverse proxy scoped to the demo path.
+   Use the full authorization provider base URL in discovery and ID token issuer validation.
+   Use the world's HTTPS origin as WebAuthn's expected origin and its hostname as the relying party ID.
+   Serve the provider and the archive on loopback and test the exact Node version the host uses.
+   The test service holds the signing key and grants in memory and has no real accounts.
+4. Make Apache authorize the member door's path before forwarding the client status.
+   Install a dedicated test CA for this demonstration and offer a shared PKCS#12 client identity to visitors.
+   Keep its signing key out of the release.
+   Run `apache2ctl configtest` before reloading, then test the static site, both client-certificate controls and the undo.
+   Location-level client authentication depends on TLS renegotiation or, in TLS 1.3, post-handshake authentication. [Apache mod_ssl](https://httpd.apache.org/docs/2.4/mod/mod_ssl.html).
+5. Build the static release from a clean checkout with its nested imports, WebAssembly worker and every procedure the world fetches.
+   Generate the lobby QR from the configured world address.
+   Check the release hashes before installation and run the world against the public path in the fixture before publication.
+   Keep the browser evidence gathered from a loopback copy distinct from evidence gathered from an internet deployment.
+
+### Figures that can ship
+
+- Start from [the CC0 MakeHuman and MPFB core assets](https://www.makehumancommunity.org/about/license.html).
+  The [system asset pack](https://static.makehumancommunity.org/assets/assetpacks/makehuman_system_assets.html) supplies the clothes, hair, skin and eyes as well.
+  Change age, body proportions, build and outfit on the fitted model, rather than changing just the colour in the renderer.
+  Give the helper a single figure used only by that character and apply its approved material in the renderer.
+- Install MPFB as a local Blender extension, using `blender --command extension build --source-dir SOURCE` and `blender --command extension install-file -r user_default -e PACKAGE.zip`.
+  MPFB provides the assembled mesh and weights.
+  Evaluate the fitted mesh and the outfit's masks before drawing triangle-area weighted samples.
+  Interpolate normals, UVs and bone weights at each point, sample the diffuse texture, drop the transparent samples and quantize the four greatest weights to a sum of 255.
+- Download the individual original BVH files from [Ian Mason’s 100STYLE page](https://www.ianxmason.com/100style/), checked against the [dataset record](https://zenodo.org/records/8127870) for credit and CC BY 4.0.
+  Keep the first and last T-poses out of the playable loops.
+  Convert the BVH rotation order in source space, change to the rig's axes, apply the rotation to each target bone's rest transform, and recover parent-relative transforms per frame.
+  Retarget independently to each skeleton.
+  Keep raw root travel for the gait speed estimate and remove horizontal travel at playback.
+  Convert only the new figures and their motions to SPLT and ANIM for redistribution.
+
+### Deployment traps
+
+- **Symptom:** the message probe times out and a service never connects. **Cause:** top-level await on address fetching lets the iframe fire load before its listener exists. **Fix:** register the listener first and await configuration in the callback. **Found by:** the first transfer before the fix timed out; all 21 rig rows passed after it.
+- **Symptom:** a client can load the world, but the initial texture says HTTP 404. **Cause:** the worker was present in the release and the texture catalogue still pointed to a sibling demo for its four shared procedures. **Fix:** stage those procedures with the published worker and resolve them under the same demo path. **Found by:** the world's normal browser boot, after the HTTP route smoke passed.
+- **Symptom:** the installer exits, then undo says another deployment is running. **Cause:** a locally launched daemon inherited the advisory lock file descriptor. **Fix:** close it when invoking service starts and reloads. **Found by:** the real Apache fixture with a foreground container supervisor.
+- **Symptom:** MPFB raises "The package does not name an extension" when imported from a source checkout. **Cause:** its user storage uses Blender's extension repository API. **Fix:** build and install the source as a local extension and load its package from the extension repository. **Found by:** Blender 4.5 background builds.
+- **Symptom:** a path-level client certificate gets an HTTP error or a TLS alert. **Cause:** the path is known after the first TLS handshake. **Evidence:** Apache 2.4 on Bookworm accepted the same test identity over TLS 1.2 and TLS 1.3 with curl and refused the request without a certificate. Use a browser-specific positive control before giving the route to visitors.
+- **Symptom:** an ImageBitmap or OffscreenCanvas transfer fires `messageerror` in the other site's Gecko process. **Fix:** show the error and send camera frames as bytes in an ArrayBuffer over the existing MessagePort. **Found by:** the echo probe and the camera frame counter.

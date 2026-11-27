@@ -173,3 +173,20 @@ Traps:
   **Fix:** `dpkg-stereo --deep --verify NAME`, as the console's tests write it; a check on the exit status also requires the summary line (`^dpkg-stereo: `), so a refused run cannot pass. **How found:** the first run of ucf-test.sh's U4: the two `GONE` rows failed, and the FAIL lines showed the usage text.
 
 An lc1 package's conffile that Lean Code does not project (it has no comments to remove: the console's `/etc/motd`, `/etc/skel/.selected_editor`) is named only by `--verify --deep` (`AFTERINST`), which needs that package's .deb (APT's cache first); with no network and no cached .deb the row is `NODEB`. A projected one (`/etc/skel/.bash_aliases`) is named by `--verify` itself (`LCCHANGED`).
+
+## Diversions in the link and start gate
+
+`lean/archive.py` reads the authenticated preinst. It authorizes a redirection only for the three exact forms below. Each uses `/bin/sh`, `set -e`, an install-or-upgrade guard and `exit 0`.
+
+- A loop over literal absolute paths. Each path receives the same literal suffix.
+- Consecutive commands with literal source and destination paths. A preceding `mkdir -p` may create the exact destination parent.
+- A literal path assigned to one variable, a `dpkg-divert --listpackage` read into `before`, a diversion with a literal suffix and a guarded move of the pending `.dpkg-new` to that suffix's `.dpkg-new`. The guard tests for an empty `before`, an existing source and an absent destination.
+
+The archive's package name must equal the package named by the diversion. The result binds that package, source, destination, archive hash and preinst hash.
+The owning package's data goes to the diverted name. The declaring package's data can occupy the original name.
+The gate assembles data from archives and has no pending dpkg conffile state, so the last form requires only the static mapping.
+An unmodelled preinst grants no redirection and its reason appears in `diversions.json`. The usual path and collision checks apply to every package.
+
+When another form is needed, retain the exact archived preinst in the tests. Compare the root assembled in both archive orders with a separate `dpkg-divert --root SCRATCH` oracle. Assert the link target and both payloads. Include near-miss scripts that vary the variable, moved path, suffix or owner, or insert a command. The parser must refuse them.
+
+**Trap.** A valid pending-conffile script could make the data-only gate fail at the boot symlink while dpkg installed both copies. Reading `diversions.json` and the authenticated boot 0.1.16 preinst found the unsupported command sequence. A two-archive real dpkg unpack and the oracle fixed the expected file layout. Add the bounded form to the parser and run `PYTHONPATH=sparky-os python3 -m lean.release check-diversions POOL` before the long gate. A payload overlap or unresolved addition in an unmodelled script fails the pre-check. See the [small round check](../../edition-packaging/references/publication-round.md#prepare-both-link-gate-views-and-check-a-small-cohort).

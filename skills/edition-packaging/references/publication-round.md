@@ -945,7 +945,10 @@ Keep the signed public index bytes unchanged, update the private local URI/list 
    A prior round's exported `archive-view.json` gives the evidence identities for reconstructing a context.
    The retained-context loader reads `metadata.json`, checks the signed indexes again and uses those bytes to solve.
    Put one official argument per line in the round's link argument file and check that its paths agree with the source and context files before handing it back.
-4. Run the gate from the frozen build commit on the changed native binary identities and their exact HR companions.
+4. Run `PYTHONPATH=sparky-os python3 -m lean.release check-diversions POOL` from the frozen build checkout.
+   Keep its report with the round. A refusal names the archive, the unsupported preinst and the payload paths at risk.
+   Inspect additions with unresolved source paths before proceeding.
+5. Run the gate from the frozen build commit on the changed native binary identities and their exact HR companions.
    Give it the complete applicable sibling list from each candidate and published index so each target can solve against its own edition.
    Copy the tested packages by reading the files and verify the copies against the index.
    Sign the disposable subset with a throwaway key and keep it outside the public source lists so predecessor qualification can check for candidate contamination.
@@ -966,13 +969,14 @@ Traps met while preparing the views:
   Generate it beside the tree, move it into place and sign it there.
   For a cleartext signature use a real output path with `sqv` and check the signed Packages hash and size.
   The comparison of generated and verified Release fields exposed the self-entry and a final line-ending difference.
-- **A data-only root reports a conffile collision.** The gate recognized neither the local variable nor the pending-conffile move in the boot package's diversion preinst.
-  It reported the collision between the Debian conffile and the edition symlink while assembling the desktop meta's filesystem.
-  Reproduce the gate error with the two exact archives and compare a fresh `dpkg --unpack` in a disposable container.
-  Read the actual diversion and hash both conffiles, including any `.dpkg-new` names while the packages are unpacked.
-  The real unpack kept both exact conffiles and installed the intended symlink.
-  Record the gate refusal as an unmodeled diversion before choosing a supported representation and rerunning the gate.
-  Keep the gate's collision checks and the fresh dpkg control together.
+- **A data-only root reports a conffile collision.** The `sparky-stereo` desktop meta's gate run exposed a collision between the Debian conffile and the edition symlink at `/etc/initramfs-tools/update-initramfs.conf`.
+  The exact boot preinst used a literal variable and moved the owning package's pending `.dpkg-new`. The parser supported only the literal loop and direct commands at the time.
+  A disposable two-archive `dpkg --unpack` established the diversion, the symlink and both retained conffile hashes.
+  Keep the measured package script and extend the gate with the exact script form and a [dpkg-divert oracle test](../../lean-code/references/diverted-files.md#diversions-in-the-link-and-start-gate).
+- **An unmodelled preinst may still ship the source name.** The link gate originally found the collision only when assembling the large meta root.
+  Comparing each unmodelled script's diversion sources with its data members identified the collision risk in seconds.
+  Run `check-diversions` before starting the long gate. The command records modelled and unmodelled scripts with reasons and exits nonzero on payload overlap or an unresolved addition.
+  An unmodelled script gains no filesystem operation from this check. The qualified link run still checks collisions in each assembled root.
 
 ### Zero removals and a caller's shell mode
 

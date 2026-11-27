@@ -96,3 +96,11 @@ The result informs the edition's optional kernel choice and leaves its boot defa
   **Cause.** The inhibitor's exit value did not propagate the child runner's failure.
   **Fix.** In the inhibited process, record the worker's actual status. Require it and the completed workload receipts before a boot transition.
   **How found.** A terminated worker left the wrapper with status zero. A wrong-kernel trial proved the explicit child-status check rejects the mismatch.
+- **Symptom.** APT says “Unable to fetch some archives” for two verified files passed as local paths with `--no-download`.
+  **Cause.** That option also prevents APT from acquiring the local archives.
+  **Fix.** Simulate the exact pair with APT and confirm the plan has no additional packages or removals. Verify the hashes, then use `dpkg -i` on the local files.
+  **How found.** The APT attempt left both packages absent. The direct install completed the two packages and the six DKMS builds with status zero.
+- **Symptom.** A remote smoke check prints `modinfo: command not found` followed by a missing-module message.
+  **Cause.** The SSH user's PATH excludes the directory containing kmod's administrative commands. The check incorrectly treated a tool failure as absent output.
+  **Fix.** Verify the absolute kmod command paths before the boot transition. Collect `dkms status`, module files with signer and vermagic, and native `/proc/modules` after explicit loads. Preserve the original tool error as its own outcome.
+  **How found.** After the RT run, the captured native module list already showed three of the six DKMS sources loaded. The absolute `modinfo` command verified all 15 RT module files from the fallback kernel.

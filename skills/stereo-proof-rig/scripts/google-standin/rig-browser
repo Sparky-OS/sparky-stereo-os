@@ -1,0 +1,6 @@
+#!/bin/sh
+# rig-browser URL: the stand-in browser of the row 299 rig. It does what a person's browser does after the person agrees on
+# Google's consent page: it requests the URL and follows the redirect to DriveSync's loopback address, once.
+log=${RIG_BROWSER_LOG:-$HOME/rig-browser.log}
+printf '%s %s\n' "$(date +%s.%N)" "$1" >> "$log"
+curl -sS --max-redirs 1 -L -o /dev/null -w '%{http_code} %{url_effective}\n' "$1" >> "$log" 2>&1

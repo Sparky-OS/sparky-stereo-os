@@ -69,6 +69,7 @@ Sparky Welcome's own first run is skipped by a unit condition there, and every o
 - [Desktop shortcuts](references/desktop-shortcuts.md): KDE's Trash and the classic Microsoft My Documents label for the home folder, account state, existing accounts and preserved removals.
 - [Copy notifications](references/copy-notifications.md): the owning package, running-job popup timing, tray retention and personal overrides.
 - [Online Accounts and secrets](references/online-accounts-and-secrets.md): provider and consumer inventory, wallet ownership, local account fixtures and PIM credential paths.
+- [A GTK program at home in KDE](../edition-packaging/references/a-gtk-rust-program-at-home-in-kde.md): a StatusNotifierItem and its dbusmenu from GIO alone, notifications Plasma files under the program's desktop entry, a Places entry written into `user-places.xbel` on request, a metered connection read from GLib's network monitor, KDE Wallet unlocked as pam_kwallet does in a rig (DriveSync, row 299).
 - [Displayed release name](references/display-release-name.md): display-only os-release reading and the pinned SparkyLinux tools.
 
 ## The Camera page

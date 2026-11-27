@@ -341,6 +341,10 @@ Keep the descriptor and its source members once for both architectures.
 The TCG guest can take more than three hours to run the archive checks for the candidate and predecessor.
 Give the native observer time for both checks and record the guest command's exit status separately from the observer's status.
 The lane's native launcher exposes `PM124_GUEST_BUILD_TIMEOUT` for this deadline.
+Keep a reader attached to the guest serial socket during the build.
+When the paused reader's socket queue filled, the serial log ended partway through the `dpkg-genbuildinfo` line even though the archive check had passed.
+Preserve the VM while replacing an expired observer and resume reading the serial socket.
+Wait for the guest exit marker, then verify sync and unmount before extracting the closure.
 
 ### Diagnose the stock phone start
 

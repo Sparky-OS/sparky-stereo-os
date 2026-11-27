@@ -35,7 +35,8 @@ apt-get -y update > /logs/update2.txt 2>&1
 PKGS="kwin-wayland plasma-workspace plasma-desktop kactivitymanagerd sparky-stereo-look plasma-theme-oxygen libkf6config-bin libkscreen-bin qdbus-qt6 dbus-bin dbus-daemon dbus-x11 python3-gi gir1.2-glib-2.0 python3-numpy python3-pil wayland-utils xwayland libstereo-declare1 qml6-module-qtquick fonts-dejavu-core locales ${EXTRA_PACKAGES:-}"
 apt-get -y -o Acquire::Retries=5 dist-upgrade > /logs/dist-upgrade.txt 2>&1
 apt-get -y -o Acquire::Retries=5 --no-install-recommends install $PKGS > /logs/install.txt 2>&1 || { tail -30 /logs/install.txt; exit 1; }
-if [ -d /extra ]; then apt-get -s --no-install-recommends install /extra/*.deb > /logs/extra-simulate.txt 2>&1; apt-get -y --no-install-recommends install /extra/*.deb > /logs/extra.txt 2>&1 || { tail -30 /logs/extra.txt; exit 1; }; fi
+# a base image made by this script keeps an empty /extra mount point: install only when debs are there
+if ls /extra/*.deb > /dev/null 2>&1; then apt-get -s --no-install-recommends install /extra/*.deb > /logs/extra-simulate.txt 2>&1; apt-get -y --no-install-recommends install /extra/*.deb > /logs/extra.txt 2>&1 || { tail -30 /logs/extra.txt; exit 1; }; fi
 useradd -m -u 1000 -s /bin/bash person 2>/dev/null || true
 dpkg-query -W -f "\${Package} \${Version}\n" > /logs/packages.txt
 apt-get clean; rm -rf /var/lib/apt/lists/*

@@ -1005,6 +1005,38 @@ The whole-pool rerun must provision the same original when that bootstrap versio
 ### An index-only candidate tree for check-installable.py
 `check-installable.py --unsigned` reads only `dists/` and simulates, so a preparation without a signed tree can give it one: the published binary indexes with each pool binary replacing the record of the same Package and Architecture, and a Release that keeps the published Origin, Label and Codename (a few lines of Python; row 933 kept one beside its report).
 
+### Compare the candidate with the published tree
+
+Run `check-installable.py` in report mode on both trees with the same APT version, engines, profiles and public archives.
+Verify the published tree's signatures and let each tree supply its own shipped pins.
+Keep the two metadata files, the per-profile solver logs and the signed public `InRelease` and `Packages` files.
+Compare public index hashes **per profile** before attributing a difference to the candidate.
+If an archive moves, replay each tree against the same authenticated external indexes for attribution and record a fresh live qualification separately.
+
+Join `installable.tsv` by package, architecture and profile, keeping both exact edition versions and the dependency path.
+Read the twin rows by package and profile and read collateral rows by origin, package, exact external version, architecture and profile.
+A candidate-only report row can be a new package or a new query selected by the checker's policy search.
+Run the exact published-side query when an absent row leaves the old solve unclear.
+Keep solver and static results together and use APT's actual simulation as the installability verdict.
+An inherited failure still needs its owning fix before publication.
+
+- **The same URLs and suite names can yield different package sets.** Debian testing refreshed between profiles in one candidate run.
+  Reading the signed release dates and recorded hashes showed that base used the previous day's testing release while NVIDIA and arm64 used the next release.
+  Authenticate each retained release with its public key and check the signed size and hash of each Packages file against the recorded profile.
+  Simulate with the same public files and the published edition's own signed indexes and pins.
+- **A CUDA consumer can fail without the vendor archive and install with it.** The two solver profiles differed, and the pinned firmware and CUDA runtime appeared in the vendor Packages index.
+  The ISO installs `sparky-stereo-cuda-repo` before reading the vendor archive and Hardware Setup installs it with the selected driver lock.
+  Cite those paths and retain the solver result using the shipped archive and pins.
+  For the legacy NVIDIA branch, apply its active preferences before the solve. Asking APT to install a lock package in a simulation does not load the package's preferences.
+- **The first profile can spend minutes indexing before it runs an install simulation.** The static checker was walking thousands of literal package selectors for every external package.
+  Timing the original and indexed matchers over the same 900 Debian entries with the published pins produced identical decisions and cut that step from 3.244 seconds to 0.026 seconds.
+  The indexed matcher preserves pin-record order and keeps the existing glob and regular expression matcher. APT still runs every requested simulation.
+
+When Debian replaces a shared-library package, read the first hard dependency the solver cannot satisfy and identify its new provider from today's signed index.
+Check the successor's source and development package as well as the new runtime name.
+Rebuild the owning edition source with its existing patches and let the shlibs machinery emit the rebuilt binary's dependencies.
+Compare all output binaries with their predecessors, retain the whole source closure and Lean Code evidence, and repeat the exact install and live full upgrade before the round takes it.
+
 ### The Lean gate over a whole pool, and an accepted package without the mark
 - **Symptom:** `python3 -m lean.release check-debs POOL/*.deb` stops with `No such file or directory: .../usr/share/dpkg-stereo/lc/NAME-dbgsym/amd64.json`; given only the primaries it stops with `matching HR documentation package is missing`.
 - **Cause:** the first stop came from an accepted Debian-source rebuild (anacron `2.3-52+stereo3d1`) that never went through Lean Code: no `Sparky-Lean-Code` field, no `-lc-hr` companion, no `+lc1`; the second is the gate's own rule, a marked package must be given with its HR companion.

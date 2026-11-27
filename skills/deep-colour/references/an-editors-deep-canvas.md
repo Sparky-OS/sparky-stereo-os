@@ -68,7 +68,7 @@ Development build (GTK and GIMP from the lane's trees, the GTK proof aid for "re
 | 16 bit stereo, the preference off, output in 3D | | declared 3, no XB48 | 1 per eye, eyes in order |
 
 Red rows, each failing as it should: the 16 bit frame judged as if KWin had shown the written values (white 1.0 wanted, 0.5806 there), the PQ canvas judged as if its values were shown as they are (0.5806 wanted, 0.5171 there), the left eye judged for the right eye's tag, milestone 2's GIMP for more than 6 values and for an XB48 buffer.
-The installed packages (gimp 3.2.8-1+stereo3d3+lc1 and gtk+3.0 3.24.52-3+stereo3d2+lc1 installed by apt into the rig image) give the same numbers in every row: 58 rows in 11 minutes (2026-11-27 02:18 to 02:29 UTC, load 21 to 30), "where rendered" excepted (the proof aid is in the development GTK only), plus a row per 2D depth that nothing is declared for it.
+The installed packages (gimp 3.2.8-1+stereo3d3+lc1 and gtk+3.0 3.24.52-3+stereo3d2+lc1 installed by apt into the rig image) give the same numbers in every row: 57 rows in 10 to 11 minutes (2026-11-27 02:18 to 02:29 UTC, load 21 to 30), "where rendered" excepted (the proof aid is in the development GTK only), plus a row per 2D depth that nothing is declared for it.
 GIMP's own meson tests: 20 of 20 on the development build. GTK's `glarea`, `notify`, `defaultvalue` and `objects-finalize` pass.
 
 ## Traps

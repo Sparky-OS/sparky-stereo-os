@@ -83,6 +83,7 @@ As in the general skill, plus the geometry:
 5. **Measured limits, written down:** Marble's perspective eyes see a slightly off-centre globe disc that the texture mapper still clips at a circle, about 0.3 px at the default separation; a known limit is stated with its number, not hidden.
 
 A static Web of Worlds demo can give three.js the published procedural player’s RGB output and enter the browser’s own WebXR session. The [working recipe for procedural surfaces and WebXR](references/web-of-worlds-procedural-surfaces.md) also covers plain Blender exports, asset licences, pixel equality and a headless walk.
+The same world with people as Gaussian splats, a held tablet showing other origins, services composed by the visitor across origins and keys with real mechanisms is [a web world the person composes](references/web-of-worlds-composed.md), with the browser's immersive zero-parallax plane read from its eye matrices.
 
 ## An X3D scene in the browser
 

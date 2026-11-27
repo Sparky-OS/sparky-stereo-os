@@ -86,6 +86,7 @@ What it means for the edition, from Epic's FAQ and the edition's kernel:
   Epic's FAQ allows exactly that: "You can maintain a separate boot entry with the required kernel and command line, and select that entry when you want to play a protected game."
 - A game started without the requirements shows an error; Epic says the account is not banned for it.
 - The Steam Deck does not meet the requirements yet, by Epic's FAQ.
+- The edition's separate entry and what a machine lacks: [an anti-cheat ready start](../drivers/references/anti-cheat-ready-boot.md) (`sparky-stereo-boot anticheat-check`).
 
 ## Proof
 

@@ -82,6 +82,8 @@ The client's `WAYLAND_DEBUG` log carries the chain: `kde_stereo_depth_v1.depth_s
 
 For the second milestone, rerun the reference-output cases and take two more measurements. A virtual display with a known physical size must show the element limit multiplied by its own factor, with a red control on +69/+25. A single directional override must move the in-front marker without altering the behind marker. Set the control through the installed KCM and compare the saved setting with the wire and the measured desk. On a published system, simulate installing Qt alone with KWin +70 available and check that apt selects KWin for Qt +26. The older Qt is the control. For Words use two pages, a scrolled and a background case, and a 2D capture compared to Debian's Words.
 
+On the 1920-wide reference output with `ElementLimit=6`, the installed Words desk measured −6 px and both papers measured 0 px. Debian's desk measured 0 px. After scrolling, the paper edge met the toolbar at column 572 in both eyes. In a background window, both pages, the desk and the title bar shared the window's −2 px shift. The 2D control matched Debian in every pixel.
+
 ## Traps
 
 - **Symptom:** Words paints the paper and desk correctly but a stock desk has no horizontal mark to measure. **Cause:** the desk between the pages is a single palette color. **Fix:** the rig supplies a patterned brush through its test style on `KWCanvas`. The ordinary `eraseRect()` draws it, and the same style runs on Debian's Words and the edition build. **Found by:** the two-page Debian capture showed a uniform gap between the pages.

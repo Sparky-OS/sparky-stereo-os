@@ -1756,3 +1756,11 @@ The simulation of colour vision deficiencies by Gustavo M. Machado, Manuel M. Ol
 - **xfade-easing** (MIT): Raymond Luckhurst (Scriptit UK), whose easing and extended transitions deb-multimedia carries and the edition keeps.
 - **HandBrake** (GPL-2.0): Damiano Galassi, John Stebbins, galinart, hnsteyding and cubicibo for the FFmpeg fixes HandBrake 1.11.2 carries, imported into the edition's FFmpeg.
 - **x264** (Loren Merritt, Fiona Glaser and contributors), **x265** (the MulticoreWare x265 contributors) and **Fraunhofer FDK AAC** (Fraunhofer IIS) for the libraries of the cohort.
+
+## System Monitor's Overview fitted to the computer (queue row 182)
+
+- **The page format and the program**: KDE's System Monitor, [plasma-systemmonitor](https://invent.kde.org/plasma/plasma-systemmonitor), by Arjen Hiemstra, David Redondo and the KDE contributors; its page manager, page files and Edit Pages dialog are what the presets of `sparky-stereo-systemmonitor` are written for, unchanged. Packaged in Debian by the Debian Qt/KDE Maintainers.
+- **The sensors**: [ksystemstats](https://invent.kde.org/plasma/ksystemstats), whose GPU plugin is by Arjen Hiemstra and David Redondo (the AMD and Intel backends), with David Edmundson (the nvidia-smi process), Amir Maimon (more AMD sensors), Bernhard Friedreich (the cards' names) and Michael Bauer (more than one card), among the plugin's contributors in its history; and [libksysguard](https://invent.kde.org/plasma/libksysguard), the faces and the sysfs and lm-sensors sensors, by Arjen Hiemstra and the KDE contributors. The probe reads the same facts ksystemstats 6.7.4 reads, as its code reads them.
+- **The words KDE already translated** (CPU, Memory, Swap, Disks, Networks, Applications, Overview, the sensor names and System Monitor's name) are KDE's translation teams' own, taken from plasma-systemmonitor 6.7.4 and ksystemstats 6.7.4.
+- **lm-sensors' libsensors** (Frodo Looijaard, Merlin Hughes and the lm-sensors contributors), through which ksystemstats reads the amdgpu hwmon.
+- **The proof**: [umockdev](https://github.com/martinpitt/umockdev) (Martin Pitt; Canonical Ltd.) records and replays a machine's sysfs for ksystemstats; AT-SPI (the GNOME accessibility stack, at-spi2-core) reads System Monitor's labels; KWin's fake input protocol drives the dialog the accessibility tree does not show.

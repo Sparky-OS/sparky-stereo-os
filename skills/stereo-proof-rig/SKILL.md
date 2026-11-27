@@ -252,6 +252,8 @@ The same login with `DESKTOP_PROBE=/rig-scripts/translucency-probe/probe.sh` cap
 
 [A guest on the host's own kernel](scripts/kernel-guest/README.md) (QEMU with KVM, the rig image as its root, an overlay per run, ssh by stdin) is for a proof that needs a real kernel under the session: uhid and hid-input, udev, UPower and PowerDevil beside a plasmashell, as in the headset's battery proof (ORDER 700); nothing of the station's `/sys` or devices is touched.
 
+[System Monitor in the rig](scripts/system-monitor/README.md) runs a real plasma-systemmonitor with the session's own ksystemstats on the host's sysfs or on a recorded machine (umockdev), reads every label through AT-SPI's GObject bindings, drives Edit Pages by fake input where AT-SPI does not reach, and gives each row a verdict against expectations written from the recordings (queue row 182).
+
 [A session's start order](references/session-start-order.md) shows how to replay a login in the real order (KWin with the person's saved screen order and focus settings, plasmashell with its desktop windows, then an autostart program before any pointer motion), how to log activations and the active output from KWin's first moment, and the trap where the first Plasma desktop window takes the active output from the main screen, so new windows and password prompts open on the wrong screen after a login.
 
 [A panel applet's pop-up over the panel](references/panel-applet-popup.md) opens the volume applet's pop-up by fake input in a real plasmashell with PipeWire's null sink inside the container, pins it, and measures its disparity, its border from the output's edges and its overlap with the panel in both eyes against a pop-up-only reference made with opacity.

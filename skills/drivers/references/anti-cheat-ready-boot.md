@@ -62,6 +62,8 @@ The rules follow Bazzite's `ujust check-anticheat` (Universal Blue; Ted O'Hayer 
 - IOMMU: `-machine q35,kernel-irqchip=split -device intel-iommu,intremap=on`; the usual start leaves it off (no `intel_iommu=on`), the anti-cheat start turns it on.
 - The published round and the stage as read-only 9p shares; the serial console through a chardev with a `logfile`, so every boot's GRUB and kernel lines are kept.
 - BIOS row: the same disk under SeaBIOS (no `-drive if=pflash`).
+- The guest is Debian's nocloud image with the round added, not an installed edition: its Qt, KScreen and FFmpeg are Debian's, so a settling `full-upgrade` removes edition packages that pin the edition's builds (libstereo-layer1, libstereo-av1, sparky-stereo-graphics). Judge the plan of the staged packages alone (`apt-get -s install` of them, `Remv` lines), and never full-upgrade the guest.
+- After a hibernation and a good resume (same boot id, a witness unit alive), this QEMU and OVMF guest wedged once and reset itself once within about a minute, with no kernel message; the first time on a build without the resume unit. Read every reading of a resume at once, and do not take a later reset for the package's fault without a control.
 
 ## Measured (2026-11-27)
 

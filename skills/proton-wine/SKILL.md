@@ -1,15 +1,15 @@
 ---
 metadata:
-  requires-packages: wine64 | libwine | dxvk-wine64
+  requires-packages: wine64 | libwine | dxvk-wine64 | steam-installer
 name: proton-wine
 description: >-
-  Windows programs through Wine, Proton, DXVK and gamescope: identify the runtime libraries in use
-  (a DXVK DLL's PE debug CRC), the chain from Direct3D to Vulkan to Stereo KWin, the stereo DXVK fork, wiz3D and the
+  Wine, Proton, DXVK, gamescope and Steam Linux Runtime: DLL provenance
+  (PE debug CRC), the chain from Direct3D to Vulkan to Stereo KWin, the stereo DXVK fork, wiz3D and the
   stereo Lutris build, StereoPhoto Maker under Wine, a WoW64 prefix and 16-bit programs, start Steam in the person's
   session environment (XDG_RUNTIME_DIR, wayland-0, pipewire-0), game-specific proof, Easy Anti-Cheat Linux v2
   requirements (Secure Boot, TPM 2.0, measured boot, IOMMU, lockdown). Load it when a game shows one eye or picks its
   own 3D output format, Wine prints Present returned status 1000001003, krnl386.exe16 failed to initialize, wineserver
-  is not found, Wine menus come out flat, a wiz3D game quits after a second, Steam started from a script sees no
+  is not found, Wine menus come out flat, a wiz3D game quits after a second, pressure-vessel loses a layer or GL preload fails, Steam sees no
   display, DXVK resizes wrongly on the first frame, or an anti-cheat refuses the system.
 ---
 
@@ -20,6 +20,7 @@ description: >-
 1. Record game, Wine/Proton, DXVK and runtime versions and the libraries actually loaded; select injector, VR or native-pair input.
 2. Use a fixed scene and private prefix. Check both eye images, UI, resize and restoration after exit; compare stereo off.
 3. Return captures, declaration and runtime evidence. A source route or launcher option does not qualify every game in that family.
+4. For the Steam container, start with a login-free runtime archive. Check the imported graphics provider, loader and declaration as in [graphics inside pressure-vessel](references/steam-runtime-graphics.md).
 
 **Check freshness first.**
 Written on 2026-10-07; much of this layer is planned, and each item says whether it is done.

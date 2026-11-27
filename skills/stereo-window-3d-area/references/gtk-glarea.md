@@ -292,6 +292,7 @@ Traps:
 - **KWin lists no half float `wl_shm` format** (6.7.4: ARGB/XRGB8888, the 2101010 four, ABGR/XBGR16161616, BGR888, RGB888): a half float picture on a software renderer has no way to KWin. The area says so; a program steps down to 16 bit integer.
 - **XRGB8888 is `wl_shm` format 1, not a fourcc.** wl_shm's codes are drm_fourcc.h's except ARGB8888 (0) and XRGB8888 (1).
 - **A failed dma-buf export can leave its EGL image behind.** The memory way destroys it before making its own buffer.
+- **(packaging) the successor forgot the predecessor's build profile.** Symptom: the +stereo3d2 build compiled and packed everything, then stopped in the link gate: "libgtk-3-0-udeb : Depends: fontconfig-udeb (>= 2.17.1) but it is not installable" and twenty more udebs. Cause: +stereo3d1 was built with `DEB_BUILD_PROFILES=noudeb` (its build-in-container.sh: Debian-Installer's GTK, unused by Calamares, cannot share a link-gate root with the debs, since libc6-udeb and libc6 ship the same files), and the successor's build.sh, written for `release/build-from-lc-dsc.sh`, did not pass `SPARKY_DEB_BUILD_PROFILES=noudeb`. Fix: the successor's build.sh passes it, with the reason. Found from the gate's solve log; the predecessor's buildinfo records `DEB_BUILD_PROFILES="noudeb"`. Read the predecessor's buildinfo before writing a successor's build call.
 
 ### X11: the two ways, timed
 

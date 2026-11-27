@@ -80,6 +80,16 @@ Command paths, DLLs and state should come from the packages on both runs.
   Check that Wine loads `d3d9_real.dll` and `S3DWrapperD3D9.dll`, the swapchain doubles its width and one full side-by-side declaration appears.
   After exit check that the previous D3D9 entry is restored.
 
+### Check the round's screensaver packages
+
+Check the release candidate's gl-stereo closure and the Screensavers page's Depends and Breaks before preparing a successor.
+Round 933 already carried gl-stereo 0.4.6 and a Screensavers page that requires gl-stereo-savers 0.4.6 or newer.
+The page's `sparky-saver-preview` helper takes its preload environment from the installed saver catalogue.
+Check the two entries in each catalogue preload as well as the pair from `gl-stereo-run`.
+Run the installed helper with `--size 320x180 --separation 2 gears FRAME_FD` on the page's Unix packet socket.
+Read and acknowledge a sealed 640×180 frame with different left and right images.
+Repeat with `deco` for a sealed 320×180 single view, and close stdin to check the preview stops.
+
 ## Test an i386 D3D9 program
 
 Use a disposable Wine prefix under the shared home, an existing PE32 D3D9 fixture that calls `CreateDevice`, `Clear` and `Present`, and private Xvfb with continuous root properties.

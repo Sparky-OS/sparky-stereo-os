@@ -1005,6 +1005,76 @@ The whole-pool rerun must provision the same original when that bootstrap versio
 ### An index-only candidate tree for check-installable.py
 `check-installable.py --unsigned` reads only `dists/` and simulates, so a preparation without a signed tree can give it one: the published binary indexes with each pool binary replacing the record of the same Package and Architecture, and a Release that keeps the published Origin, Label and Codename (a few lines of Python; row 933 kept one beside its report).
 
+### Compare the candidate with the published tree
+
+Run `check-installable.py` in report mode on both trees with the same APT version, engines, profiles and public archives.
+Verify the published tree's signatures and let each tree supply its own shipped pins.
+Keep the two metadata files, the per-profile solver logs and the signed public `InRelease` and `Packages` files.
+Compare public index hashes **per profile** before attributing a difference to the candidate.
+If an archive moves, replay each tree against the same authenticated external indexes for attribution and record a fresh live qualification separately.
+
+Join `installable.tsv` by package, architecture and profile, keeping both exact edition versions and the dependency path.
+Read the twin rows by package and profile and read collateral rows by origin, package, exact external version, architecture and profile.
+A candidate-only report row can be a new package or a new query selected by the checker's policy search.
+Run the exact published-side query when an absent row leaves the old solve unclear.
+Keep solver and static results together and use APT's actual simulation as the installability verdict.
+An inherited failure still needs its owning fix before publication.
+
+- **The same URLs and suite names can yield different package sets.** Debian testing refreshed between profiles in one candidate run.
+  Reading the signed release dates and recorded hashes showed that base used the previous day's testing release while NVIDIA and arm64 used the next release.
+  Authenticate each retained release with its public key and check the signed size and hash of each Packages file against the recorded profile.
+  Simulate with the same public files and the published edition's own signed indexes and pins.
+- **A CUDA consumer can fail without the vendor archive and install with it.** The two solver profiles differed, and the pinned firmware and CUDA runtime appeared in the vendor Packages index.
+  The ISO installs `sparky-stereo-cuda-repo` before reading the vendor archive and Hardware Setup installs it with the selected driver lock.
+  Cite those paths and retain the solver result using the shipped archive and pins.
+  For the legacy NVIDIA branch, apply its active preferences before the solve. Asking APT to install a lock package in a simulation does not load the package's preferences.
+- **The first profile can spend minutes indexing before it runs an install simulation.** The static checker was walking thousands of literal package selectors for every external package.
+  Timing the original and indexed matchers over the same 900 Debian entries with the published pins produced identical decisions and cut that step from 3.244 seconds to 0.026 seconds.
+  The indexed matcher preserves pin-record order and keeps the existing glob and regular expression matcher. APT still runs every requested simulation.
+- **A collateral row can say the candidate is from another archive even when the edition introduced the failure.** The report attributes only the direct exact relations that triggered the query.
+  Exact-version APT simulations passed on the published tree for 29 candidate-only arm64 rows. The candidate's full solver paths led to the newly preferred edition Kirigami data package in 27 of them.
+  Compare the exact target and read the full conflicting assignments before attributing the failure. If two archives offer the same package and architecture, preserve a separate exact-version solver log for each.
+
+When Debian replaces a shared-library package, read the first hard dependency the solver cannot satisfy and identify its new provider from today's signed index.
+Check the successor's source and development package as well as the new runtime name.
+Rebuild the owning edition source with its existing patches and let the shlibs machinery emit the rebuilt binary's dependencies.
+Compare all output binaries with their predecessors, retain the whole source closure and Lean Code evidence, and repeat the exact install and live full upgrade before the round takes it.
+
+### An architecture-independent data package overrides a native cohort
+
+- **Symptom.** Exact Debian Kirigami dependencies fail on arm64 after the edition adds `libkirigami-data`. KRDC fails with the same data mismatch.
+- **Cause.** The edition's data at priority 1001 outranks the Debian data required by the only native libraries on arm64.
+- **Fix.** Regenerate `sparky-stereo-only-ours` with `make-only-ours.py` from the candidate's architecture indexes. Use the generated architecture selectors to prefer edition data where its native binaries ship. Check the preferences extracted from the resulting package against the preferences used in the proof. Take an architecture-specific successor with its own complete source closure and preserve another architecture's existing source closure if that binary is still taken.
+- **How found.** On 27 November 2026, exact APT simulations using the same signed public indexes passed 30 of 32 arm64 requests with the regenerated pin, including all 27 Kirigami regressions. Both exact edition amd64 controls also passed. A metadata model of a matching arm64 edition build passed 16 of the 32 exact requests and left Debian's exact Kirigami requests blocked. The model measured version selection without compiling an arm64 binary.
+
+### Foreign test packages and LLVM OpenCL twins
+
+- **Symptom.** `libglib2.0-tests:i386` fails in an amd64 universe, or APT rejects an amd64 plus i386 pair of `mesa-opencl-icd` at identical versions.
+- **Cause.** The GLib tests pull in the Python D-Bus stack, whose amd64 and i386 packages conflict. The two Mesa ICDs pull in conflicting `libclang-cpp21` packages.
+- **Fix.** Ask for the GLib test package in a native i386 universe and each OpenCL ICD on its own. Check the supported paths that use foreign-architecture packages and their dependencies. The checker retains the failing solve and marks it designed only for the named conflict. An individual install failure or a twin at mismatched versions still needs its own repair.
+- **How found.** On 27 November 2026, the native GLib i386 simulation and the separate ICD requests passed. The archive's reverse dependencies and the Steam, Wine32, DXVK Wine32 and Lutris simulations showed no dependency on the two OpenCL ICDs together. The i386 GLib build recipe states which libraries those gaming routes need.
+
+### A legacy NVIDIA package resolves only after the hardware setup's policy transaction
+
+- **Symptom.** The base profile cannot satisfy the EGL epoch on NVIDIA 580. A CUDA profile can still select the 615 dependencies.
+- **Cause.** The base omits NVIDIA's archive. The general CUDA profile loads the open-driver lock and the CUDA repository, and the 580 route adds a separate lock ahead of the open lock.
+- **Fix.** Read the exact legacy lock package and replay each rejected exact-version request with both preferences files active. For the legacy DKMS request, also check that APT selects the edition's matching `nvidia-kernel-support`. Count a failure as designed only after that exact solve passes.
+- **How found.** The NVIDIA Hardware Setup performs the lock and archive installation before the driver transaction. The round's 27 November 2026 controls selected NVIDIA's EGL packages at `1:1.0.6-1` and the edition's 580 kernel support with the legacy lock active.
+
+### A runtime transition changes the generated dependency name
+
+- **Symptom.** The installed edition's ananicy-cpp still requires `libspdlog1.15-fmt11` after testing replaces the provider.
+- **Cause.** The old binary carries the dependency chosen by shlibs at build time. The new Debian package `libspdlog1.17` provides the fmt-specific dependency `libspdlog1.17-fmt12`.
+- **Fix.** Rebuild with today's development packages and the source's existing recipe. Inspect the emitted `Depends` with `dpkg-deb -f` and the binary's `NEEDED` entries with `readelf -d`. Supply the recipe's signed Lean archive configuration and each edition-only dependency as a checked sibling for the link gate.
+- **How found.** The exact archived package failed under APT. The 27 November 2026 rebuild linked `libspdlog.so.1.17` and `libfmt.so.12`, and the rebuilt archive and its companions passed the Lean release and signed-archive link checks.
+
+### A transition rebuild exposes an indirect linker dependency
+
+- **Symptom.** FreeCAD's `Import.so` fails to link with undefined TBB task group symbols while rebuilding for Debian's new MED library.
+- **Cause.** Open CASCADE's headers enable `HAVE_TBB`, so `ImportOCAF.cpp` calls TBB. The Import target's link command leaves out the public library that defines those calls.
+- **Fix.** Check the upstream file history and the known issue first. Declare the build dependency and link the specific Import target to `TBB::tbb`. Check the rebuilt module's `NEEDED` entries while retaining the undefined-symbol linker check.
+- **How found.** The failed link command showed `--no-undefined` and the Open CASCADE libraries without TBB. On 27 November 2026, the patched target linked and `readelf -d` showed `libtbb.so.12`. [FreeCAD issue 33573](https://github.com/FreeCAD/FreeCAD/issues/33573)
+
 ### The Lean gate over a whole pool, and an accepted package without the mark
 - **Symptom:** `python3 -m lean.release check-debs POOL/*.deb` stops with `No such file or directory: .../usr/share/dpkg-stereo/lc/NAME-dbgsym/amd64.json`; given only the primaries it stops with `matching HR documentation package is missing`.
 - **Cause:** the first stop came from an accepted Debian-source rebuild (anacron `2.3-52+stereo3d1`) that never went through Lean Code: no `Sparky-Lean-Code` field, no `-lc-hr` companion, no `+lc1`; the second is the gate's own rule, a marked package must be given with its HR companion.

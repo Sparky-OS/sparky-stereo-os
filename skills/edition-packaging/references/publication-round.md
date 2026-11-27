@@ -1068,6 +1068,13 @@ Compare all output binaries with their predecessors, retain the whole source clo
 - **Fix.** Rebuild with today's development packages and the source's existing recipe. Inspect the emitted `Depends` with `dpkg-deb -f` and the binary's `NEEDED` entries with `readelf -d`. Supply the recipe's signed Lean archive configuration and each edition-only dependency as a checked sibling for the link gate.
 - **How found.** The exact archived package failed under APT. The 27 November 2026 rebuild linked `libspdlog.so.1.17` and `libfmt.so.12`, and the rebuilt archive and its companions passed the Lean release and signed-archive link checks.
 
+### A transition rebuild exposes an indirect linker dependency
+
+- **Symptom.** FreeCAD's `Import.so` fails to link with undefined TBB task group symbols while rebuilding for Debian's new MED library.
+- **Cause.** Open CASCADE's headers enable `HAVE_TBB`, so `ImportOCAF.cpp` calls TBB. The Import target's link command leaves out the public library that defines those calls.
+- **Fix.** Check the upstream file history and the known issue first. Declare the build dependency and link the specific Import target to `TBB::tbb`. Check the rebuilt module's `NEEDED` entries while retaining the undefined-symbol linker check.
+- **How found.** The failed link command showed `--no-undefined` and the Open CASCADE libraries without TBB. On 27 November 2026, the patched target linked and `readelf -d` showed `libtbb.so.12`. [FreeCAD issue 33573](https://github.com/FreeCAD/FreeCAD/issues/33573)
+
 ### The Lean gate over a whole pool, and an accepted package without the mark
 - **Symptom:** `python3 -m lean.release check-debs POOL/*.deb` stops with `No such file or directory: .../usr/share/dpkg-stereo/lc/NAME-dbgsym/amd64.json`; given only the primaries it stops with `matching HR documentation package is missing`.
 - **Cause:** the first stop came from an accepted Debian-source rebuild (anacron `2.3-52+stereo3d1`) that never went through Lean Code: no `Sparky-Lean-Code` field, no `-lc-hr` companion, no `+lc1`; the second is the gate's own rule, a marked package must be given with its HR companion.

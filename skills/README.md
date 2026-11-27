@@ -26,6 +26,7 @@ Core skills are `sparky-stereo`, `working-practices`, `ai-partners`, `making-ski
 | Colour precision or HDR metadata | [deep-colour](deep-colour/SKILL.md) |
 | Artwork, animated pairs or theme assets | [stereo-artwork](stereo-artwork/SKILL.md) |
 | A test on a real machine or 3D television: baselines, recovery with a person at the bench, power and UPS, unattended labs with LAVA or labgrid | [test-bench](test-bench/SKILL.md) |
+| Measure a PREEMPT_RT kernel against v3 for PipeWire playback, stereo video, Wayland presentation, cyclictest or CPU inference | [drivers](drivers/SKILL.md#keep-kernel-flavours-aligned) |
 | Proving compositor/application stereo, or why the two eyes differ; a showcase stereo screenshot | [stereo-proof-rig](stereo-proof-rig/SKILL.md) |
 | Orca, AT-SPI, slow keys or magnification in a stereo session | [stereo-proof-rig](stereo-proof-rig/references/accessibility-in-a-stereo-session.md) |
 | A 2D source copied onto a 3D target, a replica or a Catch phone monitor | [stereo-proof-rig](stereo-proof-rig/SKILL.md#a-2d-source-copied-onto-a-3d-target) |

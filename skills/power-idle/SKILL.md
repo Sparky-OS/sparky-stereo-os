@@ -9,7 +9,8 @@ description: >-
   attempt, a peripheral's battery in Plasma's list (UPower, uhid, PowerDevil's notice). Load it when the screen locks or sleeps against the person's setting, the lid
   closes and the TV goes dark, hibernate fails to resume, a zram package removes another package, the zram gate refuses a
   unit, the Memory page needs a swap indicator, a power profile is held by a program, Hibernate fails and the Problems
-  page only says the service failed, or a headset or mouse is missing from Power & Battery or the Info Centre's Energy page.
+  page only says the service failed, a headset or mouse is missing from Power & Battery or the Info Centre's Energy page,
+  CoreCtrl asks for a password at login, or the power profile and CoreCtrl or LACT write one governor or card level.
 ---
 
 # Power and idle in KDE
@@ -107,6 +108,11 @@ Check the installed libkf6idletime6 was rebuilt against the running Qt before re
 
 For game performance use PPD's `HoldProfile` through `powerprofilesctl launch`, so the daemon owns restoration, concurrent holds and disconnect cleanup.
 Test the child's actual profile, argument boundaries, failure status, signals and power-saver hold precedence; an argv-only stub is insufficient.
+## A tool that holds a power setting (CoreCtrl, LACT)
+
+`sparky-stereo-corectrl` makes a tool the person installs work in the edition: CoreCtrl's documented polkit rule as a vendor rule (no password at login for an administrator at a local, active seat0 session), CoreCtrl at login in the tray through its own setting (`TryExec` autostart, `/etc/xdg/corectrl/corectrl.ini`), and one writer per setting: while CoreCtrl or LACT holds the governor or an AMD card's power level (CoreCtrl: only the controls the profile it applies keeps on, "Do not control" being the daemons'), power-profiles-daemon's CPU drivers (`--block-driver`, a runtime drop-in) and its amdgpu_dpm action (`SetActionEnabled`) and tuned's cpu plugin (a runtime instance) stay off it, and the person is told once. The person's choice of amdgpu_dpm is kept against LACT, which turns the action off at every start of its daemon.
+The recipe (reading CoreCtrl's profile stack, telling LACT's change from the person's on the bus), the measured writes (red, green and released, by process), the polkit seat rule for tests and the traps (a `--block-action` saved as the person's "off", an ordering cycle that deletes a boot job, a unit's PrivateTmp hiding a person's folder, a monitor that must never send, tuned's instance API, bpftrace's attach time): [references/a-tool-that-holds-a-setting.md](references/a-tool-that-holds-a-setting.md).
+
 ## Memory and swap
 
 The edition keeps pages in RAM (swappiness 1) and swaps to the Cushion Swap File on disk. zram and zswap are never set up by the edition and never on by default, on any machine: nothing for them is installed or configured, and there is no rule that turns them on by hardware. A person who wants zram opts in from Stereo APTus (or the Memory page's shortcut to the same action), which installs Debian's systemd-zram-generator; no edition package Conflicts with or Breaks a zram package, so that choice stays theirs. The publication and image gate (iso-build/zram-check.py in the build repository) refuses any package or image of ours that sets zram or zswap up.

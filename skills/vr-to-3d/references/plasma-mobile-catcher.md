@@ -396,7 +396,7 @@ On Plasma Mobile the standard sensor service, iio-sensor-proxy 3.9, exposes acce
 ### Keep the phone's screen on
 
 A phone in a headset is never touched, and PowerDevil's defaults for a phone dim the screen after 60 seconds and turn it off after 120 seconds on battery (300 and 600 on mains; `daemon/powerdevilsettingsdefaults.cpp`).
-With the screen off, Catch received the first two frames of a Throw and then nothing more, and the PC's encoder stopped with them.
+A screen that dims or turns off during a Throw takes the picture from the person in the headset.
 The Android Flat Headset keeps its screen on (`FLAG_KEEP_SCREEN_ON` in `HeadsetPerformance.kt`, `StandaloneHeadsetActivity.kt` and `MovieActivity.kt`), so Catch does the same: it holds an `org.freedesktop.ScreenSaver` inhibition while it listens, receives or shows a sentence, and releases it when it stops.
 Plasma's screen locker passes that inhibition to PowerDevil's policy agent as "change screen settings" (kscreenlocker's `PowerInhibitor`), the policy that stops dimming and turning off the screen.
 When the phone refuses the inhibition, the window and the waiting scene say so and what to do.
@@ -405,7 +405,7 @@ When the phone refuses the inhibition, the window and the waiting scene say so a
 2. Green: during the same Throw the list names Catch with its reason, both eyes stay on the screen, and after Catch closes the inhibition is gone.
 3. What this rig cannot show: the emulated phone's screen did not go dark even with PowerDevil's screen-off set to 30 seconds (the `[AC][Display]`, `[Battery][Display]` and `[LowBattery][Display]` groups of the user's `powerdevilrc`, then `reparseConfiguration` and `refreshStatus` on `org.kde.Solid.PowerManagement`; `refreshStatus` alone does not read the file again), so the dark screen and its absence belong to a real phone.
 
-- **Open.** A row now and then stalls after the virtual output appears: the phone receives two H.264 frames, the PC's encoder logs nothing more (no "Pausing encoder" or "Late video frames" lines, which every passing row shows), and the phone keeps Catch's window. It came three times in ten runs, each time in the first Throw after the capability rows, with the phone's screen dark once and lit twice, so the screen is not its cause. The rig now keeps the PC's virtual output, the chart's log and the running chart and shell processes when it happens.
+- **Open.** A row now and then stalls after the virtual output appears: the phone receives two H.264 frames, the PC's encoder logs nothing more (no "Pausing encoder" or "Late video frames" lines, which every passing row shows), and the phone keeps Catch's window. It came three times in ten runs, each time in the first Throw after the capability rows, with the phone's screen dark once and lit twice, so the screen is not its cause. The rig now keeps the PC's virtual output, the chart's log and the running chart and shell processes when it happens. A later stop in the same row is not this stall: at a host load of 22 the phone received five frames, the encoder logged "Pausing encoder" and "Late video frames", and the next frame came 74 seconds later, the emulated phone falling behind.
 
 ### Make the row 927 red steady
 
